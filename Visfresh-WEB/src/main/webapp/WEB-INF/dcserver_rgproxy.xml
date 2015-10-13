@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no' ?>
+<!DOCTYPE DCServerConfig SYSTEM "dcservers.dtd" >
+
+<!-- 
+  =======================================================================================
+  GTS Enterprise Device Communication Server configuration file
+  Copyright 2007-2015 GeoTelematic Solutions, Inc.
+  =======================================================================================
+-->
+
+<DCServerConfig>
+
+    <!-- ================================================================================ -->
+    <DCServer name="rgproxy">
+    
+        <!--
+         === DCS Description
+         -->
+        <Description><![CDATA[
+            RegerseGeocode Proxy Cache
+            ]]></Description>
+
+        <!--
+         === Supported Device Models
+         -->
+        <ModelNames><![CDATA[
+            RGProxy
+            ]]></ModelNames>
+
+        <!--
+         === DCS Attributes
+         -->
+        <Attributes><![CDATA[
+            jarOptional=false
+            hasInputs=false
+            hasOutputs=false
+            transmitSms=false
+            transmitUdp=false
+            transmitTcp=true
+            transmitSat=false
+            commandSms=false
+            commandUdp=false
+            commandTcp=false
+            ]]></Attributes>
+            
+        <!-- 
+         === Listen ports
+         -->
+        <ListenPorts 
+            tcpPort="35001" 
+            />
+            
+        <!--
+         === DCS runtime properties
+         -->
+        <Properties>
+
+            <Property key="signatureKey"></Property>
+            <!--
+             === "signatureKey" - The key used to sign the incoming reverse-geocode 
+             === requests.  If specified, all incoming requests must be signed with
+             === this key.  A new key can be generated with the following command:
+             ===    java -jar build/lib/rgproxy.jar -signature
+             -->
+
+            <Property key="privateLabelName">default</Property>
+            <!-- Property key="privateLabelName">google</Property -->
+            <!--
+             === "privateLabelName" - The name of the PrivateLabel domain instance 
+             === that contains the ReverseGeocodeProvider to use.
+             -->
+
+            <Property key="maximumCacheSize">400000</Property>
+            <!--
+             === "cacheMaximumSize" - The maximum size of the cache buffer.
+             === Note that if "autoTrimIntervalSec" is used, this is only a hint and 
+             === the maximum cache size could grow beyond this limit while the next 
+             === periodic auto-trim is waiting to be executed.  The growth rate can 
+             === be approximated by the number of events arriving per second, times 
+             === the nunber of seconds specified by the "autoTrimIntervalSec" property.
+             === Initial approximate memory requirements:
+             ===    200000 => ~ 100Mb
+             ===    400000 => ~ 200Mb
+             ===    800000 => ~ 300Mb
+             -->
+
+            <Property key="maximumEntryAgeSec">86400</Property>
+            <!--
+             === "cacheMaximumAgeSec" - The maximum allowed age of an entry in the 
+             === cache (in seconds).  Entries older than this age will not be used 
+             === and will be purged from the cache.
+             ===    3600 =   60-minutes ( 1-hour )
+             ===    7200 =  120-minutes ( 2-hours)
+             ===   10800 =  180-minutes ( 3-hours)
+             ===   14400 =  240-minutes ( 4-hours)
+             ===   28800 =  480-minutes ( 8-hours)
+             ===   43200 =  720-minutes (12-hours)
+             ===   86400 = 1440-minutes (24-hours)
+             ===  172800 = 2880-minutes (48-hours)
+             ===  259200 = 4320-minutes (72-hours)
+             ===  345600 = 5760-minutes (96-hours)
+             -->
+
+            <Property key="autoTrimIntervalSec">300</Property>
+            <!--
+             === "autoTrimIntervalSec" - The cache will trimmed of aged and excessive 
+             === entries each time this interval (in seconds) expires.
+             ===     60  =    1-minute
+             ===    120  =    2-minutes
+             ===    180  =    3-minutes
+             ===    240  =    4-minutes
+             ===    300  =    5-minutes
+             ===    360  =    6-minutes
+             ===    420  =    7-minutes
+             ===    480  =    8-minutes
+             ===    540  =    9-minutes
+             ===    600  =   10-minutes
+             -->
+
+            <Property key="tcpIdleTimeoutMS">10000</Property>
+            <Property key="tcpPacketTimeoutMS">10000</Property>
+            <Property key="tcpSessionTimeoutMS">10000</Property>
+            <!-- 
+             === TCP Connection timeouts (1800000 ms == 30 minutes)
+             -->
+
+            </Properties>
+
+    </DCServer>
+
+</DCServerConfig>
+

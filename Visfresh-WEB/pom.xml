@@ -1,0 +1,198 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.visfresh</groupId>
+	<artifactId>web</artifactId>
+	<version>0.0.1</version>
+	<packaging>war</packaging>
+	<name>Visfresh WEB</name>
+
+	<properties>
+		<spring.version>4.1.4.RELEASE</spring.version>
+		<spring.security.version>3.2.5.RELEASE</spring.security.version>
+		<gtse.version>2.6.0</gtse.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>3.0-alpha-1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.24</version>
+		</dependency>
+
+		<!-- Spring WEB -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<!-- Spring JPA -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jpa</artifactId>
+			<version>2.0.8</version>
+		</dependency>
+
+		<!-- Spring secrurity -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+		
+		<!-- JSON -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</dependency>
+
+		<!-- GTSe -->
+		<dependency>
+			<groupId>org.opengts</groupId>
+			<artifactId>custom</artifactId>
+			<version>${gtse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opengts</groupId>
+			<artifactId>customtrack</artifactId>
+			<version>${gtse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opengts</groupId>
+			<artifactId>dmtpserv</artifactId>
+			<version>${gtse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opengts</groupId>
+			<artifactId>gtsdb</artifactId>
+			<version>${gtse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opengts</groupId>
+			<artifactId>gtsutils</artifactId>
+			<version>${gtse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opengts</groupId>
+			<artifactId>ruledb</artifactId>
+			<version>${gtse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opengts</groupId>
+			<artifactId>ruletrack</artifactId>
+			<version>${gtse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opengts</groupId>
+			<artifactId>track</artifactId>
+			<version>${gtse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opengts</groupId>
+			<artifactId>warmaps</artifactId>
+			<version>${gtse.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opengts</groupId>
+			<artifactId>wartools</artifactId>
+			<version>${gtse.version}</version>
+		</dependency>
+
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.12</version>
+		</dependency>
+
+		<!-- Tests -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>example-jetty-embedded</artifactId>
+			<version>9.2.13.v20150730</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.jetty.tests</groupId>
+					<artifactId>test-mock-resources</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>	
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<warName>web</warName>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>in-project</id>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+			<name>In Project Repo</name>
+			<url>file://${project.basedir}/lib</url>
+		</repository>
+	</repositories>
+</project>
