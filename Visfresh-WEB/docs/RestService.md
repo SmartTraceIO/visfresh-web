@@ -28,8 +28,8 @@ An authentication can be performed as from REST client using login method, as fr
 ## Rest Service methods.
 ### Authentication.
 Method *POST*, method name *'login'*, method parameters  
-*   login - user name of logged in user  
-*   password - password  
+1. login - user name of logged in user
+2. password - password
 
 are contained in [authentication request body](#markdown-header-authentication-request-body). Returns [Authentication token response](#markdown-header-authentication-token-response). [(example)](#markdown-header-authentication-request-example)  
 ### Get access token using existing GTS(e) session.###
