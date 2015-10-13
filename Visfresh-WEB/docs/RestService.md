@@ -7,7 +7,7 @@ The date should have following format `yyyy-MM-dd'T'HH:mm:ss.SSSZ` with RFC 822 
 The GET request parameters of URL link should be URL encoded to, but JSON body of request and response should be
 sent as is without URL encoding.  
 For all POST JSON requests the “Content-Type: application/json” HTTP header should be used.
-### Server [Responses](#response-message):
+### Server [Responses](#markdown-header-response-message):
 Each server response has structure:  
 `{`  
 ` "status": {`  
@@ -28,18 +28,18 @@ An authentication can be performed as from REST client using login method, as fr
 ## Rest Service methods.
 ### Authentication.
 Method *POST*, method name *'login'*, method parameters
- * login - user name of logged in user
- * password - password  
+* login - user name of logged in user
+* password - password  
 
-are contained in [authentication request body](#authentication-request-body). Returns [Authentication token response](#authentication-token-response). [(example)](#authentication-request-example)  
+are contained in [authentication request body](#markdown-header-authentication-request-body). Returns [Authentication token response](#markdown-header-authentication-token-response). [(example)](#markdown-header-authentication-request-example)  
 ### Get access token using existing GTS(e) session.###
 The user should be logged in to GTS(e). (not implemented now).
-Method *POST*, method name *getToken*, no parameters. In case of this request the service access a current user session, determines user info, log in as REST service user and returns authentication session. [(example)](#attach-to-existing-session-example)
+Method *POST*, method name *getToken*, no parameters. In case of this request the service access a current user session, determines user info, log in as REST service user and returns authentication session. [(example)](#markdown-header-attach-to-existing-session-example)
 
 ## Objects
 ### Response message ###
 `{`  
-` "status": ` [ResponseStatus](#response-status)`,`  
+` "status": ` [ResponseStatus](#markdown-header-response-status)`,`  
 `"response": {`  
 `"token": "token_100001",`  
 `"expired": "2015-09-30T01:19:56.060+0300"`  
