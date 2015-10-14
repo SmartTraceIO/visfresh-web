@@ -17,7 +17,7 @@ public class Arrival implements EntityWithId {
     /**
      * Number of meters of arrival
      */
-    private int numberOfMettersOfArrival;
+    private int numberOfMetersOfArrival;
     /**
      * Date of occurrence.
      */
@@ -35,16 +35,16 @@ public class Arrival implements EntityWithId {
     }
 
     /**
-     * @return the numberOfMettersOfArrival
+     * @return the numberOfMetersOfArrival
      */
     public int getNumberOfMettersOfArrival() {
-        return numberOfMettersOfArrival;
+        return numberOfMetersOfArrival;
     }
     /**
-     * @param numberOfMettersOfArrival the numberOfMettersOfArrival to set
+     * @param numberOfMetersOfArrival the numberOfMetersOfArrival to set
      */
-    public void setNumberOfMettersOfArrival(final int numberOfMettersOfArrival) {
-        this.numberOfMettersOfArrival = numberOfMettersOfArrival;
+    public void setNumberOfMettersOfArrival(final int numberOfMetersOfArrival) {
+        this.numberOfMetersOfArrival = numberOfMetersOfArrival;
     }
     /**
      * @return the date

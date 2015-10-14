@@ -397,7 +397,7 @@ public class JSonFactory {
         s.setPoNum(asString(json.get("poNum")));
         s.setShipmentDescriptionDate(asDate(json.get("shipmentDescriptionDate")));
         s.setCustomFields(asString(json.get("customFields")));
-        s.setStatus(ShipmentStatus.getByDisplayName(json.get("status").getAsString()));
+        s.setStatus(ShipmentStatus.valueOf(json.get("status").getAsString()));
 
         final JsonArray array = json.get("devices").getAsJsonArray();
         final int size = array.size();
@@ -423,7 +423,7 @@ public class JSonFactory {
         obj.addProperty("poNum", s.getPoNum());
         obj.addProperty("shipmentDescriptionDate", timeToString(s.getShipmentDescriptionDate()));
         obj.addProperty("customFields", s.getCustomFields());
-        obj.addProperty("status", s.getStatus().getDisplayName());
+        obj.addProperty("status", s.getStatus().name());
 
         final JsonArray array = new JsonArray();
         for (final Device t : s.getDevices()) {
@@ -513,7 +513,7 @@ public class JSonFactory {
         a.setDate(asDate(obj.get("date")));
         a.setDevice(resolveDevice(asString(obj.get("device"))));
         a.setId(asLong(obj.get("id")));
-        a.setNumberOfMettersOfArrival(asInt(obj.get("numberOfMettersOfArrival")));
+        a.setNumberOfMettersOfArrival(asInt(obj.get("numberOfMetersOfArrival")));
         return a;
     }
     /**
@@ -523,7 +523,7 @@ public class JSonFactory {
     public JsonObject toJson(final Arrival arrival) {
         final JsonObject json = new JsonObject();
         json.addProperty("id", arrival.getId());
-        json.addProperty("numberOfMettersOfArrival", arrival.getNumberOfMettersOfArrival());
+        json.addProperty("numberOfMetersOfArrival", arrival.getNumberOfMettersOfArrival());
         json.addProperty("date", timeToString(arrival.getDate()));
         json.addProperty("device", arrival.getDevice().getImei());
         return json;

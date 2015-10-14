@@ -54,7 +54,7 @@ public class RestServiceFacade implements ReferenceResolver {
     private URL serviceUrl;
     private String authToken;
 
-    private boolean isPrintEnabled = true;
+    private boolean isPrintEnabled = false;
 
     /**
      * Default constructor.
