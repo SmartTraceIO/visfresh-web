@@ -25,6 +25,21 @@ other code - is an error code. The list of possible error codes will determined 
 In case of error the “response” element of JSON response is absent.  
 ### Security methods.
 An authentication can be performed as from REST client using login method, as from GTSE page (Will implemented in future). If the GTSE authentication has done, then access token can be get by getToken method in some HTTP session. In this case the REST client will attached to REST service using existing GTSE session.
+## Data model##
+1. [Authentication token](#markdown-header-authentication-token-response)  
+2. [Alert Profile](#markdown-header-alert-profile)  
+3. [Notification Schedule](#markdown-header-notification-schedule)   
+4. [Location Profile](#markdown-header-location-profile)  
+5. [Shipment Template](#markdown-header-shipment-template)  
+6. [Device](#markdown-header-device)  
+7. [Shipment](#markdown-header-shipment)  
+8. [Notification](#markdown-header-notification)  
+9. [Alert](#markdown-header-alert)  
+10. [Temperature Alert](#markdown-header-temperature-alert)  
+11. [Arrival](#markdown-header-arrival)  
+12. [Shipment data](#markdown-header-shipment-data)  
+13. [Device Event](#markdown-header-device-event)  
+
 ## Rest Service methods.
 1. [Authentication](#markdown-header-authentication).  
 2. [Get access token using existing GTS(e) session.](#markdown-header-get-access-token-using-existing-gts-e-session)  
@@ -191,7 +206,7 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"watchEnterDarkEnvironment": true,`  
 `"watchShock": true`  
 `}`
-### Notification Schedule ##
+### Notification Schedule ###
 `{`  
 `"id:" 77`
 `"description": "JUnit schedule",`  
@@ -296,7 +311,7 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"type": "Arrival", // notification type (Alert|Arrival)`  
 `"issue":` [Ordinary Alert Object](#markdown-header-alert) ` or ` [Temperature Alert Object](#markdown-header-temperature-alert) ` or ` [Arrival Object](#markdown-header-arrival)  
 `}`
-## Alert ##
+### Alert ###
 `{`  
 `"description": "Battery Low alert",`  
 `"name": "Battery-1",`  
