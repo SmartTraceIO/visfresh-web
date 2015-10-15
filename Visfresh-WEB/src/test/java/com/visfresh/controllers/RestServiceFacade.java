@@ -568,15 +568,15 @@ public class RestServiceFacade implements ReferenceResolver {
      * @see com.visfresh.io.ReferenceResolver#getDevice(java.lang.String)
      */
     @Override
-    public Device getDevice(final String imei) {
-        if (imei == null) {
+    public Device getDevice(final String id) {
+        if (id == null) {
             return null;
         }
 
         try {
             final List<Device> Devices = getDevices();
             for (final Device t : Devices) {
-                if (imei.equals(t.getImei())) {
+                if (id.equals(t.getId())) {
                     return t;
                 }
             }

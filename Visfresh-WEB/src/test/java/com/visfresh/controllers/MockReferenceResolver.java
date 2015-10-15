@@ -57,8 +57,8 @@ public class MockReferenceResolver implements ReferenceResolver {
      * @see com.visfresh.controllers.ReferenceResolver#getDevice(java.lang.String)
      */
     @Override
-    public Device getDevice(final String imei) {
-        return devices.get(imei);
+    public Device getDevice(final String id) {
+        return devices.get(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.io.ReferenceResolver#getShipment(java.lang.Long)
@@ -69,7 +69,7 @@ public class MockReferenceResolver implements ReferenceResolver {
     }
 
     public void add(final Device t) {
-        devices.put(t.getImei(), t);
+        devices.put(t.getId(), t);
     }
     public void add(final LocationProfile p) {
         locationProfiles.put(p.getId(), p);

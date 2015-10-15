@@ -345,7 +345,7 @@ public class RestServiceControllerTest {
     public void testGetNotifications() throws IOException, RestServiceException {
         final Shipment s = saveShipment();
         //get server device
-        final Device d = service.devices.get(s.getDevices().get(0).getImei());
+        final Device d = service.devices.get(s.getDevices().get(0).getId());
 
         //create temperature alert notification
         final TemperatureAlert tempAlert = new TemperatureAlert();
@@ -410,7 +410,7 @@ public class RestServiceControllerTest {
     public void testMarkNotificationsAsRead() throws IOException, RestServiceException {
         final Shipment s = saveShipment();
         //get server device
-        final Device d = service.devices.get(s.getDevices().get(0).getImei());
+        final Device d = service.devices.get(s.getDevices().get(0).getId());
 
         //create temperature alert notification
         final TemperatureAlert tempAlert = new TemperatureAlert();
@@ -484,7 +484,7 @@ public class RestServiceControllerTest {
     public void testGetShipmentData() throws RestServiceException, IOException {
         final Shipment s = saveShipment();
         //get server device
-        final Device d = service.devices.get(s.getDevices().get(0).getImei());
+        final Device d = service.devices.get(s.getDevices().get(0).getId());
 
         //add tracker event.
         final TrackerEvent te = createEvent(TrackerEventType.AUT);
@@ -492,7 +492,7 @@ public class RestServiceControllerTest {
 
         final List<TrackerEvent> tes = new LinkedList<TrackerEvent>();
         tes.add(te);
-        service.trackerEvents.put(d.getImei(), tes);
+        service.trackerEvents.put(d.getId(), tes);
 
         //add alert
         final Alert a = createAlert(d, AlertType.BatteryLow);
@@ -549,6 +549,7 @@ public class RestServiceControllerTest {
         final Device t = new Device();
         t.setDescription("Device description");
         t.setImei(imei);
+        t.setId(imei);
         t.setName("Device Name");
         t.setSn("1");
         return t;

@@ -296,11 +296,13 @@ public class JSonFactoryTest extends TestCase {
     public void testDevice() {
         final String description = "Device description";
         final String imei = "018923475076";
+        final String id = "018923475076.123";
         final String name = "Device Name";
         final String sn = "938479";
 
         Device t = new Device();
         t.setDescription(description);
+        t.setId(id);
         t.setImei(imei);
         t.setName(name);
         t.setSn(sn);
@@ -309,6 +311,7 @@ public class JSonFactoryTest extends TestCase {
         t= factory.parseDevice(json);
 
         assertEquals(description, t.getDescription());
+        assertEquals(id, t.getId());
         assertEquals(imei, t.getImei());
         assertEquals(name, t.getName());
         assertEquals(sn, t.getSn());
@@ -617,6 +620,7 @@ public class JSonFactoryTest extends TestCase {
         final Device t = new Device();
         t.setDescription("Device description");
         t.setImei(imei);
+        t.setId(imei);
         t.setName("Device Name");
         t.setSn("1");
         resolver.add(t);

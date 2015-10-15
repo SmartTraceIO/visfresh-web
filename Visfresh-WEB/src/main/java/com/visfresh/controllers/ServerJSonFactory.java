@@ -38,10 +38,10 @@ public class ServerJSonFactory extends JSonFactory {
      * @see com.visfresh.io.JSonFactory#resolveDevice(java.lang.String)
      */
     @Override
-    protected Device resolveDevice(final String imei) {
-        final Device device = super.resolveDevice(imei);
+    protected Device resolveDevice(final String id) {
+        final Device device = super.resolveDevice(id);
         if (device == null) {
-            log.warn("Failed to resolve device: " + imei);
+            log.warn("Failed to resolve device: " + id);
         }
         return device;
     }

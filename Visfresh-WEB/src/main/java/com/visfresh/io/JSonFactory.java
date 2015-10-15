@@ -374,6 +374,7 @@ public class JSonFactory {
         final Device tr = new Device();
         tr.setSn(asString(json.get("sn")));
         tr.setImei(asString(json.get("imei")));
+        tr.setId(asString(json.get("id")));
         tr.setName(asString(json.get("name")));
         tr.setDescription(asString(json.get("description")));
         return tr;
@@ -385,6 +386,7 @@ public class JSonFactory {
     public JsonObject toJson(final Device d) {
         final JsonObject obj = new JsonObject();
         obj.addProperty("description", d.getDescription());
+        obj.addProperty("id", d.getId());
         obj.addProperty("imei", d.getImei());
         obj.addProperty("name", d.getName());
         obj.addProperty("sn", d.getSn());
@@ -403,8 +405,8 @@ public class JSonFactory {
         final JsonArray array = json.get("devices").getAsJsonArray();
         final int size = array.size();
         for (int i = 0; i < size; i++) {
-            final String imei = array.get(i).getAsString();
-            final Device t = resolveDevice(imei);
+            final String id = array.get(i).getAsString();
+            final Device t = resolveDevice(id);
             if (t != null) {
                 s.getDevices().add(t);
             }
@@ -428,7 +430,7 @@ public class JSonFactory {
 
         final JsonArray array = new JsonArray();
         for (final Device t : s.getDevices()) {
-            array.add(new JsonPrimitive(t.getImei()));
+            array.add(new JsonPrimitive(t.getId()));
         }
         obj.add("devices", array);
 
@@ -526,7 +528,7 @@ public class JSonFactory {
         json.addProperty("id", arrival.getId());
         json.addProperty("numberOfMetersOfArrival", arrival.getNumberOfMettersOfArrival());
         json.addProperty("date", timeToString(arrival.getDate()));
-        json.addProperty("device", arrival.getDevice().getImei());
+        json.addProperty("device", arrival.getDevice().getId());
         return json;
     }
     /**
@@ -571,7 +573,7 @@ public class JSonFactory {
         json.addProperty("name", alert.getName());
         json.addProperty("id", alert.getId());
         json.addProperty("date", timeToString(alert.getDate()));
-        json.addProperty("device", alert.getDevice().getImei());
+        json.addProperty("device", alert.getDevice().getId());
         json.addProperty("type", alert.getType().name());
 
         switch (alert.getType()) {
@@ -648,7 +650,7 @@ public class JSonFactory {
      */
     public JsonObject toJson(final DeviceData deviceData) {
         final JsonObject json = new JsonObject();
-        json.addProperty("device", deviceData.getDevice().getImei());
+        json.addProperty("device", deviceData.getDevice().getId());
 
         //add alerts
         JsonArray array = new JsonArray();
@@ -703,7 +705,7 @@ public class JSonFactory {
     }
     public JsonObject toJson(final DeviceCommand cmd) {
         final JsonObject obj = new JsonObject();
-        obj.addProperty("device", cmd.getDevice().getImei());
+        obj.addProperty("device", cmd.getDevice().getId());
         obj.addProperty("command", cmd.getCommand());
         return obj;
     }
@@ -742,11 +744,11 @@ public class JSonFactory {
         return id == null ? null : getReferenceResolver().getLocationProfile(id);
     }
     /**
-     * @param imei device IMEI code.
+     * @param id device ID.
      * @return device.
      */
-    protected Device resolveDevice(final String imei) {
-        return imei == null ? null : getReferenceResolver().getDevice(imei);
+    protected Device resolveDevice(final String id) {
+        return id == null ? null : getReferenceResolver().getDevice(id);
     }
     /**
      * @param id shipment ID.

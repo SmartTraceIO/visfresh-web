@@ -170,7 +170,7 @@ public class MockRestService implements RestService {
     @Override
     public void saveDevice(final Device device) {
         synchronized (devices) {
-            devices.put(device.getImei(), device);
+            devices.put(device.getId(), device);
         }
     }
     /* (non-Javadoc)
@@ -195,7 +195,7 @@ public class MockRestService implements RestService {
         //create device IMEI set
         final Set<String> devices = new HashSet<String>();
         for (final Device d : shipment.getDevices()) {
-            devices.add(d.getImei());
+            devices.add(d.getId());
         }
 
         final List<Notification> result = new LinkedList<Notification>(notifications.values());
@@ -240,7 +240,7 @@ public class MockRestService implements RestService {
 
         //add alerts
         for (final Alert a : new LinkedList<Alert>(alerts.values())) {
-            final String imei = a.getDevice().getImei();
+            final String imei = a.getDevice().getId();
 
             DeviceData data = deviceData.get(imei);
             if (data == null) {
@@ -268,7 +268,7 @@ public class MockRestService implements RestService {
             sd.setShipment(s);
 
             for (final Device d : s.getDevices()) {
-                final DeviceData dd = deviceData.get(d.getImei());
+                final DeviceData dd = deviceData.get(d.getId());
                 if (dd != null) {
                     sd.getDeviceData().add(dd);
                 }
@@ -306,7 +306,7 @@ public class MockRestService implements RestService {
      * @see com.visfresh.services.RestService#sendCommandToDevice(com.visfresh.entities.Device, java.lang.String)
      */
     @Override
-    public void sendCommandToDevice(DeviceCommand cmd) {
+    public void sendCommandToDevice(final DeviceCommand cmd) {
         // TODO Auto-generated method stub
     }
 
@@ -316,9 +316,9 @@ public class MockRestService implements RestService {
      * @return
      */
     private boolean isOwnArrival(final Shipment shipment, final Arrival issue) {
-        final String imei = issue.getDevice().getImei();
+        final String id = issue.getDevice().getId();
         for (final Device d : shipment.getDevices()) {
-            if (d.getImei().equals(imei)) {
+            if (d.getId().equals(id)) {
                 return true;
             }
         }
@@ -330,9 +330,9 @@ public class MockRestService implements RestService {
      * @return
      */
     private boolean isOwnAlert(final Shipment shipment, final Alert issue) {
-        final String imei = issue.getDevice().getImei();
+        final String id = issue.getDevice().getId();
         for (final Device d : shipment.getDevices()) {
-            if (d.getImei().equals(imei)) {
+            if (d.getId().equals(id)) {
                 return true;
             }
         }

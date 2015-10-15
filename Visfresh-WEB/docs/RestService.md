@@ -163,7 +163,7 @@ Returns array of [Shipment Data Objects](#markdown-header-shipment-data)
 [(example)](#markdown-header-get-shipment-data-example)
 
 ### Send Command to Device ###
-Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#markdown-header-device) IMEI and device specific command.  
+Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#markdown-header-device) ID and device specific command.  
 [(example)](#markdown-header-send-command-to-device-example)
 
 ## Objects
@@ -274,6 +274,7 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 ### Device ###
 `{`  
 `"description": "Device description",`  
+`"id": "1209898347987.123", // device ID`  
 `"imei": "1209898347987", // device IMEI`  
 `"name": "Device Name",`  
 `"sn": "1"`  
@@ -303,8 +304,8 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"customFields": "customFields", //reserved for user defined custom fields`  
 `"status": "Default", // shipment status one from (Default, InProgress, Complete, Pending)`  
 `"devices": [`  
-`"234908720394857", // IMEI of` [Device](#markdown-header-device)  
-`"329847983724987" // IMEI of` [Device](#markdown-header-device)  
+`"234908720394857.124", // ID of` [Device](#markdown-header-device)  
+`"329847983724987.124" // ID of` [Device](#markdown-header-device)  
 `]`  
 `}`
 ### Notification ###
@@ -319,7 +320,7 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"name": "Battery-1",`  
 `"id": 15,`  
 `"date": "2015-10-12T23:57:45.105+0300",`  
-`"device": "234908720394857", // IMEI of associated ` [Device](#markdown-header-device)  
+`"device": "234908720394857.123", // ID of associated ` [Device](#markdown-header-device)  
 `"type": "BatteryLow" // alert type: (EnterBrightEnvironment|EnterDarkEnvironment|Shock|BatteryLow)`  
 `}`
 ### Temperature Alert###
@@ -331,7 +332,7 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"name": "TempAlert-1",`  
 `"id": 13,`  
 `"date": "2015-10-12T23:57:45.104+0300",`  
-`"device": "234908720394857", // IMEI of associated ` [Device](#markdown-header-device)  
+`"device": "234908720394857.123", // ID of associated ` [Device](#markdown-header-device)  
 `"type": "HighTemperature" // alert type (LowTemperature|HighTemperature|CriticalLowTemperature|CriticalHighTemperature)`  
 `"temperature": 5.0, //temperature is Celsius degree`  
 `"minutes": 55 //number of minutes for this temperature`  
@@ -342,14 +343,14 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"id": 17,`  
 `"numberOfMetersOfArrival": 1500, //number of meters of arrival`    
 `"date": "2015-10-12T23:57:45.105+0300",`  
-`"device": "234908720394857" //IMEI of associated` [Device Object](#markdown-header-device)  
+`"device": "234908720394857.123" //ID of associated` [Device Object](#markdown-header-device)  
 `}`
 ### Shipment data ###
 `{`  
 `"shipment": 11, // ID of associated` [Shipment](#markdown-header-shipment)  
 `"data": [`  
 `{`  
-`"device": "234908720394857", // IMEI of` [Device](#markdown-header-device)
+`"device": "234908720394857.123", // ID of` [Device](#markdown-header-device)
 `"alerts": [], // array of` [Alert Objects](#markdown-header-alert)  
 `"events": [] // array of ` [Device Event Objects](#markdown-header-device-event)
 `}`  
@@ -718,6 +719,7 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 **Request body:**  
 `{`  
 `"description": "Device description",`  
+`"id": "1209898347987.123",`  
 `"imei": "1209898347987",`  
 `"name": "Device Name",`  
 `"sn": "1"`  
@@ -740,6 +742,7 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"response": [`  
 `{`  
 `"description": "Device description",`  
+`"id": "1209898347987.123",`  
 `"imei": "1209898347987",`  
 `"name": "Device Name",`  
 `"sn": "1"`  
@@ -769,8 +772,8 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"customFields": "customFields",`  
 `"status": "Default",`  
 `"devices": [`  
-`"234908720394857", //Device IMEI`  
-`"329847983724987"  //Device IMEI`  
+`"234908720394857.123", //Device ID`  
+`"329847983724987.123"  //Device ID`  
 `]`  
 `}`  
 `}`  
@@ -812,8 +815,8 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"customFields": "customFields",`  
 `"status": "Default",`  
 `"devices": [`  
-`"234908720394857", //Device IMEI`  
-`"329847983724987"  //Device IMEI`  
+`"234908720394857.123", //Device ID`  
+`"329847983724987.123"  //Device ID`  
 `]`  
 `}`  
 `]`  
