@@ -3,14 +3,23 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
+@Table(name="alertprofiles")
 public class AlertProfile implements EntityWithId {
     /**
      * ID in data base.
      */
+    @Id
+    @GeneratedValue
     private Long id;
     /**
      * Alert profile name.

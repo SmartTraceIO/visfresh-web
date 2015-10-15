@@ -3,15 +3,24 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
+@Table(name="notifications")
 public class Notification implements EntityWithId {
     /**
      * Notification ID.
      */
+    @Id
+    @GeneratedValue
     private Long id;
     /**
      * Notification type.

@@ -31,6 +31,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
@@ -39,7 +40,6 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
-import com.visfresh.io.DeviceCommand;
 import com.visfresh.io.JSonFactory;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -507,7 +507,7 @@ public class RestServiceController {
             checkAdmin(authToken);
 
             final DeviceCommand cmd = jsonFactory.parseDeviceCommand(getJSonObject(req));
-            restService.sendCommandToDevice(cmd.getDevice(), cmd.getCommand());
+            restService.sendCommandToDevice(cmd);
 
             return createSuccessResponse(null);
         } catch (final Exception e) {

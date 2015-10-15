@@ -6,12 +6,20 @@ package com.visfresh.entities;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+
 /**
  * Base class for Shipment templates and Shipments
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
+@Inheritance(strategy= InheritanceType.TABLE_PER_CLASS)
 public abstract class ShipmentBase implements EntityWithId {
+    @Id
     private Long id;
     private String name;
     private String shipmentDescription;

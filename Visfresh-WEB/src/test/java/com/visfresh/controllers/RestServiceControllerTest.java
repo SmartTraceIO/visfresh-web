@@ -3,14 +3,15 @@
  */
 package com.visfresh.controllers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -20,6 +21,11 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -51,20 +57,17 @@ import com.visfresh.services.RestServiceException;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class RestServiceControllerTest extends TestCase {
+public class RestServiceControllerTest {
     /**
      * WEB application context.
      */
     private static WebApplicationContext context;
     private static String url;
 
-    static {
-        init();
-    }
-
     private MockRestService service;
     private RestServiceFacade facade;
     private long lastLong;
+    private static Server server;
 
     /**
      * Default constructor.
@@ -72,14 +75,9 @@ public class RestServiceControllerTest extends TestCase {
     public RestServiceControllerTest() {
         super();
     }
-    /**
-     * @param name test case name.
-     */
-    public RestServiceControllerTest(final String name) {
-        super(name);
-    }
 
-    private static void init() {
+    @BeforeClass
+    public static void initStatics() {
         try {
             //configure servlet
             final ServletHolder holder = new ServletHolder();
@@ -115,7 +113,7 @@ public class RestServiceControllerTest extends TestCase {
 
             final QueuedThreadPool pool = new QueuedThreadPool();
             pool.setDaemon(true); // it allows the server to be stopped after tests finished
-            final Server server = new Server(pool);
+            server = new Server(pool);
 
             final ServerConnector connector=new ServerConnector(server);
             connector.setPort(port);
@@ -135,8 +133,8 @@ public class RestServiceControllerTest extends TestCase {
     /* (non-Javadoc)
      * @see junit.framework.TestCase#setUp()
      */
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         service = context.getBean(MockRestService.class);
 
         facade = new RestServiceFacade();
@@ -148,6 +146,7 @@ public class RestServiceControllerTest extends TestCase {
 
     //@RequestMapping(value = "/login", method = RequestMethod.POST)
     //public @ResponseBody String login(@RequestBody final String loginRequest) {
+    @Test
     public void testLogin() throws RestServiceException, IOException {
         final String token = facade.login("aldsklksadf", "lkasdlfkj");
         assertNotNull(token);
@@ -160,11 +159,13 @@ public class RestServiceControllerTest extends TestCase {
     }
     //@RequestMapping(value = "/logout/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String logout(@PathVariable final String authToken) {
+    @Test
     public void testLogout() throws RestServiceException, IOException {
         facade.logout(facade.getAuthToken());
     }
     //@RequestMapping(value = "/refreshToken/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String refreshToken(@PathVariable final String authToken) {
+    @Test
     public void testRefreshToken() throws IOException, RestServiceException {
         final String token = facade.refreshToken();
         facade.setAuthToken(token);
@@ -173,6 +174,7 @@ public class RestServiceControllerTest extends TestCase {
     //@RequestMapping(value = "/getUser/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getUser(@PathVariable final String authToken,
     //        final @RequestParam String username) {
+    @Test
     public void testGetUser() throws IOException, RestServiceException {
         final User user = facade.getUser("anylogin");
         assertNotNull(user);
@@ -180,6 +182,7 @@ public class RestServiceControllerTest extends TestCase {
     //@RequestMapping(value = "/saveAlertProfile/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveAlertProfile(@PathVariable final String authToken,
     //        final @RequestBody String alert) {
+    @Test
     public void testSaveAlertProfile() throws RestServiceException, IOException {
         final AlertProfile p = createAlertProfile();
         final Long id = facade.saveAlertProfile(p);
@@ -187,6 +190,7 @@ public class RestServiceControllerTest extends TestCase {
     }
     //@RequestMapping(value = "/getAlertProfiles/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getAlertProfiles(@PathVariable final String authToken) {
+    @Test
     public void testGetAlertProfiles() throws RestServiceException, IOException {
         final AlertProfile p = createAlertProfile();
         facade.saveAlertProfile(p);
@@ -197,6 +201,7 @@ public class RestServiceControllerTest extends TestCase {
     //@RequestMapping(value = "/saveLocationProfile/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveLocationProfile(@PathVariable final String authToken,
     //        final @RequestBody String profile) {
+    @Test
     public void testSaveLocationProfile() throws RestServiceException, IOException {
         final LocationProfile l = createLocationProfile();
         final Long id = facade.saveLocationProfile(l);
@@ -204,6 +209,7 @@ public class RestServiceControllerTest extends TestCase {
     }
     //@RequestMapping(value = "/getLocationProfiles/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getLocationProfiles(@PathVariable final String authToken) {
+    @Test
     public void testGetLocationProfiles() throws RestServiceException, IOException {
         final LocationProfile l = createLocationProfile();
         facade.saveLocationProfile(l);
@@ -214,6 +220,7 @@ public class RestServiceControllerTest extends TestCase {
     //@RequestMapping(value = "/saveNotificationSchedule/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveNotificationSchedule(@PathVariable final String authToken,
     //        final @RequestBody String schedule) {
+    @Test
     public void testSaveNotificationSchedule() throws RestServiceException, IOException {
         final NotificationSchedule s = createNotificationSchedule();
         final Long id = facade.saveNotificationSchedule(s);
@@ -222,6 +229,7 @@ public class RestServiceControllerTest extends TestCase {
     }
     //@RequestMapping(value = "/getNotificationSchedules/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken) {
+    @Test
     public void testGetNotificationSchedules() throws RestServiceException, IOException {
         final NotificationSchedule s = createNotificationSchedule();
         facade.saveNotificationSchedule(s);
@@ -232,6 +240,7 @@ public class RestServiceControllerTest extends TestCase {
     //@RequestMapping(value = "/saveShipmentTemplate/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveShipmentTemplate(@PathVariable final String authToken,
     //        final @RequestBody String tpl) {
+    @Test
     public void testSaveShipmentTemplate() throws RestServiceException, IOException {
         final ShipmentTemplate t = createShipmentTemplate();
 
@@ -256,6 +265,7 @@ public class RestServiceControllerTest extends TestCase {
     }
     //@RequestMapping(value = "/getShipmentTemplates/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getShipmentTemplates(@PathVariable final String authToken) {
+    @Test
     public void testGetShipmentTemplates() throws RestServiceException, IOException {
         final ShipmentTemplate t = createShipmentTemplate();
 
@@ -279,12 +289,14 @@ public class RestServiceControllerTest extends TestCase {
     //@RequestMapping(value = "/saveDevice/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveDevice(@PathVariable final String authToken,
     //        final @RequestBody String device) {
+    @Test
     public void testSaveDevice() throws RestServiceException, IOException {
         final Device d = createDevice("1209898347987");
         facade.saveDevice(d);
     }
     //@RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getDevices(@PathVariable final String authToken) {
+    @Test
     public void testGetDevices() throws RestServiceException, IOException {
         final Device d = createDevice("1209898347987");
         facade.saveDevice(d);
@@ -295,6 +307,7 @@ public class RestServiceControllerTest extends TestCase {
     //@RequestMapping(value = "/saveShipment/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveShipment(@PathVariable final String authToken,
     //        final @RequestBody String shipment) {
+    @Test
     public void testSaveShipment() throws RestServiceException, IOException {
         final Shipment s = createShipment();
 
@@ -318,6 +331,7 @@ public class RestServiceControllerTest extends TestCase {
     }
     //@RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getShipments(@PathVariable final String authToken) {
+    @Test
     public void testGetShipments() throws RestServiceException, IOException {
         saveShipment();
 
@@ -327,6 +341,7 @@ public class RestServiceControllerTest extends TestCase {
     //@RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getNotifications(@PathVariable final String authToken,
     //        @RequestParam final Long shipment) {
+    @Test
     public void testGetNotifications() throws IOException, RestServiceException {
         final Shipment s = saveShipment();
         //get server device
@@ -391,6 +406,7 @@ public class RestServiceControllerTest extends TestCase {
     //@RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String markNotificationsAsRead(@PathVariable final String authToken,
     //        @RequestBody final String notificationIds) {
+    @Test
     public void testMarkNotificationsAsRead() throws IOException, RestServiceException {
         final Shipment s = saveShipment();
         //get server device
@@ -464,6 +480,7 @@ public class RestServiceControllerTest extends TestCase {
     //        @RequestParam final String fromDate,
     //        @RequestParam final String toDate,
     //        @RequestParam final String onlyWithAlerts
+    @Test
     public void testGetShipmentData() throws RestServiceException, IOException {
         final Shipment s = saveShipment();
         //get server device
@@ -493,6 +510,7 @@ public class RestServiceControllerTest extends TestCase {
         assertEquals(1, deviceData.getAlerts().size());
         assertEquals(1, deviceData.getEvents().size());
     }
+    @Test
     public void testSendCommandToDevice() throws RestServiceException, IOException {
         final Device device = createDevice("089723409857032498");
         facade.saveDevice(device);
@@ -671,10 +689,20 @@ public class RestServiceControllerTest extends TestCase {
     /* (non-Javadoc)
      * @see junit.framework.TestCase#tearDown()
      */
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         if (service != null) {
             service.clear();
+        }
+    }
+    @AfterClass
+    public static void destroyStatics() {
+        if (server != null) {
+            try {
+                server.stop();
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

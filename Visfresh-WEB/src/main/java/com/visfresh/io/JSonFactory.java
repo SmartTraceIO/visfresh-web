@@ -18,6 +18,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.DeviceData;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.LocationProfile;

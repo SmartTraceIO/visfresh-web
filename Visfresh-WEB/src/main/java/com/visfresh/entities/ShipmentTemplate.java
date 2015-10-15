@@ -3,10 +3,15 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
+@Table(name="shipmenttemplates")
 public class ShipmentTemplate extends ShipmentBase {
     private boolean addDateShipped;
     private boolean detectLocationForShippedFrom;

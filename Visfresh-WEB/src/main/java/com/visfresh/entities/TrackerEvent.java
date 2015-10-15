@@ -5,14 +5,23 @@ package com.visfresh.entities;
 
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
+@Table(name="trackerevents")
 public class TrackerEvent implements EntityWithId {
     /**
      * Event ID.
      */
+    @Id
+    @GeneratedValue
     private Long id;
     /**
      * Message type.

@@ -1,17 +1,26 @@
 /**
  *
  */
-package com.visfresh.io;
+package com.visfresh.entities;
 
-import com.visfresh.entities.Device;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DeviceCommand {
+@Entity
+@Table(name="devicecommands")
+public class DeviceCommand implements EntityWithId {
     private Device device;
     private String command;
+    @Id
+    @GeneratedValue
+    private Long id;
 
     /**
      * Default constructor.
@@ -43,5 +52,18 @@ public class DeviceCommand {
      */
     public void setCommand(final String command) {
         this.command = command;
+    }
+    /**
+     * @param id the id to set
+     */
+    public void setId(final Long id) {
+        this.id = id;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.entities.EntityWithId#getId()
+     */
+    @Override
+    public Long getId() {
+        return id;
     }
 }

@@ -3,11 +3,20 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
+@Table(name="locationprofiles")
 public class LocationProfile implements EntityWithId {
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String name;

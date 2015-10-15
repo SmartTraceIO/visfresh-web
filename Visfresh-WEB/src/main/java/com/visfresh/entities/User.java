@@ -6,13 +6,25 @@ package com.visfresh.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.visfresh.utils.StringUtils;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
+@Table(name="users")
 public class User {
+    @Id
     private String login;
     private String fullName;
+    @Transient
     private Set<Role> roles = new HashSet<Role>();
 
     /**
@@ -52,10 +64,22 @@ public class User {
     public Set<Role> getRoles() {
         return roles;
     }
-    /**
-     * @param roles the roles to set
-     */
-    public void setRoles(final Set<Role> roles) {
-        this.roles = roles;
+    @Column(name="roles")
+    protected String getRolesImpl() {
+        if (roles == null || roles.isEmpty()) {
+            return null;
+        }
+        return StringUtils.combine(roles, ",");
+    }
+    @Column(name="roles")
+    protected void setRoles(final String roles) {
+        this.roles = new HashSet<Role>();
+
+        if (roles != null && roles.length() > 0) {
+            final String[] split = roles.split(", *");
+            for (final String string : split) {
+                this.roles.add(Role.valueOf(string));
+            }
+        }
     }
 }

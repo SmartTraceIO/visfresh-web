@@ -7,11 +7,19 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
+@Table(name="shipments")
 public class Shipment extends ShipmentBase {
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "id", targetEntity = Device.class)
     private final List<Device> devices = new LinkedList<Device>();
     private String palletId;
     private String poNum;

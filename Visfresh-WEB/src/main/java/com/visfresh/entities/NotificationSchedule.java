@@ -6,11 +6,20 @@ package com.visfresh.entities;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
+@Table(name="notificationsschedules")
 public class NotificationSchedule implements EntityWithId {
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String name;

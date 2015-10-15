@@ -3,12 +3,19 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
+@Table(name="devices")
 public class Device {
     private String sn;
+    @Id
     private String imei;
     private String name;
     private String description;

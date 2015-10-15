@@ -3,10 +3,13 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Embeddable;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Embeddable
 public class Location {
     private double latitude;
     private double longitude;

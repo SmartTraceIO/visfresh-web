@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
@@ -47,5 +48,5 @@ public interface RestService {
     List<ShipmentData> getShipmentData(Date startDate, Date endDate,
             String onlyWithAlerts);
 
-    void sendCommandToDevice(Device device, String command);
+    void sendCommandToDevice(DeviceCommand cmd);
 }

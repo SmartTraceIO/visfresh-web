@@ -20,6 +20,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.DeviceData;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
@@ -305,7 +306,7 @@ public class MockRestService implements RestService {
      * @see com.visfresh.services.RestService#sendCommandToDevice(com.visfresh.entities.Device, java.lang.String)
      */
     @Override
-    public void sendCommandToDevice(final Device device, final String command) {
+    public void sendCommandToDevice(DeviceCommand cmd) {
         // TODO Auto-generated method stub
     }
 

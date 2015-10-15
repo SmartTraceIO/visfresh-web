@@ -3,10 +3,13 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Entity;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Entity
 public class TemperatureAlert extends Alert {
     private double temperature;
     private int minutes;
