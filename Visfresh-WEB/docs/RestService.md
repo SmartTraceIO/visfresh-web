@@ -8,17 +8,19 @@ The GET request parameters of URL link should be URL encoded to, but JSON body o
 sent as is without URL encoding.  
 For all POST JSON requests the “Content-Type: application/json” HTTP header should be used.
 ### Server [Responses](#markdown-header-response-message):###
-Each server response has structure:  
-`{`  
-` "status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": {`  
-`"token": "token_100001",`  
-`"expired": "2015-09-30T01:19:56.060+0300"`  
-`}`   
-`}`  
+Each server response has structure:
+```json
+{
+  "status": {
+  "code": 0,
+  "message": "Success"
+},  
+"response": {
+"token": "token_100001",  
+"expired": "2015-09-30T01:19:56.060+0300"
+}
+}  
+```
   The `response` element can be absent if there is not any response, but status code should be always in answer.  
 0 - status code is a “Success” code  
 other code - is an error code. The list of possible error codes will determined in next releases 
