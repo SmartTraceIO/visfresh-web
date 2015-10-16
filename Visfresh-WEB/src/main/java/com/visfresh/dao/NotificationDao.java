@@ -5,8 +5,6 @@ package com.visfresh.dao;
 
 import java.util.List;
 
-import org.springframework.data.repository.CrudRepository;
-
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.User;
 
@@ -15,7 +13,7 @@ import com.visfresh.entities.User;
  *
  */
 public interface NotificationDao extends
-        CrudRepository<Notification, Long> {
+        DaoBase<Notification, Long> {
 
     /**
      * @param user TODO

@@ -339,13 +339,13 @@ public class JSonSerializer {
         obj.addProperty("shipmentDescription", shpb.getShipmentDescription());
         obj.addProperty("alertSuppressionDuringCoolDown", shpb.getAlertSuppressionDuringCoolDown());
         obj.addProperty("id", shpb.getId());
-        obj.addProperty("alertProfile", getId(shpb.getAlertProfile()));
-        obj.add("alertsNotificationSchedules", getIdList(shpb.getAlertsNotificationSchedules()));
+        obj.addProperty("alertProfile", getLongId(shpb.getAlertProfile()));
+        obj.add("alertsNotificationSchedules", getLongIdList(shpb.getAlertsNotificationSchedules()));
         obj.addProperty("arrivalNotificationWithIn", shpb.getArrivalNotificationWithIn());
-        obj.add("arrivalNotificationSchedules", getIdList(shpb.getArrivalNotificationSchedules()));
-        obj.addProperty("excludeNotificationsIfNoAlertsFired", shpb.isexcludeNotificationsIfNoAlertsFired());
-        obj.addProperty("shippedFrom", getId(shpb.getShippedFrom()));
-        obj.addProperty("shippedTo", getId(shpb.getShippedTo()));
+        obj.add("arrivalNotificationSchedules", getLongIdList(shpb.getArrivalNotificationSchedules()));
+        obj.addProperty("excludeNotificationsIfNoAlertsFired", shpb.isExcludeNotificationsIfNoAlertsFired());
+        obj.addProperty("shippedFrom", getLongId(shpb.getShippedFrom()));
+        obj.addProperty("shippedTo", getLongId(shpb.getShippedTo()));
         obj.addProperty("shutdownDevice", shpb.getShutdownDeviceTimeOut());
     }
     /**
@@ -377,7 +377,7 @@ public class JSonSerializer {
         shp.setArrivalNotificationWithIn(asInt(obj.get("arrivalNotificationWithIn")));
         shp.getArrivalNotificationSchedules().addAll(
                 resolveNotificationSchedules(obj.get("arrivalNotificationSchedules").getAsJsonArray()));
-        shp.setexcludeNotificationsIfNoAlertsFired(asBoolean(obj.get("excludeNotificationsIfNoAlertsFired")));
+        shp.setExcludeNotificationsIfNoAlertsFired(asBoolean(obj.get("excludeNotificationsIfNoAlertsFired")));
         shp.setShippedFrom(resolveLocationProfile(asLong(obj.get("shippedFrom"))));
         shp.setShippedTo(resolveLocationProfile(asLong(obj.get("shippedTo"))));
         shp.setShutdownDeviceTimeOut(asInt(obj.get("shutdownDevice")));
@@ -845,17 +845,17 @@ public class JSonSerializer {
      * @param e
      * @return
      */
-    private Long getId(final EntityWithId e) {
-        return e == null ? null : e.getId();
+    private Long getLongId(final EntityWithId e) {
+        return e == null ? null : (Long) e.getId();
     }
     /**
      * @param entities list of entity.
      * @return JSON array with entity IDs.
      */
-    private <E extends EntityWithId> JsonArray getIdList(final List<E> entities) {
+    private <E extends EntityWithId> JsonArray getLongIdList(final List<E> entities) {
         final JsonArray array= new JsonArray();
         for (final E e : entities) {
-            array.add(new JsonPrimitive(e.getId()));
+            array.add(new JsonPrimitive((Long) e.getId()));
         }
         return array;
     }

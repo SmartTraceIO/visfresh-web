@@ -3,8 +3,6 @@
  */
 package com.visfresh.dao;
 
-import org.springframework.data.repository.CrudRepository;
-
 import com.visfresh.entities.LocationProfile;
 
 /**
@@ -12,5 +10,5 @@ import com.visfresh.entities.LocationProfile;
  *
  */
 public interface LocationProfileDao extends
-        CrudRepository<LocationProfile, Long> {
+        DaoBase<LocationProfile, Long> {
 }

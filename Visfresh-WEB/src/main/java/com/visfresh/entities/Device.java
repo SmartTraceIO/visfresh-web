@@ -14,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="devices")
-public class Device {
+public class Device implements EntityWithId {
     private String sn;
     @Id
     private String id;
@@ -82,6 +82,7 @@ public class Device {
     /**
      * @return the id
      */
+    @Override
     public String getId() {
         return id;
     }

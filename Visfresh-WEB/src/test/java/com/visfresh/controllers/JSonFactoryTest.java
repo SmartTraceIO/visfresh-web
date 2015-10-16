@@ -3,9 +3,15 @@
  */
 package com.visfresh.controllers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,7 +45,7 @@ import com.visfresh.io.SaveShipmentResponse;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class JSonFactoryTest extends TestCase {
+public class JSonFactoryTest {
     /**
      * Factory to test.
      */
@@ -54,18 +60,12 @@ public class JSonFactoryTest extends TestCase {
     public JSonFactoryTest() {
         super();
     }
-    /**
-     * @param name test case name.
-     */
-    public JSonFactoryTest(final String name) {
-        super(name);
-    }
 
     /* (non-Javadoc)
      * @see junit.framework.TestCase#setUp()
      */
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         final GsonBuilder b = new GsonBuilder();
         b.setPrettyPrinting();
         this.gson = b.create();
@@ -75,6 +75,7 @@ public class JSonFactoryTest extends TestCase {
         factory.setReferenceResolver(resolver);
     }
 
+    @Test
     public void testAlertProfile() {
         final double criticalHighTemperature = 5.77;
         final double criticalLowTemperature = -15.88;
@@ -112,13 +113,13 @@ public class JSonFactoryTest extends TestCase {
         final JsonObject json = factory.toJson(p).getAsJsonObject();
         p = factory.parseAlertProfile(json);
 
-        assertEquals(criticalHighTemperature, p.getCriticalHighTemperature());
-        assertEquals(criticalLowTemperature, p.getCriticalLowTemperature());
+        assertEquals(criticalHighTemperature, p.getCriticalHighTemperature(), 0.00001);
+        assertEquals(criticalLowTemperature, p.getCriticalLowTemperature(), 0.00001);
         assertEquals(description, p.getDescription());
-        assertEquals(highTemperature, p.getHighTemperature());
+        assertEquals(highTemperature, p.getHighTemperature(), 0.00001);
         assertEquals(highTemperatureForMoreThen, p.getHighTemperatureForMoreThen());
         assertEquals(id, p.getId());
-        assertEquals(lowTemperature, p.getLowTemperature());
+        assertEquals(lowTemperature, p.getLowTemperature(), 0.00001);
         assertEquals(lowTemperatureForMoreThen, p.getLowTemperatureForMoreThen());
         assertEquals(name, p.getName());
         assertEquals(watchBatteryLow, p.isWatchBatteryLow());
@@ -128,6 +129,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(criticalHighTemperatureForMoreThen, p.getCriticalHighTemperatureForMoreThen());
         assertEquals(criticalLowTemperatureForMoreThen, p.getCriticalLowTemperatureForMoreThen());
     }
+    @Test
     public void testSchedulePersonHowWhen() {
         SchedulePersonHowWhen s = new SchedulePersonHowWhen();
 
@@ -176,6 +178,7 @@ public class JSonFactoryTest extends TestCase {
         assertFalse(s.getWeekDays()[5]);
         assertFalse(s.getWeekDays()[6]);
     }
+    @Test
     public void testNotificationSchedule() {
         final String description = "JUnit schedule";
         final Long id = 77l;
@@ -197,6 +200,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(name, s.getName());
         assertEquals(2, s.getSchedules().size());
     }
+    @Test
     public void testLocationProfile() {
         final String company = "Sun Microsystems";
         final Long id = 77l;
@@ -236,9 +240,10 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(radius, p.getRadius());
         assertEquals(start, p.isStart());
         assertEquals(stop, p.isStop());
-        assertEquals(x, p.getLocation().getLatitude());
-        assertEquals(y, p.getLocation().getLongitude());
+        assertEquals(x, p.getLocation().getLatitude(), 0.00001);
+        assertEquals(y, p.getLocation().getLongitude(), 0.00001);
     }
+    @Test
     public void testShipmentTemplate() {
         final boolean addDateShipped = true;
         final AlertProfile alertProfile = createAlertProfile();
@@ -263,7 +268,7 @@ public class JSonFactoryTest extends TestCase {
         t.setAlertSuppressionDuringCoolDown(alertSuppressionDuringCoolDown);
         t.setArrivalNotificationWithIn(arrivalNotification);
         t.getArrivalNotificationSchedules().add(arrivalNotificationSchedule);
-        t.setexcludeNotificationsIfNoAlertsFired(excludeNotificationsIfNoAlertsFired);
+        t.setExcludeNotificationsIfNoAlertsFired(excludeNotificationsIfNoAlertsFired);
         t.setId(id);
         t.setName(name);
         t.setShipmentDescription(shipmentDescription);
@@ -283,7 +288,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(alertSuppressionDuringCoolDown, t.getAlertSuppressionDuringCoolDown());
         assertEquals(arrivalNotification, t.getArrivalNotificationWithIn());
         assertNotNull(t.getArrivalNotificationSchedules());
-        assertEquals(excludeNotificationsIfNoAlertsFired, t.isexcludeNotificationsIfNoAlertsFired());
+        assertEquals(excludeNotificationsIfNoAlertsFired, t.isExcludeNotificationsIfNoAlertsFired());
         assertEquals(id, t.getId());
         assertEquals(name, t.getName());
         assertEquals(shipmentDescription, t.getShipmentDescription());
@@ -293,6 +298,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(useCurrentTimeForDateShipped, t.isUseCurrentTimeForDateShipped());
         assertEquals(useLocationNearestToDevice, t.isDetectLocationForShippedFrom());
     }
+    @Test
     public void testDevice() {
         final String description = "Device description";
         final String imei = "018923475076";
@@ -316,6 +322,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(name, t.getName());
         assertEquals(sn, t.getSn());
     }
+    @Test
     public void testShipment() {
         final AlertProfile alertProfile = createAlertProfile();
         final NotificationSchedule alertsNotificationSchedule = createNotificationSchedule();
@@ -342,7 +349,7 @@ public class JSonFactoryTest extends TestCase {
         s.setAlertSuppressionDuringCoolDown(alertSuppressionDuringCoolDown);
         s.setArrivalNotificationWithIn(arrivalNotification);
         s.getArrivalNotificationSchedules().add(arrivalNotificationSchedule);
-        s.setexcludeNotificationsIfNoAlertsFired(excludeNotificationsIfNoAlertsFired);
+        s.setExcludeNotificationsIfNoAlertsFired(excludeNotificationsIfNoAlertsFired);
         s.setId(id);
         s.setName(name);
         s.setShipmentDescription(shipmentDescription);
@@ -364,7 +371,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(alertSuppressionDuringCoolDown, s.getAlertSuppressionDuringCoolDown());
         assertEquals(arrivalNotification, s.getArrivalNotificationWithIn());
         assertNotNull(s.getArrivalNotificationSchedules());
-        assertEquals(excludeNotificationsIfNoAlertsFired, s.isexcludeNotificationsIfNoAlertsFired());
+        assertEquals(excludeNotificationsIfNoAlertsFired, s.isExcludeNotificationsIfNoAlertsFired());
         assertEquals(id, s.getId());
         assertEquals(name, s.getName());
         assertEquals(shipmentDescription, s.getShipmentDescription());
@@ -377,6 +384,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(customFields, s.getCustomFields());
         assertEquals(status, s.getStatus());
     }
+    @Test
     public void testSaveShipmentResponse() {
         final Long shipmentId = 1L;
         final Long templateId = 2l;
@@ -391,6 +399,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(shipmentId, r.getShipmentId());
         assertEquals(templateId, r.getTemplateId());
     }
+    @Test
     public void testSaveShipmentRequest() {
         final boolean saveAsNewTemplate = true;
         final Shipment shipment = createShipment();
@@ -408,6 +417,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(templateName, req.getTemplateName());
         assertNotNull(req.getShipment());
     }
+    @Test
     public void testEnterDarkEnvironmentAlertNotification() {
         final Date alertDate = new Date(System.currentTimeMillis() - 100000000l);
         final String alertDescription = "Alert description";
@@ -450,6 +460,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(alertType, alert.getType());
     }
 
+    @Test
     public void testArrivalNotification() {
         final Date alertDate = new Date(System.currentTimeMillis() - 100000000l);
         final String alertDescription = "Alert description";
@@ -494,9 +505,10 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(alertName, alert.getName());
         assertNotNull(alert.getDevice());
         assertEquals(alertType, alert.getType());
-        assertEquals(temperature, alert.getTemperature());
+        assertEquals(temperature, alert.getTemperature(), 0.00001);
         assertEquals(minutes, alert.getMinutes());
     }
+    @Test
     public void testTrackerEvent() {
         final int battery = 12;
         final Long id = 7l;
@@ -516,10 +528,11 @@ public class JSonFactoryTest extends TestCase {
 
         assertEquals(battery, e.getBattery());
         assertEquals(id, e.getId());
-        assertEquals(temperature, e.getTemperature());
+        assertEquals(temperature, e.getTemperature(), 0.00001);
         assertEquals(time, e.getTime());
         assertEquals(type, e.getType());
     }
+    @Test
     public void testDeviceData() {
         DeviceData d = new DeviceData();
 
@@ -537,6 +550,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(2, d.getEvents().size());
         assertNotNull(d.getDevice());
     }
+    @Test
     public void testShipmentData() {
         final Shipment shipment = createShipment();
         final DeviceData d1 = new DeviceData();
@@ -555,6 +569,7 @@ public class JSonFactoryTest extends TestCase {
         assertNotNull(s.getShipment());
         assertEquals(2, s.getDeviceData().size());
     }
+    @Test
     public void testUser() {
         final String login = "login";
         final String fullName = "Full Name";
@@ -572,6 +587,7 @@ public class JSonFactoryTest extends TestCase {
         assertEquals(fullName, u.getFullName());
         assertEquals(2, u.getRoles().size());
     }
+    @Test
     public void testDeviceCommand() {
         final Device device = createDevice("2380947093287");
         final String command = "shutdown";
@@ -687,7 +703,7 @@ public class JSonFactoryTest extends TestCase {
         s.setAlertSuppressionDuringCoolDown(55);
         s.setArrivalNotificationWithIn(111);
         s.getArrivalNotificationSchedules().add(createNotificationSchedule());
-        s.setexcludeNotificationsIfNoAlertsFired(true);
+        s.setExcludeNotificationsIfNoAlertsFired(true);
         s.setId(generateId());
         s.setName("JUnit-tpl");
         s.setShipmentDescription("Any Description");

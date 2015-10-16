@@ -64,7 +64,7 @@ public abstract class ShipmentBase implements EntityWithId {
         setAlertSuppressionDuringCoolDown(shipment.getAlertSuppressionDuringCoolDown());
         setArrivalNotificationWithIn(shipment.getArrivalNotificationWithIn());
         arrivalNotificationSchedules.addAll((shipment.getArrivalNotificationSchedules()));
-        setexcludeNotificationsIfNoAlertsFired(shipment.isexcludeNotificationsIfNoAlertsFired());
+        setExcludeNotificationsIfNoAlertsFired(shipment.isExcludeNotificationsIfNoAlertsFired());
         setShutdownDeviceTimeOut(shipment.getShutdownDeviceTimeOut());
     }
 
@@ -196,14 +196,14 @@ public abstract class ShipmentBase implements EntityWithId {
     /**
      * @return the excludeNotificationsIfNoAlertsFired
      */
-    public boolean isexcludeNotificationsIfNoAlertsFired() {
+    public boolean isExcludeNotificationsIfNoAlertsFired() {
         return excludeNotificationsIfNoAlertsFired;
     }
 
     /**
      * @param excludeNotificationsIfNoAlertsFired the excludeNotificationsIfNoAlertsFired to set
      */
-    public void setexcludeNotificationsIfNoAlertsFired(final boolean excludeNotificationsIfNoAlertsFired) {
+    public void setExcludeNotificationsIfNoAlertsFired(final boolean excludeNotificationsIfNoAlertsFired) {
         this.excludeNotificationsIfNoAlertsFired = excludeNotificationsIfNoAlertsFired;
     }
 

@@ -35,7 +35,7 @@ public class Notification implements EntityWithId {
     /**
      * Notification issue.
      */
-    private Object issue;
+    private EntityWithId issue;
 
     /**
      * Default constructor.
@@ -47,13 +47,13 @@ public class Notification implements EntityWithId {
     /**
      * @return the issue
      */
-    public Object getIssue() {
+    public EntityWithId getIssue() {
         return issue;
     }
     /**
      * @param issue the issue to set
      */
-    public void setIssue(final Object issue) {
+    public void setIssue(final EntityWithId issue) {
         this.issue = issue;
     }
     /**

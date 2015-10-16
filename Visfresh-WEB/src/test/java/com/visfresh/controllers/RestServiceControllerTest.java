@@ -713,7 +713,7 @@ public class RestServiceControllerTest {
         s.setAlertSuppressionDuringCoolDown(55);
         s.setArrivalNotificationWithIn(111);
         s.getArrivalNotificationSchedules().add(createNotificationSchedule());
-        s.setexcludeNotificationsIfNoAlertsFired(true);
+        s.setExcludeNotificationsIfNoAlertsFired(true);
         s.setName("Shipment-" + (++lastLong));
         s.setShipmentDescription("Any Description");
         s.setShippedFrom(createLocationProfile());
@@ -754,7 +754,7 @@ public class RestServiceControllerTest {
         t.setAlertSuppressionDuringCoolDown(55);
         t.setArrivalNotificationWithIn(11);
         t.getArrivalNotificationSchedules().add(createNotificationSchedule());
-        t.setexcludeNotificationsIfNoAlertsFired(true);
+        t.setExcludeNotificationsIfNoAlertsFired(true);
         t.setName("JUnit-tpl");
         t.setShipmentDescription("Any Description");
         t.setShippedFrom(createLocationProfile());

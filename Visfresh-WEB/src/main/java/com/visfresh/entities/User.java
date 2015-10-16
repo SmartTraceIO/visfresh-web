@@ -21,7 +21,7 @@ import com.visfresh.utils.StringUtils;
  */
 @Entity
 @Table(name="users")
-public class User {
+public class User implements EntityWithId {
     @Id
     private String login;
     @ManyToOne
@@ -48,6 +48,13 @@ public class User {
      */
     public void setLogin(final String login) {
         this.login = login;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.entities.EntityWithId#getId()
+     */
+    @Override
+    public String getId() {
+        return getLogin();
     }
     /**
      * @return the fullName

@@ -6,8 +6,6 @@ package com.visfresh.dao;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.data.repository.CrudRepository;
-
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 
@@ -15,7 +13,7 @@ import com.visfresh.entities.ShipmentData;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface ShipmentDao extends CrudRepository<Shipment, Long> {
+public interface ShipmentDao extends DaoBase<Shipment, Long> {
 
     /**
      * @param startDate

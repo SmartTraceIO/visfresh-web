@@ -1,9 +1,7 @@
 /**
- * 
+ *
  */
 package com.visfresh.dao;
-
-import org.springframework.data.repository.CrudRepository;
 
 import com.visfresh.entities.NotificationSchedule;
 
@@ -12,6 +10,6 @@ import com.visfresh.entities.NotificationSchedule;
  *
  */
 public interface NotificationScheduleDao extends
-        CrudRepository<NotificationSchedule, Long> {
+        DaoBase<NotificationSchedule, Long> {
 
 }

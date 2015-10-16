@@ -1,9 +1,7 @@
 /**
- * 
+ *
  */
 package com.visfresh.dao;
-
-import org.springframework.data.repository.CrudRepository;
 
 import com.visfresh.entities.ShipmentTemplate;
 
@@ -12,6 +10,6 @@ import com.visfresh.entities.ShipmentTemplate;
  *
  */
 public interface ShipmentTemplateDao extends
-        CrudRepository<ShipmentTemplate, Long> {
+        DaoBase<ShipmentTemplate, Long> {
 
 }
