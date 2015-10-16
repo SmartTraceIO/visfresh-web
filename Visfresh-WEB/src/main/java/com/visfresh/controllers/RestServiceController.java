@@ -191,6 +191,26 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
+     * @param id alert profile ID.
+     * @return alert profile.
+     */
+    @RequestMapping(value = "/getAlertProfile/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String getAlertProfile(@PathVariable final String authToken,
+            @RequestParam final Long id) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetAlertProfiles(user);
+
+            final AlertProfile alert = restService.getAlertProfile(user.getCompany(), id);
+            return createSuccessResponse(getSerializer().toJson(alert));
+        } catch (final Exception e) {
+            log.error("Failed to get alert profiles", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
      * @return list of alert profiles.
      */
     @RequestMapping(value = "/getAlertProfiles/{authToken}", method = RequestMethod.GET)
@@ -255,6 +275,26 @@ public class RestServiceController {
             }
 
             return createSuccessResponse(array);
+        } catch (final Exception e) {
+            log.error("Failed to get location profiles", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param id location profile ID.
+     * @return location profile.
+     */
+    @RequestMapping(value = "/getLocationProfile/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String getLocationProfile(@PathVariable final String authToken,
+            @RequestParam final Long id) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetLocationProfiles(user);
+
+            final LocationProfile location = restService.getLocationProfile(user.getCompany(), id);
+            return createSuccessResponse(getSerializer().toJson(location));
         } catch (final Exception e) {
             log.error("Failed to get location profiles", e);
             return createErrorResponse(e);
@@ -352,6 +392,26 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
+     * @param id shipment template ID.
+     * @return shipment template.
+     */
+    @RequestMapping(value = "/getShipmentTemplate/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String getShipmentTemplate(@PathVariable final String authToken,
+            @RequestParam final Long id) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetShipmentTemplates(user);
+
+            final ShipmentTemplate template = restService.getShipmentTemplate(user.getCompany(), id);
+            return createSuccessResponse(getSerializer().toJson(template));
+        } catch (final Exception e) {
+            log.error("Failed to get shipment templates", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
      * @param device device.
      * @return ID of saved device.
      */
@@ -389,6 +449,26 @@ public class RestServiceController {
             }
 
             return createSuccessResponse(array);
+        } catch (final Exception e) {
+            log.error("Failed to get devices", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param id device ID.
+     * @return device.
+     */
+    @RequestMapping(value = "/getDevice/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String getDevice(@PathVariable final String authToken,
+            @RequestParam final String id) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetDevices(user);
+
+            final Device device = restService.getDevice(user.getCompany(), id);
+            return createSuccessResponse(getSerializer().toJson(device));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
@@ -443,6 +523,26 @@ public class RestServiceController {
             }
 
             return createSuccessResponse(array);
+        } catch (final Exception e) {
+            log.error("Failed to get devices", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param id shipment ID.
+     * @return shipment.
+     */
+    @RequestMapping(value = "/getShipment/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String getShipment(@PathVariable final String authToken,
+            @RequestParam final Long id) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetShipments(user);
+
+            final Shipment shipment = restService.getShipment(user.getCompany(), id);
+            return createSuccessResponse(getSerializer().toJson(shipment));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);

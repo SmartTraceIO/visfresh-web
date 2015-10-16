@@ -109,7 +109,7 @@ public class JSonFactoryTest extends TestCase {
         p.setCriticalHighTemperatureForMoreThen(criticalHighTemperatureForMoreThen);
         p.setCriticalLowTemperatureForMoreThen(criticalLowTemperatureForMoreThen);
 
-        final JsonObject json = factory.toJson(p);
+        final JsonObject json = factory.toJson(p).getAsJsonObject();
         p = factory.parseAlertProfile(json);
 
         assertEquals(criticalHighTemperature, p.getCriticalHighTemperature());
@@ -224,7 +224,7 @@ public class JSonFactoryTest extends TestCase {
         p.getLocation().setLatitude(x);
         p.getLocation().setLongitude(y);
 
-        final JsonObject obj = factory.toJson(p);
+        final JsonObject obj = factory.toJson(p).getAsJsonObject();
         p = factory.parseLocationProfile(obj);
 
         assertEquals(company, p.getCompanyDescription());
@@ -273,7 +273,7 @@ public class JSonFactoryTest extends TestCase {
         t.setUseCurrentTimeForDateShipped(useCurrentTimeForDateShipped);
         t.setDetectLocationForShippedFrom(useLocationNearestToDevice);
 
-        final JsonObject obj = factory.toJson(t);
+        final JsonObject obj = factory.toJson(t).getAsJsonObject();
 
         t = factory.parseShipmentTemplate(obj);
 
@@ -307,7 +307,7 @@ public class JSonFactoryTest extends TestCase {
         t.setName(name);
         t.setSn(sn);
 
-        final JsonObject json = factory.toJson(t);
+        final JsonObject json = factory.toJson(t).getAsJsonObject();
         t= factory.parseDevice(json);
 
         assertEquals(description, t.getDescription());
@@ -356,7 +356,7 @@ public class JSonFactoryTest extends TestCase {
         s.setCustomFields(customFields);
         s.setStatus(status);
 
-        final JsonObject obj = factory.toJson(s);
+        final JsonObject obj = factory.toJson(s).getAsJsonObject();
         s = factory.parseShipment(obj);
 
         assertNotNull(s.getAlertProfile());

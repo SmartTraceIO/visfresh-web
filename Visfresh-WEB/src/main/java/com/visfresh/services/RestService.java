@@ -50,4 +50,35 @@ public interface RestService {
             Date endDate, String onlyWithAlerts);
 
     void sendCommandToDevice(DeviceCommand cmd);
+
+    /**
+     * @param company company.
+     * @param id alert profile ID.
+     * @return alert profile.
+     */
+    AlertProfile getAlertProfile(Company company, Long id);
+    /**
+     * @param company company.
+     * @param id location profile ID.
+     * @return location profile.
+     */
+    LocationProfile getLocationProfile(Company company, Long id);
+    /**
+     * @param company company.
+     * @param id shipment template ID.
+     * @return shipment template.
+     */
+    ShipmentTemplate getShipmentTemplate(Company company, Long id);
+    /**
+     * @param company company.
+     * @param id device ID.
+     * @return device.
+     */
+    Device getDevice(Company company, String id);
+    /**
+     * @param company company.
+     * @param id shipment ID.
+     * @return shipment.
+     */
+    Shipment getShipment(Company company, Long id);
 }

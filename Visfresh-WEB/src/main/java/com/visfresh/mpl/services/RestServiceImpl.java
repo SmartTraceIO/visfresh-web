@@ -107,7 +107,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getNotificationSchedules()
      */
     @Override
-    public List<NotificationSchedule> getNotificationSchedules(Company company) {
+    public List<NotificationSchedule> getNotificationSchedules(final Company company) {
         return asList(notificationScheduleDao.findAll());
     }
 
@@ -123,7 +123,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getShipmentTemplates()
      */
     @Override
-    public List<ShipmentTemplate> getShipmentTemplates(Company company) {
+    public List<ShipmentTemplate> getShipmentTemplates(final Company company) {
         return asList(shipmentTemplateDao.findAll());
     }
 
@@ -202,6 +202,46 @@ public class RestServiceImpl implements RestService {
     @Override
     public void sendCommandToDevice(final DeviceCommand cmd) {
         deviceCommandDao.save(cmd);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getAlertProfile(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public AlertProfile getAlertProfile(final Company company, final Long id) {
+        final AlertProfile p = alertProfileDao.findOne(id);
+        return p == null || !p.getCompany().getId().equals(company.getId()) ? null : p;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getDevice(com.visfresh.entities.Company, java.lang.String)
+     */
+    @Override
+    public Device getDevice(final Company company, final String id) {
+        final Device d = deviceDao.findOne(id);
+        return  d == null || !d.getCompany().getId().equals(company.getId()) ? null : d;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getLocationProfile(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public LocationProfile getLocationProfile(final Company company, final Long id) {
+        final LocationProfile p = locationProfileDao.findOne(id);
+        return p == null || !p.getCompany().getId().equals(company.getId()) ? null : p;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getShipment(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public Shipment getShipment(final Company company, final Long id) {
+        final Shipment s = shipmentDao.findOne(id);
+        return  s == null || !s.getCompany().getId().equals(company.getId()) ? null : s;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getShipmentTemplate(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public ShipmentTemplate getShipmentTemplate(final Company company, final Long id) {
+        final ShipmentTemplate s = shipmentTemplateDao.findOne(id);
+        return  s == null || !s.getCompany().getId().equals(company.getId()) ? null : s;
     }
 
     /**

@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.entities.Alert;
@@ -117,7 +118,11 @@ public class JSonSerializer {
      * @param alert alert profile.
      * @return JSON object.
      */
-    public JsonObject toJson(final AlertProfile alert) {
+    public JsonElement toJson(final AlertProfile alert) {
+        if (alert == null) {
+            return JsonNull.INSTANCE;
+        }
+
         final JsonObject obj = new JsonObject();
 
         obj.addProperty("id", alert.getId());
@@ -167,7 +172,11 @@ public class JSonSerializer {
      * @param location
      * @return
      */
-    public JsonObject toJson(final LocationProfile location) {
+    public JsonElement toJson(final LocationProfile location) {
+        if (location == null) {
+            return JsonNull.INSTANCE;
+        }
+
         final JsonObject obj = new JsonObject();
 
         obj.addProperty("id", location.getId());
@@ -303,7 +312,11 @@ public class JSonSerializer {
      * @param tpl shipment template.
      * @return JSON object.
      */
-    public JsonObject toJson(final ShipmentTemplate tpl) {
+    public JsonElement toJson(final ShipmentTemplate tpl) {
+        if (tpl == null) {
+            return JsonNull.INSTANCE;
+        }
+
         final JsonObject obj = new JsonObject();
 
         addShipmentBase(tpl, obj);
@@ -382,7 +395,11 @@ public class JSonSerializer {
      * @param d device.
      * @return device serialized to JSON format.
      */
-    public JsonObject toJson(final Device d) {
+    public JsonElement toJson(final Device d) {
+        if (d == null) {
+            return JsonNull.INSTANCE;
+        }
+
         final JsonObject obj = new JsonObject();
         obj.addProperty("description", d.getDescription());
         obj.addProperty("id", d.getId());
@@ -417,7 +434,11 @@ public class JSonSerializer {
      * @param s shipment.
      * @return shipment serialized to JSON format.
      */
-    public JsonObject toJson(final Shipment s) {
+    public JsonElement toJson(final Shipment s) {
+        if (s == null) {
+            return JsonNull.INSTANCE;
+        }
+
         final JsonObject obj = new JsonObject();
         addShipmentBase(s, obj);
 

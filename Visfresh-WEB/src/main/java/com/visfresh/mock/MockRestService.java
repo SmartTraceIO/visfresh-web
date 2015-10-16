@@ -127,7 +127,7 @@ public class MockRestService implements RestService {
      * @see com.visfresh.services.RestService#getNotificationSchedules()
      */
     @Override
-    public List<NotificationSchedule> getNotificationSchedules(Company company) {
+    public List<NotificationSchedule> getNotificationSchedules(final Company company) {
         synchronized (notificationSchedules) {
             return new LinkedList<NotificationSchedule>(notificationSchedules.values());
         }
@@ -151,7 +151,7 @@ public class MockRestService implements RestService {
      * @see com.visfresh.services.RestService#getShipmentTemplates()
      */
     @Override
-    public List<ShipmentTemplate> getShipmentTemplates(Company company) {
+    public List<ShipmentTemplate> getShipmentTemplates(final Company company) {
         synchronized (shipmentTemplates) {
             return new LinkedList<ShipmentTemplate>(shipmentTemplates.values());
         }
@@ -290,6 +290,41 @@ public class MockRestService implements RestService {
     @Override
     public void sendCommandToDevice(final DeviceCommand cmd) {
         // TODO Auto-generated method stub
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getAlertProfile(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public AlertProfile getAlertProfile(final Company company, final Long id) {
+        return alertProfiles.get(id);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getDevice(com.visfresh.entities.Company, java.lang.String)
+     */
+    @Override
+    public Device getDevice(final Company company, final String id) {
+        return devices.get(id);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getLocationProfile(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public LocationProfile getLocationProfile(final Company company, final Long id) {
+        return locationProfiles.get(id);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getShipment(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public Shipment getShipment(final Company company, final Long id) {
+        return shipments.get(id);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getShipmentTemplate(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public ShipmentTemplate getShipmentTemplate(final Company company, final Long id) {
+        return shipmentTemplates.get(id);
     }
 
     /**
