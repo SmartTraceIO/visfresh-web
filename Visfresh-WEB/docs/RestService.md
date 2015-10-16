@@ -54,7 +54,7 @@ An authentication can be performed as from REST client using login method, as fr
 9. [Get notification schedules](#markdown-header-get-notification-schedules)  
 10. [Save Location](#markdown-header-save-location)  
 11. [Get Locations](#markdown-header-get-locations)  
-12. [Save shipment template](#markdown-header-save-shipment-template)  
+12. [Save Shipment Template](#markdown-header-save-shipment-template)  
 13. [Get Shipment templates](#markdown-header-get-shipment-templates)  
 14. [Save Device](#markdown-header-save-device)  
 15. [Get Devices](#markdown-header-get-devices)  
@@ -63,7 +63,14 @@ An authentication can be performed as from REST client using login method, as fr
 18. [Get Notifications](#markdown-header-get-notifications)  
 19. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
 20. [Get Shipment Data](#markdown-header-get-shipment-data)  
-21. [Send Command to Device](#markdown-header-send-command-to-device)  
+22. [Send Command to Device](#markdown-header-send-command-to-device)  
+22. [Get Alert Profile](#markdown-header-get-alert-profile)  
+23. [Get Location Profile](#markdown-header-get-location-profile)  
+24. [Get Shipment Template](#markdown-header-get-shipment-template)  
+25. [Get Device](#markdown-header-get-device)  
+26. [Get Shipment](#markdown-header-get-shipment)  
+27. [Send Notification Schedule](#markdown-header-get-notification-schedule)  
+
 
 ### Authentication.###
 Method *POST*, method name *login*, method parameters  
@@ -110,7 +117,7 @@ Method *POST*, method name *saveNotificationSchedule*, request body contains JSO
 
 ### Get notification schedules ###
 Method *GET*, method name *getNotificationSchedules*, have not parameters. Return array of [Notification Schedule objects](#markdown-header-notification-schedule)  
-[(example)](#markdown-header-get-notification-schedule-example)
+[(example)](#markdown-header-get-notification-schedules-example)
 
 ### Save Location ###
 Method *POST*, method name *saveLocationProfile*, request body contains JSON serialized [Location Profile Object](#markdown-header-location-profile). Response contains ID of just saved Location Profile  
@@ -164,6 +171,42 @@ Returns array of [Shipment Data Objects](#markdown-header-shipment-data)
 ### Send Command to Device ###
 Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#markdown-header-device) ID and device specific command.  
 [(example)](#markdown-header-send-command-to-device-example)
+
+### Get Alert Profile ###
+Method *GET*, method name getAlertProfile. Request parameters:  
+1. id - alert profile ID.  
+Returns [Alert Profile Object](#markdown-header-alert-profile).  
+[(example)](#markdown-header-get-alert-profile-example)
+
+### Get Location Profile ###
+Method *GET*, method name *getLocationProfile*. Request parameters:  
+1. id - alert profile ID.  
+Returns [Location Profile Object](#markdown-header-location-profile).  
+[(example)](#markdown-header-get-location-profile-example)
+
+### Get Shipment Template ###
+Method *GET*, method name *getShipmentTemplate*. Request parameters:  
+1. id - shipment template ID.  
+Returns [Shipment Template Object](#markdown-header-shipment-template)  
+[(example)](#markdown-header-get-shipment-template-example)
+
+### Get Device ###
+Method *GET*, method name *getDevice*. Request parameters:
+1. id - device ID.  
+Returns [Device Object](#markdown-header-device)  
+[(example)](#markdown-header-get-device-example)
+
+### Get Shipment ###
+Method *GET*, method name *getShipment*. Request parameters:  
+1. id - shipment ID.  
+Returns [Shipment Object](#markdown-header-shipment)  
+[(example)](#markdown-header-get-shipment-example)
+
+### Get Notification Schedule ###
+Method *GET*, method name *getNotificationSchedule*. Request parameters:  
+1. id - notification schedule ID.  
+Returns [Notification Schedule Object](#markdown-header-notification-schedule)  
+[(example)](#markdown-header-get-notification-schedule-example)
 
 ## Objects
 ### Response message ###
@@ -549,7 +592,7 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"id": 2`  
 `}`  
 `}`  
-### Get Notification Schedule example ###
+### Get Notification Schedules example ###
 **GET /vf/rest/getNotificationSchedules/${accessToken}**  
 **Response:**  
 `{`  
@@ -882,7 +925,7 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `}`  
 `}`
 ### Get Shipment Data example ###
-**GET /vf/rest/getShipmentData/token_100001?fromDate=2015-10-11T20%3A17%3A23.016%2B0300&onlyWithAlerts=false&toDate=2015-10-13T02%3A50%3A43.016%2B0300**  
+**GET /vf/rest/getShipmentData/${accessToken}?fromDate=2015-10-11T20%3A17%3A23.016%2B0300&onlyWithAlerts=false&toDate=2015-10-13T02%3A50%3A43.016%2B0300**  
 **Response:**  
 `{`  
 `"status": {`  
@@ -920,7 +963,7 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `]`  
 `}`
 ### Send Command to Device example ###
-**POST /vf/rest/sendCommandToDevice/token_100001**  
+**POST /vf/rest/sendCommandToDevice/${accessToken}**  
 **Request body:**  
 `{`  
 `"device": "089723409857032498",`  
@@ -933,3 +976,193 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"message": "Success"`  
 `}`  
 `}`  
+### Get Alert Profile example ###
+**GET /vf/rest/getAlertProfile/${accessToken}?id=77**  
+**Response:**  
+```{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "id": 77,
+    "description": "Any description",
+    "name": "AnyAlert",
+    "criticalHighTemperatureForMoreThen": 0,
+    "criticalHighTemperature": 5.0,
+    "criticalLowTemperatureForMoreThen": 0,
+    "criticalLowTemperature": -15.0,
+    "highTemperature": 1.0,
+    "highTemperatureForMoreThen": 55,
+    "lowTemperature": -10.0,
+    "lowTemperatureForMoreThen": 55,
+    "watchBatteryLow": true,
+    "watchEnterBrightEnvironment": true,
+    "watchEnterDarkEnvironment": true,
+    "watchShock": true
+  }
+}
+```
+### Get Location Profile example ###
+**GET /vf/rest/getLocationProfile/${accessToken}?id=77**  
+**Response:**  
+```{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "id": 77,
+    "companyDescription": "Sun Microsystems",
+    "name": "Loc-1",
+    "notes": "Any notes",
+    "address": "Odessa, Deribasovskaya 1, apt.1",
+    "location": {
+      "lat": 100.5,
+      "lon": 100.501
+    },
+    "radius": 1000
+  }
+}
+```
+### Get Shipment Template example ###
+**GET /rest/getShipmentTemplate/${accessToken}?id=77**  
+**Response:**  
+```{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "name": "JUnit-tpl",
+    "shipmentDescription": "Any Description",
+    "alertSuppressionDuringCoolDown": 55,
+    "id": 77,
+    "alertProfile": 78,
+    "alertsNotificationSchedules": [
+      91
+    ],
+    "arrivalNotificationWithIn": 11,
+    "arrivalNotificationSchedules": [
+      92
+    ],
+    "excludeNotificationsIfNoAlertsFired": true,
+    "shippedFrom": 79,
+    "shippedTo": 80,
+    "shutdownDevice": 155,
+    "addDateShipped": true,
+    "useCurrentTimeForDateShipped": true,
+    "detectLocationForShippedFrom": true
+  }
+}
+```
+### Get Device example ###
+**GET /vf/rest/getDevice/${accessToken}?id=923487509328.123**  
+**Response:**  
+```{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "description": "Device description",
+    "id": "923487509328.123",
+    "imei": "923487509328",
+    "name": "Device Name",
+    "sn": "1"
+  }
+}
+```
+### Get Shipment example ###
+**GET /vf/rest/getShipment/${accessToken}?id=77**  
+**Response:**  
+```{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "name": "Shipment-1",
+    "shipmentDescription": "Any Description",
+    "alertSuppressionDuringCoolDown": 55,
+    "id": 77,
+    "alertProfile": 78,
+    "alertsNotificationSchedules": [
+      91
+    ],
+    "arrivalNotificationWithIn": 111,
+    "arrivalNotificationSchedules": [
+      92
+    ],
+    "excludeNotificationsIfNoAlertsFired": true,
+    "shippedFrom": 79,
+    "shippedTo": 80,
+    "shutdownDevice": 155,
+    "palletId": "palettid",
+    "shipmentDescriptionDate": "2015-10-05T03:42:46.997+0300",
+    "customFields": "customFields",
+    "status": "Default",
+    "devices": [
+      "234908720394857.123",
+      "329847983724987.123"
+    ]
+  }
+}
+```
+### Get Notification Schedule example ###
+**GET /vf/rest/getNotificationSchedule/${accessToken}?id=77**  
+**Response:**  
+```{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "description": "JUnit schedule",
+    "name": "Sched",
+    "id": 77,
+    "schedules": [
+      {
+        "company": "Sun",
+        "emailNotification": "asuvorov@sun.com",
+        "firstName": "Alexander",
+        "lastName": "Suvorov",
+        "position": "Generalisimus",
+        "smsNotification": "1111111117",
+        "toTime": 17,
+        "fromTime": 1,
+        "pushToMobileApp": true,
+        "weekDays": [
+          true,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false
+        ]
+      },
+      {
+        "company": "Sun",
+        "emailNotification": "asuvorov@sun.com",
+        "firstName": "Alexander",
+        "lastName": "Suvorov",
+        "position": "Generalisimus",
+        "smsNotification": "1111111117",
+        "toTime": 17,
+        "fromTime": 1,
+        "pushToMobileApp": true,
+        "weekDays": [
+          true,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false
+        ]
+      }
+    ]
+  }
+}
+```

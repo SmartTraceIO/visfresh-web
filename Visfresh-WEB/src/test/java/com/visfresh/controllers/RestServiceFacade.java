@@ -54,7 +54,7 @@ public class RestServiceFacade  {
     private URL serviceUrl;
     private String authToken;
 
-    private boolean isPrintEnabled = false;
+    private boolean isPrintEnabled = true;
 
     /**
      * Default constructor.

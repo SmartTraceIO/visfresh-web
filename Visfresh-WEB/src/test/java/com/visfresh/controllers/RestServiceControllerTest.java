@@ -543,15 +543,29 @@ public class RestServiceControllerTest {
         service.locationProfiles.put(lp.getId(), lp);
         assertNotNull(facade.getLocationProfile(lp.getId()));
     }
+    @Test
     public void testGetShipmentTemplate() throws IOException, RestServiceException {
         final ShipmentTemplate sp = createShipmentTemplate();
-        service.alertProfiles.put(sp.getAlertProfile().getId(), sp.getAlertProfile());
-        service.locationProfiles.put(sp.getShippedFrom().getId(), sp.getShippedFrom());
-        service.locationProfiles.put(sp.getShippedTo().getId(), sp.getShippedTo());
+        sp.setId(77l);
+
+        final AlertProfile ap = sp.getAlertProfile();
+        ap.setId(78l);
+        service.alertProfiles.put(ap.getId(), ap);
+
+        final LocationProfile sf = sp.getShippedFrom();
+        sf.setId(79l);
+        service.locationProfiles.put(sf.getId(), sf);
+
+        final LocationProfile st = sp.getShippedTo();
+        st.setId(80l);
+        service.locationProfiles.put(st.getId(), st);
 
         NotificationSchedule ns = sp.getAlertsNotificationSchedules().get(0);
+        ns.setId(91l);
+
         service.notificationSchedules.put(ns.getId(), ns);
         ns = sp.getArrivalNotificationSchedules().get(0);
+        ns.setId(92l);
         service.notificationSchedules.put(ns.getId(), ns);
 
         service.shipmentTemplates.put(sp.getId(), sp);
