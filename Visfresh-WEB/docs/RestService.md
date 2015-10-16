@@ -979,7 +979,8 @@ Returns [Notification Schedule Object](#markdown-header-notification-schedule)
 ### Get Alert Profile example ###
 **GET /vf/rest/getAlertProfile/${accessToken}?id=77**  
 **Response:**  
-```{
+```
+{
   "status": {
     "code": 0,
     "message": "Success"
@@ -1006,7 +1007,8 @@ Returns [Notification Schedule Object](#markdown-header-notification-schedule)
 ### Get Location Profile example ###
 **GET /vf/rest/getLocationProfile/${accessToken}?id=77**  
 **Response:**  
-```{
+```
+{
   "status": {
     "code": 0,
     "message": "Success"
@@ -1028,7 +1030,8 @@ Returns [Notification Schedule Object](#markdown-header-notification-schedule)
 ### Get Shipment Template example ###
 **GET /rest/getShipmentTemplate/${accessToken}?id=77**  
 **Response:**  
-```{
+```
+{
   "status": {
     "code": 0,
     "message": "Success"
@@ -1059,7 +1062,8 @@ Returns [Notification Schedule Object](#markdown-header-notification-schedule)
 ### Get Device example ###
 **GET /vf/rest/getDevice/${accessToken}?id=923487509328.123**  
 **Response:**  
-```{
+```
+{
   "status": {
     "code": 0,
     "message": "Success"
@@ -1076,7 +1080,8 @@ Returns [Notification Schedule Object](#markdown-header-notification-schedule)
 ### Get Shipment example ###
 **GET /vf/rest/getShipment/${accessToken}?id=77**  
 **Response:**  
-```{
+```
+{
   "status": {
     "code": 0,
     "message": "Success"
@@ -1112,7 +1117,8 @@ Returns [Notification Schedule Object](#markdown-header-notification-schedule)
 ### Get Notification Schedule example ###
 **GET /vf/rest/getNotificationSchedule/${accessToken}?id=77**  
 **Response:**  
-```{
+```
+{
   "status": {
     "code": 0,
     "message": "Success"
