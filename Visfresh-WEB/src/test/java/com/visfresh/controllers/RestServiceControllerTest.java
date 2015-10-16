@@ -35,6 +35,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceData;
 import com.visfresh.entities.LocationProfile;
@@ -67,6 +68,8 @@ public class RestServiceControllerTest {
     private MockRestService service;
     private RestServiceFacade facade;
     private long lastLong;
+    private Company company = new Company(1);
+    private User user;
     private static Server server;
 
     /**
@@ -140,7 +143,9 @@ public class RestServiceControllerTest {
         facade = new RestServiceFacade();
         facade.setServiceUrl(new URL(url));
 
-        final String authToken = facade.login("anylogin", "anypassword");
+        user = new User();
+        user.setLogin("anylogin");
+        final String authToken = facade.login(user.getLogin(), "anypassword");
         facade.setAuthToken(authToken);
     }
 
@@ -364,7 +369,10 @@ public class RestServiceControllerTest {
         n.setType(NotificationType.Alert);
 
         service.alerts.put(tempAlert.getId(), tempAlert);
-        service.notifications.put(n.getId(), n);
+        final List<Notification> nofications = new LinkedList<Notification>();
+        nofications.add(n);
+
+        service.notifications.put(user.getLogin(), nofications);
 
         //create ordinar alert
         final Alert batteryAlert = new Alert();
@@ -381,7 +389,7 @@ public class RestServiceControllerTest {
         n.setType(NotificationType.Alert);
 
         service.alerts.put(batteryAlert.getId(), batteryAlert);
-        service.notifications.put(n.getId(), n);
+        nofications.add(n);
 
         //arrival notification
         final Arrival a = new Arrival();
@@ -397,10 +405,10 @@ public class RestServiceControllerTest {
         n.setType(NotificationType.Arrival);
 
         service.arrivals.put(a.getId(), a);
-        service.notifications.put(n.getId(), n);
+        nofications.add(n);
 
         //get notifications
-        final List<Notification> notifications = facade.getNotifications(s);
+        final List<Notification> notifications = facade.getNotifications();
         assertEquals(3, notifications.size());
     }
     //@RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.GET)
@@ -429,7 +437,10 @@ public class RestServiceControllerTest {
         n.setType(NotificationType.Alert);
 
         service.alerts.put(tempAlert.getId(), tempAlert);
-        service.notifications.put(n.getId(), n);
+        final List<Notification> notifications = new LinkedList<Notification>();
+        notifications.add(n);
+
+        service.notifications.put(user.getLogin(), notifications);
 
         //create ordinar alert
         final Alert batteryAlert = new Alert();
@@ -446,7 +457,7 @@ public class RestServiceControllerTest {
         n1.setType(NotificationType.Alert);
 
         service.alerts.put(batteryAlert.getId(), batteryAlert);
-        service.notifications.put(n1.getId(), n1);
+        notifications.add(n1);
 
         //arrival notification
         final Arrival a = new Arrival();
@@ -462,7 +473,7 @@ public class RestServiceControllerTest {
         n2.setType(NotificationType.Arrival);
 
         service.arrivals.put(a.getId(), a);
-        service.notifications.put(n2.getId(), n2);
+        notifications.add(n2);
 
         //get notifications
         final List<Notification> toReaden = new LinkedList<Notification>();
@@ -471,8 +482,7 @@ public class RestServiceControllerTest {
 
         facade.markNotificationsAsRead(toReaden);
 
-        final List<Notification> notifications = facade.getNotifications(s);
-        assertEquals(1, notifications.size());
+        assertEquals(1, facade.getNotifications().size());
 
     }
     //@RequestMapping(value = "/getShipmentData/{authToken}", method = RequestMethod.GET)
@@ -590,7 +600,8 @@ public class RestServiceControllerTest {
     private LocationProfile createLocationProfile() {
         final LocationProfile p = new LocationProfile();
 
-        p.setCompany("Sun Microsystems");
+        p.setCompanyDescription("Sun Microsystems");
+        p.setCompany(company);
         p.setInterim(true);
         p.setName("Loc-" + (++lastLong));
         p.setNotes("Any notes");

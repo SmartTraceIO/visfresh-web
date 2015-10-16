@@ -18,10 +18,10 @@ public interface NotificationDao extends
         CrudRepository<Notification, Long> {
 
     /**
-     * @param shipment
+     * @param user TODO
      * @return
      */
-    List<Notification> findByShipment(Long shipment);
+    List<Notification> findForUser(User user);
     /**
      * @param user the user.
      * @param ids notification IDs.

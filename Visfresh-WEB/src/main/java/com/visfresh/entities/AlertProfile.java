@@ -6,6 +6,7 @@ package com.visfresh.entities;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -21,6 +22,8 @@ public class AlertProfile implements EntityWithId {
     @Id
     @GeneratedValue
     private Long id;
+    @ManyToOne
+    private Company company;
     /**
      * Alert profile name.
      */
@@ -235,5 +238,17 @@ public class AlertProfile implements EntityWithId {
     public void setCriticalLowTemperatureForMoreThen(
             final int criticalLowTemperatureForMoreThen) {
         this.criticalLowTemperatureForMoreThen = criticalLowTemperatureForMoreThen;
+    }
+    /**
+     * @return the company
+     */
+    public Company getCompany() {
+        return company;
+    }
+    /**
+     * @param company the company to set
+     */
+    public void setCompany(final Company company) {
+        this.company = company;
     }
 }

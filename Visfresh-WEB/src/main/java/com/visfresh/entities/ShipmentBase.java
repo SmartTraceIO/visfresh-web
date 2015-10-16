@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToOne;
 
 /**
  * Base class for Shipment templates and Shipments
@@ -21,6 +22,8 @@ import javax.persistence.InheritanceType;
 public abstract class ShipmentBase implements EntityWithId {
     @Id
     private Long id;
+    @ManyToOne
+    private Company company;
     private String name;
     private String shipmentDescription;
     private LocationProfile shippedFrom;
@@ -217,5 +220,16 @@ public abstract class ShipmentBase implements EntityWithId {
     public void setShutdownDeviceTimeOut(final int ninutes) {
         this.shutdownDeviceTimeOut = ninutes;
     }
-
+    /**
+     * @return the company
+     */
+    public Company getCompany() {
+        return company;
+    }
+    /**
+     * @param company the company to set
+     */
+    public void setCompany(final Company company) {
+        this.company = company;
+    }
 }

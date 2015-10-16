@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
@@ -22,31 +23,31 @@ import com.visfresh.entities.User;
  *
  */
 public interface RestService {
-    Long saveAlertProfile(final AlertProfile alert);
-    List<AlertProfile> getAlertProfiles();
+    Long saveAlertProfile(Company company, final AlertProfile alert);
+    List<AlertProfile> getAlertProfiles(Company company);
 
-    Long saveLocationProfile(final LocationProfile profile);
-    List<LocationProfile> getLocationProfiles();
+    Long saveLocationProfile(Company company, final LocationProfile profile);
+    List<LocationProfile> getLocationProfiles(Company company);
 
-    Long saveNotificationSchedule(final NotificationSchedule schedule);
-    List<NotificationSchedule> getNotificationSchedules();
+    Long saveNotificationSchedule(Company company, final NotificationSchedule schedule);
+    List<NotificationSchedule> getNotificationSchedules(Company company);
 
-    Long saveShipmentTemplate(final ShipmentTemplate tpl);
-    List<ShipmentTemplate> getShipmentTemplates();
+    Long saveShipmentTemplate(Company company, final ShipmentTemplate tpl);
+    List<ShipmentTemplate> getShipmentTemplates(Company company);
 
-    void saveDevice(Device device);
-    List<Device> getDevices();
+    void saveDevice(Company company, Device device);
+    List<Device> getDevices(Company company);
 
-    List<Shipment> getShipments();
-    Long saveShipment(Shipment shipment);
+    List<Shipment> getShipments(Company company);
+    Long saveShipment(Company company, Shipment shipment);
 
-    Long createShipmentTemplate(Shipment shipment, String templateName);
+    Long createShipmentTemplate(Company company, Shipment shipment, String templateName);
 
-    List<Notification> getNotifications(Long shipment);
+    List<Notification> getNotifications(User user);
     void markNotificationsAsRead(User user, List<Long> ids);
 
-    List<ShipmentData> getShipmentData(Date startDate, Date endDate,
-            String onlyWithAlerts);
+    List<ShipmentData> getShipmentData(Company company, Date startDate,
+            Date endDate, String onlyWithAlerts);
 
     void sendCommandToDevice(DeviceCommand cmd);
 }

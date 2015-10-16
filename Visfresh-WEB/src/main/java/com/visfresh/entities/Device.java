@@ -5,6 +5,7 @@ package com.visfresh.entities;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -20,6 +21,8 @@ public class Device {
     private String imei;
     private String name;
     private String description;
+    @ManyToOne
+    private Company company;
 
     /**
      * Default constructor.
@@ -87,5 +90,17 @@ public class Device {
      */
     public void setId(final String id) {
         this.id = id;
+    }
+    /**
+     * @return the company
+     */
+    public Company getCompany() {
+        return company;
+    }
+    /**
+     * @param company the company to set
+     */
+    public void setCompany(final Company company) {
+        this.company = company;
     }
 }

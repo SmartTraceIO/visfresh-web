@@ -6,6 +6,7 @@ package com.visfresh.entities;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -18,9 +19,11 @@ public class LocationProfile implements EntityWithId {
     @Id
     @GeneratedValue
     private Long id;
+    @ManyToOne
+    private Company company;
 
     private String name;
-    private String company;
+    private String companyDescription;
     private String notes;
     private String address;
     private int radius = 500; //meters
@@ -65,14 +68,14 @@ public class LocationProfile implements EntityWithId {
     /**
      * @return the company
      */
-    public String getCompany() {
-        return company;
+    public String getCompanyDescription() {
+        return companyDescription;
     }
     /**
      * @param company the company to set
      */
-    public void setCompany(final String company) {
-        this.company = company;
+    public void setCompanyDescription(final String company) {
+        this.companyDescription = company;
     }
     /**
      * @return the notes
@@ -151,5 +154,17 @@ public class LocationProfile implements EntityWithId {
      */
     public void setAddress(final String address) {
         this.address = address;
+    }
+    /**
+     * @return the company
+     */
+    public Company getCompany() {
+        return company;
+    }
+    /**
+     * @param company the company to set
+     */
+    public void setCompany(final Company company) {
+        this.company = company;
     }
 }

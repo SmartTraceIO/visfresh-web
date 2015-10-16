@@ -35,12 +35,11 @@ import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
-import com.visfresh.io.JSonFactory;
+import com.visfresh.io.JSonSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.services.AuthService;
@@ -75,7 +74,12 @@ public class RestServiceController {
      * JSON converter.
      */
     @Autowired
-    private JSonFactory jsonFactory;
+    private JSonSerializer jsonSerializerFactory;
+    /**
+     * Access controller.
+     */
+    @Autowired
+    private AccessController security;
 
     /**
      * Default constructor.
@@ -100,7 +104,7 @@ public class RestServiceController {
             final String password = json.get("password").getAsString();
 
             final AuthToken token = authService.login(login, password);
-            return createSuccessResponse(jsonFactory.toJson(token));
+            return createSuccessResponse(getSerializer().toJson(token));
         } catch (final Exception e) {
             log.error("Faile to log in " + login, e);
             return createErrorResponse(e);
@@ -115,7 +119,7 @@ public class RestServiceController {
     public @ResponseBody String getAuthToken(final HttpSession session) {
         try {
             final AuthToken token = authService.attachToExistingSession(session);
-            return createSuccessResponse(jsonFactory.toJson(token));
+            return createSuccessResponse(getSerializer().toJson(token));
         } catch (final Exception e) {
             log.error("Failed to get auth token. Possible not user has logged in", e);
             return createErrorResponse(e);
@@ -136,14 +140,14 @@ public class RestServiceController {
     @RequestMapping(value = "/refreshToken/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String refreshToken(@PathVariable final String authToken) {
         try {
-            final AuthToken token = authService.refreshToken(authToken);
-            return createSuccessResponse(jsonFactory.toJson(token));
+            final User user = getLoggedInUser(authToken);
+            final AuthToken token = authService.refreshToken(user);
+            return createSuccessResponse(getSerializer().toJson(token));
         } catch (final Exception e) {
             log.error("Failed to refresh token " + authToken, e);
             return createErrorResponse(e);
         }
     }
-
     //REST methods
     /**
      * @param authToken authentication token.
@@ -155,12 +159,10 @@ public class RestServiceController {
             final @RequestParam String username) {
         try {
             final User user = getLoggedInUser(authToken);
-            if (!user.getLogin().equals(username)) {
-                checkAdmin(user);
-            }
+            security.checkCanGetUserInfo(user, username);
 
             final User u = authService.getUser(username);
-            return createSuccessResponse(u == null ? null : jsonFactory.toJson(u));
+            return createSuccessResponse(u == null ? null : getSerializer().toJson(u));
         } catch (final Exception e) {
             log.error("Failed to get user info", e);
             return createErrorResponse(e);
@@ -176,9 +178,11 @@ public class RestServiceController {
     public @ResponseBody String saveAlertProfile(@PathVariable final String authToken,
             final @RequestBody String alert) {
         try {
-            checkAdmin(authToken);
-            final Long id = restService.saveAlertProfile(
-                    jsonFactory.parseAlertProfile(getJSonObject(alert)));
+            final User user = getLoggedInUser(authToken);
+            final AlertProfile p = getSerializer().parseAlertProfile(getJSonObject(alert));
+
+            security.checkCanSaveAlertProfile(user);
+            final Long id = restService.saveAlertProfile(user.getCompany(), p);
             return createIdResponse(id);
         } catch (final Exception e) {
             log.error("Failed to save alert profile", e);
@@ -193,12 +197,14 @@ public class RestServiceController {
     public @ResponseBody String getAlertProfiles(@PathVariable final String authToken) {
         try {
             //check logged in.
-            getLoggedInUser(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetAlertProfiles(user);
+            final JSonSerializer ser = getSerializer();
 
-            final List<AlertProfile> alerts = restService.getAlertProfiles();
+            final List<AlertProfile> alerts = restService.getAlertProfiles(user.getCompany());
             final JsonArray array = new JsonArray();
             for (final AlertProfile a : alerts) {
-                array.add(jsonFactory.toJson(a));
+                array.add(ser.toJson(a));
             }
 
             return createSuccessResponse(array);
@@ -217,10 +223,12 @@ public class RestServiceController {
     public @ResponseBody String saveLocationProfile(@PathVariable final String authToken,
             final @RequestBody String profile) {
         try {
-            checkAdmin(authToken);
+            final User user = getLoggedInUser(authToken);
+            final LocationProfile lp = getSerializer().parseLocationProfile(getJSonObject(profile));
 
-            final Long id = restService.saveLocationProfile(
-                    jsonFactory.parseLocationProfile(getJSonObject(profile)));
+            security.checkCanSaveLocationProfile(user);
+
+            final Long id = restService.saveLocationProfile(user.getCompany(), lp);
             return createIdResponse(id);
         } catch (final Exception e) {
             log.error("Failed to save location profile.", e);
@@ -235,12 +243,15 @@ public class RestServiceController {
     public @ResponseBody String getLocationProfiles(@PathVariable final String authToken) {
         try {
             //check logged in.
-            getLoggedInUser(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetLocationProfiles(user);
 
-            final List<LocationProfile> locations = restService.getLocationProfiles();
+            final JSonSerializer ser = getSerializer();
+
+            final List<LocationProfile> locations = restService.getLocationProfiles(user.getCompany());
             final JsonArray array = new JsonArray();
             for (final LocationProfile location : locations) {
-                array.add(jsonFactory.toJson(location));
+                array.add(ser.toJson(location));
             }
 
             return createSuccessResponse(array);
@@ -259,10 +270,11 @@ public class RestServiceController {
     public @ResponseBody String saveNotificationSchedule(@PathVariable final String authToken,
             final @RequestBody String schedule) {
         try {
-            checkAdmin(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSaveNotificationSchedule(user);
 
             final Long id = restService.saveNotificationSchedule(
-                    jsonFactory.parseNotificationSchedule(getJSonObject(schedule)));
+                    user.getCompany(), getSerializer().parseNotificationSchedule(getJSonObject(schedule)));
             return createIdResponse(id);
         } catch (final Exception e) {
             log.error("Failed to save notification schedule", e);
@@ -277,12 +289,16 @@ public class RestServiceController {
     public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken) {
         try {
             //check logged in.
-            getLoggedInUser(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetNotificationSchedules(user);
 
-            final List<NotificationSchedule> schedules = restService.getNotificationSchedules();
+            final List<NotificationSchedule> schedules = restService.getNotificationSchedules(
+                    user.getCompany());
+
+            final JSonSerializer ser = getSerializer();
             final JsonArray array = new JsonArray();
             for (final NotificationSchedule schedule : schedules) {
-                array.add(jsonFactory.toJson(schedule));
+                array.add(ser.toJson(schedule));
             }
 
             return createSuccessResponse(array);
@@ -300,10 +316,11 @@ public class RestServiceController {
     public @ResponseBody String saveShipmentTemplate(@PathVariable final String authToken,
             final @RequestBody String tpl) {
         try {
-            checkAdmin(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSaveShipmentTemplate(user);
 
             final Long id = restService.saveShipmentTemplate(
-                    jsonFactory.parseShipmentTemplate(getJSonObject(tpl)));
+                    user.getCompany(), getSerializer().parseShipmentTemplate(getJSonObject(tpl)));
             return createIdResponse(id);
         } catch (final Exception e) {
             log.error("Failed to save shipment template", e);
@@ -318,12 +335,13 @@ public class RestServiceController {
     public @ResponseBody String getShipmentTemplates(@PathVariable final String authToken) {
         try {
             //check logged in.
-            getLoggedInUser(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetShipmentTemplates(user);
 
-            final List<ShipmentTemplate> templates = restService.getShipmentTemplates();
+            final List<ShipmentTemplate> templates = restService.getShipmentTemplates(user.getCompany());
             final JsonArray array = new JsonArray();
             for (final ShipmentTemplate tpl : templates) {
-                array.add(jsonFactory.toJson(tpl));
+                array.add(getSerializer().toJson(tpl));
             }
 
             return createSuccessResponse(array);
@@ -341,9 +359,10 @@ public class RestServiceController {
     public @ResponseBody String saveDevice(@PathVariable final String authToken,
             final @RequestBody String device) {
         try {
-            checkAdmin(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSaveDevice(user);
 
-            restService.saveDevice(jsonFactory.parseDevice(getJSonObject(device)));
+            restService.saveDevice(user.getCompany(), getSerializer().parseDevice(getJSonObject(device)));
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to save device", e);
@@ -358,12 +377,15 @@ public class RestServiceController {
     public @ResponseBody String getDevices(@PathVariable final String authToken) {
         try {
             //check logged in.
-            getLoggedInUser(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetDevices(user);
 
-            final List<Device> devices = restService.getDevices();
+            final JSonSerializer ser = getSerializer();
+
+            final List<Device> devices = restService.getDevices(user.getCompany());
             final JsonArray array = new JsonArray();
             for (final Device t : devices) {
-                array.add(jsonFactory.toJson(t));
+                array.add(ser.toJson(t));
             }
 
             return createSuccessResponse(array);
@@ -381,19 +403,21 @@ public class RestServiceController {
     public @ResponseBody String saveShipment(@PathVariable final String authToken,
             final @RequestBody String shipment) {
         try {
-            checkAdmin(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSaveShipment(user);
 
-            final SaveShipmentRequest req = jsonFactory.parseSaveShipmentRequest(getJSonObject(shipment));
-            final Long id = restService.saveShipment(req.getShipment());
+            final SaveShipmentRequest req = getSerializer().parseSaveShipmentRequest(getJSonObject(shipment));
+            final Long id = restService.saveShipment(user.getCompany(), req.getShipment());
 
             final SaveShipmentResponse resp = new SaveShipmentResponse();
             resp.setShipmentId(id);
 
             if (req.isSaveAsNewTemplate()) {
-                final Long tplId = restService.createShipmentTemplate(req.getShipment(), req.getTemplateName());
+                final Long tplId = restService.createShipmentTemplate(
+                        user.getCompany(), req.getShipment(), req.getTemplateName());
                 resp.setTemplateId(tplId);
             }
-            return createSuccessResponse(jsonFactory.toJson(resp));
+            return createSuccessResponse(getSerializer().toJson(resp));
         } catch (final Exception e) {
             log.error("Failed to save device", e);
             return createErrorResponse(e);
@@ -407,12 +431,15 @@ public class RestServiceController {
     public @ResponseBody String getShipments(@PathVariable final String authToken) {
         try {
             //check logged in.
-            getLoggedInUser(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetShipments(user);
 
-            final List<Shipment> shipments = restService.getShipments();
+            final JSonSerializer ser = getSerializer();
+
+            final List<Shipment> shipments = restService.getShipments(user.getCompany());
             final JsonArray array = new JsonArray();
             for (final Shipment t : shipments) {
-                array.add(jsonFactory.toJson(t));
+                array.add(ser.toJson(t));
             }
 
             return createSuccessResponse(array);
@@ -423,20 +450,19 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
-     * @param shipment shipment ID.
      * @return list of shipments.
      */
     @RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getNotifications(@PathVariable final String authToken,
-            @RequestParam final Long shipment) {
+    public @ResponseBody String getNotifications(@PathVariable final String authToken) {
         try {
             //check logged in.
-            getLoggedInUser(authToken);
+            final User user = getLoggedInUser(authToken);
+            final JSonSerializer ser = getSerializer();
 
-            final List<Notification> shipments = restService.getNotifications(shipment);
+            final List<Notification> shipments = restService.getNotifications(user);
             final JsonArray array = new JsonArray();
             for (final Notification t : shipments) {
-                array.add(jsonFactory.toJson(t));
+                array.add(ser.toJson(t));
             }
 
             return createSuccessResponse(array);
@@ -476,17 +502,20 @@ public class RestServiceController {
 
         try {
             //check logged in.
-            getLoggedInUser(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetShipmentData(user);
+
+            final JSonSerializer ser = getSerializer();
 
             final Date startDate = parseDate(fromDate);
             final Date endDate = parseDate(toDate);
 
             final List<ShipmentData> data = restService.getShipmentData(
-                    startDate, endDate, onlyWithAlerts);
+                    user.getCompany(), startDate, endDate, onlyWithAlerts);
 
             final JsonArray array = new JsonArray();
             for (final ShipmentData d : data) {
-                array.add(jsonFactory.toJson(d));
+                array.add(ser.toJson(d));
             }
 
             return createSuccessResponse(array);
@@ -504,9 +533,10 @@ public class RestServiceController {
     public @ResponseBody String sendCommandToDevice(@PathVariable final String authToken,
             final @RequestBody String req) {
         try {
-            checkAdmin(authToken);
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSendCommandToDevice(user);
 
-            final DeviceCommand cmd = jsonFactory.parseDeviceCommand(getJSonObject(req));
+            final DeviceCommand cmd = getSerializer().parseDeviceCommand(getJSonObject(req));
             restService.sendCommandToDevice(cmd);
 
             return createSuccessResponse(null);
@@ -520,7 +550,7 @@ public class RestServiceController {
      * @return JSON response.
      */
     protected String createIdResponse(final Long id) {
-        return createSuccessResponse(jsonFactory.idToJson(id));
+        return createSuccessResponse(JSonSerializer.idToJson(id));
     }
     /**
      * @param response.
@@ -557,7 +587,7 @@ public class RestServiceController {
         } else if (e instanceof RestServiceException) {
             code = ((RestServiceException) e).getErrorCode();
         }
-        return jsonFactory.createErrorStatus(code, e);
+        return JSonSerializer.createErrorStatus(code, e);
     }
     /**
      * @param code status code.
@@ -584,21 +614,10 @@ public class RestServiceController {
         return user;
     }
     /**
-     * @param user user.
+     * @return
      */
-    private void checkAdmin(final User user) throws RestServiceException {
-        if (!user.getRoles().contains(Role.admin)) {
-            throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "User has not admin privileges");
-        }
-    }
-    /**
-     * @param authToken
-     * @throws AuthenticationException
-     * @throws RestServiceException
-     */
-    private void checkAdmin(final String authToken) throws AuthenticationException, RestServiceException {
-        final User user = getLoggedInUser(authToken);
-        checkAdmin(user);
+    private JSonSerializer getSerializer() {
+        return jsonSerializerFactory;
     }
     /**
      * @param text the resource name.
@@ -626,6 +645,6 @@ public class RestServiceController {
      * @return date.
      */
     private Date parseDate(final String dateStr) {
-        return dateStr == null || dateStr.length() == 0 ? null : JSonFactory.parseDate(dateStr);
+        return dateStr == null || dateStr.length() == 0 ? null : JSonSerializer.parseDate(dateStr);
     }
 }

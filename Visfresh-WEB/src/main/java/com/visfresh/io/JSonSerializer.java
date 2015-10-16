@@ -42,7 +42,7 @@ import com.visfresh.services.AuthToken;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class JSonFactory {
+public class JSonSerializer {
     /**
      * The date format.
      */
@@ -52,7 +52,7 @@ public class JSonFactory {
     /**
      * Default constructor.
      */
-    public JSonFactory() {
+    public JSonSerializer() {
         super();
     }
 
@@ -107,7 +107,7 @@ public class JSonFactory {
      * @param id entity ID.
      * @return JSON object.
      */
-    public JsonObject idToJson(final Long id) {
+    public static JsonObject idToJson(final Long id) {
         final JsonObject obj = new JsonObject();
         obj.addProperty("id", id);
         return obj;
@@ -163,7 +163,6 @@ public class JSonFactory {
 
         return p;
     }
-
     /**
      * @param location
      * @return
@@ -172,7 +171,7 @@ public class JSonFactory {
         final JsonObject obj = new JsonObject();
 
         obj.addProperty("id", location.getId());
-        obj.addProperty("company", location.getCompany());
+        obj.addProperty("companyDescription", location.getCompanyDescription());
         obj.addProperty("name", location.getName());
         obj.addProperty("notes", location.getNotes());
         obj.addProperty("address", location.getAddress());
@@ -194,7 +193,7 @@ public class JSonFactory {
         final LocationProfile location = new LocationProfile();
 
         location.setId(asLong(obj.get("id")));
-        location.setCompany(asString(obj.get("company")));
+        location.setCompanyDescription(asString(obj.get("companyDescription")));
         location.setName(asString(obj.get("name")));
         location.setNotes(asString(obj.get("notes")));
         location.setAddress(asString(obj.get("address")));
@@ -757,7 +756,6 @@ public class JSonFactory {
     private Shipment resolveShipment(final Long id) {
         return id == null ? null : getReferenceResolver().getShipment(id);
     }
-
     /**
      * @param e
      * @return
@@ -841,7 +839,7 @@ public class JSonFactory {
      * @param e error.
      * @return encoded to JSON object error.
      */
-    public JsonObject createErrorStatus(final int errorCode, final Throwable e) {
+    public static JsonObject createErrorStatus(final int errorCode, final Throwable e) {
         final JsonObject obj = new JsonObject();
         obj.addProperty("code", errorCode);
         obj.addProperty("message", e.getMessage() == null ? e.toString() : e.getMessage());

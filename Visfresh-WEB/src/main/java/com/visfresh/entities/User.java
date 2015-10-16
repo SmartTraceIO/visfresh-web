@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -23,6 +24,8 @@ import com.visfresh.utils.StringUtils;
 public class User {
     @Id
     private String login;
+    @ManyToOne
+    private Company company;
     private String fullName;
     @Transient
     private Set<Role> roles = new HashSet<Role>();
@@ -81,5 +84,17 @@ public class User {
                 this.roles.add(Role.valueOf(string));
             }
         }
+    }
+    /**
+     * @return the company
+     */
+    public Company getCompany() {
+        return company;
+    }
+    /**
+     * @param company the company to set
+     */
+    public void setCompany(final Company company) {
+        this.company = company;
     }
 }

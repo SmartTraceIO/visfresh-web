@@ -6,6 +6,7 @@ package com.visfresh.entities;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
@@ -26,6 +27,11 @@ public class Notification implements EntityWithId {
      * Notification type.
      */
     private NotificationType type;
+    /**
+     * The user
+     */
+    @ManyToOne(targetEntity = User.class)
+    private User user;
     /**
      * Notification issue.
      */

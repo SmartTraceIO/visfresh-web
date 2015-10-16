@@ -28,7 +28,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * @see com.visfresh.dao.NotificationDao#findByShipment(java.lang.Long)
      */
     @Override
-    public List<Notification> findByShipment(final Long shipment) {
+    public List<Notification> findForUser(User user) {
         //TODO implement
         return new LinkedList<Notification>();
     }

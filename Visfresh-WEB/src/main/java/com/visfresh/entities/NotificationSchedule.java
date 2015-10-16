@@ -9,6 +9,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -21,6 +22,8 @@ public class NotificationSchedule implements EntityWithId {
     @Id
     @GeneratedValue
     private Long id;
+    @ManyToOne
+    private Company company;
 
     private String name;
     private String description;
@@ -76,5 +79,17 @@ public class NotificationSchedule implements EntityWithId {
      */
     public List<SchedulePersonHowWhen> getSchedules() {
         return schedules;
+    }
+    /**
+     * @return the company
+     */
+    public Company getCompany() {
+        return company;
+    }
+    /**
+     * @param company the company to set
+     */
+    public void setCompany(final Company company) {
+        this.company = company;
     }
 }

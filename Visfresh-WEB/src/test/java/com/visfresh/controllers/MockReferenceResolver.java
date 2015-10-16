@@ -24,7 +24,6 @@ public class MockReferenceResolver implements ReferenceResolver {
     private final Map<String, Device> devices = new HashMap<String, Device>();
     private final Map<Long, Shipment> shipments = new HashMap<Long, Shipment>();
 
-
     /**
      * Default constructor.
      */

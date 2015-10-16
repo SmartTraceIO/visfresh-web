@@ -8,6 +8,8 @@ package com.visfresh.entities;
  *
  */
 public enum Role {
-    admin,
-    user
+    GlobalAdmin,
+    CompanyAdmin,
+    Dispatcher,
+    ReportViewer
 }

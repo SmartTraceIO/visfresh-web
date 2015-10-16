@@ -59,8 +59,8 @@ public class MockAuthService implements AuthService {
                 final User user = new User();
                 user.setLogin(login);
                 user.setFullName(login);
-                user.getRoles().add(Role.admin);
-                user.getRoles().add(Role.user);
+                user.getRoles().add(Role.GlobalAdmin);
+                user.getRoles().add(Role.ReportViewer);
 
                 u.setUser(user);
                 users.put(login, u);
@@ -98,9 +98,9 @@ public class MockAuthService implements AuthService {
      * @see com.visfresh.services.AuthService#refreshToken(java.lang.String)
      */
     @Override
-    public AuthToken refreshToken(final String authToken)
+    public AuthToken refreshToken(final User user)
             throws AuthenticationException {
-        final MockUserInfo info = getUserInfoForToken(authToken);
+        final MockUserInfo info = getUserInfo(user.getLogin());
         if (info == null) {
             throw new AuthenticationException("Not authorized or token expired");
         }
@@ -140,10 +140,22 @@ public class MockAuthService implements AuthService {
     @Override
     public User getUser(final String username) {
         synchronized (users) {
+            final MockUserInfo ui = getUserInfo(username);
+            if (ui != null) {
+                return ui.getUser();
+            }
+        }
+        return null;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getUser(java.lang.String)
+     */
+    private MockUserInfo getUserInfo(final String username) {
+        synchronized (users) {
             for (final Map.Entry<String, MockUserInfo> e : users.entrySet()) {
                 final MockUserInfo ui = e.getValue();
                 if (ui.getUser().getLogin().equals(username)) {
-                    return ui.getUser();
+                    return ui;
                 }
             }
         }

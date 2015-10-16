@@ -84,7 +84,7 @@ Method required associated privileges. The logged in user should be some as requ
 Method returns:  
 1. login - user login name  
 2. fullName - full user name  
-3. roles - array of user roles  
+3. roles - array of user roles, one from GlobalAdmin, CompanyAdmin, Dispatcher, ReportViewer
 
 [(example)](#markdown-header-get-user-info-example)
 
@@ -145,8 +145,7 @@ Method *GET*, method name getShipments, have not parameters. Returns array of [S
 [(example)](#markdown-header-get-shipments-example)
 
 ### Get Notifications ###
-Method *GET*, method name getNotifications, method parameters:  
-1. shipment - ID of associated [Shipment Object](#markdown-header-shipment)  
+Method *GET*, method name getNotifications, method parameters, have not parameters.
 Returns array of [Notification Objects](#markdown-header-notification)  
 [(example)](#markdown-header-get-notifications-example)
 
@@ -408,8 +407,8 @@ Method *POST*, method name *sendCommandToDevice*. Request body contains [Device]
 `"login": "asuvorov",`  
 `"fullName": "Alexander Suvorov",`  
 `"roles": [`  
-`"admin",`  
-`"user"`  
+`"Dispatcher",`  
+`"ReportViewer"`  
 `]`  
 `}`  
 `}`  

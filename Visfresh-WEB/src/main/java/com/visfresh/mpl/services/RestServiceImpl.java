@@ -21,6 +21,7 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.impl.DaoImplBase;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
@@ -67,7 +68,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#saveAlertProfile(com.visfresh.entities.AlertProfile)
      */
     @Override
-    public Long saveAlertProfile(final AlertProfile alert) {
+    public Long saveAlertProfile(final Company company, final AlertProfile alert) {
         return alertProfileDao.save(alert).getId();
     }
 
@@ -75,14 +76,14 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getAlertProfiles()
      */
     @Override
-    public List<AlertProfile> getAlertProfiles() {
+    public List<AlertProfile> getAlertProfiles(final Company company) {
         return asList(alertProfileDao.findAll());
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#saveLocationProfile(com.visfresh.entities.LocationProfile)
      */
     @Override
-    public Long saveLocationProfile(final LocationProfile profile) {
+    public Long saveLocationProfile(final Company company, final LocationProfile profile) {
         return locationProfileDao.save(profile).getId();
     }
 
@@ -90,7 +91,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getLocationProfiles()
      */
     @Override
-    public List<LocationProfile> getLocationProfiles() {
+    public List<LocationProfile> getLocationProfiles(final Company company) {
         return asList(locationProfileDao.findAll());
     }
 
@@ -98,7 +99,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#saveNotificationSchedule(com.visfresh.entities.NotificationSchedule)
      */
     @Override
-    public Long saveNotificationSchedule(final NotificationSchedule schedule) {
+    public Long saveNotificationSchedule(final Company company, final NotificationSchedule schedule) {
         return notificationScheduleDao.save(schedule).getId();
     }
 
@@ -106,7 +107,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getNotificationSchedules()
      */
     @Override
-    public List<NotificationSchedule> getNotificationSchedules() {
+    public List<NotificationSchedule> getNotificationSchedules(Company company) {
         return asList(notificationScheduleDao.findAll());
     }
 
@@ -114,7 +115,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#saveShipmentTemplate(com.visfresh.entities.ShipmentTemplate)
      */
     @Override
-    public Long saveShipmentTemplate(final ShipmentTemplate tpl) {
+    public Long saveShipmentTemplate(final Company company, final ShipmentTemplate tpl) {
         return shipmentTemplateDao.save(tpl).getId();
     }
 
@@ -122,7 +123,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getShipmentTemplates()
      */
     @Override
-    public List<ShipmentTemplate> getShipmentTemplates() {
+    public List<ShipmentTemplate> getShipmentTemplates(Company company) {
         return asList(shipmentTemplateDao.findAll());
     }
 
@@ -130,7 +131,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#saveDevice(com.visfresh.entities.Device)
      */
     @Override
-    public void saveDevice(final Device device) {
+    public void saveDevice(final Company company, final Device device) {
         deviceDao.save(device);
     }
 
@@ -138,7 +139,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getDevices()
      */
     @Override
-    public List<Device> getDevices() {
+    public List<Device> getDevices(final Company company) {
         return asList(deviceDao.findAll());
     }
 
@@ -146,7 +147,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getShipments()
      */
     @Override
-    public List<Shipment> getShipments() {
+    public List<Shipment> getShipments(final Company company) {
         return asList(shipmentDao.findAll());
     }
 
@@ -154,7 +155,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#saveShipment(com.visfresh.entities.Shipment)
      */
     @Override
-    public Long saveShipment(final Shipment shipment) {
+    public Long saveShipment(final Company company, final Shipment shipment) {
         return shipmentDao.save(shipment).getId();
     }
 
@@ -162,7 +163,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#createShipmentTemplate(com.visfresh.entities.Shipment, java.lang.String)
      */
     @Override
-    public Long createShipmentTemplate(final Shipment shipment, final String templateName) {
+    public Long createShipmentTemplate(final Company company, final Shipment shipment, final String templateName) {
         final ShipmentTemplate tpl = new ShipmentTemplate(shipment);
         tpl.setAddDateShipped(true);
         tpl.setDetectLocationForShippedFrom(true);
@@ -174,8 +175,8 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getNotifications(java.lang.Long)
      */
     @Override
-    public List<Notification> getNotifications(final Long shipment) {
-        return notificationDao.findByShipment(shipment);
+    public List<Notification> getNotifications(final User user) {
+        return notificationDao.findForUser(user);
     }
 
     /* (non-Javadoc)
@@ -190,8 +191,8 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getShipmentData(java.util.Date, java.util.Date, java.lang.String)
      */
     @Override
-    public List<ShipmentData> getShipmentData(final Date startDate, final Date endDate,
-            final String onlyWithAlerts) {
+    public List<ShipmentData> getShipmentData(final Company company, final Date startDate,
+            final Date endDate, final String onlyWithAlerts) {
         return shipmentDao.getShipmentData(startDate, endDate, onlyWithAlerts);
     }
 

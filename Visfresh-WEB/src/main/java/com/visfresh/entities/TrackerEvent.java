@@ -8,6 +8,7 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -39,6 +40,11 @@ public class TrackerEvent implements EntityWithId {
      * Temperature
      */
     private double temperature;
+    /**
+     * The device.
+     */
+    @ManyToOne
+    private Device device;
 
     /**
      * Default constructor.
@@ -107,5 +113,17 @@ public class TrackerEvent implements EntityWithId {
      */
     public void setTemperature(final double temperature) {
         this.temperature = temperature;
+    }
+    /**
+     * @return the device
+     */
+    public Device getDevice() {
+        return device;
+    }
+    /**
+     * @param device the device to set
+     */
+    public void setDevice(final Device device) {
+        this.device = device;
     }
 }

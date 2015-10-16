@@ -31,7 +31,7 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
-import com.visfresh.io.JSonFactory;
+import com.visfresh.io.JSonSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 
@@ -43,7 +43,7 @@ public class JSonFactoryTest extends TestCase {
     /**
      * Factory to test.
      */
-    private JSonFactory factory;
+    private JSonSerializer factory;
     private MockReferenceResolver resolver;
     private long lastLong;
     private Gson gson;
@@ -71,7 +71,7 @@ public class JSonFactoryTest extends TestCase {
         this.gson = b.create();
 
         resolver = new MockReferenceResolver();
-        factory = new JSonFactory();
+        factory = new JSonSerializer();
         factory.setReferenceResolver(resolver);
     }
 
@@ -212,7 +212,7 @@ public class JSonFactoryTest extends TestCase {
 
         LocationProfile p = new LocationProfile();
 
-        p.setCompany(company);
+        p.setCompanyDescription(company);
         p.setId(id);
         p.setInterim(interim);
         p.setName(name);
@@ -227,7 +227,7 @@ public class JSonFactoryTest extends TestCase {
         final JsonObject obj = factory.toJson(p);
         p = factory.parseLocationProfile(obj);
 
-        assertEquals(company, p.getCompany());
+        assertEquals(company, p.getCompanyDescription());
         assertEquals(id, p.getId());
         assertEquals(interim, p.isInterim());
         assertEquals(name, p.getName());
@@ -562,8 +562,8 @@ public class JSonFactoryTest extends TestCase {
         User u = new User();
         u.setLogin(login);
         u.setFullName(fullName);
-        u.getRoles().add(Role.user);
-        u.getRoles().add(Role.admin);
+        u.getRoles().add(Role.Dispatcher);
+        u.getRoles().add(Role.ReportViewer);
 
         final JsonObject obj = factory.toJson(u);
         u = factory.parseUser(obj);
@@ -666,7 +666,7 @@ public class JSonFactoryTest extends TestCase {
     private LocationProfile createLocationProfile() {
         final LocationProfile p = new LocationProfile();
 
-        p.setCompany("Sun Microsystems");
+        p.setCompanyDescription("Sun Microsystems");
         p.setId(generateId());
         p.setInterim(true);
         p.setName("JUnit-Location");

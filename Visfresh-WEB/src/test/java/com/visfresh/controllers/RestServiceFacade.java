@@ -36,7 +36,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
-import com.visfresh.io.JSonFactory;
+import com.visfresh.io.JSonSerializer;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -49,7 +49,7 @@ import com.visfresh.services.RestServiceException;
 public class RestServiceFacade implements ReferenceResolver {
     private static final String REST_SERVICE = "/rest";
 
-    private JSonFactory jsonFactory = new JSonFactory();
+    private JSonSerializer jsonFactory = new JSonSerializer();
     private Gson gson;
     private URL serviceUrl;
     private String authToken;
@@ -203,15 +203,12 @@ public class RestServiceFacade implements ReferenceResolver {
     }
 
     /**
-     * @param s shipment.
      * @return notifications for given shipment.
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<Notification> getNotifications(final Shipment s) throws IOException, RestServiceException {
+    public List<Notification> getNotifications() throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("shipment", s.getId().toString());
-
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getNotifications"),
                 params).getAsJsonArray();
         final List<Notification> notifications = new ArrayList<Notification>(response.size());
@@ -266,8 +263,8 @@ public class RestServiceFacade implements ReferenceResolver {
     public List<ShipmentData> getShipmentData(final Date from, final Date to, final boolean onlyWithAlerts)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("fromDate", JSonFactory.formatDate(from));
-        params.put("toDate", JSonFactory.formatDate(to));
+        params.put("fromDate", JSonSerializer.formatDate(from));
+        params.put("toDate", JSonSerializer.formatDate(to));
         params.put("onlyWithAlerts", Boolean.toString(onlyWithAlerts));
 
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getShipmentData"),
@@ -329,7 +326,7 @@ public class RestServiceFacade implements ReferenceResolver {
     /**
      * @param f JSON factory.
      */
-    public void setJsonFactory(final JSonFactory f) {
+    public void setJsonFactory(final JSonSerializer f) {
         this.jsonFactory = f;
     }
 
