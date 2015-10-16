@@ -326,6 +326,13 @@ public class MockRestService implements RestService {
     public ShipmentTemplate getShipmentTemplate(final Company company, final Long id) {
         return shipmentTemplates.get(id);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getNotificationSchedule(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public NotificationSchedule getNotificationSchedule(final Company company, final Long id) {
+        return notificationSchedules.get(id);
+    }
 
     /**
      * Cleares all caches.

@@ -189,7 +189,7 @@ public class JSonFactoryTest extends TestCase {
         s.getSchedules().add(createSchedulePersonHowWhen());
         s.getSchedules().add(createSchedulePersonHowWhen());
 
-        final JsonObject obj = factory.toJson(s);
+        final JsonObject obj = factory.toJson(s).getAsJsonObject();
         s = factory.parseNotificationSchedule(obj);
 
         assertEquals(description, s.getDescription());

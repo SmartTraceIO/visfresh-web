@@ -74,7 +74,7 @@ public class RestServiceController {
      * JSON converter.
      */
     @Autowired
-    private JSonSerializer jsonSerializerFactory;
+    private JSonSerializer serializer;
     /**
      * Access controller.
      */
@@ -323,7 +323,7 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
-     * @return list of notification shedules.
+     * @return list of notification schedules.
      */
     @RequestMapping(value = "/getNotificationSchedules/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken) {
@@ -342,6 +342,28 @@ public class RestServiceController {
             }
 
             return createSuccessResponse(array);
+        } catch (final Exception e) {
+            log.error("Failed to get notification schedules", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param id notification schedule ID.
+     * @return notification schedule.
+     */
+    @RequestMapping(value = "/getNotificationSchedule/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String getNotificationSchedule(@PathVariable final String authToken,
+            @RequestParam final Long id) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetNotificationSchedules(user);
+
+            final NotificationSchedule schedule = restService.getNotificationSchedule(
+                    user.getCompany(), id);
+
+            return createSuccessResponse(getSerializer().toJson(schedule));
         } catch (final Exception e) {
             log.error("Failed to get notification schedules", e);
             return createErrorResponse(e);
@@ -717,7 +739,7 @@ public class RestServiceController {
      * @return
      */
     private JSonSerializer getSerializer() {
-        return jsonSerializerFactory;
+        return serializer;
     }
     /**
      * @param text the resource name.

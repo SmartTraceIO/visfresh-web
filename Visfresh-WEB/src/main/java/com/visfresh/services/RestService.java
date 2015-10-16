@@ -81,4 +81,10 @@ public interface RestService {
      * @return shipment.
      */
     Shipment getShipment(Company company, Long id);
+    /**
+     * @param company company.
+     * @param id notification schedule ID.
+     * @return notification schedule.
+     */
+    NotificationSchedule getNotificationSchedule(Company company, Long id);
 }

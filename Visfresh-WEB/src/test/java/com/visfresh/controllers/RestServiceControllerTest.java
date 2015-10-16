@@ -527,6 +527,85 @@ public class RestServiceControllerTest {
 
         facade.sendCommandToDevice(device, "shutdown");
     }
+    @Test
+    public void testGetAlertProfile() throws IOException, RestServiceException {
+        final AlertProfile ap = createAlertProfile();
+        ap.setId(77L);
+
+        service.alertProfiles.put(ap.getId(), ap);
+        assertNotNull(facade.getAlertProfile(ap.getId()));
+    }
+    @Test
+    public void testGetLocationProfile() throws IOException, RestServiceException {
+        final LocationProfile lp = createLocationProfile();
+        lp.setId(77L);
+
+        service.locationProfiles.put(lp.getId(), lp);
+        assertNotNull(facade.getLocationProfile(lp.getId()));
+    }
+    public void testGetShipmentTemplate() throws IOException, RestServiceException {
+        final ShipmentTemplate sp = createShipmentTemplate();
+        service.alertProfiles.put(sp.getAlertProfile().getId(), sp.getAlertProfile());
+        service.locationProfiles.put(sp.getShippedFrom().getId(), sp.getShippedFrom());
+        service.locationProfiles.put(sp.getShippedTo().getId(), sp.getShippedTo());
+
+        NotificationSchedule ns = sp.getAlertsNotificationSchedules().get(0);
+        service.notificationSchedules.put(ns.getId(), ns);
+        ns = sp.getArrivalNotificationSchedules().get(0);
+        service.notificationSchedules.put(ns.getId(), ns);
+
+        service.shipmentTemplates.put(sp.getId(), sp);
+
+        assertNotNull(facade.getShipmentTemplate(sp.getId()));
+    }
+    @Test
+    public void testGetDevice() throws IOException, RestServiceException {
+        final Device d = createDevice("923487509328");
+        service.devices.put(d.getId(), d);
+
+        assertNotNull(facade.getDevice(d.getId()));
+    }
+    @Test
+    public void testGetShipment() throws IOException, RestServiceException {
+        final Shipment sp = createShipment();
+        sp.setId(77l);
+
+        final AlertProfile ap = sp.getAlertProfile();
+        ap.setId(78l);
+        service.alertProfiles.put(ap.getId(), ap);
+
+        final LocationProfile sf = sp.getShippedFrom();
+        sf.setId(79l);
+        service.locationProfiles.put(sf.getId(), sf);
+
+        final LocationProfile st = sp.getShippedTo();
+        st.setId(80l);
+        service.locationProfiles.put(st.getId(), st);
+
+        NotificationSchedule ns = sp.getAlertsNotificationSchedules().get(0);
+        ns.setId(91l);
+
+        service.notificationSchedules.put(ns.getId(), ns);
+        ns = sp.getArrivalNotificationSchedules().get(0);
+        ns.setId(92l);
+        service.notificationSchedules.put(ns.getId(), ns);
+
+        for (final Device d : sp.getDevices()) {
+            service.devices.put(d.getId(), d);
+        }
+
+        service.shipments.put(sp.getId(), sp);
+
+        assertNotNull(facade.getShipment(sp.getId()));
+    }
+    @Test
+    public void testNotificationSchedule() throws IOException, RestServiceException {
+        final NotificationSchedule s = createNotificationSchedule();
+        s.setId(77l);
+        service.notificationSchedules.put(s.getId(), s);
+
+        assertNotNull(facade.getNotificationSchedule(s.getId()));
+    }
 
     /**
      * @return tracker event.
@@ -559,7 +638,7 @@ public class RestServiceControllerTest {
         final Device t = new Device();
         t.setDescription("Device description");
         t.setImei(imei);
-        t.setId(imei);
+        t.setId(imei + ".123");
         t.setName("Device Name");
         t.setSn("1");
         return t;

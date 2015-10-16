@@ -22,13 +22,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
-import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
@@ -46,7 +46,7 @@ import com.visfresh.services.RestServiceException;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class RestServiceFacade implements ReferenceResolver {
+public class RestServiceFacade  {
     private static final String REST_SERVICE = "/rest";
 
     private JSonSerializer jsonFactory = new JSonSerializer();
@@ -64,7 +64,49 @@ public class RestServiceFacade implements ReferenceResolver {
         final GsonBuilder b = new GsonBuilder();
         b.setPrettyPrinting();
         this.gson = b.create();
-        jsonFactory.setReferenceResolver(this);
+
+        jsonFactory.setReferenceResolver(new ReferenceResolver() {
+            @Override
+            public Shipment getShipment(final Long id) {
+                try {
+                    return RestServiceFacade.this.getShipment(id);
+                } catch (IOException | RestServiceException e) {
+                    return null;
+                }
+            }
+            @Override
+            public NotificationSchedule getNotificationSchedule(final Long id) {
+                try {
+                    return RestServiceFacade.this.getNotificationSchedule(id);
+                } catch (IOException | RestServiceException e) {
+                    return null;
+                }
+            }
+            @Override
+            public LocationProfile getLocationProfile(final Long id) {
+                try {
+                    return RestServiceFacade.this.getLocationProfile(id);
+                } catch (IOException | RestServiceException e) {
+                    return null;
+                }
+            }
+            @Override
+            public Device getDevice(final String id) {
+                try {
+                    return RestServiceFacade.this.getDevice(id);
+                } catch (IOException | RestServiceException e) {
+                    return null;
+                }
+            }
+            @Override
+            public AlertProfile getAlertProfile(final Long id) {
+                try {
+                    return RestServiceFacade.this.getAlertProfile(id);
+                } catch (IOException | RestServiceException e) {
+                    return null;
+                }
+            }
+        });
     }
 
     /**
@@ -506,46 +548,78 @@ public class RestServiceFacade implements ReferenceResolver {
     /* (non-Javadoc)
      * @see com.visfresh.controllers.ReferenceResolver#getLocationProfile(java.lang.Long)
      */
-    @Override
-    public LocationProfile getLocationProfile(final Long id) {
-        try {
-            return getById(getLocationProfiles(), id);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+    public LocationProfile getLocationProfile(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", id.toString());
+
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getLocationProfile"),
+                params);
+        return response == JsonNull.INSTANCE ? null : jsonFactory.parseLocationProfile(
+                response.getAsJsonObject());
     }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.ReferenceResolver#getAlertProfile(java.lang.Long)
      */
-    @Override
-    public AlertProfile getAlertProfile(final Long id) {
-        try {
-            return getById(getAlertProfiles(), id);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+    public AlertProfile getAlertProfile(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", id.toString());
+
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getAlertProfile"),
+                params);
+        return response == JsonNull.INSTANCE ? null : jsonFactory.parseAlertProfile(
+                response.getAsJsonObject());
     }
     /* (non-Javadoc)
      * @see com.visfresh.io.ReferenceResolver#getShipment(java.lang.Long)
      */
-    @Override
-    public Shipment getShipment(final Long id) {
-        try {
-            return getById(getShipments(), id);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+    public Shipment getShipment(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", id.toString());
+
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getShipment"),
+                params);
+        return response == JsonNull.INSTANCE ? null : jsonFactory.parseShipment(
+                response.getAsJsonObject());
     }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.ReferenceResolver#getNotificationSchedule(java.lang.Long)
      */
-    @Override
-    public NotificationSchedule getNotificationSchedule(final Long id) {
-        try {
-            return getById(getNotificationSchedules(), id);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+    public NotificationSchedule getNotificationSchedule(final Long id)
+            throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", id.toString());
+
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
+                "getNotificationSchedule"), params);
+        return response == JsonNull.INSTANCE ? null : jsonFactory.parseNotificationSchedule(
+                response.getAsJsonObject());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.io.ReferenceResolver#getDevice(java.lang.String)
+     */
+    public Device getDevice(final String id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", id.toString());
+
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
+                "getDevice"), params);
+        return response == JsonNull.INSTANCE ? null : jsonFactory.parseDevice(
+                response.getAsJsonObject());
+    }
+    /**
+     * @param id
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public ShipmentTemplate getShipmentTemplate(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", id.toString());
+
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
+                "getShipmentTemplate"), params);
+        return response == JsonNull.INSTANCE ? null : jsonFactory.parseShipmentTemplate(
+                response.getAsJsonObject());
     }
     /**
      * @param response
@@ -560,44 +634,5 @@ public class RestServiceFacade implements ReferenceResolver {
      */
     private Long parseId(final JsonObject e) {
         return e.get("id").getAsLong();
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.io.ReferenceResolver#getDevice(java.lang.String)
-     */
-    @Override
-    public Device getDevice(final String id) {
-        if (id == null) {
-            return null;
-        }
-
-        try {
-            final List<Device> Devices = getDevices();
-            for (final Device t : Devices) {
-                if (id.equals(t.getId())) {
-                    return t;
-                }
-            }
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return null;
-    }
-    /**
-     * @param list
-     * @param id entity ID.
-     * @return
-     */
-    private <M extends EntityWithId> M getById(final List<M> list, final Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        for (final M m : list) {
-            if (id.equals(m.getId())) {
-                return m;
-            }
-        }
-        return null;
     }
 }

@@ -243,7 +243,14 @@ public class RestServiceImpl implements RestService {
         final ShipmentTemplate s = shipmentTemplateDao.findOne(id);
         return  s == null || !s.getCompany().getId().equals(company.getId()) ? null : s;
     }
-
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getNotificationSchedule(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public NotificationSchedule getNotificationSchedule(final Company company, final Long id) {
+        final NotificationSchedule s = notificationScheduleDao.findOne(id);
+        return  s == null || !s.getCompany().getId().equals(company.getId()) ? null : s;
+    }
     /**
      * @param iter
      * @return

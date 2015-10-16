@@ -220,7 +220,11 @@ public class JSonSerializer {
      * @param schedule notification schedule.
      * @return JSON object.
      */
-    public JsonObject toJson(final NotificationSchedule schedule) {
+    public JsonElement toJson(final NotificationSchedule schedule) {
+        if (schedule == null) {
+            return JsonNull.INSTANCE;
+        }
+
         final JsonObject obj = new JsonObject();
 
         obj.addProperty("description", schedule.getDescription());
