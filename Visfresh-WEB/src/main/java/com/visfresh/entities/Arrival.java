@@ -3,11 +3,12 @@
  */
 package com.visfresh.entities;
 
-import java.util.Date;
-
+import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -16,24 +17,20 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="arrivals")
-public class Arrival implements EntityWithId {
-    /**
-     * Entity ID.
-     */
-    @Id
-    @GeneratedValue
-    private Long id;
+public class Arrival extends NotificationIssue {
     /**
      * Number of meters of arrival
      */
+    @Column(name = "nummeters")
     private int numberOfMetersOfArrival;
     /**
-     * Date of occurrence.
+     * Device.
      */
-    private Date date;
-    /**
-     * Alert device.
-     */
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "device",
+        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
+        columnDefinition = "bigint",
+        referencedColumnName = "id")
     private Device device;
 
     /**
@@ -56,18 +53,6 @@ public class Arrival implements EntityWithId {
         this.numberOfMetersOfArrival = numberOfMetersOfArrival;
     }
     /**
-     * @return the date
-     */
-    public Date getDate() {
-        return date;
-    }
-    /**
-     * @param date the date to set
-     */
-    public void setDate(final Date date) {
-        this.date = date;
-    }
-    /**
      * @return the device
      */
     public Device getDevice() {
@@ -78,18 +63,5 @@ public class Arrival implements EntityWithId {
      */
     public void setDevice(final Device device) {
         this.device = device;
-    }
-    /**
-     * @return the id
-     */
-    @Override
-    public Long getId() {
-        return id;
-    }
-    /**
-     * @param id the id to set
-     */
-    public void setId(final Long id) {
-        this.id = id;
     }
 }

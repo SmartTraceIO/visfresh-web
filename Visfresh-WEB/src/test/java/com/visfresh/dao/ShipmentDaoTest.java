@@ -139,8 +139,10 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         deviceDao = getContext().getBean(DeviceDao.class);
 
         final Device d = new Device();
+        d.setName("Test Device");
         d.setImei("3984709382475");
         d.setId(d.getImei() + ".1234");
+        d.setSn("456");
         d.setCompany(sharedCompany);
         d.setDescription("Test device");
         device = deviceDao.save(d);

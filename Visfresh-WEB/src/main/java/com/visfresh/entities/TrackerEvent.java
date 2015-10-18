@@ -5,11 +5,19 @@ package com.visfresh.entities;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -22,28 +30,39 @@ public class TrackerEvent implements EntityWithId {
      * Event ID.
      */
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    @Column(name = "id", columnDefinition="BIGINT AUTO_INCREMENT")
     private Long id;
     /**
      * Message type.
      */
+    @Column
+    @Enumerated
     private TrackerEventType type;
     /**
      * Time of creation.
      */
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
     private Date time;
     /**
      * Battery charge.
      */
+    @Column
     private int battery;
     /**
      * Temperature
      */
+    @Column
     private double temperature;
     /**
      * The device.
      */
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "device",
+        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
+        columnDefinition = "bigint",
+        referencedColumnName = "id")
     private Device device;
 
     /**

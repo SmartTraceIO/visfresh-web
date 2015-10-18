@@ -30,6 +30,7 @@ public class DeviceCommandDaoTest extends BaseCrudTest<DeviceCommandDao, DeviceC
         final Device d = new Device();
         d.setCompany(sharedCompany);
         final String imei = "932487032487";
+        d.setName("Test Device");
         d.setImei(imei);
         d.setId(imei + ".1234");
         d.setDescription("JUnit device");

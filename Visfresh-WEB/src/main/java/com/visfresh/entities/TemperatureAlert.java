@@ -3,6 +3,8 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 /**
@@ -10,9 +12,18 @@ import javax.persistence.Entity;
  *
  */
 @Entity
-public class TemperatureAlert extends Alert {
-    private double temperature;
-    private int minutes;
+@DiscriminatorValue(value = "tempearature")
+public class TemperatureAlert extends AbstractAlert {
+    /**
+     * Temperature.
+     */
+    @Column
+    private double temperature = 0.;
+    /**
+     * The time interval for given temperature
+     */
+    @Column
+    private int minutes = 0;
 
     /**
      * Default constructor.

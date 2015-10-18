@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.visfresh.entities.AbstractAlert;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
@@ -426,7 +427,7 @@ public class JSonFactoryTest {
         final Device device = createDevice("20394870987324");
         final AlertType alertType = AlertType.EnterDarkEnvironment;
 
-        Alert alert = new Alert();
+        AbstractAlert alert = new Alert();
         alert.setDate(alertDate);
         alert.setDescription(alertDescription);
         alert.setId(alertId);
@@ -450,7 +451,7 @@ public class JSonFactoryTest {
         assertEquals(notificationId, n.getId());
 
         //check issue
-        alert = (Alert) n.getIssue();
+        alert = (AbstractAlert) n.getIssue();
 
         assertEquals(alertDate, alert.getDate());
         assertEquals(alertDescription, alert.getDescription());

@@ -7,13 +7,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -22,12 +23,29 @@ import com.visfresh.utils.StringUtils;
 @Entity
 @Table(name="users")
 public class User implements EntityWithId {
+    /**
+     * User login.
+     */
     @Id
     private String login;
-    @ManyToOne
+    /**
+     * Company.
+     */
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "company",
+        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
+        columnDefinition = "bigint",
+        referencedColumnName = "id")
     private Company company;
+    /**
+     * Full user name.
+     */
     private String fullName;
-    @Transient
+    /**
+     * Set of roles.
+     */
+    @Column(nullable = false)
+    @Convert(converter = RoleConverter.class)
     private Set<Role> roles = new HashSet<Role>();
 
     /**
@@ -73,24 +91,6 @@ public class User implements EntityWithId {
      */
     public Set<Role> getRoles() {
         return roles;
-    }
-    @Column(name="roles")
-    protected String getRolesImpl() {
-        if (roles == null || roles.isEmpty()) {
-            return null;
-        }
-        return StringUtils.combine(roles, ",");
-    }
-    @Column(name="roles")
-    protected void setRoles(final String roles) {
-        this.roles = new HashSet<Role>();
-
-        if (roles != null && roles.length() > 0) {
-            final String[] split = roles.split(", *");
-            for (final String string : split) {
-                this.roles.add(Role.valueOf(string));
-            }
-        }
     }
     /**
      * @return the company

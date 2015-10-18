@@ -3,10 +3,15 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
+import javax.persistence.Enumerated;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 
@@ -21,21 +26,29 @@ public class Notification implements EntityWithId {
      * Notification ID.
      */
     @Id
-    @GeneratedValue
+    @Column(name = "id", columnDefinition="BIGINT AUTO_INCREMENT")
     private Long id;
     /**
      * Notification type.
      */
+    @Column(nullable = false)
+    @Enumerated
     private NotificationType type;
     /**
      * The user
      */
-    @ManyToOne(targetEntity = User.class)
+    @ManyToOne
+    @JoinColumn(name = "user")
     private User user;
     /**
      * Notification issue.
      */
-    private EntityWithId issue;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "issue",
+        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
+        columnDefinition = "bigint",
+        referencedColumnName = "id")
+    private NotificationIssue issue;
 
     /**
      * Default constructor.
@@ -47,13 +60,13 @@ public class Notification implements EntityWithId {
     /**
      * @return the issue
      */
-    public EntityWithId getIssue() {
+    public NotificationIssue getIssue() {
         return issue;
     }
     /**
      * @param issue the issue to set
      */
-    public void setIssue(final EntityWithId issue) {
+    public void setIssue(final NotificationIssue issue) {
         this.issue = issue;
     }
     /**

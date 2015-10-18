@@ -62,7 +62,7 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
         @SuppressWarnings("unchecked")
         final ID id = (ID) dao.save(e).getId();
 
-        dao.getEntityManager().flush();
+        dao.getEntityManager().clear();
 
         assertNotNull(dao.findOne(id));
     }
@@ -77,7 +77,7 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
         final E e2 = createTestEntity();
         dao.save(e2);
 
-        dao.getEntityManager().flush();
+        dao.getEntityManager().clear();
 
         assertEquals(2, dao.findAll().size());
     }
@@ -92,13 +92,13 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
         final E e2 = createTestEntity();
         dao.save(e2);
 
-        dao.getEntityManager().flush();
+        dao.getEntityManager().clear();;
         dao.delete(e1);
-        dao.getEntityManager().flush();
+        dao.getEntityManager().clear();
 
         final List<E> all = dao.findAll();
         assertEquals(1, all.size());
-        assertEquals(e1.getId(), all.get(0).getId());
+        assertEquals(e2.getId(), all.get(0).getId());
     }
 
     /**

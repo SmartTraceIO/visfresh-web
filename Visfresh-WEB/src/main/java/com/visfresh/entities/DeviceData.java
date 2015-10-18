@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class DeviceData {
     private Device device;
-    private final List<Alert> alerts = new LinkedList<Alert>();
+    private final List<AbstractAlert> alerts = new LinkedList<AbstractAlert>();
     private final List<TrackerEvent> events = new LinkedList<TrackerEvent>();
 
     /**
@@ -25,7 +25,7 @@ public class DeviceData {
     /**
      * @return the alerts
      */
-    public List<Alert> getAlerts() {
+    public List<AbstractAlert> getAlerts() {
         return alerts;
     }
     /**

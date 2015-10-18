@@ -10,6 +10,7 @@ import com.visfresh.entities.Device;
  *
  */
 public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
+    private int id;
     /**
      * Default constructor.
      */
@@ -23,8 +24,10 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
     @Override
     protected Device createTestEntity() {
         final Device d = new Device();
-        d.setImei("3984709382475");
+        d.setImei(Long.toString(3984709382475L + (++id)));
         d.setId(d.getImei() + ".1234");
+        d.setName("Test Device");
+        d.setSn("124");
         d.setCompany(sharedCompany);
         d.setDescription("Test device");
         return d;

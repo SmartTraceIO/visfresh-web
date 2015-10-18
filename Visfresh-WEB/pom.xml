@@ -24,7 +24,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.24</version>
+			<version>5.1.36</version>
 		</dependency>
 
 		<!-- Spring WEB -->
@@ -55,6 +55,12 @@
 			<artifactId>HikariCP</artifactId>
 			<version>2.4.1</version>
 		</dependency>
+		<dependency>
+		    <groupId>javax.transaction</groupId>
+		    <artifactId>javax.transaction-api</artifactId>
+		    <version>1.2</version>
+		    <scope>compile</scope>
+		</dependency>
 		
 		<!-- Hibernate -->
 		<dependency>
@@ -63,14 +69,6 @@
 		    <version>1.0.0.Final</version>
 		    <scope>compile</scope>
 		</dependency>
-		
-		<dependency>
-		    <groupId>javax.transaction</groupId>
-		    <artifactId>javax.transaction-api</artifactId>
-		    <version>1.2</version>
-		    <scope>compile</scope>
-		</dependency>
-		
 		<dependency>
 		    <groupId>org.hibernate</groupId>
 		    <artifactId>hibernate-entitymanager</artifactId>

@@ -43,6 +43,7 @@ public class DaoTestRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     protected Object createTest() throws Exception {
+        context.refresh();
         final Object test = super.createTest();
         if (test instanceof BaseCrudTest) {
             this.test = ((BaseCrudTest<?, ?, ?>) test);

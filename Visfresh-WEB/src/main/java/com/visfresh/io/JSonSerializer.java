@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.entities.AbstractAlert;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
@@ -523,7 +524,7 @@ public class JSonSerializer {
 
         final Object issue = n.getIssue();
         if (issue instanceof Alert) {
-            obj.add("issue", toJson((Alert) issue));
+            obj.add("issue", toJson((AbstractAlert) issue));
         } else if (issue instanceof Arrival) {
             obj.add("issue", toJson((Arrival) issue));
         } else {
@@ -559,9 +560,9 @@ public class JSonSerializer {
      * @param json
      * @return
      */
-    public Alert parseAlert(final JsonObject json) {
+    public AbstractAlert parseAlert(final JsonObject json) {
         final AlertType type = AlertType.valueOf(json.get("type").getAsString());
-        Alert alert;
+        AbstractAlert alert;
         switch (type) {
             case CriticalHighTemperature:
             case CriticalLowTemperature:
@@ -589,7 +590,7 @@ public class JSonSerializer {
      * @param alert
      * @return JSON object
      */
-    public JsonObject toJson(final Alert alert) {
+    public JsonObject toJson(final AbstractAlert alert) {
         final JsonObject json = new JsonObject();
 
         //add common alert properties
@@ -678,7 +679,7 @@ public class JSonSerializer {
 
         //add alerts
         JsonArray array = new JsonArray();
-        for (final Alert a : deviceData.getAlerts()) {
+        for (final AbstractAlert a : deviceData.getAlerts()) {
             array.add(toJson(a));
         }
         json.add("alerts", array);

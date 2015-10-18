@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.CrudRepository;
@@ -36,6 +37,7 @@ public class DaoImplBase<T, ID extends Serializable> implements DaoBase<T, ID> {
      * @see org.springframework.data.repository.CrudRepository#save(java.lang.Object)
      */
     @Override
+    @Transactional
     public <S extends T> S save(final S entity) {
         return delegate.save(entity);
     }
@@ -44,6 +46,7 @@ public class DaoImplBase<T, ID extends Serializable> implements DaoBase<T, ID> {
      * @see org.springframework.data.repository.CrudRepository#save(java.lang.Iterable)
      */
     @Override
+    @Transactional
     public <S extends T> Iterable<S> save(final Iterable<S> entities) {
         return delegate.save(entities);
     }
@@ -100,6 +103,7 @@ public class DaoImplBase<T, ID extends Serializable> implements DaoBase<T, ID> {
      * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Object)
      */
     @Override
+    @Transactional
     public void delete(final T entity) {
         delegate.delete(entity);
     }
@@ -108,6 +112,7 @@ public class DaoImplBase<T, ID extends Serializable> implements DaoBase<T, ID> {
      * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Iterable)
      */
     @Override
+    @Transactional
     public void delete(final Iterable<? extends T> entities) {
         delegate.delete(entities);
     }
@@ -116,6 +121,7 @@ public class DaoImplBase<T, ID extends Serializable> implements DaoBase<T, ID> {
      * @see org.springframework.data.repository.CrudRepository#deleteAll()
      */
     @Override
+    @Transactional
     public void deleteAll() {
         delegate.deleteAll();
     }

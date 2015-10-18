@@ -7,7 +7,7 @@ import java.util.Date;
 
 import org.junit.Before;
 
-import com.visfresh.entities.Alert;
+import com.visfresh.entities.AbstractAlert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.TemperatureAlert;
@@ -17,7 +17,7 @@ import com.visfresh.entities.TemperatureAlert;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
+public class AlertDaoTest extends BaseCrudTest<AlertDao, AbstractAlert, Long> {
     /**
      * Device DAO.
      */
@@ -45,6 +45,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         d.setId(imei + ".1234");
         d.setDescription("JUnit device");
         d.setSn("12345");
+        d.setName("Test device");
 
         this.device = deviceDao.save(d);
     }
@@ -52,7 +53,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()
      */
     @Override
-    protected Alert createTestEntity() {
+    protected AbstractAlert createTestEntity() {
         final TemperatureAlert alert = new TemperatureAlert();
         alert.setDate(new Date(System.currentTimeMillis() - 100000000l));
         alert.setDescription("Alert description");

@@ -3,8 +3,11 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -16,30 +19,66 @@ import javax.persistence.Table;
 @Table(name="personalschedules")
 public class SchedulePersonHowWhen implements EntityWithId {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    @Column(name = "id", columnDefinition="BIGINT AUTO_INCREMENT")
     private Long id;
 
     //person to notify
+    /**
+     * First name.
+     */
+    @Column
     private String firstName;
+    /**
+     * Last name.
+     */
+    @Column
     private String lastName;
+    /**
+     * Company description.
+     */
+    @Column
     private String company;
+    /**
+     * Position
+     */
+    @Column
     private String position;
 
     //how to notify
+    /**
+     * Phone number for SMS notification.
+     */
+    @Column
     private String smsNotification;
+    /**
+     * Email address for email notificaition
+     */
+    @Column
     private String emailNotification;
+    /**
+     * Whether or not should
+     */
+    @Column
     private boolean pushToMobileApp;
 
     //when to notify
+    /**
+     * Week days.
+     */
+    @Column(name = "weekdays", nullable = false)
+    @Convert(converter = WeekDaysConverter.class)
     private final boolean[] weekDays = new boolean[7];
 
     /**
      * Start minute from start of day.
      */
+    @Column
     private int fromTime;
     /**
      * End minute from start of day.
      */
+    @Column
     private int toTime;
 
     /**

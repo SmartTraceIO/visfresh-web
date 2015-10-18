@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.entities.Alert;
+import com.visfresh.entities.AbstractAlert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
@@ -49,7 +49,7 @@ public class MockRestService implements RestService {
     public final Map<String, Device> devices = new ConcurrentHashMap<String, Device>();
     public final Map<Long, Shipment> shipments = new ConcurrentHashMap<Long, Shipment>();
     public final Map<String, List<Notification>> notifications = new ConcurrentHashMap<String, List<Notification>>();
-    public final Map<Long, Alert> alerts = new ConcurrentHashMap<Long, Alert>();
+    public final Map<Long, AbstractAlert> alerts = new ConcurrentHashMap<Long, AbstractAlert>();
     public final Map<Long, Arrival> arrivals = new ConcurrentHashMap<Long, Arrival>();
     public final Map<String, List<TrackerEvent>> trackerEvents = new ConcurrentHashMap<String, List<TrackerEvent>>();
 
@@ -221,7 +221,7 @@ public class MockRestService implements RestService {
         final Map<String, DeviceData> deviceData= new HashMap<String, DeviceData>();
 
         //add alerts
-        for (final Alert a : new LinkedList<Alert>(alerts.values())) {
+        for (final AbstractAlert a : new LinkedList<AbstractAlert>(alerts.values())) {
             final String imei = a.getDevice().getId();
 
             DeviceData data = deviceData.get(imei);

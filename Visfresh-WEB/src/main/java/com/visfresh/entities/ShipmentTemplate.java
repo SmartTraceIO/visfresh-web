@@ -3,6 +3,7 @@
  */
 package com.visfresh.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -13,8 +14,20 @@ import javax.persistence.Table;
 @Entity
 @Table(name="shipmenttemplates")
 public class ShipmentTemplate extends ShipmentBase {
+    /**
+     * Add data shipped.
+     */
+    @Column
     private boolean addDateShipped;
+    /**
+     * Detect location for shipped from location.
+     */
+    @Column(name="detectstartlocation")
     private boolean detectLocationForShippedFrom;
+    /**
+     * Use current time for shipped date.
+     */
+    @Column(name="usecurrenttime")
     private boolean useCurrentTimeForDateShipped;
     /**
      * Default constructor.

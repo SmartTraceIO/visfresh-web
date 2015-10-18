@@ -6,10 +6,17 @@ package com.visfresh.entities;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 /**
@@ -20,26 +27,79 @@ import javax.persistence.ManyToOne;
 @Entity
 @Inheritance(strategy= InheritanceType.TABLE_PER_CLASS)
 public abstract class ShipmentBase implements EntityWithId {
+    /**
+     * ID.
+     */
     @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    @Column(name = "id", columnDefinition="BIGINT AUTO_INCREMENT")
     private Long id;
-    @ManyToOne
+    /**
+     * Company name.
+     */
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "company",
+        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
+        columnDefinition = "bigint",
+        referencedColumnName = "id")
     private Company company;
+    /**
+     * Name.
+     */
+    @Column(name = "name")
     private String name;
+    /**
+     * Shipment description.
+     */
+    @Column(name = "description")
     private String shipmentDescription;
+    /**
+     * Shipped from location.
+     */
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "shippedfrom")
     private LocationProfile shippedFrom;
+    /**
+     * Shipped to location.
+     */
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "shippedto")
     private LocationProfile shippedTo;
+    /**
+     * Alert profile
+     */
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "alertprofile")
     private AlertProfile alertProfile;
+    /**
+     * Alert notification schedules.
+     */
+    @ManyToMany
     private final List<NotificationSchedule> alertsNotificationSchedules = new LinkedList<NotificationSchedule>();
     /**
      * Alert suppression time in hours.
      */
+    @Column(name = "alertcooldownsuppression")
     private int alertSuppressionDuringCoolDown;
+    /**
+     * Arrival notification with in.
+     */
+    @Column(name = "arrivalnotifwithin")
     private int arrivalNotificationWithIn;
+    /**
+     * Arrival notification shedules.
+     */
+    @ManyToMany
     private final List<NotificationSchedule> arrivalNotificationSchedules = new LinkedList<NotificationSchedule>();
+    /**
+     * Exclude notifications if not alerts fired.
+     */
+    @Column(name = "excludenoalerts")
     private boolean excludeNotificationsIfNoAlertsFired;
     /**
      * Shutdown device time out in minutes.
      */
+    @Column(name = "shutdowntimeout")
     private int shutdownDeviceTimeOut;
 
     /**
@@ -66,21 +126,6 @@ public abstract class ShipmentBase implements EntityWithId {
         arrivalNotificationSchedules.addAll((shipment.getArrivalNotificationSchedules()));
         setExcludeNotificationsIfNoAlertsFired(shipment.isExcludeNotificationsIfNoAlertsFired());
         setShutdownDeviceTimeOut(shipment.getShutdownDeviceTimeOut());
-    }
-
-    /**
-     * @return the id
-     */
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(final Long id) {
-        this.id = id;
     }
 
     /**
@@ -231,5 +276,19 @@ public abstract class ShipmentBase implements EntityWithId {
      */
     public void setCompany(final Company company) {
         this.company = company;
+    }
+    /**
+     * @return the id
+     */
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(final Long id) {
+        this.id = id;
     }
 }
