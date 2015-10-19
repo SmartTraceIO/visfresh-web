@@ -204,6 +204,43 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(1, s.getArrivalNotificationSchedules().size());
     }
 
+    @Test
+    public void testDeleteSchedules() {
+        Shipment s = createTestEntity();
+        s.getArrivalNotificationSchedules().add(alertNotifSched);
+        s.getAlertsNotificationSchedules().add(arrivalSched);
+
+        dao.save(s);
+        s = dao.findOne(s.getId());
+
+        assertEquals(2, s.getAlertsNotificationSchedules().size());
+        assertEquals(2, s.getArrivalNotificationSchedules().size());
+
+        //attempt to remove schedules
+        s.getArrivalNotificationSchedules().remove(0);
+        s.getAlertsNotificationSchedules().remove(0);
+        s = dao.save(s);
+        s = dao.findOne(s.getId());
+
+        assertEquals(1, s.getAlertsNotificationSchedules().size());
+        assertEquals(1, s.getArrivalNotificationSchedules().size());
+    }
+    @Test
+    public void testDeleteRefsExternally() {
+        Shipment s = createTestEntity();
+        dao.save(s);
+
+        s = dao.findOne(s.getId());
+        notificationScheduleDao.delete(s.getAlertsNotificationSchedules().get(0));
+        notificationScheduleDao.delete(s.getArrivalNotificationSchedules().get(0));
+        deviceDao.delete(s.getDevices().get(0));
+        s = dao.findOne(s.getId());
+
+        assertEquals(0, s.getAlertsNotificationSchedules().size());
+        assertEquals(0, s.getArrivalNotificationSchedules().size());
+        assertEquals(0, s.getDevices().size());
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
      */

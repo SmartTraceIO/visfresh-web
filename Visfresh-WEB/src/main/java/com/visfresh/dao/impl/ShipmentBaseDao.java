@@ -5,9 +5,11 @@ package com.visfresh.dao.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -114,10 +116,15 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
      */
     private <M extends EntityWithId<Long>> void createRefs(final String table,
             final Long id, final String fieldName,  final Collection<M> e) {
+        final Set<Long> ids = new HashSet<Long>();
         for (final M m : e) {
+            ids.add(m.getId());
+        }
+
+        for (final Long m : ids) {
             final HashMap<String, Object> params = new HashMap<String, Object>();
             params.put("shipment", id);
-            params.put(fieldName, m.getId());
+            params.put(fieldName, m);
             jdbc.update("insert into " + table + " (shipment, " + fieldName + ")"
                     + " values(:shipment,:" + fieldName + ")",
                     params);
@@ -226,23 +233,26 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         return no;
     }
     /**
-     * @param no
+     * @param ship
      * @param table
      * @return
      */
     private List<NotificationSchedule> findNotificationSchedules(
-            final E no, final String table) {
+            final E ship, final String table) {
         final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_FIELD, no.getId());
+        params.put(ID_FIELD, ship.getId());
         final List<Map<String, Object>> list = jdbc.queryForList(
                 "select * from " + table + " where shipment =:" + ID_FIELD,
                 params);
 
         final List<NotificationSchedule> result = new LinkedList<NotificationSchedule>();
         for (final Map<String,Object> row : list) {
-            row.remove("schedule");
+            row.remove("shipment");
             final Long id = ((Number) row.entrySet().iterator().next().getValue()).longValue();
-            result.add(notificationScheduleDao.findOne(id));
+            final NotificationSchedule sched = notificationScheduleDao.findOne(id);
+            if (sched != null) {
+                result.add(sched);
+            }
         }
         return result;
     }
