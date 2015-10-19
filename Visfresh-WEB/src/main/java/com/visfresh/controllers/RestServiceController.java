@@ -40,6 +40,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserProfile;
 import com.visfresh.io.JSonSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -662,6 +663,43 @@ public class RestServiceController {
             final DeviceCommand cmd = getSerializer().parseDeviceCommand(getJSonObject(req));
             restService.sendCommandToDevice(cmd);
 
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to send command to device", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @return profile for given user.
+     */
+    @RequestMapping(value = "/getProfile/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String getProfile(@PathVariable final String authToken) {
+        try {
+            final User user = getLoggedInUser(authToken);
+            security.checkGetProfile(user);
+
+            final UserProfile profile = restService.getProfile(user);
+            return createSuccessResponse(getSerializer().toJson(profile));
+        } catch (final Exception e) {
+            log.error("Failed to send command to device", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param profile to save.
+     * @return profile for given user.
+     */
+    @RequestMapping(value = "/saveProfile/{authToken}", method = RequestMethod.POST)
+    public @ResponseBody String getProfile(@PathVariable final String authToken,
+            @RequestBody final String profile) {
+        try {
+            final User user = getLoggedInUser(authToken);
+            security.checkSaveProfile(user);
+
+            final UserProfile p = getSerializer().parseUserProfile(getJSon(profile));
+            restService.saveUserProfile(user, p);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to send command to device", e);

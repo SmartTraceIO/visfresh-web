@@ -5,6 +5,7 @@ package com.visfresh.controllers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -50,7 +51,9 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserProfile;
 import com.visfresh.init.mock.MockConfig;
+import com.visfresh.mock.MockAuthService;
 import com.visfresh.mock.MockRestService;
 import com.visfresh.services.RestServiceException;
 
@@ -66,6 +69,7 @@ public class RestServiceControllerTest {
     private static String url;
 
     private MockRestService service;
+    private MockAuthService authService;
     private RestServiceFacade facade;
     private long lastLong;
     private Company company = new Company(1);
@@ -139,6 +143,8 @@ public class RestServiceControllerTest {
     @Before
     public void setUp() throws Exception {
         service = context.getBean(MockRestService.class);
+        authService = context.getBean(MockAuthService.class);
+        company.setId(7L);
 
         facade = new RestServiceFacade();
         facade.setServiceUrl(new URL(url));
@@ -147,6 +153,8 @@ public class RestServiceControllerTest {
         user.setLogin("anylogin");
         final String authToken = facade.login(user.getLogin(), "anypassword");
         facade.setAuthToken(authToken);
+
+        authService.getUser(user.getLogin()).setCompany(company);
     }
 
     //@RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -619,6 +627,56 @@ public class RestServiceControllerTest {
         service.notificationSchedules.put(s.getId(), s);
 
         assertNotNull(facade.getNotificationSchedule(s.getId()));
+    }
+    @Test
+    public void testUserProfile() throws IOException, RestServiceException {
+        //add shipment to service
+        final Shipment sp = createShipment();
+        sp.setCompany(company);
+        sp.setId(77l);
+
+        final AlertProfile ap = sp.getAlertProfile();
+        ap.setId(78l);
+        service.alertProfiles.put(ap.getId(), ap);
+
+        final LocationProfile sf = sp.getShippedFrom();
+        sf.setId(79l);
+        service.locationProfiles.put(sf.getId(), sf);
+
+        final LocationProfile st = sp.getShippedTo();
+        st.setId(80l);
+        service.locationProfiles.put(st.getId(), st);
+
+        NotificationSchedule ns = sp.getAlertsNotificationSchedules().get(0);
+        ns.setId(91l);
+
+        service.notificationSchedules.put(ns.getId(), ns);
+        ns = sp.getArrivalNotificationSchedules().get(0);
+        ns.setId(92l);
+        service.notificationSchedules.put(ns.getId(), ns);
+
+        for (final Device d : sp.getDevices()) {
+            service.devices.put(d.getId(), d);
+        }
+
+        service.shipments.put(sp.getId(), sp);
+
+        //add profile to service
+
+        UserProfile p = new UserProfile();
+        p.getShipments().add(sp);
+
+        service.profiles.put(user.getLogin(), p);
+
+        p = facade.getProfile();
+        assertEquals(1, p.getShipments().size());
+
+        service.profiles.clear();
+        assertNull(facade.getProfile());
+
+        facade.saveProfile(p);
+        assertNotNull(facade.getProfile());
+        assertEquals(1, p.getShipments().size());
     }
 
     /**

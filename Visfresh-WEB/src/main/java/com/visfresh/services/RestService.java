@@ -18,6 +18,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserProfile;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -88,4 +89,14 @@ public interface RestService {
      * @return notification schedule.
      */
     NotificationSchedule getNotificationSchedule(Company company, Long id);
+    /**
+     * @param user user.
+     * @return user profile.
+     */
+    UserProfile getProfile(User user);
+    /**
+     * @param user user.
+     * @param p profile.
+     */
+    void saveUserProfile(User user, UserProfile p);
 }

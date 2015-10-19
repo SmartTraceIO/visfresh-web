@@ -36,7 +36,7 @@ public class MockAuthService implements AuthService {
     private static final long TIMEOUT = 15000L;
     private final AtomicLong tokens = new AtomicLong(100000l);
 
-    private final Map<String, MockUserInfo> users = new HashMap<String, MockUserInfo>();
+    public final Map<String, MockUserInfo> users = new HashMap<String, MockUserInfo>();
     private final AtomicBoolean isStopped = new AtomicBoolean();
 
     /**

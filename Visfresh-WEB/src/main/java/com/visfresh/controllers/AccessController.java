@@ -87,4 +87,13 @@ public interface AccessController {
      * @throws RestServiceException
      */
     void checkCanSaveAlertProfile(User user) throws RestServiceException;
+    /**
+     * @param user user.
+     * @throws RestServiceException
+     */
+    void checkGetProfile(User user) throws RestServiceException;
+    /**
+     * @param user user.
+     */
+    void checkSaveProfile(User user) throws RestServiceException;
 }

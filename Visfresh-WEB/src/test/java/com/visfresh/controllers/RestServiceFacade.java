@@ -36,6 +36,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserProfile;
 import com.visfresh.io.JSonSerializer;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
@@ -620,6 +621,27 @@ public class RestServiceFacade  {
                 "getShipmentTemplate"), params);
         return response == JsonNull.INSTANCE ? null : jsonFactory.parseShipmentTemplate(
                 response.getAsJsonObject());
+    }
+    /**
+     * @return user profile.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public UserProfile getProfile() throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
+                "getProfile"), params);
+        return response == JsonNull.INSTANCE ? null : jsonFactory.parseUserProfile(
+                response.getAsJsonObject());
+    }
+    /**
+     * @param p user profile.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void saveProfile(final UserProfile p) throws IOException, RestServiceException {
+        sendPostRequest(getPathWithToken(REST_SERVICE, "saveProfile"),
+                jsonFactory.toJson(p));
     }
     /**
      * @param response

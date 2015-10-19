@@ -70,6 +70,8 @@ An authentication can be performed as from REST client using login method, as fr
 25. [Get Device](#markdown-header-get-device)  
 26. [Get Shipment](#markdown-header-get-shipment)  
 27. [Send Notification Schedule](#markdown-header-get-notification-schedule)  
+28. [Get Profile](#markdown-header-get-profile)  
+29. [Save Profile](#markdown-header-save-profile)  
 
 
 ### Authentication.###
@@ -207,6 +209,15 @@ Method *GET*, method name *getNotificationSchedule*. Request parameters:
 1. id - notification schedule ID.  
 Returns [Notification Schedule Object](#markdown-header-notification-schedule)  
 [(example)](#markdown-header-get-notification-schedule-example)
+
+### Get Profile ###
+Method *GET*, method name *getProfile*, have not parameters. Return [Profile Object](#markdown-header-profile-object)
+of current logged in user  
+[(example)](#markdown-header-get-profile-example)
+
+### Save Profile ###
+Method *POST*, method name *saveProfile*. Request body contains JSON serialized [Profile Object](#markdown-header-profile-object)  
+[(example)](#markdown-header-save-profile-example)
 
 ## Objects
 ### Response message ###
@@ -406,6 +417,14 @@ Returns [Notification Schedule Object](#markdown-header-notification-schedule)
 `"time": "2015-10-13T00:04:03.015+0300",`  
 `"type": "AUT" //device specific status`  
 `}`
+### Profile Object ###
+```
+{
+    "shipments": [ //array of Shipment ID associated by given user
+      77
+    ]
+}
+```
 
 ## Examples ##
 ### Authentication request example ###
@@ -1169,6 +1188,39 @@ Returns [Notification Schedule Object](#markdown-header-notification-schedule)
         ]
       }
     ]
+  }
+}
+```
+### Get Profile example ###
+**GET /vf/rest/getProfile/${accessToken}**  
+**Response:**  
+```
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "shipments": [
+      77
+    ]
+  }
+}
+```
+### Save Profile example ###
+**POST /vf/rest/saveProfile/${accessToken}**  
+**Request body:**  
+```
+{
+  "shipments": [
+    77
+  ]
+}
+Response:
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
   }
 }
 ```

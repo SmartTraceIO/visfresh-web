@@ -1,4 +1,5 @@
 -- drops
+drop table if exists usershipments;
 drop table if exists shipmentdevices;
 drop table if exists arrivalnotifschedules;
 drop table if exists alertnotifschedules;
@@ -13,6 +14,7 @@ drop table if exists devicecommands;
 drop table if exists arrivals;
 drop table if exists alerts;
 drop table if exists devices;
+drop table if exists userprofiles;
 drop table if exists users;
 drop table if exists companies;
 
@@ -74,6 +76,12 @@ create table users (
    company bigint(20) not null,
    primary key (username),
    FOREIGN KEY (company) REFERENCES companies(id)   
+);
+
+create table userprofiles(
+   user varchar(127) not null,
+   primary key (user),
+   FOREIGN KEY (user) REFERENCES users(username) ON DELETE CASCADE  
 );
 
 create table trackerevents (
@@ -197,9 +205,9 @@ create table alertnotifschedules(
    shipment bigint(20) not null,
    notification bigint(20) not null,
    primary key (shipment, notification),
-   constraint alertnotifschedules_shipment_fk foreign key (shipment)
+   foreign key (shipment)
       references shipments(id) ON DELETE CASCADE,
-   constraint alertnotifschedules_notif_fx foreign key (notification)
+   foreign key (notification)
       references notificationschedules(id) ON DELETE CASCADE
 );
 
@@ -207,9 +215,9 @@ create table arrivalnotifschedules(
    shipment bigint(20) not null,
    notification bigint(20) not null,
    primary key (shipment, notification),
-   constraint arrivalnotifschedules_schedules_fk foreign key (shipment)
+   foreign key (shipment)
       references shipments(id) ON DELETE CASCADE,
-   constraint arrivalnotifschedules_notif_fk foreign key (notification)
+   foreign key (notification)
       references notificationschedules(id) ON DELETE CASCADE
 );
 
@@ -217,8 +225,18 @@ create table shipmentdevices(
    shipment bigint(20) not null,
    device varchar(20) not null,
    primary key (shipment, device),
-   constraint foreign key (shipment)
+   foreign key (shipment)
       references shipments(id) ON DELETE CASCADE,
-   foreign key shipmentdevice_device_fk (device)
+   foreign key (device)
       references devices(id) ON DELETE CASCADE
+);
+
+create table usershipments(
+   shipment bigint(20) not null,
+   user varchar(20) not null,
+   primary key (shipment, user),
+   foreign key (shipment)
+      references shipments(id) ON DELETE CASCADE,
+   foreign key (user)
+      references userprofiles(user) ON DELETE CASCADE
 );

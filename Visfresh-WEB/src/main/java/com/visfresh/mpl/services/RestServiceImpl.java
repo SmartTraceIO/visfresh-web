@@ -20,6 +20,7 @@ import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.dao.impl.DaoImplBase;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
@@ -32,6 +33,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserProfile;
 import com.visfresh.services.RestService;
 
 /**
@@ -57,6 +59,8 @@ public class RestServiceImpl implements RestService {
     private NotificationDao notificationDao;
     @Autowired
     private DeviceCommandDao deviceCommandDao;
+    @Autowired
+    private UserDao userDao;
 
     /**
      * Default constructor.
@@ -251,6 +255,28 @@ public class RestServiceImpl implements RestService {
     public NotificationSchedule getNotificationSchedule(final Company company, final Long id) {
         final NotificationSchedule s = notificationScheduleDao.findOne(id);
         return  s == null || !s.getCompany().getId().equals(company.getId()) ? null : s;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getProfile(com.visfresh.entities.User)
+     */
+    @Override
+    public UserProfile getProfile(final User user) {
+        return userDao.getProfile(user);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#saveUserProfile(com.visfresh.entities.User, com.visfresh.entities.UserProfile)
+     */
+    @Override
+    public void saveUserProfile(final User user, final UserProfile p) {
+        // check hacking
+        final Long id = user.getCompany().getId();
+        for (final Shipment s : p.getShipments()) {
+            if (!s.getCompany().getId().equals(id)) {
+                return;
+            }
+        }
+
+        userDao.saveProfile(user, p);
     }
     /**
      * @param iter

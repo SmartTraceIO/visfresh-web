@@ -9,11 +9,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Role;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserProfile;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -21,31 +25,18 @@ import com.visfresh.entities.User;
  */
 @Component
 public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
-    /**
-     * Table name.
-     */
     public static final String TABLE = "users";
-    /**
-     * Description field.
-     */
+    public static final String PROFILE_TABLE = "userprofiles";
+    public static final String USER_SHIPMENTS = "usershipments";
+
     private static final String USERNAME_FIELD = "username";
-    /**
-     * Name field.
-     */
     private static final String PASSWORD_FIELD = "password";
-    /**
-     * ID field.
-     */
     private static final String FULLNAME_FIELD = "fullname";
-    /**
-     * Company name.
-     */
     private static final String COMPANY_FIELD = "company";
-    /**
-     * Company name.
-     */
     private static final String ROLES_FIELD = "roles";
 
+    @Autowired
+    private ShipmentDao shipmentDao;
     /**
      * Default constructor.
      */
@@ -229,5 +220,53 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("id", id);
         jdbc.update("delete from " + TABLE + " where " + USERNAME_FIELD + " = :id", paramMap);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.UserDao#getProfile(com.visfresh.entities.User)
+     */
+    @Override
+    public UserProfile getProfile(final User user) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("user", user.getLogin());
+
+        final String sql = "select * from " + PROFILE_TABLE + " where user = :user";
+        final List<Map<String, Object>> list = jdbc.queryForList(sql, params);
+        if (list.size() > 0) {
+            final UserProfile p = new UserProfile();
+            //load shipments
+
+            final List<Map<String, Object>> shipmentIds = jdbc.queryForList("select shipment from "
+                    + USER_SHIPMENTS + " where user = :user", params);
+            for (final Map<String, Object> map : shipmentIds) {
+                final Long id = ((Number) map.get("shipment")).longValue();
+                final Shipment s = shipmentDao.findOne(id);
+                p.getShipments().add(s);
+            }
+            return p;
+        }
+
+        return null;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.UserDao#saveProfile(com.visfresh.entities.UserProfile)
+     */
+    @Override
+    public void saveProfile(final User user, final UserProfile profile) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("user", user.getLogin());
+
+        if (getProfile(user) == null) {
+            //create  profile record
+            jdbc.update("insert into " + PROFILE_TABLE + "(user) values (:user)", params);
+        } else {
+            //clear shipment links
+            jdbc.update("delete from " + USER_SHIPMENTS + " where user = :user", params);
+        }
+
+        //link with shipments
+        for (final Shipment s : profile.getShipments()) {
+            params.put("shipment", s.getId());
+            jdbc.update("insert into " + USER_SHIPMENTS + "(user,shipment) values(:user, : shipment)", params);
+        }
     }
 }

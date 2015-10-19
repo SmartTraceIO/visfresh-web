@@ -195,6 +195,20 @@ public class DefaultAccessController implements AccessController {
                     "User has not permissions for save alert profiles");
         }
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkGetProfile(com.visfresh.entities.User)
+     */
+    @Override
+    public void checkGetProfile(final User user) throws RestServiceException {
+        //nothing, each user can get its profile.
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkSaveProfile(com.visfresh.entities.User)
+     */
+    @Override
+    public void checkSaveProfile(final User user) throws RestServiceException {
+        //nothing, each user can save its own profile.
+    }
 
     /**
      * @param user the user.

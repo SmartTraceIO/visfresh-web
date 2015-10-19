@@ -37,6 +37,7 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserProfile;
 import com.visfresh.io.JSonSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -596,13 +597,22 @@ public class JSonFactoryTest {
         cmd.setDevice(device);
         cmd.setCommand(command);
 
-        final JsonObject obj = factory.toJson(cmd);
+        final JsonObject obj = factory.toJson(cmd).getAsJsonObject();
         cmd = factory.parseDeviceCommand(obj);
 
         assertEquals(command, cmd.getCommand());
         assertNotNull(cmd.getDevice());
     }
+    public void testUserProfile() {
+        UserProfile p = new UserProfile();
+        p.getShipments().add(createShipment());
+        p.getShipments().add(createShipment());
 
+        final JsonElement obj = factory.toJson(p);
+        p = factory.parseUserProfile(obj);
+
+        assertEquals(2, p.getShipments().size());
+    }
     /**
      * @return tracker event.
      */

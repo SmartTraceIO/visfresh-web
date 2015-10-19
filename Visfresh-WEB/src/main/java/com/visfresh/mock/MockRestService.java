@@ -32,6 +32,7 @@ import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserProfile;
 import com.visfresh.services.RestService;
 
 /**
@@ -52,6 +53,7 @@ public class MockRestService implements RestService {
     public final Map<Long, Alert> alerts = new ConcurrentHashMap<Long, Alert>();
     public final Map<Long, Arrival> arrivals = new ConcurrentHashMap<Long, Arrival>();
     public final Map<String, List<TrackerEvent>> trackerEvents = new ConcurrentHashMap<String, List<TrackerEvent>>();
+    public final Map<String, UserProfile> profiles = new HashMap<String, UserProfile>();
 
     /**
      * Default constructor.
@@ -332,6 +334,28 @@ public class MockRestService implements RestService {
     @Override
     public NotificationSchedule getNotificationSchedule(final Company company, final Long id) {
         return notificationSchedules.get(id);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getProfile(com.visfresh.entities.User)
+     */
+    @Override
+    public UserProfile getProfile(final User user) {
+        return profiles.get(user.getLogin());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#saveUserProfile(com.visfresh.entities.User, com.visfresh.entities.UserProfile)
+     */
+    @Override
+    public void saveUserProfile(final User user, final UserProfile p) {
+        // check hacking
+        final Long id = user.getCompany().getId();
+        for (final Shipment s : p.getShipments()) {
+            if (!s.getCompany().getId().equals(id)) {
+                return;
+            }
+        }
+
+        profiles.put(user.getLogin(), p);
     }
 
     /**

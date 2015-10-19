@@ -38,6 +38,7 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.entities.UserProfile;
 import com.visfresh.services.AuthToken;
 
 /**
@@ -728,11 +729,45 @@ public class JSonSerializer {
         dc.setCommand(asString(json.get("command")));
         return dc;
     }
-    public JsonObject toJson(final DeviceCommand cmd) {
+    public JsonElement toJson(final DeviceCommand cmd) {
+        if (cmd == null) {
+            return JsonNull.INSTANCE;
+        }
+
         final JsonObject obj = new JsonObject();
         obj.addProperty("device", cmd.getDevice().getId());
         obj.addProperty("command", cmd.getCommand());
         return obj;
+    }
+    /**
+     * @param profile user profile.
+     * @return User pforile as JSON object.
+     */
+    public JsonElement toJson(final UserProfile profile) {
+        if (profile == null) {
+            return JsonNull.INSTANCE;
+        }
+        final JsonObject obj = new JsonObject();
+
+        final JsonArray array = new JsonArray();
+        for (final Shipment s : profile.getShipments()) {
+            array.add(new JsonPrimitive(s.getId()));
+        }
+
+        obj.add("shipments", array);
+        return obj;
+    }
+    public UserProfile parseUserProfile(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final UserProfile p = new UserProfile();
+        final JsonArray array = ((JsonObject) e).get("shipments").getAsJsonArray();
+        for (final JsonElement id : array) {
+            p.getShipments().add(resolveShipment(id.getAsLong()));
+        }
+        return p;
     }
 
 
