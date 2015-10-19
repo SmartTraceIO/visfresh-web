@@ -48,7 +48,7 @@ public interface RestService {
     void markNotificationsAsRead(User user, Set<Long> ids);
 
     List<ShipmentData> getShipmentData(Company company, Date startDate,
-            Date endDate, String onlyWithAlerts);
+            Date endDate, boolean onlyWithAlerts);
 
     void sendCommandToDevice(DeviceCommand cmd);
 

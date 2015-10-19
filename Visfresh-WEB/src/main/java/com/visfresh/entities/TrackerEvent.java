@@ -9,7 +9,7 @@ import java.util.Date;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class TrackerEvent implements EntityWithId<Long> {
+public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent> {
     /**
      * Event ID.
      */
@@ -114,5 +114,12 @@ public class TrackerEvent implements EntityWithId<Long> {
      */
     public void setDevice(final Device device) {
         this.device = device;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(final TrackerEvent o) {
+        return getTime().compareTo(o.getTime());
     }
 }

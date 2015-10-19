@@ -31,27 +31,27 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     /**
      * ID field.
      */
-    private static final String ID_FIELD = "id";
+    protected static final String ID_FIELD = "id";
     /**
      * Event type.
      */
-    private static final String TYPE_FIELD = "type";
+    protected static final String TYPE_FIELD = "type";
     /**
      * Event time.
      */
-    private static final String TIME_FIELD = "time";
+    protected static final String TIME_FIELD = "time";
     /**
      * Battery level.
      */
-    private static final String BATTERY_FIELD = "battery";
+    protected static final String BATTERY_FIELD = "battery";
     /**
      * Temperature.
      */
-    private static final String TEMPERATURE_FIELD = "temperature";
+    protected static final String TEMPERATURE_FIELD = "temperature";
     /**
      * Device ID.
      */
-    private static final String DEVICE_FIELD = "device";
+    protected static final String DEVICE_FIELD = "device";
 
     /**
      * Default constructor.
@@ -143,14 +143,23 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      */
     private TrackerEvent createTrackerEvent(final String resultPrefix, final String deviceResultPrefix,
             final String companyResultPrefix, final Map<String, Object> map) {
+        final TrackerEvent a = createTrackerEvent(map, resultPrefix);
+        a.setDevice(DeviceDaoImpl.createDevice(deviceResultPrefix, companyResultPrefix, map));
+        return a;
+    }
+    /**
+     * @param map
+     * @param resultPrefix
+     * @return
+     */
+    public static TrackerEvent createTrackerEvent(final Map<String, Object> map,
+            final String resultPrefix) {
         final TrackerEvent a = new TrackerEvent();
         a.setId(((Number) map.get(resultPrefix + ID_FIELD)).longValue());
         a.setBattery(((Number) map.get(resultPrefix + BATTERY_FIELD)).intValue());
         a.setTemperature(((Number) map.get(resultPrefix + TEMPERATURE_FIELD)).doubleValue());
         a.setTime((Date) map.get(resultPrefix + TIME_FIELD));
         a.setType(TrackerEventType.valueOf((String) map.get(resultPrefix + TYPE_FIELD)));
-
-        a.setDevice(DeviceDaoImpl.createDevice(deviceResultPrefix, companyResultPrefix, map));
         return a;
     }
     /**
@@ -212,6 +221,18 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         map.put(entityName + "." + BATTERY_FIELD, resultPrefix + BATTERY_FIELD);
         map.put(entityName + "." + TEMPERATURE_FIELD, resultPrefix + TEMPERATURE_FIELD);
         return map;
+    }
+    public static List<String> createFieldList(final boolean excludeReferences) {
+        final List<String> list = new LinkedList<String>();
+        list.add(ID_FIELD);
+        list.add(TYPE_FIELD);
+        list.add(TIME_FIELD);
+        list.add(BATTERY_FIELD);
+        list.add(TEMPERATURE_FIELD);
+        if (!excludeReferences) {
+            list.add(DEVICE_FIELD);
+        }
+        return list;
     }
 
     /* (non-Javadoc)

@@ -193,8 +193,8 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public List<ShipmentData> getShipmentData(final Company company, final Date startDate,
-            final Date endDate, final String onlyWithAlerts) {
-        return shipmentDao.getShipmentData(startDate, endDate, onlyWithAlerts);
+            final Date endDate, final boolean onlyWithAlerts) {
+        return shipmentDao.getShipmentData(company, startDate, endDate, onlyWithAlerts);
     }
 
     /* (non-Javadoc)

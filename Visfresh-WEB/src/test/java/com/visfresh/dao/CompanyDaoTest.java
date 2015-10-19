@@ -23,7 +23,7 @@ public class CompanyDaoTest extends BaseCrudTest<CompanyDao, Company, Long> {
      * @see com.visfresh.dao.BaseCrudTest#createSharedCompany()
      */
     @Override
-    protected Company createSharedCompany() {
+    protected Company createCompany(final String name) {
         //disable creating of shared company.
         return null;
     }

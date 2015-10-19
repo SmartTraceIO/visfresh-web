@@ -216,7 +216,7 @@ public class MockRestService implements RestService {
      */
     @Override
     public List<ShipmentData> getShipmentData(final Company company, final Date startDate,
-            final Date endDate, final String onlyWithAlerts) {
+            final Date endDate, final boolean onlyWithAlerts) {
         //device data map
         final Map<String, DeviceData> deviceData= new HashMap<String, DeviceData>();
 

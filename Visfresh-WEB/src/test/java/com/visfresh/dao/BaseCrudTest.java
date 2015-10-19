@@ -115,15 +115,15 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
         dao = ctxt.getBean(clazz);
         companyDao = getContext().getBean(CompanyDao.class);
 
-        this.sharedCompany = createSharedCompany();
+        this.sharedCompany = createCompany("Unit Test LLC");
     }
 
     /**
      * @return company.
      */
-    protected Company createSharedCompany() {
+    protected Company createCompany(final String name) {
         final Company company = new Company();
-        company.setName("Unit Test LLC");
+        company.setName(name);
         return companyDao.save(company);
     }
     /**

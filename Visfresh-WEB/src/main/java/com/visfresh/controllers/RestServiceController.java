@@ -621,7 +621,7 @@ public class RestServiceController {
     public @ResponseBody String getShipmentData(@PathVariable final String authToken,
             @RequestParam final String fromDate,
             @RequestParam final String toDate,
-            @RequestParam final String onlyWithAlerts) {
+            @RequestParam final boolean onlyWithAlerts) {
 
         try {
             //check logged in.

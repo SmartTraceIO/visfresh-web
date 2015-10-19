@@ -33,31 +33,31 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
     /**
      * Alert name.
      */
-    private static final String NAME_FIELD = "name";
+    protected static final String NAME_FIELD = "name";
     /**
      * Description.
      */
-    private static final String DESCRIPTION_FIELD = "description";
+    protected static final String DESCRIPTION_FIELD = "description";
     /**
      * Device.
      */
-    private static final String DEVICE_FIELD = "device";
+    protected static final String DEVICE_FIELD = "device";
     /**
      * Temperature.
      */
-    private static final String TEMPERATURE_FIELD = "temperature";
+    protected static final String TEMPERATURE_FIELD = "temperature";
     /**
      * The time interval for given temperature
      */
-    private static final String MINUTES_FIELD = "minutes";
+    protected static final String MINUTES_FIELD = "minutes";
     /**
      * Entity ID.
      */
-    private static final String ID_FIELD = "id";
+    protected static final String ID_FIELD = "id";
     /**
      * Date of occurrence.
      */
-    private static final String DATE_FIELD = "date";
+    protected static final String DATE_FIELD = "date";
 
     /**
      * Default constructor.
@@ -206,6 +206,18 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
      */
     private Alert createAlert(final String resultPrefix, final String deviceResultPrefix,
             final String companyResultPrefix, final Map<String, Object> map) {
+        final Alert a = createAlert(map, resultPrefix);
+        a.setDevice(DeviceDaoImpl.createDevice(deviceResultPrefix, companyResultPrefix, map));
+        return a;
+    }
+
+    /**
+     * Create alert with unresolved references.
+     * @param map parameter map.
+     * @param resultPrefix
+     * @return
+     */
+    public static Alert createAlert(final Map<String, Object> map, final String resultPrefix) {
         Alert a;
         final AlertType type = AlertType.valueOf((String) map.get(resultPrefix + TYPE_FIELD));
 
@@ -227,9 +239,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         a.setId(((Number) map.get(resultPrefix + ID_FIELD)).longValue());
         a.setType(type);
         a.setDescription((String) map.get(resultPrefix + DESCRIPTION_FIELD));
-        a.setDevice(DeviceDaoImpl.createDevice(deviceResultPrefix, companyResultPrefix, map));
         a.setDate((Date) map.get(resultPrefix + DATE_FIELD));
-
         return a;
     }
 
@@ -241,14 +251,28 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
     private Map<String, String> createSelectAsMapping(final String entityName,
             final String resultPrefix) {
         final Map<String, String> map = new HashMap<String, String>();
-        map.put(entityName + "." + NAME_FIELD, resultPrefix + NAME_FIELD);
-        map.put(entityName + "." + ID_FIELD, resultPrefix + ID_FIELD);
-        map.put(entityName + "." + TYPE_FIELD, resultPrefix + TYPE_FIELD);
-        map.put(entityName + "." + DESCRIPTION_FIELD, resultPrefix + DESCRIPTION_FIELD);
-        map.put(entityName + "." + TEMPERATURE_FIELD, resultPrefix + TEMPERATURE_FIELD);
-        map.put(entityName + "." + MINUTES_FIELD, resultPrefix + MINUTES_FIELD);
-        map.put(entityName + "." + DATE_FIELD, resultPrefix + DATE_FIELD);
+        for (final String field : createFieldList(true)) {
+            map.put(entityName + "." + field, resultPrefix + field);
+        }
         return map;
+    }
+    /**
+     * @param excludeReferences exclude references like as device ID.
+     * @return list of field names.
+     */
+    public static List<String> createFieldList(final boolean excludeReferences) {
+        final List<String> list = new LinkedList<String>();
+        list.add(NAME_FIELD);
+        list.add(ID_FIELD);
+        list.add(TYPE_FIELD);
+        list.add(DESCRIPTION_FIELD);
+        list.add(TEMPERATURE_FIELD);
+        list.add(MINUTES_FIELD);
+        list.add(DATE_FIELD);
+        if (!excludeReferences) {
+            list.add(DEVICE_FIELD);
+        }
+        return list;
     }
 
     /* (non-Javadoc)

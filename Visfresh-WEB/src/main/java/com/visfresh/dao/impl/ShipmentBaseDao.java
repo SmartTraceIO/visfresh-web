@@ -181,10 +181,10 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
     public List<E> findAll() {
         final List<Map<String, Object>> list = runSelectScript(null);
 
-        final Map<Long, Company> userCache = new HashMap<Long, Company>();
+        final Map<Long, Company> companyCache = new HashMap<Long, Company>();
         final List<E> result = new LinkedList<E>();
         for (final Map<String,Object> map : list) {
-            result.add(createEntity(map, userCache));
+            result.add(createEntity(map, companyCache));
         }
         return result;
     }

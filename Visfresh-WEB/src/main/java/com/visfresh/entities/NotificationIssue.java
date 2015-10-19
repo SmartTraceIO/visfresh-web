@@ -9,7 +9,7 @@ import java.util.Date;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public abstract class NotificationIssue implements EntityWithId<Long> {
+public abstract class NotificationIssue implements EntityWithId<Long>, Comparable<NotificationIssue> {
     /**
      * Entity ID.
      */
@@ -49,5 +49,12 @@ public abstract class NotificationIssue implements EntityWithId<Long> {
      */
     public void setId(final Long id) {
         this.id = id;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(final NotificationIssue o) {
+        return getDate().compareTo(o.getDate());
     }
 }

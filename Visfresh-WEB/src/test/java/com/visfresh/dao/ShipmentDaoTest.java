@@ -12,13 +12,20 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -36,6 +43,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
     private NotificationScheduleDao notificationScheduleDao;
     private Device device;
     private DeviceDao deviceDao;
+    private TrackerEventDao trackerEventDao;
 
     /**
      * Default constructor.
@@ -48,6 +56,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
     public void beforeTest() {
         //create alert profile
         alertProfileDao = getContext().getBean(AlertProfileDao.class);
+        trackerEventDao = getContext().getBean(TrackerEventDao.class);
 
         final AlertProfile ap = new AlertProfile();
         ap.setCompany(sharedCompany);
@@ -142,14 +151,22 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         //device
         deviceDao = getContext().getBean(DeviceDao.class);
 
+        device = createDevice("3984709382475");
+    }
+
+    /**
+     * @param imei
+     * @return
+     */
+    protected Device createDevice(final String imei) {
         final Device d = new Device();
         d.setName("Test Device");
-        d.setImei("3984709382475");
+        d.setImei(imei);
         d.setId(d.getImei() + ".1234");
         d.setSn("456");
         d.setCompany(sharedCompany);
         d.setDescription("Test device");
-        device = deviceDao.save(d);
+        return deviceDao.save(d);
     }
 
     /* (non-Javadoc)
@@ -272,7 +289,104 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
     @Test
     public void testGetShipmentData() {
+        final Device d = createDevice("234980098");
 
+        Shipment s = createTestEntity();
+        s.getDevices().clear();
+        s.getDevices().add(d);
+        s = dao.save(s);
+
+        createTrackerEvent(d, TrackerEventType.INIT);
+
+        //Test onlyWithAlerts flag
+        List<ShipmentData> data = dao.getShipmentData(sharedCompany,
+                new Date(System.currentTimeMillis() - 10000000l),
+                new Date(System.currentTimeMillis() + 100000L), true);
+        assertEquals(0, data.size());
+
+        data = dao.getShipmentData(sharedCompany,
+                new Date(System.currentTimeMillis() - 10000000l),
+                new Date(System.currentTimeMillis() + 100000L), false);
+        assertEquals(1, data.size());
+
+        createAlert(d, AlertType.CriticalHighTemperature);
+        data = dao.getShipmentData(sharedCompany,
+                new Date(System.currentTimeMillis() - 10000000l),
+                new Date(System.currentTimeMillis() + 100000L), false);
+        assertEquals(1, data.size());
+
+        //assert check time interval
+        data = dao.getShipmentData(sharedCompany,
+                new Date(System.currentTimeMillis() - 10000000l),
+                new Date(System.currentTimeMillis() - 100000L), false);
+        assertEquals(0, data.size());
+    }
+
+    @Test
+    public void testGetShipmentDataForLeftCompany() {
+        final Company c = createCompany("Left company");
+
+        final Device d = createDevice("234980098");
+        d.setCompany(c);
+        deviceDao.save(d);
+
+        Shipment s = createTestEntity();
+        s.setCompany(c);
+        s.getDevices().clear();
+        s.getDevices().add(d);
+        s = dao.save(s);
+
+        createTrackerEvent(d, TrackerEventType.INIT);
+        createAlert(d, AlertType.CriticalHighTemperature);
+
+        //Test onlyWithAlerts flag
+        final List<ShipmentData> data = dao.getShipmentData(sharedCompany,
+                new Date(System.currentTimeMillis() - 10000000l),
+                new Date(System.currentTimeMillis() + 100000L), false);
+        assertEquals(0, data.size());
+    }
+
+    /**
+     * @param d device.
+     * @param t event type.
+     * @return tracker event.
+     */
+    private TrackerEvent createTrackerEvent(final Device d, final TrackerEventType t) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setBattery(27);
+        e.setDevice(d);
+        e.setTemperature(5.5);
+        e.setTime(new Date());
+        e.setType(t);
+        return trackerEventDao.save(e);
+    }
+    /**
+     * @param d
+     * @param type
+     * @return
+     */
+    private Alert createAlert(final Device d, final AlertType type) {
+        Alert a;
+        switch (type) {
+            case CriticalHighTemperature:
+            case CriticalLowTemperature:
+            case HighTemperature:
+            case LowTemperature:
+                final TemperatureAlert ta = new TemperatureAlert();
+                ta.setTemperature(10.10);
+                ta.setMinutes(20);
+                a = ta;
+                break;
+            default:
+                a = new Alert();
+        }
+
+        a.setName("Test Alert - " + type);
+        a.setType(type);
+        a.setDescription("Test aleret");
+        a.setDate(new Date());
+        a.setDevice(d);
+        return a;
     }
 
     /* (non-Javadoc)
@@ -282,6 +396,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
     public void clear() {
         super.clear();
 
+        trackerEventDao.deleteAll();
         alertProfileDao.deleteAll();
         locationProfileDao.deleteAll();
         notificationScheduleDao.deleteAll();
