@@ -10,5 +10,4 @@ import com.visfresh.entities.Arrival;
  *
  */
 public interface ArrivalDao extends DaoBase<Arrival, Long> {
-
 }

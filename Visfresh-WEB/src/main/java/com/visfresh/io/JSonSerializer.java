@@ -3,6 +3,7 @@
  */
 package com.visfresh.io;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,7 +15,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.visfresh.entities.AbstractAlert;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
@@ -27,8 +27,8 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.NotificationType;
+import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Role;
-import com.visfresh.entities.SchedulePersonHowWhen;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.ShipmentData;
@@ -235,7 +235,7 @@ public class JSonSerializer {
         final JsonArray array = new JsonArray();
         obj.add("schedules", array);
 
-        for (final SchedulePersonHowWhen sphw : schedule.getSchedules()) {
+        for (final PersonalSchedule sphw : schedule.getSchedules()) {
             array.add(toJson(sphw));
         }
 
@@ -264,7 +264,7 @@ public class JSonSerializer {
      * @param s schedule/person/how/when
      * @return JSON object.
      */
-    public JsonObject toJson(final SchedulePersonHowWhen s) {
+    public JsonObject toJson(final PersonalSchedule s) {
         final JsonObject obj = new JsonObject();
 
         obj.addProperty("company", s.getCompany());
@@ -290,9 +290,9 @@ public class JSonSerializer {
      * @param obj JSON object.
      * @return schedule/person/how/when
      */
-    public SchedulePersonHowWhen parseSchedulePersonHowWhen(
+    public PersonalSchedule parseSchedulePersonHowWhen(
             final JsonObject obj) {
-        final SchedulePersonHowWhen s = new SchedulePersonHowWhen();
+        final PersonalSchedule s = new PersonalSchedule();
 
         s.setCompany(asString(obj.get("company")));
         s.setEmailNotification(asString(obj.get("emailNotification")));
@@ -340,13 +340,13 @@ public class JSonSerializer {
         obj.addProperty("shipmentDescription", shpb.getShipmentDescription());
         obj.addProperty("alertSuppressionDuringCoolDown", shpb.getAlertSuppressionDuringCoolDown());
         obj.addProperty("id", shpb.getId());
-        obj.addProperty("alertProfile", getLongId(shpb.getAlertProfile()));
-        obj.add("alertsNotificationSchedules", getLongIdList(shpb.getAlertsNotificationSchedules()));
+        obj.addProperty("alertProfile", getId(shpb.getAlertProfile()));
+        obj.add("alertsNotificationSchedules", getIdList(shpb.getAlertsNotificationSchedules()));
         obj.addProperty("arrivalNotificationWithIn", shpb.getArrivalNotificationWithIn());
-        obj.add("arrivalNotificationSchedules", getLongIdList(shpb.getArrivalNotificationSchedules()));
+        obj.add("arrivalNotificationSchedules", getIdList(shpb.getArrivalNotificationSchedules()));
         obj.addProperty("excludeNotificationsIfNoAlertsFired", shpb.isExcludeNotificationsIfNoAlertsFired());
-        obj.addProperty("shippedFrom", getLongId(shpb.getShippedFrom()));
-        obj.addProperty("shippedTo", getLongId(shpb.getShippedTo()));
+        obj.addProperty("shippedFrom", getId(shpb.getShippedFrom()));
+        obj.addProperty("shippedTo", getId(shpb.getShippedTo()));
         obj.addProperty("shutdownDevice", shpb.getShutdownDeviceTimeOut());
     }
     /**
@@ -524,7 +524,7 @@ public class JSonSerializer {
 
         final Object issue = n.getIssue();
         if (issue instanceof Alert) {
-            obj.add("issue", toJson((AbstractAlert) issue));
+            obj.add("issue", toJson((Alert) issue));
         } else if (issue instanceof Arrival) {
             obj.add("issue", toJson((Arrival) issue));
         } else {
@@ -560,9 +560,9 @@ public class JSonSerializer {
      * @param json
      * @return
      */
-    public AbstractAlert parseAlert(final JsonObject json) {
+    public Alert parseAlert(final JsonObject json) {
         final AlertType type = AlertType.valueOf(json.get("type").getAsString());
-        AbstractAlert alert;
+        Alert alert;
         switch (type) {
             case CriticalHighTemperature:
             case CriticalLowTemperature:
@@ -590,7 +590,7 @@ public class JSonSerializer {
      * @param alert
      * @return JSON object
      */
-    public JsonObject toJson(final AbstractAlert alert) {
+    public JsonObject toJson(final Alert alert) {
         final JsonObject json = new JsonObject();
 
         //add common alert properties
@@ -679,7 +679,7 @@ public class JSonSerializer {
 
         //add alerts
         JsonArray array = new JsonArray();
-        for (final AbstractAlert a : deviceData.getAlerts()) {
+        for (final Alert a : deviceData.getAlerts()) {
             array.add(toJson(a));
         }
         json.add("alerts", array);
@@ -846,17 +846,17 @@ public class JSonSerializer {
      * @param e
      * @return
      */
-    private Long getLongId(final EntityWithId e) {
-        return e == null ? null : (Long) e.getId();
+    private <ID extends Serializable> ID getId(final EntityWithId<ID> e) {
+        return e == null ? null : (ID) e.getId();
     }
     /**
      * @param entities list of entity.
      * @return JSON array with entity IDs.
      */
-    private <E extends EntityWithId> JsonArray getLongIdList(final List<E> entities) {
+    private <E extends EntityWithId<Long>> JsonArray getIdList(final List<E> entities) {
         final JsonArray array= new JsonArray();
         for (final E e : entities) {
-            array.add(new JsonPrimitive((Long) e.getId()));
+            array.add(new JsonPrimitive(e.getId()));
         }
         return array;
     }

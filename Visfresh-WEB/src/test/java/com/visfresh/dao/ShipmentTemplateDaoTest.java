@@ -3,12 +3,18 @@
  */
 package com.visfresh.dao;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
 import org.junit.Before;
 
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.SchedulePersonHowWhen;
+import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.ShipmentTemplate;
 
 /**
@@ -95,7 +101,7 @@ public class ShipmentTemplateDaoTest
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
-        SchedulePersonHowWhen ps = new SchedulePersonHowWhen();
+        PersonalSchedule ps = new PersonalSchedule();
         ps.setCompany("Any Company");
         ps.setEmailNotification("asuvoror");
         ps.setFirstName("First");
@@ -115,7 +121,7 @@ public class ShipmentTemplateDaoTest
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
-        ps = new SchedulePersonHowWhen();
+        ps = new PersonalSchedule();
         ps.setCompany("Any Company");
         ps.setEmailNotification("asuvoror");
         ps.setFirstName("First");
@@ -154,7 +160,53 @@ public class ShipmentTemplateDaoTest
         s.setUseCurrentTimeForDateShipped(true);
         return s;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertCreateTestEntityOk(com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected void assertCreateTestEntityOk(final ShipmentTemplate tpl) {
+        assertNotNull(tpl.getAlertProfile());
+        assertEquals(5, tpl.getAlertSuppressionDuringCoolDown());
+        assertEquals(17, tpl.getArrivalNotificationWithIn());
+        assertEquals(sharedCompany.getId(), tpl.getCompany().getId());
+        assertEquals(true, tpl.isExcludeNotificationsIfNoAlertsFired());
+        assertEquals("Shipment-1", tpl.getName());
+        assertEquals("Test Shipment", tpl.getShipmentDescription());
+        assertNotNull(tpl.getShippedFrom());
+        assertNotNull(tpl.getShippedTo());
+        assertEquals(70, tpl.getShutdownDeviceTimeOut());
+        assertEquals(1, tpl.getAlertsNotificationSchedules().size());
+        assertEquals(1, tpl.getArrivalNotificationSchedules().size());
+        assertTrue(tpl.isAddDateShipped());
+        assertTrue(tpl.isDetectLocationForShippedFrom());
+        assertTrue(tpl.isUseCurrentTimeForDateShipped());
+    }
 
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
+     */
+    @Override
+    protected void assertTestGetAllOk(final int numberOfCreatedEntities,
+            final List<ShipmentTemplate> all) {
+        super.assertTestGetAllOk(numberOfCreatedEntities, all);
+
+        final ShipmentTemplate tpl = all.get(0);
+        assertNotNull(tpl.getAlertProfile());
+        assertEquals(5, tpl.getAlertSuppressionDuringCoolDown());
+        assertEquals(17, tpl.getArrivalNotificationWithIn());
+        assertEquals(sharedCompany.getId(), tpl.getCompany().getId());
+        assertEquals(true, tpl.isExcludeNotificationsIfNoAlertsFired());
+        assertEquals("Shipment-1", tpl.getName());
+        assertEquals("Test Shipment", tpl.getShipmentDescription());
+        assertNotNull(tpl.getShippedFrom());
+        assertNotNull(tpl.getShippedTo());
+        assertEquals(70, tpl.getShutdownDeviceTimeOut());
+        assertEquals(1, tpl.getAlertsNotificationSchedules().size());
+        assertEquals(1, tpl.getArrivalNotificationSchedules().size());
+        assertTrue(tpl.isAddDateShipped());
+        assertTrue(tpl.isDetectLocationForShippedFrom());
+        assertTrue(tpl.isUseCurrentTimeForDateShipped());
+    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#clear()
      */

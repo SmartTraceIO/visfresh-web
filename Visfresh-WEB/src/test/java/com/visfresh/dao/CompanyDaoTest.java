@@ -3,6 +3,8 @@
  */
 package com.visfresh.dao;
 
+import static org.junit.Assert.assertEquals;
+
 import com.visfresh.entities.Company;
 
 /**
@@ -32,6 +34,15 @@ public class CompanyDaoTest extends BaseCrudTest<CompanyDao, Company, Long> {
     protected Company createTestEntity() {
         final Company c = new Company();
         c.setName("JUnit company");
+        c.setDescription("Any Description");
         return c;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertCorrectSaved(com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected void assertCreateTestEntityOk(final Company c) {
+        assertEquals("JUnit company", c.getName());
+        assertEquals("Any Description", c.getDescription());
     }
 }

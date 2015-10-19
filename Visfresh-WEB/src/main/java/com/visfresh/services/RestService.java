@@ -5,6 +5,7 @@ package com.visfresh.services;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
@@ -44,7 +45,7 @@ public interface RestService {
     Long createShipmentTemplate(Company company, Shipment shipment, String templateName);
 
     List<Notification> getNotifications(User user);
-    void markNotificationsAsRead(User user, List<Long> ids);
+    void markNotificationsAsRead(User user, Set<Long> ids);
 
     List<ShipmentData> getShipmentData(Company company, Date startDate,
             Date endDate, String onlyWithAlerts);

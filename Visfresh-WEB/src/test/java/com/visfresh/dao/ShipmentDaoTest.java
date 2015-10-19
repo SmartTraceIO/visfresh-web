@@ -3,7 +3,11 @@
  */
 package com.visfresh.dao;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +16,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.SchedulePersonHowWhen;
+import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 
@@ -100,7 +104,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
-        SchedulePersonHowWhen ps = new SchedulePersonHowWhen();
+        PersonalSchedule ps = new PersonalSchedule();
         ps.setCompany("Any Company");
         ps.setEmailNotification("asuvoror");
         ps.setFirstName("First");
@@ -120,7 +124,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
-        ps = new SchedulePersonHowWhen();
+        ps = new PersonalSchedule();
         ps.setCompany("Any Company");
         ps.setEmailNotification("asuvoror");
         ps.setFirstName("First");
@@ -173,6 +177,60 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.getAlertsNotificationSchedules().add(alertNotifSched);
         s.getArrivalNotificationSchedules().add(arrivalSched);
         return s;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertCreateTestEntityOk(com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected void assertCreateTestEntityOk(final Shipment s) {
+        assertEquals(1, s.getDevices().size());
+        assertNotNull(s.getAlertProfile());
+        assertEquals(5, s.getAlertSuppressionDuringCoolDown());
+        assertEquals(17, s.getArrivalNotificationWithIn());
+        assertEquals(sharedCompany.getId(), s.getCompany().getId());
+        assertEquals("Custom fields", s.getCustomFields());
+        assertEquals(true, s.isExcludeNotificationsIfNoAlertsFired());
+        assertEquals("Shipment-1", s.getName());
+        assertEquals("PalletID", s.getPalletId());
+        assertEquals("PoNum", s.getPoNum());
+        assertEquals("Test Shipment", s.getShipmentDescription());
+        assertNotNull(s.getShipmentDescriptionDate());
+        assertNotNull(s.getShippedFrom());
+        assertNotNull(s.getShippedTo());
+        assertEquals(70, s.getShutdownDeviceTimeOut());
+        assertEquals(ShipmentStatus.InProgress, s.getStatus());
+        assertEquals(1, s.getAlertsNotificationSchedules().size());
+        assertEquals(1, s.getArrivalNotificationSchedules().size());
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
+     */
+    @Override
+    protected void assertTestGetAllOk(final int numberOfCreatedEntities,
+            final List<Shipment> all) {
+        super.assertTestGetAllOk(numberOfCreatedEntities, all);
+
+        final Shipment s = all.get(0);
+        assertEquals(1, s.getDevices().size());
+        assertNotNull(s.getAlertProfile());
+        assertEquals(5, s.getAlertSuppressionDuringCoolDown());
+        assertEquals(17, s.getArrivalNotificationWithIn());
+        assertEquals(sharedCompany.getId(), s.getCompany().getId());
+        assertEquals("Custom fields", s.getCustomFields());
+        assertEquals(true, s.isExcludeNotificationsIfNoAlertsFired());
+        assertEquals("Shipment-1", s.getName());
+        assertEquals("PalletID", s.getPalletId());
+        assertEquals("PoNum", s.getPoNum());
+        assertEquals("Test Shipment", s.getShipmentDescription());
+        assertNotNull(s.getShipmentDescriptionDate());
+        assertNotNull(s.getShippedFrom());
+        assertNotNull(s.getShippedTo());
+        assertEquals(70, s.getShutdownDeviceTimeOut());
+        assertEquals(ShipmentStatus.InProgress, s.getStatus());
+        assertEquals(1, s.getAlertsNotificationSchedules().size());
+        assertEquals(1, s.getArrivalNotificationSchedules().size());
     }
 
     @Test

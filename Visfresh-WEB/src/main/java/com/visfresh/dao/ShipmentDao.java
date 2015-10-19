@@ -14,7 +14,6 @@ import com.visfresh.entities.ShipmentData;
  *
  */
 public interface ShipmentDao extends DaoBase<Shipment, Long> {
-
     /**
      * @param startDate
      * @param endDate

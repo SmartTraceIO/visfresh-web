@@ -3,106 +3,75 @@
  */
 package com.visfresh.entities;
 
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Entity
-@Table(name="alertprofiles")
-public class AlertProfile implements EntityWithId {
+public class AlertProfile implements EntityWithId<Long> {
+    /**
+     * ID.
+     */
+    private Long id;
     /**
      * ID in data base.
      */
-    @Id
-    @Column(name = "id", columnDefinition="BIGINT AUTO_INCREMENT")
-    @GeneratedValue(strategy = GenerationType.TABLE)
-    private Long id;
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "company",
-        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
-        columnDefinition = "bigint",
-        referencedColumnName = "id")
     private Company company;
     /**
      * Alert profile name.
      */
-    @Column(nullable = false)
     private String name;
     /**
      * Alert profile description.
      */
-    @Column
     private String description;
     /**
      * The low temperature.
      */
-    @Column(name = "lowtemp")
     private double lowTemperature;
     /**
      * Critical low temperature
      */
-    @Column(name = "lowtempcritical")
     private double criticalLowTemperature;
     /**
      * Alert for low temperature more then given value in minutes.
      */
-    @Column(name = "lowtempmorethen")
     private int lowTemperatureForMoreThen;
     /**
      * Alert for critical low temperature more then given value in minutes.
      */
-    @Column(name = "criticallowtempmorethen")
     private int criticalLowTemperatureForMoreThen;
     /**
      * High temperature
      */
-    @Column(name = "hightemp")
     private double highTemperature;
     /**
      * Critical high temperature
      */
-    @Column(name = "hightempcritical")
     private double criticalHighTemperature;
     /**
      * Alert for high temperature more then given value in minutes.
      */
-    @Column(name = "hightempmorethen")
     private int highTemperatureForMoreThen;
     /**
      * Alert for critical high temperature more then given value in minutes.
      */
-    @Column(name = "criticalhightempmorethen")
     private int criticalHighTemperatureForMoreThen;
     /**
      * Alert for enter bright environment.
      */
-    @Column(name = "enterbrightenv")
     private boolean watchEnterBrightEnvironment;
     /**
      * Alert for enter dark environment.
      */
-    @Column(name = "enterdarktenv")
     private boolean watchEnterDarkEnvironment;
     /**
      * Alert for shock
      */
-    @Column(name = "onshock")
     private boolean watchShock;
     /**
      * Alert for baterry low.
      */
-    @Column(name = "onsbatterylow")
     private boolean watchBatteryLow;
 
     /**

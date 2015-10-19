@@ -17,7 +17,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.visfresh.entities.AbstractAlert;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
@@ -28,8 +27,8 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.NotificationType;
+import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Role;
-import com.visfresh.entities.SchedulePersonHowWhen;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentStatus;
@@ -132,7 +131,7 @@ public class JSonFactoryTest {
     }
     @Test
     public void testSchedulePersonHowWhen() {
-        SchedulePersonHowWhen s = new SchedulePersonHowWhen();
+        PersonalSchedule s = new PersonalSchedule();
 
         final String company = "Sun";
         final String emailNotification = "anybody@sun.com";
@@ -427,7 +426,7 @@ public class JSonFactoryTest {
         final Device device = createDevice("20394870987324");
         final AlertType alertType = AlertType.EnterDarkEnvironment;
 
-        AbstractAlert alert = new Alert();
+        Alert alert = new Alert();
         alert.setDate(alertDate);
         alert.setDescription(alertDescription);
         alert.setId(alertId);
@@ -451,7 +450,7 @@ public class JSonFactoryTest {
         assertEquals(notificationId, n.getId());
 
         //check issue
-        alert = (AbstractAlert) n.getIssue();
+        alert = (Alert) n.getIssue();
 
         assertEquals(alertDate, alert.getDate());
         assertEquals(alertDescription, alert.getDescription());
@@ -728,8 +727,8 @@ public class JSonFactoryTest {
     /**
      * @return any schedule/person/how/when
      */
-    private SchedulePersonHowWhen createSchedulePersonHowWhen() {
-        final SchedulePersonHowWhen s = new SchedulePersonHowWhen();
+    private PersonalSchedule createSchedulePersonHowWhen() {
+        final PersonalSchedule s = new PersonalSchedule();
 
         s.setCompany("Sun");
         s.setEmailNotification("asuvorov@sun.com");

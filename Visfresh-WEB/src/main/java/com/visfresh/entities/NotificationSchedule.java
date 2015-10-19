@@ -6,54 +6,31 @@ package com.visfresh.entities;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Entity
-@Table(name="notificationsschedules")
-public class NotificationSchedule implements EntityWithId {
+public class NotificationSchedule implements EntityWithId<Long> {
     /**
      * Notification schedule ID.
      */
-    @Id
-    @Column(name = "id", columnDefinition="BIGINT AUTO_INCREMENT")
     private Long id;
     /**
      * Company
      */
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "company",
-        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
-        columnDefinition = "bigint",
-        referencedColumnName = "id")
     private Company company;
     /**
      * Notification schedule name.
      */
-    @Column(nullable = false)
     private String name;
     /**
      * Description.
      */
-    @Column
     private String description;
     /**
      * Personal schedules
      */
-    @OneToMany(cascade = {CascadeType.ALL})
-    private final List<SchedulePersonHowWhen> schedules = new LinkedList<SchedulePersonHowWhen>();
+    private final List<PersonalSchedule> schedules = new LinkedList<PersonalSchedule>();
 
     /**
      * Default constructor.
@@ -103,7 +80,7 @@ public class NotificationSchedule implements EntityWithId {
     /**
      * @return the schedules
      */
-    public List<SchedulePersonHowWhen> getSchedules() {
+    public List<PersonalSchedule> getSchedules() {
         return schedules;
     }
     /**

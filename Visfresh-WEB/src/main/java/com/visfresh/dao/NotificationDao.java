@@ -4,6 +4,7 @@
 package com.visfresh.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.User;
@@ -24,6 +25,6 @@ public interface NotificationDao extends
      * @param user the user.
      * @param ids notification IDs.
      */
-    void deleteByUserAndId(User user, List<Long> ids);
+    void deleteByUserAndId(User user, Set<Long> ids);
 
 }

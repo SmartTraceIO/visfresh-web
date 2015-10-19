@@ -3,55 +3,35 @@
  */
 package com.visfresh.entities;
 
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Entity
-@Table(name="devices")
-public class Device implements EntityWithId {
+public class Device implements EntityWithId<String> {
     /**
      * Device ID.
      */
-    @Id
     private String id;
     /**
      * Device serial number.
      */
-    @Column(nullable = false)
     private String sn;
     /**
      * Device IMEI code
      */
-    @Column(nullable = false)
     private String imei;
     /**
      * Device name.
      */
-    @Column(nullable = false)
     private String name;
     /**
      * Device description
      */
-    @Column
     private String description;
     /**
      * Company
      */
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "company",
-        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
-        columnDefinition = "bigint",
-        referencedColumnName = "id")
     private Company company;
 
     /**

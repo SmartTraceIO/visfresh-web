@@ -3,51 +3,28 @@
  */
 package com.visfresh.entities;
 
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.ForeignKey;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Entity
-@Table(name="notifications")
-public class Notification implements EntityWithId {
+public class Notification implements EntityWithId<Long> {
     /**
      * Notification ID.
      */
-    @Id
-    @Column(name = "id", columnDefinition="BIGINT AUTO_INCREMENT")
     private Long id;
     /**
      * Notification type.
      */
-    @Column(nullable = false)
-    @Enumerated
     private NotificationType type;
     /**
      * The user
      */
-    @ManyToOne
-    @JoinColumn(name = "user")
     private User user;
     /**
      * Notification issue.
      */
-    @OneToOne(optional = false)
-    @JoinColumn(name = "issue",
-        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
-        columnDefinition = "bigint",
-        referencedColumnName = "id")
     private NotificationIssue issue;
 
     /**
@@ -93,5 +70,17 @@ public class Notification implements EntityWithId {
      */
     public void setId(final Long id) {
         this.id = id;
+    }
+    /**
+     * @return the user
+     */
+    public User getUser() {
+        return user;
+    }
+    /**
+     * @param user the user to set
+     */
+    public void setUser(final User user) {
+        this.user = user;
     }
 }

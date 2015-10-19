@@ -3,10 +3,15 @@
  */
 package com.visfresh.dao;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
@@ -40,6 +45,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         d.setCompany(sharedCompany);
         final String imei = "932487032487";
         d.setImei(imei);
+        d.setName("Test Device");
         d.setId(imei + ".1234");
         d.setDescription("JUnit device");
         d.setSn("12345");
@@ -59,6 +65,63 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         e.setTime(new Date());
         e.setType(TrackerEventType.INIT);
         return e;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertCreateTestEntityOk(com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected void assertCreateTestEntityOk(final TrackerEvent e) {
+        assertNotNull(e.getTime());
+        assertEquals(27, e.getBattery());
+        assertEquals(5.5, e.getTemperature(), 0.00001);
+        assertEquals(TrackerEventType.INIT, e.getType());
+
+        final Device d = e.getDevice();
+        assertNotNull(d);
+
+        assertEquals(device.getDescription(), d.getDescription());
+        assertEquals(device.getId(), d.getId());
+        assertEquals(device.getImei(), d.getImei());
+        assertEquals(device.getName(), d.getName());
+        assertEquals(device.getSn(), d.getSn());
+
+        final Company c = d.getCompany();
+        assertNotNull(c);
+
+        assertEquals(sharedCompany.getId(), c.getId());
+        assertEquals(sharedCompany.getName(), c.getName());
+        assertEquals(sharedCompany.getDescription(), c.getDescription());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
+     */
+    @Override
+    protected void assertTestGetAllOk(final int numberOfCreatedEntities,
+            final List<TrackerEvent> all) {
+        super.assertTestGetAllOk(numberOfCreatedEntities, all);
+
+        final TrackerEvent e = all.get(0);
+
+        assertNotNull(e.getTime());
+        assertEquals(27, e.getBattery());
+        assertEquals(5.5, e.getTemperature(), 0.00001);
+        assertEquals(TrackerEventType.INIT, e.getType());
+
+        final Device d = e.getDevice();
+        assertNotNull(d);
+
+        assertEquals(device.getDescription(), d.getDescription());
+        assertEquals(device.getId(), d.getId());
+        assertEquals(device.getImei(), d.getImei());
+        assertEquals(device.getName(), d.getName());
+        assertEquals(device.getSn(), d.getSn());
+
+        final Company c = d.getCompany();
+        assertNotNull(c);
+
+        assertEquals(sharedCompany.getId(), c.getId());
+        assertEquals(sharedCompany.getName(), c.getName());
+        assertEquals(sharedCompany.getDescription(), c.getDescription());
     }
 
     /* (non-Javadoc)

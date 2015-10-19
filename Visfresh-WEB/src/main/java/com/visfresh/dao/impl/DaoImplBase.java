@@ -4,150 +4,103 @@
 package com.visfresh.dao.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
-
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.DaoBase;
+import com.visfresh.entities.EntityWithId;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DaoImplBase<T, ID extends Serializable> implements DaoBase<T, ID> {
-    private EntityManager em;
-    private CrudRepository<T, ID> delegate;
-    private final Class<T> domainClass;
+@Component
+public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Serializable> implements DaoBase<T, ID> {
+    /**
+     * JDBC template.
+     */
+    @Autowired(required = true)
+    protected NamedParameterJdbcTemplate jdbc;
 
     /**
      * @param repository class.
      */
-    protected DaoImplBase(final Class<T> clazz) {
+    protected DaoImplBase() {
         super();
-        this.domainClass = clazz;
-    }
-
-    /* (non-Javadoc)
-     * @see org.springframework.data.repository.CrudRepository#save(java.lang.Object)
-     */
-    @Override
-    @Transactional
-    public <S extends T> S save(final S entity) {
-        return delegate.save(entity);
     }
 
     /* (non-Javadoc)
      * @see org.springframework.data.repository.CrudRepository#save(java.lang.Iterable)
      */
     @Override
-    @Transactional
-    public <S extends T> Iterable<S> save(final Iterable<S> entities) {
-        return delegate.save(entities);
+    public <S extends T> Collection<S> save(final Collection<S> entities) {
+        final List<S> result = new LinkedList<S>();
+        for (final S e : entities) {
+            result.add(save(e));
+        }
+        return result;
     }
-
     /* (non-Javadoc)
-     * @see org.springframework.data.repository.CrudRepository#findOne(java.io.Serializable)
+     * @see com.visfresh.dao.DaoBase#findAll(java.util.Collection)
      */
     @Override
-    public T findOne(final ID id) {
-        return delegate.findOne(id);
+    public List<T> findAll(final Collection<ID> ids) {
+        final List<T> result = new LinkedList<T>();
+        for (final ID id : ids) {
+            result.add(findOne(id));
+        }
+        return result;
     }
-
-    /* (non-Javadoc)
-     * @see org.springframework.data.repository.CrudRepository#exists(java.io.Serializable)
-     */
-    @Override
-    public boolean exists(final ID id) {
-        return delegate.exists(id);
-    }
-
-    /* (non-Javadoc)
-     * @see org.springframework.data.repository.CrudRepository#findAll()
-     */
-    @Override
-    public List<T> findAll() {
-        return asList(delegate.findAll());
-    }
-
-    /* (non-Javadoc)
-     * @see org.springframework.data.repository.CrudRepository#findAll(java.lang.Iterable)
-     */
-    @Override
-    public List<T> findAll(final Iterable<ID> ids) {
-        return asList(delegate.findAll(ids));
-    }
-
-    /* (non-Javadoc)
-     * @see org.springframework.data.repository.CrudRepository#count()
-     */
-    @Override
-    public long count() {
-        return delegate.count();
-    }
-
-    /* (non-Javadoc)
-     * @see org.springframework.data.repository.CrudRepository#delete(java.io.Serializable)
-     */
-    @Override
-    public void delete(final ID id) {
-        delegate.delete(id);
-    }
-
     /* (non-Javadoc)
      * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Object)
      */
     @Override
-    @Transactional
     public void delete(final T entity) {
-        delegate.delete(entity);
+        delete(entity.getId());
     }
-
     /* (non-Javadoc)
      * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Iterable)
      */
     @Override
-    @Transactional
-    public void delete(final Iterable<? extends T> entities) {
-        delegate.delete(entities);
+    public void delete(final Collection<? extends T> entities) {
+        for (final T t : entities) {
+            delete(t);
+        }
     }
-
     /* (non-Javadoc)
      * @see org.springframework.data.repository.CrudRepository#deleteAll()
      */
     @Override
-    @Transactional
     public void deleteAll() {
-        delegate.deleteAll();
-    }
-
-    @PersistenceContext
-    public void setEntityManager(final EntityManager m) {
-        this.em = m;
-        this.delegate = new SimpleJpaRepository<T, ID>(domainClass, m);
+        delete(findAll());
     }
     /**
-     * @return the entity manager.
-     */
-    @Override
-    public EntityManager getEntityManager() {
-        return em;
-    }
-
-    /**
-     * @param items
+     * @param fields
      * @return
      */
-    private List<T> asList(final Iterable<T> items) {
-        final List<T> list = new LinkedList<T>();
-        for (final T t : items) {
-            list.add(t);
+    protected String buildSelectAs(final Map<String, String> fields) {
+        final StringBuilder sb = new StringBuilder();
+        for (final Map.Entry<String, String> e : fields.entrySet()) {
+            if (sb.length() > 0) {
+                sb.append(',');
+            }
+            sb.append(e.getKey() + " as " + e.getValue());
         }
-        return list;
+        return sb.toString();
+    }
+
+    /**
+     * @param strings
+     * @return
+     */
+    protected String combine(final String... strings) {
+        return StringUtils.combine(strings, ",");
     }
 }

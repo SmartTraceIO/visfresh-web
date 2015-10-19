@@ -6,46 +6,30 @@ package com.visfresh.entities;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Entity
-@Table(name="users")
-public class User implements EntityWithId {
+public class User implements EntityWithId<String> {
     /**
      * User login.
      */
-    @Id
     private String login;
     /**
      * Company.
      */
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "company",
-        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
-        columnDefinition = "bigint",
-        referencedColumnName = "id")
     private Company company;
     /**
      * Full user name.
      */
     private String fullName;
     /**
+     * Encrypted password.
+     */
+    private String password;
+    /**
      * Set of roles.
      */
-    @Column(nullable = false)
-    @Convert(converter = RoleConverter.class)
     private Set<Role> roles = new HashSet<Role>();
 
     /**
@@ -103,5 +87,17 @@ public class User implements EntityWithId {
      */
     public void setCompany(final Company company) {
         this.company = company;
+    }
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(final String password) {
+        this.password = password;
     }
 }

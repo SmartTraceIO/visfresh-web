@@ -4,7 +4,6 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.Serializable;
 import java.util.List;
@@ -22,7 +21,7 @@ import com.visfresh.entities.EntityWithId;
  *
  */
 @RunWith(DaoTestRunner.class)
-public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWithId, ID extends Serializable> {
+public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWithId<ID>, ID extends Serializable> {
     /**
      * Spring context.
      */
@@ -34,7 +33,7 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
     /**
      * DAO for test.
      */
-    private T dao;
+    protected T dao;
     /**
      * Company DAO.
      */
@@ -58,14 +57,13 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
     @Test
     public void testCreate() {
         final E e = createTestEntity();
-
-        @SuppressWarnings("unchecked")
-        final ID id = (ID) dao.save(e).getId();
-
-        dao.getEntityManager().clear();
-
-        assertNotNull(dao.findOne(id));
+        final ID id = dao.save(e).getId();
+        assertCreateTestEntityOk(dao.findOne(id));
     }
+    /**
+     * @param findOne
+     */
+    protected abstract void assertCreateTestEntityOk(E findOne);
     /**
      * Tests get all method.
      */
@@ -73,13 +71,17 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
     public void testGetAll() {
         final E e1 = createTestEntity();
         dao.save(e1);
-
         final E e2 = createTestEntity();
         dao.save(e2);
+        assertTestGetAllOk(2, dao.findAll());
+    }
 
-        dao.getEntityManager().clear();
-
-        assertEquals(2, dao.findAll().size());
+    /**
+     * @param numberOfCreatedEntities
+     * @param all
+     */
+    protected void assertTestGetAllOk(final int numberOfCreatedEntities, final List<E> all) {
+        assertEquals(numberOfCreatedEntities, all.size());
     }
     /**
      * Tests delete method.
@@ -91,14 +93,18 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
 
         final E e2 = createTestEntity();
         dao.save(e2);
-
-        dao.getEntityManager().clear();;
         dao.delete(e1);
-        dao.getEntityManager().clear();
 
         final List<E> all = dao.findAll();
         assertEquals(1, all.size());
         assertEquals(e2.getId(), all.get(0).getId());
+    }
+    @Test
+    public void testUpdate() {
+        final E e1 = createTestEntity();
+        dao.save(e1);
+        dao.save(e1);
+        assertCreateTestEntityOk(e1);
     }
 
     /**
@@ -136,11 +142,15 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
     public void clear() {
         dao.deleteAll();
     }
+//    @AfterClass
+//    public static void afterClass() {
+//        System.out.println("!!!!!");
+//    }
 
     /**
      *
      */
-    protected final void destroy() {
+    protected final void handleFinished() {
         if (companyDao != null) {
             companyDao.deleteAll();
         }

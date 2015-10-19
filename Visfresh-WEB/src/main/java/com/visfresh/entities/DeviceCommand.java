@@ -3,45 +3,24 @@
  */
 package com.visfresh.entities;
 
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Entity
-@Table(name="devicecommands")
-public class DeviceCommand implements EntityWithId {
+public class DeviceCommand implements EntityWithId<Long> {
     /**
      * Command ID.
      */
-    @Id
-    @Column(name = "id", columnDefinition="BIGINT AUTO_INCREMENT")
-    @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
     /**
      * Device.
      */
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "device",
-        foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT),
-        columnDefinition = "bigint",
-        referencedColumnName = "id")
     private Device device;
     /**
      * Command to device
      */
-    @Column(nullable = false)
     private String command;
 
     /**

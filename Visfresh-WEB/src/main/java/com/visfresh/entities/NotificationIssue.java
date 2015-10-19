@@ -5,37 +5,18 @@ package com.visfresh.entities;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "notificationissues")
-public abstract class NotificationIssue implements EntityWithId {
+public abstract class NotificationIssue implements EntityWithId<Long> {
     /**
      * Entity ID.
      */
-    @Id
-    @Column(name = "id", columnDefinition="BIGINT AUTO_INCREMENT")
-    @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
     /**
      * Date of occurrence.
      */
-    @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
     /**

@@ -42,7 +42,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.NotificationType;
-import com.visfresh.entities.SchedulePersonHowWhen;
+import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
@@ -729,8 +729,8 @@ public class RestServiceControllerTest {
     /**
      * @return any schedule/person/how/when
      */
-    private SchedulePersonHowWhen createSchedulePersonHowWhen() {
-        final SchedulePersonHowWhen s = new SchedulePersonHowWhen();
+    private PersonalSchedule createSchedulePersonHowWhen() {
+        final PersonalSchedule s = new PersonalSchedule();
 
         s.setCompany("Sun");
         s.setEmailNotification("asuvorov@sun.com");

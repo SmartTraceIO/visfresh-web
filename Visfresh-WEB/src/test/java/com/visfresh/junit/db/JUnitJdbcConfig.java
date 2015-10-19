@@ -1,17 +1,19 @@
 /**
  *
  */
-package com.visfresh.init.prod;
+package com.visfresh.junit.db;
 
 import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.visfresh.init.JpaConfigBase;
+import com.visfresh.dao.impl.DaoImplBase;
+import com.visfresh.init.JdbcConfigBase;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -19,11 +21,12 @@ import com.visfresh.init.JpaConfigBase;
  */
 @Configuration
 @EnableTransactionManagement
-public class ProductionJpaConfig extends JpaConfigBase {
+@ComponentScan(basePackageClasses = {DaoImplBase.class})
+public class JUnitJdbcConfig extends JdbcConfigBase {
     /**
      * Default constructor.
      */
-    public ProductionJpaConfig() {
+    public JUnitJdbcConfig() {
         super();
     }
 
@@ -32,7 +35,7 @@ public class ProductionJpaConfig extends JpaConfigBase {
      */
     @Override
     protected String getPropertyFilePrefix() {
-        return "prod";
+        return "junit";
     }
 
     /* (non-Javadoc)
@@ -47,16 +50,16 @@ public class ProductionJpaConfig extends JpaConfigBase {
      * @see com.visfresh.init.JpaConfigBase#configureDataSource()
      */
     @Override
-    @Bean
+    @Bean(name = "dataSource")
     public DataSource configureDataSource() {
         return super.configureDataSource();
     }
     /* (non-Javadoc)
-     * @see com.visfresh.init.JpaConfigBase#configureEntityManagerFactory()
+     * @see com.visfresh.init.JdbcConfigBase#configureJdbcTemplate()
      */
     @Override
     @Bean
-    public LocalContainerEntityManagerFactoryBean configureEntityManagerFactory() {
-        return super.configureEntityManagerFactory();
+    public NamedParameterJdbcTemplate configureJdbcTemplate() {
+        return super.configureJdbcTemplate();
     }
 }

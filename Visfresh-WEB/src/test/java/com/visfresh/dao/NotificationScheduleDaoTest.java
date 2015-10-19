@@ -3,9 +3,13 @@
  */
 package com.visfresh.dao;
 
-import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.SchedulePersonHowWhen;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
+import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.entities.PersonalSchedule;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -31,7 +35,7 @@ public class NotificationScheduleDaoTest
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
-        final SchedulePersonHowWhen ps = new SchedulePersonHowWhen();
+        final PersonalSchedule ps = new PersonalSchedule();
         ps.setCompany("Any Company");
         ps.setEmailNotification("asuvoror");
         ps.setFirstName("First");
@@ -44,5 +48,56 @@ public class NotificationScheduleDaoTest
 
         s.getSchedules().add(ps);
         return s;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertCreateTestEntityOk(com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected void assertCreateTestEntityOk(final NotificationSchedule s) {
+        assertEquals(sharedCompany.getId(), s.getCompany().getId());
+        assertEquals("Schd-Test", s.getName());
+        assertEquals("Test schedule", s.getDescription());
+
+        assertEquals(1, s.getSchedules().size());
+
+        final PersonalSchedule ps = s.getSchedules().get(0);
+
+        assertEquals("Any Company", ps.getCompany());
+        assertEquals("asuvoror", ps.getEmailNotification());
+        assertEquals("First", ps.getFirstName());
+        assertEquals(45, ps.getFromTime());
+        assertEquals("Last", ps.getLastName());
+        assertEquals("Manager", ps.getPosition());
+        assertTrue(ps.isPushToMobileApp());
+        assertEquals("11111111118", ps.getSmsNotification());
+        assertEquals(150, ps.getToTime());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
+     */
+    @Override
+    protected void assertTestGetAllOk(final int numberOfCreatedEntities,
+            final List<NotificationSchedule> all) {
+        super.assertTestGetAllOk(numberOfCreatedEntities, all);
+
+        final NotificationSchedule s = all.get(0);
+        assertEquals(sharedCompany.getId(), s.getCompany().getId());
+        assertEquals("Schd-Test", s.getName());
+        assertEquals("Test schedule", s.getDescription());
+
+        assertEquals(1, s.getSchedules().size());
+
+        final PersonalSchedule ps = s.getSchedules().get(0);
+
+        assertEquals("Any Company", ps.getCompany());
+        assertEquals("asuvoror", ps.getEmailNotification());
+        assertEquals("First", ps.getFirstName());
+        assertEquals(45, ps.getFromTime());
+        assertEquals("Last", ps.getLastName());
+        assertEquals("Manager", ps.getPosition());
+        assertTrue(ps.isPushToMobileApp());
+        assertEquals("11111111118", ps.getSmsNotification());
+        assertEquals(150, ps.getToTime());
     }
 }

@@ -7,53 +7,34 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Entity
-@Table(name="shipments")
 public class Shipment extends ShipmentBase {
     /**
      * List of associated devices.
      */
-    @ManyToMany(fetch = FetchType.EAGER)
     private final List<Device> devices = new LinkedList<Device>();
     /**
      * Pallet ID.
      */
-    @Column
     private String palletId;
     /**
      * PO number (?)
      */
-    @Column
     private String poNum;
     /**
      * Shipment description date
      */
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
     private Date shipmentDescriptionDate;
     /**
      * This field has reserver for future custom fields implementation.
      */
-    @Column
     private String customFields;
     /**
      * Shipment status.
      */
-    @Column(nullable = false)
-    @Enumerated
     private ShipmentStatus status = ShipmentStatus.Default;
 
     /**

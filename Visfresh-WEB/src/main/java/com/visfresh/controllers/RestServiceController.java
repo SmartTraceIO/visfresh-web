@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -602,7 +603,7 @@ public class RestServiceController {
             getLoggedInUser(authToken);
 
             final JsonArray array = getJSon(notificationIds).getAsJsonArray();
-            final List<Long> ids = new LinkedList<Long>();
+            final Set<Long> ids = new HashSet<Long>();
 
             final int size = array.size();
             for (int i = 0; i < size; i++) {

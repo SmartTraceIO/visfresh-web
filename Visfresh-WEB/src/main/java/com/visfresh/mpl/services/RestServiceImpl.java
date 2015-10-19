@@ -6,6 +6,7 @@ package com.visfresh.mpl.services;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -183,7 +184,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#markNotificationsAsRead(com.visfresh.entities.User, java.util.List)
      */
     @Override
-    public void markNotificationsAsRead(final User user, final List<Long> ids) {
+    public void markNotificationsAsRead(final User user, final Set<Long> ids) {
         notificationDao.deleteByUserAndId(user, ids);
     }
 

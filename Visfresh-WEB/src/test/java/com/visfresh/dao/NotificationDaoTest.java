@@ -3,7 +3,14 @@
  */
 package com.visfresh.dao;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +19,7 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
+import com.visfresh.entities.User;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -19,9 +27,12 @@ import com.visfresh.entities.NotificationType;
  */
 public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notification, Long> {
     private DeviceDao deviceDao;
+    private UserDao userDao;
+
     private Device device;
     private ArrivalDao arrivalDao;
     private Arrival arrival;
+    private User user;
 
     /**
      * Default constructor.
@@ -33,6 +44,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
     @Before
     public void beforeTest() {
         deviceDao = getContext().getBean(DeviceDao.class);
+        userDao = getContext().getBean(UserDao.class);
 
         //create device
         final Device d = new Device();
@@ -54,15 +66,82 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         a.setDevice(device);
         a.setNumberOfMettersOfArrival(78);
         this.arrival = arrivalDao.save(a);
+
+        //create User
+        final User u = new User();
+        u.setCompany(sharedCompany);
+        u.setLogin("asuvorov");
+        u.setFullName("Alexander Suvorov");
+        u.setPassword("alskdj");
+        this.user = userDao.save(u);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertCreateTestEntityOk(com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected void assertCreateTestEntityOk(final Notification n) {
+        assertTrue(n.getIssue() instanceof Arrival);
+        assertNotNull(n.getUser());
+        assertEquals(NotificationType.Arrival, n.getType());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
+     */
+    @Override
+    protected void assertTestGetAllOk(final int numberOfCreatedEntities,
+            final List<Notification> all) {
+        super.assertTestGetAllOk(numberOfCreatedEntities, all);
+
+        final Notification n = all.get(0);
+
+        assertTrue(n.getIssue() instanceof Arrival);
+        assertNotNull(n.getUser());
+        assertEquals(NotificationType.Arrival, n.getType());
     }
 
     @Test
     public void testFindForUser() {
+        User u = new User();
+        u.setCompany(sharedCompany);
+        u.setLogin("mkutuzov");
+        u.setFullName("Michael Kutuzov");
+        u.setPassword("alskdj");
+        u = userDao.save(u);
 
+        final Notification n1 = createNotification(user);
+        dao.save(n1);
+        final Notification n2 = createNotification(u);
+        dao.save(n2);
+
+        final List<Notification> list = dao.findForUser(u);
+        assertEquals(1, list.size());
+        assertEquals(n2.getId(), list.get(0).getId());
     }
     @Test
     public void testDeleteByUserAndId() {
+        User u = new User();
+        u.setCompany(sharedCompany);
+        u.setLogin("mkutuzov");
+        u.setFullName("Michael Kutuzov");
+        u.setPassword("alskdj");
+        u = userDao.save(u);
 
+        final Notification n1 = createNotification(user);
+        dao.save(n1);
+        final Notification n2 = createNotification(u);
+        dao.save(n2);
+        final Notification n3 = createNotification(u);
+        dao.save(n3);
+
+        final Set<Long> ids = new HashSet<Long>();
+        ids.add(n1.getId());
+        dao.deleteByUserAndId(u, ids);
+
+        assertEquals(3, dao.findAll().size());
+
+        ids.add(n2.getId());
+        dao.deleteByUserAndId(u, ids);
+        assertEquals(2, dao.findAll().size());
     }
 
     /* (non-Javadoc)
@@ -70,9 +149,18 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
      */
     @Override
     protected Notification createTestEntity() {
+        return createNotification(user);
+    }
+
+    /**
+     * @param u user.
+     * @return notification.
+     */
+    private Notification createNotification(final User u) {
         final Notification n = new Notification();
         n.setType(NotificationType.Arrival);
         n.setIssue(arrival);
+        n.setUser(u);
         return n;
     }
     /* (non-Javadoc)
@@ -83,5 +171,6 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         super.clear();
         arrivalDao.deleteAll();
         deviceDao.deleteAll();
+        userDao.deleteAll();
     }
 }

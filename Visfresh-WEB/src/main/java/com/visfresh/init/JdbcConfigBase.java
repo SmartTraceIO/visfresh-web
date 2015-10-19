@@ -10,13 +10,11 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
-import com.visfresh.entities.Device;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -26,18 +24,19 @@ import com.zaxxer.hikari.HikariDataSource;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public abstract class JpaConfigBase implements TransactionManagementConfigurer {
+public abstract class JdbcConfigBase implements TransactionManagementConfigurer {
     protected final Properties configuration;
+    private final DataSource dataSource;
 
     /**
      * Default constructor.
      */
-    public JpaConfigBase() {
+    public JdbcConfigBase() {
         super();
 
         final Properties props = new Properties();
-        final InputStream in = new BufferedInputStream(JpaConfigBase.class.getClassLoader().getResourceAsStream(
-                getPropertyFilePrefix() + ".jpa.configuration"));
+        final InputStream in = new BufferedInputStream(JdbcConfigBase.class.getClassLoader().getResourceAsStream(
+                getPropertyFilePrefix() + ".db.configuration"));
         try {
             try {
                 props.load(in);
@@ -50,47 +49,34 @@ public abstract class JpaConfigBase implements TransactionManagementConfigurer {
 
         this.configuration = props;
 
-    }
-
-    /**
-     * @return JDBC data source.
-     */
-    public DataSource configureDataSource() {
+        //data source
         final HikariConfig config = new HikariConfig();
         config.setDriverClassName(configuration.getProperty("dataSource.driverClassName"));
         config.setJdbcUrl(configuration.getProperty("dataSource.url"));
         config.setUsername(configuration.getProperty("dataSource.username"));
         config.setPassword(configuration.getProperty("dataSource.password"));
 
-        return new HikariDataSource(config);
+        dataSource = new HikariDataSource(config);
     }
 
     /**
-     * @return EntityManager factory.
+     * @return JDBC data source.
      */
-    public LocalContainerEntityManagerFactoryBean configureEntityManagerFactory() {
-        final LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
-        entityManagerFactoryBean.setDataSource(configureDataSource());
-        entityManagerFactoryBean.setPackagesToScan(Device.class.getPackage().getName());
-        entityManagerFactoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-
-        final Properties jpaProperties = new Properties();
-        jpaProperties.put(org.hibernate.cfg.Environment.DIALECT, configuration.getProperty("hibernate.dialect"));
-        jpaProperties.put(org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create");
-        jpaProperties.put(org.hibernate.cfg.Environment.FORMAT_SQL, "true");
-        jpaProperties.put(org.hibernate.cfg.Environment.SHOW_SQL, "true");
-
-        entityManagerFactoryBean.setJpaProperties(jpaProperties);
-
-        return entityManagerFactoryBean;
+    public DataSource configureDataSource() {
+        return dataSource;
     }
-
+    /**
+     * @return JDBC template.
+     */
+    public NamedParameterJdbcTemplate configureJdbcTemplate() {
+        return new NamedParameterJdbcTemplate(configureDataSource());
+    }
     /* (non-Javadoc)
      * @see org.springframework.transaction.annotation.TransactionManagementConfigurer#annotationDrivenTransactionManager()
      */
     @Override
     public PlatformTransactionManager annotationDrivenTransactionManager() {
-        return new JpaTransactionManager();
+        return new DataSourceTransactionManager(configureDataSource());
     }
     /**
      * @return returns the prefix of configuration file.

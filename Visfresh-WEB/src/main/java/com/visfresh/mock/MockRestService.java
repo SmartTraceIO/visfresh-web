@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.entities.AbstractAlert;
+import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
@@ -26,7 +26,7 @@ import com.visfresh.entities.DeviceData;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.SchedulePersonHowWhen;
+import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
@@ -49,7 +49,7 @@ public class MockRestService implements RestService {
     public final Map<String, Device> devices = new ConcurrentHashMap<String, Device>();
     public final Map<Long, Shipment> shipments = new ConcurrentHashMap<Long, Shipment>();
     public final Map<String, List<Notification>> notifications = new ConcurrentHashMap<String, List<Notification>>();
-    public final Map<Long, AbstractAlert> alerts = new ConcurrentHashMap<Long, AbstractAlert>();
+    public final Map<Long, Alert> alerts = new ConcurrentHashMap<Long, Alert>();
     public final Map<Long, Arrival> arrivals = new ConcurrentHashMap<Long, Arrival>();
     public final Map<String, List<TrackerEvent>> trackerEvents = new ConcurrentHashMap<String, List<TrackerEvent>>();
 
@@ -113,7 +113,7 @@ public class MockRestService implements RestService {
     public Long saveNotificationSchedule(final Company company, final NotificationSchedule schedule) {
         if (schedule.getId() == null) {
             schedule.setId(ids.incrementAndGet());
-            for (final SchedulePersonHowWhen s : schedule.getSchedules()) {
+            for (final PersonalSchedule s : schedule.getSchedules()) {
                 s.setId(ids.incrementAndGet());
             }
             synchronized (notificationSchedules) {
@@ -198,7 +198,7 @@ public class MockRestService implements RestService {
      * @see com.visfresh.services.RestService#markNotificationsAsRead(java.util.List)
      */
     @Override
-    public void markNotificationsAsRead(final User user, final List<Long> ids) {
+    public void markNotificationsAsRead(final User user, final Set<Long> ids) {
         final Set<Long> idSet = new HashSet<Long>(ids);
 
         final List<Notification> result = notifications.get(user.getLogin());
@@ -221,7 +221,7 @@ public class MockRestService implements RestService {
         final Map<String, DeviceData> deviceData= new HashMap<String, DeviceData>();
 
         //add alerts
-        for (final AbstractAlert a : new LinkedList<AbstractAlert>(alerts.values())) {
+        for (final Alert a : new LinkedList<Alert>(alerts.values())) {
             final String imei = a.getDevice().getId();
 
             DeviceData data = deviceData.get(imei);

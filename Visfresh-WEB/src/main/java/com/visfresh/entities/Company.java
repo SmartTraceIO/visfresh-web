@@ -3,37 +3,24 @@
  */
 package com.visfresh.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Entity
-@Table(name = "companies")
-public class Company implements EntityWithId {
+public class Company implements EntityWithId<Long> {
     /**
      * Company ID.
      */
-    @Id
-    @Column(name = "id", columnDefinition="BIGINT AUTO_INCREMENT")
-    @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
 
     /**
      * Company name.
      */
-    @Column(nullable = false)
     private String name;
     /**
      * Company description
      */
-    @Column
     private String description;
 
     /**
