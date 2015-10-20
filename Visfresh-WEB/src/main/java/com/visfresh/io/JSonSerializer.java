@@ -631,6 +631,8 @@ public class JSonSerializer {
         obj.addProperty("temperature", e.getTemperature());
         obj.addProperty("time", timeToString(e.getTime()));
         obj.addProperty("type", e.getType().name());
+        obj.addProperty("latitude", e.getLatitude());
+        obj.addProperty("longitude", e.getLongitude());
         return obj;
     }
     public TrackerEvent parseTrackerEvent(final JsonObject json) {
@@ -640,6 +642,8 @@ public class JSonSerializer {
         e.setTemperature(asDouble(json.get("temperature")));
         e.setTime(asDate(json.get("time")));
         e.setType(TrackerEventType.valueOf(asString(json.get("type"))));
+        e.setLatitude(asDouble(json.get("latitude")));
+        e.setLongitude(asDouble(json.get("longitude")));
         return e;
     }
     /**

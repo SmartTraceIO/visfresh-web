@@ -90,6 +90,8 @@ create table trackerevents (
    `time` timestamp not null,
    battery int not null,
    temperature double not null,
+   latitude double not null,
+   longitude double not null,
    device varchar(127) not null,
    primary key (id),
    FOREIGN KEY (device) REFERENCES devices(id)   

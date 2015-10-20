@@ -516,6 +516,8 @@ public class JSonFactoryTest {
         final double temperature = 77.77;
         final Date time = new Date(System.currentTimeMillis() - 1000000000L);
         final TrackerEventType type = TrackerEventType.RSP;
+        final double latitude = 10.10;
+        final double longitude = 11.11;
 
         TrackerEvent e = new TrackerEvent();
         e.setBattery(battery);
@@ -523,6 +525,8 @@ public class JSonFactoryTest {
         e.setTemperature(temperature);
         e.setTime(time);
         e.setType(type);
+        e.setLatitude(latitude);
+        e.setLongitude(longitude);
 
         final JsonObject obj= factory.toJson(e);
         e = factory.parseTrackerEvent(obj);
@@ -532,6 +536,8 @@ public class JSonFactoryTest {
         assertEquals(temperature, e.getTemperature(), 0.00001);
         assertEquals(time, e.getTime());
         assertEquals(type, e.getType());
+        assertEquals(latitude, e.getLatitude(), 0.000001);
+        assertEquals(longitude, e.getLongitude(), 0.00001);
     }
     @Test
     public void testDeviceData() {

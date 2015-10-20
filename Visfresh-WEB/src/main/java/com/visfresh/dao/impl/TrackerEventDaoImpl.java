@@ -49,6 +49,14 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      */
     protected static final String TEMPERATURE_FIELD = "temperature";
     /**
+     * latitude.
+     */
+    protected static final String LATITUDE_FIELD = "latitude";
+    /**
+     * Longitude.
+     */
+    protected static final String LONGITUDE_FIELD = "longitude";
+    /**
      * Device ID.
      */
     protected static final String DEVICE_FIELD = "device";
@@ -77,12 +85,16 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
                     , TIME_FIELD
                     , BATTERY_FIELD
                     , TEMPERATURE_FIELD
+                    , LATITUDE_FIELD
+                    , LONGITUDE_FIELD
                     , DEVICE_FIELD
                 ) + ")" + " values("
                     + ":"+ TYPE_FIELD
                     + ", :" + TIME_FIELD
                     + ", :" + BATTERY_FIELD
                     + ", :" + TEMPERATURE_FIELD
+                    + ", :" + LATITUDE_FIELD
+                    + ", :" + LONGITUDE_FIELD
                     + ", :" + DEVICE_FIELD
                     + ")";
         } else {
@@ -92,6 +104,8 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
                 + TIME_FIELD + "=:" + TIME_FIELD + ","
                 + BATTERY_FIELD + "=:" + BATTERY_FIELD + ","
                 + TEMPERATURE_FIELD + "=:" + TEMPERATURE_FIELD + ","
+                + LATITUDE_FIELD + "=:" + LATITUDE_FIELD + ","
+                + LONGITUDE_FIELD + "=:" + LONGITUDE_FIELD + ","
                 + DEVICE_FIELD + "=:" + DEVICE_FIELD
                 + " where id = :" + ID_FIELD
             ;
@@ -102,6 +116,8 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         paramMap.put(TIME_FIELD, event.getTime());
         paramMap.put(BATTERY_FIELD, event.getBattery());
         paramMap.put(TEMPERATURE_FIELD, event.getTemperature());
+        paramMap.put(LATITUDE_FIELD, event.getLatitude());
+        paramMap.put(LONGITUDE_FIELD, event.getLongitude());
         paramMap.put(DEVICE_FIELD, event.getDevice().getId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -158,6 +174,8 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         a.setId(((Number) map.get(resultPrefix + ID_FIELD)).longValue());
         a.setBattery(((Number) map.get(resultPrefix + BATTERY_FIELD)).intValue());
         a.setTemperature(((Number) map.get(resultPrefix + TEMPERATURE_FIELD)).doubleValue());
+        a.setLatitude(((Number) map.get(resultPrefix + LATITUDE_FIELD)).doubleValue());
+        a.setLongitude(((Number) map.get(resultPrefix + LONGITUDE_FIELD)).doubleValue());
         a.setTime((Date) map.get(resultPrefix + TIME_FIELD));
         a.setType(TrackerEventType.valueOf((String) map.get(resultPrefix + TYPE_FIELD)));
         return a;
@@ -215,11 +233,9 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     private Map<String, String> createSelectAsMapping(final String entityName,
             final String resultPrefix) {
         final Map<String, String> map = new HashMap<String, String>();
-        map.put(entityName + "." + ID_FIELD, resultPrefix + ID_FIELD);
-        map.put(entityName + "." + TYPE_FIELD, resultPrefix + TYPE_FIELD);
-        map.put(entityName + "." + TIME_FIELD, resultPrefix + TIME_FIELD);
-        map.put(entityName + "." + BATTERY_FIELD, resultPrefix + BATTERY_FIELD);
-        map.put(entityName + "." + TEMPERATURE_FIELD, resultPrefix + TEMPERATURE_FIELD);
+        for (final String field : createFieldList(true)) {
+            map.put(entityName + "." + field, resultPrefix + field);
+        }
         return map;
     }
     public static List<String> createFieldList(final boolean excludeReferences) {
@@ -229,6 +245,8 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         list.add(TIME_FIELD);
         list.add(BATTERY_FIELD);
         list.add(TEMPERATURE_FIELD);
+        list.add(LATITUDE_FIELD);
+        list.add(LONGITUDE_FIELD);
         if (!excludeReferences) {
             list.add(DEVICE_FIELD);
         }

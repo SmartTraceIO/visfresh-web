@@ -34,6 +34,8 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
      * The device.
      */
     private Device device;
+    private double latitude;
+    private double longitude;
 
     /**
      * Default constructor.
@@ -114,6 +116,30 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
      */
     public void setDevice(final Device device) {
         this.device = device;
+    }
+    /**
+     * @return the latitude
+     */
+    public double getLatitude() {
+        return latitude;
+    }
+    /**
+     * @return the longitude
+     */
+    public double getLongitude() {
+        return longitude;
+    }
+    /**
+     * @param latitude the latitude to set
+     */
+    public void setLatitude(final double latitude) {
+        this.latitude = latitude;
+    }
+    /**
+     * @param longitude the longitude to set
+     */
+    public void setLongitude(final double longitude) {
+        this.longitude = longitude;
     }
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
