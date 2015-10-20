@@ -32,7 +32,7 @@ create table devices (
    imei varchar(30) not null,
    name varchar(127) not null,
    sn varchar(20) default null,
-   company bigint(20) not null,
+   company bigint(20),
    primary key (id),
    FOREIGN KEY (company) REFERENCES companies(id)   
 );
