@@ -5,6 +5,7 @@ package com.visfresh.web;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,9 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import com.visfresh.Device;
+import com.visfresh.DeviceCommand;
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageParser;
 import com.visfresh.DeviceMessageType;
+import com.visfresh.db.DeviceCommandDao;
+import com.visfresh.db.DeviceDao;
 import com.visfresh.db.MessageDao;
 
 /**
@@ -29,7 +34,9 @@ public class DeviceCommunicationServlet extends HttpServlet {
     private static final long serialVersionUID = -2549581331796018692L;
 
     private DeviceMessageParser parser;
-    private MessageDao dao;
+    private MessageDao messageDao;
+    private DeviceDao deviceDao;
+    private DeviceCommandDao deviceCommandDao;
 
     /**
      * Default constructor.
@@ -65,12 +72,27 @@ public class DeviceCommunicationServlet extends HttpServlet {
 
         //attempt to load device
         log.debug("device message has received: " + msg);
+        final Device device = deviceDao.getByImei(msg.getImei());
 
-        if (msg.getType() == DeviceMessageType.RSP) {
-            //process response to server command
-            log.debug("Device response has received " + msg);
+        if (device != null) {
+            if (msg.getType() == DeviceMessageType.RSP) {
+                //process response to server command
+                log.debug("Device response has received " + msg);
+            } else {
+                messageDao.create(msg);
+            }
+
+            final List<DeviceCommand> commands = deviceCommandDao.getFoDevice(device.getId());
+            if (!commands.isEmpty()) {
+                final DeviceCommand cmd = commands.get(0);
+                final String command = cmd.getCommand();
+                log.debug("Found command " + command + " for device, sending to device");
+                resp.getOutputStream().write(command.getBytes());
+
+                deviceCommandDao.delete(cmd);
+            }
         } else {
-            dao.create(msg);
+            log.warn("Not found registered device for received message " + msg);
         }
 
         resp.setStatus(HttpServletResponse.SC_OK);
@@ -100,7 +122,9 @@ public class DeviceCommunicationServlet extends HttpServlet {
 
         final ConfigurableApplicationContext ctxt = ApplicationInitializer.getBeanContext(
                 getServletContext());
-        dao = ctxt.getBean(MessageDao.class);
+        messageDao = ctxt.getBean(MessageDao.class);
+        deviceDao = ctxt.getBean(DeviceDao.class);
+        deviceCommandDao = ctxt.getBean(DeviceCommandDao.class);
 
         log.debug("Device communication servlet has initialized");
     }
