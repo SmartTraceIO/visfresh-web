@@ -29,6 +29,8 @@ public class TrackerEventDao {
     public static final String BATTERY_FIELD = "battery";
     public static final String TEMPERATURE_FIELD = "temperature";
     public static final String DEVICE_FIELD = "device";
+    public static final String LATITUDE_FIELD = "latitude";
+    public static final String LONGITUDE_FIELD = "longitude";
 
     @Autowired
     protected NamedParameterJdbcTemplate jdbc;
@@ -50,12 +52,16 @@ public class TrackerEventDao {
                 + "," + BATTERY_FIELD
                 + "," + TEMPERATURE_FIELD
                 + "," + DEVICE_FIELD
+                + "," + LATITUDE_FIELD
+                + "," + LONGITUDE_FIELD
                 + ")" + " values("
                 + ":"+ TYPE_FIELD
                 + ", :" + TIME_FIELD
                 + ", :" + BATTERY_FIELD
                 + ", :" + TEMPERATURE_FIELD
                 + ", :" + DEVICE_FIELD
+                + ", :" + LATITUDE_FIELD
+                + ", :" + LONGITUDE_FIELD
                 + ")";
 
         paramMap.put(ID_FIELD, event.getId());
@@ -63,6 +69,8 @@ public class TrackerEventDao {
         paramMap.put(TIME_FIELD, event.getTime());
         paramMap.put(BATTERY_FIELD, event.getBattery());
         paramMap.put(TEMPERATURE_FIELD, event.getTemperature());
+        paramMap.put(LATITUDE_FIELD, event.getLatitude());
+        paramMap.put(LONGITUDE_FIELD, event.getLongitude());
         paramMap.put(DEVICE_FIELD, device.getId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();

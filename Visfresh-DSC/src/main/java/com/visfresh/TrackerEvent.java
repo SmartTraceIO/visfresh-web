@@ -30,6 +30,14 @@ public class TrackerEvent implements Comparable<TrackerEvent> {
      * Temperature
      */
     private double temperature;
+    /**
+     * Latitude.
+     */
+    private double latitude;
+    /**
+     * Longitude.
+     */
+    private double longitude;
 
     /**
      * Default constructor.
@@ -104,5 +112,29 @@ public class TrackerEvent implements Comparable<TrackerEvent> {
     @Override
     public int compareTo(final TrackerEvent o) {
         return getTime().compareTo(o.getTime());
+    }
+    /**
+     * @return the latitude
+     */
+    public double getLatitude() {
+        return latitude;
+    }
+    /**
+     * @return the longitude
+     */
+    public double getLongitude() {
+        return longitude;
+    }
+    /**
+     * @param latitude the latitude to set
+     */
+    public void setLatitude(final double latitude) {
+        this.latitude = latitude;
+    }
+    /**
+     * @param longitude the longitude to set
+     */
+    public void setLongitude(final double longitude) {
+        this.longitude = longitude;
     }
 }

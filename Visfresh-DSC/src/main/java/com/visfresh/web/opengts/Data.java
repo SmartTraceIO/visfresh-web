@@ -337,6 +337,8 @@ import org.opengts.util.StringTools;
 import org.opengts.war.tools.AttributeTools;
 import org.opengts.war.tools.CommonServlet;
 
+@SuppressWarnings("all") //this is Open JTS source file therefore
+// it will better if this source will not changed by me
 public class Data
     extends CommonServlet
 {

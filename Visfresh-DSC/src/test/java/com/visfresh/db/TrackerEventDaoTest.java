@@ -81,6 +81,8 @@ public class TrackerEventDaoTest extends TestCase {
         e.setTemperature(50.50);
         e.setTime(new Date());
         e.setType("AUT");
+        e.setLongitude(100.500);
+        e.setLongitude(100.500);
 
         dao.create(device, e);
     }
