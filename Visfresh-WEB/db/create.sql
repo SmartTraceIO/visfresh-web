@@ -1,4 +1,5 @@
 -- drops
+drop table if exists systemmessages;
 drop table if exists usershipments;
 drop table if exists shipmentdevices;
 drop table if exists arrivalnotifschedules;
@@ -63,7 +64,7 @@ create table devicecommands (
    id bigint(20) auto_increment not null,
    command varchar(127) not null,
    device varchar(127) not null,
-   `date` timestamp default now(),
+   `date` timestamp default CURRENT_TIMESTAMP,
    primary key (id),
    FOREIGN KEY (device) REFERENCES devices(id)   
 );
@@ -183,6 +184,7 @@ create table shipments(
    shutdowntimeout int not null,
    shippedfrom bigint(20) not null,
    shippedto bigint(20) not null,
+   assettype varchar(127),
    company bigint(20) not null,
    primary key (id),
    FOREIGN KEY (company) REFERENCES companies(id),
@@ -197,7 +199,7 @@ create table shipments(
 
    -- Shipment fields
    palletid varchar(31) default null,
-   ponum varchar(31) default null,
+   assetnum varchar(31) default null,
    descriptiondate timestamp,
    customfiels longtext default null,
    `status` varchar(31) default null
@@ -241,4 +243,15 @@ create table usershipments(
       references shipments(id) ON DELETE CASCADE,
    foreign key (user)
       references userprofiles(user) ON DELETE CASCADE
+);
+
+create table systemmessages (
+  id bigint(20) NOT NULL AUTO_INCREMENT,
+  type varchar(128) NOT NULL,
+  time datetime NOT NULL,
+  processor varchar(32),
+  retryon timestamp NOT NULL default CURRENT_TIMESTAMP,
+  numretry int not null default 0,
+  message varchar(512) not null,
+  PRIMARY KEY (id)
 );

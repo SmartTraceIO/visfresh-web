@@ -184,7 +184,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setExcludeNotificationsIfNoAlertsFired(true);
         s.setName("Shipment-1");
         s.setPalletId("PalletID");
-        s.setPoNum("PoNum");
+        s.setAssetNum("PoNum");
         s.setShipmentDescription("Test Shipment");
         s.setShipmentDescriptionDate(new Date());
         s.setShippedFrom(shippedFrom);
@@ -210,7 +210,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(true, s.isExcludeNotificationsIfNoAlertsFired());
         assertEquals("Shipment-1", s.getName());
         assertEquals("PalletID", s.getPalletId());
-        assertEquals("PoNum", s.getPoNum());
+        assertEquals("PoNum", s.getAssetNum());
         assertEquals("Test Shipment", s.getShipmentDescription());
         assertNotNull(s.getShipmentDescriptionDate());
         assertNotNull(s.getShippedFrom());
@@ -276,7 +276,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(true, s.isExcludeNotificationsIfNoAlertsFired());
         assertEquals("Shipment-1", s.getName());
         assertEquals("PalletID", s.getPalletId());
-        assertEquals("PoNum", s.getPoNum());
+        assertEquals("PoNum", s.getAssetNum());
         assertEquals("Test Shipment", s.getShipmentDescription());
         assertNotNull(s.getShipmentDescriptionDate());
         assertNotNull(s.getShippedFrom());

@@ -145,7 +145,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         s.setExcludeNotificationsIfNoAlertsFired(true);
         s.setName("Shipment-1");
         s.setPalletId("PalletID");
-        s.setPoNum("PoNum");
+        s.setAssetNum("PoNum");
         s.setShipmentDescription("Test Shipment");
         s.setShipmentDescriptionDate(new Date());
         s.setShippedFrom(createLocationProfile());

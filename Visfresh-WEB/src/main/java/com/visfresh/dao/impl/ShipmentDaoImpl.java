@@ -39,7 +39,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      */
     private static final String SHIPMENTDEVICES_TABLE = "shipmentdevices";
     private static final String PALETTID_FIELD = "palletid";
-    private static final String PONUM_FIELD = "ponum";
+    private static final String ASSETNUM_FIELD = "assetnum";
     private static final String DESCRIPTIONDATE_FIELD = "descriptiondate";
     private static final String CUSTOMFIELDS_FIELD = "customfiels";
     private static final String STATUS_FIELD = "status";
@@ -326,7 +326,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             final Map<String, Device> deviceCache) {
         final Shipment e = super.createEntity(map, companyCache);
         e.setPalletId((String) map.get(PALETTID_FIELD));
-        e.setPoNum((String) map.get(PONUM_FIELD));
+        e.setAssetNum((String) map.get(ASSETNUM_FIELD));
         e.setShipmentDescriptionDate((Date) map.get(DESCRIPTIONDATE_FIELD));
         e.setCustomFields((String) map.get(CUSTOMFIELDS_FIELD));
         e.setStatus(ShipmentStatus.valueOf((String) map.get(STATUS_FIELD)));
@@ -368,7 +368,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         final Map<String, Object> params = super.createParameterMap(s);
         params.put(ISTEMPLATE_FIELD, false);
         params.put(PALETTID_FIELD, s.getPalletId());
-        params.put(PONUM_FIELD, s.getPoNum());
+        params.put(ASSETNUM_FIELD, s.getAssetNum());
         params.put(DESCRIPTIONDATE_FIELD, s.getShipmentDescriptionDate());
         params.put(CUSTOMFIELDS_FIELD, s.getCustomFields());
         params.put(STATUS_FIELD, s.getStatus().name());

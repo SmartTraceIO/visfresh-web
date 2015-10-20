@@ -780,8 +780,10 @@ public class RestServiceControllerTest {
         s.getDevices().add(createDevice("234908720394857"));
         s.getDevices().add(createDevice("329847983724987"));
         s.setPalletId("palettid");
+        s.setAssetNum("10515");
         s.setShipmentDescriptionDate(new Date(System.currentTimeMillis() - 1000000000l));
         s.setCustomFields("customFields");
+        s.setAssetType("SeaContainer");
         return s;
     }
     /**
@@ -820,6 +822,7 @@ public class RestServiceControllerTest {
         t.setShutdownDeviceTimeOut(155);
         t.setUseCurrentTimeForDateShipped(true);
         t.setDetectLocationForShippedFrom(true);
+        t.setAssetType("SeaContainer");
         return t;
     }
     /**

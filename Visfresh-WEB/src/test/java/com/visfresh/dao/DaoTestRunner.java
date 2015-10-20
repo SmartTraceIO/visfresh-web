@@ -10,7 +10,7 @@ import org.junit.runners.model.InitializationError;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 
-import com.visfresh.junit.db.JUnitJdbcConfig;
+import com.visfresh.junit.db.JUnitConfig;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -46,7 +46,7 @@ public class DaoTestRunner extends BlockJUnit4ClassRunner {
     @Override
     public void run(final RunNotifier notifier) {
         final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
-        ctxt.scan(JUnitJdbcConfig.class.getPackage().getName());
+        ctxt.scan(JUnitConfig.class.getPackage().getName());
         ctxt.refresh();
         context = ctxt;
 

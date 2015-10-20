@@ -23,7 +23,7 @@ public class Shipment extends ShipmentBase {
     /**
      * PO number (?)
      */
-    private String poNum;
+    private String assetNum;
     /**
      * Shipment description date
      */
@@ -59,14 +59,14 @@ public class Shipment extends ShipmentBase {
     /**
      * @return the poNum
      */
-    public String getPoNum() {
-        return poNum;
+    public String getAssetNum() {
+        return assetNum;
     }
     /**
      * @param poNum the poNum to set
      */
-    public void setPoNum(final String poNum) {
-        this.poNum = poNum;
+    public void setAssetNum(final String poNum) {
+        this.assetNum = poNum;
     }
     /**
      * @return the shipmentDescriptionDate

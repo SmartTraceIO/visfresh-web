@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.init.base;
+package com.visfresh.init.jdbc;
 
 import javax.sql.DataSource;
 
@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -23,14 +24,15 @@ import com.zaxxer.hikari.HikariDataSource;
  *
  */
 @Configuration
-public class JdbcConfigBase implements TransactionManagementConfigurer {
+@EnableTransactionManagement
+public class JdbcConfig implements TransactionManagementConfigurer {
     @Autowired
     private Environment env;
 
     /**
      * Default constructor.
      */
-    public JdbcConfigBase() {
+    public JdbcConfig() {
         super();
     }
 

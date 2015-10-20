@@ -46,7 +46,7 @@ import com.visfresh.io.SaveShipmentResponse;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class JSonFactoryTest {
+public class JSonSerializerTest {
     /**
      * Factory to test.
      */
@@ -58,7 +58,7 @@ public class JSonFactoryTest {
     /**
      * default constructor.
      */
-    public JSonFactoryTest() {
+    public JSonSerializerTest() {
         super();
     }
 
@@ -261,6 +261,7 @@ public class JSonFactoryTest {
         final int shutdownDeviceTimeOut = 155;
         final boolean useCurrentTimeForDateShipped = true;
         final boolean useLocationNearestToDevice = true;
+        final String assetType = "Trailer";
 
         ShipmentTemplate t = new ShipmentTemplate();
         t.setAddDateShipped(addDateShipped);
@@ -278,6 +279,7 @@ public class JSonFactoryTest {
         t.setShutdownDeviceTimeOut(shutdownDeviceTimeOut);
         t.setUseCurrentTimeForDateShipped(useCurrentTimeForDateShipped);
         t.setDetectLocationForShippedFrom(useLocationNearestToDevice);
+        t.setAssetType(assetType);
 
         final JsonObject obj = factory.toJson(t).getAsJsonObject();
 
@@ -298,6 +300,7 @@ public class JSonFactoryTest {
         assertEquals(shutdownDeviceTimeOut, t.getShutdownDeviceTimeOut());
         assertEquals(useCurrentTimeForDateShipped, t.isUseCurrentTimeForDateShipped());
         assertEquals(useLocationNearestToDevice, t.isDetectLocationForShippedFrom());
+        assertEquals(assetType, t.getAssetType());
     }
     @Test
     public void testDevice() {
@@ -343,6 +346,8 @@ public class JSonFactoryTest {
         final Date shipmentDescriptionDate = new Date(System.currentTimeMillis() - 1000000000l);
         final String customFields = "customFields";
         final ShipmentStatus status = ShipmentStatus.Complete;
+        final String assetType = "Trailer";
+        final String assetNum = "10515";
 
         Shipment s = new Shipment();
         s.setAlertProfile(alertProfile);
@@ -363,6 +368,8 @@ public class JSonFactoryTest {
         s.setShipmentDescriptionDate(shipmentDescriptionDate);
         s.setCustomFields(customFields);
         s.setStatus(status);
+        s.setAssetType(assetType);
+        s.setAssetNum(assetNum);
 
         final JsonObject obj = factory.toJson(s).getAsJsonObject();
         s = factory.parseShipment(obj);
@@ -384,6 +391,8 @@ public class JSonFactoryTest {
         assertEquals(shipmentDescriptionDate, s.getShipmentDescriptionDate());
         assertEquals(customFields, s.getCustomFields());
         assertEquals(status, s.getStatus());
+        assertEquals(assetType, s.getAssetType());
+        assertEquals(assetNum, s.getAssetNum());
     }
     @Test
     public void testSaveShipmentResponse() {

@@ -307,23 +307,30 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 `"radius": 1000`  
 `}`
 ### Shipment Template ###
-`{`  
-`"name": "JUnit-tpl",`  
-`"shipmentDescription": "Any Description",`  
-`"alertSuppressionDuringCoolDown": 55,`  
-`"id": 11,`  
-`"alertProfile": 2, //ID of ` [Alert Profile Object](#markdown-header-alert-profile)  
-`"alertsNotificationSchedule": 3, //ID of ` [Notification Schedule Object](#markdown-header-notification-schedule)  
-`"arrivalNotificationWithIn": 11,`  
-`"arrivalNotificationSchedule": 6, //ID of ` [Notification Schedule Object](#markdown-header-notification-schedule)  
-`"excludeNotificationsIfNoAlertsFired": true,`  
-`"shippedFrom": 9, //ID of ` [Location Profile Object](#markdown-header-location-profile)  
-`"shippedTo": 10, //ID of ` [Location Profile Object](#markdown-header-location-profile)  
-`"shutdownDevice": 155,`  
-`"addDateShipped": true,`  
-`"useCurrentTimeForDateShipped": true,`  
-`"detectLocationForShippedFrom": true`  
-`}`
+```
+{
+  "name": "JUnit-tpl",
+  "shipmentDescription": "Any Description",
+  "alertSuppressionDuringCoolDown": 55,
+  "alertProfile": 2,
+  "alertsNotificationSchedules": [ // array of ID of [notification schedules](#markdown-header-notification-schedule)
+    3
+  ],
+  "arrivalNotificationWithIn": 11,
+  "arrivalNotificationSchedules": [ // array of ID of [notification schedules](#markdown-header-notification-schedule)
+    6
+  ],
+  "excludeNotificationsIfNoAlertsFired": true,
+  "shippedFrom": 9,
+  "shippedTo": 10,
+  "shutdownDevice": 155,
+  "assetType": "SeaContainer",
+  "addDateShipped": true,
+  "useCurrentTimeForDateShipped": true,
+  "detectLocationForShippedFrom": true
+}
+
+```  
 ### Device ###
 `{`  
 `"description": "Device description",`  
@@ -339,28 +346,35 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 `"shipment":` [Shipment Object](#markdown-header-shipment)
 `}`
 ### Shipment ###
-`{`  
-`"name": "Shipment-1",`  
-`"shipmentDescription": "Any Description",`  
-`"alertSuppressionDuringCoolDown": 55,`  
-`"id": 11,`  
-`"alertProfile": 2, //ID of ` [Alert Profile Object](#markdown-header-alert-profile)  
-`"alertsNotificationSchedule": 3, //ID of ` [Notification Schedule Object](#markdown-header-notification-schedule)  
-`"arrivalNotificationWithIn": 111,`  
-`"arrivalNotificationSchedule": 6, //ID of ` [Notification Schedule Object](#markdown-header-notification-schedule)  
-`"excludeNotificationsIfNoAlertsFired": true,`  
-`"shippedFrom": 9, //ID of ` [Location Profile Object](#markdown-header-location-profile)  
-`"shippedTo": 10, //ID of ` [Location Profile Object](#markdown-header-location-profile)  
-`"shutdownDevice": 155,`  
-`"palletId": "palettid",`  
-`"shipmentDescriptionDate": "2015-10-01T10:08:11.535+0300",`  
-`"customFields": "customFields", //reserved for user defined custom fields`  
-`"status": "Default", // shipment status one from (Default, InProgress, Complete, Pending)`  
-`"devices": [`  
-`"234908720394857.124", // ID of` [Device](#markdown-header-device)  
-`"329847983724987.124" // ID of` [Device](#markdown-header-device)  
-`]`  
-`}`
+```
+{
+    "name": "Shipment-1",
+    "shipmentDescription": "Any Description",
+    "alertSuppressionDuringCoolDown": 55,
+    "alertProfile": 2,
+    "alertsNotificationSchedules": [ // Array of ID of [Notification Schedule Object](#markdown-header-notification-schedule)
+      3
+    ],
+    "arrivalNotificationWithIn": 111,
+    "arrivalNotificationSchedules": [ // Array of ID of [Notification Schedule Object](#markdown-header-notification-schedule)
+      6
+    ],
+    "excludeNotificationsIfNoAlertsFired": true,
+    "shippedFrom": 9,
+    "shippedTo": 10,
+    "shutdownDevice": 155,
+    "assetType": "SeaContainer",
+    "palletId": "palettid",
+    "assetNum": "10515",
+    "shipmentDescriptionDate": "2015-10-09T11:47:21.945+0300",
+    "customFields": "customFields",
+    "status": "Default",
+    "devices": [
+      "234908720394857.123",
+      "329847983724987.123"
+    ]
+}
+```
 ### Notification ###
 `{`  
 `"id": 18,`  
@@ -720,61 +734,77 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 `}`  
 ### Save Shipment Template example ###
 **POST /vf/rest/saveShipmentTemplate/${accessToken}**  
-**Request body:** 
-`{`  
-`"name": "JUnit-tpl",`  
-`"shipmentDescription": "Any Description",`  
-`"alertSuppressionDuringCoolDown": 55,`  
-`"alertProfile": 2,`  
-`"alertsNotificationSchedule": 3,`  
-`"arrivalNotificationWithIn": 11,`  
-`"arrivalNotificationSchedule": 6,`  
-`"excludeNotificationsIfNoAlertsFired": true,`  
-`"shippedFrom": 9,`  
-`"shippedTo": 10,`  
-`"shutdownDevice": 155,`  
-`"addDateShipped": true,`  
-`"useCurrentTimeForDateShipped": true,`  
-`"detectLocationForShippedFrom": true`  
-`}`  
+**Request body:**  
+```
+{
+  "name": "JUnit-tpl",
+  "shipmentDescription": "Any Description",
+  "alertSuppressionDuringCoolDown": 55,
+  "alertProfile": 2,
+  "alertsNotificationSchedules": [
+    3
+  ],
+  "arrivalNotificationWithIn": 11,
+  "arrivalNotificationSchedules": [
+    6
+  ],
+  "excludeNotificationsIfNoAlertsFired": true,
+  "shippedFrom": 9,
+  "shippedTo": 10,
+  "shutdownDevice": 155,
+  "assetType": "SeaContainer",
+  "addDateShipped": true,
+  "useCurrentTimeForDateShipped": true,
+  "detectLocationForShippedFrom": true
+}
+```  
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": {`  
-`"id": 11`  
-`}`  
-`}`  
+```
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "id": 11
+  }
+}
+``` 
 ### Get Shipment Templates example ###
 **GET /vf/rest/getShipmentTemplates/${accessToken}**  
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": [`  
-`{`  
-`"name": "JUnit-tpl",`  
-`"shipmentDescription": "Any Description",`  
-`"alertSuppressionDuringCoolDown": 55,`  
-`"id": 11,`  
-`"alertProfile": 2,`  
-`"alertsNotificationSchedule": 3,`  
-`"arrivalNotificationWithIn": 11,`  
-`"arrivalNotificationSchedule": 6,`  
-`"excludeNotificationsIfNoAlertsFired": true,`  
-`"shippedFrom": 9,`  
-`"shippedTo": 10,`  
-`"shutdownDevice": 155,`  
-`"addDateShipped": true,`  
-`"useCurrentTimeForDateShipped": true,`  
-`"detectLocationForShippedFrom": true`  
-`}`  
-`]`  
-`}`  
+```
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "name": "JUnit-tpl",
+      "shipmentDescription": "Any Description",
+      "alertSuppressionDuringCoolDown": 55,
+      "id": 11,
+      "alertProfile": 2,
+      "alertsNotificationSchedules": [
+        3
+      ],
+      "arrivalNotificationWithIn": 11,
+      "arrivalNotificationSchedules": [
+        6
+      ],
+      "excludeNotificationsIfNoAlertsFired": true,
+      "shippedFrom": 9,
+      "shippedTo": 10,
+      "shutdownDevice": 155,
+      "assetType": "SeaContainer",
+      "addDateShipped": true,
+      "useCurrentTimeForDateShipped": true,
+      "detectLocationForShippedFrom": true
+    }
+  ]
+}
+```
 ### Save Device example ###
 **POST /vf/rest/saveDevice/${accessToken}**  
 **Request body:**  
@@ -813,75 +843,91 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 ### Save Shipment example ###
 **POST  /vf/rest/saveShipment/${accessToken}**  
 **Request body:**  
-`{`  
-`"saveAsNewTemplate": true,`  
-`"templateName": "NewTemplate.tpl",`  
-`"shipment": {`  
-`"name": "Shipment-1",`  
-`"shipmentDescription": "Any Description",`  
-`"alertSuppressionDuringCoolDown": 55,`  
-`"alertProfile": 2,`  
-`"alertsNotificationSchedule": 3,`  
-`"arrivalNotificationWithIn": 111,`  
-`"arrivalNotificationSchedule": 6,`  
-`"excludeNotificationsIfNoAlertsFired": true,`  
-`"shippedFrom": 9,`  
-`"shippedTo": 10,`  
-`"shutdownDevice": 155,`  
-`"palletId": "palettid",`  
-`"shipmentDescriptionDate": "2015-10-01T10:06:53.698+0300",`  
-`"customFields": "customFields",`  
-`"status": "Default",`  
-`"devices": [`  
-`"234908720394857.123", //Device ID`  
-`"329847983724987.123"  //Device ID`  
-`]`  
-`}`  
-`}`  
+```
+{
+  "saveAsNewTemplate": true,
+  "templateName": "NewTemplate.tpl",
+  "shipment": {
+    "name": "Shipment-1",
+    "shipmentDescription": "Any Description",
+    "alertSuppressionDuringCoolDown": 55,
+    "alertProfile": 2,
+    "alertsNotificationSchedules": [
+      3
+    ],
+    "arrivalNotificationWithIn": 111,
+    "arrivalNotificationSchedules": [
+      6
+    ],
+    "excludeNotificationsIfNoAlertsFired": true,
+    "shippedFrom": 9,
+    "shippedTo": 10,
+    "shutdownDevice": 155,
+    "assetType": "SeaContainer",
+    "palletId": "palettid",
+    "assetNum": "10515",
+    "shipmentDescriptionDate": "2015-10-09T11:47:21.945+0300",
+    "customFields": "customFields",
+    "status": "Default",
+    "devices": [
+      "234908720394857.123",
+      "329847983724987.123"
+    ]
+  }
+}
+```
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": {`  
-`"shipmentId": 11,`  
-`"templateId": 12`  
-`}`  
-`}`
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "shipmentId": 11,
+    "templateId": 12
+  }
+}
 ### Get Shipments example ###
 **GET /vf/rest/getShipments/${accessToken}**  
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": [`  
-`{`  
-`"name": "Shipment-1",`  
-`"shipmentDescription": "Any Description",`  
-`"alertSuppressionDuringCoolDown": 55,`  
-`"id": 11,`  
-`"alertProfile": 2,`  
-`"alertsNotificationSchedule": 3,`  
-`"arrivalNotificationWithIn": 111,`  
-`"arrivalNotificationSchedule": 6,`  
-`"excludeNotificationsIfNoAlertsFired": true,`  
-`"shippedFrom": 9,`  
-`"shippedTo": 10,`  
-`"shutdownDevice": 155,`  
-`"palletId": "palettid",`  
-`"shipmentDescriptionDate": "2015-10-01T10:08:11.535+0300",`  
-`"customFields": "customFields",`  
-`"status": "Default",`  
-`"devices": [`  
-`"234908720394857.123", //Device ID`  
-`"329847983724987.123"  //Device ID`  
-`]`  
-`}`  
-`]`  
-`}`
+```
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "name": "Shipment-1",
+      "shipmentDescription": "Any Description",
+      "alertSuppressionDuringCoolDown": 55,
+      "id": 11,
+      "alertProfile": 2,
+      "alertsNotificationSchedules": [
+        3
+      ],
+      "arrivalNotificationWithIn": 111,
+      "arrivalNotificationSchedules": [
+        6
+      ],
+      "excludeNotificationsIfNoAlertsFired": true,
+      "shippedFrom": 9,
+      "shippedTo": 10,
+      "shutdownDevice": 155,
+      "assetType": "SeaContainer",
+      "palletId": "palettid",
+      "assetNum": "10515",
+      "shipmentDescriptionDate": "2015-10-09T11:54:22.953+0300",
+      "customFields": "customFields",
+      "status": "Default",
+      "devices": [
+        "234908720394857.123",
+        "329847983724987.123"
+      ]
+    }
+  ]
+}
+```
 ### Get Notifications example ###
 **GET  /vf/rest/getNotifications/${accessToken}?shipment=11**  
 **Response:**  
@@ -1072,6 +1118,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
     "shippedFrom": 79,
     "shippedTo": 80,
     "shutdownDevice": 155,
+    "assetType": "SeaContainer",
     "addDateShipped": true,
     "useCurrentTimeForDateShipped": true,
     "detectLocationForShippedFrom": true
@@ -1122,8 +1169,10 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
     "shippedFrom": 79,
     "shippedTo": 80,
     "shutdownDevice": 155,
+    "assetType": "SeaContainer",
     "palletId": "palettid",
-    "shipmentDescriptionDate": "2015-10-05T03:42:46.997+0300",
+    "assetNum": "10515",
+    "shipmentDescriptionDate": "2015-10-09T11:53:13.146+0300",
     "customFields": "customFields",
     "status": "Default",
     "devices": [

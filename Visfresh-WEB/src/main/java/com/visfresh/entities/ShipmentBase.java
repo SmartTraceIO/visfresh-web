@@ -64,6 +64,10 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
      * Shutdown device time out in minutes.
      */
     private int shutdownDeviceTimeOut;
+    /**
+     * AssertType
+     */
+    private String assetType;
 
     /**
      * Default constructor.
@@ -247,11 +251,22 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
     public Long getId() {
         return id;
     }
-
     /**
      * @param id the id to set
      */
     public void setId(final Long id) {
         this.id = id;
+    }
+    /**
+     * @return the assetType
+     */
+    public String getAssetType() {
+        return assetType;
+    }
+    /**
+     * @param assetType the assetType to set
+     */
+    public void setAssetType(final String assetType) {
+        this.assetType = assetType;
     }
 }

@@ -349,6 +349,7 @@ public class JSonSerializer {
         obj.addProperty("shippedFrom", getId(shpb.getShippedFrom()));
         obj.addProperty("shippedTo", getId(shpb.getShippedTo()));
         obj.addProperty("shutdownDevice", shpb.getShutdownDeviceTimeOut());
+        obj.addProperty("assetType", shpb.getAssetType());
     }
     /**
      * @param obj JSON object.
@@ -383,6 +384,7 @@ public class JSonSerializer {
         shp.setShippedFrom(resolveLocationProfile(asLong(obj.get("shippedFrom"))));
         shp.setShippedTo(resolveLocationProfile(asLong(obj.get("shippedTo"))));
         shp.setShutdownDeviceTimeOut(asInt(obj.get("shutdownDevice")));
+        shp.setAssetType(asString(obj.get("assetType")));
     }
     /**
      * @param json JSON object.
@@ -419,7 +421,7 @@ public class JSonSerializer {
         parseShipmentBase(json, s);
 
         s.setPalletId(asString(json.get("palletId")));
-        s.setPoNum(asString(json.get("poNum")));
+        s.setAssetNum(asString(json.get("assetNum")));
         s.setShipmentDescriptionDate(asDate(json.get("shipmentDescriptionDate")));
         s.setCustomFields(asString(json.get("customFields")));
         s.setStatus(ShipmentStatus.valueOf(json.get("status").getAsString()));
@@ -449,7 +451,7 @@ public class JSonSerializer {
         addShipmentBase(s, obj);
 
         obj.addProperty("palletId", s.getPalletId());
-        obj.addProperty("poNum", s.getPoNum());
+        obj.addProperty("assetNum", s.getAssetNum());
         obj.addProperty("shipmentDescriptionDate", timeToString(s.getShipmentDescriptionDate()));
         obj.addProperty("customFields", s.getCustomFields());
         obj.addProperty("status", s.getStatus().name());
