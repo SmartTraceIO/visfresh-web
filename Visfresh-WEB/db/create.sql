@@ -200,7 +200,7 @@ create table shipments(
    -- Shipment fields
    palletid varchar(31) default null,
    assetnum varchar(31) default null,
-   descriptiondate timestamp,
+   shipmentdate timestamp,
    customfiels longtext default null,
    `status` varchar(31) default null
 );

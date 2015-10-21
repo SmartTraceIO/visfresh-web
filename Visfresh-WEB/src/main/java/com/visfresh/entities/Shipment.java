@@ -27,7 +27,7 @@ public class Shipment extends ShipmentBase {
     /**
      * Shipment description date
      */
-    private Date shipmentDescriptionDate;
+    private Date shipmentDate;
     /**
      * This field has reserver for future custom fields implementation.
      */
@@ -69,16 +69,16 @@ public class Shipment extends ShipmentBase {
         this.assetNum = poNum;
     }
     /**
-     * @return the shipmentDescriptionDate
+     * @return the shipmentDate
      */
     public Date getShipmentDescriptionDate() {
-        return shipmentDescriptionDate;
+        return shipmentDate;
     }
     /**
-     * @param shipmentDescriptionDate the shipmentDescriptionDate to set
+     * @param shipmentDate the shipmentDate to set
      */
-    public void setShipmentDescriptionDate(final Date shipmentDescriptionDate) {
-        this.shipmentDescriptionDate = shipmentDescriptionDate;
+    public void setShipmentDescriptionDate(final Date shipmentDate) {
+        this.shipmentDate = shipmentDate;
     }
     /**
      * @return the customFields

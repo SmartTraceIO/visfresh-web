@@ -366,7 +366,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
     "assetType": "SeaContainer",
     "palletId": "palettid",
     "assetNum": "10515",
-    "shipmentDescriptionDate": "2015-10-09T11:47:21.945+0300",
+    "shipmentDate": "2015-10-09T11:47:21.945+0300",
     "customFields": "customFields",
     "status": "Default",
     "devices": [
@@ -866,7 +866,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
     "assetType": "SeaContainer",
     "palletId": "palettid",
     "assetNum": "10515",
-    "shipmentDescriptionDate": "2015-10-09T11:47:21.945+0300",
+    "shipmentDate": "2015-10-09T11:47:21.945+0300",
     "customFields": "customFields",
     "status": "Default",
     "devices": [
@@ -917,7 +917,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
       "assetType": "SeaContainer",
       "palletId": "palettid",
       "assetNum": "10515",
-      "shipmentDescriptionDate": "2015-10-09T11:54:22.953+0300",
+      "shipmentDate": "2015-10-09T11:54:22.953+0300",
       "customFields": "customFields",
       "status": "Default",
       "devices": [
@@ -1172,7 +1172,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
     "assetType": "SeaContainer",
     "palletId": "palettid",
     "assetNum": "10515",
-    "shipmentDescriptionDate": "2015-10-09T11:53:13.146+0300",
+    "shipmentDate": "2015-10-09T11:53:13.146+0300",
     "customFields": "customFields",
     "status": "Default",
     "devices": [

@@ -425,7 +425,7 @@ public class JSonSerializer {
 
         s.setPalletId(asString(json.get("palletId")));
         s.setAssetNum(asString(json.get("assetNum")));
-        s.setShipmentDescriptionDate(asDate(json.get("shipmentDescriptionDate")));
+        s.setShipmentDescriptionDate(asDate(json.get("shipmentDate")));
         s.setCustomFields(asString(json.get("customFields")));
         s.setStatus(ShipmentStatus.valueOf(json.get("status").getAsString()));
 
@@ -455,7 +455,7 @@ public class JSonSerializer {
 
         obj.addProperty("palletId", s.getPalletId());
         obj.addProperty("assetNum", s.getAssetNum());
-        obj.addProperty("shipmentDescriptionDate", timeToString(s.getShipmentDescriptionDate()));
+        obj.addProperty("shipmentDate", timeToString(s.getShipmentDescriptionDate()));
         obj.addProperty("customFields", s.getCustomFields());
         obj.addProperty("status", s.getStatus().name());
 

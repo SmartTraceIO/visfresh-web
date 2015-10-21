@@ -343,7 +343,7 @@ public class JSonSerializerTest {
         final Device t1 = createDevice("234908720394857");
         final Device t2 = createDevice("329847983724987");
         final String palletId = "palettid";
-        final Date shipmentDescriptionDate = new Date(System.currentTimeMillis() - 1000000000l);
+        final Date shipmentDate = new Date(System.currentTimeMillis() - 1000000000l);
         final String customFields = "customFields";
         final ShipmentStatus status = ShipmentStatus.Complete;
         final String assetType = "Trailer";
@@ -365,7 +365,7 @@ public class JSonSerializerTest {
         s.getDevices().add(t1);
         s.getDevices().add(t2);
         s.setPalletId(palletId);
-        s.setShipmentDescriptionDate(shipmentDescriptionDate);
+        s.setShipmentDescriptionDate(shipmentDate);
         s.setCustomFields(customFields);
         s.setStatus(status);
         s.setAssetType(assetType);
@@ -388,7 +388,7 @@ public class JSonSerializerTest {
         assertEquals(shutdownDeviceTimeOut, s.getShutdownDeviceTimeOut());
         assertEquals(2, s.getDevices().size());
         assertEquals(palletId, s.getPalletId());
-        assertEquals(shipmentDescriptionDate, s.getShipmentDescriptionDate());
+        assertEquals(shipmentDate, s.getShipmentDescriptionDate());
         assertEquals(customFields, s.getCustomFields());
         assertEquals(status, s.getStatus());
         assertEquals(assetType, s.getAssetType());
