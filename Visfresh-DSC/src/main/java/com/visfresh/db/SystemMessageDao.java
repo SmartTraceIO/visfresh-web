@@ -99,6 +99,7 @@ public class SystemMessageDao {
         obj.addProperty("type", e.getType().name());
         obj.addProperty("latitude", e.getLocation().getLatitude());
         obj.addProperty("longitude", e.getLocation().getLongitude());
+        obj.addProperty("imei", e.getImei());
 
         final SystemMessage sm = new SystemMessage();
         sm.setMessageInfo(obj.toString());
