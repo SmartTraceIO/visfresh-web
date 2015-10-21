@@ -132,19 +132,19 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
 
     @PostConstruct
     public void initialize() {
-        @SuppressWarnings("rawtypes")
-        final OrderedMap<String, DBFactory<? extends DBRecord>> factories = DBAdmin.getTableFactoryMap();
-
-        final String key = factories.getFirstKey();
         try {
+            @SuppressWarnings("rawtypes")
+            final OrderedMap<String, DBFactory<? extends DBRecord>> factories = DBAdmin.getTableFactoryMap();
+
+            final String key = factories.getFirstKey();
             if (!factories.get(key).tableExists()) {
                 final int size = factories.size();
                 for (int i = 0; i < size; i++) {
                     factories.get(i).createTable();
                 }
             }
-        } catch (final DBException e) {
-            log.error("Failed to initialize OpenGTS data base");
+        } catch (final Exception e) {
+            log.error("Failed to initialize OpenGTS data base", e);
         }
     }
 }

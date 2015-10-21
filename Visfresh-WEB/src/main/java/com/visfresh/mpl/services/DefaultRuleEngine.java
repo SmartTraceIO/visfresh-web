@@ -31,7 +31,6 @@ import com.visfresh.io.JSonSerializer;
 import com.visfresh.services.AbstractRuleEngine;
 import com.visfresh.services.OpenJtsFacade;
 import com.visfresh.services.RetryableException;
-import com.visfresh.services.RuleEngine;
 import com.visfresh.services.SystemMessageHandler;
 
 /**
@@ -46,8 +45,6 @@ public class DefaultRuleEngine extends AbstractRuleEngine implements SystemMessa
     private SystemMessageDispatcher dispatcher;
     @Autowired
     private TrackerEventDao eventDao;
-    @Autowired
-    private RuleEngine ruleEngine;
     @Autowired
     private JSonSerializer jsonSerializer;
     @Autowired

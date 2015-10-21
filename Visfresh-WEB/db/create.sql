@@ -72,7 +72,7 @@ create table devicecommands (
 create table users (
    username varchar(127) not null,
    `password` varchar(127) default null, -- encripted password
-   fullname varchar(255) not null,
+   fullname varchar(255),
    roles  varchar(255) not null,
    company bigint(20) not null,
    primary key (username),

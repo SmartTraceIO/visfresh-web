@@ -17,6 +17,6 @@ public interface ReferenceResolver {
     LocationProfile getLocationProfile(Long id);
     AlertProfile getAlertProfile(Long id);
     NotificationSchedule getNotificationSchedule(Long id);
-    Device getDevice(String imei);
+    Device getDevice(String id);
     Shipment getShipment(Long id);
 }
