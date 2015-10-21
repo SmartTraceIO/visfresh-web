@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.services.AbstractRuleEngine;
 
@@ -28,7 +29,7 @@ public class MockRuleEngine extends AbstractRuleEngine {
      * @see com.visfresh.services.RuleEngine#processTrackerEvent(com.visfresh.entities.TrackerEvent)
      */
     @Override
-    public void processTrackerEvent(final TrackerEvent e) {
+    public void processTrackerEvent(Shipment shipment, final TrackerEvent e) {
     }
 
     /* (non-Javadoc)

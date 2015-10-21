@@ -49,7 +49,6 @@ import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.init.mock.MockConfig;
@@ -505,7 +504,7 @@ public class RestServiceControllerTest {
         final Device d = service.devices.get(s.getDevices().get(0).getId());
 
         //add tracker event.
-        final TrackerEvent te = createEvent(TrackerEventType.AUT);
+        final TrackerEvent te = createEvent("AUT");
         te.setId(service.ids.incrementAndGet());
 
         final List<TrackerEvent> tes = new LinkedList<TrackerEvent>();
@@ -682,7 +681,7 @@ public class RestServiceControllerTest {
     /**
      * @return tracker event.
      */
-    private TrackerEvent createEvent(final TrackerEventType type) {
+    private TrackerEvent createEvent(final String type) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(1234);
         e.setTemperature(56);

@@ -3,7 +3,9 @@
  */
 package com.visfresh.io;
 
+import java.io.Reader;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,6 +16,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
@@ -36,9 +39,9 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
+import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.services.AuthToken;
 
 /**
@@ -632,7 +635,7 @@ public class JSonSerializer {
         obj.addProperty("id", e.getId());
         obj.addProperty("temperature", e.getTemperature());
         obj.addProperty("time", timeToString(e.getTime()));
-        obj.addProperty("type", e.getType().name());
+        obj.addProperty("type", e.getType());
         obj.addProperty("latitude", e.getLatitude());
         obj.addProperty("longitude", e.getLongitude());
         return obj;
@@ -643,7 +646,7 @@ public class JSonSerializer {
         e.setId(asLong(json.get("id")));
         e.setTemperature(asDouble(json.get("temperature")));
         e.setTime(asDate(json.get("time")));
-        e.setType(TrackerEventType.valueOf(asString(json.get("type"))));
+        e.setType(asString(json.get("type")));
         e.setLatitude(asDouble(json.get("latitude")));
         e.setLongitude(asDouble(json.get("longitude")));
         return e;
@@ -774,6 +777,39 @@ public class JSonSerializer {
             p.getShipments().add(resolveShipment(id.getAsLong()));
         }
         return p;
+    }
+    public DeviceDcsNativeEvent parseDeviceDcsNativeEvent(final JsonElement json) {
+        if (json == null || json.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject obj = json.getAsJsonObject();
+
+        final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
+        e.setBattery(asInt(obj.get("battery")));
+        e.setTemperature(asDouble(obj.get("temperature")));
+        e.setDate(parseDate(asString(obj.get("time"))));
+        e.setType(asString(obj.get("type")));
+        e.getLocation().setLatitude(asDouble(obj.get("latitude")));
+        e.getLocation().setLongitude(asDouble(obj.get("longitude")));
+        e.setImei(asString(obj.get("imei")));
+
+        return e;
+    }
+    public JsonElement toJson(final DeviceDcsNativeEvent e) {
+        if (e == null) {
+            return JsonNull.INSTANCE;
+        }
+
+        final JsonObject obj = new JsonObject();
+        obj.addProperty("battery", e.getBattery());
+        obj.addProperty("temperature", e.getTemperature());
+        obj.addProperty("time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(e.getTime()));
+        obj.addProperty("type", e.getType());
+        obj.addProperty("latitude", e.getLocation().getLatitude());
+        obj.addProperty("longitude", e.getLocation().getLongitude());
+        obj.addProperty("imei", e.getImei());
+        return obj;
     }
 
 
@@ -930,5 +966,13 @@ public class JSonSerializer {
      */
     public void setReferenceResolver(final ReferenceResolver referenceResolver) {
         this.referenceResolver = referenceResolver;
+    }
+    /**
+     * @param text JSON text.
+     * @return JSON element.
+     */
+    public static JsonElement parseJson(final String text) {
+        final Reader in = new StringReader(text);
+        return new JsonParser().parse(in);
     }
 }

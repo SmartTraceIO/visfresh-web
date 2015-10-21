@@ -211,8 +211,15 @@ public class SystemMessageDispatcher {
     protected void handleError(final SystemMessage msg, final Throwable e) {
         if (e instanceof RetryableException && ((RetryableException) e).canRetry()) {
             if (msg.getNumberOfRetry() < getRetryLimit()) {
-                log.error("Retryable exception has occured for message " + msg + ", will retry later", e);
-                msg.setRetryOn(new Date(msg.getRetryOn().getTime() + getRetryTimeOut()));
+                final RetryableException re = (RetryableException) e;
+
+                log.error("Retryable exception has occured for message " + msg + ", will retry later", re);
+                long timeOut = getRetryTimeOut();
+                if (re.getRetryTimeOut() > 0) { // if retry time out is set on exception, use it
+                    timeOut = re.getRetryTimeOut();
+                }
+
+                msg.setRetryOn(new Date(msg.getRetryOn().getTime() + timeOut));
                 msg.setNumberOfRetry(msg.getNumberOfRetry() + 1);
                 messageDao.save(msg);
             } else {

@@ -8,9 +8,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DeviceDao;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 
 /**
@@ -26,28 +29,30 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
     /**
      * Description field.
      */
-    private static final String DESCRIPTION_FIELD = "description";
+    public static final String DESCRIPTION_FIELD = "description";
     /**
      * Name field.
      */
-    private static final String NAME_FIELD = "name";
+    public static final String NAME_FIELD = "name";
     /**
      * ID field.
      */
-    protected static final String ID_FIELD = "id";
+    public static final String ID_FIELD = "id";
     /**
      * Name field.
      */
-    private static final String IMEI_FIELD = "imei";
+    public static final String IMEI_FIELD = "imei";
     /**
      * Serial number field.
      */
-    private static final String SN_FIELD = "sn";
+    public static final String SN_FIELD = "sn";
     /**
      * Company name.
      */
-    protected static final String COMPANY_FIELD = "company";
+    public static final String COMPANY_FIELD = "company";
 
+    @Autowired
+    private CompanyDao companyDao;
     /**
      * Default constructor.
      */
@@ -171,8 +176,19 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
      */
     public static Device createDevice(final String resultPrefix,
             final String companyResultPrefix, final Map<String, Object> map) {
-        final Device d = new Device();
+        final Device d = createDevice(map, resultPrefix);
         d.setCompany(CompanyDaoImpl.createCompany(companyResultPrefix, map));
+        return d;
+    }
+
+    /**
+     * @param map
+     * @param resultPrefix
+     * @return
+     */
+    protected static Device createDevice(final Map<String, Object> map,
+            final String resultPrefix) {
+        final Device d = new Device();
         d.setId((String) map.get(resultPrefix + ID_FIELD));
         d.setName((String) map.get(resultPrefix + NAME_FIELD));
         d.setDescription((String) map.get(resultPrefix + DESCRIPTION_FIELD));
@@ -225,5 +241,42 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("id", id);
         jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceDao#findAllByImei(java.lang.String)
+     */
+    @Override
+    public List<Device> findAllByImei(final String imei) {
+        final String entityName = "d";
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put(IMEI_FIELD, imei);
+
+        final Map<String, String> fields = createSelectAsMapping(entityName, "");
+        params.putAll(fields);
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select * from "
+                + TABLE + " " + entityName
+                + " where "
+                + entityName + "." + IMEI_FIELD + " = :" + IMEI_FIELD,
+                params);
+
+        final List<Device> result = new LinkedList<Device>();
+        final Map<Long, Company> cache = new HashMap<Long, Company>();
+
+        for (final Map<String,Object> map : list) {
+            final Device d = createDevice(map, "");
+
+            final Long companyId = ((Number) map.get(COMPANY_FIELD)).longValue();
+            Company c = cache.get(companyId);
+            if (c == null) {
+                c = companyDao.findOne(companyId);
+                cache.put(companyId, c);
+            }
+
+            d.setCompany(c);
+            result.add(d);
+        }
+        return result;
     }
 }

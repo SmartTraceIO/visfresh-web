@@ -9,7 +9,10 @@ package com.visfresh.services;
  */
 public class RetryableException extends Exception {
     private static final long serialVersionUID = -6333136803281304890L;
-
+    /**
+     * The retry time out.
+     */
+    private long retryTimeOut = -1;
     /**
      * Can retry message.
      */
@@ -61,5 +64,17 @@ public class RetryableException extends Exception {
      */
     public void setCanRetry(final boolean canRetry) {
         this.canRetry = canRetry;
+    }
+    /**
+     * @param retryTimeOut the retryTimeOut to set
+     */
+    public void setRetryTimeOut(final long retryTimeOut) {
+        this.retryTimeOut = retryTimeOut;
+    }
+    /**
+     * @return the retryTimeOut
+     */
+    public long getRetryTimeOut() {
+        return retryTimeOut;
     }
 }

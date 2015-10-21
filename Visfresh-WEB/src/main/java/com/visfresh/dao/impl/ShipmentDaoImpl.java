@@ -397,6 +397,30 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         cleanRefs(SHIPMENTDEVICES_TABLE, id);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#findActiveShipment(java.lang.String)
+     */
+    @Override
+    public Shipment findActiveShipment(final String imei) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("imei", imei);
+        params.put("status", ShipmentStatus.Complete.name());
+
+        final String sql = "select s." + ID_FIELD
+                + " from " + TABLE + " s"
+                + " join " + SHIPMENTDEVICES_TABLE + " sd on sd.shipment = s." + ID_FIELD
+                + " join " + DeviceDaoImpl.TABLE + " d on d." + DeviceDaoImpl.ID_FIELD + "= sd.device"
+                + " and d." + DeviceDaoImpl.IMEI_FIELD + "= :imei"
+                + " where s." + STATUS_FIELD + "<> :status";
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+
+        if (rows.size() > 0) {
+            final Long shipmentId = ((Number) rows.get(0).get(ID_FIELD)).longValue();
+            return findOne(shipmentId);
+        } else {
+            return null;
+        }
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#isTemplate()
      */
     @Override

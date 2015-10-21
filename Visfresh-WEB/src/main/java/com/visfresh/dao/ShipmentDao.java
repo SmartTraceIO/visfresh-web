@@ -16,7 +16,7 @@ import com.visfresh.entities.ShipmentData;
  */
 public interface ShipmentDao extends DaoBase<Shipment, Long> {
     /**
-     * @param company TODO
+     * @param company company.
      * @param startDate
      * @param endDate
      * @param onlyWithAlerts
@@ -24,4 +24,10 @@ public interface ShipmentDao extends DaoBase<Shipment, Long> {
      */
     List<ShipmentData> getShipmentData(Company company, Date startDate,
             Date endDate, boolean onlyWithAlerts);
+
+    /**
+     * @param imei device IMEI.
+     * @return active shipment for given devcie.
+     */
+    Shipment findActiveShipment(String imei);
 }

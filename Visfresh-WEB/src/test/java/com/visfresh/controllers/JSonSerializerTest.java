@@ -35,12 +35,12 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.JSonSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -50,7 +50,7 @@ public class JSonSerializerTest {
     /**
      * Factory to test.
      */
-    private JSonSerializer factory;
+    private JSonSerializer serializer;
     private MockReferenceResolver resolver;
     private long lastLong;
     private Gson gson;
@@ -72,8 +72,8 @@ public class JSonSerializerTest {
         this.gson = b.create();
 
         resolver = new MockReferenceResolver();
-        factory = new JSonSerializer();
-        factory.setReferenceResolver(resolver);
+        serializer = new JSonSerializer();
+        serializer.setReferenceResolver(resolver);
     }
 
     @Test
@@ -111,8 +111,8 @@ public class JSonSerializerTest {
         p.setCriticalHighTemperatureForMoreThen(criticalHighTemperatureForMoreThen);
         p.setCriticalLowTemperatureForMoreThen(criticalLowTemperatureForMoreThen);
 
-        final JsonObject json = factory.toJson(p).getAsJsonObject();
-        p = factory.parseAlertProfile(json);
+        final JsonObject json = serializer.toJson(p).getAsJsonObject();
+        p = serializer.parseAlertProfile(json);
 
         assertEquals(criticalHighTemperature, p.getCriticalHighTemperature(), 0.00001);
         assertEquals(criticalLowTemperature, p.getCriticalLowTemperature(), 0.00001);
@@ -158,8 +158,8 @@ public class JSonSerializerTest {
         s.getWeekDays()[0] = true;
         s.getWeekDays()[3] = true;
 
-        final JsonObject obj = factory.toJson(s);
-        s = factory.parseSchedulePersonHowWhen(obj);
+        final JsonObject obj = serializer.toJson(s);
+        s = serializer.parseSchedulePersonHowWhen(obj);
 
         assertEquals(company, s.getCompany());
         assertEquals(emailNotification, s.getEmailNotification());
@@ -193,8 +193,8 @@ public class JSonSerializerTest {
         s.getSchedules().add(createSchedulePersonHowWhen());
         s.getSchedules().add(createSchedulePersonHowWhen());
 
-        final JsonObject obj = factory.toJson(s).getAsJsonObject();
-        s = factory.parseNotificationSchedule(obj);
+        final JsonObject obj = serializer.toJson(s).getAsJsonObject();
+        s = serializer.parseNotificationSchedule(obj);
 
         assertEquals(description, s.getDescription());
         assertEquals(id, s.getId());
@@ -229,8 +229,8 @@ public class JSonSerializerTest {
         p.getLocation().setLatitude(x);
         p.getLocation().setLongitude(y);
 
-        final JsonObject obj = factory.toJson(p).getAsJsonObject();
-        p = factory.parseLocationProfile(obj);
+        final JsonObject obj = serializer.toJson(p).getAsJsonObject();
+        p = serializer.parseLocationProfile(obj);
 
         assertEquals(company, p.getCompanyDescription());
         assertEquals(id, p.getId());
@@ -281,9 +281,9 @@ public class JSonSerializerTest {
         t.setDetectLocationForShippedFrom(useLocationNearestToDevice);
         t.setAssetType(assetType);
 
-        final JsonObject obj = factory.toJson(t).getAsJsonObject();
+        final JsonObject obj = serializer.toJson(t).getAsJsonObject();
 
-        t = factory.parseShipmentTemplate(obj);
+        t = serializer.parseShipmentTemplate(obj);
 
         assertEquals(addDateShipped, t.isAddDateShipped());
         assertNotNull(t.getAlertProfile());
@@ -317,8 +317,8 @@ public class JSonSerializerTest {
         t.setName(name);
         t.setSn(sn);
 
-        final JsonObject json = factory.toJson(t).getAsJsonObject();
-        t= factory.parseDevice(json);
+        final JsonObject json = serializer.toJson(t).getAsJsonObject();
+        t= serializer.parseDevice(json);
 
         assertEquals(description, t.getDescription());
         assertEquals(id, t.getId());
@@ -371,8 +371,8 @@ public class JSonSerializerTest {
         s.setAssetType(assetType);
         s.setAssetNum(assetNum);
 
-        final JsonObject obj = factory.toJson(s).getAsJsonObject();
-        s = factory.parseShipment(obj);
+        final JsonObject obj = serializer.toJson(s).getAsJsonObject();
+        s = serializer.parseShipment(obj);
 
         assertNotNull(s.getAlertProfile());
         assertNotNull(s.getAlertsNotificationSchedules());
@@ -403,8 +403,8 @@ public class JSonSerializerTest {
         r.setShipmentId(shipmentId);
         r.setTemplateId(templateId);
 
-        final JsonObject obj = factory.toJson(r);
-        r = factory.parseSaveShipmentResponse(obj);
+        final JsonObject obj = serializer.toJson(r);
+        r = serializer.parseSaveShipmentResponse(obj);
 
         assertEquals(shipmentId, r.getShipmentId());
         assertEquals(templateId, r.getTemplateId());
@@ -420,8 +420,8 @@ public class JSonSerializerTest {
         req.setShipment(shipment);
         req.setTemplateName(templateName);
 
-        final JsonObject obj = factory.toJson(req);
-        req = factory.parseSaveShipmentRequest(obj);
+        final JsonObject obj = serializer.toJson(req);
+        req = serializer.parseSaveShipmentRequest(obj);
 
         assertEquals(saveAsNewTemplate, req.isSaveAsNewTemplate());
         assertEquals(templateName, req.getTemplateName());
@@ -452,8 +452,8 @@ public class JSonSerializerTest {
         n.setIssue(alert);
         n.setType(notificationType);
 
-        final JsonObject json = factory.toJson(n);
-        n = factory.parseNotification(json);
+        final JsonObject json = serializer.toJson(n);
+        n = serializer.parseNotification(json);
 
         //check notification
         assertEquals(notificationType, n.getType());
@@ -499,8 +499,8 @@ public class JSonSerializerTest {
         n.setIssue(alert);
         n.setType(notificationType);
 
-        final JsonObject json = factory.toJson(n);
-        n = factory.parseNotification(json);
+        final JsonObject json = serializer.toJson(n);
+        n = serializer.parseNotification(json);
 
         //check notification
         assertEquals(notificationType, n.getType());
@@ -524,7 +524,7 @@ public class JSonSerializerTest {
         final Long id = 7l;
         final double temperature = 77.77;
         final Date time = new Date(System.currentTimeMillis() - 1000000000L);
-        final TrackerEventType type = TrackerEventType.RSP;
+        final String type = "RSP";
         final double latitude = 10.10;
         final double longitude = 11.11;
 
@@ -537,8 +537,8 @@ public class JSonSerializerTest {
         e.setLatitude(latitude);
         e.setLongitude(longitude);
 
-        final JsonObject obj= factory.toJson(e);
-        e = factory.parseTrackerEvent(obj);
+        final JsonObject obj= serializer.toJson(e);
+        e = serializer.parseTrackerEvent(obj);
 
         assertEquals(battery, e.getBattery());
         assertEquals(id, e.getId());
@@ -556,11 +556,11 @@ public class JSonSerializerTest {
         d.setDevice(device);
         d.getAlerts().add(createAlert(device, AlertType.BatteryLow));
         d.getAlerts().add(createAlert(device, AlertType.EnterDarkEnvironment));
-        d.getEvents().add(createEvent(TrackerEventType.AUT));
-        d.getEvents().add(createEvent(TrackerEventType.DRK));
+        d.getEvents().add(createEvent("AUT"));
+        d.getEvents().add(createEvent("DRK"));
 
-        final JsonObject obj = factory.toJson(d);
-        d = factory.parseDeviceData(obj);
+        final JsonObject obj = serializer.toJson(d);
+        d = serializer.parseDeviceData(obj);
 
         assertEquals(2, d.getAlerts().size());
         assertEquals(2, d.getEvents().size());
@@ -579,8 +579,8 @@ public class JSonSerializerTest {
         s.getDeviceData().add(d1);
         s.getDeviceData().add(d2);
 
-        final JsonObject obj = factory.toJson(s);
-        s = factory.parseShipmentData(obj);
+        final JsonObject obj = serializer.toJson(s);
+        s = serializer.parseShipmentData(obj);
 
         assertNotNull(s.getShipment());
         assertEquals(2, s.getDeviceData().size());
@@ -596,8 +596,8 @@ public class JSonSerializerTest {
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.ReportViewer);
 
-        final JsonObject obj = factory.toJson(u);
-        u = factory.parseUser(obj);
+        final JsonObject obj = serializer.toJson(u);
+        u = serializer.parseUser(obj);
 
         assertEquals(login, u.getLogin());
         assertEquals(fullName, u.getFullName());
@@ -612,8 +612,8 @@ public class JSonSerializerTest {
         cmd.setDevice(device);
         cmd.setCommand(command);
 
-        final JsonObject obj = factory.toJson(cmd).getAsJsonObject();
-        cmd = factory.parseDeviceCommand(obj);
+        final JsonObject obj = serializer.toJson(cmd).getAsJsonObject();
+        cmd = serializer.parseDeviceCommand(obj);
 
         assertEquals(command, cmd.getCommand());
         assertNotNull(cmd.getDevice());
@@ -623,15 +623,43 @@ public class JSonSerializerTest {
         p.getShipments().add(createShipment());
         p.getShipments().add(createShipment());
 
-        final JsonElement obj = factory.toJson(p);
-        p = factory.parseUserProfile(obj);
+        final JsonElement obj = serializer.toJson(p);
+        p = serializer.parseUserProfile(obj);
 
         assertEquals(2, p.getShipments().size());
+    }
+    @Test
+    public void testDeviceDcsNativeEvent() {
+        DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
+
+        final int battery = 14;
+        final Date date = new Date(System.currentTimeMillis() - 100000l);
+        final String imei = "923847924387";
+        final double lat = 100.500;
+        final double lon = 100.501;
+        final String type = "Tracker";
+
+        e.setBattery(battery);
+        e.setDate(date);
+        e.setImei(imei);
+        e.getLocation().setLatitude(lat);
+        e.getLocation().setLongitude(lon);
+        e.setType(type);
+
+        final JsonElement json = serializer.toJson(e);
+        e = serializer.parseDeviceDcsNativeEvent(json);
+
+        assertEquals(battery, e.getBattery());
+        assertEquals(date, e.getTime());
+        assertEquals(imei, e.getImei());
+        assertEquals(lat, e.getLocation().getLatitude(), 0.00001);
+        assertEquals(lon, e.getLocation().getLongitude(), 0.00001);
+        assertEquals(type, e.getType());
     }
     /**
      * @return tracker event.
      */
-    private TrackerEvent createEvent(final TrackerEventType type) {
+    private TrackerEvent createEvent(final String type) {
         final TrackerEvent e = new TrackerEvent();
         e.setId(generateId());
         e.setBattery(1234);

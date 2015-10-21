@@ -4,8 +4,6 @@
 package com.visfresh.controllers;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +27,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
@@ -795,8 +792,7 @@ public class RestServiceController {
      */
     private JsonElement getJSon(final String text) throws RestServiceException {
         try {
-            final Reader in = new StringReader(text);
-            return new JsonParser().parse(in);
+            return JSonSerializer.parseJson(text);
         } catch (final Exception e) {
             throw new RestServiceException(ErrorCodes.INVALID_JSON, "Invalid JSON format");
         }

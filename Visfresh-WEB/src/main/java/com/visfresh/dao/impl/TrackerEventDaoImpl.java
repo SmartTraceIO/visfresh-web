@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -112,7 +111,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         }
 
         paramMap.put(ID_FIELD, event.getId());
-        paramMap.put(TYPE_FIELD, event.getType().name());
+        paramMap.put(TYPE_FIELD, event.getType());
         paramMap.put(TIME_FIELD, event.getTime());
         paramMap.put(BATTERY_FIELD, event.getBattery());
         paramMap.put(TEMPERATURE_FIELD, event.getTemperature());
@@ -177,7 +176,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         a.setLatitude(((Number) map.get(resultPrefix + LATITUDE_FIELD)).doubleValue());
         a.setLongitude(((Number) map.get(resultPrefix + LONGITUDE_FIELD)).doubleValue());
         a.setTime((Date) map.get(resultPrefix + TIME_FIELD));
-        a.setType(TrackerEventType.valueOf((String) map.get(resultPrefix + TYPE_FIELD)));
+        a.setType((String) map.get(resultPrefix + TYPE_FIELD));
         return a;
     }
     /**
