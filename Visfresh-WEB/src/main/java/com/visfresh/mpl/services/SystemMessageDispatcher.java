@@ -189,7 +189,8 @@ public class SystemMessageDispatcher {
     public int processMessages(final String processor) {
         final int count = 0;
 
-        final List<SystemMessage> messages = messageDao.selectMessagesForProcessing(handlers.keySet(), processor);
+        final List<SystemMessage> messages = messageDao.selectMessagesForProcessing(
+                handlers.keySet(), processor, getBatchLimit(), new Date());
         for (final SystemMessage msg : messages) {
             final SystemMessageHandler h = handlers.get(msg.getType());
             try {

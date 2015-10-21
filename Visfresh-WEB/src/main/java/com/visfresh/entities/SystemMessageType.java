@@ -8,5 +8,6 @@ package com.visfresh.entities;
  *
  */
 public enum SystemMessageType {
-    Tracker
+    Tracker,
+    Other
 }

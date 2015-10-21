@@ -213,7 +213,41 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, Long> imple
      */
     @Override
     public List<SystemMessage> selectMessagesForProcessing(
-            final Set<SystemMessageType> messageTypes, final String processor) {
-        return new LinkedList<SystemMessage>();
+            final Set<SystemMessageType> messageTypes, final String processor, final int limit, final Date beforeDate) {
+        // mark to process before select
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("processor", processor);
+        params.put("limit", limit);
+        params.put("readyOn", beforeDate);
+
+        final StringBuilder sql = new StringBuilder("update " + TABLE + " set "
+                + PROCESSOR_FIELD + " = :processor"
+                + " where " + TYPE_FIELD + " in (");
+
+        int count = 0;
+        for (final SystemMessageType t : messageTypes) {
+            if (count > 0) {
+                sql.append(',');
+            }
+            final String paramName = "type_" + count;
+            sql.append(":" + paramName);
+            params.put(paramName, t.name());
+            count++;
+        }
+        sql.append(") and " + PROCESSOR_FIELD + " is NULL");
+        sql.append(" and " + RETRYON_FIELD + " <= :readyOn");
+        sql.append(" order by " + ID_FIELD + " limit :limit");
+        jdbc.update(sql.toString(), params);
+
+        //select previously marked
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select * from " + TABLE
+                + " where "  + PROCESSOR_FIELD + " = :processor", params);
+
+        final LinkedList<SystemMessage> result = new LinkedList<SystemMessage>();
+        for (final Map<String,Object> row : list) {
+            result.add(createSystemMessage(row, ""));
+        }
+        return result;
     }
 }
