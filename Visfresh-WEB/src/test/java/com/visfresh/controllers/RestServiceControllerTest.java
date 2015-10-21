@@ -150,7 +150,7 @@ public class RestServiceControllerTest {
 
         user = new User();
         user.setLogin("anylogin");
-        final String authToken = facade.login(user.getLogin(), "anypassword");
+        final String authToken = facade.login(user.getLogin(), "");
         facade.setAuthToken(authToken);
 
         authService.getUser(user.getLogin()).setCompany(company);
@@ -160,7 +160,12 @@ public class RestServiceControllerTest {
     //public @ResponseBody String login(@RequestBody final String loginRequest) {
     @Test
     public void testLogin() throws RestServiceException, IOException {
-        final String token = facade.login("aldsklksadf", "lkasdlfkj");
+        final User user = new User();
+        user.setLogin("aldsklksadf");
+        final String password = "lkasdlfkj";
+
+        authService.createUser(user, password);
+        final String token = facade.login(user.getLogin(), password);
         assertNotNull(token);
     }
     //@RequestMapping(value = "/getToken", method = RequestMethod.GET)

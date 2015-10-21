@@ -18,6 +18,7 @@ import org.opengts.dbtools.DBRecord;
 import org.opengts.util.OrderedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -29,7 +30,7 @@ import com.visfresh.services.OpenJtsFacade;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-//@Component
+@Component
 public class DefaultOpenJtsFacade implements OpenJtsFacade {
     private static final Logger log = LoggerFactory.getLogger(DefaultOpenJtsFacade.class);
     private final Map<String, Integer> statusCodes;
@@ -55,22 +56,17 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
      * @see com.visfresh.services.OpenJtsFacade#addUser(com.visfresh.entities.User)
      */
     @Override
-    public void addUser(final User user) {
-        addCompanyIfNeed(user.getCompany());
-
-
-    }
-
-    /**
-     * @param company
-     */
-    private void addCompanyIfNeed(final Company company) {
-        final String accountId = createAccountId(company);
+    public void addUser(final User user, final String password) {
+        final String accountId = createAccountId(user.getCompany());
         try {
-            final Account acc = Account.getAccount(accountId);
+            //create company account if need.
+            Account acc = Account.getAccount(accountId);
             if (acc == null) {
                 Account.createNewAccount(null, accountId, null);
+                acc = Account.getAccount(accountId);
             }
+
+            org.opengts.db.tables.User.createNewUser(acc, user.getLogin(), null, password);
         } catch (final DBException e) {
             log.error("Failed to create OpenGTS account " + accountId, e);
         }

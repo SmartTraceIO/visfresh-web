@@ -29,7 +29,7 @@ public interface AuthService {
      */
     public void logout(final String authToken);
     /**
-     * @param user TODO
+     * @param user user
      * @return refreshed authentication token.
      * @exception AuthenticationException
      */
@@ -44,4 +44,9 @@ public interface AuthService {
      * @return user info or null if not found.
      */
     User getUser(String username);
+    /**
+     * @param user user to create.
+     * @param password TODO
+     */
+    void createUser(User user, String password);
 }

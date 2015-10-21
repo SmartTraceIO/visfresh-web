@@ -1,23 +1,22 @@
 /**
  *
  */
-package com.visfresh.mock;
+package com.visfresh.services;
 
 import com.visfresh.entities.User;
-import com.visfresh.services.AuthToken;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class MockUserInfo {
+public class UserInfo {
     private User user;
     private AuthToken token;
 
     /**
      * Default constructor.
      */
-    public MockUserInfo() {
+    public UserInfo() {
         super();
     }
 

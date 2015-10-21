@@ -12,7 +12,7 @@ import com.visfresh.entities.User;
  *
  */
 public interface OpenJtsFacade {
-    void addUser(User user);
+    void addUser(User user, String password);
     void addDevice(Device d);
     void addTrackerEvent(TrackerEvent e);
 }
