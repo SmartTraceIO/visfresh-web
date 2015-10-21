@@ -373,6 +373,16 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
                 new Date(System.currentTimeMillis() + 100000L), false);
         assertEquals(0, data.size());
     }
+    @Test
+    public void testSaveDefaultShipment() {
+        final Shipment s = new Shipment();
+        s.setName("Default profile");
+        s.setCompany(sharedCompany);
+        s.getDevices().add(device);
+        dao.save(s);
+
+        assertNotNull(dao.findOne(s.getId()));
+    }
 
     public ShipmentTemplate createShipmentTemplate() {
         final ShipmentTemplate s = new ShipmentTemplate();

@@ -153,15 +153,15 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         map.put(ISTEMPLATE_FIELD, isTemplate());
         map.put(NAME_FIELD, s.getName());
         map.put(DESCRIPTION_FIELD, s.getShipmentDescription());
-        map.put(ALERT_FIELD, s.getAlertProfile().getId());
+        map.put(ALERT_FIELD, s.getAlertProfile() == null ? null: s.getAlertProfile().getId());
         map.put(NOALERTIFCOODOWN_FIELD, s.getAlertSuppressionDuringCoolDown());
         map.put(ARRIVALNOTIFWITHIN_FIELD, s.getArrivalNotificationWithIn());
         map.put(NONOTIFSIFNOALERTS_FIELD, s.isExcludeNotificationsIfNoAlertsFired());
         map.put(SHUTDOWNTIMEOUT_FIELD, s.getShutdownDeviceTimeOut());
         map.put(ASSERTTYPE_FIELD, s.getAssetType());
         map.put(COMPANY_FIELD, s.getCompany().getId());
-        map.put(SHIPPEDFROM_FIELD, s.getShippedFrom().getId());
-        map.put(SHIPPEDTO_FIELD, s.getShippedTo().getId());
+        map.put(SHIPPEDFROM_FIELD, s.getShippedFrom() == null ? null : s.getShippedFrom().getId());
+        map.put(SHIPPEDTO_FIELD, s.getShippedTo() == null ? null : s.getShippedTo().getId());
         return map;
     }
     /* (non-Javadoc)
@@ -211,14 +211,23 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
 
         no.setId(((Number) map.get(ID_FIELD)).longValue());
         no.setName((String) map.get(NAME_FIELD));
-        no.setAlertProfile(alertProfileDao.findOne(((Number) map.get(ALERT_FIELD)).longValue()));
+        Number id = (Number) map.get(ALERT_FIELD);
+        if (id != null) {
+            no.setAlertProfile(alertProfileDao.findOne(id.longValue()));
+        }
         no.setAlertSuppressionDuringCoolDown(((Number) map.get(NOALERTIFCOODOWN_FIELD)).intValue());
         no.setArrivalNotificationWithIn(((Number) map.get(ARRIVALNOTIFWITHIN_FIELD)).intValue());
         no.setExcludeNotificationsIfNoAlertsFired((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
         no.setName((String) map.get(NAME_FIELD));
         no.setShipmentDescription((String) map.get(DESCRIPTION_FIELD));
-        no.setShippedFrom(locationProfileDao.findOne(((Number) map.get(SHIPPEDFROM_FIELD)).longValue()));
-        no.setShippedTo(locationProfileDao.findOne(((Number) map.get(SHIPPEDTO_FIELD)).longValue()));
+        id = ((Number) map.get(SHIPPEDFROM_FIELD));
+        if (id != null) {
+            no.setShippedFrom(locationProfileDao.findOne(id.longValue()));
+        }
+        id = ((Number) map.get(SHIPPEDTO_FIELD));
+        if (id != null) {
+            no.setShippedTo(locationProfileDao.findOne(id.longValue()));
+        }
         no.setShutdownDeviceTimeOut(((Number) map.get(SHUTDOWNTIMEOUT_FIELD)).intValue());
         no.setAssetType((String) map.get(ASSERTTYPE_FIELD));
 

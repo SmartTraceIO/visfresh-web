@@ -76,7 +76,7 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
      * @param company
      * @return
      */
-    protected static String createAccountId(final Company company) {
+    public static String createAccountId(final Company company) {
         return "visfresh-" + company.getId();
     }
 

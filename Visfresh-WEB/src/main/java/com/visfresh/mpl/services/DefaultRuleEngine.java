@@ -195,6 +195,7 @@ public class DefaultRuleEngine extends AbstractRuleEngine implements SystemMessa
      */
     private Shipment createDefaultShipment(final Company company, final Location location) {
         final Shipment s = new Shipment();
+        s.setName("Default Shipment");
         s.setCompany(company);
         return s;
     }
