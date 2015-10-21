@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
@@ -189,15 +190,18 @@ public class SystemMessageDispatcher {
     public int processMessages(final String processor) {
         final int count = 0;
 
-        final List<SystemMessage> messages = messageDao.selectMessagesForProcessing(
-                handlers.keySet(), processor, getBatchLimit(), new Date());
-        for (final SystemMessage msg : messages) {
-            final SystemMessageHandler h = handlers.get(msg.getType());
-            try {
-                h.handle(msg);
-                handleSuccess(msg);
-            } catch(final Throwable e) {
-                handleError(msg, e);
+        final Set<SystemMessageType> processors = handlers.keySet();
+        if (!processors.isEmpty()) {
+            final List<SystemMessage> messages = messageDao.selectMessagesForProcessing(
+                    processors, processor, getBatchLimit(), new Date());
+            for (final SystemMessage msg : messages) {
+                final SystemMessageHandler h = handlers.get(msg.getType());
+                try {
+                    h.handle(msg);
+                    handleSuccess(msg);
+                } catch(final Throwable e) {
+                    handleError(msg, e);
+                }
             }
         }
 
@@ -253,6 +257,7 @@ public class SystemMessageDispatcher {
     public void start() {
         stop();
         synchronized (isStoped) {
+            isStoped.set(false);
             for (int i = 0; i < getNumThreads(); i++) {
                 final String id = getProcessorId() + "-" + i;
                 final Dispathcer d = new Dispathcer(id);

@@ -137,7 +137,9 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public void saveDevice(final Company company, final Device device) {
-        deviceDao.save(device);
+        if (device.getCompany().getId().equals(company.getId())) {
+            deviceDao.save(device);
+        }
     }
 
     /* (non-Javadoc)
