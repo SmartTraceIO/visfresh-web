@@ -57,7 +57,7 @@ public abstract class AbstractAuthService implements AuthService {
                     users.put(login, u);
                 }
 
-                u.setToken(generateNewToken());
+                u.setToken(generateNewToken(user));
                 return u.getToken();
             }
         }
@@ -66,10 +66,11 @@ public abstract class AbstractAuthService implements AuthService {
     }
 
     /**
+     * @param user user.
      * @return
      */
-    protected AuthToken generateNewToken() {
-        final String token = generateHash(Long.toString(System.currentTimeMillis()));
+    protected AuthToken generateNewToken(final User user) {
+        final String token = user.hashCode() + "-" + generateHash(Long.toString(System.currentTimeMillis()));
         final AuthToken t = new AuthToken(token);
         t.setExpirationTime(new Date(System.currentTimeMillis() + DEFAULT_TOKEN_ACTIVE_TIMEOUT));
         return t;
@@ -129,7 +130,7 @@ public abstract class AbstractAuthService implements AuthService {
             throw new AuthenticationException("Not authorized or token expired");
         }
 
-        info.setToken(generateNewToken());
+        info.setToken(generateNewToken(user));
         return info.getToken();
     }
     /* (non-Javadoc)
