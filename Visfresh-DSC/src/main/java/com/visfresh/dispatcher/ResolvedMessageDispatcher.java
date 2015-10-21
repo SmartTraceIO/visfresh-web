@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.DeviceMessageType;
 import com.visfresh.ResolvedDeviceMessage;
 import com.visfresh.config.DeviceConstants;
+import com.visfresh.db.SystemMessageDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,6 +33,9 @@ public class ResolvedMessageDispatcher extends AbstractDispatcher {
     private static final Logger log = LoggerFactory.getLogger(ResolvedMessageDispatcher.class);
     @Autowired
     private DeviceConstants deviceConstants;
+    @Autowired
+    private SystemMessageDao systemMessageDao;
+
     /**
      * Default constructor..
      */
@@ -98,6 +102,9 @@ public class ResolvedMessageDispatcher extends AbstractDispatcher {
             // -- this will display an error if it was unable to store the event
             throw new RetryableException("Failed to save event data for device " + imei);
         }
+
+        //send system message to WEB part.
+        systemMessageDao.sendSystemMessageFor(m);
     }
 
     /**
