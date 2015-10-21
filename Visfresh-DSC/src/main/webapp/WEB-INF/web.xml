@@ -5,16 +5,6 @@
 	id="WebApp_ID" version="2.5">
 	<display-name>Visfresh DSC</display-name>
  
-    <!-- ====================================================================== -->
-    <context-param>
-        <param-name>PrivateLabelLoader.skipTag_WebPages</param-name>
-        <param-value>true</param-value>
-    </context-param>
-    <context-param>
-        <param-name>PrivateLabelLoader.skipTag_MapProvider</param-name>
-        <param-value>true</param-value>
-    </context-param>
-
 	<listener>
 		<listener-class>com.visfresh.web.ApplicationInitializer</listener-class>
 	</listener>

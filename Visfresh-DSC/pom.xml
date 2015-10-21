@@ -23,34 +23,6 @@
 			<version>5.1.24</version>
 		</dependency>
 
-
-		<!-- GTSe -->
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>custom</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>gtsdb</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>gtsutils</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>ruledb</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>wartools</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
