@@ -62,7 +62,7 @@ public class Tool {
         final Tool tool = new Tool();
 
         try {
-            //createUserAndCompany(tool);
+            createUserAndCompany(tool);
             createToolDevice(tool);
         } finally {
             tool.context.destroy();

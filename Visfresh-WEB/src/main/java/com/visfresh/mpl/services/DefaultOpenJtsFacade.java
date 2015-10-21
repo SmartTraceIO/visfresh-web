@@ -104,12 +104,10 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
     public void addTrackerEvent(final TrackerEvent e) {
         final String accountID = createAccountId(e.getDevice().getCompany());
         try {
-            final Account account = Account.getAccount(accountID);
-
             final String imei = e.getDevice().getImei();
 
-            final org.opengts.db.tables.Device device = org.opengts.db.tables.Device.getDevice(
-                    account, e.getDevice().getId());
+            final org.opengts.db.tables.Device device = org.opengts.db.tables.Device.loadDeviceByUniqueID(
+                    e.getDevice().getId());
 
             final EventData.Key evKey = new EventData.Key(accountID, imei,
                     e.getTime().getTime() / 1000l, statusCodes.get(e.getType()));

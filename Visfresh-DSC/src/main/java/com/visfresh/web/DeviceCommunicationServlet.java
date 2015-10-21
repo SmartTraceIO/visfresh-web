@@ -96,6 +96,8 @@ public class DeviceCommunicationServlet extends HttpServlet {
         }
 
         resp.setStatus(HttpServletResponse.SC_OK);
+        resp.getOutputStream().flush();
+        resp.getOutputStream().close();
     }
 
     /**
