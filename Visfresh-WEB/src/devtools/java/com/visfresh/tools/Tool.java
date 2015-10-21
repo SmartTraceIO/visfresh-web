@@ -111,11 +111,14 @@ public class Tool {
      */
     protected static void createUserAndCompany(final Tool tool) {
         //create company
-        final Company c = new Company();
-        c.setDescription("Test company for development tools");
-        c.setName(COMPANY_NAME);
+        Company c = getToolCompany(tool);
+        if (c == null) {
+            c = new Company();
+            c.setDescription("Test company for development tools");
+            c.setName(COMPANY_NAME);
 
-        tool.createCompany(c);
+            tool.createCompany(c);
+        }
 
         //create user
         final User u = new User();

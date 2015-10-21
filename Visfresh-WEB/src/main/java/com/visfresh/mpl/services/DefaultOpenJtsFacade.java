@@ -87,10 +87,14 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
     public void addDevice(final Device d) {
         try {
             final Account account = Account.getAccount(createAccountId(d.getCompany()));
-            org.opengts.db.tables.Device device = org.opengts.db.tables.Device.getDevice(account, d.getId());
+            org.opengts.db.tables.Device device = org.opengts.db.tables.Device.getDevice(
+                    account, d.getId());
             if (device == null) {
-                device = org.opengts.db.tables.Device.createNewDevice(account, d.getImei(), d.getId());
+                device = org.opengts.db.tables.Device.createNewDevice(
+                        account, d.getId(), d.getId());
+                device.setDescription("Visfresh generated");
                 log.debug("OpenGTS device has succesfully created for " + d.getId());
+                device.save();
             }
         } catch (final DBException e) {
             log.error("Failed to add device " + d.getId(), e);
@@ -104,12 +108,12 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
     public void addTrackerEvent(final TrackerEvent e) {
         final String accountID = createAccountId(e.getDevice().getCompany());
         try {
-            final String imei = e.getDevice().getImei();
+            final String deviceId = e.getDevice().getId();
+            final Account a = Account.getAccount(accountID);
+            final org.opengts.db.tables.Device device = org.opengts.db.tables.Device.getDevice(a,
+                    deviceId);
 
-            final org.opengts.db.tables.Device device = org.opengts.db.tables.Device.loadDeviceByUniqueID(
-                    e.getDevice().getId());
-
-            final EventData.Key evKey = new EventData.Key(accountID, imei,
+            final EventData.Key evKey = new EventData.Key(accountID, deviceId,
                     e.getTime().getTime() / 1000l, statusCodes.get(e.getType()));
             final EventData evdb = evKey.getDBRecord();
             evdb.setLatitude(e.getLatitude());
@@ -118,10 +122,10 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
             evdb.setBatteryTemp(e.getTemperature());
 
             if (device.insertEventData(evdb)) {
-                log.debug("Device message has saved for " + imei);
+                log.debug("Device message has saved for " + deviceId);
             } else {
                 // -- this will display an error if it was unable to store the event
-                log.error("Failed to save event data for device " + imei);
+                log.error("Failed to save event data for device " + deviceId);
             }
         } catch (final DBException exc) {
             log.error("Failed to add OpenGTS event", exc);
