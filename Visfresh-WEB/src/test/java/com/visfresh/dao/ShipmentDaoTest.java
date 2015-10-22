@@ -383,6 +383,16 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         assertNotNull(dao.findOne(s.getId()));
     }
+    @Test
+    public void testGetShipmentDeviceInfo() {
+        final Shipment s1 = createTestEntity();
+        final Shipment s2 = createTestEntity();
+        dao.save(s1);
+        dao.save(s2);
+
+        assertEquals(1, dao.getShipmentDeviceInfo(s1, s1.getDevices().get(0)).getTripCount());
+        assertEquals(2, dao.getShipmentDeviceInfo(s2, s2.getDevices().get(0)).getTripCount());
+    }
 
     public ShipmentTemplate createShipmentTemplate() {
         final ShipmentTemplate s = new ShipmentTemplate();

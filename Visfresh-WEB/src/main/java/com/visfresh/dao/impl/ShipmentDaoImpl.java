@@ -34,6 +34,11 @@ import com.visfresh.utils.StringUtils;
  */
 @Component
 public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements ShipmentDao {
+    /**
+     *
+     */
+    private static final String TRIPCOUNT_FIELD = "tripcount";
+
     private static final String SHIPMENTDEVICES_TABLE = "shipmentdevices";
 
     private static final String PALETTID_FIELD = "palletid";
@@ -373,26 +378,47 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         return params;
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.ShipmentBaseDao#createManyToManyRefs(com.visfresh.entities.ShipmentBase)
+     * @see com.visfresh.dao.impl.ShipmentBaseDao#updateReferences(com.visfresh.entities.ShipmentBase)
      */
     @Override
-    protected void createManyToManyRefs(final Shipment s) {
-        super.createManyToManyRefs(s);
-        for (final Device m : s.getDevices()) {
-            final HashMap<String, Object> params = new HashMap<String, Object>();
-            params.put("shipment", s.getId());
-            params.put("device", m.getId());
-            jdbc.update("insert into " + SHIPMENTDEVICES_TABLE + " (shipment, device)"
-                    + " values(:shipment,:device)", params);
+    protected void updateReferences(final Shipment s) {
+        super.updateReferences(s);
+        //Get device IDs
+        final HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("shipment", s.getId());
+
+        //calculate removing/adding
+        final Set<String> toRemove = new HashSet<String>();
+        final Set<String> toAdd = new HashSet<String>();
+        for (final Device d : s.getDevices()) {
+            toAdd.add(d.getId());
         }
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.ShipmentBaseDao#clearManyToManyRefs(java.lang.Long)
-     */
-    @Override
-    protected void clearManyToManyRefs(final Long id) {
-        super.clearManyToManyRefs(id);
-        cleanRefs(SHIPMENTDEVICES_TABLE, id);
+
+        final List<Map<String, Object>> rows = jdbc.queryForList("select device from " + SHIPMENTDEVICES_TABLE
+                + " where shipment = :shipment", params);
+        for (final Map<String, Object> map : rows) {
+            final String deviceId = (String) map.get("device");
+            if (!toAdd.remove(deviceId)) {
+                //if found device was not containing at new device list, mark it to remove
+                toRemove.add(deviceId);
+            }
+        }
+
+        //remove old devices
+        for (final String device : toRemove) {
+            params.put("device", device);
+            jdbc.update("delete from " + SHIPMENTDEVICES_TABLE
+                    + " where shipment = :shipment and device = :device", params);
+        }
+
+        //add new devices
+        for (final String deviceId: toAdd) {
+            params.put("device", deviceId);
+            jdbc.update("insert into shipmentdevices (shipment, device, "
+                    + TRIPCOUNT_FIELD
+                    + ") select :shipment, :device, (COALESCE(MAX(tripcount),0) + 1) from "
+                    + SHIPMENTDEVICES_TABLE + " where device = :device", params);
+        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#findActiveShipment(java.lang.String)
@@ -417,6 +443,26 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         } else {
             return null;
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#getShipmentDeviceInfo(com.visfresh.entities.Shipment, com.visfresh.entities.Device)
+     */
+    @Override
+    public ShipmentDeviceInfo getShipmentDeviceInfo(final Shipment shipment,
+            final Device device) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("shipment", shipment.getId());
+        params.put("device", device.getId());
+
+        final List<Map<String, Object>> rows = jdbc.queryForList("select * from " + SHIPMENTDEVICES_TABLE
+                + " where shipment = :shipment and device = :device", params);
+        if (rows.size() > 0) {
+            final Map<String, Object> row = rows.get(0);
+            final ShipmentDeviceInfo info = new ShipmentDeviceInfo();
+            info.setTripCount(((Number) row.get(TRIPCOUNT_FIELD)).intValue());
+            return info;
+        }
+        return null;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#isTemplate()

@@ -6,7 +6,9 @@ package com.visfresh.dao;
 import java.util.Date;
 import java.util.List;
 
+import com.visfresh.dao.impl.ShipmentDeviceInfo;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 
@@ -30,4 +32,10 @@ public interface ShipmentDao extends DaoBase<Shipment, Long> {
      * @return active shipment for given devcie.
      */
     Shipment findActiveShipment(String imei);
+    /**
+     * @param shipment the shipment.
+     * @param device the device.
+     * @return shipment device info.
+     */
+    ShipmentDeviceInfo getShipmentDeviceInfo(Shipment shipment, Device device);
 }

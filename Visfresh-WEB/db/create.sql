@@ -228,6 +228,7 @@ create table arrivalnotifschedules(
 create table shipmentdevices(
    shipment bigint(20) not null,
    device varchar(20) not null,
+   tripcount int not null,
    primary key (shipment, device),
    foreign key (shipment)
       references shipments(id) ON DELETE CASCADE,
