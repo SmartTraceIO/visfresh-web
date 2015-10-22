@@ -3,7 +3,7 @@
  */
 package com.visfresh.services;
 
-import com.visfresh.entities.Device;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 
@@ -13,6 +13,5 @@ import com.visfresh.entities.User;
  */
 public interface OpenJtsFacade {
     void addUser(User user, String password);
-    void addDevice(Device d);
-    void addTrackerEvent(TrackerEvent e);
+    void addTrackerEvent(Shipment shipment, TrackerEvent e);
 }

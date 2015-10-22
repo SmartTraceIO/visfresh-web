@@ -3,10 +3,6 @@
  */
 package com.visfresh.mpl.services;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -100,29 +96,7 @@ public class DefaultRuleEngine extends AbstractRuleEngine implements SystemMessa
 
         if (shipment == null) {
             //create new device
-            final List<Device> devices = getAllDevices(imei);
-            if (devices.size() == 0) {
-                final RetryableException exc = new RetryableException("Device with given IMEI " + imei
-                        + " is not registered.");
-                //retry after 5 minutes
-                exc.setRetryTimeOut(5 * 60 * 1000L);
-                throw exc;
-            }
-
-            final Device d = new Device();
-            d.setImei(imei);
-            d.setId(imei.substring(imei.length() - 6, imei.length()) + "." + devices.size());
-
-            //set from latest device
-            d.setCompany(devices.get(devices.size() - 1).getCompany());
-
-            //from default device
-            final Device old = devices.get(0);
-            d.setName(old.getName());
-            d.setDescription(old.getDescription());
-
-            deviceDao.save(d);
-            openJtsFacade.addDevice(d);
+            final Device d = deviceDao.findAllByImei(imei).get(0);
 
             //create shipment.
             final Shipment def = createDefaultShipment(d.getCompany(), event.getLocation());
@@ -142,6 +116,21 @@ public class DefaultRuleEngine extends AbstractRuleEngine implements SystemMessa
         }
 
         //create tracker event
+        final TrackerEvent e = createTrackerEvent(event, device);
+        trackerEventDao.save(e);
+
+        //process tracker event with rule engine.
+        processTrackerEvent(shipment, e);
+        openJtsFacade.addTrackerEvent(shipment, e);
+    }
+
+    /**
+     * @param event
+     * @param device
+     * @return
+     */
+    protected TrackerEvent createTrackerEvent(final DeviceDcsNativeEvent event,
+            final Device device) {
         final TrackerEvent e = new TrackerEvent();
         e.setDevice(device);
         e.setBattery(event.getBattery());
@@ -150,42 +139,7 @@ public class DefaultRuleEngine extends AbstractRuleEngine implements SystemMessa
         e.setTemperature(event.getBattery());
         e.setTime(event.getTime());
         e.setType(event.getType());
-
-        trackerEventDao.save(e);
-
-        //process tracker event with rule engine.
-        processTrackerEvent(shipment, e);
-        openJtsFacade.addTrackerEvent(e);
-    }
-
-    /**
-     * @param imei
-     * @return
-     */
-    private List<Device> getAllDevices(final String imei) {
-        final List<Device> all = deviceDao.findAllByImei(imei);
-        //sort devices by trip number.
-        Collections.sort(all, new Comparator<Device>() {
-            /* (non-Javadoc)
-             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-             */
-            @Override
-            public int compare(final Device d1, final Device d2) {
-                return getTripNum(d1).compareTo(getTripNum(d2));
-            }
-
-            private Integer getTripNum(final Device d) {
-                final int index = d.getId().lastIndexOf('.');
-                if (index > 0) {
-                    try {
-                        return Integer.parseInt(d.getId().substring(index + 1));
-                    } catch (final NumberFormatException e) {
-                    }
-                }
-                return -1;
-            }
-        });
-        return all;
+        return e;
     }
 
     /**

@@ -18,10 +18,14 @@ import org.opengts.dbtools.DBRecord;
 import org.opengts.util.OrderedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.impl.ShipmentDeviceInfo;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.services.OpenJtsFacade;
@@ -34,6 +38,8 @@ import com.visfresh.services.OpenJtsFacade;
 public class DefaultOpenJtsFacade implements OpenJtsFacade {
     private static final Logger log = LoggerFactory.getLogger(DefaultOpenJtsFacade.class);
     private final Map<String, Integer> statusCodes;
+    @Autowired
+    private ShipmentDao shipmentDao;
 
     /**
      * Default constructor.
@@ -57,20 +63,15 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
      */
     @Override
     public void addUser(final User user, final String password) {
-        final String accountId = createAccountId(user.getCompany());
         try {
             //create company account if need.
-            Account acc = Account.getAccount(accountId);
-            if (acc == null) {
-                acc = Account.createNewAccount(null, accountId, null);
-            }
-
+            final Account acc = createAccountIfNeed(user.getCompany());
             org.opengts.db.tables.User.createNewUser(acc, user.getLogin(), null, password);
+            log.debug("OpenGTS user " + user.getLogin() + " has autocreated");
         } catch (final DBException e) {
-            log.error("Failed to create OpenGTS account " + accountId, e);
+            log.error("Failed to create OpenGTS account " + createAccountId(user.getCompany()), e);
         }
     }
-
     /**
      * @param company
      * @return
@@ -78,41 +79,17 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
     public static String createAccountId(final Company company) {
         return "visfresh-" + company.getId();
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.services.OpenJtsFacade#addDevice(com.visfresh.entities.Device)
-     */
-    @Override
-    public void addDevice(final Device d) {
-        try {
-            final Account account = Account.getAccount(createAccountId(d.getCompany()));
-            org.opengts.db.tables.Device device = org.opengts.db.tables.Device.getDevice(
-                    account, d.getId());
-            if (device == null) {
-                device = org.opengts.db.tables.Device.createNewDevice(
-                        account, d.getId(), d.getId());
-                device.setDescription(d.getName());
-                log.debug("OpenGTS device has succesfully created for " + d.getId());
-                device.save();
-            }
-        } catch (final DBException e) {
-            log.error("Failed to add device " + d.getId(), e);
-        }
-    }
-
     /* (non-Javadoc)
      * @see com.visfresh.services.OpenJtsFacade#addTrackerEvent(com.visfresh.entities.TrackerEvent)
      */
     @Override
-    public void addTrackerEvent(final TrackerEvent e) {
-        final String accountID = createAccountId(e.getDevice().getCompany());
+    public void addTrackerEvent(final Shipment shipment, final TrackerEvent e) {
         try {
-            final String deviceId = e.getDevice().getId();
-            final Account a = Account.getAccount(accountID);
-            final org.opengts.db.tables.Device device = org.opengts.db.tables.Device.getDevice(a,
-                    deviceId);
+            final Account a = createAccountIfNeed(e.getDevice().getCompany());
+            final org.opengts.db.tables.Device device = createDeviceIfNeed(a, shipment, e.getDevice());
 
-            final EventData.Key evKey = new EventData.Key(accountID, deviceId,
+            //create event.
+            final EventData.Key evKey = new EventData.Key(a.getAccountID(), device.getDeviceID(),
                     e.getTime().getTime() / 1000l, statusCodes.get(e.getType()));
             final EventData evdb = evKey.getDBRecord();
             evdb.setLatitude(e.getLatitude());
@@ -121,16 +98,50 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
             evdb.setBatteryTemp(e.getTemperature());
 
             if (device.insertEventData(evdb)) {
-                log.debug("Device message has saved for " + deviceId);
+                log.debug("Device message has saved for " + device.getDeviceID());
             } else {
                 // -- this will display an error if it was unable to store the event
-                log.error("Failed to save event data for device " + deviceId);
+                log.error("Failed to save event data for device " + device.getDeviceID());
             }
         } catch (final DBException exc) {
             log.error("Failed to add OpenGTS event", exc);
         }
     }
+    /**
+     * @param shipment
+     * @param d
+     * @return
+     * @throws DBException
+     */
+    private org.opengts.db.tables.Device createDeviceIfNeed(final Account a, final Shipment shipment,
+            final Device d) throws DBException {
+        final ShipmentDeviceInfo info = shipmentDao.getShipmentDeviceInfo(shipment, d);
+        final String deviceId = d.getId() + "." + info.getTripCount();
 
+        org.opengts.db.tables.Device device = org.opengts.db.tables.Device.getDevice(a, deviceId);
+        if (device == null) {
+            device = org.opengts.db.tables.Device.getDevice(a, deviceId);
+            device.setDescription(d.getName());
+            device.save();
+            log.debug("OpenGTS device " + deviceId
+                    + " has autocreated for device " + d.getName());
+        }
+        return device;
+    }
+    /**
+     * @param company
+     * @return
+     * @throws DBException
+     */
+    private Account createAccountIfNeed(final Company company) throws DBException {
+        final String accountId = createAccountId(company);
+        Account acc = Account.getAccount(accountId);
+        if (acc == null) {
+            acc = Account.createNewAccount(null, accountId, null);
+            log.debug("OpenGTS account " + accountId + " has autocreated for " + company.getName());
+        }
+        return acc;
+    }
     @PostConstruct
     public void initialize() {
         try {
