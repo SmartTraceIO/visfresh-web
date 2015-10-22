@@ -46,7 +46,7 @@ public interface AuthService {
     User getUser(String username);
     /**
      * @param user user to create.
-     * @param password TODO
+     * @param password user password.
      */
     void createUser(User user, String password);
 }

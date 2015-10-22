@@ -28,6 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
@@ -38,6 +39,7 @@ import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
+import com.visfresh.io.CreateUserRequest;
 import com.visfresh.io.JSonSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -668,6 +670,29 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
+     * @param req shipment.
+     * @return status.
+     */
+    @RequestMapping(value = "/createUser/{authToken}", method = RequestMethod.POST)
+    public @ResponseBody String createUser(@PathVariable final String authToken,
+            final @RequestBody String req) {
+        try {
+            final User user = getLoggedInUser(authToken);
+            final CreateUserRequest r = getSerializer().parseCreateUserRequest(getJSonObject(req));
+            security.checkCanCreateUser(user, r);
+
+            final User newUser = r.getUser();
+            newUser.setCompany(r.getCompany());
+            authService.createUser(newUser, r.getPassword());
+
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to send command to device", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
      * @return profile for given user.
      */
     @RequestMapping(value = "/getProfile/{authToken}", method = RequestMethod.GET)
@@ -700,6 +725,31 @@ public class RestServiceController {
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to send command to device", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param id company ID.
+     * @return company.
+     */
+    @RequestMapping(value = "/getCompany/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String getCompany(@PathVariable final String authToken,
+            @RequestParam final Long id) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetCompany(user, id);
+
+            final Company company;
+            if (user.getCompany().getId().equals(id)) {
+                company = user.getCompany();
+            } else {
+                company = restService.getCompany(id);
+            }
+            return createSuccessResponse(getSerializer().toJson(company));
+        } catch (final Exception e) {
+            log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
     }

@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.AlertProfileDao;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -34,6 +36,8 @@ public class DefaultReferenceResolver implements ReferenceResolver {
     private DeviceDao deviceDao;
     @Autowired
     private ShipmentDao shipmentDao;
+    @Autowired
+    private CompanyDao companyDao;
 
     /**
      * Default constructor.
@@ -77,5 +81,12 @@ public class DefaultReferenceResolver implements ReferenceResolver {
     @Override
     public Shipment getShipment(final Long id) {
         return shipmentDao.findOne(id);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.io.ReferenceResolver#getCompany(java.lang.Long)
+     */
+    @Override
+    public Company getCompany(final Long id) {
+        return companyDao.findOne(id);
     }
 }

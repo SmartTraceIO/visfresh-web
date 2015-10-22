@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -23,6 +24,7 @@ public class MockReferenceResolver implements ReferenceResolver {
     private final Map<Long, NotificationSchedule> notificationSchedules = new HashMap<Long, NotificationSchedule>();
     private final Map<String, Device> devices = new HashMap<String, Device>();
     private final Map<Long, Shipment> shipments = new HashMap<Long, Shipment>();
+    private final Map<Long, Company> companies = new HashMap<Long, Company>();
 
     /**
      * Default constructor.
@@ -66,6 +68,13 @@ public class MockReferenceResolver implements ReferenceResolver {
     public Shipment getShipment(final Long id) {
         return shipments.get(id);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.io.ReferenceResolver#getCompany(java.lang.Long)
+     */
+    @Override
+    public Company getCompany(final Long id) {
+        return companies.get(id);
+    }
 
     public void add(final Device t) {
         devices.put(t.getId(), t);
@@ -82,5 +91,7 @@ public class MockReferenceResolver implements ReferenceResolver {
     public void add(final Shipment s) {
         shipments.put(s.getId(), s);
     }
-
+    public void add(final Company s) {
+        companies.put(s.getId(), s);
+    }
 }

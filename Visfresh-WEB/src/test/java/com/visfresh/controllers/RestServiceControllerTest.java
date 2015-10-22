@@ -44,6 +44,7 @@ import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
@@ -148,10 +149,13 @@ public class RestServiceControllerTest {
         facade = new RestServiceFacade();
         facade.setServiceUrl(new URL(url));
 
-        user = new User();
-        user.setLogin("anylogin");
-        final String authToken = facade.login(user.getLogin(), "");
+        final String login = "anylogin";
+        final String authToken = facade.login(login, "");
         facade.setAuthToken(authToken);
+
+        //add permissions
+        user = authService.users.get(login);
+        user.getRoles().add(Role.GlobalAdmin);
 
         authService.getUser(user.getLogin()).setCompany(company);
     }
@@ -683,6 +687,52 @@ public class RestServiceControllerTest {
         assertEquals(1, p.getShipments().size());
     }
 
+    @Test
+    public void testGetCompany() throws IOException, RestServiceException {
+        final String description = "JUnit test company";
+        final Long id = 77777l;
+        final String name = "Test Company";
+
+        Company c = new Company();
+        c.setDescription(description);
+        c.setId(id);
+        c.setName(name);
+
+        service.companies.put(c.getId(), c);
+
+        c = facade.getCompany(c.getId());
+
+        assertEquals(description, c.getDescription());
+        assertEquals(id, c.getId());
+        assertEquals(name, c.getName());
+    }
+    @Test
+    public void testCreateUser() throws IOException, RestServiceException {
+        //create company
+        final Company c = new Company();
+        c.setDescription("JUnit test company");
+        c.setId(7777l);
+        c.setName("JUnit-C");
+        service.companies.put(c.getId(), c);
+
+        final User u = new User();
+        u.setLogin("test-1");
+        u.setFullName("Junit Automat");
+        u.getRoles().add(Role.Dispatcher);
+        u.getRoles().add(Role.CompanyAdmin);
+
+        final String password = "password";
+
+        facade.createUser(u, c, password);
+
+        final User u2 = authService.users.get(u.getLogin());
+        assertNotNull(u2);
+        assertEquals(u.getFullName(), u2.getFullName());
+        assertEquals(u.getId(), u2.getId());
+        assertEquals(u.getLogin(), u2.getLogin());
+        assertEquals(2, u2.getRoles().size());
+        assertNotNull(u2.getCompany());
+    }
     /**
      * @return tracker event.
      */

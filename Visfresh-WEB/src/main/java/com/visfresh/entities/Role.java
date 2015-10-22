@@ -8,8 +8,19 @@ package com.visfresh.entities;
  *
  */
 public enum Role {
-    GlobalAdmin,
-    CompanyAdmin,
-    Dispatcher,
-    ReportViewer
+    GlobalAdmin(100),
+    CompanyAdmin(70),
+    Dispatcher(40),
+    ReportViewer(25);
+
+    private int priority;
+    Role(final int priority) {
+        this.priority = priority;
+    }
+    /**
+     * @return
+     */
+    public boolean hasPermissions(final Role r) {
+        return r == null || priority >= r.priority;
+    }
 }

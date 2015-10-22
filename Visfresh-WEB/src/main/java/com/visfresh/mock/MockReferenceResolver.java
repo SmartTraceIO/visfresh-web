@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -63,5 +64,12 @@ public class MockReferenceResolver implements ReferenceResolver {
     @Override
     public Shipment getShipment(final Long id) {
         return restService.shipments.get(id);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.io.ReferenceResolver#getCompany(java.lang.Long)
+     */
+    @Override
+    public Company getCompany(final Long id) {
+        return restService.companies.get(id);
     }
 }

@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.DeviceData;
@@ -37,6 +38,7 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
+import com.visfresh.io.CreateUserRequest;
 import com.visfresh.io.JSonSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -655,6 +657,51 @@ public class JSonSerializerTest {
         assertEquals(lat, e.getLocation().getLatitude(), 0.00001);
         assertEquals(lon, e.getLocation().getLongitude(), 0.00001);
         assertEquals(type, e.getType());
+    }
+    @Test
+    public void testCreateUser() {
+        final Company c = new Company();
+        c.setId(7l);
+        c.setName("JUnit");
+        c.setDescription("Test company");
+        resolver.add(c);
+
+        final String login = "newuser";
+        final String fullName = "Full User Name";
+        final String password = "anypassword";
+
+        CreateUserRequest r = new CreateUserRequest();
+        final User user = new User();
+        user.setLogin(login);
+        user.setFullName(fullName);
+
+        r.setCompany(c);
+        r.setUser(user);
+        r.setPassword(password);
+
+        final JsonElement json = serializer.toJson(r);
+        r = serializer.parseCreateUserRequest(json);
+
+        assertNotNull(user);
+        assertNotNull(r.getCompany());
+        assertEquals(password, r.getPassword());
+    }
+    public void testCompany() {
+        final String description = "Company Description";
+        final Long id = 77l;
+        final String name = "CompanyName";
+
+        Company c = new Company();
+        c.setDescription(description);
+        c.setId(id);
+        c.setName(name);
+
+        final JsonElement json = serializer.toJson(c);
+        c = serializer.parseCompany(json);
+
+        assertEquals(description, c.getDescription());
+        assertEquals(id, c.getId());
+        assertEquals(name, c.getName());
     }
     /**
      * @return tracker event.

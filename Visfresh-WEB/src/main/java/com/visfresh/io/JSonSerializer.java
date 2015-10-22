@@ -22,6 +22,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.DeviceData;
@@ -811,8 +812,62 @@ public class JSonSerializer {
         obj.addProperty("imei", e.getImei());
         return obj;
     }
+    /**
+     * @param e JSON element.
+     * @return create user request.
+     */
+    public CreateUserRequest parseCreateUserRequest(final JsonElement e) {
+        if (e == null) {
+            return null;
+        }
+        final JsonObject obj = e.getAsJsonObject();
+        final CreateUserRequest req = new CreateUserRequest();
+        req.setUser(parseUser(obj.get("user").getAsJsonObject()));
+        req.setCompany(resolveCompany(obj.get("company").getAsLong()));
+        req.setPassword(obj.get("password").getAsString());
+        return req;
+    }
+    /**
+     * @param req create user request.
+     * @return JSON object.
+     */
+    public JsonElement toJson(final CreateUserRequest req) {
+        if (req == null) {
+            return JsonNull.INSTANCE;
+        }
+        final JsonObject obj = new JsonObject();
+        obj.add("user", toJson(req.getUser()));
+        obj.addProperty("password", req.getPassword());
+        obj.addProperty("company", req.getCompany().getId());
+        return obj;
+    }
 
+    /**
+     * @param json
+     * @return
+     */
+    public Company parseCompany(final JsonElement json) {
+        if (json == null || json.isJsonNull()) {
+            return null;
+        }
+        final JsonObject obj = json.getAsJsonObject();
+        final Company c = new Company();
+        c.setDescription(asString(obj.get("description")));
+        c.setId(asLong(obj.get("id")));
+        c.setName(asString(obj.get("name")));
+        return c;
+    }
+    public JsonElement toJson(final Company c) {
+        if (c == null) {
+            return JsonNull.INSTANCE;
+        }
 
+        final JsonObject obj = new JsonObject();
+        obj.addProperty("id", c.getId());
+        obj.addProperty("name", c.getName());
+        obj.addProperty("description", c.getDescription());
+        return obj;
+    }
     /**
      * @param array
      * @return
@@ -858,6 +913,13 @@ public class JSonSerializer {
      */
     private Shipment resolveShipment(final Long id) {
         return id == null ? null : getReferenceResolver().getShipment(id);
+    }
+    /**
+     * @param id company ID.
+     * @return company.
+     */
+    private Company resolveCompany(final Long id) {
+        return id == null ? null : getReferenceResolver().getCompany(id);
     }
     /**
      * @param e

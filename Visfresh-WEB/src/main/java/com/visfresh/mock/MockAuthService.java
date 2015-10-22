@@ -24,7 +24,7 @@ public class MockAuthService extends AbstractAuthService {
     /**
      * The user map.
      */
-    private Map<String, User> users = new HashMap<String, User>();
+    public Map<String, User> users = new HashMap<String, User>();
 
     /**
      * Default constructor.

@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services;
+package com.visfresh.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -46,5 +46,11 @@ public final class HashGenerator {
         }
 
         return generatedPassword;
+    }
+    /**
+     * @param args
+     */
+    public static void main(final String[] args) {
+        System.out.println(createMd5Hash(args[0]));
     }
 }

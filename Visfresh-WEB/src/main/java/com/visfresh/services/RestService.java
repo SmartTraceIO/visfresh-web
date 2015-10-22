@@ -99,4 +99,9 @@ public interface RestService {
      * @param p profile.
      */
     void saveUserProfile(User user, UserProfile p);
+    /**
+     * @param id company ID.
+     * @return company by given ID.
+     */
+    Company getCompany(Long id);
 }

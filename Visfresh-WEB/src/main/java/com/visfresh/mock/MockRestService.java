@@ -54,6 +54,7 @@ public class MockRestService implements RestService {
     public final Map<Long, Arrival> arrivals = new ConcurrentHashMap<Long, Arrival>();
     public final Map<String, List<TrackerEvent>> trackerEvents = new ConcurrentHashMap<String, List<TrackerEvent>>();
     public final Map<String, UserProfile> profiles = new HashMap<String, UserProfile>();
+    public final Map<Long, Company> companies = new HashMap<Long, Company>();
 
     /**
      * Default constructor.
@@ -343,6 +344,13 @@ public class MockRestService implements RestService {
         return profiles.get(user.getLogin());
     }
     /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getCompany(java.lang.Long)
+     */
+    @Override
+    public Company getCompany(final Long id) {
+        return companies.get(id);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.services.RestService#saveUserProfile(com.visfresh.entities.User, com.visfresh.entities.UserProfile)
      */
     @Override
@@ -372,5 +380,7 @@ public class MockRestService implements RestService {
         alerts.clear();
         arrivals.clear();
         trackerEvents.clear();
+        profiles.clear();
+        companies.clear();
     }
 }

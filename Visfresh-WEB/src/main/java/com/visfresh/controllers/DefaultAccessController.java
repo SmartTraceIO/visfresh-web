@@ -7,8 +7,10 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
+import com.visfresh.io.CreateUserRequest;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -208,6 +210,51 @@ public class DefaultAccessController implements AccessController {
     @Override
     public void checkSaveProfile(final User user) throws RestServiceException {
         //nothing, each user can save its own profile.
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanCreateUser(com.visfresh.entities.User, com.visfresh.io.CreateUserRequest)
+     */
+    @Override
+    public void checkCanCreateUser(final User user, final CreateUserRequest r)
+            throws RestServiceException {
+        if (hasPermission(user, Role.GlobalAdmin)) {
+            return;
+        }
+        final Company company = r.getCompany();
+        if (company != null && hasPermission(user, Role.CompanyAdmin)
+                && user.getCompany().getId().equals(company.getId())) {
+            return;
+        }
+        throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                "User has not permissions for create user");
+
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanGetCompany(com.visfresh.entities.User, java.lang.Long)
+     */
+    @Override
+    public void checkCanGetCompany(final User user, final Long id) throws RestServiceException {
+        if (hasPermission(user, Role.GlobalAdmin)) {
+            return;
+        }
+        if (id != null && user.getCompany().getId().equals(id)) {
+            return;
+        }
+        throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                "User has not permissions for create user");
+    }
+    /**
+     * @param user
+     * @param role
+     * @return
+     */
+    private boolean hasPermission(final User user, final Role role) {
+        for (final Role r : user.getRoles()) {
+            if (r.hasPermissions(role)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

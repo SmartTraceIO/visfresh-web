@@ -27,6 +27,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
@@ -37,6 +38,7 @@ import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
+import com.visfresh.io.CreateUserRequest;
 import com.visfresh.io.JSonSerializer;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
@@ -50,7 +52,7 @@ import com.visfresh.services.RestServiceException;
 public class RestServiceFacade  {
     private static final String REST_SERVICE = "/rest";
 
-    private JSonSerializer jsonFactory = new JSonSerializer();
+    private JSonSerializer serializer = new JSonSerializer();
     private Gson gson;
     private URL serviceUrl;
     private String authToken;
@@ -66,12 +68,13 @@ public class RestServiceFacade  {
         b.setPrettyPrinting();
         this.gson = b.create();
 
-        jsonFactory.setReferenceResolver(new ReferenceResolver() {
+        serializer.setReferenceResolver(new ReferenceResolver() {
             @Override
             public Shipment getShipment(final Long id) {
                 try {
                     return RestServiceFacade.this.getShipment(id);
                 } catch (IOException | RestServiceException e) {
+                    e.printStackTrace();
                     return null;
                 }
             }
@@ -80,6 +83,7 @@ public class RestServiceFacade  {
                 try {
                     return RestServiceFacade.this.getNotificationSchedule(id);
                 } catch (IOException | RestServiceException e) {
+                    e.printStackTrace();
                     return null;
                 }
             }
@@ -88,6 +92,7 @@ public class RestServiceFacade  {
                 try {
                     return RestServiceFacade.this.getLocationProfile(id);
                 } catch (IOException | RestServiceException e) {
+                    e.printStackTrace();
                     return null;
                 }
             }
@@ -104,12 +109,24 @@ public class RestServiceFacade  {
                 try {
                     return RestServiceFacade.this.getAlertProfile(id);
                 } catch (IOException | RestServiceException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+            /* (non-Javadoc)
+             * @see com.visfresh.io.ReferenceResolver#getCompany(java.lang.Long)
+             */
+            @Override
+            public Company getCompany(final Long id) {
+                try {
+                    return RestServiceFacade.this.getCompany(id);
+                } catch (final Exception e) {
+                    e.printStackTrace();
                     return null;
                 }
             }
         });
     }
-
     /**
      * @param login
      *            login.
@@ -140,7 +157,7 @@ public class RestServiceFacade  {
     public Long saveAlertProfile(final AlertProfile alert)
             throws RestServiceException, IOException {
         final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveAlertProfile"),
-                jsonFactory.toJson(alert)).getAsJsonObject();
+                serializer.toJson(alert)).getAsJsonObject();
         return parseId(e);
     }
 
@@ -150,7 +167,7 @@ public class RestServiceFacade  {
 
         final List<AlertProfile> profiles = new ArrayList<AlertProfile>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            profiles.add(jsonFactory.parseAlertProfile(response.get(i).getAsJsonObject()));
+            profiles.add(serializer.parseAlertProfile(response.get(i).getAsJsonObject()));
         }
         return profiles;
     }
@@ -158,7 +175,7 @@ public class RestServiceFacade  {
     public Long saveLocationProfile(final LocationProfile profile)
             throws RestServiceException, IOException {
         final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveLocationProfile"),
-                jsonFactory.toJson(profile)).getAsJsonObject();
+                serializer.toJson(profile)).getAsJsonObject();
         return parseId(e);
     }
 
@@ -169,7 +186,7 @@ public class RestServiceFacade  {
 
         final List<LocationProfile> profiles = new ArrayList<LocationProfile>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            profiles.add(jsonFactory.parseLocationProfile(response.get(i).getAsJsonObject()));
+            profiles.add(serializer.parseLocationProfile(response.get(i).getAsJsonObject()));
         }
         return profiles;
     }
@@ -177,7 +194,7 @@ public class RestServiceFacade  {
     public Long saveNotificationSchedule(final NotificationSchedule schedule)
             throws RestServiceException, IOException {
         final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveNotificationSchedule"),
-                jsonFactory.toJson(schedule)).getAsJsonObject();
+                serializer.toJson(schedule)).getAsJsonObject();
         return parseId(e);
     }
 
@@ -188,7 +205,7 @@ public class RestServiceFacade  {
 
         final List<NotificationSchedule> profiles = new ArrayList<NotificationSchedule>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            profiles.add(jsonFactory.parseNotificationSchedule(response.get(i).getAsJsonObject()));
+            profiles.add(serializer.parseNotificationSchedule(response.get(i).getAsJsonObject()));
         }
         return profiles;
     }
@@ -196,7 +213,7 @@ public class RestServiceFacade  {
     public Long saveShipmentTemplate(final ShipmentTemplate tpl)
             throws RestServiceException, IOException {
         final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveShipmentTemplate"),
-                jsonFactory.toJson(tpl)).getAsJsonObject();
+                serializer.toJson(tpl)).getAsJsonObject();
         return parseId(e);
     }
 
@@ -206,7 +223,7 @@ public class RestServiceFacade  {
 
         final List<ShipmentTemplate> profiles = new ArrayList<ShipmentTemplate>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            profiles.add(jsonFactory.parseShipmentTemplate(response.get(i).getAsJsonObject()));
+            profiles.add(serializer.parseShipmentTemplate(response.get(i).getAsJsonObject()));
         }
         return profiles;
     }
@@ -216,7 +233,7 @@ public class RestServiceFacade  {
      */
     public void saveDevice(final Device tr) throws RestServiceException, IOException {
         sendPostRequest(getPathWithToken(REST_SERVICE, "saveDevice"),
-                jsonFactory.toJson(tr));
+                serializer.toJson(tr));
     }
     /**
      * @return
@@ -227,7 +244,7 @@ public class RestServiceFacade  {
 
         final List<Device> devices = new ArrayList<Device>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            devices.add(jsonFactory.parseDevice(response.get(i).getAsJsonObject()));
+            devices.add(serializer.parseDevice(response.get(i).getAsJsonObject()));
         }
         return devices;
     }
@@ -240,7 +257,7 @@ public class RestServiceFacade  {
 
         final List<Shipment> shipments = new ArrayList<Shipment>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            shipments.add(jsonFactory.parseShipment(response.get(i).getAsJsonObject()));
+            shipments.add(serializer.parseShipment(response.get(i).getAsJsonObject()));
         }
         return shipments;
     }
@@ -256,7 +273,7 @@ public class RestServiceFacade  {
                 params).getAsJsonArray();
         final List<Notification> notifications = new ArrayList<Notification>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            notifications.add(jsonFactory.parseNotification(response.get(i).getAsJsonObject()));
+            notifications.add(serializer.parseNotification(response.get(i).getAsJsonObject()));
         }
         return notifications;
     }
@@ -292,7 +309,7 @@ public class RestServiceFacade  {
         params.put("username", userName);
         final JsonObject response = sendGetRequest(getPathWithToken(REST_SERVICE, "getUser"),
                 params).getAsJsonObject();
-        return jsonFactory.parseUser(response);
+        return serializer.parseUser(response);
     }
 
     /**
@@ -314,7 +331,7 @@ public class RestServiceFacade  {
                 params).getAsJsonArray();
         final List<ShipmentData> result = new LinkedList<ShipmentData>();
         for (final JsonElement e : response) {
-            result.add(jsonFactory.parseShipmentData(e.getAsJsonObject()));
+            result.add(serializer.parseShipmentData(e.getAsJsonObject()));
         }
 
         return result;
@@ -333,9 +350,25 @@ public class RestServiceFacade  {
         req.setSaveAsNewTemplate(saveTemplate);
 
         final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveShipment"),
-                jsonFactory.toJson(req)).getAsJsonObject();
-        final SaveShipmentResponse resp = jsonFactory.parseSaveShipmentResponse(e);
+                serializer.toJson(req)).getAsJsonObject();
+        final SaveShipmentResponse resp = serializer.parseSaveShipmentResponse(e);
         return resp.getShipmentId();
+    }
+    /**
+     * @param u user.
+     * @param c company.
+     * @param password user password.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void createUser(final User u, final Company c, final String password) throws IOException, RestServiceException {
+        final CreateUserRequest req = new CreateUserRequest();
+        req.setCompany(c);
+        req.setUser(u);
+        req.setPassword(password);
+
+        sendPostRequest(getPathWithToken(REST_SERVICE, "createUser"),
+                serializer.toJson(req));
     }
 
     /**
@@ -363,14 +396,29 @@ public class RestServiceFacade  {
         cmd.setCommand(command);
 
         sendPostRequest(getPathWithToken(REST_SERVICE, "sendCommandToDevice"),
-                jsonFactory.toJson(cmd));
+                serializer.toJson(cmd));
+    }
+
+    /**
+     * @param id company ID.
+     * @return Company
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public Company getCompany(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", id.toString());
+
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getCompany"),
+                params);
+        return serializer.parseCompany(response);
     }
 
     /**
      * @param f JSON factory.
      */
     public void setJsonFactory(final JSonSerializer f) {
-        this.jsonFactory = f;
+        this.serializer = f;
     }
 
     /**
@@ -555,7 +603,7 @@ public class RestServiceFacade  {
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getLocationProfile"),
                 params);
-        return response == JsonNull.INSTANCE ? null : jsonFactory.parseLocationProfile(
+        return response == JsonNull.INSTANCE ? null : serializer.parseLocationProfile(
                 response.getAsJsonObject());
     }
     /* (non-Javadoc)
@@ -567,7 +615,7 @@ public class RestServiceFacade  {
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getAlertProfile"),
                 params);
-        return response == JsonNull.INSTANCE ? null : jsonFactory.parseAlertProfile(
+        return response == JsonNull.INSTANCE ? null : serializer.parseAlertProfile(
                 response.getAsJsonObject());
     }
     /* (non-Javadoc)
@@ -579,7 +627,7 @@ public class RestServiceFacade  {
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getShipment"),
                 params);
-        return response == JsonNull.INSTANCE ? null : jsonFactory.parseShipment(
+        return response == JsonNull.INSTANCE ? null : serializer.parseShipment(
                 response.getAsJsonObject());
     }
     /* (non-Javadoc)
@@ -592,7 +640,7 @@ public class RestServiceFacade  {
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
                 "getNotificationSchedule"), params);
-        return response == JsonNull.INSTANCE ? null : jsonFactory.parseNotificationSchedule(
+        return response == JsonNull.INSTANCE ? null : serializer.parseNotificationSchedule(
                 response.getAsJsonObject());
     }
     /* (non-Javadoc)
@@ -604,7 +652,7 @@ public class RestServiceFacade  {
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
                 "getDevice"), params);
-        return response == JsonNull.INSTANCE ? null : jsonFactory.parseDevice(
+        return response == JsonNull.INSTANCE ? null : serializer.parseDevice(
                 response.getAsJsonObject());
     }
     /**
@@ -619,7 +667,7 @@ public class RestServiceFacade  {
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
                 "getShipmentTemplate"), params);
-        return response == JsonNull.INSTANCE ? null : jsonFactory.parseShipmentTemplate(
+        return response == JsonNull.INSTANCE ? null : serializer.parseShipmentTemplate(
                 response.getAsJsonObject());
     }
     /**
@@ -631,7 +679,7 @@ public class RestServiceFacade  {
         final HashMap<String, String> params = new HashMap<String, String>();
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
                 "getProfile"), params);
-        return response == JsonNull.INSTANCE ? null : jsonFactory.parseUserProfile(
+        return response == JsonNull.INSTANCE ? null : serializer.parseUserProfile(
                 response.getAsJsonObject());
     }
     /**
@@ -641,7 +689,7 @@ public class RestServiceFacade  {
      */
     public void saveProfile(final UserProfile p) throws IOException, RestServiceException {
         sendPostRequest(getPathWithToken(REST_SERVICE, "saveProfile"),
-                jsonFactory.toJson(p));
+                serializer.toJson(p));
     }
     /**
      * @param response

@@ -4,6 +4,7 @@
 package com.visfresh.controllers;
 
 import com.visfresh.entities.User;
+import com.visfresh.io.CreateUserRequest;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -96,4 +97,15 @@ public interface AccessController {
      * @param user user.
      */
     void checkSaveProfile(User user) throws RestServiceException;
+    /**
+     * @param user current user.
+     * @param r request for create another user..
+     */
+    void checkCanCreateUser(User user, CreateUserRequest r) throws RestServiceException;
+    /**
+     * @param user user.
+     * @param id company ID.
+     * @throws RestServiceException
+     */
+    void checkCanGetCompany(User user, Long id) throws RestServiceException;
 }

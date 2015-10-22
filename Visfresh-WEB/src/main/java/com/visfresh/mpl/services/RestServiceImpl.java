@@ -13,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.AlertProfileDao;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.LocationProfileDao;
@@ -61,6 +62,8 @@ public class RestServiceImpl implements RestService {
     private DeviceCommandDao deviceCommandDao;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private CompanyDao companyDao;
 
     /**
      * Default constructor.
@@ -264,6 +267,13 @@ public class RestServiceImpl implements RestService {
     @Override
     public UserProfile getProfile(final User user) {
         return userDao.getProfile(user);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getCompany(java.lang.Long)
+     */
+    @Override
+    public Company getCompany(final Long id) {
+        return companyDao.findOne(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#saveUserProfile(com.visfresh.entities.User, com.visfresh.entities.UserProfile)
