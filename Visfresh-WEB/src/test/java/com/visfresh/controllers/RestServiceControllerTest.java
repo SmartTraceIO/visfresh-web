@@ -733,6 +733,24 @@ public class RestServiceControllerTest {
         assertEquals(2, u2.getRoles().size());
         assertNotNull(u2.getCompany());
     }
+    @Test
+    public void testGetCompanies() throws IOException, RestServiceException {
+        //create company
+        Company c = new Company();
+        c.setDescription("JUnit test company");
+        c.setId(7777l);
+        c.setName("JUnit-C-1");
+        service.companies.put(c.getId(), c);
+
+        c = new Company();
+        c.setDescription("JUnit test company");
+        c.setId(7778l);
+        c.setName("JUnit-C-2");
+        service.companies.put(c.getId(), c);
+
+        final List<Company> companies = facade.getCompanies();
+        assertEquals(2, companies.size());
+    }
     /**
      * @return tracker event.
      */

@@ -104,4 +104,8 @@ public interface RestService {
      * @return company by given ID.
      */
     Company getCompany(Long id);
+    /**
+     * @return
+     */
+    List<Company> getCompanies();
 }

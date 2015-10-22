@@ -243,6 +243,16 @@ public class DefaultAccessController implements AccessController {
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
                 "User has not permissions for create user");
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanGetCompanies(com.visfresh.entities.User)
+     */
+    @Override
+    public void checkCanGetCompanies(final User user) throws RestServiceException {
+        if (!hasPermission(user, Role.GlobalAdmin)) {
+            throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                    "User has not permissions for list companies");
+        }
+    }
     /**
      * @param user
      * @param role

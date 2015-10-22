@@ -62,8 +62,7 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
             //create company account if need.
             Account acc = Account.getAccount(accountId);
             if (acc == null) {
-                Account.createNewAccount(null, accountId, null);
-                acc = Account.getAccount(accountId);
+                acc = Account.createNewAccount(null, accountId, null);
             }
 
             org.opengts.db.tables.User.createNewUser(acc, user.getLogin(), null, password);
@@ -92,7 +91,7 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
             if (device == null) {
                 device = org.opengts.db.tables.Device.createNewDevice(
                         account, d.getId(), d.getId());
-                device.setDescription("Visfresh generated");
+                device.setDescription(d.getName());
                 log.debug("OpenGTS device has succesfully created for " + d.getId());
                 device.save();
             }

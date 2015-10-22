@@ -754,6 +754,29 @@ public class RestServiceController {
         }
     }
     /**
+     * @param authToken authentication token.
+     * @param id company ID.
+     * @return company.
+     */
+    @RequestMapping(value = "/getCompanies/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String getCompanies(@PathVariable final String authToken) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetCompanies(user);
+
+            final List<Company> company = restService.getCompanies();
+            final JsonArray array = new JsonArray();
+            for (final Company c : company) {
+                array.add(getSerializer().toJson(c));
+            }
+            return createSuccessResponse(array);
+        } catch (final Exception e) {
+            log.error("Failed to get devices", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
      * @param id the entity ID.
      * @return JSON response.
      */

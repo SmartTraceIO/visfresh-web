@@ -351,6 +351,13 @@ public class MockRestService implements RestService {
         return companies.get(id);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getCompanies()
+     */
+    @Override
+    public List<Company> getCompanies() {
+        return new LinkedList<Company>(companies.values());
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.services.RestService#saveUserProfile(com.visfresh.entities.User, com.visfresh.entities.UserProfile)
      */
     @Override

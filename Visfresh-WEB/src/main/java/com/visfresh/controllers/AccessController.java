@@ -108,4 +108,8 @@ public interface AccessController {
      * @throws RestServiceException
      */
     void checkCanGetCompany(User user, Long id) throws RestServiceException;
+    /**
+     * @param user user
+     */
+    void checkCanGetCompanies(User user) throws RestServiceException;
 }

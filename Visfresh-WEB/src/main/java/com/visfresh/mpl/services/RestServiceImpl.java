@@ -276,6 +276,13 @@ public class RestServiceImpl implements RestService {
         return companyDao.findOne(id);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#getCompanies()
+     */
+    @Override
+    public List<Company> getCompanies() {
+        return companyDao.findAll();
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.services.RestService#saveUserProfile(com.visfresh.entities.User, com.visfresh.entities.UserProfile)
      */
     @Override

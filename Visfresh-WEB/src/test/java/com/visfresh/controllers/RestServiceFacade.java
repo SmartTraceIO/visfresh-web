@@ -683,6 +683,22 @@ public class RestServiceFacade  {
                 response.getAsJsonObject());
     }
     /**
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public List<Company> getCompanies() throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE,
+                "getCompanies"), params).getAsJsonArray();
+
+        final List<Company> result = new LinkedList<Company>();
+        for (final JsonElement e : response) {
+            result.add(serializer.parseCompany(e));
+        }
+        return result;
+    }
+    /**
      * @param p user profile.
      * @throws RestServiceException
      * @throws IOException
