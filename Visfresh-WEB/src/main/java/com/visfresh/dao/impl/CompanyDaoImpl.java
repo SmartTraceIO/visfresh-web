@@ -50,8 +50,6 @@ public class CompanyDaoImpl extends DaoImplBase<Company, Long> implements Compan
      */
     @Override
     public <S extends Company> S save(final S entity) {
-        final String namePlaceHolder = "name";
-        final String descriptionPlaceHolder = "description";
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;
@@ -60,18 +58,19 @@ public class CompanyDaoImpl extends DaoImplBase<Company, Long> implements Compan
             //insert
             paramMap.put("id", entity.getId());
             sql = "insert into " + TABLE + " (" + combine(NAME_FIELD, DESCRIPTION_FIELD) + ")"
-                    + " values(:" + namePlaceHolder + ", :" + descriptionPlaceHolder + ")";
+                    + " values(:name, :description)";
         } else {
             //update
             sql = "update " + TABLE + " set "
-                + NAME_FIELD + "=:" + namePlaceHolder + ","
-                + DESCRIPTION_FIELD + "=:" + descriptionPlaceHolder
+                + NAME_FIELD + "=:name,"
+                + DESCRIPTION_FIELD + "=:description"
                 + " where id = :" + ID_FIELD
                 ;
         }
 
-        paramMap.put(namePlaceHolder, entity.getName());
-        paramMap.put(descriptionPlaceHolder, entity.getDescription());
+        paramMap.put("id", entity.getId());
+        paramMap.put("name", entity.getName());
+        paramMap.put("description", entity.getDescription());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);

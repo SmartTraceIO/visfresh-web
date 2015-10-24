@@ -59,7 +59,15 @@
             <param-value>false</param-value>
         </init-param>
     </filter>
+    <filter>
+    	<filter-name>AccessControlAllowOriginFilter</filter-name>
+    	<filter-class>com.visfresh.filters.AccessControlAllowOriginFilter</filter-class>
+    </filter>
 
+    <filter-mapping>
+        <filter-name>AccessControlAllowOriginFilter</filter-name>
+        <url-pattern>/vf/rest/*</url-pattern>
+    </filter-mapping>
     <filter-mapping>
         <filter-name>CharacterEncodingFilter</filter-name>
         <url-pattern>/Track</url-pattern>

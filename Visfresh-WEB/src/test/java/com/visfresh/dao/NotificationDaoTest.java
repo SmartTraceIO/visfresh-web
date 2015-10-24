@@ -19,6 +19,7 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 
 /**
@@ -28,6 +29,7 @@ import com.visfresh.entities.User;
 public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notification, Long> {
     private DeviceDao deviceDao;
     private UserDao userDao;
+    private ShipmentDao shipmentDao;
 
     private Device device;
     private ArrivalDao arrivalDao;
@@ -45,6 +47,8 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
     public void beforeTest() {
         deviceDao = getContext().getBean(DeviceDao.class);
         userDao = getContext().getBean(UserDao.class);
+        shipmentDao = getContext().getBean(ShipmentDao.class);
+        arrivalDao = getContext().getBean(ArrivalDao.class);
 
         //create device
         final Device d = new Device();
@@ -59,11 +63,16 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         this.device = deviceDao.save(d);
 
         //create arrival
-        arrivalDao = getContext().getBean(ArrivalDao.class);
+        Shipment s = new Shipment();
+        s.setName("Default profile");
+        s.setCompany(sharedCompany);
+        s.getDevices().add(d);
+        s = shipmentDao.save(s);
 
         final Arrival a = new Arrival();
         a.setDate(new Date(System.currentTimeMillis() - 1000000l));
         a.setDevice(device);
+        a.setShipment(s);
         a.setNumberOfMettersOfArrival(78);
         this.arrival = arrivalDao.save(a);
 
@@ -170,6 +179,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
     public void clear() {
         super.clear();
         arrivalDao.deleteAll();
+        shipmentDao.deleteAll();
         deviceDao.deleteAll();
         userDao.deleteAll();
     }
