@@ -75,7 +75,7 @@ An authentication can be performed as from REST client using login method, as fr
 
 
 ### Authentication.###
-Method *POST*, method name *login*, method parameters  
+Method *GET*, method name *login*, request parameters login - the user login name and password - the user password  
 1. login - user name of logged in user  
 2. password - password  
 
@@ -442,11 +442,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 
 ## Examples ##
 ### Authentication request example ###
-**POST /vf/rest/login**   
-`{`  
-`"login": "asuvorov",`  
-`"password": "password"`  
-`}`  
+**GET /vf/rest/login?login=user&password=password**   
 **Response**  
 `{`  
 `"status": {`  
