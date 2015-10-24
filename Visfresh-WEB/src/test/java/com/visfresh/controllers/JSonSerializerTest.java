@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
@@ -436,6 +437,7 @@ public class JSonSerializerTest {
         final Long alertId = 77l;
         final String alertName = "Any name";
         final Device device = createDevice("20394870987324");
+        final Shipment shipment = createShipment();
         final AlertType alertType = AlertType.EnterDarkEnvironment;
 
         Alert alert = new Alert();
@@ -444,6 +446,7 @@ public class JSonSerializerTest {
         alert.setId(alertId);
         alert.setName(alertName);
         alert.setDevice(device);
+        alert.setShipment(shipment);
         alert.setType(alertType);
 
         final Long notificationId = 78L;
@@ -469,6 +472,7 @@ public class JSonSerializerTest {
         assertEquals(alertId, alert.getId());
         assertEquals(alertName, alert.getName());
         assertNotNull(alert.getDevice());
+        assertNotNull(alert.getShipment());
         assertEquals(alertType, alert.getType());
     }
 
@@ -479,6 +483,7 @@ public class JSonSerializerTest {
         final Long alertId = 77l;
         final String alertName = "Any name";
         final Device device = createDevice("20394870987324");
+        final Shipment shipment = createShipment();
         final AlertType alertType = AlertType.HighTemperature;
         final double temperature = 10.12;
         final int minutes = 75;
@@ -492,6 +497,7 @@ public class JSonSerializerTest {
         alert.setType(alertType);
         alert.setTemperature(temperature);
         alert.setMinutes(minutes);
+        alert.setShipment(shipment);
 
         final Long notificationId = 78L;
         final NotificationType notificationType = NotificationType.Alert;
@@ -516,6 +522,7 @@ public class JSonSerializerTest {
         assertEquals(alertId, alert.getId());
         assertEquals(alertName, alert.getName());
         assertNotNull(alert.getDevice());
+        assertNotNull(alert.getShipment());
         assertEquals(alertType, alert.getType());
         assertEquals(temperature, alert.getTemperature(), 0.00001);
         assertEquals(minutes, alert.getMinutes());
@@ -555,9 +562,11 @@ public class JSonSerializerTest {
         DeviceData d = new DeviceData();
 
         final Device device = createDevice("93218709879");
+        final Shipment shipment = createShipment();
+
         d.setDevice(device);
-        d.getAlerts().add(createAlert(device, AlertType.BatteryLow));
-        d.getAlerts().add(createAlert(device, AlertType.EnterDarkEnvironment));
+        d.getAlerts().add(createAlert(device, shipment, AlertType.BatteryLow));
+        d.getAlerts().add(createAlert(device, shipment, AlertType.EnterDarkEnvironment));
         d.getEvents().add(createEvent("AUT"));
         d.getEvents().add(createEvent("DRK"));
 
@@ -659,7 +668,7 @@ public class JSonSerializerTest {
         assertEquals(type, e.getType());
     }
     @Test
-    public void testCreateUser() {
+    public void testCreateUserRequest() {
         final Company c = new Company();
         c.setId(7l);
         c.setName("JUnit");
@@ -686,6 +695,97 @@ public class JSonSerializerTest {
         assertNotNull(r.getCompany());
         assertEquals(password, r.getPassword());
     }
+    @Test
+    public void testAlert() {
+        final Device device = createDevice("92348072043987");
+        final Shipment shipment = createShipment();
+        final Date date = new Date(System.currentTimeMillis() - 100000000l);
+        final String description = "Alert description";
+        final Long id = generateId();
+        final String name = "Any name";
+        final AlertType type = AlertType.BatteryLow;
+
+        Alert alert = new Alert();
+        alert.setDate(date);
+        alert.setDescription(description);
+        alert.setId(id);
+        alert.setName(name);
+        alert.setDevice(device);
+        alert.setType(type);
+        alert.setShipment(shipment);
+
+        final JsonElement json = serializer.toJson(alert);
+        alert = serializer.parseAlert(json);
+
+        assertEquals(date, alert.getDate());
+        assertEquals(description, alert.getDescription());
+        assertEquals(device.getId(), alert.getDevice().getId());
+        assertEquals(id, alert.getId());
+        assertEquals(name, alert.getName());
+        assertEquals(shipment.getId(), alert.getShipment().getId());
+        assertEquals(type, alert.getType());
+    }
+    @Test
+    public void testTemparatureAlert() {
+        final Device device = createDevice("92348072043987");
+        final Shipment shipment = createShipment();
+        final Date date = new Date(System.currentTimeMillis() - 100000000l);
+        final String description = "Alert description";
+        final Long id = generateId();
+        final String name = "Any name";
+        final AlertType type = AlertType.CriticalHighTemperature;
+        final double temperature = -20.3;
+        final int minutes = 30;
+
+        TemperatureAlert alert = new TemperatureAlert();
+        alert.setDate(date);
+        alert.setDescription(description);
+        alert.setId(id);
+        alert.setName(name);
+        alert.setDevice(device);
+        alert.setType(type);
+        alert.setShipment(shipment);
+        alert.setTemperature(temperature);
+        alert.setMinutes(minutes);
+
+        final JsonElement json = serializer.toJson(alert);
+        alert = (TemperatureAlert) serializer.parseAlert(json);
+
+        assertEquals(date, alert.getDate());
+        assertEquals(description, alert.getDescription());
+        assertEquals(device.getId(), alert.getDevice().getId());
+        assertEquals(id, alert.getId());
+        assertEquals(name, alert.getName());
+        assertEquals(shipment.getId(), alert.getShipment().getId());
+        assertEquals(type, alert.getType());
+        assertEquals(temperature, alert.getTemperature(), 0.00001);
+        assertEquals(minutes, alert.getMinutes());
+    }
+    @Test
+    public void testArrival() {
+        final Device device = createDevice("92348072043987");
+        final Shipment shipment = createShipment();
+        final Date date = new Date(System.currentTimeMillis() - 100000000l);
+        final Long id = 77L;
+        final int numberOfMetersOfArrival = 37;
+
+        Arrival a = new Arrival();
+        a.setDate(date);
+        a.setDevice(device);
+        a.setId(id);
+        a.setNumberOfMettersOfArrival(numberOfMetersOfArrival);
+        a.setShipment(shipment);
+
+        final JsonElement e = serializer.toJson(a);
+        a = serializer.parseArrival(e);
+
+        assertEquals(date, a.getDate());
+        assertEquals(device.getId(), a.getDevice().getId());
+        assertEquals(id, a.getId());
+        assertEquals(numberOfMetersOfArrival, a.getNumberOfMettersOfArrival());
+        assertEquals(shipment.getId(), a.getShipment().getId());
+    }
+    @Test
     public void testCompany() {
         final String description = "Company Description";
         final Long id = 77l;
@@ -716,15 +816,17 @@ public class JSonSerializerTest {
         return e;
     }
     /**
+     * @param shipment TODO
      * @return alert.
      */
-    private Alert createAlert(final Device device, final AlertType type) {
+    private Alert createAlert(final Device device, final Shipment shipment, final AlertType type) {
         final Alert alert = new Alert();
         alert.setDate(new Date(System.currentTimeMillis() - 100000000l));
         alert.setDescription("Alert description");
         alert.setId(generateId());
         alert.setName("Any name");
         alert.setDevice(device);
+        alert.setShipment(shipment);
         alert.setType(type);
         return alert;
     }

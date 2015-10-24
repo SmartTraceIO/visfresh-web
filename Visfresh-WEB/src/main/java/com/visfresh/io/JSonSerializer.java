@@ -548,10 +548,16 @@ public class JSonSerializer {
      * @param asJsonObject
      * @return
      */
-    public Arrival parseArrival(final JsonObject obj) {
+    public Arrival parseArrival(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+        final JsonObject obj = e.getAsJsonObject();
+
         final Arrival a = new Arrival();
         a.setDate(asDate(obj.get("date")));
         a.setDevice(resolveDevice(asString(obj.get("device"))));
+        a.setShipment(resolveShipment(asLong(obj.get("shipment"))));
         a.setId(asLong(obj.get("id")));
         a.setNumberOfMettersOfArrival(asInt(obj.get("numberOfMetersOfArrival")));
         return a;
@@ -566,13 +572,19 @@ public class JSonSerializer {
         json.addProperty("numberOfMetersOfArrival", arrival.getNumberOfMettersOfArrival());
         json.addProperty("date", timeToString(arrival.getDate()));
         json.addProperty("device", arrival.getDevice().getId());
+        json.addProperty("shipment", arrival.getShipment().getId());
         return json;
     }
     /**
      * @param json
      * @return
      */
-    public Alert parseAlert(final JsonObject json) {
+    public Alert parseAlert(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
         final AlertType type = AlertType.valueOf(json.get("type").getAsString());
         Alert alert;
         switch (type) {
@@ -592,6 +604,7 @@ public class JSonSerializer {
         alert.setDate(asDate(json.get("date")));
         alert.setDescription(asString(json.get("description")));
         alert.setDevice(resolveDevice(asString(json.get("device"))));
+        alert.setShipment(resolveShipment(asLong(json.get("shipment"))));
         alert.setId(asLong(json.get("id")));
         alert.setName(asString(json.get("name")));
         alert.setType(type);
@@ -611,6 +624,7 @@ public class JSonSerializer {
         json.addProperty("id", alert.getId());
         json.addProperty("date", timeToString(alert.getDate()));
         json.addProperty("device", alert.getDevice().getId());
+        json.addProperty("shipment", alert.getShipment().getId());
         json.addProperty("type", alert.getType().name());
 
         switch (alert.getType()) {

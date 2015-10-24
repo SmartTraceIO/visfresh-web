@@ -16,6 +16,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 
 /**
@@ -31,6 +32,8 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
      * Device.
      */
     private Device device;
+    private ShipmentDao shipmentDao;
+    private Shipment shipment;
 
     /**
      * Default constructor.
@@ -42,6 +45,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
     @Before
     public void beforeTest() {
         deviceDao = getContext().getBean(DeviceDao.class);
+        shipmentDao = getContext().getBean(ShipmentDao.class);
 
         final Device d = new Device();
         d.setCompany(sharedCompany);
@@ -53,6 +57,12 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         d.setName("Test device");
 
         this.device = deviceDao.save(d);
+
+        final Shipment s = new Shipment();
+        s.setName("Default profile");
+        s.setCompany(sharedCompany);
+        s.getDevices().add(d);
+        shipment = shipmentDao.save(s);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()
@@ -64,6 +74,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         alert.setDescription("Alert description");
         alert.setName("Any name");
         alert.setDevice(device);
+        alert.setShipment(shipment);
         alert.setType(AlertType.CriticalHighTemperature);
         alert.setTemperature(100);
         alert.setMinutes(15);
@@ -74,9 +85,9 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
      * @see com.visfresh.dao.BaseCrudTest#assertCreateTestEntityOk(com.visfresh.entities.EntityWithId)
      */
     @Override
-    protected void assertCreateTestEntityOk(final Alert entity) {
-        assertTrue(entity instanceof TemperatureAlert);
-        final TemperatureAlert a = (TemperatureAlert) entity;
+    protected void assertCreateTestEntityOk(final Alert alert) {
+        assertTrue(alert instanceof TemperatureAlert);
+        final TemperatureAlert a = (TemperatureAlert) alert;
 
         assertNotNull(a.getDate());
         assertEquals("Alert description", a.getDescription());
@@ -93,6 +104,8 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         assertEquals(device.getImei(), d.getImei());
         assertEquals(device.getName(), d.getName());
         assertEquals(device.getSn(), d.getSn());
+
+        assertNotNull(alert.getShipment());
 
         final Company c = d.getCompany();
         assertNotNull(c);
@@ -128,6 +141,8 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         assertEquals(device.getName(), d.getName());
         assertEquals(device.getSn(), d.getSn());
 
+        assertNotNull(a.getShipment());
+
         final Company c = d.getCompany();
         assertNotNull(c);
 
@@ -141,6 +156,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
     @Override
     public void clear() {
         super.clear();
+        shipmentDao.deleteAll();
         deviceDao.deleteAll();
     }
 }

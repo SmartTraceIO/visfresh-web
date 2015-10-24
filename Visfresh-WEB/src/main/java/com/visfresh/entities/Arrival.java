@@ -8,15 +8,11 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class Arrival extends NotificationIssue {
+public class Arrival extends ShipmentIssue {
     /**
      * Number of meters of arrival
      */
     private int numberOfMetersOfArrival;
-    /**
-     * Device.
-     */
-    private Device device;
 
     /**
      * Default constructor.
@@ -36,17 +32,5 @@ public class Arrival extends NotificationIssue {
      */
     public void setNumberOfMettersOfArrival(final int numberOfMetersOfArrival) {
         this.numberOfMetersOfArrival = numberOfMetersOfArrival;
-    }
-    /**
-     * @return the device
-     */
-    public Device getDevice() {
-        return device;
-    }
-    /**
-     * @param device the device
-     */
-    public void setDevice(final Device device) {
-        this.device = device;
     }
 }

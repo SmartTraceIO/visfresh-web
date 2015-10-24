@@ -8,7 +8,7 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class Alert extends NotificationIssue {
+public class Alert extends ShipmentIssue {
     /**
      * Alert type.
      */
@@ -21,11 +21,6 @@ public class Alert extends NotificationIssue {
      * Description.
      */
     private String description;
-    /**
-     * Device.
-     */
-    private Device device;
-
     /**
      * Default constructor.
      */
@@ -73,19 +68,5 @@ public class Alert extends NotificationIssue {
      */
     public void setDescription(final String description) {
         this.description = description;
-    }
-
-    /**
-     * @return the device
-     */
-    public Device getDevice() {
-        return device;
-    }
-
-    /**
-     * @param device the device
-     */
-    public void setDevice(final Device device) {
-        this.device = device;
     }
 }

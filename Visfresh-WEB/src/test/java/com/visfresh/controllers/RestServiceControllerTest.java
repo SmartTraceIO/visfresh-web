@@ -378,6 +378,7 @@ public class RestServiceControllerTest {
         tempAlert.setMinutes(55);
         tempAlert.setName("TempAlert-1");
         tempAlert.setDevice(d);
+        tempAlert.setShipment(s);
 
         Notification n = new Notification();
         n.setId(service.ids.incrementAndGet());
@@ -398,6 +399,7 @@ public class RestServiceControllerTest {
         batteryAlert.setType(AlertType.BatteryLow);
         batteryAlert.setName("Battery-1");
         batteryAlert.setDevice(d);
+        batteryAlert.setShipment(s);
 
         n = new Notification();
         n.setId(service.ids.incrementAndGet());
@@ -413,6 +415,7 @@ public class RestServiceControllerTest {
         a.setId(service.ids.incrementAndGet());
         a.setDate(new Date());
         a.setNumberOfMettersOfArrival(1500);
+        a.setShipment(s);
 
 
         n = new Notification();
@@ -522,6 +525,7 @@ public class RestServiceControllerTest {
 
         //add alert
         final Alert a = createAlert(d, AlertType.BatteryLow);
+        a.setShipment(s);
         a.setId(service.ids.incrementAndGet());
         service.alerts.put(a.getId(), a);
 

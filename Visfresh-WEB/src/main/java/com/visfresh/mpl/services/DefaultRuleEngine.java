@@ -116,7 +116,7 @@ public class DefaultRuleEngine extends AbstractRuleEngine implements SystemMessa
         }
 
         //create tracker event
-        final TrackerEvent e = createTrackerEvent(event, device);
+        final TrackerEvent e = createTrackerEvent(event, device, shipment);
         trackerEventDao.save(e);
 
         //process tracker event with rule engine.
@@ -125,14 +125,16 @@ public class DefaultRuleEngine extends AbstractRuleEngine implements SystemMessa
     }
 
     /**
-     * @param event
-     * @param device
+     * @param event event.
+     * @param device device.
+     * @param shipment shipment.
      * @return
      */
     protected TrackerEvent createTrackerEvent(final DeviceDcsNativeEvent event,
-            final Device device) {
+            final Device device, final Shipment shipment) {
         final TrackerEvent e = new TrackerEvent();
         e.setDevice(device);
+        e.setShipment(shipment);
         e.setBattery(event.getBattery());
         e.setLatitude(event.getLocation().getLatitude());
         e.setLongitude(event.getLocation().getLongitude());

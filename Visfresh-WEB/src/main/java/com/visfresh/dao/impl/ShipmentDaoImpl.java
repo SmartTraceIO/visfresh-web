@@ -225,7 +225,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         final String resultPrefix = "result_";
 
         // select device events
-        final String selectAs = buildSelectAs(TrackerEventDaoImpl.createFieldList(false),
+        final String selectAs = buildSelectAs(TrackerEventDaoImpl.getFields(true),
                 "e", resultPrefix);
         final String sql = "select " + selectAs + " from " + TrackerEventDaoImpl.TABLE
                 + " e, " + DeviceDaoImpl.TABLE + " d" + " where e."
@@ -264,7 +264,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         final String resultPrefix = "result_";
 
         //select alerts.
-        final String selectAs = buildSelectAs(AlertDaoImpl.createFieldList(false), "a", resultPrefix);
+        final String selectAs = buildSelectAs(AlertDaoImpl.getFields(true), "a", resultPrefix);
         final String sql = "select " + selectAs + " from " + AlertDaoImpl.TABLE + " a, "
                 + DeviceDaoImpl.TABLE + " d"
                 + " where a." + AlertDaoImpl.DEVICE_FIELD + " = d." + DeviceDaoImpl.ID_FIELD

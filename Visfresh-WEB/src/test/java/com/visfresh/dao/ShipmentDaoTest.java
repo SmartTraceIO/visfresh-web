@@ -23,6 +23,7 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentData;
+import com.visfresh.entities.ShipmentIssue;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
@@ -299,7 +300,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.getDevices().add(d);
         s = dao.save(s);
 
-        createTrackerEvent(d, "INIT");
+        createTrackerEvent(d, s, "INIT");
 
         //Test onlyWithAlerts flag
         List<ShipmentData> data = dao.getShipmentData(sharedCompany,
@@ -364,7 +365,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.getDevices().add(d);
         s = dao.save(s);
 
-        createTrackerEvent(d, "INIT");
+        createTrackerEvent(d, s, "INIT");
         createAlert(d, AlertType.CriticalHighTemperature);
 
         //Test onlyWithAlerts flag
@@ -418,10 +419,11 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
      * @param t event type.
      * @return tracker event.
      */
-    private TrackerEvent createTrackerEvent(final Device d, final String t) {
+    private TrackerEvent createTrackerEvent(final Device d, final Shipment shipment, final String t) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(27);
         e.setDevice(d);
+        e.setShipment(shipment);
         e.setTemperature(5.5);
         e.setTime(new Date());
         e.setType(t);
@@ -432,7 +434,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
      * @param type
      * @return
      */
-    private Alert createAlert(final Device d, final AlertType type) {
+    private ShipmentIssue createAlert(final Device d, final AlertType type) {
         Alert a;
         switch (type) {
             case CriticalHighTemperature:
@@ -461,9 +463,9 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
      */
     @Override
     public void clear() {
+        trackerEventDao.deleteAll();
         super.clear();
         shipmentTemplateDao.deleteAll();
-        trackerEventDao.deleteAll();
         alertProfileDao.deleteAll();
         locationProfileDao.deleteAll();
         notificationScheduleDao.deleteAll();

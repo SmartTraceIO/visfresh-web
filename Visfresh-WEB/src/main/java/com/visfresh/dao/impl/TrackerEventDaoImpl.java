@@ -9,10 +9,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.TrackerEvent;
 
@@ -59,6 +61,10 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      * Device ID.
      */
     protected static final String DEVICE_FIELD = "device";
+    private static final String SHIPMENT_FIELD = "shipment";
+
+    @Autowired
+    private ShipmentDao shipmentDao;
 
     /**
      * Default constructor.
@@ -75,39 +81,13 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;
-
+        final List<String> fields = getFields(false);
         if (event.getId() == null) {
             //insert
-            paramMap.put("id", event.getId());
-            sql = "insert into " + TABLE + " (" + combine(
-                    TYPE_FIELD
-                    , TIME_FIELD
-                    , BATTERY_FIELD
-                    , TEMPERATURE_FIELD
-                    , LATITUDE_FIELD
-                    , LONGITUDE_FIELD
-                    , DEVICE_FIELD
-                ) + ")" + " values("
-                    + ":"+ TYPE_FIELD
-                    + ", :" + TIME_FIELD
-                    + ", :" + BATTERY_FIELD
-                    + ", :" + TEMPERATURE_FIELD
-                    + ", :" + LATITUDE_FIELD
-                    + ", :" + LONGITUDE_FIELD
-                    + ", :" + DEVICE_FIELD
-                    + ")";
+            sql = createInsertScript(TABLE, fields);
         } else {
             //update
-            sql = "update " + TABLE + " set "
-                + TYPE_FIELD + "=:" + TYPE_FIELD + ","
-                + TIME_FIELD + "=:" + TIME_FIELD + ","
-                + BATTERY_FIELD + "=:" + BATTERY_FIELD + ","
-                + TEMPERATURE_FIELD + "=:" + TEMPERATURE_FIELD + ","
-                + LATITUDE_FIELD + "=:" + LATITUDE_FIELD + ","
-                + LONGITUDE_FIELD + "=:" + LONGITUDE_FIELD + ","
-                + DEVICE_FIELD + "=:" + DEVICE_FIELD
-                + " where id = :" + ID_FIELD
-            ;
+            sql = createUpdateScript(TABLE, fields, ID_FIELD);
         }
 
         paramMap.put(ID_FIELD, event.getId());
@@ -118,6 +98,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         paramMap.put(LATITUDE_FIELD, event.getLatitude());
         paramMap.put(LONGITUDE_FIELD, event.getLongitude());
         paramMap.put(DEVICE_FIELD, event.getDevice().getId());
+        paramMap.put(SHIPMENT_FIELD, event.getShipment().getId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -126,6 +107,21 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         }
 
         return event;
+    }
+    public static List<String> getFields(final boolean includeId) {
+        final List<String> fields = new LinkedList<String>();
+        fields.add(TYPE_FIELD);
+        fields.add(TIME_FIELD);
+        fields.add(BATTERY_FIELD);
+        fields.add(TEMPERATURE_FIELD);
+        fields.add(LATITUDE_FIELD);
+        fields.add(LONGITUDE_FIELD);
+        fields.add(DEVICE_FIELD);
+        fields.add(SHIPMENT_FIELD);
+        if (includeId) {
+            fields.add(ID_FIELD);
+        }
+        return fields;
     }
 
     /* (non-Javadoc)
@@ -160,6 +156,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
             final String companyResultPrefix, final Map<String, Object> map) {
         final TrackerEvent a = createTrackerEvent(map, resultPrefix);
         a.setDevice(DeviceDaoImpl.createDevice(deviceResultPrefix, companyResultPrefix, map));
+        a.setShipment(shipmentDao.findOne(((Number) map.get(resultPrefix + SHIPMENT_FIELD)).longValue()));
         return a;
     }
     /**
@@ -232,24 +229,10 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     private Map<String, String> createSelectAsMapping(final String entityName,
             final String resultPrefix) {
         final Map<String, String> map = new HashMap<String, String>();
-        for (final String field : createFieldList(true)) {
+        for (final String field : getFields(true)) {
             map.put(entityName + "." + field, resultPrefix + field);
         }
         return map;
-    }
-    public static List<String> createFieldList(final boolean excludeReferences) {
-        final List<String> list = new LinkedList<String>();
-        list.add(ID_FIELD);
-        list.add(TYPE_FIELD);
-        list.add(TIME_FIELD);
-        list.add(BATTERY_FIELD);
-        list.add(TEMPERATURE_FIELD);
-        list.add(LATITUDE_FIELD);
-        list.add(LONGITUDE_FIELD);
-        if (!excludeReferences) {
-            list.add(DEVICE_FIELD);
-        }
-        return list;
     }
 
     /* (non-Javadoc)

@@ -4,16 +4,16 @@ drop table if exists usershipments;
 drop table if exists shipmentdevices;
 drop table if exists arrivalnotifschedules;
 drop table if exists alertnotifschedules;
+drop table if exists trackerevents;
+drop table if exists arrivals;
+drop table if exists alerts;
 drop table if exists shipments;
 drop table if exists personalschedules;
 drop table if exists notificationschedules;
 drop table if exists alertprofiles;
 drop table if exists locationprofiles;
 drop table if exists notifications;
-drop table if exists trackerevents;
 drop table if exists devicecommands;
-drop table if exists arrivals;
-drop table if exists alerts;
 drop table if exists devices;
 drop table if exists userprofiles;
 drop table if exists users;
@@ -36,28 +36,6 @@ create table devices (
    company bigint(20),
    primary key (id),
    FOREIGN KEY (company) REFERENCES companies(id)   
-);
-
-create table alerts (
-   id bigint(20) auto_increment not null,
-   `type` varchar(50) not null,
-   `name` varchar(127) not null,
-   description varchar(255) default null,
-   temperature double not null,
-   minutes int not null,
-   `date` timestamp not null,
-   device varchar(127) not null,
-   primary key (id),
-   FOREIGN KEY (device) REFERENCES devices(id)   
-);
-
-create table arrivals (
-   id bigint(20) auto_increment not null,
-   nummeters int not null,
-   `date` timestamp not null,
-   device varchar(127) not null,
-   primary key (id),
-   FOREIGN KEY (device) REFERENCES devices(id)   
 );
 
 create table devicecommands (
@@ -83,19 +61,6 @@ create table userprofiles(
    user varchar(127) not null,
    primary key (user),
    FOREIGN KEY (user) REFERENCES users(username) ON DELETE CASCADE  
-);
-
-create table trackerevents (
-   id bigint(20) auto_increment not null,
-   `type` varchar(20) not null,
-   `time` timestamp not null,
-   battery int not null,
-   temperature double not null,
-   latitude double not null,
-   longitude double not null,
-   device varchar(127) not null,
-   primary key (id),
-   FOREIGN KEY (device) REFERENCES devices(id)   
 );
 
 create table notifications (
@@ -203,6 +168,47 @@ create table shipments(
    shipmentdate timestamp,
    customfiels longtext default null,
    `status` varchar(31) default null
+);
+
+create table alerts (
+   id bigint(20) auto_increment not null,
+   `type` varchar(50) not null,
+   `name` varchar(127) not null,
+   description varchar(255) default null,
+   temperature double not null,
+   minutes int not null,
+   `date` timestamp not null,
+   device varchar(127) not null,
+   shipment bigint(20) not null,
+   primary key (id),
+   foreign key (shipment) references shipments(id),
+   foreign key (device) references devices(id)   
+);
+
+create table arrivals (
+   id bigint(20) auto_increment not null,
+   nummeters int not null,
+   `date` timestamp not null,
+   device varchar(127) not null,
+   shipment bigint(20) not null,
+   primary key (id),
+   foreign key (shipment) references shipments(id),
+   foreign key (device) references devices(id)   
+);
+
+create table trackerevents (
+   id bigint(20) auto_increment not null,
+   `type` varchar(20) not null,
+   `time` timestamp not null,
+   battery int not null,
+   temperature double not null,
+   latitude double not null,
+   longitude double not null,
+   device varchar(127) not null,
+   shipment bigint(20) not null,
+   primary key (id),
+   foreign key (shipment) references shipments(id),
+   foreign key (device) references devices(id)   
 );
 
 create table alertnotifschedules(

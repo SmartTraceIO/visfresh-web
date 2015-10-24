@@ -14,6 +14,7 @@ import org.junit.Before;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Shipment;
 
 
 /**
@@ -22,7 +23,9 @@ import com.visfresh.entities.Device;
  */
 public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
     private DeviceDao deviceDao;
+    private ShipmentDao shipmentDao;
     private Device device;
+    private Shipment shipment;
     /**
      * Default constructor.
      */
@@ -33,6 +36,7 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
     @Before
     public void beforeTest() {
         deviceDao = getContext().getBean(DeviceDao.class);
+        shipmentDao = getContext().getBean(ShipmentDao.class);
 
         final Device d = new Device();
         d.setCompany(sharedCompany);
@@ -44,6 +48,12 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
         d.setSn("12345");
 
         this.device = deviceDao.save(d);
+
+        final Shipment s = new Shipment();
+        s.setName("Default profile");
+        s.setCompany(sharedCompany);
+        s.getDevices().add(d);
+        shipment = shipmentDao.save(s);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()
@@ -53,6 +63,7 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
         final Arrival a = new Arrival();
         a.setDate(new Date(System.currentTimeMillis() - 1000000l));
         a.setDevice(device);
+        a.setShipment(shipment);
         a.setNumberOfMettersOfArrival(78);
         return a;
     }
@@ -79,6 +90,8 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
         assertEquals(sharedCompany.getId(), c.getId());
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
+
+        assertNotNull(a.getShipment());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
@@ -108,6 +121,8 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
         assertEquals(sharedCompany.getId(), c.getId());
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
+
+        assertNotNull(a.getShipment());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#clear()
@@ -115,6 +130,7 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
     @Override
     public void clear() {
         super.clear();
-        deviceDao.deleteAll();;
+        shipmentDao.deleteAll();
+        deviceDao.deleteAll();
     }
 }

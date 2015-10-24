@@ -95,6 +95,51 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         }
         return sb.toString();
     }
+    /**
+     * @param tableName table name.
+     * @param fields fields.
+     * @param idFieldName ID field name.
+     * @return insert.
+     */
+    protected String createInsertScript(final String tableName, final List<String> fields) {
+        final StringBuilder names = new StringBuilder();
+        final StringBuilder values = new StringBuilder();
+
+        boolean first = true;
+        for (final String field : fields) {
+            if (!first) {
+                names.append(',');
+                values.append(',');
+            } else {
+                first = false;
+            }
+
+            names.append(field);
+            values.append(':').append(field);
+        }
+
+        return "insert into " + tableName + "(" + names + ") values (" + values + ")";
+    }
+    /**
+     * @param tableName
+     * @param fields
+     * @param idField
+     * @return
+     */
+    protected String createUpdateScript(final String tableName, final List<String> fields,
+        final String idField) {
+        final StringBuilder sb = new StringBuilder();
+        for (final String field : fields) {
+            if (sb.length() > 0) {
+                sb.append(',');
+            }
+            sb.append(field).append("=:").append(field);
+        }
+
+        sb.insert(0, "update " + tableName + " set ");
+        sb.append(" where id =:").append(idField);
+        return sb.toString();
+    }
 
     /**
      * @param strings

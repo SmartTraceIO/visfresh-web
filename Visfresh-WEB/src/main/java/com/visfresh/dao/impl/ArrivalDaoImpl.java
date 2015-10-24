@@ -9,11 +9,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Arrival;
 
 /**
@@ -42,6 +44,13 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
      * Reference to device.
      */
     private static final String DEVICE_FIELD = "device";
+    /**
+     * Reference to shipment.
+     */
+    private static final String SHIPMENT_FIELD = "shipment";
+
+    @Autowired
+    private ShipmentDao shipmentDao;
 
     /**
      * Default constructor.
@@ -54,45 +63,42 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends Arrival> S save(final S alert) {
+    public <S extends Arrival> S save(final S arrival) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;
+        final List<String> fields = getFields(false);
 
-        if (alert.getId() == null) {
+        if (arrival.getId() == null) {
             //insert
-            paramMap.put("id", alert.getId());
-            sql = "insert into " + TABLE + " (" + combine(
-                    DATE_FIELD
-                    , NUMMETERS_FIELD
-                    , DEVICE_FIELD
-                ) + ")" + " values("
-                    + ":"+ DATE_FIELD
-                    + ", :" + NUMMETERS_FIELD
-                    + ", :" + DEVICE_FIELD
-                    + ")";
+            sql = createInsertScript(TABLE, fields);
         } else {
             //update
-            sql = "update " + TABLE + " set "
-                + DATE_FIELD + "=:" + DATE_FIELD + ","
-                + NUMMETERS_FIELD + "=:" + NUMMETERS_FIELD + ","
-                + DEVICE_FIELD + "=:" + DEVICE_FIELD
-                + " where id = :" + ID_FIELD
-            ;
+            sql = createUpdateScript(TABLE, fields, ID_FIELD);
         }
 
-        paramMap.put(ID_FIELD, alert.getId());
-        paramMap.put(DATE_FIELD, alert.getDate());
-        paramMap.put(NUMMETERS_FIELD, alert.getNumberOfMettersOfArrival());
-        paramMap.put(DEVICE_FIELD, alert.getDevice().getId());
+        paramMap.put(ID_FIELD, arrival.getId());
+        paramMap.put(DATE_FIELD, arrival.getDate());
+        paramMap.put(NUMMETERS_FIELD, arrival.getNumberOfMettersOfArrival());
+        paramMap.put(DEVICE_FIELD, arrival.getDevice().getId());
+        paramMap.put(SHIPMENT_FIELD, arrival.getShipment().getId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
         if (keyHolder.getKey() != null) {
-            alert.setId(keyHolder.getKey().longValue());
+            arrival.setId(keyHolder.getKey().longValue());
         }
 
-        return alert;
+        return arrival;
+    }
+
+    public List<String> getFields(final boolean addId) {
+        final LinkedList<String> fields = new LinkedList<String>();
+        fields.add(DATE_FIELD);
+        fields.add(NUMMETERS_FIELD);
+        fields.add(DEVICE_FIELD);
+        fields.add(SHIPMENT_FIELD);
+        return fields;
     }
 
     /* (non-Javadoc)
@@ -130,6 +136,7 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
         a.setDevice(DeviceDaoImpl.createDevice(deviceResultPrefix, companyResultPrefix, map));
         a.setDate((Date) map.get(resultPrefix + DATE_FIELD));
         a.setNumberOfMettersOfArrival(((Number) map.get(resultPrefix + NUMMETERS_FIELD)).intValue());
+        a.setShipment(shipmentDao.findOne(((Number) map.get(resultPrefix + SHIPMENT_FIELD)).longValue()));
         return a;
     }
     /**
@@ -188,6 +195,7 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
         map.put(entityName + "." + ID_FIELD, resultPrefix + ID_FIELD);
         map.put(entityName + "." + DATE_FIELD, resultPrefix + DATE_FIELD);
         map.put(entityName + "." + NUMMETERS_FIELD, resultPrefix + NUMMETERS_FIELD);
+        map.put(entityName + "." + SHIPMENT_FIELD, resultPrefix + SHIPMENT_FIELD);
         return map;
     }
 

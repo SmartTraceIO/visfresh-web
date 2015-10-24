@@ -13,6 +13,7 @@ import org.junit.Before;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 
 /**
@@ -24,10 +25,12 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
      * Device DAO.
      */
     private DeviceDao deviceDao;
+    private ShipmentDao shipmentDao;
     /**
      * Device.
      */
     private Device device;
+    private Shipment shipment;
 
     /**
      * Default constructor.
@@ -39,6 +42,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
     @Before
     public void beforeTest() {
         deviceDao = getContext().getBean(DeviceDao.class);
+        shipmentDao = getContext().getBean(ShipmentDao.class);
 
         final Device d = new Device();
         d.setCompany(sharedCompany);
@@ -50,6 +54,12 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         d.setSn("12345");
 
         this.device = deviceDao.save(d);
+
+        final Shipment s = new Shipment();
+        s.setName("Default profile");
+        s.setCompany(sharedCompany);
+        s.getDevices().add(d);
+        shipment = shipmentDao.save(s);
     }
 
     /* (non-Javadoc)
@@ -60,6 +70,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(27);
         e.setDevice(device);
+        e.setShipment(shipment);
         e.setTemperature(5.5);
         e.setTime(new Date());
         e.setType("INIT");
@@ -90,6 +101,8 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(sharedCompany.getId(), c.getId());
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
+
+        assertNotNull(e.getShipment());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
@@ -121,6 +134,8 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(sharedCompany.getId(), c.getId());
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
+
+        assertNotNull(e.getShipment());
     }
 
     /* (non-Javadoc)
@@ -129,6 +144,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
     @Override
     public void clear() {
         super.clear();
+        shipmentDao.deleteAll();
         deviceDao.deleteAll();
     }
 }

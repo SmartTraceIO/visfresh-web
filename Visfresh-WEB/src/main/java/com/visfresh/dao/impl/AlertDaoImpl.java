@@ -9,11 +9,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureAlert;
@@ -42,6 +44,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
      * Device.
      */
     protected static final String DEVICE_FIELD = "device";
+    protected static final String SHIPMENT_FIELD = "shipment";
     /**
      * Temperature.
      */
@@ -59,6 +62,9 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
      */
     protected static final String DATE_FIELD = "date";
 
+    @Autowired
+    private ShipmentDao shipmentDao;
+
     /**
      * Default constructor.
      */
@@ -75,38 +81,14 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
 
         String sql;
 
+        final List<String> fields = getFields(false);
         if (alert.getId() == null) {
             //insert
-            paramMap.put("id", alert.getId());
-            sql = "insert into " + TABLE + " (" + combine(
-                    NAME_FIELD
-                    , TYPE_FIELD
-                    , DESCRIPTION_FIELD
-                    , DEVICE_FIELD
-                    , TEMPERATURE_FIELD
-                    , MINUTES_FIELD
-                    , DATE_FIELD
-                ) + ")" + " values("
-                    + ":"+ NAME_FIELD
-                    + ", :" + TYPE_FIELD
-                    + ", :" + DESCRIPTION_FIELD
-                    + ", :" + DEVICE_FIELD
-                    + ", :" + TEMPERATURE_FIELD
-                    + ", :" + MINUTES_FIELD
-                    + ", :" + DATE_FIELD
-                    + ")";
+            sql = createInsertScript(TABLE, fields);
         } else {
+            paramMap.put(ID_FIELD, alert.getId());
             //update
-            sql = "update " + TABLE + " set "
-                + NAME_FIELD + "=:" + NAME_FIELD + ","
-                + TYPE_FIELD + "=:" + TYPE_FIELD + ","
-                + DESCRIPTION_FIELD + "=:" + DESCRIPTION_FIELD + ","
-                + DEVICE_FIELD + "=:" + DEVICE_FIELD + ","
-                + TEMPERATURE_FIELD + "=:" + TEMPERATURE_FIELD + ","
-                + MINUTES_FIELD + "=:" + MINUTES_FIELD + ","
-                + DATE_FIELD + "=:" + DATE_FIELD
-                + " where id = :" + ID_FIELD
-            ;
+            sql = createUpdateScript(TABLE, fields, ID_FIELD);
         }
 
         final boolean isTemperature = alert instanceof TemperatureAlert;
@@ -116,6 +98,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         paramMap.put(TYPE_FIELD, alert.getType().name());
         paramMap.put(DESCRIPTION_FIELD, alert.getDescription());
         paramMap.put(DEVICE_FIELD, alert.getDevice().getId());
+        paramMap.put(SHIPMENT_FIELD, alert.getShipment().getId());
         paramMap.put(TEMPERATURE_FIELD, isTemperature ? ((TemperatureAlert) alert).getTemperature() : -1);
         paramMap.put(MINUTES_FIELD, isTemperature ? ((TemperatureAlert) alert).getMinutes() : -1);
         paramMap.put(DATE_FIELD, alert.getDate());
@@ -127,6 +110,22 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         }
 
         return alert;
+    }
+
+    public static List<String> getFields(final boolean includeId) {
+        final List<String> fields = new LinkedList<String>();
+        fields.add(NAME_FIELD);
+        fields.add(TYPE_FIELD);
+        fields.add(DESCRIPTION_FIELD);
+        fields.add(DEVICE_FIELD);
+        fields.add(SHIPMENT_FIELD);
+        fields.add(TEMPERATURE_FIELD);
+        fields.add(MINUTES_FIELD);
+        fields.add(DATE_FIELD);
+        if (includeId) {
+            fields.add(ID_FIELD);
+        }
+        return fields;
     }
 
     /* (non-Javadoc)
@@ -208,6 +207,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
             final String companyResultPrefix, final Map<String, Object> map) {
         final Alert a = createAlert(map, resultPrefix);
         a.setDevice(DeviceDaoImpl.createDevice(deviceResultPrefix, companyResultPrefix, map));
+        a.setShipment(shipmentDao.findOne(((Number) map.get(resultPrefix + SHIPMENT_FIELD)).longValue()));
         return a;
     }
 
@@ -251,28 +251,10 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
     private Map<String, String> createSelectAsMapping(final String entityName,
             final String resultPrefix) {
         final Map<String, String> map = new HashMap<String, String>();
-        for (final String field : createFieldList(true)) {
+        for (final String field : getFields(true)) {
             map.put(entityName + "." + field, resultPrefix + field);
         }
         return map;
-    }
-    /**
-     * @param excludeReferences exclude references like as device ID.
-     * @return list of field names.
-     */
-    public static List<String> createFieldList(final boolean excludeReferences) {
-        final List<String> list = new LinkedList<String>();
-        list.add(NAME_FIELD);
-        list.add(ID_FIELD);
-        list.add(TYPE_FIELD);
-        list.add(DESCRIPTION_FIELD);
-        list.add(TEMPERATURE_FIELD);
-        list.add(MINUTES_FIELD);
-        list.add(DATE_FIELD);
-        if (!excludeReferences) {
-            list.add(DEVICE_FIELD);
-        }
-        return list;
     }
 
     /* (non-Javadoc)

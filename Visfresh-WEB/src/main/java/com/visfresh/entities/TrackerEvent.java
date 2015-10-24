@@ -42,6 +42,7 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
      * The device.
      */
     private Device device;
+    private Shipment shipment;
     private double latitude;
     private double longitude;
 
@@ -124,6 +125,18 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
      */
     public void setDevice(final Device device) {
         this.device = device;
+    }
+    /**
+     * @return the shipment
+     */
+    public Shipment getShipment() {
+        return shipment;
+    }
+    /**
+     * @param shipment the shipment to set
+     */
+    public void setShipment(final Shipment shipment) {
+        this.shipment = shipment;
     }
     /**
      * @return the latitude
