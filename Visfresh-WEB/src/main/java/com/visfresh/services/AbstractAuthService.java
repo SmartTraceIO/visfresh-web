@@ -24,7 +24,7 @@ import com.visfresh.utils.HashGenerator;
 public abstract class AbstractAuthService implements AuthService {
     private static final Logger log = LoggerFactory.getLogger(AbstractAuthService.class);
 
-    private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 10 * 60 * 1000l;//10 min
+    private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 365 * 12 * 24 * 60 * 1000l;//10 min
     private static final long TIMEOUT = 15000L;
 
     private final AtomicBoolean isStopped = new AtomicBoolean();

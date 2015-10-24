@@ -12,6 +12,7 @@
 		<spring.security.version>3.2.5.RELEASE</spring.security.version>
 		<spring.data.version>1.8.2.RELEASE</spring.data.version>
 		<gtse.version>2.6.0</gtse.version>
+		<drools.varsion>6.3.0.Final</drools.varsion>
 	</properties>
 
 	<dependencies>
@@ -119,6 +120,18 @@
 			<groupId>org.opengts</groupId>
 			<artifactId>wartools</artifactId>
 			<version>${gtse.version}</version>
+		</dependency>
+		
+		<!-- Rules Engine -->
+		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-core</artifactId>
+			<version>${drools.varsion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-compiler</artifactId>
+			<version>${drools.varsion}</version>
 		</dependency>
 
 		<!-- Logging -->

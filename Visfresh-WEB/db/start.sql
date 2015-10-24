@@ -9,4 +9,3 @@ select 'globaladmin', '2ced879c244faaaa6f00c05f3aa11f94', 'Global Administrator'
 -- Create Shipment company
 INSERT INTO companies (`name`, description)
 VALUES('Demo','Work company for rest client');
-

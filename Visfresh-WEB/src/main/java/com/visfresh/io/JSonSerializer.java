@@ -79,7 +79,12 @@ public class JSonSerializer {
      * @param json
      * @return
      */
-    public User parseUser(final JsonObject json) {
+    public User parseUser(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
         final User u = new User();
         u.setLogin(asString(json.get("login")));
         u.setFullName(asString(json.get("fullName")));

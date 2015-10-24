@@ -137,11 +137,11 @@ public class RestServiceFacade  {
      * @throws AuthenticationException
      */
     public String login(final String login, final String password) throws RestServiceException, IOException {
-        final JsonObject req = new JsonObject();
-        req.addProperty("login", login);
-        req.addProperty("password", password);
+        final Map<String, String> req = new HashMap<String, String>();
+        req.put("login", login);
+        req.put("password", password);
 
-        final JsonObject response = sendPostRequest(REST_SERVICE + "/login", req).getAsJsonObject();
+        final JsonObject response = sendGetRequest(REST_SERVICE + "/login", req).getAsJsonObject();
         return parseAuthToken(response);
     }
 
@@ -307,8 +307,8 @@ public class RestServiceFacade  {
     public User getUser(final String userName) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("username", userName);
-        final JsonObject response = sendGetRequest(getPathWithToken(REST_SERVICE, "getUser"),
-                params).getAsJsonObject();
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getUser"),
+                params);
         return serializer.parseUser(response);
     }
 

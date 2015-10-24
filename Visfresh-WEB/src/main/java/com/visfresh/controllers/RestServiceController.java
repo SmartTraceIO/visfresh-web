@@ -95,15 +95,9 @@ public class RestServiceController {
      * @param password password.
      * @return authorization token.
      */
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public @ResponseBody String login(@RequestBody final String loginRequest) {
-        String login = null;
-
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public @ResponseBody String login(final @RequestParam String login, final @RequestParam String password) {
         try {
-            final JsonObject json = getJSonObject(loginRequest);
-            login = json.get("login").getAsString();
-            final String password = json.get("password").getAsString();
-
             final AuthToken token = authService.login(login, password);
             return createSuccessResponse(getSerializer().toJson(token));
         } catch (final Exception e) {

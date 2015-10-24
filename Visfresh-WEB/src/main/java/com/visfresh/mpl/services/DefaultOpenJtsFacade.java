@@ -116,11 +116,12 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
     private org.opengts.db.tables.Device createDeviceIfNeed(final Account a, final Shipment shipment,
             final Device d) throws DBException {
         final ShipmentDeviceInfo info = shipmentDao.getShipmentDeviceInfo(shipment, d);
-        final String deviceId = d.getId() + "." + info.getTripCount();
+        final int len = d.getId().length();
+        final String deviceId = d.getId().substring(len - 6, len) + "." + info.getTripCount();
 
         org.opengts.db.tables.Device device = org.opengts.db.tables.Device.getDevice(a, deviceId);
         if (device == null) {
-            device = org.opengts.db.tables.Device.getDevice(a, deviceId);
+            device = org.opengts.db.tables.Device.getDevice(a, deviceId, true);
             device.setDescription(d.getName());
             device.save();
             log.debug("OpenGTS device " + deviceId
