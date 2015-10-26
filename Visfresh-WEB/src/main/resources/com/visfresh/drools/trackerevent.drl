@@ -1,0 +1,25 @@
+package com.visfresh.drools
+ 
+import com.visfresh.drools.AssignShipmentRule;
+import com.visfresh.drools.OpenJtsRule;
+import com.visfresh.drools.TrackerEventRequest;
+
+global com.visfresh.drools.DroolsRuleEngine engine;
+
+rule "Assign Shipment"
+    when
+        req : TrackerEventRequest(engine.getRule(AssignShipmentRule.NAME).accept(this));
+    then
+    	if(engine.getRule(AssignShipmentRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "OpenGts"
+    when
+        req : TrackerEventRequest(engine.getRule(OpenJtsRule.NAME).accept(this));
+    then
+    	if(engine.getRule(OpenJtsRule.NAME).handle(req)) {
+       		update(req);
+        }
+end

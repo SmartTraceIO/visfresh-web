@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.mpl.services;
+package com.visfresh.opengts;
 
 import java.util.HashMap;
 import java.util.Map;

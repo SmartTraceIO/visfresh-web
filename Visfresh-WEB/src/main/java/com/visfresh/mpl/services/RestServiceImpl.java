@@ -23,6 +23,7 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.dao.impl.DaoImplBase;
+import com.visfresh.drools.DroolsRuleEngine;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -42,7 +43,7 @@ import com.visfresh.services.RestService;
  *
  */
 @Component
-@ComponentScan(basePackageClasses = {DaoImplBase.class})
+@ComponentScan(basePackageClasses = {DaoImplBase.class, DroolsRuleEngine.class})
 public class RestServiceImpl implements RestService {
     @Autowired
     private AlertProfileDao alertProfileDao;
