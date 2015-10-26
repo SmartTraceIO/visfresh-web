@@ -70,7 +70,7 @@ public class AlertProfile implements EntityWithId<Long> {
      */
     private boolean watchShock;
     /**
-     * Alert for baterry low.
+     * Alert for batterry low.
      */
     private boolean watchBatteryLow;
 

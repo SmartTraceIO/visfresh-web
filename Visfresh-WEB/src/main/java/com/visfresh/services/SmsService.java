@@ -12,7 +12,8 @@ public interface SmsService {
     /**
      * Sends message to given phone.
      * @param phone phone number.
+     * @param subject TODO
      * @param message message.
      */
-    public void sendMessage(String phone, String message);
+    public void sendMessage(String phone, String subject, String message);
 }

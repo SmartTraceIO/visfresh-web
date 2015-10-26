@@ -190,7 +190,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setPalletId("PalletID");
         s.setAssetNum("PoNum");
         s.setShipmentDescription("Test Shipment");
-        s.setShipmentDescriptionDate(new Date());
+        s.setShipmentDate(new Date());
         s.setShippedFrom(shippedFrom);
         s.setShippedTo(shippedTo);
         s.setShutdownDeviceTimeOut(70);
@@ -216,7 +216,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals("PalletID", s.getPalletId());
         assertEquals("PoNum", s.getAssetNum());
         assertEquals("Test Shipment", s.getShipmentDescription());
-        assertNotNull(s.getShipmentDescriptionDate());
+        assertNotNull(s.getShipmentDate());
         assertNotNull(s.getShippedFrom());
         assertNotNull(s.getShippedTo());
         assertEquals(70, s.getShutdownDeviceTimeOut());
@@ -282,7 +282,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals("PalletID", s.getPalletId());
         assertEquals("PoNum", s.getAssetNum());
         assertEquals("Test Shipment", s.getShipmentDescription());
-        assertNotNull(s.getShipmentDescriptionDate());
+        assertNotNull(s.getShipmentDate());
         assertNotNull(s.getShippedFrom());
         assertNotNull(s.getShippedTo());
         assertEquals(70, s.getShutdownDeviceTimeOut());

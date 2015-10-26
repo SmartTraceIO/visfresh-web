@@ -368,7 +368,7 @@ public class JSonSerializerTest {
         s.getDevices().add(t1);
         s.getDevices().add(t2);
         s.setPalletId(palletId);
-        s.setShipmentDescriptionDate(shipmentDate);
+        s.setShipmentDate(shipmentDate);
         s.setCustomFields(customFields);
         s.setStatus(status);
         s.setAssetType(assetType);
@@ -391,7 +391,7 @@ public class JSonSerializerTest {
         assertEquals(shutdownDeviceTimeOut, s.getShutdownDeviceTimeOut());
         assertEquals(2, s.getDevices().size());
         assertEquals(palletId, s.getPalletId());
-        assertEquals(shipmentDate, s.getShipmentDescriptionDate());
+        assertEquals(shipmentDate, s.getShipmentDate());
         assertEquals(customFields, s.getCustomFields());
         assertEquals(status, s.getStatus());
         assertEquals(assetType, s.getAssetType());
@@ -915,7 +915,7 @@ public class JSonSerializerTest {
         s.getDevices().add(createDevice("234908720394857"));
         s.getDevices().add(createDevice("329847983724987"));
         s.setPalletId("palettid");
-        s.setShipmentDescriptionDate(new Date(System.currentTimeMillis() - 1000000000l));
+        s.setShipmentDate(new Date(System.currentTimeMillis() - 1000000000l));
         s.setCustomFields("customFields");
         resolver.add(s);
         return s;

@@ -133,7 +133,8 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
      * @return rule.
      */
     public TrackerEventRule getRule(final String name) {
-        return rules.get(name);
+        TrackerEventRule rule = rules.get(name);
+        return rule;
     }
     /**
      * @param name rule name.

@@ -23,6 +23,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.junit.db.JUnitConfig;
+import com.visfresh.mock.MockSmsService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -115,7 +116,9 @@ public class AssignShipmentRuleTest {
     @BeforeClass
     public static void beforeClass() {
         final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
-        ctxt.scan(JUnitConfig.class.getPackage().getName(), DroolsRuleEngine.class.getPackage().getName());
+        ctxt.scan(JUnitConfig.class.getPackage().getName(),
+                DroolsRuleEngine.class.getPackage().getName(),
+                MockSmsService.class.getPackage().getName());
         ctxt.refresh();
         context = ctxt;
     }

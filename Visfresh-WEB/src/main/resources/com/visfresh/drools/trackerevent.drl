@@ -3,10 +3,19 @@ package com.visfresh.drools
 import com.visfresh.drools.AssignShipmentRule;
 import com.visfresh.drools.OpenJtsRule;
 import com.visfresh.drools.TrackerEventRequest;
+import com.visfresh.drools.HighTemperatureAlertRule;
+import com.visfresh.drools.CriticalHighTemperatureAlertRule;
+import com.visfresh.drools.LowTemperatureAlertRule;
+import com.visfresh.drools.CriticalLowTemperatureAlertRule;
+import com.visfresh.drools.EnterBrightEnvironmentAlertRule;
+import com.visfresh.drools.EnterDarkEnvironmentAlertRule;
+import com.visfresh.drools.ShockAlertRule;
+import com.visfresh.drools.BatteryLowAlertRule;
+import com.visfresh.drools.ArrivalRule;
 
 global com.visfresh.drools.DroolsRuleEngine engine;
 
-rule "Assign Shipment"
+rule "AssignShipment"
     when
         req : TrackerEventRequest(engine.getRule(AssignShipmentRule.NAME).accept(this));
     then
@@ -20,6 +29,87 @@ rule "OpenGts"
         req : TrackerEventRequest(engine.getRule(OpenJtsRule.NAME).accept(this));
     then
     	if(engine.getRule(OpenJtsRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "HighTemperatureAlert"
+    when
+        req : TrackerEventRequest(engine.getRule(HighTemperatureAlertRule.NAME).accept(this));
+    then
+    	if(engine.getRule(HighTemperatureAlertRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "CriticalHighTemperatureAlert"
+    when
+        req : TrackerEventRequest(engine.getRule(CriticalHighTemperatureAlertRule.NAME).accept(this));
+    then
+    	if(engine.getRule(CriticalHighTemperatureAlertRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "LowTemperatureAlert"
+    when
+        req : TrackerEventRequest(engine.getRule(LowTemperatureAlertRule.NAME).accept(this));
+    then
+    	if(engine.getRule(LowTemperatureAlertRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "CriticalLowTemperatureAlert"
+    when
+        req : TrackerEventRequest(engine.getRule(CriticalLowTemperatureAlertRule.NAME).accept(this));
+    then
+    	if(engine.getRule(CriticalLowTemperatureAlertRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "EnterBrightEnvironmentAlert"
+    when
+        req : TrackerEventRequest(engine.getRule(EnterBrightEnvironmentAlertRule.NAME).accept(this));
+    then
+    	if(engine.getRule(EnterBrightEnvironmentAlertRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "EnterDarkEnvironmentAlert"
+    when
+        req : TrackerEventRequest(engine.getRule(EnterDarkEnvironmentAlertRule.NAME).accept(this));
+    then
+    	if(engine.getRule(EnterDarkEnvironmentAlertRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "ShockAlert"
+    when
+        req : TrackerEventRequest(engine.getRule(ShockAlertRule.NAME).accept(this));
+    then
+    	if(engine.getRule(ShockAlertRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "BatteryLowAlert"
+    when
+        req : TrackerEventRequest(engine.getRule(BatteryLowAlertRule.NAME).accept(this));
+    then
+    	if(engine.getRule(BatteryLowAlertRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "Arrival"
+    when
+        req : TrackerEventRequest(engine.getRule(ArrivalRule.NAME).accept(this));
+    then
+    	if(engine.getRule(ArrivalRule.NAME).handle(req)) {
        		update(req);
         }
 end

@@ -878,7 +878,7 @@ public class RestServiceControllerTest {
         s.getDevices().add(createDevice("329847983724987"));
         s.setPalletId("palettid");
         s.setAssetNum("10515");
-        s.setShipmentDescriptionDate(new Date(System.currentTimeMillis() - 1000000000l));
+        s.setShipmentDate(new Date(System.currentTimeMillis() - 1000000000l));
         s.setCustomFields("customFields");
         s.setAssetType("SeaContainer");
         return s;

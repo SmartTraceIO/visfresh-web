@@ -266,4 +266,22 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         paramMap.put("id", id);
         jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
     }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getFirstHotOccurence(com.visfresh.entities.TrackerEvent, double)
+     */
+    @Override
+    public Date getFirstHotOccurence(final TrackerEvent e, final double minimalTemperature) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getFirstColdOccurence(com.visfresh.entities.TrackerEvent, double)
+     */
+    @Override
+    public Date getFirstColdOccurence(final TrackerEvent e, final double maximalTemperature) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

@@ -27,7 +27,7 @@ public class Shipment extends ShipmentBase {
     /**
      * Shipment description date
      */
-    private Date shipmentDate;
+    private Date shipmentDate = new Date();
     /**
      * This field has reserver for future custom fields implementation.
      */
@@ -71,13 +71,13 @@ public class Shipment extends ShipmentBase {
     /**
      * @return the shipmentDate
      */
-    public Date getShipmentDescriptionDate() {
+    public Date getShipmentDate() {
         return shipmentDate;
     }
     /**
      * @param shipmentDate the shipmentDate to set
      */
-    public void setShipmentDescriptionDate(final Date shipmentDate) {
+    public void setShipmentDate(final Date shipmentDate) {
         this.shipmentDate = shipmentDate;
     }
     /**

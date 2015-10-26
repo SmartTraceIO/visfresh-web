@@ -330,7 +330,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         final Shipment e = super.createEntity(map, companyCache);
         e.setPalletId((String) map.get(PALETTID_FIELD));
         e.setAssetNum((String) map.get(ASSETNUM_FIELD));
-        e.setShipmentDescriptionDate((Date) map.get(SHIPMENTDATE_FIELD));
+        e.setShipmentDate((Date) map.get(SHIPMENTDATE_FIELD));
         e.setCustomFields((String) map.get(CUSTOMFIELDS_FIELD));
         e.setStatus(ShipmentStatus.valueOf((String) map.get(STATUS_FIELD)));
         e.getDevices().addAll(findDevices(e, deviceCache));
@@ -372,7 +372,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(ISTEMPLATE_FIELD, false);
         params.put(PALETTID_FIELD, s.getPalletId());
         params.put(ASSETNUM_FIELD, s.getAssetNum());
-        params.put(SHIPMENTDATE_FIELD, s.getShipmentDescriptionDate());
+        params.put(SHIPMENTDATE_FIELD, s.getShipmentDate());
         params.put(CUSTOMFIELDS_FIELD, s.getCustomFields());
         params.put(STATUS_FIELD, s.getStatus().name());
         return params;
