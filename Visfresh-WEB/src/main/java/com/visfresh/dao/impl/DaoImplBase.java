@@ -22,7 +22,8 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Serializable> implements DaoBase<T, ID> {
+public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Serializable&Comparable<ID>>
+        implements DaoBase<T, ID> {
     /**
      * JDBC template.
      */

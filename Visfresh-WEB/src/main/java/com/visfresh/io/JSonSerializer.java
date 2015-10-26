@@ -1004,7 +1004,7 @@ public class JSonSerializer {
      * @param e
      * @return
      */
-    private <ID extends Serializable> ID getId(final EntityWithId<ID> e) {
+    private <ID extends Serializable & Comparable<ID>> ID getId(final EntityWithId<ID> e) {
         return e == null ? null : (ID) e.getId();
     }
     /**

@@ -4,8 +4,12 @@
 package com.visfresh.controllers;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +35,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
@@ -206,17 +211,21 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
+     * @param pageIndex the page index.
+     * @param pageSize the page size.
      * @return list of alert profiles.
      */
     @RequestMapping(value = "/getAlertProfiles/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getAlertProfiles(@PathVariable final String authToken) {
+    public @ResponseBody String getAlertProfiles(@PathVariable final String authToken,
+            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetAlertProfiles(user);
             final JSonSerializer ser = getSerializer();
 
-            final List<AlertProfile> alerts = restService.getAlertProfiles(user.getCompany());
+            final List<AlertProfile> alerts = getPage(
+                    restService.getAlertProfiles(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final AlertProfile a : alerts) {
                 array.add(ser.toJson(a));
@@ -227,6 +236,34 @@ public class RestServiceController {
             log.error("Failed to get alert profiles", e);
             return createErrorResponse(e);
         }
+    }
+
+    /**
+     * @param list
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    private <E extends EntityWithId<ID>, ID extends Serializable & Comparable<ID>> List<E>
+            getPage(final List<E> list, final int pageIndex, final int pageSize) {
+        final int fromIndex = (pageIndex - 1) * pageSize;
+        if (fromIndex >= list.size()) {
+            return new LinkedList<E>();
+        }
+
+        //sort first of all
+        Collections.sort(list, new Comparator<E>() {
+            /* (non-Javadoc)
+             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+             */
+            @Override
+            public int compare(final E o1, final E o2) {
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+
+        final int toIndex = Math.min(fromIndex + pageSize, list.size());
+        return list.subList(fromIndex, toIndex);
     }
 
     /**
@@ -252,10 +289,13 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
+     * @param pageIndex the page index.
+     * @param pageSize the page size.
      * @return list of location profiles.
      */
     @RequestMapping(value = "/getLocationProfiles/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getLocationProfiles(@PathVariable final String authToken) {
+    public @ResponseBody String getLocationProfiles(@PathVariable final String authToken,
+            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -263,7 +303,8 @@ public class RestServiceController {
 
             final JSonSerializer ser = getSerializer();
 
-            final List<LocationProfile> locations = restService.getLocationProfiles(user.getCompany());
+            final List<LocationProfile> locations = getPage(restService.getLocationProfiles(user.getCompany()),
+                    pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final LocationProfile location : locations) {
                 array.add(ser.toJson(location));
@@ -318,17 +359,20 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
+     * @param pageIndex page index.
+     * @param pageSize page size.
      * @return list of notification schedules.
      */
     @RequestMapping(value = "/getNotificationSchedules/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken) {
+    public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken,
+            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetNotificationSchedules(user);
 
-            final List<NotificationSchedule> schedules = restService.getNotificationSchedules(
-                    user.getCompany());
+            final List<NotificationSchedule> schedules = getPage(restService.getNotificationSchedules(
+                    user.getCompany()), pageIndex, pageSize);
 
             final JSonSerializer ser = getSerializer();
             final JsonArray array = new JsonArray();
@@ -386,16 +430,20 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
+     * @param pageIndex page index.
+     * @param pageSize page size.
      * @return list of shipment templates.
      */
     @RequestMapping(value = "/getShipmentTemplates/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getShipmentTemplates(@PathVariable final String authToken) {
+    public @ResponseBody String getShipmentTemplates(@PathVariable final String authToken,
+            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipmentTemplates(user);
 
-            final List<ShipmentTemplate> templates = restService.getShipmentTemplates(user.getCompany());
+            final List<ShipmentTemplate> templates = getPage(
+                    restService.getShipmentTemplates(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final ShipmentTemplate tpl : templates) {
                 array.add(getSerializer().toJson(tpl));
@@ -448,10 +496,13 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
+     * @param pageIndex page index.
+     * @param pageSize page size.
      * @return list of devices.
      */
     @RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getDevices(@PathVariable final String authToken) {
+    public @ResponseBody String getDevices(@PathVariable final String authToken,
+            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -459,7 +510,7 @@ public class RestServiceController {
 
             final JSonSerializer ser = getSerializer();
 
-            final List<Device> devices = restService.getDevices(user.getCompany());
+            final List<Device> devices = getPage(restService.getDevices(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final Device t : devices) {
                 array.add(ser.toJson(t));
@@ -522,10 +573,13 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
+     * @param pageIndex page index.
+     * @param pageSize page size.
      * @return list of shipments.
      */
     @RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getShipments(@PathVariable final String authToken) {
+    public @ResponseBody String getShipments(@PathVariable final String authToken,
+            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -533,7 +587,7 @@ public class RestServiceController {
 
             final JSonSerializer ser = getSerializer();
 
-            final List<Shipment> shipments = restService.getShipments(user.getCompany());
+            final List<Shipment> shipments = getPage(restService.getShipments(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final Shipment t : shipments) {
                 array.add(ser.toJson(t));
@@ -567,16 +621,19 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
+     * @param pageIndex page index.
+     * @param pageSize page size.
      * @return list of shipments.
      */
     @RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getNotifications(@PathVariable final String authToken) {
+    public @ResponseBody String getNotifications(@PathVariable final String authToken,
+            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             final JSonSerializer ser = getSerializer();
 
-            final List<Notification> shipments = restService.getNotifications(user);
+            final List<Notification> shipments = getPage(restService.getNotifications(user), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final Notification t : shipments) {
                 array.add(ser.toJson(t));
@@ -749,17 +806,19 @@ public class RestServiceController {
     }
     /**
      * @param authToken authentication token.
-     * @param id company ID.
+     * @param pageIndex page index.
+     * @param pageSize page size.
      * @return company.
      */
     @RequestMapping(value = "/getCompanies/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getCompanies(@PathVariable final String authToken) {
+    public @ResponseBody String getCompanies(@PathVariable final String authToken,
+            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetCompanies(user);
 
-            final List<Company> company = restService.getCompanies();
+            final List<Company> company = getPage(restService.getCompanies(), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final Company c : company) {
                 array.add(getSerializer().toJson(c));

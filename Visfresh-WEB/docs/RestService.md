@@ -86,7 +86,7 @@ The user should be logged in to GTS(e). (not implemented now).
 Method *POST*, method name *getToken*, no parameters. In case of this request the service access a current user session, determines user info, log in as REST service user and returns authentication session.  
 [(example)](#markdown-header-attach-to-existing-session-example)
 ### Get User Info ###
-Method *GET*, method name *getUser*, method parameters
+Method *GET*, method name *getUser*, method parameters  
 1. username - name of user  
 
 Method required associated privileges. The logged in user should be some as requested info user or should have admin role.  
@@ -110,7 +110,10 @@ Method *POST*, method name *saveAlertProfile*, request body contains JSON serial
 [(example)](#markdown-header-save-alert-profile-example)
 
 ### Get Alert Profiles ###
-Method *GET*, method name *getAlertProfiles*, have not parameters. Returns an array of [Alert Profile objects](#markdown-header-alert-profile).  
+Method *GET*, method name *getAlertProfiles*,  
+1. pageIndex - number of page  
+2. pageSize - size of page  
+Returns an array of [Alert Profile objects](#markdown-header-alert-profile).  
 [(example)](#markdown-header-get-alert-profiles-example)
 
 ### Save notification schedule ###
@@ -118,7 +121,10 @@ Method *POST*, method name *saveNotificationSchedule*, request body contains JSO
 [(example)](#markdown-header-save-notification-schedule-example)]
 
 ### Get notification schedules ###
-Method *GET*, method name *getNotificationSchedules*, have not parameters. Return array of [Notification Schedule objects](#markdown-header-notification-schedule)  
+Method *GET*, method name *getNotificationSchedules*,  
+1. pageIndex - number of page  
+2. pageSize - size of page  
+Return array of [Notification Schedule objects](#markdown-header-notification-schedule)  
 [(example)](#markdown-header-get-notification-schedules-example)
 
 ### Save Location ###
@@ -126,7 +132,10 @@ Method *POST*, method name *saveLocationProfile*, request body contains JSON ser
 [(example)](#markdown-header-save-location-example)
 
 ### Get Locations ###
-Method *GET*, method name *getLocationProfiles*, have not parameters. Returns array of [Location Profile Objects](#markdown-header-location-profile)  
+Method *GET*, method name *getLocationProfiles*,  
+1. pageIndex - number of page  
+2. pageSize - size of page  
+Returns array of [Location Profile Objects](#markdown-header-location-profile)  
 [(example)](#markdown-header-get-location-profiles-example)
 
 ### Save Shipment template ###
@@ -134,7 +143,10 @@ Method *POST*, method name *saveShipmentTemplate*, request body contains JSON se
 [(example)](#markdown-header-save-shipment-template-example)
 
 ### Get Shipment templates ###
-Method *GET*, method name *getShipmentTemplates*, have not parameters. Returns array of [Shipment Template Objects](#markdown-header-shipment-template)  
+Method *GET*, method name *getShipmentTemplates*,  
+1. pageIndex - number of page  
+2. pageSize - size of page  
+Returns array of [Shipment Template Objects](#markdown-header-shipment-template)  
 [(example)](#markdown-header-get-shipment-templates-example)
 
 ### Save Device ###
@@ -142,7 +154,10 @@ Method *POST*, method name *saveDevice*, request body contains JSON serialized [
 [(example)](#markdown-header-save-device-example)
 
 ### Get Devices ###
-Method *GET*, method name *getDevices*, have not parameters. Returns array of [Device Objects](#markdown-header-device).  
+Method *GET*, method name *getDevices*,  
+1. pageIndex - number of page  
+2. pageSize - size of page  
+Returns array of [Device Objects](#markdown-header-device).  
 [(example)](#markdown-header-get-devices-example)
 
 ### Save Shipment ###
@@ -150,11 +165,16 @@ Method *POST*, method name saveShipment, request body contains JSON serialized [
 [(example)](#markdown-header-save-shipment-example)
 
 ### Get Shipments ###
-Method *GET*, method name getShipments, have not parameters. Returns array of [Shipment Objects](#markdown-header-shipment).  
+Method *GET*, method name getShipments,  
+1. pageIndex - number of page  
+2. pageSize - size of page  
+Returns array of [Shipment Objects](#markdown-header-shipment).  
 [(example)](#markdown-header-get-shipments-example)
 
 ### Get Notifications ###
-Method *GET*, method name getNotifications, method parameters, have not parameters.
+Method *GET*, method name getNotifications,  
+1. pageIndex - number of page  
+2. pageSize - size of page  
 Returns array of [Notification Objects](#markdown-header-notification)  
 [(example)](#markdown-header-get-notifications-example)
 

@@ -13,7 +13,7 @@ import com.visfresh.entities.EntityWithId;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface DaoBase<T extends EntityWithId<ID>, ID extends Serializable> {
+public interface DaoBase<T extends EntityWithId<ID>, ID extends Serializable & Comparable<ID>> {
     public abstract <S extends T> S save(final S entity);
     public <S extends T> Collection<S> save(final Collection<S> entities);
     public T findOne(final ID id);

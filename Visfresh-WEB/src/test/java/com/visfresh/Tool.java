@@ -77,7 +77,7 @@ public class Tool {
         }
 
         Company c = null;
-        final List<Company> companies = service.getCompanies();
+        final List<Company> companies = service.getCompanies(1, 10000);
         for (final Company company : companies) {
             if (company.getName().equals(COMPANY_NAME)) {
                 c = company;

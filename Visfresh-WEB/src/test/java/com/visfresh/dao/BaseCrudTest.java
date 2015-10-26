@@ -21,7 +21,8 @@ import com.visfresh.entities.EntityWithId;
  *
  */
 @RunWith(DaoTestRunner.class)
-public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWithId<ID>, ID extends Serializable> {
+public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWithId<ID>,
+        ID extends Serializable & Comparable<ID>> {
     /**
      * Spring context.
      */

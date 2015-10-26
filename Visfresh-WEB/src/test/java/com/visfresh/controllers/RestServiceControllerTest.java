@@ -215,9 +215,12 @@ public class RestServiceControllerTest {
     public void testGetAlertProfiles() throws RestServiceException, IOException {
         final AlertProfile p = createAlertProfile();
         facade.saveAlertProfile(p);
+        facade.saveAlertProfile(p);
 
-        final List<AlertProfile> alertProfiles = facade.getAlertProfiles();
-        assertEquals(1, alertProfiles.size());
+        assertEquals(2, facade.getAlertProfiles(1, 10000).size());
+        assertEquals(1, facade.getAlertProfiles(1, 1).size());
+        assertEquals(1, facade.getAlertProfiles(2, 1).size());
+        assertEquals(0, facade.getAlertProfiles(3, 1).size());
     }
     //@RequestMapping(value = "/saveLocationProfile/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveLocationProfile(@PathVariable final String authToken,
@@ -232,11 +235,13 @@ public class RestServiceControllerTest {
     //public @ResponseBody String getLocationProfiles(@PathVariable final String authToken) {
     @Test
     public void testGetLocationProfiles() throws RestServiceException, IOException {
-        final LocationProfile l = createLocationProfile();
-        facade.saveLocationProfile(l);
+        facade.saveLocationProfile(createLocationProfile());
+        facade.saveLocationProfile(createLocationProfile());
 
-        final List<LocationProfile> locationProfiles = facade.getLocationProfiles();
-        assertEquals(1, locationProfiles.size());
+        assertEquals(2, facade.getLocationProfiles(1, 10000).size());
+        assertEquals(1, facade.getLocationProfiles(1, 1).size());
+        assertEquals(1, facade.getLocationProfiles(2, 1).size());
+        assertEquals(0, facade.getLocationProfiles(3, 10000).size());
     }
     //@RequestMapping(value = "/saveNotificationSchedule/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveNotificationSchedule(@PathVariable final String authToken,
@@ -252,11 +257,13 @@ public class RestServiceControllerTest {
     //public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken) {
     @Test
     public void testGetNotificationSchedules() throws RestServiceException, IOException {
-        final NotificationSchedule s = createNotificationSchedule();
-        facade.saveNotificationSchedule(s);
+        facade.saveNotificationSchedule(createNotificationSchedule());
+        facade.saveNotificationSchedule(createNotificationSchedule());
 
-        final List<NotificationSchedule> notificationSchedules = facade.getNotificationSchedules();
-        assertEquals(1, notificationSchedules.size());
+        assertEquals(2, facade.getNotificationSchedules(1, 10000).size());
+        assertEquals(1, facade.getNotificationSchedules(1, 1).size());
+        assertEquals(1, facade.getNotificationSchedules(2, 1).size());
+        assertEquals(0, facade.getNotificationSchedules(3, 10000).size());
     }
     //@RequestMapping(value = "/saveShipmentTemplate/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveShipmentTemplate(@PathVariable final String authToken,
@@ -303,9 +310,12 @@ public class RestServiceControllerTest {
         t.getShippedTo().setId(id);
 
         facade.saveShipmentTemplate(t);
+        facade.saveShipmentTemplate(t);
 
-        final List<ShipmentTemplate> shipmentTemplates = facade.getShipmentTemplates();
-        assertEquals(1, shipmentTemplates.size());
+        assertEquals(2, facade.getShipmentTemplates(1, 10000).size());
+        assertEquals(1, facade.getShipmentTemplates(1, 1).size());
+        assertEquals(1, facade.getShipmentTemplates(2, 1).size());
+        assertEquals(0, facade.getShipmentTemplates(3, 10000).size());
     }
     //@RequestMapping(value = "/saveDevice/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveDevice(@PathVariable final String authToken,
@@ -319,11 +329,13 @@ public class RestServiceControllerTest {
     //public @ResponseBody String getDevices(@PathVariable final String authToken) {
     @Test
     public void testGetDevices() throws RestServiceException, IOException {
-        final Device d = createDevice("1209898347987");
-        facade.saveDevice(d);
+        facade.saveDevice(createDevice("1209898347987"));
+        facade.saveDevice(createDevice("1209898347988"));
 
-        final List<Device> devices = facade.getDevices();
-        assertEquals(1, devices.size());
+        assertEquals(2, facade.getDevices(1, 10000).size());
+        assertEquals(1, facade.getDevices(1, 1).size());
+        assertEquals(1, facade.getDevices(2, 1).size());
+        assertEquals(0, facade.getDevices(3, 10000).size());
     }
     //@RequestMapping(value = "/saveShipment/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveShipment(@PathVariable final String authToken,
@@ -355,9 +367,12 @@ public class RestServiceControllerTest {
     @Test
     public void testGetShipments() throws RestServiceException, IOException {
         saveShipment();
+        saveShipment();
 
-        final List<Shipment> shipments = facade.getShipments();
-        assertEquals(1, shipments.size());
+        assertEquals(2, facade.getShipments(1, 10000).size());
+        assertEquals(1, facade.getShipments(1, 1).size());
+        assertEquals(1, facade.getShipments(2, 1).size());
+        assertEquals(0, facade.getShipments(3, 10000).size());
     }
     //@RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getNotifications(@PathVariable final String authToken,
@@ -427,8 +442,10 @@ public class RestServiceControllerTest {
         nofications.add(n);
 
         //get notifications
-        final List<Notification> notifications = facade.getNotifications();
-        assertEquals(3, notifications.size());
+        assertEquals(3, facade.getNotifications(1, 10000).size());
+        assertEquals(1, facade.getNotifications(1, 1).size());
+        assertEquals(1, facade.getNotifications(2, 1).size());
+        assertEquals(0, facade.getNotifications(3, 10000).size());
     }
     //@RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String markNotificationsAsRead(@PathVariable final String authToken,
@@ -503,7 +520,7 @@ public class RestServiceControllerTest {
 
         facade.markNotificationsAsRead(toReaden);
 
-        assertEquals(1, facade.getNotifications().size());
+        assertEquals(1, facade.getNotifications(1, 10000).size());
 
     }
     //@RequestMapping(value = "/getShipmentData/{authToken}", method = RequestMethod.GET)
@@ -754,8 +771,10 @@ public class RestServiceControllerTest {
         c.setName("JUnit-C-2");
         service.companies.put(c.getId(), c);
 
-        final List<Company> companies = facade.getCompanies();
-        assertEquals(2, companies.size());
+        assertEquals(2, facade.getCompanies(1, 10000).size());
+        assertEquals(1, facade.getCompanies(1, 1).size());
+        assertEquals(1, facade.getCompanies(2, 1).size());
+        assertEquals(0, facade.getCompanies(3, 10000).size());
     }
     /**
      * @return tracker event.
