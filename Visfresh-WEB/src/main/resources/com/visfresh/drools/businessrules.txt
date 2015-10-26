@@ -1,0 +1,23 @@
+11:09:05] James Richardson: need some flexibility - for diff customers - diff parameters
+[11:09:54] James Richardson: 2 use cases
+[11:10:27] James Richardson: Case 1. single journey from A to B
+[11:10:36] James Richardson: no shipment data entered so acting as a default shipment
+[11:11:04] James Richardson: devices has not moved for say 2hrs
+[11:12:47] James Richardson: data type =  "STP"  means the device is stable (maybe stopped),
+[11:15:44] James Richardson: if within, say, 3kms of a specified End Location - ==> shutdown
+[11:16:34] James Richardson: if not within 3kms of End Location - (driver might be parked overnight)
+[11:17:05] James Richardson: or customer has not set up End Location
+[11:20:32] James Richardson: so we wait X more hours - if still no movement ==> shutdown
+[11:20:58] James Richardson: we could get clever and detect door openings via light sensor
+[11:21:44] James Richardson: if door has been opened since leaving start Point - and no movement for X hrs ==> shutdown
+[11:24:12] James Richardson: Case 2 - multiple stop journey
+[11:25:04] James Richardson: say a van delivering seafood to multiple restaurants
+[11:25:40] James Richardson: no shipment data entered
+[11:26:04] James Richardson: device stops for 20mins at each stop
+[11:26:33] James Richardson: at last stop, the driver might collect the device
+[11:27:28] James Richardson: if he does, and the device sits in his pocket, not switched off, then alerts likely to fire
+[11:30:22] James Richardson: and device would still be moving - as truck drives back to base
+[11:30:51] James Richardson: Сообщение удалено.
+[11:33:08] James Richardson: this is OK - the driver is responsible for switching off device
+[11:33:51] James Richardson: if the device stays at the last stop, after X hrs of no movement ==> shuttdown
+[11:35:08] James Richardson: or device is at a specified End Location - and no movement for Yhrs ==> shutdown

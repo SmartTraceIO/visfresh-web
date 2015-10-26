@@ -3,7 +3,6 @@
  */
 package com.visfresh.mock;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.TrackerEvent;
@@ -18,7 +17,6 @@ public class MockRuleEngine implements RuleEngine {
     /**
      * @param env
      */
-    @Autowired
     public MockRuleEngine() {
         super();
     }
