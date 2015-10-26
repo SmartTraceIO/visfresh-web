@@ -110,7 +110,7 @@ Method *POST*, method name *saveAlertProfile*, request body contains JSON serial
 [(example)](#markdown-header-save-alert-profile-example)
 
 ### Get Alert Profiles ###
-Method *GET*, method name *getAlertProfiles*,  
+Method *GET*, method name *getAlertProfiles*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
 Returns an array of [Alert Profile objects](#markdown-header-alert-profile).  
@@ -121,7 +121,7 @@ Method *POST*, method name *saveNotificationSchedule*, request body contains JSO
 [(example)](#markdown-header-save-notification-schedule-example)]
 
 ### Get notification schedules ###
-Method *GET*, method name *getNotificationSchedules*,  
+Method *GET*, method name *getNotificationSchedules*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
 Return array of [Notification Schedule objects](#markdown-header-notification-schedule)  
@@ -132,7 +132,7 @@ Method *POST*, method name *saveLocationProfile*, request body contains JSON ser
 [(example)](#markdown-header-save-location-example)
 
 ### Get Locations ###
-Method *GET*, method name *getLocationProfiles*,  
+Method *GET*, method name *getLocationProfiles*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
 Returns array of [Location Profile Objects](#markdown-header-location-profile)  
@@ -143,7 +143,7 @@ Method *POST*, method name *saveShipmentTemplate*, request body contains JSON se
 [(example)](#markdown-header-save-shipment-template-example)
 
 ### Get Shipment templates ###
-Method *GET*, method name *getShipmentTemplates*,  
+Method *GET*, method name *getShipmentTemplates*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
 Returns array of [Shipment Template Objects](#markdown-header-shipment-template)  
@@ -154,7 +154,7 @@ Method *POST*, method name *saveDevice*, request body contains JSON serialized [
 [(example)](#markdown-header-save-device-example)
 
 ### Get Devices ###
-Method *GET*, method name *getDevices*,  
+Method *GET*, method name *getDevices*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
 Returns array of [Device Objects](#markdown-header-device).  
@@ -165,14 +165,14 @@ Method *POST*, method name saveShipment, request body contains JSON serialized [
 [(example)](#markdown-header-save-shipment-example)
 
 ### Get Shipments ###
-Method *GET*, method name getShipments,  
+Method *GET*, method name getShipments, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
 Returns array of [Shipment Objects](#markdown-header-shipment).  
 [(example)](#markdown-header-get-shipments-example)
 
 ### Get Notifications ###
-Method *GET*, method name getNotifications,  
+Method *GET*, method name getNotifications, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
 Returns array of [Notification Objects](#markdown-header-notification)  
