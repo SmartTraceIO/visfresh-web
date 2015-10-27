@@ -687,7 +687,12 @@ public class JSonSerializer {
 
         return json;
     }
-    public ShipmentData parseShipmentData(final JsonObject json) {
+    public ShipmentData parseShipmentData(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
         final ShipmentData s = new ShipmentData();
         s.setShipment(resolveShipment(asLong(json.get("shipment"))));
 

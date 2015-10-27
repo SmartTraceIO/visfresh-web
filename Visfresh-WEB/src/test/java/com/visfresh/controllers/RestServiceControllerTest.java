@@ -535,11 +535,9 @@ public class RestServiceControllerTest {
         final Device d = service.devices.get(s.getDevices().get(0).getId());
 
         //add tracker event.
-        final TrackerEvent te = createEvent("AUT");
-        te.setId(service.ids.incrementAndGet());
-
         final List<TrackerEvent> tes = new LinkedList<TrackerEvent>();
-        tes.add(te);
+        tes.add(createEvent("AUT"));
+        tes.add(createEvent("AUT"));
         service.trackerEvents.put(d.getId(), tes);
 
         //add alert
@@ -548,17 +546,42 @@ public class RestServiceControllerTest {
         a.setId(service.ids.incrementAndGet());
         service.alerts.put(a.getId(), a);
 
-        final List<ShipmentData> data = facade.getShipmentData(new Date(System.currentTimeMillis() - 100000000L),
-                new Date(System.currentTimeMillis() + 10000000l), false);
-        assertEquals(1, data.size());
+        final TemperatureAlert ta = createTemperatureAlert(s, d, AlertType.HighTemperature);
+        service.alerts.put(ta.getId(), ta);
 
-        final ShipmentData sd = data.get(0);
+        final Date fromTime = new Date(System.currentTimeMillis() - 100000000L);
+        final Date toTime = new Date(System.currentTimeMillis() + 10000000l);
+        final ShipmentData sd = facade.getShipmentData(fromTime, toTime, s);
+        assertNotNull(sd);
+
         assertEquals(1, sd.getDeviceData().size());
 
         final DeviceData deviceData = sd.getDeviceData().get(0);
-        assertEquals(1, deviceData.getAlerts().size());
-        assertEquals(1, deviceData.getEvents().size());
+        assertEquals(2, deviceData.getAlerts().size());
+        assertEquals(2, deviceData.getEvents().size());
     }
+    /**
+     * @param s
+     * @param d
+     * @param hightemperature
+     * @return
+     */
+    private TemperatureAlert createTemperatureAlert(final Shipment s, final Device d,
+            final AlertType hightemperature) {
+        final TemperatureAlert alert = new TemperatureAlert();
+        alert.setDate(new Date());
+        alert.setId(service.ids.incrementAndGet());
+        alert.setDescription("Temp Alert");
+        alert.setType(AlertType.HighTemperature);
+        alert.setTemperature(5);
+        alert.setMinutes(55);
+        alert.setName("TempAlert-1");
+        alert.setDevice(d);
+        alert.setShipment(s);
+        alert.setId(service.ids.incrementAndGet());
+        return alert;
+    }
+
     @Test
     public void testSendCommandToDevice() throws RestServiceException, IOException {
         final Device device = createDevice("089723409857032498");
@@ -785,6 +808,9 @@ public class RestServiceControllerTest {
         e.setTemperature(56);
         e.setTime(new Date());
         e.setType(type);
+        e.setLatitude(50.50);
+        e.setLongitude(51.51);
+        e.setId(service.ids.incrementAndGet());
         return e;
     }
     /**

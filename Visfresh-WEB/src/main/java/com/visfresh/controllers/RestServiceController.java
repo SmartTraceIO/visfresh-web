@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.DeviceData;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
@@ -672,7 +674,7 @@ public class RestServiceController {
     public @ResponseBody String getShipmentData(@PathVariable final String authToken,
             @RequestParam final String fromDate,
             @RequestParam final String toDate,
-            @RequestParam final boolean onlyWithAlerts) {
+            @RequestParam final Long shipment) {
 
         try {
             //check logged in.
@@ -685,14 +687,21 @@ public class RestServiceController {
             final Date endDate = parseDate(toDate);
 
             final List<ShipmentData> data = restService.getShipmentData(
-                    user.getCompany(), startDate, endDate, onlyWithAlerts);
+                    user.getCompany(), startDate, endDate, false);
 
-            final JsonArray array = new JsonArray();
-            for (final ShipmentData d : data) {
-                array.add(ser.toJson(d));
+            //TODO implement filtering on service level
+            final Iterator<ShipmentData> iter = data.iterator();
+            while (iter.hasNext()) {
+                final ShipmentData sd = iter.next();
+                final Shipment s = sd.getShipment();
+
+                //check shipment ID.
+                if (shipment != null && !s.getId().equals(shipment)) {
+                    iter.remove();
+                }
             }
 
-            return createSuccessResponse(array);
+            return createSuccessResponse(data.size() == 0 ? null : ser.toJson(data.get(0)));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
@@ -929,5 +938,58 @@ public class RestServiceController {
      */
     private Date parseDate(final String dateStr) {
         return dateStr == null || dateStr.length() == 0 ? null : JSonSerializer.parseDate(dateStr);
+    }
+
+    /**
+     * @param data
+     * @param shipment
+     * @param device
+     * @param shipmentDescription
+     * @param onlyWithAlerts
+     */
+    protected void filterDeviceData(final List<ShipmentData> data,
+            final Long shipment, final String device,
+            final String shipmentDescription, final boolean onlyWithAlerts) {
+        final Iterator<ShipmentData> iter = data.iterator();
+        while (iter.hasNext()) {
+            final ShipmentData sd = iter.next();
+            final Shipment s = sd.getShipment();
+            boolean shouldRemoveShipment = false;
+
+            //check shipment ID.
+            if (shipment != null && !s.getId().equals(shipment)) {
+                shouldRemoveShipment = true;
+            }
+            //check shipment description
+            if (!shouldRemoveShipment && shipmentDescription != null
+                    && (s.getShipmentDescription() == null
+                    || s.getShipmentDescription().indexOf(shipmentDescription)< 0)) {
+                shouldRemoveShipment = true;
+            }
+
+            if (shouldRemoveShipment) {
+                iter.remove();
+            } else {
+                //filter device data
+                final Iterator<DeviceData> deviter = sd.getDeviceData().iterator();
+                while (deviter.hasNext()) {
+                    final DeviceData dd = deviter.next();
+
+                    boolean shouldRemoveDevice = false;
+                    //check device
+                    if (device != null && !dd.getDevice().getId().equals(device)) {
+                        shouldRemoveDevice = true;
+                    }
+                    //check has alerts
+                    if (!shouldRemoveDevice && onlyWithAlerts && dd.getAlerts().size() == 0) {
+                        shouldRemoveDevice = true;
+                    }
+
+                    if (shouldRemoveDevice) {
+                        deviter.remove();
+                    }
+                }
+            }
+        }
     }
 }

@@ -350,26 +350,20 @@ public class RestServiceFacade  {
     /**
      * @param from
      * @param to
-     * @param onlyWithAlerts
+     * @param shipment
      * @return
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<ShipmentData> getShipmentData(final Date from, final Date to, final boolean onlyWithAlerts)
+    public ShipmentData getShipmentData(final Date from, final Date to, final Shipment shipment)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("fromDate", JSonSerializer.formatDate(from));
         params.put("toDate", JSonSerializer.formatDate(to));
-        params.put("onlyWithAlerts", Boolean.toString(onlyWithAlerts));
+        params.put("shipment", shipment.getId().toString());
 
-        final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getShipmentData"),
-                params).getAsJsonArray();
-        final List<ShipmentData> result = new LinkedList<ShipmentData>();
-        for (final JsonElement e : response) {
-            result.add(serializer.parseShipmentData(e.getAsJsonObject()));
-        }
-
-        return result;
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getShipmentData"), params);
+        return serializer.parseShipmentData(response);
     }
 
     /**
