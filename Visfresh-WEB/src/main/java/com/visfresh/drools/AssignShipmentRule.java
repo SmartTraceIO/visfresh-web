@@ -65,6 +65,7 @@ public class AssignShipmentRule implements TrackerEventRule {
             final Shipment s = new Shipment();
             s.setName("Default Shipment");
             s.setCompany(device.getCompany());
+            s.setDevice(device);
             shipment = shipmentDao.save(s);
         }
 

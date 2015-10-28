@@ -24,7 +24,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.io.JSonSerializer;
+import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.mpl.services.SystemMessageDispatcher;
 import com.visfresh.services.RetryableException;
@@ -44,7 +44,7 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
     @Autowired
     private TrackerEventDao eventDao;
     @Autowired
-    private JSonSerializer jsonSerializer;
+    private EntityJSonSerializer jsonSerializer;
     @Autowired
     private TrackerEventDao trackerEventDao;
     @Autowired
@@ -81,7 +81,7 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
      */
     @Override
     public void handle(final SystemMessage msg) throws RetryableException {
-        final JsonElement e = JSonSerializer.parseJson(msg.getMessageInfo());
+        final JsonElement e = EntityJSonSerializer.parseJson(msg.getMessageInfo());
         log.debug("Native DCS event has received " + e);
 
         final DeviceDcsNativeEvent event = jsonSerializer.parseDeviceDcsNativeEvent(e.getAsJsonObject());

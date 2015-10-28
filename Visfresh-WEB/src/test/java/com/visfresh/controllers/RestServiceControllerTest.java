@@ -32,13 +32,13 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.FrameworkServlet;
 
+import com.google.gson.JsonElement;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
-import com.visfresh.entities.DeviceData;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
@@ -46,7 +46,6 @@ import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
@@ -355,9 +354,7 @@ public class RestServiceControllerTest {
         s.getShippedFrom().setId(id);
         id = facade.saveLocationProfile(s.getShippedTo());
         s.getShippedTo().setId(id);
-        for (final Device d : s.getDevices()) {
-            facade.saveDevice(d);
-        }
+        facade.saveDevice(s.getDevice());
 
         id = facade.saveShipment(s, "NewTemplate.tpl", true);
         assertNotNull(id);
@@ -381,7 +378,7 @@ public class RestServiceControllerTest {
     public void testGetNotifications() throws IOException, RestServiceException {
         final Shipment s = saveShipment();
         //get server device
-        final Device d = service.devices.get(s.getDevices().get(0).getId());
+        final Device d = service.devices.get(s.getDevice().getId());
 
         //create temperature alert notification
         final TemperatureAlert tempAlert = new TemperatureAlert();
@@ -454,7 +451,7 @@ public class RestServiceControllerTest {
     public void testMarkNotificationsAsRead() throws IOException, RestServiceException {
         final Shipment s = saveShipment();
         //get server device
-        final Device d = service.devices.get(s.getDevices().get(0).getId());
+        final Device d = service.devices.get(s.getDevice().getId());
 
         //create temperature alert notification
         final TemperatureAlert tempAlert = new TemperatureAlert();
@@ -529,19 +526,19 @@ public class RestServiceControllerTest {
     //        @RequestParam final String toDate,
     //        @RequestParam final String onlyWithAlerts
     @Test
-    public void testGetShipmentData() throws RestServiceException, IOException {
+    public void testGetSingleShipment() throws RestServiceException, IOException {
         final Shipment s = saveShipment();
         //get server device
-        final Device d = service.devices.get(s.getDevices().get(0).getId());
+        final Device d = service.devices.get(s.getDevice().getId());
 
         //add tracker event.
         final List<TrackerEvent> tes = new LinkedList<TrackerEvent>();
-        tes.add(createEvent("AUT"));
-        tes.add(createEvent("AUT"));
+        tes.add(createEvent(s, "AUT", d));
+        tes.add(createEvent(s, "AUT", d));
         service.trackerEvents.put(d.getId(), tes);
 
         //add alert
-        final Alert a = createAlert(d, AlertType.BatteryLow);
+        final Alert a = createAlert(s, d, AlertType.BatteryLow);
         a.setShipment(s);
         a.setId(service.ids.incrementAndGet());
         service.alerts.put(a.getId(), a);
@@ -549,16 +546,13 @@ public class RestServiceControllerTest {
         final TemperatureAlert ta = createTemperatureAlert(s, d, AlertType.HighTemperature);
         service.alerts.put(ta.getId(), ta);
 
+        final Arrival arrival = createArrival(s, d);
+        service.arrivals.put(arrival.getId(), arrival);
+
         final Date fromTime = new Date(System.currentTimeMillis() - 100000000L);
         final Date toTime = new Date(System.currentTimeMillis() + 10000000l);
-        final ShipmentData sd = facade.getShipmentData(fromTime, toTime, s);
+        final JsonElement sd = facade.getSingleShipment(s, fromTime, toTime);
         assertNotNull(sd);
-
-        assertEquals(1, sd.getDeviceData().size());
-
-        final DeviceData deviceData = sd.getDeviceData().get(0);
-        assertEquals(2, deviceData.getAlerts().size());
-        assertEquals(2, deviceData.getEvents().size());
     }
     /**
      * @param s
@@ -666,10 +660,7 @@ public class RestServiceControllerTest {
         ns.setId(92l);
         service.notificationSchedules.put(ns.getId(), ns);
 
-        for (final Device d : sp.getDevices()) {
-            service.devices.put(d.getId(), d);
-        }
-
+        service.devices.put(sp.getDevice().getId(), sp.getDevice());
         service.shipments.put(sp.getId(), sp);
 
         assertNotNull(facade.getShipment(sp.getId()));
@@ -709,10 +700,7 @@ public class RestServiceControllerTest {
         ns.setId(92l);
         service.notificationSchedules.put(ns.getId(), ns);
 
-        for (final Device d : sp.getDevices()) {
-            service.devices.put(d.getId(), d);
-        }
-
+        service.devices.put(sp.getDevice().getId(), sp.getDevice());
         service.shipments.put(sp.getId(), sp);
 
         //add profile to service
@@ -800,10 +788,14 @@ public class RestServiceControllerTest {
         assertEquals(0, facade.getCompanies(3, 10000).size());
     }
     /**
+     * @param shipment shipment.
+     * @param device device.
      * @return tracker event.
      */
-    private TrackerEvent createEvent(final String type) {
+    private TrackerEvent createEvent(final Shipment shipment, final String type, final Device device) {
         final TrackerEvent e = new TrackerEvent();
+        e.setShipment(shipment);
+        e.setDevice(device);
         e.setBattery(1234);
         e.setTemperature(56);
         e.setTime(new Date());
@@ -814,10 +806,28 @@ public class RestServiceControllerTest {
         return e;
     }
     /**
+     * @param s shipment.
+     * @param d device.
+     * @return
+     */
+    private Arrival createArrival(final Shipment s, final Device d) {
+        final Arrival arrival = new Arrival();
+        arrival.setDevice(d);
+        arrival.setShipment(s);
+        arrival.setNumberOfMettersOfArrival(400);
+        arrival.setDate(new Date(System.currentTimeMillis() - 50000));
+        arrival.setId(service.ids.incrementAndGet());
+        return arrival;
+    }
+    /**
+     * @param s shipment
+     * @param device device
+     * @param type alert type.
      * @return alert.
      */
-    private Alert createAlert(final Device device, final AlertType type) {
+    private Alert createAlert(final Shipment s, final Device device, final AlertType type) {
         final Alert alert = new Alert();
+        alert.setShipment(s);
         alert.setDate(new Date(System.currentTimeMillis() - 100000000l));
         alert.setDescription("Alert description");
         alert.setName("Alert-" + type);
@@ -900,13 +910,14 @@ public class RestServiceControllerTest {
         s.setShippedFrom(createLocationProfile());
         s.setShippedTo(createLocationProfile());
         s.setShutdownDeviceTimeOut(155);
-        s.getDevices().add(createDevice("234908720394857"));
-        s.getDevices().add(createDevice("329847983724987"));
+        s.setDevice(createDevice("234908720394857"));
         s.setPalletId("palettid");
         s.setAssetNum("10515");
         s.setShipmentDate(new Date(System.currentTimeMillis() - 1000000000l));
-        s.setCustomFields("customFields");
+        s.getCustomFields().put("field1", "value1");
         s.setAssetType("SeaContainer");
+        s.setPoNum(893793487);
+        s.setTripCount(88);
         return s;
     }
     /**
@@ -966,10 +977,7 @@ public class RestServiceControllerTest {
         s.getShippedFrom().setId(id);
         id = facade.saveLocationProfile(s.getShippedTo());
         s.getShippedTo().setId(id);
-
-        for (final Device d : s.getDevices()) {
-            facade.saveDevice(d);
-        }
+        facade.saveDevice(s.getDevice());
 
         id = facade.saveShipment(s, "NewTemplate.tpl", true);
         s.setId(id);

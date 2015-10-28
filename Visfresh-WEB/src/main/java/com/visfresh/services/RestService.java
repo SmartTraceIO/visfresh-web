@@ -3,7 +3,6 @@
  */
 package com.visfresh.services;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -15,7 +14,6 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
@@ -47,10 +45,6 @@ public interface RestService {
 
     List<Notification> getNotifications(User user);
     void markNotificationsAsRead(User user, Set<Long> ids);
-
-    List<ShipmentData> getShipmentData(Company company, Date startDate,
-            Date endDate, boolean onlyWithAlerts);
-
     void sendCommandToDevice(DeviceCommand cmd);
 
     /**

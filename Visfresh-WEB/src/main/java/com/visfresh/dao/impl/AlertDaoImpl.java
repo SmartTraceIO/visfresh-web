@@ -18,6 +18,7 @@ import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 
 /**
@@ -194,6 +195,32 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
                 + (id == null ? "" : " and " + entityName + "." + ID_FIELD + " = :id"),
                 params);
         return list;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.AlertDao#getAlerts(com.visfresh.entities.Shipment, java.util.Date, java.util.Date)
+     */
+    @Override
+    public List<Alert> getAlerts(final Shipment shipment, final Date fromDate, final Date toDate) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("shipment", shipment.getId());
+        final Map<String, String> fields = createSelectAsMapping("a", "res");
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select "
+                + buildSelectAs(fields)
+                + " from "
+                + TABLE + " a"
+                + " where "
+                + "a." + SHIPMENT_FIELD + " =:shipment order by date, id",
+                params);
+        final List<Alert> alerts = new LinkedList<Alert>();
+        for (final Map<String,Object> row : list) {
+            final Alert a = createAlert(row, "res");
+            a.setShipment(shipment);
+            a.setDevice(shipment.getDevice());
+            alerts.add(a);
+        }
+        return alerts;
     }
 
     /**

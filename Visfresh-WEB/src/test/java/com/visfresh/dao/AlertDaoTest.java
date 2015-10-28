@@ -61,7 +61,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         final Shipment s = new Shipment();
         s.setName("Default profile");
         s.setCompany(sharedCompany);
-        s.getDevices().add(d);
+        s.setDevice(d);
         shipment = shipmentDao.save(s);
     }
     /* (non-Javadoc)

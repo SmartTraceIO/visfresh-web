@@ -4,8 +4,8 @@
 package com.visfresh.entities;
 
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -15,23 +15,33 @@ public class Shipment extends ShipmentBase {
     /**
      * List of associated devices.
      */
-    private final List<Device> devices = new LinkedList<Device>();
+    private Device device;
     /**
      * Pallet ID.
      */
     private String palletId;
     /**
-     * PO number (?)
+     * Asset number (?)
      */
     private String assetNum;
+    /**
+     * Trip count for given device.
+     */
+    private int tripCount;
+    /**
+     * PO number
+     */
+    private int poNum;
+
+    /**
+     * This field has reserver for future custom fields implementation.
+     */
+    private final Map<String, String> customFields = new HashMap<String, String>();
+
     /**
      * Shipment description date
      */
     private Date shipmentDate = new Date();
-    /**
-     * This field has reserver for future custom fields implementation.
-     */
-    private String customFields;
     /**
      * Shipment status.
      */
@@ -83,20 +93,20 @@ public class Shipment extends ShipmentBase {
     /**
      * @return the customFields
      */
-    public String getCustomFields() {
+    public Map<String, String> getCustomFields() {
         return customFields;
-    }
-    /**
-     * @param customFields the customFields to set
-     */
-    public void setCustomFields(final String customFields) {
-        this.customFields = customFields;
     }
     /**
      * @return the devices
      */
-    public List<Device> getDevices() {
-        return devices;
+    public Device getDevice() {
+        return device;
+    }
+    /**
+     * @param device the device to set
+     */
+    public void setDevice(final Device device) {
+        this.device = device;
     }
     /**
      * @return the status
@@ -109,5 +119,33 @@ public class Shipment extends ShipmentBase {
      */
     public void setStatus(final ShipmentStatus status) {
         this.status = status;
+    }
+
+    /**
+     * @return the tripCount
+     */
+    public int getTripCount() {
+        return tripCount;
+    }
+
+    /**
+     * @param tripCount the tripCount to set
+     */
+    public void setTripCount(final int tripCount) {
+        this.tripCount = tripCount;
+    }
+
+    /**
+     * @return the poNum
+     */
+    public int getPoNum() {
+        return poNum;
+    }
+
+    /**
+     * @param poNum the poNum to set
+     */
+    public void setPoNum(final int poNum) {
+        this.poNum = poNum;
     }
 }

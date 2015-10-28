@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Shipment;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -131,12 +132,23 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
      */
     private Arrival createArrival(final String resultPrefix, final String deviceResultPrefix,
             final String companyResultPrefix, final Map<String, Object> map) {
+        final Arrival a = createArrival(map, resultPrefix);
+        a.setDevice(DeviceDaoImpl.createDevice(deviceResultPrefix, companyResultPrefix, map));
+        a.setShipment(shipmentDao.findOne(((Number) map.get(resultPrefix + SHIPMENT_FIELD)).longValue()));
+        return a;
+    }
+
+    /**
+     * @param map
+     * @param resultPrefix
+     * @return
+     */
+    protected Arrival createArrival(final Map<String, Object> map,
+            final String resultPrefix) {
         final Arrival a = new Arrival();
         a.setId(((Number) map.get(resultPrefix + ID_FIELD)).longValue());
-        a.setDevice(DeviceDaoImpl.createDevice(deviceResultPrefix, companyResultPrefix, map));
         a.setDate((Date) map.get(resultPrefix + DATE_FIELD));
         a.setNumberOfMettersOfArrival(((Number) map.get(resultPrefix + NUMMETERS_FIELD)).intValue());
-        a.setShipment(shipmentDao.findOne(((Number) map.get(resultPrefix + SHIPMENT_FIELD)).longValue()));
         return a;
     }
     /**
@@ -220,7 +232,33 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
         }
         return result;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ArrivalDao#getArrivals(com.visfresh.entities.Shipment, java.util.Date, java.util.Date)
+     */
+    @Override
+    public List<Arrival> getArrivals(final Shipment shipment, final Date fromDate,
+            final Date toDate) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("shipment", shipment.getId());
+        final Map<String, String> fields = createSelectAsMapping("a", "res");
 
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select "
+                + buildSelectAs(fields)
+                + " from "
+                + TABLE + " a"
+                + " where "
+                + "a." + SHIPMENT_FIELD + " =:shipment order by date, id",
+                params);
+        final List<Arrival> alerts = new LinkedList<Arrival>();
+        for (final Map<String,Object> row : list) {
+            final Arrival a = createArrival(row, "res");
+            a.setShipment(shipment);
+            a.setDevice(shipment.getDevice());
+            alerts.add(a);
+        }
+        return alerts;
+    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
      */

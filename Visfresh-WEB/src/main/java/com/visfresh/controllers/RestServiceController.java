@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -36,23 +35,24 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
-import com.visfresh.entities.DeviceData;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CreateUserRequest;
-import com.visfresh.io.JSonSerializer;
+import com.visfresh.io.EntityJSonSerializer;
+import com.visfresh.io.ReportSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.io.SingleShipmentDto;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.AuthToken;
 import com.visfresh.services.AuthenticationException;
+import com.visfresh.services.ReportService;
 import com.visfresh.services.RestService;
 import com.visfresh.services.RestServiceException;
 
@@ -79,15 +79,24 @@ public class RestServiceController {
     @Autowired
     private RestService restService;
     /**
+     * Report service.
+     */
+    @Autowired
+    private ReportService reportService;
+    /**
      * JSON converter.
      */
     @Autowired
-    private JSonSerializer serializer;
+    private EntityJSonSerializer serializer;
     /**
      * Access controller.
      */
     @Autowired
     private AccessController security;
+    /**
+     * Report serializer.
+     */
+    private ReportSerializer reportSerializer = new ReportSerializer();
 
     /**
      * Default constructor.
@@ -224,7 +233,7 @@ public class RestServiceController {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetAlertProfiles(user);
-            final JSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer();
 
             final List<AlertProfile> alerts = getPage(
                     restService.getAlertProfiles(user.getCompany()), pageIndex, pageSize);
@@ -303,7 +312,7 @@ public class RestServiceController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetLocationProfiles(user);
 
-            final JSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer();
 
             final List<LocationProfile> locations = getPage(restService.getLocationProfiles(user.getCompany()),
                     pageIndex, pageSize);
@@ -376,7 +385,7 @@ public class RestServiceController {
             final List<NotificationSchedule> schedules = getPage(restService.getNotificationSchedules(
                     user.getCompany()), pageIndex, pageSize);
 
-            final JSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer();
             final JsonArray array = new JsonArray();
             for (final NotificationSchedule schedule : schedules) {
                 array.add(ser.toJson(schedule));
@@ -510,7 +519,7 @@ public class RestServiceController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetDevices(user);
 
-            final JSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer();
 
             final List<Device> devices = getPage(restService.getDevices(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
@@ -587,7 +596,7 @@ public class RestServiceController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipments(user);
 
-            final JSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer();
 
             final List<Shipment> shipments = getPage(restService.getShipments(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
@@ -633,7 +642,7 @@ public class RestServiceController {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            final JSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer();
 
             final List<Notification> shipments = getPage(restService.getNotifications(user), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
@@ -670,7 +679,7 @@ public class RestServiceController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/getShipmentData/{authToken}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getShipmentData(@PathVariable final String authToken,
             @RequestParam final String fromDate,
             @RequestParam final String toDate,
@@ -681,27 +690,11 @@ public class RestServiceController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipmentData(user);
 
-            final JSonSerializer ser = getSerializer();
-
             final Date startDate = parseDate(fromDate);
             final Date endDate = parseDate(toDate);
 
-            final List<ShipmentData> data = restService.getShipmentData(
-                    user.getCompany(), startDate, endDate, false);
-
-            //TODO implement filtering on service level
-            final Iterator<ShipmentData> iter = data.iterator();
-            while (iter.hasNext()) {
-                final ShipmentData sd = iter.next();
-                final Shipment s = sd.getShipment();
-
-                //check shipment ID.
-                if (shipment != null && !s.getId().equals(shipment)) {
-                    iter.remove();
-                }
-            }
-
-            return createSuccessResponse(data.size() == 0 ? null : ser.toJson(data.get(0)));
+            final SingleShipmentDto dto = reportService.getSingleShipment(startDate, endDate, shipment);
+            return createSuccessResponse(dto == null ? null : reportSerializer.toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
@@ -843,7 +836,7 @@ public class RestServiceController {
      * @return JSON response.
      */
     protected String createIdResponse(final Long id) {
-        return createSuccessResponse(JSonSerializer.idToJson(id));
+        return createSuccessResponse(EntityJSonSerializer.idToJson(id));
     }
     /**
      * @param response.
@@ -880,7 +873,7 @@ public class RestServiceController {
         } else if (e instanceof RestServiceException) {
             code = ((RestServiceException) e).getErrorCode();
         }
-        return JSonSerializer.createErrorStatus(code, e);
+        return EntityJSonSerializer.createErrorStatus(code, e);
     }
     /**
      * @param code status code.
@@ -909,7 +902,7 @@ public class RestServiceController {
     /**
      * @return
      */
-    private JSonSerializer getSerializer() {
+    private EntityJSonSerializer getSerializer() {
         return serializer;
     }
     /**
@@ -927,7 +920,7 @@ public class RestServiceController {
      */
     private JsonElement getJSon(final String text) throws RestServiceException {
         try {
-            return JSonSerializer.parseJson(text);
+            return EntityJSonSerializer.parseJson(text);
         } catch (final Exception e) {
             throw new RestServiceException(ErrorCodes.INVALID_JSON, "Invalid JSON format");
         }
@@ -937,59 +930,6 @@ public class RestServiceController {
      * @return date.
      */
     private Date parseDate(final String dateStr) {
-        return dateStr == null || dateStr.length() == 0 ? null : JSonSerializer.parseDate(dateStr);
-    }
-
-    /**
-     * @param data
-     * @param shipment
-     * @param device
-     * @param shipmentDescription
-     * @param onlyWithAlerts
-     */
-    protected void filterDeviceData(final List<ShipmentData> data,
-            final Long shipment, final String device,
-            final String shipmentDescription, final boolean onlyWithAlerts) {
-        final Iterator<ShipmentData> iter = data.iterator();
-        while (iter.hasNext()) {
-            final ShipmentData sd = iter.next();
-            final Shipment s = sd.getShipment();
-            boolean shouldRemoveShipment = false;
-
-            //check shipment ID.
-            if (shipment != null && !s.getId().equals(shipment)) {
-                shouldRemoveShipment = true;
-            }
-            //check shipment description
-            if (!shouldRemoveShipment && shipmentDescription != null
-                    && (s.getShipmentDescription() == null
-                    || s.getShipmentDescription().indexOf(shipmentDescription)< 0)) {
-                shouldRemoveShipment = true;
-            }
-
-            if (shouldRemoveShipment) {
-                iter.remove();
-            } else {
-                //filter device data
-                final Iterator<DeviceData> deviter = sd.getDeviceData().iterator();
-                while (deviter.hasNext()) {
-                    final DeviceData dd = deviter.next();
-
-                    boolean shouldRemoveDevice = false;
-                    //check device
-                    if (device != null && !dd.getDevice().getId().equals(device)) {
-                        shouldRemoveDevice = true;
-                    }
-                    //check has alerts
-                    if (!shouldRemoveDevice && onlyWithAlerts && dd.getAlerts().size() == 0) {
-                        shouldRemoveDevice = true;
-                    }
-
-                    if (shouldRemoveDevice) {
-                        deviter.remove();
-                    }
-                }
-            }
-        }
+        return dateStr == null || dateStr.length() == 0 ? null : EntityJSonSerializer.parseDate(dateStr);
     }
 }

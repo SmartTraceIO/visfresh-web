@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.impl.ShipmentDeviceInfo;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
@@ -115,9 +114,8 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
      */
     private org.opengts.db.tables.Device createDeviceIfNeed(final Account a, final Shipment shipment,
             final Device d) throws DBException {
-        final ShipmentDeviceInfo info = shipmentDao.getShipmentDeviceInfo(shipment, d);
         final int len = d.getId().length();
-        final String deviceId = d.getId().substring(len - 6, len) + "." + info.getTripCount();
+        final String deviceId = d.getId().substring(len - 6, len) + "." + shipment.getTripCount();
 
         org.opengts.db.tables.Device device = org.opengts.db.tables.Device.getDevice(a, deviceId);
         if (device == null) {
@@ -157,7 +155,7 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
                 }
             }
         } catch (final Exception e) {
-            log.error("Failed to initialize OpenGTS data base", e);
+//            log.error("Failed to initialize OpenGTS data base", e);
         }
     }
 }

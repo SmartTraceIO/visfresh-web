@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 
 /**
@@ -268,12 +269,65 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getEvents(com.visfresh.entities.Shipment, java.util.Date, java.util.Date)
+     */
+    @Override
+    public List<TrackerEvent> getEvents(final Shipment shipment, final Date fromDate,
+            final Date toDate) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("shipment", shipment.getId());
+        final Map<String, String> fields = createSelectAsMapping("e", "res");
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select "
+                + buildSelectAs(fields)
+                + " from "
+                + TABLE + " e"
+                + " where "
+                + "e." + SHIPMENT_FIELD + " =:shipment order by time, id",
+                params);
+        final List<TrackerEvent> events = new LinkedList<TrackerEvent>();
+        for (final Map<String,Object> row : list) {
+            final TrackerEvent e = createTrackerEvent(row, "res");
+            e.setShipment(shipment);
+            e.setDevice(shipment.getDevice());
+            events.add(e);
+        }
+        return events;
+    }
+
+    /* (non-Javadoc)
      * @see com.visfresh.dao.TrackerEventDao#getFirstHotOccurence(com.visfresh.entities.TrackerEvent, double)
      */
     @Override
     public Date getFirstHotOccurence(final TrackerEvent e, final double minimalTemperature) {
-        // TODO Auto-generated method stub
-        return null;
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("temperature", minimalTemperature);
+        params.put("shipment", e.getShipment().getId());
+
+        //find first previous normal temperature.
+        List<Map<String, Object>> rows = jdbc.queryForList(
+                "select id from " + TABLE + " where "
+                + SHIPMENT_FIELD + " =:shipment and temperature > :temperature order by id desc limit 1",
+                params);
+        if (rows.size() == 0) {
+            return null;
+        }
+
+        //select from first normal temperature
+        final long startId = ((Number) rows.get(0).get("id")).longValue();
+        params.put("startId", startId);
+        params.put("endId", e.getId());
+        rows = jdbc.queryForList(
+                "select time from " + TABLE + " where "
+                + SHIPMENT_FIELD + " =:shipment and id > :startId and id < :endId and temperature >= :temperature"
+                + " order by id limit 1",
+                params);
+        if (rows.size() == 0) {
+            return null;
+        }
+
+        return (Date) rows.get(0).get("time");
     }
 
     /* (non-Javadoc)
@@ -281,7 +335,32 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      */
     @Override
     public Date getFirstColdOccurence(final TrackerEvent e, final double maximalTemperature) {
-        // TODO Auto-generated method stub
-        return null;
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("temperature", maximalTemperature);
+        params.put("shipment", e.getShipment().getId());
+
+        //find first previous normal temperature.
+        List<Map<String, Object>> rows = jdbc.queryForList(
+                "select id from " + TABLE + " where "
+                + SHIPMENT_FIELD + " =:shipment and temperature < :temperature order by id desc limit 1",
+                params);
+        if (rows.size() == 0) {
+            return null;
+        }
+
+        //select from first normal temperature
+        final long startId = ((Number) rows.get(0).get("id")).longValue();
+        params.put("startId", startId);
+        params.put("endId", e.getId());
+        rows = jdbc.queryForList(
+                "select time from " + TABLE + " where "
+                + SHIPMENT_FIELD + " =:shipment and id > :startId and id < :endId and temperature <= :temperature"
+                + " order by id limit 1",
+                params);
+        if (rows.size() == 0) {
+            return null;
+        }
+
+        return (Date) rows.get(0).get("time");
     }
 }

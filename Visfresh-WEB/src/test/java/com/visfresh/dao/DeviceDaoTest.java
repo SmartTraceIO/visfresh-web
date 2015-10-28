@@ -45,6 +45,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         d.setSn("124");
         d.setCompany(sharedCompany);
         d.setDescription("Test device");
+        d.setTripCount(5);
         return d;
     }
     /* (non-Javadoc)
@@ -56,6 +57,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals("Test Device", d.getName());
         assertEquals("124", d.getSn());
         assertEquals("Test device", d.getDescription());
+        assertEquals(5, d.getTripCount());
 
         //test company
         final Company c = d.getCompany();
@@ -78,6 +80,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals("Test Device", d.getName());
         assertEquals("124", d.getSn());
         assertEquals("Test device", d.getDescription());
+        assertEquals(5, d.getTripCount());
 
         //test company
         final Company c = d.getCompany();

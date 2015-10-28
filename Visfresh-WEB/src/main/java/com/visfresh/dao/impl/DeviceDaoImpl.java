@@ -50,6 +50,10 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
      * Company name.
      */
     public static final String COMPANY_FIELD = "company";
+    /**
+     * Device trip count.
+     */
+    public static final String TRIPCOUNT_FIELD = "tripcount";
 
     @Autowired
     private CompanyDao companyDao;
@@ -65,12 +69,6 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
      */
     @Override
     public <S extends Device> S save(final S device) {
-        final String namePlaceHolder = "name";
-        final String descriptionPlaceHolder = "description";
-        final String imeiPlaceHolder = "imei";
-        final String snPlaceHolder = "sn";
-        final String companyPlaceHolder = "company";
-        final String idPlaceHolder = "id";
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;
@@ -84,34 +82,38 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
                     IMEI_FIELD,
                     SN_FIELD,
                     COMPANY_FIELD,
+                    TRIPCOUNT_FIELD,
                     DESCRIPTION_FIELD
                 ) + ")" + " values("
-                    + ":"+ namePlaceHolder
-                    + ", :" + idPlaceHolder
-                    + ", :" + imeiPlaceHolder
-                    + ", :" + snPlaceHolder
-                    + ", :" + companyPlaceHolder
-                    + ", :" + descriptionPlaceHolder
+                    + ":"+ NAME_FIELD
+                    + ", :" + ID_FIELD
+                    + ", :" + IMEI_FIELD
+                    + ", :" + SN_FIELD
+                    + ", :" + COMPANY_FIELD
+                    + ", :" + TRIPCOUNT_FIELD
+                    + ", :" + DESCRIPTION_FIELD
                     + ")";
         } else {
             //update
             sql = "update " + TABLE + " set "
-                + NAME_FIELD + "=:" + namePlaceHolder + ","
-                + ID_FIELD + "=:" + idPlaceHolder + ","
-                + IMEI_FIELD + "=:" + imeiPlaceHolder + ","
-                + SN_FIELD + "=:" + snPlaceHolder + ","
-                + COMPANY_FIELD + "=:" + companyPlaceHolder + ","
-                + DESCRIPTION_FIELD + "=:" + descriptionPlaceHolder
+                + NAME_FIELD + "=:" + NAME_FIELD + ","
+                + ID_FIELD + "=:" + ID_FIELD + ","
+                + IMEI_FIELD + "=:" + IMEI_FIELD + ","
+                + SN_FIELD + "=:" + SN_FIELD + ","
+                + COMPANY_FIELD + "=:" + COMPANY_FIELD + ","
+                + TRIPCOUNT_FIELD + "=:" + TRIPCOUNT_FIELD + ","
+                + DESCRIPTION_FIELD + "=:" + DESCRIPTION_FIELD
                 + " where id = :" + ID_FIELD
             ;
         }
 
-        paramMap.put(idPlaceHolder, device.getId());
-        paramMap.put(namePlaceHolder, device.getName());
-        paramMap.put(descriptionPlaceHolder, device.getDescription());
-        paramMap.put(imeiPlaceHolder, device.getImei());
-        paramMap.put(snPlaceHolder, device.getSn());
-        paramMap.put(companyPlaceHolder, device.getCompany().getId());
+        paramMap.put(ID_FIELD, device.getId());
+        paramMap.put(NAME_FIELD, device.getName());
+        paramMap.put(DESCRIPTION_FIELD, device.getDescription());
+        paramMap.put(IMEI_FIELD, device.getImei());
+        paramMap.put(SN_FIELD, device.getSn());
+        paramMap.put(COMPANY_FIELD, device.getCompany().getId());
+        paramMap.put(TRIPCOUNT_FIELD, device.getTripCount());
 
         jdbc.update(sql, paramMap);
 
@@ -194,6 +196,7 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
         d.setDescription((String) map.get(resultPrefix + DESCRIPTION_FIELD));
         d.setSn((String) map.get(resultPrefix + SN_FIELD));
         d.setImei((String) map.get(resultPrefix + IMEI_FIELD));
+        d.setTripCount(((Number) map.get(resultPrefix + TRIPCOUNT_FIELD)).intValue());
         return d;
     }
 
@@ -210,6 +213,7 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
         map.put(entityName + "." + DESCRIPTION_FIELD, resultPrefix + DESCRIPTION_FIELD);
         map.put(entityName + "." + IMEI_FIELD, resultPrefix + IMEI_FIELD);
         map.put(entityName + "." + SN_FIELD, resultPrefix + SN_FIELD);
+        map.put(entityName + "." + TRIPCOUNT_FIELD, resultPrefix + TRIPCOUNT_FIELD);
         return map ;
     }
 

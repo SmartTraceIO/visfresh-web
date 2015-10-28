@@ -1,7 +1,6 @@
 -- drops
 drop table if exists systemmessages;
 drop table if exists usershipments;
-drop table if exists shipmentdevices;
 drop table if exists arrivalnotifschedules;
 drop table if exists alertnotifschedules;
 drop table if exists trackerevents;
@@ -34,6 +33,7 @@ create table devices (
    name varchar(127) not null,
    sn varchar(20) default null,
    company bigint(20),
+   tripcount int not null default 0,
    primary key (id),
    FOREIGN KEY (company) REFERENCES companies(id)   
 );
@@ -163,11 +163,15 @@ create table shipments(
    usecurrenttime boolean not null default true,
 
    -- Shipment fields
-   palletid varchar(31) default null,
-   assetnum varchar(31) default null,
+   device varchar(20),
+   palletid varchar(31),
+   assetnum varchar(31),
    shipmentdate timestamp,
-   customfiels longtext default null,
-   `status` varchar(31) default null
+   customfiels longtext,
+   ponum int not null default 0,
+   tripcount int not null default 0,
+   `status` varchar(31) default null,
+   foreign key (device) references devices(id)
 );
 
 create table alerts (
@@ -229,17 +233,6 @@ create table arrivalnotifschedules(
       references shipments(id) ON DELETE CASCADE,
    foreign key (notification)
       references notificationschedules(id) ON DELETE CASCADE
-);
-
-create table shipmentdevices(
-   shipment bigint(20) not null,
-   device varchar(20) not null,
-   tripcount int not null,
-   primary key (shipment, device),
-   foreign key (shipment)
-      references shipments(id) ON DELETE CASCADE,
-   foreign key (device)
-      references devices(id) ON DELETE CASCADE
 );
 
 create table usershipments(

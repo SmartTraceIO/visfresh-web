@@ -33,6 +33,10 @@ public class Device implements EntityWithId<String> {
      * Company
      */
     private Company company;
+    /**
+     * Current device trip count.
+     */
+    private int tripCount;
 
     /**
      * Default constructor.
@@ -113,5 +117,17 @@ public class Device implements EntityWithId<String> {
      */
     public void setCompany(final Company company) {
         this.company = company;
+    }
+    /**
+     * @return the tripCount
+     */
+    public int getTripCount() {
+        return tripCount;
+    }
+    /**
+     * @param tripCount the tripCount to set
+     */
+    public void setTripCount(final int tripCount) {
+        this.tripCount = tripCount;
     }
 }

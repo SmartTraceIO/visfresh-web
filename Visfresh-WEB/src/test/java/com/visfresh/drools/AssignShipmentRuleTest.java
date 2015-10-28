@@ -109,8 +109,8 @@ public class AssignShipmentRuleTest {
         trackerEventDao.deleteAll();
         arrivalDao.deleteAll();
         alertDao.deleteAll();
-        deviceDao.deleteAll();
         shipmentDao.deleteAll();
+        deviceDao.deleteAll();
         companyDao.deleteAll();
     }
     @BeforeClass

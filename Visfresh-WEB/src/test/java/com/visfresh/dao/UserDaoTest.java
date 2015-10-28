@@ -136,12 +136,12 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
 
     private Shipment createShipment() {
         final Shipment s = new Shipment();
-        s.getDevices().add(createDevice("234908042398"));
+        s.setDevice(createDevice("234908042398"));
         s.setAlertProfile(createAlertProfile());
         s.setAlertSuppressionDuringCoolDown(5);
         s.setArrivalNotificationWithIn(17);
         s.setCompany(sharedCompany);
-        s.setCustomFields("Custom fields");
+        s.getCustomFields().put("field1", "Custom fields");
         s.setExcludeNotificationsIfNoAlertsFired(true);
         s.setName("Shipment-1");
         s.setPalletId("PalletID");

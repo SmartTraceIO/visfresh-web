@@ -34,12 +34,11 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CreateUserRequest;
-import com.visfresh.io.JSonSerializer;
+import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -52,7 +51,7 @@ import com.visfresh.services.RestServiceException;
 public class RestServiceFacade  {
     private static final String REST_SERVICE = "/rest";
 
-    private JSonSerializer serializer = new JSonSerializer();
+    private EntityJSonSerializer serializer = new EntityJSonSerializer();
     private Gson gson;
     private URL serviceUrl;
     private String authToken;
@@ -346,24 +345,14 @@ public class RestServiceFacade  {
                 params);
         return serializer.parseUser(response);
     }
-
-    /**
-     * @param from
-     * @param to
-     * @param shipment
-     * @return
-     * @throws RestServiceException
-     * @throws IOException
-     */
-    public ShipmentData getShipmentData(final Date from, final Date to, final Shipment shipment)
+    public JsonElement getSingleShipment(final Shipment shipment, final Date from, final Date to)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("fromDate", JSonSerializer.formatDate(from));
-        params.put("toDate", JSonSerializer.formatDate(to));
+        params.put("fromDate", EntityJSonSerializer.formatDate(from));
+        params.put("toDate", EntityJSonSerializer.formatDate(to));
         params.put("shipment", shipment.getId().toString());
 
-        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getShipmentData"), params);
-        return serializer.parseShipmentData(response);
+        return sendGetRequest(getPathWithToken(REST_SERVICE, "getSingleShipment"), params);
     }
 
     /**
@@ -446,7 +435,7 @@ public class RestServiceFacade  {
     /**
      * @param f JSON factory.
      */
-    public void setJsonFactory(final JSonSerializer f) {
+    public void setJsonFactory(final EntityJSonSerializer f) {
         this.serializer = f;
     }
 

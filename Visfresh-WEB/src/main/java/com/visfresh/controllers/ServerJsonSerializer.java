@@ -6,7 +6,7 @@ package com.visfresh.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.io.JSonSerializer;
+import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.ReferenceResolver;
 
 /**
@@ -14,7 +14,7 @@ import com.visfresh.io.ReferenceResolver;
  *
  */
 @Component
-public class ServerJsonSerializer extends JSonSerializer {
+public class ServerJsonSerializer extends EntityJSonSerializer {
     /**
      * Default constructor.
      */

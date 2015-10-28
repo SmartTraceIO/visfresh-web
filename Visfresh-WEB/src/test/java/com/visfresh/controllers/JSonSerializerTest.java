@@ -24,7 +24,6 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
-import com.visfresh.entities.DeviceData;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
@@ -32,7 +31,6 @@ import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
@@ -40,7 +38,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CreateUserRequest;
-import com.visfresh.io.JSonSerializer;
+import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
@@ -53,7 +51,7 @@ public class JSonSerializerTest {
     /**
      * Factory to test.
      */
-    private JSonSerializer serializer;
+    private EntityJSonSerializer serializer;
     private MockReferenceResolver resolver;
     private long lastLong;
     private Gson gson;
@@ -75,7 +73,7 @@ public class JSonSerializerTest {
         this.gson = b.create();
 
         resolver = new MockReferenceResolver();
-        serializer = new JSonSerializer();
+        serializer = new EntityJSonSerializer();
         serializer.setReferenceResolver(resolver);
     }
 
@@ -343,14 +341,14 @@ public class JSonSerializerTest {
         final LocationProfile shippedFrom = createLocationProfile();
         final LocationProfile shippedTo = createLocationProfile();
         final int shutdownDeviceTimeOut = 155;
-        final Device t1 = createDevice("234908720394857");
-        final Device t2 = createDevice("329847983724987");
+        final Device device = createDevice("234908720394857");
         final String palletId = "palettid";
         final Date shipmentDate = new Date(System.currentTimeMillis() - 1000000000l);
-        final String customFields = "customFields";
         final ShipmentStatus status = ShipmentStatus.Complete;
         final String assetType = "Trailer";
         final String assetNum = "10515";
+        final int poNum = 938498;
+        final int tripCount = 11;
 
         Shipment s = new Shipment();
         s.setAlertProfile(alertProfile);
@@ -365,14 +363,15 @@ public class JSonSerializerTest {
         s.setShippedFrom(shippedFrom);
         s.setShippedTo(shippedTo);
         s.setShutdownDeviceTimeOut(shutdownDeviceTimeOut);
-        s.getDevices().add(t1);
-        s.getDevices().add(t2);
+        s.setDevice(device);
         s.setPalletId(palletId);
         s.setShipmentDate(shipmentDate);
-        s.setCustomFields(customFields);
+        s.getCustomFields().put("name", "value");
         s.setStatus(status);
         s.setAssetType(assetType);
         s.setAssetNum(assetNum);
+        s.setPoNum(poNum);
+        s.setTripCount(tripCount );
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
         s = serializer.parseShipment(obj);
@@ -389,13 +388,15 @@ public class JSonSerializerTest {
         assertNotNull(s.getShippedFrom());
         assertNotNull(s.getShippedTo());
         assertEquals(shutdownDeviceTimeOut, s.getShutdownDeviceTimeOut());
-        assertEquals(2, s.getDevices().size());
+        assertEquals(device.getId(), s.getDevice().getId());
         assertEquals(palletId, s.getPalletId());
         assertEquals(shipmentDate, s.getShipmentDate());
-        assertEquals(customFields, s.getCustomFields());
+        assertEquals("value", s.getCustomFields().get("name"));
         assertEquals(status, s.getStatus());
         assertEquals(assetType, s.getAssetType());
         assertEquals(assetNum, s.getAssetNum());
+        assertEquals(poNum, s.getPoNum());
+        assertEquals(tripCount, s.getTripCount());
     }
     @Test
     public void testSaveShipmentResponse() {
@@ -546,7 +547,7 @@ public class JSonSerializerTest {
         e.setLatitude(latitude);
         e.setLongitude(longitude);
 
-        final JsonObject obj= serializer.toJson(e);
+        final JsonObject obj= EntityJSonSerializer.toJson(e);
         e = serializer.parseTrackerEvent(obj);
 
         assertEquals(battery, e.getBattery());
@@ -556,45 +557,6 @@ public class JSonSerializerTest {
         assertEquals(type, e.getType());
         assertEquals(latitude, e.getLatitude(), 0.000001);
         assertEquals(longitude, e.getLongitude(), 0.00001);
-    }
-    @Test
-    public void testDeviceData() {
-        DeviceData d = new DeviceData();
-
-        final Device device = createDevice("93218709879");
-        final Shipment shipment = createShipment();
-
-        d.setDevice(device);
-        d.getAlerts().add(createAlert(device, shipment, AlertType.BatteryLow));
-        d.getAlerts().add(createAlert(device, shipment, AlertType.EnterDarkEnvironment));
-        d.getEvents().add(createEvent("AUT"));
-        d.getEvents().add(createEvent("DRK"));
-
-        final JsonObject obj = serializer.toJson(d);
-        d = serializer.parseDeviceData(obj);
-
-        assertEquals(2, d.getAlerts().size());
-        assertEquals(2, d.getEvents().size());
-        assertNotNull(d.getDevice());
-    }
-    @Test
-    public void testShipmentData() {
-        final Shipment shipment = createShipment();
-        final DeviceData d1 = new DeviceData();
-        d1.setDevice(createDevice("109823981237049"));
-        final DeviceData d2 = new DeviceData();
-        d2.setDevice(createDevice("2309875948987987"));
-
-        ShipmentData s = new ShipmentData();
-        s.setShipment(shipment);
-        s.getDeviceData().add(d1);
-        s.getDeviceData().add(d2);
-
-        final JsonObject obj = serializer.toJson(s);
-        s = serializer.parseShipmentData(obj);
-
-        assertNotNull(s.getShipment());
-        assertEquals(2, s.getDeviceData().size());
     }
     @Test
     public void testUser() {
@@ -714,7 +676,7 @@ public class JSonSerializerTest {
         alert.setType(type);
         alert.setShipment(shipment);
 
-        final JsonElement json = serializer.toJson(alert);
+        final JsonElement json = EntityJSonSerializer.toJson(alert);
         alert = serializer.parseAlert(json);
 
         assertEquals(date, alert.getDate());
@@ -748,7 +710,7 @@ public class JSonSerializerTest {
         alert.setTemperature(temperature);
         alert.setMinutes(minutes);
 
-        final JsonElement json = serializer.toJson(alert);
+        final JsonElement json = EntityJSonSerializer.toJson(alert);
         alert = (TemperatureAlert) serializer.parseAlert(json);
 
         assertEquals(date, alert.getDate());
@@ -776,7 +738,7 @@ public class JSonSerializerTest {
         a.setNumberOfMettersOfArrival(numberOfMetersOfArrival);
         a.setShipment(shipment);
 
-        final JsonElement e = serializer.toJson(a);
+        final JsonElement e = EntityJSonSerializer.toJson(a);
         a = serializer.parseArrival(e);
 
         assertEquals(date, a.getDate());
@@ -802,33 +764,6 @@ public class JSonSerializerTest {
         assertEquals(description, c.getDescription());
         assertEquals(id, c.getId());
         assertEquals(name, c.getName());
-    }
-    /**
-     * @return tracker event.
-     */
-    private TrackerEvent createEvent(final String type) {
-        final TrackerEvent e = new TrackerEvent();
-        e.setId(generateId());
-        e.setBattery(1234);
-        e.setTemperature(56);
-        e.setTime(new Date());
-        e.setType(type);
-        return e;
-    }
-    /**
-     * @param shipment TODO
-     * @return alert.
-     */
-    private Alert createAlert(final Device device, final Shipment shipment, final AlertType type) {
-        final Alert alert = new Alert();
-        alert.setDate(new Date(System.currentTimeMillis() - 100000000l));
-        alert.setDescription("Alert description");
-        alert.setId(generateId());
-        alert.setName("Any name");
-        alert.setDevice(device);
-        alert.setShipment(shipment);
-        alert.setType(type);
-        return alert;
     }
     /**
      * @param imei IMEI.
@@ -912,11 +847,10 @@ public class JSonSerializerTest {
         s.setShippedFrom(createLocationProfile());
         s.setShippedTo(createLocationProfile());
         s.setShutdownDeviceTimeOut(155);
-        s.getDevices().add(createDevice("234908720394857"));
-        s.getDevices().add(createDevice("329847983724987"));
+        s.setDevice(createDevice("234908720394857"));
         s.setPalletId("palettid");
         s.setShipmentDate(new Date(System.currentTimeMillis() - 1000000000l));
-        s.setCustomFields("customFields");
+        s.getCustomFields().put("name", "customField1");
         resolver.add(s);
         return s;
     }

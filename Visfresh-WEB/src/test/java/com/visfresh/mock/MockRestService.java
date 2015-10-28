@@ -3,7 +3,6 @@
  */
 package com.visfresh.mock;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,13 +21,11 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
-import com.visfresh.entities.DeviceData;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
@@ -213,57 +210,6 @@ public class MockRestService implements RestService {
                 }
             }
         }
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#getShipmentData(java.util.Date, java.util.Date, java.lang.String)
-     */
-    @Override
-    public List<ShipmentData> getShipmentData(final Company company, final Date startDate,
-            final Date endDate, final boolean onlyWithAlerts) {
-        //device data map
-        final Map<String, DeviceData> deviceData= new HashMap<String, DeviceData>();
-
-        //add alerts
-        for (final Alert a : new LinkedList<Alert>(alerts.values())) {
-            final String imei = a.getDevice().getId();
-
-            DeviceData data = deviceData.get(imei);
-            if (data == null) {
-                data = new DeviceData();
-                data.setDevice(a.getDevice());
-                deviceData.put(imei, data);
-            }
-
-            data.getAlerts().add(a);
-        }
-
-        //add tracker events
-        for (final Map.Entry<String, DeviceData> e : deviceData.entrySet()) {
-            final String imei = e.getKey();
-            final List<TrackerEvent> te = trackerEvents.get(imei);
-            if (te != null) {
-                e.getValue().getEvents().addAll(te);
-            }
-        }
-
-        //build result
-        final List<ShipmentData> result = new LinkedList<ShipmentData>();
-        for (final Shipment s : new LinkedList<Shipment>(shipments.values())) {
-            final ShipmentData sd = new ShipmentData();
-            sd.setShipment(s);
-
-            for (final Device d : s.getDevices()) {
-                final DeviceData dd = deviceData.get(d.getId());
-                if (dd != null) {
-                    sd.getDeviceData().add(dd);
-                }
-            }
-
-            if (sd.getDeviceData().size() > 0) {
-                result.add(sd);
-            }
-        }
-        return result;
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#saveShipment(com.visfresh.entities.Shipment)

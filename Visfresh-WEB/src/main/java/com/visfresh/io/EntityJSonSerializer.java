@@ -3,12 +3,8 @@
  */
 package com.visfresh.io;
 
-import java.io.Reader;
 import java.io.Serializable;
-import java.io.StringReader;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +12,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
@@ -25,7 +20,6 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
-import com.visfresh.entities.DeviceData;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
@@ -35,7 +29,6 @@ import com.visfresh.entities.PersonalSchedule;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentBase;
-import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
@@ -49,17 +42,13 @@ import com.visfresh.services.AuthToken;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class JSonSerializer {
-    /**
-     * The date format.
-     */
-    public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+public class EntityJSonSerializer extends AbstractJsonSerializer {
     private ReferenceResolver referenceResolver;
 
     /**
      * Default constructor.
      */
-    public JSonSerializer() {
+    public EntityJSonSerializer() {
         super();
     }
 
@@ -431,19 +420,12 @@ public class JSonSerializer {
 
         s.setPalletId(asString(json.get("palletId")));
         s.setAssetNum(asString(json.get("assetNum")));
+        s.setTripCount(asInt(json.get("tripCount")));
+        s.setPoNum(asInt(json.get("poNum")));
         s.setShipmentDate(asDate(json.get("shipmentDate")));
-        s.setCustomFields(asString(json.get("customFields")));
+        s.getCustomFields().putAll(parseStringMap(json.get("customFields")));
         s.setStatus(ShipmentStatus.valueOf(json.get("status").getAsString()));
-
-        final JsonArray array = json.get("devices").getAsJsonArray();
-        final int size = array.size();
-        for (int i = 0; i < size; i++) {
-            final String id = array.get(i).getAsString();
-            final Device t = resolveDevice(id);
-            if (t != null) {
-                s.getDevices().add(t);
-            }
-        }
+        s.setDevice(resolveDevice(asString(json.get("device"))));
 
         return s;
     }
@@ -460,20 +442,16 @@ public class JSonSerializer {
         addShipmentBase(s, obj);
 
         obj.addProperty("palletId", s.getPalletId());
+        obj.addProperty("tripCount", s.getTripCount());
+        obj.addProperty("poNum", s.getPoNum());
         obj.addProperty("assetNum", s.getAssetNum());
         obj.addProperty("shipmentDate", timeToString(s.getShipmentDate()));
-        obj.addProperty("customFields", s.getCustomFields());
+        obj.add("customFields", toJson(s.getCustomFields()));
         obj.addProperty("status", s.getStatus().name());
-
-        final JsonArray array = new JsonArray();
-        for (final Device t : s.getDevices()) {
-            array.add(new JsonPrimitive(t.getId()));
-        }
-        obj.add("devices", array);
+        obj.addProperty("device", s.getDevice() == null ? null : s.getDevice().getId());
 
         return obj;
     }
-
     /**
      * @param json JSON object.
      * @return save shipment request.
@@ -566,7 +544,7 @@ public class JSonSerializer {
      * @param arrival
      * @return JSON object.
      */
-    public JsonObject toJson(final Arrival arrival) {
+    public static JsonObject toJson(final Arrival arrival) {
         final JsonObject json = new JsonObject();
         json.addProperty("id", arrival.getId());
         json.addProperty("numberOfMetersOfArrival", arrival.getNumberOfMettersOfArrival());
@@ -615,7 +593,7 @@ public class JSonSerializer {
      * @param alert
      * @return JSON object
      */
-    public JsonObject toJson(final Alert alert) {
+    public static JsonObject toJson(final Alert alert) {
         final JsonObject json = new JsonObject();
 
         //add common alert properties
@@ -649,7 +627,7 @@ public class JSonSerializer {
      * @param e tracker event.
      * @return JSON object.
      */
-    public JsonObject toJson(final TrackerEvent e) {
+    public static JsonObject toJson(final TrackerEvent e) {
         final JsonObject obj = new JsonObject();
         obj.addProperty("battery", e.getBattery());
         obj.addProperty("id", e.getId());
@@ -671,88 +649,6 @@ public class JSonSerializer {
         e.setLongitude(asDouble(json.get("longitude")));
         return e;
     }
-    /**
-     * @param d shipment data.
-     * @return JSON object.
-     */
-    public JsonObject toJson(final ShipmentData d) {
-        final JsonObject json = new JsonObject();
-        json.addProperty("shipment", d.getShipment().getId());
-
-        final JsonArray array = new JsonArray();
-        for (final DeviceData deviceData : d.getDeviceData()) {
-            array.add(toJson(deviceData));
-        }
-        json.add("data", array);
-
-        return json;
-    }
-    public ShipmentData parseShipmentData(final JsonElement e) {
-        if (e == null || e.isJsonNull()) {
-            return null;
-        }
-
-        final JsonObject json = e.getAsJsonObject();
-        final ShipmentData s = new ShipmentData();
-        s.setShipment(resolveShipment(asLong(json.get("shipment"))));
-
-        final JsonArray array = json.get("data").getAsJsonArray();
-        final int size = array.size();
-        for (int i = 0; i < size; i++) {
-            s.getDeviceData().add(parseDeviceData(array.get(i).getAsJsonObject()));
-        }
-
-        return s;
-    }
-    /**
-     * @param deviceData
-     * @return
-     */
-    public JsonObject toJson(final DeviceData deviceData) {
-        final JsonObject json = new JsonObject();
-        json.addProperty("device", deviceData.getDevice().getId());
-
-        //add alerts
-        JsonArray array = new JsonArray();
-        for (final Alert a : deviceData.getAlerts()) {
-            array.add(toJson(a));
-        }
-        json.add("alerts", array);
-
-        //add events
-        array = new JsonArray();
-        for (final TrackerEvent e : deviceData.getEvents()) {
-            array.add(toJson(e));
-        }
-        json.add("events", array);
-
-        return json;
-    }
-    /**
-     * @param json JSON object.
-     * @return device data.
-     */
-    public DeviceData parseDeviceData(final JsonObject json) {
-        final DeviceData d = new DeviceData();
-        d.setDevice(resolveDevice(asString(json.get("device"))));
-
-        //alerts
-        JsonArray array = json.get("alerts").getAsJsonArray();
-        int size = array.size();
-        for (int i = 0; i < size; i++) {
-            d.getAlerts().add(parseAlert(array.get(i).getAsJsonObject()));
-        }
-
-        //events
-        array = json.get("events").getAsJsonArray();
-        size = array.size();
-        for (int i = 0; i < size; i++) {
-            d.getEvents().add(parseTrackerEvent(array.get(i).getAsJsonObject()));
-        }
-
-        return d;
-    }
-
     /**
      * @param json JSON object.
      * @return device command.
@@ -949,66 +845,6 @@ public class JSonSerializer {
      * @param e
      * @return
      */
-    private double asDouble(final JsonElement e) {
-        return e == null || e.isJsonNull() ? 0 : e.getAsDouble();
-    }
-    /**
-     * @param e
-     * @return
-     */
-    private int asInt(final JsonElement e) {
-        return e == null || e.isJsonNull() ? 0 : e.getAsInt();
-    }
-    /**
-     * @param e JSON element.
-     * @return JSON element as long.
-     */
-    private Long asLong(final JsonElement e) {
-        return e == null || e.isJsonNull() ? null : e.getAsLong();
-    }
-    /**
-     * @param e JSON element.
-     * @return JSON element as string.
-     */
-    private String asString(final JsonElement e) {
-        return e == null || e.isJsonNull() ? null : e.getAsString();
-    }
-    /**
-     * @param e JSON element.
-     * @return JSON element as boolean.
-     */
-    private Boolean asBoolean(final JsonElement e) {
-        return e == null || e.isJsonNull() ? null : e.getAsBoolean();
-    }
-    /**
-     * @param e JSON string.
-     * @return JSON string as boolean.
-     */
-    private Date asDate(final JsonElement e) {
-        return e == null || e.isJsonNull() ? null : parseDate(e.getAsString());
-    }
-    /**
-     * @param str
-     * @return
-     */
-    public static Date parseDate(final String str) {
-        try {
-            return new SimpleDateFormat(DATE_FORMAT).parse(str);
-        } catch (final ParseException exc) {
-            throw new RuntimeException(exc);
-        }
-    }
-    /**
-     * @param date
-     * @return
-     */
-    public static String formatDate(final Date date) {
-        return new SimpleDateFormat(DATE_FORMAT).format(date);
-    }
-    /**
-     * @param e
-     * @return
-     */
     private <ID extends Serializable & Comparable<ID>> ID getId(final EntityWithId<ID> e) {
         return e == null ? null : (ID) e.getId();
     }
@@ -1035,13 +871,6 @@ public class JSonSerializer {
         return obj;
     }
     /**
-     * @param time
-     * @return the time in 'yyyy-MM-dd'T'HH:mm:ss.SSSZ' format.
-     */
-    private String timeToString(final Date time) {
-        return time == null ? null : new SimpleDateFormat(DATE_FORMAT).format(time);
-    }
-    /**
      * @return the referenceResolver
      */
     public ReferenceResolver getReferenceResolver() {
@@ -1052,13 +881,5 @@ public class JSonSerializer {
      */
     public void setReferenceResolver(final ReferenceResolver referenceResolver) {
         this.referenceResolver = referenceResolver;
-    }
-    /**
-     * @param text JSON text.
-     * @return JSON element.
-     */
-    public static JsonElement parseJson(final String text) {
-        final Reader in = new StringReader(text);
-        return new JsonParser().parse(in);
     }
 }

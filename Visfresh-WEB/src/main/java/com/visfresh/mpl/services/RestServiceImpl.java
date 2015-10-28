@@ -3,7 +3,6 @@
  */
 package com.visfresh.mpl.services;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +31,6 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShipmentData;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
@@ -196,16 +194,6 @@ public class RestServiceImpl implements RestService {
     public void markNotificationsAsRead(final User user, final Set<Long> ids) {
         notificationDao.deleteByUserAndId(user, ids);
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#getShipmentData(java.util.Date, java.util.Date, java.lang.String)
-     */
-    @Override
-    public List<ShipmentData> getShipmentData(final Company company, final Date startDate,
-            final Date endDate, final boolean onlyWithAlerts) {
-        return shipmentDao.getShipmentData(company, startDate, endDate, onlyWithAlerts);
-    }
-
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#sendCommandToDevice(com.visfresh.entities.Device, java.lang.String)
      */

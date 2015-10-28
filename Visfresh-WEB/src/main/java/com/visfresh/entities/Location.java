@@ -20,6 +20,16 @@ public class Location {
     }
 
     /**
+     * @param lat
+     * @param lon
+     */
+    public Location(final double lat, final double lon) {
+        super();
+        this.latitude = lat;
+        this.longitude = lon;
+    }
+
+    /**
      * @return the x
      */
     public double getLatitude() {
