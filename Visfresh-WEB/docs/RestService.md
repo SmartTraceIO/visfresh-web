@@ -39,8 +39,7 @@ An authentication can be performed as from REST client using login method, as fr
 9. [Alert](#markdown-header-alert)  
 10. [Temperature Alert](#markdown-header-temperature-alert)  
 11. [Arrival](#markdown-header-arrival)  
-12. [Shipment data](#markdown-header-shipment-data)  
-13. [Device Event](#markdown-header-device-event)  
+12. [Device Event](#markdown-header-device-event)  
 
 ## Rest Service methods.
 1. [Authentication](#markdown-header-authentication).  
@@ -62,17 +61,18 @@ An authentication can be performed as from REST client using login method, as fr
 17. [Get Shipments](#markdown-header-get-shipments)  
 18. [Get Notifications](#markdown-header-get-notifications)  
 19. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
-20. [Get Shipment Data](#markdown-header-get-shipment-data)  
-22. [Send Command to Device](#markdown-header-send-command-to-device)  
-22. [Get Alert Profile](#markdown-header-get-alert-profile)  
-23. [Get Location Profile](#markdown-header-get-location-profile)  
-24. [Get Shipment Template](#markdown-header-get-shipment-template)  
-25. [Get Device](#markdown-header-get-device)  
-26. [Get Shipment](#markdown-header-get-shipment)  
-27. [Send Notification Schedule](#markdown-header-get-notification-schedule)  
-28. [Get Profile](#markdown-header-get-profile)  
-29. [Save Profile](#markdown-header-save-profile)  
+20. [Send Command to Device](#markdown-header-send-command-to-device)  
+21. [Get Alert Profile](#markdown-header-get-alert-profile)  
+22. [Get Location Profile](#markdown-header-get-location-profile)  
+23. [Get Shipment Template](#markdown-header-get-shipment-template)  
+24. [Get Device](#markdown-header-get-device)  
+25. [Get Shipment](#markdown-header-get-shipment)  
+26. [Send Notification Schedule](#markdown-header-get-notification-schedule)  
+27. [Get Profile](#markdown-header-get-profile)  
+28. [Save Profile](#markdown-header-save-profile)  
 
+## Reports ##
+1. [Get Single Shipment](#markdown-header-get-single-shipment)
 
 ### Authentication.###
 Method *GET*, method name *login*, request parameters login - the user login name and password - the user password  
@@ -182,14 +182,6 @@ Returns array of [Notification Objects](#markdown-header-notification)
 Method *POST*, method name *markNotificationsAsRead*. Request body contains JSON array of notification ID.  
 [(example)](#markdown-header-mark-notification-as-read-example)
 
-### Get Shipment Data ###
-Method *GET*, method name *getShipmentData*. Request parameters:  
-1. fromDate - start date in 'yyyy-MM-dd'T'HH:mm:ss.SSSZ' format  
-2. toDate - end date in 'yyyy-MM-dd'T'HH:mm:ss.SSSZ' format  
-3. onlyWithAlerts - only select shipment data with alerts flag  
-Returns array of [Shipment Data Objects](#markdown-header-shipment-data)  
-[(example)](#markdown-header-get-shipment-data-example)
-
 ### Send Command to Device ###
 Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#markdown-header-device) ID and device specific command.  
 [(example)](#markdown-header-send-command-to-device-example)
@@ -238,6 +230,13 @@ of current logged in user
 ### Save Profile ###
 Method *POST*, method name *saveProfile*. Request body contains JSON serialized [Profile Object](#markdown-header-profile-object)  
 [(example)](#markdown-header-save-profile-example)
+
+### Get Single Shipment ###
+Method *GET*, method *getSingleShipment*. Request parameters:  
+1 fromDate start selection data 
+2. toDate end selection data  
+3. shipment shipment ID  
+[(example)](#markdown-header-get-single-shipment-example)
 
 ## Objects
 ### Response message ###
@@ -372,11 +371,11 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
     "shipmentDescription": "Any Description",
     "alertSuppressionDuringCoolDown": 55,
     "alertProfile": 2,
-    "alertsNotificationSchedules": [ // Array of ID of [Notification Schedule Object](#markdown-header-notification-schedule)
+    "alertsNotificationSchedules": [ //array of ID of notification schedule objects
       3
     ],
     "arrivalNotificationWithIn": 111,
-    "arrivalNotificationSchedules": [ // Array of ID of [Notification Schedule Object](#markdown-header-notification-schedule)
+    "arrivalNotificationSchedules": [//array of ID of notification schedule objects
       6
     ],
     "excludeNotificationsIfNoAlertsFired": true,
@@ -385,15 +384,16 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
     "shutdownDevice": 155,
     "assetType": "SeaContainer",
     "palletId": "palettid",
+    "tripCount": 88,
+    "poNum": 893793487,
     "assetNum": "10515",
-    "shipmentDate": "2015-10-09T11:47:21.945+0300",
-    "customFields": "customFields",
-    "status": "Default",
-    "devices": [
-      "234908720394857.123",
-      "329847983724987.123"
-    ]
-}
+    "shipmentDate": "2015-10-16T22:55:41.044+0300",
+    "customFields": {  //map of custom fields
+      "field1": "value1"
+    },
+    "status": "Default", //status Default/In Progress/Completed/Pending
+    "device": "234908720394857"
+  }
 ```
 ### Notification ###
 `{`  
@@ -431,17 +431,6 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 `"numberOfMetersOfArrival": 1500, //number of meters of arrival`    
 `"date": "2015-10-12T23:57:45.105+0300",`  
 `"device": "234908720394857.123" //ID of associated` [Device Object](#markdown-header-device)  
-`}`
-### Shipment data ###
-`{`  
-`"shipment": 11, // ID of associated` [Shipment](#markdown-header-shipment)  
-`"data": [`  
-`{`  
-`"device": "234908720394857.123", // ID of` [Device](#markdown-header-device)
-`"alerts": [], // array of` [Alert Objects](#markdown-header-alert)  
-`"events": [] // array of ` [Device Event Objects](#markdown-header-device-event)
-`}`  
-`]`  
 `}`
 ### Device Event ###
 `{`  
@@ -555,7 +544,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 `}`  
 `}`  
 ### Get Alert Profiles example ###
-**GET  /vf/rest/getAlertProfiles/${accessToken}**  
+**GET  /vf/rest/getAlertProfiles/${accessToken}?pageSize=1&pageIndex=3**  
 **Response:**  
 `{`  
 `"status": {`  
@@ -642,7 +631,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 `}`  
 `}`  
 ### Get Notification Schedules example ###
-**GET /vf/rest/getNotificationSchedules/${accessToken}**  
+**GET /vf/rest/getNotificationSchedules/${accessToken}?pageSize=1&pageIndex=3**  
 **Response:**  
 `{`  
 `"status": {`  
@@ -726,7 +715,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 `}`  
 `}`  
 ### Get Location Profiles example ###
-**GET /vf/rest/getLocationProfiles/${accessToken}**  
+**GET /vf/rest/getLocationProfiles/${accessToken}?pageSize=1&pageIndex=3**  
 **Response:**  
 `{`  
 `"status": {`  
@@ -753,25 +742,36 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 **Request body:**  
 ```
 {
-  "name": "JUnit-tpl",
-  "shipmentDescription": "Any Description",
-  "alertSuppressionDuringCoolDown": 55,
-  "alertProfile": 2,
-  "alertsNotificationSchedules": [
-    3
-  ],
-  "arrivalNotificationWithIn": 11,
-  "arrivalNotificationSchedules": [
-    6
-  ],
-  "excludeNotificationsIfNoAlertsFired": true,
-  "shippedFrom": 9,
-  "shippedTo": 10,
-  "shutdownDevice": 155,
-  "assetType": "SeaContainer",
-  "addDateShipped": true,
-  "useCurrentTimeForDateShipped": true,
-  "detectLocationForShippedFrom": true
+  "saveAsNewTemplate": true,
+  "templateName": "NewTemplate.tpl",
+  "shipment": {
+    "name": "Shipment-1",
+    "shipmentDescription": "Any Description",
+    "alertSuppressionDuringCoolDown": 55,
+    "alertProfile": 2,
+    "alertsNotificationSchedules": [
+      3
+    ],
+    "arrivalNotificationWithIn": 111,
+    "arrivalNotificationSchedules": [
+      6
+    ],
+    "excludeNotificationsIfNoAlertsFired": true,
+    "shippedFrom": 9,
+    "shippedTo": 10,
+    "shutdownDevice": 155,
+    "assetType": "SeaContainer",
+    "palletId": "palettid",
+    "tripCount": 88,
+    "poNum": 893793487,
+    "assetNum": "10515",
+    "shipmentDate": "2015-10-16T22:55:41.044+0300",
+    "customFields": {
+      "field1": "value1"
+    },
+    "status": "Default",
+    "device": "234908720394857"
+  }
 }
 ```  
 **Response:**  
@@ -787,7 +787,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 }
 ``` 
 ### Get Shipment Templates example ###
-**GET /vf/rest/getShipmentTemplates/${accessToken}**  
+**GET /vf/rest/getShipmentTemplates/${accessToken}?pageSize=1&pageIndex=3**  
 **Response:**  
 ```
 {
@@ -904,7 +904,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
   }
 }
 ### Get Shipments example ###
-**GET /vf/rest/getShipments/${accessToken}**  
+**GET /vf/rest/getShipments/${accessToken}?pageSize=1&pageIndex=3**  
 **Response:**  
 ```
 {
@@ -914,38 +914,42 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
   },
   "response": [
     {
-      "name": "Shipment-1",
-      "shipmentDescription": "Any Description",
-      "alertSuppressionDuringCoolDown": 55,
-      "id": 11,
-      "alertProfile": 2,
-      "alertsNotificationSchedules": [
-        3
-      ],
-      "arrivalNotificationWithIn": 111,
-      "arrivalNotificationSchedules": [
-        6
-      ],
-      "excludeNotificationsIfNoAlertsFired": true,
-      "shippedFrom": 9,
-      "shippedTo": 10,
-      "shutdownDevice": 155,
-      "assetType": "SeaContainer",
-      "palletId": "palettid",
-      "assetNum": "10515",
-      "shipmentDate": "2015-10-09T11:54:22.953+0300",
-      "customFields": "customFields",
-      "status": "Default",
-      "devices": [
-        "234908720394857.123",
-        "329847983724987.123"
-      ]
+      "saveAsNewTemplate": true,
+      "templateName": "NewTemplate.tpl",
+      "shipment": {
+        "name": "Shipment-1",
+        "shipmentDescription": "Any Description",
+        "alertSuppressionDuringCoolDown": 55,
+        "alertProfile": 2,
+        "alertsNotificationSchedules": [
+          3
+        ],
+        "arrivalNotificationWithIn": 111,
+        "arrivalNotificationSchedules": [
+          6
+        ],
+        "excludeNotificationsIfNoAlertsFired": true,
+        "shippedFrom": 9,
+        "shippedTo": 10,
+        "shutdownDevice": 155,
+        "assetType": "SeaContainer",
+        "palletId": "palettid",
+        "tripCount": 88,
+        "poNum": 893793487,
+        "assetNum": "10515",
+        "shipmentDate": "2015-10-16T22:55:41.044+0300",
+        "customFields": {
+          "field1": "value1"
+        },
+        "status": "Default",
+        "device": "234908720394857"
+      }
     }
   ]
 }
 ```
 ### Get Notifications example ###
-**GET  /vf/rest/getNotifications/${accessToken}?shipment=11**  
+**GET  /vf/rest/getNotifications/${accessToken}?shipment=11&pageSize=1&pageIndex=3**  
 **Response:**  
 `{`  
 `"status": {`  
@@ -1004,44 +1008,6 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 `"code": 0,` 
 `"message": "Success"` 
 `}`  
-`}`
-### Get Shipment Data example ###
-**GET /vf/rest/getShipmentData/${accessToken}?fromDate=2015-10-11T20%3A17%3A23.016%2B0300&onlyWithAlerts=false&toDate=2015-10-13T02%3A50%3A43.016%2B0300**  
-**Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": [`  
-`{`  
-`"shipment": 11,`  
-`"data": [`  
-`{`  
-`"device": "234908720394857",`  
-`"alerts": [`  
-`{`  
-`"description": "Alert description",`  
-`"name": "Alert-BatteryLow",`  
-`"id": 14,`  
-`"date": "2015-10-11T20:17:23.016+0300",`  
-`"device": "234908720394857",`  
-`"type": "BatteryLow"`  
-`}`  
-`],`  
-`"events": [`  
-`{`  
-`"battery": 1234,`  
-`"id": 13,`  
-`"temperature": 56.0,`  
-`"time": "2015-10-13T00:04:03.015+0300",`  
-`"type": "AUT"`  
-`}`  
-`]`  
-`}`  
-`]`  
-`}`  
-`]`  
 `}`
 ### Send Command to Device example ###
 **POST /vf/rest/sendCommandToDevice/${accessToken}**  
@@ -1172,29 +1138,29 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
     "name": "Shipment-1",
     "shipmentDescription": "Any Description",
     "alertSuppressionDuringCoolDown": 55,
-    "id": 77,
-    "alertProfile": 78,
+    "alertProfile": 2,
     "alertsNotificationSchedules": [
-      91
+      3
     ],
     "arrivalNotificationWithIn": 111,
     "arrivalNotificationSchedules": [
-      92
+      6
     ],
     "excludeNotificationsIfNoAlertsFired": true,
-    "shippedFrom": 79,
-    "shippedTo": 80,
+    "shippedFrom": 9,
+    "shippedTo": 10,
     "shutdownDevice": 155,
     "assetType": "SeaContainer",
     "palletId": "palettid",
+    "tripCount": 88,
+    "poNum": 893793487,
     "assetNum": "10515",
-    "shipmentDate": "2015-10-09T11:53:13.146+0300",
-    "customFields": "customFields",
+    "shipmentDate": "2015-10-16T22:55:41.044+0300",
+    "customFields": {
+      "field1": "value1"
+    },
     "status": "Default",
-    "devices": [
-      "234908720394857.123",
-      "329847983724987.123"
-    ]
+    "device": "234908720394857"
   }
 }
 ```
@@ -1286,6 +1252,83 @@ Response:
   "status": {
     "code": 0,
     "message": "Success"
+  }
+}
+```
+### Get Single Shipment example ###
+**GET /vf/rest/getSingleShipment/${accessToken}?fromDate=${startDate}&shipment=${shipmentId}&toDate=${endData}**  
+**Response:**  
+```
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "alertProfile": 2,
+    "alertsNotificationSchedules": [
+      3
+    ],
+    "alertSuppressionDuringCoolDown": 55,
+    "arrivalNotificationSchedules": [
+      6
+    ],
+    "arrivalNotificationWithIn": 111,
+    "assetNum": "10515",
+    "assetType": "SeaContainer",
+    "customFields": {
+      "field1": "value1"
+    },
+    "palletId": "palettid",
+    "poNum": 893793487,
+    "shipmentDescription": "Any Description",
+    "shippedFrom": 9,
+    "shippedTo": 10,
+    "shutdownDevice": 155,
+    "status": "Default",
+    "tripCount": 88,
+    "items": [
+      {
+        "timestamp": 1446027400702,
+        "location": {
+          "latitude": 50.5,
+          "longitude": 51.51
+        },
+        "temperature": 56.0,
+        "type": "AUT",
+        "alerts": [
+          {
+            "description": "Alert description",
+            "name": "Alert-BatteryLow",
+            "type": "BatteryLow"
+          }
+        ],
+        "arrivas": [
+          {
+            "numberOfMetersOfArrival": 400
+          }
+        ]
+      },
+      {
+        "timestamp": 1446027400702,
+        "location": {
+          "latitude": 50.5,
+          "longitude": 51.51
+        },
+        "temperature": 56.0,
+        "type": "AUT",
+        "alerts": [
+          {
+            "description": "Temp Alert",
+            "name": "TempAlert-1",
+            "type": "HighTemperature",
+            "temperature": 5.0,
+            "minutes": 55
+          }
+        ],
+        "arrivas": []
+      }
+    ]
   }
 }
 ```
