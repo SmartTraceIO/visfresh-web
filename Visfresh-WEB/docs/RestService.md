@@ -233,7 +233,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 
 ### Get Single Shipment ###
 Method *GET*, method *getSingleShipment*. Request parameters:  
-1 fromDate start selection data 
+1 fromDate start selection data  
 2. toDate end selection data  
 3. shipment shipment ID  
 [(example)](#markdown-header-get-single-shipment-example)

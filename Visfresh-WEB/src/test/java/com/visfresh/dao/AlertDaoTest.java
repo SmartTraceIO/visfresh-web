@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Test;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
@@ -57,28 +58,45 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         d.setName("Test device");
 
         this.device = deviceDao.save(d);
-
-        final Shipment s = new Shipment();
+        shipment = createShipment(d);
+    }
+    /**
+     * @param d
+     * @return
+     */
+    private Shipment createShipment(final Device d) {
+        Shipment s = new Shipment();
         s.setName("Default profile");
         s.setCompany(sharedCompany);
         s.setDevice(d);
-        shipment = shipmentDao.save(s);
+        s = shipmentDao.save(s);
+        return s;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()
      */
     @Override
     protected Alert createTestEntity() {
+        final Date date = new Date(System.currentTimeMillis() - 100000000l);
+        final AlertType type = AlertType.CriticalHighTemperature;
+        return createAlert(type, date);
+    }
+
+    /**
+     * @param type alert type.
+     * @param date date.
+     * @return
+     */
+    protected Alert createAlert(final AlertType type, final Date date) {
         final TemperatureAlert alert = new TemperatureAlert();
-        alert.setDate(new Date(System.currentTimeMillis() - 100000000l));
+        alert.setDate(date);
         alert.setDescription("Alert description");
         alert.setName("Any name");
         alert.setDevice(device);
         alert.setShipment(shipment);
-        alert.setType(AlertType.CriticalHighTemperature);
+        alert.setType(type);
         alert.setTemperature(100);
         alert.setMinutes(15);
-
         return alert;
     }
     /* (non-Javadoc)
@@ -149,6 +167,31 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         assertEquals(sharedCompany.getId(), c.getId());
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
+    }
+    @Test
+    public void testGetAlertsByShipmentAndTimeRanges() {
+        final Date startDate = new Date(System.currentTimeMillis() - 1000000000l);
+        final Date endDate = new Date(System.currentTimeMillis() - 1000000l);
+
+        createAndSave(new Date(startDate.getTime() - 1000l));
+        createAndSave(new Date(startDate.getTime()));
+        createAndSave(new Date(startDate.getTime() + 10000l));
+        createAndSave(new Date(endDate.getTime()));
+        createAndSave(new Date(endDate.getTime() + 1000l));
+
+        assertEquals(3, dao.getAlerts(shipment, startDate, endDate).size());
+
+        //check left shipment
+        final Shipment left = createShipment(device);
+        assertEquals(0, dao.getAlerts(left, startDate, endDate).size());
+    }
+
+    /**
+     * @param date
+     */
+    private Alert createAndSave(final Date date) {
+        final Alert a = createAlert(AlertType.HighTemperature, date);
+        return dao.save(a);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#clear()

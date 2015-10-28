@@ -240,6 +240,8 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
             final Date toDate) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("shipment", shipment.getId());
+        params.put("fromDate", fromDate);
+        params.put("toDate", toDate);
         final Map<String, String> fields = createSelectAsMapping("a", "res");
 
         final List<Map<String, Object>> list = jdbc.queryForList(
@@ -248,8 +250,10 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
                 + " from "
                 + TABLE + " a"
                 + " where "
-                + "a." + SHIPMENT_FIELD + " =:shipment order by date, id",
+                + "a." + SHIPMENT_FIELD + " =:shipment"
+                + " and date >= :fromDate and date <= :toDate order by date, id",
                 params);
+
         final List<Arrival> alerts = new LinkedList<Arrival>();
         for (final Map<String,Object> row : list) {
             final Arrival a = createArrival(row, "res");

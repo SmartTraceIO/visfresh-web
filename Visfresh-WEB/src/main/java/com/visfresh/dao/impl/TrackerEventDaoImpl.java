@@ -276,15 +276,18 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
             final Date toDate) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("shipment", shipment.getId());
-        final Map<String, String> fields = createSelectAsMapping("e", "res");
+        params.put("fromDate", fromDate);
+        params.put("toDate", toDate);
+        final Map<String, String> fields = createSelectAsMapping("a", "res");
 
         final List<Map<String, Object>> list = jdbc.queryForList(
                 "select "
                 + buildSelectAs(fields)
                 + " from "
-                + TABLE + " e"
+                + TABLE + " a"
                 + " where "
-                + "e." + SHIPMENT_FIELD + " =:shipment order by time, id",
+                + "a." + SHIPMENT_FIELD + " =:shipment"
+                + " and time >= :fromDate and time <= :toDate order by time, id",
                 params);
         final List<TrackerEvent> events = new LinkedList<TrackerEvent>();
         for (final Map<String,Object> row : list) {
@@ -304,11 +307,12 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("temperature", minimalTemperature);
         params.put("shipment", e.getShipment().getId());
+        params.put("id", e.getId());
 
         //find first previous normal temperature.
         List<Map<String, Object>> rows = jdbc.queryForList(
                 "select id from " + TABLE + " where "
-                + SHIPMENT_FIELD + " =:shipment and temperature > :temperature order by id desc limit 1",
+                + SHIPMENT_FIELD + " =:shipment and temperature < :temperature and id < :id order by id desc limit 1",
                 params);
         if (rows.size() == 0) {
             return null;
@@ -338,11 +342,12 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("temperature", maximalTemperature);
         params.put("shipment", e.getShipment().getId());
+        params.put("id", e.getId());
 
         //find first previous normal temperature.
         List<Map<String, Object>> rows = jdbc.queryForList(
                 "select id from " + TABLE + " where "
-                + SHIPMENT_FIELD + " =:shipment and temperature < :temperature order by id desc limit 1",
+                + SHIPMENT_FIELD + " =:shipment and temperature > :temperature and id < :id order by id desc limit 1",
                 params);
         if (rows.size() == 0) {
             return null;
