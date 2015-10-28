@@ -38,7 +38,7 @@ public class CriticalHighTemperatureAlertRule extends HighTemperatureAlertRule {
         final TrackerEvent e = req.getEvent();
         final AlertProfile profile = e.getShipment().getAlertProfile();
         if (profile.getCriticalHighTemperature() <= e.getTemperature()) {
-            final long period = getHighTemperaturePeriod(e, e.getTemperature());
+            final long period = getHighTemperaturePeriod(e, profile.getCriticalHighTemperature());
             if (period > profile.getCriticalHighTemperatureForMoreThen()) {
                 return true;
             }
@@ -66,7 +66,7 @@ public class CriticalHighTemperatureAlertRule extends HighTemperatureAlertRule {
         alert.setTemperature(event.getTemperature());
         alert.setType(AlertType.CriticalHighTemperature);
         alert.setDescription("Critical high Temperature more then " + criticalTemperature + "C during "
-                + minutes + " minutes");
+                + minutes + " minutes for " + event.getDevice().getId());
         alert.setMinutes(minutes);
         alert.setName("Critical High Temperature");
 

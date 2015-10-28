@@ -57,7 +57,7 @@ public class LowTemperatureAlertRule extends AbstractAlertRule {
         final TrackerEvent e = req.getEvent();
         final AlertProfile profile = e.getShipment().getAlertProfile();
         if (profile.getLowTemperature() <= e.getTemperature()) {
-            final long period = getLowTemperaturePeriod(e, e.getTemperature());
+            final long period = getLowTemperaturePeriod(e, profile.getHighTemperature());
             if (period > profile.getLowTemperatureForMoreThen()) {
                 return true;
             }
@@ -107,7 +107,7 @@ public class LowTemperatureAlertRule extends AbstractAlertRule {
         alert.setTemperature(event.getTemperature());
         alert.setType(AlertType.LowTemperature);
         alert.setDescription("Low Temperature less then " + criticalTemperature + "C during "
-                + minutes + " minutes");
+                + minutes + " minutes for " + event.getDevice().getId());
         alert.setMinutes(minutes);
         alert.setName("Low Temperature");
 

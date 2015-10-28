@@ -8,8 +8,6 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +24,6 @@ import com.visfresh.entities.TrackerEvent;
  */
 @Component
 public abstract class AbstractAlertRule extends AbstractNotificationRule {
-    private static final Logger log = LoggerFactory.getLogger(AbstractAlertRule.class);
-
     @Autowired
     protected AlertDao alertDao;
 
@@ -43,12 +39,7 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      */
     @Override
     public boolean accept(final TrackerEventRequest e) {
-        final boolean accept = super.accept(e) && e.getEvent().getShipment().getAlertProfile() != null;
-        if (accept) {
-            log.debug("Alert Rule " + getName() + " matches for shipment "
-                    + e.getEvent().getShipment().getName() + " tracker event. Notification will generated");
-        }
-        return accept;
+        return super.accept(e) && e.getEvent().getShipment().getAlertProfile() != null;
     }
 
     protected void defaultAssign(final TrackerEvent e, final Alert a) {

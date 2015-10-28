@@ -38,7 +38,7 @@ public class CriticalLowTemperatureAlertRule extends LowTemperatureAlertRule {
         final TrackerEvent e = req.getEvent();
         final AlertProfile profile = e.getShipment().getAlertProfile();
         if (profile.getCriticalLowTemperature() <= e.getTemperature()) {
-            final long period = getLowTemperaturePeriod(e, e.getTemperature());
+            final long period = getLowTemperaturePeriod(e, profile.getCriticalLowTemperature());
             if (period > profile.getCriticalLowTemperatureForMoreThen()) {
                 return true;
             }
@@ -66,7 +66,7 @@ public class CriticalLowTemperatureAlertRule extends LowTemperatureAlertRule {
         alert.setTemperature(event.getTemperature());
         alert.setType(AlertType.CriticalLowTemperature);
         alert.setDescription("Critical Low Temperature more then " + criticalTemperature + "C during "
-                + minutes + " minutes");
+                + minutes + " minutes for " + event.getDevice().getId());
         alert.setMinutes(minutes);
         alert.setName("Critical Low Temperature");
 

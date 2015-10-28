@@ -96,8 +96,8 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
      */
     @Override
     public void run() {
-        final int maxPause = 5000;
-        final int minPause = 1000;
+        final int maxPause = 20000;
+        final int minPause = 10000;
         startTime = System.currentTimeMillis();
 
         try {
@@ -157,12 +157,12 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     protected JsonObject createEvent() {
         final JsonObject obj = new JsonObject();
         //update battery
-        battery += (random.nextInt(2) - 1);
+        battery += (random.nextBoolean()? 1 : - 1);
         battery = Math.max(0, battery);
         battery = Math.min(battery, 10);
 
         //update temperature
-        temperature += (random.nextInt(2) - 1);
+        temperature += (random.nextBoolean()? 1 : - 1);
         temperature = Math.max(-10, temperature);
         temperature = Math.min(temperature, 16);
 

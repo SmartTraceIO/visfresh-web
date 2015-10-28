@@ -57,7 +57,7 @@ public class HighTemperatureAlertRule extends AbstractAlertRule {
         final TrackerEvent e = req.getEvent();
         final AlertProfile profile = e.getShipment().getAlertProfile();
         if (profile.getHighTemperature() <= e.getTemperature()) {
-            final long period = getHighTemperaturePeriod(e, e.getTemperature());
+            final long period = getHighTemperaturePeriod(e, profile.getHighTemperature());
             if (period > profile.getHighTemperatureForMoreThen()) {
                 return true;
             }
@@ -107,7 +107,7 @@ public class HighTemperatureAlertRule extends AbstractAlertRule {
         alert.setTemperature(event.getTemperature());
         alert.setType(AlertType.HighTemperature);
         alert.setDescription("High Temperature more then " + criticalTemperature + "C during "
-                + minutes + " minutes");
+                + minutes + " minutes for " + event.getDevice().getId());
         alert.setMinutes(minutes);
         alert.setName("High Temperature");
 

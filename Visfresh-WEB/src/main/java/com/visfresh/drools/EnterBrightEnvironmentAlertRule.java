@@ -40,7 +40,7 @@ public class EnterBrightEnvironmentAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setDescription("Device entered Bright Environment");
+        alert.setDescription("Device " + event.getDevice().getId() + " entered Bright Environment");
         alert.setName("Enter Bright Environment");
         alert.setType(AlertType.EnterBrightEnvironment);
         return alert;

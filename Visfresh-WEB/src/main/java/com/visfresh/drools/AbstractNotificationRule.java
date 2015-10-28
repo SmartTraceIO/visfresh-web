@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.mail.MessagingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +126,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
             final int min = hour * 60 + c.get(Calendar.MINUTE);
 
             //check out of time frame of day.
-            if (s.getFromTime() < min || s.getToTime() > min) {
+            if (s.getFromTime() > min || s.getToTime() < min) {
                 matches = false;
             }
         }
@@ -146,8 +147,12 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
         boolean sent = false;
         //send email
         if (email != null && email.length() > 0) {
-            emailService.sendMessage(email, subject, message);
-            sent = true;
+            try {
+                emailService.sendMessage(email, subject, message);
+                sent = true;
+            } catch (final MessagingException e) {
+                log.error("Failed to send email message to " + email, e);
+            }
         } else {
             log.warn("Email has not set for personal schedule for " + person + " , email can't be send");
         }

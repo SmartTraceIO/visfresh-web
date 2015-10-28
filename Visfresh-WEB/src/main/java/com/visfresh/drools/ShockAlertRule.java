@@ -40,7 +40,7 @@ public class ShockAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setDescription("Device shocked");
+        alert.setDescription("Device " + alert.getDevice().getId() + " shocked");
         alert.setName("Shock");
         alert.setType(AlertType.Shock);
         return alert;
