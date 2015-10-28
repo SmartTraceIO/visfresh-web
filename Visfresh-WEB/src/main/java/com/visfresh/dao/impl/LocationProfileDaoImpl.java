@@ -226,6 +226,28 @@ public class LocationProfileDaoImpl extends DaoImplBase<LocationProfile, Long>
         }
         return result;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.AlertProfileDao#findByCompany(com.visfresh.entities.Company)
+     */
+    @Override
+    public List<LocationProfile> findByCompany(final Company company) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("company", company.getId());
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                "select * from "
+                + TABLE
+                + " where " + COMPANY_FIELD + " = :company",
+                params);
+
+        final List<LocationProfile> result = new LinkedList<LocationProfile>();
+
+        final Map<Long, Company> companyCache = new HashMap<Long, Company>();
+        companyCache.put(company.getId(), company);
+        for (final Map<String, Object> row : rows) {
+            result.add(createLocationProfile(row, companyCache));
+        }
+        return result;
+    }
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)

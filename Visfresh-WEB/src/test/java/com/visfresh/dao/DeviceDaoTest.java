@@ -88,6 +88,31 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
     }
+    @Test
+    public void testFindByCompany() {
+        createAndSaveDevice(sharedCompany, "293487032784");
+        createAndSaveDevice(sharedCompany, "834270983474");
+
+        assertEquals(2, dao.findByCompany(sharedCompany).size());
+
+        //test left company
+        Company left = new Company();
+        left.setName("name");
+        left.setDescription("description");
+        left = companyDao.save(left);
+
+        assertEquals(0, dao.findByCompany(left).size());
+    }
+
+    /**
+     * @param c
+     * @param imei
+     */
+    private Device createAndSaveDevice(final Company c, final String imei) {
+        final Device d = createDevice(imei);
+        d.setCompany(c);
+        return dao.save(d);
+    }
 
     @Test
     public void testAllGetByImei() {

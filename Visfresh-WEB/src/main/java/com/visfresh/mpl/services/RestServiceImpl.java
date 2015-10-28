@@ -3,7 +3,6 @@
  */
 package com.visfresh.mpl.services;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -76,6 +75,7 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public Long saveAlertProfile(final Company company, final AlertProfile alert) {
+        alert.setCompany(company);
         return alertProfileDao.save(alert).getId();
     }
 
@@ -84,13 +84,14 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public List<AlertProfile> getAlertProfiles(final Company company) {
-        return asList(alertProfileDao.findAll());
+        return alertProfileDao.findByCompany(company);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#saveLocationProfile(com.visfresh.entities.LocationProfile)
      */
     @Override
     public Long saveLocationProfile(final Company company, final LocationProfile profile) {
+        profile.setCompany(company);
         return locationProfileDao.save(profile).getId();
     }
 
@@ -99,7 +100,7 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public List<LocationProfile> getLocationProfiles(final Company company) {
-        return asList(locationProfileDao.findAll());
+        return locationProfileDao.findByCompany(company);
     }
 
     /* (non-Javadoc)
@@ -107,6 +108,7 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public Long saveNotificationSchedule(final Company company, final NotificationSchedule schedule) {
+        schedule.setCompany(company);
         return notificationScheduleDao.save(schedule).getId();
     }
 
@@ -115,7 +117,7 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public List<NotificationSchedule> getNotificationSchedules(final Company company) {
-        return asList(notificationScheduleDao.findAll());
+        return notificationScheduleDao.findByCompany(company);
     }
 
     /* (non-Javadoc)
@@ -123,6 +125,7 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public Long saveShipmentTemplate(final Company company, final ShipmentTemplate tpl) {
+        tpl.setCompany(company);
         return shipmentTemplateDao.save(tpl).getId();
     }
 
@@ -131,7 +134,7 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public List<ShipmentTemplate> getShipmentTemplates(final Company company) {
-        return asList(shipmentTemplateDao.findAll());
+        return shipmentTemplateDao.findByCompany(company);
     }
 
     /* (non-Javadoc)
@@ -148,7 +151,7 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public List<Device> getDevices(final Company company) {
-        return asList(deviceDao.findAll());
+        return deviceDao.findByCompany(company);
     }
 
     /* (non-Javadoc)
@@ -156,7 +159,7 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public List<Shipment> getShipments(final Company company) {
-        return asList(shipmentDao.findAll());
+        return shipmentDao.findByCompany(company);
     }
 
     /* (non-Javadoc)
@@ -164,6 +167,7 @@ public class RestServiceImpl implements RestService {
      */
     @Override
     public Long saveShipment(final Company company, final Shipment shipment) {
+        shipment.setCompany(company);
         return shipmentDao.save(shipment).getId();
     }
 
@@ -173,6 +177,7 @@ public class RestServiceImpl implements RestService {
     @Override
     public Long createShipmentTemplate(final Company company, final Shipment shipment, final String templateName) {
         final ShipmentTemplate tpl = new ShipmentTemplate(shipment);
+        tpl.setCompany(company);
         tpl.setAddDateShipped(true);
         tpl.setDetectLocationForShippedFrom(true);
         tpl.setUseCurrentTimeForDateShipped(true);
@@ -284,16 +289,5 @@ public class RestServiceImpl implements RestService {
         }
 
         userDao.saveProfile(user, p);
-    }
-    /**
-     * @param iter
-     * @return
-     */
-    private <E> List<E> asList(final Iterable<E> iter) {
-        final List<E> list = new LinkedList<E>();
-        for (final E e : iter) {
-            list.add(e);
-        }
-        return list;
     }
 }

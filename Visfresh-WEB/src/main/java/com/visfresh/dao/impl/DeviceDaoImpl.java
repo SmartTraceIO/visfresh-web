@@ -283,4 +283,25 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
         }
         return result;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.AlertProfileDao#findByCompany(com.visfresh.entities.Company)
+     */
+    @Override
+    public List<Device> findByCompany(final Company company) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("company", company.getId());
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                "select * from "
+                + TABLE
+                + " where " + COMPANY_FIELD + " = :company",
+                params);
+
+        final List<Device> result = new LinkedList<Device>();
+        for (final Map<String, Object> row : rows) {
+            final Device d = createDevice(row, "");
+            d.setCompany(company);
+            result.add(d);
+        }
+        return result;
+    }
 }

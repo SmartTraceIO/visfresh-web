@@ -272,6 +272,30 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
      * @return
      */
     protected abstract E createEntity();
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.AlertProfileDao#findByCompany(com.visfresh.entities.Company)
+     */
+    public List<E> findByCompany(final Company company) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("company", company.getId());
+        params.put("istemplate", isTemplate());
+
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                "select * from "
+                + TABLE
+                + " where " + COMPANY_FIELD + " = :company and "
+                + ISTEMPLATE_FIELD + "=:istemplate",
+                params);
+
+        final List<E> result = new LinkedList<E>();
+
+        final Map<Long, Company> companyCache = new HashMap<Long, Company>();
+        companyCache.put(company.getId(), company);
+        for (final Map<String, Object> row : rows) {
+            result.add(createEntity(row, companyCache));
+        }
+        return result;
+    }
     /**
      * @param id
      * @return

@@ -8,6 +8,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonalSchedule;
 
@@ -99,5 +102,20 @@ public class NotificationScheduleDaoTest
         assertTrue(ps.isPushToMobileApp());
         assertEquals("11111111118", ps.getSmsNotification());
         assertEquals(150, ps.getToTime());
+    }
+    @Test
+    public void testFindByCompany() {
+        dao.save(createTestEntity());
+        dao.save(createTestEntity());
+
+        assertEquals(2, dao.findByCompany(sharedCompany).size());
+
+        //test left company
+        Company left = new Company();
+        left.setName("name");
+        left.setDescription("description");
+        left = companyDao.save(left);
+
+        assertEquals(0, dao.findByCompany(left).size());
     }
 }

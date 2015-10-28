@@ -38,7 +38,7 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
     /**
      * Company DAO.
      */
-    private CompanyDao companyDao;
+    protected CompanyDao companyDao;
     /**
      * Shared company.
      */

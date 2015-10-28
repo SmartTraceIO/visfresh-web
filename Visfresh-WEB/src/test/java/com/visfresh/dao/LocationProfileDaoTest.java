@@ -9,6 +9,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import com.visfresh.entities.Company;
 import com.visfresh.entities.LocationProfile;
 
 /**
@@ -59,6 +62,29 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
         assertNotNull(lp.getLocation());
         assertEquals(100.200, lp.getLocation().getLatitude(), 0.000001);
         assertEquals(300.400, lp.getLocation().getLongitude(), 0.000001);
+    }
+    @Test
+    public void testFindByCompany() {
+        createAndSaveLocationProfile(sharedCompany);
+        createAndSaveLocationProfile(sharedCompany);
+
+        assertEquals(2, dao.findByCompany(sharedCompany).size());
+
+        //test left company
+        Company left = new Company();
+        left.setName("name");
+        left.setDescription("description");
+        left = companyDao.save(left);
+
+        assertEquals(0, dao.findByCompany(left).size());
+    }
+    /**
+     * @param c
+     */
+    private LocationProfile createAndSaveLocationProfile(final Company c) {
+        final LocationProfile a = createTestEntity();
+        a.setCompany(c);
+        return dao.save(a);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)

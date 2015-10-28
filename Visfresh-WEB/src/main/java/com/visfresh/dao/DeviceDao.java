@@ -5,6 +5,7 @@ package com.visfresh.dao;
 
 import java.util.List;
 
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 
 /**
@@ -18,4 +19,9 @@ public interface DeviceDao extends DaoBase<Device, String> {
      * @return list of all registered devices by given IMEI.
      */
     List<Device> findAllByImei(String imei);
+    /**
+     * @param company company.
+     * @return list of devices.
+     */
+    List<Device> findByCompany(Company company);
 }

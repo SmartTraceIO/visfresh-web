@@ -3,6 +3,9 @@
  */
 package com.visfresh.dao;
 
+import java.util.List;
+
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
 
 /**
@@ -15,4 +18,10 @@ public interface ShipmentDao extends DaoBase<Shipment, Long> {
      * @return active shipment for given devcie.
      */
     Shipment findActiveShipment(String imei);
+
+    /**
+     * @param company company.
+     * @return list of shipments.
+     */
+    List<Shipment> findByCompany(Company company);
 }

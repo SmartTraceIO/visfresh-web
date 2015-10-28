@@ -8,7 +8,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Test;
+
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Company;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -27,8 +30,17 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
      */
     @Override
     protected AlertProfile createTestEntity() {
+        final Company c = sharedCompany;
+        return createAlertProfile(c);
+    }
+
+    /**
+     * @param c
+     * @return
+     */
+    protected AlertProfile createAlertProfile(final Company c) {
         final AlertProfile p = new AlertProfile();
-        p.setCompany(sharedCompany);
+        p.setCompany(c);
         p.setCriticalHighTemperature(10.10);
         p.setCriticalHighTemperatureForMoreThen(10);
         p.setCriticalLowTemperature(-20.20);
@@ -63,6 +75,28 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertTrue(p.isWatchShock());
         assertTrue(p.isWatchEnterDarkEnvironment());
     }
+    @Test
+    public void testFindByCompany() {
+        createAndSaveAlertProfile(sharedCompany);
+        createAndSaveAlertProfile(sharedCompany);
+
+        assertEquals(2, dao.findByCompany(sharedCompany).size());
+
+        //test left company
+        Company left = new Company();
+        left.setName("name");
+        left.setDescription("description");
+        left = companyDao.save(left);
+
+        assertEquals(0, dao.findByCompany(left).size());
+    }
+    /**
+     * @param c
+     */
+    private AlertProfile createAndSaveAlertProfile(final Company c) {
+        return dao.save(createAlertProfile(c));
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
      */

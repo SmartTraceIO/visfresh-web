@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -318,6 +319,21 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         assertEquals(1, dao.findOne(s1.getId()).getTripCount());
         assertEquals(2, dao.findOne(s2.getId()).getTripCount());
+    }
+    @Test
+    public void testFindByCompany() {
+        dao.save(createTestEntity());
+        createShipmentTemplate();
+
+        assertEquals(1, dao.findByCompany(sharedCompany).size());
+
+        //test left company
+        Company left = new Company();
+        left.setName("name");
+        left.setDescription("description");
+        left = companyDao.save(left);
+
+        assertEquals(0, dao.findByCompany(left).size());
     }
 
     public ShipmentTemplate createShipmentTemplate() {

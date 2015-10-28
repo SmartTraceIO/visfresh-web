@@ -62,63 +62,15 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
     public <S extends AlertProfile> S save(final S ap) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
-        String sql;
+        final List<String> fields = getFields(false);
 
+        String sql;
         if (ap.getId() == null) {
             //insert
-            sql = "insert into " + TABLE + " (" + combine(
-                    NAME_FIELD
-                    , DESCRIPTION_FIELD
-                    , LOWTEMP_FIELD
-                    , CRITICALLOWTEMP_FIELD
-                    , LOWTEMPFORMORETHEN_FIELD
-                    , CRITICALLOWTEMPFORMORETHEN_FIELD
-                    , HIGHTEMP_FIELD
-                    , HIGHTEMPFORMORETHEN_FIELD
-                    , CRITICALHIGHTEMPFORMORETHEN_FIELD
-                    , ONENTERBRIGHT_FIELD
-                    , ONENTERDARK_FIELD
-                    , ONSHOCK_FIELD
-                    , ONBATTERYLOW_FIELD
-                    , COMPANY_FIELD
-                    , CRITICALHIGHTEMP_FIELD
-                ) + ")" + " values("
-                    + ":"+ NAME_FIELD
-                    + ", :" + DESCRIPTION_FIELD
-                    + ", :" + LOWTEMP_FIELD
-                    + ", :" + CRITICALLOWTEMP_FIELD
-                    + ", :" + LOWTEMPFORMORETHEN_FIELD
-                    + ", :" + CRITICALLOWTEMPFORMORETHEN_FIELD
-                    + ", :" + HIGHTEMP_FIELD
-                    + ", :" + HIGHTEMPFORMORETHEN_FIELD
-                    + ", :" + CRITICALHIGHTEMPFORMORETHEN_FIELD
-                    + ", :" + ONENTERBRIGHT_FIELD
-                    + ", :" + ONENTERDARK_FIELD
-                    + ", :" + ONSHOCK_FIELD
-                    + ", :" + ONBATTERYLOW_FIELD
-                    + ", :" + COMPANY_FIELD
-                    + ", :" + CRITICALHIGHTEMP_FIELD
-                    + ")";
+            sql = createInsertScript(TABLE, fields);
         } else {
             //update
-            sql = "update " + TABLE + " set "
-                + NAME_FIELD + "=:" + NAME_FIELD
-                + "," + DESCRIPTION_FIELD + "=:" + DESCRIPTION_FIELD
-                + "," + LOWTEMP_FIELD + "=:" + LOWTEMP_FIELD
-                + "," + CRITICALLOWTEMP_FIELD + "=:" + CRITICALLOWTEMP_FIELD
-                + "," + LOWTEMPFORMORETHEN_FIELD + "=:" + LOWTEMPFORMORETHEN_FIELD
-                + "," + CRITICALLOWTEMPFORMORETHEN_FIELD + "=:" + CRITICALLOWTEMPFORMORETHEN_FIELD
-                + "," + HIGHTEMP_FIELD + "=:" + HIGHTEMP_FIELD
-                + "," + HIGHTEMPFORMORETHEN_FIELD + "=:" + HIGHTEMPFORMORETHEN_FIELD
-                + "," + CRITICALHIGHTEMPFORMORETHEN_FIELD + "=:" + CRITICALHIGHTEMPFORMORETHEN_FIELD
-                + "," + ONENTERBRIGHT_FIELD + "=:" + ONENTERBRIGHT_FIELD
-                + "," + ONENTERDARK_FIELD + "=:" + ONENTERDARK_FIELD
-                + "," + ONSHOCK_FIELD + "=:" + ONSHOCK_FIELD
-                + "," + ONBATTERYLOW_FIELD + "=:" + ONBATTERYLOW_FIELD
-                + "," + CRITICALHIGHTEMP_FIELD + "=:" + CRITICALHIGHTEMP_FIELD
-                + "," + COMPANY_FIELD + "=:" + COMPANY_FIELD
-                + " where " + ID_FIELD + " = :" + ID_FIELD
-            ;
+            sql = createUpdateScript(TABLE, fields, ID_FIELD);
         }
 
         paramMap.put(ID_FIELD, ap.getId());
@@ -146,7 +98,28 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
 
         return ap;
     }
-
+    private List<String> getFields(final boolean includeId) {
+        final List<String> fields = new LinkedList<String>();
+        fields.add(NAME_FIELD);
+        fields.add(DESCRIPTION_FIELD);
+        fields.add(LOWTEMP_FIELD);
+        fields.add(CRITICALLOWTEMP_FIELD);
+        fields.add(LOWTEMPFORMORETHEN_FIELD);
+        fields.add(CRITICALLOWTEMPFORMORETHEN_FIELD);
+        fields.add(HIGHTEMP_FIELD);
+        fields.add(HIGHTEMPFORMORETHEN_FIELD);
+        fields.add(CRITICALHIGHTEMPFORMORETHEN_FIELD);
+        fields.add(ONENTERBRIGHT_FIELD);
+        fields.add(ONENTERDARK_FIELD);
+        fields.add(ONSHOCK_FIELD);
+        fields.add(ONBATTERYLOW_FIELD);
+        fields.add(COMPANY_FIELD);
+        fields.add(CRITICALHIGHTEMP_FIELD);
+        if (includeId) {
+            fields.add(ID_FIELD);
+        }
+        return fields;
+    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
      */
@@ -195,12 +168,34 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
         }
         return result;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.AlertProfileDao#findByCompany(com.visfresh.entities.Company)
+     */
+    @Override
+    public List<AlertProfile> findByCompany(final Company company) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("company", company.getId());
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                "select * from "
+                + TABLE
+                + " where " + COMPANY_FIELD + " = :company",
+                params);
+
+        final List<AlertProfile> result = new LinkedList<AlertProfile>();
+
+        final Map<Long, Company> companyCache = new HashMap<Long, Company>();
+        companyCache.put(company.getId(), company);
+        for (final Map<String, Object> row : rows) {
+            result.add(createAlertProfile(row, companyCache));
+        }
+        return result;
+    }
     /**
      * @param map
      * @return
      */
     private AlertProfile createAlertProfile(final Map<String, Object> map,
-            final Map<Long, Company> userCache) {
+            final Map<Long, Company> cache) {
         final AlertProfile no = new AlertProfile();
 
         no.setId(((Number) map.get(ID_FIELD)).longValue());
@@ -223,10 +218,10 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
         no.setWatchBatteryLow((Boolean) map.get(ONBATTERYLOW_FIELD));
 
         final long companyId = ((Number) map.get(COMPANY_FIELD)).longValue();
-        Company company = userCache.get(companyId);
+        Company company = cache.get(companyId);
         if (company == null) {
             company = companyDao.findOne(companyId);
-            userCache.put(companyId, company);
+            cache.put(companyId, company);
         }
         no.setCompany(company);
 
