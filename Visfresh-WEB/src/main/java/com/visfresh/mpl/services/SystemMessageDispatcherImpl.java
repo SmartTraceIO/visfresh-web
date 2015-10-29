@@ -23,6 +23,7 @@ import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.services.RetryableException;
+import com.visfresh.services.SystemMessageDispatcher;
 import com.visfresh.services.SystemMessageHandler;
 
 /**
@@ -30,11 +31,11 @@ import com.visfresh.services.SystemMessageHandler;
  *
  */
 @Component
-public class SystemMessageDispatcher {
+public class SystemMessageDispatcherImpl implements SystemMessageDispatcher {
     /**
      * Logger.
      */
-    private static final Logger log = LoggerFactory.getLogger(SystemMessageDispatcher.class);
+    private static final Logger log = LoggerFactory.getLogger(SystemMessageDispatcherImpl.class);
 
     /**
      * Processor ID.
@@ -107,7 +108,7 @@ public class SystemMessageDispatcher {
      * Default constructor..
      */
     @Autowired
-    public SystemMessageDispatcher(final Environment env) {
+    public SystemMessageDispatcherImpl(final Environment env) {
         super();
         processorId = env.getProperty("system.dispatcher.baseProcessorId", "sys-dispatcher");
         setBatchLimit(Integer.parseInt(env.getProperty("system.dispatcher.batchLimit", "10")));
@@ -183,10 +184,10 @@ public class SystemMessageDispatcher {
         this.retryTimeOut = retryTimeOut;
     }
 
-    /**
-     * @param processor processor ID.
-     * @return number of processed messages.
+    /* (non-Javadoc)
+     * @see com.visfresh.mpl.services.SystemMessageDispatcher#processMessages(java.lang.String)
      */
+    @Override
     public int processMessages(final String processor) {
         final int count = 0;
 
@@ -266,6 +267,10 @@ public class SystemMessageDispatcher {
         }
     }
 
+    /* (non-Javadoc)
+     * @see com.visfresh.mpl.services.SystemMessageDispatcher#setSystemMessageHandler(com.visfresh.entities.SystemMessageType, com.visfresh.services.SystemMessageHandler)
+     */
+    @Override
     public void setSystemMessageHandler(final SystemMessageType type, final SystemMessageHandler h) {
         if (h == null) {
             handlers.remove(type);

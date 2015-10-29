@@ -19,10 +19,10 @@ import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.dao.mock.MockDaoConfig;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.junit.db.JUnitConfig;
 import com.visfresh.mock.MockSmsService;
 
 /**
@@ -116,7 +116,7 @@ public class AssignShipmentRuleTest {
     @BeforeClass
     public static void beforeClass() {
         final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
-        ctxt.scan(JUnitConfig.class.getPackage().getName(),
+        ctxt.scan(MockDaoConfig.class.getPackage().getName(),
                 DroolsRuleEngine.class.getPackage().getName(),
                 MockSmsService.class.getPackage().getName());
         ctxt.refresh();

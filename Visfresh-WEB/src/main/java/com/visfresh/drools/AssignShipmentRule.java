@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.TrackerEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -27,7 +25,6 @@ public class AssignShipmentRule implements TrackerEventRule {
     private ShipmentDao shipmentDao;
     @Autowired
     private DroolsRuleEngine engine;
-
     /**
      * Default constructor.
      */
@@ -45,31 +42,23 @@ public class AssignShipmentRule implements TrackerEventRule {
      */
     @Override
     public boolean accept(final TrackerEventRequest e) {
-        return e.getEvent().getShipment() == null && e.getClientProperty(this) == null;
+        if(e.getEvent().getShipment() == null && e.getClientProperty(this) == null) {
+            final Shipment s = shipmentDao.findActiveShipment(e.getEvent().getDevice().getImei());
+            if (s != null) {
+                //cache shipment to request.
+                e.putClientProperty(this, s);
+                return true;
+            }
+        }
+        return false;
     }
     /* (non-Javadoc)
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
     public boolean handle(final TrackerEventRequest req) {
-        //mark request as processed.
-        req.putClientProperty(this, Boolean.TRUE);
-
-        final TrackerEvent event = req.getEvent();
-
-        final Device device = event.getDevice();
-        Shipment shipment = shipmentDao.findActiveShipment(device.getImei());
-
-        if (shipment == null) {
-            //create shipment.
-            final Shipment s = new Shipment();
-            s.setName("Default Shipment");
-            s.setCompany(device.getCompany());
-            s.setDevice(device);
-            shipment = shipmentDao.save(s);
-        }
-
-        event.setShipment(shipment);
+        final Shipment shipment = (Shipment) req.getClientProperty(this);
+        req.getEvent().setShipment(shipment);
         return true;
     }
 }

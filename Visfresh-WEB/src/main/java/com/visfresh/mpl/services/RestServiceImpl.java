@@ -33,6 +33,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
+import com.visfresh.opengts.DefaultOpenJtsFacade;
 import com.visfresh.services.RestService;
 
 /**
@@ -40,7 +41,7 @@ import com.visfresh.services.RestService;
  *
  */
 @Component
-@ComponentScan(basePackageClasses = {DaoImplBase.class, DroolsRuleEngine.class})
+@ComponentScan(basePackageClasses = {DaoImplBase.class, DroolsRuleEngine.class, DefaultOpenJtsFacade.class})
 public class RestServiceImpl implements RestService {
     @Autowired
     private AlertProfileDao alertProfileDao;

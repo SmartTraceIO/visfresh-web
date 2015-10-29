@@ -12,14 +12,26 @@ import com.visfresh.drools.EnterDarkEnvironmentAlertRule;
 import com.visfresh.drools.ShockAlertRule;
 import com.visfresh.drools.BatteryLowAlertRule;
 import com.visfresh.drools.ArrivalRule;
+import com.visfresh.drools.AutoStartShipmentRule;
 
 global com.visfresh.drools.DroolsRuleEngine engine;
 
 rule "AssignShipment"
+	salience 100
     when
         req : TrackerEventRequest(engine.getRule(AssignShipmentRule.NAME).accept(this));
     then
     	if(engine.getRule(AssignShipmentRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "AutoStartShipment"
+	salience 50
+    when
+        req : TrackerEventRequest(engine.getRule(AutoStartShipmentRule.NAME).accept(this));
+    then
+    	if(engine.getRule(AutoStartShipmentRule.NAME).handle(req)) {
        		update(req);
         }
 end

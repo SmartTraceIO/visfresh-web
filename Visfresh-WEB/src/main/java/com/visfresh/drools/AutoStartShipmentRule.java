@@ -8,32 +8,27 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.services.OpenJtsFacade;
+import com.visfresh.dao.ShipmentDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class OpenJtsRule implements TrackerEventRule {
+public class AutoStartShipmentRule implements TrackerEventRule {
     /**
      * Rule name.
      */
-    public static final String NAME = "OpenJts";
+    public static final String NAME = "AutoStartShipment";
     @Autowired
-    private OpenJtsFacade openJtsFacade;
+    private ShipmentDao shipmentDao;
     @Autowired
     private DroolsRuleEngine engine;
 
     /**
-     * Is enabled flag (only for unit tests.
-     */
-    private boolean isEnabled;
-
-    /**
      * Default constructor.
      */
-    public OpenJtsRule() {
+    public AutoStartShipmentRule() {
         super();
     }
 
@@ -47,30 +42,18 @@ public class OpenJtsRule implements TrackerEventRule {
      */
     @Override
     public boolean accept(final TrackerEventRequest e) {
-        return e.getClientProperty(this) == null;
+        return e.getEvent().getShipment() == null && e.getClientProperty(this) == null;
     }
     /* (non-Javadoc)
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
     public boolean handle(final TrackerEventRequest req) {
-        //mark request as processed.
         req.putClientProperty(this, Boolean.TRUE);
-        if (isEnabled) {
-            openJtsFacade.addTrackerEvent(req.getEvent().getShipment(), req.getEvent());
-        }
+        //TODO
+//        final Shipment shipment = (Shipment) req.getClientProperty(this);
+//        req.getEvent().setShipment(shipment);
+//        return true;
         return false;
-    }
-    /**
-     * @return the isEnabled
-     */
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-    /**
-     * @param isEnabled the isEnabled to set
-     */
-    public void setEnabled(final boolean isEnabled) {
-        this.isEnabled = isEnabled;
     }
 }

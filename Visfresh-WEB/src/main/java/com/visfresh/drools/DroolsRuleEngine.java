@@ -26,9 +26,9 @@ import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
-import com.visfresh.mpl.services.SystemMessageDispatcher;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.RuleEngine;
+import com.visfresh.services.SystemMessageDispatcher;
 import com.visfresh.services.SystemMessageHandler;
 
 /**
@@ -44,15 +44,25 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
     @Autowired
     private TrackerEventDao eventDao;
     @Autowired
-    private EntityJSonSerializer jsonSerializer;
-    @Autowired
     private TrackerEventDao trackerEventDao;
     @Autowired
     private DeviceDao deviceDao;
+    private EntityJSonSerializer jsonSerializer = new EntityJSonSerializer();
 
     private KieContainer kie;
 
     private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<String, TrackerEventRule>();
+    private final TrackerEventRule emptyRule = new TrackerEventRule() {
+        @Override
+        public boolean handle(final TrackerEventRequest e) {
+            return false;
+        }
+        @Override
+        public boolean accept(final TrackerEventRequest e) {
+            return false;
+        }
+    };
+
     /**
      * @param env
      */
@@ -133,7 +143,11 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
      * @return rule.
      */
     public TrackerEventRule getRule(final String name) {
-        TrackerEventRule rule = rules.get(name);
+        final TrackerEventRule rule = rules.get(name);
+        if (name == null) {
+            log.warn("Rule with name " + name + " is not found. Given drools expression will ignored");
+            return emptyRule;
+        }
         return rule;
     }
     /**
