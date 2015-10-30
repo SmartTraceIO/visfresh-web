@@ -79,6 +79,16 @@ public class RestServiceImpl implements RestService {
         alert.setCompany(company);
         return alertProfileDao.save(alert).getId();
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteAlertProfile(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public void deleteAlertProfile(final Company company, final Long alertProfileId) {
+        final AlertProfile p = alertProfileDao.findOne(alertProfileId);
+        if (p != null && p.getCompany().getId().equals(company.getId())) {
+            alertProfileDao.delete(alertProfileId);
+        }
+    }
 
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getAlertProfiles()
@@ -91,7 +101,7 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#saveLocationProfile(com.visfresh.entities.LocationProfile)
      */
     @Override
-    public Long saveLocationProfile(final Company company, final LocationProfile profile) {
+    public Long saveLocation(final Company company, final LocationProfile profile) {
         profile.setCompany(company);
         return locationProfileDao.save(profile).getId();
     }
@@ -100,8 +110,18 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getLocationProfiles()
      */
     @Override
-    public List<LocationProfile> getLocationProfiles(final Company company) {
+    public List<LocationProfile> getLocation(final Company company) {
         return locationProfileDao.findByCompany(company);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteLocation(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public void deleteLocation(final Company company, final Long locationId) {
+        final LocationProfile p = locationProfileDao.findOne(locationId);
+        if (p != null && p.getCompany().getId().equals(company.getId())) {
+            locationProfileDao.delete(locationId);
+        }
     }
 
     /* (non-Javadoc)
@@ -120,7 +140,17 @@ public class RestServiceImpl implements RestService {
     public List<NotificationSchedule> getNotificationSchedules(final Company company) {
         return notificationScheduleDao.findByCompany(company);
     }
-
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteNotificationSchedule(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public void deleteNotificationSchedule(final Company company,
+            final Long notificationScheduleId) {
+        final NotificationSchedule n = notificationScheduleDao.findOne(notificationScheduleId);
+        if (n != null && n.getCompany().getId().equals(company.getId())) {
+            notificationScheduleDao.delete(notificationScheduleId);
+        }
+    }
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#saveShipmentTemplate(com.visfresh.entities.ShipmentTemplate)
      */
@@ -170,6 +200,16 @@ public class RestServiceImpl implements RestService {
     public Long saveShipment(final Company company, final Shipment shipment) {
         shipment.setCompany(company);
         return shipmentDao.save(shipment).getId();
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteShipment(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public void deleteShipment(final Company company, final Long shipmentId) {
+        final Shipment s = shipmentDao.findOne(shipmentId);
+        if (s != null && s.getCompany().getId().equals(company.getId())) {
+            shipmentDao.delete(shipmentId);
+        }
     }
 
     /* (non-Javadoc)
@@ -246,6 +286,16 @@ public class RestServiceImpl implements RestService {
     public ShipmentTemplate getShipmentTemplate(final Company company, final Long id) {
         final ShipmentTemplate s = shipmentTemplateDao.findOne(id);
         return  s == null || !s.getCompany().getId().equals(company.getId()) ? null : s;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteShipmentTemplate(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public void deleteShipmentTemplate(final Company company, final Long id) {
+        final ShipmentTemplate s = shipmentTemplateDao.findOne(id);
+        if (s != null && s.getCompany().getId().equals(company.getId())) {
+            shipmentTemplateDao.delete(id);
+        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getNotificationSchedule(com.visfresh.entities.Company, java.lang.Long)

@@ -26,8 +26,8 @@ public interface RestService {
     Long saveAlertProfile(Company company, final AlertProfile alert);
     List<AlertProfile> getAlertProfiles(Company company);
 
-    Long saveLocationProfile(Company company, final LocationProfile profile);
-    List<LocationProfile> getLocationProfiles(Company company);
+    Long saveLocation(Company company, final LocationProfile profile);
+    List<LocationProfile> getLocation(Company company);
 
     Long saveNotificationSchedule(Company company, final NotificationSchedule schedule);
     List<NotificationSchedule> getNotificationSchedules(Company company);
@@ -102,4 +102,30 @@ public interface RestService {
      * @return
      */
     List<Company> getCompanies();
+    /**
+     * @param company TODO
+     * @param alertProfileId
+     */
+    void deleteAlertProfile(Company company, Long alertProfileId);
+    /**
+     * @param company TODO
+     * @param locationId
+     */
+    void deleteLocation(Company company, Long locationId);
+    /**
+     * @param company
+     * @param notificationScheduleId
+     */
+    void deleteNotificationSchedule(Company company,
+            Long notificationScheduleId);
+    /**
+     * @param company
+     * @param shipmentId
+     */
+    void deleteShipment(Company company, Long shipmentId);
+    /**
+     * @param company
+     * @param shipmentTemplateId
+     */
+    void deleteShipmentTemplate(Company company, Long shipmentTemplateId);
 }

@@ -72,12 +72,12 @@ public interface AccessController {
      * @param user user to check permissions.
      * @throws RestServiceException
      */
-    void checkCanGetLocationProfiles(User user) throws RestServiceException;
+    void checkCanGetLocations(User user) throws RestServiceException;
     /**
      * @param user user to check permissions.
      * @throws RestServiceException
      */
-    void checkCanSaveLocationProfile(User user) throws RestServiceException;
+    void checkCanSaveLocation(User user) throws RestServiceException;
     /**
      * @param user user to check permissions.
      * @throws RestServiceException

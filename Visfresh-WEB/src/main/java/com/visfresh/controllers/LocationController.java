@@ -52,15 +52,15 @@ public class LocationController extends AbstractController {
      * @return ID of saved location profile.
      */
     @RequestMapping(value = "/saveLocation/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String saveLocationProfile(@PathVariable final String authToken,
+    public @ResponseBody String saveLocation(@PathVariable final String authToken,
             final @RequestBody String profile) {
         try {
             final User user = getLoggedInUser(authToken);
             final LocationProfile lp = getSerializer().parseLocationProfile(getJSonObject(profile));
 
-            security.checkCanSaveLocationProfile(user);
+            security.checkCanSaveLocation(user);
 
-            final Long id = restService.saveLocationProfile(user.getCompany(), lp);
+            final Long id = restService.saveLocation(user.getCompany(), lp);
             return createIdResponse("locationId", id);
         } catch (final Exception e) {
             log.error("Failed to save location profile.", e);
@@ -74,16 +74,16 @@ public class LocationController extends AbstractController {
      * @return list of location profiles.
      */
     @RequestMapping(value = "/getLocations/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getLocationProfiles(@PathVariable final String authToken,
+    public @ResponseBody String getLocation(@PathVariable final String authToken,
             @RequestParam final int pageIndex, @RequestParam final int pageSize) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetLocationProfiles(user);
+            security.checkCanGetLocations(user);
 
             final EntityJSonSerializer ser = getSerializer();
 
-            final List<LocationProfile> locations = getPage(restService.getLocationProfiles(user.getCompany()),
+            final List<LocationProfile> locations = getPage(restService.getLocation(user.getCompany()),
                     pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final LocationProfile location : locations) {
@@ -102,15 +102,35 @@ public class LocationController extends AbstractController {
      * @return location profile.
      */
     @RequestMapping(value = "/getLocation/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getLocationProfile(@PathVariable final String authToken,
+    public @ResponseBody String getLocation(@PathVariable final String authToken,
             @RequestParam final Long locationId) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetLocationProfiles(user);
+            security.checkCanGetLocations(user);
 
             final LocationProfile location = restService.getLocationProfile(user.getCompany(), locationId);
             return createSuccessResponse(getSerializer().toJson(location));
+        } catch (final Exception e) {
+            log.error("Failed to get location profiles", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param locationId location profile ID.
+     * @return location profile.
+     */
+    @RequestMapping(value = "/deleteLocation/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String deleteLocation(@PathVariable final String authToken,
+            @RequestParam final Long locationId) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSaveLocation(user);
+
+            restService.deleteLocation(user.getCompany(), locationId);
+            return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to get location profiles", e);
             return createErrorResponse(e);

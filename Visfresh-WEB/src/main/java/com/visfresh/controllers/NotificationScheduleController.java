@@ -117,4 +117,25 @@ public class NotificationScheduleController extends AbstractController {
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param authToken authentication token.
+     * @param notificationScheduleId notification schedule ID.
+     * @return notification schedule.
+     */
+    @RequestMapping(value = "/deleteNotificationSchedule/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String deleteNotificationSchedule(@PathVariable final String authToken,
+            @RequestParam final Long notificationScheduleId) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSaveNotificationSchedule(user);
+
+            restService.deleteNotificationSchedule(user.getCompany(), notificationScheduleId);
+
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to get notification schedules", e);
+            return createErrorResponse(e);
+        }
+    }
 }

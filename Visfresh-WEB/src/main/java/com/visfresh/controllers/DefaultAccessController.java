@@ -156,7 +156,7 @@ public class DefaultAccessController implements AccessController {
      * @see com.visfresh.controllers.AccessController#checkCanGetLocationProfiles(com.visfresh.entities.User)
      */
     @Override
-    public void checkCanGetLocationProfiles(final User user)
+    public void checkCanGetLocations(final User user)
             throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
@@ -168,7 +168,7 @@ public class DefaultAccessController implements AccessController {
      * @see com.visfresh.controllers.AccessController#checkCanSaveLocationProfile(com.visfresh.entities.User)
      */
     @Override
-    public void checkCanSaveLocationProfile(final User user)
+    public void checkCanSaveLocation(final User user)
             throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,

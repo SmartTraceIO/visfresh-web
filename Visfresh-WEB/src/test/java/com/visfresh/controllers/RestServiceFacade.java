@@ -69,65 +69,12 @@ public class RestServiceFacade  {
         final GsonBuilder b = new GsonBuilder();
         b.setPrettyPrinting();
         this.gson = b.create();
-
-        serializer.setReferenceResolver(new ReferenceResolver() {
-            @Override
-            public Shipment getShipment(final Long id) {
-                try {
-                    return RestServiceFacade.this.getShipment(id);
-                } catch (IOException | RestServiceException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-            @Override
-            public NotificationSchedule getNotificationSchedule(final Long id) {
-                try {
-                    return RestServiceFacade.this.getNotificationSchedule(id);
-                } catch (IOException | RestServiceException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-            @Override
-            public LocationProfile getLocationProfile(final Long id) {
-                try {
-                    return RestServiceFacade.this.getLocation(id);
-                } catch (IOException | RestServiceException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-            @Override
-            public Device getDevice(final String id) {
-                try {
-                    return RestServiceFacade.this.getDevice(id);
-                } catch (IOException | RestServiceException e) {
-                    return null;
-                }
-            }
-            @Override
-            public AlertProfile getAlertProfile(final Long id) {
-                try {
-                    return RestServiceFacade.this.getAlertProfile(id);
-                } catch (IOException | RestServiceException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-            /* (non-Javadoc)
-             * @see com.visfresh.io.ReferenceResolver#getCompany(java.lang.Long)
-             */
-            @Override
-            public Company getCompany(final Long id) {
-                try {
-                    return RestServiceFacade.this.getCompany(id);
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        });
+    }
+    /**
+     * @param referenceResolver
+     */
+    public void setReferenceResolver(final ReferenceResolver referenceResolver) {
+        serializer.setReferenceResolver(referenceResolver);
     }
     /**
      * @param login
@@ -161,6 +108,16 @@ public class RestServiceFacade  {
         final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveAlertProfile"),
                 serializer.toJson(alert)).getAsJsonObject();
         return parseId(e);
+    }
+    /**
+     * @param p
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deleteAlertProfile(final AlertProfile p) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("alertProfileId", p.getId().toString());
+        sendGetRequest(getPathWithToken(REST_SERVICE, "deleteAlertProfile"), params);
     }
 
     public List<AlertProfile> getAlertProfiles(final int pageIndex, final int pageSize) throws RestServiceException, IOException {
@@ -627,6 +584,17 @@ public class RestServiceFacade  {
         return response == JsonNull.INSTANCE ? null : serializer.parseLocationProfile(
                 response.getAsJsonObject());
     }
+    /**
+     * @param id
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deleteLocation(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("locationId", id.toString());
+
+        sendGetRequest(getPathWithToken(REST_SERVICE, "deleteLocation"), params);
+    }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.ReferenceResolver#getAlertProfile(java.lang.Long)
      */
@@ -651,6 +619,16 @@ public class RestServiceFacade  {
         return response == JsonNull.INSTANCE ? null : serializer.parseShipment(
                 response.getAsJsonObject());
     }
+    /**
+     * @param id
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deleteShipment(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("shipmentId", id.toString());
+        sendGetRequest(getPathWithToken(REST_SERVICE, "deleteShipment"), params);
+    }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.ReferenceResolver#getNotificationSchedule(java.lang.Long)
      */
@@ -663,6 +641,17 @@ public class RestServiceFacade  {
                 "getNotificationSchedule"), params);
         return response == JsonNull.INSTANCE ? null : serializer.parseNotificationSchedule(
                 response.getAsJsonObject());
+    }
+    /**
+     * @param id
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deleteNotificationSchedule(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("notificationScheduleId", id.toString());
+
+        sendGetRequest(getPathWithToken(REST_SERVICE, "deleteNotificationSchedule"), params);
     }
     /* (non-Javadoc)
      * @see com.visfresh.io.ReferenceResolver#getDevice(java.lang.String)
@@ -690,6 +679,16 @@ public class RestServiceFacade  {
                 "getShipmentTemplate"), params);
         return response == JsonNull.INSTANCE ? null : serializer.parseShipmentTemplate(
                 response.getAsJsonObject());
+    }
+    /**
+     * @param id
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deleteShipmentTemplate(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("shipmentTemplateId", id.toString());
+        sendGetRequest(getPathWithToken(REST_SERVICE, "deleteShipmentTemplate"), params);
     }
     /**
      * @return user profile.

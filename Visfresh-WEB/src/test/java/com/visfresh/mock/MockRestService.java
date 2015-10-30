@@ -74,6 +74,13 @@ public class MockRestService implements RestService {
         return alert.getId();
     }
     /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteAlertProfile(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public void deleteAlertProfile(final Company company, final Long alertProfileId) {
+        alertProfiles.remove(alertProfileId);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getAlertProfiles()
      */
     @Override
@@ -87,7 +94,7 @@ public class MockRestService implements RestService {
      * @see com.visfresh.services.RestService#saveLocationProfile(com.visfresh.entities.LocationProfile)
      */
     @Override
-    public Long saveLocationProfile(final Company company, final LocationProfile profile) {
+    public Long saveLocation(final Company company, final LocationProfile profile) {
         if (profile.getId() == null) {
             profile.setId(ids.incrementAndGet());
             synchronized (locationProfiles) {
@@ -100,9 +107,18 @@ public class MockRestService implements RestService {
      * @see com.visfresh.services.RestService#getLocationProfiles()
      */
     @Override
-    public List<LocationProfile> getLocationProfiles(final Company company) {
+    public List<LocationProfile> getLocation(final Company company) {
         synchronized (locationProfiles) {
             return new LinkedList<LocationProfile>(locationProfiles.values());
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteLocation(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public void deleteLocation(final Company company, final Long locationId) {
+        synchronized (locationProfiles) {
+            locationProfiles.remove(locationId);
         }
     }
 
@@ -130,6 +146,16 @@ public class MockRestService implements RestService {
     public List<NotificationSchedule> getNotificationSchedules(final Company company) {
         synchronized (notificationSchedules) {
             return new LinkedList<NotificationSchedule>(notificationSchedules.values());
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteNotificationSchedule(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public void deleteNotificationSchedule(final Company company,
+            final Long notificationScheduleId) {
+        synchronized (notificationSchedules) {
+            notificationSchedules.remove(notificationScheduleId);
         }
     }
 
@@ -218,6 +244,7 @@ public class MockRestService implements RestService {
     public Long saveShipment(final Company company, final Shipment shipment) {
         if (shipment.getId() == null) {
             shipment.setId(ids.incrementAndGet());
+            shipment.setCompany(company);
             synchronized (shipments) {
                 shipments.put(shipment.getId(), shipment);
             }
@@ -269,11 +296,25 @@ public class MockRestService implements RestService {
         return shipments.get(id);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteShipment(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public void deleteShipment(final Company company, final Long shipmentId) {
+        shipments.remove(shipmentId);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getShipmentTemplate(com.visfresh.entities.Company, java.lang.Long)
      */
     @Override
     public ShipmentTemplate getShipmentTemplate(final Company company, final Long id) {
         return shipmentTemplates.get(id);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteShipmentTemplate(com.visfresh.entities.Company, java.lang.Long)
+     */
+    @Override
+    public void deleteShipmentTemplate(final Company company, final Long id) {
+        shipmentTemplates.remove(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getNotificationSchedule(com.visfresh.entities.Company, java.lang.Long)
@@ -335,5 +376,18 @@ public class MockRestService implements RestService {
         trackerEvents.clear();
         profiles.clear();
         companies.clear();
+    }
+
+    /**
+     * @param id
+     * @param e
+     */
+    public void addTrackerEvent(final String id, final TrackerEvent e) {
+        List<TrackerEvent> events = trackerEvents.get(id);
+        if (events == null) {
+            events = new LinkedList<TrackerEvent>();
+            trackerEvents.put(id, events);
+        }
+        events.add(e);
     }
 }

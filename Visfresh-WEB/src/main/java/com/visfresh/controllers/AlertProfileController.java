@@ -87,6 +87,26 @@ public class AlertProfileController extends AbstractController {
     }
     /**
      * @param authToken authentication token.
+     * @param alertProfileId alert profile ID.
+     * @return alert profile.
+     */
+    @RequestMapping(value = "/deleteAlertProfile/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String deleteAlertProfile(@PathVariable final String authToken,
+            @RequestParam final Long alertProfileId) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSaveAlertProfile(user);
+
+            restService.deleteAlertProfile(user.getCompany(), alertProfileId);
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to get alert profiles", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
      * @param pageIndex the page index.
      * @param pageSize the page size.
      * @return list of alert profiles.

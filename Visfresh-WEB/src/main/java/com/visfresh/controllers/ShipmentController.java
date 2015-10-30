@@ -128,6 +128,26 @@ public class ShipmentController extends AbstractController {
     }
     /**
      * @param authToken authentication token.
+     * @param shipmentTemplateId shipment template ID.
+     * @return shipment template.
+     */
+    @RequestMapping(value = "/deleteShipmentTemplate/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String deleteShipmentTemplate(@PathVariable final String authToken,
+            @RequestParam final Long shipmentTemplateId) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSaveShipmentTemplate(user);
+
+            restService.deleteShipmentTemplate(user.getCompany(), shipmentTemplateId);
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to delete shipment templates", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
      * @param shipment shipment.
      * @return ID of saved shipment.
      */
@@ -203,6 +223,22 @@ public class ShipmentController extends AbstractController {
             return createErrorResponse(e);
         }
     }
+    @RequestMapping(value = "/deleteShipment/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String deleteShipment(@PathVariable final String authToken,
+            @RequestParam final Long shipmentId) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSaveShipment(user);
+
+            restService.deleteShipment(user.getCompany(), shipmentId);
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to get devices", e);
+            return createErrorResponse(e);
+        }
+    }
+
     @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getShipmentData(@PathVariable final String authToken,
             @RequestParam final String fromDate,
