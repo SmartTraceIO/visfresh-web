@@ -597,7 +597,7 @@ public class RestServiceControllerTest {
         lp.setId(77L);
 
         service.locationProfiles.put(lp.getId(), lp);
-        assertNotNull(facade.getLocationProfile(lp.getId()));
+        assertNotNull(facade.getLocation(lp.getId()));
     }
     @Test
     public void testGetShipmentTemplate() throws IOException, RestServiceException {

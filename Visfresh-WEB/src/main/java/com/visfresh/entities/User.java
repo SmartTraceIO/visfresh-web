@@ -5,6 +5,7 @@ package com.visfresh.entities;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -27,6 +28,10 @@ public class User implements EntityWithId<String> {
      * Encrypted password.
      */
     private String password;
+    /**
+     * Time Zone
+     */
+    private TimeZone timeZone = TimeZone.getDefault();
     /**
      * Set of roles.
      */
@@ -99,5 +104,17 @@ public class User implements EntityWithId<String> {
      */
     public void setPassword(final String password) {
         this.password = password;
+    }
+    /**
+     * @return the timeZone
+     */
+    public TimeZone getTimeZone() {
+        return timeZone;
+    }
+    /**
+     * @param timeZone the timeZone to set
+     */
+    public void setTimeZone(final TimeZone timeZone) {
+        this.timeZone = timeZone;
     }
 }

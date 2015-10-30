@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -48,8 +49,8 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
     /**
      * Default constructor.
      */
-    public EntityJSonSerializer() {
-        super();
+    public EntityJSonSerializer(final TimeZone tz) {
+        super(tz);
     }
 
     /**
@@ -62,7 +63,6 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("expired", timeToString(token.getExpirationTime()));
         return obj;
     }
-
 
     /**
      * @param json
@@ -105,12 +105,13 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
     }
 
     /**
+     * @param idFieldName ID field name
      * @param id entity ID.
      * @return JSON object.
      */
-    public static JsonObject idToJson(final Long id) {
+    public static JsonObject idToJson(final String idFieldName, final Long id) {
         final JsonObject obj = new JsonObject();
-        obj.addProperty("id", id);
+        obj.addProperty(idFieldName, id);
         return obj;
     }
 
@@ -125,9 +126,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty("id", alert.getId());
+        obj.addProperty("alertProfileId", alert.getId());
         obj.addProperty("description", alert.getDescription());
-        obj.addProperty("name", alert.getName());
+        obj.addProperty("alertProfileName", alert.getName());
         obj.addProperty("criticalHighTemperatureForMoreThen", alert.getCriticalHighTemperatureForMoreThen());
         obj.addProperty("criticalHighTemperature", alert.getCriticalHighTemperature());
         obj.addProperty("criticalLowTemperatureForMoreThen", alert.getCriticalLowTemperatureForMoreThen());
@@ -150,9 +151,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
     public AlertProfile parseAlertProfile(final JsonObject alert) {
         final AlertProfile p = new AlertProfile();
 
-        p.setId(asLong(alert.get("id")));
+        p.setId(asLong(alert.get("alertProfileId")));
         p.setDescription(asString(alert.get("description")));
-        p.setName(asString(alert.get("name")));
+        p.setName(asString(alert.get("alertProfileName")));
         p.setCriticalHighTemperature(asDouble(alert.get("criticalHighTemperature")));
         p.setCriticalHighTemperatureForMoreThen(asInt(alert.get("criticalHighTemperatureForMoreThen")));
         p.setCriticalLowTemperature(asDouble(alert.get("criticalLowTemperature")));

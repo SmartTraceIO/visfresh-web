@@ -6,7 +6,7 @@ package com.visfresh.init.mock;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import com.visfresh.controllers.RestServiceController;
+import com.visfresh.controllers.AbstractController;
 import com.visfresh.mock.MockRestService;
 
 /**
@@ -16,7 +16,7 @@ import com.visfresh.mock.MockRestService;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@ComponentScan(basePackageClasses = {RestServiceController.class, MockRestService.class})
+@ComponentScan(basePackageClasses = {AbstractController.class, MockRestService.class})
 @Configuration
 public class MockConfig {
     /**

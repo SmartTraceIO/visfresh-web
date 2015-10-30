@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -73,7 +74,7 @@ public class JSonSerializerTest {
         this.gson = b.create();
 
         resolver = new MockReferenceResolver();
-        serializer = new EntityJSonSerializer();
+        serializer = new EntityJSonSerializer(TimeZone.getDefault());
         serializer.setReferenceResolver(resolver);
     }
 

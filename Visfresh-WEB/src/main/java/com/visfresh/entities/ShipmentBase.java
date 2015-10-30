@@ -63,7 +63,7 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
     /**
      * Shutdown device time out in minutes.
      */
-    private int shutdownDeviceTimeOut;
+    private int shutdownDeviceAfterMinutes;
     /**
      * AssertType
      */
@@ -223,14 +223,14 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
      * @return the shutdownDevice
      */
     public int getShutdownDeviceTimeOut() {
-        return shutdownDeviceTimeOut;
+        return shutdownDeviceAfterMinutes;
     }
 
     /**
      * @param ninutes the shutdownDevice to set
      */
     public void setShutdownDeviceTimeOut(final int ninutes) {
-        this.shutdownDeviceTimeOut = ninutes;
+        this.shutdownDeviceAfterMinutes = ninutes;
     }
     /**
      * @return the company

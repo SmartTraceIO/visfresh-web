@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TimeZone;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -51,7 +54,7 @@ import com.visfresh.services.RestServiceException;
 public class RestServiceFacade  {
     private static final String REST_SERVICE = "/rest";
 
-    private EntityJSonSerializer serializer = new EntityJSonSerializer();
+    private EntityJSonSerializer serializer = new EntityJSonSerializer(TimeZone.getDefault());
     private Gson gson;
     private URL serviceUrl;
     private String authToken;
@@ -89,7 +92,7 @@ public class RestServiceFacade  {
             @Override
             public LocationProfile getLocationProfile(final Long id) {
                 try {
-                    return RestServiceFacade.this.getLocationProfile(id);
+                    return RestServiceFacade.this.getLocation(id);
                 } catch (IOException | RestServiceException e) {
                     e.printStackTrace();
                     return null;
@@ -176,7 +179,7 @@ public class RestServiceFacade  {
 
     public Long saveLocationProfile(final LocationProfile profile)
             throws RestServiceException, IOException {
-        final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveLocationProfile"),
+        final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveLocation"),
                 serializer.toJson(profile)).getAsJsonObject();
         return parseId(e);
     }
@@ -193,7 +196,7 @@ public class RestServiceFacade  {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("pageIndex", Integer.toString(pageIndex));
         params.put("pageSize", Integer.toString(pageSize));
-        final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getLocationProfiles"),
+        final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getLocations"),
                 params).getAsJsonArray();
 
         final List<LocationProfile> profiles = new ArrayList<LocationProfile>(response.size());
@@ -425,7 +428,7 @@ public class RestServiceFacade  {
      */
     public Company getCompany(final Long id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("id", id.toString());
+        params.put("companyId", id.toString());
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getCompany"),
                 params);
@@ -615,11 +618,11 @@ public class RestServiceFacade  {
     /* (non-Javadoc)
      * @see com.visfresh.controllers.ReferenceResolver#getLocationProfile(java.lang.Long)
      */
-    public LocationProfile getLocationProfile(final Long id) throws IOException, RestServiceException {
+    public LocationProfile getLocation(final Long id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("id", id.toString());
+        params.put("locationId", id.toString());
 
-        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getLocationProfile"),
+        final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getLocation"),
                 params);
         return response == JsonNull.INSTANCE ? null : serializer.parseLocationProfile(
                 response.getAsJsonObject());
@@ -629,7 +632,7 @@ public class RestServiceFacade  {
      */
     public AlertProfile getAlertProfile(final Long id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("id", id.toString());
+        params.put("alertProfileId", id.toString());
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getAlertProfile"),
                 params);
@@ -641,7 +644,7 @@ public class RestServiceFacade  {
      */
     public Shipment getShipment(final Long id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("id", id.toString());
+        params.put("shipmentId", id.toString());
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE, "getShipment"),
                 params);
@@ -654,7 +657,7 @@ public class RestServiceFacade  {
     public NotificationSchedule getNotificationSchedule(final Long id)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("id", id.toString());
+        params.put("notificationScheduleId", id.toString());
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
                 "getNotificationSchedule"), params);
@@ -666,7 +669,7 @@ public class RestServiceFacade  {
      */
     public Device getDevice(final String id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("id", id.toString());
+        params.put("deviceId", id.toString());
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
                 "getDevice"), params);
@@ -681,7 +684,7 @@ public class RestServiceFacade  {
      */
     public ShipmentTemplate getShipmentTemplate(final Long id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("id", id.toString());
+        params.put("shipmentTemplateId", id.toString());
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
                 "getShipmentTemplate"), params);
@@ -741,6 +744,11 @@ public class RestServiceFacade  {
      * @return ID attribute.
      */
     private Long parseId(final JsonObject e) {
-        return e.get("id").getAsLong();
+        //according meeting can have name not only 'id'
+        final Set<Entry<String, JsonElement>> set = e.entrySet();
+        if (set.size() != 1) {
+            throw new RuntimeException("Unexpected ID format: " + e);
+        }
+        return set.iterator().next().getValue().getAsLong();
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-import com.visfresh.controllers.RestServiceController;
+import com.visfresh.controllers.AbstractController;
 import com.visfresh.init.jdbc.JdbcConfig;
 import com.visfresh.mpl.services.RestServiceImpl;
 
@@ -16,7 +16,7 @@ import com.visfresh.mpl.services.RestServiceImpl;
  *
  */
 @Configuration
-@ComponentScan(basePackageClasses = {RestServiceController.class,
+@ComponentScan(basePackageClasses = {AbstractController.class,
         RestServiceImpl.class, JdbcConfig.class
 // ,MockRestService.class //this package should be replaced to reverence
 // production classes instead of mock

@@ -3,6 +3,8 @@
  */
 package com.visfresh.io;
 
+import java.util.TimeZone;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -21,8 +23,8 @@ public class ReportSerializer extends AbstractJsonSerializer {
     /**
      * Default constructor.
      */
-    public ReportSerializer() {
-        super();
+    public ReportSerializer(final TimeZone tz) {
+        super(tz);
     }
 
     public JsonObject toJson(final SingleShipmentDto dto) {

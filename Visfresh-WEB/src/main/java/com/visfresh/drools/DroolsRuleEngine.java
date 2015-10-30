@@ -4,6 +4,7 @@
 package com.visfresh.drools;
 
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
@@ -47,7 +48,6 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
     private TrackerEventDao trackerEventDao;
     @Autowired
     private DeviceDao deviceDao;
-    private EntityJSonSerializer jsonSerializer = new EntityJSonSerializer();
 
     private KieContainer kie;
 
@@ -94,7 +94,8 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
         final JsonElement e = EntityJSonSerializer.parseJson(msg.getMessageInfo());
         log.debug("Native DCS event has received " + e);
 
-        final DeviceDcsNativeEvent event = jsonSerializer.parseDeviceDcsNativeEvent(e.getAsJsonObject());
+        final DeviceDcsNativeEvent event = new EntityJSonSerializer(TimeZone.getDefault()).parseDeviceDcsNativeEvent(
+                e.getAsJsonObject());
 
         processDcsEvent(event);
     }

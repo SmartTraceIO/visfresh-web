@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -29,7 +30,7 @@ public class AbstractJsonSerializer {
     /**
      *
      */
-    public AbstractJsonSerializer() {
+    public AbstractJsonSerializer(final TimeZone tz) {
         super();
     }
 
