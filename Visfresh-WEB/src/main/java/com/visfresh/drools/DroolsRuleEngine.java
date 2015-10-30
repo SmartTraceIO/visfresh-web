@@ -137,11 +137,11 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
 
         trackerEventDao.save(e);
     }
-
     /**
      * @param name rule name.
      * @return rule.
      */
+    @Override
     public TrackerEventRule getRule(final String name) {
         final TrackerEventRule rule = rules.get(name);
         if (name == null) {
