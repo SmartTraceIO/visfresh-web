@@ -30,7 +30,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.NotificationType;
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -41,6 +41,7 @@ import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CreateUserRequest;
 import com.visfresh.io.EntityJSonSerializer;
+import com.visfresh.io.SavePersonScheduleRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
@@ -135,7 +136,7 @@ public class JSonSerializerTest {
     }
     @Test
     public void testSchedulePersonHowWhen() {
-        PersonalSchedule s = new PersonalSchedule();
+        PersonSchedule s = new PersonSchedule();
 
         final String company = "Sun";
         final String emailNotification = "anybody@sun.com";
@@ -162,7 +163,7 @@ public class JSonSerializerTest {
         s.getWeekDays()[3] = true;
 
         final JsonObject obj = serializer.toJson(s);
-        s = serializer.parseSchedulePersonHowWhen(obj);
+        s = serializer.parsePersonSchedule(obj);
 
         assertEquals(company, s.getCompany());
         assertEquals(emailNotification, s.getEmailNotification());
@@ -193,8 +194,8 @@ public class JSonSerializerTest {
         s.setDescription(description);
         s.setId(id);
         s.setName(name);
-        s.getSchedules().add(createSchedulePersonHowWhen());
-        s.getSchedules().add(createSchedulePersonHowWhen());
+        s.getSchedules().add(createPersonSchedule());
+        s.getSchedules().add(createPersonSchedule());
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
         s = serializer.parseNotificationSchedule(obj);
@@ -203,6 +204,19 @@ public class JSonSerializerTest {
         assertEquals(id, s.getId());
         assertEquals(name, s.getName());
         assertEquals(2, s.getSchedules().size());
+    }
+    @Test
+    public void testSavePersonScheduleRequest() {
+        SavePersonScheduleRequest req = new SavePersonScheduleRequest();
+        final Long notificationScheduleId = 77L;
+        req.setNotificationScheduleId(notificationScheduleId);
+        req.setSchedule(createPersonSchedule());
+
+        final JsonObject obj = serializer.toJson(req);
+        req = serializer.parseSavePersonScheduleRequest(obj);
+
+        assertEquals(notificationScheduleId, req.getNotificationScheduleId());
+        assertNotNull(req.getSchedule());
     }
     @Test
     public void testLocationProfile() {
@@ -797,8 +811,8 @@ public class JSonSerializerTest {
         s.setDescription("JUnit schedule");
         s.setId(generateId());
         s.setName("Sched");
-        s.getSchedules().add(createSchedulePersonHowWhen());
-        s.getSchedules().add(createSchedulePersonHowWhen());
+        s.getSchedules().add(createPersonSchedule());
+        s.getSchedules().add(createPersonSchedule());
         resolver.add(s);
         return s;
     }
@@ -873,8 +887,8 @@ public class JSonSerializerTest {
     /**
      * @return any schedule/person/how/when
      */
-    private PersonalSchedule createSchedulePersonHowWhen() {
-        final PersonalSchedule s = new PersonalSchedule();
+    private PersonSchedule createPersonSchedule() {
+        final PersonSchedule s = new PersonSchedule();
 
         s.setCompany("Sun");
         s.setEmailNotification("asuvorov@sun.com");

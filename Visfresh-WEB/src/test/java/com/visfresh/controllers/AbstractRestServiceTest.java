@@ -13,7 +13,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.mock.MockRestService;
@@ -113,8 +113,8 @@ public class AbstractRestServiceTest {
         final NotificationSchedule s = new NotificationSchedule();
         s.setDescription("JUnit schedule");
         s.setName("Sched");
-        s.getSchedules().add(createSchedulePersonHowWhen());
-        s.getSchedules().add(createSchedulePersonHowWhen());
+        s.getSchedules().add(createPersonSchedule());
+        s.getSchedules().add(createPersonSchedule());
         if (save) {
             getRestService().saveNotificationSchedule(getCompany(), s);
         }
@@ -123,8 +123,8 @@ public class AbstractRestServiceTest {
     /**
      * @return any schedule/person/how/when
      */
-    private PersonalSchedule createSchedulePersonHowWhen() {
-        final PersonalSchedule s = new PersonalSchedule();
+    protected PersonSchedule createPersonSchedule() {
+        final PersonSchedule s = new PersonSchedule();
 
         s.setCompany("Sun");
         s.setEmailNotification("asuvorov@sun.com");

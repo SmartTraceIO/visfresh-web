@@ -18,7 +18,7 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 
@@ -105,8 +105,8 @@ public class ArrivalRule extends AbstractNotificationRule {
         final Calendar date = new GregorianCalendar();
         final String message = "Device is in " + arrival.getNumberOfMettersOfArrival() + " meters for arrival";
         //notify subscribers
-        final List<PersonalSchedule> schedules = getAllPersonalSchedules(event.getShipment());
-        for (final PersonalSchedule s : schedules) {
+        final List<PersonSchedule> schedules = getAllPersonalSchedules(event.getShipment());
+        for (final PersonSchedule s : schedules) {
             if (matchesTimeFrame(s, date)) {
                 sendNotification(s, "Arrival Notification", message);
             }
@@ -127,12 +127,12 @@ public class ArrivalRule extends AbstractNotificationRule {
      * @return
      */
     @Override
-    protected List<PersonalSchedule> getAllPersonalSchedules(final Shipment shipment) {
-        final List<PersonalSchedule> all = new LinkedList<PersonalSchedule>();
+    protected List<PersonSchedule> getAllPersonalSchedules(final Shipment shipment) {
+        final List<PersonSchedule> all = new LinkedList<PersonSchedule>();
 
         final List<NotificationSchedule> schedules = shipment.getArrivalNotificationSchedules();
         for (final NotificationSchedule schedule : schedules) {
-            final List<PersonalSchedule> personalSchedules = schedule.getSchedules();
+            final List<PersonSchedule> personalSchedules = schedule.getSchedules();
             all.addAll(personalSchedules);
         }
 

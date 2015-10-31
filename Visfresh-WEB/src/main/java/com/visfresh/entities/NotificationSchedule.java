@@ -30,7 +30,7 @@ public class NotificationSchedule implements EntityWithId<Long> {
     /**
      * Personal schedules
      */
-    private final List<PersonalSchedule> schedules = new LinkedList<PersonalSchedule>();
+    private final List<PersonSchedule> schedules = new LinkedList<PersonSchedule>();
 
     /**
      * Default constructor.
@@ -80,7 +80,7 @@ public class NotificationSchedule implements EntityWithId<Long> {
     /**
      * @return the schedules
      */
-    public List<PersonalSchedule> getSchedules() {
+    public List<PersonSchedule> getSchedules() {
         return schedules;
     }
     /**

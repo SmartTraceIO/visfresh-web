@@ -21,7 +21,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.services.RestServiceException;
@@ -260,9 +260,9 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
      * @param position company position
      * @return
      */
-    private PersonalSchedule createSchedule(final String firstName, final String lastName,
+    private PersonSchedule createSchedule(final String firstName, final String lastName,
             final String email, final String phone, final String position) {
-        final PersonalSchedule s = new PersonalSchedule();
+        final PersonSchedule s = new PersonSchedule();
         s.setCompany("Smart Trace");
         s.setEmailNotification(email);
         s.setFirstName(firstName);

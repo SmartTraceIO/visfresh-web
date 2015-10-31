@@ -18,7 +18,7 @@ import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -99,13 +99,13 @@ public class NotificationScheduleDaoImpl extends DaoImplBase<NotificationSchedul
         }
 
         deletePersonalSchedulesFor(sched.getId());
-        for (final PersonalSchedule ps : sched.getSchedules()) {
+        for (final PersonSchedule ps : sched.getSchedules()) {
             savePersonalSchedule(sched.getId(), ps);
         }
         return sched;
     }
 
-    private void savePersonalSchedule(final Long schedId, final PersonalSchedule ps) {
+    private void savePersonalSchedule(final Long schedId, final PersonSchedule ps) {
         final String sql = "insert into " + PERSONAL_SCHEDULE_TABLE + " (" + combine(
                 COMPANY_FIELD
                 , FIRSTNAME_FIELD
@@ -242,7 +242,7 @@ public class NotificationScheduleDaoImpl extends DaoImplBase<NotificationSchedul
      * @param id
      * @return
      */
-    private Collection<PersonalSchedule> findPersonalSchedulesFor(final Long id) {
+    private Collection<PersonSchedule> findPersonalSchedulesFor(final Long id) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put(SCHEDULE_FIELD, id);
         final List<Map<String, Object>> list = jdbc.queryForList(
@@ -251,9 +251,9 @@ public class NotificationScheduleDaoImpl extends DaoImplBase<NotificationSchedul
                 + (id == null ? "" : " where " + SCHEDULE_FIELD + " = :" + SCHEDULE_FIELD),
                 params);
 
-        final List<PersonalSchedule> result = new LinkedList<PersonalSchedule>();
+        final List<PersonSchedule> result = new LinkedList<PersonSchedule>();
         for (final Map<String,Object> map : list) {
-            final PersonalSchedule ps = new PersonalSchedule();
+            final PersonSchedule ps = new PersonSchedule();
             ps.setId(((Number) map.get(ID_FIELD)).longValue());
             ps.setCompany((String) map.get(COMPANY_FIELD));
             ps.setFirstName((String) map.get(FIRSTNAME_FIELD));

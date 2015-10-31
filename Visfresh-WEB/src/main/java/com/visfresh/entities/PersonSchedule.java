@@ -8,7 +8,7 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class PersonalSchedule implements EntityWithId<Long> {
+public class PersonSchedule implements EntityWithId<Long> {
     /**
      * Personal schedule ID.
      */
@@ -64,7 +64,7 @@ public class PersonalSchedule implements EntityWithId<Long> {
     /**
      *
      */
-    public PersonalSchedule() {
+    public PersonSchedule() {
         super();
     }
 

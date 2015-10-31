@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 
@@ -59,8 +59,8 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
 
         final Calendar date = new GregorianCalendar();
         //notify subscribers
-        final List<PersonalSchedule> schedules = getAllPersonalSchedules(e.getEvent().getShipment());
-        for (final PersonalSchedule s : schedules) {
+        final List<PersonSchedule> schedules = getAllPersonalSchedules(e.getEvent().getShipment());
+        for (final PersonSchedule s : schedules) {
             if (matchesTimeFrame(s, date)) {
                 sendNotification(s, alert.getName(), alert.getDescription());
             }
@@ -86,12 +86,12 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      * @return
      */
     @Override
-    protected List<PersonalSchedule> getAllPersonalSchedules(final Shipment shipment) {
-        final List<PersonalSchedule> all = new LinkedList<PersonalSchedule>();
+    protected List<PersonSchedule> getAllPersonalSchedules(final Shipment shipment) {
+        final List<PersonSchedule> all = new LinkedList<PersonSchedule>();
 
         final List<NotificationSchedule> schedules = shipment.getAlertsNotificationSchedules();
         for (final NotificationSchedule schedule : schedules) {
-            final List<PersonalSchedule> personalSchedules = schedule.getSchedules();
+            final List<PersonSchedule> personalSchedules = schedule.getSchedules();
             all.addAll(personalSchedules);
         }
 

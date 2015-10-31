@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -38,7 +38,7 @@ public class NotificationScheduleDaoTest
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
-        final PersonalSchedule ps = new PersonalSchedule();
+        final PersonSchedule ps = new PersonSchedule();
         ps.setCompany("Any Company");
         ps.setEmailNotification("asuvoror");
         ps.setFirstName("First");
@@ -64,7 +64,7 @@ public class NotificationScheduleDaoTest
 
         assertEquals(1, s.getSchedules().size());
 
-        final PersonalSchedule ps = s.getSchedules().get(0);
+        final PersonSchedule ps = s.getSchedules().get(0);
 
         assertEquals("Any Company", ps.getCompany());
         assertEquals("asuvoror", ps.getEmailNotification());
@@ -91,7 +91,7 @@ public class NotificationScheduleDaoTest
 
         assertEquals(1, s.getSchedules().size());
 
-        final PersonalSchedule ps = s.getSchedules().get(0);
+        final PersonSchedule ps = s.getSchedules().get(0);
 
         assertEquals("Any Company", ps.getCompany());
         assertEquals("asuvoror", ps.getEmailNotification());

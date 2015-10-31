@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
@@ -61,8 +61,8 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
                 && shipment.getStatus() != ShipmentStatus.Complete;
 
         if (accept) {
-            final List<PersonalSchedule> schedules = getAllPersonalSchedules(shipment);
-            for (final PersonalSchedule s : schedules) {
+            final List<PersonSchedule> schedules = getAllPersonalSchedules(shipment);
+            for (final PersonSchedule s : schedules) {
                 if (matchesTimeFrame(s)) {
                     return true;
                 }
@@ -76,7 +76,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
      * @param s personal schedule.
      * @return true if the situation (time and other) matches the schedule.
      */
-    private boolean matchesTimeFrame(final PersonalSchedule s) {
+    private boolean matchesTimeFrame(final PersonSchedule s) {
         final Calendar c = new GregorianCalendar();
         return matchesTimeFrame(s, c);
     }
@@ -87,7 +87,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
      * @param c the time to match as calendar object.
      * @return true if matches the schedule time frames, false otherwise.
      */
-    protected boolean matchesTimeFrame(final PersonalSchedule s, final Calendar c) {
+    protected boolean matchesTimeFrame(final PersonSchedule s, final Calendar c) {
         boolean matches = false;
 
         //check matches week days.
@@ -139,7 +139,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
      * @param subject message subject.
      * @param message message body.
      */
-    protected void sendNotification(final PersonalSchedule s, final String subject,
+    protected void sendNotification(final PersonSchedule s, final String subject,
             final String message) {
         final String email = s.getEmailNotification();
         final String person = getPersonDescription(s);
@@ -178,7 +178,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
      * @param s personal schedule.
      * @return person description.
      */
-    private String getPersonDescription(final PersonalSchedule s) {
+    private String getPersonDescription(final PersonSchedule s) {
         return s.getFirstName() + " " + s.getLastName() + ", "+ s.getPosition() + " of " + s.getCompany();
     }
 
@@ -186,7 +186,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
      * @param shipment shipment.
      * @return
      */
-    protected abstract List<PersonalSchedule> getAllPersonalSchedules(final Shipment shipment);
+    protected abstract List<PersonSchedule> getAllPersonalSchedules(final Shipment shipment);
 
     public abstract String getName();
 }

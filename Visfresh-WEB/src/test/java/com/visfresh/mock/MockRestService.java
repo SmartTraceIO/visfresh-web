@@ -24,7 +24,7 @@ import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
@@ -131,11 +131,13 @@ public class MockRestService implements RestService {
     public Long saveNotificationSchedule(final Company company, final NotificationSchedule schedule) {
         if (schedule.getId() == null) {
             schedule.setId(ids.incrementAndGet());
-            for (final PersonalSchedule s : schedule.getSchedules()) {
-                s.setId(ids.incrementAndGet());
-            }
             synchronized (notificationSchedules) {
                 notificationSchedules.put(schedule.getId(), schedule);
+            }
+        }
+        for (final PersonSchedule s : schedule.getSchedules()) {
+            if (s.getId() == null) {
+                s.setId(ids.incrementAndGet());
             }
         }
         return schedule.getId();

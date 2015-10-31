@@ -19,7 +19,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -112,7 +112,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
-        PersonalSchedule ps = new PersonalSchedule();
+        PersonSchedule ps = new PersonSchedule();
         ps.setCompany("Any Company");
         ps.setEmailNotification("asuvoror");
         ps.setFirstName("First");
@@ -132,7 +132,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
-        ps = new PersonalSchedule();
+        ps = new PersonSchedule();
         ps.setCompany("Any Company");
         ps.setEmailNotification("asuvoror");
         ps.setFirstName("First");

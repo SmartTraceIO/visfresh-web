@@ -26,7 +26,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.NotificationType;
-import com.visfresh.entities.PersonalSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentBase;
@@ -242,7 +242,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final JsonArray array = new JsonArray();
         obj.add("schedules", array);
 
-        for (final PersonalSchedule sphw : schedule.getSchedules()) {
+        for (final PersonSchedule sphw : schedule.getSchedules()) {
             array.add(toJson(sphw));
         }
 
@@ -261,7 +261,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonArray array = obj.get("schedules").getAsJsonArray();
         for (int i = 0; i < array.size(); i++) {
-            sched.getSchedules().add(parseSchedulePersonHowWhen(array.get(i).getAsJsonObject()));
+            sched.getSchedules().add(parsePersonSchedule(array.get(i).getAsJsonObject()));
         }
 
         return sched;
@@ -271,7 +271,11 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param s schedule/person/how/when
      * @return JSON object.
      */
-    public JsonObject toJson(final PersonalSchedule s) {
+    public JsonObject toJson(final PersonSchedule s) {
+        if (s == null) {
+            return null;
+        }
+
         final JsonObject obj = new JsonObject();
 
         obj.addProperty("company", s.getCompany());
@@ -297,9 +301,14 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param obj JSON object.
      * @return schedule/person/how/when
      */
-    public PersonalSchedule parseSchedulePersonHowWhen(
-            final JsonObject obj) {
-        final PersonalSchedule s = new PersonalSchedule();
+    public PersonSchedule parsePersonSchedule(
+            final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject obj = e.getAsJsonObject();
+        final PersonSchedule s = new PersonSchedule();
 
         s.setCompany(asString(obj.get("company")));
         s.setEmailNotification(asString(obj.get("emailNotification")));
@@ -664,6 +673,31 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         return e;
     }
     /**
+     * @param req
+     * @return
+     */
+    public JsonObject toJson(final SavePersonScheduleRequest req) {
+        if (req == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("notificationScheduleId", req.getNotificationScheduleId());
+        json.add("schedule", toJson(req.getSchedule()));
+        return json;
+    }
+    public SavePersonScheduleRequest parseSavePersonScheduleRequest(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
+        final SavePersonScheduleRequest req = new SavePersonScheduleRequest();
+        req.setNotificationScheduleId(asLong(json.get("notificationScheduleId")));
+        req.setSchedule(parsePersonSchedule(json.get("schedule").getAsJsonObject()));
+        return req;
+    }
+    /**
      * @param json JSON object.
      * @return device command.
      */
@@ -859,8 +893,8 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param e
      * @return
      */
-    private <ID extends Serializable & Comparable<ID>> ID getId(final EntityWithId<ID> e) {
-        return e == null ? null : (ID) e.getId();
+    private <IDD extends Serializable & Comparable<IDD>> IDD getId(final EntityWithId<IDD> e) {
+        return e == null ? null : (IDD) e.getId();
     }
     /**
      * @param entities list of entity.
