@@ -9,13 +9,13 @@ package com.visfresh.entities;
  */
 public enum AlertType {
     //temperature alerts
-    LowTemperature,
-    HighTemperature,
-    CriticalLowTemperature,
-    CriticalHighTemperature,
+    Cold,
+    Hot,
+    CriticalCold,
+    CriticalHot,
     //other alerts
-    EnterBrightEnvironment,
-    EnterDarkEnvironment,
+    LightOn,
+    LightOff,
     Shock,
-    BatteryLow
+    Battery
 }

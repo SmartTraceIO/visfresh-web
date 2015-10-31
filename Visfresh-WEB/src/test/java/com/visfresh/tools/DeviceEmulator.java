@@ -202,7 +202,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private Shipment createShipmentIfNeed(final Device device) throws RestServiceException, IOException {
         final String name = "DevelopmentShipment";
 
-        final List<Shipment> shipments = service.getShipments(1, 100000);
+        final List<Shipment> shipments = null;// TODO service.getShipments(1, 100000);
         for (final Shipment shipment : shipments) {
             if (name.equals(shipment.getName()) && shipment.getStatus() != ShipmentStatus.Complete) {
                 return shipment;

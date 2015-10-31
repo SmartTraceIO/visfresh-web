@@ -21,10 +21,10 @@ import com.google.gson.JsonArray;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
-import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.ReportSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.io.ShipmentStateDto;
 import com.visfresh.io.SingleShipmentDto;
 import com.visfresh.services.ReportService;
 import com.visfresh.services.RestService;
@@ -188,11 +188,11 @@ public class ShipmentController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipments(user);
 
-            final EntityJSonSerializer ser = getSerializer(user);
+            final ReportSerializer ser = getReportSerializer(user);
 
-            final List<Shipment> shipments = getPage(restService.getShipments(user.getCompany()), pageIndex, pageSize);
+            final List<ShipmentStateDto> shipments = getPage(restService.getShipments(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
-            for (final Shipment t : shipments) {
+            for (final ShipmentStateDto t : shipments) {
                 array.add(ser.toJson(t));
             }
 
@@ -253,10 +253,18 @@ public class ShipmentController extends AbstractController {
             final Date endDate = parseDate(toDate);
 
             final SingleShipmentDto dto = reportService.getSingleShipment(startDate, endDate, shipment);
-            return createSuccessResponse(dto == null ? null : new ReportSerializer(user.getTimeZone()).toJson(dto));
+            return createSuccessResponse(dto == null ? null : getReportSerializer(user).toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+
+    /**
+     * @param user
+     * @return
+     */
+    protected ReportSerializer getReportSerializer(final User user) {
+        return new ReportSerializer(user.getTimeZone());
     }
 }

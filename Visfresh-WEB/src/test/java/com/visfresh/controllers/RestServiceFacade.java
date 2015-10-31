@@ -237,18 +237,12 @@ public class RestServiceFacade  {
      * @param pageSize page size.
      * @return
      */
-    public List<Shipment> getShipments(final int pageIndex, final int pageSize) throws RestServiceException, IOException {
+    public JsonArray getShipments(final int pageIndex, final int pageSize) throws RestServiceException, IOException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("pageIndex", Integer.toString(pageIndex));
         params.put("pageSize", Integer.toString(pageSize));
-        final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getShipments"),
+        return sendGetRequest(getPathWithToken(REST_SERVICE, "getShipments"),
                 params).getAsJsonArray();
-
-        final List<Shipment> shipments = new ArrayList<Shipment>(response.size());
-        for (int i = 0; i < response.size(); i++) {
-            shipments.add(serializer.parseShipment(response.get(i).getAsJsonObject()));
-        }
-        return shipments;
     }
 
     /**

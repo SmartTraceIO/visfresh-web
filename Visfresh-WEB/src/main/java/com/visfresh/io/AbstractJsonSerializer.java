@@ -40,10 +40,11 @@ public class AbstractJsonSerializer {
      * @param customFields
      * @return
      */
-    public static JsonObject toJson(final Map<String, String> customFields) {
+    public static <K, V> JsonObject toJson(final Map<K, V> customFields) {
         final JsonObject obj = new JsonObject();
-        for (final Map.Entry<String, String> e : customFields.entrySet()) {
-            obj.addProperty(e.getKey(), e.getValue());
+        for (final Map.Entry<K, V> e : customFields.entrySet()) {
+            obj.addProperty(String.valueOf(e.getKey()),
+                    String.valueOf(e.getValue()));
         }
         return obj;
     }
@@ -139,6 +140,9 @@ public class AbstractJsonSerializer {
      * @return
      */
     public static String formatTimeZone(final Date date, final TimeZone t) {
+        if (date == null) {
+            return null;
+        }
         final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         sdf.setTimeZone(t);
         return sdf.format(date);

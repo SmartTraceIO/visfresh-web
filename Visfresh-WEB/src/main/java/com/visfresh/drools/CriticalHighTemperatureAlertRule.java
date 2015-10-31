@@ -64,7 +64,7 @@ public class CriticalHighTemperatureAlertRule extends HighTemperatureAlertRule {
 
         defaultAssign(event, alert);
         alert.setTemperature(event.getTemperature());
-        alert.setType(AlertType.CriticalHighTemperature);
+        alert.setType(AlertType.CriticalHot);
         alert.setDescription("Critical high Temperature more then " + criticalTemperature + "C during "
                 + minutes + " minutes for " + event.getDevice().getId());
         alert.setMinutes(minutes);

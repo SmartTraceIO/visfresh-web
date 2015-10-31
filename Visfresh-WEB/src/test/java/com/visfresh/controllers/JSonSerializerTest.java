@@ -441,7 +441,7 @@ public class JSonSerializerTest {
         final String alertName = "Any name";
         final Device device = createDevice("20394870987324");
         final Shipment shipment = createShipment();
-        final AlertType alertType = AlertType.EnterDarkEnvironment;
+        final AlertType alertType = AlertType.LightOff;
 
         Alert alert = new Alert();
         alert.setDate(alertDate);
@@ -487,7 +487,7 @@ public class JSonSerializerTest {
         final String alertName = "Any name";
         final Device device = createDevice("20394870987324");
         final Shipment shipment = createShipment();
-        final AlertType alertType = AlertType.HighTemperature;
+        final AlertType alertType = AlertType.Hot;
         final double temperature = 10.12;
         final int minutes = 75;
 
@@ -667,7 +667,7 @@ public class JSonSerializerTest {
         final String description = "Alert description";
         final Long id = generateId();
         final String name = "Any name";
-        final AlertType type = AlertType.BatteryLow;
+        final AlertType type = AlertType.Battery;
 
         Alert alert = new Alert();
         alert.setDate(date);
@@ -697,7 +697,7 @@ public class JSonSerializerTest {
         final String description = "Alert description";
         final Long id = generateId();
         final String name = "Any name";
-        final AlertType type = AlertType.CriticalHighTemperature;
+        final AlertType type = AlertType.CriticalHot;
         final double temperature = -20.3;
         final int minutes = 30;
 

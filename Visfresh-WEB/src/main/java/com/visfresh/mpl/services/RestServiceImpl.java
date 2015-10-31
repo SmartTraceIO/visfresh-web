@@ -3,13 +3,18 @@
  */
 package com.visfresh.mpl.services;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DeviceCommandDao;
@@ -22,7 +27,9 @@ import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.dao.impl.DaoImplBase;
 import com.visfresh.drools.DroolsRuleEngine;
+import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
@@ -33,6 +40,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
+import com.visfresh.io.ShipmentStateDto;
 import com.visfresh.opengts.DefaultOpenJtsFacade;
 import com.visfresh.services.RestService;
 
@@ -63,6 +71,8 @@ public class RestServiceImpl implements RestService {
     private UserDao userDao;
     @Autowired
     private CompanyDao companyDao;
+    @Autowired
+    private AlertDao alertDao;
 
     /**
      * Default constructor.
@@ -189,8 +199,35 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getShipments()
      */
     @Override
-    public List<Shipment> getShipments(final Company company) {
-        return shipmentDao.findByCompany(company);
+    public List<ShipmentStateDto> getShipments(final Company company) {
+        final List<Shipment> shipments = shipmentDao.findByCompany(company);
+        final List<ShipmentStateDto> result = new LinkedList<ShipmentStateDto>();
+        for (final Shipment s : shipments) {
+            final List<Alert> alerts = alertDao.getAlerts(s,
+                    new Date(0L), new Date(System.currentTimeMillis() + 100000000l));
+            final ShipmentStateDto dto = new ShipmentStateDto(s);
+            dto.getAlertSummary().putAll(toSummaryMap(alerts));
+            result.add(dto);
+        }
+        return result;
+    }
+
+    /**
+     * @param alerts
+     * @return
+     */
+    public static  Map<AlertType, Integer> toSummaryMap(
+            final List<Alert> alerts) {
+        final Map<AlertType, Integer> map = new HashMap<AlertType, Integer>();
+        for (final Alert alert : alerts) {
+            Integer numAlerts = map.get(alert.getType());
+            if (numAlerts == null) {
+                numAlerts = 0;
+            }
+            numAlerts = numAlerts + 1;
+            map.put(alert.getType(), numAlerts);
+        }
+        return map;
     }
 
     /* (non-Javadoc)

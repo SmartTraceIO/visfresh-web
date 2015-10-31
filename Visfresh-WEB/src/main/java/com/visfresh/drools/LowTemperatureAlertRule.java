@@ -105,7 +105,7 @@ public class LowTemperatureAlertRule extends AbstractAlertRule {
 
         defaultAssign(event, alert);
         alert.setTemperature(event.getTemperature());
-        alert.setType(AlertType.LowTemperature);
+        alert.setType(AlertType.Cold);
         alert.setDescription("Low Temperature less then " + criticalTemperature + "C during "
                 + minutes + " minutes for " + event.getDevice().getId());
         alert.setMinutes(minutes);

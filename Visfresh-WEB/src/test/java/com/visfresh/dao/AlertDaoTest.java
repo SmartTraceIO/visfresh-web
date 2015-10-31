@@ -78,7 +78,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
     @Override
     protected Alert createTestEntity() {
         final Date date = new Date(System.currentTimeMillis() - 100000000l);
-        final AlertType type = AlertType.CriticalHighTemperature;
+        final AlertType type = AlertType.CriticalHot;
         return createAlert(type, date);
     }
 
@@ -110,7 +110,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         assertNotNull(a.getDate());
         assertEquals("Alert description", a.getDescription());
         assertEquals("Any name", a.getName());
-        assertEquals(AlertType.CriticalHighTemperature, a.getType());
+        assertEquals(AlertType.CriticalHot, a.getType());
         assertEquals(100, a.getTemperature(), 0.00001);
         assertEquals(15, a.getMinutes());
 
@@ -146,7 +146,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         assertNotNull(a.getDate());
         assertEquals("Alert description", a.getDescription());
         assertEquals("Any name", a.getName());
-        assertEquals(AlertType.CriticalHighTemperature, a.getType());
+        assertEquals(AlertType.CriticalHot, a.getType());
         assertEquals(100, a.getTemperature(), 0.00001);
         assertEquals(15, a.getMinutes());
 
@@ -190,7 +190,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
      * @param date
      */
     private Alert createAndSave(final Date date) {
-        final Alert a = createAlert(AlertType.HighTemperature, date);
+        final Alert a = createAlert(AlertType.Hot, date);
         return dao.save(a);
     }
     /* (non-Javadoc)

@@ -64,7 +64,7 @@ public class CriticalLowTemperatureAlertRule extends LowTemperatureAlertRule {
 
         defaultAssign(event, alert);
         alert.setTemperature(event.getTemperature());
-        alert.setType(AlertType.CriticalLowTemperature);
+        alert.setType(AlertType.CriticalCold);
         alert.setDescription("Critical Low Temperature more then " + criticalTemperature + "C during "
                 + minutes + " minutes for " + event.getDevice().getId());
         alert.setMinutes(minutes);

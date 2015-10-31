@@ -30,6 +30,8 @@ import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
+import com.visfresh.io.ShipmentStateDto;
+import com.visfresh.mpl.services.RestServiceImpl;
 import com.visfresh.services.RestService;
 
 /**
@@ -204,11 +206,38 @@ public class MockRestService implements RestService {
      * @see com.visfresh.services.RestService#getShipments()
      */
     @Override
-    public List<Shipment> getShipments(final Company company) {
+    public List<ShipmentStateDto> getShipments(final Company company) {
+        LinkedList<Shipment> list;
         synchronized (shipments) {
-            return new LinkedList<Shipment>(shipments.values());
+            list = new LinkedList<Shipment>(shipments.values());
         }
+
+
+        final List<ShipmentStateDto> result = new LinkedList<ShipmentStateDto>();
+        for (final Shipment s : list) {
+            final ShipmentStateDto dto = new ShipmentStateDto(s);
+            result.add(dto);
+            final List<Alert> shipmentAlerts = getShipmentAlerts(s);
+            if (shipmentAlerts != null) {
+                dto.getAlertSummary().putAll(RestServiceImpl.toSummaryMap(shipmentAlerts));
+            }
+        }
+        return result;
     }
+    /**
+     * @param s
+     * @return
+     */
+    private List<Alert> getShipmentAlerts(final Shipment s) {
+        final List<Alert> result = new LinkedList<Alert>();
+        for (final Alert a : new LinkedList<Alert>(alerts.values())) {
+            if (a.getShipment().getId().equals(s.getId())) {
+                result.add(a);
+            }
+        }
+        return result;
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getNotifications(java.lang.Long)
      */

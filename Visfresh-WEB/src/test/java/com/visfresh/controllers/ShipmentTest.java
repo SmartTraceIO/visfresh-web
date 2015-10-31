@@ -81,8 +81,26 @@ public class ShipmentTest extends AbstractRestServiceTest {
     //public @ResponseBody String getShipments(@PathVariable final String authToken) {
     @Test
     public void testGetShipments() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
         createShipment(true);
-        createShipment(true);
+
+        //add alert
+        final Device d = s.getDevice();
+
+        createAlert(s, d, AlertType.Battery);
+        createAlert(s, d, AlertType.Battery);
+        createAlert(s, d, AlertType.Shock);
+        createAlert(s, d, AlertType.LightOff);
+        createAlert(s, d, AlertType.LightOn);
+
+        createTemperatureAlert(s, d, AlertType.Hot);
+        createTemperatureAlert(s, d, AlertType.Hot);
+        createTemperatureAlert(s, d, AlertType.Cold);
+        createTemperatureAlert(s, d, AlertType.CriticalCold);
+        createTemperatureAlert(s, d, AlertType.CriticalCold);
+        createTemperatureAlert(s, d, AlertType.CriticalCold);
+        createTemperatureAlert(s, d, AlertType.CriticalHot);
+        createArrival(s, d);
 
         assertEquals(2, facade.getShipments(1, 10000).size());
         assertEquals(1, facade.getShipments(1, 1).size());
@@ -116,8 +134,8 @@ public class ShipmentTest extends AbstractRestServiceTest {
         createEvent(s, "AUT", d);
 
         //add alert
-        createAlert(s, d, AlertType.BatteryLow);
-        createTemperatureAlert(s, d, AlertType.HighTemperature);
+        createAlert(s, d, AlertType.Battery);
+        createTemperatureAlert(s, d, AlertType.Hot);
         createArrival(s, d);
 
         final Date fromTime = new Date(System.currentTimeMillis() - 100000000L);
@@ -128,18 +146,18 @@ public class ShipmentTest extends AbstractRestServiceTest {
     /**
      * @param s
      * @param d
-     * @param hightemperature
+     * @param type
      * @return
      */
     private TemperatureAlert createTemperatureAlert(final Shipment s, final Device d,
-            final AlertType hightemperature) {
+            final AlertType type) {
         final TemperatureAlert alert = new TemperatureAlert();
         alert.setDate(new Date());
         alert.setDescription("Temp Alert");
-        alert.setType(AlertType.HighTemperature);
+        alert.setType(type);
         alert.setTemperature(5);
         alert.setMinutes(55);
-        alert.setName("TempAlert-1");
+        alert.setName("TempAlert");
         alert.setDevice(d);
         alert.setShipment(s);
         alert.setId(getRestService().ids.incrementAndGet());
@@ -195,6 +213,8 @@ public class ShipmentTest extends AbstractRestServiceTest {
         alert.setName("Alert-" + type);
         alert.setDevice(device);
         alert.setType(type);
+        alert.setId(getRestService().ids.incrementAndGet());
+        getRestService().alerts.put(alert.getId(), alert);
         return alert;
     }
 }

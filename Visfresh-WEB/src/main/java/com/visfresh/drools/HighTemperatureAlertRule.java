@@ -105,7 +105,7 @@ public class HighTemperatureAlertRule extends AbstractAlertRule {
 
         defaultAssign(event, alert);
         alert.setTemperature(event.getTemperature());
-        alert.setType(AlertType.HighTemperature);
+        alert.setType(AlertType.Hot);
         alert.setDescription("High Temperature more then " + criticalTemperature + "C during "
                 + minutes + " minutes for " + event.getDevice().getId());
         alert.setMinutes(minutes);

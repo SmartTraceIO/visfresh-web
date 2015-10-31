@@ -36,8 +36,8 @@ public class TemperatureAlert extends Alert {
      * @param type
      */
     private void checkAlertType(final AlertType type) {
-        if (!(type == AlertType.LowTemperature || type == AlertType.HighTemperature
-                || type == AlertType.CriticalLowTemperature || type == AlertType.CriticalHighTemperature)) {
+        if (!(type == AlertType.Cold || type == AlertType.Hot
+                || type == AlertType.CriticalCold || type == AlertType.CriticalHot)) {
             throw new IllegalArgumentException("Illegal alert type " + type + " for temperature alert");
         }
     }

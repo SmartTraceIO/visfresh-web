@@ -95,6 +95,36 @@ public class ReportSerializer extends AbstractJsonSerializer {
 
         return json;
     }
+
+    /**
+     * @param dto
+     * @return
+     */
+    public JsonObject toJson(final ShipmentStateDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        final JsonObject json = new JsonObject();
+        json.addProperty("actualArrivalDate", formatDate(dto.getActualArrivalDate()));
+        json.addProperty("alertProfile", dto.getAlertProfile());
+        json.addProperty("alertProfileName", dto.getAlertProfileName());
+        json.add("alertSummary", toJson(dto.getAlertSummary()));
+        json.addProperty("assetNum", dto.getAssetNum());
+        json.addProperty("assetType", dto.getAssetType());
+        json.addProperty("deviceName", dto.getDeviceName());
+        json.addProperty("deviceSN", dto.getDeviceSN());
+        json.addProperty("estArrivalDate", formatDate(dto.getEstArrivalDate()));
+        json.addProperty("palettid", dto.getPalettid());
+        json.addProperty("percentageCompleted", dto.getPercentageCompleted());
+        json.addProperty("shipmentDate", formatDate(dto.getShipmentDate()));
+        json.addProperty("shipmentDescription", dto.getShipmentDescription());
+        json.addProperty("shipmentId", dto.getShipmentId());
+        json.addProperty("shippedFrom", dto.getShippedFrom());
+        json.addProperty("shippedTo", dto.getShippedTo());
+        json.addProperty("status", dto.getStatus().toString());
+        json.addProperty("tripcount", dto.getTripcount());
+        return json;
+    }
     /**
      * @param arrival
      * @return

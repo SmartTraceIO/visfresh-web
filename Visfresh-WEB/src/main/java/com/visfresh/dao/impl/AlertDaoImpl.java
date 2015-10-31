@@ -252,10 +252,10 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         final AlertType type = AlertType.valueOf((String) map.get(resultPrefix + TYPE_FIELD));
 
         switch (type) {
-            case CriticalHighTemperature:
-            case CriticalLowTemperature:
-            case HighTemperature:
-            case LowTemperature:
+            case CriticalHot:
+            case CriticalCold:
+            case Hot:
+            case Cold:
                 final TemperatureAlert ta = new TemperatureAlert();
                 ta.setTemperature(((Number) map.get(resultPrefix + TEMPERATURE_FIELD)).doubleValue());
                 ta.setMinutes(((Number) map.get(resultPrefix + MINUTES_FIELD)).intValue());

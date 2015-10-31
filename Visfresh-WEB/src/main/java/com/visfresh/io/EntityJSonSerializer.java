@@ -332,7 +332,10 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
 
         addShipmentBase(tpl, obj);
-        obj.addProperty("addDateShipped", tpl.isAddDateShipped());
+        obj.addProperty("templateName", tpl.getName());
+        obj.addProperty("shipmentDefaultDescription", tpl.getShipmentDescription());
+        obj.addProperty("templateId", tpl.getId());
+        obj.addProperty("addDateShippedToDesc", tpl.isAddDateShipped());
         obj.addProperty("useCurrentTimeForDateShipped", tpl.isUseCurrentTimeForDateShipped());
         obj.addProperty("detectLocationForShippedFrom", tpl.isDetectLocationForShippedFrom());
 
@@ -343,10 +346,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param obj
      */
     private void addShipmentBase(final ShipmentBase shpb, final JsonObject obj) {
-        obj.addProperty("name", shpb.getName());
-        obj.addProperty("shipmentDescription", shpb.getShipmentDescription());
-        obj.addProperty("alertSuppressionDuringCoolDown", shpb.getAlertSuppressionDuringCoolDown());
-        obj.addProperty("id", shpb.getId());
+        obj.addProperty("alertSuppressionMinutes", shpb.getAlertSuppressionDuringCoolDown());
         obj.addProperty("alertProfile", getId(shpb.getAlertProfile()));
         obj.add("alertsNotificationSchedules", getIdList(shpb.getAlertsNotificationSchedules()));
         obj.addProperty("arrivalNotificationWithIn", shpb.getArrivalNotificationWithIn());
@@ -354,7 +354,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("excludeNotificationsIfNoAlertsFired", shpb.isExcludeNotificationsIfNoAlertsFired());
         obj.addProperty("shippedFrom", getId(shpb.getShippedFrom()));
         obj.addProperty("shippedTo", getId(shpb.getShippedTo()));
-        obj.addProperty("shutdownDevice", shpb.getShutdownDeviceTimeOut());
+        obj.addProperty("shutdownDeviceAfterMinutes", shpb.getShutdownDeviceTimeOut());
         obj.addProperty("assetType", shpb.getAssetType());
     }
     /**
@@ -365,7 +365,10 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final ShipmentTemplate tpl = new ShipmentTemplate();
 
         parseShipmentBase(obj, tpl);
-        tpl.setAddDateShipped(asBoolean(obj.get("addDateShipped")));
+        tpl.setId(asLong(obj.get("templateId")));
+        tpl.setName(asString(obj.get("templateName")));
+        tpl.setShipmentDescription(asString(obj.get("shipmentDefaultDescription")));
+        tpl.setAddDateShipped(asBoolean(obj.get("addDateShippedToDesc")));
         tpl.setUseCurrentTimeForDateShipped(asBoolean(obj.get("useCurrentTimeForDateShipped")));
         tpl.setDetectLocationForShippedFrom(asBoolean(obj.get("detectLocationForShippedFrom")));
 
@@ -376,10 +379,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param shp
      */
     private void parseShipmentBase(final JsonObject obj, final ShipmentBase shp) {
-        shp.setName(asString(obj.get("name")));
-        shp.setShipmentDescription(asString(obj.get("shipmentDescription")));
-        shp.setAlertSuppressionDuringCoolDown(asInt(obj.get("alertSuppressionDuringCoolDown")));
-        shp.setId(asLong(obj.get("id")));
+        shp.setAlertSuppressionDuringCoolDown(asInt(obj.get("alertSuppressionMinutes")));
         shp.setAlertProfile(resolveAlertProfile(asLong(obj.get("alertProfile"))));
         shp.getAlertsNotificationSchedules().addAll(
                 resolveNotificationSchedules(obj.get("alertsNotificationSchedules").getAsJsonArray()));
@@ -389,7 +389,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         shp.setExcludeNotificationsIfNoAlertsFired(asBoolean(obj.get("excludeNotificationsIfNoAlertsFired")));
         shp.setShippedFrom(resolveLocationProfile(asLong(obj.get("shippedFrom"))));
         shp.setShippedTo(resolveLocationProfile(asLong(obj.get("shippedTo"))));
-        shp.setShutdownDeviceTimeOut(asInt(obj.get("shutdownDevice")));
+        shp.setShutdownDeviceTimeOut(asInt(obj.get("shutdownDeviceAfterMinutes")));
         shp.setAssetType(asString(obj.get("assetType")));
     }
     /**
@@ -426,6 +426,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final Shipment s = new Shipment();
         parseShipmentBase(json, s);
 
+        s.setId(asLong(json.get("shipmentId")));
+        s.setName(asString(json.get("deviceName")));
+        s.setShipmentDescription(asString(json.get("shipmentDescription")));
         s.setPalletId(asString(json.get("palletId")));
         s.setAssetNum(asString(json.get("assetNum")));
         s.setTripCount(asInt(json.get("tripCount")));
@@ -433,7 +436,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         s.setShipmentDate(asDate(json.get("shipmentDate")));
         s.getCustomFields().putAll(parseStringMap(json.get("customFields")));
         s.setStatus(ShipmentStatus.valueOf(json.get("status").getAsString()));
-        s.setDevice(resolveDevice(asString(json.get("device"))));
+        s.setDevice(resolveDevice(asString(json.get("deviceSN"))));
 
         return s;
     }
@@ -449,6 +452,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
         addShipmentBase(s, obj);
 
+        obj.addProperty("deviceName", s.getName());
+        obj.addProperty("shipmentDescription", s.getShipmentDescription());
+        obj.addProperty("shipmentId", s.getId());
         obj.addProperty("palletId", s.getPalletId());
         obj.addProperty("tripCount", s.getTripCount());
         obj.addProperty("poNum", s.getPoNum());
@@ -456,7 +462,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("shipmentDate", timeToString(s.getShipmentDate()));
         obj.add("customFields", toJson(s.getCustomFields()));
         obj.addProperty("status", s.getStatus().name());
-        obj.addProperty("device", s.getDevice() == null ? null : s.getDevice().getId());
+        obj.addProperty("deviceSN", s.getDevice() == null ? null : s.getDevice().getId());
 
         return obj;
     }
@@ -574,10 +580,10 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final AlertType type = AlertType.valueOf(json.get("type").getAsString());
         Alert alert;
         switch (type) {
-            case CriticalHighTemperature:
-            case CriticalLowTemperature:
-            case HighTemperature:
-            case LowTemperature:
+            case CriticalHot:
+            case CriticalCold:
+            case Hot:
+            case Cold:
                 final TemperatureAlert ta = new TemperatureAlert();
                 ta.setTemperature(asDouble(json.get("temperature")));
                 ta.setMinutes(asInt(json.get("minutes")));
@@ -614,10 +620,10 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         json.addProperty("type", alert.getType().name());
 
         switch (alert.getType()) {
-            case CriticalHighTemperature:
-            case CriticalLowTemperature:
-            case HighTemperature:
-            case LowTemperature:
+            case CriticalHot:
+            case CriticalCold:
+            case Hot:
+            case Cold:
                 final TemperatureAlert ta = (TemperatureAlert) alert;
                 json.addProperty("temperature", ta.getTemperature());
                 json.addProperty("minutes", ta.getMinutes());
