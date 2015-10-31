@@ -31,7 +31,7 @@ public class User implements EntityWithId<String> {
     /**
      * Time Zone
      */
-    private TimeZone timeZone = TimeZone.getDefault();
+    private TimeZone timeZone = TimeZone.getTimeZone("UTC");
     /**
      * Set of roles.
      */

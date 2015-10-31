@@ -55,7 +55,7 @@ public class AlertProfileController extends AbstractController {
             final @RequestBody String alert) {
         try {
             final User user = getLoggedInUser(authToken);
-            final AlertProfile p = getSerializer().parseAlertProfile(getJSonObject(alert));
+            final AlertProfile p = getSerializer(user).parseAlertProfile(getJSonObject(alert));
 
             security.checkCanSaveAlertProfile(user);
             final Long id = restService.saveAlertProfile(user.getCompany(), p);
@@ -79,7 +79,7 @@ public class AlertProfileController extends AbstractController {
             security.checkCanGetAlertProfiles(user);
 
             final AlertProfile alert = restService.getAlertProfile(user.getCompany(), alertProfileId);
-            return createSuccessResponse(getSerializer().toJson(alert));
+            return createSuccessResponse(getSerializer(user).toJson(alert));
         } catch (final Exception e) {
             log.error("Failed to get alert profiles", e);
             return createErrorResponse(e);
@@ -118,7 +118,7 @@ public class AlertProfileController extends AbstractController {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetAlertProfiles(user);
-            final EntityJSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer(user);
 
             final List<AlertProfile> alerts = getPage(
                     restService.getAlertProfiles(user.getCompany()), pageIndex, pageSize);

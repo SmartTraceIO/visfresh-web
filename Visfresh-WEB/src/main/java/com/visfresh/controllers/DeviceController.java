@@ -58,7 +58,7 @@ public class DeviceController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveDevice(user);
 
-            restService.saveDevice(user.getCompany(), getSerializer().parseDevice(getJSonObject(device)));
+            restService.saveDevice(user.getCompany(), getSerializer(user).parseDevice(getJSonObject(device)));
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to save device", e);
@@ -79,7 +79,7 @@ public class DeviceController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetDevices(user);
 
-            final EntityJSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer(user);
 
             final List<Device> devices = getPage(restService.getDevices(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
@@ -107,7 +107,7 @@ public class DeviceController extends AbstractController {
             security.checkCanGetDevices(user);
 
             final Device device = restService.getDevice(user.getCompany(), deviceId);
-            return createSuccessResponse(getSerializer().toJson(device));
+            return createSuccessResponse(getSerializer(user).toJson(device));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
@@ -125,7 +125,7 @@ public class DeviceController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanSendCommandToDevice(user);
 
-            final DeviceCommand cmd = getSerializer().parseDeviceCommand(getJSonObject(req));
+            final DeviceCommand cmd = getSerializer(user).parseDeviceCommand(getJSonObject(req));
             restService.sendCommandToDevice(cmd);
 
             return createSuccessResponse(null);

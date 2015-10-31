@@ -25,13 +25,15 @@ public class AbstractJsonSerializer {
     /**
      * The date format.
      */
-    public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+    private final TimeZone timeZone;
 
     /**
      *
      */
     public AbstractJsonSerializer(final TimeZone tz) {
         super();
+        timeZone = tz;
     }
 
     /**
@@ -127,10 +129,20 @@ public class AbstractJsonSerializer {
      * @param date
      * @return
      */
-    public static String formatDate(final Date date) {
-        return new SimpleDateFormat(DATE_FORMAT).format(date);
+    public String formatDate(final Date date) {
+        final TimeZone t = this.timeZone;
+        return formatTimeZone(date, t);
     }
-
+    /**
+     * @param date
+     * @param t
+     * @return
+     */
+    public static String formatTimeZone(final Date date, final TimeZone t) {
+        final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        sdf.setTimeZone(t);
+        return sdf.format(date);
+    }
     /**
      * @param text JSON text.
      * @return JSON element.

@@ -74,7 +74,7 @@ public class ReportSerializer extends AbstractJsonSerializer {
         final JsonObject json = new JsonObject();
         final TrackerEvent event = item.getEvent();
 
-        json.addProperty("timestamp", event.getTime().getTime());
+        json.addProperty("timestamp", formatDate(event.getTime()));
         json.add("location", toJson(new Location(event.getLatitude(), event.getLongitude())));
         json.addProperty("temperature", event.getTemperature());
         json.addProperty("type", event.getType());

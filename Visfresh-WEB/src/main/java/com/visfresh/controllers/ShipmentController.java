@@ -5,7 +5,6 @@ package com.visfresh.controllers;
 
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +71,7 @@ public class ShipmentController extends AbstractController {
             security.checkCanSaveShipmentTemplate(user);
 
             final Long id = restService.saveShipmentTemplate(
-                    user.getCompany(), getSerializer().parseShipmentTemplate(getJSonObject(tpl)));
+                    user.getCompany(), getSerializer(user).parseShipmentTemplate(getJSonObject(tpl)));
             return createIdResponse("shipmentTemplateId", id);
         } catch (final Exception e) {
             log.error("Failed to save shipment template", e);
@@ -97,7 +96,7 @@ public class ShipmentController extends AbstractController {
                     restService.getShipmentTemplates(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final ShipmentTemplate tpl : templates) {
-                array.add(getSerializer().toJson(tpl));
+                array.add(getSerializer(user).toJson(tpl));
             }
 
             return createSuccessResponse(array);
@@ -120,7 +119,7 @@ public class ShipmentController extends AbstractController {
             security.checkCanGetShipmentTemplates(user);
 
             final ShipmentTemplate template = restService.getShipmentTemplate(user.getCompany(), shipmentTemplateId);
-            return createSuccessResponse(getSerializer().toJson(template));
+            return createSuccessResponse(getSerializer(user).toJson(template));
         } catch (final Exception e) {
             log.error("Failed to get shipment templates", e);
             return createErrorResponse(e);
@@ -158,7 +157,7 @@ public class ShipmentController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveShipment(user);
 
-            final SaveShipmentRequest req = getSerializer().parseSaveShipmentRequest(getJSonObject(shipment));
+            final SaveShipmentRequest req = getSerializer(user).parseSaveShipmentRequest(getJSonObject(shipment));
             final Long id = restService.saveShipment(user.getCompany(), req.getShipment());
 
             final SaveShipmentResponse resp = new SaveShipmentResponse();
@@ -169,7 +168,7 @@ public class ShipmentController extends AbstractController {
                         user.getCompany(), req.getShipment(), req.getTemplateName());
                 resp.setTemplateId(tplId);
             }
-            return createSuccessResponse(getSerializer().toJson(resp));
+            return createSuccessResponse(getSerializer(user).toJson(resp));
         } catch (final Exception e) {
             log.error("Failed to save device", e);
             return createErrorResponse(e);
@@ -189,7 +188,7 @@ public class ShipmentController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipments(user);
 
-            final EntityJSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer(user);
 
             final List<Shipment> shipments = getPage(restService.getShipments(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
@@ -217,7 +216,7 @@ public class ShipmentController extends AbstractController {
             security.checkCanGetShipments(user);
 
             final Shipment shipment = restService.getShipment(user.getCompany(), shipmentId);
-            return createSuccessResponse(getSerializer().toJson(shipment));
+            return createSuccessResponse(getSerializer(user).toJson(shipment));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
@@ -254,7 +253,7 @@ public class ShipmentController extends AbstractController {
             final Date endDate = parseDate(toDate);
 
             final SingleShipmentDto dto = reportService.getSingleShipment(startDate, endDate, shipment);
-            return createSuccessResponse(dto == null ? null : new ReportSerializer(TimeZone.getDefault()).toJson(dto));
+            return createSuccessResponse(dto == null ? null : new ReportSerializer(user.getTimeZone()).toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);

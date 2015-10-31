@@ -308,8 +308,8 @@ public class RestServiceFacade  {
     public JsonElement getSingleShipment(final Shipment shipment, final Date from, final Date to)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("fromDate", EntityJSonSerializer.formatDate(from));
-        params.put("toDate", EntityJSonSerializer.formatDate(to));
+        params.put("fromDate", serializer.formatDate(from));
+        params.put("toDate", serializer.formatDate(to));
         params.put("shipment", shipment.getId().toString());
 
         return sendGetRequest(getPathWithToken(REST_SERVICE, "getSingleShipment"), params);

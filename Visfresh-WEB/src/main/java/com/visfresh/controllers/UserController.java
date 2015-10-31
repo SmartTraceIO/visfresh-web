@@ -56,7 +56,7 @@ public class UserController extends AbstractController {
             security.checkCanGetUserInfo(user, username);
 
             final User u = authService.getUser(username);
-            return createSuccessResponse(u == null ? null : getSerializer().toJson(u));
+            return createSuccessResponse(u == null ? null : getSerializer(user).toJson(u));
         } catch (final Exception e) {
             log.error("Failed to get user info", e);
             return createErrorResponse(e);
@@ -72,7 +72,7 @@ public class UserController extends AbstractController {
             final @RequestBody String req) {
         try {
             final User user = getLoggedInUser(authToken);
-            final CreateUserRequest r = getSerializer().parseCreateUserRequest(getJSonObject(req));
+            final CreateUserRequest r = getSerializer(user).parseCreateUserRequest(getJSonObject(req));
             security.checkCanCreateUser(user, r);
 
             final User newUser = r.getUser();
@@ -96,7 +96,7 @@ public class UserController extends AbstractController {
             security.checkGetProfile(user);
 
             final UserProfile profile = restService.getProfile(user);
-            return createSuccessResponse(getSerializer().toJson(profile));
+            return createSuccessResponse(getSerializer(user).toJson(profile));
         } catch (final Exception e) {
             log.error("Failed to send command to device", e);
             return createErrorResponse(e);
@@ -114,7 +114,7 @@ public class UserController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkSaveProfile(user);
 
-            final UserProfile p = getSerializer().parseUserProfile(getJSon(profile));
+            final UserProfile p = getSerializer(user).parseUserProfile(getJSon(profile));
             restService.saveUserProfile(user, p);
             return createSuccessResponse(null);
         } catch (final Exception e) {

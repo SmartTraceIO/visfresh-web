@@ -59,7 +59,7 @@ public class NotificationScheduleController extends AbstractController {
             security.checkCanSaveNotificationSchedule(user);
 
             final Long id = restService.saveNotificationSchedule(
-                    user.getCompany(), getSerializer().parseNotificationSchedule(getJSonObject(schedule)));
+                    user.getCompany(), getSerializer(user).parseNotificationSchedule(getJSonObject(schedule)));
             return createIdResponse("notificationScheduleId", id);
         } catch (final Exception e) {
             log.error("Failed to save notification schedule", e);
@@ -83,7 +83,7 @@ public class NotificationScheduleController extends AbstractController {
             final List<NotificationSchedule> schedules = getPage(restService.getNotificationSchedules(
                     user.getCompany()), pageIndex, pageSize);
 
-            final EntityJSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer(user);
             final JsonArray array = new JsonArray();
             for (final NotificationSchedule schedule : schedules) {
                 array.add(ser.toJson(schedule));
@@ -111,7 +111,7 @@ public class NotificationScheduleController extends AbstractController {
             final NotificationSchedule schedule = restService.getNotificationSchedule(
                     user.getCompany(), notificationScheduleId);
 
-            return createSuccessResponse(getSerializer().toJson(schedule));
+            return createSuccessResponse(getSerializer(user).toJson(schedule));
         } catch (final Exception e) {
             log.error("Failed to get notification schedules", e);
             return createErrorResponse(e);

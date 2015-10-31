@@ -3,6 +3,7 @@
  */
 package com.visfresh.drools;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,6 +51,7 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
     private DeviceDao deviceDao;
 
     private KieContainer kie;
+    private static final int TIME_ZONE_OFSET = TimeZone.getDefault().getRawOffset();
 
     private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<String, TrackerEventRule>();
     private final TrackerEventRule emptyRule = new TrackerEventRule() {
@@ -96,6 +98,8 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
 
         final DeviceDcsNativeEvent event = new EntityJSonSerializer(TimeZone.getDefault()).parseDeviceDcsNativeEvent(
                 e.getAsJsonObject());
+        //convert the UTC time to local
+        event.setDate(new Date(event.getTime().getTime() + TIME_ZONE_OFSET));
 
         processDcsEvent(event);
     }
@@ -157,5 +161,8 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
      */
     protected void setRule(final String name, final TrackerEventRule rule) {
         rules.put(name, rule);
+    }
+    public static void main(final String[] args) throws Exception {
+        System.out.println(TimeZone.getDefault().getRawOffset());
     }
 }

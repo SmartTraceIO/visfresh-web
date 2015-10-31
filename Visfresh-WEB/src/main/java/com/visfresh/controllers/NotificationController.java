@@ -59,7 +59,7 @@ public class NotificationController extends AbstractController {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            final EntityJSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer(user);
 
             final List<Notification> shipments = getPage(restService.getNotifications(user), pageIndex, pageSize);
             final JsonArray array = new JsonArray();

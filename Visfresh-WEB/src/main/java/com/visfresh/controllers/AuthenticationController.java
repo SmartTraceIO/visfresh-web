@@ -51,7 +51,7 @@ public class AuthenticationController extends AbstractController {
     public @ResponseBody String login(final @RequestParam String login, final @RequestParam String password) {
         try {
             final AuthToken token = authService.login(login, password);
-            return createSuccessResponse(getSerializer().toJson(token));
+            return createSuccessResponse(getSerializer(null).toJson(token));
         } catch (final Exception e) {
             log.error("Faile to log in " + login, e);
             return createErrorResponse(e);
@@ -66,7 +66,7 @@ public class AuthenticationController extends AbstractController {
     public @ResponseBody String getAuthToken(final HttpSession session) {
         try {
             final AuthToken token = authService.attachToExistingSession(session);
-            return createSuccessResponse(getSerializer().toJson(token));
+            return createSuccessResponse(getSerializer(null).toJson(token));
         } catch (final Exception e) {
             log.error("Failed to get auth token. Possible not user has logged in", e);
             return createErrorResponse(e);
@@ -89,7 +89,7 @@ public class AuthenticationController extends AbstractController {
         try {
             final User user = getLoggedInUser(authToken);
             final AuthToken token = authService.refreshToken(user);
-            return createSuccessResponse(getSerializer().toJson(token));
+            return createSuccessResponse(getSerializer(user).toJson(token));
         } catch (final Exception e) {
             log.error("Failed to refresh token " + authToken, e);
             return createErrorResponse(e);

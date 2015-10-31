@@ -56,7 +56,7 @@ public class LocationController extends AbstractController {
             final @RequestBody String profile) {
         try {
             final User user = getLoggedInUser(authToken);
-            final LocationProfile lp = getSerializer().parseLocationProfile(getJSonObject(profile));
+            final LocationProfile lp = getSerializer(user).parseLocationProfile(getJSonObject(profile));
 
             security.checkCanSaveLocation(user);
 
@@ -81,7 +81,7 @@ public class LocationController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetLocations(user);
 
-            final EntityJSonSerializer ser = getSerializer();
+            final EntityJSonSerializer ser = getSerializer(user);
 
             final List<LocationProfile> locations = getPage(restService.getLocation(user.getCompany()),
                     pageIndex, pageSize);
@@ -110,7 +110,7 @@ public class LocationController extends AbstractController {
             security.checkCanGetLocations(user);
 
             final LocationProfile location = restService.getLocationProfile(user.getCompany(), locationId);
-            return createSuccessResponse(getSerializer().toJson(location));
+            return createSuccessResponse(getSerializer(user).toJson(location));
         } catch (final Exception e) {
             log.error("Failed to get location profiles", e);
             return createErrorResponse(e);

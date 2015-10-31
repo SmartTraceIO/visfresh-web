@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNull;
 
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.junit.Before;
 
@@ -85,6 +86,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         u.setCompany(sharedCompany);
         u.setLogin("asuvorov-" + (++ids));
         u.setPassword("abrakadabra");
+        u.setTimeZone(TimeZone.getTimeZone("UTC"));
         return u;
     }
     /**
@@ -162,6 +164,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         assertEquals("asuvorov-1", user.getLogin());
         assertEquals("Alexander Suvorov", user.getFullName());
         assertEquals("abrakadabra", user.getPassword());
+        assertEquals(TimeZone.getTimeZone("UTC"), user.getTimeZone());
 
         //test company
         final Company c = user.getCompany();
@@ -183,6 +186,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         assertNotNull(user.getLogin());
         assertEquals("Alexander Suvorov", user.getFullName());
         assertEquals("abrakadabra", user.getPassword());
+        assertEquals(TimeZone.getTimeZone("UTC"), user.getTimeZone());
 
         //test company
         final Company c = user.getCompany();

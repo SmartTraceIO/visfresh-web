@@ -178,10 +178,12 @@ public abstract class AbstractController {
         return dateStr == null || dateStr.length() == 0 ? null : EntityJSonSerializer.parseDate(dateStr);
     }
     /**
+     * @param user user.
      * @return serializer.
      */
-    protected EntityJSonSerializer getSerializer() {
-        final EntityJSonSerializer ser = new EntityJSonSerializer(TimeZone.getDefault());
+    protected EntityJSonSerializer getSerializer(final User user) {
+        final EntityJSonSerializer ser = new EntityJSonSerializer(
+                user == null ? TimeZone.getDefault() : user.getTimeZone());
         ser.setReferenceResolver(resolver);
         return ser;
     }

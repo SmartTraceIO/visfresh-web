@@ -68,7 +68,7 @@ public class CompanyController extends AbstractController {
             } else {
                 company = restService.getCompany(companyId);
             }
-            return createSuccessResponse(getSerializer().toJson(company));
+            return createSuccessResponse(getSerializer(user).toJson(company));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
@@ -91,7 +91,7 @@ public class CompanyController extends AbstractController {
             final List<Company> company = getPage(restService.getCompanies(), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final Company c : company) {
-                array.add(getSerializer().toJson(c));
+                array.add(getSerializer(user).toJson(c));
             }
             return createSuccessResponse(array);
         } catch (final Exception e) {
