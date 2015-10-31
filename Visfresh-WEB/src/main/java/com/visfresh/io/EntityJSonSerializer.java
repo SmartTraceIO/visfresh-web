@@ -9,8 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.eclipse.jetty.spdy.api.Settings.ID;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -129,7 +127,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
 
         obj.addProperty("alertProfileId", alert.getId());
-        obj.addProperty("description", alert.getDescription());
+        obj.addProperty("alertProfileDescription", alert.getDescription());
         obj.addProperty("alertProfileName", alert.getName());
         obj.addProperty("criticalHighTemperatureForMoreThen", alert.getCriticalHighTemperatureForMoreThen());
         obj.addProperty("criticalHighTemperature", alert.getCriticalHighTemperature());
@@ -154,7 +152,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final AlertProfile p = new AlertProfile();
 
         p.setId(asLong(alert.get("alertProfileId")));
-        p.setDescription(asString(alert.get("description")));
+        p.setDescription(asString(alert.get("alertProfileDescription")));
         p.setName(asString(alert.get("alertProfileName")));
         p.setCriticalHighTemperature(asDouble(alert.get("criticalHighTemperature")));
         p.setCriticalHighTemperatureForMoreThen(asInt(alert.get("criticalHighTemperatureForMoreThen")));
