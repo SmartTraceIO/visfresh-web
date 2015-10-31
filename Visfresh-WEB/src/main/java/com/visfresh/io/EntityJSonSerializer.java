@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.eclipse.jetty.spdy.api.Settings.ID;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -180,18 +182,21 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty("id", location.getId());
+        obj.addProperty("locationId", location.getId());
         obj.addProperty("companyDescription", location.getCompanyDescription());
-        obj.addProperty("name", location.getName());
+        obj.addProperty("locationName", location.getName());
         obj.addProperty("notes", location.getNotes());
         obj.addProperty("address", location.getAddress());
+        obj.addProperty("startFlag", location.isStart() ? "Y" : "N");
+        obj.addProperty("interimFlag", location.isInterim() ? "Y" : "N");
+        obj.addProperty("endFlag", location.isStop() ? "Y" : "N");
 
         final JsonObject loc = new JsonObject();
         obj.add("location", loc);
         loc.addProperty("lat", location.getLocation().getLatitude());
         loc.addProperty("lon", location.getLocation().getLongitude());
 
-        obj.addProperty("radius", location.getRadius());
+        obj.addProperty("radiusMeters", location.getRadius());
 
         return obj;
     }
@@ -202,17 +207,21 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
     public LocationProfile parseLocationProfile(final JsonObject obj) {
         final LocationProfile location = new LocationProfile();
 
-        location.setId(asLong(obj.get("id")));
+        location.setId(asLong(obj.get("locationId")));
         location.setCompanyDescription(asString(obj.get("companyDescription")));
-        location.setName(asString(obj.get("name")));
+        location.setName(asString(obj.get("locationName")));
         location.setNotes(asString(obj.get("notes")));
         location.setAddress(asString(obj.get("address")));
+
+        location.setStart("Y".equalsIgnoreCase(asString(obj.get("startFlag"))));
+        location.setInterim("Y".equalsIgnoreCase(asString(obj.get("interimFlag"))));
+        location.setStop("Y".equalsIgnoreCase(asString(obj.get("endFlag"))));
 
         final JsonObject loc = obj.get("location").getAsJsonObject();
         location.getLocation().setLatitude(loc.get("lat").getAsDouble());
         location.getLocation().setLongitude(loc.get("lon").getAsDouble());
 
-        location.setRadius(asInt(obj.get("radius")));
+        location.setRadius(asInt(obj.get("radiusMeters")));
 
         return location;
     }
@@ -726,7 +735,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
         obj.addProperty("battery", e.getBattery());
         obj.addProperty("temperature", e.getTemperature());
-        obj.addProperty("time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(e.getTime()));
+        obj.addProperty("time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(e.getTime()));
         obj.addProperty("type", e.getType());
         obj.addProperty("latitude", e.getLocation().getLatitude());
         obj.addProperty("longitude", e.getLocation().getLongitude());

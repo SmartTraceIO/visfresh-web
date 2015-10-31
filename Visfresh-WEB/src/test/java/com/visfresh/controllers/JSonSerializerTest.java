@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -391,7 +392,7 @@ public class JSonSerializerTest {
         assertEquals(shutdownDeviceTimeOut, s.getShutdownDeviceTimeOut());
         assertEquals(device.getId(), s.getDevice().getId());
         assertEquals(palletId, s.getPalletId());
-        assertEquals(shipmentDate, s.getShipmentDate());
+        assertEquals(format(shipmentDate), format(s.getShipmentDate()));
         assertEquals("value", s.getCustomFields().get("name"));
         assertEquals(status, s.getStatus());
         assertEquals(assetType, s.getAssetType());
@@ -469,7 +470,7 @@ public class JSonSerializerTest {
         //check issue
         alert = (Alert) n.getIssue();
 
-        assertEquals(alertDate, alert.getDate());
+        assertEquals(format(alertDate), format(alert.getDate()));
         assertEquals(alertDescription, alert.getDescription());
         assertEquals(alertId, alert.getId());
         assertEquals(alertName, alert.getName());
@@ -519,7 +520,7 @@ public class JSonSerializerTest {
         //check issue
         alert = (TemperatureAlert) n.getIssue();
 
-        assertEquals(alertDate, alert.getDate());
+        assertEquals(format(alertDate), format(alert.getDate()));
         assertEquals(alertDescription, alert.getDescription());
         assertEquals(alertId, alert.getId());
         assertEquals(alertName, alert.getName());
@@ -554,7 +555,7 @@ public class JSonSerializerTest {
         assertEquals(battery, e.getBattery());
         assertEquals(id, e.getId());
         assertEquals(temperature, e.getTemperature(), 0.00001);
-        assertEquals(time, e.getTime());
+        assertEquals(format(time), format(e.getTime()));
         assertEquals(type, e.getType());
         assertEquals(latitude, e.getLatitude(), 0.000001);
         assertEquals(longitude, e.getLongitude(), 0.00001);
@@ -624,7 +625,7 @@ public class JSonSerializerTest {
         e = serializer.parseDeviceDcsNativeEvent(json);
 
         assertEquals(battery, e.getBattery());
-        assertEquals(date, e.getTime());
+        assertEquals(format(date), format(e.getTime()));
         assertEquals(imei, e.getImei());
         assertEquals(lat, e.getLocation().getLatitude(), 0.00001);
         assertEquals(lon, e.getLocation().getLongitude(), 0.00001);
@@ -680,7 +681,7 @@ public class JSonSerializerTest {
         final JsonElement json = EntityJSonSerializer.toJson(alert);
         alert = serializer.parseAlert(json);
 
-        assertEquals(date, alert.getDate());
+        assertEquals(format(date), format(alert.getDate()));
         assertEquals(description, alert.getDescription());
         assertEquals(device.getId(), alert.getDevice().getId());
         assertEquals(id, alert.getId());
@@ -714,7 +715,7 @@ public class JSonSerializerTest {
         final JsonElement json = EntityJSonSerializer.toJson(alert);
         alert = (TemperatureAlert) serializer.parseAlert(json);
 
-        assertEquals(date, alert.getDate());
+        assertEquals(format(date), format(alert.getDate()));
         assertEquals(description, alert.getDescription());
         assertEquals(device.getId(), alert.getDevice().getId());
         assertEquals(id, alert.getId());
@@ -724,6 +725,14 @@ public class JSonSerializerTest {
         assertEquals(temperature, alert.getTemperature(), 0.00001);
         assertEquals(minutes, alert.getMinutes());
     }
+    /**
+     * @param date
+     * @return
+     */
+    private String format(final Date date) {
+        return new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss").format(date);
+    }
+
     @Test
     public void testArrival() {
         final Device device = createDevice("92348072043987");
@@ -742,7 +751,7 @@ public class JSonSerializerTest {
         final JsonElement e = EntityJSonSerializer.toJson(a);
         a = serializer.parseArrival(e);
 
-        assertEquals(date, a.getDate());
+        assertEquals(format(date), format(a.getDate()));
         assertEquals(device.getId(), a.getDevice().getId());
         assertEquals(id, a.getId());
         assertEquals(numberOfMetersOfArrival, a.getNumberOfMettersOfArrival());
