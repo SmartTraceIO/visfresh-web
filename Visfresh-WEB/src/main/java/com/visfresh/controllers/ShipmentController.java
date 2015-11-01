@@ -182,7 +182,15 @@ public class ShipmentController extends AbstractController {
      */
     @RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getShipments(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
+            @RequestParam final int pageIndex,
+            @RequestParam final int pageSize,
+            @RequestParam(required = false) final boolean onlyWithAlerts,
+            @RequestParam(required = false) final Long shippedFrom,
+            @RequestParam(required = false) final Long shippedTo,
+            @RequestParam(required = false) final String goods,
+            @RequestParam(required = false) final String device,
+            @RequestParam(required = false) final String status
+            ) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -193,6 +201,30 @@ public class ShipmentController extends AbstractController {
             final List<ShipmentStateDto> shipments = getPage(restService.getShipments(user.getCompany()), pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final ShipmentStateDto t : shipments) {
+                //TODO move filtering to DAO
+                if (onlyWithAlerts && !hasAlerts(t)) {
+                    continue;
+                }
+                if (shippedFrom != null && (t.getShippedFrom() == null
+                        || !shippedFrom.equals(t.getShippedFrom()))) {
+                    continue;
+                }
+                if (shippedTo != null && (t.getShippedTo() == null
+                        || !shippedTo.equals(t.getShippedTo()))) {
+                    continue;
+                }
+                if (device != null && (t.getDeviceSN() == null
+                        || !device.equals(t.getDeviceSN()))) {
+                    continue;
+                }
+                if (goods != null && (t.getShipmentDescription() == null
+                        || t.getShipmentDescription().indexOf(goods) < 0)) {
+                    continue;
+                }
+                if (status != null && !t.getStatus().toString().equals(status)) {
+                    continue;
+                }
+
                 array.add(ser.toJson(t));
             }
 
@@ -202,6 +234,19 @@ public class ShipmentController extends AbstractController {
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param t
+     * @return
+     */
+    private boolean hasAlerts(final ShipmentStateDto t) {
+        for (final Integer n : t.getAlertSummary().values()) {
+            if (n != null && n > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @param authToken authentication token.
      * @param shipmentId shipment ID.

@@ -18,6 +18,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
@@ -146,6 +147,29 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Date toTime = new Date(System.currentTimeMillis() + 10000000l);
         final JsonElement sd = facade.getSingleShipment(s, fromTime, toTime);
         assertNotNull(sd);
+    }
+    //@RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
+    //public @ResponseBody String getShipments(@PathVariable final String authToken) {
+    @Test
+    public void testGetShipmentsFiltered() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+
+        final Long shippedFrom = s.getShippedFrom().getId();
+        final Long shippedTo = s.getShippedTo().getId();
+        final String goods = s.getShipmentDescription();
+        final ShipmentStatus status = ShipmentStatus.Default;
+        final String device = s.getDevice().getId();
+
+        assertEquals(1, facade.getShipments(1, 10000,
+                shippedFrom, shippedTo, goods, device, status).size());
+        assertEquals(0, facade.getShipments(1, 10000,
+                shippedTo, shippedTo, goods, device, status).size());
+        assertEquals(0, facade.getShipments(1, 10000,
+                shippedFrom, shippedFrom, "abrakadabra", device, status).size());
+        assertEquals(0, facade.getShipments(1, 10000,
+                shippedFrom, shippedTo, goods, "11111111", status).size());
+        assertEquals(0, facade.getShipments(1, 10000,
+                shippedFrom, shippedTo, goods, device, ShipmentStatus.Complete).size());
     }
     /**
      * @param s

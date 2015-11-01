@@ -152,7 +152,8 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
                 + buildSelectAs(fields)
                 + " from "
                 + TABLE
-                + (id == null ? "" : " where " + ID_FIELD + " = :" + ID_PLACEHOLDER),
+                + (id == null ? "" : " where " + ID_FIELD + " = :" + ID_PLACEHOLDER)
+                + " order by " + ID_FIELD,
                 params);
         return list;
     }

@@ -174,7 +174,8 @@ public class NotificationScheduleDaoImpl extends DaoImplBase<NotificationSchedul
         final List<Map<String, Object>> list = jdbc.queryForList(
                 "select * from "
                 + TABLE
-                + (id == null ? "" : " where " + ID_FIELD + " = :" + ID_FIELD),
+                + (id == null ? "" : " where " + ID_FIELD + " = :" + ID_FIELD)
+                + " order by " + ID_FIELD,
                 params);
         return list;
     }

@@ -308,7 +308,8 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
                 "select * from "
                 + TABLE
                 + " where " + ISTEMPLATE_FIELD + "=:" + ISTEMPLATE_FIELD
-                + (id == null ? "" : " and " + ID_FIELD + " = :" + ID_FIELD),
+                + (id == null ? "" : " and " + ID_FIELD + " = :" + ID_FIELD)
+                + " order by " + ID_FIELD,
                 params);
         return list;
     }

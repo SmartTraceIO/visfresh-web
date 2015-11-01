@@ -199,9 +199,9 @@ public abstract class AbstractRestServiceTest {
         final Device t = new Device();
         t.setDescription("Device description");
         t.setImei(imei);
-        t.setId(imei + ".123");
+        t.setId(imei.substring(imei.length() - 6));
         t.setName("Device Name");
-        t.setSn("1");
+        t.setSn(t.getId());
         if (save) {
             getRestService().saveDevice(getCompany(), t);
         }

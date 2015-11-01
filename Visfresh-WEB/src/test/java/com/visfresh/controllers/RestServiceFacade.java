@@ -38,6 +38,7 @@ import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
@@ -239,10 +240,44 @@ public class RestServiceFacade  {
      * @param pageSize page size.
      * @return
      */
-    public JsonArray getShipments(final int pageIndex, final int pageSize) throws RestServiceException, IOException {
+    public JsonArray getShipments(final int pageIndex, final int pageSize)
+            throws RestServiceException, IOException {
+        return getShipments(pageIndex, pageSize, null, null, null, null, null);
+    }
+    /**
+     * @param pageIndex
+     * @param pageSize
+     * @param shippedFrom
+     * @param shippedTo
+     * @param goods
+     * @param device
+     * @param status
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public JsonArray getShipments(final int pageIndex, final int pageSize, final Long shippedFrom,
+            final Long shippedTo, final String goods, final String device, final ShipmentStatus status)
+                    throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("pageIndex", Integer.toString(pageIndex));
         params.put("pageSize", Integer.toString(pageSize));
+        if (shippedFrom != null) {
+            params.put("shippedFrom", shippedFrom.toString());
+        }
+        if (shippedTo != null) {
+            params.put("shippedTo", shippedTo.toString());
+        }
+        if (goods != null) {
+            params.put("goods", goods.toString());
+        }
+        if (device != null) {
+            params.put("device", device.toString());
+        }
+        if (status != null) {
+            params.put("status", status.toString());
+        }
+
         return sendGetRequest(getPathWithToken(REST_SERVICE, "getShipments"),
                 params).getAsJsonArray();
     }
