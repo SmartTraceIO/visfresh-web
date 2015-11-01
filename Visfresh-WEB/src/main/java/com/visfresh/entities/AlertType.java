@@ -16,6 +16,7 @@ public enum AlertType {
     //other alerts
     LightOn,
     LightOff,
-    Shock,
-    Battery
+    MovementStart,
+    MovementStop,
+    Battery,
 }

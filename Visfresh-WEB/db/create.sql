@@ -56,7 +56,7 @@ create table users (
     fullname varchar(255),
     roles varchar(255) not null,
     company bigint(20) not null,
-    timezone varchar(31) not null,
+    timezone varchar(31) not null default 'UTC',
     primary key (username),
     FOREIGN KEY (company)
         REFERENCES companies (id)
@@ -112,7 +112,8 @@ create table alertprofiles (
     criticalhightempformorethen int not null,
     onenterbright boolean not null,
     onenterdark boolean not null,
-    onshock boolean not null,
+    onmovementstart boolean not null,
+    onmovementstop boolean not null,
     onbatterylow boolean not null,
     company bigint(20) not null,
     primary key (id),

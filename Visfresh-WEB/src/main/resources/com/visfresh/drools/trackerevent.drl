@@ -9,10 +9,11 @@ import com.visfresh.drools.LowTemperatureAlertRule;
 import com.visfresh.drools.CriticalLowTemperatureAlertRule;
 import com.visfresh.drools.EnterBrightEnvironmentAlertRule;
 import com.visfresh.drools.EnterDarkEnvironmentAlertRule;
-import com.visfresh.drools.ShockAlertRule;
 import com.visfresh.drools.BatteryLowAlertRule;
 import com.visfresh.drools.ArrivalRule;
 import com.visfresh.drools.AutoStartShipmentRule;
+import com.visfresh.drools.MovementStartAlertRule;
+import com.visfresh.drools.MovementStopAlertRule;
 
 global com.visfresh.drools.DroolsRuleEngine engine;
 
@@ -99,15 +100,6 @@ rule "EnterDarkEnvironmentAlert"
         }
 end
 
-rule "ShockAlert"
-    when
-        req : TrackerEventRequest(engine.getRule(ShockAlertRule.NAME).accept(this));
-    then
-    	if(engine.getRule(ShockAlertRule.NAME).handle(req)) {
-       		update(req);
-        }
-end
-
 rule "BatteryLowAlert"
     when
         req : TrackerEventRequest(engine.getRule(BatteryLowAlertRule.NAME).accept(this));
@@ -122,6 +114,24 @@ rule "Arrival"
         req : TrackerEventRequest(engine.getRule(ArrivalRule.NAME).accept(this));
     then
     	if(engine.getRule(ArrivalRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "MovementStartAlert"
+    when
+        req : TrackerEventRequest(engine.getRule(MovementStartAlertRule.NAME).accept(this));
+    then
+    	if(engine.getRule(MovementStartAlertRule.NAME).handle(req)) {
+       		update(req);
+        }
+end
+
+rule "MovementStopAlert"
+    when
+        req : TrackerEventRequest(engine.getRule(MovementStopAlertRule.NAME).accept(this));
+    then
+    	if(engine.getRule(MovementStopAlertRule.NAME).handle(req)) {
        		update(req);
         }
 end

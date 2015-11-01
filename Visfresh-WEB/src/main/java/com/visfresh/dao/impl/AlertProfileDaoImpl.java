@@ -39,7 +39,8 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
     public static final String CRITICALHIGHTEMPFORMORETHEN_FIELD = "criticalhightempformorethen";
     public static final String ONENTERBRIGHT_FIELD = "onenterbright";
     public static final String ONENTERDARK_FIELD = "onenterdark";
-    public static final String ONSHOCK_FIELD = "onshock";
+    public static final String ONMOVEMENTSTART_FIELD = "onmovementstart";
+    public static final String ONMOVEMENTSTOP_FIELD = "onmovementstop";
     public static final String ONBATTERYLOW_FIELD = "onbatterylow";
     public static final String COMPANY_FIELD = "company";
 
@@ -86,7 +87,8 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
         paramMap.put(CRITICALHIGHTEMPFORMORETHEN_FIELD, ap.getCriticalHighTemperatureForMoreThen());
         paramMap.put(ONENTERBRIGHT_FIELD, ap.isWatchEnterBrightEnvironment());
         paramMap.put(ONENTERDARK_FIELD, ap.isWatchEnterDarkEnvironment());
-        paramMap.put(ONSHOCK_FIELD, ap.isWatchShock());
+        paramMap.put(ONMOVEMENTSTART_FIELD, ap.isWatchMovementStart());
+        paramMap.put(ONMOVEMENTSTOP_FIELD, ap.isWatchMovementStop());
         paramMap.put(ONBATTERYLOW_FIELD, ap.isWatchBatteryLow());
         paramMap.put(COMPANY_FIELD, ap.getCompany().getId());
 
@@ -111,7 +113,8 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
         fields.add(CRITICALHIGHTEMPFORMORETHEN_FIELD);
         fields.add(ONENTERBRIGHT_FIELD);
         fields.add(ONENTERDARK_FIELD);
-        fields.add(ONSHOCK_FIELD);
+        fields.add(ONMOVEMENTSTART_FIELD);
+        fields.add(ONMOVEMENTSTOP_FIELD);
         fields.add(ONBATTERYLOW_FIELD);
         fields.add(COMPANY_FIELD);
         fields.add(CRITICALHIGHTEMP_FIELD);
@@ -214,7 +217,8 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
                 ((Number) map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD)).intValue());
         no.setWatchEnterBrightEnvironment((Boolean) map.get(ONENTERBRIGHT_FIELD));
         no.setWatchEnterDarkEnvironment((Boolean) map.get(ONENTERDARK_FIELD));
-        no.setWatchShock((Boolean) map.get(ONSHOCK_FIELD));
+        no.setWatchMovementStart((Boolean) map.get(ONMOVEMENTSTART_FIELD));
+        no.setWatchMovementStop((Boolean) map.get(ONMOVEMENTSTOP_FIELD));
         no.setWatchBatteryLow((Boolean) map.get(ONBATTERYLOW_FIELD));
 
         final long companyId = ((Number) map.get(COMPANY_FIELD)).longValue();
@@ -247,7 +251,8 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
         map.put(CRITICALHIGHTEMPFORMORETHEN_FIELD, CRITICALHIGHTEMPFORMORETHEN_FIELD);
         map.put(ONENTERBRIGHT_FIELD, ONENTERBRIGHT_FIELD);
         map.put(ONENTERDARK_FIELD, ONENTERDARK_FIELD);
-        map.put(ONSHOCK_FIELD, ONSHOCK_FIELD);
+        map.put(ONMOVEMENTSTART_FIELD, ONMOVEMENTSTART_FIELD);
+        map.put(ONMOVEMENTSTOP_FIELD, ONMOVEMENTSTOP_FIELD);
         map.put(ONBATTERYLOW_FIELD, ONBATTERYLOW_FIELD);
         map.put(COMPANY_FIELD, COMPANY_FIELD);
 

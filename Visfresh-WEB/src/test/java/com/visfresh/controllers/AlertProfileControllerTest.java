@@ -18,11 +18,11 @@ import com.visfresh.services.RestServiceException;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class AlertProfileTest extends AbstractRestServiceTest {
+public class AlertProfileControllerTest extends AbstractRestServiceTest {
     /**
      * Default constructor.
      */
-    public AlertProfileTest() {
+    public AlertProfileControllerTest() {
         super();
     }
     //@RequestMapping(value = "/saveAlertProfile/{authToken}", method = RequestMethod.POST)

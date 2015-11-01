@@ -27,11 +27,11 @@ import com.visfresh.services.RestServiceException;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ShipmentTest extends AbstractRestServiceTest {
+public class ShipmentControllerTest extends AbstractRestServiceTest {
     /**
      * Default constructor.
      */
-    public ShipmentTest() {
+    public ShipmentControllerTest() {
         super();
     }
     //@RequestMapping(value = "/saveShipmentTemplate/{authToken}", method = RequestMethod.POST)
@@ -89,7 +89,11 @@ public class ShipmentTest extends AbstractRestServiceTest {
 
         createAlert(s, d, AlertType.Battery);
         createAlert(s, d, AlertType.Battery);
-        createAlert(s, d, AlertType.Shock);
+        createAlert(s, d, AlertType.MovementStart);
+        createAlert(s, d, AlertType.MovementStart);
+        createAlert(s, d, AlertType.MovementStart);
+        createAlert(s, d, AlertType.MovementStart);
+        createAlert(s, d, AlertType.MovementStop);
         createAlert(s, d, AlertType.LightOff);
         createAlert(s, d, AlertType.LightOn);
 

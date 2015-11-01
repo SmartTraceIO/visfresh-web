@@ -131,7 +131,8 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         ap.setLowTemperatureForMoreThen(7);
         ap.setName("JUnit-Alert");
         ap.setWatchBatteryLow(true);
-        ap.setWatchShock(true);
+        ap.setWatchMovementStart(true);
+        ap.setWatchMovementStop(true);
         ap.setWatchEnterDarkEnvironment(true);
         return alertProfileDao.save(ap);
     }

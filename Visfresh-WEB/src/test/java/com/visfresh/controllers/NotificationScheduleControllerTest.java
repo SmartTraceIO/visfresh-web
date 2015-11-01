@@ -19,11 +19,11 @@ import com.visfresh.services.RestServiceException;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class NotificationScheduleTest extends AbstractRestServiceTest {
+public class NotificationScheduleControllerTest extends AbstractRestServiceTest {
     /**
      * Default constructor.
      */
-    public NotificationScheduleTest() {
+    public NotificationScheduleControllerTest() {
         super();
     }
     //@RequestMapping(value = "/saveNotificationSchedule/{authToken}", method = RequestMethod.POST)

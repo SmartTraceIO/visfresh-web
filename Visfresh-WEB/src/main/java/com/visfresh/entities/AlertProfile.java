@@ -66,13 +66,11 @@ public class AlertProfile implements EntityWithId<Long> {
      */
     private boolean watchEnterDarkEnvironment;
     /**
-     * Alert for shock
-     */
-    private boolean watchShock;
-    /**
      * Alert for batterry low.
      */
     private boolean watchBatteryLow;
+    private boolean watchMovementStart;
+    private boolean watchMovementStop;
 
     /**
      * Default constructor.
@@ -216,18 +214,6 @@ public class AlertProfile implements EntityWithId<Long> {
         this.watchEnterDarkEnvironment = watchEnterDarkEnvironment;
     }
     /**
-     * @return the watchShock
-     */
-    public boolean isWatchShock() {
-        return watchShock;
-    }
-    /**
-     * @param watchShock the watchShock to set
-     */
-    public void setWatchShock(final boolean watchShock) {
-        this.watchShock = watchShock;
-    }
-    /**
      * @return the watchBatteryLow
      */
     public boolean isWatchBatteryLow() {
@@ -276,5 +262,29 @@ public class AlertProfile implements EntityWithId<Long> {
      */
     public void setCompany(final Company company) {
         this.company = company;
+    }
+    /**
+     * @return
+     */
+    public boolean isWatchMovementStart() {
+        return watchMovementStart;
+    }
+    /**
+     * @param watchMovementStart the watchMovementStart to set
+     */
+    public void setWatchMovementStart(final boolean watchMovementStart) {
+        this.watchMovementStart = watchMovementStart;
+    }
+    /**
+     * @return
+     */
+    public boolean isWatchMovementStop() {
+        return watchMovementStop;
+    }
+    /**
+     * @param watchMovementStop the watchMovementStop to set
+     */
+    public void setWatchMovementStop(final boolean watchMovementStop) {
+        this.watchMovementStop = watchMovementStop;
     }
 }

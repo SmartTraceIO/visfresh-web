@@ -14,13 +14,13 @@ import com.visfresh.entities.TrackerEvent;
  *
  */
 @Component
-public class ShockAlertRule extends AbstractAlertRule {
-    public static final String NAME = "ShockAlert";
+public class MovementStopAlertRule extends AbstractAlertRule {
+    public static final String NAME = "MovementStopAlert";
 
     /**
      * Default constructor.
      */
-    public ShockAlertRule() {
+    public MovementStopAlertRule() {
         super();
     }
 
@@ -30,7 +30,8 @@ public class ShockAlertRule extends AbstractAlertRule {
     @Override
     public boolean accept(final TrackerEventRequest e) {
         //Not handled now. Not fully understandeable how to check the shock.
-        return super.accept(e) && e.getEvent().getShipment().getAlertProfile().isWatchShock() && false;
+        return super.accept(e) && e.getEvent().getShipment().getAlertProfile().isWatchMovementStop()
+                && false;
     }
 
     /* (non-Javadoc)
@@ -40,9 +41,9 @@ public class ShockAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setDescription("Device " + alert.getDevice().getId() + " shocked");
-        alert.setName("Shock");
-        alert.setType(AlertType.Shock);
+        alert.setDescription("Device " + alert.getDevice().getId() + " movement stoped");
+        alert.setName("Movement Stop");
+        alert.setType(AlertType.MovementStop);
         return alert;
     }
 

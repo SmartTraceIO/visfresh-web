@@ -19,11 +19,11 @@ import com.visfresh.services.RestServiceException;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class LocationTest extends AbstractRestServiceTest {
+public class LocationControllerTest extends AbstractRestServiceTest {
     /**
      * Default constructor.
      */
-    public LocationTest() {
+    public LocationControllerTest() {
         super();
     }
     //@RequestMapping(value = "/saveLocationProfile/{authToken}", method = RequestMethod.POST)

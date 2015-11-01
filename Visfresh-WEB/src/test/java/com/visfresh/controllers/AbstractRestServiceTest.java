@@ -23,7 +23,7 @@ import com.visfresh.mock.MockRestService;
  *
  */
 @RunWith(RestServiceRunner.class)
-public class AbstractRestServiceTest {
+public abstract class AbstractRestServiceTest {
     protected WebApplicationContext context;
     protected RestServiceFacade facade;
     private long lastLong;
@@ -77,7 +77,8 @@ public class AbstractRestServiceTest {
         p.setWatchBatteryLow(true);
         p.setWatchEnterBrightEnvironment(true);
         p.setWatchEnterDarkEnvironment(true);
-        p.setWatchShock(true);
+        p.setWatchMovementStart(true);
+        p.setWatchMovementStop(true);
 
         if (save) {
             getRestService().saveAlertProfile(getCompany(), p);

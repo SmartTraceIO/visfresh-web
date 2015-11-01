@@ -129,18 +129,19 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("alertProfileId", alert.getId());
         obj.addProperty("alertProfileDescription", alert.getDescription());
         obj.addProperty("alertProfileName", alert.getName());
-        obj.addProperty("criticalHighTemperatureForMoreThen", alert.getCriticalHighTemperatureForMoreThen());
+        obj.addProperty("criticalHighTemperatureMinutes", alert.getCriticalHighTemperatureForMoreThen());
         obj.addProperty("criticalHighTemperature", alert.getCriticalHighTemperature());
-        obj.addProperty("criticalLowTemperatureForMoreThen", alert.getCriticalLowTemperatureForMoreThen());
+        obj.addProperty("criticalLowTemperatureMinutes", alert.getCriticalLowTemperatureForMoreThen());
         obj.addProperty("criticalLowTemperature", alert.getCriticalLowTemperature());
         obj.addProperty("highTemperature", alert.getHighTemperature());
-        obj.addProperty("highTemperatureForMoreThen", alert.getHighTemperatureForMoreThen());
+        obj.addProperty("highTemperatureMinutes", alert.getHighTemperatureForMoreThen());
         obj.addProperty("lowTemperature", alert.getLowTemperature());
-        obj.addProperty("lowTemperatureForMoreThen", alert.getLowTemperatureForMoreThen());
+        obj.addProperty("lowTemperatureMinutes", alert.getLowTemperatureForMoreThen());
         obj.addProperty("watchBatteryLow", alert.isWatchBatteryLow());
         obj.addProperty("watchEnterBrightEnvironment", alert.isWatchEnterBrightEnvironment());
         obj.addProperty("watchEnterDarkEnvironment", alert.isWatchEnterDarkEnvironment());
-        obj.addProperty("watchShock", alert.isWatchShock());
+        obj.addProperty("watchMovementStart", alert.isWatchMovementStart());
+        obj.addProperty("watchMovementStop", alert.isWatchMovementStop());
 
         return obj;
     }
@@ -155,17 +156,18 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         p.setDescription(asString(alert.get("alertProfileDescription")));
         p.setName(asString(alert.get("alertProfileName")));
         p.setCriticalHighTemperature(asDouble(alert.get("criticalHighTemperature")));
-        p.setCriticalHighTemperatureForMoreThen(asInt(alert.get("criticalHighTemperatureForMoreThen")));
+        p.setCriticalHighTemperatureForMoreThen(asInt(alert.get("criticalHighTemperatureMinutes")));
         p.setCriticalLowTemperature(asDouble(alert.get("criticalLowTemperature")));
-        p.setCriticalLowTemperatureForMoreThen(asInt(alert.get("criticalLowTemperatureForMoreThen")));
+        p.setCriticalLowTemperatureForMoreThen(asInt(alert.get("criticalLowTemperatureMinutes")));
         p.setHighTemperature(asDouble(alert.get("highTemperature")));
-        p.setHighTemperatureForMoreThen(asInt(alert.get("highTemperatureForMoreThen")));
+        p.setHighTemperatureForMoreThen(asInt(alert.get("highTemperatureMinutes")));
         p.setLowTemperature(asDouble(alert.get("lowTemperature")));
-        p.setLowTemperatureForMoreThen(asInt(alert.get("lowTemperatureForMoreThen")));
+        p.setLowTemperatureForMoreThen(asInt(alert.get("lowTemperatureMinutes")));
         p.setWatchBatteryLow(asBoolean(alert.get("watchBatteryLow")));
         p.setWatchEnterBrightEnvironment(asBoolean(alert.get("watchEnterBrightEnvironment")));
         p.setWatchEnterDarkEnvironment(asBoolean(alert.get("watchEnterDarkEnvironment")));
-        p.setWatchShock(asBoolean(alert.get("watchShock")));
+        p.setWatchMovementStart(asBoolean(alert.get("watchMovementStart")));
+        p.setWatchMovementStop(asBoolean(alert.get("watchMovementStop")));
 
         return p;
     }

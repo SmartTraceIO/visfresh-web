@@ -20,7 +20,7 @@ import com.visfresh.services.RuleEngine;
  *
  */
 @RunWith(RuleEngineTestRunner.class)
-public class BaseRuleTest {
+public abstract class BaseRuleTest {
     protected RuleEngine engine;
     protected AnnotationConfigApplicationContext context;
     protected Company company;

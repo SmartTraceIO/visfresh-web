@@ -60,7 +60,8 @@ public class ShipmentTemplateDaoTest
         ap.setLowTemperatureForMoreThen(7);
         ap.setName("JUnit-Alert");
         ap.setWatchBatteryLow(true);
-        ap.setWatchShock(true);
+        ap.setWatchMovementStart(true);
+        ap.setWatchMovementStop(true);
         ap.setWatchEnterDarkEnvironment(true);
         alertProfile = alertProfileDao.save(ap);
 

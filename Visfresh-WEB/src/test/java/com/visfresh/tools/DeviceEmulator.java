@@ -16,6 +16,8 @@ import java.util.Random;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Device;
@@ -83,7 +85,8 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         profile.setWatchBatteryLow(true);
         profile.setWatchEnterBrightEnvironment(true);
         profile.setWatchEnterDarkEnvironment(true);
-        profile.setWatchShock(true);
+        profile.setWatchMovementStart(true);
+        profile.setWatchMovementStop(true);
 
         final Long id = service.saveAlertProfile(profile);
         profile.setId(id);
@@ -202,9 +205,13 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private Shipment createShipmentIfNeed(final Device device) throws RestServiceException, IOException {
         final String name = "DevelopmentShipment";
 
-        final List<Shipment> shipments = null;// TODO service.getShipments(1, 100000);
-        for (final Shipment shipment : shipments) {
-            if (name.equals(shipment.getName()) && shipment.getStatus() != ShipmentStatus.Complete) {
+        final JsonArray shipments = service.getShipments(1, 100000);
+        for (final JsonElement e : shipments) {
+            final JsonObject obj = e.getAsJsonObject();
+            final Long id = obj.get("shipmentId").getAsLong();
+            final Shipment shipment = service.getShipment(id);
+            if (name.equals(shipment.getName())
+                    && shipment.getStatus() != ShipmentStatus.Complete) {
                 return shipment;
             }
         }

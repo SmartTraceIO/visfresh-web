@@ -51,7 +51,8 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         p.setLowTemperatureForMoreThen(7);
         p.setName("JUnit-Alert");
         p.setWatchBatteryLow(true);
-        p.setWatchShock(true);
+        p.setWatchMovementStart(true);
+        p.setWatchMovementStop(true);
         p.setWatchEnterDarkEnvironment(true);
 
         return p;
@@ -72,7 +73,8 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertEquals(7, p.getLowTemperatureForMoreThen());
         assertEquals("JUnit-Alert", p.getName());
         assertTrue(p.isWatchBatteryLow());
-        assertTrue(p.isWatchShock());
+        assertTrue(p.isWatchMovementStart());
+        assertTrue(p.isWatchMovementStop());
         assertTrue(p.isWatchEnterDarkEnvironment());
     }
     @Test
@@ -118,7 +120,8 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertEquals(7, p.getLowTemperatureForMoreThen());
         assertEquals("JUnit-Alert", p.getName());
         assertTrue(p.isWatchBatteryLow());
-        assertTrue(p.isWatchShock());
+        assertTrue(p.isWatchMovementStart());
+        assertTrue(p.isWatchMovementStop());
         assertTrue(p.isWatchEnterDarkEnvironment());
     }
 }

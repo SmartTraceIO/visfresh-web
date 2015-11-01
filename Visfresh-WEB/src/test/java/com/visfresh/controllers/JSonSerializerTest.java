@@ -94,9 +94,10 @@ public class JSonSerializerTest {
         final boolean watchBatteryLow = true;
         final boolean watchEnterBrightEnvironment = true;
         final boolean watchEnterDarkEnvironment = false;
-        final boolean watchShock = false;
         final int criticalHighTemperatureForMoreThen = 91;
         final int criticalLowTemperatureForMoreThen = 71;
+        final boolean watchMovementStart = true;
+        final boolean watchMovementStop = true;
 
         AlertProfile p = new AlertProfile();
         p.setCriticalHighTemperature(criticalHighTemperature);
@@ -111,7 +112,8 @@ public class JSonSerializerTest {
         p.setWatchBatteryLow(watchBatteryLow);
         p.setWatchEnterBrightEnvironment(watchEnterBrightEnvironment);
         p.setWatchEnterDarkEnvironment(watchEnterDarkEnvironment);
-        p.setWatchShock(watchShock);
+        p.setWatchMovementStart(watchMovementStart);
+        p.setWatchMovementStop(watchMovementStop);
         p.setCriticalHighTemperatureForMoreThen(criticalHighTemperatureForMoreThen);
         p.setCriticalLowTemperatureForMoreThen(criticalLowTemperatureForMoreThen);
 
@@ -130,7 +132,8 @@ public class JSonSerializerTest {
         assertEquals(watchBatteryLow, p.isWatchBatteryLow());
         assertEquals(watchEnterBrightEnvironment, p.isWatchEnterBrightEnvironment());
         assertEquals(watchEnterDarkEnvironment, p.isWatchEnterDarkEnvironment());
-        assertEquals(watchShock, p.isWatchShock());
+        assertEquals(watchMovementStart, p.isWatchMovementStart());
+        assertEquals(watchMovementStop, p.isWatchMovementStop());
         assertEquals(criticalHighTemperatureForMoreThen, p.getCriticalHighTemperatureForMoreThen());
         assertEquals(criticalLowTemperatureForMoreThen, p.getCriticalLowTemperatureForMoreThen());
     }
@@ -833,7 +836,8 @@ public class JSonSerializerTest {
         p.setWatchBatteryLow(true);
         p.setWatchEnterBrightEnvironment(true);
         p.setWatchEnterDarkEnvironment(true);
-        p.setWatchShock(true);
+        p.setWatchMovementStart(true);
+        p.setWatchMovementStop(true);
         resolver.add(p);
         return p;
     }
