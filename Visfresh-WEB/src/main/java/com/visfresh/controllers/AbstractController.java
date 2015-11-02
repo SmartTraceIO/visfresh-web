@@ -89,7 +89,34 @@ public abstract class AbstractController {
             }
         });
     }
+    protected <E, V extends Comparable<V>> void sort(final List<E> list,
+            final ValueProvider<E, V> p, final boolean ascent) {
+        Collections.sort(list, new Comparator<E>() {
+            /* (non-Javadoc)
+             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+             */
+            @Override
+            public int compare(final E obj1, final E obj2) {
+                final V o1 = p.getValue(obj1);
+                final V o2 = p.getValue(obj2);
 
+                if (o1 == null && o2 == null) {
+                    return 0;
+                }
+                if (o1 != null && o2 == null) {
+                    return 1;
+                }
+                if (o1 == null && o2 != null) {
+                    return -1;
+                }
+
+                if (ascent) {
+                    return o1.compareTo(o2);
+                }
+                return o2.compareTo(o1);
+            }
+        });
+    }
     /**
      * @param id the entity ID.
      * @param idFieldName ID field name.
