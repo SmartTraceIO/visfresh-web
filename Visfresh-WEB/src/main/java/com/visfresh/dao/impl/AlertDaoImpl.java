@@ -34,14 +34,6 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
      */
     private static final String TYPE_FIELD = "type";
     /**
-     * Alert name.
-     */
-    protected static final String NAME_FIELD = "name";
-    /**
-     * Description.
-     */
-    protected static final String DESCRIPTION_FIELD = "description";
-    /**
      * Device.
      */
     protected static final String DEVICE_FIELD = "device";
@@ -95,9 +87,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         final boolean isTemperature = alert instanceof TemperatureAlert;
 
         paramMap.put(ID_FIELD, alert.getId());
-        paramMap.put(NAME_FIELD, alert.getName());
         paramMap.put(TYPE_FIELD, alert.getType().name());
-        paramMap.put(DESCRIPTION_FIELD, alert.getDescription());
         paramMap.put(DEVICE_FIELD, alert.getDevice().getId());
         paramMap.put(SHIPMENT_FIELD, alert.getShipment().getId());
         paramMap.put(TEMPERATURE_FIELD, isTemperature ? ((TemperatureAlert) alert).getTemperature() : -1);
@@ -115,9 +105,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
 
     public static List<String> getFields(final boolean includeId) {
         final List<String> fields = new LinkedList<String>();
-        fields.add(NAME_FIELD);
         fields.add(TYPE_FIELD);
-        fields.add(DESCRIPTION_FIELD);
         fields.add(DEVICE_FIELD);
         fields.add(SHIPMENT_FIELD);
         fields.add(TEMPERATURE_FIELD);
@@ -265,10 +253,8 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
                 a = new Alert();
         }
 
-        a.setName((String) map.get(resultPrefix + NAME_FIELD));
         a.setId(((Number) map.get(resultPrefix + ID_FIELD)).longValue());
         a.setType(type);
-        a.setDescription((String) map.get(resultPrefix + DESCRIPTION_FIELD));
         a.setDate((Date) map.get(resultPrefix + DATE_FIELD));
         return a;
     }

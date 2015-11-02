@@ -41,8 +41,6 @@ public class BatteryLowAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setDescription("Battery is low: " + event.getBattery() + " for " + event.getDevice().getId());
-        alert.setName("BatteryLow");
         alert.setType(AlertType.Battery);
         return alert;
     }

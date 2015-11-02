@@ -181,11 +181,9 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
             final AlertType type) {
         final TemperatureAlert alert = new TemperatureAlert();
         alert.setDate(new Date());
-        alert.setDescription("Temp Alert");
         alert.setType(type);
         alert.setTemperature(5);
         alert.setMinutes(55);
-        alert.setName("TempAlert");
         alert.setDevice(d);
         alert.setShipment(s);
         alert.setId(getRestService().ids.incrementAndGet());
@@ -237,8 +235,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Alert alert = new Alert();
         alert.setShipment(s);
         alert.setDate(new Date(System.currentTimeMillis() - 100000000l));
-        alert.setDescription("Alert description");
-        alert.setName("Alert-" + type);
         alert.setDevice(device);
         alert.setType(type);
         alert.setId(getRestService().ids.incrementAndGet());

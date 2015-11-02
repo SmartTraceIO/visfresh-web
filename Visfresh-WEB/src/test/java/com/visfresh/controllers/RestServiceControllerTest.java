@@ -134,11 +134,9 @@ public class RestServiceControllerTest extends AbstractRestServiceTest {
         final TemperatureAlert tempAlert = new TemperatureAlert();
         tempAlert.setDate(new Date());
         tempAlert.setId(service.ids.incrementAndGet());
-        tempAlert.setDescription("Temp Alert");
         tempAlert.setType(AlertType.Hot);
         tempAlert.setTemperature(5);
         tempAlert.setMinutes(55);
-        tempAlert.setName("TempAlert-1");
         tempAlert.setDevice(d);
         tempAlert.setShipment(s);
 
@@ -157,9 +155,7 @@ public class RestServiceControllerTest extends AbstractRestServiceTest {
         final Alert batteryAlert = new Alert();
         batteryAlert.setDate(new Date());
         batteryAlert.setId(service.ids.incrementAndGet());
-        batteryAlert.setDescription("Battery Low alert");
         batteryAlert.setType(AlertType.Battery);
-        batteryAlert.setName("Battery-1");
         batteryAlert.setDevice(d);
         batteryAlert.setShipment(s);
 
@@ -207,11 +203,9 @@ public class RestServiceControllerTest extends AbstractRestServiceTest {
         final TemperatureAlert tempAlert = new TemperatureAlert();
         tempAlert.setDate(new Date());
         tempAlert.setId(service.ids.incrementAndGet());
-        tempAlert.setDescription("Temp Alert");
         tempAlert.setType(AlertType.Hot);
         tempAlert.setTemperature(5);
         tempAlert.setMinutes(55);
-        tempAlert.setName("TempAlert-1");
         tempAlert.setShipment(s);
         tempAlert.setDevice(d);
 
@@ -230,9 +224,7 @@ public class RestServiceControllerTest extends AbstractRestServiceTest {
         final Alert batteryAlert = new Alert();
         batteryAlert.setDate(new Date());
         batteryAlert.setId(service.ids.incrementAndGet());
-        batteryAlert.setDescription("Battery Low alert");
         batteryAlert.setType(AlertType.Battery);
-        batteryAlert.setName("Battery-1");
         batteryAlert.setDevice(d);
         batteryAlert.setShipment(s);
 

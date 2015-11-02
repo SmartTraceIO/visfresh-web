@@ -40,8 +40,6 @@ public class EnterDarkEnvironmentAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setDescription("Device " + alert.getDevice().getId() + " entered Dark Environment");
-        alert.setName("Enter Dark Environment");
         alert.setType(AlertType.LightOff);
         return alert;
     }

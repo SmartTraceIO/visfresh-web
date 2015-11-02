@@ -41,8 +41,6 @@ public class MovementStopAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setDescription("Device " + alert.getDevice().getId() + " movement stoped");
-        alert.setName("Movement Stop");
 //        alert.setType(AlertType.MovementStop);
         return alert;
     }

@@ -608,11 +608,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
 
         alert.setDate(asDate(json.get("date")));
-        alert.setDescription(asString(json.get("description")));
         alert.setDevice(resolveDevice(asString(json.get("device"))));
         alert.setShipment(resolveShipment(asLong(json.get("shipment"))));
         alert.setId(asLong(json.get("id")));
-        alert.setName(asString(json.get("name")));
         alert.setType(type);
 
         return alert;
@@ -625,8 +623,6 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final JsonObject json = new JsonObject();
 
         //add common alert properties
-        json.addProperty("description", alert.getDescription());
-        json.addProperty("name", alert.getName());
         json.addProperty("id", alert.getId());
         json.addProperty("date", timeToString(alert.getDate()));
         json.addProperty("device", alert.getDevice().getId());

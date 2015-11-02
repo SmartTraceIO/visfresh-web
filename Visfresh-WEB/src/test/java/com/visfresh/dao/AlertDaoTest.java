@@ -90,8 +90,6 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
     protected Alert createAlert(final AlertType type, final Date date) {
         final TemperatureAlert alert = new TemperatureAlert();
         alert.setDate(date);
-        alert.setDescription("Alert description");
-        alert.setName("Any name");
         alert.setDevice(device);
         alert.setShipment(shipment);
         alert.setType(type);
@@ -108,8 +106,6 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         final TemperatureAlert a = (TemperatureAlert) alert;
 
         assertNotNull(a.getDate());
-        assertEquals("Alert description", a.getDescription());
-        assertEquals("Any name", a.getName());
         assertEquals(AlertType.CriticalHot, a.getType());
         assertEquals(100, a.getTemperature(), 0.00001);
         assertEquals(15, a.getMinutes());
@@ -144,8 +140,6 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         final TemperatureAlert a = (TemperatureAlert) all.get(0);
 
         assertNotNull(a.getDate());
-        assertEquals("Alert description", a.getDescription());
-        assertEquals("Any name", a.getName());
         assertEquals(AlertType.CriticalHot, a.getType());
         assertEquals(100, a.getTemperature(), 0.00001);
         assertEquals(15, a.getMinutes());

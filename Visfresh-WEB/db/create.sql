@@ -190,8 +190,6 @@ create table shipments (
 create table alerts (
     id bigint(20) auto_increment not null,
     `type` varchar(50) not null,
-    `name` varchar(127) not null,
-    description varchar(255) default null,
     temperature double not null,
     minutes int not null,
     `date` timestamp not null,

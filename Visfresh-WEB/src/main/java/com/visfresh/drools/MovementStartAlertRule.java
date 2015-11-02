@@ -40,8 +40,6 @@ public class MovementStartAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setDescription("Device " + alert.getDevice().getId() + " movement started");
-        alert.setName("Movement Starts");
         alert.setType(AlertType.MovementStart);
         return alert;
     }
