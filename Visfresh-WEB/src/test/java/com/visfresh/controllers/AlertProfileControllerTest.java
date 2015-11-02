@@ -49,13 +49,50 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
     //public @ResponseBody String getAlertProfiles(@PathVariable final String authToken) {
     @Test
     public void testGetAlertProfiles() throws RestServiceException, IOException {
-        final AlertProfile p = createAlertProfile(false);
-        facade.saveAlertProfile(p);
-        facade.saveAlertProfile(p);
+        createAlertProfile(true);
+        createAlertProfile(true);
 
         assertEquals(2, facade.getAlertProfiles(1, 10000).size());
         assertEquals(1, facade.getAlertProfiles(1, 1).size());
         assertEquals(1, facade.getAlertProfiles(2, 1).size());
         assertEquals(0, facade.getAlertProfiles(3, 1).size());
+    }
+    @Test
+    public void testGetSortedAlertProfiles() throws RestServiceException, IOException {
+        final AlertProfile p1 = createAlertProfile(false);
+        p1.setName("b");
+        p1.setDescription("c");
+        getRestService().saveAlertProfile(getCompany(), p1);
+
+        final AlertProfile p2 = createAlertProfile(false);
+        p2.setName("a");
+        p2.setDescription("b");
+        getRestService().saveAlertProfile(getCompany(), p2);
+
+        final AlertProfile p3 = createAlertProfile(false);
+        p3.setName("c");
+        p3.setDescription("a");
+        getRestService().saveAlertProfile(getCompany(), p3);
+
+        //test sort by ID
+        AlertProfile first = facade.getAlertProfiles(1, 10000, "alertProfileId", "asc").get(0);
+        assertEquals(p1.getId(), first.getId());
+
+        first = facade.getAlertProfiles(1, 10000, "alertProfileId", "desc").get(0);
+        assertEquals(p3.getId(), first.getId());
+
+        //test sort by name
+        first = facade.getAlertProfiles(1, 10000, "alertProfileName", "asc").get(0);
+        assertEquals(p2.getId(), first.getId());
+
+        first = facade.getAlertProfiles(1, 10000, "alertProfileName", "desc").get(0);
+        assertEquals(p3.getId(), first.getId());
+
+        //test sort by description
+        first = facade.getAlertProfiles(1, 10000, "alertProfileDescription", "asc").get(0);
+        assertEquals(p3.getId(), first.getId());
+
+        first = facade.getAlertProfiles(1, 10000, "alertProfileDescription", "desc").get(0);
+        assertEquals(p1.getId(), first.getId());
     }
 }

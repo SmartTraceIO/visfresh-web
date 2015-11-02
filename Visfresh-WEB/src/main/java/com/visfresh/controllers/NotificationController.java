@@ -61,7 +61,10 @@ public class NotificationController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<Notification> shipments = getPage(restService.getNotifications(user), pageIndex, pageSize);
+            final List<Notification> ns = restService.getNotifications(user);
+            sort(ns);
+
+            final List<Notification> shipments = getPage(ns, pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final Notification t : shipments) {
                 array.add(ser.toJson(t));
@@ -72,6 +75,12 @@ public class NotificationController extends AbstractController {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param ns
+     */
+    private void sort(final List<Notification> ns) {
+        sortById(ns, true);
     }
     @RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.POST)
     public @ResponseBody String markNotificationsAsRead(@PathVariable final String authToken,

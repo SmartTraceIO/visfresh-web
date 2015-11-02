@@ -92,8 +92,10 @@ public class ShipmentController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipmentTemplates(user);
 
-            final List<ShipmentTemplate> templates = getPage(
-                    restService.getShipmentTemplates(user.getCompany()), pageIndex, pageSize);
+            final List<ShipmentTemplate> tpls = restService.getShipmentTemplates(user.getCompany());
+            sort(tpls);
+
+            final List<ShipmentTemplate> templates = getPage(tpls, pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final ShipmentTemplate tpl : templates) {
                 array.add(getSerializer(user).toJson(tpl));
@@ -105,6 +107,14 @@ public class ShipmentController extends AbstractController {
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param tpls
+     */
+    private void sort(final List<ShipmentTemplate> tpls) {
+        // TODO Auto-generated method stub
+        sortById(tpls, true);
+    }
+
     /**
      * @param authToken authentication token.
      * @param shipmentTemplateId shipment template ID.

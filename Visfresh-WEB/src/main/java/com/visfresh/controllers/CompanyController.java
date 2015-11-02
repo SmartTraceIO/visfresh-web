@@ -88,7 +88,10 @@ public class CompanyController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetCompanies(user);
 
-            final List<Company> company = getPage(restService.getCompanies(), pageIndex, pageSize);
+            final List<Company> companies = restService.getCompanies();
+            sort(companies);
+
+            final List<Company> company = getPage(companies, pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final Company c : company) {
                 array.add(getSerializer(user).toJson(c));
@@ -98,5 +101,11 @@ public class CompanyController extends AbstractController {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param companies
+     */
+    private void sort(final List<Company> companies) {
+        sortById(companies, true);
     }
 }

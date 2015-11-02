@@ -3,6 +3,8 @@
  */
 package com.visfresh.controllers;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -113,15 +115,20 @@ public class AlertProfileController extends AbstractController {
      */
     @RequestMapping(value = "/getAlertProfiles/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getAlertProfiles(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
+            @RequestParam final int pageIndex, @RequestParam final int pageSize,
+            @RequestParam(required = false) final String sc,
+            @RequestParam(required = false) final String so
+            ) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetAlertProfiles(user);
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<AlertProfile> alerts = getPage(
-                    restService.getAlertProfiles(user.getCompany()), pageIndex, pageSize);
+            final List<AlertProfile> profiles = restService.getAlertProfiles(user.getCompany());
+            sort(profiles, sc, so);
+
+            final List<AlertProfile> alerts = getPage(profiles, pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final AlertProfile a : alerts) {
                 array.add(ser.toJson(a));
@@ -131,6 +138,44 @@ public class AlertProfileController extends AbstractController {
         } catch (final Exception e) {
             log.error("Failed to get alert profiles", e);
             return createErrorResponse(e);
+        }
+    }
+
+    /**
+     * @param profiles
+     * @param sc
+     * @param so
+     */
+    private void sort(final List<AlertProfile> profiles, final String sc, final String so) {
+        final boolean ascent = !"desc".equals(so);
+        if ("alertProfileName".equalsIgnoreCase(sc)) {
+            Collections.sort(profiles, new Comparator<AlertProfile>() {
+                /* (non-Javadoc)
+                 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+                 */
+                @Override
+                public int compare(final AlertProfile o1, final AlertProfile o2) {
+                    if (ascent) {
+                        return o1.getName().compareTo(o2.getName());
+                    }
+                    return o2.getName().compareTo(o1.getName());
+                }
+            });
+        } else if ("alertProfileDescription".equalsIgnoreCase(sc)) {
+            Collections.sort(profiles, new Comparator<AlertProfile>() {
+                /* (non-Javadoc)
+                 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+                 */
+                @Override
+                public int compare(final AlertProfile o1, final AlertProfile o2) {
+                    if (ascent) {
+                        return o1.getDescription().compareTo(o2.getDescription());
+                    }
+                    return o2.getDescription().compareTo(o1.getDescription());
+                }
+            });
+        } else {
+            sortById(profiles, ascent);
         }
     }
 }

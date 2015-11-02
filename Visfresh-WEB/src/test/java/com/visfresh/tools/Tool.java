@@ -56,8 +56,8 @@ public class Tool extends AbstractTool {
         if (args.length < 1) {
             throw new RuntimeException("Password is required as program argument");
         }
-//        final String serviceUrl = "http://139.162.3.8:8080/web/vf";
-        final String serviceUrl = "http://localhost:8080/web/vf";
+        final String serviceUrl = "http://139.162.3.8:8080/web/vf";
+//        final String serviceUrl = "http://localhost:8080/web/vf";
 
         final Tool tool = new Tool(serviceUrl, "globaladmin", args[0]);
         final String[] devices = {

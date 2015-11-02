@@ -81,7 +81,10 @@ public class DeviceController extends AbstractController {
 
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<Device> devices = getPage(restService.getDevices(user.getCompany()), pageIndex, pageSize);
+            final List<Device> ds = restService.getDevices(user.getCompany());
+            sort(ds);
+
+            final List<Device> devices = getPage(ds, pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final Device t : devices) {
                 array.add(ser.toJson(t));
@@ -92,6 +95,12 @@ public class DeviceController extends AbstractController {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param ds
+     */
+    private void sort(final List<Device> ds) {
+        sortById(ds, true);
     }
     /**
      * @param authToken authentication token.

@@ -77,14 +77,20 @@ public class NotificationScheduleController extends AbstractController {
      */
     @RequestMapping(value = "/getNotificationSchedules/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
+            @RequestParam final int pageIndex, @RequestParam final int pageSize,
+            @RequestParam(required = false) final String sc,
+            @RequestParam(required = false) final String so
+            ) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetNotificationSchedules(user);
 
-            final List<NotificationSchedule> schedules = getPage(restService.getNotificationSchedules(
-                    user.getCompany()), pageIndex, pageSize);
+            final List<NotificationSchedule> scs = restService.getNotificationSchedules(
+                    user.getCompany());
+            sort(scs, sc, so);
+
+            final List<NotificationSchedule> schedules = getPage(scs, pageIndex, pageSize);
 
             final EntityJSonSerializer ser = getSerializer(user);
             final JsonArray array = new JsonArray();
@@ -98,6 +104,16 @@ public class NotificationScheduleController extends AbstractController {
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param scs
+     * @param sc
+     * @param so
+     */
+    private void sort(final List<NotificationSchedule> scs, final String sc, final String so) {
+        // TODO Auto-generated method stub
+        sortById(scs, true);
+    }
+
     /**
      * @param authToken authentication token.
      * @param notificationScheduleId notification schedule ID.

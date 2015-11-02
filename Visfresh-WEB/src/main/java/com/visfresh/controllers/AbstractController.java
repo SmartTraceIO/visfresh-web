@@ -66,6 +66,15 @@ public abstract class AbstractController {
             return new LinkedList<E>();
         }
 
+        final int toIndex = Math.min(fromIndex + pageSize, list.size());
+        return list.subList(fromIndex, toIndex);
+    }
+
+    /**
+     * @param list
+     */
+    protected <E extends EntityWithId<ID>, ID extends Serializable & Comparable<ID>> void sortById(
+            final List<E> list, final boolean ascent) {
         //sort first of all
         Collections.sort(list, new Comparator<E>() {
             /* (non-Javadoc)
@@ -73,12 +82,12 @@ public abstract class AbstractController {
              */
             @Override
             public int compare(final E o1, final E o2) {
-                return o1.getId().compareTo(o2.getId());
+                if (ascent) {
+                    return o1.getId().compareTo(o2.getId());
+                }
+                return o2.getId().compareTo(o1.getId());
             }
         });
-
-        final int toIndex = Math.min(fromIndex + pageSize, list.size());
-        return list.subList(fromIndex, toIndex);
     }
 
     /**

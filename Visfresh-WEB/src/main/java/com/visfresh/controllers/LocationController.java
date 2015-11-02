@@ -75,7 +75,10 @@ public class LocationController extends AbstractController {
      */
     @RequestMapping(value = "/getLocations/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getLocation(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
+            @RequestParam final int pageIndex, @RequestParam final int pageSize,
+            @RequestParam(required = false) final String sc,
+            @RequestParam(required = false) final String so
+            ) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -83,8 +86,10 @@ public class LocationController extends AbstractController {
 
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<LocationProfile> locations = getPage(restService.getLocation(user.getCompany()),
-                    pageIndex, pageSize);
+            final List<LocationProfile> ls = restService.getLocation(user.getCompany());
+            sort(ls, sc, so);
+
+            final List<LocationProfile> locations = getPage(ls,pageIndex, pageSize);
             final JsonArray array = new JsonArray();
             for (final LocationProfile location : locations) {
                 array.add(ser.toJson(location));
@@ -96,6 +101,18 @@ public class LocationController extends AbstractController {
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param locations list of locations.
+     * @param sc sort column.
+     * @param so sort order.
+     */
+    private void sort(final List<LocationProfile> locations, final String sc, final String so) {
+//        obj.addProperty("alertProfileId", alert.getId());
+//        obj.addProperty("alertProfileDescription", alert.getDescription());
+//        obj.addProperty("alertProfileName", alert.getName());
+
+    }
+
     /**
      * @param authToken authentication token.
      * @param locationId location profile ID.

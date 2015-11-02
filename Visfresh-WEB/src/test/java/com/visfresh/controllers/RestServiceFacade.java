@@ -124,9 +124,30 @@ public class RestServiceFacade  {
     }
 
     public List<AlertProfile> getAlertProfiles(final int pageIndex, final int pageSize) throws RestServiceException, IOException {
+        return getAlertProfiles(pageIndex, pageSize, null, null);
+    }
+    /**
+     * @param pageIndex
+     * @param pageSize
+     * @param sortColumn
+     * @param sortOrder
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public List<AlertProfile> getAlertProfiles(final int pageIndex, final int pageSize,
+            final String sortColumn,
+            final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("pageIndex", Integer.toString(pageIndex));
         params.put("pageSize", Integer.toString(pageSize));
+        if (sortColumn != null) {
+            params.put("sc", sortColumn);
+        }
+        if (sortOrder != null) {
+            params.put("so", sortOrder);
+        }
+
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getAlertProfiles"),
                 params).getAsJsonArray();
 
