@@ -3,6 +3,8 @@
  */
 package com.visfresh.controllers;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -111,29 +113,21 @@ public class NotificationScheduleController extends AbstractController {
      */
     private void sort(final List<NotificationSchedule> profiles, final String sc, final String so) {
         final boolean ascent = !"desc".equals(so);
-        if ("notificationScheduleName".equalsIgnoreCase(sc)) {
-            sort(profiles, new ValueProvider<NotificationSchedule, String>() {
-                /* (non-Javadoc)
-                 * @see com.visfresh.controllers.ValueProvider#getValue(java.lang.Object)
-                 */
-                @Override
-                public String getValue(final NotificationSchedule k) {
-                    return k.getName();
+        Collections.sort(profiles, new Comparator<NotificationSchedule>() {
+            /* (non-Javadoc)
+             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+             */
+            @Override
+            public int compare(final NotificationSchedule o1, final NotificationSchedule o2) {
+                if ("notificationScheduleName".equalsIgnoreCase(sc)) {
+                    return compareTo(o1.getName(), o2.getName(), ascent);
+                } else if ("notificationScheduleDescription".equalsIgnoreCase(sc)) {
+                    return compareTo(o1.getDescription(), o2.getDescription(), ascent);
                 }
-            }, ascent);
-        } else if ("notificationScheduleDescription".equalsIgnoreCase(sc)) {
-            sort(profiles, new ValueProvider<NotificationSchedule, String>() {
-                /* (non-Javadoc)
-                 * @see com.visfresh.controllers.ValueProvider#getValue(java.lang.Object)
-                 */
-                @Override
-                public String getValue(final NotificationSchedule k) {
-                    return k.getDescription();
-                }
-            }, ascent);
-        } else {
-            sortById(profiles, ascent);
-        }
+                return compareTo(o1.getId(), o2.getId(), ascent);
+            }
+        });
+
     }
 
     /**

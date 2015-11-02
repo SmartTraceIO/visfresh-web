@@ -15,6 +15,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.mock.MockRestService;
 
@@ -96,7 +97,7 @@ public abstract class AbstractRestServiceTest {
         p.setInterim(true);
         p.setName("Loc-" + (++lastLong));
         p.setNotes("Any notes");
-        p.setAddress("Odessa, Deribasovskaya 1, apt.1");
+        p.setAddress("Bankstown Warehouse");
         p.setRadius(1000);
         p.setStart(true);
         p.setStop(true);
@@ -163,6 +164,7 @@ public abstract class AbstractRestServiceTest {
         s.setPoNum(893793487);
         s.setTripCount(88);
         s.setCompany(getCompany());
+        s.setStatus(ShipmentStatus.InProgress);
         if (save) {
             getRestService().saveShipment(getCompany(), s);
         }

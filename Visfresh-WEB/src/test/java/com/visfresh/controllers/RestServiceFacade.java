@@ -157,7 +157,6 @@ public class RestServiceFacade  {
         }
         return profiles;
     }
-
     public Long saveLocationProfile(final LocationProfile profile)
             throws RestServiceException, IOException {
         final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveLocation"),
@@ -174,9 +173,29 @@ public class RestServiceFacade  {
      */
     public List<LocationProfile> getLocationProfiles(final int pageIndex, final int pageSize)
             throws RestServiceException, IOException {
+        return getLocationProfiles(pageIndex, pageSize, null, null);
+    }
+    /**
+     * @param pageIndex
+     * @param pageSize
+     * @param sortColumn
+     * @param sortOrder
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public List<LocationProfile> getLocationProfiles(final int pageIndex, final int pageSize,
+            final String sortColumn, final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("pageIndex", Integer.toString(pageIndex));
         params.put("pageSize", Integer.toString(pageSize));
+        if (sortColumn != null) {
+            params.put("sc", sortColumn);
+        }
+        if (sortOrder != null) {
+            params.put("so", sortOrder);
+        }
+
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getLocations"),
                 params).getAsJsonArray();
 
@@ -186,20 +205,17 @@ public class RestServiceFacade  {
         }
         return profiles;
     }
-
     public Long saveNotificationSchedule(final NotificationSchedule schedule)
             throws RestServiceException, IOException {
         final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveNotificationSchedule"),
                 serializer.toJson(schedule)).getAsJsonObject();
         return parseId(e);
     }
-
     public List<NotificationSchedule> getNotificationSchedules(final int pageIndex, final int pageSize)
             throws RestServiceException, IOException {
         return getNotificationSchedules(pageIndex, pageSize, null, null);
     }
     /**
-
      * @param pageIndex
      * @param pageSize
      * @param sortColumn
@@ -219,7 +235,6 @@ public class RestServiceFacade  {
         if (sortOrder != null) {
             params.put("so", sortOrder);
         }
-
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getNotificationSchedules"),
                 params).getAsJsonArray();
 
@@ -304,6 +319,7 @@ public class RestServiceFacade  {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("pageIndex", Integer.toString(pageIndex));
         params.put("pageSize", Integer.toString(pageSize));
+
         if (shippedFrom != null) {
             params.put("shippedFrom", shippedFrom.toString());
         }

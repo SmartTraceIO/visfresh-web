@@ -68,6 +68,10 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
      * AssertType
      */
     private String assetType;
+    /**
+     * Max count of alerts of given type.
+     */
+    private int maxTimesAlertFires = 4;
 
     /**
      * Default constructor.
@@ -268,5 +272,17 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
      */
     public void setAssetType(final String assetType) {
         this.assetType = assetType;
+    }
+    /**
+     * @return the maxTimesAlertFires
+     */
+    public int getMaxTimesAlertFires() {
+        return maxTimesAlertFires;
+    }
+    /**
+     * @param maxTimesAlertFires the maxTimesAlertFires to set
+     */
+    public void setMaxTimesAlertFires(final int maxTimesAlertFires) {
+        this.maxTimesAlertFires = maxTimesAlertFires;
     }
 }

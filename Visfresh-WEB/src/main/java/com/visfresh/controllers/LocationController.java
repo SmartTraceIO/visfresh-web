@@ -3,6 +3,8 @@
  */
 package com.visfresh.controllers;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -102,18 +104,6 @@ public class LocationController extends AbstractController {
         }
     }
     /**
-     * @param locations list of locations.
-     * @param sc sort column.
-     * @param so sort order.
-     */
-    private void sort(final List<LocationProfile> locations, final String sc, final String so) {
-//        obj.addProperty("alertProfileId", alert.getId());
-//        obj.addProperty("alertProfileDescription", alert.getDescription());
-//        obj.addProperty("alertProfileName", alert.getName());
-
-    }
-
-    /**
      * @param authToken authentication token.
      * @param locationId location profile ID.
      * @return location profile.
@@ -152,5 +142,31 @@ public class LocationController extends AbstractController {
             log.error("Failed to get location profiles", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param profiles
+     * @param sc
+     * @param so
+     */
+    private void sort(final List<LocationProfile> profiles, final String sc, final String so) {
+        final boolean ascent = !"desc".equals(so);
+        Collections.sort(profiles, new Comparator<LocationProfile>() {
+            /* (non-Javadoc)
+             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+             */
+            @Override
+            public int compare(final LocationProfile o1, final LocationProfile o2) {
+                if ("address".equalsIgnoreCase(sc)) {
+                    return compareTo(o1.getAddress(), o2.getAddress(), ascent);
+                } else if ("companyDescription".equalsIgnoreCase(sc)) {
+                    return compareTo(o1.getCompanyDescription(), o2.getCompanyDescription(), ascent);
+                } else if ("locationName".equalsIgnoreCase(sc)) {
+                    return compareTo(o1.getName(), o2.getName(), ascent);
+                } else if ("notes".equalsIgnoreCase(sc)) {
+                    return compareTo(o1.getNotes(), o2.getNotes(), ascent);
+                }
+                return compareTo(o1.getId(), o2.getId(), ascent);
+            }
+        });
     }
 }

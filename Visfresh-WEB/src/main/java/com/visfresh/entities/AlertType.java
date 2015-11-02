@@ -17,6 +17,6 @@ public enum AlertType {
     LightOn,
     LightOff,
     MovementStart,
-    MovementStop,
+//    MovementStop,
     Battery,
 }

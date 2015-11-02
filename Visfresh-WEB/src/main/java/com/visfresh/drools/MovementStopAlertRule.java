@@ -6,7 +6,6 @@ package com.visfresh.drools;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TrackerEvent;
 
 /**
@@ -30,8 +29,9 @@ public class MovementStopAlertRule extends AbstractAlertRule {
     @Override
     public boolean accept(final TrackerEventRequest e) {
         //Not handled now. Not fully understandeable how to check the shock.
-        return super.accept(e) && e.getEvent().getShipment().getAlertProfile().isWatchMovementStop()
-                && false;
+//        return super.accept(e) && e.getEvent().getShipment().getAlertProfile().isWatchMovementStop()
+//                && false;
+        return false;
     }
 
     /* (non-Javadoc)
@@ -43,7 +43,7 @@ public class MovementStopAlertRule extends AbstractAlertRule {
         defaultAssign(event, alert);
         alert.setDescription("Device " + alert.getDevice().getId() + " movement stoped");
         alert.setName("Movement Stop");
-        alert.setType(AlertType.MovementStop);
+//        alert.setType(AlertType.MovementStop);
         return alert;
     }
 

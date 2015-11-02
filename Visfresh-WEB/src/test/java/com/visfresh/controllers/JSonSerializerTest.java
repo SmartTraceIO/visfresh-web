@@ -368,6 +368,7 @@ public class JSonSerializerTest {
         final String assetNum = "10515";
         final int poNum = 938498;
         final int tripCount = 11;
+        final int maxTimesAlertFires = 14;
 
         Shipment s = new Shipment();
         s.setAlertProfile(alertProfile);
@@ -390,7 +391,8 @@ public class JSonSerializerTest {
         s.setAssetType(assetType);
         s.setAssetNum(assetNum);
         s.setPoNum(poNum);
-        s.setTripCount(tripCount );
+        s.setTripCount(tripCount);
+        s.setMaxTimesAlertFires(maxTimesAlertFires);
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
         s = serializer.parseShipment(obj);
@@ -416,6 +418,7 @@ public class JSonSerializerTest {
         assertEquals(assetNum, s.getAssetNum());
         assertEquals(poNum, s.getPoNum());
         assertEquals(tripCount, s.getTripCount());
+        assertEquals(maxTimesAlertFires, s.getMaxTimesAlertFires());
     }
     @Test
     public void testSaveShipmentResponse() {

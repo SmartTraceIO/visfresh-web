@@ -3,6 +3,8 @@
  */
 package com.visfresh.controllers;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -38,6 +40,7 @@ public class AlertProfileController extends AbstractController {
      */
     @Autowired
     private RestService restService;
+
     /**
      * Default constructor.
      */
@@ -146,28 +149,20 @@ public class AlertProfileController extends AbstractController {
      */
     private void sort(final List<AlertProfile> profiles, final String sc, final String so) {
         final boolean ascent = !"desc".equals(so);
-        if ("alertProfileName".equalsIgnoreCase(sc)) {
-            sort(profiles, new ValueProvider<AlertProfile, String>() {
-                /* (non-Javadoc)
-                 * @see com.visfresh.controllers.ValueProvider#getValue(java.lang.Object)
-                 */
-                @Override
-                public String getValue(final AlertProfile k) {
-                    return k.getName();
+        Collections.sort(profiles, new Comparator<AlertProfile>() {
+            /* (non-Javadoc)
+             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+             */
+            @Override
+            public int compare(final AlertProfile o1, final AlertProfile o2) {
+                if ("alertProfileName".equalsIgnoreCase(sc)) {
+                    return compareTo(o1.getName(), o2.getName(), ascent);
                 }
-            }, ascent);
-        } else if ("alertProfileDescription".equalsIgnoreCase(sc)) {
-            sort(profiles, new ValueProvider<AlertProfile, String>() {
-                /* (non-Javadoc)
-                 * @see com.visfresh.controllers.ValueProvider#getValue(java.lang.Object)
-                 */
-                @Override
-                public String getValue(final AlertProfile k) {
-                    return k.getDescription();
+                if ("alertProfileDescription".equalsIgnoreCase(sc)) {
+                    return compareTo(o1.getDescription(), o2.getDescription(), ascent);
                 }
-            }, ascent);
-        } else {
-            sortById(profiles, ascent);
-        }
+                return compareTo(o1.getId(), o2.getId(), ascent);
+            }
+        });
     }
 }

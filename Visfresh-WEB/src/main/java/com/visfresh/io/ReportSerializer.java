@@ -33,7 +33,7 @@ public class ReportSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty("alertProfile", dto.getAlertProfile());
+        obj.addProperty("alertProfileId", dto.getAlertProfile());
         obj.add("alertsNotificationSchedules", asJsonArray(dto.getAlertsNotificationSchedules()));
         obj.addProperty("alertSuppressionDuringCoolDown", dto.getAlertSuppressionDuringCoolDown());
         obj.add("arrivalNotificationSchedules", asJsonArray(dto.getArrivalNotificationSchedules()));
@@ -104,25 +104,27 @@ public class ReportSerializer extends AbstractJsonSerializer {
         if (dto == null) {
             return null;
         }
+
         final JsonObject json = new JsonObject();
-        json.addProperty("actualArrivalDate", formatDate(dto.getActualArrivalDate()));
-        json.addProperty("alertProfile", dto.getAlertProfile());
-        json.addProperty("alertProfileName", dto.getAlertProfileName());
-        json.add("alertSummary", toJson(dto.getAlertSummary()));
+        json.addProperty("shipmentId", dto.getShipmentId());
+        json.addProperty("status", dto.getStatus().toString());
+        json.addProperty("deviceSN", dto.getDeviceSN());
+        json.addProperty("deviceName", dto.getDeviceName());
+        json.addProperty("tripCount", dto.getTripCount());
+        json.addProperty("shipmentDescription", dto.getShipmentDescription());
+        json.addProperty("palletId", dto.getPalettId());
         json.addProperty("assetNum", dto.getAssetNum());
         json.addProperty("assetType", dto.getAssetType());
-        json.addProperty("deviceName", dto.getDeviceName());
-        json.addProperty("deviceSN", dto.getDeviceSN());
-        json.addProperty("estArrivalDate", formatDate(dto.getEstArrivalDate()));
-        json.addProperty("palettid", dto.getPalettid());
-        json.addProperty("percentageCompleted", dto.getPercentageCompleted());
-        json.addProperty("shipmentDate", formatDate(dto.getShipmentDate()));
-        json.addProperty("shipmentDescription", dto.getShipmentDescription());
-        json.addProperty("shipmentId", dto.getShipmentId());
         json.addProperty("shippedFrom", dto.getShippedFrom());
+        json.addProperty("shipmentDate", formatDate(dto.getShipmentDate()));
         json.addProperty("shippedTo", dto.getShippedTo());
-        json.addProperty("status", dto.getStatus().toString());
-        json.addProperty("tripcount", dto.getTripcount());
+        json.addProperty("estArrivalDate", formatDate(dto.getEstArrivalDate()));
+        json.addProperty("actualArrivalDate", formatDate(dto.getActualArrivalDate()));
+        json.addProperty("percentageComplete", dto.getPercentageComplete());
+        json.addProperty("alertProfileId", dto.getAlertProfileId());
+        json.addProperty("alertProfileName", dto.getAlertProfileName());
+        json.add("alertSummary", toJson(dto.getAlertSummary()));
+
         return json;
     }
     /**

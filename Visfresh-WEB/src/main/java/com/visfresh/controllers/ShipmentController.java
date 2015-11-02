@@ -3,6 +3,8 @@
  */
 package com.visfresh.controllers;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -195,11 +197,13 @@ public class ShipmentController extends AbstractController {
             @RequestParam final int pageIndex,
             @RequestParam final int pageSize,
             @RequestParam(required = false) final boolean onlyWithAlerts,
-            @RequestParam(required = false) final Long shippedFrom,
-            @RequestParam(required = false) final Long shippedTo,
+            @RequestParam(required = false) final String shippedFrom,
+            @RequestParam(required = false) final String shippedTo,
             @RequestParam(required = false) final String goods,
             @RequestParam(required = false) final String device,
-            @RequestParam(required = false) final String status
+            @RequestParam(required = false) final String status,
+            @RequestParam(required = false) final String sc,
+            @RequestParam(required = false) final String so
             ) {
         try {
             //check logged in.
@@ -209,20 +213,22 @@ public class ShipmentController extends AbstractController {
             final ReportSerializer ser = getReportSerializer(user);
 
             final List<ShipmentStateDto> shipments = getPage(restService.getShipments(user.getCompany()), pageIndex, pageSize);
+            sort(shipments, sc, so);
+
             final JsonArray array = new JsonArray();
             for (final ShipmentStateDto t : shipments) {
                 //TODO move filtering to DAO
                 if (onlyWithAlerts && !hasAlerts(t)) {
                     continue;
                 }
-                if (shippedFrom != null && (t.getShippedFrom() == null
-                        || !shippedFrom.equals(t.getShippedFrom()))) {
-                    continue;
-                }
-                if (shippedTo != null && (t.getShippedTo() == null
-                        || !shippedTo.equals(t.getShippedTo()))) {
-                    continue;
-                }
+//                if (shippedFrom != null && (t.getShippedFrom() == null
+//                        || !shippedFrom.equals(t.getShippedFrom()))) {
+//                    continue;
+//                }
+//                if (shippedTo != null && (t.getShippedTo() == null
+//                        || !shippedTo.equals(t.getShippedTo()))) {
+//                    continue;
+//                }
                 if (device != null && (t.getDeviceSN() == null
                         || !device.equals(t.getDeviceSN()))) {
                     continue;
@@ -243,6 +249,75 @@ public class ShipmentController extends AbstractController {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param profiles
+     * @param sc
+     * @param so
+     */
+    private void sort(final List<ShipmentStateDto> profiles, final String sc, final String so) {
+        final boolean ascent = !"desc".equals(so);
+        Collections.sort(profiles, new Comparator<ShipmentStateDto>() {
+            /* (non-Javadoc)
+             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+             */
+            @Override
+            public int compare(final ShipmentStateDto o1, final ShipmentStateDto o2) {
+                if ("shipmentId".equals(sc)) {
+                    return compareTo(o1.getShipmentId(), o2.getShipmentId(), ascent);
+                }
+                if ("status".equals(sc)) {
+                    return compareTo(o1.getStatus().toString(), o2.getStatus().toString(), ascent);
+                }
+                if ("deviceSN".equals(sc)) {
+                    compareTo(o1.getDeviceSN(), o2.getDeviceSN(), ascent);
+                }
+                if ("deviceName".equals(sc)) {
+                    return compareTo(o1.getDeviceName(), o2.getDeviceName(), ascent);
+                }
+                if ("tripCount".equals(sc)) {
+                    return compareTo(o1.getTripCount(), o2.getTripCount(), ascent);
+                }
+                if ("shipmentDescription".equals(sc)) {
+                    return compareTo(o1.getShipmentDescription(), o2.getShipmentDescription(), ascent);
+                }
+                if ("palletId".equals(sc)) {
+                    return compareTo(o1.getPalettId(), o2.getPalettId(), ascent);
+                }
+                if ("assetNum".equals(sc)) {
+                    return compareTo(o1.getAssetNum(), o2.getAssetNum(), ascent);
+                }
+                if ("assetType".equals(sc)) {
+                    return compareTo(o1.getAssetType(), o2.getAssetType(), ascent);
+                }
+                if ("shippedFrom".equals(sc)) {
+                    return compareTo(o1.getShippedFrom(), o2.getShippedFrom(), ascent);
+                }
+                if ("shipmentDate".equals(sc)) {
+                    return compareTo(o1.getShipmentDate(), o2.getShipmentDate(), ascent);
+                }
+                if ("shippedTo".equals(sc)) {
+                    return compareTo(o1.getShippedTo(), o2.getShippedTo(), ascent);
+                }
+                if ("estArrivalDate".equals(sc)) {
+                    return compareTo(o1.getEstArrivalDate(), o2.getEstArrivalDate(), ascent);
+                }
+                if ("actualArrivalDate".equals(sc)) {
+                    return compareTo(o1.getActualArrivalDate(), o2.getActualArrivalDate(), ascent);
+                }
+                if ("percentageComplete".equals(sc)) {
+                    return compareTo(o1.getPercentageComplete(), o2.getPercentageComplete(), ascent);
+                }
+                if ("alertProfileId".equals(sc)) {
+                    return compareTo(o1.getAlertProfileId(), o2.getAlertProfileId(), ascent);
+                }
+                if ("alertProfileName".equals(sc)) {
+                    return compareTo(o1.getAlertProfileName(), o2.getAlertProfileName(), ascent);
+                }
+
+                return compareTo(o1.getId(), o2.getId(), ascent);
+            }
+        });
     }
     /**
      * @param t

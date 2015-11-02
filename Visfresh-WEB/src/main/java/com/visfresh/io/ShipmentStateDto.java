@@ -20,18 +20,18 @@ public class ShipmentStateDto implements EntityWithId<Long> {
     private Long shipmentId;
     private String deviceSN;
     private String deviceName;
-    private int tripcount;
+    private int tripCount;
     private String shipmentDescription;
     private String palettid;
-    private Long shippedFrom;
-    private Long shippedTo;
+    private String shippedFrom;
+    private String shippedTo;
     private Date shipmentDate;
     private Date estArrivalDate;
     private Date actualArrivalDate;
-    private int percentageCompleted;
+    private int percentageComplete;
     private String assetNum;
     private String assetType;
-    private Long alertProfile;
+    private Long alertProfileId;
     private String alertProfileName;
     private final Map<AlertType, Integer> alertSummary = new HashMap<AlertType, Integer>();
     private ShipmentStatus status;
@@ -44,7 +44,7 @@ public class ShipmentStateDto implements EntityWithId<Long> {
     }
     public ShipmentStateDto(final Shipment s) {
         super();
-        this.setAlertProfile(s.getAlertProfile() != null ? s.getAlertProfile().getId() : null);
+        this.setAlertProfileId(s.getAlertProfile() != null ? s.getAlertProfile().getId() : null);
         this.setAlertProfileName(s.getAlertProfile() != null ? s.getAlertProfile().getName() : null);
         this.setAssetNum(s.getAssetNum());
         this.setAssetType(s.getAssetType());
@@ -52,12 +52,12 @@ public class ShipmentStateDto implements EntityWithId<Long> {
         this.setDeviceSN(s.getDevice().getId());
         this.setEstArrivalDate(s.getShipmentDate());
         this.setPalettid(s.getPalletId());
-        this.setPercentageCompleted(0);
+        this.setPercentageComplete(0);
         this.setShipmentDate(s.getShipmentDate());
         this.setShipmentDescription(s.getShipmentDescription());
         this.setShipmentId(s.getId());
-        this.setShippedFrom(s.getShippedFrom() == null ? null : s.getShippedFrom().getId());
-        this.setShippedTo(s.getShippedTo() == null ? null : s.getShippedTo().getId());
+        this.setShippedFrom(s.getShippedFrom() == null ? null : s.getShippedFrom().getAddress());
+        this.setShippedTo(s.getShippedTo() == null ? null : s.getShippedTo().getAddress());
         this.setStatus(s.getStatus());
         this.setTripcount(s.getTripCount());
     }
@@ -100,14 +100,14 @@ public class ShipmentStateDto implements EntityWithId<Long> {
     /**
      * @return the tripcount
      */
-    public int getTripcount() {
-        return tripcount;
+    public int getTripCount() {
+        return tripCount;
     }
     /**
-     * @param tripcount the tripcount to set
+     * @param count the tripcount to set
      */
-    public void setTripcount(final int tripcount) {
-        this.tripcount = tripcount;
+    public void setTripcount(final int count) {
+        this.tripCount = count;
     }
     /**
      * @return the shipmentDescription
@@ -124,7 +124,7 @@ public class ShipmentStateDto implements EntityWithId<Long> {
     /**
      * @return the palettid
      */
-    public String getPalettid() {
+    public String getPalettId() {
         return palettid;
     }
     /**
@@ -136,25 +136,25 @@ public class ShipmentStateDto implements EntityWithId<Long> {
     /**
      * @return the shippedFrom
      */
-    public Long getShippedFrom() {
+    public String getShippedFrom() {
         return shippedFrom;
     }
     /**
      * @param shippedFrom the shippedFrom to set
      */
-    public void setShippedFrom(final Long shippedFrom) {
+    public void setShippedFrom(final String shippedFrom) {
         this.shippedFrom = shippedFrom;
     }
     /**
      * @return the shippedTo
      */
-    public Long getShippedTo() {
+    public String getShippedTo() {
         return shippedTo;
     }
     /**
      * @param shippedTo the shippedTo to set
      */
-    public void setShippedTo(final Long shippedTo) {
+    public void setShippedTo(final String shippedTo) {
         this.shippedTo = shippedTo;
     }
     /**
@@ -197,14 +197,14 @@ public class ShipmentStateDto implements EntityWithId<Long> {
     /**
      * @return the percentageCompleted
      */
-    public int getPercentageCompleted() {
-        return percentageCompleted;
+    public int getPercentageComplete() {
+        return percentageComplete;
     }
     /**
      * @param percentageCompleted the percentageCompleted to set
      */
-    public void setPercentageCompleted(final int percentageCompleted) {
-        this.percentageCompleted = percentageCompleted;
+    public void setPercentageComplete(final int percentageCompleted) {
+        this.percentageComplete = percentageCompleted;
     }
     /**
      * @return the assetNum
@@ -233,14 +233,14 @@ public class ShipmentStateDto implements EntityWithId<Long> {
     /**
      * @return the alertProfile
      */
-    public Long getAlertProfile() {
-        return alertProfile;
+    public Long getAlertProfileId() {
+        return alertProfileId;
     }
     /**
      * @param alertProfile the alertProfile to set
      */
-    public void setAlertProfile(final Long alertProfile) {
-        this.alertProfile = alertProfile;
+    public void setAlertProfileId(final Long alertProfile) {
+        this.alertProfileId = alertProfile;
     }
     /**
      * @return the alertProfileName
