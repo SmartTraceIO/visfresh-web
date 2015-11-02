@@ -105,13 +105,35 @@ public class NotificationScheduleController extends AbstractController {
         }
     }
     /**
-     * @param scs
+     * @param profiles
      * @param sc
      * @param so
      */
-    private void sort(final List<NotificationSchedule> scs, final String sc, final String so) {
-        // TODO Auto-generated method stub
-        sortById(scs, true);
+    private void sort(final List<NotificationSchedule> profiles, final String sc, final String so) {
+        final boolean ascent = !"desc".equals(so);
+        if ("notificationScheduleName".equalsIgnoreCase(sc)) {
+            sort(profiles, new ValueProvider<NotificationSchedule, String>() {
+                /* (non-Javadoc)
+                 * @see com.visfresh.controllers.ValueProvider#getValue(java.lang.Object)
+                 */
+                @Override
+                public String getValue(final NotificationSchedule k) {
+                    return k.getName();
+                }
+            }, ascent);
+        } else if ("notificationScheduleDescription".equalsIgnoreCase(sc)) {
+            sort(profiles, new ValueProvider<NotificationSchedule, String>() {
+                /* (non-Javadoc)
+                 * @see com.visfresh.controllers.ValueProvider#getValue(java.lang.Object)
+                 */
+                @Override
+                public String getValue(final NotificationSchedule k) {
+                    return k.getDescription();
+                }
+            }, ascent);
+        } else {
+            sortById(profiles, ascent);
+        }
     }
 
     /**

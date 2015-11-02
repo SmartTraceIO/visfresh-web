@@ -182,21 +182,22 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty("locationId", location.getId());
-        obj.addProperty("companyDescription", location.getCompanyDescription());
-        obj.addProperty("locationName", location.getName());
-        obj.addProperty("notes", location.getNotes());
         obj.addProperty("address", location.getAddress());
-        obj.addProperty("startFlag", location.isStart() ? "Y" : "N");
-        obj.addProperty("interimFlag", location.isInterim() ? "Y" : "N");
         obj.addProperty("endFlag", location.isStop() ? "Y" : "N");
+        obj.addProperty("companyDescription", location.getCompanyDescription());
+        obj.addProperty("interimFlag", location.isInterim() ? "Y" : "N");
 
         final JsonObject loc = new JsonObject();
         obj.add("location", loc);
         loc.addProperty("lat", location.getLocation().getLatitude());
         loc.addProperty("lon", location.getLocation().getLongitude());
 
+        obj.addProperty("locationId", location.getId());
+        obj.addProperty("locationName", location.getName());
+
+        obj.addProperty("notes", location.getNotes());
         obj.addProperty("radiusMeters", location.getRadius());
+        obj.addProperty("startFlag", location.isStart() ? "Y" : "N");
 
         return obj;
     }
@@ -237,9 +238,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty("description", schedule.getDescription());
-        obj.addProperty("name", schedule.getName());
-        obj.addProperty("id", schedule.getId());
+        obj.addProperty("notificationScheduleDescription", schedule.getDescription());
+        obj.addProperty("notificationScheduleId", schedule.getId());
+        obj.addProperty("notificationScheduleName", schedule.getName());
 
         final JsonArray array = new JsonArray();
         obj.add("schedules", array);
@@ -257,9 +258,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
     public NotificationSchedule parseNotificationSchedule(final JsonObject obj) {
         final NotificationSchedule sched = new NotificationSchedule();
 
-        sched.setDescription(asString(obj.get("description")));
-        sched.setName(asString(obj.get("name")));
-        sched.setId(asLong(obj.get("id")));
+        sched.setDescription(asString(obj.get("notificationScheduleDescription")));
+        sched.setName(asString(obj.get("notificationScheduleName")));
+        sched.setId(asLong(obj.get("notificationScheduleId")));
 
         final JsonArray array = obj.get("schedules").getAsJsonArray();
         for (int i = 0; i < array.size(); i++) {
@@ -280,16 +281,16 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty("company", s.getCompany());
         obj.addProperty("emailNotification", s.getEmailNotification());
         obj.addProperty("firstName", s.getFirstName());
+        obj.addProperty("fromTime", s.getFromTime());
+        obj.addProperty("company", s.getCompany());
+        obj.addProperty("id", s.getId());
         obj.addProperty("lastName", s.getLastName());
         obj.addProperty("position", s.getPosition());
+        obj.addProperty("pushToMobileApp", s.isPushToMobileApp());
         obj.addProperty("smsNotification", s.getSmsNotification());
         obj.addProperty("toTime", s.getToTime());
-        obj.addProperty("fromTime", s.getFromTime());
-        obj.addProperty("id", s.getId());
-        obj.addProperty("pushToMobileApp", s.isPushToMobileApp());
 
         final JsonArray weekDays = new JsonArray();
         for (final boolean day : s.getWeekDays()) {
