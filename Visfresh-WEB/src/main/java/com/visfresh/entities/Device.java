@@ -10,10 +10,6 @@ package com.visfresh.entities;
  */
 public class Device implements EntityWithId<String> {
     /**
-     * Device ID.
-     */
-    private String id;
-    /**
      * Device serial number.
      */
     private String sn;
@@ -98,13 +94,7 @@ public class Device implements EntityWithId<String> {
      */
     @Override
     public String getId() {
-        return id;
-    }
-    /**
-     * @param id the id to set
-     */
-    public void setId(final String id) {
-        this.id = id;
+        return getImei();
     }
     /**
      * @return the company

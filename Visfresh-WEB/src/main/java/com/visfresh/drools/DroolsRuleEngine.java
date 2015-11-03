@@ -120,7 +120,7 @@ public class DroolsRuleEngine implements RuleEngine, SystemMessageHandler {
         e.setType(event.getType());
         final String imei = event.getImei();
 
-        final Device device = deviceDao.findAllByImei(imei).get(0);
+        final Device device = deviceDao.findByImei(imei);
         e.setDevice(device);
 
         //process tracker event with rule engine.

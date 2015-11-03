@@ -44,7 +44,6 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
         final String imei = "932487032487";
         d.setImei(imei);
         d.setName("Test Device");
-        d.setId(imei + ".1234");
         d.setDescription("JUnit device");
         d.setSn("12345");
 

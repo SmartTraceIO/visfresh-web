@@ -59,7 +59,6 @@ public abstract class BaseRuleTest {
         final Device d = new Device();
         d.setName("Test Device");
         d.setImei(imei);
-        d.setId(d.getImei());
         d.setSn("456");
         d.setCompany(company);
         d.setDescription("Test device");

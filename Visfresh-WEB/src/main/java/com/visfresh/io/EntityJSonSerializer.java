@@ -434,7 +434,6 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final Device tr = new Device();
         tr.setSn(asString(json.get("sn")));
         tr.setImei(asString(json.get("imei")));
-        tr.setId(asString(json.get("id")));
         tr.setName(asString(json.get("name")));
         tr.setDescription(asString(json.get("description")));
         return tr;
@@ -450,7 +449,6 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
         obj.addProperty("description", d.getDescription());
-        obj.addProperty("id", d.getId());
         obj.addProperty("imei", d.getImei());
         obj.addProperty("name", d.getName());
         obj.addProperty("sn", d.getSn());

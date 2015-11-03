@@ -28,14 +28,13 @@ create table companies (
 );
 
 create table devices (
-    id varchar(127) not null,
     description varchar(255),
     imei varchar(30) not null,
     name varchar(127) not null,
     sn varchar(20) default null,
     company bigint(20),
     tripcount int not null default 0,
-    primary key (id),
+    primary key (imei),
     FOREIGN KEY (company)
         REFERENCES companies (id)
 );
@@ -47,7 +46,7 @@ create table devicecommands (
     `date` timestamp default CURRENT_TIMESTAMP,
     primary key (id),
     FOREIGN KEY (device)
-        REFERENCES devices (id)
+        REFERENCES devices (imei)
 );
 
 create table users (
@@ -185,7 +184,7 @@ create table shipments (
     tripcount int not null default 0,
     `status` varchar(31) default null,
     foreign key (device)
-        references devices (id)
+        references devices (imei)
 );
 
 create table alerts (
@@ -200,7 +199,7 @@ create table alerts (
     foreign key (shipment)
         references shipments (id),
     foreign key (device)
-        references devices (id)
+        references devices (imei)
 );
 
 create table arrivals (
@@ -213,7 +212,7 @@ create table arrivals (
     foreign key (shipment)
         references shipments (id),
     foreign key (device)
-        references devices (id)
+        references devices (imei)
 );
 
 create table trackerevents (
@@ -230,7 +229,7 @@ create table trackerevents (
     foreign key (shipment)
         references shipments (id),
     foreign key (device)
-        references devices (id)
+        references devices (imei)
 );
 
 create table alertnotifschedules (

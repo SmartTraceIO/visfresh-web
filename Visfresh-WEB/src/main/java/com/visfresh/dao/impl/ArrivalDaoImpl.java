@@ -189,7 +189,7 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
                 + ", " + CompanyDaoImpl.TABLE + " " + companyEntityName
                 + " where "
                 + entityName + "." + DEVICE_FIELD + " = "
-                + deviceEntityName + "." + DeviceDaoImpl.ID_FIELD
+                + deviceEntityName + "." + DeviceDaoImpl.IMEI_FIELD
                 + " and " + deviceEntityName + "." + DeviceDaoImpl.COMPANY_FIELD + " = "
                 + companyEntityName + "." + CompanyDaoImpl.ID_FIELD
                 + (id == null ? "" : " and " + entityName + "." + ID_FIELD + " = :id"),

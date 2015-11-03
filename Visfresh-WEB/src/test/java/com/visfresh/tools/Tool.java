@@ -42,7 +42,6 @@ public class Tool extends AbstractTool {
 
         final Device device = new Device();
         device.setImei(imei);
-        device.setId(imei);
         device.setCompany(company);
         device.setName("DevTool/" + imei.substring(0, imei.length() - 6));
 

@@ -7,7 +7,7 @@ The date should have following format `yyyy-MM-dd'T'HH:mm` in current user's tim
 The GET request parameters of URL link should be URL encoded to, but JSON body of request and response should be
 sent as is without URL encoding.  
 For all POST JSON requests the “Content-Type: application/json” HTTP header should be used.
-### Server [Responses](#markdown-header-response-message):###
+### Server [Responses](#response-message):###
 Each server response has structure:
 ```json
 {
@@ -28,66 +28,68 @@ In case of error the “response” element of JSON response is absent.
 ### Security methods.
 An authentication can be performed as from REST client using login method, as from GTSE page (Will implemented in future). If the GTSE authentication has done, then access token can be get by getToken method in some HTTP session. In this case the REST client will attached to REST service using existing GTSE session.
 ## Data model##
-1. [Authentication token](#markdown-header-authentication-token-response)  
-2. [Alert Profile](#markdown-header-alert-profile)  
-3. [Notification Schedule](#markdown-header-notification-schedule)   
-4. [Location](#markdown-header-location)  
-5. [Shipment Template](#markdown-header-shipment-template)  
-6. [Device](#markdown-header-device)  
-7. [Shipment](#markdown-header-shipment)  
-8. [Notification](#markdown-header-notification)  
-9. [Alert](#markdown-header-alert)  
-10. [Temperature Alert](#markdown-header-temperature-alert)  
-11. [Arrival](#markdown-header-arrival)  
-12. [Device Event](#markdown-header-device-event)  
+1. [Authentication token](#authentication-token-response)  
+2. [Alert Profile](#alert-profile)  
+3. [Notification Schedule](#notification-schedule)   
+4. [Location](#location)  
+5. [Shipment Template](#shipment-template)  
+6. [Device](#device)  
+7. [Shipment](#shipment)  
+8. [Notification](#notification)  
+9. [Alert](#alert)  
+10. [Temperature Alert](#temperature-alert)  
+11. [Arrival](#arrival)  
+12. [Device Event](#device-event)  
 
 ## Rest Service methods.
-1. [Authentication](#markdown-header-authentication).  
-2. [Get access token using existing GTS(e) session.](#markdown-header-get-access-token-using-existing-gts-e-session)  
-3. [Get User Info](#markdown-header-get-user-info)  
-4. [Logout](#markdown-header-logout)  
-5. [Refresh access token](#markdown-header-refresh-access-token)  
-6. [Save alert profile](#markdown-header-save-alert-profile)  
-7. [Get Alert Profile](#markdown-header-get-alert-profile)  
-8. [Get Alert Profiles](#markdown-header-get-alert-profiles)  
-7. [Delete Alert Profile](#markdown-header-delete-alert-profile)  
-9. [Save notification schedule](#markdown-header-save-notification-schedule)  
-10. [Get notification schedules](#markdown-header-get-notification-schedules)  
-12. [Get Notification Schedule](#markdown-header-get-notification-schedule)  
-13. [Delete Notification Schedule](#markdown-header-delete-notification-schedule)  
-14. [Save Location](#markdown-header-save-location)  
-15. [Get Locations](#markdown-header-get-locations)  
-16. [Get Location](#markdown-header-get-location)  
-17. [Delete Location](#markdown-header-delete-location)  
-18. [Save Shipment Template](#markdown-header-save-shipment-template)  
-19. [Get Shipment templates](#markdown-header-get-shipment-templates)  
-20. [Save Device](#markdown-header-save-device)  
-21. [Get Devices](#markdown-header-get-devices)  
-22. [Save Shipment](#markdown-header-save-shipment)  
-23. [Get Shipments](#markdown-header-get-shipments)  
-24. [Get Notifications](#markdown-header-get-notifications)  
-25. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
-26. [Send Command to Device](#markdown-header-send-command-to-device)  
-27. [Get Shipment Template](#markdown-header-get-shipment-template)  
-28. [Get Device](#markdown-header-get-device)  
-29. [Get Shipment](#markdown-header-get-shipment)  
-30. [Get Profile](#markdown-header-get-profile)  
-31. [Save Profile](#markdown-header-save-profile)  
+1. [Authentication](#authentication).  
+2. [Get access token using existing GTS(e) session.](#get-access-token-using-existing-gts-e-session)  
+3. [Get User Info](#get-user-info)  
+4. [Logout](#logout)  
+5. [Refresh access token](#refresh-access-token)  
+6. [Save alert profile](#save-alert-profile)  
+7. [Get Alert Profile](#get-alert-profile)  
+8. [Get Alert Profiles](#get-alert-profiles)  
+7. [Delete Alert Profile](#delete-alert-profile)  
+9. [Save notification schedule](#save-notification-schedule)  
+10. [Get notification schedules](#get-notification-schedules)  
+12. [Get Notification Schedule](#get-notification-schedule)  
+13. [Delete Notification Schedule](#delete-notification-schedule)  
+14. [Save Location](#save-location)  
+15. [Get Locations](#get-locations)  
+16. [Get Location](#get-location)  
+17. [Delete Location](#delete-location)  
+18. [Save Shipment Template](#save-shipment-template)  
+19. [Get Shipment templates](#get-shipment-templates)  
+27. [Get Shipment Template](#get-shipment-template)  
+27. [Delete Shipment Template](#delete-shipment-template)  
+20. [Save Device](#save-device)  
+28. [Get Device](#get-device)  
+21. [Get Devices](#get-devices)  
+22. [Save Shipment](#save-shipment)  
+23. [Get Shipments](#get-shipments)  
+29. [Get Shipment](#get-shipment)  
+1. [Delete Shipment](#delete-shipment)  
+24. [Get Notifications](#get-notifications)  
+25. [Mark Notification as read](#mark-notification-as-read)  
+26. [Send Command to Device](#send-command-to-device)  
+30. [Get Profile](#get-profile)  
+31. [Save Profile](#save-profile)  
 
 ## Reports ##
-1. [Get Single Shipment](#markdown-header-get-single-shipment)
+1. [Get Single Shipment](#get-single-shipment)
 
 ### Authentication.###
 Method *GET*, method name *login*, request parameters login - the user login name and password - the user password  
 1. login - user name of logged in user  
 2. password - password  
 
-are contained in [authentication request body](#markdown-header-authentication-request-body). Returns [Authentication token response](#markdown-header-authentication-token-response).  
-[(example)](#markdown-header-authentication-request-example)  
+are contained in [authentication request body](#authentication-request-body). Returns [Authentication token response](#authentication-token-response).  
+[(example)](#authentication-request-example)  
 ### Get access token using existing GTS(e) session.###
 The user should be logged in to GTS(e). (not implemented now).
 Method *POST*, method name *getToken*, no parameters. In case of this request the service access a current user session, determines user info, log in as REST service user and returns authentication session.  
-[(example)](#markdown-header-attach-to-existing-session-example)
+[(example)](#attach-to-existing-session-example)
 ### Get User Info ###
 Method *GET*, method name *getUser*, method parameters  
 1. username - name of user  
@@ -98,19 +100,19 @@ Method returns:
 2. fullName - full user name  
 3. roles - array of user roles, one from GlobalAdmin, CompanyAdmin, Dispatcher, ReportViewer
 
-[(example)](#markdown-header-get-user-info-example)
+[(example)](#get-user-info-example)
 
 ### Logout ###
 Method *GET*, method name *logout*, have not parameters. Closes user REST session and clears all associated resources  
-[(example)](#markdown-header-logout-example)
+[(example)](#logout-example)
 
 ### Refresh access token ###
 Method *GET*, method name *refreshToken*, have not parameters. Refresh the access token for current REST session.  
-[(example)](#markdown-header-refresh-access-token)
+[(example)](#refresh-access-token)
 
 ### Save alert profile ###
-Method *POST*, method name *saveAlertProfile*, request body contains JSON serialized [Alert Profile object](#markdown-header-alert-profile). Response contains ID of just saved Alert Profile.  
-[(example)](#markdown-header-save-alert-profile-example)
+Method *POST*, method name *saveAlertProfile*, request body contains JSON serialized [Alert Profile object](#alert-profile). Response contains ID of just saved Alert Profile.  
+[(example)](#save-alert-profile-example)
 
 ### Get Alert Profiles ###
 Method *GET*, method name *getAlertProfiles*, method parameters:  
@@ -118,23 +120,23 @@ Method *GET*, method name *getAlertProfiles*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order (asc/desc)  
-Returns an array of [Alert Profile objects](#markdown-header-alert-profile).  
-[(example)](#markdown-header-get-alert-profiles-example)
+Returns an array of [Alert Profile objects](#alert-profile).  
+[(example)](#get-alert-profiles-example)
 
 ### Get Alert Profile ###
 Method *GET*, method name getAlertProfile. Request parameters:  
 1. alertProfileId - alert profile ID.  
-Returns [Alert Profile Object](#markdown-header-alert-profile).  
-[(example)](#markdown-header-get-alert-profile-example)
+Returns [Alert Profile Object](#alert-profile).  
+[(example)](#get-alert-profile-example)
 
 ### Delete Alert Profile ###
 Method *GET*, method name *deleteAlertProfile*, method parameters:  
 1. alertProfileId - alert profile ID  
-[(example)](#markdown-header-delete-alert-profile-example)
+[(example)](#delete-alert-profile-example)
 
 ### Save Notification Schedule ###
-Method *POST*, method name *saveNotificationSchedule*, request body contains JSON serialized [Notification Schedule object](#markdown-header-notification-schedule). Response contains ID of just saved Notification Schedule.  
-[(example)](#markdown-header-save-notification-schedule-example)]
+Method *POST*, method name *saveNotificationSchedule*, request body contains JSON serialized [Notification Schedule object](#notification-schedule). Response contains ID of just saved Notification Schedule.  
+[(example)](#save-notification-schedule-example)]
 
 ### Get Notification Schedules ###
 Method *GET*, method name *getNotificationSchedules*, method parameters:  
@@ -142,23 +144,23 @@ Method *GET*, method name *getNotificationSchedules*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order (asc/desc)  
-Return array of [Notification Schedule objects](#markdown-header-notification-schedule)  
-[(example)](#markdown-header-get-notification-schedules-example)
+Return array of [Notification Schedule objects](#notification-schedule)  
+[(example)](#get-notification-schedules-example)
 
 ### Get Notification Schedule ###
 Method *GET*, method name *getNotificationSchedule*. Request parameters:  
 1. notificationScheduleId - notification schedule ID.  
-Returns [Notification Schedule Object](#markdown-header-notification-schedule)  
-[(example)](#markdown-header-get-notification-schedule-example)
+Returns [Notification Schedule Object](#notification-schedule)  
+[(example)](#get-notification-schedule-example)
 
 ### Delete Notification schedule ###
 Method *GET*, *deleteNotificationSchedule*. Request parameters:  
 1. notificationScheduleId - notification schedule ID.  
-[(example)](#markdown-header-delete-notification-schedule-example)
+[(example)](#delete-notification-schedule-example)
 
 ### Save Location ###
-Method *POST*, method name *saveLocation*, request body contains JSON serialized [Location Object](#markdown-header-location). Response contains ID of just saved Location  
-[(example)](#markdown-header-save-location-example)
+Method *POST*, method name *saveLocation*, request body contains JSON serialized [Location Object](#location). Response contains ID of just saved Location  
+[(example)](#save-location-example)
 
 ### Get Locations ###
 Method *GET*, method name *getLocations*, method parameters:  
@@ -166,106 +168,116 @@ Method *GET*, method name *getLocations*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order  
-Returns array of [Location Objects](#markdown-header-location)  
-[(example)](#markdown-header-get-location-example)
+Returns array of [Location Objects](#location)  
+[(example)](#get-location-example)
 
 ### Get Location ###
 Method *GET*, method name *getLocation*. Request parameters:  
 1. locationId - Location ID.  
-Returns [Location Object](#markdown-header-location).  
-[(example)](#markdown-header-get-location-example)
+Returns [Location Object](#location).  
+[(example)](#get-location-example)
 
 ### Delete Location ###
 Method *GET*, method name *deleteLocation*. Request parameters:  
 1. locationId - Location ID.  
-[(example)](#markdown-header-delete-location-example)
+[(example)](#delete-location-example)
 
 ### Save Shipment template ###
-Method *POST*, method name *saveShipmentTemplate*, request body contains JSON serialized [Shipment Template Object](#markdown-header-shipment-template). Response contains ID of just saved Shipment Template  
-[(example)](#markdown-header-save-shipment-template-example)
+Method *POST*, method name *saveShipmentTemplate*, request body contains JSON serialized [Shipment Template Object](#shipment-template). Response contains ID of just saved Shipment Template  
+[(example)](#save-shipment-template-example)
 
 ### Get Shipment templates ###
 Method *GET*, method name *getShipmentTemplates*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Shipment Template Objects](#markdown-header-shipment-template)  
-[(example)](#markdown-header-get-shipment-templates-example)
+Returns array of [Shipment Template Objects](#shipment-template)  
+[(example)](#get-shipment-templates-example)
+
+### Get Shipment Template ###
+Method *GET*, method name *getShipmentTemplate*. Request parameters:  
+1. id - shipment template ID.  
+Returns [Shipment Template Object](#shipment-template)  
+[(example)](#get-shipment-template-example)
+
+### Delete Shipment Template ###
+Method *GET*, method name *deleteShipmentTemplate*, Request parameters:  
+1. shipmentTemplateId - shipment template ID.  
+[(example)](#delete-shipment-template-example)
 
 ### Save Device ###
-Method *POST*, method name *saveDevice*, request body contains JSON serialized [Device Object](#markdown-header-device). Response contains ID of just saved Device  
-[(example)](#markdown-header-save-device-example)
+Method *POST*, method name *saveDevice*, request body contains JSON serialized [Device Object](#device). Response contains ID of just saved Device  
+[(example)](#save-device-example)
 
 ### Get Devices ###
 Method *GET*, method name *getDevices*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Device Objects](#markdown-header-device).  
-[(example)](#markdown-header-get-devices-example)
+Returns array of [Device Objects](#device).  
+[(example)](#get-devices-example)
+
+### Get Device ###
+Method *GET*, method name *getDevice*. Request parameters:
+1. id - device ID.  
+Returns [Device Object](#device)  
+[(example)](#get-device-example)
 
 ### Save Shipment ###
-Method *POST*, method name saveShipment, request body contains JSON serialized [Save Shipment request](#markdown-header-save-shipment-request). Response contains ID of just saved Shipment and ID of shipment template if the shipment was saved with corresponding option.  
-[(example)](#markdown-header-save-shipment-example)
+Method *POST*, method name saveShipment, request body contains JSON serialized [Save Shipment request](#save-shipment-request). Response contains ID of just saved Shipment and ID of shipment template if the shipment was saved with corresponding option.  
+[(example)](#save-shipment-example)
+
+### Get Shipment ###
+Method *GET*, method name *getShipment*. Request parameters:  
+1. id - shipment ID.  
+Returns [Shipment Object](#shipment)  
+[(example)](#get-shipment-example)
 
 ### Get Shipments ###
 Method *GET*, method name getShipments, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Shipment Objects](#markdown-header-shipment).  
-[(example)](#markdown-header-get-shipments-example)
+Returns array of [Shipment Description Objects](#shipment-description), it is not same as [Shipment Object](#shipment).  
+[(example)](#get-shipments-example)
 
-### Get Notifications ###
-Method *GET*, method name getNotifications, method parameters:  
-1. pageIndex - number of page  
-2. pageSize - size of page  
-Returns array of [Notification Objects](#markdown-header-notification)  
-[(example)](#markdown-header-get-notifications-example)
-
-### Mark Notification as read ###
-Method *POST*, method name *markNotificationsAsRead*. Request body contains JSON array of notification ID.  
-[(example)](#markdown-header-mark-notification-as-read-example)
-
-### Send Command to Device ###
-Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#markdown-header-device) ID and device specific command.  
-[(example)](#markdown-header-send-command-to-device-example)
-
-### Get Shipment Template ###
-Method *GET*, method name *getShipmentTemplate*. Request parameters:  
-1. id - shipment template ID.  
-Returns [Shipment Template Object](#markdown-header-shipment-template)  
-[(example)](#markdown-header-get-shipment-template-example)
-
-### Get Device ###
-Method *GET*, method name *getDevice*. Request parameters:
-1. id - device ID.  
-Returns [Device Object](#markdown-header-device)  
-[(example)](#markdown-header-get-device-example)
-
-### Get Shipment ###
-Method *GET*, method name *getShipment*. Request parameters:  
-1. id - shipment ID.  
-Returns [Shipment Object](#markdown-header-shipment)  
-[(example)](#markdown-header-get-shipment-example)
-
-### Get Profile ###
-Method *GET*, method name *getProfile*, have not parameters. Return [Profile Object](#markdown-header-profile-object)
-of current logged in user  
-[(example)](#markdown-header-get-profile-example)
-
-### Save Profile ###
-Method *POST*, method name *saveProfile*. Request body contains JSON serialized [Profile Object](#markdown-header-profile-object)  
-[(example)](#markdown-header-save-profile-example)
+### Delete Shipment ###
+Method *GET*, method name deleteShipment, method parameters:  
+1. shipmentId - shipment ID  
+[(example)](#delete-shipment-example)
 
 ### Get Single Shipment ###
 Method *GET*, method *getSingleShipment*. Request parameters:  
 1 fromDate start selection data  
 2. toDate end selection data  
 3. shipment shipment ID  
-[(example)](#markdown-header-get-single-shipment-example)
+[(example)](#get-single-shipment-example)
+
+### Get Notifications ###
+Method *GET*, method name getNotifications, method parameters:  
+1. pageIndex - number of page  
+2. pageSize - size of page  
+Returns array of [Notification Objects](#notification)  
+[(example)](#get-notifications-example)
+
+### Mark Notification as read ###
+Method *POST*, method name *markNotificationsAsRead*. Request body contains JSON array of notification ID.  
+[(example)](#mark-notification-as-read-example)
+
+### Send Command to Device ###
+Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#device) ID and device specific command.  
+[(example)](#send-command-to-device-example)
+
+### Get Profile ###
+Method *GET*, method name *getProfile*, have not parameters. Return [Profile Object](#profile-object)
+of current logged in user  
+[(example)](#get-profile-example)
+
+### Save Profile ###
+Method *POST*, method name *saveProfile*. Request body contains JSON serialized [Profile Object](#profile-object)  
+[(example)](#save-profile-example)
 
 ## Objects
 ### Response message ###
 `{` 
-` "status": ` [ResponseStatus](#markdown-header-response-status)`,`  
+` "status": ` [ResponseStatus](#response-status)`,`  
 `"response": {`  
 `"token": "token_100001",`  
 `"expired": "2015-09-30T01:19"`  
@@ -318,7 +330,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
     ]
 }
 ```
-[(See Person Schedule)](#markdown-header-person-schedule)
+[(See Person Schedule)](#person-schedule)
 ### Person Schedule ###
 ```json
 {
@@ -368,11 +380,11 @@ Method *GET*, method *getSingleShipment*. Request parameters:
   "shipmentDescription": "Any Description",
   "alertSuppressionDuringCoolDown": 55,
   "alertProfile": 2,
-  "alertsNotificationSchedules": [ // array of ID of [notification schedules](#markdown-header-notification-schedule)
+  "alertsNotificationSchedules": [ // array of ID of [notification schedules](#notification-schedule)
     3
   ],
   "arrivalNotificationWithIn": 11,
-  "arrivalNotificationSchedules": [ // array of ID of [notification schedules](#markdown-header-notification-schedule)
+  "arrivalNotificationSchedules": [ // array of ID of [notification schedules](#notification-schedule)
     6
   ],
   "excludeNotificationsIfNoAlertsFired": true,
@@ -398,10 +410,10 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `{`  
 `"saveAsNewTemplate": true,`  
 `"templateName": "NewTemplate.tpl", // template name in case of save also as new template`  
-`"shipment":` [Shipment Object](#markdown-header-shipment)
+`"shipment":` [Shipment Object](#shipment)
 `}`
 ### Shipment ###
-```
+```json
 {
     "name": "Shipment-1",
     "shipmentDescription": "Any Description",
@@ -431,11 +443,43 @@ Method *GET*, method *getSingleShipment*. Request parameters:
     "device": "234908720394857"
   }
 ```
+### Shipment Description ###
+```json
+{
+  "shipmentId": 11, //ID of associated shipment object
+  "status": "InProgress", //status Default/InProgress/Completed/Pending
+  "deviceSN": "394857",
+  "deviceName": "Device Name",
+  "tripCount": 88,
+  "shipmentDescription": "Any Description",
+  "palletId": "palettid",
+  "assetNum": "10515",
+  "assetType": "SeaContainer",
+  "shippedFrom": "Bankstown Warehouse",
+  "shipmentDate": "2015-10-23T03:06",
+  "shippedTo": "Coles Perth DC",
+  "estArrivalDate": "2015-10-23T03:06",
+  "percentageComplete": 0,
+  "alertProfileId": 2,
+  "alertProfileName": "AnyAlert",
+  "alertSummary": {
+    "CriticalHot": "1",
+    "Battery": "2",
+    "LightOn": "1",
+    "Cold": "1",
+    "MovementStart": "4",
+    "CriticalCold": "3",
+    "LightOff": "1",
+    "Hot": "2"
+  }
+}
+```
+See also [Shipment Object](#shipment)
 ### Notification ###
 `{`  
 `"id": 18,`  
 `"type": "Arrival", // notification type (Alert|Arrival)`  
-`"issue":` [Ordinary Alert Object](#markdown-header-alert) ` or ` [Temperature Alert Object](#markdown-header-temperature-alert) ` or ` [Arrival Object](#markdown-header-arrival)  
+`"issue":` [Ordinary Alert Object](#alert) ` or ` [Temperature Alert Object](#temperature-alert) ` or ` [Arrival Object](#arrival)  
 `}`
 ### Alert ###
 `{`  
@@ -443,7 +487,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `"name": "Battery-1",`  
 `"id": 15,`  
 `"date": "2015-10-12T23:57",`  
-`"device": "234908720394857", // ID of associated ` [Device](#markdown-header-device)  
+`"device": "234908720394857", // ID of associated ` [Device](#device)  
 `"type": "BatteryLow" // alert type: (EnterBrightEnvironment|EnterDarkEnvironment|Shock|BatteryLow)`  
 `}`
 ### Temperature Alert###
@@ -455,7 +499,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `"name": "TempAlert-1",`  
 `"id": 13,`  
 `"date": "2015-10-12T23:57",`  
-`"device": "234908720394857", // ID of associated ` [Device](#markdown-header-device)  
+`"device": "234908720394857", // ID of associated ` [Device](#device)  
 `"type": "HighTemperature" // alert type (LowTemperature|HighTemperature|CriticalLowTemperature|CriticalHighTemperature)`  
 `"temperature": 5.0, //temperature is Celsius degree`  
 `"minutes": 55 //number of minutes for this temperature`  
@@ -466,7 +510,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `"id": 17,`  
 `"numberOfMetersOfArrival": 1500, //number of meters of arrival`    
 `"date": "2015-10-12T23:57",`  
-`"device": "234908720394857" //ID of associated` [Device Object](#markdown-header-device)  
+`"device": "234908720394857" //ID of associated` [Device Object](#device)  
 `}`
 ### Device Event ###
 `{`  
@@ -477,7 +521,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `"type": "AUT" //device specific status`  
 `}`
 ### Profile Object ###
-```
+```json
 {
     "shipments": [ //array of Shipment ID associated by given user
       77
@@ -552,7 +596,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `}`  
 ### Save alert profile example ###
 **POST /vf/rest/saveAlertProfile/${authToken}**  
-```
+```json
 Request body:
 {
   "alertProfileName": "AnyAlert",
@@ -595,7 +639,7 @@ Response:
 ### Get Alert Profiles example ###
 **GET /vf/rest/getAlertProfiles/${accessToken}?so=desc&pageSize=10000&sc=alertProfileDescription&pageIndex=1**  
 **Response:**  
-```
+```json
 Response:
 {
   "status": {
@@ -663,7 +707,7 @@ Response:
 ### Delete Alert Profile example ###
 **GET vf/rest/deleteAlertProfile/${accessToken}?alertProfileId=4**  
 **Response:**
-```
+```json
 {
   "status": {
     "code": 0,
@@ -675,7 +719,7 @@ Response:
 ### Save Notification Schedule example ###
 **POST /vf/rest/saveNotificationSchedule/${accessToken}**  
 **Request body:**  
-```
+```json
 {
   "notificationScheduleDescription": "JUnit schedule",
   "notificationScheduleName": "Sched",
@@ -724,7 +768,7 @@ Response:
 }
 ```
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -748,7 +792,7 @@ Response:
 ### Get Notification Schedules example ###
 **GET /vf/rest/getNotificationSchedules/${accessToken}?so=desc&pageSize=10000&sc=notificationScheduleDescription&pageIndex=1**  
 **Response:**  
-```  
+```json
 {
   "status": {
     "code": 0,
@@ -859,7 +903,7 @@ Response:
 ### Save Location example ###
 **POST vf/rest/saveLocation/${accessToken}**  
 **Request body:**  
-```
+```json
 {
   "locationName": "Loc-1",
   "companyName": "Sun Microsystems",
@@ -898,7 +942,7 @@ Response:
 ### Get Locations example ###
 **GET /vf/rest/getLocations/${accessToken}?so=desc&pageSize=10000&sc=notes&pageIndex=1**  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -926,7 +970,7 @@ Response:
 ### Save Shipment Template example ###
 **POST /vf/rest/saveShipmentTemplate/${accessToken}**  
 **Request body:**  
-```
+```json
 {
   "saveAsNewTemplate": true,
   "templateName": "NewTemplate.tpl",
@@ -961,7 +1005,7 @@ Response:
 }
 ```  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -975,7 +1019,7 @@ Response:
 ### Get Shipment Templates example ###
 **GET /vf/rest/getShipmentTemplates/${accessToken}?pageSize=1&pageIndex=3**  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -1005,6 +1049,137 @@ Response:
       "detectLocationForShippedFrom": true
     }
   ]
+}
+```
+### Delete Shipment Template example ###
+**GET /vf/rest/deleteShipmentTemplate/${accessToken}?shipmentTemplateId=78**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
+### Save Shipment example ###
+**POST  /vf/rest/saveShipment/${accessToken}**  
+**Request body:**  
+```json
+{
+  "saveAsNewTemplate": true,
+  "templateName": "NewTemplate.tpl",
+  "shipment": {
+    "name": "Shipment-1",
+    "shipmentDescription": "Any Description",
+    "alertSuppressionDuringCoolDown": 55,
+    "alertProfile": 2,
+    "alertsNotificationSchedules": [
+      3
+    ],
+    "arrivalNotificationWithIn": 111,
+    "arrivalNotificationSchedules": [
+      6
+    ],
+    "excludeNotificationsIfNoAlertsFired": true,
+    "shippedFrom": 9,
+    "shippedTo": 10,
+    "shutdownDevice": 155,
+    "assetType": "SeaContainer",
+    "palletId": "palettid",
+    "assetNum": "10515",
+    "shipmentDate": "2015-10-09T11:47",
+    "customFields": "customFields",
+    "status": "Default",
+    "devices": [
+      "234908720394857",
+      "329847983724987"
+    ]
+  }
+}
+```
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "shipmentId": 11,
+    "templateId": 12
+  }
+}
+```
+### Get Shipments example ###
+**GET /vf/rest/getShipments/${accessToken}?pageSize=1&pageIndex=3**  
+**Response:**  
+```gson
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "shipmentId": 11,
+      "status": "InProgress",
+      "deviceSN": "394857",
+      "deviceName": "Device Name",
+      "tripCount": 88,
+      "shipmentDescription": "Any Description",
+      "palletId": "palettid",
+      "assetNum": "10515",
+      "assetType": "SeaContainer",
+      "shippedFrom": "Bankstown Warehouse",
+      "shipmentDate": "2015-10-23T03:06",
+      "shippedTo": "Coles Perth DC",
+      "estArrivalDate": "2015-10-23T03:06",
+      "percentageComplete": 0,
+      "alertProfileId": 2,
+      "alertProfileName": "AnyAlert",
+      "alertSummary": {
+        "CriticalHot": "1",
+        "Battery": "2",
+        "LightOn": "1",
+        "Cold": "1",
+        "MovementStart": "4",
+        "CriticalCold": "3",
+        "LightOff": "1",
+        "Hot": "2"
+      }
+    },
+    {
+      "shipmentId": 21,
+      "status": "InProgress",
+      "deviceSN": "394857",
+      "deviceName": "Device Name",
+      "tripCount": 88,
+      "shipmentDescription": "Any Description",
+      "palletId": "palettid",
+      "assetNum": "10515",
+      "assetType": "SeaContainer",
+      "shippedFrom": "Bankstown Warehouse",
+      "shipmentDate": "2015-10-23T03:06",
+      "shippedTo": "Coles Perth DC",
+      "estArrivalDate": "2015-10-23T03:06",
+      "percentageComplete": 0,
+      "alertProfileId": 12,
+      "alertProfileName": "AnyAlert",
+      "alertSummary": {}
+    }
+  ]
+}
+```
+### Delete Shipment example ###
+**GET /vf/rest/deleteShipment/${accessToken}?shipmentId=110**  
+** Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
 }
 ```
 ### Save Device example ###
@@ -1042,98 +1217,6 @@ Response:
 `}`  
 `]`  
 `}`  
-### Save Shipment example ###
-**POST  /vf/rest/saveShipment/${accessToken}**  
-**Request body:**  
-```
-{
-  "saveAsNewTemplate": true,
-  "templateName": "NewTemplate.tpl",
-  "shipment": {
-    "name": "Shipment-1",
-    "shipmentDescription": "Any Description",
-    "alertSuppressionDuringCoolDown": 55,
-    "alertProfile": 2,
-    "alertsNotificationSchedules": [
-      3
-    ],
-    "arrivalNotificationWithIn": 111,
-    "arrivalNotificationSchedules": [
-      6
-    ],
-    "excludeNotificationsIfNoAlertsFired": true,
-    "shippedFrom": 9,
-    "shippedTo": 10,
-    "shutdownDevice": 155,
-    "assetType": "SeaContainer",
-    "palletId": "palettid",
-    "assetNum": "10515",
-    "shipmentDate": "2015-10-09T11:47",
-    "customFields": "customFields",
-    "status": "Default",
-    "devices": [
-      "234908720394857",
-      "329847983724987"
-    ]
-  }
-}
-```
-**Response:**  
-{
-  "status": {
-    "code": 0,
-    "message": "Success"
-  },
-  "response": {
-    "shipmentId": 11,
-    "templateId": 12
-  }
-}
-### Get Shipments example ###
-**GET /vf/rest/getShipments/${accessToken}?pageSize=1&pageIndex=3**  
-**Response:**  
-```
-{
-  "status": {
-    "code": 0,
-    "message": "Success"
-  },
-  "response": [
-    {
-      "saveAsNewTemplate": true,
-      "templateName": "NewTemplate.tpl",
-      "shipment": {
-        "name": "Shipment-1",
-        "shipmentDescription": "Any Description",
-        "alertSuppressionDuringCoolDown": 55,
-        "alertProfile": 2,
-        "alertsNotificationSchedules": [
-          3
-        ],
-        "arrivalNotificationWithIn": 111,
-        "arrivalNotificationSchedules": [
-          6
-        ],
-        "excludeNotificationsIfNoAlertsFired": true,
-        "shippedFrom": 9,
-        "shippedTo": 10,
-        "shutdownDevice": 155,
-        "assetType": "SeaContainer",
-        "palletId": "palettid",
-        "tripCount": 88,
-        "poNum": 893793487,
-        "assetNum": "10515",
-        "shipmentDate": "2015-10-16T22:55",
-        "customFields": {
-          "field1": "value1"
-        },
-        "status": "Default",
-        "device": "234908720394857"
-      }
-    }
-  ]
-}
-```
 ### Get Notifications example ###
 **GET  /vf/rest/getNotifications/${accessToken}?shipment=11&pageSize=1&pageIndex=3**  
 **Response:**  
@@ -1212,7 +1295,7 @@ Response:
 ### Get Alert Profile example ###
 **GET /vf/rest/getAlertProfile/${accessToken}?alertProfileId=5**  
 **Response:**  
-```
+```json
 Response:
 {
   "status": {
@@ -1242,7 +1325,7 @@ Response:
 ### Get Location example ###
 **GET /vf/rest/getLocation/${accessToken}?locationId=2**  
 **Response:**  
-```
+```json
 Response:
 {
   "status": {
@@ -1269,7 +1352,7 @@ Response:
 ### Delete Location example ###
 **GET /vf/rest/deleteLocation/${accessToken}?locationId=2**  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -1280,7 +1363,7 @@ Response:
 ### Get Shipment Template example ###
 **GET /rest/getShipmentTemplate/${accessToken}?id=77**  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -1313,7 +1396,7 @@ Response:
 ### Get Device example ###
 **GET /vf/rest/getDevice/${accessToken}?id=923487509328**  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -1331,7 +1414,7 @@ Response:
 ### Get Shipment example ###
 **GET /vf/rest/getShipment/${accessToken}?id=77**  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -1370,7 +1453,7 @@ Response:
 ### Get Notification Schedule example ###
 **GET /vf/rest/getNotificationSchedule/${accessToken}?notificationScheduleId=77**  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -1430,7 +1513,7 @@ Response:
 ### Delete Notification Schedule example ###
 **GET vf/rest/deleteNotificationSchedule/${accessToken}?notificationScheduleId=23**  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -1441,7 +1524,7 @@ Response:
 ### Get Profile example ###
 **GET /vf/rest/getProfile/${accessToken}**  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,
@@ -1457,7 +1540,7 @@ Response:
 ### Save Profile example ###
 **POST /vf/rest/saveProfile/${accessToken}**  
 **Request body:**  
-```
+```json
 {
   "shipments": [
     77
@@ -1474,7 +1557,7 @@ Response:
 ### Get Single Shipment example ###
 **GET /vf/rest/getSingleShipment/${accessToken}?fromDate=${startDate}&shipment=${shipmentId}&toDate=${endData}**  
 **Response:**  
-```
+```json
 {
   "status": {
     "code": 0,

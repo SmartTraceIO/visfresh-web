@@ -67,7 +67,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         final String sql = "select " + selectAs + " from " + TrackerEventDaoImpl.TABLE
                 + " e, " + DeviceDaoImpl.TABLE + " d" + " where e."
                 + TrackerEventDaoImpl.DEVICE_FIELD + " = d."
-                + DeviceDaoImpl.ID_FIELD + " and d."
+                + DeviceDaoImpl.IMEI_FIELD + " and d."
                 + DeviceDaoImpl.COMPANY_FIELD + " = :companyId" + " and e."
                 + TrackerEventDaoImpl.TIME_FIELD + " >= :startDate and e."
                 + TrackerEventDaoImpl.TIME_FIELD + " <= :endDate"
@@ -104,7 +104,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         final String selectAs = buildSelectAs(AlertDaoImpl.getFields(true), "a", resultPrefix);
         final String sql = "select " + selectAs + " from " + AlertDaoImpl.TABLE + " a, "
                 + DeviceDaoImpl.TABLE + " d"
-                + " where a." + AlertDaoImpl.DEVICE_FIELD + " = d." + DeviceDaoImpl.ID_FIELD
+                + " where a." + AlertDaoImpl.DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
                 + " and d." + DeviceDaoImpl.COMPANY_FIELD + " = :companyId"
                 + " and a." + AlertDaoImpl.DATE_FIELD + " >= :startDate and a." + AlertDaoImpl.DATE_FIELD + " <= :endDate"
                 + " order by a." + AlertDaoImpl.DATE_FIELD;
@@ -226,7 +226,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
 
         final String sql = "select s." + ID_FIELD
                 + " from " + TABLE + " s"
-                + " join " + DeviceDaoImpl.TABLE + " d on d." + DeviceDaoImpl.ID_FIELD + "= s.device"
+                + " join " + DeviceDaoImpl.TABLE + " d on d." + DeviceDaoImpl.IMEI_FIELD + "= s.device"
                 + " and d." + DeviceDaoImpl.IMEI_FIELD + "= :imei"
                 + " where s." + STATUS_FIELD + "<> :status";
         final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);

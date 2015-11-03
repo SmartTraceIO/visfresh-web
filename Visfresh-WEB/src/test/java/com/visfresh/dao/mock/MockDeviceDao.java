@@ -23,14 +23,8 @@ public class MockDeviceDao extends MockDaoBase<Device, String> implements Device
      * @see com.visfresh.dao.DeviceDao#findAllByImei(java.lang.String)
      */
     @Override
-    public List<Device> findAllByImei(final String imei) {
-        final List<Device> list = new LinkedList<Device>();
-        for (final Device d : entities.values()) {
-            if (d.getImei().equals(imei)) {
-                list.add(d);
-            }
-        }
-        return list;
+    public Device findByImei(final String imei) {
+        return findOne(imei);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceDao#findByCompany(com.visfresh.entities.Company)

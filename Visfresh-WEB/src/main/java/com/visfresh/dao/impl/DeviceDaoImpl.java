@@ -35,10 +35,6 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
      */
     public static final String NAME_FIELD = "name";
     /**
-     * ID field.
-     */
-    public static final String ID_FIELD = "id";
-    /**
      * Name field.
      */
     public static final String IMEI_FIELD = "imei";
@@ -75,10 +71,8 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
 
         if (findOne(device.getId()) == null) {
             //insert
-            paramMap.put("id", device.getId());
             sql = "insert into " + TABLE + " (" + combine(
                     NAME_FIELD,
-                    ID_FIELD,
                     IMEI_FIELD,
                     SN_FIELD,
                     COMPANY_FIELD,
@@ -86,7 +80,6 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
                     DESCRIPTION_FIELD
                 ) + ")" + " values("
                     + ":"+ NAME_FIELD
-                    + ", :" + ID_FIELD
                     + ", :" + IMEI_FIELD
                     + ", :" + SN_FIELD
                     + ", :" + COMPANY_FIELD
@@ -97,17 +90,16 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
             //update
             sql = "update " + TABLE + " set "
                 + NAME_FIELD + "=:" + NAME_FIELD + ","
-                + ID_FIELD + "=:" + ID_FIELD + ","
                 + IMEI_FIELD + "=:" + IMEI_FIELD + ","
                 + SN_FIELD + "=:" + SN_FIELD + ","
                 + COMPANY_FIELD + "=:" + COMPANY_FIELD + ","
                 + TRIPCOUNT_FIELD + "=:" + TRIPCOUNT_FIELD + ","
                 + DESCRIPTION_FIELD + "=:" + DESCRIPTION_FIELD
-                + " where id = :" + ID_FIELD
+                + " where imei = :" + IMEI_FIELD
             ;
         }
 
-        paramMap.put(ID_FIELD, device.getId());
+        paramMap.put(IMEI_FIELD, device.getId());
         paramMap.put(NAME_FIELD, device.getName());
         paramMap.put(DESCRIPTION_FIELD, device.getDescription());
         paramMap.put(IMEI_FIELD, device.getImei());
@@ -137,18 +129,18 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
     }
 
     /**
-     * @param id
+     * @param imei
      * @param entityName
      * @param companyEntityName
      * @param resultPrefix
      * @param companyResultPrefix
      * @return
      */
-    private List<Map<String, Object>> runSelect(final String id,
+    private List<Map<String, Object>> runSelect(final String imei,
             final String entityName, final String companyEntityName,
             final String resultPrefix, final String companyResultPrefix) {
         final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_FIELD, id);
+        params.put("imei", imei);
 
         final Map<String, String> fields = createSelectAsMapping(entityName, resultPrefix);
         final Map<String, String> companyFields = CompanyDaoImpl.createSelectAsMapping(
@@ -165,7 +157,7 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
                 + ", " + CompanyDaoImpl.TABLE + " " + companyEntityName
                 + " where "
                 + entityName + "." + COMPANY_FIELD + " = " + companyEntityName + "." + CompanyDaoImpl.ID_FIELD
-                + (id == null ? "" : " and " + entityName + "." + ID_FIELD + " = :id"),
+                + (imei == null ? "" : " and " + entityName + "." + IMEI_FIELD + " = :imei"),
                 params);
         return list;
     }
@@ -191,7 +183,6 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
     protected static Device createDevice(final Map<String, Object> map,
             final String resultPrefix) {
         final Device d = new Device();
-        d.setId((String) map.get(resultPrefix + ID_FIELD));
         d.setName((String) map.get(resultPrefix + NAME_FIELD));
         d.setDescription((String) map.get(resultPrefix + DESCRIPTION_FIELD));
         d.setSn((String) map.get(resultPrefix + SN_FIELD));
@@ -208,7 +199,6 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
     public static Map<String, String> createSelectAsMapping(final String entityName,
             final String resultPrefix) {
         final Map<String, String> map = new HashMap<String, String>();
-        map.put(entityName + "." + ID_FIELD, resultPrefix + ID_FIELD);
         map.put(entityName + "." + NAME_FIELD, resultPrefix + NAME_FIELD);
         map.put(entityName + "." + DESCRIPTION_FIELD, resultPrefix + DESCRIPTION_FIELD);
         map.put(entityName + "." + IMEI_FIELD, resultPrefix + IMEI_FIELD);
@@ -243,45 +233,15 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
     @Override
     public void delete(final String id) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-        jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
+        paramMap.put("imei", id);
+        jdbc.update("delete from " + TABLE + " where " + IMEI_FIELD + " = :imei", paramMap);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceDao#findAllByImei(java.lang.String)
      */
     @Override
-    public List<Device> findAllByImei(final String imei) {
-        final String entityName = "d";
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(IMEI_FIELD, imei);
-
-        final Map<String, String> fields = createSelectAsMapping(entityName, "");
-        params.putAll(fields);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select * from "
-                + TABLE + " " + entityName
-                + " where "
-                + entityName + "." + IMEI_FIELD + " = :" + IMEI_FIELD,
-                params);
-
-        final List<Device> result = new LinkedList<Device>();
-        final Map<Long, Company> cache = new HashMap<Long, Company>();
-
-        for (final Map<String,Object> map : list) {
-            final Device d = createDevice(map, "");
-
-            final Long companyId = ((Number) map.get(COMPANY_FIELD)).longValue();
-            Company c = cache.get(companyId);
-            if (c == null) {
-                c = companyDao.findOne(companyId);
-                cache.put(companyId, c);
-            }
-
-            d.setCompany(c);
-            result.add(d);
-        }
-        return result;
+    public Device findByImei(final String imei) {
+        return findOne(imei);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.AlertProfileDao#findByCompany(com.visfresh.entities.Company)

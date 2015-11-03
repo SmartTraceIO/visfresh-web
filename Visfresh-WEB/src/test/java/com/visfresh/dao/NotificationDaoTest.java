@@ -55,7 +55,6 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         d.setCompany(sharedCompany);
         final String imei = "932487032487";
         d.setImei(imei);
-        d.setId(imei + ".1234");
         d.setName("Test Device");
         d.setDescription("JUnit device");
         d.setSn("12345");
