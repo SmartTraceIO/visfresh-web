@@ -92,7 +92,7 @@ public abstract class AbstractRestServiceTest {
     protected LocationProfile createLocationProfile(final boolean save) {
         final LocationProfile p = new LocationProfile();
 
-        p.setCompanyDescription("Sun Microsystems");
+        p.setCompanyName("Sun Microsystems");
         p.setCompany(getCompany());
         p.setInterim(true);
         p.setName("Loc-" + (++lastLong));

@@ -5,7 +5,6 @@ package com.visfresh.controllers;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,10 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
-import com.visfresh.io.SavePersonScheduleRequest;
 import com.visfresh.services.RestService;
 
 /**
@@ -171,90 +168,6 @@ public class NotificationScheduleController extends AbstractController {
         } catch (final Exception e) {
             log.error("Failed to get notification schedules", e);
             return createErrorResponse(e);
-        }
-    }
-    /**
-     * @param authToken authentication token.
-     * @param schedule notification schedule.
-     * @return ID of saved notification schedule.
-     */
-    @RequestMapping(value = "/savePersonSchedule/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String savePersonSchedule(@PathVariable final String authToken,
-            final @RequestBody String schedule) {
-        try {
-            final User user = getLoggedInUser(authToken);
-            security.checkCanSaveNotificationSchedule(user);
-
-            final SavePersonScheduleRequest req = getSerializer(user).parseSavePersonScheduleRequest(
-                    getJSon(schedule));
-            final NotificationSchedule s = restService.getNotificationSchedule(user.getCompany(),
-                    req.getNotificationScheduleId());
-            final PersonSchedule personSchedule = req.getSchedule();
-            if (personSchedule.getId() != null) {
-                removePersonSchedule(s, personSchedule.getId());
-            }
-            s.getSchedules().add(personSchedule);
-            restService.saveNotificationSchedule(user.getCompany(), s);
-            return createIdResponse("personScheduleId", personSchedule.getId());
-        } catch (final Exception e) {
-            log.error("Failed to save notification schedule", e);
-            return createErrorResponse(e);
-        }
-    }
-    /**
-     * @param authToken authentication token.
-     * @param notificationScheduleId notification schedule ID.
-     * @return notification schedule.
-     */
-    @RequestMapping(value = "/getPersonSchedule/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getPersonSchedule(@PathVariable final String authToken,
-            @RequestParam final Long notificationScheduleId,
-            @RequestParam final Long personScheduleId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser(authToken);
-            security.checkCanGetNotificationSchedules(user);
-
-            final NotificationSchedule schedule = restService.getNotificationSchedule(
-                    user.getCompany(), notificationScheduleId);
-
-            if (schedule == null) {
-                return createSuccessResponse(null);
-            }
-
-            return createSuccessResponse(getSerializer(user).toJson(
-                    findPersonScheduleById(schedule, personScheduleId)));
-        } catch (final Exception e) {
-            log.error("Failed to get notification schedules", e);
-            return createErrorResponse(e);
-        }
-    }
-    /**
-     * @param schedule
-     * @param id
-     * @return
-     */
-    private PersonSchedule findPersonScheduleById(final NotificationSchedule schedule,
-            final Long id) {
-        for (final PersonSchedule s : schedule.getSchedules()) {
-            if (s.getId().equals(id)) {
-                return s;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param s
-     * @param id
-     */
-    private void removePersonSchedule(final NotificationSchedule s, final Long id) {
-        final Iterator<PersonSchedule> iter = s.getSchedules().iterator();
-        while (iter.hasNext()) {
-            if (iter.next().getId().equals(id)) {
-                iter.remove();
-                break;
-            }
         }
     }
 }

@@ -188,22 +188,22 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
+        obj.addProperty("locationId", location.getId());
+        obj.addProperty("locationName", location.getName());
+        obj.addProperty("companyName", location.getCompanyName());
+        obj.addProperty("notes", location.getNotes());
         obj.addProperty("address", location.getAddress());
-        obj.addProperty("endFlag", location.isStop() ? "Y" : "N");
-        obj.addProperty("companyDescription", location.getCompanyDescription());
-        obj.addProperty("interimFlag", location.isInterim() ? "Y" : "N");
 
         final JsonObject loc = new JsonObject();
         obj.add("location", loc);
         loc.addProperty("lat", location.getLocation().getLatitude());
         loc.addProperty("lon", location.getLocation().getLongitude());
 
-        obj.addProperty("locationId", location.getId());
-        obj.addProperty("locationName", location.getName());
-
-        obj.addProperty("notes", location.getNotes());
         obj.addProperty("radiusMeters", location.getRadius());
+
         obj.addProperty("startFlag", location.isStart() ? "Y" : "N");
+        obj.addProperty("interimFlag", location.isInterim() ? "Y" : "N");
+        obj.addProperty("endFlag", location.isStop() ? "Y" : "N");
 
         return obj;
     }
@@ -215,7 +215,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final LocationProfile location = new LocationProfile();
 
         location.setId(asLong(obj.get("locationId")));
-        location.setCompanyDescription(asString(obj.get("companyDescription")));
+        location.setCompanyName(asString(obj.get("companyName")));
         location.setName(asString(obj.get("locationName")));
         location.setNotes(asString(obj.get("notes")));
         location.setAddress(asString(obj.get("address")));

@@ -238,7 +238,7 @@ public class JSonSerializerTest {
 
         LocationProfile p = new LocationProfile();
 
-        p.setCompanyDescription(company);
+        p.setCompanyName(company);
         p.setId(id);
         p.setInterim(interim);
         p.setName(name);
@@ -253,7 +253,7 @@ public class JSonSerializerTest {
         final JsonObject obj = serializer.toJson(p).getAsJsonObject();
         p = serializer.parseLocationProfile(obj);
 
-        assertEquals(company, p.getCompanyDescription());
+        assertEquals(company, p.getCompanyName());
         assertEquals(id, p.getId());
         assertEquals(interim, p.isInterim());
         assertEquals(name, p.getName());
@@ -833,7 +833,7 @@ public class JSonSerializerTest {
     private LocationProfile createLocationProfile() {
         final LocationProfile p = new LocationProfile();
 
-        p.setCompanyDescription("Sun Microsystems");
+        p.setCompanyName("Sun Microsystems");
         p.setId(generateId());
         p.setInterim(true);
         p.setName("JUnit-Location");

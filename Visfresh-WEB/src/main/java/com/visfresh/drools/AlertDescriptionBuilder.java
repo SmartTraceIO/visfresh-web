@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services;
+package com.visfresh.drools;
 
 import org.springframework.stereotype.Component;
 

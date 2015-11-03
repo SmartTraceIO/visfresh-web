@@ -24,7 +24,7 @@ public class LocationProfile implements EntityWithId<Long> {
     /**
      * Company description
      */
-    private String companyDescription;
+    private String companyName;
     /**
      * Any notes
      */
@@ -89,14 +89,14 @@ public class LocationProfile implements EntityWithId<Long> {
     /**
      * @return the company
      */
-    public String getCompanyDescription() {
-        return companyDescription;
+    public String getCompanyName() {
+        return companyName;
     }
     /**
      * @param company the company to set
      */
-    public void setCompanyDescription(final String company) {
-        this.companyDescription = company;
+    public void setCompanyName(final String company) {
+        this.companyName = company;
     }
     /**
      * @return the notes

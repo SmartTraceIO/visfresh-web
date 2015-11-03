@@ -31,7 +31,7 @@ An authentication can be performed as from REST client using login method, as fr
 1. [Authentication token](#markdown-header-authentication-token-response)  
 2. [Alert Profile](#markdown-header-alert-profile)  
 3. [Notification Schedule](#markdown-header-notification-schedule)   
-4. [Location Profile](#markdown-header-location-profile)  
+4. [Location](#markdown-header-location)  
 5. [Shipment Template](#markdown-header-shipment-template)  
 6. [Device](#markdown-header-device)  
 7. [Shipment](#markdown-header-shipment)  
@@ -48,28 +48,31 @@ An authentication can be performed as from REST client using login method, as fr
 4. [Logout](#markdown-header-logout)  
 5. [Refresh access token](#markdown-header-refresh-access-token)  
 6. [Save alert profile](#markdown-header-save-alert-profile)  
-7. [Get Alert Profiles](#markdown-header-get-alert-profiles)  
-8. [Save notification schedule](#markdown-header-save-notification-schedule)  
-9. [Get notification schedules](#markdown-header-get-notification-schedules)  
-10. [Save Location](#markdown-header-save-location)  
-11. [Get Locations](#markdown-header-get-locations)  
-12. [Save Shipment Template](#markdown-header-save-shipment-template)  
-13. [Get Shipment templates](#markdown-header-get-shipment-templates)  
-14. [Save Device](#markdown-header-save-device)  
-15. [Get Devices](#markdown-header-get-devices)  
-16. [Save Shipment](#markdown-header-save-shipment)  
-17. [Get Shipments](#markdown-header-get-shipments)  
-18. [Get Notifications](#markdown-header-get-notifications)  
-19. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
-20. [Send Command to Device](#markdown-header-send-command-to-device)  
-21. [Get Alert Profile](#markdown-header-get-alert-profile)  
-22. [Get Location Profile](#markdown-header-get-location-profile)  
-23. [Get Shipment Template](#markdown-header-get-shipment-template)  
-24. [Get Device](#markdown-header-get-device)  
-25. [Get Shipment](#markdown-header-get-shipment)  
-26. [Send Notification Schedule](#markdown-header-get-notification-schedule)  
-27. [Get Profile](#markdown-header-get-profile)  
-28. [Save Profile](#markdown-header-save-profile)  
+7. [Get Alert Profile](#markdown-header-get-alert-profile)  
+8. [Get Alert Profiles](#markdown-header-get-alert-profiles)  
+7. [Delete Alert Profile](#markdown-header-delete-alert-profile)  
+9. [Save notification schedule](#markdown-header-save-notification-schedule)  
+10. [Get notification schedules](#markdown-header-get-notification-schedules)  
+12. [Get Notification Schedule](#markdown-header-get-notification-schedule)  
+13. [Delete Notification Schedule](#markdown-header-delete-notification-schedule)  
+14. [Save Location](#markdown-header-save-location)  
+15. [Get Locations](#markdown-header-get-locations)  
+16. [Get Location](#markdown-header-get-location)  
+17. [Delete Location](#markdown-header-delete-location)  
+18. [Save Shipment Template](#markdown-header-save-shipment-template)  
+19. [Get Shipment templates](#markdown-header-get-shipment-templates)  
+20. [Save Device](#markdown-header-save-device)  
+21. [Get Devices](#markdown-header-get-devices)  
+22. [Save Shipment](#markdown-header-save-shipment)  
+23. [Get Shipments](#markdown-header-get-shipments)  
+24. [Get Notifications](#markdown-header-get-notifications)  
+25. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
+26. [Send Command to Device](#markdown-header-send-command-to-device)  
+27. [Get Shipment Template](#markdown-header-get-shipment-template)  
+28. [Get Device](#markdown-header-get-device)  
+29. [Get Shipment](#markdown-header-get-shipment)  
+30. [Get Profile](#markdown-header-get-profile)  
+31. [Save Profile](#markdown-header-save-profile)  
 
 ## Reports ##
 1. [Get Single Shipment](#markdown-header-get-single-shipment)
@@ -113,30 +116,69 @@ Method *POST*, method name *saveAlertProfile*, request body contains JSON serial
 Method *GET*, method name *getAlertProfiles*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
+3. sc - sort column  
+4. so - sort order (asc/desc)  
 Returns an array of [Alert Profile objects](#markdown-header-alert-profile).  
 [(example)](#markdown-header-get-alert-profiles-example)
 
-### Save notification schedule ###
+### Get Alert Profile ###
+Method *GET*, method name getAlertProfile. Request parameters:  
+1. alertProfileId - alert profile ID.  
+Returns [Alert Profile Object](#markdown-header-alert-profile).  
+[(example)](#markdown-header-get-alert-profile-example)
+
+### Delete Alert Profile ###
+Method *GET*, method name *deleteAlertProfile*, method parameters:  
+1. alertProfileId - alert profile ID  
+[(example)](#markdown-header-delete-alert-profile-example)
+
+### Save Notification Schedule ###
 Method *POST*, method name *saveNotificationSchedule*, request body contains JSON serialized [Notification Schedule object](#markdown-header-notification-schedule). Response contains ID of just saved Notification Schedule.  
 [(example)](#markdown-header-save-notification-schedule-example)]
 
-### Get notification schedules ###
+### Get Notification Schedules ###
 Method *GET*, method name *getNotificationSchedules*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
+3. sc - sort column  
+4. so - sort order (asc/desc)  
 Return array of [Notification Schedule objects](#markdown-header-notification-schedule)  
 [(example)](#markdown-header-get-notification-schedules-example)
 
+### Get Notification Schedule ###
+Method *GET*, method name *getNotificationSchedule*. Request parameters:  
+1. notificationScheduleId - notification schedule ID.  
+Returns [Notification Schedule Object](#markdown-header-notification-schedule)  
+[(example)](#markdown-header-get-notification-schedule-example)
+
+### Delete Notification schedule ###
+Method *GET*, *deleteNotificationSchedule*. Request parameters:  
+1. notificationScheduleId - notification schedule ID.  
+[(example)](#markdown-header-delete-notification-schedule-example)
+
 ### Save Location ###
-Method *POST*, method name *saveLocationProfile*, request body contains JSON serialized [Location Profile Object](#markdown-header-location-profile). Response contains ID of just saved Location Profile  
+Method *POST*, method name *saveLocation*, request body contains JSON serialized [Location Object](#markdown-header-location). Response contains ID of just saved Location  
 [(example)](#markdown-header-save-location-example)
 
 ### Get Locations ###
-Method *GET*, method name *getLocationProfiles*, method parameters:  
+Method *GET*, method name *getLocations*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Location Profile Objects](#markdown-header-location-profile)  
-[(example)](#markdown-header-get-location-profiles-example)
+3. sc - sort column  
+4. so - sort order  
+Returns array of [Location Objects](#markdown-header-location)  
+[(example)](#markdown-header-get-location-example)
+
+### Get Location ###
+Method *GET*, method name *getLocation*. Request parameters:  
+1. locationId - Location ID.  
+Returns [Location Object](#markdown-header-location).  
+[(example)](#markdown-header-get-location-example)
+
+### Delete Location ###
+Method *GET*, method name *deleteLocation*. Request parameters:  
+1. locationId - Location ID.  
+[(example)](#markdown-header-delete-location-example)
 
 ### Save Shipment template ###
 Method *POST*, method name *saveShipmentTemplate*, request body contains JSON serialized [Shipment Template Object](#markdown-header-shipment-template). Response contains ID of just saved Shipment Template  
@@ -186,18 +228,6 @@ Method *POST*, method name *markNotificationsAsRead*. Request body contains JSON
 Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#markdown-header-device) ID and device specific command.  
 [(example)](#markdown-header-send-command-to-device-example)
 
-### Get Alert Profile ###
-Method *GET*, method name getAlertProfile. Request parameters:  
-1. id - alert profile ID.  
-Returns [Alert Profile Object](#markdown-header-alert-profile).  
-[(example)](#markdown-header-get-alert-profile-example)
-
-### Get Location Profile ###
-Method *GET*, method name *getLocationProfile*. Request parameters:  
-1. id - alert profile ID.  
-Returns [Location Profile Object](#markdown-header-location-profile).  
-[(example)](#markdown-header-get-location-profile-example)
-
 ### Get Shipment Template ###
 Method *GET*, method name *getShipmentTemplate*. Request parameters:  
 1. id - shipment template ID.  
@@ -215,12 +245,6 @@ Method *GET*, method name *getShipment*. Request parameters:
 1. id - shipment ID.  
 Returns [Shipment Object](#markdown-header-shipment)  
 [(example)](#markdown-header-get-shipment-example)
-
-### Get Notification Schedule ###
-Method *GET*, method name *getNotificationSchedule*. Request parameters:  
-1. id - notification schedule ID.  
-Returns [Notification Schedule Object](#markdown-header-notification-schedule)  
-[(example)](#markdown-header-get-notification-schedule-example)
 
 ### Get Profile ###
 Method *GET*, method name *getProfile*, have not parameters. Return [Profile Object](#markdown-header-profile-object)
@@ -263,68 +287,80 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `"expired": "2015-10-12T23:39:29.946+0300" // expiration time`  
 `}`
 ### Alert Profile ###
-`{`  
-`"id:" 77`
-`"description": "Any description",`  
-`"name": "AnyAlert",`  
-`"criticalHighTemperatureForMoreThen": 0,`  
-``"criticalHighTemperature": 5.0,`  
-`"criticalLowTemperatureForMoreThen": 0,`  
-`"criticalLowTemperature": -15.0,`  
-`"highTemperature": 1.0,`  
-`"highTemperatureForMoreThen": 55,`  
-`"lowTemperature": -10.0,`  
-`"lowTemperatureForMoreThen": 55,`  
-`"watchBatteryLow": true,`  
-`"watchEnterBrightEnvironment": true,`  
-`"watchEnterDarkEnvironment": true,`  
-`"watchShock": true`  
-`}`
+```
+{
+  "alertProfileId": 8,
+  "alertProfileName": "a",
+  "alertProfileDescription": "b",
+  "highTemperature": 1.0,
+  "highTemperatureMinutes": 55,
+  "criticalHighTemperatureMinutes": 0,
+  "criticalHighTemperature": 5.0,
+  "lowTemperature": -10.0,
+  "lowTemperatureMinutes": 55,
+  "criticalLowTemperatureMinutes": 0,
+  "criticalLowTemperature": -15.0,
+  "watchBatteryLow": true,
+  "watchEnterBrightEnvironment": true,
+  "watchEnterDarkEnvironment": true,
+  "watchMovementStart": true,
+  "watchMovementStop": true
+}
+```
 ### Notification Schedule ###
-`{`  
-`"id:" 77`
-`"description": "JUnit schedule",`  
-`"name": "Sched",`  
-`"schedules": [`  
-[PersonalScheduleObject](#markdown-header-personal-schedule),  
-[PersonalScheduleObject](#markdown-header-personal-schedule)  
-`]`  
-`}`
-### Personal Schedule ###
-`{`  
-`"id:" 77`
-`"company": "Sun",`  
-`"emailNotification": "asuvorov@sun.com",`  
-`"firstName": "Alexander",`  
-`"lastName": "Suvorov",`  
-`"position": "Generalisimus",`  
-`"smsNotification": "1111111117",`  
-`"toTime": 17,`  
-`"fromTime": 1,`  
-`"pushToMobileApp": true,`  
-`"weekDays": [`  
-`true,`  
-`false,`  
-`false,`  
-`true,`  
-`false,`  
-`false,`  
-`false`  
-`]`  
-`}`
-### Location Profile ###
-`{`  
-`"id": 2,`  
-`"company": "Sun Microsystems",`  
-`"name": "Loc-1",`  
-`"notes": "Any notes",`  
-`"address": "Odessa, Deribasovskaya 1, apt.1",`  
-`"location": {`  
-`"lat": 100.5,`  
-`"lon": 100.501`  
-`},`  
-`"radius": 1000`  
-`}`
+```
+{
+    "notificationScheduleId": 11,
+    "notificationScheduleName": "Sched",
+    "notificationScheduleDescription": "JUnit schedule",
+    "schedules": [
+       //array of embedded person schedules
+    ]
+}
+```
+[(See Person Schedule)](#markdown-header-person-schedule)
+### Person Schedule ###
+```
+{
+  "id": 13,
+  "firstName": "Alexander",
+  "lastName": "Suvorov",
+  "company": "Sun",
+  "position": "Generalisimus",
+  "emailNotification": "asuvorov@sun.com",
+  "smsNotification": "1111111117",
+  "pushToMobileApp": true,
+  "fromTime": 1,
+  "toTime": 17,
+  "weekDays": [
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false
+  ]
+}
+```
+### Location ###
+```
+{
+  "locationId": 11,
+  "locationName": "Loc-1",
+  "companyName": "Sun Microsystems",
+  "notes": "Any notes",
+  "address": "Bankstown Warehouse",
+  "location": {
+    "lat": 100.5,
+    "lon": 100.501
+  },
+  "radiusMeters": 1000,
+  "startFlag": "Y",
+  "interimFlag": "Y",
+  "endFlag": "Y"
+}
+```
 ### Shipment Template ###
 ```
 {
@@ -515,24 +551,37 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `}`  
 `}`  
 ### Save alert profile example ###
-**POST  /vf/rest/saveAlertProfile/${accessToken}**  
-**Request body:**  
-`{`  
-`"description": "Any description",`  
-`"name": "AnyAlert",`  
-`"criticalHighTemperatureForMoreThen": 0,`  
-`"criticalHighTemperature": 5.0,`  
-`"criticalLowTemperatureForMoreThen": 0,`  
-`"criticalLowTemperature": -15.0,`  
-`"highTemperature": 1.0,`  
-`"highTemperatureForMoreThen": 55,`  
-`"lowTemperature": -10.0,`  
-`"lowTemperatureForMoreThen": 55,`  
-`"watchBatteryLow": true,`  
-`"watchEnterBrightEnvironment": true,`  
-`"watchEnterDarkEnvironment": true,`   
-`"watchShock": true`  
-`}`  
+**POST /vf/rest/saveAlertProfile/${authToken}**  
+```
+Request body:
+{
+  "alertProfileName": "AnyAlert",
+  "alertProfileDescription": "Any description",
+  "highTemperature": 1.0,
+  "highTemperatureMinutes": 55,
+  "criticalHighTemperatureMinutes": 0,
+  "criticalHighTemperature": 5.0,
+  "lowTemperature": -10.0,
+  "lowTemperatureMinutes": 55,
+  "criticalLowTemperatureMinutes": 0,
+  "criticalLowTemperature": -15.0,
+  "watchBatteryLow": true,
+  "watchEnterBrightEnvironment": true,
+  "watchEnterDarkEnvironment": true,
+  "watchMovementStart": true,
+  "watchMovementStop": true
+}
+Response:
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "alertProfileId": 6
+  }
+}
+```
 **Response:**  
 `{`   
 `"status": {`  
@@ -544,82 +593,148 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `}`  
 `}`  
 ### Get Alert Profiles example ###
-**GET  /vf/rest/getAlertProfiles/${accessToken}?pageSize=1&pageIndex=3**  
+**GET /vf/rest/getAlertProfiles/${accessToken}?so=desc&pageSize=10000&sc=alertProfileDescription&pageIndex=1**  
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": [`  
-`{`  
-`"id": 2,`  
-`"description": "Any description",`  
-`"name": "AnyAlert",`  
-`"criticalHighTemperatureForMoreThen": 0,`  
-`"criticalHighTemperature": 5.0,`  
-`"criticalLowTemperatureForMoreThen": 0,`  
-`"criticalLowTemperature": -15.0,`  
-`"highTemperature": 1.0,`  
-`"highTemperatureForMoreThen": 55,`  
-`"lowTemperature": -10.0,`  
-`"lowTemperatureForMoreThen": 55,`  
-`"watchBatteryLow": true,`  
-`"watchEnterBrightEnvironment": true,`  
-`"watchEnterDarkEnvironment": true,`  
-`"watchShock": true`  
-`}`  
-`]`  
-`}`  
+```
+Response:
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "alertProfileId": 7,
+      "alertProfileName": "b",
+      "alertProfileDescription": "c",
+      "highTemperature": 1.0,
+      "highTemperatureMinutes": 55,
+      "criticalHighTemperatureMinutes": 0,
+      "criticalHighTemperature": 5.0,
+      "lowTemperature": -10.0,
+      "lowTemperatureMinutes": 55,
+      "criticalLowTemperatureMinutes": 0,
+      "criticalLowTemperature": -15.0,
+      "watchBatteryLow": true,
+      "watchEnterBrightEnvironment": true,
+      "watchEnterDarkEnvironment": true,
+      "watchMovementStart": true,
+      "watchMovementStop": true
+    },
+    {
+      "alertProfileId": 8,
+      "alertProfileName": "a",
+      "alertProfileDescription": "b",
+      "highTemperature": 1.0,
+      "highTemperatureMinutes": 55,
+      "criticalHighTemperatureMinutes": 0,
+      "criticalHighTemperature": 5.0,
+      "lowTemperature": -10.0,
+      "lowTemperatureMinutes": 55,
+      "criticalLowTemperatureMinutes": 0,
+      "criticalLowTemperature": -15.0,
+      "watchBatteryLow": true,
+      "watchEnterBrightEnvironment": true,
+      "watchEnterDarkEnvironment": true,
+      "watchMovementStart": true,
+      "watchMovementStop": true
+    },
+    {
+      "alertProfileId": 9,
+      "alertProfileName": "c",
+      "alertProfileDescription": "a",
+      "highTemperature": 1.0,
+      "highTemperatureMinutes": 55,
+      "criticalHighTemperatureMinutes": 0,
+      "criticalHighTemperature": 5.0,
+      "lowTemperature": -10.0,
+      "lowTemperatureMinutes": 55,
+      "criticalLowTemperatureMinutes": 0,
+      "criticalLowTemperature": -15.0,
+      "watchBatteryLow": true,
+      "watchEnterBrightEnvironment": true,
+      "watchEnterDarkEnvironment": true,
+      "watchMovementStart": true,
+      "watchMovementStop": true
+    }
+  ]
+}
+```
+### Delete Alert Profile example ###
+**GET vf/rest/deleteAlertProfile/${accessToken}?alertProfileId=4**  
+**Response:**
+```
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
+
 ### Save Notification Schedule example ###
 **POST /vf/rest/saveNotificationSchedule/${accessToken}**  
 **Request body:**  
-`{`  
-`"description": "JUnit schedule",`  
-`"name": "Sched",`  
-`"schedules": [`  
-`{`  
-`"company": "Sun",`  
-`"emailNotification": "asuvorov@sun.com",`  
-`"firstName": "Alexander",`  
-`"lastName": "Suvorov",`  
-`"position": "Generalisimus",`  
-`"smsNotification": "1111111117",`  
-`"toTime": 17,`  
-`"fromTime": 1,`  
-`"pushToMobileApp": true,`  
-`"weekDays": [`  
-`true,`  
-`false,`  
-`false,`  
-`true,`  
-`false,`  
-`false,`  
-`false`  
-`]`  
-`},`  
-`{`  
-`"company": "Sun",`  
-`"emailNotification": "asuvorov@sun.com",`  
-`"firstName": "Alexander",`  
-`"lastName": "Suvorov",`  
-`"position": "Generalisimus",`  
-`"smsNotification": "1111111117",`  
-`"toTime": 17,`  
-`"fromTime": 1,`  
-`"pushToMobileApp": true,`  
-`"weekDays": [`  
-`true,`  
-`false,`  
-`false,`  
-`true,`  
-`false,`  
-`false,`  
-`false`  
-`]`  
-`}`  
-`]`  
-`}`  
+```
+{
+  "notificationScheduleDescription": "JUnit schedule",
+  "notificationScheduleName": "Sched",
+  "schedules": [
+    {
+      "emailNotification": "asuvorov@sun.com",
+      "firstName": "Alexander",
+      "fromTime": 1,
+      "company": "Sun",
+      "lastName": "Suvorov",
+      "position": "Generalisimus",
+      "pushToMobileApp": true,
+      "smsNotification": "1111111117",
+      "toTime": 17,
+      "weekDays": [
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "emailNotification": "asuvorov@sun.com",
+      "firstName": "Alexander",
+      "fromTime": 1,
+      "company": "Sun",
+      "lastName": "Suvorov",
+      "position": "Generalisimus",
+      "pushToMobileApp": true,
+      "smsNotification": "1111111117",
+      "toTime": 17,
+      "weekDays": [
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false
+      ]
+    }
+  ]
+}
+```
+**Response:**  
+```
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "notificationScheduleId": 2
+  }
+}
+```  
 **Response:**  
 `{`  
 `"status": {`  
@@ -631,79 +746,145 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `}`  
 `}`  
 ### Get Notification Schedules example ###
-**GET /vf/rest/getNotificationSchedules/${accessToken}?pageSize=1&pageIndex=3**  
+**GET /vf/rest/getNotificationSchedules/${accessToken}?so=desc&pageSize=10000&sc=notificationScheduleDescription&pageIndex=1**  
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": [`  
-`{`  
-`"description": "JUnit schedule",`  
-`"name": "Sched",`  
-`"id": 2,`  
-`"schedules": [`  
-`{`  
-`"company": "Sun",`  
-`"emailNotification": "asuvorov@sun.com",`  
-`"firstName": "Alexander",`  
-`"lastName": "Suvorov",`  
-`"position": "Generalisimus",`  
-`"smsNotification": "1111111117",`  
-`"toTime": 17,`  
-`"fromTime": 1,`  
-`"id": 3,`  
-`"pushToMobileApp": true,`  
-`"weekDays": [`  
-`true,`  
-`false,`  
-`false,`  
-`true,`  
-`false,`  
-`false,`  
-`false`  
-`]`  
-`},`  
-`{`  
-`"company": "Sun",`  
-`"emailNotification": "asuvorov@sun.com",`  
-`"firstName": "Alexander",`  
-`"lastName": "Suvorov",`  
-`"position": "Generalisimus",`  
-`"smsNotification": "1111111117",`  
-`"toTime": 17,`  
-`"fromTime": 1,`  
-`"id": 4,`  
-`"pushToMobileApp": true,`  
-`"weekDays": [`  
-`true,`  
-`false,`  
-`false,`  
-`true,`  
-`false,`  
-`false,`  
-`false`  
-`]`  
-`}`  
-`]`  
-`}`  
-`]`  
-`}`  
+```  
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "notificationScheduleDescription": "JUnit schedule",
+      "notificationScheduleId": 5,
+      "notificationScheduleName": "Sched",
+      "schedules": [
+        {
+          "emailNotification": "asuvorov@sun.com",
+          "firstName": "Alexander",
+          "fromTime": 1,
+          "company": "Sun",
+          "id": 6,
+          "lastName": "Suvorov",
+          "position": "Generalisimus",
+          "pushToMobileApp": true,
+          "smsNotification": "1111111117",
+          "toTime": 17,
+          "weekDays": [
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "emailNotification": "asuvorov@sun.com",
+          "firstName": "Alexander",
+          "fromTime": 1,
+          "company": "Sun",
+          "id": 7,
+          "lastName": "Suvorov",
+          "position": "Generalisimus",
+          "pushToMobileApp": true,
+          "smsNotification": "1111111117",
+          "toTime": 17,
+          "weekDays": [
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "notificationScheduleDescription": "JUnit schedule",
+      "notificationScheduleId": 8,
+      "notificationScheduleName": "Sched",
+      "schedules": [
+        {
+          "emailNotification": "asuvorov@sun.com",
+          "firstName": "Alexander",
+          "fromTime": 1,
+          "company": "Sun",
+          "id": 9,
+          "lastName": "Suvorov",
+          "position": "Generalisimus",
+          "pushToMobileApp": true,
+          "smsNotification": "1111111117",
+          "toTime": 17,
+          "weekDays": [
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "emailNotification": "asuvorov@sun.com",
+          "firstName": "Alexander",
+          "fromTime": 1,
+          "company": "Sun",
+          "id": 10,
+          "lastName": "Suvorov",
+          "position": "Generalisimus",
+          "pushToMobileApp": true,
+          "smsNotification": "1111111117",
+          "toTime": 17,
+          "weekDays": [
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        }
+      ]
+    }
+  ]
+}
+```  
 ### Save Location example ###
-**POST /vf/rest/saveLocationProfile/${accessToken}**  
+**POST vf/rest/saveLocation/${accessToken}**  
 **Request body:**  
-`{`  
-`"company": "Sun Microsystems",`  
-`"name": "Loc-1",`  
-`"notes": "Any notes",`  
-`"address": "Odessa, Deribasovskaya 1, apt.1",`  
-`"location": {`  
-`"lat": 100.5,`  
-`"lon": 100.501`  
-`},`  
-`"radius": 1000`  
-`}`  
+```
+{
+  "locationName": "Loc-1",
+  "companyName": "Sun Microsystems",
+  "notes": "Any notes",
+  "address": "Bankstown Warehouse",
+  "location": {
+    "lat": 100.5,
+    "lon": 100.501
+  },
+  "radiusMeters": 1000,
+  "startFlag": "Y",
+  "interimFlag": "Y",
+  "endFlag": "Y"
+}
+Response:
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "locationId": 2
+  }
+}
+```
 **Response:**  
 `{`  
 `"status": {`  
@@ -714,29 +895,34 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `"id": 2`  
 `}`  
 `}`  
-### Get Location Profiles example ###
-**GET /vf/rest/getLocationProfiles/${accessToken}?pageSize=1&pageIndex=3**  
+### Get Locations example ###
+**GET /vf/rest/getLocations/${accessToken}?so=desc&pageSize=10000&sc=notes&pageIndex=1**  
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": [`  
-`{`  
-`"id": 2,`  
-`"company": "Sun Microsystems",`  
-`"name": "Loc-1",`  
-`"notes": "Any notes",`  
-`"address": "Odessa, Deribasovskaya 1, apt.1",`  
-`"location": {`  
-`"lat": 100.5,`  
-`"lon": 100.501`  
-`},`  
-`"radius": 1000`  
-`}`  
-`]`  
-`}`  
+```
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "locationId": 2,
+      "locationName": "Loc-1",
+      "companyName": "Sun Microsystems",
+      "notes": "Any notes",
+      "address": "Bankstown Warehouse",
+      "location": {
+        "lat": 100.5,
+        "lon": 100.501
+      },
+      "radiusMeters": 1000,
+      "startFlag": "Y",
+      "interimFlag": "Y",
+      "endFlag": "Y"
+    }
+  ]
+}
+```  
 ### Save Shipment Template example ###
 **POST /vf/rest/saveShipmentTemplate/${accessToken}**  
 **Request body:**  
@@ -1024,53 +1210,70 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `}`  
 `}`  
 ### Get Alert Profile example ###
-**GET /vf/rest/getAlertProfile/${accessToken}?id=77**  
+**GET /vf/rest/getAlertProfile/${accessToken}?alertProfileId=5**  
 **Response:**  
 ```
+Response:
 {
   "status": {
     "code": 0,
     "message": "Success"
   },
   "response": {
-    "id": 77,
-    "description": "Any description",
-    "name": "AnyAlert",
-    "criticalHighTemperatureForMoreThen": 0,
-    "criticalHighTemperature": 5.0,
-    "criticalLowTemperatureForMoreThen": 0,
-    "criticalLowTemperature": -15.0,
+    "alertProfileId": 5,
+    "alertProfileName": "AnyAlert",
+    "alertProfileDescription": "Any description",
     "highTemperature": 1.0,
-    "highTemperatureForMoreThen": 55,
+    "highTemperatureMinutes": 55,
+    "criticalHighTemperatureMinutes": 0,
+    "criticalHighTemperature": 5.0,
     "lowTemperature": -10.0,
-    "lowTemperatureForMoreThen": 55,
+    "lowTemperatureMinutes": 55,
+    "criticalLowTemperatureMinutes": 0,
+    "criticalLowTemperature": -15.0,
     "watchBatteryLow": true,
     "watchEnterBrightEnvironment": true,
     "watchEnterDarkEnvironment": true,
-    "watchShock": true
+    "watchMovementStart": true,
+    "watchMovementStop": true
   }
 }
 ```
-### Get Location Profile example ###
-**GET /vf/rest/getLocationProfile/${accessToken}?id=77**  
+### Get Location example ###
+**GET /vf/rest/getLocation/${accessToken}?locationId=2**  
 **Response:**  
 ```
+Response:
 {
   "status": {
     "code": 0,
     "message": "Success"
   },
   "response": {
-    "id": 77,
-    "companyDescription": "Sun Microsystems",
-    "name": "Loc-1",
+    "locationId": 2,
+    "locationName": "Loc-1",
+    "companyName": "Sun Microsystems",
     "notes": "Any notes",
-    "address": "Odessa, Deribasovskaya 1, apt.1",
+    "address": "Bankstown Warehouse",
     "location": {
       "lat": 100.5,
       "lon": 100.501
     },
-    "radius": 1000
+    "radiusMeters": 1000,
+    "startFlag": "Y",
+    "interimFlag": "Y",
+    "endFlag": "Y"
+  }
+}
+```
+### Delete Location example ###
+**GET /vf/rest/deleteLocation/${accessToken}?locationId=2**  
+**Response:**  
+```
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
   }
 }
 ```
@@ -1165,7 +1368,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 }
 ```
 ### Get Notification Schedule example ###
-**GET /vf/rest/getNotificationSchedule/${accessToken}?id=77**  
+**GET /vf/rest/getNotificationSchedule/${accessToken}?notificationScheduleId=77**  
 **Response:**  
 ```
 {
@@ -1174,20 +1377,21 @@ Method *GET*, method *getSingleShipment*. Request parameters:
     "message": "Success"
   },
   "response": {
-    "description": "JUnit schedule",
-    "name": "Sched",
-    "id": 77,
+    "notificationScheduleDescription": "JUnit schedule",
+    "notificationScheduleId": 11,
+    "notificationScheduleName": "Sched",
     "schedules": [
       {
-        "company": "Sun",
         "emailNotification": "asuvorov@sun.com",
         "firstName": "Alexander",
+        "fromTime": 1,
+        "company": "Sun",
+        "id": 12,
         "lastName": "Suvorov",
         "position": "Generalisimus",
+        "pushToMobileApp": true,
         "smsNotification": "1111111117",
         "toTime": 17,
-        "fromTime": 1,
-        "pushToMobileApp": true,
         "weekDays": [
           true,
           false,
@@ -1199,15 +1403,16 @@ Method *GET*, method *getSingleShipment*. Request parameters:
         ]
       },
       {
-        "company": "Sun",
         "emailNotification": "asuvorov@sun.com",
         "firstName": "Alexander",
+        "fromTime": 1,
+        "company": "Sun",
+        "id": 13,
         "lastName": "Suvorov",
         "position": "Generalisimus",
+        "pushToMobileApp": true,
         "smsNotification": "1111111117",
         "toTime": 17,
-        "fromTime": 1,
-        "pushToMobileApp": true,
         "weekDays": [
           true,
           false,
@@ -1219,6 +1424,17 @@ Method *GET*, method *getSingleShipment*. Request parameters:
         ]
       }
     ]
+  }
+}
+```
+### Delete Notification Schedule example ###
+**GET vf/rest/deleteNotificationSchedule/${accessToken}?notificationScheduleId=23**  
+**Response:**  
+```
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
   }
 }
 ```

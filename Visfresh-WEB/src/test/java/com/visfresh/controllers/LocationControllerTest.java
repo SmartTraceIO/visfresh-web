@@ -65,35 +65,35 @@ public class LocationControllerTest extends AbstractRestServiceTest {
         final LocationProfile p1 = createLocationProfile(false);
         p1.setName("f");
         p1.setAddress("f");
-        p1.setCompanyDescription("f");
+        p1.setCompanyName("f");
         p1.setNotes("f");
         getRestService().saveLocation(getCompany(), p1);
 
         final LocationProfile p2 = createLocationProfile(false);
         p2.setName("a");
         p2.setAddress("b");
-        p2.setCompanyDescription("c");
+        p2.setCompanyName("c");
         p2.setNotes("d");
         getRestService().saveLocation(getCompany(), p2);
 
         final LocationProfile p3 = createLocationProfile(false);
         p3.setName("d");
         p3.setAddress("a");
-        p3.setCompanyDescription("b");
+        p3.setCompanyName("b");
         p3.setNotes("c");
         getRestService().saveLocation(getCompany(), p3);
 
         final LocationProfile p4 = createLocationProfile(false);
         p4.setName("c");
         p4.setAddress("d");
-        p4.setCompanyDescription("a");
+        p4.setCompanyName("a");
         p4.setNotes("b");
         getRestService().saveLocation(getCompany(), p4);
 
         final LocationProfile p5 = createLocationProfile(false);
         p5.setName("b");
         p5.setAddress("c");
-        p5.setCompanyDescription("d");
+        p5.setCompanyName("d");
         p5.setNotes("a");
         getRestService().saveLocation(getCompany(), p5);
 

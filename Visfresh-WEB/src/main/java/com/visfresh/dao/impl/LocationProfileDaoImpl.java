@@ -109,7 +109,7 @@ public class LocationProfileDaoImpl extends DaoImplBase<LocationProfile, Long>
 
         paramMap.put(ID_FIELD, lp.getId());
         paramMap.put(NAME_FIELD, lp.getName());
-        paramMap.put(COMPANY_DESCRIPTION_FIELD, lp.getCompanyDescription());
+        paramMap.put(COMPANY_DESCRIPTION_FIELD, lp.getCompanyName());
         paramMap.put(NOTES_FIELD, lp.getNotes());
         paramMap.put(ADDRESS_FIELD, lp.getAddress());
         paramMap.put(START_FIELD, lp.isStart());
@@ -192,7 +192,7 @@ public class LocationProfileDaoImpl extends DaoImplBase<LocationProfile, Long>
         no.setId(((Number) map.get(ID_FIELD)).longValue());
 
         no.setAddress((String) map.get(ADDRESS_FIELD));
-        no.setCompanyDescription((String) map.get(COMPANY_DESCRIPTION_FIELD));
+        no.setCompanyName((String) map.get(COMPANY_DESCRIPTION_FIELD));
         no.setInterim((Boolean) map.get(INTERIM_FIELD));
         no.setName((String) map.get(NAME_FIELD));
         no.setNotes((String) map.get(NOTES_FIELD));

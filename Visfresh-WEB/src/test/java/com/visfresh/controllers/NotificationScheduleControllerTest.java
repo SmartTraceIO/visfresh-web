@@ -12,7 +12,6 @@ import java.io.IOException;
 import org.junit.Test;
 
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonSchedule;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -32,7 +31,6 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
     @Test
     public void testSaveNotificationSchedule() throws RestServiceException, IOException {
         final NotificationSchedule s = createNotificationSchedule(false);
-        s.getSchedules().clear();
         final Long id = facade.saveNotificationSchedule(s);
 
         assertNotNull(id);
@@ -53,19 +51,6 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
     public void testGetNotificationSchedule() throws IOException, RestServiceException {
         final NotificationSchedule s = createNotificationSchedule(true);
         assertNotNull(facade.getNotificationSchedule(s.getId()));
-    }
-    @Test
-    public void testSavePersonSchedule() throws IOException, RestServiceException {
-        final NotificationSchedule s = createNotificationSchedule(true);
-        s.getSchedules().clear();
-
-        final PersonSchedule ps = createPersonSchedule();
-        assertNotNull(facade.savePersonSchedule(s.getId(), ps));
-    }
-    @Test
-    public void testGetPersonSchedule() throws IOException, RestServiceException {
-        final NotificationSchedule s = createNotificationSchedule(true);
-        assertNotNull(facade.getPersonSchedule(s.getId(), s.getSchedules().get(0).getId()));
     }
     @Test
     public void testDeleteNotificationSchedule() throws IOException, RestServiceException {

@@ -36,7 +36,6 @@ import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -45,7 +44,6 @@ import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CreateUserRequest;
 import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.ReferenceResolver;
-import com.visfresh.io.SavePersonScheduleRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.services.RestServiceException;
@@ -732,25 +730,6 @@ public class RestServiceFacade  {
                 response.getAsJsonObject());
     }
     /**
-     * @param notificationScheduleId
-     * @param personScheduleId
-     * @return
-     * @throws RestServiceException
-     * @throws IOException
-     */
-    public PersonSchedule getPersonSchedule(
-            final Long notificationScheduleId, final Long personScheduleId)
-                    throws IOException, RestServiceException {
-        final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("notificationScheduleId", notificationScheduleId.toString());
-        params.put("personScheduleId", personScheduleId.toString());
-
-        final JsonElement response = sendGetRequest(getPathWithToken(
-                REST_SERVICE, "getPersonSchedule"), params);
-        return serializer.parsePersonSchedule(response);
-    }
-
-    /**
      * @param id
      * @throws RestServiceException
      * @throws IOException
@@ -760,23 +739,6 @@ public class RestServiceFacade  {
         params.put("notificationScheduleId", id.toString());
 
         sendGetRequest(getPathWithToken(REST_SERVICE, "deleteNotificationSchedule"), params);
-    }
-    /**
-     * @param id
-     * @param ps
-     * @return
-     * @throws RestServiceException
-     * @throws IOException
-     */
-    public Long savePersonSchedule(final Long id, final PersonSchedule ps)
-            throws IOException, RestServiceException {
-        final SavePersonScheduleRequest req = new SavePersonScheduleRequest();
-        req.setNotificationScheduleId(id);
-        req.setSchedule(ps);
-
-        final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE,
-                "savePersonSchedule"), serializer.toJson(req)).getAsJsonObject();
-        return parseId(e);
     }
     /* (non-Javadoc)
      * @see com.visfresh.io.ReferenceResolver#getDevice(java.lang.String)

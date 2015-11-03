@@ -83,7 +83,9 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetShipments() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
-        createShipment(true);
+        s.getShippedTo().setAddress("Coles Perth DC");
+        final Shipment s2 = createShipment(true);
+        s2.getShippedTo().setAddress("Coles Perth DC");
 
         //add alert
         final Device d = s.getDevice();

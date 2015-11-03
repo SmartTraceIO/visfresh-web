@@ -159,7 +159,7 @@ public class LocationController extends AbstractController {
                 if ("address".equalsIgnoreCase(sc)) {
                     return compareTo(o1.getAddress(), o2.getAddress(), ascent);
                 } else if ("companyDescription".equalsIgnoreCase(sc)) {
-                    return compareTo(o1.getCompanyDescription(), o2.getCompanyDescription(), ascent);
+                    return compareTo(o1.getCompanyName(), o2.getCompanyName(), ascent);
                 } else if ("locationName".equalsIgnoreCase(sc)) {
                     return compareTo(o1.getName(), o2.getName(), ascent);
                 } else if ("notes".equalsIgnoreCase(sc)) {
