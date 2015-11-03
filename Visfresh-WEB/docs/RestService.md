@@ -1,8 +1,8 @@
 # Visfresh Rest Service
 
 ### Date format:###
-The date should have following format `yyyy-MM-dd'T'HH:mm:ss.SSSZ` with RFC 822 time zone as for requests as for responses. Example:
-`2015-09-30T01:19:56.060+0300`
+The date should have following format `yyyy-MM-dd'T'HH:mm` in current user's time zone if the user is logged in now and UTC time zone otherwise. Example:
+`2015-09-30T01:19`
 ### Requests and responses:###
 The GET request parameters of URL link should be URL encoded to, but JSON body of request and response should be
 sent as is without URL encoding.  
@@ -17,7 +17,7 @@ Each server response has structure:
 },  
 "response": {
 "token": "token_100001",  
-"expired": "2015-09-30T01:19:56.060+0300"
+"expired": "2015-09-30T01:19"
 }
 }  
 ```
@@ -268,7 +268,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 ` "status": ` [ResponseStatus](#markdown-header-response-status)`,`  
 `"response": {`  
 `"token": "token_100001",`  
-`"expired": "2015-09-30T01:19:56.060+0300"`  
+`"expired": "2015-09-30T01:19"`  
 `}`   
 `}`
 ### Response status ###
@@ -284,7 +284,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 ### Authentication token response ###
 `{`  
 `"token": "token_100002", // authentication token`  
-`"expired": "2015-10-12T23:39:29.946+0300" // expiration time`  
+`"expired": "2015-10-12T23:39" // expiration time`  
 `}`
 ### Alert Profile ###
 ```json
@@ -389,7 +389,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 ### Device ###
 `{`  
 `"description": "Device description",`  
-`"id": "1209898347987.123", // device ID`  
+`"id": "1209898347987", // device ID`  
 `"imei": "1209898347987", // device IMEI`  
 `"name": "Device Name",`  
 `"sn": "1"`  
@@ -423,7 +423,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
     "tripCount": 88,
     "poNum": 893793487,
     "assetNum": "10515",
-    "shipmentDate": "2015-10-16T22:55:41.044+0300",
+    "shipmentDate": "2015-10-16T22:55",
     "customFields": {  //map of custom fields
       "field1": "value1"
     },
@@ -442,8 +442,8 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `"description": "Battery Low alert",`  
 `"name": "Battery-1",`  
 `"id": 15,`  
-`"date": "2015-10-12T23:57:45.105+0300",`  
-`"device": "234908720394857.123", // ID of associated ` [Device](#markdown-header-device)  
+`"date": "2015-10-12T23:57",`  
+`"device": "234908720394857", // ID of associated ` [Device](#markdown-header-device)  
 `"type": "BatteryLow" // alert type: (EnterBrightEnvironment|EnterDarkEnvironment|Shock|BatteryLow)`  
 `}`
 ### Temperature Alert###
@@ -454,8 +454,8 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `"description": "Temp Alert",`  
 `"name": "TempAlert-1",`  
 `"id": 13,`  
-`"date": "2015-10-12T23:57:45.104+0300",`  
-`"device": "234908720394857.123", // ID of associated ` [Device](#markdown-header-device)  
+`"date": "2015-10-12T23:57",`  
+`"device": "234908720394857", // ID of associated ` [Device](#markdown-header-device)  
 `"type": "HighTemperature" // alert type (LowTemperature|HighTemperature|CriticalLowTemperature|CriticalHighTemperature)`  
 `"temperature": 5.0, //temperature is Celsius degree`  
 `"minutes": 55 //number of minutes for this temperature`  
@@ -465,15 +465,15 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `{`  
 `"id": 17,`  
 `"numberOfMetersOfArrival": 1500, //number of meters of arrival`    
-`"date": "2015-10-12T23:57:45.105+0300",`  
-`"device": "234908720394857.123" //ID of associated` [Device Object](#markdown-header-device)  
+`"date": "2015-10-12T23:57",`  
+`"device": "234908720394857" //ID of associated` [Device Object](#markdown-header-device)  
 `}`
 ### Device Event ###
 `{`  
 `"battery": 1234, //battery level`  
 `"id": 13,`  
 `"temperature": 56.0, //temperature in Celsius degree`  
-`"time": "2015-10-13T00:04:03.015+0300",`  
+`"time": "2015-10-13T00:04",`  
 `"type": "AUT" //device specific status`  
 `}`
 ### Profile Object ###
@@ -496,7 +496,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `},`  
 `"response": {`  
 `"token": "token_100002",`  
-`"expired": "2015-10-12T23:39:29.946+0300"`  
+`"expired": "2015-10-12T23:39"`  
 `}`  
 `}`
 ### Attach to existing session example ###
@@ -509,7 +509,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `},`  
 `"response": {`  
 `"token": "token_100001",`  
-`"expired": "2015-09-30T01:19:56.060+0300"`  
+`"expired": "2015-09-30T01:19"`  
 `}`  
 `}`  
 ### Get user info example ###
@@ -547,7 +547,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `},`  
 `"response": {`  
 `"token": "token_100001",`  
-`"expired": "2015-09-30T01:19:56.060+0300"`  
+`"expired": "2015-09-30T01:19"`  
 `}`  
 `}`  
 ### Save alert profile example ###
@@ -951,7 +951,7 @@ Response:
     "tripCount": 88,
     "poNum": 893793487,
     "assetNum": "10515",
-    "shipmentDate": "2015-10-16T22:55:41.044+0300",
+    "shipmentDate": "2015-10-16T22:55",
     "customFields": {
       "field1": "value1"
     },
@@ -1012,7 +1012,7 @@ Response:
 **Request body:**  
 `{`  
 `"description": "Device description",`  
-`"id": "1209898347987.123",`  
+`"id": "1209898347987",`  
 `"imei": "1209898347987",`  
 `"name": "Device Name",`  
 `"sn": "1"`  
@@ -1035,7 +1035,7 @@ Response:
 `"response": [`  
 `{`  
 `"description": "Device description",`  
-`"id": "1209898347987.123",`  
+`"id": "1209898347987",`  
 `"imei": "1209898347987",`  
 `"name": "Device Name",`  
 `"sn": "1"`  
@@ -1068,12 +1068,12 @@ Response:
     "assetType": "SeaContainer",
     "palletId": "palettid",
     "assetNum": "10515",
-    "shipmentDate": "2015-10-09T11:47:21.945+0300",
+    "shipmentDate": "2015-10-09T11:47",
     "customFields": "customFields",
     "status": "Default",
     "devices": [
-      "234908720394857.123",
-      "329847983724987.123"
+      "234908720394857",
+      "329847983724987"
     ]
   }
 }
@@ -1123,7 +1123,7 @@ Response:
         "tripCount": 88,
         "poNum": 893793487,
         "assetNum": "10515",
-        "shipmentDate": "2015-10-16T22:55:41.044+0300",
+        "shipmentDate": "2015-10-16T22:55",
         "customFields": {
           "field1": "value1"
         },
@@ -1149,7 +1149,7 @@ Response:
 `"issue": {`  
 `"id": 17,`  
 `"numberOfMetersOfArrival": 1500,`  
-`"date": "2015-10-12T23:57:45.105+0300",`  
+`"date": "2015-10-12T23:57",`  
 `"device": "234908720394857"`  
 `}`  
 `},`  
@@ -1160,7 +1160,7 @@ Response:
 `"description": "Battery Low alert",`  
 `"name": "Battery-1",`  
 `"id": 15,`  
-`"date": "2015-10-12T23:57:45.105+0300",`  
+`"date": "2015-10-12T23:57",`  
 `"device": "234908720394857",`  
 `"type": "BatteryLow"`  
 `}`  
@@ -1172,7 +1172,7 @@ Response:
 `"description": "Temp Alert",`  
 `"name": "TempAlert-1",`  
 `"id": 13,`  
-`"date": "2015-10-12T23:57:45.104+0300",`  
+`"date": "2015-10-12T23:57",`  
 `"device": "234908720394857",`  
 `"type": "HighTemperature",`  
 `"temperature": 5.0,`  
@@ -1311,7 +1311,7 @@ Response:
 }
 ```
 ### Get Device example ###
-**GET /vf/rest/getDevice/${accessToken}?id=923487509328.123**  
+**GET /vf/rest/getDevice/${accessToken}?id=923487509328**  
 **Response:**  
 ```
 {
@@ -1321,7 +1321,7 @@ Response:
   },
   "response": {
     "description": "Device description",
-    "id": "923487509328.123",
+    "id": "923487509328",
     "imei": "923487509328",
     "name": "Device Name",
     "sn": "1"
@@ -1358,7 +1358,7 @@ Response:
     "tripCount": 88,
     "poNum": 893793487,
     "assetNum": "10515",
-    "shipmentDate": "2015-10-16T22:55:41.044+0300",
+    "shipmentDate": "2015-10-16T22:55",
     "customFields": {
       "field1": "value1"
     },
