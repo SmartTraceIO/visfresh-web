@@ -33,6 +33,7 @@ import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
@@ -77,6 +78,8 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final User u = new User();
         u.setLogin(asString(json.get("login")));
         u.setFullName(asString(json.get("fullName")));
+        u.setTimeZone(TimeZone.getTimeZone(asString(json.get("timeZone"))));
+        u.setTemperatureUnits(TemperatureUnits.valueOf(asString(json.get("temperatureUnits"))));
 
         final JsonArray array = json.get("roles").getAsJsonArray();
         final int size = array.size();
@@ -100,6 +103,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
             roleArray.add(new JsonPrimitive(r.name()));
         }
         obj.add("roles", roleArray);
+
+        obj.addProperty("timeZone", u.getTimeZone().getID());
+        obj.addProperty("temperatureUnits", u.getTemperatureUnits().toString());
 
         return obj;
     }

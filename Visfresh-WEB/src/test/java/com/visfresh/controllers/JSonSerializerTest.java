@@ -36,6 +36,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
@@ -572,10 +573,14 @@ public class JSonSerializerTest {
     public void testUser() {
         final String login = "login";
         final String fullName = "Full Name";
+        final TimeZone timeZone = TimeZone.getTimeZone("Europe/Moscow");
+        final TemperatureUnits temperatureUnits = TemperatureUnits.Fahrenheit;
 
         User u = new User();
         u.setLogin(login);
         u.setFullName(fullName);
+        u.setTimeZone(timeZone);
+        u.setTemperatureUnits(temperatureUnits);
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.ReportViewer);
 
@@ -585,6 +590,8 @@ public class JSonSerializerTest {
         assertEquals(login, u.getLogin());
         assertEquals(fullName, u.getFullName());
         assertEquals(2, u.getRoles().size());
+        assertEquals(timeZone, u.getTimeZone());
+        assertEquals(temperatureUnits, u.getTemperatureUnits());
     }
     @Test
     public void testDeviceCommand() {
