@@ -287,7 +287,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 `"expired": "2015-10-12T23:39:29.946+0300" // expiration time`  
 `}`
 ### Alert Profile ###
-```
+```json
 {
   "alertProfileId": 8,
   "alertProfileName": "a",
@@ -308,7 +308,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 }
 ```
 ### Notification Schedule ###
-```
+```json
 {
     "notificationScheduleId": 11,
     "notificationScheduleName": "Sched",
@@ -320,7 +320,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 ```
 [(See Person Schedule)](#markdown-header-person-schedule)
 ### Person Schedule ###
-```
+```json
 {
   "id": 13,
   "firstName": "Alexander",
@@ -344,7 +344,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 }
 ```
 ### Location ###
-```
+```json
 {
   "locationId": 11,
   "locationName": "Loc-1",
@@ -362,7 +362,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 }
 ```
 ### Shipment Template ###
-```
+```json
 {
   "name": "JUnit-tpl",
   "shipmentDescription": "Any Description",
