@@ -47,7 +47,7 @@ public interface AccessController {
      * @param user user to check permissions.
      * @throws RestServiceException
      */
-    void checkCanSaveDevice(User user) throws RestServiceException;
+    void checkCanManageDevices(User user) throws RestServiceException;
     /**
      * @param user user to check permissions.
      * @throws RestServiceException

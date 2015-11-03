@@ -56,7 +56,7 @@ public class DeviceController extends AbstractController {
             final @RequestBody String device) {
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveDevice(user);
+            security.checkCanManageDevices(user);
 
             restService.saveDevice(user.getCompany(), getSerializer(user).parseDevice(getJSonObject(device)));
             return createSuccessResponse(null);
@@ -104,19 +104,39 @@ public class DeviceController extends AbstractController {
     }
     /**
      * @param authToken authentication token.
-     * @param deviceId device ID.
+     * @param imei device ID.
      * @return device.
      */
     @RequestMapping(value = "/getDevice/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getDevice(@PathVariable final String authToken,
-            @RequestParam final String deviceId) {
+            @RequestParam final String imei) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetDevices(user);
 
-            final Device device = restService.getDevice(user.getCompany(), deviceId);
+            final Device device = restService.getDevice(user.getCompany(), imei);
             return createSuccessResponse(getSerializer(user).toJson(device));
+        } catch (final Exception e) {
+            log.error("Failed to get devices", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param imei device ID.
+     * @return device.
+     */
+    @RequestMapping(value = "/deleteDevice/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String deleteDevice(@PathVariable final String authToken,
+            @RequestParam final String imei) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanManageDevices(user);
+
+            restService.deleteDevice(user.getCompany(), imei);
+            return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);

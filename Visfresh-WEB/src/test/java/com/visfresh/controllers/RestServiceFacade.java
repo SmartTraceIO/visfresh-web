@@ -745,12 +745,22 @@ public class RestServiceFacade  {
      */
     public Device getDevice(final String id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("deviceId", id.toString());
+        params.put("imei", id.toString());
 
         final JsonElement response = sendGetRequest(getPathWithToken(REST_SERVICE,
                 "getDevice"), params);
         return response == JsonNull.INSTANCE ? null : serializer.parseDevice(
                 response.getAsJsonObject());
+    }
+    /**
+     * @param p device to delete.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deleteDevice(final Device p) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("imei", p.getId());
+        sendGetRequest(getPathWithToken(REST_SERVICE, "deleteDevice"), params);
     }
     /**
      * @param id

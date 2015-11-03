@@ -97,7 +97,7 @@ public class DefaultAccessController implements AccessController {
      * @see com.visfresh.controllers.AccessController#checkCanSaveDevice(com.visfresh.entities.User)
      */
     @Override
-    public void checkCanSaveDevice(final User user) throws RestServiceException {
+    public void checkCanManageDevices(final User user) throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
                     "User has not permissions for save device");

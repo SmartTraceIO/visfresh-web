@@ -53,28 +53,29 @@ An authentication can be performed as from REST client using login method, as fr
 7. [Delete Alert Profile](#delete-alert-profile)  
 9. [Save notification schedule](#save-notification-schedule)  
 10. [Get notification schedules](#get-notification-schedules)  
-12. [Get Notification Schedule](#get-notification-schedule)  
-13. [Delete Notification Schedule](#delete-notification-schedule)  
-14. [Save Location](#save-location)  
-15. [Get Locations](#get-locations)  
-16. [Get Location](#get-location)  
-17. [Delete Location](#delete-location)  
-18. [Save Shipment Template](#save-shipment-template)  
-19. [Get Shipment templates](#get-shipment-templates)  
-27. [Get Shipment Template](#get-shipment-template)  
-27. [Delete Shipment Template](#delete-shipment-template)  
-20. [Save Device](#save-device)  
-28. [Get Device](#get-device)  
-21. [Get Devices](#get-devices)  
+11. [Get Notification Schedule](#get-notification-schedule)  
+12. [Delete Notification Schedule](#delete-notification-schedule)  
+13. [Save Location](#save-location)  
+14. [Get Locations](#get-locations)  
+15. [Get Location](#get-location)  
+16. [Delete Location](#delete-location)  
+17. [Save Shipment Template](#save-shipment-template)  
+18. [Get Shipment templates](#get-shipment-templates)  
+20. [Get Shipment Template](#get-shipment-template)  
+21. [Delete Shipment Template](#delete-shipment-template)  
 22. [Save Shipment](#save-shipment)  
 23. [Get Shipments](#get-shipments)  
-29. [Get Shipment](#get-shipment)  
-1. [Delete Shipment](#delete-shipment)  
-24. [Get Notifications](#get-notifications)  
-25. [Mark Notification as read](#mark-notification-as-read)  
-26. [Send Command to Device](#send-command-to-device)  
-30. [Get Profile](#get-profile)  
-31. [Save Profile](#save-profile)  
+24. [Get Shipment](#get-shipment)  
+25. [Delete Shipment](#delete-shipment)  
+26. [Save Device](#save-device)  
+27. [Get Device](#get-device)  
+28. [Get Devices](#get-devices)  
+29. [Delete Device](#delete-device)  
+30. [Get Notifications](#get-notifications)  
+31. [Send Command to Device](#send-command-to-device)  
+32. [Mark Notification as read](#mark-notification-as-read)  
+33. [Get Profile](#get-profile)  
+34. [Save Profile](#save-profile)  
 
 ## Reports ##
 1. [Get Single Shipment](#get-single-shipment)
@@ -205,7 +206,7 @@ Method *GET*, method name *deleteShipmentTemplate*, Request parameters:
 [(example)](#delete-shipment-template-example)
 
 ### Save Device ###
-Method *POST*, method name *saveDevice*, request body contains JSON serialized [Device Object](#device). Response contains ID of just saved Device  
+Method *POST*, method name *saveDevice*, request body contains JSON serialized [Device Object](#device).  
 [(example)](#save-device-example)
 
 ### Get Devices ###
@@ -217,9 +218,14 @@ Returns array of [Device Objects](#device).
 
 ### Get Device ###
 Method *GET*, method name *getDevice*. Request parameters:
-1. id - device ID.  
+1. imei - device IMEI.  
 Returns [Device Object](#device)  
 [(example)](#get-device-example)
+
+### Delete Device ###
+Method *GET*, method name *deleteDevice*. Request parameters:
+1. imei - device IMEI.  
+[(example)](#delete-device-example)
 
 ### Save Shipment ###
 Method *POST*, method name saveShipment, request body contains JSON serialized [Save Shipment request](#save-shipment-request). Response contains ID of just saved Shipment and ID of shipment template if the shipment was saved with corresponding option.  
@@ -399,13 +405,14 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 
 ```  
 ### Device ###
-`{`  
-`"description": "Device description",`  
-`"id": "1209898347987", // device ID`  
-`"imei": "1209898347987", // device IMEI`  
-`"name": "Device Name",`  
-`"sn": "1"`  
-`}`
+```json
+{
+  "description": "Device description",
+  "imei": "0239487043987",
+  "name": "Device Name",
+  "sn": "043987"
+}
+```  
 ### Save Shipment request ###
 `{`  
 `"saveAsNewTemplate": true,`  
@@ -1185,38 +1192,59 @@ Response:
 ### Save Device example ###
 **POST /vf/rest/saveDevice/${accessToken}**  
 **Request body:**  
-`{`  
-`"description": "Device description",`  
-`"id": "1209898347987",`  
-`"imei": "1209898347987",`  
-`"name": "Device Name",`  
-`"sn": "1"`  
-`}`  
+```json
+{
+  "description": "Device description",
+  "imei": "0239487043987",
+  "name": "Device Name",
+  "sn": "043987"
+}
+```  
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`}`  
-`}`  
+```  
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```  
 ### Get Devices example ###
-**GET  /vf/rest/getDevices/${accessToken}**  
+**GET /vf/rest/getDevices/${accessToken}?pageSize=10000&pageIndex=1**  
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": [`  
-`{`  
-`"description": "Device description",`  
-`"id": "1209898347987",`  
-`"imei": "1209898347987",`  
-`"name": "Device Name",`  
-`"sn": "1"`  
-`}`  
-`]`  
-`}`  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "description": "Device description",
+      "imei": "0239487043222",
+      "name": "Device Name",
+      "sn": "043222"
+    },
+    {
+      "description": "Device description",
+      "imei": "0239487043987",
+      "name": "Device Name",
+      "sn": "043987"
+    }
+  ]
+}
+```
+### Delete Device example ##
+**GET /vf/rest/deleteDevice/${accessToken}?imei=0239487043987**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
 ### Get Notifications example ###
 **GET  /vf/rest/getNotifications/${accessToken}?shipment=11&pageSize=1&pageIndex=3**  
 **Response:**  

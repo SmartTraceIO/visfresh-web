@@ -194,6 +194,16 @@ public class RestServiceImpl implements RestService {
     public List<Device> getDevices(final Company company) {
         return deviceDao.findByCompany(company);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteDevice(com.visfresh.entities.Company, java.lang.String)
+     */
+    @Override
+    public void deleteDevice(final Company company, final String imei) {
+        final Device d = deviceDao.findByImei(imei);
+        if (d != null && d.getCompany().getId().equals(company.getId())) {
+            deviceDao.delete(d);
+        }
+    }
 
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getShipments()

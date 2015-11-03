@@ -205,6 +205,13 @@ public class MockRestService implements RestService {
         }
     }
     /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#deleteDevice(com.visfresh.entities.Company, java.lang.String)
+     */
+    @Override
+    public void deleteDevice(final Company company, final String imei) {
+        devices.remove(imei);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getShipments()
      */
     @Override

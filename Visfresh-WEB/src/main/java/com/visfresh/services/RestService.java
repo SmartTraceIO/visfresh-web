@@ -104,12 +104,12 @@ public interface RestService {
      */
     List<Company> getCompanies();
     /**
-     * @param company TODO
+     * @param company company
      * @param alertProfileId
      */
     void deleteAlertProfile(Company company, Long alertProfileId);
     /**
-     * @param company TODO
+     * @param company company
      * @param locationId
      */
     void deleteLocation(Company company, Long locationId);
@@ -129,4 +129,9 @@ public interface RestService {
      * @param shipmentTemplateId
      */
     void deleteShipmentTemplate(Company company, Long shipmentTemplateId);
+    /**
+     * @param company company.
+     * @param imei device IMEI.
+     */
+    void deleteDevice(Company company, String imei);
 }
