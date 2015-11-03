@@ -44,7 +44,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
 
     @Test
     public void testAccept() {
-        shipment.setArrivalNotificationWithIn(1);
+        shipment.setArrivalNotificationWithinKm(1);
 
         final TrackerEvent e = new TrackerEvent();
         e.setDevice(shipment.getDevice());
@@ -77,7 +77,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
     }
     @Test
     public void testHandle() {
-        shipment.setArrivalNotificationWithIn(1);
+        shipment.setArrivalNotificationWithinKm(1);
 
         final TrackerEvent e = new TrackerEvent();
         e.setDevice(shipment.getDevice());

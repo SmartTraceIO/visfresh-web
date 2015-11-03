@@ -51,7 +51,7 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
     /**
      * Arrival notification with in.
      */
-    private int arrivalNotificationWithIn;
+    private int arrivalNotificationWithinKm;
     /**
      * Arrival notification shedules.
      */
@@ -93,7 +93,7 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
         setAlertProfile(shipment.getAlertProfile());
         alertsNotificationSchedules.addAll((shipment.getAlertsNotificationSchedules()));
         setAlertSuppressionDuringCoolDown(shipment.getAlertSuppressionDuringCoolDown());
-        setArrivalNotificationWithIn(shipment.getArrivalNotificationWithIn());
+        setArrivalNotificationWithinKm(shipment.getArrivalNotificationWithinKm());
         arrivalNotificationSchedules.addAll((shipment.getArrivalNotificationSchedules()));
         setExcludeNotificationsIfNoAlertsFired(shipment.isExcludeNotificationsIfNoAlertsFired());
         setShutdownDeviceTimeOut(shipment.getShutdownDeviceTimeOut());
@@ -192,15 +192,15 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
     /**
      * @return the arrivalNotification
      */
-    public int getArrivalNotificationWithIn() {
-        return arrivalNotificationWithIn;
+    public int getArrivalNotificationWithinKm() {
+        return arrivalNotificationWithinKm;
     }
 
     /**
      * @param km number of kilometers for arrival notification.
      */
-    public void setArrivalNotificationWithIn(final int km) {
-        this.arrivalNotificationWithIn = km;
+    public void setArrivalNotificationWithinKm(final int km) {
+        this.arrivalNotificationWithinKm = km;
     }
 
     /**

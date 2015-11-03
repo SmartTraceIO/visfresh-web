@@ -144,7 +144,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         s.setDevice(createDevice("234908042398"));
         s.setAlertProfile(createAlertProfile());
         s.setAlertSuppressionDuringCoolDown(5);
-        s.setArrivalNotificationWithIn(17);
+        s.setArrivalNotificationWithinKm(17);
         s.setCompany(sharedCompany);
         s.getCustomFields().put("field1", "Custom fields");
         s.setExcludeNotificationsIfNoAlertsFired(true);

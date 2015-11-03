@@ -349,14 +349,23 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        addShipmentBase(tpl, obj);
+        obj.addProperty("templateId", tpl.getId());
         obj.addProperty("templateName", tpl.getName());
         obj.addProperty("shipmentDefaultDescription", tpl.getShipmentDescription());
-        obj.addProperty("templateId", tpl.getId());
         obj.addProperty("addDateShippedToDesc", tpl.isAddDateShipped());
-        obj.addProperty("useCurrentTimeForDateShipped", tpl.isUseCurrentTimeForDateShipped());
+        obj.addProperty("shippedFrom", getId(tpl.getShippedFrom()));
+        obj.addProperty("shippedTo", getId(tpl.getShippedTo()));
         obj.addProperty("detectLocationForShippedFrom", tpl.isDetectLocationForShippedFrom());
-
+        obj.addProperty("useCurrentTimeForDateShipped", tpl.isUseCurrentTimeForDateShipped());
+        obj.addProperty("alertProfile", getId(tpl.getAlertProfile()));
+        obj.addProperty("alertSuppressionMinutes", tpl.getAlertSuppressionDuringCoolDown());
+        obj.addProperty("maxTimesAlertFires", tpl.getMaxTimesAlertFires());
+        obj.add("alertsNotificationSchedules", getIdList(tpl.getAlertsNotificationSchedules()));
+        obj.addProperty("excludeNotificationsIfNoAlerts", tpl.isExcludeNotificationsIfNoAlertsFired());
+        obj.addProperty("arrivalNotificationWithinKm", tpl.getArrivalNotificationWithinKm());
+        obj.add("arrivalNotificationSchedules", getIdList(tpl.getArrivalNotificationSchedules()));
+        obj.addProperty("assetType", tpl.getAssetType());
+        obj.addProperty("shutdownDeviceAfterMinutes", tpl.getShutdownDeviceTimeOut());
         return obj;
     }
     /**
@@ -384,10 +393,10 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("alertSuppressionMinutes", shpb.getAlertSuppressionDuringCoolDown());
         obj.addProperty("alertProfile", getId(shpb.getAlertProfile()));
         obj.add("alertsNotificationSchedules", getIdList(shpb.getAlertsNotificationSchedules()));
-        obj.addProperty("arrivalNotificationWithIn", shpb.getArrivalNotificationWithIn());
+        obj.addProperty("arrivalNotificationWithinKm", shpb.getArrivalNotificationWithinKm());
         obj.add("arrivalNotificationSchedules", getIdList(shpb.getArrivalNotificationSchedules()));
         obj.addProperty("assetType", shpb.getAssetType());
-        obj.addProperty("excludeNotificationsIfNoAlertsFired", shpb.isExcludeNotificationsIfNoAlertsFired());
+        obj.addProperty("excludeNotificationsIfNoAlerts", shpb.isExcludeNotificationsIfNoAlertsFired());
         obj.addProperty("shippedFrom", getId(shpb.getShippedFrom()));
         obj.addProperty("shippedTo", getId(shpb.getShippedTo()));
         obj.addProperty("shutdownDeviceAfterMinutes", shpb.getShutdownDeviceTimeOut());
@@ -402,11 +411,11 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         shp.setAlertProfile(resolveAlertProfile(asLong(obj.get("alertProfile"))));
         shp.getAlertsNotificationSchedules().addAll(
                 resolveNotificationSchedules(obj.get("alertsNotificationSchedules").getAsJsonArray()));
-        shp.setArrivalNotificationWithIn(asInt(obj.get("arrivalNotificationWithIn")));
+        shp.setArrivalNotificationWithinKm(asInt(obj.get("arrivalNotificationWithinKm")));
         shp.getArrivalNotificationSchedules().addAll(
                 resolveNotificationSchedules(obj.get("arrivalNotificationSchedules").getAsJsonArray()));
         shp.setAssetType(asString(obj.get("assetType")));
-        shp.setExcludeNotificationsIfNoAlertsFired(asBoolean(obj.get("excludeNotificationsIfNoAlertsFired")));
+        shp.setExcludeNotificationsIfNoAlertsFired(asBoolean(obj.get("excludeNotificationsIfNoAlerts")));
         shp.setShippedFrom(resolveLocationProfile(asLong(obj.get("shippedFrom"))));
         shp.setShippedTo(resolveLocationProfile(asLong(obj.get("shippedTo"))));
         shp.setShutdownDeviceTimeOut(asInt(obj.get("shutdownDeviceAfterMinutes")));

@@ -178,7 +178,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setDevice(device);
         s.setAlertProfile(alertProfile);
         s.setAlertSuppressionDuringCoolDown(5);
-        s.setArrivalNotificationWithIn(17);
+        s.setArrivalNotificationWithinKm(17);
         s.setCompany(sharedCompany);
         s.getCustomFields().put("field1", "Custom field 1");
         s.setExcludeNotificationsIfNoAlertsFired(true);
@@ -206,7 +206,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(device.getId(), s.getDevice().getId());
         assertNotNull(s.getAlertProfile());
         assertEquals(5, s.getAlertSuppressionDuringCoolDown());
-        assertEquals(17, s.getArrivalNotificationWithIn());
+        assertEquals(17, s.getArrivalNotificationWithinKm());
         assertEquals(sharedCompany.getId(), s.getCompany().getId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
         assertEquals(true, s.isExcludeNotificationsIfNoAlertsFired());
@@ -259,7 +259,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(device.getId(), s.getDevice().getId());
         assertNotNull(s.getAlertProfile());
         assertEquals(5, s.getAlertSuppressionDuringCoolDown());
-        assertEquals(17, s.getArrivalNotificationWithIn());
+        assertEquals(17, s.getArrivalNotificationWithinKm());
         assertEquals(sharedCompany.getId(), s.getCompany().getId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
         assertEquals(true, s.isExcludeNotificationsIfNoAlertsFired());
@@ -341,7 +341,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         final ShipmentTemplate s = new ShipmentTemplate();
         s.setAlertProfile(alertProfile);
         s.setAlertSuppressionDuringCoolDown(5);
-        s.setArrivalNotificationWithIn(17);
+        s.setArrivalNotificationWithinKm(17);
         s.setCompany(sharedCompany);
         s.setExcludeNotificationsIfNoAlertsFired(true);
         s.setName("Shipment-1");

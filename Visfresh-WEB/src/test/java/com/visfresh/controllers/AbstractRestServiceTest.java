@@ -147,7 +147,7 @@ public abstract class AbstractRestServiceTest {
         s.setAlertProfile(createAlertProfile(save));
         s.getAlertsNotificationSchedules().add(createNotificationSchedule(save));
         s.setAlertSuppressionDuringCoolDown(55);
-        s.setArrivalNotificationWithIn(111);
+        s.setArrivalNotificationWithinKm(111);
         s.getArrivalNotificationSchedules().add(createNotificationSchedule(save));
         s.setExcludeNotificationsIfNoAlertsFired(true);
         s.setName("Shipment-" + (++lastLong));
@@ -176,7 +176,7 @@ public abstract class AbstractRestServiceTest {
         t.setAlertProfile(createAlertProfile(save));
         t.getAlertsNotificationSchedules().add(createNotificationSchedule(save));
         t.setAlertSuppressionDuringCoolDown(55);
-        t.setArrivalNotificationWithIn(11);
+        t.setArrivalNotificationWithinKm(11);
         t.getArrivalNotificationSchedules().add(createNotificationSchedule(save));
         t.setExcludeNotificationsIfNoAlertsFired(true);
         t.setName("JUnit-tpl");

@@ -99,7 +99,7 @@ public abstract class AbstractReportService implements ReportService {
         dto.setAlertsNotificationSchedules(getIds(shipment.getAlertsNotificationSchedules()));
         dto.setAlertSuppressionDuringCoolDown(shipment.getAlertSuppressionDuringCoolDown());
         dto.setArrivalNotificationSchedules(getIds(shipment.getArrivalNotificationSchedules()));
-        dto.setArrivalNotificationWithIn(shipment.getArrivalNotificationWithIn());
+        dto.setArrivalNotificationWithIn(shipment.getArrivalNotificationWithinKm());
         dto.setAssetNum(shipment.getAssetNum());
         dto.setAssetType(shipment.getAssetType());
         dto.getCustomFields().putAll(shipment.getCustomFields());

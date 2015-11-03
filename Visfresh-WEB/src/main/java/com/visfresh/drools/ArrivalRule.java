@@ -67,7 +67,7 @@ public class ArrivalRule extends AbstractNotificationRule {
         final LocationProfile endLocation = shipment.getShippedTo();
         if (endLocation != null) {
             final double distance = getNumberOfMetersForArrival(latitude, longitude, endLocation);
-            return distance < shipment.getArrivalNotificationWithIn();
+            return distance < shipment.getArrivalNotificationWithinKm();
         }
         return false;
     }
