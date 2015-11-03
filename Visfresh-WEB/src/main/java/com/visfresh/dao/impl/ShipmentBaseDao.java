@@ -154,7 +154,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         map.put(NAME_FIELD, s.getName());
         map.put(DESCRIPTION_FIELD, s.getShipmentDescription());
         map.put(ALERT_FIELD, s.getAlertProfile() == null ? null: s.getAlertProfile().getId());
-        map.put(NOALERTIFCOODOWN_FIELD, s.getAlertSuppressionDuringCoolDown());
+        map.put(NOALERTIFCOODOWN_FIELD, s.getAlertSuppressionMinutes());
         map.put(ARRIVALNOTIFWITHIN_FIELD, s.getArrivalNotificationWithinKm());
         map.put(NONOTIFSIFNOALERTS_FIELD, s.isExcludeNotificationsIfNoAlertsFired());
         map.put(SHUTDOWNTIMEOUT_FIELD, s.getShutdownDeviceTimeOut());
@@ -215,7 +215,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         if (id != null) {
             no.setAlertProfile(alertProfileDao.findOne(id.longValue()));
         }
-        no.setAlertSuppressionDuringCoolDown(((Number) map.get(NOALERTIFCOODOWN_FIELD)).intValue());
+        no.setAlertSuppressionMinutes(((Number) map.get(NOALERTIFCOODOWN_FIELD)).intValue());
         no.setArrivalNotificationWithinKm(((Number) map.get(ARRIVALNOTIFWITHIN_FIELD)).intValue());
         no.setExcludeNotificationsIfNoAlertsFired((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
         no.setName((String) map.get(NAME_FIELD));

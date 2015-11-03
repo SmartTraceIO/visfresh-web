@@ -288,7 +288,7 @@ public class JSonSerializerTest {
         t.setAddDateShipped(addDateShipped);
         t.setAlertProfile(alertProfile);
         t.getAlertsNotificationSchedules().add(alertsNotificationSchedule);
-        t.setAlertSuppressionDuringCoolDown(alertSuppressionDuringCoolDown);
+        t.setAlertSuppressionMinutes(alertSuppressionDuringCoolDown);
         t.setArrivalNotificationWithinKm(arrivalNotification);
         t.getArrivalNotificationSchedules().add(arrivalNotificationSchedule);
         t.setExcludeNotificationsIfNoAlertsFired(excludeNotificationsIfNoAlertsFired);
@@ -309,7 +309,7 @@ public class JSonSerializerTest {
         assertEquals(addDateShipped, t.isAddDateShipped());
         assertNotNull(t.getAlertProfile());
         assertNotNull(t.getAlertsNotificationSchedules());
-        assertEquals(alertSuppressionDuringCoolDown, t.getAlertSuppressionDuringCoolDown());
+        assertEquals(alertSuppressionDuringCoolDown, t.getAlertSuppressionMinutes());
         assertEquals(arrivalNotification, t.getArrivalNotificationWithinKm());
         assertNotNull(t.getArrivalNotificationSchedules());
         assertEquals(excludeNotificationsIfNoAlertsFired, t.isExcludeNotificationsIfNoAlertsFired());
@@ -371,7 +371,7 @@ public class JSonSerializerTest {
         Shipment s = new Shipment();
         s.setAlertProfile(alertProfile);
         s.getAlertsNotificationSchedules().add(alertsNotificationSchedule);
-        s.setAlertSuppressionDuringCoolDown(alertSuppressionDuringCoolDown);
+        s.setAlertSuppressionMinutes(alertSuppressionDuringCoolDown);
         s.setArrivalNotificationWithinKm(arrivalNotification);
         s.getArrivalNotificationSchedules().add(arrivalNotificationSchedule);
         s.setExcludeNotificationsIfNoAlertsFired(excludeNotificationsIfNoAlertsFired);
@@ -397,7 +397,7 @@ public class JSonSerializerTest {
 
         assertNotNull(s.getAlertProfile());
         assertNotNull(s.getAlertsNotificationSchedules());
-        assertEquals(alertSuppressionDuringCoolDown, s.getAlertSuppressionDuringCoolDown());
+        assertEquals(alertSuppressionDuringCoolDown, s.getAlertSuppressionMinutes());
         assertEquals(arrivalNotification, s.getArrivalNotificationWithinKm());
         assertNotNull(s.getArrivalNotificationSchedules());
         assertEquals(excludeNotificationsIfNoAlertsFired, s.isExcludeNotificationsIfNoAlertsFired());
@@ -847,7 +847,7 @@ public class JSonSerializerTest {
         final Shipment s = new Shipment();
         s.setAlertProfile(createAlertProfile());
         s.getAlertsNotificationSchedules().add(createNotificationSchedule());
-        s.setAlertSuppressionDuringCoolDown(55);
+        s.setAlertSuppressionMinutes(55);
         s.setArrivalNotificationWithinKm(111);
         s.getArrivalNotificationSchedules().add(createNotificationSchedule());
         s.setExcludeNotificationsIfNoAlertsFired(true);

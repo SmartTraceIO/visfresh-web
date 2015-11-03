@@ -99,11 +99,11 @@ public class AlertDescriptionBuilder {
         String degree;
         switch (units) {
             case Fahrenheit:
-                degree = "\u00b0F";
+                degree = "F";
                 temp = t * 1.8 + 32;
                 break;
                 default:
-                    degree = "\u00b0C";
+                    degree = "C";
                     temp = t;
                     //nothing
                     break;

@@ -9,13 +9,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.visfresh.entities.AlertType;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class SingleShipmentDto {
     private String shipmentDescription;
-    private String device;
     private int tripCount;
     private String palletId;
     private int poNum;
@@ -27,20 +28,25 @@ public class SingleShipmentDto {
     private String assetNum;
     private String assetType;
 
-    private long alertProfile;
-    private int alertSuppressionDuringCoolDown;
+    private long alertProfileId;
     private long[] alertsNotificationSchedules = {};
 
-    private int arrivalNotificationWithIn;
+    private int arrivalNotificationWithinKm;
     private long[] arrivalNotificationSchedules = {};
     private boolean excludeNotificationsIfNoAlertsFired;
 
-    private int shutdownDevice;
-
-    private final Map<String, String> customFields = new HashMap<String, String>();
-
     private String status;
     private final List<SingleShipmentTimeItem> items = new LinkedList<SingleShipmentTimeItem>();
+    private String currentLocation;
+    private String deviceSn;
+    private String deviceName;
+    private Date estArrivalDate;
+    private Date actualArrivalDate;
+    private int percentageComplete;
+    private String alertProfileName;
+    private int maxTimesAlertFires;
+    private int alertSuppressionMinutes;
+    private final Map<AlertType, Integer> alertSummary = new HashMap<AlertType, Integer>();
 
     /**
      * Default constructor.
@@ -60,18 +66,6 @@ public class SingleShipmentDto {
      */
     public void setShipmentDescription(final String shipmentDescription) {
         this.shipmentDescription = shipmentDescription;
-    }
-    /**
-     * @return the device
-     */
-    public String getDevice() {
-        return device;
-    }
-    /**
-     * @param device the device to set
-     */
-    public void setDevice(final String device) {
-        this.device = device;
     }
     /**
      * @return the tripCount
@@ -172,26 +166,14 @@ public class SingleShipmentDto {
     /**
      * @return the alertProfile
      */
-    public long getAlertProfile() {
-        return alertProfile;
+    public long getAlertProfileId() {
+        return alertProfileId;
     }
     /**
      * @param alertProfile the alertProfile to set
      */
-    public void setAlertProfile(final long alertProfile) {
-        this.alertProfile = alertProfile;
-    }
-    /**
-     * @return the alertSuppressionDuringCoolDown
-     */
-    public int getAlertSuppressionDuringCoolDown() {
-        return alertSuppressionDuringCoolDown;
-    }
-    /**
-     * @param alertSuppressionDuringCoolDown the alertSuppressionDuringCoolDown to set
-     */
-    public void setAlertSuppressionDuringCoolDown(final int alertSuppressionDuringCoolDown) {
-        this.alertSuppressionDuringCoolDown = alertSuppressionDuringCoolDown;
+    public void setAlertProfileId(final long alertProfile) {
+        this.alertProfileId = alertProfile;
     }
     /**
      * @return the alertsNotificationSchedules
@@ -208,14 +190,14 @@ public class SingleShipmentDto {
     /**
      * @return the arrivalNotificationWithIn
      */
-    public int getArrivalNotificationWithIn() {
-        return arrivalNotificationWithIn;
+    public int getArrivalNotificationWithInKm() {
+        return arrivalNotificationWithinKm;
     }
     /**
      * @param arrivalNotificationWithIn the arrivalNotificationWithIn to set
      */
-    public void setArrivalNotificationWithIn(final int arrivalNotificationWithIn) {
-        this.arrivalNotificationWithIn = arrivalNotificationWithIn;
+    public void setArrivalNotificationWithInKm(final int arrivalNotificationWithIn) {
+        this.arrivalNotificationWithinKm = arrivalNotificationWithIn;
     }
     /**
      * @return the arrivalNotificationSchedules
@@ -243,18 +225,6 @@ public class SingleShipmentDto {
         this.excludeNotificationsIfNoAlertsFired = excludeNotificationsIfNoAlertsFired;
     }
     /**
-     * @return the shutdownDevice
-     */
-    public int getShutdownDevice() {
-        return shutdownDevice;
-    }
-    /**
-     * @param shutdownDevice the shutdownDevice to set
-     */
-    public void setShutdownDevice(final int shutdownDevice) {
-        this.shutdownDevice = shutdownDevice;
-    }
-    /**
      * @return the status
      */
     public String getStatus() {
@@ -267,15 +237,123 @@ public class SingleShipmentDto {
         this.status = status;
     }
     /**
-     * @return the customFields
-     */
-    public Map<String, String> getCustomFields() {
-        return customFields;
-    }
-    /**
      * @return the items
      */
     public List<SingleShipmentTimeItem> getItems() {
         return items;
+    }
+    /**
+     * @return current location.
+     */
+    public String getCurrentLocation() {
+        return currentLocation;
+    }
+    /**
+     * @param currentLocation the currentLocation to set
+     */
+    public void setCurrentLocation(final String currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+    /**
+     * @return device serial number.
+     */
+    public String getDeviceSn() {
+        return deviceSn;
+    }
+    /**
+     * @param deviceSn the deviceSn to set
+     */
+    public void setDeviceSn(final String deviceSn) {
+        this.deviceSn = deviceSn;
+    }
+    /**
+     * @return device name.
+     */
+    public String getDeviceName() {
+        return deviceName;
+    }
+    /**
+     * @param deviceName the deviceName to set
+     */
+    public void setDeviceName(final String deviceName) {
+        this.deviceName = deviceName;
+    }
+    /**
+     * @return estimated arrival date.
+     */
+    public Date getEstArrivalDate() {
+        return estArrivalDate;
+    }
+    /**
+     * @param estArrivalDate the estArrivalDate to set
+     */
+    public void setEstArrivalDate(final Date estArrivalDate) {
+        this.estArrivalDate = estArrivalDate;
+    }
+    /**
+     * @return actual arrival date.
+     */
+    public Date getActualArrivalDate() {
+        return actualArrivalDate;
+    }
+    /**
+     * @param actualArrivalDate the actualArrivalDate to set
+     */
+    public void setActualArrivalDate(final Date actualArrivalDate) {
+        this.actualArrivalDate = actualArrivalDate;
+    }
+    /**
+     * @return percentage completed.
+     */
+    public int getPercentageComplete() {
+        return percentageComplete;
+    }
+    /**
+     * @param percentageComplete the percentageComplete to set
+     */
+    public void setPercentageComplete(final int percentageComplete) {
+        this.percentageComplete = percentageComplete;
+    }
+    /**
+     * @return alert profile name.
+     */
+    public String getAlertProfileName() {
+        return alertProfileName;
+    }
+    /**
+     * @param alertProfileName the alertProfileName to set
+     */
+    public void setAlertProfileName(final String alertProfileName) {
+        this.alertProfileName = alertProfileName;
+    }
+    /**
+     * @return max times alert fires.
+     */
+    public int getMaxTimesAlertFires() {
+        return maxTimesAlertFires;
+    }
+    /**
+     * @param maxTimesAlertFires the maxTimesAlertFires to set
+     */
+    public void setMaxTimesAlertFires(final int maxTimesAlertFires) {
+        this.maxTimesAlertFires = maxTimesAlertFires;
+    }
+    /**
+     * @return alert suppression in minutes.
+     */
+    public int getAlertSuppressionMinutes() {
+        return alertSuppressionMinutes;
+    }
+    /**
+     * @param alertSuppressionMinutes the alertSuppressionMinutes to set
+     */
+    public void setAlertSuppressionMinutes(final int alertSuppressionMinutes) {
+        this.alertSuppressionMinutes = alertSuppressionMinutes;
+    }
+    /**
+     * @return alert summary map.
+     */
+    public Map<AlertType, Integer> getAlertSummary() {
+        return alertSummary;
     }
 }

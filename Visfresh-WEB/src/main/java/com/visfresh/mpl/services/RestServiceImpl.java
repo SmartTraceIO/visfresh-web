@@ -4,10 +4,8 @@
 package com.visfresh.mpl.services;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +27,6 @@ import com.visfresh.dao.impl.DaoImplBase;
 import com.visfresh.drools.DroolsRuleEngine;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
@@ -216,30 +213,11 @@ public class RestServiceImpl implements RestService {
             final List<Alert> alerts = alertDao.getAlerts(s,
                     new Date(0L), new Date(System.currentTimeMillis() + 100000000l));
             final ShipmentStateDto dto = new ShipmentStateDto(s);
-            dto.getAlertSummary().putAll(toSummaryMap(alerts));
+            dto.getAlertSummary().putAll(AbstractReportService.toSummaryMap(alerts));
             result.add(dto);
         }
         return result;
     }
-
-    /**
-     * @param alerts
-     * @return
-     */
-    public static  Map<AlertType, Integer> toSummaryMap(
-            final List<Alert> alerts) {
-        final Map<AlertType, Integer> map = new HashMap<AlertType, Integer>();
-        for (final Alert alert : alerts) {
-            Integer numAlerts = map.get(alert.getType());
-            if (numAlerts == null) {
-                numAlerts = 0;
-            }
-            numAlerts = numAlerts + 1;
-            map.put(alert.getType(), numAlerts);
-        }
-        return map;
-    }
-
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#saveShipment(com.visfresh.entities.Shipment)
      */

@@ -146,7 +146,7 @@ public abstract class AbstractRestServiceTest {
         final Shipment s = new Shipment();
         s.setAlertProfile(createAlertProfile(save));
         s.getAlertsNotificationSchedules().add(createNotificationSchedule(save));
-        s.setAlertSuppressionDuringCoolDown(55);
+        s.setAlertSuppressionMinutes(55);
         s.setArrivalNotificationWithinKm(111);
         s.getArrivalNotificationSchedules().add(createNotificationSchedule(save));
         s.setExcludeNotificationsIfNoAlertsFired(true);
@@ -175,7 +175,7 @@ public abstract class AbstractRestServiceTest {
         t.setAddDateShipped(true);
         t.setAlertProfile(createAlertProfile(save));
         t.getAlertsNotificationSchedules().add(createNotificationSchedule(save));
-        t.setAlertSuppressionDuringCoolDown(55);
+        t.setAlertSuppressionMinutes(55);
         t.setArrivalNotificationWithinKm(11);
         t.getArrivalNotificationSchedules().add(createNotificationSchedule(save));
         t.setExcludeNotificationsIfNoAlertsFired(true);

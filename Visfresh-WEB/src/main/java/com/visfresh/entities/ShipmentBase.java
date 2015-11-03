@@ -47,7 +47,7 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
     /**
      * Alert suppression time in hours.
      */
-    private int alertSuppressionDuringCoolDown;
+    private int alertSuppressionMinutes;
     /**
      * Arrival notification with in.
      */
@@ -92,7 +92,7 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
         setShippedTo(shipment.getShippedTo());
         setAlertProfile(shipment.getAlertProfile());
         alertsNotificationSchedules.addAll((shipment.getAlertsNotificationSchedules()));
-        setAlertSuppressionDuringCoolDown(shipment.getAlertSuppressionDuringCoolDown());
+        setAlertSuppressionMinutes(shipment.getAlertSuppressionMinutes());
         setArrivalNotificationWithinKm(shipment.getArrivalNotificationWithinKm());
         arrivalNotificationSchedules.addAll((shipment.getArrivalNotificationSchedules()));
         setExcludeNotificationsIfNoAlertsFired(shipment.isExcludeNotificationsIfNoAlertsFired());
@@ -178,15 +178,15 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
     /**
      * @return the alertSuppressionDuringCoolDown
      */
-    public int getAlertSuppressionDuringCoolDown() {
-        return alertSuppressionDuringCoolDown;
+    public int getAlertSuppressionMinutes() {
+        return alertSuppressionMinutes;
     }
 
     /**
      * @param alertSuppressionDuringCoolDown the alertSuppressionDuringCoolDown to set
      */
-    public void setAlertSuppressionDuringCoolDown(final int alertSuppressionDuringCoolDown) {
-        this.alertSuppressionDuringCoolDown = alertSuppressionDuringCoolDown;
+    public void setAlertSuppressionMinutes(final int alertSuppressionDuringCoolDown) {
+        this.alertSuppressionMinutes = alertSuppressionDuringCoolDown;
     }
 
     /**

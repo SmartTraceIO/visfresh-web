@@ -3,30 +3,33 @@
  */
 package com.visfresh.io;
 
-import java.util.TimeZone;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.drools.AlertDescriptionBuilder;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.User;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class ReportSerializer extends AbstractJsonSerializer {
-    private final EntityJSonSerializer entitySerializer;
+    private final AlertDescriptionBuilder alertBuilder;
+    private final User user;
     /**
      * Default constructor.
      */
-    public ReportSerializer(final TimeZone tz) {
-        super(tz);
-        entitySerializer = new EntityJSonSerializer(tz);
+    public ReportSerializer(final User user) {
+        super(user.getTimeZone());
+        alertBuilder = new AlertDescriptionBuilder();
+        this.user = user;
     }
 
     public JsonObject toJson(final SingleShipmentDto dto) {
@@ -35,24 +38,31 @@ public class ReportSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty("alertProfileId", dto.getAlertProfile());
-        obj.add("alertsNotificationSchedules", asJsonArray(dto.getAlertsNotificationSchedules()));
-        obj.addProperty("alertSuppressionDuringCoolDown", dto.getAlertSuppressionDuringCoolDown());
-        obj.add("arrivalNotificationSchedules", asJsonArray(dto.getArrivalNotificationSchedules()));
-        obj.addProperty("arrivalNotificationWithIn", dto.getArrivalNotificationWithIn());
+        obj.addProperty("status", dto.getStatus());
+        obj.addProperty("currentLocation", dto.getCurrentLocation());
+        obj.addProperty("deviceSN", dto.getDeviceSn());
+        obj.addProperty("deviceName", dto.getDeviceName());
+        obj.addProperty("tripCount", dto.getTripCount());
+        obj.addProperty("shipmentDescription", dto.getShipmentDescription());
+        obj.addProperty("palletId", dto.getPalletId());
         obj.addProperty("assetNum", dto.getAssetNum());
         obj.addProperty("assetType", dto.getAssetType());
-        obj.add("customFields", toJson(dto.getCustomFields()));
-        obj.addProperty("device", dto.getDevice());
-        obj.addProperty("palletId", dto.getPalletId());
         obj.addProperty("poNum", dto.getPoNum());
-        obj.addProperty("shipmentDate", formatDate(dto.getShipmentDate()));
-        obj.addProperty("shipmentDescription", dto.getShipmentDescription());
         obj.addProperty("shippedFrom", dto.getShippedFrom());
         obj.addProperty("shippedTo", dto.getShippedTo());
-        obj.addProperty("shutdownDevice", dto.getShutdownDevice());
-        obj.addProperty("status", dto.getStatus());
-        obj.addProperty("tripCount", dto.getTripCount());
+        obj.addProperty("shipmentDate", formatDate(dto.getShipmentDate()));
+        obj.addProperty("estArrivalDate", formatDate(dto.getEstArrivalDate()));
+        obj.addProperty("actualArrivalDate", formatDate(dto.getActualArrivalDate()));
+        obj.addProperty("percentageComplete", dto.getPercentageComplete());
+        obj.addProperty("alertProfileId", dto.getAlertProfileId());
+        obj.addProperty("alertProfileName", dto.getAlertProfileName());
+        obj.addProperty("maxTimesAlertFires", dto.getMaxTimesAlertFires());
+        obj.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
+        obj.add("alertsNotificationSchedules", asJsonArray(dto.getAlertsNotificationSchedules()));
+        obj.add("alertSummary", toJson(dto.getAlertSummary()));
+        obj.add("arrivalNotificationSchedules", asJsonArray(dto.getArrivalNotificationSchedules()));
+        obj.addProperty("arrivalNotificationWithinKm", dto.getArrivalNotificationWithInKm());
+        obj.addProperty("excludeNotificationIfNoAlerts", dto.isExcludeNotificationsIfNoAlertsFired());
 
         //serialize time items
         final JsonArray items = new JsonArray();
@@ -78,24 +88,49 @@ public class ReportSerializer extends AbstractJsonSerializer {
 
         json.addProperty("timestamp", formatDate(event.getTime()));
         json.add("location", toJson(new Location(event.getLatitude(), event.getLongitude())));
-        json.addProperty("temperature", event.getTemperature());
+        final double t = event.getTemperature();
+        json.addProperty("temperature",
+                user.getTemperatureUnits() == TemperatureUnits.Fahrenheit ? t * 1.8 + 32 : t);
         json.addProperty("type", event.getType());
 
         //add alerts.
         final JsonArray alerts = new JsonArray();
         json.add("alerts", alerts);
         for (final Alert a : item.getAlerts()) {
-            alerts.add(toJson(a));
+            alerts.add(toJsonAlertDescription(a));
         }
 
         //add arrivals
         final JsonArray arrivals = new JsonArray();
         json.add("arrivas", arrivals);
         for (final Arrival a : item.getArrivals()) {
-            arrivals.add(toJson(a));
+            arrivals.add(toJsonArrivalDescription(a));
         }
 
         return json;
+    }
+    /**
+     * @param a arrival
+     * @return
+     */
+    private JsonObject toJsonArrivalDescription(final Arrival a) {
+        final JsonObject obj = new JsonObject();
+        obj.addProperty("numberOfMetersOfArrival", a.getNumberOfMettersOfArrival());
+
+        final StringBuilder sb = new StringBuilder();
+        obj.addProperty("arrivalReportSentTo", sb.toString());
+        return obj;
+    }
+    /**
+     * @param a
+     * @return
+     */
+    private JsonObject toJsonAlertDescription(final Alert a) {
+        final JsonObject obj = new JsonObject();
+        obj.addProperty("description", this.alertBuilder.buildDescription(a, user));
+        obj.addProperty("type", a.getType().toString());
+        return obj;
+
     }
 
     /**
@@ -129,25 +164,6 @@ public class ReportSerializer extends AbstractJsonSerializer {
 
         return json;
     }
-    /**
-     * @param arrival
-     * @return
-     */
-    private JsonElement toJson(final Arrival arrival) {
-        final JsonObject obj = entitySerializer.toJson(arrival);
-        removeRefs(obj);
-        return obj;
-    }
-    /**
-     * @param alert
-     * @return
-     */
-    private JsonObject toJson(final Alert alert) {
-        final JsonObject obj = entitySerializer.toJson(alert);
-        removeRefs(obj);
-        return obj;
-    }
-
     /**
      * @param obj
      */

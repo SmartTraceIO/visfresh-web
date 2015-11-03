@@ -5,9 +5,12 @@ package com.visfresh.mpl.services;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.Shipment;
@@ -67,9 +70,27 @@ public abstract class AbstractReportService implements ReportService {
             item.getArrivals().add(arrival);
         }
 
+        dto.getAlertSummary().putAll(toSummaryMap(alerts));
         return dto;
     }
 
+    /**
+     * @param alerts
+     * @return
+     */
+    public static  Map<AlertType, Integer> toSummaryMap(
+            final List<Alert> alerts) {
+        final Map<AlertType, Integer> map = new HashMap<AlertType, Integer>();
+        for (final Alert alert : alerts) {
+            Integer numAlerts = map.get(alert.getType());
+            if (numAlerts == null) {
+                numAlerts = 0;
+            }
+            numAlerts = numAlerts + 1;
+            map.put(alert.getType(), numAlerts);
+        }
+        return map;
+    }
     /**
      * @param shipmentId
      * @return
@@ -95,22 +116,32 @@ public abstract class AbstractReportService implements ReportService {
      */
     private SingleShipmentDto creatSingleShipmentDto(final Shipment shipment) {
         final SingleShipmentDto dto = new SingleShipmentDto();
-        dto.setAlertProfile(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());
+        dto.setAlertProfileId(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());
         dto.setAlertsNotificationSchedules(getIds(shipment.getAlertsNotificationSchedules()));
-        dto.setAlertSuppressionDuringCoolDown(shipment.getAlertSuppressionDuringCoolDown());
         dto.setArrivalNotificationSchedules(getIds(shipment.getArrivalNotificationSchedules()));
-        dto.setArrivalNotificationWithIn(shipment.getArrivalNotificationWithinKm());
+        dto.setArrivalNotificationWithInKm(shipment.getArrivalNotificationWithinKm());
         dto.setAssetNum(shipment.getAssetNum());
         dto.setAssetType(shipment.getAssetType());
-        dto.getCustomFields().putAll(shipment.getCustomFields());
         dto.setPalletId(shipment.getPalletId());
         dto.setPoNum(shipment.getPoNum());
         dto.setShipmentDescription(shipment.getShipmentDescription());
         dto.setShippedFrom(shipment.getShippedFrom() == null ? null : shipment.getShippedFrom().getId());
         dto.setShippedTo(shipment.getShippedTo() == null ? null : shipment.getShippedTo().getId());
-        dto.setShutdownDevice(shipment.getShutdownDeviceTimeOut());
         dto.setStatus(shipment.getStatus().getLabel());
         dto.setTripCount(shipment.getTripCount());
+        dto.setCurrentLocation("Not determined");
+        dto.setDeviceSn(shipment.getDevice().getSn());
+        dto.setDeviceName(shipment.getDevice().getName());
+        //Mock arrival date.
+        //TODO replace it by calculated.
+        final Date arrivalDate = new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L);
+        dto.setEstArrivalDate(arrivalDate);
+        dto.setActualArrivalDate(arrivalDate);
+        //TODO replace with autodetected
+        dto.setPercentageComplete(0);
+        dto.setAlertProfileName(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getName());
+        dto.setMaxTimesAlertFires(shipment.getMaxTimesAlertFires());
+        dto.setAlertSuppressionMinutes(shipment.getAlertSuppressionMinutes());
         return dto;
     }
 

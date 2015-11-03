@@ -395,6 +395,6 @@ public class ShipmentController extends AbstractController {
      * @return
      */
     protected ReportSerializer getReportSerializer(final User user) {
-        return new ReportSerializer(user.getTimeZone());
+        return new ReportSerializer(user);
     }
 }

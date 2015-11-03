@@ -147,7 +147,7 @@ public class ShipmentTemplateDaoTest
     protected ShipmentTemplate createTestEntity() {
         final ShipmentTemplate s = new ShipmentTemplate();
         s.setAlertProfile(alertProfile);
-        s.setAlertSuppressionDuringCoolDown(5);
+        s.setAlertSuppressionMinutes(5);
         s.setArrivalNotificationWithinKm(17);
         s.setCompany(sharedCompany);
         s.setExcludeNotificationsIfNoAlertsFired(true);
@@ -169,7 +169,7 @@ public class ShipmentTemplateDaoTest
     @Override
     protected void assertCreateTestEntityOk(final ShipmentTemplate tpl) {
         assertNotNull(tpl.getAlertProfile());
-        assertEquals(5, tpl.getAlertSuppressionDuringCoolDown());
+        assertEquals(5, tpl.getAlertSuppressionMinutes());
         assertEquals(17, tpl.getArrivalNotificationWithinKm());
         assertEquals(sharedCompany.getId(), tpl.getCompany().getId());
         assertEquals(true, tpl.isExcludeNotificationsIfNoAlertsFired());
@@ -209,7 +209,7 @@ public class ShipmentTemplateDaoTest
 
         final ShipmentTemplate tpl = all.get(0);
         assertNotNull(tpl.getAlertProfile());
-        assertEquals(5, tpl.getAlertSuppressionDuringCoolDown());
+        assertEquals(5, tpl.getAlertSuppressionMinutes());
         assertEquals(17, tpl.getArrivalNotificationWithinKm());
         assertEquals(sharedCompany.getId(), tpl.getCompany().getId());
         assertEquals(true, tpl.isExcludeNotificationsIfNoAlertsFired());

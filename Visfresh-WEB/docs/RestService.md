@@ -1592,52 +1592,55 @@ Response:
     "message": "Success"
   },
   "response": {
-    "alertProfile": 2,
+    "status": "In Progress",
+    "currentLocation": "Not determined",
+    "deviceSN": "394857",
+    "deviceName": "Device Name",
+    "tripCount": 88,
+    "shipmentDescription": "Any Description",
+    "palletId": "palettid",
+    "assetNum": "10515",
+    "assetType": "SeaContainer",
+    "poNum": 893793487,
+    "shippedFrom": 9,
+    "shippedTo": 10,
+    "estArrivalDate": "2015-11-05T23:05",
+    "actualArrivalDate": "2015-11-05T23:05",
+    "percentageComplete": 0,
+    "alertProfileId": 2,
+    "alertProfileName": "AnyAlert",
+    "maxTimesAlertFires": 4,
+    "alertSuppressionMinutes": 55,
     "alertsNotificationSchedules": [
       3
     ],
-    "alertSuppressionDuringCoolDown": 55,
+    "alertSummary": {
+      "Hot": "1"
+    },
     "arrivalNotificationSchedules": [
       6
     ],
-    "arrivalNotificationWithIn": 111,
-    "assetNum": "10515",
-    "assetType": "SeaContainer",
-    "customFields": {
-      "field1": "value1"
-    },
-    "palletId": "palettid",
-    "poNum": 893793487,
-    "shipmentDescription": "Any Description",
-    "shippedFrom": 9,
-    "shippedTo": 10,
-    "shutdownDevice": 155,
-    "status": "Default",
-    "tripCount": 88,
+    "arrivalNotificationWithinKm": 111,
+    "excludeNotificationIfNoAlerts": false,
     "items": [
       {
-        "timestamp": 1446027400702,
+        "timestamp": "2015-11-03T23:05",
         "location": {
           "latitude": 50.5,
           "longitude": 51.51
         },
         "temperature": 56.0,
         "type": "AUT",
-        "alerts": [
-          {
-            "description": "Alert description",
-            "name": "Alert-BatteryLow",
-            "type": "BatteryLow"
-          }
-        ],
+        "alerts": [],
         "arrivas": [
           {
-            "numberOfMetersOfArrival": 400
+            "numberOfMetersOfArrival": 400,
+            "arrivalReportSentTo": ""
           }
         ]
       },
       {
-        "timestamp": 1446027400702,
+        "timestamp": "2015-11-03T23:05",
         "location": {
           "latitude": 50.5,
           "longitude": 51.51
@@ -1646,11 +1649,8 @@ Response:
         "type": "AUT",
         "alerts": [
           {
-            "description": "Temp Alert",
-            "name": "TempAlert-1",
-            "type": "HighTemperature",
-            "temperature": 5.0,
-            "minutes": 55
+            "description": "Too hot alert - tracker 394857(88) went above 5,0C degrees for 55 min",
+            "type": "Hot"
           }
         ],
         "arrivas": []

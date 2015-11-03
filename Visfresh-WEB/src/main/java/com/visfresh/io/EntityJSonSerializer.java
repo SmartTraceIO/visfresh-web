@@ -363,7 +363,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("detectLocationForShippedFrom", tpl.isDetectLocationForShippedFrom());
         obj.addProperty("useCurrentTimeForDateShipped", tpl.isUseCurrentTimeForDateShipped());
         obj.addProperty("alertProfile", getId(tpl.getAlertProfile()));
-        obj.addProperty("alertSuppressionMinutes", tpl.getAlertSuppressionDuringCoolDown());
+        obj.addProperty("alertSuppressionMinutes", tpl.getAlertSuppressionMinutes());
         obj.addProperty("maxTimesAlertFires", tpl.getMaxTimesAlertFires());
         obj.add("alertsNotificationSchedules", getIdList(tpl.getAlertsNotificationSchedules()));
         obj.addProperty("excludeNotificationsIfNoAlerts", tpl.isExcludeNotificationsIfNoAlertsFired());
@@ -395,7 +395,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param obj
      */
     private void addShipmentBase(final ShipmentBase shpb, final JsonObject obj) {
-        obj.addProperty("alertSuppressionMinutes", shpb.getAlertSuppressionDuringCoolDown());
+        obj.addProperty("alertSuppressionMinutes", shpb.getAlertSuppressionMinutes());
         obj.addProperty("alertProfile", getId(shpb.getAlertProfile()));
         obj.add("alertsNotificationSchedules", getIdList(shpb.getAlertsNotificationSchedules()));
         obj.addProperty("arrivalNotificationWithinKm", shpb.getArrivalNotificationWithinKm());
@@ -412,7 +412,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param shp
      */
     private void parseShipmentBase(final JsonObject obj, final ShipmentBase shp) {
-        shp.setAlertSuppressionDuringCoolDown(asInt(obj.get("alertSuppressionMinutes")));
+        shp.setAlertSuppressionMinutes(asInt(obj.get("alertSuppressionMinutes")));
         shp.setAlertProfile(resolveAlertProfile(asLong(obj.get("alertProfile"))));
         shp.getAlertsNotificationSchedules().addAll(
                 resolveNotificationSchedules(obj.get("alertsNotificationSchedules").getAsJsonArray()));

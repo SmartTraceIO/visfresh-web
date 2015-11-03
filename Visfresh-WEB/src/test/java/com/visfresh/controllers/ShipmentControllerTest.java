@@ -12,7 +12,7 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
@@ -147,7 +147,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         final Date fromTime = new Date(System.currentTimeMillis() - 100000000L);
         final Date toTime = new Date(System.currentTimeMillis() + 10000000l);
-        final JsonElement sd = facade.getSingleShipment(s, fromTime, toTime);
+        final JsonObject sd = facade.getSingleShipment(s, fromTime, toTime).getAsJsonObject();
         assertNotNull(sd);
     }
     //@RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)

@@ -31,7 +31,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.ShipmentStateDto;
-import com.visfresh.mpl.services.RestServiceImpl;
+import com.visfresh.mpl.services.AbstractReportService;
 import com.visfresh.services.RestService;
 
 /**
@@ -228,7 +228,7 @@ public class MockRestService implements RestService {
             result.add(dto);
             final List<Alert> shipmentAlerts = getShipmentAlerts(s);
             if (shipmentAlerts != null) {
-                dto.getAlertSummary().putAll(RestServiceImpl.toSummaryMap(shipmentAlerts));
+                dto.getAlertSummary().putAll(AbstractReportService.toSummaryMap(shipmentAlerts));
             }
         }
         return result;
