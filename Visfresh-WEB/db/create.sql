@@ -56,6 +56,7 @@ create table users (
     fullname varchar(255),
     roles varchar(255) not null,
     company bigint(20) not null,
+    tempunits varchar(20) not null default 'Celsius',
     timezone varchar(31) not null default 'UTC',
     primary key (username),
     FOREIGN KEY (company)

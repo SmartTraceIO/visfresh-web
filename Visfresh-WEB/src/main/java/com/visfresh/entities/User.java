@@ -36,6 +36,10 @@ public class User implements EntityWithId<String> {
      * Set of roles.
      */
     private Set<Role> roles = new HashSet<Role>();
+    /**
+     * Temperature units
+     */
+    private TemperatureUnits temperatureUnits = TemperatureUnits.Celsius;
 
     /**
      * Default constructor.
@@ -116,5 +120,17 @@ public class User implements EntityWithId<String> {
      */
     public void setTimeZone(final TimeZone timeZone) {
         this.timeZone = timeZone;
+    }
+    /**
+     * @return the temperatureUnits
+     */
+    public TemperatureUnits getTemperatureUnits() {
+        return temperatureUnits;
+    }
+    /**
+     * @param temperatureUnits the temperatureUnits to set
+     */
+    public void setTemperatureUnits(final TemperatureUnits temperatureUnits) {
+        this.temperatureUnits = temperatureUnits;
     }
 }

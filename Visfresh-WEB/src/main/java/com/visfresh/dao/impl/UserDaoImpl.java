@@ -17,6 +17,7 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 
@@ -36,6 +37,7 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
     private static final String COMPANY_FIELD = "company";
     private static final String ROLES_FIELD = "roles";
     private static final String TIME_ZONE_FIELD = "timezone";
+    private static final String TEMPERATURE_UNITS = "tempunits";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -87,6 +89,7 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
                     FULLNAME_FIELD,
                     ROLES_FIELD,
                     TIME_ZONE_FIELD,
+                    TEMPERATURE_UNITS,
                     COMPANY_FIELD
                 ) + ")" + " values("
                     + ":"+ USERNAME_FIELD
@@ -94,6 +97,7 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
                     + ", :" + FULLNAME_FIELD
                     + ", :" + ROLES_FIELD
                     + ", :" + TIME_ZONE_FIELD
+                    + ", :" + TEMPERATURE_UNITS
                     + ", :" + COMPANY_FIELD
                     + ")";
         } else {
@@ -104,6 +108,7 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
                 + "," + ROLES_FIELD + "=:" + ROLES_FIELD
                 + "," + COMPANY_FIELD + "=:" + COMPANY_FIELD
                 + "," + TIME_ZONE_FIELD + "=:" + TIME_ZONE_FIELD
+                + "," + TEMPERATURE_UNITS + "=:" + TEMPERATURE_UNITS
                 + " where " + USERNAME_FIELD + " = :" + USERNAME_FIELD
             ;
         }
@@ -114,6 +119,7 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
         paramMap.put(ROLES_FIELD, convertToDatabaseColumn(user.getRoles()));
         paramMap.put(COMPANY_FIELD, user.getCompany().getId());
         paramMap.put(TIME_ZONE_FIELD, user.getTimeZone().getID());
+        paramMap.put(TEMPERATURE_UNITS, user.getTemperatureUnits().toString());
         jdbc.update(sql, paramMap);
 
         return user;
@@ -179,6 +185,7 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
         u.setFullName((String) map.get(resultPrefix + FULLNAME_FIELD));
         u.setPassword((String) map.get(resultPrefix + PASSWORD_FIELD));
         u.setTimeZone(TimeZone.getTimeZone((String) map.get(resultPrefix + TIME_ZONE_FIELD)));
+        u.setTemperatureUnits(TemperatureUnits.valueOf((String) map.get(resultPrefix + TEMPERATURE_UNITS)));
         u.getRoles().addAll(convertToEntityAttribute((String) map.get(resultPrefix + ROLES_FIELD)));
         return u;
     }
@@ -196,6 +203,7 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
         map.put(entityName + "." + ROLES_FIELD, resultPrefix + ROLES_FIELD);
         map.put(entityName + "." + FULLNAME_FIELD, resultPrefix + FULLNAME_FIELD);
         map.put(entityName + "." + TIME_ZONE_FIELD, resultPrefix + TIME_ZONE_FIELD);
+        map.put(entityName + "." + TEMPERATURE_UNITS, resultPrefix + TEMPERATURE_UNITS);
         return map ;
     }
 

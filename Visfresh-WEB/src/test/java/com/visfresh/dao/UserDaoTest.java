@@ -19,6 +19,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 
@@ -87,6 +88,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         u.setLogin("asuvorov-" + (++ids));
         u.setPassword("abrakadabra");
         u.setTimeZone(TimeZone.getTimeZone("UTC"));
+        u.setTemperatureUnits(TemperatureUnits.Fahrenheit);
         return u;
     }
     /**
@@ -166,6 +168,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         assertEquals("Alexander Suvorov", user.getFullName());
         assertEquals("abrakadabra", user.getPassword());
         assertEquals(TimeZone.getTimeZone("UTC"), user.getTimeZone());
+        assertEquals(TemperatureUnits.Fahrenheit, user.getTemperatureUnits());
 
         //test company
         final Company c = user.getCompany();
@@ -188,6 +191,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         assertEquals("Alexander Suvorov", user.getFullName());
         assertEquals("abrakadabra", user.getPassword());
         assertEquals(TimeZone.getTimeZone("UTC"), user.getTimeZone());
+        assertEquals(TemperatureUnits.Fahrenheit, user.getTemperatureUnits());
 
         //test company
         final Company c = user.getCompany();
