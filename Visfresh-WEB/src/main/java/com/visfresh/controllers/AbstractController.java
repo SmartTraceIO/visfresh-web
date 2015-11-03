@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
@@ -34,6 +33,7 @@ import com.visfresh.services.RestServiceException;
 @Component
 @ComponentScan(basePackageClasses = {AuthService.class})
 public abstract class AbstractController {
+    protected static final TimeZone UTС = TimeZone.getTimeZone("UTC");
     /**
      * Authentication service.
      */
@@ -201,19 +201,12 @@ public abstract class AbstractController {
         }
     }
     /**
-     * @param dateStr date string.
-     * @return date.
-     */
-    protected Date parseDate(final String dateStr) {
-        return dateStr == null || dateStr.length() == 0 ? null : EntityJSonSerializer.parseDate(dateStr);
-    }
-    /**
      * @param user user.
      * @return serializer.
      */
     protected EntityJSonSerializer getSerializer(final User user) {
         final EntityJSonSerializer ser = new EntityJSonSerializer(
-                user == null ? TimeZone.getDefault() : user.getTimeZone());
+                user == null ? UTС : user.getTimeZone());
         ser.setReferenceResolver(resolver);
         return ser;
     }

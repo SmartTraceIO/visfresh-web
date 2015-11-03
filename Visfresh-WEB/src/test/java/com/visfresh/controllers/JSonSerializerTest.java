@@ -77,7 +77,7 @@ public class JSonSerializerTest {
         this.gson = b.create();
 
         resolver = new MockReferenceResolver();
-        serializer = new EntityJSonSerializer(TimeZone.getDefault());
+        serializer = new EntityJSonSerializer(TimeZone.getTimeZone("UTC"));
         serializer.setReferenceResolver(resolver);
     }
 
@@ -558,7 +558,7 @@ public class JSonSerializerTest {
         e.setLatitude(latitude);
         e.setLongitude(longitude);
 
-        final JsonObject obj= EntityJSonSerializer.toJson(e);
+        final JsonObject obj= serializer.toJson(e);
         e = serializer.parseTrackerEvent(obj);
 
         assertEquals(battery, e.getBattery());
@@ -689,7 +689,7 @@ public class JSonSerializerTest {
         alert.setType(type);
         alert.setShipment(shipment);
 
-        final JsonElement json = EntityJSonSerializer.toJson(alert);
+        final JsonElement json = serializer.toJson(alert);
         alert = serializer.parseAlert(json);
 
         assertEquals(format(date), format(alert.getDate()));
@@ -717,7 +717,7 @@ public class JSonSerializerTest {
         alert.setTemperature(temperature);
         alert.setMinutes(minutes);
 
-        final JsonElement json = EntityJSonSerializer.toJson(alert);
+        final JsonElement json = serializer.toJson(alert);
         alert = (TemperatureAlert) serializer.parseAlert(json);
 
         assertEquals(format(date), format(alert.getDate()));
@@ -733,7 +733,7 @@ public class JSonSerializerTest {
      * @return
      */
     private String format(final Date date) {
-        return new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss").format(date);
+        return new SimpleDateFormat("yyyy-MM-dd:HH:mm").format(date);
     }
 
     @Test
@@ -751,7 +751,7 @@ public class JSonSerializerTest {
         a.setNumberOfMettersOfArrival(numberOfMetersOfArrival);
         a.setShipment(shipment);
 
-        final JsonElement e = EntityJSonSerializer.toJson(a);
+        final JsonElement e = serializer.toJson(a);
         a = serializer.parseArrival(e);
 
         assertEquals(format(date), format(a.getDate()));

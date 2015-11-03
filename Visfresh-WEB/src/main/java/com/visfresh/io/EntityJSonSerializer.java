@@ -4,6 +4,7 @@
 package com.visfresh.io;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +46,10 @@ import com.visfresh.services.AuthToken;
  *
  */
 public class EntityJSonSerializer extends AbstractJsonSerializer {
+    /**
+     *
+     */
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private ReferenceResolver referenceResolver;
 
     /**
@@ -61,7 +66,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
     public JsonObject toJson(final AuthToken token) {
         final JsonObject obj = new JsonObject();
         obj.addProperty("token", token.getToken());
-        obj.addProperty("expired", timeToString(token.getExpirationTime()));
+        obj.addProperty("expired", formatDate(token.getExpirationTime()));
         return obj;
     }
 
@@ -488,7 +493,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("tripCount", s.getTripCount());
         obj.addProperty("poNum", s.getPoNum());
         obj.addProperty("assetNum", s.getAssetNum());
-        obj.addProperty("shipmentDate", timeToString(s.getShipmentDate()));
+        obj.addProperty("shipmentDate", formatDate(s.getShipmentDate()));
         obj.add("customFields", toJson(s.getCustomFields()));
         obj.addProperty("status", s.getStatus().name());
         obj.addProperty("deviceSN", s.getDevice() == null ? null : s.getDevice().getId());
@@ -587,11 +592,11 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param arrival
      * @return JSON object.
      */
-    public static JsonObject toJson(final Arrival arrival) {
+    public JsonObject toJson(final Arrival arrival) {
         final JsonObject json = new JsonObject();
         json.addProperty("id", arrival.getId());
         json.addProperty("numberOfMetersOfArrival", arrival.getNumberOfMettersOfArrival());
-        json.addProperty("date", timeToString(arrival.getDate()));
+        json.addProperty("date", formatDate(arrival.getDate()));
         json.addProperty("device", arrival.getDevice().getId());
         json.addProperty("shipment", arrival.getShipment().getId());
         return json;
@@ -634,12 +639,12 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param alert
      * @return JSON object
      */
-    public static JsonObject toJson(final Alert alert) {
+    public JsonObject toJson(final Alert alert) {
         final JsonObject json = new JsonObject();
 
         //add common alert properties
         json.addProperty("id", alert.getId());
-        json.addProperty("date", timeToString(alert.getDate()));
+        json.addProperty("date", formatDate(alert.getDate()));
         json.addProperty("device", alert.getDevice().getId());
         json.addProperty("shipment", alert.getShipment().getId());
         json.addProperty("type", alert.getType().name());
@@ -666,12 +671,12 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param e tracker event.
      * @return JSON object.
      */
-    public static JsonObject toJson(final TrackerEvent e) {
+    public JsonObject toJson(final TrackerEvent e) {
         final JsonObject obj = new JsonObject();
         obj.addProperty("battery", e.getBattery());
         obj.addProperty("id", e.getId());
         obj.addProperty("temperature", e.getTemperature());
-        obj.addProperty("time", timeToString(e.getTime()));
+        obj.addProperty("time", formatDate(e.getTime()));
         obj.addProperty("type", e.getType());
         obj.addProperty("latitude", e.getLatitude());
         obj.addProperty("longitude", e.getLongitude());
@@ -773,7 +778,11 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
         e.setBattery(asInt(obj.get("battery")));
         e.setTemperature(asDouble(obj.get("temperature")));
-        e.setDate(parseDate(asString(obj.get("time"))));
+        try {
+            e.setDate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").parse(asString(obj.get("time"))));
+        } catch (final ParseException e1) {
+            e1.printStackTrace();
+        }
         e.setType(asString(obj.get("type")));
         e.getLocation().setLatitude(asDouble(obj.get("latitude")));
         e.getLocation().setLongitude(asDouble(obj.get("longitude")));
@@ -785,11 +794,13 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         if (e == null) {
             return JsonNull.INSTANCE;
         }
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        sdf.setTimeZone(UTC);
 
         final JsonObject obj = new JsonObject();
         obj.addProperty("battery", e.getBattery());
         obj.addProperty("temperature", e.getTemperature());
-        obj.addProperty("time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(e.getTime()));
+        obj.addProperty("time", sdf.format(e.getTime()));
         obj.addProperty("type", e.getType());
         obj.addProperty("latitude", e.getLocation().getLatitude());
         obj.addProperty("longitude", e.getLocation().getLongitude());

@@ -379,17 +379,17 @@ public class ShipmentController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipmentData(user);
 
-            final Date startDate = parseDate(fromDate);
-            final Date endDate = parseDate(toDate);
+            final ReportSerializer ser = getReportSerializer(user);
+            final Date startDate = ser.parseDate(fromDate);
+            final Date endDate = ser.parseDate(toDate);
 
             final SingleShipmentDto dto = reportService.getSingleShipment(startDate, endDate, shipment);
-            return createSuccessResponse(dto == null ? null : getReportSerializer(user).toJson(dto));
+            return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
     }
-
     /**
      * @param user
      * @return

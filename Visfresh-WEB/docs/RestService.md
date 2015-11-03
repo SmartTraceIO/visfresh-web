@@ -427,7 +427,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
     "customFields": {  //map of custom fields
       "field1": "value1"
     },
-    "status": "Default", //status Default/In Progress/Completed/Pending
+    "status": "Default", //status Default/InProgress/Completed/Pending
     "device": "234908720394857"
   }
 ```

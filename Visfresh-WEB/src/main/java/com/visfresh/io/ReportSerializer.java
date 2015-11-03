@@ -20,11 +20,13 @@ import com.visfresh.entities.TrackerEvent;
  *
  */
 public class ReportSerializer extends AbstractJsonSerializer {
+    private final EntityJSonSerializer entitySerializer;
     /**
      * Default constructor.
      */
     public ReportSerializer(final TimeZone tz) {
         super(tz);
+        entitySerializer = new EntityJSonSerializer(tz);
     }
 
     public JsonObject toJson(final SingleShipmentDto dto) {
@@ -44,7 +46,7 @@ public class ReportSerializer extends AbstractJsonSerializer {
         obj.addProperty("device", dto.getDevice());
         obj.addProperty("palletId", dto.getPalletId());
         obj.addProperty("poNum", dto.getPoNum());
-        obj.addProperty("shipmentDate", timeToString(dto.getShipmentDate()));
+        obj.addProperty("shipmentDate", formatDate(dto.getShipmentDate()));
         obj.addProperty("shipmentDescription", dto.getShipmentDescription());
         obj.addProperty("shippedFrom", dto.getShippedFrom());
         obj.addProperty("shippedTo", dto.getShippedTo());
@@ -132,7 +134,7 @@ public class ReportSerializer extends AbstractJsonSerializer {
      * @return
      */
     private JsonElement toJson(final Arrival arrival) {
-        final JsonObject obj = EntityJSonSerializer.toJson(arrival);
+        final JsonObject obj = entitySerializer.toJson(arrival);
         removeRefs(obj);
         return obj;
     }
@@ -141,7 +143,7 @@ public class ReportSerializer extends AbstractJsonSerializer {
      * @return
      */
     private JsonObject toJson(final Alert alert) {
-        final JsonObject obj = EntityJSonSerializer.toJson(alert);
+        final JsonObject obj = entitySerializer.toJson(alert);
         removeRefs(obj);
         return obj;
     }

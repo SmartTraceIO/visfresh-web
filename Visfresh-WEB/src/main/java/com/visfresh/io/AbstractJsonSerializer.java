@@ -25,7 +25,7 @@ public class AbstractJsonSerializer {
     /**
      * The date format.
      */
-    public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+    public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm";
     private final TimeZone timeZone;
 
     /**
@@ -65,19 +65,6 @@ public class AbstractJsonSerializer {
         }
         return map;
     }
-
-    /**
-     * @param str
-     * @return
-     */
-    public static Date parseDate(final String str) {
-        try {
-            return new SimpleDateFormat(DATE_FORMAT).parse(str);
-        } catch (final ParseException exc) {
-            throw new RuntimeException(exc);
-        }
-    }
-
     /**
      * @param e
      * @return
@@ -147,6 +134,29 @@ public class AbstractJsonSerializer {
         sdf.setTimeZone(t);
         return sdf.format(date);
     }
+
+    /**
+     * @param str
+     * @return
+     */
+    public Date parseDate(final String str) {
+        return parseDate(str, timeZone);
+    }
+
+    /**
+     * @param str
+     * @param tz
+     * @return
+     */
+    public static Date parseDate(final String str, final TimeZone tz) {
+        final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        sdf.setTimeZone(tz);
+        try {
+            return sdf.parse(str);
+        } catch (final ParseException exc) {
+            throw new RuntimeException(exc);
+        }
+    }
     /**
      * @param text JSON text.
      * @return JSON element.
@@ -159,13 +169,4 @@ public class AbstractJsonSerializer {
         final Reader in = new StringReader(text);
         return new JsonParser().parse(in);
     }
-
-    /**
-     * @param time
-     * @return the time in 'yyyy-MM-dd'T'HH:mm:ss.SSSZ' format.
-     */
-    protected static String timeToString(final Date time) {
-        return time == null ? null : new SimpleDateFormat(DATE_FORMAT).format(time);
-    }
-
 }
