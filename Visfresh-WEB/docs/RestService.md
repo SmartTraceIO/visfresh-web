@@ -307,17 +307,25 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 ### Alert Profile ###
 ```json
 {
-  "alertProfileId": 8,
-  "alertProfileName": "a",
-  "alertProfileDescription": "b",
-  "highTemperature": 1.0,
-  "highTemperatureMinutes": 55,
-  "criticalHighTemperature": 5.0,
+  "alertProfileId": 2,
+  "alertProfileName": "AnyAlert",
+  "alertProfileDescription": "Any description",
+  "highTemperature": 5.0,
+  "highTemperatureMinutes": 0,
+  "highTemperature2": 4.0, //optional
+  "highTemperatureMinutes2": 2, //optional
+  "criticalHighTemperature": 10.0,
   "criticalHighTemperatureMinutes": 0,
+  "criticalHighTemperature2": 9.0, //optional
+  "criticalHighTemperatureMinutes2": 1, //optional
   "lowTemperature": -10.0,
-  "lowTemperatureMinutes": 55,
+  "lowTemperatureMinutes": 40,
+  "lowTemperature2": -8.0, //optional
+  "lowTemperatureMinutes2": 55, //optional
   "criticalLowTemperature": -15.0,
   "criticalLowTemperatureMinutes": 0,
+  "criticalLowTemperature2": -14.0, //optional
+  "criticalLowTemperatureMinutes2": 1, //optional
   "watchBatteryLow": true,
   "watchEnterBrightEnvironment": true,
   "watchEnterDarkEnvironment": true,
@@ -603,26 +611,36 @@ See also [Shipment Object](#markdown-header-shipment)
 `}`  
 ### Save alert profile example ###
 **POST /vf/rest/saveAlertProfile/${authToken}**  
+**Request body:**  
 ```json
-Request body:
 {
   "alertProfileName": "AnyAlert",
   "alertProfileDescription": "Any description",
-  "highTemperature": 1.0,
-  "highTemperatureMinutes": 55,
+  "highTemperature": 5.0,
+  "highTemperatureMinutes": 0,
+  "highTemperature2": 4.0,
+  "highTemperatureMinutes2": 2,
+  "criticalHighTemperature": 10.0,
   "criticalHighTemperatureMinutes": 0,
-  "criticalHighTemperature": 5.0,
+  "criticalHighTemperature2": 9.0,
+  "criticalHighTemperatureMinutes2": 1,
   "lowTemperature": -10.0,
-  "lowTemperatureMinutes": 55,
-  "criticalLowTemperatureMinutes": 0,
+  "lowTemperatureMinutes": 40,
+  "lowTemperature2": -8.0,
+  "lowTemperatureMinutes2": 55,
   "criticalLowTemperature": -15.0,
+  "criticalLowTemperatureMinutes": 0,
+  "criticalLowTemperature2": -14.0,
+  "criticalLowTemperatureMinutes2": 1,
   "watchBatteryLow": true,
   "watchEnterBrightEnvironment": true,
   "watchEnterDarkEnvironment": true,
   "watchMovementStart": true,
   "watchMovementStop": true
 }
-Response:
+```
+**Response:** 
+```json
 {
   "status": {
     "code": 0,
@@ -633,21 +651,46 @@ Response:
   }
 }
 ```
+### Get Alert Profile example ###
+**GET /vf/rest/getAlertProfile/${accessToken}?alertProfileId=5**  
 **Response:**  
-`{`   
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": {`  
-`"id": 2`  
-`}`  
-`}`  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "alertProfileId": 2,
+    "alertProfileName": "AnyAlert",
+    "alertProfileDescription": "Any description",
+    "highTemperature": 5.0,
+    "highTemperatureMinutes": 0,
+    "highTemperature2": 4.0,
+    "highTemperatureMinutes2": 2,
+    "criticalHighTemperature": 10.0,
+    "criticalHighTemperatureMinutes": 0,
+    "criticalHighTemperature2": 9.0,
+    "criticalHighTemperatureMinutes2": 1,
+    "lowTemperature": -10.0,
+    "lowTemperatureMinutes": 40,
+    "lowTemperature2": -8.0,
+    "lowTemperatureMinutes2": 55,
+    "criticalLowTemperature": -15.0,
+    "criticalLowTemperatureMinutes": 0,
+    "criticalLowTemperature2": -14.0,
+    "criticalLowTemperatureMinutes2": 1,
+    "watchBatteryLow": true,
+    "watchEnterBrightEnvironment": true,
+    "watchEnterDarkEnvironment": true,
+    "watchMovementStart": true,
+    "watchMovementStop": true
+  }
+}
 ### Get Alert Profiles example ###
 **GET /vf/rest/getAlertProfiles/${accessToken}?so=desc&pageSize=10000&sc=alertProfileDescription&pageIndex=1**  
 **Response:**  
 ```json
-Response:
 {
   "status": {
     "code": 0,
@@ -655,17 +698,25 @@ Response:
   },
   "response": [
     {
-      "alertProfileId": 7,
-      "alertProfileName": "b",
-      "alertProfileDescription": "c",
-      "highTemperature": 1.0,
-      "highTemperatureMinutes": 55,
+      "alertProfileId": 2,
+      "alertProfileName": "AnyAlert",
+      "alertProfileDescription": "Any description",
+      "highTemperature": 5.0,
+      "highTemperatureMinutes": 0,
+      "highTemperature2": 4.0,
+      "highTemperatureMinutes2": 2,
+      "criticalHighTemperature": 10.0,
       "criticalHighTemperatureMinutes": 0,
-      "criticalHighTemperature": 5.0,
+      "criticalHighTemperature2": 9.0,
+      "criticalHighTemperatureMinutes2": 1,
       "lowTemperature": -10.0,
-      "lowTemperatureMinutes": 55,
-      "criticalLowTemperatureMinutes": 0,
+      "lowTemperatureMinutes": 40,
+      "lowTemperature2": -8.0,
+      "lowTemperatureMinutes2": 55,
       "criticalLowTemperature": -15.0,
+      "criticalLowTemperatureMinutes": 0,
+      "criticalLowTemperature2": -14.0,
+      "criticalLowTemperatureMinutes2": 1,
       "watchBatteryLow": true,
       "watchEnterBrightEnvironment": true,
       "watchEnterDarkEnvironment": true,
@@ -673,35 +724,25 @@ Response:
       "watchMovementStop": true
     },
     {
-      "alertProfileId": 8,
-      "alertProfileName": "a",
-      "alertProfileDescription": "b",
-      "highTemperature": 1.0,
-      "highTemperatureMinutes": 55,
+      "alertProfileId": 3,
+      "alertProfileName": "AnyAlert",
+      "alertProfileDescription": "Any description",
+      "highTemperature": 5.0,
+      "highTemperatureMinutes": 0,
+      "highTemperature2": 4.0,
+      "highTemperatureMinutes2": 2,
+      "criticalHighTemperature": 10.0,
       "criticalHighTemperatureMinutes": 0,
-      "criticalHighTemperature": 5.0,
+      "criticalHighTemperature2": 9.0,
+      "criticalHighTemperatureMinutes2": 1,
       "lowTemperature": -10.0,
-      "lowTemperatureMinutes": 55,
-      "criticalLowTemperatureMinutes": 0,
+      "lowTemperatureMinutes": 40,
+      "lowTemperature2": -8.0,
+      "lowTemperatureMinutes2": 55,
       "criticalLowTemperature": -15.0,
-      "watchBatteryLow": true,
-      "watchEnterBrightEnvironment": true,
-      "watchEnterDarkEnvironment": true,
-      "watchMovementStart": true,
-      "watchMovementStop": true
-    },
-    {
-      "alertProfileId": 9,
-      "alertProfileName": "c",
-      "alertProfileDescription": "a",
-      "highTemperature": 1.0,
-      "highTemperatureMinutes": 55,
-      "criticalHighTemperatureMinutes": 0,
-      "criticalHighTemperature": 5.0,
-      "lowTemperature": -10.0,
-      "lowTemperatureMinutes": 55,
       "criticalLowTemperatureMinutes": 0,
-      "criticalLowTemperature": -15.0,
+      "criticalLowTemperature2": -14.0,
+      "criticalLowTemperatureMinutes2": 1,
       "watchBatteryLow": true,
       "watchEnterBrightEnvironment": true,
       "watchEnterDarkEnvironment": true,
@@ -1380,35 +1421,6 @@ Response:
 `"message": "Success"`  
 `}`  
 `}`  
-### Get Alert Profile example ###
-**GET /vf/rest/getAlertProfile/${accessToken}?alertProfileId=5**  
-**Response:**  
-```json
-Response:
-{
-  "status": {
-    "code": 0,
-    "message": "Success"
-  },
-  "response": {
-    "alertProfileId": 5,
-    "alertProfileName": "AnyAlert",
-    "alertProfileDescription": "Any description",
-    "highTemperature": 1.0,
-    "highTemperatureMinutes": 55,
-    "criticalHighTemperatureMinutes": 0,
-    "criticalHighTemperature": 5.0,
-    "lowTemperature": -10.0,
-    "lowTemperatureMinutes": 55,
-    "criticalLowTemperatureMinutes": 0,
-    "criticalLowTemperature": -15.0,
-    "watchBatteryLow": true,
-    "watchEnterBrightEnvironment": true,
-    "watchEnterDarkEnvironment": true,
-    "watchMovementStart": true,
-    "watchMovementStop": true
-  }
-}
 ```
 ### Get Location example ###
 **GET /vf/rest/getLocation/${accessToken}?locationId=2**  

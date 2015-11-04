@@ -29,14 +29,27 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
     public static final String ID_FIELD = "id";
     public static final String NAME_FIELD = "name";
     public static final String DESCRIPTION_FIELD = "description";
+
     public static final String LOWTEMP_FIELD = "lowtemp";
-    public static final String CRITICALLOWTEMP_FIELD = "criticallowtem";
     public static final String LOWTEMPFORMORETHEN_FIELD = "lowtempformorethen";
+    public static final String LOWTEMP_FIELD_2 = "lowtemp2";
+    public static final String LOWTEMPFORMORETHEN_FIELD_2 = "lowtempformorethen2";
+
+    public static final String CRITICALLOWTEMP_FIELD = "criticallowtem";
     public static final String CRITICALLOWTEMPFORMORETHEN_FIELD = "criticallowtempformorethen";
+    public static final String CRITICALLOWTEMP_FIELD_2 = "criticallowtem2";
+    public static final String CRITICALLOWTEMPFORMORETHEN_FIELD_2 = "criticallowtempformorethen2";
+
     public static final String HIGHTEMP_FIELD = "hightemp";
-    public static final String CRITICALHIGHTEMP_FIELD = "criticalhightemp";
     public static final String HIGHTEMPFORMORETHEN_FIELD = "hightempformorethen";
+    public static final String HIGHTEMP_FIELD_2 = "hightemp2";
+    public static final String HIGHTEMPFORMORETHEN_FIELD_2 = "hightempformorethen2";
+
+    public static final String CRITICALHIGHTEMP_FIELD = "criticalhightemp";
     public static final String CRITICALHIGHTEMPFORMORETHEN_FIELD = "criticalhightempformorethen";
+    public static final String CRITICALHIGHTEMP_FIELD_2 = "criticalhightemp2";
+    public static final String CRITICALHIGHTEMPFORMORETHEN_FIELD_2 = "criticalhightempformorethen2";
+
     public static final String ONENTERBRIGHT_FIELD = "onenterbright";
     public static final String ONENTERDARK_FIELD = "onenterdark";
     public static final String ONMOVEMENTSTART_FIELD = "onmovementstart";
@@ -77,14 +90,27 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
         paramMap.put(ID_FIELD, ap.getId());
         paramMap.put(NAME_FIELD, ap.getName());
         paramMap.put(DESCRIPTION_FIELD, ap.getDescription());
+
         paramMap.put(LOWTEMP_FIELD, ap.getLowTemperature());
-        paramMap.put(CRITICALLOWTEMP_FIELD, ap.getCriticalLowTemperature());
         paramMap.put(LOWTEMPFORMORETHEN_FIELD, ap.getLowTemperatureForMoreThen());
+        paramMap.put(LOWTEMP_FIELD_2, ap.getLowTemperature2());
+        paramMap.put(LOWTEMPFORMORETHEN_FIELD_2, ap.getLowTemperatureForMoreThen2());
+
+        paramMap.put(CRITICALLOWTEMP_FIELD, ap.getCriticalLowTemperature());
         paramMap.put(CRITICALLOWTEMPFORMORETHEN_FIELD, ap.getCriticalLowTemperatureForMoreThen());
+        paramMap.put(CRITICALLOWTEMP_FIELD_2, ap.getCriticalLowTemperature2());
+        paramMap.put(CRITICALLOWTEMPFORMORETHEN_FIELD_2, ap.getCriticalLowTemperatureForMoreThen2());
+
         paramMap.put(HIGHTEMP_FIELD, ap.getHighTemperature());
-        paramMap.put(CRITICALHIGHTEMP_FIELD, ap.getCriticalHighTemperature());
         paramMap.put(HIGHTEMPFORMORETHEN_FIELD, ap.getHighTemperatureForMoreThen());
+        paramMap.put(HIGHTEMP_FIELD_2, ap.getHighTemperature2());
+        paramMap.put(HIGHTEMPFORMORETHEN_FIELD_2, ap.getHighTemperatureForMoreThen2());
+
+        paramMap.put(CRITICALHIGHTEMP_FIELD, ap.getCriticalHighTemperature());
         paramMap.put(CRITICALHIGHTEMPFORMORETHEN_FIELD, ap.getCriticalHighTemperatureForMoreThen());
+        paramMap.put(CRITICALHIGHTEMP_FIELD_2, ap.getCriticalHighTemperature2());
+        paramMap.put(CRITICALHIGHTEMPFORMORETHEN_FIELD_2, ap.getCriticalHighTemperatureForMoreThen2());
+
         paramMap.put(ONENTERBRIGHT_FIELD, ap.isWatchEnterBrightEnvironment());
         paramMap.put(ONENTERDARK_FIELD, ap.isWatchEnterDarkEnvironment());
         paramMap.put(ONMOVEMENTSTART_FIELD, ap.isWatchMovementStart());
@@ -104,20 +130,33 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
         final List<String> fields = new LinkedList<String>();
         fields.add(NAME_FIELD);
         fields.add(DESCRIPTION_FIELD);
+
         fields.add(LOWTEMP_FIELD);
-        fields.add(CRITICALLOWTEMP_FIELD);
         fields.add(LOWTEMPFORMORETHEN_FIELD);
+        fields.add(LOWTEMP_FIELD_2);
+        fields.add(LOWTEMPFORMORETHEN_FIELD_2);
+
+        fields.add(CRITICALLOWTEMP_FIELD);
         fields.add(CRITICALLOWTEMPFORMORETHEN_FIELD);
+        fields.add(CRITICALLOWTEMP_FIELD_2);
+        fields.add(CRITICALLOWTEMPFORMORETHEN_FIELD_2);
+
         fields.add(HIGHTEMP_FIELD);
         fields.add(HIGHTEMPFORMORETHEN_FIELD);
+        fields.add(HIGHTEMP_FIELD_2);
+        fields.add(HIGHTEMPFORMORETHEN_FIELD_2);
+
+        fields.add(CRITICALHIGHTEMP_FIELD);
         fields.add(CRITICALHIGHTEMPFORMORETHEN_FIELD);
+        fields.add(CRITICALHIGHTEMP_FIELD_2);
+        fields.add(CRITICALHIGHTEMPFORMORETHEN_FIELD_2);
+
         fields.add(ONENTERBRIGHT_FIELD);
         fields.add(ONENTERDARK_FIELD);
         fields.add(ONMOVEMENTSTART_FIELD);
         fields.add(ONMOVEMENTSTOP_FIELD);
         fields.add(ONBATTERYLOW_FIELD);
         fields.add(COMPANY_FIELD);
-        fields.add(CRITICALHIGHTEMP_FIELD);
         if (includeId) {
             fields.add(ID_FIELD);
         }
@@ -206,16 +245,47 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
 
         no.setName((String) map.get(NAME_FIELD));
         no.setDescription((String) map.get(DESCRIPTION_FIELD));
+
         no.setLowTemperature(((Number) map.get(LOWTEMP_FIELD)).doubleValue());
-        no.setCriticalLowTemperature(((Number) map.get(CRITICALLOWTEMP_FIELD)).doubleValue());
         no.setLowTemperatureForMoreThen(((Number) map.get(LOWTEMPFORMORETHEN_FIELD)).intValue());
+        if (map.get(LOWTEMP_FIELD_2) != null) {
+            no.setLowTemperature2(((Number) map.get(LOWTEMP_FIELD_2)).doubleValue());
+        }
+        if (map.get(LOWTEMPFORMORETHEN_FIELD_2) != null) {
+            no.setLowTemperatureForMoreThen2(((Number) map.get(LOWTEMPFORMORETHEN_FIELD_2)).intValue());
+        }
+
+        no.setCriticalLowTemperature(((Number) map.get(CRITICALLOWTEMP_FIELD)).doubleValue());
         no.setCriticalLowTemperatureForMoreThen(
                 ((Number) map.get(CRITICALLOWTEMPFORMORETHEN_FIELD)).intValue());
+        if (map.get(CRITICALLOWTEMP_FIELD_2) != null) {
+            no.setCriticalLowTemperature2(((Number) map.get(CRITICALLOWTEMP_FIELD_2)).doubleValue());
+        }
+        if (map.get(CRITICALLOWTEMPFORMORETHEN_FIELD_2) != null) {
+            no.setCriticalLowTemperatureForMoreThen2(
+                    ((Number) map.get(CRITICALLOWTEMPFORMORETHEN_FIELD_2)).intValue());
+        }
+
         no.setHighTemperature(((Number) map.get(HIGHTEMP_FIELD)).doubleValue());
-        no.setCriticalHighTemperature(((Number) map.get(CRITICALHIGHTEMP_FIELD)).doubleValue());
         no.setHighTemperatureForMoreThen(((Number) map.get(HIGHTEMPFORMORETHEN_FIELD)).intValue());
+        if (map.get(HIGHTEMP_FIELD_2) != null) {
+            no.setHighTemperature2(((Number) map.get(HIGHTEMP_FIELD_2)).doubleValue());
+        }
+        if (map.get(HIGHTEMPFORMORETHEN_FIELD_2) != null) {
+            no.setHighTemperatureForMoreThen2(((Number) map.get(HIGHTEMPFORMORETHEN_FIELD_2)).intValue());
+        }
+
+        no.setCriticalHighTemperature(((Number) map.get(CRITICALHIGHTEMP_FIELD)).doubleValue());
         no.setCriticalHighTemperatureForMoreThen(
                 ((Number) map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD)).intValue());
+        if (map.get(CRITICALHIGHTEMP_FIELD_2) != null) {
+            no.setCriticalHighTemperature2(((Number) map.get(CRITICALHIGHTEMP_FIELD_2)).doubleValue());
+        }
+        if (map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD_2) != null) {
+            no.setCriticalHighTemperatureForMoreThen2(
+                    ((Number) map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD_2)).intValue());
+        }
+
         no.setWatchEnterBrightEnvironment((Boolean) map.get(ONENTERBRIGHT_FIELD));
         no.setWatchEnterDarkEnvironment((Boolean) map.get(ONENTERDARK_FIELD));
         no.setWatchMovementStart((Boolean) map.get(ONMOVEMENTSTART_FIELD));
@@ -238,25 +308,9 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
      */
     private Map<String, String> createSelectAsMapping() {
         final Map<String, String> map = new HashMap<String, String>();
-
-        map.put(ID_FIELD,  ID_FIELD);
-        map.put(NAME_FIELD, NAME_FIELD);
-        map.put(DESCRIPTION_FIELD, DESCRIPTION_FIELD);
-        map.put(LOWTEMP_FIELD, LOWTEMP_FIELD);
-        map.put(CRITICALLOWTEMP_FIELD, CRITICALLOWTEMP_FIELD);
-        map.put(LOWTEMPFORMORETHEN_FIELD, LOWTEMPFORMORETHEN_FIELD);
-        map.put(CRITICALLOWTEMPFORMORETHEN_FIELD, CRITICALLOWTEMPFORMORETHEN_FIELD);
-        map.put(HIGHTEMP_FIELD, HIGHTEMP_FIELD);
-        map.put(CRITICALHIGHTEMP_FIELD, CRITICALHIGHTEMP_FIELD);
-        map.put(HIGHTEMPFORMORETHEN_FIELD, HIGHTEMPFORMORETHEN_FIELD);
-        map.put(CRITICALHIGHTEMPFORMORETHEN_FIELD, CRITICALHIGHTEMPFORMORETHEN_FIELD);
-        map.put(ONENTERBRIGHT_FIELD, ONENTERBRIGHT_FIELD);
-        map.put(ONENTERDARK_FIELD, ONENTERDARK_FIELD);
-        map.put(ONMOVEMENTSTART_FIELD, ONMOVEMENTSTART_FIELD);
-        map.put(ONMOVEMENTSTOP_FIELD, ONMOVEMENTSTOP_FIELD);
-        map.put(ONBATTERYLOW_FIELD, ONBATTERYLOW_FIELD);
-        map.put(COMPANY_FIELD, COMPANY_FIELD);
-
+        for (final String field : getFields(true)) {
+            map.put(field, field);
+        }
         return map;
     }
 

@@ -140,14 +140,35 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("alertProfileId", alert.getId());
         obj.addProperty("alertProfileName", alert.getName());
         obj.addProperty("alertProfileDescription", alert.getDescription());
+
         obj.addProperty("highTemperature", alert.getHighTemperature());
         obj.addProperty("highTemperatureMinutes", alert.getHighTemperatureForMoreThen());
+        if (alert.getHighTemperature2() != null) {
+            obj.addProperty("highTemperature2", alert.getHighTemperature2());
+            obj.addProperty("highTemperatureMinutes2", alert.getHighTemperatureForMoreThen2());
+        }
+
         obj.addProperty("criticalHighTemperature", alert.getCriticalHighTemperature());
         obj.addProperty("criticalHighTemperatureMinutes", alert.getCriticalHighTemperatureForMoreThen());
+        if (alert.getCriticalHighTemperature2() != null) {
+            obj.addProperty("criticalHighTemperature2", alert.getCriticalHighTemperature2());
+            obj.addProperty("criticalHighTemperatureMinutes2", alert.getCriticalHighTemperatureForMoreThen2());
+        }
+
         obj.addProperty("lowTemperature", alert.getLowTemperature());
         obj.addProperty("lowTemperatureMinutes", alert.getLowTemperatureForMoreThen());
+        if (alert.getLowTemperature2() != null) {
+            obj.addProperty("lowTemperature2", alert.getLowTemperature2());
+            obj.addProperty("lowTemperatureMinutes2", alert.getLowTemperatureForMoreThen2());
+        }
+
         obj.addProperty("criticalLowTemperature", alert.getCriticalLowTemperature());
         obj.addProperty("criticalLowTemperatureMinutes", alert.getCriticalLowTemperatureForMoreThen());
+        if (alert.getCriticalLowTemperature2() != null) {
+            obj.addProperty("criticalLowTemperature2", alert.getCriticalLowTemperature2());
+            obj.addProperty("criticalLowTemperatureMinutes2", alert.getCriticalLowTemperatureForMoreThen2());
+        }
+
         obj.addProperty("watchBatteryLow", alert.isWatchBatteryLow());
         obj.addProperty("watchEnterBrightEnvironment", alert.isWatchEnterBrightEnvironment());
         obj.addProperty("watchEnterDarkEnvironment", alert.isWatchEnterDarkEnvironment());
@@ -166,14 +187,35 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         p.setId(asLong(alert.get("alertProfileId")));
         p.setDescription(asString(alert.get("alertProfileDescription")));
         p.setName(asString(alert.get("alertProfileName")));
+
         p.setCriticalHighTemperature(asDouble(alert.get("criticalHighTemperature")));
         p.setCriticalHighTemperatureForMoreThen(asInt(alert.get("criticalHighTemperatureMinutes")));
+        if (alert.has("criticalHighTemperature2")) {
+            p.setCriticalHighTemperature2(asDouble(alert.get("criticalHighTemperature2")));
+            p.setCriticalHighTemperatureForMoreThen2(asInt(alert.get("criticalHighTemperatureMinutes2")));
+        }
+
         p.setCriticalLowTemperature(asDouble(alert.get("criticalLowTemperature")));
         p.setCriticalLowTemperatureForMoreThen(asInt(alert.get("criticalLowTemperatureMinutes")));
+        if (alert.has("criticalLowTemperature2")) {
+            p.setCriticalLowTemperature2(asDouble(alert.get("criticalLowTemperature2")));
+            p.setCriticalLowTemperatureForMoreThen2(asInt(alert.get("criticalLowTemperatureMinutes2")));
+        }
+
         p.setHighTemperature(asDouble(alert.get("highTemperature")));
         p.setHighTemperatureForMoreThen(asInt(alert.get("highTemperatureMinutes")));
+        if (alert.has("highTemperature2")) {
+            p.setHighTemperature2(asDouble(alert.get("highTemperature2")));
+            p.setHighTemperatureForMoreThen2(asInt(alert.get("highTemperatureMinutes2")));
+        }
+
         p.setLowTemperature(asDouble(alert.get("lowTemperature")));
         p.setLowTemperatureForMoreThen(asInt(alert.get("lowTemperatureMinutes")));
+        if (alert.has("lowTemperature2")) {
+            p.setLowTemperature2(asDouble(alert.get("lowTemperature2")));
+            p.setLowTemperatureForMoreThen2(asInt(alert.get("lowTemperatureMinutes2")));
+        }
+
         p.setWatchBatteryLow(asBoolean(alert.get("watchBatteryLow")));
         p.setWatchEnterBrightEnvironment(asBoolean(alert.get("watchEnterBrightEnvironment")));
         p.setWatchEnterDarkEnvironment(asBoolean(alert.get("watchEnterDarkEnvironment")));

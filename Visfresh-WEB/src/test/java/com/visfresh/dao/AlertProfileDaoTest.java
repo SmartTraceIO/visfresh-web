@@ -92,6 +92,46 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
 
         assertEquals(0, dao.findByCompany(left).size());
     }
+    @Test
+    public void testTemperature2() {
+        AlertProfile a = createAlertProfile(sharedCompany);
+
+        final Double criticalHighTemperature2 = 1.;
+        final Integer criticalHighTemperatureForMoreThen2 = 2;
+        final Double criticalLowTemperature2 = 3.;
+        final Integer criticalLowTemperatureForMoreThen2 = 4;
+        final Double highTemperature2 = 5.;
+        final Integer highTemperatureForMoreThen2 = 6;
+        final Double lowTemperature2 = 7.;
+        final Integer lowTemperatureForMoreThen2 = 8;
+
+        a.setCriticalHighTemperature2(criticalHighTemperature2);
+        a.setCriticalHighTemperatureForMoreThen2(criticalHighTemperatureForMoreThen2);
+
+        a.setCriticalLowTemperature2(criticalLowTemperature2);
+        a.setCriticalLowTemperatureForMoreThen2(criticalLowTemperatureForMoreThen2);
+
+        a.setHighTemperature2(highTemperature2);
+        a.setHighTemperatureForMoreThen2(highTemperatureForMoreThen2);
+
+        a.setLowTemperature2(lowTemperature2);
+        a.setLowTemperatureForMoreThen2(lowTemperatureForMoreThen2);
+
+        final Long id = dao.save(a).getId();
+        a = dao.findOne(id);
+
+        assertEquals(criticalHighTemperature2, a.getCriticalHighTemperature2());
+        assertEquals(criticalHighTemperatureForMoreThen2, a.getCriticalHighTemperatureForMoreThen2());
+
+        assertEquals(criticalLowTemperature2, a.getCriticalLowTemperature2());
+        assertEquals(criticalLowTemperatureForMoreThen2, a.getCriticalLowTemperatureForMoreThen2());
+
+        assertEquals(highTemperature2, a.getHighTemperature2());
+        assertEquals(highTemperatureForMoreThen2, a.getHighTemperatureForMoreThen2());
+
+        assertEquals(lowTemperature2, a.getLowTemperature2());
+        assertEquals(lowTemperatureForMoreThen2, a.getLowTemperatureForMoreThen2());
+    }
     /**
      * @param c
      */

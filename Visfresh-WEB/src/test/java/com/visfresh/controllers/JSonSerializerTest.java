@@ -139,6 +139,41 @@ public class JSonSerializerTest {
         assertEquals(criticalLowTemperatureForMoreThen, p.getCriticalLowTemperatureForMoreThen());
     }
     @Test
+    public void testAlertProfile2() {
+        AlertProfile p = createAlertProfile();
+
+        final Double criticalHighTemperature2 = 1.0;
+        final Integer criticalHighTemperatureForMoreThen2 = 2;
+        final Double criticalLowTemperature2 = 3.0;
+        final Integer criticalLowTemperatureForMoreThen2 = 4;
+        final Double highTemperature2 = 5.0;
+        final Integer highTemperatureForMoreThen2= 6;
+        final Double lowTemperature2 = 7.0;
+        final Integer lowTemperatureForMoreThen2 = 8;
+
+        p.setCriticalHighTemperature2(criticalHighTemperature2);
+        p.setCriticalHighTemperatureForMoreThen2(criticalHighTemperatureForMoreThen2);
+        p.setCriticalLowTemperature2(criticalLowTemperature2);
+        p.setCriticalLowTemperatureForMoreThen2(criticalLowTemperatureForMoreThen2);
+        p.setHighTemperature2(highTemperature2);
+        p.setHighTemperatureForMoreThen2(highTemperatureForMoreThen2);
+        p.setLowTemperature2(lowTemperature2);
+        p.setLowTemperatureForMoreThen2(lowTemperatureForMoreThen2);
+
+        final JsonObject json = serializer.toJson(p).getAsJsonObject();
+        p = serializer.parseAlertProfile(json);
+
+        assertEquals(criticalHighTemperature2, p.getCriticalHighTemperature2());
+        assertEquals(criticalHighTemperatureForMoreThen2, p.getCriticalHighTemperatureForMoreThen2());
+        assertEquals(criticalLowTemperature2, p.getCriticalLowTemperature2());
+        assertEquals(criticalLowTemperatureForMoreThen2, p.getCriticalLowTemperatureForMoreThen2());
+        assertEquals(highTemperature2, p.getHighTemperature2());
+        assertEquals(highTemperatureForMoreThen2, p.getHighTemperatureForMoreThen2());
+        assertEquals(lowTemperature2, p.getLowTemperature2());
+        assertEquals(lowTemperatureForMoreThen2, p.getLowTemperatureForMoreThen2());
+    }
+
+    @Test
     public void testSchedulePersonHowWhen() {
         PersonSchedule s = new PersonSchedule();
 
