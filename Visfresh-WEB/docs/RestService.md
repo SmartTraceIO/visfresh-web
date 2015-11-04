@@ -111,10 +111,6 @@ Method *GET*, method name *logout*, have not parameters. Closes user REST sessio
 Method *GET*, method name *refreshToken*, have not parameters. Refresh the access token for current REST session.  
 [(example)](#markdown-header-refresh-access-token)
 
-### Save alert profile ###
-Method *POST*, method name *saveAlertProfile*, request body contains JSON serialized [Alert Profile object](#markdown-header-alert-profile). Response contains ID of just saved Alert Profile.  
-[(example)](#markdown-header-save-alert-profile-example)
-
 ### Get Alert Profiles ###
 Method *GET*, method name *getAlertProfiles*, method parameters:  
 1. pageIndex - number of page  
@@ -129,6 +125,10 @@ Method *GET*, method name getAlertProfile. Request parameters:
 1. alertProfileId - alert profile ID.  
 Returns [Alert Profile Object](#markdown-header-alert-profile).  
 [(example)](#markdown-header-get-alert-profile-example)
+
+### Save alert profile ###
+Method *POST*, method name *saveAlertProfile*, request body contains JSON serialized [Alert Profile object](#markdown-header-alert-profile). Response contains ID of just saved Alert Profile.  
+[(example)](#markdown-header-save-alert-profile-example)
 
 ### Delete Alert Profile ###
 Method *GET*, method name *deleteAlertProfile*, method parameters:  
@@ -312,12 +312,12 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
   "alertProfileDescription": "b",
   "highTemperature": 1.0,
   "highTemperatureMinutes": 55,
-  "criticalHighTemperatureMinutes": 0,
   "criticalHighTemperature": 5.0,
+  "criticalHighTemperatureMinutes": 0,
   "lowTemperature": -10.0,
   "lowTemperatureMinutes": 55,
-  "criticalLowTemperatureMinutes": 0,
   "criticalLowTemperature": -15.0,
+  "criticalLowTemperatureMinutes": 0,
   "watchBatteryLow": true,
   "watchEnterBrightEnvironment": true,
   "watchEnterDarkEnvironment": true,
@@ -340,7 +340,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
 ### Person Schedule ###
 ```json
 {
-  "id": 13,
+  "personScheduleId": 13,
   "firstName": "Alexander",
   "lastName": "Suvorov",
   "company": "Sun",
@@ -732,14 +732,14 @@ Response:
   "notificationScheduleName": "Sched",
   "schedules": [
     {
-      "emailNotification": "asuvorov@sun.com",
       "firstName": "Alexander",
-      "fromTime": 1,
-      "company": "Sun",
       "lastName": "Suvorov",
+      "company": "Sun",
       "position": "Generalisimus",
-      "pushToMobileApp": true,
+      "emailNotification": "asuvorov@sun.com",
       "smsNotification": "1111111117",
+      "pushToMobileApp": true,
+      "fromTime": 1,
       "toTime": 17,
       "weekDays": [
         true,
@@ -752,14 +752,14 @@ Response:
       ]
     },
     {
-      "emailNotification": "asuvorov@sun.com",
       "firstName": "Alexander",
-      "fromTime": 1,
-      "company": "Sun",
       "lastName": "Suvorov",
+      "company": "Sun",
       "position": "Generalisimus",
-      "pushToMobileApp": true,
+      "emailNotification": "asuvorov@sun.com",
       "smsNotification": "1111111117",
+      "pushToMobileApp": true,
+      "fromTime": 1,
       "toTime": 17,
       "weekDays": [
         true,
@@ -808,19 +808,19 @@ Response:
   "response": [
     {
       "notificationScheduleDescription": "JUnit schedule",
-      "notificationScheduleId": 5,
+      "notificationScheduleId": 2,
       "notificationScheduleName": "Sched",
       "schedules": [
         {
-          "emailNotification": "asuvorov@sun.com",
+          "personScheduleId": 3,
           "firstName": "Alexander",
-          "fromTime": 1,
-          "company": "Sun",
-          "id": 6,
           "lastName": "Suvorov",
+          "company": "Sun",
           "position": "Generalisimus",
-          "pushToMobileApp": true,
+          "emailNotification": "asuvorov@sun.com",
           "smsNotification": "1111111117",
+          "pushToMobileApp": true,
+          "fromTime": 1,
           "toTime": 17,
           "weekDays": [
             true,
@@ -833,15 +833,15 @@ Response:
           ]
         },
         {
-          "emailNotification": "asuvorov@sun.com",
+          "personScheduleId": 4,
           "firstName": "Alexander",
-          "fromTime": 1,
-          "company": "Sun",
-          "id": 7,
           "lastName": "Suvorov",
+          "company": "Sun",
           "position": "Generalisimus",
-          "pushToMobileApp": true,
+          "emailNotification": "asuvorov@sun.com",
           "smsNotification": "1111111117",
+          "pushToMobileApp": true,
+          "fromTime": 1,
           "toTime": 17,
           "weekDays": [
             true,
@@ -857,19 +857,19 @@ Response:
     },
     {
       "notificationScheduleDescription": "JUnit schedule",
-      "notificationScheduleId": 8,
+      "notificationScheduleId": 5,
       "notificationScheduleName": "Sched",
       "schedules": [
         {
-          "emailNotification": "asuvorov@sun.com",
+          "personScheduleId": 6,
           "firstName": "Alexander",
-          "fromTime": 1,
-          "company": "Sun",
-          "id": 9,
           "lastName": "Suvorov",
+          "company": "Sun",
           "position": "Generalisimus",
-          "pushToMobileApp": true,
+          "emailNotification": "asuvorov@sun.com",
           "smsNotification": "1111111117",
+          "pushToMobileApp": true,
+          "fromTime": 1,
           "toTime": 17,
           "weekDays": [
             true,
@@ -882,15 +882,15 @@ Response:
           ]
         },
         {
-          "emailNotification": "asuvorov@sun.com",
+          "personScheduleId": 7,
           "firstName": "Alexander",
-          "fromTime": 1,
-          "company": "Sun",
-          "id": 10,
           "lastName": "Suvorov",
+          "company": "Sun",
           "position": "Generalisimus",
-          "pushToMobileApp": true,
+          "emailNotification": "asuvorov@sun.com",
           "smsNotification": "1111111117",
+          "pushToMobileApp": true,
+          "fromTime": 1,
           "toTime": 17,
           "weekDays": [
             true,
@@ -907,6 +907,66 @@ Response:
   ]
 }
 ```  
+### Get Notification Schedule example ###
+**GET /vf/rest/getNotificationSchedule/${accessToken}?notificationScheduleId=77**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "notificationScheduleDescription": "JUnit schedule",
+    "notificationScheduleId": 2,
+    "notificationScheduleName": "Sched",
+    "schedules": [
+      {
+        "personScheduleId": 3,
+        "firstName": "Alexander",
+        "lastName": "Suvorov",
+        "company": "Sun",
+        "position": "Generalisimus",
+        "emailNotification": "asuvorov@sun.com",
+        "smsNotification": "1111111117",
+        "pushToMobileApp": true,
+        "fromTime": 1,
+        "toTime": 17,
+        "weekDays": [
+          true,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false
+        ]
+      },
+      {
+        "personScheduleId": 4,
+        "firstName": "Alexander",
+        "lastName": "Suvorov",
+        "company": "Sun",
+        "position": "Generalisimus",
+        "emailNotification": "asuvorov@sun.com",
+        "smsNotification": "1111111117",
+        "pushToMobileApp": true,
+        "fromTime": 1,
+        "toTime": 17,
+        "weekDays": [
+          true,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false
+        ]
+      }
+    ]
+  }
+}
+```
 ### Save Location example ###
 **POST vf/rest/saveLocation/${accessToken}**  
 **Request body:**  
@@ -1475,66 +1535,6 @@ Response:
     },
     "status": "Default",
     "device": "234908720394857"
-  }
-}
-```
-### Get Notification Schedule example ###
-**GET /vf/rest/getNotificationSchedule/${accessToken}?notificationScheduleId=77**  
-**Response:**  
-```json
-{
-  "status": {
-    "code": 0,
-    "message": "Success"
-  },
-  "response": {
-    "notificationScheduleDescription": "JUnit schedule",
-    "notificationScheduleId": 11,
-    "notificationScheduleName": "Sched",
-    "schedules": [
-      {
-        "emailNotification": "asuvorov@sun.com",
-        "firstName": "Alexander",
-        "fromTime": 1,
-        "company": "Sun",
-        "id": 12,
-        "lastName": "Suvorov",
-        "position": "Generalisimus",
-        "pushToMobileApp": true,
-        "smsNotification": "1111111117",
-        "toTime": 17,
-        "weekDays": [
-          true,
-          false,
-          false,
-          true,
-          false,
-          false,
-          false
-        ]
-      },
-      {
-        "emailNotification": "asuvorov@sun.com",
-        "firstName": "Alexander",
-        "fromTime": 1,
-        "company": "Sun",
-        "id": 13,
-        "lastName": "Suvorov",
-        "position": "Generalisimus",
-        "pushToMobileApp": true,
-        "smsNotification": "1111111117",
-        "toTime": 17,
-        "weekDays": [
-          true,
-          false,
-          false,
-          true,
-          false,
-          false,
-          false
-        ]
-      }
-    ]
   }
 }
 ```

@@ -142,12 +142,12 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("alertProfileDescription", alert.getDescription());
         obj.addProperty("highTemperature", alert.getHighTemperature());
         obj.addProperty("highTemperatureMinutes", alert.getHighTemperatureForMoreThen());
-        obj.addProperty("criticalHighTemperatureMinutes", alert.getCriticalHighTemperatureForMoreThen());
         obj.addProperty("criticalHighTemperature", alert.getCriticalHighTemperature());
+        obj.addProperty("criticalHighTemperatureMinutes", alert.getCriticalHighTemperatureForMoreThen());
         obj.addProperty("lowTemperature", alert.getLowTemperature());
         obj.addProperty("lowTemperatureMinutes", alert.getLowTemperatureForMoreThen());
-        obj.addProperty("criticalLowTemperatureMinutes", alert.getCriticalLowTemperatureForMoreThen());
         obj.addProperty("criticalLowTemperature", alert.getCriticalLowTemperature());
+        obj.addProperty("criticalLowTemperatureMinutes", alert.getCriticalLowTemperatureForMoreThen());
         obj.addProperty("watchBatteryLow", alert.isWatchBatteryLow());
         obj.addProperty("watchEnterBrightEnvironment", alert.isWatchEnterBrightEnvironment());
         obj.addProperty("watchEnterDarkEnvironment", alert.isWatchEnterDarkEnvironment());
@@ -292,15 +292,15 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty("emailNotification", s.getEmailNotification());
+        obj.addProperty("personScheduleId", s.getId());
         obj.addProperty("firstName", s.getFirstName());
-        obj.addProperty("fromTime", s.getFromTime());
-        obj.addProperty("company", s.getCompany());
-        obj.addProperty("id", s.getId());
         obj.addProperty("lastName", s.getLastName());
+        obj.addProperty("company", s.getCompany());
         obj.addProperty("position", s.getPosition());
-        obj.addProperty("pushToMobileApp", s.isPushToMobileApp());
+        obj.addProperty("emailNotification", s.getEmailNotification());
         obj.addProperty("smsNotification", s.getSmsNotification());
+        obj.addProperty("pushToMobileApp", s.isPushToMobileApp());
+        obj.addProperty("fromTime", s.getFromTime());
         obj.addProperty("toTime", s.getToTime());
 
         final JsonArray weekDays = new JsonArray();
@@ -332,7 +332,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         s.setSmsNotification(asString(obj.get("smsNotification")));
         s.setToTime(asInt(obj.get("toTime")));
         s.setFromTime(asInt(obj.get("fromTime")));
-        s.setId(asLong(obj.get("id")));
+        s.setId(asLong(obj.get("personScheduleId")));
         s.setPushToMobileApp(asBoolean(obj.get("pushToMobileApp")));
 
         final JsonArray weekDays = obj.get("weekDays").getAsJsonArray();

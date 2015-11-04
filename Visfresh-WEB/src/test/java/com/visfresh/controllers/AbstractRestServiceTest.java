@@ -70,8 +70,8 @@ public abstract class AbstractRestServiceTest {
         p.setCriticalHighTemperature(5);
         p.setCriticalLowTemperature(-15);
         p.setDescription("Any description");
-        p.setHighTemperature(1);
-        p.setHighTemperatureForMoreThen(55);
+        p.setHighTemperature(5);
+        p.setHighTemperatureForMoreThen(0);
         p.setLowTemperature(-10);
         p.setLowTemperatureForMoreThen(55);
         p.setName("AnyAlert");

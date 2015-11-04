@@ -52,6 +52,8 @@ public class AccessControlAllowOriginFilter implements Filter {
      */
     private void doFilter(final HttpServletRequest request, final HttpServletResponse response,
             final FilterChain chain) throws IOException, ServletException {
+        System.out.println("Context path: " + request.getContextPath());
+        System.out.println("Path info: " + request.getPathInfo());
         final Enumeration<?> names = request.getHeaderNames();
         while (names.hasMoreElements()) {
             final String key = (String) names.nextElement();
