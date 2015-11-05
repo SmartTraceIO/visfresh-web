@@ -904,6 +904,41 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         return obj;
     }
     /**
+     * @param req
+     * @return
+     */
+    public JsonObject toJson(final UpdateUserDetailsRequest req) {
+        if (req == null) {
+            return null;
+        }
+
+        final JsonObject obj = new JsonObject();
+        obj.addProperty("fullName", req.getFullName());
+        obj.addProperty("password", req.getPassword());
+        obj.addProperty("user", req.getUser());
+        obj.addProperty("temperatureUnits", req.getTemperatureUnits().toString());
+        obj.addProperty("timeZone", req.getTimeZone().getID());
+        return obj;
+    }
+    public UpdateUserDetailsRequest parseUpdateUserDetailsRequest(final JsonElement el) {
+        if (el == null || el.isJsonNull()) {
+            return null;
+        }
+        final JsonObject json = el.getAsJsonObject();
+
+        final UpdateUserDetailsRequest req = new UpdateUserDetailsRequest();
+        req.setFullName(asString(json.get("fullName")));
+        req.setPassword(asString(json.get("password")));
+        req.setUser(asString(json.get("user")));
+        if (json.has("temperatureUnits")) {
+            req.setTemperatureUnits(TemperatureUnits.valueOf(json.get("temperatureUnits").getAsString()));
+        }
+        if (json.has("timeZone")) {
+            req.setTimeZone(TimeZone.getTimeZone(json.get("timeZone").getAsString()));
+        }
+        return req;
+    }
+    /**
      * @param array
      * @return
      */

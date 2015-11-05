@@ -45,37 +45,38 @@ An authentication can be performed as from REST client using login method, as fr
 1. [Authentication](#markdown-header-authentication).  
 2. [Get access token using existing GTS(e) session.](#markdown-header-get-access-token-using-existing-gts-e-session)  
 3. [Get User Info](#markdown-header-get-user-info)  
-4. [Logout](#markdown-header-logout)  
-5. [Refresh access token](#markdown-header-refresh-access-token)  
-6. [Save alert profile](#markdown-header-save-alert-profile)  
-7. [Get Alert Profile](#markdown-header-get-alert-profile)  
-8. [Get Alert Profiles](#markdown-header-get-alert-profiles)  
-7. [Delete Alert Profile](#markdown-header-delete-alert-profile)  
-9. [Save notification schedule](#markdown-header-save-notification-schedule)  
-10. [Get notification schedules](#markdown-header-get-notification-schedules)  
-11. [Get Notification Schedule](#markdown-header-get-notification-schedule)  
-12. [Delete Notification Schedule](#markdown-header-delete-notification-schedule)  
-13. [Save Location](#markdown-header-save-location)  
-14. [Get Locations](#markdown-header-get-locations)  
-15. [Get Location](#markdown-header-get-location)  
-16. [Delete Location](#markdown-header-delete-location)  
-17. [Save Shipment Template](#markdown-header-save-shipment-template)  
-18. [Get Shipment templates](#markdown-header-get-shipment-templates)  
-20. [Get Shipment Template](#markdown-header-get-shipment-template)  
-21. [Delete Shipment Template](#markdown-header-delete-shipment-template)  
-22. [Save Shipment](#markdown-header-save-shipment)  
-23. [Get Shipments](#markdown-header-get-shipments)  
-24. [Get Shipment](#markdown-header-get-shipment)  
-25. [Delete Shipment](#markdown-header-delete-shipment)  
-26. [Save Device](#markdown-header-save-device)  
-27. [Get Device](#markdown-header-get-device)  
-28. [Get Devices](#markdown-header-get-devices)  
-29. [Delete Device](#markdown-header-delete-device)  
-30. [Get Notifications](#markdown-header-get-notifications)  
-31. [Send Command to Device](#markdown-header-send-command-to-device)  
-32. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
-33. [Get Profile](#markdown-header-get-profile)  
-34. [Save Profile](#markdown-header-save-profile)  
+4. [Update User details](#markdown-header-update-user-details)  
+5. [Logout](#markdown-header-logout)  
+6. [Refresh access token](#markdown-header-refresh-access-token)  
+7. [Save alert profile](#markdown-header-save-alert-profile)  
+8. [Get Alert Profile](#markdown-header-get-alert-profile)  
+9. [Get Alert Profiles](#markdown-header-get-alert-profiles)  
+10. [Delete Alert Profile](#markdown-header-delete-alert-profile)  
+11. [Save notification schedule](#markdown-header-save-notification-schedule)  
+12. [Get notification schedules](#markdown-header-get-notification-schedules)  
+13. [Get Notification Schedule](#markdown-header-get-notification-schedule)  
+14. [Delete Notification Schedule](#markdown-header-delete-notification-schedule)  
+15. [Save Location](#markdown-header-save-location)  
+16. [Get Locations](#markdown-header-get-locations)  
+17. [Get Location](#markdown-header-get-location)  
+18. [Delete Location](#markdown-header-delete-location)  
+19. [Save Shipment Template](#markdown-header-save-shipment-template)  
+20. [Get Shipment templates](#markdown-header-get-shipment-templates)  
+21. [Get Shipment Template](#markdown-header-get-shipment-template)  
+22. [Delete Shipment Template](#markdown-header-delete-shipment-template)  
+23. [Save Shipment](#markdown-header-save-shipment)  
+24. [Get Shipments](#markdown-header-get-shipments)  
+25. [Get Shipment](#markdown-header-get-shipment)  
+26. [Delete Shipment](#markdown-header-delete-shipment)  
+27. [Save Device](#markdown-header-save-device)  
+28. [Get Device](#markdown-header-get-device)  
+29. [Get Devices](#markdown-header-get-devices)  
+30. [Delete Device](#markdown-header-delete-device)  
+31. [Get Notifications](#markdown-header-get-notifications)  
+32. [Send Command to Device](#markdown-header-send-command-to-device)  
+33. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
+34. [Get Profile](#markdown-header-get-profile)  
+35. [Save Profile](#markdown-header-save-profile)  
 
 ## Reports ##
 1. [Get Single Shipment](#markdown-header-get-single-shipment)
@@ -100,8 +101,18 @@ Method returns:
 1. login - user login name  
 2. fullName - full user name  
 3. roles - array of user roles, one from GlobalAdmin, CompanyAdmin, Dispatcher, ReportViewer
-
+4. timeZone - user type zone.  
+5. temperatureUnits - temperature units.  
 [(example)](#markdown-header-get-user-info-example)
+
+### Update User Details ###
+Method *POST*, method name *updateUserDetails*. JSON request body contains following properties:  
+1. fullName - full user name.  
+2. password - user password.  
+3. user - user login name. It is not changeable parameter. Is used for identify the user to change details.  
+4. temperatureUnits - user temparature units.  
+5. timeZone - user time zone.  
+[(example)](#markdown-header-update-user-details-example)
 
 ### Logout ###
 Method *GET*, method name *logout*, have not parameters. Closes user REST session and clears all associated resources  
@@ -574,20 +585,43 @@ See also [Shipment Object](#markdown-header-shipment)
 ### Get user info example ###
 **GET /vf/rest/getUser/${authToken}?username=asuvorov**  
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": {`  
-`"login": "asuvorov",`  
-`"fullName": "Alexander Suvorov",`  
-`"roles": [`  
-`"Dispatcher",`  
-`"ReportViewer"`  
-`]`  
-`}`  
-`}`  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "login": "anylogin",
+    "roles": [
+      "GlobalAdmin"
+    ],
+    "timeZone": "GMT+2",
+    "temperatureUnits": "Celsius"
+  }
+}
+```
+### Update User Details example ###
+**POST http://localhost:56803/web/vf/rest/updateUserDetails/${authToken}**  
+**Request body:**  
+```json
+{
+  "fullName": "Full User Name",
+  "password": "abrakadabra",
+  "user": "anylogin",
+  "temperatureUnits": "Fahrenheit",
+  "timeZone": "GMT+02:00"
+}
+```
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
 ### Logout example ###
 **GET /vf/rest/logout/${authToken}**  
 **Response:**  

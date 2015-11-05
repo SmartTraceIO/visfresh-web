@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CreateUserRequest;
+import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.RestService;
 
 /**
@@ -116,6 +117,22 @@ public class UserController extends AbstractController {
 
             final UserProfile p = getSerializer(user).parseUserProfile(getJSon(profile));
             restService.saveUserProfile(user, p);
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to send command to device", e);
+            return createErrorResponse(e);
+        }
+    }
+    @RequestMapping(value = "/updateUserDetails/{authToken}", method = RequestMethod.POST)
+    public @ResponseBody String updateUserDetails(@PathVariable final String authToken,
+            @RequestBody final String body) {
+        try {
+            final User user = getLoggedInUser(authToken);
+            final UpdateUserDetailsRequest req = getSerializer(user).parseUpdateUserDetailsRequest(getJSon(body));
+
+            security.checkUpdateUserDetails(user, req.getUser());
+
+            restService.updateUserDetails(req);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to send command to device", e);

@@ -38,8 +38,10 @@ import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.ShipmentStateDto;
+import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.opengts.DefaultOpenJtsFacade;
 import com.visfresh.services.RestService;
+import com.visfresh.utils.HashGenerator;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -248,6 +250,26 @@ public class RestServiceImpl implements RestService {
         tpl.setDetectLocationForShippedFrom(true);
         tpl.setUseCurrentTimeForDateShipped(true);
         return shipmentTemplateDao.save(tpl).getId();
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#updateUserDetails(com.visfresh.io.UpdateUserDetailsRequest)
+     */
+    @Override
+    public void updateUserDetails(final UpdateUserDetailsRequest req) {
+        final User u = userDao.findOne(req.getUser());
+        if (req.getFullName() != null) {
+            u.setFullName(req.getFullName());
+        }
+        if (req.getPassword() != null) {
+            u.setPassword(HashGenerator.createMd5Hash(req.getPassword()));
+        }
+        if (req.getTemperatureUnits() != null) {
+            u.setTemperatureUnits(req.getTemperatureUnits());
+        }
+        if (req.getTimeZone() != null) {
+            u.setTimeZone(req.getTimeZone());
+        }
+        userDao.save(u);
     }
 
     /* (non-Javadoc)

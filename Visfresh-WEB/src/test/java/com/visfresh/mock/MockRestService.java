@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
@@ -31,8 +32,10 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.ShipmentStateDto;
+import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.mpl.services.AbstractReportService;
 import com.visfresh.services.RestService;
+import com.visfresh.utils.HashGenerator;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -55,6 +58,8 @@ public class MockRestService implements RestService {
     public final Map<String, UserProfile> profiles = new HashMap<String, UserProfile>();
     public final Map<Long, Company> companies = new HashMap<Long, Company>();
 
+    @Autowired
+    private MockAuthService authService;
     /**
      * Default constructor.
      */
@@ -374,6 +379,25 @@ public class MockRestService implements RestService {
     @Override
     public Company getCompany(final Long id) {
         return companies.get(id);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RestService#updateUserDetails(com.visfresh.io.UpdateUserDetailsRequest)
+     */
+    @Override
+    public void updateUserDetails(final UpdateUserDetailsRequest req) {
+        final User u = authService.getUser(req.getUser());
+        if (req.getFullName() != null) {
+            u.setFullName(req.getFullName());
+        }
+        if (req.getPassword() != null) {
+            u.setPassword(HashGenerator.createMd5Hash(req.getPassword()));
+        }
+        if (req.getTemperatureUnits() != null) {
+            u.setTemperatureUnits(req.getTemperatureUnits());
+        }
+        if (req.getTimeZone() != null) {
+            u.setTimeZone(req.getTimeZone());
+        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getCompanies()

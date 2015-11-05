@@ -46,6 +46,7 @@ import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -435,7 +436,15 @@ public class RestServiceFacade  {
         sendPostRequest(getPathWithToken(REST_SERVICE, "createUser"),
                 serializer.toJson(req));
     }
-
+    /**
+     * @param req update user details request.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void updateUserDetails(final UpdateUserDetailsRequest req) throws IOException, RestServiceException {
+        sendPostRequest(getPathWithToken(REST_SERVICE, "updateUserDetails"),
+                serializer.toJson(req));
+    }
     /**
      * @param toReaden
      * @throws RestServiceException

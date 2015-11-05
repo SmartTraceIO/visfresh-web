@@ -112,4 +112,10 @@ public interface AccessController {
      * @param user user
      */
     void checkCanGetCompanies(User user) throws RestServiceException;
+    /**
+     * @param user
+     * @param userName
+     * @throws RestServiceException
+     */
+    void checkUpdateUserDetails(User user, String userName) throws RestServiceException;
 }

@@ -18,6 +18,7 @@ import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.ShipmentStateDto;
+import com.visfresh.io.UpdateUserDetailsRequest;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -134,4 +135,8 @@ public interface RestService {
      * @param imei device IMEI.
      */
     void deleteDevice(Company company, String imei);
+    /**
+     * @param req request.
+     */
+    void updateUserDetails(UpdateUserDetailsRequest req);
 }

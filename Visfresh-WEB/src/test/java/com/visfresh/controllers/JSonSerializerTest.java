@@ -45,6 +45,7 @@ import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.SavePersonScheduleRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 
 /**
@@ -809,6 +810,30 @@ public class JSonSerializerTest {
         assertEquals(description, c.getDescription());
         assertEquals(id, c.getId());
         assertEquals(name, c.getName());
+    }
+    @Test
+    public void getUpdateUserDetailsRequest() {
+        final String fullName = "Full User Name";
+        final String password = "password";
+        final TemperatureUnits tu = TemperatureUnits.Fahrenheit;
+        final TimeZone tz = TimeZone.getTimeZone("GMT+3");
+        final String login = "login";
+
+        UpdateUserDetailsRequest req = new UpdateUserDetailsRequest();
+        req.setFullName(fullName);
+        req.setPassword(password);
+        req.setTemperatureUnits(tu);
+        req.setTimeZone(tz);
+        req.setUser(login);
+
+        final JsonElement json = serializer.toJson(req);
+        req = serializer.parseUpdateUserDetailsRequest(json);
+
+        assertEquals(fullName, req.getFullName());
+        assertEquals(password, req.getPassword());
+        assertEquals(tu, req.getTemperatureUnits());
+        assertEquals(tz, req.getTimeZone());
+        assertEquals(login, req.getUser());
     }
     /**
      * @param imei IMEI.
