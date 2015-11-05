@@ -1471,7 +1471,6 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 **GET /vf/rest/getLocation/${accessToken}?locationId=2**  
 **Response:**  
 ```json
-Response:
 {
   "status": {
     "code": 0,
