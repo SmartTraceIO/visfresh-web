@@ -36,6 +36,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     private static final String CUSTOMFIELDS_FIELD = "customfiels";
     private static final String STATUS_FIELD = "status";
     private static final String DEVICE_FIELD = "device";
+    private static final String ASSETTYPE_FIELD = "assettype";
 
     @Autowired
     private DeviceDao deviceDao;
@@ -173,6 +174,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         e.setDevice(deviceDao.findOne((String) map.get(DEVICE_FIELD)));
         e.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         e.setPoNum(((Number) map.get(PONUM_FIELD)).intValue());
+        e.setAssetType((String) map.get(ASSETTYPE_FIELD));
         return e;
     }
     /**
@@ -197,6 +199,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(PONUM_FIELD, s.getPoNum());
         params.put(TRIPCOUNT_FIELD, s.getTripCount());
         params.put(DEVICE_FIELD, s.getDevice().getId());
+        params.put(ASSETTYPE_FIELD, s.getAssetType());
         return params;
     }
     /* (non-Javadoc)

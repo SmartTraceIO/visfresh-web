@@ -406,27 +406,27 @@ see [ResponseStatus](#markdown-header-response-status)
 ### Shipment Template ###
 ```json
 {
-  "name": "JUnit-tpl",
+  "shipmentTemplateId": 58,
+  "shipmentTemplateName": "JUnit-tpl",
   "shipmentDescription": "Any Description",
-  "alertSuppressionDuringCoolDown": 55,
-  "alertProfile": 2,
-  "alertsNotificationSchedules": [ // array of ID of [notification schedules](#markdown-header-notification-schedule)
-    3
-  ],
-  "arrivalNotificationWithIn": 11,
-  "arrivalNotificationSchedules": [ // array of ID of [notification schedules](#markdown-header-notification-schedule)
-    6
-  ],
-  "excludeNotificationsIfNoAlertsFired": true,
-  "shippedFrom": 9,
-  "shippedTo": 10,
-  "shutdownDevice": 155,
-  "assetType": "SeaContainer",
   "addDateShipped": true,
+  "shippedFrom": 56,
+  "shippedTo": 57,
+  "detectLocationForShippedFrom": true,
   "useCurrentTimeForDateShipped": true,
-  "detectLocationForShippedFrom": true
+  "alertProfile": 49,
+  "alertSuppressionMinutes": 55,
+  "maxTimesAlertFires": 4,
+  "alertsNotificationSchedules": [
+    50
+  ],
+  "arrivalNotificationWithinKm": 11,
+  "excludeNotificationsIfNoAlerts": true,
+  "arrivalNotificationSchedules": [
+    53
+  ],
+  "shutdownDeviceAfterMinutes": 155
 }
-
 ```  
 ### Device ###
 ```json
@@ -1117,36 +1117,25 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 **Request body:**  
 ```json
 {
-  "saveAsNewTemplate": true,
-  "templateName": "NewTemplate.tpl",
-  "shipment": {
-    "name": "Shipment-1",
-    "shipmentDescription": "Any Description",
-    "alertSuppressionDuringCoolDown": 55,
-    "alertProfile": 2,
-    "alertsNotificationSchedules": [
-      3
-    ],
-    "arrivalNotificationWithIn": 111,
-    "arrivalNotificationSchedules": [
-      6
-    ],
-    "excludeNotificationsIfNoAlertsFired": true,
-    "shippedFrom": 9,
-    "shippedTo": 10,
-    "shutdownDevice": 155,
-    "assetType": "SeaContainer",
-    "palletId": "palettid",
-    "tripCount": 88,
-    "poNum": 893793487,
-    "assetNum": "10515",
-    "shipmentDate": "2015-10-16T22:55",
-    "customFields": {
-      "field1": "value1"
-    },
-    "status": "Default",
-    "device": "234908720394857"
-  }
+  "shipmentTemplateName": "JUnit-tpl",
+  "shipmentDescription": "Any Description",
+  "addDateShipped": true,
+  "shippedFrom": 45,
+  "shippedTo": 46,
+  "detectLocationForShippedFrom": true,
+  "useCurrentTimeForDateShipped": true,
+  "alertProfileId": 38,
+  "alertSuppressionMinutes": 55,
+  "maxTimesAlertFires": 4,
+  "alertsNotificationSchedules": [
+    39
+  ],
+  "arrivalNotificationWithinKm": 11,
+  "excludeNotificationsIfNoAlerts": true,
+  "arrivalNotificationSchedules": [
+    42
+  ],
+  "shutdownDeviceAfterMinutes": 155
 }
 ```  
 **Response:**  
@@ -1157,7 +1146,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "message": "Success"
   },
   "response": {
-    "id": 11
+    "shipmentTemplateId": 48
   }
 }
 ``` 
@@ -1172,26 +1161,48 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": [
     {
-      "name": "JUnit-tpl",
+      "shipmentTemplateId": 58,
+      "shipmentTemplateName": "JUnit-tpl",
       "shipmentDescription": "Any Description",
-      "alertSuppressionDuringCoolDown": 55,
-      "id": 11,
-      "alertProfile": 2,
-      "alertsNotificationSchedules": [
-        3
-      ],
-      "arrivalNotificationWithIn": 11,
-      "arrivalNotificationSchedules": [
-        6
-      ],
-      "excludeNotificationsIfNoAlertsFired": true,
-      "shippedFrom": 9,
-      "shippedTo": 10,
-      "shutdownDevice": 155,
-      "assetType": "SeaContainer",
       "addDateShipped": true,
+      "shippedFrom": 56,
+      "shippedTo": 57,
+      "detectLocationForShippedFrom": true,
       "useCurrentTimeForDateShipped": true,
-      "detectLocationForShippedFrom": true
+      "alertProfileId": 49,
+      "alertSuppressionMinutes": 55,
+      "maxTimesAlertFires": 4,
+      "alertsNotificationSchedules": [
+        50
+      ],
+      "arrivalNotificationWithinKm": 11,
+      "excludeNotificationsIfNoAlerts": true,
+      "arrivalNotificationSchedules": [
+        53
+      ],
+      "shutdownDeviceAfterMinutes": 155
+    },
+    {
+      "shipmentTemplateId": 68,
+      "shipmentTemplateName": "JUnit-tpl",
+      "shipmentDescription": "Any Description",
+      "addDateShipped": true,
+      "shippedFrom": 66,
+      "shippedTo": 67,
+      "detectLocationForShippedFrom": true,
+      "useCurrentTimeForDateShipped": true,
+      "alertProfileId": 59,
+      "alertSuppressionMinutes": 55,
+      "maxTimesAlertFires": 4,
+      "alertsNotificationSchedules": [
+        60
+      ],
+      "arrivalNotificationWithinKm": 11,
+      "excludeNotificationsIfNoAlerts": true,
+      "arrivalNotificationSchedules": [
+        63
+      ],
+      "shutdownDeviceAfterMinutes": 155
     }
   ]
 }
@@ -1505,7 +1516,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```
 ### Get Shipment Template example ###
-**GET /rest/getShipmentTemplate/${accessToken}?id=77**  
+**GET /rest/getShipmentTemplate/${accessToken}?id=88**  
 **Response:**  
 ```json
 {
@@ -1514,26 +1525,26 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "message": "Success"
   },
   "response": {
-    "name": "JUnit-tpl",
+    "shipmentTemplateId": 88,
+    "shipmentTemplateName": "JUnit-tpl",
     "shipmentDescription": "Any Description",
-    "alertSuppressionDuringCoolDown": 55,
-    "id": 77,
-    "alertProfile": 78,
-    "alertsNotificationSchedules": [
-      91
-    ],
-    "arrivalNotificationWithIn": 11,
-    "arrivalNotificationSchedules": [
-      92
-    ],
-    "excludeNotificationsIfNoAlertsFired": true,
-    "shippedFrom": 79,
-    "shippedTo": 80,
-    "shutdownDevice": 155,
-    "assetType": "SeaContainer",
     "addDateShipped": true,
+    "shippedFrom": 86,
+    "shippedTo": 87,
+    "detectLocationForShippedFrom": true,
     "useCurrentTimeForDateShipped": true,
-    "detectLocationForShippedFrom": true
+    "alertProfileId": 79,
+    "alertSuppressionMinutes": 55,
+    "maxTimesAlertFires": 4,
+    "alertsNotificationSchedules": [
+      80
+    ],
+    "arrivalNotificationWithinKm": 11,
+    "excludeNotificationsIfNoAlerts": true,
+    "arrivalNotificationSchedules": [
+      83
+    ],
+    "shutdownDeviceAfterMinutes": 155
   }
 }
 ```

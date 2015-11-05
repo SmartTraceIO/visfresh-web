@@ -318,7 +318,6 @@ public class JSonSerializerTest {
         final int shutdownDeviceTimeOut = 155;
         final boolean useCurrentTimeForDateShipped = true;
         final boolean useLocationNearestToDevice = true;
-        final String assetType = "Trailer";
 
         ShipmentTemplate t = new ShipmentTemplate();
         t.setAddDateShipped(addDateShipped);
@@ -327,7 +326,7 @@ public class JSonSerializerTest {
         t.setAlertSuppressionMinutes(alertSuppressionDuringCoolDown);
         t.setArrivalNotificationWithinKm(arrivalNotification);
         t.getArrivalNotificationSchedules().add(arrivalNotificationSchedule);
-        t.setExcludeNotificationsIfNoAlertsFired(excludeNotificationsIfNoAlertsFired);
+        t.setExcludeNotificationsIfNoAlerts(excludeNotificationsIfNoAlertsFired);
         t.setId(id);
         t.setName(name);
         t.setShipmentDescription(shipmentDescription);
@@ -336,7 +335,6 @@ public class JSonSerializerTest {
         t.setShutdownDeviceTimeOut(shutdownDeviceTimeOut);
         t.setUseCurrentTimeForDateShipped(useCurrentTimeForDateShipped);
         t.setDetectLocationForShippedFrom(useLocationNearestToDevice);
-        t.setAssetType(assetType);
 
         final JsonObject obj = serializer.toJson(t).getAsJsonObject();
 
@@ -348,7 +346,7 @@ public class JSonSerializerTest {
         assertEquals(alertSuppressionDuringCoolDown, t.getAlertSuppressionMinutes());
         assertEquals(arrivalNotification, t.getArrivalNotificationWithinKm());
         assertNotNull(t.getArrivalNotificationSchedules());
-        assertEquals(excludeNotificationsIfNoAlertsFired, t.isExcludeNotificationsIfNoAlertsFired());
+        assertEquals(excludeNotificationsIfNoAlertsFired, t.isExcludeNotificationsIfNoAlerts());
         assertEquals(id, t.getId());
         assertEquals(name, t.getName());
         assertEquals(shipmentDescription, t.getShipmentDescription());
@@ -357,7 +355,6 @@ public class JSonSerializerTest {
         assertEquals(shutdownDeviceTimeOut, t.getShutdownDeviceTimeOut());
         assertEquals(useCurrentTimeForDateShipped, t.isUseCurrentTimeForDateShipped());
         assertEquals(useLocationNearestToDevice, t.isDetectLocationForShippedFrom());
-        assertEquals(assetType, t.getAssetType());
     }
     @Test
     public void testDevice() {
@@ -410,7 +407,7 @@ public class JSonSerializerTest {
         s.setAlertSuppressionMinutes(alertSuppressionDuringCoolDown);
         s.setArrivalNotificationWithinKm(arrivalNotification);
         s.getArrivalNotificationSchedules().add(arrivalNotificationSchedule);
-        s.setExcludeNotificationsIfNoAlertsFired(excludeNotificationsIfNoAlertsFired);
+        s.setExcludeNotificationsIfNoAlerts(excludeNotificationsIfNoAlertsFired);
         s.setId(id);
         s.setName(name);
         s.setShipmentDescription(shipmentDescription);
@@ -436,7 +433,7 @@ public class JSonSerializerTest {
         assertEquals(alertSuppressionDuringCoolDown, s.getAlertSuppressionMinutes());
         assertEquals(arrivalNotification, s.getArrivalNotificationWithinKm());
         assertNotNull(s.getArrivalNotificationSchedules());
-        assertEquals(excludeNotificationsIfNoAlertsFired, s.isExcludeNotificationsIfNoAlertsFired());
+        assertEquals(excludeNotificationsIfNoAlertsFired, s.isExcludeNotificationsIfNoAlerts());
         assertEquals(id, s.getId());
         assertEquals(name, s.getName());
         assertEquals(shipmentDescription, s.getShipmentDescription());
@@ -910,7 +907,7 @@ public class JSonSerializerTest {
         s.setAlertSuppressionMinutes(55);
         s.setArrivalNotificationWithinKm(111);
         s.getArrivalNotificationSchedules().add(createNotificationSchedule());
-        s.setExcludeNotificationsIfNoAlertsFired(true);
+        s.setExcludeNotificationsIfNoAlerts(true);
         s.setId(generateId());
         s.setName("JUnit-tpl");
         s.setShipmentDescription("Any Description");

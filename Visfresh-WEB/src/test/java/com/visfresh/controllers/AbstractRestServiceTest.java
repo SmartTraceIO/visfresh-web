@@ -164,7 +164,7 @@ public abstract class AbstractRestServiceTest {
         s.setAlertSuppressionMinutes(55);
         s.setArrivalNotificationWithinKm(111);
         s.getArrivalNotificationSchedules().add(createNotificationSchedule(save));
-        s.setExcludeNotificationsIfNoAlertsFired(true);
+        s.setExcludeNotificationsIfNoAlerts(true);
         s.setName("Shipment-" + (++lastLong));
         s.setShipmentDescription("Any Description");
         s.setShippedFrom(createLocationProfile(true));
@@ -193,7 +193,7 @@ public abstract class AbstractRestServiceTest {
         t.setAlertSuppressionMinutes(55);
         t.setArrivalNotificationWithinKm(11);
         t.getArrivalNotificationSchedules().add(createNotificationSchedule(save));
-        t.setExcludeNotificationsIfNoAlertsFired(true);
+        t.setExcludeNotificationsIfNoAlerts(true);
         t.setName("JUnit-tpl");
         t.setShipmentDescription("Any Description");
         t.setShippedFrom(createLocationProfile(save));
@@ -201,7 +201,6 @@ public abstract class AbstractRestServiceTest {
         t.setShutdownDeviceTimeOut(155);
         t.setUseCurrentTimeForDateShipped(true);
         t.setDetectLocationForShippedFrom(true);
-        t.setAssetType("SeaContainer");
 
         if (save) {
             getRestService().saveShipmentTemplate(getCompany(), t);

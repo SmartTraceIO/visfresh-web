@@ -32,6 +32,10 @@ public class Shipment extends ShipmentBase {
      * PO number
      */
     private int poNum;
+    /**
+     * AssertType
+     */
+    private String assetType;
 
     /**
      * This field has reserver for future custom fields implementation.
@@ -147,5 +151,17 @@ public class Shipment extends ShipmentBase {
      */
     public void setPoNum(final int poNum) {
         this.poNum = poNum;
+    }
+    /**
+     * @return the assetType
+     */
+    public String getAssetType() {
+        return assetType;
+    }
+    /**
+     * @param assetType the assetType to set
+     */
+    public void setAssetType(final String assetType) {
+        this.assetType = assetType;
     }
 }

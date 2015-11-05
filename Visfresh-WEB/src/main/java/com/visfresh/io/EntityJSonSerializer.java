@@ -396,23 +396,23 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty("templateId", tpl.getId());
-        obj.addProperty("templateName", tpl.getName());
-        obj.addProperty("shipmentDefaultDescription", tpl.getShipmentDescription());
-        obj.addProperty("addDateShippedToDesc", tpl.isAddDateShipped());
+        obj.addProperty("shipmentTemplateId", tpl.getId());
+        obj.addProperty("shipmentTemplateName", tpl.getName());
+        obj.addProperty("shipmentDescription", tpl.getShipmentDescription());
+        obj.addProperty("addDateShipped", tpl.isAddDateShipped());
         obj.addProperty("shippedFrom", getId(tpl.getShippedFrom()));
         obj.addProperty("shippedTo", getId(tpl.getShippedTo()));
         obj.addProperty("detectLocationForShippedFrom", tpl.isDetectLocationForShippedFrom());
         obj.addProperty("useCurrentTimeForDateShipped", tpl.isUseCurrentTimeForDateShipped());
-        obj.addProperty("alertProfile", getId(tpl.getAlertProfile()));
+        obj.addProperty("alertProfileId", getId(tpl.getAlertProfile()));
         obj.addProperty("alertSuppressionMinutes", tpl.getAlertSuppressionMinutes());
         obj.addProperty("maxTimesAlertFires", tpl.getMaxTimesAlertFires());
         obj.add("alertsNotificationSchedules", getIdList(tpl.getAlertsNotificationSchedules()));
-        obj.addProperty("excludeNotificationsIfNoAlerts", tpl.isExcludeNotificationsIfNoAlertsFired());
         obj.addProperty("arrivalNotificationWithinKm", tpl.getArrivalNotificationWithinKm());
+        obj.addProperty("excludeNotificationsIfNoAlerts", tpl.isExcludeNotificationsIfNoAlerts());
         obj.add("arrivalNotificationSchedules", getIdList(tpl.getArrivalNotificationSchedules()));
-        obj.addProperty("assetType", tpl.getAssetType());
         obj.addProperty("shutdownDeviceAfterMinutes", tpl.getShutdownDeviceTimeOut());
+
         return obj;
     }
     /**
@@ -423,31 +423,15 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final ShipmentTemplate tpl = new ShipmentTemplate();
 
         parseShipmentBase(obj, tpl);
-        tpl.setId(asLong(obj.get("templateId")));
-        tpl.setName(asString(obj.get("templateName")));
-        tpl.setShipmentDescription(asString(obj.get("shipmentDefaultDescription")));
-        tpl.setAddDateShipped(asBoolean(obj.get("addDateShippedToDesc")));
+
+        tpl.setId(asLong(obj.get("shipmentTemplateId")));
+        tpl.setName(asString(obj.get("shipmentTemplateName")));
+        tpl.setShipmentDescription(asString(obj.get("shipmentDescription")));
+        tpl.setAddDateShipped(asBoolean(obj.get("addDateShipped")));
         tpl.setUseCurrentTimeForDateShipped(asBoolean(obj.get("useCurrentTimeForDateShipped")));
         tpl.setDetectLocationForShippedFrom(asBoolean(obj.get("detectLocationForShippedFrom")));
 
         return tpl;
-    }
-    /**
-     * @param shpb
-     * @param obj
-     */
-    private void addShipmentBase(final ShipmentBase shpb, final JsonObject obj) {
-        obj.addProperty("alertSuppressionMinutes", shpb.getAlertSuppressionMinutes());
-        obj.addProperty("alertProfile", getId(shpb.getAlertProfile()));
-        obj.add("alertsNotificationSchedules", getIdList(shpb.getAlertsNotificationSchedules()));
-        obj.addProperty("arrivalNotificationWithinKm", shpb.getArrivalNotificationWithinKm());
-        obj.add("arrivalNotificationSchedules", getIdList(shpb.getArrivalNotificationSchedules()));
-        obj.addProperty("assetType", shpb.getAssetType());
-        obj.addProperty("excludeNotificationsIfNoAlerts", shpb.isExcludeNotificationsIfNoAlertsFired());
-        obj.addProperty("shippedFrom", getId(shpb.getShippedFrom()));
-        obj.addProperty("shippedTo", getId(shpb.getShippedTo()));
-        obj.addProperty("shutdownDeviceAfterMinutes", shpb.getShutdownDeviceTimeOut());
-        obj.addProperty("maxTimesAlertFires", shpb.getMaxTimesAlertFires());
     }
     /**
      * @param obj
@@ -455,14 +439,13 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      */
     private void parseShipmentBase(final JsonObject obj, final ShipmentBase shp) {
         shp.setAlertSuppressionMinutes(asInt(obj.get("alertSuppressionMinutes")));
-        shp.setAlertProfile(resolveAlertProfile(asLong(obj.get("alertProfile"))));
+        shp.setAlertProfile(resolveAlertProfile(asLong(obj.get("alertProfileId"))));
         shp.getAlertsNotificationSchedules().addAll(
                 resolveNotificationSchedules(obj.get("alertsNotificationSchedules").getAsJsonArray()));
         shp.setArrivalNotificationWithinKm(asInt(obj.get("arrivalNotificationWithinKm")));
         shp.getArrivalNotificationSchedules().addAll(
                 resolveNotificationSchedules(obj.get("arrivalNotificationSchedules").getAsJsonArray()));
-        shp.setAssetType(asString(obj.get("assetType")));
-        shp.setExcludeNotificationsIfNoAlertsFired(asBoolean(obj.get("excludeNotificationsIfNoAlerts")));
+        shp.setExcludeNotificationsIfNoAlerts(asBoolean(obj.get("excludeNotificationsIfNoAlerts")));
         shp.setShippedFrom(resolveLocationProfile(asLong(obj.get("shippedFrom"))));
         shp.setShippedTo(resolveLocationProfile(asLong(obj.get("shippedTo"))));
         shp.setShutdownDeviceTimeOut(asInt(obj.get("shutdownDeviceAfterMinutes")));
@@ -500,6 +483,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final Shipment s = new Shipment();
         parseShipmentBase(json, s);
 
+        s.setAssetType(asString(json.get("assetType")));
         s.setId(asLong(json.get("shipmentId")));
         s.setName(asString(json.get("deviceName")));
         s.setShipmentDescription(asString(json.get("shipmentDescription")));
@@ -524,7 +508,18 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        addShipmentBase(s, obj);
+
+        obj.addProperty("alertSuppressionMinutes", s.getAlertSuppressionMinutes());
+        obj.addProperty("alertProfileId", getId(s.getAlertProfile()));
+        obj.add("alertsNotificationSchedules", getIdList(s.getAlertsNotificationSchedules()));
+        obj.addProperty("arrivalNotificationWithinKm", s.getArrivalNotificationWithinKm());
+        obj.add("arrivalNotificationSchedules", getIdList(s.getArrivalNotificationSchedules()));
+        obj.addProperty("assetType", s.getAssetType());
+        obj.addProperty("excludeNotificationsIfNoAlerts", s.isExcludeNotificationsIfNoAlerts());
+        obj.addProperty("shippedFrom", getId(s.getShippedFrom()));
+        obj.addProperty("shippedTo", getId(s.getShippedTo()));
+        obj.addProperty("shutdownDeviceAfterMinutes", s.getShutdownDeviceTimeOut());
+        obj.addProperty("maxTimesAlertFires", s.getMaxTimesAlertFires());
 
         obj.addProperty("deviceName", s.getName());
         obj.addProperty("shipmentDescription", s.getShipmentDescription());

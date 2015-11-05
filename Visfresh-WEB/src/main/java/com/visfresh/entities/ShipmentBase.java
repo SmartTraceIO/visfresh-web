@@ -59,15 +59,11 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
     /**
      * Exclude notifications if not alerts fired.
      */
-    private boolean excludeNotificationsIfNoAlertsFired;
+    private boolean excludeNotificationsIfNoAlerts;
     /**
      * Shutdown device time out in minutes.
      */
     private int shutdownDeviceAfterMinutes;
-    /**
-     * AssertType
-     */
-    private String assetType;
     /**
      * Max count of alerts of given type.
      */
@@ -95,7 +91,7 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
         setAlertSuppressionMinutes(shipment.getAlertSuppressionMinutes());
         setArrivalNotificationWithinKm(shipment.getArrivalNotificationWithinKm());
         arrivalNotificationSchedules.addAll((shipment.getArrivalNotificationSchedules()));
-        setExcludeNotificationsIfNoAlertsFired(shipment.isExcludeNotificationsIfNoAlertsFired());
+        setExcludeNotificationsIfNoAlerts(shipment.isExcludeNotificationsIfNoAlerts());
         setShutdownDeviceTimeOut(shipment.getShutdownDeviceTimeOut());
     }
 
@@ -212,15 +208,15 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
     /**
      * @return the excludeNotificationsIfNoAlertsFired
      */
-    public boolean isExcludeNotificationsIfNoAlertsFired() {
-        return excludeNotificationsIfNoAlertsFired;
+    public boolean isExcludeNotificationsIfNoAlerts() {
+        return excludeNotificationsIfNoAlerts;
     }
 
     /**
      * @param excludeNotificationsIfNoAlertsFired the excludeNotificationsIfNoAlertsFired to set
      */
-    public void setExcludeNotificationsIfNoAlertsFired(final boolean excludeNotificationsIfNoAlertsFired) {
-        this.excludeNotificationsIfNoAlertsFired = excludeNotificationsIfNoAlertsFired;
+    public void setExcludeNotificationsIfNoAlerts(final boolean excludeNotificationsIfNoAlertsFired) {
+        this.excludeNotificationsIfNoAlerts = excludeNotificationsIfNoAlertsFired;
     }
 
     /**
@@ -260,18 +256,6 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
      */
     public void setId(final Long id) {
         this.id = id;
-    }
-    /**
-     * @return the assetType
-     */
-    public String getAssetType() {
-        return assetType;
-    }
-    /**
-     * @param assetType the assetType to set
-     */
-    public void setAssetType(final String assetType) {
-        this.assetType = assetType;
     }
     /**
      * @return the maxTimesAlertFires

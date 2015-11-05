@@ -46,7 +46,6 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
     protected static final String ARRIVALNOTIFWITHIN_FIELD = "arrivalnotifwithIn";
     protected static final String NONOTIFSIFNOALERTS_FIELD = "nonotifsifnoalerts";
     protected static final String SHUTDOWNTIMEOUT_FIELD = "shutdowntimeout";
-    protected static final String ASSERTTYPE_FIELD = "assettype";
     protected static final String COMPANY_FIELD = "company";
     private static final String SHIPPEDTO_FIELD = "shippedto";
     private static final String SHIPPEDFROM_FIELD = "shippedfrom";
@@ -156,9 +155,8 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         map.put(ALERT_FIELD, s.getAlertProfile() == null ? null: s.getAlertProfile().getId());
         map.put(NOALERTIFCOODOWN_FIELD, s.getAlertSuppressionMinutes());
         map.put(ARRIVALNOTIFWITHIN_FIELD, s.getArrivalNotificationWithinKm());
-        map.put(NONOTIFSIFNOALERTS_FIELD, s.isExcludeNotificationsIfNoAlertsFired());
+        map.put(NONOTIFSIFNOALERTS_FIELD, s.isExcludeNotificationsIfNoAlerts());
         map.put(SHUTDOWNTIMEOUT_FIELD, s.getShutdownDeviceTimeOut());
-        map.put(ASSERTTYPE_FIELD, s.getAssetType());
         map.put(COMPANY_FIELD, s.getCompany().getId());
         map.put(SHIPPEDFROM_FIELD, s.getShippedFrom() == null ? null : s.getShippedFrom().getId());
         map.put(SHIPPEDTO_FIELD, s.getShippedTo() == null ? null : s.getShippedTo().getId());
@@ -217,7 +215,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         }
         no.setAlertSuppressionMinutes(((Number) map.get(NOALERTIFCOODOWN_FIELD)).intValue());
         no.setArrivalNotificationWithinKm(((Number) map.get(ARRIVALNOTIFWITHIN_FIELD)).intValue());
-        no.setExcludeNotificationsIfNoAlertsFired((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
+        no.setExcludeNotificationsIfNoAlerts((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
         no.setName((String) map.get(NAME_FIELD));
         no.setShipmentDescription((String) map.get(DESCRIPTION_FIELD));
         id = ((Number) map.get(SHIPPEDFROM_FIELD));
@@ -229,7 +227,6 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
             no.setShippedTo(locationProfileDao.findOne(id.longValue()));
         }
         no.setShutdownDeviceTimeOut(((Number) map.get(SHUTDOWNTIMEOUT_FIELD)).intValue());
-        no.setAssetType((String) map.get(ASSERTTYPE_FIELD));
 
         final long companyId = ((Number) map.get(COMPANY_FIELD)).longValue();
         Company company = cache.get(companyId);

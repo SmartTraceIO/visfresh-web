@@ -180,7 +180,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setArrivalNotificationWithinKm(17);
         s.setCompany(sharedCompany);
         s.getCustomFields().put("field1", "Custom field 1");
-        s.setExcludeNotificationsIfNoAlertsFired(true);
+        s.setExcludeNotificationsIfNoAlerts(true);
         s.setName("Shipment-1");
         s.setPalletId("PalletID");
         s.setAssetNum("PoNum");
@@ -208,7 +208,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(17, s.getArrivalNotificationWithinKm());
         assertEquals(sharedCompany.getId(), s.getCompany().getId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
-        assertEquals(true, s.isExcludeNotificationsIfNoAlertsFired());
+        assertEquals(true, s.isExcludeNotificationsIfNoAlerts());
         assertEquals("Shipment-1", s.getName());
         assertEquals("PalletID", s.getPalletId());
         assertEquals("PoNum", s.getAssetNum());
@@ -261,7 +261,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(17, s.getArrivalNotificationWithinKm());
         assertEquals(sharedCompany.getId(), s.getCompany().getId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
-        assertEquals(true, s.isExcludeNotificationsIfNoAlertsFired());
+        assertEquals(true, s.isExcludeNotificationsIfNoAlerts());
         assertEquals("Shipment-1", s.getName());
         assertEquals("PalletID", s.getPalletId());
         assertEquals("PoNum", s.getAssetNum());
@@ -342,7 +342,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setAlertSuppressionMinutes(5);
         s.setArrivalNotificationWithinKm(17);
         s.setCompany(sharedCompany);
-        s.setExcludeNotificationsIfNoAlertsFired(true);
+        s.setExcludeNotificationsIfNoAlerts(true);
         s.setName("Shipment-1");
         s.setShipmentDescription("Test Shipment");
         s.setShippedFrom(shippedFrom);
