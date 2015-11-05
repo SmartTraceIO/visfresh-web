@@ -23,6 +23,7 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.services.RestService;
+import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -94,7 +95,7 @@ public class NotificationScheduleController extends AbstractController {
             final EntityJSonSerializer ser = getSerializer(user);
             final JsonArray array = new JsonArray();
             for (final NotificationSchedule schedule : schedules) {
-                array.add(ser.toJson(schedule));
+                array.add(ser.toJson(new NotificationScheduleListItem(schedule)));
             }
 
             return createSuccessResponse(array);

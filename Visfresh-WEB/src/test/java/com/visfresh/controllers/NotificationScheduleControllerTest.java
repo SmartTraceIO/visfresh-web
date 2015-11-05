@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -76,7 +77,7 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
         getRestService().saveNotificationSchedule(getCompany(), p3);
 
         //test sort by ID
-        NotificationSchedule first = facade.getNotificationSchedules(1, 10000, "notificationScheduleId", "asc").get(0);
+        NotificationScheduleListItem first = facade.getNotificationSchedules(1, 10000, "notificationScheduleId", "asc").get(0);
         assertEquals(p1.getId(), first.getId());
 
         first = facade.getNotificationSchedules(1, 10000, "notificationScheduleId", "desc").get(0);

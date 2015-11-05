@@ -41,6 +41,7 @@ import com.visfresh.entities.UserProfile;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.services.AuthToken;
 import com.visfresh.services.lists.ListShipmentTemplateItem;
+import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -983,6 +984,36 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         item.setAlertProfile(asLong(json.get("alertProfile")));
         item.setAlertProfileName(asString(json.get("alertProfileName")));
 
+        return item;
+    }
+
+    /**
+     * @param item
+     * @return
+     */
+    public JsonObject toJson(final NotificationScheduleListItem item) {
+        if (item == null) {
+            return null;
+        }
+
+        final JsonObject obj = new JsonObject();
+        obj.addProperty("notificationScheduleId", item.getNotificationScheduleId());
+        obj.addProperty("notificationScheduleName", item.getNotificationScheduleName());
+        obj.addProperty("notificationScheduleDescription", item.getNotificationScheduleDescription());
+        obj.addProperty("peopleToNotify", item.getPeopleToNotify());
+        return obj;
+    }
+    public NotificationScheduleListItem parseNotificationScheduleListItem(final JsonElement el) {
+        if (el == null || el.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = el.getAsJsonObject();
+        final NotificationScheduleListItem item = new NotificationScheduleListItem();
+        item.setNotificationScheduleDescription(asString(json.get("notificationScheduleDescription")));
+        item.setNotificationScheduleId(asLong(json.get("notificationScheduleId")));
+        item.setNotificationScheduleName(asString(json.get("notificationScheduleName")));
+        item.setPeopleToNotify(asString(json.get("peopleToNotify")));
         return item;
     }
     /**

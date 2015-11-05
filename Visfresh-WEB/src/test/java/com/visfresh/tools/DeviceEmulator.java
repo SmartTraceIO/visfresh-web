@@ -27,6 +27,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -239,10 +240,10 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private NotificationSchedule createNotificationScheduleIfNeed() throws RestServiceException, IOException {
         final String name = "Test Schedule";
 
-        final List<NotificationSchedule> schedules = service.getNotificationSchedules(1, 100000);
-        for (final NotificationSchedule s : schedules) {
-            if (name.equals(s.getName())) {
-                return s;
+        final List<NotificationScheduleListItem> schedules = service.getNotificationSchedules(1, 100000);
+        for (final NotificationScheduleListItem s : schedules) {
+            if (name.equals(s.getNotificationScheduleName())) {
+                return service.getNotificationSchedule(s.getId());
             }
         }
 

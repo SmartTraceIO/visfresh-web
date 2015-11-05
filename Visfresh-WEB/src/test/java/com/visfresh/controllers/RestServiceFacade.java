@@ -49,6 +49,7 @@ import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.lists.ListShipmentTemplateItem;
+import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -211,7 +212,7 @@ public class RestServiceFacade  {
                 serializer.toJson(schedule)).getAsJsonObject();
         return parseId(e);
     }
-    public List<NotificationSchedule> getNotificationSchedules(final int pageIndex, final int pageSize)
+    public List<NotificationScheduleListItem> getNotificationSchedules(final int pageIndex, final int pageSize)
             throws RestServiceException, IOException {
         return getNotificationSchedules(pageIndex, pageSize, null, null);
     }
@@ -224,7 +225,7 @@ public class RestServiceFacade  {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<NotificationSchedule> getNotificationSchedules(final int pageIndex, final int pageSize,
+    public List<NotificationScheduleListItem> getNotificationSchedules(final int pageIndex, final int pageSize,
             final String sortColumn, final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("pageIndex", Integer.toString(pageIndex));
@@ -238,9 +239,9 @@ public class RestServiceFacade  {
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getNotificationSchedules"),
                 params).getAsJsonArray();
 
-        final List<NotificationSchedule> profiles = new ArrayList<NotificationSchedule>(response.size());
+        final List<NotificationScheduleListItem> profiles = new ArrayList<NotificationScheduleListItem>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            profiles.add(serializer.parseNotificationSchedule(response.get(i).getAsJsonObject()));
+            profiles.add(serializer.parseNotificationScheduleListItem(response.get(i).getAsJsonObject()));
         }
         return profiles;
     }

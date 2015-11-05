@@ -48,6 +48,7 @@ import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.services.lists.ListShipmentTemplateItem;
+import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -875,6 +876,28 @@ public class JSonSerializerTest {
         assertEquals(tu, req.getTemperatureUnits());
         assertEquals(tz, req.getTimeZone());
         assertEquals(login, req.getUser());
+    }
+    @Test
+    public void testNotificationScheduleListItem() {
+        NotificationScheduleListItem item = new NotificationScheduleListItem();
+
+        final String notificationScheduleDescription = "notificationScheduleDescription";
+        final long notificationScheduleId = 7l;
+        final String notificationScheduleName = "notificationScheduleName";
+        final String peopleToNotify = "peopleToNotify";
+
+        item.setNotificationScheduleDescription(notificationScheduleDescription);
+        item.setNotificationScheduleId(notificationScheduleId);
+        item.setNotificationScheduleName(notificationScheduleName);
+        item.setPeopleToNotify(peopleToNotify);
+
+        final JsonObject obj = serializer.toJson(item);
+        item = serializer.parseNotificationScheduleListItem(obj);
+
+        assertEquals(notificationScheduleDescription, item.getNotificationScheduleDescription());
+        assertEquals(notificationScheduleId, item.getNotificationScheduleId());
+        assertEquals(notificationScheduleName, item.getNotificationScheduleName());
+        assertEquals(peopleToNotify, item.getPeopleToNotify());
     }
     /**
      * @param imei IMEI.

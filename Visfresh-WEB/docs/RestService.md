@@ -42,7 +42,9 @@ An authentication can be performed as from REST client using login method, as fr
 
 ## Lists ##
 List items is short representations of base entities, like as [Alert Profile](#markdown-header-alert-profile), [Location](#markdown-header-location), etc. Some of fields can be get from corresponding base entity and some can be synthetic fields.  
+
 1. [Shipment Template list item](#markdown-header-shipment-template-list-item) 
+2. [Notification Schedule list item](#markdown-header-notification-schedule-list-item)  
 
 ## Rest Service methods.
 1. [Authentication](#markdown-header-authentication).  
@@ -160,7 +162,7 @@ Method *GET*, method name *getNotificationSchedules*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order (asc/desc)  
-Return array of [Notification Schedule objects](#markdown-header-notification-schedule)  
+Return array of [Notification Schedule list item](#markdown-header-notification-schedule-list-item)  
 [(example)](#markdown-header-get-notification-schedules-example)
 
 ### Get Notification Schedule ###
@@ -589,6 +591,15 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "alertProfileName": "AnyAlert"
 }
 ```
+### Notification Schedule List item ###
+```json
+{
+  "notificationScheduleId": 5,
+  "notificationScheduleName": "Sched",
+  "notificationScheduleDescription": "JUnit schedule",
+  "peopleToNotify": "Alexander Suvorov, Mikhael Kutuzov"
+}
+```
 ## Examples ##
 ### Authentication request example ###
 **GET /vf/rest/login?login=user&password=password**   
@@ -915,102 +926,16 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": [
     {
-      "notificationScheduleDescription": "JUnit schedule",
       "notificationScheduleId": 2,
       "notificationScheduleName": "Sched",
-      "schedules": [
-        {
-          "personScheduleId": 3,
-          "firstName": "Alexander",
-          "lastName": "Suvorov",
-          "company": "Sun",
-          "position": "Generalisimus",
-          "emailNotification": "asuvorov@sun.com",
-          "smsNotification": "1111111117",
-          "pushToMobileApp": true,
-          "fromTime": 1,
-          "toTime": 17,
-          "weekDays": [
-            true,
-            false,
-            false,
-            true,
-            false,
-            false,
-            false
-          ]
-        },
-        {
-          "personScheduleId": 4,
-          "firstName": "Alexander",
-          "lastName": "Suvorov",
-          "company": "Sun",
-          "position": "Generalisimus",
-          "emailNotification": "asuvorov@sun.com",
-          "smsNotification": "1111111117",
-          "pushToMobileApp": true,
-          "fromTime": 1,
-          "toTime": 17,
-          "weekDays": [
-            true,
-            false,
-            false,
-            true,
-            false,
-            false,
-            false
-          ]
-        }
-      ]
+      "notificationScheduleDescription": "JUnit schedule",
+      "peopleToNotify": "Alexander Suvorov, Alexander Suvorov"
     },
     {
-      "notificationScheduleDescription": "JUnit schedule",
       "notificationScheduleId": 5,
       "notificationScheduleName": "Sched",
-      "schedules": [
-        {
-          "personScheduleId": 6,
-          "firstName": "Alexander",
-          "lastName": "Suvorov",
-          "company": "Sun",
-          "position": "Generalisimus",
-          "emailNotification": "asuvorov@sun.com",
-          "smsNotification": "1111111117",
-          "pushToMobileApp": true,
-          "fromTime": 1,
-          "toTime": 17,
-          "weekDays": [
-            true,
-            false,
-            false,
-            true,
-            false,
-            false,
-            false
-          ]
-        },
-        {
-          "personScheduleId": 7,
-          "firstName": "Alexander",
-          "lastName": "Suvorov",
-          "company": "Sun",
-          "position": "Generalisimus",
-          "emailNotification": "asuvorov@sun.com",
-          "smsNotification": "1111111117",
-          "pushToMobileApp": true,
-          "fromTime": 1,
-          "toTime": 17,
-          "weekDays": [
-            true,
-            false,
-            false,
-            true,
-            false,
-            false,
-            false
-          ]
-        }
-      ]
+      "notificationScheduleDescription": "JUnit schedule",
+      "peopleToNotify": "Alexander Suvorov, Alexander Suvorov"
     }
   ]
 }
