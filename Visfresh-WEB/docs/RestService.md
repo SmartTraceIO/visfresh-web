@@ -1467,7 +1467,6 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   }
 }
 ```
-```
 ### Get Location example ###
 **GET /vf/rest/getLocation/${accessToken}?locationId=2**  
 **Response:**  
@@ -1632,9 +1631,9 @@ Response:
     77
   ]
 }
-```json
-Response:
 ```
+**Response:**  
+```json
 {
   "status": {
     "code": 0,
