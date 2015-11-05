@@ -48,6 +48,7 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.services.lists.ListShipmentTemplateItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -251,16 +252,16 @@ public class RestServiceFacade  {
         return parseId(e);
     }
 
-    public List<ShipmentTemplate> getShipmentTemplates(final int pageIndex, final int pageSize) throws RestServiceException, IOException {
+    public List<ListShipmentTemplateItem> getShipmentTemplates(final int pageIndex, final int pageSize) throws RestServiceException, IOException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("pageIndex", Integer.toString(pageIndex));
         params.put("pageSize", Integer.toString(pageSize));
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getShipmentTemplates"),
                 params).getAsJsonArray();
 
-        final List<ShipmentTemplate> profiles = new ArrayList<ShipmentTemplate>(response.size());
+        final List<ListShipmentTemplateItem> profiles = new ArrayList<ListShipmentTemplateItem>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            profiles.add(serializer.parseShipmentTemplate(response.get(i).getAsJsonObject()));
+            profiles.add(serializer.parseListShipmentTemplateItem(response.get(i).getAsJsonObject()));
         }
         return profiles;
     }

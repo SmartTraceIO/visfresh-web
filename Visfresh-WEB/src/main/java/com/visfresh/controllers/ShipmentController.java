@@ -23,6 +23,7 @@ import com.google.gson.JsonArray;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
+import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.ReportSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -30,6 +31,7 @@ import com.visfresh.io.ShipmentStateDto;
 import com.visfresh.io.SingleShipmentDto;
 import com.visfresh.services.ReportService;
 import com.visfresh.services.RestService;
+import com.visfresh.services.lists.ListShipmentTemplateItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -98,9 +100,12 @@ public class ShipmentController extends AbstractController {
             sort(tpls);
 
             final List<ShipmentTemplate> templates = getPage(tpls, pageIndex, pageSize);
+
             final JsonArray array = new JsonArray();
+            final EntityJSonSerializer ser = getSerializer(user);
             for (final ShipmentTemplate tpl : templates) {
-                array.add(getSerializer(user).toJson(tpl));
+                final ListShipmentTemplateItem item = new ListShipmentTemplateItem(tpl);
+                array.add(ser.toJson(item));
             }
 
             return createSuccessResponse(array);

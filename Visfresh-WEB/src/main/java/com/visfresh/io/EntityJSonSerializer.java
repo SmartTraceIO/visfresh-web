@@ -40,6 +40,7 @@ import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.services.AuthToken;
+import com.visfresh.services.lists.ListShipmentTemplateItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -934,6 +935,55 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
             req.setTimeZone(TimeZone.getTimeZone(json.get("timeZone").getAsString()));
         }
         return req;
+    }
+
+    /**
+     * @param item
+     * @return
+     */
+    public JsonObject toJson(final ListShipmentTemplateItem item) {
+        if (item == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("shipmentTemplateId", item.getShipmentTemplateId());
+
+        json.addProperty("shipmentTemplateName", item.getShipmentTemplateName());
+        json.addProperty("shipmentDescription", item.getShipmentDescription());
+
+        json.addProperty("shippedFrom", item.getShippedFrom());
+        json.addProperty("shippedFromLocationName", item.getShippedFromLocationName());
+
+        json.addProperty("shippedTo", item.getShippedTo());
+        json.addProperty("shippedToLocationName", item.getShippedToLocationName());
+
+        json.addProperty("alertProfile", item.getAlertProfile());
+        json.addProperty("alertProfileName", item.getAlertProfileName());
+        return json;
+    }
+    public ListShipmentTemplateItem parseListShipmentTemplateItem(final JsonElement el) {
+        if (el == null || el.isJsonNull()) {
+            return null;
+        }
+        final JsonObject json = el.getAsJsonObject();
+
+        final ListShipmentTemplateItem item = new ListShipmentTemplateItem();
+        item.setShipmentTemplateId(asLong(json.get("shipmentTemplateId")));
+
+        item.setShipmentTemplateName(asString(json.get("shipmentTemplateName")));
+        item.setShipmentDescription(asString(json.get("shipmentDescription")));
+
+        item.setShippedFrom(asLong(json.get("shippedFrom")));
+        item.setShippedFromLocationName(asString(json.get("shippedFromLocationName")));
+
+        item.setShippedTo(asLong(json.get("shippedTo")));
+        item.setShippedToLocationName(asString(json.get("shippedToLocationName")));
+
+        item.setAlertProfile(asLong(json.get("alertProfile")));
+        item.setAlertProfileName(asString(json.get("alertProfileName")));
+
+        return item;
     }
     /**
      * @param array

@@ -47,6 +47,7 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
+import com.visfresh.services.lists.ListShipmentTemplateItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -763,6 +764,43 @@ public class JSonSerializerTest {
         assertEquals(type, alert.getType());
         assertEquals(temperature, alert.getTemperature(), 0.00001);
         assertEquals(minutes, alert.getMinutes());
+    }
+    @Test
+    public void testListShipmentTemplateItem() {
+        ListShipmentTemplateItem item = new ListShipmentTemplateItem();
+
+        final Long alertProfile = 1l;
+        final String alertProfileName = "Alert Profile Name";
+        final String shipmentDescription = "Shipment Description";
+        final long shipmentTemplateId = 2l;
+        final String shipmentTemplateName = "Shipment Template Name";
+        final Long shippedFrom = 3L;
+        final String shippedFromLocationName = "Shipped from location name";
+        final Long shippedTo = 4l;
+        final String shippedToLocationName = "Shipped to location name";
+
+        item.setAlertProfile(alertProfile);
+        item.setAlertProfileName(alertProfileName);
+        item.setShipmentDescription(shipmentDescription);
+        item.setShipmentTemplateId(shipmentTemplateId);
+        item.setShipmentTemplateName(shipmentTemplateName);
+        item.setShippedFrom(shippedFrom);
+        item.setShippedFromLocationName(shippedFromLocationName);
+        item.setShippedTo(shippedTo);
+        item.setShippedToLocationName(shippedToLocationName);
+
+        final JsonObject obj = serializer.toJson(item);
+        item = serializer.parseListShipmentTemplateItem(obj);
+
+        assertEquals(alertProfile, item.getAlertProfile());
+        assertEquals(alertProfileName, item.getAlertProfileName());
+        assertEquals(shipmentDescription, item.getShipmentDescription());
+        assertEquals(shipmentTemplateId, item.getShipmentTemplateId());
+        assertEquals(shipmentTemplateName, item.getShipmentTemplateName());
+        assertEquals(shippedFrom, item.getShippedFrom());
+        assertEquals(shippedFromLocationName, item.getShippedFromLocationName());
+        assertEquals(shippedTo, item.getShippedTo());
+        assertEquals(shippedToLocationName, item.getShippedToLocationName());
     }
     /**
      * @param date
