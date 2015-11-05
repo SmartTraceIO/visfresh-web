@@ -7,7 +7,7 @@ The date should have following format `yyyy-MM-dd'T'HH:mm` in current user's tim
 The GET request parameters of URL link should be URL encoded to, but JSON body of request and response should be
 sent as is without URL encoding.  
 For all POST JSON requests the “Content-Type: application/json” HTTP header should be used.
-### Server [Responses](#response-message):###
+### Server [Responses](#markdown-header-response-message):###
 Each server response has structure:
 ```json
 {
@@ -28,70 +28,70 @@ In case of error the “response” element of JSON response is absent.
 ### Security methods.
 An authentication can be performed as from REST client using login method, as from GTSE page (Will implemented in future). If the GTSE authentication has done, then access token can be get by getToken method in some HTTP session. In this case the REST client will attached to REST service using existing GTSE session.
 ## Data model##
-1. [Authentication token](#authentication-token)  
-2. [Alert Profile](#alert-profile)  
-3. [Notification Schedule](#notification-schedule)   
-4. [Location](#location)  
-5. [Shipment Template](#shipment-template)  
-6. [Device](#device)  
-7. [Shipment](#shipment)  
-8. [Notification](#notification)  
-9. [Alert](#alert)  
-10. [Temperature Alert](#temperature-alert)  
-11. [Arrival](#arrival)  
-12. [Device Event](#device-event)  
+1. [Authentication token](#markdown-header-authentication-token)  
+2. [Alert Profile](#markdown-header-alert-profile)  
+3. [Notification Schedule](#markdown-header-notification-schedule)   
+4. [Location](#markdown-header-location)  
+5. [Shipment Template](#markdown-header-shipment-template)  
+6. [Device](#markdown-header-device)  
+7. [Shipment](#markdown-header-shipment)  
+8. [Notification](#markdown-header-notification)  
+9. [Alert](#markdown-header-alert)  
+10. [Temperature Alert](#markdown-header-temperature-alert)  
+11. [Arrival](#markdown-header-arrival)  
+12. [Device Event](#markdown-header-device-event)  
 
 ## Rest Service methods.
-1. [Authentication](#authentication).  
-2. [Get access token using existing GTS(e) session.](#get-access-token-using-existing-gts-e-session)  
-3. [Get User Info](#get-user-info)  
-4. [Update User details](#update-user-details)  
-5. [Logout](#logout)  
-6. [Refresh access token](#refresh-access-token)  
-7. [Save alert profile](#save-alert-profile)  
-8. [Get Alert Profile](#get-alert-profile)  
-9. [Get Alert Profiles](#get-alert-profiles)  
-10. [Delete Alert Profile](#delete-alert-profile)  
-11. [Save notification schedule](#save-notification-schedule)  
-12. [Get notification schedules](#get-notification-schedules)  
-13. [Get Notification Schedule](#get-notification-schedule)  
-14. [Delete Notification Schedule](#delete-notification-schedule)  
-15. [Save Location](#save-location)  
-16. [Get Locations](#get-locations)  
-17. [Get Location](#get-location)  
-18. [Delete Location](#delete-location)  
-19. [Save Shipment Template](#save-shipment-template)  
-20. [Get Shipment templates](#get-shipment-templates)  
-21. [Get Shipment Template](#get-shipment-template)  
-22. [Delete Shipment Template](#delete-shipment-template)  
-23. [Save Shipment](#save-shipment)  
-24. [Get Shipments](#get-shipments)  
-25. [Get Shipment](#get-shipment)  
-26. [Delete Shipment](#delete-shipment)  
-27. [Save Device](#save-device)  
-28. [Get Device](#get-device)  
-29. [Get Devices](#get-devices)  
-30. [Delete Device](#delete-device)  
-31. [Get Notifications](#get-notifications)  
-32. [Send Command to Device](#send-command-to-device)  
-33. [Mark Notification as read](#mark-notification-as-read)  
-34. [Get Profile](#get-profile)  
-35. [Save Profile](#save-profile)  
+1. [Authentication](#markdown-header-authentication).  
+2. [Get access token using existing GTS(e) session.](#markdown-header-get-access-token-using-existing-gts-e-session)  
+3. [Get User Info](#markdown-header-get-user-info)  
+4. [Update User details](#markdown-header-update-user-details)  
+5. [Logout](#markdown-header-logout)  
+6. [Refresh access token](#markdown-header-refresh-access-token)  
+7. [Save alert profile](#markdown-header-save-alert-profile)  
+8. [Get Alert Profile](#markdown-header-get-alert-profile)  
+9. [Get Alert Profiles](#markdown-header-get-alert-profiles)  
+10. [Delete Alert Profile](#markdown-header-delete-alert-profile)  
+11. [Save notification schedule](#markdown-header-save-notification-schedule)  
+12. [Get notification schedules](#markdown-header-get-notification-schedules)  
+13. [Get Notification Schedule](#markdown-header-get-notification-schedule)  
+14. [Delete Notification Schedule](#markdown-header-delete-notification-schedule)  
+15. [Save Location](#markdown-header-save-location)  
+16. [Get Locations](#markdown-header-get-locations)  
+17. [Get Location](#markdown-header-get-location)  
+18. [Delete Location](#markdown-header-delete-location)  
+19. [Save Shipment Template](#markdown-header-save-shipment-template)  
+20. [Get Shipment templates](#markdown-header-get-shipment-templates)  
+21. [Get Shipment Template](#markdown-header-get-shipment-template)  
+22. [Delete Shipment Template](#markdown-header-delete-shipment-template)  
+23. [Save Shipment](#markdown-header-save-shipment)  
+24. [Get Shipments](#markdown-header-get-shipments)  
+25. [Get Shipment](#markdown-header-get-shipment)  
+26. [Delete Shipment](#markdown-header-delete-shipment)  
+27. [Save Device](#markdown-header-save-device)  
+28. [Get Device](#markdown-header-get-device)  
+29. [Get Devices](#markdown-header-get-devices)  
+30. [Delete Device](#markdown-header-delete-device)  
+31. [Get Notifications](#markdown-header-get-notifications)  
+32. [Send Command to Device](#markdown-header-send-command-to-device)  
+33. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
+34. [Get Profile](#markdown-header-get-profile)  
+35. [Save Profile](#markdown-header-save-profile)  
 
 ## Reports ##
-1. [Get Single Shipment](#get-single-shipment)
+1. [Get Single Shipment](#markdown-header-get-single-shipment)
 
 ### Authentication.###
 Method *GET*, method name *login*, request parameters login - the user login name and password - the user password  
 1. login - user name of logged in user  
 2. password - password  
-Returns [Authentication token](#authentication-token).  
-[(example)](#authentication-request-example)  
+Returns [Authentication token](#markdown-header-authentication-token).  
+[(example)](#markdown-header-authentication-request-example)  
 
 ### Get access token using existing GTS(e) session.###
 The user should be logged in to GTS(e). (not implemented now).
 Method *POST*, method name *getToken*, no parameters. In case of this request the service access a current user session, determines user info, log in as REST service user and returns authentication session.  
-[(example)](#attach-to-existing-session-example)
+[(example)](#markdown-header-attach-to-existing-session-example)
 
 ### Get User Info ###
 Method *GET*, method name *getUser*, method parameters  
@@ -104,7 +104,7 @@ Method returns:
 3. roles - array of user roles, one from GlobalAdmin, CompanyAdmin, Dispatcher, ReportViewer
 4. timeZone - user type zone.  
 5. temperatureUnits - temperature units.  
-[(example)](#get-user-info-example)
+[(example)](#markdown-header-get-user-info-example)
 
 ### Update User Details ###
 Method *POST*, method name *updateUserDetails*. JSON request body contains following properties:  
@@ -113,15 +113,15 @@ Method *POST*, method name *updateUserDetails*. JSON request body contains follo
 3. user - user login name. It is not changeable parameter. Is used for identify the user to change details.  
 4. temperatureUnits - user temparature units.  
 5. timeZone - user time zone.  
-[(example)](#update-user-details-example)
+[(example)](#markdown-header-update-user-details-example)
 
 ### Logout ###
 Method *GET*, method name *logout*, have not parameters. Closes user REST session and clears all associated resources  
-[(example)](#logout-example)
+[(example)](#markdown-header-logout-example)
 
 ### Refresh access token ###
 Method *GET*, method name *refreshToken*, have not parameters. Refresh the access token for current REST session.  
-[(example)](#refresh-access-token)
+[(example)](#markdown-header-refresh-access-token)
 
 ### Get Alert Profiles ###
 Method *GET*, method name *getAlertProfiles*, method parameters:  
@@ -129,27 +129,27 @@ Method *GET*, method name *getAlertProfiles*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order (asc/desc)  
-Returns an array of [Alert Profile objects](#alert-profile).  
-[(example)](#get-alert-profiles-example)
+Returns an array of [Alert Profile objects](#markdown-header-alert-profile).  
+[(example)](#markdown-header-get-alert-profiles-example)
 
 ### Get Alert Profile ###
 Method *GET*, method name getAlertProfile. Request parameters:  
 1. alertProfileId - alert profile ID.  
-Returns [Alert Profile Object](#alert-profile).  
-[(example)](#get-alert-profile-example)
+Returns [Alert Profile Object](#markdown-header-alert-profile).  
+[(example)](#markdown-header-get-alert-profile-example)
 
 ### Save alert profile ###
-Method *POST*, method name *saveAlertProfile*, request body contains JSON serialized [Alert Profile object](#alert-profile). Response contains ID of just saved Alert Profile.  
-[(example)](#save-alert-profile-example)
+Method *POST*, method name *saveAlertProfile*, request body contains JSON serialized [Alert Profile object](#markdown-header-alert-profile). Response contains ID of just saved Alert Profile.  
+[(example)](#markdown-header-save-alert-profile-example)
 
 ### Delete Alert Profile ###
 Method *GET*, method name *deleteAlertProfile*, method parameters:  
 1. alertProfileId - alert profile ID  
-[(example)](#delete-alert-profile-example)
+[(example)](#markdown-header-delete-alert-profile-example)
 
 ### Save Notification Schedule ###
-Method *POST*, method name *saveNotificationSchedule*, request body contains JSON serialized [Notification Schedule object](#notification-schedule). Response contains ID of just saved Notification Schedule.  
-[(example)](#save-notification-schedule-example)]
+Method *POST*, method name *saveNotificationSchedule*, request body contains JSON serialized [Notification Schedule object](#markdown-header-notification-schedule). Response contains ID of just saved Notification Schedule.  
+[(example)](#markdown-header-save-notification-schedule-example)]
 
 ### Get Notification Schedules ###
 Method *GET*, method name *getNotificationSchedules*, method parameters:  
@@ -157,23 +157,23 @@ Method *GET*, method name *getNotificationSchedules*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order (asc/desc)  
-Return array of [Notification Schedule objects](#notification-schedule)  
-[(example)](#get-notification-schedules-example)
+Return array of [Notification Schedule objects](#markdown-header-notification-schedule)  
+[(example)](#markdown-header-get-notification-schedules-example)
 
 ### Get Notification Schedule ###
 Method *GET*, method name *getNotificationSchedule*. Request parameters:  
 1. notificationScheduleId - notification schedule ID.  
-Returns [Notification Schedule Object](#notification-schedule)  
-[(example)](#get-notification-schedule-example)
+Returns [Notification Schedule Object](#markdown-header-notification-schedule)  
+[(example)](#markdown-header-get-notification-schedule-example)
 
 ### Delete Notification schedule ###
 Method *GET*, *deleteNotificationSchedule*. Request parameters:  
 1. notificationScheduleId - notification schedule ID.  
-[(example)](#delete-notification-schedule-example)
+[(example)](#markdown-header-delete-notification-schedule-example)
 
 ### Save Location ###
-Method *POST*, method name *saveLocation*, request body contains JSON serialized [Location Object](#location). Response contains ID of just saved Location  
-[(example)](#save-location-example)
+Method *POST*, method name *saveLocation*, request body contains JSON serialized [Location Object](#markdown-header-location). Response contains ID of just saved Location  
+[(example)](#markdown-header-save-location-example)
 
 ### Get Locations ###
 Method *GET*, method name *getLocations*, method parameters:  
@@ -181,116 +181,116 @@ Method *GET*, method name *getLocations*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order  
-Returns array of [Location Objects](#location)  
-[(example)](#get-locations-example)
+Returns array of [Location Objects](#markdown-header-location)  
+[(example)](#markdown-header-get-locations-example)
 
 ### Get Location ###
 Method *GET*, method name *getLocation*. Request parameters:  
 1. locationId - Location ID.  
-Returns [Location Object](#location).  
-[(example)](#get-location-example)
+Returns [Location Object](#markdown-header-location).  
+[(example)](#markdown-header-get-location-example)
 
 ### Delete Location ###
 Method *GET*, method name *deleteLocation*. Request parameters:  
 1. locationId - Location ID.  
-[(example)](#delete-location-example)
+[(example)](#markdown-header-delete-location-example)
 
 ### Save Shipment template ###
-Method *POST*, method name *saveShipmentTemplate*, request body contains JSON serialized [Shipment Template Object](#shipment-template). Response contains ID of just saved Shipment Template  
-[(example)](#save-shipment-template-example)
+Method *POST*, method name *saveShipmentTemplate*, request body contains JSON serialized [Shipment Template Object](#markdown-header-shipment-template). Response contains ID of just saved Shipment Template  
+[(example)](#markdown-header-save-shipment-template-example)
 
 ### Get Shipment templates ###
 Method *GET*, method name *getShipmentTemplates*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Shipment Template Objects](#shipment-template)  
-[(example)](#get-shipment-templates-example)
+Returns array of [Shipment Template Objects](#markdown-header-shipment-template)  
+[(example)](#markdown-header-get-shipment-templates-example)
 
 ### Get Shipment Template ###
 Method *GET*, method name *getShipmentTemplate*. Request parameters:  
 1. id - shipment template ID.  
-Returns [Shipment Template Object](#shipment-template)  
-[(example)](#get-shipment-template-example)
+Returns [Shipment Template Object](#markdown-header-shipment-template)  
+[(example)](#markdown-header-get-shipment-template-example)
 
 ### Delete Shipment Template ###
 Method *GET*, method name *deleteShipmentTemplate*, Request parameters:  
 1. shipmentTemplateId - shipment template ID.  
-[(example)](#delete-shipment-template-example)
+[(example)](#markdown-header-delete-shipment-template-example)
 
 ### Save Device ###
-Method *POST*, method name *saveDevice*, request body contains JSON serialized [Device Object](#device).  
-[(example)](#save-device-example)
+Method *POST*, method name *saveDevice*, request body contains JSON serialized [Device Object](#markdown-header-device).  
+[(example)](#markdown-header-save-device-example)
 
 ### Get Devices ###
 Method *GET*, method name *getDevices*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Device Objects](#device).  
-[(example)](#get-devices-example)
+Returns array of [Device Objects](#markdown-header-device).  
+[(example)](#markdown-header-get-devices-example)
 
 ### Get Device ###
 Method *GET*, method name *getDevice*. Request parameters:
 1. imei - device IMEI.  
-Returns [Device Object](#device)  
-[(example)](#get-device-example)
+Returns [Device Object](#markdown-header-device)  
+[(example)](#markdown-header-get-device-example)
 
 ### Delete Device ###
 Method *GET*, method name *deleteDevice*. Request parameters:
 1. imei - device IMEI.  
-[(example)](#delete-device-example)
+[(example)](#markdown-header-delete-device-example)
 
 ### Save Shipment ###
-Method *POST*, method name saveShipment, request body contains JSON serialized [Save Shipment request](#save-shipment-request). Response contains ID of just saved Shipment and ID of shipment template if the shipment was saved with corresponding option.  
-[(example)](#save-shipment-example)
+Method *POST*, method name saveShipment, request body contains JSON serialized [Save Shipment request](#markdown-header-save-shipment-request). Response contains ID of just saved Shipment and ID of shipment template if the shipment was saved with corresponding option.  
+[(example)](#markdown-header-save-shipment-example)
 
 ### Get Shipment ###
 Method *GET*, method name *getShipment*. Request parameters:  
 1. id - shipment ID.  
-Returns [Shipment Object](#shipment)  
-[(example)](#get-shipment-example)
+Returns [Shipment Object](#markdown-header-shipment)  
+[(example)](#markdown-header-get-shipment-example)
 
 ### Get Shipments ###
 Method *GET*, method name getShipments, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Shipment Description Objects](#shipment-description), it is not same as [Shipment Object](#shipment).  
-[(example)](#get-shipments-example)
+Returns array of [Shipment Description Objects](#markdown-header-shipment-description), it is not same as [Shipment Object](#markdown-header-shipment).  
+[(example)](#markdown-header-get-shipments-example)
 
 ### Delete Shipment ###
 Method *GET*, method name deleteShipment, method parameters:  
 1. shipmentId - shipment ID  
-[(example)](#delete-shipment-example)
+[(example)](#markdown-header-delete-shipment-example)
 
 ### Get Single Shipment ###
 Method *GET*, method *getSingleShipment*. Request parameters:  
 1 fromDate start selection data  
 2. toDate end selection data  
 3. shipment shipment ID  
-[(example)](#get-single-shipment-example)
+[(example)](#markdown-header-get-single-shipment-example)
 
 ### Get Notifications ###
 Method *GET*, method name getNotifications, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Notification Objects](#notification)  
-[(example)](#get-notifications-example)
+Returns array of [Notification Objects](#markdown-header-notification)  
+[(example)](#markdown-header-get-notifications-example)
 
 ### Mark Notification as read ###
 Method *POST*, method name *markNotificationsAsRead*. Request body contains JSON array of notification ID.  
-[(example)](#mark-notification-as-read-example)
+[(example)](#markdown-header-mark-notification-as-read-example)
 
 ### Send Command to Device ###
-Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#device) ID and device specific command.  
-[(example)](#send-command-to-device-example)
+Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#markdown-header-device) ID and device specific command.  
+[(example)](#markdown-header-send-command-to-device-example)
 
 ### Get Profile ###
-Method *GET*, method name *getProfile*, have not parameters. Return [Profile Object](#profile-object)
+Method *GET*, method name *getProfile*, have not parameters. Return [Profile Object](#markdown-header-profile-object)
 of current logged in user  
-[(example)](#get-profile-example)
+[(example)](#markdown-header-get-profile-example)
 
 ### Save Profile ###
-Method *POST*, method name *saveProfile*. Request body contains JSON serialized [Profile Object](#profile-object)  
-[(example)](#save-profile-example)
+Method *POST*, method name *saveProfile*. Request body contains JSON serialized [Profile Object](#markdown-header-profile-object)  
+[(example)](#markdown-header-save-profile-example)
 
 ## Objects
 ### Response message ###
@@ -306,7 +306,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
   }
 }
 ```
-see [ResponseStatus](#response-status)
+see [ResponseStatus](#markdown-header-response-status)
 ### Response status ###
 ```json
 {
@@ -361,7 +361,7 @@ see [ResponseStatus](#response-status)
     ]
 }
 ```
-[(See Person Schedule)](#person-schedule)
+[(See Person Schedule)](#markdown-header-person-schedule)
 ### Person Schedule ###
 ```json
 {
@@ -411,11 +411,11 @@ see [ResponseStatus](#response-status)
   "shipmentDescription": "Any Description",
   "alertSuppressionDuringCoolDown": 55,
   "alertProfile": 2,
-  "alertsNotificationSchedules": [ // array of ID of [notification schedules](#notification-schedule)
+  "alertsNotificationSchedules": [ // array of ID of [notification schedules](#markdown-header-notification-schedule)
     3
   ],
   "arrivalNotificationWithIn": 11,
-  "arrivalNotificationSchedules": [ // array of ID of [notification schedules](#notification-schedule)
+  "arrivalNotificationSchedules": [ // array of ID of [notification schedules](#markdown-header-notification-schedule)
     6
   ],
   "excludeNotificationsIfNoAlertsFired": true,
@@ -446,7 +446,7 @@ see [ResponseStatus](#response-status)
   "shipment": ${EmbeddedShipmentObject} //this shipment object to save
 }
 ```
-see [Shipment Object](#shipment)
+see [Shipment Object](#markdown-header-shipment)
 ### Shipment ###
 ```json
 {
@@ -509,12 +509,12 @@ see [Shipment Object](#shipment)
   }
 }
 ```
-See also [Shipment Object](#shipment)
+See also [Shipment Object](#markdown-header-shipment)
 ### Notification ###
 `{`  
 `"id": 18,`  
 `"type": "Arrival", // notification type (Alert|Arrival)`  
-`"issue":` [Ordinary Alert Object](#alert) ` or ` [Temperature Alert Object](#temperature-alert) ` or ` [Arrival Object](#arrival)  
+`"issue":` [Ordinary Alert Object](#markdown-header-alert) ` or ` [Temperature Alert Object](#markdown-header-temperature-alert) ` or ` [Arrival Object](#markdown-header-arrival)  
 `}`
 ### Alert ###
 `{`  
@@ -522,7 +522,7 @@ See also [Shipment Object](#shipment)
 `"name": "Battery-1",`  
 `"id": 15,`  
 `"date": "2015-10-12T23:57",`  
-`"device": "234908720394857", // ID of associated ` [Device](#device)  
+`"device": "234908720394857", // ID of associated ` [Device](#markdown-header-device)  
 `"type": "BatteryLow" // alert type: (EnterBrightEnvironment|EnterDarkEnvironment|Shock|BatteryLow)`  
 `}`
 ### Temperature Alert###
@@ -534,7 +534,7 @@ See also [Shipment Object](#shipment)
 `"name": "TempAlert-1",`  
 `"id": 13,`  
 `"date": "2015-10-12T23:57",`  
-`"device": "234908720394857", // ID of associated ` [Device](#device)  
+`"device": "234908720394857", // ID of associated ` [Device](#markdown-header-device)  
 `"type": "HighTemperature" // alert type (LowTemperature|HighTemperature|CriticalLowTemperature|CriticalHighTemperature)`  
 `"temperature": 5.0, //temperature is Celsius degree`  
 `"minutes": 55 //number of minutes for this temperature`  
@@ -545,7 +545,7 @@ See also [Shipment Object](#shipment)
 `"id": 17,`  
 `"numberOfMetersOfArrival": 1500, //number of meters of arrival`    
 `"date": "2015-10-12T23:57",`  
-`"device": "234908720394857" //ID of associated` [Device Object](#device)  
+`"device": "234908720394857" //ID of associated` [Device Object](#markdown-header-device)  
 `}`
 ### Device Event ###
 `{`  
