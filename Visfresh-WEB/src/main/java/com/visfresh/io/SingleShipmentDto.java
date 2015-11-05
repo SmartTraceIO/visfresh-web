@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.visfresh.entities.AlertType;
+import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -29,10 +30,12 @@ public class SingleShipmentDto {
     private String assetType;
 
     private long alertProfileId;
-    private long[] alertsNotificationSchedules = {};
+    private final List<NotificationScheduleListItem> alertsNotificationSchedules
+        = new LinkedList<NotificationScheduleListItem>();
 
     private int arrivalNotificationWithinKm;
-    private long[] arrivalNotificationSchedules = {};
+    private final List<NotificationScheduleListItem> arrivalNotificationSchedules
+        = new LinkedList<NotificationScheduleListItem>();
     private boolean excludeNotificationsIfNoAlertsFired;
 
     private String status;
@@ -178,14 +181,8 @@ public class SingleShipmentDto {
     /**
      * @return the alertsNotificationSchedules
      */
-    public long[] getAlertsNotificationSchedules() {
+    public List<NotificationScheduleListItem> getAlertsNotificationSchedules() {
         return alertsNotificationSchedules;
-    }
-    /**
-     * @param alertsNotificationSchedules the alertsNotificationSchedules to set
-     */
-    public void setAlertsNotificationSchedules(final long[] alertsNotificationSchedules) {
-        this.alertsNotificationSchedules = alertsNotificationSchedules;
     }
     /**
      * @return the arrivalNotificationWithIn
@@ -202,14 +199,8 @@ public class SingleShipmentDto {
     /**
      * @return the arrivalNotificationSchedules
      */
-    public long[] getArrivalNotificationSchedules() {
+    public List<NotificationScheduleListItem> getArrivalNotificationSchedules() {
         return arrivalNotificationSchedules;
-    }
-    /**
-     * @param arrivalNotificationSchedules the arrivalNotificationSchedules to set
-     */
-    public void setArrivalNotificationSchedules(final long[] arrivalNotificationSchedules) {
-        this.arrivalNotificationSchedules = arrivalNotificationSchedules;
     }
     /**
      * @return the excludeNotificationsIfNoAlertsFired

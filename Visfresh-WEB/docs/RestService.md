@@ -1578,27 +1578,37 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "poNum": 893793487,
     "shippedFrom": 9,
     "shippedTo": 10,
-    "estArrivalDate": "2015-11-05T23:05",
-    "actualArrivalDate": "2015-11-05T23:05",
+    "estArrivalDate": "2015-11-07T21:24",
+    "actualArrivalDate": "2015-11-07T21:24",
     "percentageComplete": 0,
     "alertProfileId": 2,
     "alertProfileName": "AnyAlert",
     "maxTimesAlertFires": 4,
     "alertSuppressionMinutes": 55,
     "alertsNotificationSchedules": [
-      3
+      {
+        "notificationScheduleId": 3,
+        "notificationScheduleName": "Sched",
+        "notificationScheduleDescription": "JUnit schedule",
+        "peopleToNotify": "Alexander Suvorov, Alexander Suvorov"
+      }
     ],
     "alertSummary": {
       "Hot": "1"
     },
     "arrivalNotificationSchedules": [
-      6
+      {
+        "notificationScheduleId": 6,
+        "notificationScheduleName": "Sched",
+        "notificationScheduleDescription": "JUnit schedule",
+        "peopleToNotify": "Alexander Suvorov, Alexander Suvorov"
+      }
     ],
     "arrivalNotificationWithinKm": 111,
     "excludeNotificationIfNoAlerts": false,
     "items": [
       {
-        "timestamp": "2015-11-03T23:05",
+        "timestamp": "2015-11-05T21:24",
         "location": {
           "latitude": 50.5,
           "longitude": 51.51
@@ -1614,7 +1624,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         ]
       },
       {
-        "timestamp": "2015-11-03T23:05",
+        "timestamp": "2015-11-05T21:24",
         "location": {
           "latitude": 50.5,
           "longitude": 51.51

@@ -3,11 +3,12 @@
  */
 package com.visfresh.io;
 
+import java.util.List;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.visfresh.drools.AlertDescriptionBuilder;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
@@ -15,6 +16,7 @@ import com.visfresh.entities.Location;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -22,6 +24,7 @@ import com.visfresh.entities.User;
  */
 public class ReportSerializer extends AbstractJsonSerializer {
     private final AlertDescriptionBuilder alertBuilder;
+    private final EntityJSonSerializer entitySerializer;
     private final User user;
     /**
      * Default constructor.
@@ -30,6 +33,7 @@ public class ReportSerializer extends AbstractJsonSerializer {
         super(user.getTimeZone());
         alertBuilder = new AlertDescriptionBuilder();
         this.user = user;
+        entitySerializer = new EntityJSonSerializer(user.getTimeZone());
     }
 
     public JsonObject toJson(final SingleShipmentDto dto) {
@@ -192,11 +196,11 @@ public class ReportSerializer extends AbstractJsonSerializer {
      * @param items
      * @return
      */
-    private JsonArray asJsonArray(final long[] items) {
+    private JsonArray asJsonArray(final List<NotificationScheduleListItem> items) {
         final JsonArray array = new JsonArray();
         if (items != null) {
-            for (final long i : items) {
-                array.add(new JsonPrimitive(i));
+            for (final NotificationScheduleListItem i : items) {
+                array.add(entitySerializer.toJson(i));
             }
         }
         return array;

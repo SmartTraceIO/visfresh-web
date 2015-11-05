@@ -6,18 +6,20 @@ package com.visfresh.mpl.services;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
-import com.visfresh.entities.EntityWithId;
+import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.io.SingleShipmentDto;
 import com.visfresh.io.SingleShipmentTimeItem;
 import com.visfresh.services.ReportService;
+import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -117,8 +119,8 @@ public abstract class AbstractReportService implements ReportService {
     private SingleShipmentDto creatSingleShipmentDto(final Shipment shipment) {
         final SingleShipmentDto dto = new SingleShipmentDto();
         dto.setAlertProfileId(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());
-        dto.setAlertsNotificationSchedules(getIds(shipment.getAlertsNotificationSchedules()));
-        dto.setArrivalNotificationSchedules(getIds(shipment.getArrivalNotificationSchedules()));
+        dto.getAlertsNotificationSchedules().addAll(toListItems(shipment.getAlertsNotificationSchedules()));
+        dto.getArrivalNotificationSchedules().addAll(toListItems(shipment.getArrivalNotificationSchedules()));
         dto.setArrivalNotificationWithInKm(shipment.getArrivalNotificationWithinKm());
         dto.setAssetNum(shipment.getAssetNum());
         dto.setAssetType(shipment.getAssetType());
@@ -149,14 +151,13 @@ public abstract class AbstractReportService implements ReportService {
      * @param arrivalNotificationSchedules
      * @return
      */
-    private <E extends EntityWithId<Long>> long[] getIds(final List<E> entities) {
-        final long[] ids = new long[entities.size()];
-        for (int i = 0; i < ids.length; i++) {
-            ids[i] = entities.get(i).getId();
+    private List<NotificationScheduleListItem> toListItems(final List<NotificationSchedule> entities) {
+        final List<NotificationScheduleListItem> items = new LinkedList<NotificationScheduleListItem>();
+        for (final NotificationSchedule s : entities) {
+            items.add(new NotificationScheduleListItem(s));
         }
-        return ids;
+        return items;
     }
-
     /**
      * @param shipment
      * @param fromDate
