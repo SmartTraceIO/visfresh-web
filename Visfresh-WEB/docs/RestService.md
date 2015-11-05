@@ -39,7 +39,6 @@ An authentication can be performed as from REST client using login method, as fr
 9. [Alert](#markdown-header-alert)  
 10. [Temperature Alert](#markdown-header-temperature-alert)  
 11. [Arrival](#markdown-header-arrival)  
-12. [Device Event](#markdown-header-device-event)  
 
 ## Rest Service methods.
 1. [Authentication](#markdown-header-authentication).  
@@ -511,50 +510,54 @@ see [Shipment Object](#markdown-header-shipment)
 ```
 See also [Shipment Object](#markdown-header-shipment)
 ### Notification ###
-`{`  
-`"id": 18,`  
-`"type": "Arrival", // notification type (Alert|Arrival)`  
-`"issue":` [Ordinary Alert Object](#markdown-header-alert) ` or ` [Temperature Alert Object](#markdown-header-temperature-alert) ` or ` [Arrival Object](#markdown-header-arrival)  
-`}`
+```json
+{
+  "id": 29,
+  "type": "Alert",
+  "issue": { // Notification issue Temperature Alert|Other Alert|Arrival
+    "id": 28,
+    "date": "2015-11-05T13:57",
+    "device": "234908720394857",
+    "shipment": 27,
+    "type": "Hot",
+    "temperature": 5.0,
+    "minutes": 55
+  }
+}
+```  
+see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](#markdown-header-temperature-alert), [Arrival Object](#markdown-header-arrival)
 ### Alert ###
-`{`  
-`"description": "Battery Low alert",`  
-`"name": "Battery-1",`  
-`"id": 15,`  
-`"date": "2015-10-12T23:57",`  
-`"device": "234908720394857", // ID of associated ` [Device](#markdown-header-device)  
-`"type": "BatteryLow" // alert type: (EnterBrightEnvironment|EnterDarkEnvironment|Shock|BatteryLow)`  
-`}`
+```json
+{
+	"id": 14,
+	"date": "2015-11-05T13:57",
+	"device": "234908720394857",
+	"shipment": 11,
+	"type": "Battery"  // alert type: (EnterBrightEnvironment|EnterDarkEnvironment|Shock|BatteryLow)
+}
+```
 ### Temperature Alert###
-`{`  
-`"id": 14,`  
-`"type": "Alert",`  
-`"issue": {`  
-`"description": "Temp Alert",`  
-`"name": "TempAlert-1",`  
-`"id": 13,`  
-`"date": "2015-10-12T23:57",`  
-`"device": "234908720394857", // ID of associated ` [Device](#markdown-header-device)  
-`"type": "HighTemperature" // alert type (LowTemperature|HighTemperature|CriticalLowTemperature|CriticalHighTemperature)`  
-`"temperature": 5.0, //temperature is Celsius degree`  
-`"minutes": 55 //number of minutes for this temperature`  
-`}`  
-`}`
+```json
+{
+    "id": 28,
+    "date": "2015-11-05T13:57",
+    "device": "234908720394857",
+    "shipment": 27,
+    "type": "Hot", // alert type (LowTemperature|HighTemperature|CriticalLowTemperature|CriticalHighTemperature)
+    "temperature": 5.0,
+    "minutes": 55
+}
+```
 ### Arrival ###
-`{`  
-`"id": 17,`  
-`"numberOfMetersOfArrival": 1500, //number of meters of arrival`    
-`"date": "2015-10-12T23:57",`  
-`"device": "234908720394857" //ID of associated` [Device Object](#markdown-header-device)  
-`}`
-### Device Event ###
-`{`  
-`"battery": 1234, //battery level`  
-`"id": 13,`  
-`"temperature": 56.0, //temperature in Celsius degree`  
-`"time": "2015-10-13T00:04",`  
-`"type": "AUT" //device specific status`  
-`}`
+```json
+{
+	"id": 16,
+	"numberOfMetersOfArrival": 1500,
+	"date": "2015-11-05T13:57",
+	"device": "234908720394857",
+	"shipment": 11
+}
+```
 ### Profile Object ###
 ```json
 {
@@ -879,16 +882,6 @@ See also [Shipment Object](#markdown-header-shipment)
   }
 }
 ```  
-**Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": {`  
-`"id": 2`  
-`}`  
-`}`  
 ### Get Notification Schedules example ###
 **GET /vf/rest/getNotificationSchedules/${accessToken}?so=desc&pageSize=10000&sc=notificationScheduleDescription&pageIndex=1**  
 **Response:**  
@@ -1078,7 +1071,9 @@ See also [Shipment Object](#markdown-header-shipment)
   "interimFlag": "Y",
   "endFlag": "Y"
 }
-Response:
+```
+**Response:**  
+```json
 {
   "status": {
     "code": 0,
@@ -1089,16 +1084,6 @@ Response:
   }
 }
 ```
-**Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": {`  
-`"id": 2`  
-`}`  
-`}`  
 ### Get Locations example ###
 **GET /vf/rest/getLocations/${accessToken}?so=desc&pageSize=10000&sc=notes&pageIndex=1**  
 **Response:**  
@@ -1274,7 +1259,7 @@ Response:
 ### Get Shipments example ###
 **GET /vf/rest/getShipments/${accessToken}?pageSize=1&pageIndex=3**  
 **Response:**  
-```gson
+```json
 {
   "status": {
     "code": 0,
@@ -1401,78 +1386,87 @@ Response:
 ### Get Notifications example ###
 **GET  /vf/rest/getNotifications/${accessToken}?shipment=11&pageSize=1&pageIndex=3**  
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`},`  
-`"response": [`  
-`{`  
-`"id": 18,`  
-`"type": "Arrival",`  
-`"issue": {`  
-`"id": 17,`  
-`"numberOfMetersOfArrival": 1500,`  
-`"date": "2015-10-12T23:57",`  
-`"device": "234908720394857"`  
-`}`  
-`},`  
-`{`  
-`"id": 16,`  
-`"type": "Alert",`  
-`"issue": {`  
-`"description": "Battery Low alert",`  
-`"name": "Battery-1",`  
-`"id": 15,`  
-`"date": "2015-10-12T23:57",`  
-`"device": "234908720394857",`  
-`"type": "BatteryLow"`  
-`}`  
-`},`  
-`{`  
-`"id": 14,`  
-`"type": "Alert",`  
-`"issue": {`  
-`"description": "Temp Alert",`  
-`"name": "TempAlert-1",`  
-`"id": 13,`  
-`"date": "2015-10-12T23:57",`  
-`"device": "234908720394857",`  
-`"type": "HighTemperature",`  
-`"temperature": 5.0,`  
-`"minutes": 55`  
-`}`  
-`}`  
-`]`  
-`}`
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [ //array of notifications id, notification type, issue (Alert/Arrival)
+    {
+      "id": 13,
+      "type": "Alert",
+      "issue": { //Temperature alert
+        "id": 12,
+        "date": "2015-11-05T13:57",
+        "device": "234908720394857",
+        "shipment": 11,
+        "type": "Hot",
+        "temperature": 5.0,
+        "minutes": 55
+      }
+    },
+    {
+      "id": 15,
+      "type": "Alert",
+      "issue": { // Low Battery alert
+        "id": 14,
+        "date": "2015-11-05T13:57",
+        "device": "234908720394857",
+        "shipment": 11,
+        "type": "Battery"
+      }
+    },
+    {
+      "id": 17,
+      "type": "Arrival",
+      "issue": { //Arrival
+        "id": 16,
+        "numberOfMetersOfArrival": 1500,
+        "date": "2015-11-05T13:57",
+        "device": "234908720394857",
+        "shipment": 11
+      }
+    }
+  ]
+}
+```
 ### Mark Notification as read example ###
 **POST /vf/rest/markNotificationsAsRead/${accessToken}**    
 **Request body:**  
-`[`  
-`16, //notification ID`  
-`18`  
-`]`  
+```json
+[ //array of notification ID
+  31,
+  33
+]
+```  
 **Response:**  
-`{` 
-`"status": {` 
-`"code": 0,` 
-`"message": "Success"` 
-`}`  
-`}`
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
 ### Send Command to Device example ###
 **POST /vf/rest/sendCommandToDevice/${accessToken}**  
 **Request body:**  
-`{`  
-`"device": "089723409857032498",`  
-`"command": "shutdown"`  
-`}`  
+```json
+{
+  "device": "089723409857032498",
+  "command": "shutdown"
+}
+```
 **Response:**  
-`{`  
-`"status": {`  
-`"code": 0,`  
-`"message": "Success"`  
-`}`  
-`}`  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
 ```
 ### Get Location example ###
 **GET /vf/rest/getLocation/${accessToken}?locationId=2**  
@@ -1638,7 +1632,9 @@ Response:
     77
   ]
 }
+```json
 Response:
+```
 {
   "status": {
     "code": 0,
