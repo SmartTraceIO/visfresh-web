@@ -1339,7 +1339,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```  
 **Response:**  
-```  
+```json
 {
   "status": {
     "code": 0,
