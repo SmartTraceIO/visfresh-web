@@ -180,6 +180,7 @@ public abstract class AbstractRestServiceTest {
         s.setTripCount(88);
         s.setCompany(getCompany());
         s.setStatus(ShipmentStatus.InProgress);
+        s.setCommentsForReceiver("Comments for receiver");
         if (save) {
             getRestService().saveShipment(getCompany(), s);
         }
@@ -201,6 +202,7 @@ public abstract class AbstractRestServiceTest {
         t.setShutdownDeviceTimeOut(155);
         t.setUseCurrentTimeForDateShipped(true);
         t.setDetectLocationForShippedFrom(true);
+        t.setCommentsForReceiver("Comments for receiver");
 
         if (save) {
             getRestService().saveShipmentTemplate(getCompany(), t);

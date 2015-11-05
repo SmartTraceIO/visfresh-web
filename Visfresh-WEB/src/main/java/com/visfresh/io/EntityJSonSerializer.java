@@ -412,6 +412,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("excludeNotificationsIfNoAlerts", tpl.isExcludeNotificationsIfNoAlerts());
         obj.add("arrivalNotificationSchedules", getIdList(tpl.getArrivalNotificationSchedules()));
         obj.addProperty("shutdownDeviceAfterMinutes", tpl.getShutdownDeviceTimeOut());
+        obj.addProperty("commentsForReceiver", tpl.getCommentsForReceiver());
 
         return obj;
     }
@@ -450,6 +451,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         shp.setShippedTo(resolveLocationProfile(asLong(obj.get("shippedTo"))));
         shp.setShutdownDeviceTimeOut(asInt(obj.get("shutdownDeviceAfterMinutes")));
         shp.setMaxTimesAlertFires(asInt(obj.get("maxTimesAlertFires")));
+        shp.setCommentsForReceiver(asString(obj.get("commentsForReceiver")));
     }
     /**
      * @param json JSON object.
@@ -532,7 +534,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.add("customFields", toJson(s.getCustomFields()));
         obj.addProperty("status", s.getStatus().name());
         obj.addProperty("deviceSN", s.getDevice() == null ? null : s.getDevice().getId());
-
+        obj.addProperty("commentsForReceiver", s.getCommentsForReceiver());
         return obj;
     }
     /**

@@ -188,6 +188,7 @@ create table shipments (
     assetnum varchar(31),
     shipmentdate timestamp,
     customfiels longtext,
+    comments longtext,
     ponum int not null default 0,
     tripcount int not null default 0,
     `status` varchar(31) default null,

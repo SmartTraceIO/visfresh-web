@@ -68,6 +68,10 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
      * Max count of alerts of given type.
      */
     private int maxTimesAlertFires = 4;
+    /**
+     * Comments for receiver
+     */
+    private String commentsForReceiver;
 
     /**
      * Default constructor.
@@ -268,5 +272,17 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
      */
     public void setMaxTimesAlertFires(final int maxTimesAlertFires) {
         this.maxTimesAlertFires = maxTimesAlertFires;
+    }
+    /**
+     * @return the commentsForReceiver
+     */
+    public String getCommentsForReceiver() {
+        return commentsForReceiver;
+    }
+    /**
+     * @param comments the commentsForReceiver to set
+     */
+    public void setCommentsForReceiver(final String comments) {
+        this.commentsForReceiver = comments;
     }
 }

@@ -194,6 +194,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setStatus(ShipmentStatus.InProgress);
         s.getAlertsNotificationSchedules().add(alertNotifSched);
         s.getArrivalNotificationSchedules().add(arrivalSched);
+        s.setCommentsForReceiver("commentsForReceiver");
         return s;
     }
 
@@ -222,6 +223,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(ShipmentStatus.InProgress, s.getStatus());
         assertEquals(1, s.getAlertsNotificationSchedules().size());
         assertEquals(1, s.getArrivalNotificationSchedules().size());
+        assertEquals("commentsForReceiver", s.getCommentsForReceiver());
     }
 
     @Test
@@ -274,6 +276,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(ShipmentStatus.InProgress, s.getStatus());
         assertEquals(1, s.getAlertsNotificationSchedules().size());
         assertEquals(1, s.getArrivalNotificationSchedules().size());
+        assertEquals("commentsForReceiver", s.getCommentsForReceiver());
     }
 
     @Test

@@ -49,6 +49,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
     protected static final String COMPANY_FIELD = "company";
     private static final String SHIPPEDTO_FIELD = "shippedto";
     private static final String SHIPPEDFROM_FIELD = "shippedfrom";
+    private static final String COMMENTS_FIELD = "comments";
 
     @Autowired
     private AlertProfileDao alertProfileDao;
@@ -160,6 +161,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         map.put(COMPANY_FIELD, s.getCompany().getId());
         map.put(SHIPPEDFROM_FIELD, s.getShippedFrom() == null ? null : s.getShippedFrom().getId());
         map.put(SHIPPEDTO_FIELD, s.getShippedTo() == null ? null : s.getShippedTo().getId());
+        map.put(COMMENTS_FIELD, s.getCommentsForReceiver());
         return map;
     }
     /* (non-Javadoc)
@@ -218,6 +220,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         no.setExcludeNotificationsIfNoAlerts((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
         no.setName((String) map.get(NAME_FIELD));
         no.setShipmentDescription((String) map.get(DESCRIPTION_FIELD));
+        no.setCommentsForReceiver((String) map.get(COMMENTS_FIELD));
         id = ((Number) map.get(SHIPPEDFROM_FIELD));
         if (id != null) {
             no.setShippedFrom(locationProfileDao.findOne(id.longValue()));

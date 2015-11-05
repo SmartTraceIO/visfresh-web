@@ -318,6 +318,7 @@ public class JSonSerializerTest {
         final int shutdownDeviceTimeOut = 155;
         final boolean useCurrentTimeForDateShipped = true;
         final boolean useLocationNearestToDevice = true;
+        final String commentsForReceiver = "commentsForReceiver";
 
         ShipmentTemplate t = new ShipmentTemplate();
         t.setAddDateShipped(addDateShipped);
@@ -335,6 +336,7 @@ public class JSonSerializerTest {
         t.setShutdownDeviceTimeOut(shutdownDeviceTimeOut);
         t.setUseCurrentTimeForDateShipped(useCurrentTimeForDateShipped);
         t.setDetectLocationForShippedFrom(useLocationNearestToDevice);
+        t.setCommentsForReceiver(commentsForReceiver);
 
         final JsonObject obj = serializer.toJson(t).getAsJsonObject();
 
@@ -355,6 +357,7 @@ public class JSonSerializerTest {
         assertEquals(shutdownDeviceTimeOut, t.getShutdownDeviceTimeOut());
         assertEquals(useCurrentTimeForDateShipped, t.isUseCurrentTimeForDateShipped());
         assertEquals(useLocationNearestToDevice, t.isDetectLocationForShippedFrom());
+        assertEquals(commentsForReceiver, t.getCommentsForReceiver());
     }
     @Test
     public void testDevice() {
@@ -400,6 +403,7 @@ public class JSonSerializerTest {
         final int poNum = 938498;
         final int tripCount = 11;
         final int maxTimesAlertFires = 14;
+        final String commentsForReceiver = "commentsForReceiver";
 
         Shipment s = new Shipment();
         s.setAlertProfile(alertProfile);
@@ -424,6 +428,7 @@ public class JSonSerializerTest {
         s.setPoNum(poNum);
         s.setTripCount(tripCount);
         s.setMaxTimesAlertFires(maxTimesAlertFires);
+        s.setCommentsForReceiver(commentsForReceiver);
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
         s = serializer.parseShipment(obj);
@@ -450,6 +455,7 @@ public class JSonSerializerTest {
         assertEquals(poNum, s.getPoNum());
         assertEquals(tripCount, s.getTripCount());
         assertEquals(maxTimesAlertFires, s.getMaxTimesAlertFires());
+        assertEquals(commentsForReceiver, s.getCommentsForReceiver());
     }
     @Test
     public void testSaveShipmentResponse() {
