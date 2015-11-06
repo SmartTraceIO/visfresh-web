@@ -429,13 +429,13 @@ see [ResponseStatus](#markdown-header-response-status)
     "alertsNotificationSchedules": [
       80
     ],
+    "commentsForReceiver": "Comments for receiver"
     "arrivalNotificationWithinKm": 11,
     "excludeNotificationsIfNoAlerts": true,
     "arrivalNotificationSchedules": [
       83
     ],
     "shutdownDeviceAfterMinutes": 155,
-    "commentsForReceiver": "Comments for receiver"
 }
 ```  
 ### Device ###
@@ -1081,13 +1081,13 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "alertsNotificationSchedules": [
     39
   ],
+  "commentsForReceiver": "Comments for receiver"
   "arrivalNotificationWithinKm": 11,
   "excludeNotificationsIfNoAlerts": true,
   "arrivalNotificationSchedules": [
     42
   ],
   "shutdownDeviceAfterMinutes": 155,
-  "commentsForReceiver": "Comments for receiver"
 }
 ```  
 **Response:**  
@@ -1471,13 +1471,13 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "alertsNotificationSchedules": [
       80
     ],
+    "commentsForReceiver": "Comments for receiver"
     "arrivalNotificationWithinKm": 11,
     "excludeNotificationsIfNoAlerts": true,
     "arrivalNotificationSchedules": [
       83
     ],
     "shutdownDeviceAfterMinutes": 155,
-    "commentsForReceiver": "Comments for receiver"
   }
 }
 ```
@@ -1655,7 +1655,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
             "type": "Hot"
           }
         ],
-        "arrivas": [
+        "arrivals": [
           {
             "numberOfMetersOfArrival": 400,
             "arrivalReportSentTo": ""
@@ -1671,7 +1671,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         "temperature": 56.0,
         "type": "AUT",
         "alerts": [],
-        "arrivas": []
+        "arrivals": []
       }
     ]
   }

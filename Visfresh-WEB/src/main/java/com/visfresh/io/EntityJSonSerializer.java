@@ -410,11 +410,11 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("alertSuppressionMinutes", tpl.getAlertSuppressionMinutes());
         obj.addProperty("maxTimesAlertFires", tpl.getMaxTimesAlertFires());
         obj.add("alertsNotificationSchedules", getIdList(tpl.getAlertsNotificationSchedules()));
+        obj.addProperty("commentsForReceiver", tpl.getCommentsForReceiver());
         obj.addProperty("arrivalNotificationWithinKm", tpl.getArrivalNotificationWithinKm());
         obj.addProperty("excludeNotificationsIfNoAlerts", tpl.isExcludeNotificationsIfNoAlerts());
         obj.add("arrivalNotificationSchedules", getIdList(tpl.getArrivalNotificationSchedules()));
         obj.addProperty("shutdownDeviceAfterMinutes", tpl.getShutdownDeviceTimeOut());
-        obj.addProperty("commentsForReceiver", tpl.getCommentsForReceiver());
 
         return obj;
     }
