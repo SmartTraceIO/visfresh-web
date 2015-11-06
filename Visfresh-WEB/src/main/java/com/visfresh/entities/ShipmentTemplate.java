@@ -21,6 +21,10 @@ public class ShipmentTemplate extends ShipmentBase {
      * Use current time for shipped date.
      */
     private boolean useCurrentTimeForDateShipped;
+    /**
+     * Name.
+     */
+    private String name;
 
     /**
      * Default constructor.
@@ -35,6 +39,18 @@ public class ShipmentTemplate extends ShipmentBase {
         super(shipment);
     }
 
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+    /**
+     * @param name the name to set
+     */
+    public void setName(final String name) {
+        this.name = name;
+    }
     /**
      * @return the addDateShipped
      */

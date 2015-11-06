@@ -27,10 +27,10 @@ import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.ReportSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
-import com.visfresh.io.ShipmentStateDto;
 import com.visfresh.io.SingleShipmentDto;
 import com.visfresh.services.ReportService;
 import com.visfresh.services.RestService;
+import com.visfresh.services.lists.ListShipmentItem;
 import com.visfresh.services.lists.ListShipmentTemplateItem;
 
 /**
@@ -217,11 +217,11 @@ public class ShipmentController extends AbstractController {
 
             final ReportSerializer ser = getReportSerializer(user);
 
-            final List<ShipmentStateDto> shipments = getPage(restService.getShipments(user.getCompany()), pageIndex, pageSize);
+            final List<ListShipmentItem> shipments = getPage(restService.getShipments(user.getCompany()), pageIndex, pageSize);
             sort(shipments, sc, so);
 
             final JsonArray array = new JsonArray();
-            for (final ShipmentStateDto t : shipments) {
+            for (final ListShipmentItem t : shipments) {
                 //TODO move filtering to DAO
                 if (onlyWithAlerts && !hasAlerts(t)) {
                     continue;
@@ -260,14 +260,14 @@ public class ShipmentController extends AbstractController {
      * @param sc
      * @param so
      */
-    private void sort(final List<ShipmentStateDto> profiles, final String sc, final String so) {
+    private void sort(final List<ListShipmentItem> profiles, final String sc, final String so) {
         final boolean ascent = !"desc".equals(so);
-        Collections.sort(profiles, new Comparator<ShipmentStateDto>() {
+        Collections.sort(profiles, new Comparator<ListShipmentItem>() {
             /* (non-Javadoc)
              * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
              */
             @Override
-            public int compare(final ShipmentStateDto o1, final ShipmentStateDto o2) {
+            public int compare(final ListShipmentItem o1, final ListShipmentItem o2) {
                 if ("shipmentId".equals(sc)) {
                     return compareTo(o1.getShipmentId(), o2.getShipmentId(), ascent);
                 }
@@ -328,7 +328,7 @@ public class ShipmentController extends AbstractController {
      * @param t
      * @return
      */
-    private boolean hasAlerts(final ShipmentStateDto t) {
+    private boolean hasAlerts(final ListShipmentItem t) {
         for (final Integer n : t.getAlertSummary().values()) {
             if (n != null && n > 0) {
                 return true;

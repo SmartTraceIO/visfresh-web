@@ -56,7 +56,7 @@ public class AssignShipmentRuleTest extends BaseRuleTest {
         assertFalse(rule.accept(req));
 
         //create shipment but in final state
-        final Shipment s = createDefaultShipment("Test Shipment", ShipmentStatus.Complete, event.getDevice());
+        final Shipment s = createDefaultShipment(ShipmentStatus.Complete, event.getDevice());
         assertFalse(rule.accept(req));
 
         s.setStatus(ShipmentStatus.InProgress);
@@ -65,7 +65,7 @@ public class AssignShipmentRuleTest extends BaseRuleTest {
     }
     @Test
     public void testHandle() {
-        final Shipment s = createDefaultShipment("Test Shipment", ShipmentStatus.InProgress, event.getDevice());
+        final Shipment s = createDefaultShipment(ShipmentStatus.InProgress, event.getDevice());
         final TrackerEventRequest req = new TrackerEventRequest(event);
 
         //try accept because should cache shipment in accept method.

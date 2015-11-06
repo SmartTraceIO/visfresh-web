@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.entities.Shipment;
 import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
@@ -51,13 +53,48 @@ public class SingleShipmentDto {
     private int alertSuppressionMinutes;
     private final Map<AlertType, Integer> alertSummary = new HashMap<AlertType, Integer>();
     private Long shipmentId;
-    private String shipmentName;
+    private String commentsForReceiver;
 
     /**
      * Default constructor.
      */
     public SingleShipmentDto() {
         super();
+    }
+
+    /**
+     * @param shipment
+     */
+    public SingleShipmentDto(final Shipment shipment) {
+        super();
+        setAlertProfileId(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());
+        getAlertsNotificationSchedules().addAll(toListItems(shipment.getAlertsNotificationSchedules()));
+        getArrivalNotificationSchedules().addAll(toListItems(shipment.getArrivalNotificationSchedules()));
+        setArrivalNotificationWithInKm(shipment.getArrivalNotificationWithinKm());
+        setAssetNum(shipment.getAssetNum());
+        setAssetType(shipment.getAssetType());
+        setPalletId(shipment.getPalletId());
+        setPoNum(shipment.getPoNum());
+        setShipmentDescription(shipment.getShipmentDescription());
+        setShipmentId(shipment.getId());
+        setShippedFrom(shipment.getShippedFrom() == null ? null : shipment.getShippedFrom().getId());
+        setShippedTo(shipment.getShippedTo() == null ? null : shipment.getShippedTo().getId());
+        setStatus(shipment.getStatus().getLabel());
+        setTripCount(shipment.getTripCount());
+        setCurrentLocation("Not determined");
+        setDeviceSn(shipment.getDevice().getSn());
+        setDeviceName(shipment.getDevice().getName());
+        //Mock arrival date.
+        //TODO replace it by calculated.
+        final Date arrivalDate = new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L);
+        setEstArrivalDate(arrivalDate);
+        setActualArrivalDate(arrivalDate);
+        //TODO replace with autodetected
+        setPercentageComplete(0);
+        setAlertProfileName(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getName());
+        setMaxTimesAlertFires(shipment.getMaxTimesAlertFires());
+        setAlertSuppressionMinutes(shipment.getAlertSuppressionMinutes());
+        setCommentsForReceiver(shipment.getCommentsForReceiver());
     }
 
     /**
@@ -362,15 +399,27 @@ public class SingleShipmentDto {
         this.shipmentId = shipmentId;
     }
     /**
-     * @return shipment name.
+     * @return
      */
-    public String getShipmentName() {
-        return shipmentName;
+    public String getCommentsForReceiver() {
+        return commentsForReceiver;
     }
     /**
-     * @param shipmentName the shipmentName to set
+     * @param comments the commentsForReceiver to set
      */
-    public void setShipmentName(final String shipmentName) {
-        this.shipmentName = shipmentName;
+    public void setCommentsForReceiver(final String comments) {
+        this.commentsForReceiver = comments;
+    }
+
+    /**
+     * @param arrivalNotificationSchedules
+     * @return
+     */
+    private List<NotificationScheduleListItem> toListItems(final List<NotificationSchedule> entities) {
+        final List<NotificationScheduleListItem> items = new LinkedList<NotificationScheduleListItem>();
+        for (final NotificationSchedule s : entities) {
+            items.add(new NotificationScheduleListItem(s));
+        }
+        return items;
     }
 }

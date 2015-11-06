@@ -63,7 +63,6 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
 
         //create arrival
         Shipment s = new Shipment();
-        s.setName("Default profile");
         s.setCompany(sharedCompany);
         s.setDevice(d);
         s = shipmentDao.save(s);

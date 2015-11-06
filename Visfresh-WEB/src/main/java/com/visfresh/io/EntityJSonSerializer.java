@@ -489,7 +489,6 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         s.setAssetType(asString(json.get("assetType")));
         s.setId(asLong(json.get("shipmentId")));
-        s.setName(asString(json.get("shipmentName")));
         s.setShipmentDescription(asString(json.get("shipmentDescription")));
         s.setPalletId(asString(json.get("palletId")));
         s.setAssetNum(asString(json.get("assetNum")));
@@ -497,7 +496,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         s.setPoNum(asInt(json.get("poNum")));
         s.setShipmentDate(asDate(json.get("shipmentDate")));
         s.getCustomFields().putAll(parseStringMap(json.get("customFields")));
-        s.setStatus(ShipmentStatus.valueOf(json.get("shipmentStatus").getAsString()));
+        s.setStatus(ShipmentStatus.valueOf(json.get("status").getAsString()));
         s.setDevice(resolveDevice(asString(json.get("deviceImei"))));
 
         return s;
@@ -512,12 +511,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-
-        obj.addProperty("shipmentId", s.getId());
-        obj.addProperty("shipmentName", s.getName());
-        obj.addProperty("shipmentDescription", s.getShipmentDescription());
-        obj.addProperty("shipmentDate", formatDate(s.getShipmentDate()));
-        obj.addProperty("shipmentStatus", s.getStatus().name());
+        obj.addProperty("status", s.getStatus().name());
 
         if (s.getDevice() != null) {
             obj.addProperty("deviceImei", s.getDevice().getImei());
@@ -526,27 +520,31 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
         obj.addProperty("tripCount", s.getTripCount());
 
+        obj.addProperty("shipmentId", s.getId());
+        obj.addProperty("shipmentDescription", s.getShipmentDescription());
+
+        obj.addProperty("palletId", s.getPalletId());
+        obj.addProperty("poNum", s.getPoNum());
+        obj.addProperty("assetNum", s.getAssetNum());
+        obj.addProperty("assetType", s.getAssetType());
+
         obj.addProperty("shippedFrom", getId(s.getShippedFrom()));
         obj.addProperty("shippedTo", getId(s.getShippedTo()));
+        obj.addProperty("shipmentDate", formatDate(s.getShipmentDate()));
 
         obj.addProperty("alertProfileId", getId(s.getAlertProfile()));
         obj.addProperty("alertSuppressionMinutes", s.getAlertSuppressionMinutes());
         obj.addProperty("maxTimesAlertFires", s.getMaxTimesAlertFires());
-
         obj.add("alertsNotificationSchedules", getIdList(s.getAlertsNotificationSchedules()));
+
+        obj.addProperty("commentsForReceiver", s.getCommentsForReceiver());
         obj.addProperty("arrivalNotificationWithinKm", s.getArrivalNotificationWithinKm());
         obj.addProperty("excludeNotificationsIfNoAlerts", s.isExcludeNotificationsIfNoAlerts());
         obj.add("arrivalNotificationSchedules", getIdList(s.getArrivalNotificationSchedules()));
 
-        obj.addProperty("assetType", s.getAssetType());
-        obj.addProperty("assetNum", s.getAssetNum());
-
-        obj.addProperty("palletId", s.getPalletId());
-        obj.addProperty("poNum", s.getPoNum());
-        obj.add("customFields", toJson(s.getCustomFields()));
-
         obj.addProperty("shutdownDeviceAfterMinutes", s.getShutdownDeviceTimeOut());
-        obj.addProperty("commentsForReceiver", s.getCommentsForReceiver());
+
+        obj.add("customFields", toJson(s.getCustomFields()));
         return obj;
     }
     /**
@@ -565,6 +563,8 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty("saveAsNewTemplate", req.isSaveAsNewTemplate());
         obj.addProperty("templateName", req.getTemplateName());
         obj.add("shipment", toJson(req.getShipment()));
+        obj.remove("deviceSN");
+        obj.remove("deviceName");
         return obj;
     }
 

@@ -69,11 +69,10 @@ public abstract class BaseRuleTest {
      * @param status shipment status
      * @return
      */
-    protected Shipment createDefaultShipment(final String name, final ShipmentStatus status, final Device device) {
+    protected Shipment createDefaultShipment(final ShipmentStatus status, final Device device) {
         final Shipment s = new Shipment();
         s.setDevice(device);
         s.setCompany(company);
-        s.setName(name);
         s.setStatus(status);
         return context.getBean(ShipmentDao.class).save(s);
     }

@@ -181,7 +181,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setCompany(sharedCompany);
         s.getCustomFields().put("field1", "Custom field 1");
         s.setExcludeNotificationsIfNoAlerts(true);
-        s.setName("Shipment-1");
         s.setPalletId("PalletID");
         s.setAssetNum("PoNum");
         s.setPoNum(329487);
@@ -210,7 +209,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(sharedCompany.getId(), s.getCompany().getId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
         assertEquals(true, s.isExcludeNotificationsIfNoAlerts());
-        assertEquals("Shipment-1", s.getName());
         assertEquals("PalletID", s.getPalletId());
         assertEquals("PoNum", s.getAssetNum());
         assertEquals(329487, s.getPoNum());
@@ -264,7 +262,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(sharedCompany.getId(), s.getCompany().getId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
         assertEquals(true, s.isExcludeNotificationsIfNoAlerts());
-        assertEquals("Shipment-1", s.getName());
         assertEquals("PalletID", s.getPalletId());
         assertEquals("PoNum", s.getAssetNum());
         assertEquals("Test Shipment", s.getShipmentDescription());
@@ -306,7 +303,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
     @Test
     public void testSaveDefaultShipment() {
         final Shipment s = new Shipment();
-        s.setName("Default profile");
         s.setCompany(sharedCompany);
         s.setDevice(device);
         dao.save(s);

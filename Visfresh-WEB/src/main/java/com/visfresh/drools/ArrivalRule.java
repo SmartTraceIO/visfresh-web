@@ -52,7 +52,8 @@ public class ArrivalRule extends AbstractNotificationRule {
                 event.getShipment(), event.getLatitude(), event.getLongitude());
         if (accept) {
             log.debug("Arrival Rule matches for shipment "
-                    + event.getShipment().getName() + " tracker event. Notification will generated");
+                    + event.getShipment().getShipmentDescription()
+                    + " tracker event. Notification will generated");
         }
         return accept;
     }

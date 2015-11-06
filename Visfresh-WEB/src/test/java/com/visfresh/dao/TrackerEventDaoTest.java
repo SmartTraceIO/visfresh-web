@@ -63,7 +63,6 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
      */
     private Shipment createShipment(final Device d) {
         Shipment s = new Shipment();
-        s.setName("Default profile");
         s.setCompany(sharedCompany);
         s.setDevice(d);
         s = shipmentDao.save(s);

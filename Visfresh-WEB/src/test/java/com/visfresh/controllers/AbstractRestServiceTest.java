@@ -165,7 +165,6 @@ public abstract class AbstractRestServiceTest {
         s.setArrivalNotificationWithinKm(111);
         s.getArrivalNotificationSchedules().add(createNotificationSchedule(save));
         s.setExcludeNotificationsIfNoAlerts(true);
-        s.setName("Shipment-" + (++lastLong));
         s.setShipmentDescription("Any Description");
         s.setShippedFrom(createLocationProfile(true));
         s.setShippedTo(createLocationProfile(true));

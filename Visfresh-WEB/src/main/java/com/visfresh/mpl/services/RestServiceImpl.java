@@ -37,10 +37,10 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
-import com.visfresh.io.ShipmentStateDto;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.opengts.DefaultOpenJtsFacade;
 import com.visfresh.services.RestService;
+import com.visfresh.services.lists.ListShipmentItem;
 import com.visfresh.utils.HashGenerator;
 
 /**
@@ -208,13 +208,13 @@ public class RestServiceImpl implements RestService {
      * @see com.visfresh.services.RestService#getShipments()
      */
     @Override
-    public List<ShipmentStateDto> getShipments(final Company company) {
+    public List<ListShipmentItem> getShipments(final Company company) {
         final List<Shipment> shipments = shipmentDao.findByCompany(company);
-        final List<ShipmentStateDto> result = new LinkedList<ShipmentStateDto>();
+        final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
         for (final Shipment s : shipments) {
             final List<Alert> alerts = alertDao.getAlerts(s,
                     new Date(0L), new Date(System.currentTimeMillis() + 100000000l));
-            final ShipmentStateDto dto = new ShipmentStateDto(s);
+            final ListShipmentItem dto = new ListShipmentItem(s);
             dto.getAlertSummary().putAll(AbstractReportService.toSummaryMap(alerts));
             result.add(dto);
         }

@@ -46,6 +46,7 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
         tpl.setAddDateShipped((Boolean) map.get(ADDDATASHIPPED_FIELD));
         tpl.setDetectLocationForShippedFrom((Boolean) map.get(DETECTLOCATION_FIELD));
         tpl.setUseCurrentTimeForDateShipped((Boolean) map.get(USECURRENTTIME_FIELD));
+        tpl.setName((String) map.get(NAME_FIELD));
         return tpl;
     }
     /* (non-Javadoc)
@@ -57,7 +58,8 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
         params.put(ADDDATASHIPPED_FIELD, s.isAddDateShipped());
         params.put(DETECTLOCATION_FIELD, s.isDetectLocationForShippedFrom());
         params.put(USECURRENTTIME_FIELD, s.isUseCurrentTimeForDateShipped());
-        return params;
+        params.put(NAME_FIELD, s.getName());
+       return params;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#isTemplate()

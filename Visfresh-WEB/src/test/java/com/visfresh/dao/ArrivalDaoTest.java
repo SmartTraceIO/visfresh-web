@@ -56,7 +56,6 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
      */
     private Shipment createShipment(final Device d) {
         Shipment s = new Shipment();
-        s.setName("Default profile");
         s.setCompany(sharedCompany);
         s.setDevice(d);
         s = shipmentDao.save(s);

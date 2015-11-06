@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.io;
+package com.visfresh.services.lists;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import com.visfresh.entities.ShipmentStatus;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ShipmentStateDto implements EntityWithId<Long> {
+public class ListShipmentItem implements EntityWithId<Long> {
     private Long shipmentId;
     private String deviceSN;
     private String deviceName;
@@ -39,10 +39,10 @@ public class ShipmentStateDto implements EntityWithId<Long> {
     /**
      * Default constructor.
      */
-    public ShipmentStateDto() {
+    public ListShipmentItem() {
         super();
     }
-    public ShipmentStateDto(final Shipment s) {
+    public ListShipmentItem(final Shipment s) {
         super();
         this.setAlertProfileId(s.getAlertProfile() != null ? s.getAlertProfile().getId() : null);
         this.setAlertProfileName(s.getAlertProfile() != null ? s.getAlertProfile().getName() : null);

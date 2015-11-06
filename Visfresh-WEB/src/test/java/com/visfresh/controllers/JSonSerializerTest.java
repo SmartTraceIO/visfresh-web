@@ -391,7 +391,6 @@ public class JSonSerializerTest {
         final NotificationSchedule arrivalNotificationSchedule = createNotificationSchedule();
         final boolean excludeNotificationsIfNoAlertsFired = true;
         final Long id = 77l;
-        final String name = "JUnit-tpl";
         final String shipmentDescription = "Any Description";
         final LocationProfile shippedFrom = createLocationProfile();
         final LocationProfile shippedTo = createLocationProfile();
@@ -415,7 +414,6 @@ public class JSonSerializerTest {
         s.getArrivalNotificationSchedules().add(arrivalNotificationSchedule);
         s.setExcludeNotificationsIfNoAlerts(excludeNotificationsIfNoAlertsFired);
         s.setId(id);
-        s.setName(name);
         s.setShipmentDescription(shipmentDescription);
         s.setShippedFrom(shippedFrom);
         s.setShippedTo(shippedTo);
@@ -442,7 +440,6 @@ public class JSonSerializerTest {
         assertNotNull(s.getArrivalNotificationSchedules());
         assertEquals(excludeNotificationsIfNoAlertsFired, s.isExcludeNotificationsIfNoAlerts());
         assertEquals(id, s.getId());
-        assertEquals(name, s.getName());
         assertEquals(shipmentDescription, s.getShipmentDescription());
         assertNotNull(s.getShippedFrom());
         assertNotNull(s.getShippedTo());
@@ -976,7 +973,6 @@ public class JSonSerializerTest {
         s.getArrivalNotificationSchedules().add(createNotificationSchedule());
         s.setExcludeNotificationsIfNoAlerts(true);
         s.setId(generateId());
-        s.setName("JUnit-tpl");
         s.setShipmentDescription("Any Description");
         s.setShippedFrom(createLocationProfile());
         s.setShippedTo(createLocationProfile());

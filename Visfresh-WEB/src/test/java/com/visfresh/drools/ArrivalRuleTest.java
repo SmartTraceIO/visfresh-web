@@ -38,8 +38,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
     @Before
     public void setUp() {
         rule = context.getBean(ArrivalRule.class);
-        shipment = createDefaultShipment("Test Shipment",
-                ShipmentStatus.InProgress, createDevice("9283470987"));
+        shipment = createDefaultShipment(ShipmentStatus.InProgress, createDevice("9283470987"));
     }
 
     @Test

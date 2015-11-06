@@ -147,7 +147,6 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         s.setCompany(sharedCompany);
         s.getCustomFields().put("field1", "Custom fields");
         s.setExcludeNotificationsIfNoAlerts(true);
-        s.setName("Shipment-1");
         s.setPalletId("PalletID");
         s.setAssetNum("PoNum");
         s.setShipmentDescription("Test Shipment");

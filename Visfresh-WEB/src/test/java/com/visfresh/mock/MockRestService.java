@@ -31,10 +31,10 @@ import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
-import com.visfresh.io.ShipmentStateDto;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.mpl.services.AbstractReportService;
 import com.visfresh.services.RestService;
+import com.visfresh.services.lists.ListShipmentItem;
 import com.visfresh.utils.HashGenerator;
 
 /**
@@ -220,16 +220,16 @@ public class MockRestService implements RestService {
      * @see com.visfresh.services.RestService#getShipments()
      */
     @Override
-    public List<ShipmentStateDto> getShipments(final Company company) {
+    public List<ListShipmentItem> getShipments(final Company company) {
         LinkedList<Shipment> list;
         synchronized (shipments) {
             list = new LinkedList<Shipment>(shipments.values());
         }
 
 
-        final List<ShipmentStateDto> result = new LinkedList<ShipmentStateDto>();
+        final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
         for (final Shipment s : list) {
-            final ShipmentStateDto dto = new ShipmentStateDto(s);
+            final ListShipmentItem dto = new ListShipmentItem(s);
             result.add(dto);
             final List<Alert> shipmentAlerts = getShipmentAlerts(s);
             if (shipmentAlerts != null) {

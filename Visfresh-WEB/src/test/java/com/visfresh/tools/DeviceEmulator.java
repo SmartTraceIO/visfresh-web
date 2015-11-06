@@ -204,14 +204,14 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
      * @throws RestServiceException
      */
     private Shipment createShipmentIfNeed(final Device device) throws RestServiceException, IOException {
-        final String name = "DevelopmentShipment";
+        final String description = "DevelopmentShipment";
 
         final JsonArray shipments = service.getShipments(1, 100000);
         for (final JsonElement e : shipments) {
             final JsonObject obj = e.getAsJsonObject();
             final Long id = obj.get("shipmentId").getAsLong();
             final Shipment shipment = service.getShipment(id);
-            if (name.equals(shipment.getName())
+            if (description.equals(shipment.getShipmentDescription())
                     && shipment.getStatus() != ShipmentStatus.Complete) {
                 return shipment;
             }
@@ -221,7 +221,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         final Shipment s = new Shipment();
 
         s.setDevice(device);
-        s.setName(name);
+        s.setShipmentDescription(description);
         s.setCompany(company);
         s.setAlertProfile(createAlertProfileIfNeed());
         s.getAlertsNotificationSchedules().add(createNotificationScheduleIfNeed());

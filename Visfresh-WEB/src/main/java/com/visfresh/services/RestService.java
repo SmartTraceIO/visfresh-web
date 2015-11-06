@@ -17,8 +17,8 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
-import com.visfresh.io.ShipmentStateDto;
 import com.visfresh.io.UpdateUserDetailsRequest;
+import com.visfresh.services.lists.ListShipmentItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -40,7 +40,7 @@ public interface RestService {
     void saveDevice(Company company, Device device);
     List<Device> getDevices(Company company);
 
-    List<ShipmentStateDto> getShipments(Company company);
+    List<ListShipmentItem> getShipments(Company company);
     Long saveShipment(Company company, Shipment shipment);
 
     Long createShipmentTemplate(Company company, Shipment shipment, String templateName);

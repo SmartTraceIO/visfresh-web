@@ -151,7 +151,6 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
     protected Map<String, Object> createParameterMap(final E s) {
         final Map<String, Object> map= new HashMap<String, Object>();
         map.put(ISTEMPLATE_FIELD, isTemplate());
-        map.put(NAME_FIELD, s.getName());
         map.put(DESCRIPTION_FIELD, s.getShipmentDescription());
         map.put(ALERT_FIELD, s.getAlertProfile() == null ? null: s.getAlertProfile().getId());
         map.put(NOALERTIFCOODOWN_FIELD, s.getAlertSuppressionMinutes());
@@ -210,7 +209,6 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         final E no = createEntity();
 
         no.setId(((Number) map.get(ID_FIELD)).longValue());
-        no.setName((String) map.get(NAME_FIELD));
         Number id = (Number) map.get(ALERT_FIELD);
         if (id != null) {
             no.setAlertProfile(alertProfileDao.findOne(id.longValue()));
@@ -218,7 +216,6 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         no.setAlertSuppressionMinutes(((Number) map.get(NOALERTIFCOODOWN_FIELD)).intValue());
         no.setArrivalNotificationWithinKm(((Number) map.get(ARRIVALNOTIFWITHIN_FIELD)).intValue());
         no.setExcludeNotificationsIfNoAlerts((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
-        no.setName((String) map.get(NAME_FIELD));
         no.setShipmentDescription((String) map.get(DESCRIPTION_FIELD));
         no.setCommentsForReceiver((String) map.get(COMMENTS_FIELD));
         id = ((Number) map.get(SHIPPEDFROM_FIELD));

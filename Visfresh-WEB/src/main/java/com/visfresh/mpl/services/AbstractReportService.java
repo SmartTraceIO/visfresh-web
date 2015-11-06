@@ -6,20 +6,17 @@ package com.visfresh.mpl.services;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
-import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.io.SingleShipmentDto;
 import com.visfresh.io.SingleShipmentTimeItem;
 import com.visfresh.services.ReportService;
-import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -117,48 +114,7 @@ public abstract class AbstractReportService implements ReportService {
      * @return
      */
     private SingleShipmentDto creatSingleShipmentDto(final Shipment shipment) {
-        final SingleShipmentDto dto = new SingleShipmentDto();
-        dto.setAlertProfileId(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());
-        dto.getAlertsNotificationSchedules().addAll(toListItems(shipment.getAlertsNotificationSchedules()));
-        dto.getArrivalNotificationSchedules().addAll(toListItems(shipment.getArrivalNotificationSchedules()));
-        dto.setArrivalNotificationWithInKm(shipment.getArrivalNotificationWithinKm());
-        dto.setAssetNum(shipment.getAssetNum());
-        dto.setAssetType(shipment.getAssetType());
-        dto.setPalletId(shipment.getPalletId());
-        dto.setPoNum(shipment.getPoNum());
-        dto.setShipmentDescription(shipment.getShipmentDescription());
-        dto.setShipmentName(shipment.getName());
-        dto.setShipmentId(shipment.getId());
-        dto.setShippedFrom(shipment.getShippedFrom() == null ? null : shipment.getShippedFrom().getId());
-        dto.setShippedTo(shipment.getShippedTo() == null ? null : shipment.getShippedTo().getId());
-        dto.setStatus(shipment.getStatus().getLabel());
-        dto.setTripCount(shipment.getTripCount());
-        dto.setCurrentLocation("Not determined");
-        dto.setDeviceSn(shipment.getDevice().getSn());
-        dto.setDeviceName(shipment.getDevice().getName());
-        //Mock arrival date.
-        //TODO replace it by calculated.
-        final Date arrivalDate = new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L);
-        dto.setEstArrivalDate(arrivalDate);
-        dto.setActualArrivalDate(arrivalDate);
-        //TODO replace with autodetected
-        dto.setPercentageComplete(0);
-        dto.setAlertProfileName(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getName());
-        dto.setMaxTimesAlertFires(shipment.getMaxTimesAlertFires());
-        dto.setAlertSuppressionMinutes(shipment.getAlertSuppressionMinutes());
-        return dto;
-    }
-
-    /**
-     * @param arrivalNotificationSchedules
-     * @return
-     */
-    private List<NotificationScheduleListItem> toListItems(final List<NotificationSchedule> entities) {
-        final List<NotificationScheduleListItem> items = new LinkedList<NotificationScheduleListItem>();
-        for (final NotificationSchedule s : entities) {
-            items.add(new NotificationScheduleListItem(s));
-        }
-        return items;
+        return new SingleShipmentDto(shipment);
     }
     /**
      * @param shipment

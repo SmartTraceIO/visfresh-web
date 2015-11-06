@@ -21,10 +21,6 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
      */
     private Company company;
     /**
-     * Name.
-     */
-    private String name;
-    /**
      * Shipment description.
      */
     private String shipmentDescription;
@@ -86,7 +82,6 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
     public ShipmentBase(final ShipmentBase shipment) {
         super();
 
-        setName(shipment.getName());
         setShipmentDescription(shipment.getShipmentDescription());
         setShippedFrom(shipment.getShippedFrom());
         setShippedTo(shipment.getShippedTo());
@@ -97,20 +92,6 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
         arrivalNotificationSchedules.addAll((shipment.getArrivalNotificationSchedules()));
         setExcludeNotificationsIfNoAlerts(shipment.isExcludeNotificationsIfNoAlerts());
         setShutdownDeviceTimeOut(shipment.getShutdownDeviceTimeOut());
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(final String name) {
-        this.name = name;
     }
 
     /**
