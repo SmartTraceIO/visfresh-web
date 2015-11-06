@@ -127,6 +127,8 @@ public abstract class AbstractReportService implements ReportService {
         dto.setPalletId(shipment.getPalletId());
         dto.setPoNum(shipment.getPoNum());
         dto.setShipmentDescription(shipment.getShipmentDescription());
+        dto.setShipmentName(shipment.getName());
+        dto.setShipmentId(shipment.getId());
         dto.setShippedFrom(shipment.getShippedFrom() == null ? null : shipment.getShippedFrom().getId());
         dto.setShippedTo(shipment.getShippedTo() == null ? null : shipment.getShippedTo().getId());
         dto.setStatus(shipment.getStatus().getLabel());

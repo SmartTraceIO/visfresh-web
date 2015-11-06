@@ -40,33 +40,69 @@ public class ReportSerializer extends AbstractJsonSerializer {
         if (dto == null) {
             return null;
         }
+//
+//        if (s.getDevice() != null) {
+//            obj.addProperty("deviceImei", s.getDevice().getImei());
+//            obj.addProperty("deviceSN", s.getDevice().getSn());
+//            obj.addProperty("deviceName", s.getDevice().getName());
+//        }
+//        obj.addProperty("tripCount", s.getTripCount());
+//
+//        obj.addProperty("shippedFrom", getId(s.getShippedFrom()));
+//        obj.addProperty("shippedTo", getId(s.getShippedTo()));
+//
+//        obj.addProperty("alertProfileId", getId(s.getAlertProfile()));
+//        obj.addProperty("alertSuppressionMinutes", s.getAlertSuppressionMinutes());
+//        obj.addProperty("maxTimesAlertFires", s.getMaxTimesAlertFires());
+//
+//        obj.add("alertsNotificationSchedules", getIdList(s.getAlertsNotificationSchedules()));
+//        obj.addProperty("arrivalNotificationWithinKm", s.getArrivalNotificationWithinKm());
+//        obj.addProperty("excludeNotificationsIfNoAlerts", s.isExcludeNotificationsIfNoAlerts());
+//        obj.add("arrivalNotificationSchedules", getIdList(s.getArrivalNotificationSchedules()));
+//
+//        obj.addProperty("assetType", s.getAssetType());
+//        obj.addProperty("assetNum", s.getAssetNum());
+//
+//        obj.addProperty("palletId", s.getPalletId());
+//        obj.addProperty("poNum", s.getPoNum());
+//        obj.add("customFields", toJson(s.getCustomFields()));
+//
+//        obj.addProperty("shutdownDeviceAfterMinutes", s.getShutdownDeviceTimeOut());
+//        obj.addProperty("commentsForReceiver", s.getCommentsForReceiver());
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty("status", dto.getStatus());
-        obj.addProperty("currentLocation", dto.getCurrentLocation());
+        obj.addProperty("shipmentId", dto.getShipmentId());
+        obj.addProperty("shipmentName", dto.getShipmentName());
+        obj.addProperty("shipmentStatus", dto.getStatus());
+        obj.addProperty("shipmentDescription", dto.getShipmentDescription());
+        obj.addProperty("shipmentDate", formatDate(dto.getShipmentDate()));
+
         obj.addProperty("deviceSN", dto.getDeviceSn());
         obj.addProperty("deviceName", dto.getDeviceName());
         obj.addProperty("tripCount", dto.getTripCount());
-        obj.addProperty("shipmentDescription", dto.getShipmentDescription());
+
+        obj.addProperty("shippedFrom", dto.getShippedFrom());
+        obj.addProperty("shippedTo", dto.getShippedTo());
+        obj.addProperty("currentLocation", dto.getCurrentLocation());
+        obj.addProperty("estArrivalDate", formatDate(dto.getEstArrivalDate()));
+        obj.addProperty("actualArrivalDate", formatDate(dto.getActualArrivalDate()));
+        obj.addProperty("percentageComplete", dto.getPercentageComplete());
+
+        obj.addProperty("alertProfileId", dto.getAlertProfileId());
+        obj.addProperty("alertProfileName", dto.getAlertProfileName());
+        obj.add("alertsNotificationSchedules", asJsonArray(dto.getAlertsNotificationSchedules()));
+        obj.add("alertSummary", toJson(dto.getAlertSummary()));
+        obj.addProperty("maxTimesAlertFires", dto.getMaxTimesAlertFires());
+        obj.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
+        obj.addProperty("excludeNotificationIfNoAlerts", dto.isExcludeNotificationsIfNoAlertsFired());
+
+        obj.add("arrivalNotificationSchedules", asJsonArray(dto.getArrivalNotificationSchedules()));
+        obj.addProperty("arrivalNotificationWithinKm", dto.getArrivalNotificationWithInKm());
+
         obj.addProperty("palletId", dto.getPalletId());
         obj.addProperty("assetNum", dto.getAssetNum());
         obj.addProperty("assetType", dto.getAssetType());
         obj.addProperty("poNum", dto.getPoNum());
-        obj.addProperty("shippedFrom", dto.getShippedFrom());
-        obj.addProperty("shippedTo", dto.getShippedTo());
-        obj.addProperty("shipmentDate", formatDate(dto.getShipmentDate()));
-        obj.addProperty("estArrivalDate", formatDate(dto.getEstArrivalDate()));
-        obj.addProperty("actualArrivalDate", formatDate(dto.getActualArrivalDate()));
-        obj.addProperty("percentageComplete", dto.getPercentageComplete());
-        obj.addProperty("alertProfileId", dto.getAlertProfileId());
-        obj.addProperty("alertProfileName", dto.getAlertProfileName());
-        obj.addProperty("maxTimesAlertFires", dto.getMaxTimesAlertFires());
-        obj.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
-        obj.add("alertsNotificationSchedules", asJsonArray(dto.getAlertsNotificationSchedules()));
-        obj.add("alertSummary", toJson(dto.getAlertSummary()));
-        obj.add("arrivalNotificationSchedules", asJsonArray(dto.getArrivalNotificationSchedules()));
-        obj.addProperty("arrivalNotificationWithinKm", dto.getArrivalNotificationWithInKm());
-        obj.addProperty("excludeNotificationIfNoAlerts", dto.isExcludeNotificationsIfNoAlertsFired());
 
         //serialize time items
         final JsonArray items = new JsonArray();

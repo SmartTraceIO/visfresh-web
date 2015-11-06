@@ -50,6 +50,8 @@ public class SingleShipmentDto {
     private int maxTimesAlertFires;
     private int alertSuppressionMinutes;
     private final Map<AlertType, Integer> alertSummary = new HashMap<AlertType, Integer>();
+    private Long shipmentId;
+    private String shipmentName;
 
     /**
      * Default constructor.
@@ -346,5 +348,29 @@ public class SingleShipmentDto {
      */
     public Map<AlertType, Integer> getAlertSummary() {
         return alertSummary;
+    }
+    /**
+     * @return shipment ID.
+     */
+    public Long getShipmentId() {
+        return shipmentId;
+    }
+    /**
+     * @param shipmentId the shipmentId to set
+     */
+    public void setShipmentId(final Long shipmentId) {
+        this.shipmentId = shipmentId;
+    }
+    /**
+     * @return shipment name.
+     */
+    public String getShipmentName() {
+        return shipmentName;
+    }
+    /**
+     * @param shipmentName the shipmentName to set
+     */
+    public void setShipmentName(final String shipmentName) {
+        this.shipmentName = shipmentName;
     }
 }

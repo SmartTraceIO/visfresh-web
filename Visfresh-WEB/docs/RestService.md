@@ -258,6 +258,8 @@ Returns [Shipment Object](#markdown-header-shipment)
 Method *GET*, method name getShipments, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
+3. sc - sort column  
+4. so - sort order  
 Returns array of [Shipment Description Objects](#markdown-header-shipment-description), it is not same as [Shipment Object](#markdown-header-shipment).  
 [(example)](#markdown-header-get-shipments-example)
 
@@ -456,35 +458,37 @@ see [Shipment Object](#markdown-header-shipment)
 ### Shipment ###
 ```json
 {
-    "alertSuppressionMinutes": 55,
-    "alertProfileId": 111,
-    "alertsNotificationSchedules": [
-      112
-    ],
-    "arrivalNotificationWithinKm": 111,
-    "arrivalNotificationSchedules": [
-      115
-    ],
-    "assetType": "SeaContainer",
-    "excludeNotificationsIfNoAlerts": true,
-    "shippedFrom": 118,
-    "shippedTo": 119,
-    "shutdownDeviceAfterMinutes": 155,
-    "maxTimesAlertFires": 4,
-    "deviceName": "Shipment-1",
-    "shipmentDescription": "Any Description",
-    "shipmentId": 120,
-    "palletId": "palettid",
-    "tripCount": 88,
-    "poNum": 893793487,
-    "assetNum": "10515",
-    "shipmentDate": "2015-10-25T05:32",
-    "customFields": {
-      "field1": "value1"
-    },
-    "status": "InProgress",
-    "deviceSN": "234908720394857",
-    "commentsForReceiver": "Comments for receiver"
+	"shipmentId": 120,
+	"shipmentName": "Shipment-1",
+	"shipmentDescription": "Any Description",
+	"shipmentDate": "2015-10-25T20:27",
+	"shipmentStatus": "InProgress",
+	"deviceImei": "234908720394857",
+	"deviceSN": "394857",
+	"deviceName": "Device Name",
+	"tripCount": 88,
+	"shippedFrom": 118,
+	"shippedTo": 119,
+	"alertProfileId": 111,
+	"alertSuppressionMinutes": 55,
+	"maxTimesAlertFires": 4,
+	"alertsNotificationSchedules": [
+	  112
+	],
+	"arrivalNotificationWithinKm": 111,
+	"excludeNotificationsIfNoAlerts": true,
+	"arrivalNotificationSchedules": [
+	  115
+	],
+	"assetType": "SeaContainer",
+	"assetNum": "10515",
+	"palletId": "palettid",
+	"poNum": 893793487,
+	"customFields": {
+	  "field1": "value1"
+	},
+	"shutdownDeviceAfterMinutes": 155,
+	"commentsForReceiver": "Comments for receiver"
 }
 ```
 ### Shipment Description ###
@@ -1152,33 +1156,35 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "saveAsNewTemplate": true,
   "templateName": "NewTemplate.tpl",
   "shipment": {
-    "alertSuppressionMinutes": 55,
+    "shipmentName": "Shipment-1",
+    "shipmentDescription": "Any Description",
+    "shipmentDate": "2015-10-25T22:27",
+    "shipmentStatus": "InProgress",
+    "deviceImei": "234908720394857",
+    "deviceSN": "394857",
+    "deviceName": "Device Name",
+    "tripCount": 88,
+    "shippedFrom": 96,
+    "shippedTo": 97,
     "alertProfileId": 89,
+    "alertSuppressionMinutes": 55,
+    "maxTimesAlertFires": 4,
     "alertsNotificationSchedules": [
       90
     ],
     "arrivalNotificationWithinKm": 111,
+    "excludeNotificationsIfNoAlerts": true,
     "arrivalNotificationSchedules": [
       93
     ],
     "assetType": "SeaContainer",
-    "excludeNotificationsIfNoAlerts": true,
-    "shippedFrom": 96,
-    "shippedTo": 97,
-    "shutdownDeviceAfterMinutes": 155,
-    "maxTimesAlertFires": 4,
-    "deviceName": "Shipment-1",
-    "shipmentDescription": "Any Description",
-    "palletId": "palettid",
-    "tripCount": 88,
-    "poNum": 893793487,
     "assetNum": "10515",
-    "shipmentDate": "2015-10-25T07:32",
+    "palletId": "palettid",
+    "poNum": 893793487,
     "customFields": {
       "field1": "value1"
     },
-    "status": "InProgress",
-    "deviceSN": "234908720394857",
+    "shutdownDeviceAfterMinutes": 155,
     "commentsForReceiver": "Comments for receiver"
   }
 }
@@ -1207,7 +1213,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": [
     {
-      "shipmentId": 130,
+      "shipmentId": 21,
       "status": "InProgress",
       "deviceSN": "234908720394857",
       "deviceName": "Device Name",
@@ -1217,11 +1223,11 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       "assetNum": "10515",
       "assetType": "SeaContainer",
       "shippedFrom": "Bankstown Warehouse",
-      "shipmentDate": "2015-10-25T05:32",
-      "shippedTo": "Bankstown Warehouse",
-      "estArrivalDate": "2015-10-25T05:32",
+      "shipmentDate": "2015-10-25T20:27",
+      "shippedTo": "Coles Perth DC",
+      "estArrivalDate": "2015-10-25T20:27",
       "percentageComplete": 0,
-      "alertProfileId": 121,
+      "alertProfileId": 12,
       "alertProfileName": "AnyAlert",
       "alertSummary": {}
     }
@@ -1478,34 +1484,36 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "message": "Success"
   },
   "response": {
-    "alertSuppressionMinutes": 55,
+    "shipmentId": 120,
+    "shipmentName": "Shipment-1",
+    "shipmentDescription": "Any Description",
+    "shipmentDate": "2015-10-25T20:27",
+    "shipmentStatus": "InProgress",
+    "deviceImei": "234908720394857",
+    "deviceSN": "394857",
+    "deviceName": "Device Name",
+    "tripCount": 88,
+    "shippedFrom": 118,
+    "shippedTo": 119,
     "alertProfileId": 111,
+    "alertSuppressionMinutes": 55,
+    "maxTimesAlertFires": 4,
     "alertsNotificationSchedules": [
       112
     ],
     "arrivalNotificationWithinKm": 111,
+    "excludeNotificationsIfNoAlerts": true,
     "arrivalNotificationSchedules": [
       115
     ],
     "assetType": "SeaContainer",
-    "excludeNotificationsIfNoAlerts": true,
-    "shippedFrom": 118,
-    "shippedTo": 119,
-    "shutdownDeviceAfterMinutes": 155,
-    "maxTimesAlertFires": 4,
-    "deviceName": "Shipment-1",
-    "shipmentDescription": "Any Description",
-    "shipmentId": 120,
-    "palletId": "palettid",
-    "tripCount": 88,
-    "poNum": 893793487,
     "assetNum": "10515",
-    "shipmentDate": "2015-10-25T05:32",
+    "palletId": "palettid",
+    "poNum": 893793487,
     "customFields": {
       "field1": "value1"
     },
-    "status": "InProgress",
-    "deviceSN": "234908720394857",
+    "shutdownDeviceAfterMinutes": 155,
     "commentsForReceiver": "Comments for receiver"
   }
 }
@@ -1566,25 +1574,21 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "message": "Success"
   },
   "response": {
-    "status": "In Progress",
-    "currentLocation": "Not determined",
+    "shipmentId": 11,
+    "shipmentName": "Shipment-1",
+    "shipmentStatus": "In Progress",
+    "shipmentDescription": "Any Description",
     "deviceSN": "394857",
     "deviceName": "Device Name",
     "tripCount": 88,
-    "shipmentDescription": "Any Description",
-    "palletId": "palettid",
-    "assetNum": "10515",
-    "assetType": "SeaContainer",
-    "poNum": 893793487,
     "shippedFrom": 9,
     "shippedTo": 10,
-    "estArrivalDate": "2015-11-07T21:24",
-    "actualArrivalDate": "2015-11-07T21:24",
+    "currentLocation": "Not determined",
+    "estArrivalDate": "2015-11-08T10:33",
+    "actualArrivalDate": "2015-11-08T10:33",
     "percentageComplete": 0,
     "alertProfileId": 2,
     "alertProfileName": "AnyAlert",
-    "maxTimesAlertFires": 4,
-    "alertSuppressionMinutes": 55,
     "alertsNotificationSchedules": [
       {
         "notificationScheduleId": 3,
@@ -1596,6 +1600,9 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "alertSummary": {
       "Hot": "1"
     },
+    "maxTimesAlertFires": 4,
+    "alertSuppressionMinutes": 55,
+    "excludeNotificationIfNoAlerts": false,
     "arrivalNotificationSchedules": [
       {
         "notificationScheduleId": 6,
@@ -1605,26 +1612,13 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       }
     ],
     "arrivalNotificationWithinKm": 111,
-    "excludeNotificationIfNoAlerts": false,
+    "palletId": "palettid",
+    "assetNum": "10515",
+    "assetType": "SeaContainer",
+    "poNum": 893793487,
     "items": [
       {
-        "timestamp": "2015-11-05T21:24",
-        "location": {
-          "latitude": 50.5,
-          "longitude": 51.51
-        },
-        "temperature": 56.0,
-        "type": "AUT",
-        "alerts": [],
-        "arrivas": [
-          {
-            "numberOfMetersOfArrival": 400,
-            "arrivalReportSentTo": ""
-          }
-        ]
-      },
-      {
-        "timestamp": "2015-11-05T21:24",
+        "timestamp": "2015-11-06T10:33",
         "location": {
           "latitude": 50.5,
           "longitude": 51.51
@@ -1637,6 +1631,22 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
             "type": "Hot"
           }
         ],
+        "arrivas": [
+          {
+            "numberOfMetersOfArrival": 400,
+            "arrivalReportSentTo": ""
+          }
+        ]
+      },
+      {
+        "timestamp": "2015-11-06T10:33",
+        "location": {
+          "latitude": 50.5,
+          "longitude": 51.51
+        },
+        "temperature": 56.0,
+        "type": "AUT",
+        "alerts": [],
         "arrivas": []
       }
     ]
