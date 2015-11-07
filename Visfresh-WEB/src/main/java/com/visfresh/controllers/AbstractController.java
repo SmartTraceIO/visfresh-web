@@ -20,6 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.entities.EntityWithCompany;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
@@ -55,6 +56,18 @@ public abstract class AbstractController {
         super();
     }
 
+
+    /**
+     * @param user
+     * @param s
+     * @throws RestServiceException
+     */
+    protected void checkCompanyAccess(final User user,
+            final EntityWithCompany s) throws RestServiceException {
+        if (s != null && s.getCompany() != null && !s.getCompany().getId().equals(user.getCompany().getId())) {
+            throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
+        }
+    }
     /**
      * @param list
      * @param pageIndex

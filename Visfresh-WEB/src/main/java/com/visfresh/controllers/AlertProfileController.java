@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
-import com.visfresh.services.RestService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -39,7 +39,7 @@ public class AlertProfileController extends AbstractController {
      * REST service.
      */
     @Autowired
-    private RestService restService;
+    private AlertProfileDao dao;
 
     /**
      * Default constructor.
@@ -61,7 +61,10 @@ public class AlertProfileController extends AbstractController {
             final AlertProfile p = getSerializer(user).parseAlertProfile(getJSonObject(alert));
 
             security.checkCanSaveAlertProfile(user);
-            final Long id = restService.saveAlertProfile(user.getCompany(), p);
+            checkCompanyAccess(user, p);
+
+            p.setCompany(user.getCompany());
+            final Long id = dao.save(p).getId();
             return createIdResponse("alertProfileId", id);
         } catch (final Exception e) {
             log.error("Failed to save alert profile", e);
@@ -81,7 +84,9 @@ public class AlertProfileController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetAlertProfiles(user);
 
-            final AlertProfile alert = restService.getAlertProfile(user.getCompany(), alertProfileId);
+            final AlertProfile alert = dao.findOne(alertProfileId);
+            checkCompanyAccess(user, alert);
+
             return createSuccessResponse(getSerializer(user).toJson(alert));
         } catch (final Exception e) {
             log.error("Failed to get alert profiles", e);
@@ -101,7 +106,10 @@ public class AlertProfileController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveAlertProfile(user);
 
-            restService.deleteAlertProfile(user.getCompany(), alertProfileId);
+            final AlertProfile p = dao.findOne(alertProfileId);
+            checkCompanyAccess(user, p);
+            dao.delete(p);
+
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to get alert profiles", e);
@@ -130,7 +138,7 @@ public class AlertProfileController extends AbstractController {
             security.checkCanGetAlertProfiles(user);
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<AlertProfile> profiles = restService.getAlertProfiles(user.getCompany());
+            final List<AlertProfile> profiles = dao.findByCompany(user.getCompany());
             sort(profiles, sc, so);
 
             final int total = profiles.size();

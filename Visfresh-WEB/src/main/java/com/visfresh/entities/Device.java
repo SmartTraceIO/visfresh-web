@@ -8,7 +8,7 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class Device implements EntityWithId<String> {
+public class Device implements EntityWithId<String>, EntityWithCompany {
     /**
      * Device serial number.
      */
@@ -99,6 +99,7 @@ public class Device implements EntityWithId<String> {
     /**
      * @return the company
      */
+    @Override
     public Company getCompany() {
         return company;
     }

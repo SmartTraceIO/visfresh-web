@@ -11,7 +11,7 @@ import java.util.List;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public abstract class ShipmentBase implements EntityWithId<Long> {
+public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithCompany {
     /**
      * ID.
      */
@@ -220,6 +220,7 @@ public abstract class ShipmentBase implements EntityWithId<Long> {
     /**
      * @return the company
      */
+    @Override
     public Company getCompany() {
         return company;
     }

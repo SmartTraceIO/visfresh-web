@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.dao.DeviceDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
-import com.visfresh.services.RestService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -34,11 +34,9 @@ public class DeviceController extends AbstractController {
      * Logger.
      */
     private static final Logger log = LoggerFactory.getLogger(DeviceController.class);
-    /**
-     * REST service.
-     */
+
     @Autowired
-    private RestService restService;
+    private DeviceDao dao;
 
     /**
      * Default constructor.
@@ -58,7 +56,11 @@ public class DeviceController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanManageDevices(user);
 
-            restService.saveDevice(user.getCompany(), getSerializer(user).parseDevice(getJSonObject(device)));
+            final Device d = getSerializer(user).parseDevice(getJSonObject(device));
+            checkCompanyAccess(user, d);
+
+            d.setCompany(user.getCompany());
+            dao.save(d);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to save device", e);
@@ -84,7 +86,7 @@ public class DeviceController extends AbstractController {
 
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<Device> ds = restService.getDevices(user.getCompany());
+            final List<Device> ds = dao.findByCompany(user.getCompany());
             sort(ds);
 
             final int total = ds.size();
@@ -119,7 +121,9 @@ public class DeviceController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetDevices(user);
 
-            final Device device = restService.getDevice(user.getCompany(), imei);
+            final Device device = dao.findByImei(imei);
+            checkCompanyAccess(user, device);
+
             return createSuccessResponse(getSerializer(user).toJson(device));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
@@ -139,7 +143,10 @@ public class DeviceController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanManageDevices(user);
 
-            restService.deleteDevice(user.getCompany(), imei);
+            final Device d = dao.findOne(imei);
+            checkCompanyAccess(user, d);
+
+            dao.delete(d);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
@@ -159,7 +166,7 @@ public class DeviceController extends AbstractController {
             security.checkCanSendCommandToDevice(user);
 
             final DeviceCommand cmd = getSerializer(user).parseDeviceCommand(getJSonObject(req));
-            restService.sendCommandToDevice(cmd);
+            //TODO imiplement
 
             return createSuccessResponse(null);
         } catch (final Exception e) {

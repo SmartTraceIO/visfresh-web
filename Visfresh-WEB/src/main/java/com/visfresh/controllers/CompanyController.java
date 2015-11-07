@@ -16,10 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
-import com.visfresh.services.ReportService;
-import com.visfresh.services.RestService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,16 +31,9 @@ public class CompanyController extends AbstractController {
      * Logger.
      */
     private static final Logger log = LoggerFactory.getLogger(CompanyController.class);
-    /**
-     * REST service.
-     */
+
     @Autowired
-    private RestService restService;
-    /**
-     * Report service.
-     */
-    @Autowired
-    private ReportService reportService;
+    private CompanyDao dao;
 
     /**
      * Default constructor.
@@ -66,7 +58,7 @@ public class CompanyController extends AbstractController {
             if (user.getCompany().getId().equals(companyId)) {
                 company = user.getCompany();
             } else {
-                company = restService.getCompany(companyId);
+                company = dao.findOne(companyId);
             }
             return createSuccessResponse(getSerializer(user).toJson(company));
         } catch (final Exception e) {
@@ -92,7 +84,7 @@ public class CompanyController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetCompanies(user);
 
-            final List<Company> companies = restService.getCompanies();
+            final List<Company> companies = dao.findAll();
             sort(companies);
 
             final int total = companies.size();

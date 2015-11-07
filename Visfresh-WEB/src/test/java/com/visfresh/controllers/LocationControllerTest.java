@@ -60,42 +60,40 @@ public class LocationControllerTest extends AbstractRestServiceTest {
     }
     @Test
     public void testGetSortedLocationProfiles() throws RestServiceException, IOException {
-//        } else if ("notes".equalsIgnoreCase(sc)) {
-
         final LocationProfile p1 = createLocationProfile(false);
         p1.setName("f");
         p1.setAddress("f");
         p1.setCompanyName("f");
         p1.setNotes("f");
-        getRestService().saveLocation(getCompany(), p1);
+        saveLocationDirectly(p1);
 
         final LocationProfile p2 = createLocationProfile(false);
         p2.setName("a");
         p2.setAddress("b");
         p2.setCompanyName("c");
         p2.setNotes("d");
-        getRestService().saveLocation(getCompany(), p2);
+        saveLocationDirectly(p2);
 
         final LocationProfile p3 = createLocationProfile(false);
         p3.setName("d");
         p3.setAddress("a");
         p3.setCompanyName("b");
         p3.setNotes("c");
-        getRestService().saveLocation(getCompany(), p3);
+        saveLocationDirectly(p3);
 
         final LocationProfile p4 = createLocationProfile(false);
         p4.setName("c");
         p4.setAddress("d");
         p4.setCompanyName("a");
         p4.setNotes("b");
-        getRestService().saveLocation(getCompany(), p4);
+        saveLocationDirectly(p4);
 
         final LocationProfile p5 = createLocationProfile(false);
         p5.setName("b");
         p5.setAddress("c");
         p5.setCompanyName("d");
         p5.setNotes("a");
-        getRestService().saveLocation(getCompany(), p5);
+        saveLocationDirectly(p5);
 
         //test sort by ID
         LocationProfile first = facade.getLocations(1, 10000, "locationId", "asc").get(0);

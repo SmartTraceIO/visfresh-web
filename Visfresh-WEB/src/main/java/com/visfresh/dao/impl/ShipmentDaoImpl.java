@@ -148,6 +148,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         }
         return sb.toString();
     }
+
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#createEntity(java.util.Map, java.util.Map)
      */

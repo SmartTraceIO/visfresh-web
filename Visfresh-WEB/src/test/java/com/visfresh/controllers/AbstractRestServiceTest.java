@@ -8,7 +8,13 @@ import java.util.Date;
 import org.junit.runner.RunWith;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.visfresh.dao.CompanyDao;
+import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.mock.MockAlertProfileDao;
+import com.visfresh.dao.mock.MockLocationProfileDao;
 import com.visfresh.dao.mock.MockNotificationScheduleDao;
+import com.visfresh.dao.mock.MockShipmentDao;
+import com.visfresh.dao.mock.MockShipmentTemplateDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -18,7 +24,6 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
-import com.visfresh.mock.MockRestService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -98,7 +103,7 @@ public abstract class AbstractRestServiceTest {
         p.setWatchMovementStop(true);
 
         if (save) {
-            getRestService().saveAlertProfile(getCompany(), p);
+            saveAlertProfileDirectly(p);
         }
         return p;
     }
@@ -120,7 +125,7 @@ public abstract class AbstractRestServiceTest {
         p.getLocation().setLatitude(100.500);
         p.getLocation().setLongitude(100.501);
         if (save) {
-            getRestService().saveLocation(getCompany(), p);
+            saveLocationDirectly(p);
         }
         return p;
     }
@@ -142,11 +147,47 @@ public abstract class AbstractRestServiceTest {
     /**
      * @param s
      */
-    protected void saveNotificationScheduleDirectly(final NotificationSchedule s) {
+    protected Long saveNotificationScheduleDirectly(final NotificationSchedule s) {
         final MockNotificationScheduleDao dao = context.getBean(MockNotificationScheduleDao.class);
         s.setCompany(getCompany());
         dao.save(s);
+        return s.getId();
     }
+    protected Long saveAlertProfileDirectly(final AlertProfile p) {
+        final MockAlertProfileDao dao = context.getBean(MockAlertProfileDao.class);
+        p.setCompany(getCompany());
+        dao.save(p);
+        return p.getId();
+    }
+    /**
+     * @param company
+     * @param p
+     */
+    protected Long saveLocationDirectly(final LocationProfile p) {
+        final MockLocationProfileDao dao = context.getBean(MockLocationProfileDao.class);
+        p.setCompany(getCompany());
+        dao.save(p);
+        return p.getId();
+    }
+    /**
+     * @param s
+     */
+    protected Long saveShipmentDirectly(final Shipment s) {
+        final MockShipmentDao dao = context.getBean(MockShipmentDao.class);
+        s.setCompany(getCompany());
+        dao.save(s);
+        return s.getId();
+    }
+    /**
+     * @param t
+     */
+    protected Long saveShipmentTemplateDirectly(final ShipmentTemplate t) {
+        final MockShipmentTemplateDao dao = context.getBean(MockShipmentTemplateDao.class);
+        t.setCompany(getCompany());
+        dao.save(t);
+        return t.getId();
+    }
+
     /**
      * @return any schedule/person/how/when
      */
@@ -191,7 +232,7 @@ public abstract class AbstractRestServiceTest {
         s.setStatus(ShipmentStatus.InProgress);
         s.setCommentsForReceiver("Comments for receiver");
         if (save) {
-            getRestService().saveShipment(getCompany(), s);
+            saveShipmentDirectly(s);
         }
         return s;
     }
@@ -214,7 +255,7 @@ public abstract class AbstractRestServiceTest {
         t.setCommentsForReceiver("Comments for receiver");
 
         if (save) {
-            getRestService().saveShipmentTemplate(getCompany(), t);
+            saveShipmentTemplateDirectly(t);
         }
         return t;
     }
@@ -229,7 +270,8 @@ public abstract class AbstractRestServiceTest {
         t.setName("Device Name");
         t.setSn(imei.substring(imei.length() - 6));
         if (save) {
-            getRestService().saveDevice(getCompany(), t);
+            t.setCompany(getCompany());
+            context.getBean(DeviceDao.class).save(t);
         }
         return t;
     }
@@ -238,12 +280,11 @@ public abstract class AbstractRestServiceTest {
      * @return
      */
     protected Company getCompany() {
-        return getRestService().getCompany(1l);
-    }
-    /**
-     *
-     */
-    protected MockRestService getRestService() {
-        return context.getBean(MockRestService.class);
+        for (final Company c : context.getBean(CompanyDao.class).findAll()) {
+            if (RestServiceRunner.SHARED_COMPANY_NAME.equals(c.getName())) {
+                return c;
+            }
+        }
+        return null;
     }
 }

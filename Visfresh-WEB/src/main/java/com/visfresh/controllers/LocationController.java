@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
-import com.visfresh.services.RestService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -35,11 +35,8 @@ public class LocationController extends AbstractController {
      * Logger.
      */
     private static final Logger log = LoggerFactory.getLogger(LocationController.class);
-    /**
-     * REST service.
-     */
     @Autowired
-    private RestService restService;
+    private LocationProfileDao dao;
 
     /**
      * Default constructor.
@@ -61,8 +58,10 @@ public class LocationController extends AbstractController {
             final LocationProfile lp = getSerializer(user).parseLocationProfile(getJSonObject(profile));
 
             security.checkCanSaveLocation(user);
+            checkCompanyAccess(user, lp);
 
-            final Long id = restService.saveLocation(user.getCompany(), lp);
+            lp.setCompany(user.getCompany());
+            final long id = dao.save(lp).getId();
             return createIdResponse("locationId", id);
         } catch (final Exception e) {
             log.error("Failed to save location profile.", e);
@@ -91,7 +90,7 @@ public class LocationController extends AbstractController {
 
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<LocationProfile> ls = restService.getLocation(user.getCompany());
+            final List<LocationProfile> ls = dao.findByCompany(user.getCompany());
             sort(ls, sc, so);
 
             final int total = ls.size();
@@ -120,8 +119,10 @@ public class LocationController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetLocations(user);
 
-            final LocationProfile location = restService.getLocationProfile(user.getCompany(), locationId);
-            return createSuccessResponse(getSerializer(user).toJson(location));
+            final LocationProfile p = dao.findOne(locationId);
+            checkCompanyAccess(user, p);
+
+            return createSuccessResponse(getSerializer(user).toJson(p));
         } catch (final Exception e) {
             log.error("Failed to get location profiles", e);
             return createErrorResponse(e);
@@ -140,7 +141,10 @@ public class LocationController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveLocation(user);
 
-            restService.deleteLocation(user.getCompany(), locationId);
+            final LocationProfile p = dao.findOne(locationId);
+            checkCompanyAccess(user, p);
+            dao.delete(locationId);
+
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to get location profiles", e);

@@ -10,7 +10,7 @@ import java.util.List;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class NotificationSchedule implements EntityWithId<Long> {
+public class NotificationSchedule implements EntityWithId<Long>, EntityWithCompany {
     /**
      * Notification schedule ID.
      */
@@ -86,6 +86,7 @@ public class NotificationSchedule implements EntityWithId<Long> {
     /**
      * @return the company
      */
+    @Override
     public Company getCompany() {
         return company;
     }

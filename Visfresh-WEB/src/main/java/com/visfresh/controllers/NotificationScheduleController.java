@@ -24,7 +24,6 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
-import com.visfresh.services.RestServiceException;
 import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
@@ -214,18 +213,6 @@ public class NotificationScheduleController extends AbstractController {
         } catch (final Exception e) {
             log.error("Failed to get notification schedules", e);
             return createErrorResponse(e);
-        }
-    }
-
-    /**
-     * @param user
-     * @param s
-     * @throws RestServiceException
-     */
-    protected void checkCompanyAccess(final User user,
-            final NotificationSchedule s) throws RestServiceException {
-        if (s != null && s.getCompany() != null && !s.getCompany().getId().equals(user.getCompany().getId())) {
-            throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
         }
     }
 }

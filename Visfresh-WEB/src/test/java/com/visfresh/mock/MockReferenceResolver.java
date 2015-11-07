@@ -6,7 +6,13 @@ package com.visfresh.mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.CompanyDao;
+import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
+import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.mock.MockAlertProfileDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -22,9 +28,19 @@ import com.visfresh.io.ReferenceResolver;
 @Component
 public class MockReferenceResolver implements ReferenceResolver {
     @Autowired
-    private MockRestService restService;
+    private MockAlertProfileDao alertProfileDao;
     @Autowired
     private NotificationScheduleDao notificationScheduleDao;
+    @Autowired
+    private LocationProfileDao locationProfileDao;
+    @Autowired
+    private ShipmentDao shipmentDao;
+    @Autowired
+    private ShipmentTemplateDao shipmentTemplateDao;
+    @Autowired
+    private DeviceDao deviceDao;
+    @Autowired
+    private CompanyDao companyDao;
 
     /**
      * Fefault constructor.
@@ -38,14 +54,14 @@ public class MockReferenceResolver implements ReferenceResolver {
      */
     @Override
     public LocationProfile getLocationProfile(final Long id) {
-        return restService.locationProfiles.get(id);
+        return locationProfileDao.findOne(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.ReferenceResolver#getAlertProfile(java.lang.Long)
      */
     @Override
     public AlertProfile getAlertProfile(final Long id) {
-        return restService.alertProfiles.get(id);
+        return alertProfileDao.findOne(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.ReferenceResolver#getNotificationSchedule(java.lang.Long)
@@ -59,20 +75,20 @@ public class MockReferenceResolver implements ReferenceResolver {
      */
     @Override
     public Device getDevice(final String imei) {
-        return restService.devices.get(imei);
+        return deviceDao.findByImei(imei);
     }
     /* (non-Javadoc)
      * @see com.visfresh.io.ReferenceResolver#getShipment(java.lang.Long)
      */
     @Override
     public Shipment getShipment(final Long id) {
-        return restService.shipments.get(id);
+        return shipmentDao.findOne(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.io.ReferenceResolver#getCompany(java.lang.Long)
      */
     @Override
     public Company getCompany(final Long id) {
-        return restService.companies.get(id);
+        return companyDao.findOne(id);
     }
 }

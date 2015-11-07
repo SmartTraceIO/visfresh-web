@@ -9,8 +9,10 @@ import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.services.RestServiceException;
 
@@ -19,12 +21,19 @@ import com.visfresh.services.RestServiceException;
  *
  */
 public class AlertProfileControllerTest extends AbstractRestServiceTest {
+    private AlertProfileDao dao;
     /**
      * Default constructor.
      */
     public AlertProfileControllerTest() {
         super();
     }
+
+    @Before
+    public void setUp() {
+        dao = context.getBean(AlertProfileDao.class);
+    }
+
     //@RequestMapping(value = "/saveAlertProfile/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveAlertProfile(@PathVariable final String authToken,
     //        final @RequestBody String alert) {
@@ -43,7 +52,7 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
     public void testDeleteAlertProfile() throws RestServiceException, IOException {
         final AlertProfile p = createAlertProfile(true);
         facade.deleteAlertProfile(p);
-        assertNull(getRestService().getAlertProfile(getCompany(), p.getId()));
+        assertNull(dao.findOne(p.getId()));
     }
     //@RequestMapping(value = "/getAlertProfiles/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getAlertProfiles(@PathVariable final String authToken) {
@@ -62,17 +71,17 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         final AlertProfile p1 = createAlertProfile(false);
         p1.setName("b");
         p1.setDescription("c");
-        getRestService().saveAlertProfile(getCompany(), p1);
+        saveAlertProfileDirectly(p1);
 
         final AlertProfile p2 = createAlertProfile(false);
         p2.setName("a");
         p2.setDescription("b");
-        getRestService().saveAlertProfile(getCompany(), p2);
+        saveAlertProfileDirectly(p2);
 
         final AlertProfile p3 = createAlertProfile(false);
         p3.setName("c");
         p3.setDescription("a");
-        getRestService().saveAlertProfile(getCompany(), p3);
+        saveAlertProfileDirectly(p3);
 
         //test sort by ID
         AlertProfile first = facade.getAlertProfiles(1, 10000, "alertProfileId", "asc").get(0);

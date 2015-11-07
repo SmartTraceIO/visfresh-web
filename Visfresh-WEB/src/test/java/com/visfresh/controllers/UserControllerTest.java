@@ -13,6 +13,8 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.dao.CompanyDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
@@ -20,7 +22,6 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.UpdateUserDetailsRequest;
-import com.visfresh.mock.MockAuthService;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -28,8 +29,9 @@ import com.visfresh.services.RestServiceException;
  *
  */
 public class UserControllerTest extends AbstractRestServiceTest {
-    private MockAuthService authService;
     private User user;
+    private UserDao dao;
+    private CompanyDao companyDao;
 
     /**
      * Default constructor.
@@ -40,8 +42,9 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
     @Before
     public void setUp() {
-        authService = context.getBean(MockAuthService.class);
-        user = authService.users.values().iterator().next();
+        dao = context.getBean(UserDao.class);
+        companyDao = context.getBean(CompanyDao.class);
+        user = dao.findAll().get(0);
     }
     //@RequestMapping(value = "/getUser/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getUser(@PathVariable final String authToken,
@@ -60,12 +63,12 @@ public class UserControllerTest extends AbstractRestServiceTest {
         UserProfile p = new UserProfile();
         p.getShipments().add(sp);
 
-        getRestService().profiles.put(user.getLogin(), p);
+        dao.saveProfile(user, p);
 
         p = facade.getProfile();
         assertEquals(1, p.getShipments().size());
 
-        getRestService().profiles.clear();
+        dao.saveProfile(user, null);
         assertNull(facade.getProfile());
 
         facade.saveProfile(p);
@@ -79,7 +82,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         c.setDescription("JUnit test company");
         c.setId(7777l);
         c.setName("JUnit-C");
-        getRestService().companies.put(c.getId(), c);
+        companyDao.save(c);
 
         final User u = new User();
         u.setLogin("test-1");
@@ -91,7 +94,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         facade.createUser(u, c, password);
 
-        final User u2 = authService.users.get(u.getLogin());
+        final User u2 = dao.findOne(u.getLogin());
         assertNotNull(u2);
         assertEquals(u.getFullName(), u2.getFullName());
         assertEquals(u.getId(), u2.getId());

@@ -6,8 +6,11 @@ package com.visfresh.controllers;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,18 +24,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
-import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.ReportSerializer;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.SingleShipmentDto;
-import com.visfresh.services.ReportService;
-import com.visfresh.services.RestService;
+import com.visfresh.io.SingleShipmentTimeItem;
 import com.visfresh.services.lists.ListShipmentItem;
-import com.visfresh.services.lists.ListShipmentTemplateItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -46,126 +56,24 @@ public class ShipmentController extends AbstractController {
      */
     private static final Logger log = LoggerFactory.getLogger(ShipmentController.class);
     /**
-     * REST service.
-     */
-    @Autowired
-    private RestService restService;
-    /**
      * Report service.
      */
     @Autowired
-    private ReportService reportService;
+    private ShipmentDao shipmentDao;
+    @Autowired
+    private ShipmentTemplateDao shipmentTemplateDao;
+    @Autowired
+    private AlertDao alertDao;
+    @Autowired
+    private ArrivalDao arrivalDao;
+    @Autowired
+    private TrackerEventDao trackerEventDao;
 
     /**
      * Default constructor.
      */
     public ShipmentController() {
         super();
-    }
-
-    /**
-     * @param authToken authentication token.
-     * @param tpl shipment template.
-     * @return ID of saved shipment template.
-     */
-    @RequestMapping(value = "/saveShipmentTemplate/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String saveShipmentTemplate(@PathVariable final String authToken,
-            final @RequestBody String tpl) {
-        try {
-            final User user = getLoggedInUser(authToken);
-            security.checkCanSaveShipmentTemplate(user);
-
-            final Long id = restService.saveShipmentTemplate(
-                    user.getCompany(), getSerializer(user).parseShipmentTemplate(getJSonObject(tpl)));
-            return createIdResponse("shipmentTemplateId", id);
-        } catch (final Exception e) {
-            log.error("Failed to save shipment template", e);
-            return createErrorResponse(e);
-        }
-    }
-    /**
-     * @param authToken authentication token.
-     * @param pageIndex page index.
-     * @param pageSize page size.
-     * @return list of shipment templates.
-     */
-    @RequestMapping(value = "/getShipmentTemplates/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getShipmentTemplates(@PathVariable final String authToken,
-            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
-        final int page = pageIndex == null ? 1 : pageIndex.intValue();
-        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
-
-        try {
-            //check logged in.
-            final User user = getLoggedInUser(authToken);
-            security.checkCanGetShipmentTemplates(user);
-
-            final List<ShipmentTemplate> tpls = restService.getShipmentTemplates(user.getCompany());
-            sort(tpls);
-
-            final int total = tpls.size();
-            final List<ShipmentTemplate> templates = getPage(tpls, page, size);
-
-            final JsonArray array = new JsonArray();
-            final EntityJSonSerializer ser = getSerializer(user);
-            for (final ShipmentTemplate tpl : templates) {
-                final ListShipmentTemplateItem item = new ListShipmentTemplateItem(tpl);
-                array.add(ser.toJson(item));
-            }
-
-            return createListSuccessResponse(array, total);
-        } catch (final Exception e) {
-            log.error("Failed to get shipment templates", e);
-            return createErrorResponse(e);
-        }
-    }
-    /**
-     * @param tpls
-     */
-    private void sort(final List<ShipmentTemplate> tpls) {
-        // TODO Auto-generated method stub
-        sortById(tpls, true);
-    }
-
-    /**
-     * @param authToken authentication token.
-     * @param shipmentTemplateId shipment template ID.
-     * @return shipment template.
-     */
-    @RequestMapping(value = "/getShipmentTemplate/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getShipmentTemplate(@PathVariable final String authToken,
-            @RequestParam final Long shipmentTemplateId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser(authToken);
-            security.checkCanGetShipmentTemplates(user);
-
-            final ShipmentTemplate template = restService.getShipmentTemplate(user.getCompany(), shipmentTemplateId);
-            return createSuccessResponse(getSerializer(user).toJson(template));
-        } catch (final Exception e) {
-            log.error("Failed to get shipment templates", e);
-            return createErrorResponse(e);
-        }
-    }
-    /**
-     * @param authToken authentication token.
-     * @param shipmentTemplateId shipment template ID.
-     * @return shipment template.
-     */
-    @RequestMapping(value = "/deleteShipmentTemplate/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String deleteShipmentTemplate(@PathVariable final String authToken,
-            @RequestParam final Long shipmentTemplateId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser(authToken);
-            security.checkCanSaveShipmentTemplate(user);
-
-            restService.deleteShipmentTemplate(user.getCompany(), shipmentTemplateId);
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to delete shipment templates", e);
-            return createErrorResponse(e);
-        }
     }
     /**
      * @param authToken authentication token.
@@ -180,13 +88,16 @@ public class ShipmentController extends AbstractController {
             security.checkCanSaveShipment(user);
 
             final SaveShipmentRequest req = getSerializer(user).parseSaveShipmentRequest(getJSonObject(shipment));
-            final Long id = restService.saveShipment(user.getCompany(), req.getShipment());
+            checkCompanyAccess(user, req.getShipment());
+
+            req.getShipment().setCompany(user.getCompany());
+            final Long id = shipmentDao.save(req.getShipment()).getId();
 
             final SaveShipmentResponse resp = new SaveShipmentResponse();
             resp.setShipmentId(id);
 
             if (req.isSaveAsNewTemplate()) {
-                final Long tplId = restService.createShipmentTemplate(
+                final Long tplId = createShipmentTemplate(
                         user.getCompany(), req.getShipment(), req.getTemplateName());
                 resp.setTemplateId(tplId);
             }
@@ -195,6 +106,14 @@ public class ShipmentController extends AbstractController {
             log.error("Failed to save device", e);
             return createErrorResponse(e);
         }
+    }
+    private Long createShipmentTemplate(final Company company, final Shipment shipment, final String templateName) {
+        final ShipmentTemplate tpl = new ShipmentTemplate(shipment);
+        tpl.setCompany(company);
+        tpl.setAddDateShipped(true);
+        tpl.setDetectLocationForShippedFrom(true);
+        tpl.setUseCurrentTimeForDateShipped(true);
+        return shipmentTemplateDao.save(tpl).getId();
     }
     /**
      * @param authToken authentication token.
@@ -225,7 +144,8 @@ public class ShipmentController extends AbstractController {
 
             final ReportSerializer ser = getReportSerializer(user);
 
-            final List<ListShipmentItem> shps = restService.getShipments(user.getCompany());
+            final List<ListShipmentItem> shps = getShipments(user.getCompany());
+
             final Iterator<ListShipmentItem> iter = shps.iterator();
             while (iter.hasNext()) {
                 final ListShipmentItem t = iter.next();
@@ -260,6 +180,23 @@ public class ShipmentController extends AbstractController {
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param company
+     * @return
+     */
+    private List<ListShipmentItem> getShipments(final Company company) {
+        final List<Shipment> shipments = shipmentDao.findByCompany(company);
+        final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
+        for (final Shipment s : shipments) {
+            final List<Alert> alerts = alertDao.getAlerts(s,
+                    new Date(0L), new Date(System.currentTimeMillis() + 100000000l));
+            final ListShipmentItem dto = new ListShipmentItem(s);
+            dto.getAlertSummary().putAll(toSummaryMap(alerts));
+            result.add(dto);
+        }
+        return result;
+    }
+
     /**
      * @param profiles
      * @param sc
@@ -355,7 +292,9 @@ public class ShipmentController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipments(user);
 
-            final Shipment shipment = restService.getShipment(user.getCompany(), shipmentId);
+            final Shipment shipment = shipmentDao.findOne(shipmentId);
+            checkCompanyAccess(user, shipment);
+
             return createSuccessResponse(getSerializer(user).toJson(shipment));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
@@ -370,7 +309,10 @@ public class ShipmentController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveShipment(user);
 
-            restService.deleteShipment(user.getCompany(), shipmentId);
+            final Shipment s = shipmentDao.findOne(shipmentId);
+            checkCompanyAccess(user, s);
+
+            shipmentDao.delete(s);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
@@ -393,7 +335,40 @@ public class ShipmentController extends AbstractController {
             final Date startDate = ser.parseDate(fromDate);
             final Date endDate = ser.parseDate(toDate);
 
-            final SingleShipmentDto dto = reportService.getSingleShipment(startDate, endDate, shipment);
+            final Shipment s = shipmentDao.findOne(shipment);
+            checkCompanyAccess(user, s);
+            if (s == null) {
+                return null;
+            }
+
+            final SingleShipmentDto dto = creatSingleShipmentDto(s);
+
+            final List<TrackerEvent> events = trackerEventDao.getEvents(s, startDate, endDate);
+            for (final TrackerEvent e : events) {
+                final SingleShipmentTimeItem item = new SingleShipmentTimeItem();
+                item.setEvent(e);
+                dto.getItems().add(item);
+            }
+            Collections.sort(dto.getItems());
+
+            if (events.size() > 0) {
+                //add alerts
+                final List<Alert> alerts = alertDao.getAlerts(s, startDate, endDate);
+                for (final Alert alert : alerts) {
+                    final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), alert.getDate());
+                    item.getAlerts().add(alert);
+                }
+
+                //add arrivals
+                final List<Arrival> arrivals = arrivalDao.getArrivals(s, startDate, endDate);
+                for (final Arrival arrival : arrivals) {
+                    final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), arrival.getDate());
+                    item.getArrivals().add(arrival);
+                }
+
+                dto.getAlertSummary().putAll(toSummaryMap(alerts));
+            }
+
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
@@ -406,5 +381,43 @@ public class ShipmentController extends AbstractController {
      */
     protected ReportSerializer getReportSerializer(final User user) {
         return new ReportSerializer(user);
+    }
+    /**
+     * @param alerts
+     * @return
+     */
+    public static  Map<AlertType, Integer> toSummaryMap(
+            final List<Alert> alerts) {
+        final Map<AlertType, Integer> map = new HashMap<AlertType, Integer>();
+        for (final Alert alert : alerts) {
+            Integer numAlerts = map.get(alert.getType());
+            if (numAlerts == null) {
+                numAlerts = 0;
+            }
+            numAlerts = numAlerts + 1;
+            map.put(alert.getType(), numAlerts);
+        }
+        return map;
+    }
+    /**
+     * @param items
+     * @param date
+     * @return
+     */
+    private SingleShipmentTimeItem getBestCandidate(final List<SingleShipmentTimeItem> items, final Date date) {
+        for (final SingleShipmentTimeItem i : items) {
+            if (i.getEvent().getTime().equals(date) || i.getEvent().getTime().after(date)) {
+                return i;
+            }
+        }
+        return items.get(items.size() - 1);
+    }
+
+    /**
+     * @param shipment
+     * @return
+     */
+    private SingleShipmentDto creatSingleShipmentDto(final Shipment shipment) {
+        return new SingleShipmentDto(shipment);
     }
 }

@@ -10,9 +10,15 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.util.Date;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
+import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
@@ -29,12 +35,28 @@ import com.visfresh.services.RestServiceException;
  *
  */
 public class ShipmentControllerTest extends AbstractRestServiceTest {
+    private ShipmentDao shipmentDao;
+    private ShipmentTemplateDao shipmentTemplateDao;
+    private AlertDao alertDao;
+    private ArrivalDao arrivalDao;
+    private TrackerEventDao trackerEventDao;
+
     /**
      * Default constructor.
      */
     public ShipmentControllerTest() {
         super();
     }
+
+    @Before
+    public void setUp() {
+        shipmentDao = context.getBean(ShipmentDao.class);
+        shipmentTemplateDao = context.getBean(ShipmentTemplateDao.class);
+        alertDao = context.getBean(AlertDao.class);
+        arrivalDao = context.getBean(ArrivalDao.class);
+        trackerEventDao = context.getBean(TrackerEventDao.class);
+    }
+
     //@RequestMapping(value = "/saveShipmentTemplate/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveShipmentTemplate(@PathVariable final String authToken,
     //        final @RequestBody String tpl) {
@@ -66,7 +88,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testDeleteShipmentTemplate() throws IOException, RestServiceException {
         final ShipmentTemplate sp = createShipmentTemplate(true);
         facade.deleteShipmentTemplate(sp.getId());
-        assertNull(getRestService().getShipmentTemplate(getCompany(), sp.getId()));
+        assertNull(shipmentTemplateDao.findOne(sp.getId()));
     }
     //@RequestMapping(value = "/saveShipment/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveShipment(@PathVariable final String authToken,
@@ -123,7 +145,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testDeleteShipment() throws IOException, RestServiceException {
         final Shipment sp = createShipment(true);
         facade.deleteShipment(sp.getId());
-        assertNull(getRestService().getShipment(getCompany(), sp.getId()));
+        assertNull(shipmentDao.findOne(sp.getId()));
     }
     //@RequestMapping(value = "/getShipmentData/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getShipmentData(@PathVariable final String authToken,
@@ -188,8 +210,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         alert.setMinutes(55);
         alert.setDevice(d);
         alert.setShipment(s);
-        alert.setId(getRestService().ids.incrementAndGet());
-        getRestService().alerts.put(alert.getId(), alert);
+        alertDao.save(alert);
         return alert;
     }
     /**
@@ -207,9 +228,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         e.setType(type);
         e.setLatitude(50.50);
         e.setLongitude(51.51);
-        e.setId(getRestService().ids.incrementAndGet());
 
-        getRestService().addTrackerEvent(device.getId(), e);
+        trackerEventDao.save(e);
         return e;
     }
     /**
@@ -223,8 +243,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         arrival.setShipment(s);
         arrival.setNumberOfMettersOfArrival(400);
         arrival.setDate(new Date(System.currentTimeMillis() - 50000));
-        arrival.setId(getRestService().ids.incrementAndGet());
-        getRestService().arrivals.put(arrival.getId(), arrival);
+        arrivalDao.save(arrival);
         return arrival;
     }
     /**
@@ -239,8 +258,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         alert.setDate(new Date(System.currentTimeMillis() - 100000000l));
         alert.setDevice(device);
         alert.setType(type);
-        alert.setId(getRestService().ids.incrementAndGet());
-        getRestService().alerts.put(alert.getId(), alert);
+        alertDao.save(alert);
         return alert;
     }
 }

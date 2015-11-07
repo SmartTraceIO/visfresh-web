@@ -8,7 +8,7 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class LocationProfile implements EntityWithId<Long> {
+public class LocationProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * Profile ID.
      */
@@ -179,6 +179,7 @@ public class LocationProfile implements EntityWithId<Long> {
     /**
      * @return the company
      */
+    @Override
     public Company getCompany() {
         return company;
     }

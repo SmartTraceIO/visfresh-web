@@ -24,7 +24,22 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.FrameworkServlet;
 
+import com.visfresh.dao.CompanyDao;
+import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.NotificationScheduleDao;
+import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.mock.MockAlertDao;
+import com.visfresh.dao.mock.MockAlertProfileDao;
+import com.visfresh.dao.mock.MockArrivalDao;
+import com.visfresh.dao.mock.MockCompanyDao;
+import com.visfresh.dao.mock.MockDeviceDao;
+import com.visfresh.dao.mock.MockLocationProfileDao;
+import com.visfresh.dao.mock.MockNotificationDao;
 import com.visfresh.dao.mock.MockNotificationScheduleDao;
+import com.visfresh.dao.mock.MockShipmentDao;
+import com.visfresh.dao.mock.MockShipmentTemplateDao;
+import com.visfresh.dao.mock.MockUserDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -36,13 +51,14 @@ import com.visfresh.entities.User;
 import com.visfresh.init.mock.MockConfig;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.mock.MockAuthService;
-import com.visfresh.mock.MockRestService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class RestServiceRunner extends BlockJUnit4ClassRunner {
+    public static final String SHARED_COMPANY_NAME = "Special JUnit Company";
+
     /**
      * WEB application context.
      */
@@ -65,40 +81,40 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
             facade = new RestServiceFacade();
             facade.setServiceUrl(new URL("http://localhost:" + port + "/web/vf"));
             facade.setReferenceResolver(new ReferenceResolver() {
-                private Company getCompany() {
-                    return getRestService().getCompanies().get(0);
-                }
                 @Override
                 public Shipment getShipment(final Long id) {
-                    return getRestService().getShipment(getCompany(), id);
+                    final ShipmentDao dao = context.getBean(ShipmentDao.class);
+                    return dao.findOne(id);
                 }
                 @Override
                 public NotificationSchedule getNotificationSchedule(final Long id) {
-                    return getNotificationScheduleDao().findOne(id);
+                    final NotificationScheduleDao dao = context.getBean(NotificationScheduleDao.class);
+                    return dao.findOne(id);
                 }
                 @Override
                 public LocationProfile getLocationProfile(final Long id) {
-                    return getRestService().getLocationProfile(getCompany(), id);
+                    final LocationProfileDao dao = context.getBean(LocationProfileDao.class);
+                    return dao.findOne(id);
                 }
                 @Override
                 public Device getDevice(final String id) {
-                    return getRestService().getDevice(getCompany(), id);
+                    final DeviceDao dao = context.getBean(DeviceDao.class);
+                    return dao.findOne(id);
                 }
                 @Override
                 public Company getCompany(final Long id) {
-                    return getRestService().getCompany(id);
+                    final CompanyDao dao = context.getBean(CompanyDao.class);
+                    return dao.findOne(id);
                 }
                 @Override
                 public AlertProfile getAlertProfile(final Long id) {
-                    return getRestService().getAlertProfile(getCompany(), id);
+                    final MockAlertProfileDao dao = context.getBean(MockAlertProfileDao.class);
+                    return dao.findOne(id);
                 }
             });
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
-    }
-    protected static MockRestService getRestService() {
-        return context.getBean(MockRestService.class);
     }
     /**
      * @param klass testing class.
@@ -178,9 +194,9 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
         try {
             //create company
             final Company c = new Company(1l);
-            c.setName("JUnit");
+            c.setName(SHARED_COMPANY_NAME);
             c.setDescription("JUnit company");
-            getRestService().companies.put(c.getId(), c);
+            context.getBean(CompanyDao.class).save(c);
 
             //create user
             final MockAuthService service = context.getBean(MockAuthService.class);
@@ -222,14 +238,17 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
      *
      */
     private void cleanUp() {
-        getNotificationScheduleDao().clear();
-        context.getBean(MockRestService.class).clear();
-    }
-    /**
-     * @return
-     */
-    protected static MockNotificationScheduleDao getNotificationScheduleDao() {
-        return context.getBean(MockNotificationScheduleDao.class);
+        context.getBean(MockAlertProfileDao.class).clear();
+        context.getBean(MockLocationProfileDao.class).clear();
+        context.getBean(MockShipmentDao.class).clear();
+        context.getBean(MockShipmentTemplateDao.class).clear();
+        context.getBean(MockDeviceDao.class).clear();
+        context.getBean(MockCompanyDao.class).clear();
+        context.getBean(MockUserDao.class).clear();
+        context.getBean(MockAlertDao.class).clear();
+        context.getBean(MockArrivalDao.class).clear();
+        context.getBean(MockNotificationDao.class).clear();
+        context.getBean(MockNotificationScheduleDao.class).clear();
     }
     /* (non-Javadoc)
      * @see java.lang.Object#finalize()

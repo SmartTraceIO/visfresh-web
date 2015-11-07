@@ -7,7 +7,6 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthToken;
-import com.visfresh.services.RestService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -30,11 +28,6 @@ public class AuthenticationController extends AbstractController {
      * Logger.
      */
     private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
-    /**
-     * REST service.
-     */
-    @Autowired
-    private RestService restService;
     /**
      * Default constructor.
      */

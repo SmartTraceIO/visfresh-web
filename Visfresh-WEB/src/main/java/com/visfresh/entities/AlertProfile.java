@@ -8,7 +8,7 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class AlertProfile implements EntityWithId<Long> {
+public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * ID.
      */
@@ -286,6 +286,7 @@ public class AlertProfile implements EntityWithId<Long> {
     /**
      * @return the company
      */
+    @Override
     public Company getCompany() {
         return company;
     }

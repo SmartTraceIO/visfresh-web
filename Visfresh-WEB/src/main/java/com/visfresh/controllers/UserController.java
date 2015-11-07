@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CreateUserRequest;
 import com.visfresh.io.UpdateUserDetailsRequest;
-import com.visfresh.services.RestService;
+import com.visfresh.utils.HashGenerator;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,10 +33,10 @@ public class UserController extends AbstractController {
      */
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     /**
-     * REST service.
+     * User DAO.
      */
     @Autowired
-    private RestService restService;
+    private UserDao dao;
 
     /**
      * Default constructor.
@@ -96,7 +97,7 @@ public class UserController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkGetProfile(user);
 
-            final UserProfile profile = restService.getProfile(user);
+            final UserProfile profile = dao.getProfile(user);
             return createSuccessResponse(getSerializer(user).toJson(profile));
         } catch (final Exception e) {
             log.error("Failed to send command to device", e);
@@ -116,7 +117,7 @@ public class UserController extends AbstractController {
             security.checkSaveProfile(user);
 
             final UserProfile p = getSerializer(user).parseUserProfile(getJSon(profile));
-            restService.saveUserProfile(user, p);
+            dao.saveProfile(user, p);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to send command to device", e);
@@ -132,7 +133,20 @@ public class UserController extends AbstractController {
 
             security.checkUpdateUserDetails(user, req.getUser());
 
-            restService.updateUserDetails(req);
+            final User u = dao.findOne(req.getUser());
+            if (req.getFullName() != null) {
+                u.setFullName(req.getFullName());
+            }
+            if (req.getPassword() != null) {
+                u.setPassword(HashGenerator.createMd5Hash(req.getPassword()));
+            }
+            if (req.getTemperatureUnits() != null) {
+                u.setTemperatureUnits(req.getTemperatureUnits());
+            }
+            if (req.getTimeZone() != null) {
+                u.setTimeZone(req.getTimeZone());
+            }
+            dao.save(u);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to send command to device", e);

@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.dao.NotificationDao;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
-import com.visfresh.services.RestService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -35,11 +35,9 @@ public class NotificationController extends AbstractController {
      * Logger.
      */
     private static final Logger log = LoggerFactory.getLogger(NotificationController.class);
-    /**
-     * REST service.
-     */
+
     @Autowired
-    private RestService restService;
+    private NotificationDao dao;
 
     /**
      * Default constructor.
@@ -64,7 +62,7 @@ public class NotificationController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<Notification> ns = restService.getNotifications(user);
+            final List<Notification> ns = dao.findForUser(user);
             sort(ns);
 
             final int total = ns.size();
@@ -102,7 +100,7 @@ public class NotificationController extends AbstractController {
                 ids.add(array.get(i).getAsLong());
             }
 
-            restService.markNotificationsAsRead(user, ids);
+            dao.deleteByUserAndId(user, ids);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
