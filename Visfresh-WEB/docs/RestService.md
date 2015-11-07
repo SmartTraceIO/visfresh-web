@@ -180,7 +180,7 @@ Method *GET*, method name *deleteNotificationSchedule*. Request parameters:
 [(example)](#markdown-header-delete-notification-schedule-example)
 
 ### Delete Person Schedule ###
-Method *GET*, method name *deletePersonSchedule*. Request parameters:
+Method *GET*, method name *deletePersonSchedule*. Request parameters:  
 1. notificationScheduleId  
 2. personScheduleId  
 [(example)](#markdown-header-delete-person-schedule-example)
@@ -1571,7 +1571,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   }
 }
 ```
-### Delete Person Schedule ###
+### Delete Person Schedule example ###
 **GET /vf/rest/deletePersonSchedule/${accessToken}?notificationScheduleId=1&personScheduleId=3**  
 **Response:**  
 ```json
