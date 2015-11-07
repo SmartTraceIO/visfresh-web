@@ -24,6 +24,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.FrameworkServlet;
 
+import com.visfresh.dao.mock.MockNotificationScheduleDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -73,7 +74,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
                 }
                 @Override
                 public NotificationSchedule getNotificationSchedule(final Long id) {
-                    return getRestService().getNotificationSchedule(getCompany(), id);
+                    return getNotificationScheduleDao().findOne(id);
                 }
                 @Override
                 public LocationProfile getLocationProfile(final Long id) {
@@ -221,7 +222,14 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
      *
      */
     private void cleanUp() {
+        getNotificationScheduleDao().clear();
         context.getBean(MockRestService.class).clear();
+    }
+    /**
+     * @return
+     */
+    protected static MockNotificationScheduleDao getNotificationScheduleDao() {
+        return context.getBean(MockNotificationScheduleDao.class);
     }
     /* (non-Javadoc)
      * @see java.lang.Object#finalize()

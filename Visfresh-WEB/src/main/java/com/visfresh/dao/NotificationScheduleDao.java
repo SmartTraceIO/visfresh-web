@@ -19,5 +19,4 @@ public interface NotificationScheduleDao extends
      * @return list of notification schedules.
      */
     List<NotificationSchedule> findByCompany(Company company);
-
 }

@@ -768,6 +768,20 @@ public class RestServiceFacade  {
 
         sendGetRequest(getPathWithToken(REST_SERVICE, "deleteNotificationSchedule"), params);
     }
+    /**
+     * @param scheduleId
+     * @param personScheduleId
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deletePersonSchedule(final long scheduleId, final long personScheduleId)
+            throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("notificationScheduleId", Long.toString(scheduleId));
+        params.put("personScheduleId", Long.toString(personScheduleId));
+
+        sendGetRequest(getPathWithToken(REST_SERVICE, "deletePersonSchedule"), params);
+    }
     /* (non-Javadoc)
      * @see com.visfresh.io.ReferenceResolver#getDevice(java.lang.String)
      */

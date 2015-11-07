@@ -62,27 +62,28 @@ List items is short representations of base entities, like as [Alert Profile](#m
 12. [Get notification schedules](#markdown-header-get-notification-schedules)  
 13. [Get Notification Schedule](#markdown-header-get-notification-schedule)  
 14. [Delete Notification Schedule](#markdown-header-delete-notification-schedule)  
-15. [Save Location](#markdown-header-save-location)  
-16. [Get Locations](#markdown-header-get-locations)  
-17. [Get Location](#markdown-header-get-location)  
-18. [Delete Location](#markdown-header-delete-location)  
-19. [Save Shipment Template](#markdown-header-save-shipment-template)  
-20. [Get Shipment templates](#markdown-header-get-shipment-templates)  
-21. [Get Shipment Template](#markdown-header-get-shipment-template)  
-22. [Delete Shipment Template](#markdown-header-delete-shipment-template)  
-23. [Save Shipment](#markdown-header-save-shipment)  
-24. [Get Shipments](#markdown-header-get-shipments)  
-25. [Get Shipment](#markdown-header-get-shipment)  
-26. [Delete Shipment](#markdown-header-delete-shipment)  
-27. [Save Device](#markdown-header-save-device)  
-28. [Get Device](#markdown-header-get-device)  
-29. [Get Devices](#markdown-header-get-devices)  
-30. [Delete Device](#markdown-header-delete-device)  
-31. [Get Notifications](#markdown-header-get-notifications)  
-32. [Send Command to Device](#markdown-header-send-command-to-device)  
-33. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
-34. [Get Profile](#markdown-header-get-profile)  
-35. [Save Profile](#markdown-header-save-profile)  
+15. [Delete Person Schedule](#markdown-header-delete-person-schedule)  
+16. [Save Location](#markdown-header-save-location)  
+17. [Get Locations](#markdown-header-get-locations)  
+18. [Get Location](#markdown-header-get-location)  
+19. [Delete Location](#markdown-header-delete-location)  
+20. [Save Shipment Template](#markdown-header-save-shipment-template)  
+21. [Get Shipment templates](#markdown-header-get-shipment-templates)  
+22. [Get Shipment Template](#markdown-header-get-shipment-template)  
+23. [Delete Shipment Template](#markdown-header-delete-shipment-template)  
+24. [Save Shipment](#markdown-header-save-shipment)  
+25. [Get Shipments](#markdown-header-get-shipments)  
+26. [Get Shipment](#markdown-header-get-shipment)  
+27. [Delete Shipment](#markdown-header-delete-shipment)  
+28. [Save Device](#markdown-header-save-device)  
+29. [Get Device](#markdown-header-get-device)  
+30. [Get Devices](#markdown-header-get-devices)  
+31. [Delete Device](#markdown-header-delete-device)  
+32. [Get Notifications](#markdown-header-get-notifications)  
+33. [Send Command to Device](#markdown-header-send-command-to-device)  
+34. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
+35. [Get Profile](#markdown-header-get-profile)  
+36. [Save Profile](#markdown-header-save-profile)  
 
 ## Reports ##
 1. [Get Single Shipment](#markdown-header-get-single-shipment)
@@ -174,9 +175,15 @@ Returns [Notification Schedule Object](#markdown-header-notification-schedule)
 [(example)](#markdown-header-get-notification-schedule-example)
 
 ### Delete Notification schedule ###
-Method *GET*, *deleteNotificationSchedule*. Request parameters:  
+Method *GET*, method name *deleteNotificationSchedule*. Request parameters:  
 1. notificationScheduleId - notification schedule ID.  
 [(example)](#markdown-header-delete-notification-schedule-example)
+
+### Delete Person Schedule ###
+Method *GET*, method name *deletePersonSchedule*. Request parameters:
+1. notificationScheduleId  
+2. personScheduleId  
+[(example)](#markdown-header-delete-person-schedule-example)
 
 ### Save Location ###
 Method *POST*, method name *saveLocation*, request body contains JSON serialized [Location Object](#markdown-header-location). Response contains ID of just saved Location  
@@ -1555,6 +1562,17 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ```
 ### Delete Notification Schedule example ###
 **GET vf/rest/deleteNotificationSchedule/${accessToken}?notificationScheduleId=23**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
+### Delete Person Schedule ###
+**GET /vf/rest/deletePersonSchedule/${accessToken}?notificationScheduleId=1&personScheduleId=3**  
 **Response:**  
 ```json
 {

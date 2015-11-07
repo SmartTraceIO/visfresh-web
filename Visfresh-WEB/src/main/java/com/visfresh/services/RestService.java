@@ -12,7 +12,6 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
-import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
@@ -30,9 +29,6 @@ public interface RestService {
 
     Long saveLocation(Company company, final LocationProfile profile);
     List<LocationProfile> getLocation(Company company);
-
-    Long saveNotificationSchedule(Company company, final NotificationSchedule schedule);
-    List<NotificationSchedule> getNotificationSchedules(Company company);
 
     Long saveShipmentTemplate(Company company, final ShipmentTemplate tpl);
     List<ShipmentTemplate> getShipmentTemplates(Company company);
@@ -80,12 +76,6 @@ public interface RestService {
      */
     Shipment getShipment(Company company, Long id);
     /**
-     * @param company company.
-     * @param id notification schedule ID.
-     * @return notification schedule.
-     */
-    NotificationSchedule getNotificationSchedule(Company company, Long id);
-    /**
      * @param user user.
      * @return user profile.
      */
@@ -114,12 +104,6 @@ public interface RestService {
      * @param locationId
      */
     void deleteLocation(Company company, Long locationId);
-    /**
-     * @param company
-     * @param notificationScheduleId
-     */
-    void deleteNotificationSchedule(Company company,
-            Long notificationScheduleId);
     /**
      * @param company
      * @param shipmentId

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.entities.PersonSchedule;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -37,5 +38,18 @@ public class MockNotificationScheduleDao extends MockDaoBase<NotificationSchedul
             }
         }
         return list;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.mock.MockDaoBase#save(com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    public <S extends NotificationSchedule> S save(final S entity) {
+        final S ns = super.save(entity);
+        for (final PersonSchedule ps : ns.getSchedules()) {
+            if (ps.getId() == null) {
+                ps.setId(generateId());
+            }
+        }
+        return ns;
     }
 }

@@ -8,6 +8,7 @@ import java.util.Date;
 import org.junit.runner.RunWith;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.visfresh.dao.mock.MockNotificationScheduleDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -133,9 +134,18 @@ public abstract class AbstractRestServiceTest {
         s.getSchedules().add(createPersonSchedule());
         s.getSchedules().add(createPersonSchedule());
         if (save) {
-            getRestService().saveNotificationSchedule(getCompany(), s);
+            saveNotificationScheduleDirectly(s);
         }
         return s;
+    }
+
+    /**
+     * @param s
+     */
+    protected void saveNotificationScheduleDirectly(final NotificationSchedule s) {
+        final MockNotificationScheduleDao dao = context.getBean(MockNotificationScheduleDao.class);
+        s.setCompany(getCompany());
+        dao.save(s);
     }
     /**
      * @return any schedule/person/how/when

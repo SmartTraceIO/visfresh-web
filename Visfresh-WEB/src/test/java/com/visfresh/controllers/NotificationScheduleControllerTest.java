@@ -64,17 +64,17 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
         final NotificationSchedule p1 = createNotificationSchedule(false);
         p1.setName("b");
         p1.setDescription("c");
-        getRestService().saveNotificationSchedule(getCompany(), p1);
+        saveNotificationScheduleDirectly(p1);
 
         final NotificationSchedule p2 = createNotificationSchedule(false);
         p2.setName("a");
         p2.setDescription("b");
-        getRestService().saveNotificationSchedule(getCompany(), p2);
+        saveNotificationScheduleDirectly(p2);
 
         final NotificationSchedule p3 = createNotificationSchedule(false);
         p3.setName("c");
         p3.setDescription("a");
-        getRestService().saveNotificationSchedule(getCompany(), p3);
+        saveNotificationScheduleDirectly(p3);
 
         //test sort by ID
         NotificationScheduleListItem first = facade.getNotificationSchedules(1, 10000, "notificationScheduleId", "asc").get(0);
@@ -96,5 +96,21 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
 
         first = facade.getNotificationSchedules(1, 10000, "notificationScheduleDescription", "desc").get(0);
         assertEquals(p1.getId(), first.getId());
+    }
+    /**
+     * Tests deletePersonSchedule method.
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    @Test
+    public void testDeletePersonSchedule() throws IOException, RestServiceException {
+        final NotificationSchedule p = createNotificationSchedule(true);
+
+        facade.deletePersonSchedule(p.getId(), p.getSchedules().get(1).getId());
+
+        final NotificationSchedule p1 = facade.getNotificationSchedule(p.getId());
+
+        assertEquals(1, p1.getSchedules().size());
+        assertEquals(p.getSchedules().get(0).getId(), p1.getSchedules().get(0).getId());
     }
 }

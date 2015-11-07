@@ -19,7 +19,6 @@ import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationDao;
-import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.UserDao;
@@ -32,7 +31,6 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
-import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
@@ -54,8 +52,6 @@ public class RestServiceImpl implements RestService {
     private AlertProfileDao alertProfileDao;
     @Autowired
     private LocationProfileDao locationProfileDao;
-    @Autowired
-    private NotificationScheduleDao notificationScheduleDao;
     @Autowired
     private ShipmentTemplateDao shipmentTemplateDao;
     @Autowired
@@ -130,34 +126,6 @@ public class RestServiceImpl implements RestService {
         final LocationProfile p = locationProfileDao.findOne(locationId);
         if (p != null && p.getCompany().getId().equals(company.getId())) {
             locationProfileDao.delete(locationId);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#saveNotificationSchedule(com.visfresh.entities.NotificationSchedule)
-     */
-    @Override
-    public Long saveNotificationSchedule(final Company company, final NotificationSchedule schedule) {
-        schedule.setCompany(company);
-        return notificationScheduleDao.save(schedule).getId();
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#getNotificationSchedules()
-     */
-    @Override
-    public List<NotificationSchedule> getNotificationSchedules(final Company company) {
-        return notificationScheduleDao.findByCompany(company);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#deleteNotificationSchedule(com.visfresh.entities.Company, java.lang.Long)
-     */
-    @Override
-    public void deleteNotificationSchedule(final Company company,
-            final Long notificationScheduleId) {
-        final NotificationSchedule n = notificationScheduleDao.findOne(notificationScheduleId);
-        if (n != null && n.getCompany().getId().equals(company.getId())) {
-            notificationScheduleDao.delete(notificationScheduleId);
         }
     }
     /* (non-Javadoc)
@@ -343,14 +311,6 @@ public class RestServiceImpl implements RestService {
         if (s != null && s.getCompany().getId().equals(company.getId())) {
             shipmentTemplateDao.delete(id);
         }
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#getNotificationSchedule(com.visfresh.entities.Company, java.lang.Long)
-     */
-    @Override
-    public NotificationSchedule getNotificationSchedule(final Company company, final Long id) {
-        final NotificationSchedule s = notificationScheduleDao.findOne(id);
-        return  s == null || !s.getCompany().getId().equals(company.getId()) ? null : s;
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getProfile(com.visfresh.entities.User)

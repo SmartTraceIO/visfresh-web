@@ -146,4 +146,11 @@ public class MockDaoBase<T extends EntityWithId<ID>, ID extends Serializable&Com
         });
         return list;
     }
+
+    /**
+     * Clears the DAO.
+     */
+    public void clear() {
+        entities.clear();
+    }
 }

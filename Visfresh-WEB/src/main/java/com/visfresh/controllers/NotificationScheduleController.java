@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
-import com.visfresh.services.RestService;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
@@ -37,10 +39,10 @@ public class NotificationScheduleController extends AbstractController {
      */
     private static final Logger log = LoggerFactory.getLogger(NotificationScheduleController.class);
     /**
-     * REST service.
+     * Notification schedule DAO.
      */
     @Autowired
-    private RestService restService;
+    private NotificationScheduleDao dao;
 
     /**
      * Default constructor.
@@ -61,8 +63,12 @@ public class NotificationScheduleController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveNotificationSchedule(user);
 
-            final Long id = restService.saveNotificationSchedule(
-                    user.getCompany(), getSerializer(user).parseNotificationSchedule(getJSonObject(schedule)));
+            final NotificationSchedule s = getSerializer(user).parseNotificationSchedule(
+                    getJSonObject(schedule));
+            checkCompanyAccess(user, s);
+
+            s.setCompany(user.getCompany());
+            final Long id = dao.save(s).getId();
             return createIdResponse("notificationScheduleId", id);
         } catch (final Exception e) {
             log.error("Failed to save notification schedule", e);
@@ -89,8 +95,7 @@ public class NotificationScheduleController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetNotificationSchedules(user);
 
-            final List<NotificationSchedule> scs = restService.getNotificationSchedules(
-                    user.getCompany());
+            final List<NotificationSchedule> scs = dao.findByCompany(user.getCompany());
             sort(scs, sc, so);
 
             final int total = scs.size();
@@ -103,6 +108,40 @@ public class NotificationScheduleController extends AbstractController {
             }
 
             return createListSuccessResponse(array, total);
+        } catch (final Exception e) {
+            log.error("Failed to get notification schedules", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token
+     * @param personScheduleId person schedule ID.
+     * @return list of notification schedules.
+     */
+    @RequestMapping(value = "/deletePersonSchedule/{authToken}", method = RequestMethod.GET)
+    public @ResponseBody String deletePersonSchedule(@PathVariable final String authToken,
+            @RequestParam final long notificationScheduleId,
+            @RequestParam final long personScheduleId) {
+
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanSaveNotificationSchedule(user);
+
+            //find schedule
+            final NotificationSchedule s = dao.findOne(notificationScheduleId);
+            if (s != null && s.getCompany().getId().equals(user.getCompany().getId())) {
+                for (final PersonSchedule ps : s.getSchedules()) {
+                    if (ps.getId().equals(personScheduleId)) {
+                        s.getSchedules().remove(ps);
+                        break;
+                    }
+                }
+
+                dao.save(s);
+            }
+
+            return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to get notification schedules", e);
             return createErrorResponse(e);
@@ -145,10 +184,10 @@ public class NotificationScheduleController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanGetNotificationSchedules(user);
 
-            final NotificationSchedule schedule = restService.getNotificationSchedule(
-                    user.getCompany(), notificationScheduleId);
+            final NotificationSchedule s = dao.findOne(notificationScheduleId);
+            checkCompanyAccess(user, s);
 
-            return createSuccessResponse(getSerializer(user).toJson(schedule));
+            return createSuccessResponse(getSerializer(user).toJson(s));
         } catch (final Exception e) {
             log.error("Failed to get notification schedules", e);
             return createErrorResponse(e);
@@ -167,12 +206,26 @@ public class NotificationScheduleController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveNotificationSchedule(user);
 
-            restService.deleteNotificationSchedule(user.getCompany(), notificationScheduleId);
+            final NotificationSchedule s = dao.findOne(notificationScheduleId);
+            checkCompanyAccess(user, s);
 
+            dao.delete(s);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to get notification schedules", e);
             return createErrorResponse(e);
+        }
+    }
+
+    /**
+     * @param user
+     * @param s
+     * @throws RestServiceException
+     */
+    protected void checkCompanyAccess(final User user,
+            final NotificationSchedule s) throws RestServiceException {
+        if (s != null && s.getCompany() != null && !s.getCompany().getId().equals(user.getCompany().getId())) {
+            throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
         }
     }
 }

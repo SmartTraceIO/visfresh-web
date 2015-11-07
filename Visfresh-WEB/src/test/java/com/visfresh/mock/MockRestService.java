@@ -24,8 +24,6 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
-import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
@@ -47,7 +45,6 @@ public class MockRestService implements RestService {
 
     public final Map<Long, AlertProfile> alertProfiles = new ConcurrentHashMap<Long, AlertProfile>();
     public final Map<Long, LocationProfile> locationProfiles = new ConcurrentHashMap<Long, LocationProfile>();
-    public final Map<Long, NotificationSchedule> notificationSchedules = new ConcurrentHashMap<Long, NotificationSchedule>();
     public final Map<Long, ShipmentTemplate> shipmentTemplates = new ConcurrentHashMap<Long, ShipmentTemplate>();
     public final Map<String, Device> devices = new ConcurrentHashMap<String, Device>();
     public final Map<Long, Shipment> shipments = new ConcurrentHashMap<Long, Shipment>();
@@ -126,45 +123,6 @@ public class MockRestService implements RestService {
     public void deleteLocation(final Company company, final Long locationId) {
         synchronized (locationProfiles) {
             locationProfiles.remove(locationId);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#saveNotificationSchedule(com.visfresh.entities.NotificationSchedule)
-     */
-    @Override
-    public Long saveNotificationSchedule(final Company company, final NotificationSchedule schedule) {
-        if (schedule.getId() == null) {
-            schedule.setId(ids.incrementAndGet());
-            synchronized (notificationSchedules) {
-                notificationSchedules.put(schedule.getId(), schedule);
-            }
-        }
-        for (final PersonSchedule s : schedule.getSchedules()) {
-            if (s.getId() == null) {
-                s.setId(ids.incrementAndGet());
-            }
-        }
-        return schedule.getId();
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#getNotificationSchedules()
-     */
-    @Override
-    public List<NotificationSchedule> getNotificationSchedules(final Company company) {
-        synchronized (notificationSchedules) {
-            return new LinkedList<NotificationSchedule>(notificationSchedules.values());
-        }
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#deleteNotificationSchedule(com.visfresh.entities.Company, java.lang.Long)
-     */
-    @Override
-    public void deleteNotificationSchedule(final Company company,
-            final Long notificationScheduleId) {
-        synchronized (notificationSchedules) {
-            notificationSchedules.remove(notificationScheduleId);
         }
     }
 
@@ -360,13 +318,6 @@ public class MockRestService implements RestService {
         shipmentTemplates.remove(id);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#getNotificationSchedule(com.visfresh.entities.Company, java.lang.Long)
-     */
-    @Override
-    public NotificationSchedule getNotificationSchedule(final Company company, final Long id) {
-        return notificationSchedules.get(id);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getProfile(com.visfresh.entities.User)
      */
     @Override
@@ -428,7 +379,6 @@ public class MockRestService implements RestService {
     public void clear() {
         alertProfiles.clear();
         locationProfiles.clear();
-        notificationSchedules.clear();
         shipmentTemplates.clear();
         devices.clear();
         shipments.clear();

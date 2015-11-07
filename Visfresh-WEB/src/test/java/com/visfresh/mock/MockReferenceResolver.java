@@ -6,6 +6,7 @@ package com.visfresh.mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -22,6 +23,8 @@ import com.visfresh.io.ReferenceResolver;
 public class MockReferenceResolver implements ReferenceResolver {
     @Autowired
     private MockRestService restService;
+    @Autowired
+    private NotificationScheduleDao notificationScheduleDao;
 
     /**
      * Fefault constructor.
@@ -49,7 +52,7 @@ public class MockReferenceResolver implements ReferenceResolver {
      */
     @Override
     public NotificationSchedule getNotificationSchedule(final Long id) {
-        return restService.notificationSchedules.get(id);
+        return notificationScheduleDao.findOne(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.ReferenceResolver#getDevice(java.lang.String)
