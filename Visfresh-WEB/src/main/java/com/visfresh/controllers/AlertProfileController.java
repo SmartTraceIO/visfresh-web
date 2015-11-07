@@ -133,13 +133,14 @@ public class AlertProfileController extends AbstractController {
             final List<AlertProfile> profiles = restService.getAlertProfiles(user.getCompany());
             sort(profiles, sc, so);
 
+            final int total = profiles.size();
             final List<AlertProfile> alerts = getPage(profiles, page, size);
             final JsonArray array = new JsonArray();
             for (final AlertProfile a : alerts) {
                 array.add(ser.toJson(a));
             }
 
-            return createSuccessResponse(array);
+            return createListSuccessResponse(array, total);
         } catch (final Exception e) {
             log.error("Failed to get alert profiles", e);
             return createErrorResponse(e);

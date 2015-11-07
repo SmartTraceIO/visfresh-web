@@ -6,6 +6,7 @@ package com.visfresh.controllers;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -102,6 +103,7 @@ public class ShipmentController extends AbstractController {
             final List<ShipmentTemplate> tpls = restService.getShipmentTemplates(user.getCompany());
             sort(tpls);
 
+            final int total = tpls.size();
             final List<ShipmentTemplate> templates = getPage(tpls, page, size);
 
             final JsonArray array = new JsonArray();
@@ -111,7 +113,7 @@ public class ShipmentController extends AbstractController {
                 array.add(ser.toJson(item));
             }
 
-            return createSuccessResponse(array);
+            return createListSuccessResponse(array, total);
         } catch (final Exception e) {
             log.error("Failed to get shipment templates", e);
             return createErrorResponse(e);
@@ -223,15 +225,11 @@ public class ShipmentController extends AbstractController {
 
             final ReportSerializer ser = getReportSerializer(user);
 
-            final List<ListShipmentItem> shipments = getPage(restService.getShipments(user.getCompany()), page, size);
-            sort(shipments, sc, so);
-
-            final JsonArray array = new JsonArray();
-            for (final ListShipmentItem t : shipments) {
-                //TODO move filtering to DAO
-                if (onlyWithAlerts && !hasAlerts(t)) {
-                    continue;
-                }
+            final List<ListShipmentItem> shps = restService.getShipments(user.getCompany());
+            final Iterator<ListShipmentItem> iter = shps.iterator();
+            while (iter.hasNext()) {
+                final ListShipmentItem t = iter.next();
+                if (onlyWithAlerts && !hasAlerts(t)
 //                if (shippedFrom != null && (t.getShippedFrom() == null
 //                        || !shippedFrom.equals(t.getShippedFrom()))) {
 //                    continue;
@@ -240,22 +238,23 @@ public class ShipmentController extends AbstractController {
 //                        || !shippedTo.equals(t.getShippedTo()))) {
 //                    continue;
 //                }
-                if (device != null && (t.getDeviceSN() == null
-                        || !device.equals(t.getDeviceSN()))) {
-                    continue;
+                || device != null && (t.getDeviceSN() == null || !device.equals(t.getDeviceSN()))
+                || goods != null && (t.getShipmentDescription() == null
+                    || t.getShipmentDescription().indexOf(goods) < 0)
+                || status != null && !t.getStatus().toString().equals(status)) {
+                    iter.remove();
                 }
-                if (goods != null && (t.getShipmentDescription() == null
-                        || t.getShipmentDescription().indexOf(goods) < 0)) {
-                    continue;
-                }
-                if (status != null && !t.getStatus().toString().equals(status)) {
-                    continue;
-                }
-
-                array.add(ser.toJson(t));
             }
 
-            return createSuccessResponse(array);
+            final int total = shps.size();
+            final List<ListShipmentItem> shipments = getPage(shps, page, size);
+            sort(shipments, sc, so);
+
+            final JsonArray array = new JsonArray();
+            for (final ListShipmentItem s : shipments) {
+                array.add(ser.toJson(s));
+            }
+            return createListSuccessResponse(array, total);
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);

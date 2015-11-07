@@ -135,7 +135,7 @@ Method *GET*, method name *getAlertProfiles*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order (asc/desc)  
-Returns an array of [Alert Profile objects](#markdown-header-alert-profile).  
+Returns an array of [Alert Profile objects](#markdown-header-alert-profile) and total items count.  
 [(example)](#markdown-header-get-alert-profiles-example)
 
 ### Get Alert Profile ###
@@ -163,7 +163,8 @@ Method *GET*, method name *getNotificationSchedules*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order (asc/desc)  
-Return array of [Notification Schedule list item](#markdown-header-notification-schedule-list-item)  
+Return array of [Notification Schedule list item](#markdown-header-notification-schedule-list-item)
+and total items count  
 [(example)](#markdown-header-get-notification-schedules-example)
 
 ### Get Notification Schedule ###
@@ -187,7 +188,7 @@ Method *GET*, method name *getLocations*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order  
-Returns array of [Location Objects](#markdown-header-location)  
+Returns array of [Location Objects](#markdown-header-location) and total items count  
 [(example)](#markdown-header-get-locations-example)
 
 ### Get Location ###
@@ -209,7 +210,8 @@ Method *POST*, method name *saveShipmentTemplate*, request body contains JSON se
 Method *GET*, method name *getShipmentTemplates*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Shipment Template List item](#markdown-header-shipment-template-list-item)  
+Returns array of [Shipment Template List item](#markdown-header-shipment-template-list-item)
+and total items count  
 [(example)](#markdown-header-get-shipment-templates-example)
 
 ### Get Shipment Template ###
@@ -231,7 +233,7 @@ Method *POST*, method name *saveDevice*, request body contains JSON serialized [
 Method *GET*, method name *getDevices*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Device Objects](#markdown-header-device).  
+Returns array of [Device Objects](#markdown-header-device) and total items count.  
 [(example)](#markdown-header-get-devices-example)
 
 ### Get Device ###
@@ -261,7 +263,8 @@ Method *GET*, method name getShipments, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order  
-Returns array of [Shipment List items](#markdown-header-shipment-list-item), it is not same as [Shipment Object](#markdown-header-shipment).  
+Returns array of [Shipment List items](#markdown-header-shipment-list-item) and total items count,
+it is not same as [Shipment Object](#markdown-header-shipment).  
 [(example)](#markdown-header-get-shipments-example)
 
 ### Delete Shipment ###
@@ -280,7 +283,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 Method *GET*, method name getNotifications, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
-Returns array of [Notification Objects](#markdown-header-notification)  
+Returns array of [Notification Objects](#markdown-header-notification) and total items count  
 [(example)](#markdown-header-get-notifications-example)
 
 ### Mark Notification as read ###
@@ -312,6 +315,7 @@ Method *POST*, method name *saveProfile*. Request body contains JSON serialized 
     "token": "1401890001-e4adc2304877e138edf5e33a3e584c35",
     "expired": "2016-01-17T00:35"
   }
+  //additional response information. I.e. totalCount for lists
 }
 ```
 see [ResponseStatus](#markdown-header-response-status)
@@ -841,7 +845,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       "watchMovementStart": true,
       "watchMovementStop": true
     }
-  ]
+  ],
+  "totalCount": 2
 }
 ```
 ### Delete Alert Profile example ###
@@ -941,7 +946,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       "notificationScheduleDescription": "JUnit schedule",
       "peopleToNotify": "Alexander Suvorov, Alexander Suvorov"
     }
-  ]
+  ],
+  "totalCount": 2
 }
 ```  
 ### Get Notification Schedule example ###
@@ -1060,7 +1066,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       "interimFlag": "Y",
       "endFlag": "Y"
     }
-  ]
+  ],
+  "totalCount": 1
 }
 ```  
 ### Save Shipment Template example ###
@@ -1134,7 +1141,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       "alertProfile": 59,
       "alertProfileName": "AnyAlert"
     }
-  ]
+  ],
+  "totalCount": 2
 }
 ```
 ### Delete Shipment Template example ###
@@ -1256,7 +1264,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       "alertProfileName": "AnyAlert",
       "alertSummary": {}
     }
-  ]
+  ],
+  "totalCount": 2
 }
 ```
 ### Delete Shipment example ###
@@ -1312,7 +1321,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       "name": "Device Name",
       "sn": "043987"
     }
-  ]
+  ],
+  "totalCount": 2
 }
 ```
 ### Delete Device example ##
@@ -1371,7 +1381,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         "shipment": 11
       }
     }
-  ]
+  ],
+  "totalCount": 3
 }
 ```
 ### Mark Notification as read example ###

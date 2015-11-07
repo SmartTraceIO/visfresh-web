@@ -87,13 +87,14 @@ public class DeviceController extends AbstractController {
             final List<Device> ds = restService.getDevices(user.getCompany());
             sort(ds);
 
+            final int total = ds.size();
             final List<Device> devices = getPage(ds, page, size);
             final JsonArray array = new JsonArray();
             for (final Device t : devices) {
                 array.add(ser.toJson(t));
             }
 
-            return createSuccessResponse(array);
+            return createListSuccessResponse(array, total);
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);

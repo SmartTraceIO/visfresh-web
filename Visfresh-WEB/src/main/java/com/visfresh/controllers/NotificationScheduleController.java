@@ -93,6 +93,7 @@ public class NotificationScheduleController extends AbstractController {
                     user.getCompany());
             sort(scs, sc, so);
 
+            final int total = scs.size();
             final List<NotificationSchedule> schedules = getPage(scs, page, size);
 
             final EntityJSonSerializer ser = getSerializer(user);
@@ -101,7 +102,7 @@ public class NotificationScheduleController extends AbstractController {
                 array.add(ser.toJson(new NotificationScheduleListItem(schedule)));
             }
 
-            return createSuccessResponse(array);
+            return createListSuccessResponse(array, total);
         } catch (final Exception e) {
             log.error("Failed to get notification schedules", e);
             return createErrorResponse(e);

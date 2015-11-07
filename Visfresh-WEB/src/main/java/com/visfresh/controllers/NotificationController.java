@@ -67,13 +67,14 @@ public class NotificationController extends AbstractController {
             final List<Notification> ns = restService.getNotifications(user);
             sort(ns);
 
+            final int total = ns.size();
             final List<Notification> shipments = getPage(ns, page, size);
             final JsonArray array = new JsonArray();
             for (final Notification t : shipments) {
                 array.add(ser.toJson(t));
             }
 
-            return createSuccessResponse(array);
+            return createListSuccessResponse(array, total);
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);

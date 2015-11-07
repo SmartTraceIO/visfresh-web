@@ -94,13 +94,14 @@ public class LocationController extends AbstractController {
             final List<LocationProfile> ls = restService.getLocation(user.getCompany());
             sort(ls, sc, so);
 
+            final int total = ls.size();
             final List<LocationProfile> locations = getPage(ls, page, size);
             final JsonArray array = new JsonArray();
             for (final LocationProfile location : locations) {
                 array.add(ser.toJson(location));
             }
 
-            return createSuccessResponse(array);
+            return createListSuccessResponse(array, total);
         } catch (final Exception e) {
             log.error("Failed to get location profiles", e);
             return createErrorResponse(e);

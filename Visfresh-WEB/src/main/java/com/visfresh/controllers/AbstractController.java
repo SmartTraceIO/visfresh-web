@@ -15,9 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
@@ -124,11 +126,25 @@ public abstract class AbstractController {
      * @return
      */
     protected String createSuccessResponse(final JsonElement response) {
+        final JsonObject obj = createSuccessResponseObject(response);
+        return obj.toString();
+    }
+
+    /**
+     * @param response
+     * @return
+     */
+    protected JsonObject createSuccessResponseObject(final JsonElement response) {
         final JsonObject obj = new JsonObject();
         //add status
         obj.add("status", createStatus(0, "Success"));
         //add response
         obj.add("response", response == null ? JsonNull.INSTANCE : response);
+        return obj;
+    }
+    protected String createListSuccessResponse(final JsonArray array, final int total) {
+        final JsonObject obj = createSuccessResponseObject(array);
+        obj.add("totalCount", new JsonPrimitive(total));
         return obj.toString();
     }
     /**
