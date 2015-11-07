@@ -116,10 +116,14 @@ public class AlertProfileController extends AbstractController {
      */
     @RequestMapping(value = "/getAlertProfiles/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getAlertProfiles(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize,
+            @RequestParam(required = false) final Integer pageIndex,
+            @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
             ) {
+        final int page = pageIndex == null ? 1 : pageIndex.intValue();
+        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -129,7 +133,7 @@ public class AlertProfileController extends AbstractController {
             final List<AlertProfile> profiles = restService.getAlertProfiles(user.getCompany());
             sort(profiles, sc, so);
 
-            final List<AlertProfile> alerts = getPage(profiles, pageIndex, pageSize);
+            final List<AlertProfile> alerts = getPage(profiles, page, size);
             final JsonArray array = new JsonArray();
             for (final AlertProfile a : alerts) {
                 array.add(ser.toJson(a));

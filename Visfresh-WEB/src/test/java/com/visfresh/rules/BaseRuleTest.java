@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

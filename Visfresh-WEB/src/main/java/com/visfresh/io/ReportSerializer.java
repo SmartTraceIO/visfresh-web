@@ -9,13 +9,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.visfresh.drools.AlertDescriptionBuilder;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.rules.AlertDescriptionBuilder;
 import com.visfresh.services.lists.ListShipmentItem;
 import com.visfresh.services.lists.NotificationScheduleListItem;
 

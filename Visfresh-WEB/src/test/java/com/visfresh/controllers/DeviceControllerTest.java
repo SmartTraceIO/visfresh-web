@@ -52,7 +52,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         createDevice("0239487043987", true);
         createDevice("0239487043222", true);
 
-        assertEquals(2, facade.getDevices(1, 10000).size());
+        assertEquals(2, facade.getDevices(null, null).size());
         assertEquals(1, facade.getDevices(1, 1).size());
         assertEquals(1, facade.getDevices(2, 1).size());
         assertEquals(0, facade.getDevices(3, 1).size());

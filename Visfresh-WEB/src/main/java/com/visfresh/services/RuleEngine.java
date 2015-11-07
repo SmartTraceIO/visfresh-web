@@ -3,8 +3,8 @@
  */
 package com.visfresh.services;
 
-import com.visfresh.drools.TrackerEventRule;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.rules.TrackerEventRule;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

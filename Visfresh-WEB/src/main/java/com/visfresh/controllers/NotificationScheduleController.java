@@ -77,10 +77,13 @@ public class NotificationScheduleController extends AbstractController {
      */
     @RequestMapping(value = "/getNotificationSchedules/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize,
+            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
             ) {
+        final int page = pageIndex == null ? 1 : pageIndex.intValue();
+        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -90,7 +93,7 @@ public class NotificationScheduleController extends AbstractController {
                     user.getCompany());
             sort(scs, sc, so);
 
-            final List<NotificationSchedule> schedules = getPage(scs, pageIndex, pageSize);
+            final List<NotificationSchedule> schedules = getPage(scs, page, size);
 
             final EntityJSonSerializer ser = getSerializer(user);
             final JsonArray array = new JsonArray();

@@ -1,8 +1,9 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,14 +13,15 @@ import com.visfresh.entities.TrackerEvent;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class TrackerEventRequest {
+public class RuleContext {
     private final TrackerEvent event;
     private Map<Object, Object> clientProperties = new ConcurrentHashMap<Object, Object>();
+    private Map<TrackerEventRule, Boolean> processedMap = new HashMap<TrackerEventRule, Boolean>();
 
     /**
      * @param e tracker event.
      */
-    public TrackerEventRequest(final TrackerEvent e) {
+    public RuleContext(final TrackerEvent e) {
         super();
         this.event = e;
     }
@@ -42,5 +44,22 @@ public class TrackerEventRequest {
      */
     public Object getClientProperty(final Object key) {
         return clientProperties.get(key);
+    }
+    /**
+     * @param rule rule.
+     */
+    public void setProcessed(final TrackerEventRule rule) {
+        synchronized (processedMap) {
+            processedMap.put(rule, Boolean.TRUE);
+        }
+    }
+    /**
+     * @param rule rule.
+     * @return
+     */
+    public boolean isProcessed(final TrackerEventRule rule) {
+        synchronized (processedMap) {
+            return Boolean.TRUE == processedMap.get(rule);
+        }
     }
 }

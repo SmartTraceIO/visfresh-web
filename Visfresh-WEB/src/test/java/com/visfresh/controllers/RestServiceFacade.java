@@ -124,7 +124,7 @@ public class RestServiceFacade  {
         sendGetRequest(getPathWithToken(REST_SERVICE, "deleteAlertProfile"), params);
     }
 
-    public List<AlertProfile> getAlertProfiles(final int pageIndex, final int pageSize) throws RestServiceException, IOException {
+    public List<AlertProfile> getAlertProfiles(final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
         return getAlertProfiles(pageIndex, pageSize, null, null);
     }
     /**
@@ -136,12 +136,14 @@ public class RestServiceFacade  {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<AlertProfile> getAlertProfiles(final int pageIndex, final int pageSize,
+    public List<AlertProfile> getAlertProfiles(final Integer pageIndex, final Integer pageSize,
             final String sortColumn,
             final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("pageIndex", Integer.toString(pageIndex));
-        params.put("pageSize", Integer.toString(pageSize));
+        if (pageIndex != null) {
+            params.put("pageIndex", Integer.toString(pageIndex));
+            params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
+        }
         if (sortColumn != null) {
             params.put("sc", sortColumn);
         }
@@ -172,9 +174,9 @@ public class RestServiceFacade  {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<LocationProfile> getLocationProfiles(final int pageIndex, final int pageSize)
+    public List<LocationProfile> getLocations(final Integer pageIndex, final Integer pageSize)
             throws RestServiceException, IOException {
-        return getLocationProfiles(pageIndex, pageSize, null, null);
+        return getLocations(pageIndex, pageSize, null, null);
     }
     /**
      * @param pageIndex
@@ -185,11 +187,13 @@ public class RestServiceFacade  {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<LocationProfile> getLocationProfiles(final int pageIndex, final int pageSize,
+    public List<LocationProfile> getLocations(final Integer pageIndex, final Integer pageSize,
             final String sortColumn, final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("pageIndex", Integer.toString(pageIndex));
-        params.put("pageSize", Integer.toString(pageSize));
+        if (pageIndex != null) {
+            params.put("pageIndex", Integer.toString(pageIndex));
+            params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
+        }
         if (sortColumn != null) {
             params.put("sc", sortColumn);
         }
@@ -212,7 +216,8 @@ public class RestServiceFacade  {
                 serializer.toJson(schedule)).getAsJsonObject();
         return parseId(e);
     }
-    public List<NotificationScheduleListItem> getNotificationSchedules(final int pageIndex, final int pageSize)
+    public List<NotificationScheduleListItem> getNotificationSchedules(
+            final Integer pageIndex, final Integer pageSize)
             throws RestServiceException, IOException {
         return getNotificationSchedules(pageIndex, pageSize, null, null);
     }
@@ -225,11 +230,14 @@ public class RestServiceFacade  {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<NotificationScheduleListItem> getNotificationSchedules(final int pageIndex, final int pageSize,
+    public List<NotificationScheduleListItem> getNotificationSchedules(
+            final Integer pageIndex, final Integer pageSize,
             final String sortColumn, final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("pageIndex", Integer.toString(pageIndex));
-        params.put("pageSize", Integer.toString(pageSize));
+        if (pageIndex != null) {
+            params.put("pageIndex", Integer.toString(pageIndex));
+            params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
+        }
         if (sortColumn != null) {
             params.put("sc", sortColumn);
         }
@@ -253,10 +261,12 @@ public class RestServiceFacade  {
         return parseId(e);
     }
 
-    public List<ListShipmentTemplateItem> getShipmentTemplates(final int pageIndex, final int pageSize) throws RestServiceException, IOException {
+    public List<ListShipmentTemplateItem> getShipmentTemplates(final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("pageIndex", Integer.toString(pageIndex));
-        params.put("pageSize", Integer.toString(pageSize));
+        if (pageIndex != null) {
+            params.put("pageIndex", Integer.toString(pageIndex));
+            params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
+        }
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getShipmentTemplates"),
                 params).getAsJsonArray();
 
@@ -279,10 +289,12 @@ public class RestServiceFacade  {
      * @param pageSize page size.
      * @return
      */
-    public List<Device> getDevices(final int pageIndex, final int pageSize) throws RestServiceException, IOException {
+    public List<Device> getDevices(final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("pageIndex", Integer.toString(pageIndex));
-        params.put("pageSize", Integer.toString(pageSize));
+        if (pageIndex != null) {
+            params.put("pageIndex", Integer.toString(pageIndex));
+            params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
+        }
 
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getDevices"),
                 params).getAsJsonArray();
@@ -298,7 +310,7 @@ public class RestServiceFacade  {
      * @param pageSize page size.
      * @return
      */
-    public JsonArray getShipments(final int pageIndex, final int pageSize)
+    public JsonArray getShipments(final Integer pageIndex, final Integer pageSize)
             throws RestServiceException, IOException {
         return getShipments(pageIndex, pageSize, null, null, null, null, null);
     }
@@ -314,12 +326,14 @@ public class RestServiceFacade  {
      * @throws RestServiceException
      * @throws IOException
      */
-    public JsonArray getShipments(final int pageIndex, final int pageSize, final Long shippedFrom,
+    public JsonArray getShipments(final Integer pageIndex, final Integer pageSize, final Long shippedFrom,
             final Long shippedTo, final String goods, final String device, final ShipmentStatus status)
                     throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("pageIndex", Integer.toString(pageIndex));
-        params.put("pageSize", Integer.toString(pageSize));
+        if (pageIndex != null) {
+            params.put("pageIndex", Integer.toString(pageIndex));
+            params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
+        }
 
         if (shippedFrom != null) {
             params.put("shippedFrom", shippedFrom.toString());
@@ -348,10 +362,13 @@ public class RestServiceFacade  {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<Notification> getNotifications(final int pageIndex, final int pageSize) throws IOException, RestServiceException {
+    public List<Notification> getNotifications(final Integer pageIndex, final Integer pageSize)
+            throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("pageIndex", Integer.toString(pageIndex));
-        params.put("pageSize", Integer.toString(pageSize));
+        if (pageIndex != null) {
+            params.put("pageIndex", Integer.toString(pageIndex));
+            params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
+        }
 
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE, "getNotifications"),
                 params).getAsJsonArray();
@@ -817,10 +834,12 @@ public class RestServiceFacade  {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<Company> getCompanies(final int pageIndex, final int pageSize) throws IOException, RestServiceException {
+    public List<Company> getCompanies(final Integer pageIndex, final Integer pageSize) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("pageIndex", Integer.toString(pageIndex));
-        params.put("pageSize", Integer.toString(pageSize));
+        if (pageIndex != null) {
+            params.put("pageIndex", Integer.toString(pageIndex));
+            params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
+        }
         final JsonArray response = sendGetRequest(getPathWithToken(REST_SERVICE,
                 "getCompanies"), params).getAsJsonArray();
 

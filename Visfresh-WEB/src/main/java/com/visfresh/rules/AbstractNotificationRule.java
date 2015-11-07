@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -35,7 +35,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
     @Autowired
     protected EmailService emailService;
     @Autowired
-    private DroolsRuleEngine engine;
+    private AbstractRuleEngine engine;
 
     /**
      * Default constructor.
@@ -52,11 +52,11 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
      * @see com.visfresh.drools.TrackerEventRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest e) {
+    public boolean accept(final RuleContext e) {
         final TrackerEvent event = e.getEvent();
         final Shipment shipment = event.getShipment();
 
-        final boolean accept = e.getClientProperty(this) == null
+        final boolean accept = !e.isProcessed(this)
                 && shipment != null
                 && shipment.getStatus() != ShipmentStatus.Complete;
 

@@ -73,7 +73,10 @@ public class DeviceController extends AbstractController {
      */
     @RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getDevices(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
+            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
+        final int page = pageIndex == null ? 1 : pageIndex.intValue();
+        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -84,7 +87,7 @@ public class DeviceController extends AbstractController {
             final List<Device> ds = restService.getDevices(user.getCompany());
             sort(ds);
 
-            final List<Device> devices = getPage(ds, pageIndex, pageSize);
+            final List<Device> devices = getPage(ds, page, size);
             final JsonArray array = new JsonArray();
             for (final Device t : devices) {
                 array.add(ser.toJson(t));

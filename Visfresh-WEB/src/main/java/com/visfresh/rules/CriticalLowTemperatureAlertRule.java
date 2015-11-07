@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import org.springframework.stereotype.Component;
 
@@ -34,7 +34,7 @@ public class CriticalLowTemperatureAlertRule extends LowTemperatureAlertRule {
      * @return true if has temperature issue.
      */
     @Override
-    protected boolean chekTemperatureIssue(final TrackerEventRequest req) {
+    protected boolean chekTemperatureIssue(final RuleContext req) {
         final TrackerEvent e = req.getEvent();
         final AlertProfile profile = e.getShipment().getAlertProfile();
         if (profile.getCriticalLowTemperature() <= e.getTemperature()) {

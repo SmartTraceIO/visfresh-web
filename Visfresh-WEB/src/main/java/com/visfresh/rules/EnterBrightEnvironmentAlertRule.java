@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import org.springframework.stereotype.Component;
 
@@ -14,14 +14,13 @@ import com.visfresh.entities.TrackerEvent;
  *
  */
 @Component
-public class BatteryLowAlertRule extends AbstractAlertRule {
-    private static final int LOW_BATTERY_LIMIT = 2;
-    public static final String NAME = "BatteryLowAlert";
+public class EnterBrightEnvironmentAlertRule extends AbstractAlertRule {
+    public static final String NAME = "EnterBrightEnvironmentAlert";
 
     /**
      * Default constructor.
      */
-    public BatteryLowAlertRule() {
+    public EnterBrightEnvironmentAlertRule() {
         super();
     }
 
@@ -29,9 +28,9 @@ public class BatteryLowAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest e) {
-        return e.getEvent().getBattery() < LOW_BATTERY_LIMIT && super.accept(e)
-                && e.getEvent().getShipment().getAlertProfile().isWatchBatteryLow();
+    public boolean accept(final RuleContext e) {
+        return "BRT".equalsIgnoreCase(e.getEvent().getType()) && super.accept(e)
+                && e.getEvent().getShipment().getAlertProfile().isWatchEnterBrightEnvironment();
     }
 
     /* (non-Javadoc)
@@ -41,7 +40,7 @@ public class BatteryLowAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setType(AlertType.Battery);
+        alert.setType(AlertType.LightOn);
         return alert;
     }
 

@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -19,6 +19,8 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.rules.ArrivalRule;
+import com.visfresh.rules.RuleContext;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -51,7 +53,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         e.setTime(new Date());
         e.setType("AUT");
 
-        final TrackerEventRequest req = new TrackerEventRequest(e);
+        final RuleContext req = new RuleContext(e);
         //final location not set
         assertFalse(rule.accept(req));
 
@@ -98,7 +100,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final TrackerEventRequest req = new TrackerEventRequest(e);
+        final RuleContext req = new RuleContext(e);
         rule.accept(req);
         rule.handle(req);
 

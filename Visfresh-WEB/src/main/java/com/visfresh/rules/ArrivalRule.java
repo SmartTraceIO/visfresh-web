@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -46,7 +46,7 @@ public class ArrivalRule extends AbstractNotificationRule {
      * @see com.visfresh.drools.TrackerEventRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest req) {
+    public boolean accept(final RuleContext req) {
         final TrackerEvent event = req.getEvent();
         final boolean accept = super.accept(req) && isNearEndLocation(
                 event.getShipment(), event.getLatitude(), event.getLongitude());
@@ -90,10 +90,10 @@ public class ArrivalRule extends AbstractNotificationRule {
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public final boolean handle(final TrackerEventRequest req) {
+    public final boolean handle(final RuleContext context) {
         final Arrival arrival = new Arrival();
-        final TrackerEvent event = req.getEvent();
-        req.putClientProperty(this, Boolean.TRUE);
+        final TrackerEvent event = context.getEvent();
+        context.setProcessed(this);
 
         arrival.setDate(event.getTime());
         arrival.setDevice(event.getDevice());

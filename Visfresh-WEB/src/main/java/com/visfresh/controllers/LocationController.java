@@ -77,10 +77,13 @@ public class LocationController extends AbstractController {
      */
     @RequestMapping(value = "/getLocations/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getLocation(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize,
+            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
             ) {
+        final int page = pageIndex == null ? 1 : pageIndex.intValue();
+        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -91,7 +94,7 @@ public class LocationController extends AbstractController {
             final List<LocationProfile> ls = restService.getLocation(user.getCompany());
             sort(ls, sc, so);
 
-            final List<LocationProfile> locations = getPage(ls,pageIndex, pageSize);
+            final List<LocationProfile> locations = getPage(ls, page, size);
             final JsonArray array = new JsonArray();
             for (final LocationProfile location : locations) {
                 array.add(ser.toJson(location));

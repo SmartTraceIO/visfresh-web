@@ -52,7 +52,7 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         createAlertProfile(true);
         createAlertProfile(true);
 
-        assertEquals(2, facade.getAlertProfiles(1, 10000).size());
+        assertEquals(2, facade.getAlertProfiles(null, null).size());
         assertEquals(1, facade.getAlertProfiles(1, 1).size());
         assertEquals(1, facade.getAlertProfiles(2, 1).size());
         assertEquals(0, facade.getAlertProfiles(3, 1).size());

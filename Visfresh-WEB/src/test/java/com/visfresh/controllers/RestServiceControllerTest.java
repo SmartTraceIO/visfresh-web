@@ -88,26 +88,6 @@ public class RestServiceControllerTest extends AbstractRestServiceTest {
         facade.setAuthToken(token);
         assertNotNull(token);
     }
-    //@RequestMapping(value = "/saveDevice/{authToken}", method = RequestMethod.POST)
-    //public @ResponseBody String saveDevice(@PathVariable final String authToken,
-    //        final @RequestBody String device) {
-    @Test
-    public void testSaveDevice() throws RestServiceException, IOException {
-        final Device d = createDevice("1209898347987", false);
-        facade.saveDevice(d);
-    }
-    //@RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getDevices(@PathVariable final String authToken) {
-    @Test
-    public void testGetDevices() throws RestServiceException, IOException {
-        createDevice("1209898347987", true);
-        createDevice("1209898347988", true);
-
-        assertEquals(2, facade.getDevices(1, 10000).size());
-        assertEquals(1, facade.getDevices(1, 1).size());
-        assertEquals(1, facade.getDevices(2, 1).size());
-        assertEquals(0, facade.getDevices(3, 10000).size());
-    }
     //@RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getNotifications(@PathVariable final String authToken,
     //        @RequestParam final Long shipment) {
@@ -172,7 +152,7 @@ public class RestServiceControllerTest extends AbstractRestServiceTest {
         nofications.add(n);
 
         //get notifications
-        assertEquals(3, facade.getNotifications(1, 10000).size());
+        assertEquals(3, facade.getNotifications(null, null).size());
         assertEquals(1, facade.getNotifications(1, 1).size());
         assertEquals(1, facade.getNotifications(2, 1).size());
         assertEquals(0, facade.getNotifications(3, 10000).size());
@@ -246,7 +226,7 @@ public class RestServiceControllerTest extends AbstractRestServiceTest {
 
         facade.markNotificationsAsRead(toReaden);
 
-        assertEquals(1, facade.getNotifications(1, 10000).size());
+        assertEquals(1, facade.getNotifications(null, null).size());
 
     }
 
@@ -299,7 +279,7 @@ public class RestServiceControllerTest extends AbstractRestServiceTest {
         service.companies.put(c.getId(), c);
 
         //+ one default company existing on server
-        assertEquals(3, facade.getCompanies(1, 10000).size());
+        assertEquals(3, facade.getCompanies(null, null).size());
         assertEquals(1, facade.getCompanies(1, 1).size());
         assertEquals(1, facade.getCompanies(2, 1).size());
         assertEquals(0, facade.getCompanies(3, 10000).size());

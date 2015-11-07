@@ -109,7 +109,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         createTemperatureAlert(s, d, AlertType.CriticalHot);
         createArrival(s, d);
 
-        assertEquals(2, facade.getShipments(1, 10000).size());
+        assertEquals(2, facade.getShipments(null, null).size());
         assertEquals(1, facade.getShipments(1, 1).size());
         assertEquals(1, facade.getShipments(2, 1).size());
         assertEquals(0, facade.getShipments(3, 10000).size());

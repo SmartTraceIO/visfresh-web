@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -9,13 +9,13 @@ package com.visfresh.drools;
  */
 public interface TrackerEventRule {
     /**
-     * @param e tracker event.
+     * @param context tracker event context.
      * @return true if can process event.
      */
-    boolean accept(TrackerEventRequest e);
+    boolean accept(RuleContext context);
     /**
-     * @param e tracker event.
+     * @param context tracker event context.
      * @return true if need reprocess event.
      */
-    boolean handle(TrackerEventRequest e);
+    boolean handle(RuleContext context);
 }

@@ -53,10 +53,10 @@ public class LocationControllerTest extends AbstractRestServiceTest {
         createLocationProfile(true);
         createLocationProfile(true);
 
-        assertEquals(2, facade.getLocationProfiles(1, 10000).size());
-        assertEquals(1, facade.getLocationProfiles(1, 1).size());
-        assertEquals(1, facade.getLocationProfiles(2, 1).size());
-        assertEquals(0, facade.getLocationProfiles(3, 10000).size());
+        assertEquals(2, facade.getLocations(null, null).size());
+        assertEquals(1, facade.getLocations(1, 1).size());
+        assertEquals(1, facade.getLocations(2, 1).size());
+        assertEquals(0, facade.getLocations(3, 10000).size());
     }
     @Test
     public void testGetSortedLocationProfiles() throws RestServiceException, IOException {
@@ -98,38 +98,38 @@ public class LocationControllerTest extends AbstractRestServiceTest {
         getRestService().saveLocation(getCompany(), p5);
 
         //test sort by ID
-        LocationProfile first = facade.getLocationProfiles(1, 10000, "locationId", "asc").get(0);
+        LocationProfile first = facade.getLocations(1, 10000, "locationId", "asc").get(0);
         assertEquals(p1.getId(), first.getId());
 
-        first = facade.getLocationProfiles(1, 10000, "locationId", "desc").get(0);
+        first = facade.getLocations(1, 10000, "locationId", "desc").get(0);
         assertEquals(p5.getId(), first.getId());
 
         //location name
-        first = facade.getLocationProfiles(1, 10000, "locationName", "asc").get(0);
+        first = facade.getLocations(1, 10000, "locationName", "asc").get(0);
         assertEquals(p2.getId(), first.getId());
 
-        first = facade.getLocationProfiles(1, 10000, "locationName", "desc").get(0);
+        first = facade.getLocations(1, 10000, "locationName", "desc").get(0);
         assertEquals(p1.getId(), first.getId());
 
         //test sort by address
-        first = facade.getLocationProfiles(1, 10000, "address", "asc").get(0);
+        first = facade.getLocations(1, 10000, "address", "asc").get(0);
         assertEquals(p3.getId(), first.getId());
 
-        first = facade.getLocationProfiles(1, 10000, "address", "desc").get(0);
+        first = facade.getLocations(1, 10000, "address", "desc").get(0);
         assertEquals(p1.getId(), first.getId());
 
         //test sort by description
-        first = facade.getLocationProfiles(1, 10000, "companyDescription", "asc").get(0);
+        first = facade.getLocations(1, 10000, "companyDescription", "asc").get(0);
         assertEquals(p4.getId(), first.getId());
 
-        first = facade.getLocationProfiles(1, 10000, "companyDescription", "desc").get(0);
+        first = facade.getLocations(1, 10000, "companyDescription", "desc").get(0);
         assertEquals(p1.getId(), first.getId());
 
         //test sort by description
-        first = facade.getLocationProfiles(1, 10000, "notes", "asc").get(0);
+        first = facade.getLocations(1, 10000, "notes", "asc").get(0);
         assertEquals(p5.getId(), first.getId());
 
-        first = facade.getLocationProfiles(1, 10000, "notes", "desc").get(0);
+        first = facade.getLocations(1, 10000, "notes", "desc").get(0);
         assertEquals(p1.getId(), first.getId());
     }
 }

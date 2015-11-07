@@ -55,7 +55,10 @@ public class NotificationController extends AbstractController {
      */
     @RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getNotifications(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
+            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
+        final int page = pageIndex == null ? 1 : pageIndex.intValue();
+        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -64,7 +67,7 @@ public class NotificationController extends AbstractController {
             final List<Notification> ns = restService.getNotifications(user);
             sort(ns);
 
-            final List<Notification> shipments = getPage(ns, pageIndex, pageSize);
+            final List<Notification> shipments = getPage(ns, page, size);
             final JsonArray array = new JsonArray();
             for (final Notification t : shipments) {
                 array.add(ser.toJson(t));

@@ -90,7 +90,10 @@ public class ShipmentController extends AbstractController {
      */
     @RequestMapping(value = "/getShipmentTemplates/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getShipmentTemplates(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
+            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
+        final int page = pageIndex == null ? 1 : pageIndex.intValue();
+        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -99,7 +102,7 @@ public class ShipmentController extends AbstractController {
             final List<ShipmentTemplate> tpls = restService.getShipmentTemplates(user.getCompany());
             sort(tpls);
 
-            final List<ShipmentTemplate> templates = getPage(tpls, pageIndex, pageSize);
+            final List<ShipmentTemplate> templates = getPage(tpls, page, size);
 
             final JsonArray array = new JsonArray();
             final EntityJSonSerializer ser = getSerializer(user);
@@ -199,8 +202,8 @@ public class ShipmentController extends AbstractController {
      */
     @RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getShipments(@PathVariable final String authToken,
-            @RequestParam final int pageIndex,
-            @RequestParam final int pageSize,
+            @RequestParam(required = false) final Integer pageIndex,
+            @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final boolean onlyWithAlerts,
             @RequestParam(required = false) final String shippedFrom,
             @RequestParam(required = false) final String shippedTo,
@@ -210,6 +213,9 @@ public class ShipmentController extends AbstractController {
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
             ) {
+        final int page = pageIndex == null ? 1 : pageIndex.intValue();
+        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -217,7 +223,7 @@ public class ShipmentController extends AbstractController {
 
             final ReportSerializer ser = getReportSerializer(user);
 
-            final List<ListShipmentItem> shipments = getPage(restService.getShipments(user.getCompany()), pageIndex, pageSize);
+            final List<ListShipmentItem> shipments = getPage(restService.getShipments(user.getCompany()), page, size);
             sort(shipments, sc, so);
 
             final JsonArray array = new JsonArray();

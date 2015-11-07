@@ -1,11 +1,12 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TrackerEvent;
 
 /**
@@ -13,13 +14,13 @@ import com.visfresh.entities.TrackerEvent;
  *
  */
 @Component
-public class MovementStopAlertRule extends AbstractAlertRule {
-    public static final String NAME = "MovementStopAlert";
+public class EnterDarkEnvironmentAlertRule extends AbstractAlertRule {
+    public static final String NAME = "EnterDarkEnvironmentAlert";
 
     /**
      * Default constructor.
      */
-    public MovementStopAlertRule() {
+    public EnterDarkEnvironmentAlertRule() {
         super();
     }
 
@@ -27,11 +28,9 @@ public class MovementStopAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest e) {
-        //Not handled now. Not fully understandeable how to check the shock.
-//        return super.accept(e) && e.getEvent().getShipment().getAlertProfile().isWatchMovementStop()
-//                && false;
-        return false;
+    public boolean accept(final RuleContext e) {
+        return "DRK".equalsIgnoreCase(e.getEvent().getType()) && super.accept(e)
+                && e.getEvent().getShipment().getAlertProfile().isWatchEnterDarkEnvironment();
     }
 
     /* (non-Javadoc)
@@ -41,7 +40,7 @@ public class MovementStopAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-//        alert.setType(AlertType.MovementStop);
+        alert.setType(AlertType.LightOff);
         return alert;
     }
 

@@ -82,7 +82,11 @@ public class CompanyController extends AbstractController {
      */
     @RequestMapping(value = "/getCompanies/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getCompanies(@PathVariable final String authToken,
-            @RequestParam final int pageIndex, @RequestParam final int pageSize) {
+            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
+
+        final int page = pageIndex == null ? 1 : pageIndex.intValue();
+        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
@@ -91,7 +95,7 @@ public class CompanyController extends AbstractController {
             final List<Company> companies = restService.getCompanies();
             sort(companies);
 
-            final List<Company> company = getPage(companies, pageIndex, pageSize);
+            final List<Company> company = getPage(companies, page, size);
             final JsonArray array = new JsonArray();
             for (final Company c : company) {
                 array.add(getSerializer(user).toJson(c));

@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -20,6 +20,7 @@ import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.mock.MockDaoConfig;
+import com.visfresh.drools.DroolsRuleEngine;
 import com.visfresh.mock.MockSmsService;
 import com.visfresh.services.RuleEngine;
 

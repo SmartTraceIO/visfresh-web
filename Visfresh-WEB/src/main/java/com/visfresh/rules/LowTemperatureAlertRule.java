@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import java.util.Date;
 
@@ -40,7 +40,7 @@ public class LowTemperatureAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest req) {
+    public boolean accept(final RuleContext req) {
         boolean accept = super.accept(req);
         if (accept) {
             accept = chekTemperatureIssue(req);
@@ -53,7 +53,7 @@ public class LowTemperatureAlertRule extends AbstractAlertRule {
      * @param accept
      * @return
      */
-    protected boolean chekTemperatureIssue(final TrackerEventRequest req) {
+    protected boolean chekTemperatureIssue(final RuleContext req) {
         final TrackerEvent e = req.getEvent();
         final AlertProfile profile = e.getShipment().getAlertProfile();
         if (profile.getLowTemperature() <= e.getTemperature()) {

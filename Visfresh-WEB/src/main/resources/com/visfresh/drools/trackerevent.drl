@@ -1,26 +1,27 @@
 package com.visfresh.drools
  
-import com.visfresh.drools.AssignShipmentRule;
-import com.visfresh.drools.OpenJtsRule;
-import com.visfresh.drools.TrackerEventRequest;
-import com.visfresh.drools.HighTemperatureAlertRule;
-import com.visfresh.drools.CriticalHighTemperatureAlertRule;
-import com.visfresh.drools.LowTemperatureAlertRule;
-import com.visfresh.drools.CriticalLowTemperatureAlertRule;
-import com.visfresh.drools.EnterBrightEnvironmentAlertRule;
-import com.visfresh.drools.EnterDarkEnvironmentAlertRule;
-import com.visfresh.drools.BatteryLowAlertRule;
-import com.visfresh.drools.ArrivalRule;
-import com.visfresh.drools.AutoStartShipmentRule;
-import com.visfresh.drools.MovementStartAlertRule;
-import com.visfresh.drools.MovementStopAlertRule;
+import com.visfresh.rules.AssignShipmentRule;
+import com.visfresh.rules.OpenJtsRule;
+import com.visfresh.rules.RuleContext;
+import com.visfresh.rules.HighTemperatureAlertRule;
+import com.visfresh.rules.CriticalHighTemperatureAlertRule;
+import com.visfresh.rules.LowTemperatureAlertRule;
+import com.visfresh.rules.CriticalLowTemperatureAlertRule;
+import com.visfresh.rules.EnterBrightEnvironmentAlertRule;
+import com.visfresh.rules.EnterDarkEnvironmentAlertRule;
+import com.visfresh.rules.BatteryLowAlertRule;
+import com.visfresh.rules.ArrivalRule;
+import com.visfresh.rules.AutoStartShipmentRule;
+import com.visfresh.rules.MovementStartAlertRule;
+import com.visfresh.rules.MovementStopAlertRule;
+import com.visfresh.rules.AbstractRuleEngine;
 
-global com.visfresh.drools.DroolsRuleEngine engine;
+global AbstractRuleEngine engine;
 
 rule "AssignShipment"
 	salience 100
     when
-        req : TrackerEventRequest(engine.getRule(AssignShipmentRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(AssignShipmentRule.NAME).accept(this));
     then
     	if(engine.getRule(AssignShipmentRule.NAME).handle(req)) {
        		update(req);
@@ -30,7 +31,7 @@ end
 rule "AutoStartShipment"
 	salience 50
     when
-        req : TrackerEventRequest(engine.getRule(AutoStartShipmentRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(AutoStartShipmentRule.NAME).accept(this));
     then
     	if(engine.getRule(AutoStartShipmentRule.NAME).handle(req)) {
        		update(req);
@@ -39,7 +40,7 @@ end
 
 rule "OpenGts"
     when
-        req : TrackerEventRequest(engine.getRule(OpenJtsRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(OpenJtsRule.NAME).accept(this));
     then
     	if(engine.getRule(OpenJtsRule.NAME).handle(req)) {
        		update(req);
@@ -48,7 +49,7 @@ end
 
 rule "HighTemperatureAlert"
     when
-        req : TrackerEventRequest(engine.getRule(HighTemperatureAlertRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(HighTemperatureAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(HighTemperatureAlertRule.NAME).handle(req)) {
        		update(req);
@@ -57,7 +58,7 @@ end
 
 rule "CriticalHighTemperatureAlert"
     when
-        req : TrackerEventRequest(engine.getRule(CriticalHighTemperatureAlertRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(CriticalHighTemperatureAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(CriticalHighTemperatureAlertRule.NAME).handle(req)) {
        		update(req);
@@ -66,7 +67,7 @@ end
 
 rule "LowTemperatureAlert"
     when
-        req : TrackerEventRequest(engine.getRule(LowTemperatureAlertRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(LowTemperatureAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(LowTemperatureAlertRule.NAME).handle(req)) {
        		update(req);
@@ -75,7 +76,7 @@ end
 
 rule "CriticalLowTemperatureAlert"
     when
-        req : TrackerEventRequest(engine.getRule(CriticalLowTemperatureAlertRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(CriticalLowTemperatureAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(CriticalLowTemperatureAlertRule.NAME).handle(req)) {
        		update(req);
@@ -84,7 +85,7 @@ end
 
 rule "EnterBrightEnvironmentAlert"
     when
-        req : TrackerEventRequest(engine.getRule(EnterBrightEnvironmentAlertRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(EnterBrightEnvironmentAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(EnterBrightEnvironmentAlertRule.NAME).handle(req)) {
        		update(req);
@@ -93,7 +94,7 @@ end
 
 rule "EnterDarkEnvironmentAlert"
     when
-        req : TrackerEventRequest(engine.getRule(EnterDarkEnvironmentAlertRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(EnterDarkEnvironmentAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(EnterDarkEnvironmentAlertRule.NAME).handle(req)) {
        		update(req);
@@ -102,7 +103,7 @@ end
 
 rule "BatteryLowAlert"
     when
-        req : TrackerEventRequest(engine.getRule(BatteryLowAlertRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(BatteryLowAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(BatteryLowAlertRule.NAME).handle(req)) {
        		update(req);
@@ -111,7 +112,7 @@ end
 
 rule "Arrival"
     when
-        req : TrackerEventRequest(engine.getRule(ArrivalRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(ArrivalRule.NAME).accept(this));
     then
     	if(engine.getRule(ArrivalRule.NAME).handle(req)) {
        		update(req);
@@ -120,7 +121,7 @@ end
 
 rule "MovementStartAlert"
     when
-        req : TrackerEventRequest(engine.getRule(MovementStartAlertRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(MovementStartAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(MovementStartAlertRule.NAME).handle(req)) {
        		update(req);
@@ -129,7 +130,7 @@ end
 
 rule "MovementStopAlert"
     when
-        req : TrackerEventRequest(engine.getRule(MovementStopAlertRule.NAME).accept(this));
+        req : RuleContext(engine.getRule(MovementStopAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(MovementStopAlertRule.NAME).handle(req)) {
        		update(req);

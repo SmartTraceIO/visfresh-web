@@ -1,12 +1,11 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TrackerEvent;
 
 /**
@@ -14,13 +13,13 @@ import com.visfresh.entities.TrackerEvent;
  *
  */
 @Component
-public class EnterBrightEnvironmentAlertRule extends AbstractAlertRule {
-    public static final String NAME = "EnterBrightEnvironmentAlert";
+public class MovementStopAlertRule extends AbstractAlertRule {
+    public static final String NAME = "MovementStopAlert";
 
     /**
      * Default constructor.
      */
-    public EnterBrightEnvironmentAlertRule() {
+    public MovementStopAlertRule() {
         super();
     }
 
@@ -28,9 +27,11 @@ public class EnterBrightEnvironmentAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest e) {
-        return "BRT".equalsIgnoreCase(e.getEvent().getType()) && super.accept(e)
-                && e.getEvent().getShipment().getAlertProfile().isWatchEnterBrightEnvironment();
+    public boolean accept(final RuleContext e) {
+        //Not handled now. Not fully understandeable how to check the shock.
+//        return super.accept(e) && e.getEvent().getShipment().getAlertProfile().isWatchMovementStop()
+//                && false;
+        return false;
     }
 
     /* (non-Javadoc)
@@ -40,7 +41,7 @@ public class EnterBrightEnvironmentAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setType(AlertType.LightOn);
+//        alert.setType(AlertType.MovementStop);
         return alert;
     }
 

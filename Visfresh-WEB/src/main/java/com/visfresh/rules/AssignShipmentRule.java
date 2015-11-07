@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import javax.annotation.PostConstruct;
 
@@ -24,7 +24,7 @@ public class AssignShipmentRule implements TrackerEventRule {
     @Autowired
     private ShipmentDao shipmentDao;
     @Autowired
-    private DroolsRuleEngine engine;
+    private AbstractRuleEngine engine;
     /**
      * Default constructor.
      */
@@ -41,12 +41,12 @@ public class AssignShipmentRule implements TrackerEventRule {
      * @see com.visfresh.drools.TrackerEventRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest e) {
-        if(e.getEvent().getShipment() == null && e.getClientProperty(this) == null) {
-            final Shipment s = shipmentDao.findActiveShipment(e.getEvent().getDevice().getImei());
+    public boolean accept(final RuleContext context) {
+        if(context.getEvent().getShipment() == null && !context.isProcessed(this)) {
+            final Shipment s = shipmentDao.findActiveShipment(context.getEvent().getDevice().getImei());
             if (s != null) {
                 //cache shipment to request.
-                e.putClientProperty(this, s);
+                context.putClientProperty(this, s);
                 return true;
             }
         }
@@ -56,7 +56,7 @@ public class AssignShipmentRule implements TrackerEventRule {
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean handle(final TrackerEventRequest req) {
+    public boolean handle(final RuleContext req) {
         final Shipment shipment = (Shipment) req.getClientProperty(this);
         req.getEvent().setShipment(shipment);
         return true;

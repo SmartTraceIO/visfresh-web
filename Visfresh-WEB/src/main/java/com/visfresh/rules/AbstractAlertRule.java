@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -39,7 +39,7 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      * @see com.visfresh.drools.TrackerEventRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest e) {
+    public boolean accept(final RuleContext e) {
         return super.accept(e) && e.getEvent().getShipment().getAlertProfile() != null;
     }
 
@@ -53,9 +53,9 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public final boolean handle(final TrackerEventRequest e) {
+    public final boolean handle(final RuleContext e) {
         final Alert alert = handleInternal(e.getEvent());
-        e.putClientProperty(this, Boolean.TRUE);
+        e.setProcessed(this);
         saveAlert(alert);
 
         final Calendar date = new GregorianCalendar();

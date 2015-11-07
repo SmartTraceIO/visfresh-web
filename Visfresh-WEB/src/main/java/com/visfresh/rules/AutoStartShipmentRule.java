@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import javax.annotation.PostConstruct;
 
@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.entities.TrackerEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -23,7 +24,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     @Autowired
     private ShipmentDao shipmentDao;
     @Autowired
-    private DroolsRuleEngine engine;
+    private AbstractRuleEngine engine;
 
     /**
      * Default constructor.
@@ -41,15 +42,26 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      * @see com.visfresh.drools.TrackerEventRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest e) {
-        return e.getEvent().getShipment() == null && e.getClientProperty(this) == null;
+    public boolean accept(final RuleContext context) {
+        final TrackerEvent e = context.getEvent();
+        if(e.getShipment() == null && !context.isProcessed(this)) {
+            //search previous Shipment for given device and check whether or not
+            //device is moved from end location
+//            final Shipment s = shipmentDao.findLastShipment(e.getDevice().getImei());
+//            if (s == null) {
+//                return true;
+//            }
+
+
+        }
+        return false;
     }
     /* (non-Javadoc)
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean handle(final TrackerEventRequest req) {
-        req.putClientProperty(this, Boolean.TRUE);
+    public boolean handle(final RuleContext context) {
+        context.setProcessed(this);
         //TODO
 //        final Shipment shipment = (Shipment) req.getClientProperty(this);
 //        req.getEvent().setShipment(shipment);

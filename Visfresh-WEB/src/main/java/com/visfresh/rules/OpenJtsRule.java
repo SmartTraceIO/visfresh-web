@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import javax.annotation.PostConstruct;
 
@@ -23,7 +23,7 @@ public class OpenJtsRule implements TrackerEventRule {
     @Autowired
     private OpenJtsFacade openJtsFacade;
     @Autowired
-    private DroolsRuleEngine engine;
+    private AbstractRuleEngine engine;
 
     /**
      * Is enabled flag (only for unit tests.
@@ -46,16 +46,16 @@ public class OpenJtsRule implements TrackerEventRule {
      * @see com.visfresh.drools.TrackerEventRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest e) {
-        return e.getClientProperty(this) == null;
+    public boolean accept(final RuleContext e) {
+        return !e.isProcessed(this);
     }
     /* (non-Javadoc)
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean handle(final TrackerEventRequest req) {
+    public boolean handle(final RuleContext req) {
         //mark request as processed.
-        req.putClientProperty(this, Boolean.TRUE);
+        req.setProcessed(this);
         if (isEnabled) {
             openJtsFacade.addTrackerEvent(req.getEvent().getShipment(), req.getEvent());
         }

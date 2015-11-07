@@ -240,7 +240,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private NotificationSchedule createNotificationScheduleIfNeed() throws RestServiceException, IOException {
         final String name = "Test Schedule";
 
-        final List<NotificationScheduleListItem> schedules = service.getNotificationSchedules(1, 100000);
+        final List<NotificationScheduleListItem> schedules = service.getNotificationSchedules(null, null);
         for (final NotificationScheduleListItem s : schedules) {
             if (name.equals(s.getNotificationScheduleName())) {
                 return service.getNotificationSchedule(s.getId());

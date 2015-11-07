@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import org.springframework.stereotype.Component;
 
@@ -14,13 +14,14 @@ import com.visfresh.entities.TrackerEvent;
  *
  */
 @Component
-public class MovementStartAlertRule extends AbstractAlertRule {
-    public static final String NAME = "MovementStartAlert";
+public class BatteryLowAlertRule extends AbstractAlertRule {
+    private static final int LOW_BATTERY_LIMIT = 2;
+    public static final String NAME = "BatteryLowAlert";
 
     /**
      * Default constructor.
      */
-    public MovementStartAlertRule() {
+    public BatteryLowAlertRule() {
         super();
     }
 
@@ -28,9 +29,9 @@ public class MovementStartAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest e) {
-        //Not handled now. Not fully understandeable how to check the shock.
-        return super.accept(e) && e.getEvent().getShipment().getAlertProfile().isWatchMovementStart() && false;
+    public boolean accept(final RuleContext e) {
+        return e.getEvent().getBattery() < LOW_BATTERY_LIMIT && super.accept(e)
+                && e.getEvent().getShipment().getAlertProfile().isWatchBatteryLow();
     }
 
     /* (non-Javadoc)
@@ -40,7 +41,7 @@ public class MovementStartAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setType(AlertType.MovementStart);
+        alert.setType(AlertType.Battery);
         return alert;
     }
 

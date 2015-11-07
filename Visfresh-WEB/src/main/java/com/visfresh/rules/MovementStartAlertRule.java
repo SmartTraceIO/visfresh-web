@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.drools;
+package com.visfresh.rules;
 
 import org.springframework.stereotype.Component;
 
@@ -14,13 +14,13 @@ import com.visfresh.entities.TrackerEvent;
  *
  */
 @Component
-public class EnterDarkEnvironmentAlertRule extends AbstractAlertRule {
-    public static final String NAME = "EnterDarkEnvironmentAlert";
+public class MovementStartAlertRule extends AbstractAlertRule {
+    public static final String NAME = "MovementStartAlert";
 
     /**
      * Default constructor.
      */
-    public EnterDarkEnvironmentAlertRule() {
+    public MovementStartAlertRule() {
         super();
     }
 
@@ -28,9 +28,9 @@ public class EnterDarkEnvironmentAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final TrackerEventRequest e) {
-        return "DRK".equalsIgnoreCase(e.getEvent().getType()) && super.accept(e)
-                && e.getEvent().getShipment().getAlertProfile().isWatchEnterDarkEnvironment();
+    public boolean accept(final RuleContext e) {
+        //Not handled now. Not fully understandeable how to check the shock.
+        return super.accept(e) && e.getEvent().getShipment().getAlertProfile().isWatchMovementStart() && false;
     }
 
     /* (non-Javadoc)
@@ -40,7 +40,7 @@ public class EnterDarkEnvironmentAlertRule extends AbstractAlertRule {
     protected Alert handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
-        alert.setType(AlertType.LightOff);
+        alert.setType(AlertType.MovementStart);
         return alert;
     }
 
