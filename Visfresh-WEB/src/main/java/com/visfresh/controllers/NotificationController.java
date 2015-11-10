@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
 import com.visfresh.dao.NotificationDao;
+import com.visfresh.dao.Page;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
@@ -31,6 +33,8 @@ import com.visfresh.io.EntityJSonSerializer;
 @Controller("Notification")
 @RequestMapping("/rest")
 public class NotificationController extends AbstractController {
+    public static final String PROPERTY_ID = "id";
+    public static final String PROPERTY_TYPE = "type";
     /**
      * Logger.
      */
@@ -54,21 +58,21 @@ public class NotificationController extends AbstractController {
     @RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getNotifications(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
-        final int page = pageIndex == null ? 1 : pageIndex.intValue();
-        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<Notification> ns = dao.findForUser(user);
-            sort(ns);
+            final List<Notification> ns = dao.findForUser(user,
+                    new Sorting(getDefaultSortOrder()),
+                    null,
+                    page);
 
-            final int total = ns.size();
-            final List<Notification> shipments = getPage(ns, page, size);
+            final int total = dao.getEntityCount(user, null);
             final JsonArray array = new JsonArray();
-            for (final Notification t : shipments) {
+            for (final Notification t : ns) {
                 array.add(ser.toJson(t));
             }
 
@@ -79,10 +83,13 @@ public class NotificationController extends AbstractController {
         }
     }
     /**
-     * @param ns
+     * @return
      */
-    private void sort(final List<Notification> ns) {
-        sortById(ns, true);
+    private String[] getDefaultSortOrder() {
+        return new String[] {
+            PROPERTY_ID,
+            PROPERTY_TYPE
+        };
     }
     @RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.POST)
     public @ResponseBody String markNotificationsAsRead(@PathVariable final String authToken,

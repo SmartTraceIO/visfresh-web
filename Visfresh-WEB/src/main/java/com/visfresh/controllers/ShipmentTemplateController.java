@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
 import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
@@ -30,7 +32,7 @@ import com.visfresh.services.lists.ListShipmentTemplateItem;
  */
 @Controller("ShipmentTemplate")
 @RequestMapping("/rest")
-public class ShipmentTemplateController extends AbstractController {
+public class ShipmentTemplateController extends AbstractController implements ShipmentTemplateConstants {
     /**
      * Logger.
      */
@@ -78,20 +80,21 @@ public class ShipmentTemplateController extends AbstractController {
      */
     @RequestMapping(value = "/getShipmentTemplates/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getShipmentTemplates(@PathVariable final String authToken,
-            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
-        final int page = pageIndex == null ? 1 : pageIndex.intValue();
-        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+            @RequestParam(required = false) final Integer pageIndex,
+            @RequestParam(required = false) final Integer pageSize) {
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipmentTemplates(user);
 
-            final List<ShipmentTemplate> tpls = shipmentTemplateDao.findByCompany(user.getCompany());
-            sort(tpls);
-
-            final int total = tpls.size();
-            final List<ShipmentTemplate> templates = getPage(tpls, page, size);
+            final List<ShipmentTemplate> templates = shipmentTemplateDao.findByCompany(
+                    user.getCompany(),
+                    new Sorting(getDefaultSortOrder()),
+                    page,
+                    null);
+            final int total = shipmentTemplateDao.getEntityCount(user.getCompany(), null);
 
             final JsonArray array = new JsonArray();
             final EntityJSonSerializer ser = getSerializer(user);
@@ -106,12 +109,16 @@ public class ShipmentTemplateController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    /**
-     * @param tpls
-     */
-    private void sort(final List<ShipmentTemplate> tpls) {
-        // TODO Auto-generated method stub
-        sortById(tpls, true);
+    private String[] getDefaultSortOrder() {
+        return new String[] {
+            PROPERTY_SHIPMENT_TEMPLATE_NAME,
+            PROPERTY_SHIPMENT_DESCRIPTION,
+            PROPERTY_SHIPPED_FROM,
+            PROPERTY_SHIPPED_TO,
+            PROPERTY_SHIPMENT_TEMPLATE_ID,
+            PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM,
+            PROPERTY_USE_CURRENT_TIME_FOR_DATE_SHIPPED
+        };
     }
 
     /**

@@ -4,10 +4,8 @@
 package com.visfresh.controllers;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,14 +24,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.JsonArray;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.Filter;
+import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
@@ -50,7 +52,7 @@ import com.visfresh.services.lists.ListShipmentItem;
  */
 @Controller("Shipment")
 @RequestMapping("/rest")
-public class ShipmentController extends AbstractController {
+public class ShipmentController extends AbstractController implements ShipmentConstants {
     /**
      * Logger.
      */
@@ -126,16 +128,15 @@ public class ShipmentController extends AbstractController {
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final boolean onlyWithAlerts,
-            @RequestParam(required = false) final String shippedFrom,
-            @RequestParam(required = false) final String shippedTo,
+            @RequestParam(required = false) final Long shippedFrom,
+            @RequestParam(required = false) final Long shippedTo,
             @RequestParam(required = false) final String goods,
             @RequestParam(required = false) final String device,
             @RequestParam(required = false) final String status,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
             ) {
-        final int page = pageIndex == null ? 1 : pageIndex.intValue();
-        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
             //check logged in.
@@ -144,31 +145,13 @@ public class ShipmentController extends AbstractController {
 
             final ReportSerializer ser = getReportSerializer(user);
 
-            final List<ListShipmentItem> shps = getShipments(user.getCompany());
-
-            final Iterator<ListShipmentItem> iter = shps.iterator();
-            while (iter.hasNext()) {
-                final ListShipmentItem t = iter.next();
-                if (onlyWithAlerts && !hasAlerts(t)
-//                if (shippedFrom != null && (t.getShippedFrom() == null
-//                        || !shippedFrom.equals(t.getShippedFrom()))) {
-//                    continue;
-//                }
-//                if (shippedTo != null && (t.getShippedTo() == null
-//                        || !shippedTo.equals(t.getShippedTo()))) {
-//                    continue;
-//                }
-                || device != null && (t.getDeviceSN() == null || !device.equals(t.getDeviceSN()))
-                || goods != null && (t.getShipmentDescription() == null
-                    || t.getShipmentDescription().indexOf(goods) < 0)
-                || status != null && !t.getStatus().toString().equals(status)) {
-                    iter.remove();
-                }
-            }
-
-            final int total = shps.size();
-            final List<ListShipmentItem> shipments = getPage(shps, page, size);
-            sort(shipments, sc, so);
+            final Filter filter = createFilter(onlyWithAlerts, shippedFrom, shippedTo, goods, device, status);
+            final List<ListShipmentItem> shipments = getShipments(
+                    user.getCompany(),
+                    createSorting(sc, so, getDefaultListShipmentsSortingOrder()),
+                    filter,
+                    page);
+            final int total = shipmentDao.getEntityCount(user.getCompany(), filter);
 
             final JsonArray array = new JsonArray();
             for (final ListShipmentItem s : shipments) {
@@ -181,12 +164,59 @@ public class ShipmentController extends AbstractController {
         }
     }
     /**
+     * @return
+     */
+    private String[] getDefaultListShipmentsSortingOrder() {
+        return new String[] {
+            PROPERTY_SHIPMENT_DESCRIPTION,
+            PROPERTY_SHIPMENT_ID,
+            PROPERTY_ALERT_PROFILE_ID,
+            PROPERTY_SHIPPED_FROM,
+            PROPERTY_SHIPPED_TO,
+            PROPERTY_COMMENTS_FOR_RECEIVER,
+            PROPERTY_ALERT_PROFILE
+        };
+    }
+    /**
+     * @param onlyWithAlerts
+     * @param shippedFrom
+     * @param shippedTo
+     * @param goods
+     * @param device
+     * @param status
+     * @return
+     */
+    private Filter createFilter(final boolean onlyWithAlerts, final Long shippedFrom,
+            final Long shippedTo, final String goods, final String device, final String status) {
+        final Filter f = new Filter();
+        if (shippedFrom != null) {
+            f.addFilter(PROPERTY_SHIPPED_FROM, shippedFrom);
+        }
+        if (shippedTo != null) {
+            f.addFilter(PROPERTY_SHIPPED_TO, shippedTo);
+        }
+        if (goods != null) {
+            f.addFilter(PROPERTY_SHIPMENT_DESCRIPTION, goods);
+        }
+        if (device != null) {
+            f.addFilter(PROPERTY_DEVICE_IMEI, device);
+        }
+        if (status != null) {
+            f.addFilter(PROPERTY_STATUS, ShipmentStatus.valueOf(status));
+        }
+        return f;
+    }
+    /**
      * @param company
      * @return
      */
-    private List<ListShipmentItem> getShipments(final Company company) {
-        final List<Shipment> shipments = shipmentDao.findByCompany(company);
+    private List<ListShipmentItem> getShipments(final Company company,
+            final Sorting sorting,
+            final Filter filter,
+            final Page page) {
+        final List<Shipment> shipments = shipmentDao.findByCompany(company, sorting, page, filter);
         final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
+        //add alerts to each shipment.
         for (final Shipment s : shipments) {
             final List<Alert> alerts = alertDao.getAlerts(s,
                     new Date(0L), new Date(System.currentTimeMillis() + 100000000l));
@@ -195,88 +225,6 @@ public class ShipmentController extends AbstractController {
             result.add(dto);
         }
         return result;
-    }
-
-    /**
-     * @param profiles
-     * @param sc
-     * @param so
-     */
-    private void sort(final List<ListShipmentItem> profiles, final String sc, final String so) {
-        final boolean ascent = !"desc".equals(so);
-        Collections.sort(profiles, new Comparator<ListShipmentItem>() {
-            /* (non-Javadoc)
-             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-             */
-            @Override
-            public int compare(final ListShipmentItem o1, final ListShipmentItem o2) {
-                if ("shipmentId".equals(sc)) {
-                    return compareTo(o1.getShipmentId(), o2.getShipmentId(), ascent);
-                }
-                if ("status".equals(sc)) {
-                    return compareTo(o1.getStatus().toString(), o2.getStatus().toString(), ascent);
-                }
-                if ("deviceSN".equals(sc)) {
-                    compareTo(o1.getDeviceSN(), o2.getDeviceSN(), ascent);
-                }
-                if ("deviceName".equals(sc)) {
-                    return compareTo(o1.getDeviceName(), o2.getDeviceName(), ascent);
-                }
-                if ("tripCount".equals(sc)) {
-                    return compareTo(o1.getTripCount(), o2.getTripCount(), ascent);
-                }
-                if ("shipmentDescription".equals(sc)) {
-                    return compareTo(o1.getShipmentDescription(), o2.getShipmentDescription(), ascent);
-                }
-                if ("palletId".equals(sc)) {
-                    return compareTo(o1.getPalettId(), o2.getPalettId(), ascent);
-                }
-                if ("assetNum".equals(sc)) {
-                    return compareTo(o1.getAssetNum(), o2.getAssetNum(), ascent);
-                }
-                if ("assetType".equals(sc)) {
-                    return compareTo(o1.getAssetType(), o2.getAssetType(), ascent);
-                }
-                if ("shippedFrom".equals(sc)) {
-                    return compareTo(o1.getShippedFrom(), o2.getShippedFrom(), ascent);
-                }
-                if ("shipmentDate".equals(sc)) {
-                    return compareTo(o1.getShipmentDate(), o2.getShipmentDate(), ascent);
-                }
-                if ("shippedTo".equals(sc)) {
-                    return compareTo(o1.getShippedTo(), o2.getShippedTo(), ascent);
-                }
-                if ("estArrivalDate".equals(sc)) {
-                    return compareTo(o1.getEstArrivalDate(), o2.getEstArrivalDate(), ascent);
-                }
-                if ("actualArrivalDate".equals(sc)) {
-                    return compareTo(o1.getActualArrivalDate(), o2.getActualArrivalDate(), ascent);
-                }
-                if ("percentageComplete".equals(sc)) {
-                    return compareTo(o1.getPercentageComplete(), o2.getPercentageComplete(), ascent);
-                }
-                if ("alertProfileId".equals(sc)) {
-                    return compareTo(o1.getAlertProfileId(), o2.getAlertProfileId(), ascent);
-                }
-                if ("alertProfileName".equals(sc)) {
-                    return compareTo(o1.getAlertProfileName(), o2.getAlertProfileName(), ascent);
-                }
-
-                return compareTo(o1.getId(), o2.getId(), ascent);
-            }
-        });
-    }
-    /**
-     * @param t
-     * @return
-     */
-    private boolean hasAlerts(final ListShipmentItem t) {
-        for (final Integer n : t.getAlertSummary().values()) {
-            if (n != null && n > 0) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

@@ -93,7 +93,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         createAndSaveDevice(sharedCompany, "293487032784");
         createAndSaveDevice(sharedCompany, "834270983474");
 
-        assertEquals(2, dao.findByCompany(sharedCompany).size());
+        assertEquals(2, dao.findByCompany(sharedCompany, null, null, null).size());
 
         //test left company
         Company left = new Company();
@@ -101,7 +101,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         left.setDescription("description");
         left = companyDao.save(left);
 
-        assertEquals(0, dao.findByCompany(left).size());
+        assertEquals(0, dao.findByCompany(left, null, null, null).size());
     }
 
     /**

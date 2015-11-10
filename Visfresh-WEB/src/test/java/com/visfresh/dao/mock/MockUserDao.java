@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.UserConstants;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
@@ -53,5 +54,27 @@ public class MockUserDao extends MockDaoBase<User, String> implements UserDao {
         } else {
             profiles.put(user.getId(), profile);
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.mock.MockDaoBase#getValueForFilterOrCompare(java.lang.String, com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected Object getValueForFilterOrCompare(final String property, final User u) {
+        if (property.equals(UserConstants.PROPERTY_ROLES)) {
+            return u.getRoles();
+        }
+        if (property.equals(UserConstants.PROPERTY_TEMPERATURE_UNITS)) {
+            return u.getTemperatureUnits();
+        }
+        if (property.equals(UserConstants.PROPERTY_TIME_ZONE)) {
+            return u.getTimeZone();
+        }
+        if (property.equals(UserConstants.PROPERTY_FULL_NAME)) {
+            return u.getFullName();
+        }
+        if (property.equals(UserConstants.PROPERTY_LOGIN)) {
+            return u.getLogin();
+        }
+        throw new IllegalArgumentException("Undefined property: " + property);
     }
 }

@@ -27,7 +27,7 @@ import com.visfresh.utils.HashGenerator;
  */
 @Controller("User")
 @RequestMapping("/rest")
-public class UserController extends AbstractController {
+public class UserController extends AbstractController implements UserConstants {
     /**
      * Logger.
      */

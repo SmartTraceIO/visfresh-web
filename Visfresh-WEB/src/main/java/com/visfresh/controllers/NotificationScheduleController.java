@@ -3,8 +3,6 @@
  */
 package com.visfresh.controllers;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
 import com.visfresh.dao.NotificationScheduleDao;
+import com.visfresh.dao.Page;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.User;
@@ -32,7 +31,7 @@ import com.visfresh.services.lists.NotificationScheduleListItem;
  */
 @Controller("NotificationSchedule")
 @RequestMapping("/rest")
-public class NotificationScheduleController extends AbstractController {
+public class NotificationScheduleController extends AbstractController implements NotificationScheduleConstants {
     /**
      * Logger.
      */
@@ -82,23 +81,25 @@ public class NotificationScheduleController extends AbstractController {
      */
     @RequestMapping(value = "/getNotificationSchedules/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken,
-            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize,
+            @RequestParam(required = false) final Integer pageIndex,
+            @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
             ) {
-        final int page = pageIndex == null ? 1 : pageIndex.intValue();
-        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetNotificationSchedules(user);
 
-            final List<NotificationSchedule> scs = dao.findByCompany(user.getCompany());
-            sort(scs, sc, so);
+            final List<NotificationSchedule> schedules = dao.findByCompany(
+                    user.getCompany(),
+                    createSorting(sc, so, getDefaultSortOrder()),
+                    page,
+                    null);
 
-            final int total = scs.size();
-            final List<NotificationSchedule> schedules = getPage(scs, page, size);
+            final int total = dao.getEntityCount(user.getCompany(), null);
 
             final EntityJSonSerializer ser = getSerializer(user);
             final JsonArray array = new JsonArray();
@@ -112,6 +113,17 @@ public class NotificationScheduleController extends AbstractController {
             return createErrorResponse(e);
         }
     }
+    /**
+     * @return
+     */
+    private String[] getDefaultSortOrder() {
+        return new String[]{
+            PROPERTY_NOTIFICATION_SCHEDULE_NAME,
+            PROPERTY_NOTIFICATION_SCHEDULE_ID,
+            PROPERTY_NOTIFICATION_SCHEDULE_DESCRIPTION
+        };
+    }
+
     /**
      * @param authToken authentication token
      * @param personScheduleId person schedule ID.
@@ -146,30 +158,6 @@ public class NotificationScheduleController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    /**
-     * @param profiles
-     * @param sc
-     * @param so
-     */
-    private void sort(final List<NotificationSchedule> profiles, final String sc, final String so) {
-        final boolean ascent = !"desc".equals(so);
-        Collections.sort(profiles, new Comparator<NotificationSchedule>() {
-            /* (non-Javadoc)
-             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-             */
-            @Override
-            public int compare(final NotificationSchedule o1, final NotificationSchedule o2) {
-                if ("notificationScheduleName".equalsIgnoreCase(sc)) {
-                    return compareTo(o1.getName(), o2.getName(), ascent);
-                } else if ("notificationScheduleDescription".equalsIgnoreCase(sc)) {
-                    return compareTo(o1.getDescription(), o2.getDescription(), ascent);
-                }
-                return compareTo(o1.getId(), o2.getId(), ascent);
-            }
-        });
-
-    }
-
     /**
      * @param authToken authentication token.
      * @param notificationScheduleId notification schedule ID.

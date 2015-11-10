@@ -9,14 +9,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.dao.CompanyDao;
+import com.visfresh.controllers.NotificationScheduleConstants;
 import com.visfresh.dao.NotificationScheduleDao;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 
@@ -25,7 +23,7 @@ import com.visfresh.entities.PersonSchedule;
  *
  */
 @Component
-public class NotificationScheduleDaoImpl extends DaoImplBase<NotificationSchedule, Long>
+public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<NotificationSchedule, Long>
     implements NotificationScheduleDao {
 
     public static final String TABLE = "notificationschedules";
@@ -47,14 +45,20 @@ public class NotificationScheduleDaoImpl extends DaoImplBase<NotificationSchedul
     private static final String TOTIME_FIELD = "totime";
     private static final String SCHEDULE_FIELD = "schedule";
 
-    @Autowired
-    private CompanyDao companyDao;
+    private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
 
     /**
      * Default constructor.
      */
     public NotificationScheduleDaoImpl() {
         super();
+        propertyToDbFields.put(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_NAME,
+                NAME_FIELD);
+        propertyToDbFields.put(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_ID,
+                ID_FIELD);
+        propertyToDbFields.put(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_DESCRIPTION,
+                DESCRIPTION_FIELD);
+
     }
 
     /* (non-Javadoc)
@@ -152,93 +156,6 @@ public class NotificationScheduleDaoImpl extends DaoImplBase<NotificationSchedul
             ps.setId(keyHolder.getKey().longValue());
         }
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
-     */
-    @Override
-    public NotificationSchedule findOne(final Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        final List<Map<String, Object>> list = runSelectScript(id);
-        return list.size() == 0 ? null : createNotificationSchedule(list.get(0), new HashMap<Long, Company>());
-    }
-    /**
-     * @param id
-     * @return
-     */
-    private List<Map<String, Object>> runSelectScript(final Long id) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_FIELD, id);
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select * from "
-                + TABLE
-                + (id == null ? "" : " where " + ID_FIELD + " = :" + ID_FIELD)
-                + " order by " + ID_FIELD,
-                params);
-        return list;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findAll()
-     */
-    @Override
-    public List<NotificationSchedule> findAll() {
-        final List<Map<String, Object>> list = runSelectScript(null);
-
-        final Map<Long, Company> userCache = new HashMap<Long, Company>();
-        final List<NotificationSchedule> result = new LinkedList<NotificationSchedule>();
-        for (final Map<String,Object> map : list) {
-            result.add(createNotificationSchedule(map, userCache));
-        }
-        return result;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.AlertProfileDao#findByCompany(com.visfresh.entities.Company)
-     */
-    @Override
-    public List<NotificationSchedule> findByCompany(final Company company) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("company", company.getId());
-        final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select * from "
-                + TABLE
-                + " where " + COMPANY_FIELD + " = :company",
-                params);
-
-        final List<NotificationSchedule> result = new LinkedList<NotificationSchedule>();
-
-        final Map<Long, Company> companyCache = new HashMap<Long, Company>();
-        companyCache.put(company.getId(), company);
-        for (final Map<String, Object> row : rows) {
-            result.add(createNotificationSchedule(row, companyCache));
-        }
-        return result;
-    }
-    /**
-     * @param map
-     * @return
-     */
-    private NotificationSchedule createNotificationSchedule(final Map<String, Object> map,
-            final Map<Long, Company> cache) {
-        final NotificationSchedule no = new NotificationSchedule();
-
-        no.setId(((Number) map.get(ID_FIELD)).longValue());
-        no.setName((String) map.get(NAME_FIELD));
-        no.setDescription((String) map.get(DESCRIPTION_FIELD));
-
-        final long companyId = ((Number) map.get(COMPANY_FIELD)).longValue();
-        Company company = cache.get(companyId);
-        if (company == null) {
-            company = companyDao.findOne(companyId);
-            cache.put(companyId, company);
-        }
-        no.setCompany(company);
-        no.getSchedules().addAll(findPersonalSchedulesFor(no.getId()));
-        return no;
-    }
-
     /**
      * @param id
      * @return
@@ -272,19 +189,6 @@ public class NotificationScheduleDaoImpl extends DaoImplBase<NotificationSchedul
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
-     */
-    @Override
-    public void delete(final Long id) {
-        deletePersonalSchedulesFor(id);
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-
-        //delete notification schedule
-        jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
-    }
-
     /**
      * @param id schedule ID.
      */
@@ -313,5 +217,48 @@ public class NotificationScheduleDaoImpl extends DaoImplBase<NotificationSchedul
             result[i] = Boolean.parseBoolean(split[i]);
         }
         return result;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#getCompanyFieldName()
+     */
+    @Override
+    protected String getCompanyFieldName() {
+        return COMPANY_FIELD;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
+     */
+    @Override
+    protected Map<String, String> getPropertyToDbMap() {
+        return propertyToDbFields;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
+     */
+    @Override
+    protected String getTableName() {
+        return TABLE;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
+     */
+    @Override
+    protected String getIdFieldName() {
+        return ID_FIELD;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
+     */
+    @Override
+    protected NotificationSchedule createEntity(final Map<String, Object> map) {
+        final NotificationSchedule no = new NotificationSchedule();
+
+        no.setId(((Number) map.get(ID_FIELD)).longValue());
+        no.setName((String) map.get(NAME_FIELD));
+        no.setDescription((String) map.get(DESCRIPTION_FIELD));
+
+        no.getSchedules().addAll(findPersonalSchedulesFor(no.getId()));
+        return no;
     }
 }

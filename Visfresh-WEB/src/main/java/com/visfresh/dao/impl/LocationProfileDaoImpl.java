@@ -4,18 +4,14 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.dao.CompanyDao;
+import com.visfresh.controllers.LocationConstants;
 import com.visfresh.dao.LocationProfileDao;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.LocationProfile;
 
 /**
@@ -23,7 +19,7 @@ import com.visfresh.entities.LocationProfile;
  *
  */
 @Component
-public class LocationProfileDaoImpl extends DaoImplBase<LocationProfile, Long>
+public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<LocationProfile, Long>
     implements LocationProfileDao {
 
     public static final String TABLE = "locationprofiles";
@@ -42,15 +38,24 @@ public class LocationProfileDaoImpl extends DaoImplBase<LocationProfile, Long>
     private static final String RADIUS_FIELD = "radius";
     private static final String COMPANY_FIELD = "company";
 
-    private static final String ID_PLACEHOLDER = "32_497803_29475";
+    private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
 
-    @Autowired
-    private CompanyDao companyDao;
     /**
      * Default constructor.
      */
     public LocationProfileDaoImpl() {
         super();
+        propertyToDbFields.put(LocationConstants.PROPERTY_END_FLAG, STOP_FIELD);
+        propertyToDbFields.put(LocationConstants.PROPERTY_INTERIM_FLAG, INTERIM_FIELD);
+        propertyToDbFields.put(LocationConstants.PROPERTY_START_FLAG, START_FIELD);
+        propertyToDbFields.put(LocationConstants.PROPERTY_RADIUS_METERS, RADIUS_FIELD);
+        propertyToDbFields.put(LocationConstants.PROPERTY_LON, LONGITUDE_FIELD);
+        propertyToDbFields.put(LocationConstants.PROPERTY_LAT, LATITUDE_FIELD);
+        propertyToDbFields.put(LocationConstants.PROPERTY_ADDRESS, ADDRESS_FIELD);
+        propertyToDbFields.put(LocationConstants.PROPERTY_NOTES, NOTES_FIELD);
+        propertyToDbFields.put(LocationConstants.PROPERTY_COMPANY_NAME, COMPANY_DESCRIPTION_FIELD);
+        propertyToDbFields.put(LocationConstants.PROPERTY_LOCATION_NAME, NAME_FIELD);
+        propertyToDbFields.put(LocationConstants.PROPERTY_LOCATION_ID, ID_FIELD);
     }
 
     /* (non-Javadoc)
@@ -130,64 +135,40 @@ public class LocationProfileDaoImpl extends DaoImplBase<LocationProfile, Long>
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
+     * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
      */
     @Override
-    public LocationProfile findOne(final Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        final List<Map<String, Object>> list = runSelectScript(id);
-        return list.size() == 0 ? null : createLocationProfile(list.get(0), new HashMap<Long, Company>());
+    protected String getIdFieldName() {
+        return ID_FIELD;
     }
-    /**
-     * @param id
-     * @return
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#getCompanyFieldName()
      */
-    private List<Map<String, Object>> runSelectScript(final Long id) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_PLACEHOLDER, id);
-
-        final Map<String, String> fields = createSelectAsMapping();
-
-        params.putAll(fields);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select "
-                + buildSelectAs(fields)
-                + " from "
-                + TABLE
-                + (id == null ? "" : " where " + ID_FIELD + " = :" + ID_PLACEHOLDER)
-                + " order by " + ID_FIELD,
-                params);
-        return list;
+    @Override
+    protected String getCompanyFieldName() {
+        return COMPANY_FIELD;
     }
-    /**
-     * @return
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
      */
-    private Map<String, String> createSelectAsMapping() {
-        final Map<String, String> map = new HashMap<String, String>();
-        map.put(ID_FIELD,  ID_FIELD);
-        map.put(NAME_FIELD, NAME_FIELD);
-        map.put(COMPANY_DESCRIPTION_FIELD, COMPANY_DESCRIPTION_FIELD);
-        map.put(NOTES_FIELD, NOTES_FIELD);
-        map.put(ADDRESS_FIELD, ADDRESS_FIELD);
-        map.put(START_FIELD, START_FIELD);
-        map.put(STOP_FIELD, STOP_FIELD);
-        map.put(INTERIM_FIELD, INTERIM_FIELD);
-        map.put(LATITUDE_FIELD, LATITUDE_FIELD);
-        map.put(LONGITUDE_FIELD, LONGITUDE_FIELD);
-        map.put(RADIUS_FIELD, RADIUS_FIELD);
-        map.put(COMPANY_FIELD, COMPANY_FIELD);
-        return map;
+    @Override
+    protected Map<String, String> getPropertyToDbMap() {
+        return propertyToDbFields;
     }
-    /**
-     * @param map
-     * @return
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
      */
-    private LocationProfile createLocationProfile(final Map<String, Object> map,
-            final Map<Long, Company> userCache) {
+    @Override
+    protected String getTableName() {
+        return TABLE;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
+     */
+    @Override
+    protected LocationProfile createEntity(final Map<String, Object> map) {
         final LocationProfile no = new LocationProfile();
         no.setId(((Number) map.get(ID_FIELD)).longValue());
 
@@ -202,61 +183,6 @@ public class LocationProfileDaoImpl extends DaoImplBase<LocationProfile, Long>
         no.getLocation().setLatitude(((Number) map.get(LATITUDE_FIELD)).doubleValue());
         no.getLocation().setLongitude(((Number) map.get(LONGITUDE_FIELD)).doubleValue());
 
-        final long companyId = ((Number) map.get(COMPANY_FIELD)).longValue();
-        Company company = userCache.get(companyId);
-        if (company == null) {
-            company = companyDao.findOne(companyId);
-            userCache.put(companyId, company);
-        }
-        no.setCompany(company);
-
         return no;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findAll()
-     */
-    @Override
-    public List<LocationProfile> findAll() {
-        final List<Map<String, Object>> list = runSelectScript(null);
-
-        final Map<Long, Company> userCache = new HashMap<Long, Company>();
-        final List<LocationProfile> result = new LinkedList<LocationProfile>();
-        for (final Map<String,Object> map : list) {
-            result.add(createLocationProfile(map, userCache));
-        }
-        return result;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.AlertProfileDao#findByCompany(com.visfresh.entities.Company)
-     */
-    @Override
-    public List<LocationProfile> findByCompany(final Company company) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("company", company.getId());
-        final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select * from "
-                + TABLE
-                + " where " + COMPANY_FIELD + " = :company",
-                params);
-
-        final List<LocationProfile> result = new LinkedList<LocationProfile>();
-
-        final Map<Long, Company> companyCache = new HashMap<Long, Company>();
-        companyCache.put(company.getId(), company);
-        for (final Map<String, Object> row : rows) {
-            result.add(createLocationProfile(row, companyCache));
-        }
-        return result;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
-     */
-    @Override
-    public void delete(final Long id) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-        jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
     }
 }

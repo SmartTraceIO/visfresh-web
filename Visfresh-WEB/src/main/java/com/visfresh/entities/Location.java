@@ -53,4 +53,11 @@ public class Location {
     public void setLongitude(final double lon) {
         this.longitude = lon;
     }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getLatitude() + "," + getLongitude();
+    }
 }

@@ -280,7 +280,7 @@ public abstract class AbstractRestServiceTest {
      * @return
      */
     protected Company getCompany() {
-        for (final Company c : context.getBean(CompanyDao.class).findAll()) {
+        for (final Company c : context.getBean(CompanyDao.class).findAll(null, null, null)) {
             if (RestServiceRunner.SHARED_COMPANY_NAME.equals(c.getName())) {
                 return c;
             }

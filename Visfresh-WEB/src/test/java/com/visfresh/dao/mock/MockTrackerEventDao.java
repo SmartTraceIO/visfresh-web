@@ -84,4 +84,12 @@ public class MockTrackerEventDao extends MockDaoBase<TrackerEvent, Long> impleme
         }
         return orderById(events, true);
     }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.mock.MockDaoBase#getValueForFilterOrCompare(java.lang.String, com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected Object getValueForFilterOrCompare(final String property, final TrackerEvent t) {
+        return null;
+    }
 }

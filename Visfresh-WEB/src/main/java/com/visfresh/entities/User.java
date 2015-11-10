@@ -11,7 +11,7 @@ import java.util.TimeZone;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class User implements EntityWithId<String> {
+public class User implements EntityWithId<String>, EntityWithCompany {
     /**
      * User login.
      */
@@ -88,12 +88,14 @@ public class User implements EntityWithId<String> {
     /**
      * @return the company
      */
+    @Override
     public Company getCompany() {
         return company;
     }
     /**
      * @param company the company to set
      */
+    @Override
     public void setCompany(final Company company) {
         this.company = company;
     }

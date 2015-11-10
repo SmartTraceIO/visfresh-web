@@ -4,16 +4,12 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.dao.CompanyDao;
+import com.visfresh.controllers.DeviceConstants;
 import com.visfresh.dao.DeviceDao;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 
 /**
@@ -21,7 +17,7 @@ import com.visfresh.entities.Device;
  *
  */
 @Component
-public class DeviceDaoImpl extends DaoImplBase<Device, String> implements DeviceDao {
+public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> implements DeviceDao {
     /**
      * Table name.
      */
@@ -51,13 +47,17 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
      */
     public static final String TRIPCOUNT_FIELD = "tripcount";
 
-    @Autowired
-    private CompanyDao companyDao;
+    private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     /**
      * Default constructor.
      */
     public DeviceDaoImpl() {
         super();
+
+        propertyToDbFields.put(DeviceConstants.PROPERTY_DESCRIPTION, DESCRIPTION_FIELD);
+        propertyToDbFields.put(DeviceConstants.PROPERTY_NAME, NAME_FIELD);
+        propertyToDbFields.put(DeviceConstants.PROPERTY_SN, SN_FIELD);
+        propertyToDbFields.put(DeviceConstants.PROPERTY_IMEI, IMEI_FIELD);
     }
 
     /* (non-Javadoc)
@@ -111,130 +111,40 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
 
         return device;
     }
-
     /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
+     * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
      */
     @Override
-    public Device findOne(final String id) {
-        final String entityName = "d";
-        final String companyEntityName = "c";
-        final String resultPrefix = "d_";
-        final String companyResultPrefix = "c_";
-
-        final List<Map<String, Object>> list = runSelect(id, entityName,
-                companyEntityName, resultPrefix, companyResultPrefix);
-
-        return list.size() == 0 ? null : createDevice(resultPrefix, companyResultPrefix, list.get(0));
+    protected String getIdFieldName() {
+        return IMEI_FIELD;
     }
 
-    /**
-     * @param imei
-     * @param entityName
-     * @param companyEntityName
-     * @param resultPrefix
-     * @param companyResultPrefix
-     * @return
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
      */
-    private List<Map<String, Object>> runSelect(final String imei,
-            final String entityName, final String companyEntityName,
-            final String resultPrefix, final String companyResultPrefix) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("imei", imei);
-
-        final Map<String, String> fields = createSelectAsMapping(entityName, resultPrefix);
-        final Map<String, String> companyFields = CompanyDaoImpl.createSelectAsMapping(
-                companyEntityName, companyResultPrefix);
-        params.putAll(fields);
-        params.putAll(companyFields);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select "
-                + buildSelectAs(fields)
-                + ", " + buildSelectAs(companyFields)
-                + " from "
-                + TABLE + " " + entityName
-                + ", " + CompanyDaoImpl.TABLE + " " + companyEntityName
-                + " where "
-                + entityName + "." + COMPANY_FIELD + " = " + companyEntityName + "." + CompanyDaoImpl.ID_FIELD
-                + (imei == null ? "" : " and " + entityName + "." + IMEI_FIELD + " = :imei"),
-                params);
-        return list;
+    @Override
+    protected Map<String, String> getPropertyToDbMap() {
+        return propertyToDbFields;
     }
-
-    /**
-     * @param resultPrefix
-     * @param companyResultPrefix
-     * @param map
-     * @return
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
      */
-    public static Device createDevice(final String resultPrefix,
-            final String companyResultPrefix, final Map<String, Object> map) {
-        final Device d = createDevice(map, resultPrefix);
-        d.setCompany(CompanyDaoImpl.createCompany(companyResultPrefix, map));
-        return d;
+    @Override
+    protected String getTableName() {
+        return TABLE;
     }
-
-    /**
-     * @param map
-     * @param resultPrefix
-     * @return
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
      */
-    protected static Device createDevice(final Map<String, Object> map,
-            final String resultPrefix) {
+    @Override
+    protected Device createEntity(final Map<String, Object> map) {
         final Device d = new Device();
-        d.setName((String) map.get(resultPrefix + NAME_FIELD));
-        d.setDescription((String) map.get(resultPrefix + DESCRIPTION_FIELD));
-        d.setSn((String) map.get(resultPrefix + SN_FIELD));
-        d.setImei((String) map.get(resultPrefix + IMEI_FIELD));
-        d.setTripCount(((Number) map.get(resultPrefix + TRIPCOUNT_FIELD)).intValue());
+        d.setName((String) map.get(NAME_FIELD));
+        d.setDescription((String) map.get(DESCRIPTION_FIELD));
+        d.setSn((String) map.get(SN_FIELD));
+        d.setImei((String) map.get(IMEI_FIELD));
+        d.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         return d;
-    }
-
-    /**
-     * @param entityName
-     * @param resultPrefix
-     * @return
-     */
-    public static Map<String, String> createSelectAsMapping(final String entityName,
-            final String resultPrefix) {
-        final Map<String, String> map = new HashMap<String, String>();
-        map.put(entityName + "." + NAME_FIELD, resultPrefix + NAME_FIELD);
-        map.put(entityName + "." + DESCRIPTION_FIELD, resultPrefix + DESCRIPTION_FIELD);
-        map.put(entityName + "." + IMEI_FIELD, resultPrefix + IMEI_FIELD);
-        map.put(entityName + "." + SN_FIELD, resultPrefix + SN_FIELD);
-        map.put(entityName + "." + TRIPCOUNT_FIELD, resultPrefix + TRIPCOUNT_FIELD);
-        return map ;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findAll()
-     */
-    @Override
-    public List<Device> findAll() {
-        final String entityName = "d";
-        final String companyEntityName = "c";
-        final String resultPrefix = "d_";
-        final String companyResultPrefix = "c_";
-
-        final List<Map<String, Object>> list = runSelect(null,
-                entityName, companyEntityName, resultPrefix, companyResultPrefix);
-
-        final List<Device> result = new LinkedList<Device>();
-        for (final Map<String,Object> map : list) {
-            result.add(createDevice(resultPrefix, companyResultPrefix, map));
-        }
-        return result;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
-     */
-    @Override
-    public void delete(final String id) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("imei", id);
-        jdbc.update("delete from " + TABLE + " where " + IMEI_FIELD + " = :imei", paramMap);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceDao#findAllByImei(java.lang.String)
@@ -244,24 +154,10 @@ public class DeviceDaoImpl extends DaoImplBase<Device, String> implements Device
         return findOne(imei);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.AlertProfileDao#findByCompany(com.visfresh.entities.Company)
+     * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#getCompanyFieldName()
      */
     @Override
-    public List<Device> findByCompany(final Company company) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("company", company.getId());
-        final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select * from "
-                + TABLE
-                + " where " + COMPANY_FIELD + " = :company",
-                params);
-
-        final List<Device> result = new LinkedList<Device>();
-        for (final Map<String, Object> row : rows) {
-            final Device d = createDevice(row, "");
-            d.setCompany(company);
-            result.add(d);
-        }
-        return result;
+    protected String getCompanyFieldName() {
+        return COMPANY_FIELD;
     }
 }

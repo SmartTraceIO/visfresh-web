@@ -17,14 +17,23 @@ public interface NotificationDao extends
         DaoBase<Notification, Long> {
 
     /**
-     * @param user TODO
+     * @param user user
+     * @param sorting sorting.
+     * @param filter filtering
+     * @param page page.
      * @return
      */
-    List<Notification> findForUser(User user);
+    List<Notification> findForUser(User user, Sorting sorting, Filter filter, Page page);
     /**
      * @param user the user.
      * @param ids notification IDs.
      */
     void deleteByUserAndId(User user, Set<Long> ids);
+    /**
+     * @param user user.
+     * @param filter filter.
+     * @return count of user satisfying given filter.
+     */
+    int getEntityCount(User user, Filter filter);
 
 }

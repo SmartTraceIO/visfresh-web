@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.Page;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.User;
@@ -29,7 +32,7 @@ import com.visfresh.io.EntityJSonSerializer;
  */
 @Controller("Device")
 @RequestMapping("/rest")
-public class DeviceController extends AbstractController {
+public class DeviceController extends AbstractController implements DeviceConstants {
     /**
      * Logger.
      */
@@ -37,6 +40,8 @@ public class DeviceController extends AbstractController {
 
     @Autowired
     private DeviceDao dao;
+    @Autowired
+    private DeviceCommandDao deviceCommandDao;
 
     /**
      * Default constructor.
@@ -76,8 +81,7 @@ public class DeviceController extends AbstractController {
     @RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getDevices(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
-        final int page = pageIndex == null ? 1 : pageIndex.intValue();
-        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
             //check logged in.
@@ -86,11 +90,12 @@ public class DeviceController extends AbstractController {
 
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<Device> ds = dao.findByCompany(user.getCompany());
-            sort(ds);
+            final List<Device> devices = dao.findByCompany(user.getCompany(),
+                    new Sorting(getDefaultSortOrder()),
+                    page,
+                    null);
 
-            final int total = ds.size();
-            final List<Device> devices = getPage(ds, page, size);
+            final int total = dao.getEntityCount(user.getCompany(), null);
             final JsonArray array = new JsonArray();
             for (final Device t : devices) {
                 array.add(ser.toJson(t));
@@ -103,10 +108,13 @@ public class DeviceController extends AbstractController {
         }
     }
     /**
-     * @param ds
+     * @return default sort order.
      */
-    private void sort(final List<Device> ds) {
-        sortById(ds, true);
+    private String[] getDefaultSortOrder() {
+        return new String[] {
+            PROPERTY_NAME,
+            PROPERTY_SN
+        };
     }
     /**
      * @param authToken authentication token.
@@ -166,7 +174,7 @@ public class DeviceController extends AbstractController {
             security.checkCanSendCommandToDevice(user);
 
             final DeviceCommand cmd = getSerializer(user).parseDeviceCommand(getJSonObject(req));
-            //TODO imiplement
+            deviceCommandDao.save(cmd);
 
             return createSuccessResponse(null);
         } catch (final Exception e) {

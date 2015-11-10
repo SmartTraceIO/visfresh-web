@@ -5,6 +5,7 @@ package com.visfresh.dao.impl;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.DaoBase;
+import com.visfresh.dao.Filter;
+import com.visfresh.dao.Page;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.utils.StringUtils;
 
@@ -80,7 +84,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      */
     @Override
     public void deleteAll() {
-        delete(findAll());
+        delete(findAll(null, null, null));
     }
     /**
      * @param fields
@@ -141,7 +145,139 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         sb.append(" where id =:").append(idField);
         return sb.toString();
     }
+    /**
+     * @param sorts
+     * @param params
+     * @param sorting
+     */
+    protected void addSorts(final List<String> sorts, final Map<String, Object> params,
+            final Sorting sorting, final Map<String, String> propertyToDbFields) {
+        if (sorting != null) {
+            for (final String property : sorting.getSortProperties()) {
+                final String field = propertyToDbFields.get(property);
+                if (field != null) {
+                    sorts.add(field);
+                } else {
+                    throw new RuntimeException("Unsupported property name: " + property);
+                }
+            }
+        }
+    }
+    /**
+     * @param filter
+     * @param params
+     * @param filters
+     */
+    protected void addFiltes(final Filter filter, final Map<String, Object> params,
+            final List<String> filters, final Map<String, String> propertyToDbFields) {
+        if (filter != null) {
+            for (final String property : filter.getFilteredProperties()) {
+                String field = propertyToDbFields.get(property);
+                if (field == null) {
+                    field = property;
+                }
 
+                final String key = "filter_" + property;
+                params.put(key, filter.getFilter(property));
+                filters.add(field + "= :" + key);
+            }
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
+     */
+    @Override
+    public T findOne(final ID id) {
+        final Filter f = new Filter();
+        f.addFilter(getIdFieldName(), id);
+
+        final List<T> list = findAll(f, null, null);
+        return list.size() == 0 ? null : list.get(0);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DaoBase#getEntityCount(com.visfresh.dao.Filter)
+     */
+    @Override
+    public final int getEntityCount(final Filter filter) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        final List<String> filters = new LinkedList<String>();
+
+        addFiltes(filter, params, filters, getPropertyToDbMap());
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select count(*) as count from "
+                + getTableName()
+                + (filters.size() == 0 ? "" : "where " + StringUtils.combine(filters, " and ")),
+                params);
+        return ((Number) list.get(0).get("count")).intValue();
+    }
+    /**
+     * @return
+     */
+    protected abstract Map<String, String> getPropertyToDbMap();
+    /**
+     * @return
+     */
+    protected abstract String getTableName();
+    /**
+     * @return
+     */
+    protected abstract String getIdFieldName();
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DaoBase#findAll()
+     */
+    @Override
+    public List<T> findAll(final Filter filter, final Sorting sorting, final Page page) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        final List<String> filters = new LinkedList<String>();
+        final List<String> sorts = new LinkedList<String>();
+
+        addFiltes(filter, params, filters, getPropertyToDbMap());
+        addSorts(sorts, params, sorting, getPropertyToDbMap());
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select * from "
+                + getTableName()
+                + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and "))
+                + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ",")
+                        + (sorting.isAscentDirection() ? " asc" : " desc"))
+                + (page == null ? "" : " limit "
+                        + ((page.getPageNumber() - 1) * page.getPageSize())
+                        + "," + page.getPageSize()),
+                params);
+
+        final Map<String, Object> cache = new HashMap<String, Object>();
+        final List<T> result = new LinkedList<T>();
+        for (final Map<String,Object> map : list) {
+            final T t = createEntity(map);
+            resolveReferences(t, map, cache);
+            result.add(t);
+        }
+        return result;
+    }
+
+    /**
+     * @param t
+     * @param map
+     * @param cache
+     */
+    protected abstract void resolveReferences(T t, Map<String, Object> map,
+            Map<String, Object> cache);
+    /**
+     * @param map
+     * @return
+     */
+    protected abstract T createEntity(Map<String, Object> map);
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
+     */
+    @Override
+    public final void delete(final ID id) {
+        final Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("id", id);
+        jdbc.update("delete from " + getTableName() + " where " + getIdFieldName() + " = :id", paramMap);
+    }
     /**
      * @param strings
      * @return

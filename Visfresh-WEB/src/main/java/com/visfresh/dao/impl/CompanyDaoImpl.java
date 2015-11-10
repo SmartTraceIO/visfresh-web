@@ -4,14 +4,13 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.CompanyConstants;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.Company;
 
@@ -25,24 +24,21 @@ public class CompanyDaoImpl extends DaoImplBase<Company, Long> implements Compan
      * Description field.
      */
     private static final String DESCRIPTION_FIELD = "description";
-    /**
-     * Name field.
-     */
+
     private static final String NAME_FIELD = "name";
-    /**
-     * ID field.
-     */
     public static final String ID_FIELD = "id";
-    /**
-     * Table name.
-     */
     public static final String TABLE = "companies";
+
+    private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
 
     /**
      * Default constructor.
      */
     public CompanyDaoImpl() {
         super();
+        propertyToDbFields.put(CompanyConstants.PROPERTY_ID, ID_FIELD);
+        propertyToDbFields.put(CompanyConstants.PROPERTY_NAME, NAME_FIELD);
+        propertyToDbFields.put(CompanyConstants.PROPERTY_DESCRIPTION, DESCRIPTION_FIELD);
     }
 
     /* (non-Javadoc)
@@ -82,92 +78,43 @@ public class CompanyDaoImpl extends DaoImplBase<Company, Long> implements Compan
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
+     * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
      */
     @Override
-    public Company findOne(final Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        final String entityName = "c";
-        final String resultPrefix = "c_";
-
-        final List<Map<String, Object>> list = runSelect(id, entityName, resultPrefix);
-        return list.size() == 0 ? null : createCompany(resultPrefix, list.get(0));
+    protected String getIdFieldName() {
+        return ID_FIELD;
     }
-
-    /**
-     * @param id
-     * @param entityName
-     * @param resultPrefix
-     * @return
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
      */
-    private List<Map<String, Object>> runSelect(final Long id,
-            final String entityName, final String resultPrefix) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_FIELD, id);
-
-        final Map<String, String> fields = createSelectAsMapping(entityName, resultPrefix);
-        params.putAll(fields);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select "
-                + buildSelectAs(fields)
-                + " from " + TABLE + " " + entityName
-                + (id == null ? "": " where " + entityName + "." + ID_FIELD + " = :id"),
-                params);
-        return list;
-    }
-
-    /**
-     * @param resultPrefix
-     * @return
-     */
-    protected static Map<String, String> createSelectAsMapping(
-            final String entityName, final String resultPrefix) {
-        final Map<String, String> map = new HashMap<String, String>();
-        map.put(entityName + "." + ID_FIELD, resultPrefix + ID_FIELD);
-        map.put(entityName + "." + NAME_FIELD, resultPrefix + NAME_FIELD);
-        map.put(entityName + "." + DESCRIPTION_FIELD, resultPrefix + DESCRIPTION_FIELD);
-        return map ;
-    }
-    /**
-     * @param namePrefix field name prefix.
-     * @param map result map.
-     * @return company.
-     */
-    protected static Company createCompany(final String namePrefix, final Map<String, Object> map) {
+    @Override
+    protected Company createEntity(final Map<String, Object> map) {
         final Company c = new Company();
-        c.setId(((Number) map.get(namePrefix + ID_FIELD)).longValue());
-        c.setName((String) map.get(namePrefix + NAME_FIELD));
-        c.setDescription((String) map.get(namePrefix + DESCRIPTION_FIELD));
+        c.setId(((Number) map.get(ID_FIELD)).longValue());
+        c.setName((String) map.get(NAME_FIELD));
+        c.setDescription((String) map.get(DESCRIPTION_FIELD));
         return c;
     }
-
     /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findAll()
+     * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
      */
     @Override
-    public List<Company> findAll() {
-        final String entityName = "c";
-        final String resultPrefix = "c_";
-
-        final List<Map<String, Object>> list = runSelect(null, entityName, resultPrefix);
-
-        final List<Company> result = new LinkedList<Company>();
-        for (final Map<String,Object> map : list) {
-            result.add(createCompany(resultPrefix, map));
-        }
-        return result;
+    protected void resolveReferences(final Company t, final Map<String, Object> map,
+            final Map<String, Object> cache) {
+        // nothing to resolve
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
      */
     @Override
-    public void delete(final Long id) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-        jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
+    protected Map<String, String> getPropertyToDbMap() {
+        return propertyToDbFields;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
+     */
+    @Override
+    protected String getTableName() {
+        return TABLE;
     }
 }

@@ -44,7 +44,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
     public void setUp() {
         dao = context.getBean(UserDao.class);
         companyDao = context.getBean(CompanyDao.class);
-        user = dao.findAll().get(0);
+        user = dao.findAll(null, null, null).get(0);
     }
     //@RequestMapping(value = "/getUser/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getUser(@PathVariable final String authToken,

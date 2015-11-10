@@ -4,9 +4,6 @@
 package com.visfresh.controllers;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
@@ -20,8 +17,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.EntityWithCompany;
-import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.ReferenceResolver;
@@ -67,64 +64,6 @@ public abstract class AbstractController {
         if (s != null && s.getCompany() != null && !s.getCompany().getId().equals(user.getCompany().getId())) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
         }
-    }
-    /**
-     * @param list
-     * @param pageIndex
-     * @param pageSize
-     * @return
-     */
-    protected <E extends EntityWithId<ID>, ID extends Serializable & Comparable<ID>> List<E> getPage(
-            final List<E> list, final int pageIndex, final int pageSize) {
-        final int fromIndex = (pageIndex - 1) * pageSize;
-        if (fromIndex >= list.size()) {
-            return new LinkedList<E>();
-        }
-
-        final int toIndex = Math.min(fromIndex + pageSize, list.size());
-        return list.subList(fromIndex, toIndex);
-    }
-
-    /**
-     * @param list
-     */
-    protected <E extends EntityWithId<ID>, ID extends Serializable & Comparable<ID>> void sortById(
-            final List<E> list, final boolean ascent) {
-        //sort first of all
-        Collections.sort(list, new Comparator<E>() {
-            /* (non-Javadoc)
-             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-             */
-            @Override
-            public int compare(final E o1, final E o2) {
-                if (ascent) {
-                    return o1.getId().compareTo(o2.getId());
-                }
-                return o2.getId().compareTo(o1.getId());
-            }
-        });
-    }
-    protected <C extends Comparable<C>> int compareTo(final C d1, final C d2, final boolean ascent) {
-        final int result = comparePossibleNull(d1, d2, ascent);
-        if (result != 0) {
-            return result;
-        }
-        return ascent ? d1.compareTo(d2) : d2.compareTo(d1);
-    }
-    /**
-     * @param o1
-     * @param o2
-     * @param ascent
-     * @return
-     */
-    private int comparePossibleNull(final Object o1, final Object o2, final boolean ascent) {
-        if (o1 != null && o2 == null) {
-            return ascent ? 1 : -1;
-        }
-        if (o1 == null && o2 != null) {
-            return ascent ? -1 : 1;
-        }
-        return 0;
     }
     /**
      * @param id the entity ID.
@@ -238,5 +177,30 @@ public abstract class AbstractController {
                 user == null ? UTС : user.getTimeZone());
         ser.setReferenceResolver(resolver);
         return ser;
+    }
+
+    /**
+     * @param sc
+     * @param so
+     * @param defaultSortOrder
+     * @return
+     */
+    protected Sorting createSorting(final String sc, final String so,
+            final String[] defaultSortOrder) {
+        final boolean ascent = !"desc".equalsIgnoreCase(so);
+        if (sc == null) {
+            return new Sorting(ascent, defaultSortOrder);
+        }
+
+        final List<String> props = new LinkedList<String>();
+        for (final String prop : defaultSortOrder) {
+            if (prop.equals(sc)) {
+                props.add(0, prop);
+            } else {
+                props.add(prop);
+            }
+        }
+
+        return new Sorting(ascent, props.toArray(new String[props.size()]));
     }
 }

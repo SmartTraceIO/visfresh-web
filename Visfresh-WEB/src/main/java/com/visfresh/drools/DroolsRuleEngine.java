@@ -56,7 +56,5 @@ public class DroolsRuleEngine extends AbstractRuleEngine {
         } finally {
             session.destroy();
         }
-
-        trackerEventDao.save(e);
     }
 }

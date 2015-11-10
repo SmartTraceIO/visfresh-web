@@ -74,7 +74,7 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
         dao.save(e1);
         final E e2 = createTestEntity();
         dao.save(e2);
-        assertTestGetAllOk(2, dao.findAll());
+        assertTestGetAllOk(2, dao.findAll(null, null, null));
     }
 
     /**
@@ -96,7 +96,7 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
         dao.save(e2);
         dao.delete(e1);
 
-        final List<E> all = dao.findAll();
+        final List<E> all = dao.findAll(null, null, null);
         assertEquals(1, all.size());
         assertEquals(e2.getId(), all.get(0).getId());
     }

@@ -95,39 +95,42 @@ public class LocationControllerTest extends AbstractRestServiceTest {
         p5.setNotes("a");
         saveLocationDirectly(p5);
 
+        final int lastIndex = 4;
         //test sort by ID
-        LocationProfile first = facade.getLocations(1, 10000, "locationId", "asc").get(0);
-        assertEquals(p1.getId(), first.getId());
+        LocationProfile loc = facade.getLocations(1, 10000,
+                LocationConstants.PROPERTY_LOCATION_ID, "asc").get(0);
+        assertEquals(p1.getId(), loc.getId());
 
-        first = facade.getLocations(1, 10000, "locationId", "desc").get(0);
-        assertEquals(p5.getId(), first.getId());
+        loc = facade.getLocations(1, 10000,
+                LocationConstants.PROPERTY_LOCATION_ID, "desc").get(lastIndex);
+        assertEquals(p1.getId(), loc.getId());
 
         //location name
-        first = facade.getLocations(1, 10000, "locationName", "asc").get(0);
-        assertEquals(p2.getId(), first.getId());
+        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_LOCATION_NAME, "asc").get(0);
+        assertEquals(p2.getId(), loc.getId());
 
-        first = facade.getLocations(1, 10000, "locationName", "desc").get(0);
-        assertEquals(p1.getId(), first.getId());
+        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_LOCATION_NAME, "desc").get(lastIndex);
+        assertEquals(p2.getId(), loc.getId());
 
         //test sort by address
-        first = facade.getLocations(1, 10000, "address", "asc").get(0);
-        assertEquals(p3.getId(), first.getId());
+        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_ADDRESS, "asc").get(0);
+        assertEquals(p3.getId(), loc.getId());
 
-        first = facade.getLocations(1, 10000, "address", "desc").get(0);
-        assertEquals(p1.getId(), first.getId());
-
-        //test sort by description
-        first = facade.getLocations(1, 10000, "companyDescription", "asc").get(0);
-        assertEquals(p4.getId(), first.getId());
-
-        first = facade.getLocations(1, 10000, "companyDescription", "desc").get(0);
-        assertEquals(p1.getId(), first.getId());
+        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_ADDRESS, "desc").get(lastIndex);
+        assertEquals(p3.getId(), loc.getId());
 
         //test sort by description
-        first = facade.getLocations(1, 10000, "notes", "asc").get(0);
-        assertEquals(p5.getId(), first.getId());
+        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_COMPANY_NAME, "asc").get(0);
+        assertEquals(p4.getId(), loc.getId());
 
-        first = facade.getLocations(1, 10000, "notes", "desc").get(0);
-        assertEquals(p1.getId(), first.getId());
+        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_COMPANY_NAME, "desc").get(lastIndex);
+        assertEquals(p4.getId(), loc.getId());
+
+        //test sort by description
+        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_NOTES, "asc").get(0);
+        assertEquals(p5.getId(), loc.getId());
+
+        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_NOTES, "desc").get(lastIndex);
+        assertEquals(p5.getId(), loc.getId());
     }
 }

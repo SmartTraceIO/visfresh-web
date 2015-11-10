@@ -120,7 +120,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         final Notification n2 = createNotification(u);
         dao.save(n2);
 
-        final List<Notification> list = dao.findForUser(u);
+        final List<Notification> list = dao.findForUser(u, null, null, null);
         assertEquals(1, list.size());
         assertEquals(n2.getId(), list.get(0).getId());
     }
@@ -144,11 +144,11 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         ids.add(n1.getId());
         dao.deleteByUserAndId(u, ids);
 
-        assertEquals(3, dao.findAll().size());
+        assertEquals(3, dao.findAll(null, null, null).size());
 
         ids.add(n2.getId());
         dao.deleteByUserAndId(u, ids);
-        assertEquals(2, dao.findAll().size());
+        assertEquals(2, dao.findAll(null, null, null).size());
     }
 
     /* (non-Javadoc)

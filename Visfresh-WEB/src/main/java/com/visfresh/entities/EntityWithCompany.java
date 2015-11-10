@@ -12,4 +12,5 @@ public interface EntityWithCompany {
      * @return the company
      */
     Company getCompany();
+    void setCompany(Company c);
 }

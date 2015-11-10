@@ -13,17 +13,17 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.Company;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> implements AlertProfileDao {
+public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfile, Long> implements AlertProfileDao {
     public static final String TABLE = "alertprofiles";
 
     public static final String ID_FIELD = "id";
@@ -57,16 +57,83 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
     public static final String ONBATTERYLOW_FIELD = "onbatterylow";
     public static final String COMPANY_FIELD = "company";
 
-    private static final String ID_PLACEHOLDER = "32_497803_29475";
-
     @Autowired
     private CompanyDao companyDao;
+    private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
 
     /**
      * Default constructor.
      */
     public AlertProfileDaoImpl() {
         super();
+
+        //build property to field map
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_STOP, ONMOVEMENTSTOP_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_START, ONMOVEMENTSTART_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_WATCH_ENTER_DARK_ENVIRONMENT, ONENTERDARK_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_WATCH_ENTER_BRIGHT_ENVIRONMENT, ONENTERBRIGHT_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_WATCH_BATTERY_LOW, ONBATTERYLOW_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES2,
+                CRITICALHIGHTEMPFORMORETHEN_FIELD_2);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE2, CRITICALLOWTEMP_FIELD_2);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES,
+                CRITICALLOWTEMPFORMORETHEN_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE,
+                CRITICALLOWTEMP_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES2,
+                LOWTEMPFORMORETHEN_FIELD_2);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_LOW_TEMPERATURE2,
+                LOWTEMP_FIELD_2);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES,
+                LOWTEMPFORMORETHEN_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_LOW_TEMPERATURE,
+                LOWTEMP_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES2,
+                CRITICALHIGHTEMPFORMORETHEN_FIELD_2);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE2,
+                CRITICALHIGHTEMP_FIELD_2);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES,
+            CRITICALHIGHTEMPFORMORETHEN_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE,
+                CRITICALHIGHTEMP_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES2,
+                HIGHTEMPFORMORETHEN_FIELD_2);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE2,
+                HIGHTEMP_FIELD_2);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES,
+                HIGHTEMPFORMORETHEN_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE,
+                HIGHTEMP_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION,
+                DESCRIPTION_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME,
+                NAME_FIELD);
+        propertyToDbFields.put(
+                AlertProfileConstants.PROPERTY_ALERT_PROFILE_ID,
+                ID_FIELD);
     }
 
     /* (non-Javadoc)
@@ -163,82 +230,40 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
         return fields;
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
+     * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
      */
     @Override
-    public AlertProfile findOne(final Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        final List<Map<String, Object>> list = runSelectScript(id);
-        return list.size() == 0 ? null : createAlertProfile(list.get(0), new HashMap<Long, Company>());
-    }
-    /**
-     * @param id
-     * @return
-     */
-    private List<Map<String, Object>> runSelectScript(final Long id) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_PLACEHOLDER, id);
-
-        final Map<String, String> fields = createSelectAsMapping();
-
-        params.putAll(fields);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select "
-                + buildSelectAs(fields)
-                + " from "
-                + TABLE
-                + (id == null ? "" : " where " + ID_FIELD + " = :" + ID_PLACEHOLDER)
-                + " order by " + ID_FIELD,
-                params);
-        return list;
+    protected String getIdFieldName() {
+        return ID_FIELD;
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findAll()
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
      */
     @Override
-    public List<AlertProfile> findAll() {
-        final List<Map<String, Object>> list = runSelectScript(null);
-
-        final Map<Long, Company> userCache = new HashMap<Long, Company>();
-        final List<AlertProfile> result = new LinkedList<AlertProfile>();
-        for (final Map<String,Object> map : list) {
-            result.add(createAlertProfile(map, userCache));
-        }
-        return result;
+    protected Map<String, String> getPropertyToDbMap() {
+        return propertyToDbFields;
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.AlertProfileDao#findByCompany(com.visfresh.entities.Company)
+     * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
      */
     @Override
-    public List<AlertProfile> findByCompany(final Company company) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("company", company.getId());
-        final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select * from "
-                + TABLE
-                + " where " + COMPANY_FIELD + " = :company",
-                params);
-
-        final List<AlertProfile> result = new LinkedList<AlertProfile>();
-
-        final Map<Long, Company> companyCache = new HashMap<Long, Company>();
-        companyCache.put(company.getId(), company);
-        for (final Map<String, Object> row : rows) {
-            result.add(createAlertProfile(row, companyCache));
-        }
-        return result;
+    protected String getTableName() {
+        return TABLE;
     }
-    /**
-     * @param map
-     * @return
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#getCompanyFieldName()
      */
-    private AlertProfile createAlertProfile(final Map<String, Object> map,
-            final Map<Long, Company> cache) {
+    @Override
+    protected String getCompanyFieldName() {
+        return COMPANY_FIELD;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
+     */
+    @Override
+    protected AlertProfile createEntity(final Map<String, Object> map) {
         final AlertProfile no = new AlertProfile();
 
         no.setId(((Number) map.get(ID_FIELD)).longValue());
@@ -291,36 +316,6 @@ public class AlertProfileDaoImpl extends DaoImplBase<AlertProfile, Long> impleme
         no.setWatchMovementStart((Boolean) map.get(ONMOVEMENTSTART_FIELD));
         no.setWatchMovementStop((Boolean) map.get(ONMOVEMENTSTOP_FIELD));
         no.setWatchBatteryLow((Boolean) map.get(ONBATTERYLOW_FIELD));
-
-        final long companyId = ((Number) map.get(COMPANY_FIELD)).longValue();
-        Company company = cache.get(companyId);
-        if (company == null) {
-            company = companyDao.findOne(companyId);
-            cache.put(companyId, company);
-        }
-        no.setCompany(company);
-
         return no;
-    }
-
-    /**
-     * @return
-     */
-    private Map<String, String> createSelectAsMapping() {
-        final Map<String, String> map = new HashMap<String, String>();
-        for (final String field : getFields(true)) {
-            map.put(field, field);
-        }
-        return map;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
-     */
-    @Override
-    public void delete(final Long id) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-        jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
     }
 }

@@ -155,6 +155,7 @@ create table personalschedules (
     primary key (id),
     FOREIGN KEY (`schedule`)
         REFERENCES notificationschedules (id)
+		ON DELETE CASCADE
 );
 
 create table shipments (

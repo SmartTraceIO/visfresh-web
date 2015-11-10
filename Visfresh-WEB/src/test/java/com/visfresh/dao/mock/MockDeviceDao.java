@@ -3,13 +3,10 @@
  */
 package com.visfresh.dao.mock;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.DeviceConstants;
 import com.visfresh.dao.DeviceDao;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 
 /**
@@ -17,7 +14,7 @@ import com.visfresh.entities.Device;
  *
  */
 @Component
-public class MockDeviceDao extends MockDaoBase<Device, String> implements DeviceDao {
+public class MockDeviceDao extends MockEntityWithCompanyDaoBase<Device, String> implements DeviceDao {
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceDao#findAllByImei(java.lang.String)
@@ -27,16 +24,22 @@ public class MockDeviceDao extends MockDaoBase<Device, String> implements Device
         return findOne(imei);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.DeviceDao#findByCompany(com.visfresh.entities.Company)
+     * @see com.visfresh.dao.mock.MockDaoBase#getValueForFilterOrCompare(java.lang.String, com.visfresh.entities.EntityWithId)
      */
     @Override
-    public List<Device> findByCompany(final Company company) {
-        final List<Device> list = new LinkedList<Device>();
-        for (final Device d : entities.values()) {
-            if (d.getCompany().getId().equals(company.getId())) {
-                list.add(d);
-            }
+    protected Object getValueForFilterOrCompare(final String property, final Device t) {
+        if (property.equals(DeviceConstants.PROPERTY_DESCRIPTION)) {
+            return t.getDescription();
         }
-        return list;
+        if (property.equals(DeviceConstants.PROPERTY_NAME)) {
+            return t.getName();
+        }
+        if (property.equals(DeviceConstants.PROPERTY_SN)) {
+            return t.getSn();
+        }
+        if (property.equals(DeviceConstants.PROPERTY_IMEI)) {
+            return t.getImei();
+        }
+        throw new IllegalArgumentException("Unsupported property: " + property);
     }
 }

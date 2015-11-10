@@ -189,4 +189,11 @@ public class LocationProfile implements EntityWithId<Long>, EntityWithCompany {
     public void setCompany(final Company company) {
         this.company = company;
     }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getId() + ": " + getAddress() + " (" + getLocation() + ")";
+    }
 }

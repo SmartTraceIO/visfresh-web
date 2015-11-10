@@ -15,6 +15,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.controllers.AlertProfileConstants;
+import com.visfresh.controllers.CompanyConstants;
+import com.visfresh.controllers.DeviceConstants;
+import com.visfresh.controllers.LocationConstants;
+import com.visfresh.controllers.NotificationController;
+import com.visfresh.controllers.NotificationScheduleConstants;
+import com.visfresh.controllers.ShipmentConstants;
+import com.visfresh.controllers.ShipmentTemplateConstants;
+import com.visfresh.controllers.UserConstants;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
@@ -49,7 +58,7 @@ import com.visfresh.services.lists.NotificationScheduleListItem;
  */
 public class EntityJSonSerializer extends AbstractJsonSerializer {
     /**
-     *
+     * UTC time zone.
      */
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private ReferenceResolver referenceResolver;
@@ -83,12 +92,13 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject json = e.getAsJsonObject();
         final User u = new User();
-        u.setLogin(asString(json.get("login")));
-        u.setFullName(asString(json.get("fullName")));
-        u.setTimeZone(TimeZone.getTimeZone(asString(json.get("timeZone"))));
-        u.setTemperatureUnits(TemperatureUnits.valueOf(asString(json.get("temperatureUnits"))));
+        u.setLogin(asString(json.get(UserConstants.PROPERTY_LOGIN)));
+        u.setFullName(asString(json.get(UserConstants.PROPERTY_FULL_NAME)));
+        u.setTimeZone(TimeZone.getTimeZone(asString(json.get(UserConstants.PROPERTY_TIME_ZONE))));
+        u.setTemperatureUnits(TemperatureUnits.valueOf(asString(json.get(
+                UserConstants.PROPERTY_TEMPERATURE_UNITS))));
 
-        final JsonArray array = json.get("roles").getAsJsonArray();
+        final JsonArray array = json.get(UserConstants.PROPERTY_ROLES).getAsJsonArray();
         final int size = array.size();
         for (int i = 0; i < size; i++) {
             u.getRoles().add(Role.valueOf(array.get(i).getAsString()));
@@ -102,17 +112,17 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      */
     public JsonObject toJson(final User u) {
         final JsonObject obj = new JsonObject();
-        obj.addProperty("login", u.getLogin());
-        obj.addProperty("fullName", u.getFullName());
+        obj.addProperty(UserConstants.PROPERTY_LOGIN, u.getLogin());
+        obj.addProperty(UserConstants.PROPERTY_FULL_NAME, u.getFullName());
 
         final JsonArray roleArray = new JsonArray();
         for (final Role r : u.getRoles()) {
             roleArray.add(new JsonPrimitive(r.name()));
         }
-        obj.add("roles", roleArray);
+        obj.add(UserConstants.PROPERTY_ROLES, roleArray);
 
-        obj.addProperty("timeZone", u.getTimeZone().getID());
-        obj.addProperty("temperatureUnits", u.getTemperatureUnits().toString());
+        obj.addProperty(UserConstants.PROPERTY_TIME_ZONE, u.getTimeZone().getID());
+        obj.addProperty(UserConstants.PROPERTY_TEMPERATURE_UNITS, u.getTemperatureUnits().toString());
 
         return obj;
     }
@@ -139,43 +149,63 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
         //alertProfileId, alertProfileName, alertProfileDescription, highTemperature, criticalHighTemperature, lowTemperature, criticalHighTemperature, watchEnterBrightEnvironment, watchEnterDarkEnvironment, watchMovementStart
-        obj.addProperty("alertProfileId", alert.getId());
-        obj.addProperty("alertProfileName", alert.getName());
-        obj.addProperty("alertProfileDescription", alert.getDescription());
+        obj.addProperty(AlertProfileConstants.PROPERTY_ALERT_PROFILE_ID, alert.getId());
+        obj.addProperty(AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME, alert.getName());
+        obj.addProperty(AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION, alert.getDescription());
 
-        obj.addProperty("highTemperature", alert.getHighTemperature());
-        obj.addProperty("highTemperatureMinutes", alert.getHighTemperatureForMoreThen());
+        obj.addProperty(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE,
+                alert.getHighTemperature());
+        obj.addProperty(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES,
+                alert.getHighTemperatureForMoreThen());
         if (alert.getHighTemperature2() != null) {
-            obj.addProperty("highTemperature2", alert.getHighTemperature2());
-            obj.addProperty("highTemperatureMinutes2", alert.getHighTemperatureForMoreThen2());
+            obj.addProperty(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE2,
+                    alert.getHighTemperature2());
+            obj.addProperty(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES2,
+                    alert.getHighTemperatureForMoreThen2());
         }
 
-        obj.addProperty("criticalHighTemperature", alert.getCriticalHighTemperature());
-        obj.addProperty("criticalHighTemperatureMinutes", alert.getCriticalHighTemperatureForMoreThen());
+        obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE,
+                alert.getCriticalHighTemperature());
+        obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES,
+                alert.getCriticalHighTemperatureForMoreThen());
         if (alert.getCriticalHighTemperature2() != null) {
-            obj.addProperty("criticalHighTemperature2", alert.getCriticalHighTemperature2());
-            obj.addProperty("criticalHighTemperatureMinutes2", alert.getCriticalHighTemperatureForMoreThen2());
+            obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE2,
+                    alert.getCriticalHighTemperature2());
+            obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES2,
+                    alert.getCriticalHighTemperatureForMoreThen2());
         }
 
-        obj.addProperty("lowTemperature", alert.getLowTemperature());
-        obj.addProperty("lowTemperatureMinutes", alert.getLowTemperatureForMoreThen());
+        obj.addProperty(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE, alert.getLowTemperature());
+        obj.addProperty(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES,
+                alert.getLowTemperatureForMoreThen());
         if (alert.getLowTemperature2() != null) {
-            obj.addProperty("lowTemperature2", alert.getLowTemperature2());
-            obj.addProperty("lowTemperatureMinutes2", alert.getLowTemperatureForMoreThen2());
+            obj.addProperty(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE2,
+                    alert.getLowTemperature2());
+            obj.addProperty(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES2,
+                    alert.getLowTemperatureForMoreThen2());
         }
 
-        obj.addProperty("criticalLowTemperature", alert.getCriticalLowTemperature());
-        obj.addProperty("criticalLowTemperatureMinutes", alert.getCriticalLowTemperatureForMoreThen());
+        obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE,
+                alert.getCriticalLowTemperature());
+        obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES,
+                alert.getCriticalLowTemperatureForMoreThen());
         if (alert.getCriticalLowTemperature2() != null) {
-            obj.addProperty("criticalLowTemperature2", alert.getCriticalLowTemperature2());
-            obj.addProperty("criticalLowTemperatureMinutes2", alert.getCriticalLowTemperatureForMoreThen2());
+            obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE2,
+                    alert.getCriticalLowTemperature2());
+            obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES2,
+                    alert.getCriticalLowTemperatureForMoreThen2());
         }
 
-        obj.addProperty("watchBatteryLow", alert.isWatchBatteryLow());
-        obj.addProperty("watchEnterBrightEnvironment", alert.isWatchEnterBrightEnvironment());
-        obj.addProperty("watchEnterDarkEnvironment", alert.isWatchEnterDarkEnvironment());
-        obj.addProperty("watchMovementStart", alert.isWatchMovementStart());
-        obj.addProperty("watchMovementStop", alert.isWatchMovementStop());
+        obj.addProperty(AlertProfileConstants.PROPERTY_WATCH_BATTERY_LOW,
+                alert.isWatchBatteryLow());
+        obj.addProperty(AlertProfileConstants.PROPERTY_WATCH_ENTER_BRIGHT_ENVIRONMENT,
+                alert.isWatchEnterBrightEnvironment());
+        obj.addProperty(AlertProfileConstants.PROPERTY_WATCH_ENTER_DARK_ENVIRONMENT,
+                alert.isWatchEnterDarkEnvironment());
+        obj.addProperty(AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_START,
+                alert.isWatchMovementStart());
+        obj.addProperty(AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_STOP,
+                alert.isWatchMovementStop());
 
         return obj;
     }
@@ -186,43 +216,58 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
     public AlertProfile parseAlertProfile(final JsonObject alert) {
         final AlertProfile p = new AlertProfile();
 
-        p.setId(asLong(alert.get("alertProfileId")));
-        p.setDescription(asString(alert.get("alertProfileDescription")));
-        p.setName(asString(alert.get("alertProfileName")));
+        p.setId(asLong(alert.get(AlertProfileConstants.PROPERTY_ALERT_PROFILE_ID)));
+        p.setDescription(asString(alert.get(AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION)));
+        p.setName(asString(alert.get(AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME)));
 
-        p.setCriticalHighTemperature(asDouble(alert.get("criticalHighTemperature")));
-        p.setCriticalHighTemperatureForMoreThen(asInt(alert.get("criticalHighTemperatureMinutes")));
-        if (alert.has("criticalHighTemperature2")) {
-            p.setCriticalHighTemperature2(asDouble(alert.get("criticalHighTemperature2")));
-            p.setCriticalHighTemperatureForMoreThen2(asInt(alert.get("criticalHighTemperatureMinutes2")));
+        p.setCriticalHighTemperature(asDouble(alert.get(
+                AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE)));
+        p.setCriticalHighTemperatureForMoreThen(asInt(alert.get(
+                AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES)));
+        if (alert.has(AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE2)) {
+            p.setCriticalHighTemperature2(asDouble(alert.get(
+                    AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE2)));
+            p.setCriticalHighTemperatureForMoreThen2(asInt(alert.get(
+                    AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES2)));
         }
 
-        p.setCriticalLowTemperature(asDouble(alert.get("criticalLowTemperature")));
-        p.setCriticalLowTemperatureForMoreThen(asInt(alert.get("criticalLowTemperatureMinutes")));
-        if (alert.has("criticalLowTemperature2")) {
-            p.setCriticalLowTemperature2(asDouble(alert.get("criticalLowTemperature2")));
-            p.setCriticalLowTemperatureForMoreThen2(asInt(alert.get("criticalLowTemperatureMinutes2")));
+        p.setCriticalLowTemperature(asDouble(alert.get(AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE)));
+        p.setCriticalLowTemperatureForMoreThen(asInt(alert.get(
+                AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES)));
+        if (alert.has(AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE2)) {
+            p.setCriticalLowTemperature2(asDouble(alert.get(
+                    AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE2)));
+            p.setCriticalLowTemperatureForMoreThen2(asInt(alert.get(
+                    AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES2)));
         }
 
-        p.setHighTemperature(asDouble(alert.get("highTemperature")));
-        p.setHighTemperatureForMoreThen(asInt(alert.get("highTemperatureMinutes")));
-        if (alert.has("highTemperature2")) {
-            p.setHighTemperature2(asDouble(alert.get("highTemperature2")));
-            p.setHighTemperatureForMoreThen2(asInt(alert.get("highTemperatureMinutes2")));
+        p.setHighTemperature(asDouble(alert.get(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE)));
+        p.setHighTemperatureForMoreThen(asInt(alert.get(
+                AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES)));
+        if (alert.has(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE2)) {
+            p.setHighTemperature2(asDouble(alert.get(
+                    AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE2)));
+            p.setHighTemperatureForMoreThen2(asInt(alert.get(
+                    AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES2)));
         }
 
-        p.setLowTemperature(asDouble(alert.get("lowTemperature")));
-        p.setLowTemperatureForMoreThen(asInt(alert.get("lowTemperatureMinutes")));
-        if (alert.has("lowTemperature2")) {
-            p.setLowTemperature2(asDouble(alert.get("lowTemperature2")));
-            p.setLowTemperatureForMoreThen2(asInt(alert.get("lowTemperatureMinutes2")));
+        p.setLowTemperature(asDouble(alert.get(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE)));
+        p.setLowTemperatureForMoreThen(asInt(alert.get(
+                AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES)));
+        if (alert.has(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE2)) {
+            p.setLowTemperature2(asDouble(alert.get(
+                    AlertProfileConstants.PROPERTY_LOW_TEMPERATURE2)));
+            p.setLowTemperatureForMoreThen2(asInt(alert.get(
+                    AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES2)));
         }
 
-        p.setWatchBatteryLow(asBoolean(alert.get("watchBatteryLow")));
-        p.setWatchEnterBrightEnvironment(asBoolean(alert.get("watchEnterBrightEnvironment")));
-        p.setWatchEnterDarkEnvironment(asBoolean(alert.get("watchEnterDarkEnvironment")));
-        p.setWatchMovementStart(asBoolean(alert.get("watchMovementStart")));
-        p.setWatchMovementStop(asBoolean(alert.get("watchMovementStop")));
+        p.setWatchBatteryLow(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_BATTERY_LOW)));
+        p.setWatchEnterBrightEnvironment(asBoolean(alert.get(
+                AlertProfileConstants.PROPERTY_WATCH_ENTER_BRIGHT_ENVIRONMENT)));
+        p.setWatchEnterDarkEnvironment(asBoolean(alert.get(
+                AlertProfileConstants.PROPERTY_WATCH_ENTER_DARK_ENVIRONMENT)));
+        p.setWatchMovementStart(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_START)));
+        p.setWatchMovementStop(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_STOP)));
 
         return p;
     }
@@ -237,22 +282,22 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty("locationId", location.getId());
-        obj.addProperty("locationName", location.getName());
-        obj.addProperty("companyName", location.getCompanyName());
-        obj.addProperty("notes", location.getNotes());
-        obj.addProperty("address", location.getAddress());
+        obj.addProperty(LocationConstants.PROPERTY_LOCATION_ID, location.getId());
+        obj.addProperty(LocationConstants.PROPERTY_LOCATION_NAME, location.getName());
+        obj.addProperty(LocationConstants.PROPERTY_COMPANY_NAME, location.getCompanyName());
+        obj.addProperty(LocationConstants.PROPERTY_NOTES, location.getNotes());
+        obj.addProperty(LocationConstants.PROPERTY_ADDRESS, location.getAddress());
 
         final JsonObject loc = new JsonObject();
-        obj.add("location", loc);
-        loc.addProperty("lat", location.getLocation().getLatitude());
-        loc.addProperty("lon", location.getLocation().getLongitude());
+        obj.add(LocationConstants.PROPERTY_LOCATION, loc);
+        loc.addProperty(LocationConstants.PROPERTY_LAT, location.getLocation().getLatitude());
+        loc.addProperty(LocationConstants.PROPERTY_LON, location.getLocation().getLongitude());
 
-        obj.addProperty("radiusMeters", location.getRadius());
+        obj.addProperty(LocationConstants.PROPERTY_RADIUS_METERS, location.getRadius());
 
-        obj.addProperty("startFlag", location.isStart() ? "Y" : "N");
-        obj.addProperty("interimFlag", location.isInterim() ? "Y" : "N");
-        obj.addProperty("endFlag", location.isStop() ? "Y" : "N");
+        obj.addProperty(LocationConstants.PROPERTY_START_FLAG, location.isStart() ? "Y" : "N");
+        obj.addProperty(LocationConstants.PROPERTY_INTERIM_FLAG, location.isInterim() ? "Y" : "N");
+        obj.addProperty(LocationConstants.PROPERTY_END_FLAG, location.isStop() ? "Y" : "N");
 
         return obj;
     }
@@ -263,21 +308,21 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
     public LocationProfile parseLocationProfile(final JsonObject obj) {
         final LocationProfile location = new LocationProfile();
 
-        location.setId(asLong(obj.get("locationId")));
-        location.setCompanyName(asString(obj.get("companyName")));
-        location.setName(asString(obj.get("locationName")));
-        location.setNotes(asString(obj.get("notes")));
-        location.setAddress(asString(obj.get("address")));
+        location.setId(asLong(obj.get(LocationConstants.PROPERTY_LOCATION_ID)));
+        location.setCompanyName(asString(obj.get(LocationConstants.PROPERTY_COMPANY_NAME)));
+        location.setName(asString(obj.get(LocationConstants.PROPERTY_LOCATION_NAME)));
+        location.setNotes(asString(obj.get(LocationConstants.PROPERTY_NOTES)));
+        location.setAddress(asString(obj.get(LocationConstants.PROPERTY_ADDRESS)));
 
-        location.setStart("Y".equalsIgnoreCase(asString(obj.get("startFlag"))));
-        location.setInterim("Y".equalsIgnoreCase(asString(obj.get("interimFlag"))));
-        location.setStop("Y".equalsIgnoreCase(asString(obj.get("endFlag"))));
+        location.setStart("Y".equalsIgnoreCase(asString(obj.get(LocationConstants.PROPERTY_START_FLAG))));
+        location.setInterim("Y".equalsIgnoreCase(asString(obj.get(LocationConstants.PROPERTY_INTERIM_FLAG))));
+        location.setStop("Y".equalsIgnoreCase(asString(obj.get(LocationConstants.PROPERTY_END_FLAG))));
 
-        final JsonObject loc = obj.get("location").getAsJsonObject();
-        location.getLocation().setLatitude(loc.get("lat").getAsDouble());
-        location.getLocation().setLongitude(loc.get("lon").getAsDouble());
+        final JsonObject loc = obj.get(LocationConstants.PROPERTY_LOCATION).getAsJsonObject();
+        location.getLocation().setLatitude(loc.get(LocationConstants.PROPERTY_LAT).getAsDouble());
+        location.getLocation().setLongitude(loc.get(LocationConstants.PROPERTY_LON).getAsDouble());
 
-        location.setRadius(asInt(obj.get("radiusMeters")));
+        location.setRadius(asInt(obj.get(LocationConstants.PROPERTY_RADIUS_METERS)));
 
         return location;
     }
@@ -293,9 +338,10 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty("notificationScheduleDescription", schedule.getDescription());
-        obj.addProperty("notificationScheduleId", schedule.getId());
-        obj.addProperty("notificationScheduleName", schedule.getName());
+        obj.addProperty(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_DESCRIPTION,
+                schedule.getDescription());
+        obj.addProperty(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_ID, schedule.getId());
+        obj.addProperty(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_NAME, schedule.getName());
 
         final JsonArray array = new JsonArray();
         obj.add("schedules", array);
@@ -313,9 +359,10 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
     public NotificationSchedule parseNotificationSchedule(final JsonObject obj) {
         final NotificationSchedule sched = new NotificationSchedule();
 
-        sched.setDescription(asString(obj.get("notificationScheduleDescription")));
-        sched.setName(asString(obj.get("notificationScheduleName")));
-        sched.setId(asLong(obj.get("notificationScheduleId")));
+        sched.setDescription(asString(obj.get(
+                NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_DESCRIPTION)));
+        sched.setName(asString(obj.get(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_NAME)));
+        sched.setId(asLong(obj.get(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_ID)));
 
         final JsonArray array = obj.get("schedules").getAsJsonArray();
         for (int i = 0; i < array.size(); i++) {
@@ -398,23 +445,23 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty("shipmentTemplateId", tpl.getId());
-        obj.addProperty("shipmentTemplateName", tpl.getName());
-        obj.addProperty("shipmentDescription", tpl.getShipmentDescription());
-        obj.addProperty("addDateShipped", tpl.isAddDateShipped());
-        obj.addProperty("shippedFrom", getId(tpl.getShippedFrom()));
-        obj.addProperty("shippedTo", getId(tpl.getShippedTo()));
-        obj.addProperty("detectLocationForShippedFrom", tpl.isDetectLocationForShippedFrom());
-        obj.addProperty("useCurrentTimeForDateShipped", tpl.isUseCurrentTimeForDateShipped());
-        obj.addProperty("alertProfileId", getId(tpl.getAlertProfile()));
-        obj.addProperty("alertSuppressionMinutes", tpl.getAlertSuppressionMinutes());
-        obj.addProperty("maxTimesAlertFires", tpl.getMaxTimesAlertFires());
-        obj.add("alertsNotificationSchedules", getIdList(tpl.getAlertsNotificationSchedules()));
-        obj.addProperty("commentsForReceiver", tpl.getCommentsForReceiver());
-        obj.addProperty("arrivalNotificationWithinKm", tpl.getArrivalNotificationWithinKm());
-        obj.addProperty("excludeNotificationsIfNoAlerts", tpl.isExcludeNotificationsIfNoAlerts());
-        obj.add("arrivalNotificationSchedules", getIdList(tpl.getArrivalNotificationSchedules()));
-        obj.addProperty("shutdownDeviceAfterMinutes", tpl.getShutdownDeviceTimeOut());
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_ID, tpl.getId());
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME, tpl.getName());
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION, tpl.getShipmentDescription());
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_ADD_DATE_SHIPPED, tpl.isAddDateShipped());
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPPED_FROM, getId(tpl.getShippedFrom()));
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPPED_TO, getId(tpl.getShippedTo()));
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM, tpl.isDetectLocationForShippedFrom());
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_USE_CURRENT_TIME_FOR_DATE_SHIPPED, tpl.isUseCurrentTimeForDateShipped());
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_ALERT_PROFILE_ID, getId(tpl.getAlertProfile()));
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES, tpl.getAlertSuppressionMinutes());
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_MAX_TIMES_ALERT_FIRES, tpl.getMaxTimesAlertFires());
+        obj.add(ShipmentTemplateConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES, getIdList(tpl.getAlertsNotificationSchedules()));
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_COMMENTS_FOR_RECEIVER, tpl.getCommentsForReceiver());
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM, tpl.getArrivalNotificationWithinKm());
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS, tpl.isExcludeNotificationsIfNoAlerts());
+        obj.add(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES, getIdList(tpl.getArrivalNotificationSchedules()));
+        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES, tpl.getShutdownDeviceTimeOut());
 
         return obj;
     }
@@ -427,12 +474,12 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         parseShipmentBase(obj, tpl);
 
-        tpl.setId(asLong(obj.get("shipmentTemplateId")));
-        tpl.setName(asString(obj.get("shipmentTemplateName")));
-        tpl.setShipmentDescription(asString(obj.get("shipmentDescription")));
-        tpl.setAddDateShipped(asBoolean(obj.get("addDateShipped")));
-        tpl.setUseCurrentTimeForDateShipped(asBoolean(obj.get("useCurrentTimeForDateShipped")));
-        tpl.setDetectLocationForShippedFrom(asBoolean(obj.get("detectLocationForShippedFrom")));
+        tpl.setId(asLong(obj.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_ID)));
+        tpl.setName(asString(obj.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME)));
+        tpl.setShipmentDescription(asString(obj.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION)));
+        tpl.setAddDateShipped(asBoolean(obj.get(ShipmentTemplateConstants.PROPERTY_ADD_DATE_SHIPPED)));
+        tpl.setUseCurrentTimeForDateShipped(asBoolean(obj.get(ShipmentTemplateConstants.PROPERTY_USE_CURRENT_TIME_FOR_DATE_SHIPPED)));
+        tpl.setDetectLocationForShippedFrom(asBoolean(obj.get(ShipmentTemplateConstants.PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM)));
 
         return tpl;
     }
@@ -441,19 +488,21 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param shp
      */
     private void parseShipmentBase(final JsonObject obj, final ShipmentBase shp) {
-        shp.setAlertSuppressionMinutes(asInt(obj.get("alertSuppressionMinutes")));
-        shp.setAlertProfile(resolveAlertProfile(asLong(obj.get("alertProfileId"))));
-        shp.getAlertsNotificationSchedules().addAll(
-                resolveNotificationSchedules(obj.get("alertsNotificationSchedules").getAsJsonArray()));
-        shp.setArrivalNotificationWithinKm(asInt(obj.get("arrivalNotificationWithinKm")));
-        shp.getArrivalNotificationSchedules().addAll(
-                resolveNotificationSchedules(obj.get("arrivalNotificationSchedules").getAsJsonArray()));
-        shp.setExcludeNotificationsIfNoAlerts(asBoolean(obj.get("excludeNotificationsIfNoAlerts")));
-        shp.setShippedFrom(resolveLocationProfile(asLong(obj.get("shippedFrom"))));
-        shp.setShippedTo(resolveLocationProfile(asLong(obj.get("shippedTo"))));
-        shp.setShutdownDeviceTimeOut(asInt(obj.get("shutdownDeviceAfterMinutes")));
-        shp.setMaxTimesAlertFires(asInt(obj.get("maxTimesAlertFires")));
-        shp.setCommentsForReceiver(asString(obj.get("commentsForReceiver")));
+        shp.setAlertSuppressionMinutes(asInt(obj.get(ShipmentConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES)));
+        shp.setAlertProfile(resolveAlertProfile(asLong(obj.get(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID))));
+        shp.getAlertsNotificationSchedules().addAll(resolveNotificationSchedules(obj.get(
+                ShipmentConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES).getAsJsonArray()));
+        shp.setArrivalNotificationWithinKm(asInt(obj.get(
+                ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM)));
+        shp.getArrivalNotificationSchedules().addAll(resolveNotificationSchedules(
+                obj.get(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES).getAsJsonArray()));
+        shp.setExcludeNotificationsIfNoAlerts(asBoolean(obj.get(
+                ShipmentConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS)));
+        shp.setShippedFrom(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_FROM))));
+        shp.setShippedTo(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_TO))));
+        shp.setShutdownDeviceTimeOut(asInt(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES)));
+        shp.setMaxTimesAlertFires(asInt(obj.get(ShipmentConstants.PROPERTY_MAX_TIMES_ALERT_FIRES)));
+        shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER)));
     }
     /**
      * @param json JSON object.
@@ -461,10 +510,10 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      */
     public Device parseDevice(final JsonObject json) {
         final Device tr = new Device();
-        tr.setSn(asString(json.get("sn")));
-        tr.setImei(asString(json.get("imei")));
-        tr.setName(asString(json.get("name")));
-        tr.setDescription(asString(json.get("description")));
+        tr.setSn(asString(json.get(DeviceConstants.PROPERTY_SN)));
+        tr.setImei(asString(json.get(DeviceConstants.PROPERTY_IMEI)));
+        tr.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
+        tr.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));
         return tr;
     }
     /**
@@ -477,27 +526,27 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty("description", d.getDescription());
-        obj.addProperty("imei", d.getImei());
-        obj.addProperty("name", d.getName());
-        obj.addProperty("sn", d.getSn());
+        obj.addProperty(DeviceConstants.PROPERTY_DESCRIPTION, d.getDescription());
+        obj.addProperty(DeviceConstants.PROPERTY_IMEI, d.getImei());
+        obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
+        obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
         return obj;
     }
     public Shipment parseShipment(final JsonObject json) {
         final Shipment s = new Shipment();
         parseShipmentBase(json, s);
 
-        s.setAssetType(asString(json.get("assetType")));
-        s.setId(asLong(json.get("shipmentId")));
-        s.setShipmentDescription(asString(json.get("shipmentDescription")));
-        s.setPalletId(asString(json.get("palletId")));
-        s.setAssetNum(asString(json.get("assetNum")));
-        s.setTripCount(asInt(json.get("tripCount")));
-        s.setPoNum(asInt(json.get("poNum")));
-        s.setShipmentDate(asDate(json.get("shipmentDate")));
-        s.getCustomFields().putAll(parseStringMap(json.get("customFields")));
-        s.setStatus(ShipmentStatus.valueOf(json.get("status").getAsString()));
-        s.setDevice(resolveDevice(asString(json.get("deviceImei"))));
+        s.setAssetType(asString(json.get(ShipmentConstants.PROPERTY_ASSET_TYPE)));
+        s.setId(asLong(json.get(ShipmentConstants.PROPERTY_SHIPMENT_ID)));
+        s.setShipmentDescription(asString(json.get(ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION)));
+        s.setPalletId(asString(json.get(ShipmentConstants.PROPERTY_PALLET_ID)));
+        s.setAssetNum(asString(json.get(ShipmentConstants.PROPERTY_ASSET_NUM)));
+        s.setTripCount(asInt(json.get(ShipmentConstants.PROPERTY_TRIP_COUNT)));
+        s.setPoNum(asInt(json.get(ShipmentConstants.PROPERTY_PO_NUM)));
+        s.setShipmentDate(asDate(json.get(ShipmentConstants.PROPERTY_SHIPMENT_DATE)));
+        s.getCustomFields().putAll(parseStringMap(json.get(ShipmentConstants.PROPERTY_CUSTOM_FIELDS)));
+        s.setStatus(ShipmentStatus.valueOf(json.get(ShipmentConstants.PROPERTY_STATUS).getAsString()));
+        s.setDevice(resolveDevice(asString(json.get(ShipmentConstants.PROPERTY_DEVICE_IMEI))));
 
         return s;
     }
@@ -511,40 +560,40 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty("status", s.getStatus().name());
+        obj.addProperty(ShipmentConstants.PROPERTY_STATUS, s.getStatus().name());
 
         if (s.getDevice() != null) {
-            obj.addProperty("deviceImei", s.getDevice().getImei());
+            obj.addProperty(ShipmentConstants.PROPERTY_DEVICE_IMEI, s.getDevice().getImei());
             obj.addProperty("deviceSN", s.getDevice().getSn());
             obj.addProperty("deviceName", s.getDevice().getName());
         }
-        obj.addProperty("tripCount", s.getTripCount());
+        obj.addProperty(ShipmentConstants.PROPERTY_TRIP_COUNT, s.getTripCount());
 
-        obj.addProperty("shipmentId", s.getId());
-        obj.addProperty("shipmentDescription", s.getShipmentDescription());
+        obj.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_ID, s.getId());
+        obj.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION, s.getShipmentDescription());
 
-        obj.addProperty("palletId", s.getPalletId());
-        obj.addProperty("poNum", s.getPoNum());
-        obj.addProperty("assetNum", s.getAssetNum());
-        obj.addProperty("assetType", s.getAssetType());
+        obj.addProperty(ShipmentConstants.PROPERTY_PALLET_ID, s.getPalletId());
+        obj.addProperty(ShipmentConstants.PROPERTY_PO_NUM, s.getPoNum());
+        obj.addProperty(ShipmentConstants.PROPERTY_ASSET_NUM, s.getAssetNum());
+        obj.addProperty(ShipmentConstants.PROPERTY_ASSET_TYPE, s.getAssetType());
 
-        obj.addProperty("shippedFrom", getId(s.getShippedFrom()));
-        obj.addProperty("shippedTo", getId(s.getShippedTo()));
-        obj.addProperty("shipmentDate", formatDate(s.getShipmentDate()));
+        obj.addProperty(ShipmentConstants.PROPERTY_SHIPPED_FROM, getId(s.getShippedFrom()));
+        obj.addProperty(ShipmentConstants.PROPERTY_SHIPPED_TO, getId(s.getShippedTo()));
+        obj.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_DATE, formatDate(s.getShipmentDate()));
 
-        obj.addProperty("alertProfileId", getId(s.getAlertProfile()));
-        obj.addProperty("alertSuppressionMinutes", s.getAlertSuppressionMinutes());
-        obj.addProperty("maxTimesAlertFires", s.getMaxTimesAlertFires());
-        obj.add("alertsNotificationSchedules", getIdList(s.getAlertsNotificationSchedules()));
+        obj.addProperty(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID, getId(s.getAlertProfile()));
+        obj.addProperty(ShipmentConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES, s.getAlertSuppressionMinutes());
+        obj.addProperty(ShipmentConstants.PROPERTY_MAX_TIMES_ALERT_FIRES, s.getMaxTimesAlertFires());
+        obj.add(ShipmentConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES, getIdList(s.getAlertsNotificationSchedules()));
 
-        obj.addProperty("commentsForReceiver", s.getCommentsForReceiver());
-        obj.addProperty("arrivalNotificationWithinKm", s.getArrivalNotificationWithinKm());
-        obj.addProperty("excludeNotificationsIfNoAlerts", s.isExcludeNotificationsIfNoAlerts());
-        obj.add("arrivalNotificationSchedules", getIdList(s.getArrivalNotificationSchedules()));
+        obj.addProperty(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER, s.getCommentsForReceiver());
+        obj.addProperty(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM, s.getArrivalNotificationWithinKm());
+        obj.addProperty(ShipmentConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS, s.isExcludeNotificationsIfNoAlerts());
+        obj.add(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES, getIdList(s.getArrivalNotificationSchedules()));
 
-        obj.addProperty("shutdownDeviceAfterMinutes", s.getShutdownDeviceTimeOut());
+        obj.addProperty(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES, s.getShutdownDeviceTimeOut());
 
-        obj.add("customFields", toJson(s.getCustomFields()));
+        obj.add(ShipmentConstants.PROPERTY_CUSTOM_FIELDS, toJson(s.getCustomFields()));
         return obj;
     }
     /**
@@ -570,7 +619,7 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
     public SaveShipmentResponse parseSaveShipmentResponse(final JsonObject json) {
         final SaveShipmentResponse resp = new SaveShipmentResponse();
-        resp.setShipmentId(asLong(json.get("shipmentId")));
+        resp.setShipmentId(asLong(json.get(ShipmentConstants.PROPERTY_SHIPMENT_ID)));
         resp.setTemplateId(asLong(json.get("templateId")));
         return resp;
     }
@@ -580,14 +629,14 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      */
     public JsonObject toJson(final SaveShipmentResponse resp) {
         final JsonObject obj = new JsonObject();
-        obj.addProperty("shipmentId", resp.getShipmentId());
+        obj.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_ID, resp.getShipmentId());
         obj.addProperty("templateId", resp.getTemplateId());
         return obj;
     }
     public Notification parseNotification(final JsonObject json) {
         final Notification n = new Notification();
-        n.setId(asLong(json.get("id")));
-        n.setType(NotificationType.valueOf(asString(json.get("type"))));
+        n.setId(asLong(json.get(NotificationController.PROPERTY_ID)));
+        n.setType(NotificationType.valueOf(asString(json.get(NotificationController.PROPERTY_TYPE))));
 
         switch (n.getType()) {
             case Alert:
@@ -606,8 +655,8 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      */
     public JsonObject toJson(final Notification n) {
         final JsonObject obj = new JsonObject();
-        obj.addProperty("id", n.getId());
-        obj.addProperty("type", n.getType().name());
+        obj.addProperty(NotificationController.PROPERTY_ID, n.getId());
+        obj.addProperty(NotificationController.PROPERTY_TYPE, n.getType().name());
 
         final Object issue = n.getIssue();
         if (issue instanceof Alert) {
@@ -752,7 +801,8 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject json = new JsonObject();
-        json.addProperty("notificationScheduleId", req.getNotificationScheduleId());
+        json.addProperty(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_ID,
+                req.getNotificationScheduleId());
         json.add("schedule", toJson(req.getSchedule()));
         return json;
     }
@@ -763,7 +813,8 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject json = e.getAsJsonObject();
         final SavePersonScheduleRequest req = new SavePersonScheduleRequest();
-        req.setNotificationScheduleId(asLong(json.get("notificationScheduleId")));
+        req.setNotificationScheduleId(asLong(json.get(
+                NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_ID)));
         req.setSchedule(parsePersonSchedule(json.get("schedule").getAsJsonObject()));
         return req;
     }
@@ -896,9 +947,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
         final JsonObject obj = json.getAsJsonObject();
         final Company c = new Company();
-        c.setDescription(asString(obj.get("description")));
-        c.setId(asLong(obj.get("id")));
-        c.setName(asString(obj.get("name")));
+        c.setDescription(asString(obj.get(CompanyConstants.PROPERTY_DESCRIPTION)));
+        c.setId(asLong(obj.get(CompanyConstants.PROPERTY_ID)));
+        c.setName(asString(obj.get(CompanyConstants.PROPERTY_NAME)));
         return c;
     }
     public JsonElement toJson(final Company c) {
@@ -907,9 +958,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty("id", c.getId());
-        obj.addProperty("name", c.getName());
-        obj.addProperty("description", c.getDescription());
+        obj.addProperty(CompanyConstants.PROPERTY_ID, c.getId());
+        obj.addProperty(CompanyConstants.PROPERTY_NAME, c.getName());
+        obj.addProperty(CompanyConstants.PROPERTY_DESCRIPTION, c.getDescription());
         return obj;
     }
     /**
@@ -922,11 +973,11 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty("fullName", req.getFullName());
+        obj.addProperty(UserConstants.PROPERTY_FULL_NAME, req.getFullName());
         obj.addProperty("password", req.getPassword());
         obj.addProperty("user", req.getUser());
-        obj.addProperty("temperatureUnits", req.getTemperatureUnits().toString());
-        obj.addProperty("timeZone", req.getTimeZone().getID());
+        obj.addProperty(UserConstants.PROPERTY_TEMPERATURE_UNITS, req.getTemperatureUnits().toString());
+        obj.addProperty(UserConstants.PROPERTY_TIME_ZONE, req.getTimeZone().getID());
         return obj;
     }
     public UpdateUserDetailsRequest parseUpdateUserDetailsRequest(final JsonElement el) {
@@ -936,14 +987,15 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final JsonObject json = el.getAsJsonObject();
 
         final UpdateUserDetailsRequest req = new UpdateUserDetailsRequest();
-        req.setFullName(asString(json.get("fullName")));
+        req.setFullName(asString(json.get(UserConstants.PROPERTY_FULL_NAME)));
         req.setPassword(asString(json.get("password")));
         req.setUser(asString(json.get("user")));
-        if (json.has("temperatureUnits")) {
-            req.setTemperatureUnits(TemperatureUnits.valueOf(json.get("temperatureUnits").getAsString()));
+        if (json.has(UserConstants.PROPERTY_TEMPERATURE_UNITS)) {
+            req.setTemperatureUnits(TemperatureUnits.valueOf(
+                    json.get(UserConstants.PROPERTY_TEMPERATURE_UNITS).getAsString()));
         }
-        if (json.has("timeZone")) {
-            req.setTimeZone(TimeZone.getTimeZone(json.get("timeZone").getAsString()));
+        if (json.has(UserConstants.PROPERTY_TIME_ZONE)) {
+            req.setTimeZone(TimeZone.getTimeZone(json.get(UserConstants.PROPERTY_TIME_ZONE).getAsString()));
         }
         return req;
     }
@@ -958,19 +1010,19 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject json = new JsonObject();
-        json.addProperty("shipmentTemplateId", item.getShipmentTemplateId());
+        json.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_TEMPLATE_ID, item.getShipmentTemplateId());
 
-        json.addProperty("shipmentTemplateName", item.getShipmentTemplateName());
-        json.addProperty("shipmentDescription", item.getShipmentDescription());
+        json.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME, item.getShipmentTemplateName());
+        json.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION, item.getShipmentDescription());
 
-        json.addProperty("shippedFrom", item.getShippedFrom());
-        json.addProperty("shippedFromLocationName", item.getShippedFromLocationName());
+        json.addProperty(ShipmentConstants.PROPERTY_SHIPPED_FROM, item.getShippedFrom());
+        json.addProperty(ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME, item.getShippedFromLocationName());
 
-        json.addProperty("shippedTo", item.getShippedTo());
-        json.addProperty("shippedToLocationName", item.getShippedToLocationName());
+        json.addProperty(ShipmentConstants.PROPERTY_SHIPPED_TO, item.getShippedTo());
+        json.addProperty(ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME, item.getShippedToLocationName());
 
-        json.addProperty("alertProfile", item.getAlertProfile());
-        json.addProperty("alertProfileName", item.getAlertProfileName());
+        json.addProperty(ShipmentConstants.PROPERTY_ALERT_PROFILE, item.getAlertProfile());
+        json.addProperty(ShipmentConstants.PROPERTY_ALERT_PROFILE_NAME, item.getAlertProfileName());
         return json;
     }
     public ListShipmentTemplateItem parseListShipmentTemplateItem(final JsonElement el) {
@@ -980,19 +1032,19 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final JsonObject json = el.getAsJsonObject();
 
         final ListShipmentTemplateItem item = new ListShipmentTemplateItem();
-        item.setShipmentTemplateId(asLong(json.get("shipmentTemplateId")));
+        item.setShipmentTemplateId(asLong(json.get(ShipmentConstants.PROPERTY_SHIPMENT_TEMPLATE_ID)));
 
-        item.setShipmentTemplateName(asString(json.get("shipmentTemplateName")));
-        item.setShipmentDescription(asString(json.get("shipmentDescription")));
+        item.setShipmentTemplateName(asString(json.get(ShipmentConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME)));
+        item.setShipmentDescription(asString(json.get(ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION)));
 
-        item.setShippedFrom(asLong(json.get("shippedFrom")));
-        item.setShippedFromLocationName(asString(json.get("shippedFromLocationName")));
+        item.setShippedFrom(asLong(json.get(ShipmentConstants.PROPERTY_SHIPPED_FROM)));
+        item.setShippedFromLocationName(asString(json.get(ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME)));
 
-        item.setShippedTo(asLong(json.get("shippedTo")));
-        item.setShippedToLocationName(asString(json.get("shippedToLocationName")));
+        item.setShippedTo(asLong(json.get(ShipmentConstants.PROPERTY_SHIPPED_TO)));
+        item.setShippedToLocationName(asString(json.get(ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME)));
 
-        item.setAlertProfile(asLong(json.get("alertProfile")));
-        item.setAlertProfileName(asString(json.get("alertProfileName")));
+        item.setAlertProfile(asLong(json.get(ShipmentConstants.PROPERTY_ALERT_PROFILE)));
+        item.setAlertProfileName(asString(json.get(ShipmentConstants.PROPERTY_ALERT_PROFILE_NAME)));
 
         return item;
     }
@@ -1007,9 +1059,12 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty("notificationScheduleId", item.getNotificationScheduleId());
-        obj.addProperty("notificationScheduleName", item.getNotificationScheduleName());
-        obj.addProperty("notificationScheduleDescription", item.getNotificationScheduleDescription());
+        obj.addProperty(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_ID,
+                item.getNotificationScheduleId());
+        obj.addProperty(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_NAME,
+                item.getNotificationScheduleName());
+        obj.addProperty(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_DESCRIPTION,
+                item.getNotificationScheduleDescription());
         obj.addProperty("peopleToNotify", item.getPeopleToNotify());
         return obj;
     }
@@ -1020,9 +1075,12 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
 
         final JsonObject json = el.getAsJsonObject();
         final NotificationScheduleListItem item = new NotificationScheduleListItem();
-        item.setNotificationScheduleDescription(asString(json.get("notificationScheduleDescription")));
-        item.setNotificationScheduleId(asLong(json.get("notificationScheduleId")));
-        item.setNotificationScheduleName(asString(json.get("notificationScheduleName")));
+        item.setNotificationScheduleDescription(asString(json.get(
+                NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_DESCRIPTION)));
+        item.setNotificationScheduleId(asLong(json.get(
+                NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_ID)));
+        item.setNotificationScheduleName(asString(json.get(
+                NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_NAME)));
         item.setPeopleToNotify(asString(json.get("peopleToNotify")));
         return item;
     }

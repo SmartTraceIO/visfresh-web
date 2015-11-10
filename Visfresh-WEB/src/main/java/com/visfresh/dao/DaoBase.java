@@ -14,13 +14,14 @@ import com.visfresh.entities.EntityWithId;
  *
  */
 public interface DaoBase<T extends EntityWithId<ID>, ID extends Serializable & Comparable<ID>> {
-    public abstract <S extends T> S save(final S entity);
-    public <S extends T> Collection<S> save(final Collection<S> entities);
-    public T findOne(final ID id);
-    public List<T> findAll();
-    public List<T> findAll(final Collection<ID> ids);
-    public void delete(final ID id);
-    public void delete(final T entity);
-    public void delete(final Collection<? extends T> entities);
-    public void deleteAll();
+    abstract <S extends T> S save(final S entity);
+    <S extends T> Collection<S> save(final Collection<S> entities);
+    T findOne(final ID id);
+    List<T> findAll(Filter filter, Sorting sorting, Page page);
+    List<T> findAll(final Collection<ID> ids);
+    void delete(final ID id);
+    void delete(final T entity);
+    void delete(final Collection<? extends T> entities);
+    void deleteAll();
+    int getEntityCount(Filter filter);
 }

@@ -82,7 +82,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         createAndSaveAlertProfile(sharedCompany);
         createAndSaveAlertProfile(sharedCompany);
 
-        assertEquals(2, dao.findByCompany(sharedCompany).size());
+        assertEquals(2, dao.findByCompany(sharedCompany, null, null, null).size());
 
         //test left company
         Company left = new Company();
@@ -90,7 +90,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         left.setDescription("description");
         left = companyDao.save(left);
 
-        assertEquals(0, dao.findByCompany(left).size());
+        assertEquals(0, dao.findByCompany(left, null, null, null).size());
     }
     @Test
     public void testTemperature2() {

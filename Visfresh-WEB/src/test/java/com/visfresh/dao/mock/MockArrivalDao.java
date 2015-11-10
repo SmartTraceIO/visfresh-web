@@ -40,4 +40,11 @@ public class MockArrivalDao extends MockDaoBase<Arrival, Long> implements Arriva
         }
         return orderById(alerts, true);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.mock.MockDaoBase#getValueForFilterOrCompare(java.lang.String, com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected Object getValueForFilterOrCompare(final String property, final Arrival t) {
+        return null;
+    }
 }

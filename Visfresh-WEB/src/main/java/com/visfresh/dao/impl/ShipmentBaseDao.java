@@ -18,9 +18,11 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DaoBase;
+import com.visfresh.dao.Filter;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
-import com.visfresh.entities.Company;
+import com.visfresh.dao.Page;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.ShipmentBase;
@@ -30,12 +32,12 @@ import com.visfresh.utils.StringUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBase<E, Long>
+public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWithCompanyDaoImplBase<E, Long>
     implements DaoBase<E, Long> {
 
     public static final String TABLE = "shipments";
-    private static final String ARRIVALNOTIFSCHEDULES_TABLE = "arrivalnotifschedules";
-    private static final String ALERTNOTIFSCHEDULES_TABLE = "alertnotifschedules";
+    protected static final String ARRIVALNOTIFSCHEDULES_TABLE = "arrivalnotifschedules";
+    protected static final String ALERTNOTIFSCHEDULES_TABLE = "alertnotifschedules";
 
     protected static final String ID_FIELD = "id";
     protected static final String ISTEMPLATE_FIELD = "istemplate";
@@ -47,9 +49,9 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
     protected static final String NONOTIFSIFNOALERTS_FIELD = "nonotifsifnoalerts";
     protected static final String SHUTDOWNTIMEOUT_FIELD = "shutdowntimeout";
     protected static final String COMPANY_FIELD = "company";
-    private static final String SHIPPEDTO_FIELD = "shippedto";
-    private static final String SHIPPEDFROM_FIELD = "shippedfrom";
-    private static final String COMMENTS_FIELD = "comments";
+    protected static final String SHIPPEDTO_FIELD = "shippedto";
+    protected static final String SHIPPEDFROM_FIELD = "shippedfrom";
+    protected static final String COMMENTS_FIELD = "comments";
 
     @Autowired
     private AlertProfileDao alertProfileDao;
@@ -163,31 +165,15 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
         map.put(COMMENTS_FIELD, s.getCommentsForReceiver());
         return map;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
-     */
-    @Override
-    public void delete(final Long id) {
-        clearManyToManyRefs(id);
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
 
-        //delete notification schedule
-        jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
-    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findAll()
      */
     @Override
-    public List<E> findAll() {
-        final List<Map<String, Object>> list = runSelectScript(null);
-
-        final Map<Long, Company> companyCache = new HashMap<Long, Company>();
-        final List<E> result = new LinkedList<E>();
-        for (final Map<String,Object> map : list) {
-            result.add(createEntity(map, companyCache));
-        }
-        return result;
+    public List<E> findAll(final Filter filter, final Sorting sorting, final Page page) {
+        final Filter f = new Filter(filter);
+        f.addFilter(ISTEMPLATE_FIELD, isTemplate());
+        return super.findAll(f, sorting, page);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
@@ -198,48 +184,12 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
             return null;
         }
 
-        final List<Map<String, Object>> list = runSelectScript(id);
-        return list.size() == 0 ? null : createEntity(list.get(0), new HashMap<Long, Company>());
-    }
-    /**
-     * @param map
-     * @return
-     */
-    protected E createEntity(final Map<String, Object> map, final Map<Long, Company> cache) {
-        final E no = createEntity();
+        final Filter f = new Filter();
+        f.addFilter(ID_FIELD, id);
+        f.addFilter(ISTEMPLATE_FIELD, isTemplate());
 
-        no.setId(((Number) map.get(ID_FIELD)).longValue());
-        Number id = (Number) map.get(ALERT_FIELD);
-        if (id != null) {
-            no.setAlertProfile(alertProfileDao.findOne(id.longValue()));
-        }
-        no.setAlertSuppressionMinutes(((Number) map.get(NOALERTIFCOODOWN_FIELD)).intValue());
-        no.setArrivalNotificationWithinKm(((Number) map.get(ARRIVALNOTIFWITHIN_FIELD)).intValue());
-        no.setExcludeNotificationsIfNoAlerts((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
-        no.setShipmentDescription((String) map.get(DESCRIPTION_FIELD));
-        no.setCommentsForReceiver((String) map.get(COMMENTS_FIELD));
-        id = ((Number) map.get(SHIPPEDFROM_FIELD));
-        if (id != null) {
-            no.setShippedFrom(locationProfileDao.findOne(id.longValue()));
-        }
-        id = ((Number) map.get(SHIPPEDTO_FIELD));
-        if (id != null) {
-            no.setShippedTo(locationProfileDao.findOne(id.longValue()));
-        }
-        no.setShutdownDeviceTimeOut(((Number) map.get(SHUTDOWNTIMEOUT_FIELD)).intValue());
-
-        final long companyId = ((Number) map.get(COMPANY_FIELD)).longValue();
-        Company company = cache.get(companyId);
-        if (company == null) {
-            company = companyDao.findOne(companyId);
-            cache.put(companyId, company);
-        }
-        no.setCompany(company);
-
-        no.getAlertsNotificationSchedules().addAll(findNotificationSchedules(no, ALERTNOTIFSCHEDULES_TABLE));
-        no.getArrivalNotificationSchedules().addAll(findNotificationSchedules(no, ARRIVALNOTIFSCHEDULES_TABLE));
-
-        return no;
+        final List<E> list = findAll(f, null, null);
+        return list.size() == 0 ? null : list.get(0);
     }
     /**
      * @param ship
@@ -269,49 +219,62 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends DaoImplBas
      * @return
      */
     protected abstract E createEntity();
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.AlertProfileDao#findByCompany(com.visfresh.entities.Company)
-     */
-    public List<E> findByCompany(final Company company) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("company", company.getId());
-        params.put("istemplate", isTemplate());
 
-        final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select * from "
-                + TABLE
-                + " where " + COMPANY_FIELD + " = :company and "
-                + ISTEMPLATE_FIELD + "=:istemplate",
-                params);
-
-        final List<E> result = new LinkedList<E>();
-
-        final Map<Long, Company> companyCache = new HashMap<Long, Company>();
-        companyCache.put(company.getId(), company);
-        for (final Map<String, Object> row : rows) {
-            result.add(createEntity(row, companyCache));
-        }
-        return result;
-    }
-    /**
-     * @param id
-     * @return
-     */
-    private List<Map<String, Object>> runSelectScript(final Long id) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_FIELD, id);
-        params.put(ISTEMPLATE_FIELD, isTemplate());
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select * from "
-                + TABLE
-                + " where " + ISTEMPLATE_FIELD + "=:" + ISTEMPLATE_FIELD
-                + (id == null ? "" : " and " + ID_FIELD + " = :" + ID_FIELD)
-                + " order by " + ID_FIELD,
-                params);
-        return list;
-    }
     /**
      * @return
      */
     protected abstract boolean isTemplate();
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#getCompanyFieldName()
+     */
+    @Override
+    protected String getCompanyFieldName() {
+        return COMPANY_FIELD;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
+     */
+    @Override
+    protected String getTableName() {
+        return TABLE;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
+     */
+    @Override
+    protected String getIdFieldName() {
+        return ID_FIELD;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
+     */
+    @Override
+    protected E createEntity(final Map<String, Object> map) {
+        final E no = createEntity();
+
+        no.setId(((Number) map.get(ID_FIELD)).longValue());
+        Number id = (Number) map.get(ALERT_FIELD);
+        if (id != null) {
+            no.setAlertProfile(alertProfileDao.findOne(id.longValue()));
+        }
+        no.setAlertSuppressionMinutes(((Number) map.get(NOALERTIFCOODOWN_FIELD)).intValue());
+        no.setArrivalNotificationWithinKm(((Number) map.get(ARRIVALNOTIFWITHIN_FIELD)).intValue());
+        no.setExcludeNotificationsIfNoAlerts((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
+        no.setShipmentDescription((String) map.get(DESCRIPTION_FIELD));
+        no.setCommentsForReceiver((String) map.get(COMMENTS_FIELD));
+        id = ((Number) map.get(SHIPPEDFROM_FIELD));
+        if (id != null) {
+            no.setShippedFrom(locationProfileDao.findOne(id.longValue()));
+        }
+        id = ((Number) map.get(SHIPPEDTO_FIELD));
+        if (id != null) {
+            no.setShippedTo(locationProfileDao.findOne(id.longValue()));
+        }
+        no.setShutdownDeviceTimeOut(((Number) map.get(SHUTDOWNTIMEOUT_FIELD)).intValue());
+
+        no.getAlertsNotificationSchedules().addAll(findNotificationSchedules(no, ALERTNOTIFSCHEDULES_TABLE));
+        no.getArrivalNotificationSchedules().addAll(findNotificationSchedules(no, ARRIVALNOTIFSCHEDULES_TABLE));
+
+        return no;
+    }
 }

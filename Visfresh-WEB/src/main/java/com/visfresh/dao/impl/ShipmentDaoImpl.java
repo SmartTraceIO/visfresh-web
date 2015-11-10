@@ -12,14 +12,13 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.ShipmentConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.entities.TrackerEvent;
 import com.visfresh.io.EntityJSonSerializer;
 
 /**
@@ -41,11 +40,38 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     @Autowired
     private DeviceDao deviceDao;
 
+    private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
+
     /**
      * Default constructor.
      */
     public ShipmentDaoImpl() {
         super();
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID, ALERT_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES, NOALERTIFCOODOWN_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM,
+                ARRIVALNOTIFWITHIN_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS,
+                NONOTIFSIFNOALERTS_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPPED_FROM, SHIPPEDFROM_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPPED_TO, SHIPPEDTO_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES,
+                SHUTDOWNTIMEOUT_FIELD);
+//        propertyToDbFields.put(ShipmentConstants.PROPERTY_MAX_TIMES_ALERT_FIRES,
+//                );
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER, COMMENTS_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION, DESCRIPTION_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_ALERT_PROFILE, ALERT_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_DEVICE_IMEI, DEVICE_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_STATUS, STATUS_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_CUSTOM_FIELDS, CUSTOMFIELDS_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPMENT_DATE, SHIPMENTDATE_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_PO_NUM, PONUM_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_TRIP_COUNT, TRIPCOUNT_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_ASSET_NUM, ASSETNUM_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_PALLET_ID, PALETTID_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPMENT_ID, ID_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_ASSET_TYPE, ASSETTYPE_FIELD);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#createEntity()
@@ -53,45 +79,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     @Override
     protected Shipment createEntity() {
         return new Shipment();
-    }
-    /**
-     * @param params
-     * @return
-     */
-    protected Map<String, List<TrackerEvent>> getDeviceEventMap(
-            final Map<String, Object> params) {
-        final String resultPrefix = "result_";
-
-        // select device events
-        final String selectAs = buildSelectAs(TrackerEventDaoImpl.getFields(true),
-                "e", resultPrefix);
-        final String sql = "select " + selectAs + " from " + TrackerEventDaoImpl.TABLE
-                + " e, " + DeviceDaoImpl.TABLE + " d" + " where e."
-                + TrackerEventDaoImpl.DEVICE_FIELD + " = d."
-                + DeviceDaoImpl.IMEI_FIELD + " and d."
-                + DeviceDaoImpl.COMPANY_FIELD + " = :companyId" + " and e."
-                + TrackerEventDaoImpl.TIME_FIELD + " >= :startDate and e."
-                + TrackerEventDaoImpl.TIME_FIELD + " <= :endDate"
-                + " order by e." + TrackerEventDaoImpl.TIME_FIELD;
-
-        // map of device alerts. The key is device ID.
-        final Map<String, List<TrackerEvent>> deviceEvents = new HashMap<String, List<TrackerEvent>>();
-
-        final List<Map<String, Object>> list = jdbc.queryForList(sql, params);
-        for (final Map<String, Object> row : list) {
-            final String deviceId = (String) row.get(resultPrefix
-                    + TrackerEventDaoImpl.DEVICE_FIELD);
-            // add alert to map
-            List<TrackerEvent> events = deviceEvents.get(deviceId);
-            if (events == null) {
-                events = new LinkedList<TrackerEvent>();
-                deviceEvents.put(deviceId, events);
-            }
-
-            events.add(TrackerEventDaoImpl.createTrackerEvent(row, resultPrefix));
-        }
-
-        return deviceEvents;
     }
     /**
      * @param params
@@ -123,7 +110,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
                 deviceAlerts.put(deviceId, alerts);
             }
 
-            alerts.add(AlertDaoImpl.createAlert(row, resultPrefix));
+            alerts.add(AlertDaoImpl.createAlert(row));
         }
 
         return deviceAlerts;
@@ -149,24 +136,15 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         return sb.toString();
     }
 
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.ShipmentBaseDao#createEntity(java.util.Map, java.util.Map)
-     */
-    @Override
-    protected Shipment createEntity(final Map<String, Object> map,
-            final Map<Long, Company> companyCache) {
-        return createEntity(map, companyCache, new HashMap<String, Device>());
-    }
     /**
      * @param map
      * @param companyCache
      * @param deviceCache
      * @return
      */
-    protected Shipment createEntity(final Map<String, Object> map,
-            final Map<Long, Company> companyCache,
-            final Map<String, Device> deviceCache) {
-        final Shipment e = super.createEntity(map, companyCache);
+    @Override
+    protected Shipment createEntity(final Map<String, Object> map) {
+        final Shipment e = super.createEntity(map);
         e.setPalletId((String) map.get(PALETTID_FIELD));
         e.setAssetNum((String) map.get(ASSETNUM_FIELD));
         e.setShipmentDate((Date) map.get(SHIPMENTDATE_FIELD));
@@ -248,5 +226,30 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     @Override
     protected boolean isTemplate() {
         return false;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final Shipment s, final Map<String, Object> row,
+            final Map<String, Object> cache) {
+        super.resolveReferences(s, row, cache);
+
+        final String imei = (String) row.get(DEVICE_FIELD);
+        final String key = "device_" + imei;
+        Device device = (Device) cache.get(key);
+        if (device == null) {
+            device = deviceDao.findByImei(imei);
+            cache.put(key, device);
+        }
+
+        s.setDevice(device);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
+     */
+    @Override
+    protected Map<String, String> getPropertyToDbMap() {
+        return propertyToDbFields;
     }
 }

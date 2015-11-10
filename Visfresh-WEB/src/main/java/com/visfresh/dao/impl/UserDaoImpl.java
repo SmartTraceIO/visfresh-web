@@ -13,6 +13,7 @@ import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.UserConstants;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Role;
@@ -26,7 +27,7 @@ import com.visfresh.entities.UserProfile;
  *
  */
 @Component
-public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
+public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> implements UserDao {
     public static final String TABLE = "users";
     public static final String PROFILE_TABLE = "userprofiles";
     public static final String USER_SHIPMENTS = "usershipments";
@@ -41,12 +42,20 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
 
     @Autowired
     private ShipmentDao shipmentDao;
+    private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
+
     /**
      * Default constructor.
      */
     public UserDaoImpl() {
         super();
+        propertyToDbFields.put(UserConstants.PROPERTY_ROLES, ROLES_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_TEMPERATURE_UNITS, TEMPERATURE_UNITS);
+        propertyToDbFields.put(UserConstants.PROPERTY_TIME_ZONE, TIME_ZONE_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_FULL_NAME, FULLNAME_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_LOGIN, USERNAME_FIELD);
     }
+
     public String convertToDatabaseColumn(final Collection<Role> roles) {
         final StringBuilder sb = new StringBuilder();
 
@@ -124,118 +133,6 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
 
         return user;
     }
-    @Override
-    public User findOne(final String id) {
-        final String entityName = "u";
-        final String companyEntityName = "c";
-        final String resultPrefix = "u_";
-        final String companyResultPrefix = "c_";
-
-        final List<Map<String, Object>> list = runSelect(id, entityName,
-                companyEntityName, resultPrefix, companyResultPrefix);
-
-        return list.size() == 0 ? null : createUser(resultPrefix, companyResultPrefix, list.get(0));
-    }
-
-    /**
-     * @param id
-     * @param entityName
-     * @param companyEntityName
-     * @param resultPrefix
-     * @param companyResultPrefix
-     * @return
-     */
-    private List<Map<String, Object>> runSelect(final String id,
-            final String entityName, final String companyEntityName,
-            final String resultPrefix, final String companyResultPrefix) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(USERNAME_FIELD, id);
-
-        final Map<String, String> fields = createSelectAsMapping(entityName, resultPrefix);
-        final Map<String, String> companyFields = CompanyDaoImpl.createSelectAsMapping(
-                companyEntityName, companyResultPrefix);
-        params.putAll(fields);
-        params.putAll(companyFields);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select "
-                + buildSelectAs(fields)
-                + ", " + buildSelectAs(companyFields)
-                + " from "
-                + TABLE + " " + entityName
-                + ", " + CompanyDaoImpl.TABLE + " " + companyEntityName
-                + " where "
-                + entityName + "." + COMPANY_FIELD + " = " + companyEntityName + "." + CompanyDaoImpl.ID_FIELD
-                + (id == null ? "" : " and " + entityName + "." + USERNAME_FIELD + " = :" + USERNAME_FIELD),
-                params);
-        return list;
-    }
-
-    /**
-     * @param resultPrefix
-     * @param companyResultPrefix
-     * @param map
-     * @return
-     */
-    public User createUser(final String resultPrefix,
-            final String companyResultPrefix, final Map<String, Object> map) {
-        final User u = new User();
-        u.setCompany(CompanyDaoImpl.createCompany(companyResultPrefix, map));
-        u.setLogin((String) map.get(resultPrefix + USERNAME_FIELD));
-        u.setFullName((String) map.get(resultPrefix + FULLNAME_FIELD));
-        u.setPassword((String) map.get(resultPrefix + PASSWORD_FIELD));
-        u.setTimeZone(TimeZone.getTimeZone((String) map.get(resultPrefix + TIME_ZONE_FIELD)));
-        u.setTemperatureUnits(TemperatureUnits.valueOf((String) map.get(resultPrefix + TEMPERATURE_UNITS)));
-        u.getRoles().addAll(convertToEntityAttribute((String) map.get(resultPrefix + ROLES_FIELD)));
-        return u;
-    }
-
-    /**
-     * @param entityName
-     * @param resultPrefix
-     * @return
-     */
-    public static Map<String, String> createSelectAsMapping(final String entityName,
-            final String resultPrefix) {
-        final Map<String, String> map = new HashMap<String, String>();
-        map.put(entityName + "." + USERNAME_FIELD, resultPrefix + USERNAME_FIELD);
-        map.put(entityName + "." + PASSWORD_FIELD, resultPrefix + PASSWORD_FIELD);
-        map.put(entityName + "." + ROLES_FIELD, resultPrefix + ROLES_FIELD);
-        map.put(entityName + "." + FULLNAME_FIELD, resultPrefix + FULLNAME_FIELD);
-        map.put(entityName + "." + TIME_ZONE_FIELD, resultPrefix + TIME_ZONE_FIELD);
-        map.put(entityName + "." + TEMPERATURE_UNITS, resultPrefix + TEMPERATURE_UNITS);
-        return map ;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findAll()
-     */
-    @Override
-    public List<User> findAll() {
-        final String entityName = "d";
-        final String companyEntityName = "c";
-        final String resultPrefix = "d_";
-        final String companyResultPrefix = "c_";
-
-        final List<Map<String, Object>> list = runSelect(null,
-                entityName, companyEntityName, resultPrefix, companyResultPrefix);
-
-        final List<User> result = new LinkedList<User>();
-        for (final Map<String,Object> map : list) {
-            result.add(createUser(resultPrefix, companyResultPrefix, map));
-        }
-        return result;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
-     */
-    @Override
-    public void delete(final String id) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-        jdbc.update("delete from " + TABLE + " where " + USERNAME_FIELD + " = :id", paramMap);
-    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.UserDao#getProfile(com.visfresh.entities.User)
      */
@@ -283,5 +180,47 @@ public class UserDaoImpl extends DaoImplBase<User, String> implements UserDao {
             params.put("shipment", s.getId());
             jdbc.update("insert into " + USER_SHIPMENTS + "(user,shipment) values(:user, : shipment)", params);
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#getCompanyFieldName()
+     */
+    @Override
+    protected String getCompanyFieldName() {
+        return COMPANY_FIELD;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
+     */
+    @Override
+    protected Map<String, String> getPropertyToDbMap() {
+        return propertyToDbFields;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
+     */
+    @Override
+    protected String getTableName() {
+        return TABLE;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
+     */
+    @Override
+    protected String getIdFieldName() {
+        return USERNAME_FIELD;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
+     */
+    @Override
+    protected User createEntity(final Map<String, Object> map) {
+        final User u = new User();
+        u.setLogin((String) map.get(USERNAME_FIELD));
+        u.setFullName((String) map.get(FULLNAME_FIELD));
+        u.setPassword((String) map.get(PASSWORD_FIELD));
+        u.setTimeZone(TimeZone.getTimeZone((String) map.get(TIME_ZONE_FIELD)));
+        u.setTemperatureUnits(TemperatureUnits.valueOf((String) map.get(TEMPERATURE_UNITS)));
+        u.getRoles().addAll(convertToEntityAttribute((String) map.get(ROLES_FIELD)));
+        return u;
     }
 }

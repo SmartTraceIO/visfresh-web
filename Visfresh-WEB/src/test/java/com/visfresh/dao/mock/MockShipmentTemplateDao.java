@@ -3,13 +3,10 @@
  */
 package com.visfresh.dao.mock;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.ShipmentTemplateConstants;
 import com.visfresh.dao.ShipmentTemplateDao;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.ShipmentTemplate;
 
@@ -18,7 +15,7 @@ import com.visfresh.entities.ShipmentTemplate;
  *
  */
 @Component
-public class MockShipmentTemplateDao extends MockDaoBase<ShipmentTemplate, Long> implements ShipmentTemplateDao {
+public class MockShipmentTemplateDao extends MockEntityWithCompanyDaoBase<ShipmentTemplate, Long> implements ShipmentTemplateDao {
     /**
      * Default constructor.
      */
@@ -40,16 +37,56 @@ public class MockShipmentTemplateDao extends MockDaoBase<ShipmentTemplate, Long>
         return e;
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.ShipmentDao#findByCompany(com.visfresh.entities.Company)
+     * @see com.visfresh.dao.mock.MockDaoBase#getValueForFilterOrCompare(java.lang.String, com.visfresh.entities.EntityWithId)
      */
     @Override
-    public List<ShipmentTemplate> findByCompany(final Company company) {
-        final List<ShipmentTemplate> list = new LinkedList<ShipmentTemplate>();
-        for (final ShipmentTemplate s : findAll()) {
-            if (s.getCompany().getId().equals(company.getId())) {
-                list.add(s);
-            }
+    protected Object getValueForFilterOrCompare(final String property, final ShipmentTemplate t) {
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES)) {
+            return t.getShutdownDeviceTimeOut();
         }
-        return list;
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS)) {
+            return t.isExcludeNotificationsIfNoAlerts();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM)) {
+            return t.getArrivalNotificationWithinKm();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_COMMENTS_FOR_RECEIVER)) {
+            return t.getCommentsForReceiver();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_MAX_TIMES_ALERT_FIRES)) {
+            return t.getMaxTimesAlertFires();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES)) {
+            return t.getAlertSuppressionMinutes();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_USE_CURRENT_TIME_FOR_DATE_SHIPPED)) {
+            return t.isUseCurrentTimeForDateShipped();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM)) {
+            return t.isDetectLocationForShippedFrom();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_SHIPPED_TO)) {
+            return t.getShippedTo();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_SHIPPED_FROM)) {
+            return t.getShippedFrom();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_ADD_DATE_SHIPPED)) {
+            return t.isAddDateShipped();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION)) {
+            return t.getShipmentDescription();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME)) {
+            return t.getName();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_ID)) {
+            return t.getId();
+        }
+        if (property.equals(ShipmentTemplateConstants.PROPERTY_ALERT_PROFILE_ID)) {
+            return t.getAlertProfile() == null ? null : t.getAlertProfile().getId();
+        }
+
+        throw new IllegalStateException("Unsupported property: " + property);
     }
 }

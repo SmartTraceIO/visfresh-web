@@ -17,7 +17,7 @@ public interface UserDao extends DaoBase<User, String> {
      */
     UserProfile getProfile(User user);
     /**
-     * @param user TODO
+     * @param user user
      * @param profile user profile to save.
      */
     void saveProfile(User user, UserProfile profile);

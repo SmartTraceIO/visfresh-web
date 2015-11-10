@@ -3,13 +3,10 @@
  */
 package com.visfresh.dao.mock;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.LocationConstants;
 import com.visfresh.dao.LocationProfileDao;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.LocationProfile;
 
 /**
@@ -17,7 +14,8 @@ import com.visfresh.entities.LocationProfile;
  *
  */
 @Component
-public class MockLocationProfileDao extends MockDaoBase<LocationProfile, Long> implements LocationProfileDao {
+public class MockLocationProfileDao extends MockEntityWithCompanyDaoBase<LocationProfile, Long>
+        implements LocationProfileDao {
     /**
      * Default constructor.
      */
@@ -26,16 +24,48 @@ public class MockLocationProfileDao extends MockDaoBase<LocationProfile, Long> i
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.dao.LocationProfileDao#findByCompany(com.visfresh.entities.Company)
+     * @see com.visfresh.dao.mock.MockDaoBase#getValueForFilterOrCompare(java.lang.String, com.visfresh.entities.EntityWithId)
      */
     @Override
-    public List<LocationProfile> findByCompany(final Company company) {
-        final List<LocationProfile> list = new LinkedList<LocationProfile>();
-        for (final LocationProfile d : entities.values()) {
-            if (d.getCompany().getId().equals(company.getId())) {
-                list.add(d);
-            }
+    protected Object getValueForFilterOrCompare(final String property,
+            final LocationProfile t) {
+        if (property.equals(LocationConstants.PROPERTY_END_FLAG)) {
+            return t.isStop();
         }
-        return list;
+        if (property.equals(LocationConstants.PROPERTY_INTERIM_FLAG)) {
+            return t.isInterim();
+        }
+        if (property.equals(LocationConstants.PROPERTY_START_FLAG)) {
+            return t.isStart();
+        }
+        if (property.equals(LocationConstants.PROPERTY_RADIUS_METERS)) {
+            return t.getRadius();
+        }
+        if (property.equals(LocationConstants.PROPERTY_LON)) {
+            return t.getLocation().getLongitude();
+        }
+        if (property.equals(LocationConstants.PROPERTY_LAT)) {
+            return t.getLocation().getLatitude();
+        }
+        if (property.equals(LocationConstants.PROPERTY_LOCATION)) {
+            return t.getLocation();
+        }
+        if (property.equals(LocationConstants.PROPERTY_ADDRESS)) {
+            return t.getAddress();
+        }
+        if (property.equals(LocationConstants.PROPERTY_NOTES)) {
+            return t.getNotes();
+        }
+        if (property.equals(LocationConstants.PROPERTY_COMPANY_NAME)) {
+            return t.getCompanyName();
+        }
+        if (property.equals(LocationConstants.PROPERTY_LOCATION_NAME)) {
+            return t.getName();
+        }
+        if (property.equals(LocationConstants.PROPERTY_LOCATION_ID)) {
+            return t.getId();
+        }
+
+        return null;
     }
 }

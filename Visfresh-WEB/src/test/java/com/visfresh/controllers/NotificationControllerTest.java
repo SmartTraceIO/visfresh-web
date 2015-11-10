@@ -53,7 +53,7 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
      */
     @Before
     public void setUp() throws Exception {
-        user = context.getBean(UserDao.class).findAll().get(0);
+        user = context.getBean(UserDao.class).findAll(null, null, null).get(0);
         deviceDao = context.getBean(DeviceDao.class);
         alertDao = context.getBean(AlertDao.class);
         arrivalDao = context.getBean(ArrivalDao.class);

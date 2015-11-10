@@ -30,37 +30,14 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      * Table name.
      */
     public static final String TABLE = "trackerevents";
-    /**
-     * ID field.
-     */
+
     protected static final String ID_FIELD = "id";
-    /**
-     * Event type.
-     */
     protected static final String TYPE_FIELD = "type";
-    /**
-     * Event time.
-     */
     protected static final String TIME_FIELD = "time";
-    /**
-     * Battery level.
-     */
     protected static final String BATTERY_FIELD = "battery";
-    /**
-     * Temperature.
-     */
     protected static final String TEMPERATURE_FIELD = "temperature";
-    /**
-     * latitude.
-     */
     protected static final String LATITUDE_FIELD = "latitude";
-    /**
-     * Longitude.
-     */
     protected static final String LONGITUDE_FIELD = "longitude";
-    /**
-     * Device ID.
-     */
     protected static final String DEVICE_FIELD = "device";
     private static final String SHIPMENT_FIELD = "shipment";
 
@@ -124,150 +101,6 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         }
         return fields;
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
-     */
-    @Override
-    public TrackerEvent findOne(final Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        final String entityName = "a";
-        final String companyEntityName = "c";
-        final String resultPrefix = "a_";
-        final String companyResultPrefix = "c_";
-        final String deviceEntityName = "d";
-        final String deviceResultPrefix = "d_";
-
-        final List<Map<String, Object>> list = runSelectScript(id, entityName,
-                companyEntityName, resultPrefix, companyResultPrefix,
-                deviceEntityName, deviceResultPrefix);
-        return list.size() == 0 ? null : createTrackerEvent(resultPrefix, deviceResultPrefix, companyResultPrefix, list.get(0));
-    }
-    /**
-     * @param resultPrefix
-     * @param deviceResultPrefix
-     * @param companyResultPrefix
-     * @param map
-     * @return
-     */
-    private TrackerEvent createTrackerEvent(final String resultPrefix, final String deviceResultPrefix,
-            final String companyResultPrefix, final Map<String, Object> map) {
-        final TrackerEvent a = createTrackerEvent(map, resultPrefix);
-        a.setDevice(DeviceDaoImpl.createDevice(deviceResultPrefix, companyResultPrefix, map));
-        a.setShipment(shipmentDao.findOne(((Number) map.get(resultPrefix + SHIPMENT_FIELD)).longValue()));
-        return a;
-    }
-    /**
-     * @param map
-     * @param resultPrefix
-     * @return
-     */
-    public static TrackerEvent createTrackerEvent(final Map<String, Object> map,
-            final String resultPrefix) {
-        final TrackerEvent a = new TrackerEvent();
-        a.setId(((Number) map.get(resultPrefix + ID_FIELD)).longValue());
-        a.setBattery(((Number) map.get(resultPrefix + BATTERY_FIELD)).intValue());
-        a.setTemperature(((Number) map.get(resultPrefix + TEMPERATURE_FIELD)).doubleValue());
-        a.setLatitude(((Number) map.get(resultPrefix + LATITUDE_FIELD)).doubleValue());
-        a.setLongitude(((Number) map.get(resultPrefix + LONGITUDE_FIELD)).doubleValue());
-        a.setTime((Date) map.get(resultPrefix + TIME_FIELD));
-        a.setType((String) map.get(resultPrefix + TYPE_FIELD));
-        return a;
-    }
-    /**
-     * @param id
-     * @param entityName
-     * @param companyEntityName
-     * @param resultPrefix
-     * @param companyResultPrefix
-     * @param deviceEntityName
-     * @param deviceResultPrefix
-     * @return
-     */
-    private List<Map<String, Object>> runSelectScript(final Long id,
-            final String entityName, final String companyEntityName,
-            final String resultPrefix, final String companyResultPrefix,
-            final String deviceEntityName, final String deviceResultPrefix) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_FIELD, id);
-
-        final Map<String, String> fields = createSelectAsMapping(entityName, resultPrefix);
-        final Map<String, String> companyFields = CompanyDaoImpl.createSelectAsMapping(
-                companyEntityName, companyResultPrefix);
-        final Map<String, String> deviceFields = DeviceDaoImpl.createSelectAsMapping(
-                deviceEntityName, deviceResultPrefix);
-
-        params.putAll(fields);
-        params.putAll(companyFields);
-        params.putAll(deviceFields);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select "
-                + buildSelectAs(fields)
-                + ", " + buildSelectAs(deviceFields)
-                + ", " + buildSelectAs(companyFields)
-                + " from "
-                + TABLE + " " + entityName
-                + ", " + DeviceDaoImpl.TABLE + " " + deviceEntityName
-                + ", " + CompanyDaoImpl.TABLE + " " + companyEntityName
-                + " where "
-                + entityName + "." + DEVICE_FIELD + " = "
-                + deviceEntityName + "." + DeviceDaoImpl.IMEI_FIELD
-                + " and " + deviceEntityName + "." + DeviceDaoImpl.COMPANY_FIELD + " = "
-                + companyEntityName + "." + CompanyDaoImpl.ID_FIELD
-                + (id == null ? "" : " and " + entityName + "." + ID_FIELD + " = :id"),
-                params);
-        return list;
-    }
-    /**
-     * @param entityName
-     * @param resultPrefix
-     * @return
-     */
-    private Map<String, String> createSelectAsMapping(final String entityName,
-            final String resultPrefix) {
-        final Map<String, String> map = new HashMap<String, String>();
-        for (final String field : getFields(true)) {
-            map.put(entityName + "." + field, resultPrefix + field);
-        }
-        return map;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findAll()
-     */
-    @Override
-    public List<TrackerEvent> findAll() {
-        final String entityName = "a";
-        final String companyEntityName = "c";
-        final String resultPrefix = "a_";
-        final String companyResultPrefix = "c_";
-        final String deviceEntityName = "d";
-        final String deviceResultPrefix = "d_";
-
-        final List<Map<String, Object>> list = runSelectScript(null, entityName, companyEntityName, resultPrefix,
-                companyResultPrefix, deviceEntityName, deviceResultPrefix);
-
-        final List<TrackerEvent> result = new LinkedList<TrackerEvent>();
-        for (final Map<String,Object> map : list) {
-            result.add(createTrackerEvent(resultPrefix, deviceResultPrefix, companyResultPrefix, map));
-        }
-        return result;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
-     */
-    @Override
-    public void delete(final Long id) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-        jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
-    }
-
     /* (non-Javadoc)
      * @see com.visfresh.dao.TrackerEventDao#getEvents(com.visfresh.entities.Shipment, java.util.Date, java.util.Date)
      */
@@ -278,22 +111,20 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         params.put("shipment", shipment.getId());
         params.put("fromDate", fromDate);
         params.put("toDate", toDate);
-        final Map<String, String> fields = createSelectAsMapping("a", "res");
 
         final List<Map<String, Object>> list = jdbc.queryForList(
-                "select "
-                + buildSelectAs(fields)
-                + " from "
-                + TABLE + " a"
+                "select * from "
+                + TABLE
                 + " where "
-                + "a." + SHIPMENT_FIELD + " =:shipment"
+                + SHIPMENT_FIELD + " =:shipment"
                 + " and time >= :fromDate and time <= :toDate order by time, id",
                 params);
+
+        final Map<String, Object> cache = new HashMap<String, Object>();
         final List<TrackerEvent> events = new LinkedList<TrackerEvent>();
         for (final Map<String,Object> row : list) {
-            final TrackerEvent e = createTrackerEvent(row, "res");
-            e.setShipment(shipment);
-            e.setDevice(shipment.getDevice());
+            final TrackerEvent e = createEntity(row);
+            resolveReferences(e, row, cache);
             events.add(e);
         }
         return events;
@@ -367,5 +198,62 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         }
 
         return (Date) rows.get(0).get("time");
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
+     */
+    @Override
+    protected Map<String, String> getPropertyToDbMap() {
+        return new HashMap<String, String>();
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
+     */
+    @Override
+    protected String getTableName() {
+        return TABLE;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
+     */
+    @Override
+    protected String getIdFieldName() {
+        return ID_FIELD;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final TrackerEvent e, final Map<String, Object> row,
+            final Map<String, Object> cache) {
+        final String shipmentId = row.get(SHIPMENT_FIELD).toString();
+        Shipment shipment = (Shipment) cache.get(shipmentId);
+        if (shipment == null) {
+            shipment = shipmentDao.findOne(Long.valueOf(shipmentId));
+            cache.put(shipmentId, shipment);
+        }
+
+        e.setShipment(shipment);
+        e.setDevice(shipment.getDevice());
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
+     */
+    @Override
+    protected TrackerEvent createEntity(final Map<String, Object> map) {
+        final TrackerEvent a = new TrackerEvent();
+        a.setId(((Number) map.get(ID_FIELD)).longValue());
+        a.setBattery(((Number) map.get(BATTERY_FIELD)).intValue());
+        a.setTemperature(((Number) map.get(TEMPERATURE_FIELD)).doubleValue());
+        a.setLatitude(((Number) map.get(LATITUDE_FIELD)).doubleValue());
+        a.setLongitude(((Number) map.get(LONGITUDE_FIELD)).doubleValue());
+        a.setTime((Date) map.get(TIME_FIELD));
+        a.setType((String) map.get(TYPE_FIELD));
+        return a;
     }
 }

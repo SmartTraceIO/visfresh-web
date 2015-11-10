@@ -3,8 +3,6 @@
  */
 package com.visfresh.controllers;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
 import com.visfresh.dao.AlertProfileDao;
+import com.visfresh.dao.Page;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
@@ -30,7 +29,7 @@ import com.visfresh.io.EntityJSonSerializer;
  */
 @Controller("AlertProfile")
 @RequestMapping("/rest")
-public class AlertProfileController extends AbstractController {
+public class AlertProfileController extends AbstractController implements AlertProfileConstants {
     /**
      * Logger.
      */
@@ -129,8 +128,7 @@ public class AlertProfileController extends AbstractController {
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
             ) {
-        final int page = pageIndex == null ? 1 : pageIndex.intValue();
-        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
             //check logged in.
@@ -138,11 +136,13 @@ public class AlertProfileController extends AbstractController {
             security.checkCanGetAlertProfiles(user);
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<AlertProfile> profiles = dao.findByCompany(user.getCompany());
-            sort(profiles, sc, so);
+            final List<AlertProfile> alerts = dao.findByCompany(
+                    user.getCompany(),
+                    createSorting(sc, so, getDefaultSortOrder()),
+                    page,
+                    null);
+            final int total = dao.getEntityCount(user.getCompany(), null);
 
-            final int total = profiles.size();
-            final List<AlertProfile> alerts = getPage(profiles, page, size);
             final JsonArray array = new JsonArray();
             for (final AlertProfile a : alerts) {
                 array.add(ser.toJson(a));
@@ -154,28 +154,14 @@ public class AlertProfileController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-
     /**
-     * @param profiles
-     * @param sc
-     * @param so
+     * @return default sort order.
      */
-    private void sort(final List<AlertProfile> profiles, final String sc, final String so) {
-        final boolean ascent = !"desc".equals(so);
-        Collections.sort(profiles, new Comparator<AlertProfile>() {
-            /* (non-Javadoc)
-             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-             */
-            @Override
-            public int compare(final AlertProfile o1, final AlertProfile o2) {
-                if ("alertProfileName".equalsIgnoreCase(sc)) {
-                    return compareTo(o1.getName(), o2.getName(), ascent);
-                }
-                if ("alertProfileDescription".equalsIgnoreCase(sc)) {
-                    return compareTo(o1.getDescription(), o2.getDescription(), ascent);
-                }
-                return compareTo(o1.getId(), o2.getId(), ascent);
-            }
-        });
+    private String[] getDefaultSortOrder() {
+        return new String[] {
+            PROPERTY_ALERT_PROFILE_ID,
+            PROPERTY_ALERT_PROFILE_NAME,
+            PROPERTY_ALERT_PROFILE_DESCRIPTION
+        };
     }
 }

@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
 import com.visfresh.dao.CompanyDao;
+import com.visfresh.dao.Page;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
 
@@ -26,7 +28,7 @@ import com.visfresh.entities.User;
  */
 @Controller("Company")
 @RequestMapping("/rest")
-public class CompanyController extends AbstractController {
+public class CompanyController extends AbstractController implements CompanyConstants {
     /**
      * Logger.
      */
@@ -74,23 +76,20 @@ public class CompanyController extends AbstractController {
      */
     @RequestMapping(value = "/getCompanies/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String getCompanies(@PathVariable final String authToken,
-            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
-
-        final int page = pageIndex == null ? 1 : pageIndex.intValue();
-        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+            @RequestParam(required = false) final Integer pageIndex,
+            @RequestParam(required = false) final Integer pageSize) {
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetCompanies(user);
 
-            final List<Company> companies = dao.findAll();
-            sort(companies);
+            final List<Company> companies = dao.findAll(null, new Sorting(getDefaultSortOrder()), page);
+            final int total = dao.getEntityCount(null);
 
-            final int total = companies.size();
-            final List<Company> company = getPage(companies, page, size);
             final JsonArray array = new JsonArray();
-            for (final Company c : company) {
+            for (final Company c : companies) {
                 array.add(getSerializer(user).toJson(c));
             }
             return createListSuccessResponse(array, total);
@@ -100,9 +99,12 @@ public class CompanyController extends AbstractController {
         }
     }
     /**
-     * @param companies
+     * @return default sort order.
      */
-    private void sort(final List<Company> companies) {
-        sortById(companies, true);
+    private String[] getDefaultSortOrder() {
+        return new String[] {
+            PROPERTY_NAME,
+            PROPERTY_ID
+        };
     }
 }

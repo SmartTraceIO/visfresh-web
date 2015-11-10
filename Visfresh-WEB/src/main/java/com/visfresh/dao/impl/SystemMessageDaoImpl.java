@@ -96,76 +96,6 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, Long> imple
 
         return msg;
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
-     */
-    @Override
-    public SystemMessage findOne(final Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        final String entityName = "msg";
-        final String resultPrefix = "msg_";
-
-        final List<Map<String, Object>> list = runSelectScript(id, entityName,
-                resultPrefix);
-        return list.size() == 0 ? null : createSystemMessage(list.get(0), resultPrefix);
-    }
-
-    /**
-     * @param id
-     * @param entityName
-     * @param resultPrefix
-     * @return
-     */
-    private List<Map<String, Object>> runSelectScript(final Long id,
-            final String entityName, final String resultPrefix) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_FIELD, id);
-
-        final Map<String, String> fields = createSelectAsMapping(entityName, resultPrefix);
-        params.putAll(fields);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-            "select * from "
-            + TABLE + " " + entityName
-            + (id == null ? "" : " where " + entityName + "." + ID_FIELD + " = :id"),
-            params);
-        return list;
-    }
-    /**
-     * Create alert with unresolved references.
-     * @param map parameter map.
-     * @param resultPrefix
-     * @return
-     */
-    public static SystemMessage createSystemMessage(final Map<String, Object> map, final String resultPrefix) {
-        final SystemMessage m = new SystemMessage();
-        m.setId(((Number) map.get(ID_FIELD)).longValue());
-        m.setTime((Date) map.get(TYME_FIELD));
-        m.setType(SystemMessageType.valueOf((String) map.get(TYPE_FIELD)));
-        m.setProcessor((String) map.get(PROCESSOR_FIELD));
-        m.setRetryOn((Date) map.get(RETRYON_FIELD));
-        m.setNumberOfRetry(((Number) map.get(NUMRETRY_FIELD)).intValue());
-        m.setMessageInfo((String) map.get(MESSAGE_FIELD));
-        return m;
-    }
-
-    /**
-     * @param entityName
-     * @param resultPrefix
-     * @return
-     */
-    private Map<String, String> createSelectAsMapping(final String entityName,
-            final String resultPrefix) {
-        final Map<String, String> map = new HashMap<String, String>();
-        for (final String field : createFieldList()) {
-            map.put(entityName + "." + field, resultPrefix + field);
-        }
-        return map;
-    }
     /**
      * @return list of field names.
      */
@@ -180,34 +110,6 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, Long> imple
         list.add(MESSAGE_FIELD);
         return list;
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findAll()
-     */
-    @Override
-    public List<SystemMessage> findAll() {
-        final String entityName = "msg";
-        final String resultPrefix = "msg_";
-
-        final List<Map<String, Object>> list = runSelectScript(null, entityName, resultPrefix);
-
-        final List<SystemMessage> result = new LinkedList<SystemMessage>();
-        for (final Map<String,Object> map : list) {
-            result.add(createSystemMessage(map, resultPrefix));
-        }
-        return result;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
-     */
-    @Override
-    public void delete(final Long id) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-        jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
-    }
-
     /* (non-Javadoc)
      * @see com.visfresh.dao.SystemMessageDao#selectMessagesForProcessing(java.util.Set, java.lang.String)
      */
@@ -246,8 +148,54 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, Long> imple
 
         final LinkedList<SystemMessage> result = new LinkedList<SystemMessage>();
         for (final Map<String,Object> row : list) {
-            result.add(createSystemMessage(row, ""));
+            result.add(createEntity(row));
         }
         return result;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
+     */
+    @Override
+    protected Map<String, String> getPropertyToDbMap() {
+        return new HashMap<String, String>();
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
+     */
+    @Override
+    protected String getTableName() {
+        return TABLE;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
+     */
+    @Override
+    protected String getIdFieldName() {
+        return ID_FIELD;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final SystemMessage t, final Map<String, Object> map,
+            final Map<String, Object> cache) {
+        // nothing to resolve.
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
+     */
+    @Override
+    protected SystemMessage createEntity(final Map<String, Object> map) {
+        final SystemMessage m = new SystemMessage();
+        m.setId(((Number) map.get(ID_FIELD)).longValue());
+        m.setTime((Date) map.get(TYME_FIELD));
+        m.setType(SystemMessageType.valueOf((String) map.get(TYPE_FIELD)));
+        m.setProcessor((String) map.get(PROCESSOR_FIELD));
+        m.setRetryOn((Date) map.get(RETRYON_FIELD));
+        m.setNumberOfRetry(((Number) map.get(NUMRETRY_FIELD)).intValue());
+        m.setMessageInfo((String) map.get(MESSAGE_FIELD));
+        return m;
     }
 }

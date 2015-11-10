@@ -4,7 +4,6 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +15,10 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.Filter;
 import com.visfresh.dao.NotificationDao;
+import com.visfresh.dao.Page;
+import com.visfresh.dao.Sorting;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
@@ -48,10 +50,6 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * Reference ID to user.
      */
     public static final String USER_FIELD = "user";
-    /**
-     *
-     */
-    private static final String ID_PLACEHOLDER = "32_497803_29475";
 
     /**
      * User DAO.
@@ -79,26 +77,10 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * @see com.visfresh.dao.NotificationDao#findByShipment(java.lang.Long)
      */
     @Override
-    public List<Notification> findForUser(final User user) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_PLACEHOLDER, user.getLogin());
-
-        final Map<String, String> fields = createSelectAsMapping();
-
-        params.putAll(fields);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select " + buildSelectAs(fields) + " from " + TABLE + " where " + USER_FIELD + " = :"
-                        + ID_PLACEHOLDER,
-                params);
-        final Map<String, User> userCache = new HashMap<String, User>();
-        userCache.put(user.getLogin(), user);
-
-        final List<Notification> result = new LinkedList<Notification>();
-        for (final Map<String,Object> map : list) {
-            result.add(createNotification(map, userCache));
-        }
-        return result;
+    public List<Notification> findForUser(final User user, final Sorting sorting, final Filter filter, final Page page) {
+        final Filter f = new Filter(filter);
+        f.addFilter(USER_FIELD, user.getLogin());
+        return findAll(f, sorting, page);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.NotificationDao#deleteByUserAndId(com.visfresh.entities.User, java.util.List)
@@ -169,36 +151,59 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         return no;
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
+     * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
      */
     @Override
-    public Notification findOne(final Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        final List<Map<String, Object>> list = runSelectScript(id);
-        return list.size() == 0 ? null : createNotification(list.get(0), new HashMap<String, User>());
+    protected String getIdFieldName() {
+        return ID_FIELD;
     }
-    /**
-     * @param map
-     * @return
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getTableName()
      */
-    private Notification createNotification(final Map<String, Object> map,
-            final Map<String, User> userCache) {
+    @Override
+    protected String getTableName() {
+        return TABLE;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
+     */
+    @Override
+    protected Map<String, String> getPropertyToDbMap() {
+        return new HashMap<String, String>();
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.NotificationDao#getEntityCount(com.visfresh.entities.User, com.visfresh.dao.Filter)
+     */
+    @Override
+    public int getEntityCount(final User user, final Filter filter) {
+        final Filter f = new Filter(filter);
+        f.addFilter(USER_FIELD, user.getLogin());
+        return getEntityCount(f);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final Notification t, final Map<String, Object> map,
+            final Map<String, Object> userCache) {
+        final String userName = (String) map.get(USER_FIELD);
+        User user = (User) userCache.get(userName);
+        if (user == null) {
+            user = userDao.findOne(userName);
+            userCache.put(userName, user);
+        }
+        t.setUser(user);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
+     */
+    @Override
+    protected Notification createEntity(final Map<String, Object> map) {
         final Notification no = new Notification();
         no.setId(((Number) map.get(ID_FIELD)).longValue());
 
         final NotificationType type = NotificationType.valueOf((String) map.get(TYPE_FIELD));
         no.setType(type);
-
-        final String userName = (String) map.get(USER_FIELD);
-        User user = userCache.get(userName);
-        if (user == null) {
-            user = userDao.findOne(userName);
-            userCache.put(userName, user);
-        }
-        no.setUser(user);
 
         final long issueId = ((Number) map.get(ISSUE_FIELD)).longValue();
         if (type == NotificationType.Alert) {
@@ -208,60 +213,5 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         }
 
         return no;
-    }
-    /**
-     * @param id
-     * @return
-     */
-    private List<Map<String, Object>> runSelectScript(final Long id) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put(ID_PLACEHOLDER, id);
-
-        final Map<String, String> fields = createSelectAsMapping();
-
-        params.putAll(fields);
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select "
-                + buildSelectAs(fields)
-                + " from "
-                + TABLE
-                + (id == null ? "" : " where " + ID_FIELD + " = :" + ID_PLACEHOLDER),
-                params);
-        return list;
-    }
-    /**
-     * @return
-     */
-    private Map<String, String> createSelectAsMapping() {
-        final Map<String, String> map = new HashMap<String, String>();
-        map.put(ID_FIELD,  ID_FIELD);
-        map.put(TYPE_FIELD, TYPE_FIELD);
-        map.put(ISSUE_FIELD, ISSUE_FIELD);
-        map.put(USER_FIELD, USER_FIELD);
-        return map;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findAll()
-     */
-    @Override
-    public List<Notification> findAll() {
-        final List<Map<String, Object>> list = runSelectScript(null);
-
-        final Map<String, User> userCache = new HashMap<String, User>();
-        final List<Notification> result = new LinkedList<Notification>();
-        for (final Map<String,Object> map : list) {
-            result.add(createNotification(map, userCache));
-        }
-        return result;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)
-     */
-    @Override
-    public void delete(final Long id) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-        jdbc.update("delete from " + TABLE + " where " + ID_FIELD + " = :id", paramMap);
     }
 }

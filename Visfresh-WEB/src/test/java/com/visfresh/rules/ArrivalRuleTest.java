@@ -19,8 +19,6 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.rules.ArrivalRule;
-import com.visfresh.rules.RuleContext;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -105,7 +103,6 @@ public class ArrivalRuleTest extends BaseRuleTest {
         rule.handle(req);
 
         //check arrival created
-        assertEquals(1, context.getBean(ArrivalDao.class).findAll().size());
+        assertEquals(1, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
     }
-
 }

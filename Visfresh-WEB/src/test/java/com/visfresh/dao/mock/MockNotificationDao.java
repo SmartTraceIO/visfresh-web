@@ -12,7 +12,11 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.NotificationController;
+import com.visfresh.dao.Filter;
 import com.visfresh.dao.NotificationDao;
+import com.visfresh.dao.Page;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.User;
 
@@ -33,9 +37,21 @@ public class MockNotificationDao extends MockDaoBase<Notification, Long> impleme
      * @see com.visfresh.dao.NotificationDao#findForUser(com.visfresh.entities.User)
      */
     @Override
-    public List<Notification> findForUser(final User user) {
+    public List<Notification> findForUser(final User user, final Sorting sorting, final Filter filter, final Page page) {
+        final List<Notification> list = getAllByUser(user, sorting, filter);
+        return getPage(list, page);
+    }
+
+    /**
+     * @param user
+     * @param sorting
+     * @param filter
+     * @return
+     */
+    protected List<Notification> getAllByUser(final User user, final Sorting sorting,
+            final Filter filter) {
         final List<Notification> list = new LinkedList<Notification>();
-        for (final Notification n : entities.values()) {
+        for (final Notification n : findAll(filter, sorting, null)) {
             if (n.getUser().getId().equals(user.getId())) {
                 list.add(n);
             }
@@ -55,5 +71,25 @@ public class MockNotificationDao extends MockDaoBase<Notification, Long> impleme
                 iter.remove();
             }
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.NotificationDao#getEntityCount(com.visfresh.entities.User, com.visfresh.dao.Filter)
+     */
+    @Override
+    public int getEntityCount(final User user, final Filter filter) {
+        return getAllByUser(user, null, filter).size();
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.mock.MockDaoBase#getValueForFilterOrCompare(java.lang.String, com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected Object getValueForFilterOrCompare(final String property, final Notification t) {
+        if (property.equals(NotificationController.PROPERTY_ID)) {
+            return t.getId();
+        }
+        if (property.equals(NotificationController.PROPERTY_TYPE)) {
+            return t.getType();
+        }
+        throw new IllegalArgumentException("Undefined property: " + property);
     }
 }

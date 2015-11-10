@@ -3,12 +3,13 @@
  */
 package com.visfresh.dao.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.ShipmentTemplateConstants;
 import com.visfresh.dao.ShipmentTemplateDao;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.ShipmentTemplate;
 
 /**
@@ -19,15 +20,46 @@ import com.visfresh.entities.ShipmentTemplate;
 public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
     implements ShipmentTemplateDao {
 
-    public static final String ADDDATASHIPPED_FIELD = "adddatashipped";
-    public static final String DETECTLOCATION_FIELD = "detectlocation";
-    public static final String USECURRENTTIME_FIELD = "usecurrenttime";
+    private static final String ADDDATASHIPPED_FIELD = "adddatashipped";
+    private static final String DETECTLOCATION_FIELD = "detectlocation";
+    private static final String USECURRENTTIME_FIELD = "usecurrenttime";
 
+    private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     /**
      * Default constructor.
      */
     public ShipmentTemplateDaoImpl() {
         super();
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES,
+                SHUTDOWNTIMEOUT_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS,
+                NONOTIFSIFNOALERTS_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM,
+                ARRIVALNOTIFWITHIN_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_COMMENTS_FOR_RECEIVER,
+                COMMENTS_FIELD);
+//        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_MAX_TIMES_ALERT_FIRES, );
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES,
+                NOALERTIFCOODOWN_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_USE_CURRENT_TIME_FOR_DATE_SHIPPED,
+                USECURRENTTIME_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM,
+                DETECTLOCATION_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPPED_TO,
+                SHIPPEDTO_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPPED_FROM,
+                SHIPPEDFROM_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_ADD_DATE_SHIPPED,
+                ADDDATASHIPPED_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION,
+                DESCRIPTION_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME,
+                NAME_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_ID,
+                ID_FIELD);
+        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_ALERT_PROFILE_ID,
+                ALERT_FIELD);
+
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#createEntity()
@@ -40,9 +72,8 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
      * @see com.visfresh.dao.impl.ShipmentBaseDao#createEntity(java.util.Map, java.util.Map)
      */
     @Override
-    protected ShipmentTemplate createEntity(final Map<String, Object> map,
-            final Map<Long, Company> cache) {
-        final ShipmentTemplate tpl = super.createEntity(map, cache);
+    protected ShipmentTemplate createEntity(final Map<String, Object> map) {
+        final ShipmentTemplate tpl = super.createEntity(map);
         tpl.setAddDateShipped((Boolean) map.get(ADDDATASHIPPED_FIELD));
         tpl.setDetectLocationForShippedFrom((Boolean) map.get(DETECTLOCATION_FIELD));
         tpl.setUseCurrentTimeForDateShipped((Boolean) map.get(USECURRENTTIME_FIELD));
@@ -59,7 +90,7 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
         params.put(DETECTLOCATION_FIELD, s.isDetectLocationForShippedFrom());
         params.put(USECURRENTTIME_FIELD, s.isUseCurrentTimeForDateShipped());
         params.put(NAME_FIELD, s.getName());
-       return params;
+        return params;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#isTemplate()
@@ -67,5 +98,12 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
     @Override
     protected boolean isTemplate() {
         return true;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
+     */
+    @Override
+    protected Map<String, String> getPropertyToDbMap() {
+        return propertyToDbFields;
     }
 }

@@ -3,13 +3,10 @@
  */
 package com.visfresh.dao.mock;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.NotificationScheduleConstants;
 import com.visfresh.dao.NotificationScheduleDao;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 
@@ -18,7 +15,7 @@ import com.visfresh.entities.PersonSchedule;
  *
  */
 @Component
-public class MockNotificationScheduleDao extends MockDaoBase<NotificationSchedule, Long> implements NotificationScheduleDao {
+public class MockNotificationScheduleDao extends MockEntityWithCompanyDaoBase<NotificationSchedule, Long> implements NotificationScheduleDao {
     /**
      * Default constructor.
      */
@@ -26,19 +23,6 @@ public class MockNotificationScheduleDao extends MockDaoBase<NotificationSchedul
         super();
     }
 
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.LocationProfileDao#findByCompany(com.visfresh.entities.Company)
-     */
-    @Override
-    public List<NotificationSchedule> findByCompany(final Company company) {
-        final List<NotificationSchedule> list = new LinkedList<NotificationSchedule>();
-        for (final NotificationSchedule d : entities.values()) {
-            if (d.getCompany().getId().equals(company.getId())) {
-                list.add(d);
-            }
-        }
-        return list;
-    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.mock.MockDaoBase#save(com.visfresh.entities.EntityWithId)
      */
@@ -51,5 +35,22 @@ public class MockNotificationScheduleDao extends MockDaoBase<NotificationSchedul
             }
         }
         return ns;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.mock.MockDaoBase#getValueForFilterOrCompare(java.lang.String, com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    protected Object getValueForFilterOrCompare(final String property,
+            final NotificationSchedule t) {
+        if (property.equals(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_NAME)) {
+            return t.getName();
+        }
+        if (property.equals(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_ID)) {
+            return t.getId();
+        }
+        if (property.equals(NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_DESCRIPTION)) {
+            return t.getDescription();
+        }
+        throw new IllegalArgumentException("Unsupported property: " + property);
     }
 }

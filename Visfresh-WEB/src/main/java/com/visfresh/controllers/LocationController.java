@@ -3,8 +3,6 @@
  */
 package com.visfresh.controllers;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
 import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.Page;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.User;
 import com.visfresh.io.EntityJSonSerializer;
@@ -30,7 +29,7 @@ import com.visfresh.io.EntityJSonSerializer;
  */
 @Controller("Location")
 @RequestMapping("/rest")
-public class LocationController extends AbstractController {
+public class LocationController extends AbstractController implements LocationConstants {
     /**
      * Logger.
      */
@@ -80,8 +79,7 @@ public class LocationController extends AbstractController {
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
             ) {
-        final int page = pageIndex == null ? 1 : pageIndex.intValue();
-        final int size = pageSize == null ? Integer.MAX_VALUE : pageSize.intValue();
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
             //check logged in.
@@ -90,11 +88,12 @@ public class LocationController extends AbstractController {
 
             final EntityJSonSerializer ser = getSerializer(user);
 
-            final List<LocationProfile> ls = dao.findByCompany(user.getCompany());
-            sort(ls, sc, so);
+            final List<LocationProfile> locations = dao.findByCompany(user.getCompany(),
+                    createSorting(sc, so, getDefaultSortOrder()),
+                    page,
+                    null);
 
-            final int total = ls.size();
-            final List<LocationProfile> locations = getPage(ls, page, size);
+            final int total = dao.getEntityCount(user.getCompany(), null);
             final JsonArray array = new JsonArray();
             for (final LocationProfile location : locations) {
                 array.add(ser.toJson(location));
@@ -152,29 +151,15 @@ public class LocationController extends AbstractController {
         }
     }
     /**
-     * @param profiles
-     * @param sc
-     * @param so
+     * @return default sort order.
      */
-    private void sort(final List<LocationProfile> profiles, final String sc, final String so) {
-        final boolean ascent = !"desc".equals(so);
-        Collections.sort(profiles, new Comparator<LocationProfile>() {
-            /* (non-Javadoc)
-             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-             */
-            @Override
-            public int compare(final LocationProfile o1, final LocationProfile o2) {
-                if ("address".equalsIgnoreCase(sc)) {
-                    return compareTo(o1.getAddress(), o2.getAddress(), ascent);
-                } else if ("companyDescription".equalsIgnoreCase(sc)) {
-                    return compareTo(o1.getCompanyName(), o2.getCompanyName(), ascent);
-                } else if ("locationName".equalsIgnoreCase(sc)) {
-                    return compareTo(o1.getName(), o2.getName(), ascent);
-                } else if ("notes".equalsIgnoreCase(sc)) {
-                    return compareTo(o1.getNotes(), o2.getNotes(), ascent);
-                }
-                return compareTo(o1.getId(), o2.getId(), ascent);
-            }
-        });
+    private String[] getDefaultSortOrder() {
+        return new String[] {
+            PROPERTY_LOCATION_ID,
+            PROPERTY_LOCATION_NAME,
+            PROPERTY_COMPANY_NAME,
+            PROPERTY_ADDRESS,
+            PROPERTY_NOTES
+        };
     }
 }

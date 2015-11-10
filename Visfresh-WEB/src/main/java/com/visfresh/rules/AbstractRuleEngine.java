@@ -40,13 +40,14 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     private static final int TIME_ZONE_OFSET = TimeZone.getDefault().getRawOffset();
 
     @Autowired
-    protected SystemMessageDispatcher dispatcher;
+    private SystemMessageDispatcher dispatcher;
     @Autowired
     private TrackerEventDao eventDao;
     @Autowired
-    protected TrackerEventDao trackerEventDao;
+    private TrackerEventDao trackerEventDao;
     @Autowired
     private DeviceDao deviceDao;
+    private final EntityJSonSerializer jsonParser = new EntityJSonSerializer(TimeZone.getDefault());
     private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<String, TrackerEventRule>();
 
     private final TrackerEventRule emptyRule = new TrackerEventRule() {
@@ -81,7 +82,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         final JsonElement e = EntityJSonSerializer.parseJson(msg.getMessageInfo());
         log.debug("Native DCS event has received " + e);
 
-        final DeviceDcsNativeEvent event = new EntityJSonSerializer(TimeZone.getDefault()).parseDeviceDcsNativeEvent(
+        final DeviceDcsNativeEvent event = jsonParser.parseDeviceDcsNativeEvent(
                 e.getAsJsonObject());
         //convert the UTC time to local
         event.setDate(new Date(event.getTime().getTime() + TIME_ZONE_OFSET));
@@ -103,6 +104,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         final Device device = deviceDao.findByImei(imei);
         e.setDevice(device);
+
+        trackerEventDao.save(e);
 
         //process tracker event with rule engine.
         processTrackerEvent(e);
