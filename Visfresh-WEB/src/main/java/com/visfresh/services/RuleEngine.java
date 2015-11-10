@@ -3,7 +3,7 @@
  */
 package com.visfresh.services;
 
-import com.visfresh.entities.TrackerEvent;
+import com.visfresh.rules.RuleContext;
 import com.visfresh.rules.TrackerEventRule;
 
 /**
@@ -12,9 +12,9 @@ import com.visfresh.rules.TrackerEventRule;
  */
 public interface RuleEngine {
     /**
-     * @param e tracker event.
+     * @param context rule context
      */
-    void processTrackerEvent(TrackerEvent e);
+    void invokeRules(RuleContext context);
     /**
      * @param name rule name.
      * @return rule.

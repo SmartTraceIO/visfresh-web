@@ -5,6 +5,7 @@ package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.rules.DeviceState;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -136,5 +138,19 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals(sharedCompany.getId(), c.getId());
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
+    }
+    @Test
+    public void testDeviceState() {
+        final Device d = createDevice("3984709382475");
+        dao.save(d);
+
+        final DeviceState s = new DeviceState();
+
+        dao.saveState(d.getImei(), s);
+        assertNotNull(dao.getState(d.getImei()));
+
+        //test on delete trigger
+        dao.delete(d);
+        assertNull(dao.getState(d.getImei()));
     }
 }

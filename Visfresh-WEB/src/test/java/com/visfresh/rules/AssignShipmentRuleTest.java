@@ -17,9 +17,6 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.rules.AssignShipmentRule;
-import com.visfresh.rules.RuleContext;
-import com.visfresh.rules.TrackerEventRule;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -55,7 +52,7 @@ public class AssignShipmentRuleTest extends BaseRuleTest {
     @Test
     public void testAccept() {
         //not accepts because shipment not found
-        final RuleContext req = new RuleContext(event);
+        final RuleContext req = new RuleContext(event, new DeviceState());
         assertFalse(rule.accept(req));
 
         //create shipment but in final state
@@ -69,7 +66,7 @@ public class AssignShipmentRuleTest extends BaseRuleTest {
     @Test
     public void testHandle() {
         final Shipment s = createDefaultShipment(ShipmentStatus.InProgress, event.getDevice());
-        final RuleContext req = new RuleContext(event);
+        final RuleContext req = new RuleContext(event, new DeviceState());
 
         //try accept because should cache shipment in accept method.
         rule.accept(req);

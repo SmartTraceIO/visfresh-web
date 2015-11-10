@@ -4,6 +4,7 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.controllers.DeviceConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.entities.Device;
+import com.visfresh.rules.DeviceState;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -48,6 +50,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
     public static final String TRIPCOUNT_FIELD = "tripcount";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
+    private final DeviceStateSerializer stateSerializer = new DeviceStateSerializer();
     /**
      * Default constructor.
      */
@@ -159,5 +162,38 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
     @Override
     protected String getCompanyFieldName() {
         return COMPANY_FIELD;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceDao#getState(java.lang.String)
+     */
+    @Override
+    public DeviceState getState(final String imei) {
+        final Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("device", imei);
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select state as state from devicestates where device = :device", paramMap);
+        if (list.size() == 0) {
+            return null;
+        }
+
+        final String state = (String) list.get(0).get("state");
+        return stateSerializer.parseState(state);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceDao#save(java.lang.String, com.visfresh.rules.DeviceState)
+     */
+    @Override
+    public void saveState(final String imei, final DeviceState state) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("state", stateSerializer.toString(state));
+        params.put("device", imei);
+
+        if (getState(imei) == null) {
+            jdbc.update("insert into devicestates(device, state) values (:device, :state)", params);
+        } else {
+            jdbc.update("update devicestates set steate = :state where device = :device", params);
+        }
     }
 }

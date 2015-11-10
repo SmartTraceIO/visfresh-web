@@ -1,4 +1,5 @@
 -- drops
+drop table if exists devicestates;
 drop table if exists alertnotifschedules;
 drop table if exists arrivalnotifschedules;
 drop table if exists devicecommands;
@@ -287,4 +288,12 @@ create table systemmessages (
     numretry int not null default 0,
     message varchar(512) not null,
     PRIMARY KEY (id)
+);
+
+create table devicestates (
+    device varchar(20),
+    state longtext,
+    primary key (device),
+    foreign key (device)
+        references devices (imei) on delete cascade
 );

@@ -15,15 +15,18 @@ import com.visfresh.entities.TrackerEvent;
  */
 public class RuleContext {
     private final TrackerEvent event;
+    private final DeviceState state;
     private Map<Object, Object> clientProperties = new ConcurrentHashMap<Object, Object>();
     private Map<TrackerEventRule, Boolean> processedMap = new HashMap<TrackerEventRule, Boolean>();
 
     /**
      * @param e tracker event.
+     * @param state device rules state.
      */
-    public RuleContext(final TrackerEvent e) {
+    public RuleContext(final TrackerEvent e, final DeviceState state) {
         super();
         this.event = e;
+        this.state = state;
     }
     /**
      * @return the event
@@ -61,5 +64,11 @@ public class RuleContext {
         synchronized (processedMap) {
             return Boolean.TRUE == processedMap.get(rule);
         }
+    }
+    /**
+     * @return the session
+     */
+    public DeviceState getState() {
+        return state;
     }
 }

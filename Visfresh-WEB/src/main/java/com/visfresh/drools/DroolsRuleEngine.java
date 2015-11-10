@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.entities.TrackerEvent;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.RuleContext;
 
@@ -45,13 +44,13 @@ public class DroolsRuleEngine extends AbstractRuleEngine {
     }
 
     @Override
-    public void processTrackerEvent(final TrackerEvent e) {
-        log.debug("Tracker event has received " + e);
+    public void invokeRules(final RuleContext context) {
+        log.debug("Tracker event has received " + context.getEvent());
         final KieSession session = kie.newKieSession("ksession-rules");
 
         try {
             session.setGlobal("engine", this);
-            session.insert(new RuleContext(e));
+            session.insert(context);
             session.fireAllRules();
         } finally {
             session.destroy();

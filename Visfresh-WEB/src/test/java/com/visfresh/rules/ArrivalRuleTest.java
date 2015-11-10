@@ -51,7 +51,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         e.setTime(new Date());
         e.setType("AUT");
 
-        final RuleContext req = new RuleContext(e);
+        final RuleContext req = new RuleContext(e, new DeviceState());
         //final location not set
         assertFalse(rule.accept(req));
 
@@ -98,7 +98,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e);
+        final RuleContext req = new RuleContext(e, new DeviceState());
         rule.accept(req);
         rule.handle(req);
 

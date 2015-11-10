@@ -119,43 +119,33 @@ public class AbstractJsonSerializer {
      */
     public String formatDate(final Date date) {
         final TimeZone t = this.timeZone;
-        return formatTimeZone(date, t);
-    }
-    /**
-     * @param date
-     * @param t
-     * @return
-     */
-    public static String formatTimeZone(final Date date, final TimeZone t) {
         if (date == null) {
             return null;
         }
-        final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+
+        final SimpleDateFormat sdf = createDateFormat();
         sdf.setTimeZone(t);
         return sdf.format(date);
     }
-
     /**
      * @param str
      * @return
      */
     public Date parseDate(final String str) {
-        return parseDate(str, timeZone);
-    }
+        final SimpleDateFormat sdf = createDateFormat();
+        sdf.setTimeZone(timeZone);
 
-    /**
-     * @param str
-     * @param tz
-     * @return
-     */
-    public static Date parseDate(final String str, final TimeZone tz) {
-        final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-        sdf.setTimeZone(tz);
         try {
             return sdf.parse(str);
         } catch (final ParseException exc) {
             throw new RuntimeException(exc);
         }
+    }
+    /**
+     * @return date format.
+     */
+    protected SimpleDateFormat createDateFormat() {
+        return new SimpleDateFormat(DATE_FORMAT);
     }
     /**
      * @param text JSON text.
