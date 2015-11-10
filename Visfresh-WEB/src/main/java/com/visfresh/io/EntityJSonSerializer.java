@@ -19,7 +19,7 @@ import com.visfresh.controllers.AlertProfileConstants;
 import com.visfresh.controllers.CompanyConstants;
 import com.visfresh.controllers.DeviceConstants;
 import com.visfresh.controllers.LocationConstants;
-import com.visfresh.controllers.NotificationController;
+import com.visfresh.controllers.NotificationConstants;
 import com.visfresh.controllers.NotificationScheduleConstants;
 import com.visfresh.controllers.ShipmentConstants;
 import com.visfresh.controllers.ShipmentTemplateConstants;
@@ -635,8 +635,8 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
     }
     public Notification parseNotification(final JsonObject json) {
         final Notification n = new Notification();
-        n.setId(asLong(json.get(NotificationController.PROPERTY_ID)));
-        n.setType(NotificationType.valueOf(asString(json.get(NotificationController.PROPERTY_TYPE))));
+        n.setId(asLong(json.get(NotificationConstants.PROPERTY_ID)));
+        n.setType(NotificationType.valueOf(asString(json.get(NotificationConstants.PROPERTY_TYPE))));
 
         switch (n.getType()) {
             case Alert:
@@ -655,8 +655,8 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      */
     public JsonObject toJson(final Notification n) {
         final JsonObject obj = new JsonObject();
-        obj.addProperty(NotificationController.PROPERTY_ID, n.getId());
-        obj.addProperty(NotificationController.PROPERTY_TYPE, n.getType().name());
+        obj.addProperty(NotificationConstants.PROPERTY_ID, n.getId());
+        obj.addProperty(NotificationConstants.PROPERTY_TYPE, n.getType().name());
 
         final Object issue = n.getIssue();
         if (issue instanceof Alert) {

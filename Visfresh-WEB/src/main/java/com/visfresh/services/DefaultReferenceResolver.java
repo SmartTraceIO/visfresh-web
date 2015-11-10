@@ -1,18 +1,17 @@
 /**
  *
  */
-package com.visfresh.mock;
+package com.visfresh.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.ShipmentTemplateDao;
-import com.visfresh.dao.mock.MockAlertProfileDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -26,56 +25,55 @@ import com.visfresh.io.ReferenceResolver;
  *
  */
 @Component
-public class MockReferenceResolver implements ReferenceResolver {
-    @Autowired
-    private MockAlertProfileDao alertProfileDao;
-    @Autowired
-    private NotificationScheduleDao notificationScheduleDao;
+public class DefaultReferenceResolver implements ReferenceResolver {
     @Autowired
     private LocationProfileDao locationProfileDao;
     @Autowired
-    private ShipmentDao shipmentDao;
+    private AlertProfileDao alertProfileDao;
     @Autowired
-    private ShipmentTemplateDao shipmentTemplateDao;
+    private NotificationScheduleDao notificationScheduleDao;
     @Autowired
     private DeviceDao deviceDao;
+    @Autowired
+    private ShipmentDao shipmentDao;
     @Autowired
     private CompanyDao companyDao;
 
     /**
-     * Fefault constructor.
+     * Default constructor.
      */
-    public MockReferenceResolver() {
+    public DefaultReferenceResolver() {
         super();
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.controllers.ReferenceResolver#getLocationProfile(java.lang.Long)
+     * @see com.visfresh.io.ReferenceResolver#getLocationProfile(java.lang.Long)
      */
     @Override
     public LocationProfile getLocationProfile(final Long id) {
         return locationProfileDao.findOne(id);
     }
+
     /* (non-Javadoc)
-     * @see com.visfresh.controllers.ReferenceResolver#getAlertProfile(java.lang.Long)
+     * @see com.visfresh.io.ReferenceResolver#getAlertProfile(java.lang.Long)
      */
     @Override
     public AlertProfile getAlertProfile(final Long id) {
         return alertProfileDao.findOne(id);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.controllers.ReferenceResolver#getNotificationSchedule(java.lang.Long)
+     * @see com.visfresh.io.ReferenceResolver#getNotificationSchedule(java.lang.Long)
      */
     @Override
     public NotificationSchedule getNotificationSchedule(final Long id) {
         return notificationScheduleDao.findOne(id);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.controllers.ReferenceResolver#getDevice(java.lang.String)
+     * @see com.visfresh.io.ReferenceResolver#getDevice(java.lang.String)
      */
     @Override
-    public Device getDevice(final String imei) {
-        return deviceDao.findByImei(imei);
+    public Device getDevice(final String id) {
+        return deviceDao.findOne(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.io.ReferenceResolver#getShipment(java.lang.Long)

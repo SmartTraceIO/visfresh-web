@@ -39,12 +39,10 @@ public class CompanyControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetCompany() throws IOException, RestServiceException {
         final String description = "JUnit test company";
-        final Long id = 77777l;
         final String name = "Test Company";
 
         Company c = new Company();
         c.setDescription(description);
-        c.setId(id);
         c.setName(name);
 
         dao.save(c);
@@ -52,7 +50,6 @@ public class CompanyControllerTest extends AbstractRestServiceTest {
         c = facade.getCompany(c.getId());
 
         assertEquals(description, c.getDescription());
-        assertEquals(id, c.getId());
         assertEquals(name, c.getName());
     }
     @Test
@@ -60,13 +57,11 @@ public class CompanyControllerTest extends AbstractRestServiceTest {
         //create company
         Company c = new Company();
         c.setDescription("JUnit test company");
-        c.setId(7777l);
         c.setName("JUnit-C-1");
         dao.save(c);
 
         c = new Company();
         c.setDescription("JUnit test company");
-        c.setId(7778l);
         c.setName("JUnit-C-2");
         dao.save(c);
 

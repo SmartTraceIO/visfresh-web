@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.mpl.services;
+package com.visfresh.services;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -12,10 +12,6 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.User;
-import com.visfresh.services.AbstractAuthService;
-import com.visfresh.services.AuthToken;
-import com.visfresh.services.AuthenticationException;
-import com.visfresh.services.OpenJtsFacade;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

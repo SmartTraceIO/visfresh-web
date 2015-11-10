@@ -8,13 +8,13 @@ import java.util.Date;
 import org.junit.runner.RunWith;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DeviceDao;
-import com.visfresh.dao.mock.MockAlertProfileDao;
-import com.visfresh.dao.mock.MockLocationProfileDao;
-import com.visfresh.dao.mock.MockNotificationScheduleDao;
-import com.visfresh.dao.mock.MockShipmentDao;
-import com.visfresh.dao.mock.MockShipmentTemplateDao;
+import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.NotificationScheduleDao;
+import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -148,13 +148,13 @@ public abstract class AbstractRestServiceTest {
      * @param s
      */
     protected Long saveNotificationScheduleDirectly(final NotificationSchedule s) {
-        final MockNotificationScheduleDao dao = context.getBean(MockNotificationScheduleDao.class);
+        final NotificationScheduleDao dao = context.getBean(NotificationScheduleDao.class);
         s.setCompany(getCompany());
         dao.save(s);
         return s.getId();
     }
     protected Long saveAlertProfileDirectly(final AlertProfile p) {
-        final MockAlertProfileDao dao = context.getBean(MockAlertProfileDao.class);
+        final AlertProfileDao dao = context.getBean(AlertProfileDao.class);
         p.setCompany(getCompany());
         dao.save(p);
         return p.getId();
@@ -164,7 +164,7 @@ public abstract class AbstractRestServiceTest {
      * @param p
      */
     protected Long saveLocationDirectly(final LocationProfile p) {
-        final MockLocationProfileDao dao = context.getBean(MockLocationProfileDao.class);
+        final LocationProfileDao dao = context.getBean(LocationProfileDao.class);
         p.setCompany(getCompany());
         dao.save(p);
         return p.getId();
@@ -173,7 +173,7 @@ public abstract class AbstractRestServiceTest {
      * @param s
      */
     protected Long saveShipmentDirectly(final Shipment s) {
-        final MockShipmentDao dao = context.getBean(MockShipmentDao.class);
+        final ShipmentDao dao = context.getBean(ShipmentDao.class);
         s.setCompany(getCompany());
         dao.save(s);
         return s.getId();
@@ -182,7 +182,7 @@ public abstract class AbstractRestServiceTest {
      * @param t
      */
     protected Long saveShipmentTemplateDirectly(final ShipmentTemplate t) {
-        final MockShipmentTemplateDao dao = context.getBean(MockShipmentTemplateDao.class);
+        final ShipmentTemplateDao dao = context.getBean(ShipmentTemplateDao.class);
         t.setCompany(getCompany());
         dao.save(t);
         return t.getId();

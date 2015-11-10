@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.NotificationController;
+import com.visfresh.controllers.NotificationConstants;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.Page;
@@ -84,10 +84,10 @@ public class MockNotificationDao extends MockDaoBase<Notification, Long> impleme
      */
     @Override
     protected Object getValueForFilterOrCompare(final String property, final Notification t) {
-        if (property.equals(NotificationController.PROPERTY_ID)) {
+        if (property.equals(NotificationConstants.PROPERTY_ID)) {
             return t.getId();
         }
-        if (property.equals(NotificationController.PROPERTY_TYPE)) {
+        if (property.equals(NotificationConstants.PROPERTY_TYPE)) {
             return t.getType();
         }
         throw new IllegalArgumentException("Undefined property: " + property);

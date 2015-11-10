@@ -83,25 +83,33 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         p3.setDescription("a");
         saveAlertProfileDirectly(p3);
 
+        final int maxIndex = 2;
+
         //test sort by ID
-        AlertProfile first = facade.getAlertProfiles(1, 10000, "alertProfileId", "asc").get(0);
+        AlertProfile first = facade.getAlertProfiles(1, 10000,
+                AlertProfileConstants.PROPERTY_ALERT_PROFILE_ID, "asc").get(0);
         assertEquals(p1.getId(), first.getId());
 
-        first = facade.getAlertProfiles(1, 10000, "alertProfileId", "desc").get(0);
-        assertEquals(p3.getId(), first.getId());
+        first = facade.getAlertProfiles(1, 10000,
+                AlertProfileConstants.PROPERTY_ALERT_PROFILE_ID, "desc").get(maxIndex);
+        assertEquals(p1.getId(), first.getId());
 
         //test sort by name
-        first = facade.getAlertProfiles(1, 10000, "alertProfileName", "asc").get(0);
+        first = facade.getAlertProfiles(1, 10000,
+                AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME, "asc").get(0);
         assertEquals(p2.getId(), first.getId());
 
-        first = facade.getAlertProfiles(1, 10000, "alertProfileName", "desc").get(0);
-        assertEquals(p3.getId(), first.getId());
+        first = facade.getAlertProfiles(1, 10000,
+                AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME, "desc").get(maxIndex);
+        assertEquals(p2.getId(), first.getId());
 
         //test sort by description
-        first = facade.getAlertProfiles(1, 10000, "alertProfileDescription", "asc").get(0);
+        first = facade.getAlertProfiles(1, 10000,
+                AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION, "asc").get(0);
         assertEquals(p3.getId(), first.getId());
 
-        first = facade.getAlertProfiles(1, 10000, "alertProfileDescription", "desc").get(0);
-        assertEquals(p1.getId(), first.getId());
+        first = facade.getAlertProfiles(1, 10000,
+                AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION, "desc").get(maxIndex);
+        assertEquals(p3.getId(), first.getId());
     }
 }

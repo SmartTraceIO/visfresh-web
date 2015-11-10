@@ -10,8 +10,8 @@ import org.springframework.context.annotation.PropertySource;
 import com.visfresh.controllers.AbstractController;
 import com.visfresh.dao.impl.DaoImplBase;
 import com.visfresh.init.jdbc.JdbcConfig;
-import com.visfresh.mpl.services.DefaultAuthService;
 import com.visfresh.opengts.DefaultOpenJtsFacade;
+import com.visfresh.services.DefaultAuthService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

@@ -91,7 +91,6 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
 
         if (findOne(user.getId()) == null) {
             //insert
-            paramMap.put("id", user.getId());
             sql = "insert into " + TABLE + " (" + combine(
                     USERNAME_FIELD,
                     PASSWORD_FIELD,
@@ -167,18 +166,22 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("user", user.getLogin());
 
-        if (getProfile(user) == null) {
+        if (profile == null) {
             //create  profile record
+            jdbc.update("delete from " + PROFILE_TABLE + " where user = :user", params);
+        } else if (getProfile(user) == null) {
             jdbc.update("insert into " + PROFILE_TABLE + "(user) values (:user)", params);
-        } else {
-            //clear shipment links
-            jdbc.update("delete from " + USER_SHIPMENTS + " where user = :user", params);
         }
 
-        //link with shipments
-        for (final Shipment s : profile.getShipments()) {
-            params.put("shipment", s.getId());
-            jdbc.update("insert into " + USER_SHIPMENTS + "(user,shipment) values(:user, : shipment)", params);
+        //clear shipment links
+        jdbc.update("delete from " + USER_SHIPMENTS + " where user = :user", params);
+
+        if (profile != null) {
+            //link with shipments
+            for (final Shipment s : profile.getShipments()) {
+                params.put("shipment", s.getId());
+                jdbc.update("insert into " + USER_SHIPMENTS + "(user,shipment) values(:user, :shipment)", params);
+            }
         }
     }
     /* (non-Javadoc)

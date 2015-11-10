@@ -80,7 +80,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         //create company
         final Company c = new Company();
         c.setDescription("JUnit test company");
-        c.setId(7777l);
         c.setName("JUnit-C");
         companyDao.save(c);
 

@@ -3,11 +3,12 @@
  */
 package com.visfresh.dao.impl;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -102,42 +103,54 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
             sched.setId(keyHolder.getKey().longValue());
         }
 
-        deletePersonalSchedulesFor(sched.getId());
-        for (final PersonSchedule ps : sched.getSchedules()) {
-            savePersonalSchedule(sched.getId(), ps);
-        }
+        mergePersonSchedules(sched);
         return sched;
     }
 
-    private void savePersonalSchedule(final Long schedId, final PersonSchedule ps) {
-        final String sql = "insert into " + PERSONAL_SCHEDULE_TABLE + " (" + combine(
-                COMPANY_FIELD
-                , FIRSTNAME_FIELD
-                , LASTNAME_FIELD
-                , POSITION_FIELD
-                , SMS_FIELD
-                , EMAIL_FIELD
-                , PUSHTOMOBILEAPP_FIELD
-                , WEEKDAYS_FIELD
-                , FROMTIME_FIELD
-                , TOTIME_FIELD
-                , SCHEDULE_FIELD
-            ) + ")" + " values("
-                + ":"+ COMPANY_FIELD
-                + ", :" + FIRSTNAME_FIELD
-                + ", :" + LASTNAME_FIELD
-                + ", :" + POSITION_FIELD
-                + ", :" + SMS_FIELD
-                + ", :" + EMAIL_FIELD
-                + ", :" + PUSHTOMOBILEAPP_FIELD
-                + ", :" + WEEKDAYS_FIELD
-                + ", :" + FROMTIME_FIELD
-                + ", :" + TOTIME_FIELD
-                + ", :" + SCHEDULE_FIELD
-                + ")";
+    private void mergePersonSchedules(final NotificationSchedule s) {
+        //create old schedule ID set
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put(SCHEDULE_FIELD, s.getId());
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select id from "
+                + PERSONAL_SCHEDULE_TABLE
+                + " where " + SCHEDULE_FIELD + " = :" + SCHEDULE_FIELD,
+                params);
 
+        //create old ID set
+        final Set<Long> old = new HashSet<Long>();
+        for (final Map<String,Object> row : list) {
+            old.add(((Number) row.get("id")).longValue());
+        }
+
+        //save current person schedules.
+        for (final PersonSchedule ps : s.getSchedules()) {
+            savePersonalSchedule(s.getId(), ps);
+            old.remove(ps.getId());
+        }
+
+        //remove redundant
+        for (final Long id : old) {
+            final Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("id", id);
+            //delete personal schedule
+            jdbc.update("delete from " + PERSONAL_SCHEDULE_TABLE + " where id = :id",
+                    paramMap);
+        }
+    }
+
+    private void savePersonalSchedule(final Long schedId, final PersonSchedule ps) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put(ID_FIELD, ps.getId());
+        final List<String> fields = getPersonScheduleField(false);
+
+        final String sql;
+        if (ps.getId() == null) {
+            sql = createInsertScript(PERSONAL_SCHEDULE_TABLE, fields);
+        } else {
+            paramMap.put(ID_FIELD, ps.getId());
+            sql = createUpdateScript(PERSONAL_SCHEDULE_TABLE, fields, ID_FIELD);
+        }
+
         paramMap.put(COMPANY_FIELD, ps.getCompany());
         paramMap.put(FIRSTNAME_FIELD, ps.getFirstName());
         paramMap.put(LASTNAME_FIELD, ps.getLastName());
@@ -156,11 +169,29 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
             ps.setId(keyHolder.getKey().longValue());
         }
     }
+    private List<String> getPersonScheduleField(final boolean includeId) {
+        final List<String> fields = new LinkedList<String>();
+        if (includeId) {
+            fields.add(ID_FIELD);
+        }
+        fields.add(COMPANY_FIELD);
+        fields.add(FIRSTNAME_FIELD);
+        fields.add(LASTNAME_FIELD);
+        fields.add(POSITION_FIELD);
+        fields.add(SMS_FIELD);
+        fields.add(EMAIL_FIELD);
+        fields.add(PUSHTOMOBILEAPP_FIELD);
+        fields.add(WEEKDAYS_FIELD);
+        fields.add(FROMTIME_FIELD);
+        fields.add(TOTIME_FIELD);
+        fields.add(SCHEDULE_FIELD);
+        return fields;
+    }
     /**
      * @param id
      * @return
      */
-    private Collection<PersonSchedule> findPersonalSchedulesFor(final Long id) {
+    private List<PersonSchedule> findPersonalSchedulesFor(final Long id) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put(SCHEDULE_FIELD, id);
         final List<Map<String, Object>> list = jdbc.queryForList(
@@ -189,16 +220,6 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
         return result;
     }
 
-    /**
-     * @param id schedule ID.
-     */
-    private void deletePersonalSchedulesFor(final Long id) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-        //delete personal schedule
-        jdbc.update("delete from " + PERSONAL_SCHEDULE_TABLE + " where " + SCHEDULE_FIELD + " = :id",
-                paramMap);
-    }
     public String convertToDatabaseColumn(final boolean[] attribute) {
         final StringBuilder sb = new StringBuilder();
         for (final boolean b : attribute) {

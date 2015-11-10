@@ -252,4 +252,19 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     protected Map<String, String> getPropertyToDbMap() {
         return propertyToDbFields;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.String, java.lang.Object, java.util.Map, java.util.List)
+     */
+    @Override
+    protected void addFilterValue(final String key, final String dbFieldName, final Object value,
+            final Map<String, Object> params, final List<String> filters) {
+        if (STATUS_FIELD.equals(dbFieldName)) {
+            super.addFilterValue(key, dbFieldName, value == null ? null : value.toString(), params, filters);
+        } else if (DESCRIPTION_FIELD.equals(dbFieldName)){
+            params.put(key, "%" + value + "%");
+            filters.add(dbFieldName + " like :" + key);
+        } else {
+            super.addFilterValue(key, dbFieldName, value, params, filters);
+        }
+    }
 }

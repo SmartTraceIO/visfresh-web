@@ -19,11 +19,11 @@ import com.visfresh.init.jdbc.JdbcConfig;
 @EnableTransactionManagement
 @ComponentScan(basePackageClasses = {JdbcConfig.class, DaoImplBase.class})
 @PropertySource("classpath:/junit.app.properties")
-public class JUnitConfig {
+public class JUnitDbConfig {
     /**
      * Default constructor.
      */
-    public JUnitConfig() {
+    public JUnitDbConfig() {
         super();
     }
 }

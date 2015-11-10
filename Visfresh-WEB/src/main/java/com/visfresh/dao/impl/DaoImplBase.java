@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,8 @@ import com.visfresh.utils.StringUtils;
 @Component
 public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Serializable&Comparable<ID>>
         implements DaoBase<T, ID> {
+    private static final Logger log = LoggerFactory.getLogger(DaoImplBase.class);
+
     /**
      * JDBC template.
      */
@@ -153,12 +157,15 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
     protected void addSorts(final List<String> sorts, final Map<String, Object> params,
             final Sorting sorting, final Map<String, String> propertyToDbFields) {
         if (sorting != null) {
+            final boolean isAscent = sorting.isAscentDirection();
+
             for (final String property : sorting.getSortProperties()) {
                 final String field = propertyToDbFields.get(property);
                 if (field != null) {
-                    sorts.add(field);
+                    sorts.add(field + (isAscent ? " asc" : " desc"));
                 } else {
-                    throw new RuntimeException("Unsupported property name: " + property);
+                    sorts.add(property + (isAscent ? " asc" : " desc"));
+                    log.warn("Field mapping for given property " + property + " not found");
                 }
             }
         }
@@ -172,16 +179,30 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
             final List<String> filters, final Map<String, String> propertyToDbFields) {
         if (filter != null) {
             for (final String property : filter.getFilteredProperties()) {
+                final String key = "filter_" + property;
+                final Object value = filter.getFilter(property);
                 String field = propertyToDbFields.get(property);
                 if (field == null) {
                     field = property;
                 }
 
-                final String key = "filter_" + property;
-                params.put(key, filter.getFilter(property));
-                filters.add(field + "= :" + key);
+                addFilterValue(key, field, value, params, filters);
             }
         }
+    }
+
+    /**
+     * @param key
+     * @param dbFieldName
+     * @param value
+     * @param params
+     * @param filters
+     */
+    protected void addFilterValue(final String key, final String dbFieldName,
+            final Object value, final Map<String, Object> params,
+            final List<String> filters) {
+        params.put(key, value);
+        filters.add(dbFieldName + "= :" + key);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
@@ -207,7 +228,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         final List<Map<String, Object>> list = jdbc.queryForList(
                 "select count(*) as count from "
                 + getTableName()
-                + (filters.size() == 0 ? "" : "where " + StringUtils.combine(filters, " and ")),
+                + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")),
                 params);
         return ((Number) list.get(0).get("count")).intValue();
     }
@@ -239,8 +260,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
                 "select * from "
                 + getTableName()
                 + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and "))
-                + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ",")
-                        + (sorting.isAscentDirection() ? " asc" : " desc"))
+                + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ","))
                 + (page == null ? "" : " limit "
                         + ((page.getPageNumber() - 1) * page.getPageSize())
                         + "," + page.getPageSize()),

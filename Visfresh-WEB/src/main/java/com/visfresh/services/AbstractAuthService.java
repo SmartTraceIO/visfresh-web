@@ -54,10 +54,10 @@ public abstract class AbstractAuthService implements AuthService {
                 UserInfo u = users.get(login);
                 if (u == null) {
                     u = new UserInfo();
-                    u.setUser(user);
                     users.put(login, u);
                 }
 
+                u.setUser(user);
                 u.setToken(generateNewToken(user));
                 return u.getToken();
             }

@@ -24,22 +24,19 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.FrameworkServlet;
 
+import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.AlertProfileDao;
+import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.CompanyDao;
+import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.mock.MockAlertDao;
-import com.visfresh.dao.mock.MockAlertProfileDao;
-import com.visfresh.dao.mock.MockArrivalDao;
-import com.visfresh.dao.mock.MockCompanyDao;
-import com.visfresh.dao.mock.MockDeviceDao;
-import com.visfresh.dao.mock.MockLocationProfileDao;
-import com.visfresh.dao.mock.MockNotificationDao;
-import com.visfresh.dao.mock.MockNotificationScheduleDao;
-import com.visfresh.dao.mock.MockShipmentDao;
-import com.visfresh.dao.mock.MockShipmentTemplateDao;
-import com.visfresh.dao.mock.MockUserDao;
+import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -50,7 +47,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.init.mock.MockConfig;
 import com.visfresh.io.ReferenceResolver;
-import com.visfresh.mock.MockAuthService;
+import com.visfresh.services.AuthService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -108,7 +105,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
                 }
                 @Override
                 public AlertProfile getAlertProfile(final Long id) {
-                    final MockAlertProfileDao dao = context.getBean(MockAlertProfileDao.class);
+                    final AlertProfileDao dao = context.getBean(AlertProfileDao.class);
                     return dao.findOne(id);
                 }
             });
@@ -193,13 +190,13 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
     protected void runChild(final FrameworkMethod method, final RunNotifier notifier) {
         try {
             //create company
-            final Company c = new Company(1l);
+            final Company c = new Company();
             c.setName(SHARED_COMPANY_NAME);
             c.setDescription("JUnit company");
             context.getBean(CompanyDao.class).save(c);
 
             //create user
-            final MockAuthService service = context.getBean(MockAuthService.class);
+            final AuthService service = context.getBean(AuthService.class);
             final User user = new User();
             user.setLogin("anylogin");
             user.setCompany(c);
@@ -233,22 +230,23 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
         return test;
     }
 
-
     /**
      *
      */
     private void cleanUp() {
-        context.getBean(MockAlertProfileDao.class).clear();
-        context.getBean(MockLocationProfileDao.class).clear();
-        context.getBean(MockShipmentDao.class).clear();
-        context.getBean(MockShipmentTemplateDao.class).clear();
-        context.getBean(MockDeviceDao.class).clear();
-        context.getBean(MockCompanyDao.class).clear();
-        context.getBean(MockUserDao.class).clear();
-        context.getBean(MockAlertDao.class).clear();
-        context.getBean(MockArrivalDao.class).clear();
-        context.getBean(MockNotificationDao.class).clear();
-        context.getBean(MockNotificationScheduleDao.class).clear();
+        context.getBean(TrackerEventDao.class).deleteAll();
+        context.getBean(DeviceCommandDao.class).deleteAll();
+        context.getBean(NotificationDao.class).deleteAll();
+        context.getBean(AlertDao.class).deleteAll();
+        context.getBean(ArrivalDao.class).deleteAll();
+        context.getBean(ShipmentDao.class).deleteAll();
+        context.getBean(ShipmentTemplateDao.class).deleteAll();
+        context.getBean(AlertProfileDao.class).deleteAll();
+        context.getBean(LocationProfileDao.class).deleteAll();
+        context.getBean(NotificationScheduleDao.class).deleteAll();
+        context.getBean(DeviceDao.class).deleteAll();
+        context.getBean(UserDao.class).deleteAll();
+        context.getBean(CompanyDao.class).deleteAll();
     }
     /* (non-Javadoc)
      * @see java.lang.Object#finalize()

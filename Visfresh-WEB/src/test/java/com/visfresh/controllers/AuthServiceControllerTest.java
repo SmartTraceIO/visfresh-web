@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.entities.User;
-import com.visfresh.mock.MockAuthService;
+import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -20,7 +20,7 @@ import com.visfresh.services.RestServiceException;
  */
 public class AuthServiceControllerTest extends AbstractRestServiceTest {
 
-    private MockAuthService authService;
+    private AuthService authService;
 
     /**
      * Default constructor.
@@ -35,7 +35,7 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
      */
     @Before
     public void setUp() throws Exception {
-        authService = context.getBean(MockAuthService.class);
+        authService = context.getBean(AuthService.class);
     }
 
     //@RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -45,6 +45,7 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         final User user = new User();
         user.setLogin("aldsklksadf");
         final String password = "lkasdlfkj";
+        user.setCompany(getCompany());
 
         authService.createUser(user, password);
         final String token = facade.login(user.getLogin(), password);

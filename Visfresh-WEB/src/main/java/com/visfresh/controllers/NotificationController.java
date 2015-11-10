@@ -32,9 +32,7 @@ import com.visfresh.io.EntityJSonSerializer;
  */
 @Controller("Notification")
 @RequestMapping("/rest")
-public class NotificationController extends AbstractController {
-    public static final String PROPERTY_ID = "id";
-    public static final String PROPERTY_TYPE = "type";
+public class NotificationController extends AbstractController implements NotificationConstants {
     /**
      * Logger.
      */
