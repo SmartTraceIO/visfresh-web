@@ -4,6 +4,7 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -64,13 +65,13 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
     protected void assertCreateTestEntityOk(final AlertProfile p) {
         assertEquals(sharedCompany.getId(), p.getCompany().getId());
         assertEquals(10.10, p.getCriticalHighTemperature(), 0.00001);
-        assertEquals(10, p.getCriticalHighTemperatureForMoreThen());
+        assertEquals(10, p.getCriticalHighTemperatureForMoreThen().intValue());
         assertEquals(-20.20, p.getCriticalLowTemperature(), 0.00001);
         assertEquals("JUnit test alert pforile", p.getDescription());
         assertEquals(5.45, p.getHighTemperature(), 0.00001);
-        assertEquals(10, p.getHighTemperatureForMoreThen());
+        assertEquals(10, p.getHighTemperatureForMoreThen().intValue());
         assertEquals(-10.45, p.getLowTemperature(), 0.0001);
-        assertEquals(7, p.getLowTemperatureForMoreThen());
+        assertEquals(7, p.getLowTemperatureForMoreThen().intValue());
         assertEquals("JUnit-Alert", p.getName());
         assertTrue(p.isWatchBatteryLow());
         assertTrue(p.isWatchMovementStart());
@@ -132,13 +133,34 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertEquals(lowTemperature2, a.getLowTemperature2());
         assertEquals(lowTemperatureForMoreThen2, a.getLowTemperatureForMoreThen2());
     }
+    public void testNullValues() {
+        AlertProfile p = new AlertProfile();
+        p.setCompany(sharedCompany);
+        p.setName("Name");
+        dao.save(p);
+
+        p = dao.findOne(p.getId());
+
+        assertNull(p.getCriticalHighTemperature());
+        assertNull(p.getCriticalHighTemperature2());
+        assertNull(p.getCriticalHighTemperatureForMoreThen());
+        assertNull(p.getCriticalHighTemperatureForMoreThen2());
+        assertNull(p.getCriticalLowTemperature());
+        assertNull(p.getCriticalLowTemperature2());
+        assertNull(p.getCriticalLowTemperatureForMoreThen());
+        assertNull(p.getCriticalLowTemperatureForMoreThen2());
+        assertNull(p.getDescription());
+        assertNull(p.getHighTemperature());
+        assertNull(p.getHighTemperature2());
+        assertNull(p.getHighTemperatureForMoreThen());
+        assertNull(p.getHighTemperatureForMoreThen2());
+    }
     /**
      * @param c
      */
     private AlertProfile createAndSaveAlertProfile(final Company c) {
         return dao.save(createAlertProfile(c));
     }
-
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
      */
@@ -151,13 +173,13 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
 
         assertEquals(sharedCompany.getId(), p.getCompany().getId());
         assertEquals(10.10, p.getCriticalHighTemperature(), 0.00001);
-        assertEquals(10, p.getCriticalHighTemperatureForMoreThen());
+        assertEquals(10, p.getCriticalHighTemperatureForMoreThen().intValue());
         assertEquals(-20.20, p.getCriticalLowTemperature(), 0.00001);
         assertEquals("JUnit test alert pforile", p.getDescription());
         assertEquals(5.45, p.getHighTemperature(), 0.00001);
-        assertEquals(10, p.getHighTemperatureForMoreThen());
+        assertEquals(10, p.getHighTemperatureForMoreThen().intValue());
         assertEquals(-10.45, p.getLowTemperature(), 0.0001);
-        assertEquals(7, p.getLowTemperatureForMoreThen());
+        assertEquals(7, p.getLowTemperatureForMoreThen().intValue());
         assertEquals("JUnit-Alert", p.getName());
         assertTrue(p.isWatchBatteryLow());
         assertTrue(p.isWatchMovementStart());

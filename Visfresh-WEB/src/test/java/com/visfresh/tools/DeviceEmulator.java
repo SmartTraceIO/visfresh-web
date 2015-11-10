@@ -74,14 +74,14 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
 
         profile.setCompany(company);
         profile.setName(name);
-        profile.setHighTemperature(15);
+        profile.setHighTemperature(15.);
         profile.setHighTemperatureForMoreThen(5);
-        profile.setCriticalHighTemperature(20);
+        profile.setCriticalHighTemperature(20.);
         profile.setCriticalLowTemperatureForMoreThen(1);
         profile.setDescription("Development tool profile");
-        profile.setLowTemperature(3);
+        profile.setLowTemperature(3.);
         profile.setLowTemperatureForMoreThen(10);
-        profile.setCriticalLowTemperature(-5);
+        profile.setCriticalLowTemperature(-5.);
         profile.setCriticalHighTemperatureForMoreThen(1);
         profile.setWatchBatteryLow(true);
         profile.setWatchEnterBrightEnvironment(true);

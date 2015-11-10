@@ -142,9 +142,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      * @param alert alert profile.
      * @return JSON object.
      */
-    public JsonElement toJson(final AlertProfile alert) {
+    public JsonObject toJson(final AlertProfile alert) {
         if (alert == null) {
-            return JsonNull.INSTANCE;
+            return null;
         }
 
         final JsonObject obj = new JsonObject();

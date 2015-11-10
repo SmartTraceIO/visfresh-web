@@ -271,18 +271,25 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         no.setName((String) map.get(NAME_FIELD));
         no.setDescription((String) map.get(DESCRIPTION_FIELD));
 
-        no.setLowTemperature(((Number) map.get(LOWTEMP_FIELD)).doubleValue());
-        no.setLowTemperatureForMoreThen(((Number) map.get(LOWTEMPFORMORETHEN_FIELD)).intValue());
+        if (map.get(LOWTEMP_FIELD) != null) {
+            no.setLowTemperature(((Number) map.get(LOWTEMP_FIELD)).doubleValue());
+        }
+        if (map.get(LOWTEMPFORMORETHEN_FIELD) != null) {
+            no.setLowTemperatureForMoreThen(((Number) map.get(LOWTEMPFORMORETHEN_FIELD)).intValue());
+        }
         if (map.get(LOWTEMP_FIELD_2) != null) {
             no.setLowTemperature2(((Number) map.get(LOWTEMP_FIELD_2)).doubleValue());
         }
         if (map.get(LOWTEMPFORMORETHEN_FIELD_2) != null) {
             no.setLowTemperatureForMoreThen2(((Number) map.get(LOWTEMPFORMORETHEN_FIELD_2)).intValue());
         }
-
-        no.setCriticalLowTemperature(((Number) map.get(CRITICALLOWTEMP_FIELD)).doubleValue());
-        no.setCriticalLowTemperatureForMoreThen(
-                ((Number) map.get(CRITICALLOWTEMPFORMORETHEN_FIELD)).intValue());
+        if (map.get(CRITICALLOWTEMP_FIELD) != null) {
+            no.setCriticalLowTemperature(((Number) map.get(CRITICALLOWTEMP_FIELD)).doubleValue());
+        }
+        if (map.get(CRITICALLOWTEMPFORMORETHEN_FIELD) != null) {
+            no.setCriticalLowTemperatureForMoreThen(
+                    ((Number) map.get(CRITICALLOWTEMPFORMORETHEN_FIELD)).intValue());
+        }
         if (map.get(CRITICALLOWTEMP_FIELD_2) != null) {
             no.setCriticalLowTemperature2(((Number) map.get(CRITICALLOWTEMP_FIELD_2)).doubleValue());
         }
@@ -290,19 +297,25 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             no.setCriticalLowTemperatureForMoreThen2(
                     ((Number) map.get(CRITICALLOWTEMPFORMORETHEN_FIELD_2)).intValue());
         }
-
-        no.setHighTemperature(((Number) map.get(HIGHTEMP_FIELD)).doubleValue());
-        no.setHighTemperatureForMoreThen(((Number) map.get(HIGHTEMPFORMORETHEN_FIELD)).intValue());
+        if (map.get(HIGHTEMP_FIELD) != null) {
+            no.setHighTemperature(((Number) map.get(HIGHTEMP_FIELD)).doubleValue());
+        }
+        if (map.get(HIGHTEMPFORMORETHEN_FIELD) != null) {
+            no.setHighTemperatureForMoreThen(((Number) map.get(HIGHTEMPFORMORETHEN_FIELD)).intValue());
+        }
         if (map.get(HIGHTEMP_FIELD_2) != null) {
             no.setHighTemperature2(((Number) map.get(HIGHTEMP_FIELD_2)).doubleValue());
         }
         if (map.get(HIGHTEMPFORMORETHEN_FIELD_2) != null) {
             no.setHighTemperatureForMoreThen2(((Number) map.get(HIGHTEMPFORMORETHEN_FIELD_2)).intValue());
         }
-
-        no.setCriticalHighTemperature(((Number) map.get(CRITICALHIGHTEMP_FIELD)).doubleValue());
-        no.setCriticalHighTemperatureForMoreThen(
-                ((Number) map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD)).intValue());
+        if (map.get(CRITICALHIGHTEMP_FIELD) != null) {
+            no.setCriticalHighTemperature(((Number) map.get(CRITICALHIGHTEMP_FIELD)).doubleValue());
+        }
+        if (map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD) != null) {
+            no.setCriticalHighTemperatureForMoreThen(
+                    ((Number) map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD)).intValue());
+        }
         if (map.get(CRITICALHIGHTEMP_FIELD_2) != null) {
             no.setCriticalHighTemperature2(((Number) map.get(CRITICALHIGHTEMP_FIELD_2)).doubleValue());
         }

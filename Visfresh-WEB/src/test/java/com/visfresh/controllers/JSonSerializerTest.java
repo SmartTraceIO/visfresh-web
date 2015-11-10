@@ -90,15 +90,15 @@ public class JSonSerializerTest {
         final double criticalLowTemperature = -15.88;
         final String description = "Any description";
         final double highTemperature = 1.22;
-        final int highTemperatureForMoreThen = 55; // min
+        final Integer highTemperatureForMoreThen = 55; // min
         final Long id = 7L;
         final double lowTemperature = -10.33;
-        final int lowTemperatureForMoreThen = 55; //min
+        final Integer lowTemperatureForMoreThen = 55; //min
         final String name = "AnyName";
         final boolean watchBatteryLow = true;
         final boolean watchEnterBrightEnvironment = true;
         final boolean watchEnterDarkEnvironment = false;
-        final int criticalHighTemperatureForMoreThen = 91;
+        final Integer criticalHighTemperatureForMoreThen = 91;
         final int criticalLowTemperatureForMoreThen = 71;
         final boolean watchMovementStart = true;
         final boolean watchMovementStop = true;
@@ -139,7 +139,7 @@ public class JSonSerializerTest {
         assertEquals(watchMovementStart, p.isWatchMovementStart());
         assertEquals(watchMovementStop, p.isWatchMovementStop());
         assertEquals(criticalHighTemperatureForMoreThen, p.getCriticalHighTemperatureForMoreThen());
-        assertEquals(criticalLowTemperatureForMoreThen, p.getCriticalLowTemperatureForMoreThen());
+        assertEquals(criticalLowTemperatureForMoreThen, p.getCriticalLowTemperatureForMoreThen().intValue());
     }
     @Test
     public void testAlertProfile2() {
@@ -174,6 +174,11 @@ public class JSonSerializerTest {
         assertEquals(highTemperatureForMoreThen2, p.getHighTemperatureForMoreThen2());
         assertEquals(lowTemperature2, p.getLowTemperature2());
         assertEquals(lowTemperatureForMoreThen2, p.getLowTemperatureForMoreThen2());
+    }
+    @Test
+    public void testAlertProfileNullValues() {
+        AlertProfile p = new AlertProfile();
+        p = serializer.parseAlertProfile(serializer.toJson(p));
     }
 
     @Test
@@ -927,13 +932,13 @@ public class JSonSerializerTest {
      */
     private AlertProfile createAlertProfile() {
         final AlertProfile p = new AlertProfile();
-        p.setCriticalHighTemperature(5);
-        p.setCriticalLowTemperature(-15);
+        p.setCriticalHighTemperature(5.);
+        p.setCriticalLowTemperature(-15.);
         p.setDescription("Any description");
-        p.setHighTemperature(1);
+        p.setHighTemperature(1.);
         p.setHighTemperatureForMoreThen(55);
         p.setId(generateId());
-        p.setLowTemperature(-10);
+        p.setLowTemperature(-10.);
         p.setLowTemperatureForMoreThen(55);
         p.setName("AnyAlert");
         p.setWatchBatteryLow(true);

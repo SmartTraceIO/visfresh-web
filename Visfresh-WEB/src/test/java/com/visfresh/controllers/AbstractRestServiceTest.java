@@ -76,22 +76,22 @@ public abstract class AbstractRestServiceTest {
         p.setName("AnyAlert");
         p.setDescription("Any description");
 
-        p.setCriticalHighTemperature(10);
+        p.setCriticalHighTemperature(10.);
         p.setCriticalHighTemperatureForMoreThen(0);
         p.setCriticalHighTemperature2(9.);
         p.setCriticalHighTemperatureForMoreThen2(1);
 
-        p.setCriticalLowTemperature(-15);
+        p.setCriticalLowTemperature(-15.);
         p.setCriticalLowTemperatureForMoreThen(0);
         p.setCriticalLowTemperature2(-14.);
         p.setCriticalLowTemperatureForMoreThen2(1);
 
-        p.setHighTemperature(5);
+        p.setHighTemperature(5.);
         p.setHighTemperatureForMoreThen(0);
         p.setHighTemperature2(4.);
         p.setHighTemperatureForMoreThen2(2);
 
-        p.setLowTemperature(-10);
+        p.setLowTemperature(-10.);
         p.setLowTemperatureForMoreThen(40);
         p.setLowTemperature2(-8.);
         p.setLowTemperatureForMoreThen2(55);

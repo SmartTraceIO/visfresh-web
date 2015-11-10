@@ -28,11 +28,11 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * The low temperature.
      */
-    private double lowTemperature;
+    private Double lowTemperature;
     /**
      * Alert for low temperature more then given value in minutes.
      */
-    private int lowTemperatureForMoreThen;
+    private Integer lowTemperatureForMoreThen;
     /**
      * The low temperature.
      */
@@ -44,11 +44,11 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * Critical low temperature
      */
-    private double criticalLowTemperature;
+    private Double criticalLowTemperature;
     /**
      * Alert for critical low temperature more then given value in minutes.
      */
-    private int criticalLowTemperatureForMoreThen;
+    private Integer criticalLowTemperatureForMoreThen;
     /**
      * Critical low temperature
      */
@@ -60,11 +60,11 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * High temperature
      */
-    private double highTemperature;
+    private Double highTemperature;
     /**
      * Alert for high temperature more then given value in minutes.
      */
-    private int highTemperatureForMoreThen;
+    private Integer highTemperatureForMoreThen;
     /**
      * High temperature
      */
@@ -76,11 +76,11 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * Critical high temperature
      */
-    private double criticalHighTemperature;
+    private Double criticalHighTemperature;
     /**
      * Alert for critical high temperature more then given value in minutes.
      */
-    private int criticalHighTemperatureForMoreThen;
+    private Integer criticalHighTemperatureForMoreThen;
     /**
      * Critical high temperature
      */
@@ -152,73 +152,73 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * @return the lowTemperature
      */
-    public double getLowTemperature() {
+    public Double getLowTemperature() {
         return lowTemperature;
     }
     /**
      * @param lowTemperature the lowTemperature to set
      */
-    public void setLowTemperature(final double lowTemperature) {
+    public void setLowTemperature(final Double lowTemperature) {
         this.lowTemperature = lowTemperature;
     }
     /**
      * @return the criticalLowTemperature
      */
-    public double getCriticalLowTemperature() {
+    public Double getCriticalLowTemperature() {
         return criticalLowTemperature;
     }
     /**
      * @param criticalLowTemperature the criticalLowTemperature to set
      */
-    public void setCriticalLowTemperature(final double criticalLowTemperature) {
+    public void setCriticalLowTemperature(final Double criticalLowTemperature) {
         this.criticalLowTemperature = criticalLowTemperature;
     }
     /**
      * @return the lowTemperatureForMoreThen
      */
-    public int getLowTemperatureForMoreThen() {
+    public Integer getLowTemperatureForMoreThen() {
         return lowTemperatureForMoreThen;
     }
     /**
      * @param lowTemperatureForMoreThen the lowTemperatureForMoreThen to set
      */
-    public void setLowTemperatureForMoreThen(final int lowTemperatureForMoreThen) {
+    public void setLowTemperatureForMoreThen(final Integer lowTemperatureForMoreThen) {
         this.lowTemperatureForMoreThen = lowTemperatureForMoreThen;
     }
     /**
      * @return the highTemperature
      */
-    public double getHighTemperature() {
+    public Double getHighTemperature() {
         return highTemperature;
     }
     /**
      * @param highTemperature the highTemperature to set
      */
-    public void setHighTemperature(final double highTemperature) {
+    public void setHighTemperature(final Double highTemperature) {
         this.highTemperature = highTemperature;
     }
     /**
      * @return the criticalHighTemperature
      */
-    public double getCriticalHighTemperature() {
+    public Double getCriticalHighTemperature() {
         return criticalHighTemperature;
     }
     /**
      * @param criticalHighTemperature the criticalHighTemperature to set
      */
-    public void setCriticalHighTemperature(final double criticalHighTemperature) {
+    public void setCriticalHighTemperature(final Double criticalHighTemperature) {
         this.criticalHighTemperature = criticalHighTemperature;
     }
     /**
      * @return the highTemperatureForMoreThen
      */
-    public int getHighTemperatureForMoreThen() {
+    public Integer getHighTemperatureForMoreThen() {
         return highTemperatureForMoreThen;
     }
     /**
      * @param highTemperatureForMoreThen the highTemperatureForMoreThen to set
      */
-    public void setHighTemperatureForMoreThen(final int highTemperatureForMoreThen) {
+    public void setHighTemperatureForMoreThen(final Integer highTemperatureForMoreThen) {
         this.highTemperatureForMoreThen = highTemperatureForMoreThen;
     }
     /**
@@ -260,21 +260,21 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * @return the criticalHighTemperatureForMoreThen
      */
-    public int getCriticalHighTemperatureForMoreThen() {
+    public Integer getCriticalHighTemperatureForMoreThen() {
         return criticalHighTemperatureForMoreThen;
     }
     /**
      * @return the criticalLowTemperatureForMoreThen
      */
-    public int getCriticalLowTemperatureForMoreThen() {
+    public Integer getCriticalLowTemperatureForMoreThen() {
         return criticalLowTemperatureForMoreThen;
     }
     /**
-     * @param criticalHighTemperatureForMoreThen the criticalHighTemperatureForMoreThen to set
+     * @param minutes the criticalHighTemperatureForMoreThen to set
      */
     public void setCriticalHighTemperatureForMoreThen(
-            final int criticalHighTemperatureForMoreThen) {
-        this.criticalHighTemperatureForMoreThen = criticalHighTemperatureForMoreThen;
+            final Integer minutes) {
+        this.criticalHighTemperatureForMoreThen = minutes;
     }
     /**
      * @param criticalLowTemperatureForMoreThen the criticalLowTemperatureForMoreThen to set
@@ -293,6 +293,7 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * @param company the company to set
      */
+    @Override
     public void setCompany(final Company company) {
         this.company = company;
     }
