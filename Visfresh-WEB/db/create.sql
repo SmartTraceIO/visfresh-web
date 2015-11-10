@@ -235,7 +235,7 @@ create table trackerevents (
     latitude double not null,
     longitude double not null,
     device varchar(127) not null,
-    shipment bigint(20) not null,
+    shipment bigint(20),
     primary key (id),
     foreign key (shipment)
         references shipments (id),

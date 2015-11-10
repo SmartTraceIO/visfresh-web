@@ -23,6 +23,7 @@ import com.visfresh.controllers.NotificationConstants;
 import com.visfresh.controllers.NotificationScheduleConstants;
 import com.visfresh.controllers.ShipmentConstants;
 import com.visfresh.controllers.ShipmentTemplateConstants;
+import com.visfresh.controllers.TrackerEventConstants;
 import com.visfresh.controllers.UserConstants;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
@@ -790,24 +791,24 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
      */
     public JsonObject toJson(final TrackerEvent e) {
         final JsonObject obj = new JsonObject();
-        obj.addProperty("battery", e.getBattery());
-        obj.addProperty("id", e.getId());
-        obj.addProperty("temperature", e.getTemperature());
-        obj.addProperty("time", formatDate(e.getTime()));
-        obj.addProperty("type", e.getType());
-        obj.addProperty("latitude", e.getLatitude());
-        obj.addProperty("longitude", e.getLongitude());
+        obj.addProperty(TrackerEventConstants.PROPERTY_BATTERY, e.getBattery());
+        obj.addProperty(TrackerEventConstants.PROPERTY_ID, e.getId());
+        obj.addProperty(TrackerEventConstants.PROPERTY_TEMPERATURE, e.getTemperature());
+        obj.addProperty(TrackerEventConstants.PROPERTY_TIME, formatDate(e.getTime()));
+        obj.addProperty(TrackerEventConstants.PROPERTY_TYPE, e.getType());
+        obj.addProperty(TrackerEventConstants.PROPERTY_LATITUDE, e.getLatitude());
+        obj.addProperty(TrackerEventConstants.PROPERTY_LONGITUDE, e.getLongitude());
         return obj;
     }
     public TrackerEvent parseTrackerEvent(final JsonObject json) {
         final TrackerEvent e = new TrackerEvent();
-        e.setBattery(asInt(json.get("battery")));
-        e.setId(asLong(json.get("id")));
-        e.setTemperature(asDouble(json.get("temperature")));
-        e.setTime(asDate(json.get("time")));
-        e.setType(asString(json.get("type")));
-        e.setLatitude(asDouble(json.get("latitude")));
-        e.setLongitude(asDouble(json.get("longitude")));
+        e.setBattery(asInt(json.get(TrackerEventConstants.PROPERTY_BATTERY)));
+        e.setId(asLong(json.get(TrackerEventConstants.PROPERTY_ID)));
+        e.setTemperature(asDouble(json.get(TrackerEventConstants.PROPERTY_TEMPERATURE)));
+        e.setTime(asDate(json.get(TrackerEventConstants.PROPERTY_TIME)));
+        e.setType(asString(json.get(TrackerEventConstants.PROPERTY_TYPE)));
+        e.setLatitude(asDouble(json.get(TrackerEventConstants.PROPERTY_LATITUDE)));
+        e.setLongitude(asDouble(json.get(TrackerEventConstants.PROPERTY_LONGITUDE)));
         return e;
     }
     /**
@@ -895,16 +896,16 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         final JsonObject obj = json.getAsJsonObject();
 
         final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
-        e.setBattery(asInt(obj.get("battery")));
-        e.setTemperature(asDouble(obj.get("temperature")));
+        e.setBattery(asInt(obj.get(TrackerEventConstants.PROPERTY_BATTERY)));
+        e.setTemperature(asDouble(obj.get(TrackerEventConstants.PROPERTY_TEMPERATURE)));
         try {
             e.setDate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").parse(asString(obj.get("time"))));
         } catch (final ParseException e1) {
             e1.printStackTrace();
         }
         e.setType(asString(obj.get("type")));
-        e.getLocation().setLatitude(asDouble(obj.get("latitude")));
-        e.getLocation().setLongitude(asDouble(obj.get("longitude")));
+        e.getLocation().setLatitude(asDouble(obj.get(TrackerEventConstants.PROPERTY_LATITUDE)));
+        e.getLocation().setLongitude(asDouble(obj.get(TrackerEventConstants.PROPERTY_LONGITUDE)));
         e.setImei(asString(obj.get("imei")));
 
         return e;
@@ -917,12 +918,12 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         sdf.setTimeZone(UTC);
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty("battery", e.getBattery());
-        obj.addProperty("temperature", e.getTemperature());
+        obj.addProperty(TrackerEventConstants.PROPERTY_BATTERY, e.getBattery());
+        obj.addProperty(TrackerEventConstants.PROPERTY_TEMPERATURE, e.getTemperature());
         obj.addProperty("time", sdf.format(e.getTime()));
         obj.addProperty("type", e.getType());
-        obj.addProperty("latitude", e.getLocation().getLatitude());
-        obj.addProperty("longitude", e.getLocation().getLongitude());
+        obj.addProperty(TrackerEventConstants.PROPERTY_LATITUDE, e.getLocation().getLatitude());
+        obj.addProperty(TrackerEventConstants.PROPERTY_LONGITUDE, e.getLocation().getLongitude());
         obj.addProperty("imei", e.getImei());
         return obj;
     }

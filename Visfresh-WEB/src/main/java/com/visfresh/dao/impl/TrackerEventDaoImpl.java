@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.TrackerEventConstants;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Shipment;
@@ -26,6 +27,7 @@ import com.visfresh.entities.TrackerEvent;
 @Component
 public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     implements TrackerEventDao {
+
     /**
      * Table name.
      */
@@ -44,11 +46,21 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     @Autowired
     private ShipmentDao shipmentDao;
 
+    private final Map<String, String> propertyToDbMap = new HashMap<String, String>();
+
     /**
      * Default constructor.
      */
     public TrackerEventDaoImpl() {
         super();
+
+        propertyToDbMap.put(TrackerEventConstants.PROPERTY_LONGITUDE, LONGITUDE_FIELD);
+        propertyToDbMap.put(TrackerEventConstants.PROPERTY_LATITUDE, LATITUDE_FIELD);
+        propertyToDbMap.put(TrackerEventConstants.PROPERTY_TEMPERATURE, TEMPERATURE_FIELD);
+        propertyToDbMap.put(TrackerEventConstants.PROPERTY_BATTERY, BATTERY_FIELD);
+        propertyToDbMap.put(TrackerEventConstants.PROPERTY_ID, ID_FIELD);
+        propertyToDbMap.put(TrackerEventConstants.PROPERTY_TIME, TIME_FIELD);
+        propertyToDbMap.put(TrackerEventConstants.PROPERTY_TYPE, TYPE_FIELD);
     }
 
     /* (non-Javadoc)
@@ -205,7 +217,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      */
     @Override
     protected Map<String, String> getPropertyToDbMap() {
-        return new HashMap<String, String>();
+        return propertyToDbMap;
     }
 
     /* (non-Javadoc)
