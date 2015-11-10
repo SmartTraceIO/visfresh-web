@@ -6,6 +6,7 @@ package com.visfresh.controllers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
@@ -179,6 +180,20 @@ public class JSonSerializerTest {
     public void testAlertProfileNullValues() {
         AlertProfile p = new AlertProfile();
         p = serializer.parseAlertProfile(serializer.toJson(p));
+
+        assertNull(p.getCriticalHighTemperature());
+        assertNull(p.getCriticalHighTemperature2());
+        assertNull(p.getCriticalHighTemperatureForMoreThen());
+        assertNull(p.getCriticalHighTemperatureForMoreThen2());
+        assertNull(p.getCriticalLowTemperature());
+        assertNull(p.getCriticalLowTemperature2());
+        assertNull(p.getCriticalLowTemperatureForMoreThen());
+        assertNull(p.getCriticalLowTemperatureForMoreThen2());
+        assertNull(p.getDescription());
+        assertNull(p.getHighTemperature());
+        assertNull(p.getHighTemperature2());
+        assertNull(p.getHighTemperatureForMoreThen());
+        assertNull(p.getHighTemperatureForMoreThen2());
     }
 
     @Test
