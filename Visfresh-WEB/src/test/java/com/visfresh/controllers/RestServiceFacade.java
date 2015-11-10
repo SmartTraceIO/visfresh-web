@@ -427,7 +427,7 @@ public class RestServiceFacade  {
      * @param templateName
      * @param saveTemplate
      */
-    public Long saveShipment(final Shipment shipment, final String templateName,
+    public SaveShipmentResponse saveShipment(final Shipment shipment, final String templateName,
             final boolean saveTemplate) throws RestServiceException, IOException {
         final SaveShipmentRequest req = new SaveShipmentRequest();
         req.setShipment(shipment);
@@ -437,7 +437,7 @@ public class RestServiceFacade  {
         final JsonObject e = sendPostRequest(getPathWithToken(REST_SERVICE, "saveShipment"),
                 serializer.toJson(req)).getAsJsonObject();
         final SaveShipmentResponse resp = serializer.parseSaveShipmentResponse(e);
-        return resp.getShipmentId();
+        return resp;
     }
     /**
      * @param u user.

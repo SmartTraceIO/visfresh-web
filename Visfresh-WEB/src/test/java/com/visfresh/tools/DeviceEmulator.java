@@ -226,7 +226,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         s.setAlertProfile(createAlertProfileIfNeed());
         s.getAlertsNotificationSchedules().add(createNotificationScheduleIfNeed());
 
-        final Long id = service.saveShipment(s, null, false);
+        final Long id = service.saveShipment(s, null, false).getShipmentId();
         s.setId(id);
 
         return s;

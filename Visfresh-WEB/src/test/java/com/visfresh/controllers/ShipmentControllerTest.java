@@ -28,6 +28,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -97,8 +98,15 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testSaveShipment() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
         s.setId(null);
-        final Long id = facade.saveShipment(s, "NewTemplate.tpl", true);
-        assertNotNull(id);
+        final SaveShipmentResponse resp = facade.saveShipment(s, "NewTemplate.tpl", true);
+        assertNotNull(resp.getShipmentId());
+
+        //check new template is saved
+        final long id = resp.getTemplateId();
+        final ShipmentTemplate tpl = shipmentTemplateDao.findOne(id);
+
+        assertNotNull(tpl);
+        assertNotNull(tpl.getName());
     }
     //@RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getShipments(@PathVariable final String authToken) {
