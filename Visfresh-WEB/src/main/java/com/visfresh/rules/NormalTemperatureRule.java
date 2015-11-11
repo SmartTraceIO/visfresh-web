@@ -83,7 +83,7 @@ public class NormalTemperatureRule implements TrackerEventRule {
     @Override
     public boolean handle(final RuleContext context) {
         context.setProcessed(this);
-        context.getState().flushDates();
+        context.getState().getTemperatureAlerts().clear();
         return false;
     }
 }

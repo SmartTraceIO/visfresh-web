@@ -3,16 +3,13 @@
  */
 package com.visfresh.rules;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class DeviceState {
-    private final Map<String, Date> dates = new HashMap<String, Date>();
+    private RulesState temperatureAlerts = new RulesState();
+    private RulesState shipmentAutoStart = new RulesState();
 
     /**
      * Default constructor.
@@ -22,31 +19,27 @@ public class DeviceState {
     }
 
     /**
-     * Flushes temperature savings.
+     * @return the temperatureAlerts
      */
-    public void flushDates() {
-        dates.clear();
-    }
-
-    /**
-     * @param key key date.
-     * @param date date.
-     */
-    public void setDate(final String key, final Date date) {
-        dates.put(key, date);
-    }
-
-    /**
-     * @param key
-     * @return
-     */
-    public Date getDate(final String key) {
-        return dates.get(key);
+    public RulesState getTemperatureAlerts() {
+        return temperatureAlerts;
     }
     /**
-     * @return the dates
+     * @param temperatureAlerts the temperatureAlerts to set
      */
-    public Map<String, Date> getDates() {
-        return dates;
+    public void setTemperatureAlerts(final RulesState temperatureAlerts) {
+        this.temperatureAlerts = temperatureAlerts;
+    }
+    /**
+     * @return the shipmentAutoStart
+     */
+    public RulesState getShipmentAutoStart() {
+        return shipmentAutoStart;
+    }
+    /**
+     * @param shipmentAutoStart the shipmentAutoStart to set
+     */
+    public void setShipmentAutoStart(final RulesState shipmentAutoStart) {
+        this.shipmentAutoStart = shipmentAutoStart;
     }
 }

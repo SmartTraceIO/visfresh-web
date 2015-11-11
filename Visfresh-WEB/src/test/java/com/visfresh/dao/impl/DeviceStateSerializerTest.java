@@ -41,17 +41,19 @@ public class DeviceStateSerializerTest {
         final Date d1 = new Date(System.currentTimeMillis() - 100000);
         final Date d2 = new Date(System.currentTimeMillis() - 1000);
 
-        s.setDate("1", d1);
-        s.setDate("2", d2);
-
+        s.getShipmentAutoStart().getDates().put("1", d1);
+        s.getShipmentAutoStart().getDates().put("2", d2);
+        s.getShipmentAutoStart().getProperties().put("key", "value");
 
         final String str = serializer.toString(s);
+        System.out.println(str);
         s = serializer.parseState(str);
 
         assertNotNull(s);
 
-        assertEquals(format(d1), format(s.getDate("1")));
-        assertEquals(format(d2), format(s.getDate("2")));
+        assertEquals(format(d1), format(s.getShipmentAutoStart().getDates().get("1")));
+        assertEquals(format(d2), format(s.getShipmentAutoStart().getDates().get("2")));
+        assertEquals("value", s.getShipmentAutoStart().getProperties().get("key"));
     }
 
     /**

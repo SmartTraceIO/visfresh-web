@@ -115,9 +115,9 @@ public class NormalTemperatureRuleTest extends BaseRuleTest {
     public void testHandle() {
         final DeviceState state = new DeviceState();
         final String key = "230qwhp";
-        state.setDate(key, new Date());
+        state.getTemperatureAlerts().getDates().put(key, new Date());
 
         rule.handle(new RuleContext(createEvent(normalTemperature), state));
-        assertNull(state.getDate(key));
+        assertNull(state.getTemperatureAlerts().getDates().get(key));
     }
 }
