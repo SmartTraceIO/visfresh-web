@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.constants.DeviceConstants;
 import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Page;

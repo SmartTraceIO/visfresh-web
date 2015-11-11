@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.NotificationScheduleConstants;
+import com.visfresh.constants.NotificationScheduleConstants;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;

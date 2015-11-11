@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.CompanyConstants;
+import com.visfresh.constants.CompanyConstants;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.Company;
 

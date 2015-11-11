@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.init.mock;
+package com.visfresh.controllers.init;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -18,18 +18,18 @@ import com.visfresh.services.RuleEngine;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@ComponentScan(basePackageClasses = {AbstractController.class,
+@ComponentScan(basePackageClasses = {
+        AbstractController.class,//controllers package
         RuleEngine.class, //services package
         JUnitDbConfig.class, //JUnit DB DAO configuration
         MockOpenJtsFacade.class //OpenJts facade implementation.
-//        MockDaoConfig.class
         })
 @Configuration
-public class MockConfig {
+public class RestServicesTestConfig {
     /**
      * Default constructor.
      */
-    public MockConfig() {
+    public RestServicesTestConfig() {
         super();
     }
 }

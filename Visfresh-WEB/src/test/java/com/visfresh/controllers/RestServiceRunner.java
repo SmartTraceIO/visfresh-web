@@ -24,6 +24,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.FrameworkServlet;
 
+import com.visfresh.controllers.init.RestServicesTestConfig;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.ArrivalDao;
@@ -45,7 +46,6 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
-import com.visfresh.init.mock.MockConfig;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.services.AuthService;
 
@@ -151,7 +151,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
         holder.setHeldClass(DispatcherServlet.class);
         holder.setName("SpringDispatcher");
         holder.setInitParameter("contextClass", AnnotationConfigWebApplicationContext.class.getName());
-        holder.setInitParameter("contextConfigLocation", MockConfig.class.getPackage().getName());
+        holder.setInitParameter("contextConfigLocation", RestServicesTestConfig.class.getPackage().getName());
 
         //add servlet mapping
         final ServletMapping mapping = new ServletMapping();

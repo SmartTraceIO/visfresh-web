@@ -12,6 +12,7 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.services.RestServiceException;

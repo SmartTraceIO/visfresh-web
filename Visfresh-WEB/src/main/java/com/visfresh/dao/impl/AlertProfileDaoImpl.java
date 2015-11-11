@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.AlertProfileConstants;
+import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.AlertProfile;

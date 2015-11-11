@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.constants.NotificationConstants;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;

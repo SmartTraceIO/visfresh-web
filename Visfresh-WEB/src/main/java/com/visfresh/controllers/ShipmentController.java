@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.Filter;

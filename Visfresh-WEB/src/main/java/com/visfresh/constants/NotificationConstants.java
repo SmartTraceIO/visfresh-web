@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.visfresh.controllers;
+package com.visfresh.constants;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

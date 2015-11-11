@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.DeviceConstants;
+import com.visfresh.constants.DeviceConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.entities.Device;
 import com.visfresh.rules.DeviceState;

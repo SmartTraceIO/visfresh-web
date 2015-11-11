@@ -17,6 +17,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.EntityWithCompany;
 import com.visfresh.entities.User;

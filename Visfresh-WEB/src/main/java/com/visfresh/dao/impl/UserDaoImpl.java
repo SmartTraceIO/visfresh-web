@@ -13,7 +13,7 @@ import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.UserConstants;
+import com.visfresh.constants.UserConstants;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Role;

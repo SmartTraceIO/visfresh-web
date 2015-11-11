@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.LocationConstants;
+import com.visfresh.constants.LocationConstants;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.entities.LocationProfile;
 

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.JsonArray;
+import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.AlertProfile;

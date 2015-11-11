@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import com.visfresh.constants.LocationConstants;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.services.RestServiceException;
 

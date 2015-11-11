@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.TrackerEventConstants;
+import com.visfresh.constants.TrackerEventConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;

@@ -12,7 +12,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.ShipmentConstants;
+import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Alert;
