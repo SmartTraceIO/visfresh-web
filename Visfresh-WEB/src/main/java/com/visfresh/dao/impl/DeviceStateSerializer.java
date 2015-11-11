@@ -4,6 +4,9 @@
 package com.visfresh.dao.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import com.google.gson.JsonElement;
@@ -36,15 +39,27 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
      * @return
      */
     public DeviceState parseState(final String state) {
-        return parseState(parseJson(state));
+        return parseState(parseJson(state).getAsJsonObject());
     }
     /**
-     * @param parseJson
+     * @param json
      * @return
      */
-    private DeviceState parseState(final JsonElement parseJson) {
+    private DeviceState parseState(final JsonObject json) {
         final DeviceState s = new DeviceState();
+        s.getDates().putAll(jsonToDates(json.get("dates").getAsJsonObject()));
         return s;
+    }
+    /**
+     * @param json
+     * @return
+     */
+    private Map<String, Date> jsonToDates(final JsonObject json) {
+        final Map<String, Date> map = new HashMap<String, Date>();
+        for (final Map.Entry<String, JsonElement> e : json.entrySet()) {
+            map.put(e.getKey(), parseDate(e.getValue().getAsString()));
+        }
+        return map ;
     }
 
     /**
@@ -64,6 +79,19 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject json = new JsonObject();
+        json.add("dates", datesToJson(state.getDates()));
         return json;
+    }
+
+    /**
+     * @param dates
+     * @return
+     */
+    private JsonObject datesToJson(final Map<String, Date> dates) {
+        final JsonObject obj = new JsonObject();
+        for (final Map.Entry<String, Date> e : dates.entrySet()) {
+            obj.addProperty(e.getKey(), formatDate(e.getValue()));
+        }
+        return obj;
     }
 }

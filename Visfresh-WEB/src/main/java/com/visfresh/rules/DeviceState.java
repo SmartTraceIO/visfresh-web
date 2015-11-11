@@ -13,6 +13,7 @@ import java.util.Map;
  */
 public class DeviceState {
     private final Map<String, Date> dates = new HashMap<String, Date>();
+
     /**
      * Default constructor.
      */
@@ -41,5 +42,11 @@ public class DeviceState {
      */
     public Date getDate(final String key) {
         return dates.get(key);
+    }
+    /**
+     * @return the dates
+     */
+    public Map<String, Date> getDates() {
+        return dates;
     }
 }

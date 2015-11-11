@@ -4,6 +4,7 @@
 package com.visfresh.rules;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +41,8 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      */
     @Override
     public boolean accept(final RuleContext e) {
-        return super.accept(e) && e.getEvent().getShipment().getAlertProfile() != null;
+        return e.getState().getDate(getName()) == null
+                && super.accept(e) && e.getEvent().getShipment().getAlertProfile() != null;
     }
 
     protected void defaultAssign(final TrackerEvent e, final Alert a) {
@@ -57,6 +59,9 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
         final Alert alert = handleInternal(e.getEvent());
         e.setProcessed(this);
         saveAlert(alert);
+
+        //set already processed
+        e.getState().setDate(getName(), new Date());
 
         final Calendar date = new GregorianCalendar();
         //notify subscribers

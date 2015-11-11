@@ -3,7 +3,11 @@
  */
 package com.visfresh.dao.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,10 +38,27 @@ public class DeviceStateSerializerTest {
     @Test
     public void testSerialize() {
         DeviceState s = new DeviceState();
+        final Date d1 = new Date(System.currentTimeMillis() - 100000);
+        final Date d2 = new Date(System.currentTimeMillis() - 1000);
+
+        s.setDate("1", d1);
+        s.setDate("2", d2);
+
 
         final String str = serializer.toString(s);
         s = serializer.parseState(str);
 
         assertNotNull(s);
+
+        assertEquals(format(d1), format(s.getDate("1")));
+        assertEquals(format(d2), format(s.getDate("2")));
+    }
+
+    /**
+     * @param d2
+     * @return
+     */
+    private String format(final Date d2) {
+        return new SimpleDateFormat("yyyy-MM-dd:HH:mm:ss").format(d2);
     }
 }
