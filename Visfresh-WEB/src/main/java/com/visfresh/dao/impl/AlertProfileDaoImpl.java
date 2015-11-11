@@ -4,9 +4,11 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -17,6 +19,8 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
+import com.visfresh.entities.TemperatureIssue;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -158,26 +162,6 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         paramMap.put(NAME_FIELD, ap.getName());
         paramMap.put(DESCRIPTION_FIELD, ap.getDescription());
 
-        paramMap.put(LOWTEMP_FIELD, ap.getLowTemperature());
-        paramMap.put(LOWTEMPFORMORETHEN_FIELD, ap.getLowTemperatureForMoreThen());
-        paramMap.put(LOWTEMP_FIELD_2, ap.getLowTemperature2());
-        paramMap.put(LOWTEMPFORMORETHEN_FIELD_2, ap.getLowTemperatureForMoreThen2());
-
-        paramMap.put(CRITICALLOWTEMP_FIELD, ap.getCriticalLowTemperature());
-        paramMap.put(CRITICALLOWTEMPFORMORETHEN_FIELD, ap.getCriticalLowTemperatureForMoreThen());
-        paramMap.put(CRITICALLOWTEMP_FIELD_2, ap.getCriticalLowTemperature2());
-        paramMap.put(CRITICALLOWTEMPFORMORETHEN_FIELD_2, ap.getCriticalLowTemperatureForMoreThen2());
-
-        paramMap.put(HIGHTEMP_FIELD, ap.getHighTemperature());
-        paramMap.put(HIGHTEMPFORMORETHEN_FIELD, ap.getHighTemperatureForMoreThen());
-        paramMap.put(HIGHTEMP_FIELD_2, ap.getHighTemperature2());
-        paramMap.put(HIGHTEMPFORMORETHEN_FIELD_2, ap.getHighTemperatureForMoreThen2());
-
-        paramMap.put(CRITICALHIGHTEMP_FIELD, ap.getCriticalHighTemperature());
-        paramMap.put(CRITICALHIGHTEMPFORMORETHEN_FIELD, ap.getCriticalHighTemperatureForMoreThen());
-        paramMap.put(CRITICALHIGHTEMP_FIELD_2, ap.getCriticalHighTemperature2());
-        paramMap.put(CRITICALHIGHTEMPFORMORETHEN_FIELD_2, ap.getCriticalHighTemperatureForMoreThen2());
-
         paramMap.put(ONENTERBRIGHT_FIELD, ap.isWatchEnterBrightEnvironment());
         paramMap.put(ONENTERDARK_FIELD, ap.isWatchEnterDarkEnvironment());
         paramMap.put(ONMOVEMENTSTART_FIELD, ap.isWatchMovementStart());
@@ -191,32 +175,96 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             ap.setId(keyHolder.getKey().longValue());
         }
 
+        updateTemperatureIssues(ap.getId(), ap.getTemperatureIssues());
         return ap;
     }
+    /**
+     * @param id alert profile ID.
+     * @param issues temperature issues.
+     */
+    private void updateTemperatureIssues(final Long id, final List<TemperatureIssue> issues) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("apid", id);
+
+        //get old issues
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select id from allerttemperatures where alertprofile = :apid", params);
+        final Set<Long> actual = new HashSet<Long>();
+        for (final Map<String,Object> row : list) {
+            actual.add(((Number) row.get("id")).longValue());
+        }
+
+        //process issues
+        for (final TemperatureIssue issue : issues) {
+            final Long issueId = issue.getId();
+            final Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("temperature", issue.getTemperature());
+            paramMap.put("type", issue.getType().toString());
+            paramMap.put("timeOut", issue.getTimeOutMinutes());
+            paramMap.put("apid", id);
+
+            if (issueId != null) {
+                paramMap.put("id", issueId);
+                actual.remove(issueId);
+
+                jdbc.update("update allerttemperatures set"
+                        + " type = :type,"
+                        + " temp = :temperature,"
+                        + " timeout = :timeOut"
+                        + " where id = :id", paramMap);
+            } else {
+                final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+                jdbc.update("insert into allerttemperatures"
+                        + "(type, temp, timeout, alertprofile)"
+                        + " values(:type, :temperature, :timeOut, :apid)",
+                        new MapSqlParameterSource(paramMap), keyHolder);
+                if (keyHolder.getKey() != null) {
+                    issue.setId(keyHolder.getKey().longValue());
+                }
+            }
+        }
+
+        //delete old
+        final Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("alertprofile", id);
+
+        for (final Long issueId : actual) {
+            paramMap.put("id", issueId);
+            jdbc.update("delete from allerttemperatures where id = :id and alertprofile = :alertprofile",
+                    paramMap);
+        }
+    }
+
+    /**
+     * @param id alert profile ID.
+     * @return list of temperature issues.
+     */
+    private List<TemperatureIssue> loadTemperatureIssues(final Long id) {
+        final List<TemperatureIssue> list = new LinkedList<TemperatureIssue>();
+
+        final Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("alertprofile", id);
+        final List<Map<String, Object>> rows = jdbc.queryForList("select * from allerttemperatures"
+                + " where alertprofile = :alertprofile", paramMap);
+
+        //create temperature issues from DB rows
+        for (final Map<String, Object> row : rows) {
+            final TemperatureIssue issue = new TemperatureIssue();
+            issue.setId(((Number) row.get("id")).longValue());
+            issue.setTemperature(((Number) row.get("temp")).doubleValue());
+            issue.setTimeOutMinutes(((Number) row.get("timeout")).intValue());
+            issue.setType(AlertType.valueOf((String) row.get("type")));
+
+            list.add(issue);
+        }
+
+        return list;
+    }
+
     private List<String> getFields(final boolean includeId) {
         final List<String> fields = new LinkedList<String>();
         fields.add(NAME_FIELD);
         fields.add(DESCRIPTION_FIELD);
-
-        fields.add(LOWTEMP_FIELD);
-        fields.add(LOWTEMPFORMORETHEN_FIELD);
-        fields.add(LOWTEMP_FIELD_2);
-        fields.add(LOWTEMPFORMORETHEN_FIELD_2);
-
-        fields.add(CRITICALLOWTEMP_FIELD);
-        fields.add(CRITICALLOWTEMPFORMORETHEN_FIELD);
-        fields.add(CRITICALLOWTEMP_FIELD_2);
-        fields.add(CRITICALLOWTEMPFORMORETHEN_FIELD_2);
-
-        fields.add(HIGHTEMP_FIELD);
-        fields.add(HIGHTEMPFORMORETHEN_FIELD);
-        fields.add(HIGHTEMP_FIELD_2);
-        fields.add(HIGHTEMPFORMORETHEN_FIELD_2);
-
-        fields.add(CRITICALHIGHTEMP_FIELD);
-        fields.add(CRITICALHIGHTEMPFORMORETHEN_FIELD);
-        fields.add(CRITICALHIGHTEMP_FIELD_2);
-        fields.add(CRITICALHIGHTEMPFORMORETHEN_FIELD_2);
 
         fields.add(ONENTERBRIGHT_FIELD);
         fields.add(ONENTERDARK_FIELD);
@@ -271,58 +319,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         no.setName((String) map.get(NAME_FIELD));
         no.setDescription((String) map.get(DESCRIPTION_FIELD));
 
-        if (map.get(LOWTEMP_FIELD) != null) {
-            no.setLowTemperature(((Number) map.get(LOWTEMP_FIELD)).doubleValue());
-        }
-        if (map.get(LOWTEMPFORMORETHEN_FIELD) != null) {
-            no.setLowTemperatureForMoreThen(((Number) map.get(LOWTEMPFORMORETHEN_FIELD)).intValue());
-        }
-        if (map.get(LOWTEMP_FIELD_2) != null) {
-            no.setLowTemperature2(((Number) map.get(LOWTEMP_FIELD_2)).doubleValue());
-        }
-        if (map.get(LOWTEMPFORMORETHEN_FIELD_2) != null) {
-            no.setLowTemperatureForMoreThen2(((Number) map.get(LOWTEMPFORMORETHEN_FIELD_2)).intValue());
-        }
-        if (map.get(CRITICALLOWTEMP_FIELD) != null) {
-            no.setCriticalLowTemperature(((Number) map.get(CRITICALLOWTEMP_FIELD)).doubleValue());
-        }
-        if (map.get(CRITICALLOWTEMPFORMORETHEN_FIELD) != null) {
-            no.setCriticalLowTemperatureForMoreThen(
-                    ((Number) map.get(CRITICALLOWTEMPFORMORETHEN_FIELD)).intValue());
-        }
-        if (map.get(CRITICALLOWTEMP_FIELD_2) != null) {
-            no.setCriticalLowTemperature2(((Number) map.get(CRITICALLOWTEMP_FIELD_2)).doubleValue());
-        }
-        if (map.get(CRITICALLOWTEMPFORMORETHEN_FIELD_2) != null) {
-            no.setCriticalLowTemperatureForMoreThen2(
-                    ((Number) map.get(CRITICALLOWTEMPFORMORETHEN_FIELD_2)).intValue());
-        }
-        if (map.get(HIGHTEMP_FIELD) != null) {
-            no.setHighTemperature(((Number) map.get(HIGHTEMP_FIELD)).doubleValue());
-        }
-        if (map.get(HIGHTEMPFORMORETHEN_FIELD) != null) {
-            no.setHighTemperatureForMoreThen(((Number) map.get(HIGHTEMPFORMORETHEN_FIELD)).intValue());
-        }
-        if (map.get(HIGHTEMP_FIELD_2) != null) {
-            no.setHighTemperature2(((Number) map.get(HIGHTEMP_FIELD_2)).doubleValue());
-        }
-        if (map.get(HIGHTEMPFORMORETHEN_FIELD_2) != null) {
-            no.setHighTemperatureForMoreThen2(((Number) map.get(HIGHTEMPFORMORETHEN_FIELD_2)).intValue());
-        }
-        if (map.get(CRITICALHIGHTEMP_FIELD) != null) {
-            no.setCriticalHighTemperature(((Number) map.get(CRITICALHIGHTEMP_FIELD)).doubleValue());
-        }
-        if (map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD) != null) {
-            no.setCriticalHighTemperatureForMoreThen(
-                    ((Number) map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD)).intValue());
-        }
-        if (map.get(CRITICALHIGHTEMP_FIELD_2) != null) {
-            no.setCriticalHighTemperature2(((Number) map.get(CRITICALHIGHTEMP_FIELD_2)).doubleValue());
-        }
-        if (map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD_2) != null) {
-            no.setCriticalHighTemperatureForMoreThen2(
-                    ((Number) map.get(CRITICALHIGHTEMPFORMORETHEN_FIELD_2)).intValue());
-        }
+        no.getTemperatureIssues().addAll(loadTemperatureIssues(no.getId()));
 
         no.setWatchEnterBrightEnvironment((Boolean) map.get(ONENTERBRIGHT_FIELD));
         no.setWatchEnterDarkEnvironment((Boolean) map.get(ONENTERDARK_FIELD));

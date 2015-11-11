@@ -44,6 +44,7 @@ import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureIssue;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
@@ -154,49 +155,6 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         obj.addProperty(AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME, alert.getName());
         obj.addProperty(AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION, alert.getDescription());
 
-        obj.addProperty(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE,
-                alert.getHighTemperature());
-        obj.addProperty(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES,
-                alert.getHighTemperatureForMoreThen());
-        if (alert.getHighTemperature2() != null) {
-            obj.addProperty(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE2,
-                    alert.getHighTemperature2());
-            obj.addProperty(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES2,
-                    alert.getHighTemperatureForMoreThen2());
-        }
-
-        obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE,
-                alert.getCriticalHighTemperature());
-        obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES,
-                alert.getCriticalHighTemperatureForMoreThen());
-        if (alert.getCriticalHighTemperature2() != null) {
-            obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE2,
-                    alert.getCriticalHighTemperature2());
-            obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES2,
-                    alert.getCriticalHighTemperatureForMoreThen2());
-        }
-
-        obj.addProperty(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE, alert.getLowTemperature());
-        obj.addProperty(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES,
-                alert.getLowTemperatureForMoreThen());
-        if (alert.getLowTemperature2() != null) {
-            obj.addProperty(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE2,
-                    alert.getLowTemperature2());
-            obj.addProperty(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES2,
-                    alert.getLowTemperatureForMoreThen2());
-        }
-
-        obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE,
-                alert.getCriticalLowTemperature());
-        obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES,
-                alert.getCriticalLowTemperatureForMoreThen());
-        if (alert.getCriticalLowTemperature2() != null) {
-            obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE2,
-                    alert.getCriticalLowTemperature2());
-            obj.addProperty(AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES2,
-                    alert.getCriticalLowTemperatureForMoreThen2());
-        }
-
         obj.addProperty(AlertProfileConstants.PROPERTY_WATCH_BATTERY_LOW,
                 alert.isWatchBatteryLow());
         obj.addProperty(AlertProfileConstants.PROPERTY_WATCH_ENTER_BRIGHT_ENVIRONMENT,
@@ -207,6 +165,12 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
                 alert.isWatchMovementStart());
         obj.addProperty(AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_STOP,
                 alert.isWatchMovementStop());
+
+        final JsonArray tempIssues = new JsonArray();
+        obj.add("temperatureIssues", tempIssues);
+        for (final TemperatureIssue issue : alert.getTemperatureIssues()) {
+            tempIssues.add(toJson(issue));
+        }
 
         return obj;
     }
@@ -221,51 +185,9 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         p.setDescription(asString(alert.get(AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION)));
         p.setName(asString(alert.get(AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME)));
 
-        if (notNull(alert, AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE)) {
-            p.setCriticalHighTemperature(asDouble(alert.get(
-                    AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE)));
-            p.setCriticalHighTemperatureForMoreThen(asInt(alert.get(
-                    AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES)));
-        }
-        if (notNull(alert, AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE2)) {
-            p.setCriticalHighTemperature2(asDouble(alert.get(
-                    AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE2)));
-            p.setCriticalHighTemperatureForMoreThen2(asInt(alert.get(
-                    AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES2)));
-        }
-        if (notNull(alert, AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE)) {
-            p.setCriticalLowTemperature(asDouble(alert.get(
-                    AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE)));
-            p.setCriticalLowTemperatureForMoreThen(asInt(alert.get(
-                    AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES)));
-        }
-        if (notNull(alert, AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE2)) {
-            p.setCriticalLowTemperature2(asDouble(alert.get(
-                    AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE2)));
-            p.setCriticalLowTemperatureForMoreThen2(asInt(alert.get(
-                    AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES2)));
-        }
-        if (notNull(alert, AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE)) {
-            p.setHighTemperature(asDouble(alert.get(AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE)));
-            p.setHighTemperatureForMoreThen(asInt(alert.get(
-                    AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES)));
-        }
-        if (notNull(alert, AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE2)) {
-            p.setHighTemperature2(asDouble(alert.get(
-                    AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE2)));
-            p.setHighTemperatureForMoreThen2(asInt(alert.get(
-                    AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES2)));
-        }
-        if (notNull(alert, AlertProfileConstants.PROPERTY_LOW_TEMPERATURE)) {
-            p.setLowTemperature(asDouble(alert.get(AlertProfileConstants.PROPERTY_LOW_TEMPERATURE)));
-            p.setLowTemperatureForMoreThen(asInt(alert.get(
-                    AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES)));
-        }
-        if (notNull(alert, AlertProfileConstants.PROPERTY_LOW_TEMPERATURE2)) {
-            p.setLowTemperature2(asDouble(alert.get(
-                    AlertProfileConstants.PROPERTY_LOW_TEMPERATURE2)));
-            p.setLowTemperatureForMoreThen2(asInt(alert.get(
-                    AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES2)));
+        final JsonArray tempIssues = alert.get("temperatureIssues").getAsJsonArray();
+        for (final JsonElement issue : tempIssues) {
+            p.getTemperatureIssues().add(parseTemperatureIssue(issue.getAsJsonObject()));
         }
 
         p.setWatchBatteryLow(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_BATTERY_LOW)));
@@ -279,11 +201,36 @@ public class EntityJSonSerializer extends AbstractJsonSerializer {
         return p;
     }
     /**
+     * @param issue
+     * @return
+     */
+    public JsonObject toJson(final TemperatureIssue issue) {
+        final JsonObject obj = new JsonObject();
+        obj.addProperty("id", issue.getId());
+        obj.addProperty("type", issue.getType().toString());
+        obj.addProperty("temperature", issue.getTemperature());
+        obj.addProperty("timeOutMinutes", issue.getTimeOutMinutes());
+        return obj;
+    }
+    /**
+     * @param json
+     * @return
+     */
+    public TemperatureIssue parseTemperatureIssue(final JsonObject json) {
+        final TemperatureIssue issue = new TemperatureIssue();
+        issue.setId(asLong(json.get("id")));
+        issue.setType(AlertType.valueOf(json.get("type").getAsString()));
+        issue.setTemperature(asDouble(json.get("temperature")));
+        issue.setTimeOutMinutes(asInt(json.get("timeOutMinutes")));
+        return issue;
+    }
+
+    /**
      * @param obj
      * @param property
      * @return
      */
-    private boolean notNull(final JsonObject obj, final String property) {
+    protected boolean notNull(final JsonObject obj, final String property) {
         if (!obj.has(property)) {
             return false;
         }

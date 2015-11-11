@@ -16,6 +16,7 @@ drop table if exists shipments;
 drop table if exists locationprofiles;
 drop table if exists personalschedules;
 drop table if exists notificationschedules;
+drop table if exists allerttemperatures;
 drop table if exists alertprofiles;
 drop table if exists devices;
 drop table if exists companies;
@@ -103,22 +104,6 @@ create table alertprofiles (
     id bigint(20) auto_increment not null,
     `name` varchar(127) not null,
     description varchar(255) default null,
-    lowtemp float,
-    lowtempformorethen int,
-    lowtemp2 float,
-    lowtempformorethen2 int,
-    criticallowtem float,
-    criticallowtempformorethen int,
-    criticallowtem2 float,
-    criticallowtempformorethen2 int,
-    hightemp float,
-    hightempformorethen int,
-    hightemp2 float,
-    hightempformorethen2 int,
-    criticalhightemp float,
-    criticalhightempformorethen int,
-    criticalhightemp2 float,
-    criticalhightempformorethen2 int,
     onenterbright boolean not null,
     onenterdark boolean not null,
     onmovementstart boolean not null,
@@ -128,6 +113,18 @@ create table alertprofiles (
     primary key (id),
     FOREIGN KEY (company)
         REFERENCES companies (id)
+);
+
+create table allerttemperatures (
+    id bigint(20) auto_increment not null,
+    `type` varchar(50) not null,
+    temp float not null,
+    timeout int not null,
+    alertprofile bigint(20) not null,
+    primary key (id),
+    foreign key (alertprofile)
+		references alertprofiles (id)
+		on delete cascade
 );
 
 create table notificationschedules (

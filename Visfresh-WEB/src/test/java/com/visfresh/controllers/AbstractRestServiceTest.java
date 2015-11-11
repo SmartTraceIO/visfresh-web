@@ -16,6 +16,7 @@ import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
@@ -24,6 +25,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.entities.TemperatureIssue;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -72,40 +74,61 @@ public abstract class AbstractRestServiceTest {
      * @return any alert profile.
      */
     protected AlertProfile createAlertProfile(final boolean save) {
-        final AlertProfile p = new AlertProfile();
-        p.setName("AnyAlert");
-        p.setDescription("Any description");
+        final AlertProfile ap = new AlertProfile();
+        ap.setName("AnyAlert");
+        ap.setDescription("Any description");
 
-        p.setCriticalHighTemperature(10.);
-        p.setCriticalHighTemperatureForMoreThen(0);
-        p.setCriticalHighTemperature2(9.);
-        p.setCriticalHighTemperatureForMoreThen2(1);
+        final int normalTemperature = 3;
+        TemperatureIssue criticalHot = new TemperatureIssue(AlertType.CriticalHot);
+        criticalHot.setTemperature(normalTemperature + 15);
+        criticalHot.setTimeOutMinutes(0);
+        ap.getTemperatureIssues().add(criticalHot);
 
-        p.setCriticalLowTemperature(-15.);
-        p.setCriticalLowTemperatureForMoreThen(0);
-        p.setCriticalLowTemperature2(-14.);
-        p.setCriticalLowTemperatureForMoreThen2(1);
+        criticalHot = new TemperatureIssue(AlertType.CriticalHot);
+        criticalHot.setTemperature(normalTemperature + 14);
+        criticalHot.setTimeOutMinutes(1);
+        ap.getTemperatureIssues().add(criticalHot);
 
-        p.setHighTemperature(5.);
-        p.setHighTemperatureForMoreThen(0);
-        p.setHighTemperature2(4.);
-        p.setHighTemperatureForMoreThen2(2);
+        TemperatureIssue criticalLow = new TemperatureIssue(AlertType.CriticalCold);
+        criticalLow.setTemperature(normalTemperature -15.);
+        criticalLow.setTimeOutMinutes(0);
+        ap.getTemperatureIssues().add(criticalLow);
 
-        p.setLowTemperature(-10.);
-        p.setLowTemperatureForMoreThen(40);
-        p.setLowTemperature2(-8.);
-        p.setLowTemperatureForMoreThen2(55);
+        criticalLow = new TemperatureIssue(AlertType.CriticalCold);
+        criticalLow.setTemperature(normalTemperature -14.);
+        criticalLow.setTimeOutMinutes(1);
+        ap.getTemperatureIssues().add(criticalLow);
 
-        p.setWatchBatteryLow(true);
-        p.setWatchEnterBrightEnvironment(true);
-        p.setWatchEnterDarkEnvironment(true);
-        p.setWatchMovementStart(true);
-        p.setWatchMovementStop(true);
+        TemperatureIssue hot = new TemperatureIssue(AlertType.Hot);
+        hot.setTemperature(normalTemperature + 3);
+        hot.setTimeOutMinutes(0);
+        ap.getTemperatureIssues().add(hot);
+
+        hot = new TemperatureIssue(AlertType.Hot);
+        hot.setTemperature(normalTemperature + 4.);
+        hot.setTimeOutMinutes(2);
+        ap.getTemperatureIssues().add(hot);
+
+        TemperatureIssue low = new TemperatureIssue(AlertType.Cold);
+        low.setTemperature(normalTemperature -10.);
+        low.setTimeOutMinutes(40);
+        ap.getTemperatureIssues().add(low);
+
+        low = new TemperatureIssue(AlertType.Cold);
+        low.setTemperature(normalTemperature-8.);
+        low.setTimeOutMinutes(55);
+        ap.getTemperatureIssues().add(low);
+
+        ap.setWatchBatteryLow(true);
+        ap.setWatchEnterBrightEnvironment(true);
+        ap.setWatchEnterDarkEnvironment(true);
+        ap.setWatchMovementStart(true);
+        ap.setWatchMovementStop(true);
 
         if (save) {
-            saveAlertProfileDirectly(p);
+            saveAlertProfileDirectly(ap);
         }
-        return p;
+        return ap;
     }
     /**
      * @return any location profile.

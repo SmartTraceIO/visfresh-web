@@ -6,7 +6,6 @@ package com.visfresh.controllers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
@@ -37,6 +36,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureIssue;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
@@ -87,113 +87,61 @@ public class JSonSerializerTest {
 
     @Test
     public void testAlertProfile() {
-        final double criticalHighTemperature = 5.77;
-        final double criticalLowTemperature = -15.88;
         final String description = "Any description";
-        final double highTemperature = 1.22;
-        final Integer highTemperatureForMoreThen = 55; // min
         final Long id = 7L;
-        final double lowTemperature = -10.33;
-        final Integer lowTemperatureForMoreThen = 55; //min
         final String name = "AnyName";
         final boolean watchBatteryLow = true;
         final boolean watchEnterBrightEnvironment = true;
         final boolean watchEnterDarkEnvironment = false;
-        final Integer criticalHighTemperatureForMoreThen = 91;
-        final int criticalLowTemperatureForMoreThen = 71;
         final boolean watchMovementStart = true;
         final boolean watchMovementStop = true;
 
         AlertProfile p = new AlertProfile();
-        p.setCriticalHighTemperature(criticalHighTemperature);
-        p.setCriticalLowTemperature(criticalLowTemperature);
         p.setDescription(description);
-        p.setHighTemperature(highTemperature);
-        p.setHighTemperatureForMoreThen(highTemperatureForMoreThen);
         p.setId(id);
-        p.setLowTemperature(lowTemperature);
-        p.setLowTemperatureForMoreThen(lowTemperatureForMoreThen);
         p.setName(name);
         p.setWatchBatteryLow(watchBatteryLow);
         p.setWatchEnterBrightEnvironment(watchEnterBrightEnvironment);
         p.setWatchEnterDarkEnvironment(watchEnterDarkEnvironment);
         p.setWatchMovementStart(watchMovementStart);
         p.setWatchMovementStop(watchMovementStop);
-        p.setCriticalHighTemperatureForMoreThen(criticalHighTemperatureForMoreThen);
-        p.setCriticalLowTemperatureForMoreThen(criticalLowTemperatureForMoreThen);
+        p.getTemperatureIssues().add(new TemperatureIssue(AlertType.Hot));
+        p.getTemperatureIssues().add(new TemperatureIssue(AlertType.CriticalHot));
 
         final JsonObject json = serializer.toJson(p).getAsJsonObject();
         p = serializer.parseAlertProfile(json);
 
-        assertEquals(criticalHighTemperature, p.getCriticalHighTemperature(), 0.00001);
-        assertEquals(criticalLowTemperature, p.getCriticalLowTemperature(), 0.00001);
         assertEquals(description, p.getDescription());
-        assertEquals(highTemperature, p.getHighTemperature(), 0.00001);
-        assertEquals(highTemperatureForMoreThen, p.getHighTemperatureForMoreThen());
         assertEquals(id, p.getId());
-        assertEquals(lowTemperature, p.getLowTemperature(), 0.00001);
-        assertEquals(lowTemperatureForMoreThen, p.getLowTemperatureForMoreThen());
         assertEquals(name, p.getName());
         assertEquals(watchBatteryLow, p.isWatchBatteryLow());
         assertEquals(watchEnterBrightEnvironment, p.isWatchEnterBrightEnvironment());
         assertEquals(watchEnterDarkEnvironment, p.isWatchEnterDarkEnvironment());
         assertEquals(watchMovementStart, p.isWatchMovementStart());
         assertEquals(watchMovementStop, p.isWatchMovementStop());
-        assertEquals(criticalHighTemperatureForMoreThen, p.getCriticalHighTemperatureForMoreThen());
-        assertEquals(criticalLowTemperatureForMoreThen, p.getCriticalLowTemperatureForMoreThen().intValue());
+        assertEquals(2, p.getTemperatureIssues().size());
     }
     @Test
-    public void testAlertProfile2() {
-        AlertProfile p = createAlertProfile();
+    public void testTemperatureIssues() {
+        final double temperature = 15.;
+        final int timeOutMinutes = 20;
+        final AlertType type = AlertType.CriticalCold;
+        final Long id = 77l;
 
-        final Double criticalHighTemperature2 = 1.0;
-        final Integer criticalHighTemperatureForMoreThen2 = 2;
-        final Double criticalLowTemperature2 = 3.0;
-        final Integer criticalLowTemperatureForMoreThen2 = 4;
-        final Double highTemperature2 = 5.0;
-        final Integer highTemperatureForMoreThen2= 6;
-        final Double lowTemperature2 = 7.0;
-        final Integer lowTemperatureForMoreThen2 = 8;
+        TemperatureIssue issue = new TemperatureIssue();
 
-        p.setCriticalHighTemperature2(criticalHighTemperature2);
-        p.setCriticalHighTemperatureForMoreThen2(criticalHighTemperatureForMoreThen2);
-        p.setCriticalLowTemperature2(criticalLowTemperature2);
-        p.setCriticalLowTemperatureForMoreThen2(criticalLowTemperatureForMoreThen2);
-        p.setHighTemperature2(highTemperature2);
-        p.setHighTemperatureForMoreThen2(highTemperatureForMoreThen2);
-        p.setLowTemperature2(lowTemperature2);
-        p.setLowTemperatureForMoreThen2(lowTemperatureForMoreThen2);
+        issue.setId(id);
+        issue.setTemperature(temperature);
+        issue.setTimeOutMinutes(timeOutMinutes);
+        issue.setType(type);
 
-        final JsonObject json = serializer.toJson(p).getAsJsonObject();
-        p = serializer.parseAlertProfile(json);
+        final JsonObject obj = serializer.toJson(issue);
+        issue = serializer.parseTemperatureIssue(obj);
 
-        assertEquals(criticalHighTemperature2, p.getCriticalHighTemperature2());
-        assertEquals(criticalHighTemperatureForMoreThen2, p.getCriticalHighTemperatureForMoreThen2());
-        assertEquals(criticalLowTemperature2, p.getCriticalLowTemperature2());
-        assertEquals(criticalLowTemperatureForMoreThen2, p.getCriticalLowTemperatureForMoreThen2());
-        assertEquals(highTemperature2, p.getHighTemperature2());
-        assertEquals(highTemperatureForMoreThen2, p.getHighTemperatureForMoreThen2());
-        assertEquals(lowTemperature2, p.getLowTemperature2());
-        assertEquals(lowTemperatureForMoreThen2, p.getLowTemperatureForMoreThen2());
-    }
-    @Test
-    public void testAlertProfileNullValues() {
-        AlertProfile p = new AlertProfile();
-        p = serializer.parseAlertProfile(serializer.toJson(p));
-
-        assertNull(p.getCriticalHighTemperature());
-        assertNull(p.getCriticalHighTemperature2());
-        assertNull(p.getCriticalHighTemperatureForMoreThen());
-        assertNull(p.getCriticalHighTemperatureForMoreThen2());
-        assertNull(p.getCriticalLowTemperature());
-        assertNull(p.getCriticalLowTemperature2());
-        assertNull(p.getCriticalLowTemperatureForMoreThen());
-        assertNull(p.getCriticalLowTemperatureForMoreThen2());
-        assertNull(p.getDescription());
-        assertNull(p.getHighTemperature());
-        assertNull(p.getHighTemperature2());
-        assertNull(p.getHighTemperatureForMoreThen());
-        assertNull(p.getHighTemperatureForMoreThen2());
+        assertEquals(temperature, issue.getTemperature(), 0.0001);
+        assertEquals(type, issue.getType());
+        assertEquals(timeOutMinutes, issue.getTimeOutMinutes());
+        assertEquals(id, issue.getId());
     }
 
     @Test
@@ -947,20 +895,27 @@ public class JSonSerializerTest {
      */
     private AlertProfile createAlertProfile() {
         final AlertProfile p = new AlertProfile();
-        p.setCriticalHighTemperature(5.);
-        p.setCriticalLowTemperature(-15.);
         p.setDescription("Any description");
-        p.setHighTemperature(1.);
-        p.setHighTemperatureForMoreThen(55);
         p.setId(generateId());
-        p.setLowTemperature(-10.);
-        p.setLowTemperatureForMoreThen(55);
         p.setName("AnyAlert");
         p.setWatchBatteryLow(true);
         p.setWatchEnterBrightEnvironment(true);
         p.setWatchEnterDarkEnvironment(true);
         p.setWatchMovementStart(true);
         p.setWatchMovementStop(true);
+
+        TemperatureIssue issue = new TemperatureIssue();
+        issue.setTemperature(10);
+        issue.setType(AlertType.CriticalHot);
+        issue.setTimeOutMinutes(17);
+        p.getTemperatureIssues().add(issue);
+
+        issue = new TemperatureIssue();
+        issue.setTemperature(-3);
+        issue.setType(AlertType.Cold);
+        issue.setTimeOutMinutes(18);
+        p.getTemperatureIssues().add(issue);
+
         resolver.add(p);
         return p;
     }

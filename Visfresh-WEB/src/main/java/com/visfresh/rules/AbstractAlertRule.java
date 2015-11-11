@@ -54,17 +54,20 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      */
     @Override
     public final boolean handle(final RuleContext e) {
-        final Alert alert = handleInternal(e.getEvent());
+        final Alert[] alerts = handleInternal(e.getEvent());
         e.setProcessed(this);
-        saveAlert(alert);
 
-        final Calendar date = new GregorianCalendar();
-        //notify subscribers
-        final List<PersonSchedule> schedules = getAllPersonalSchedules(e.getEvent().getShipment());
-        for (final PersonSchedule s : schedules) {
-            if (matchesTimeFrame(s, date)) {
-                sendNotification(s, alert.getType().toString(),
-                        descriptionBuilder.buildDescription(alert, null));
+        for (final Alert alert : alerts) {
+            saveAlert(alert);
+
+            final Calendar date = new GregorianCalendar();
+            //notify subscribers
+            final List<PersonSchedule> schedules = getAllPersonalSchedules(e.getEvent().getShipment());
+            for (final PersonSchedule s : schedules) {
+                if (matchesTimeFrame(s, date)) {
+                    sendNotification(s, alert.getType().toString(),
+                            descriptionBuilder.buildDescription(alert, null));
+                }
             }
         }
 
@@ -81,7 +84,7 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      * @param event event.
      * @return alert if created, null otherwise.
      */
-    protected abstract Alert handleInternal(TrackerEvent event);
+    protected abstract Alert[] handleInternal(TrackerEvent event);
 
     /**
      * @param shipment shipment.

@@ -20,12 +20,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureIssue;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.lists.NotificationScheduleListItem;
 
@@ -74,15 +76,33 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
 
         profile.setCompany(company);
         profile.setName(name);
-        profile.setHighTemperature(15.);
-        profile.setHighTemperatureForMoreThen(5);
-        profile.setCriticalHighTemperature(20.);
-        profile.setCriticalLowTemperatureForMoreThen(1);
+
+        //hot
+        TemperatureIssue issue = new TemperatureIssue(AlertType.Hot);
+        issue.setTemperature(15.);
+        issue.setTimeOutMinutes(5);
+        profile.getTemperatureIssues().add(issue);
+
+        //critical hot
+        issue = new TemperatureIssue(AlertType.CriticalHot);
+        issue.setTemperature(20.);
+        issue.setTimeOutMinutes(1);
+        profile.getTemperatureIssues().add(issue);
+
         profile.setDescription("Development tool profile");
-        profile.setLowTemperature(3.);
-        profile.setLowTemperatureForMoreThen(10);
-        profile.setCriticalLowTemperature(-5.);
-        profile.setCriticalHighTemperatureForMoreThen(1);
+
+        //log
+        issue = new TemperatureIssue(AlertType.Cold);
+        issue.setTemperature(3.);
+        issue.setTimeOutMinutes(10);
+        profile.getTemperatureIssues().add(issue);
+
+        //critical cold
+        issue = new TemperatureIssue(AlertType.CriticalCold);
+        issue.setTemperature(-5.);
+        issue.setTimeOutMinutes(1);
+        profile.getTemperatureIssues().add(issue);
+
         profile.setWatchBatteryLow(true);
         profile.setWatchEnterBrightEnvironment(true);
         profile.setWatchEnterDarkEnvironment(true);

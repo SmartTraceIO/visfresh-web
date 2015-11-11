@@ -16,8 +16,10 @@ import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TemperatureIssue;
 import com.visfresh.entities.TrackerEvent;
 
 /**
@@ -53,25 +55,46 @@ public class NormalTemperatureRuleTest extends BaseRuleTest {
         p.setDescription("Any description");
         p.setCompany(company);
 
-        p.setCriticalHighTemperature(normalTemperature + 15);
-        p.setCriticalHighTemperatureForMoreThen(0);
-        p.setCriticalHighTemperature2(normalTemperature + 14);
-        p.setCriticalHighTemperatureForMoreThen2(1);
+        TemperatureIssue criticalHot = new TemperatureIssue(AlertType.CriticalHot);
+        criticalHot.setTemperature(normalTemperature + 15);
+        criticalHot.setTimeOutMinutes(0);
+        p.getTemperatureIssues().add(criticalHot);
 
-        p.setCriticalLowTemperature(normalTemperature -15.);
-        p.setCriticalLowTemperatureForMoreThen(0);
-        p.setCriticalLowTemperature2(normalTemperature -14.);
-        p.setCriticalLowTemperatureForMoreThen2(1);
+        criticalHot = new TemperatureIssue(AlertType.CriticalHot);
+        criticalHot.setTemperature(normalTemperature + 14);
+        criticalHot.setTimeOutMinutes(1);
+        p.getTemperatureIssues().add(criticalHot);
 
-        p.setHighTemperature(normalTemperature + 3);
-        p.setHighTemperatureForMoreThen(0);
-        p.setHighTemperature2(normalTemperature + 4.);
-        p.setHighTemperatureForMoreThen2(2);
+        TemperatureIssue criticalLow = new TemperatureIssue(AlertType.CriticalCold);
+        criticalLow.setTemperature(normalTemperature -15.);
+        criticalLow.setTimeOutMinutes(0);
+        p.getTemperatureIssues().add(criticalLow);
 
-        p.setLowTemperature(normalTemperature -10.);
-        p.setLowTemperatureForMoreThen(40);
-        p.setLowTemperature2(normalTemperature-8.);
-        p.setLowTemperatureForMoreThen2(55);
+        criticalLow = new TemperatureIssue(AlertType.CriticalCold);
+        criticalLow.setTemperature(normalTemperature -14.);
+        criticalLow.setTimeOutMinutes(1);
+        p.getTemperatureIssues().add(criticalLow);
+
+        TemperatureIssue hot = new TemperatureIssue(AlertType.Hot);
+        hot.setTemperature(normalTemperature + 3);
+        hot.setTimeOutMinutes(0);
+        p.getTemperatureIssues().add(hot);
+
+        hot = new TemperatureIssue(AlertType.Hot);
+        hot.setTemperature(normalTemperature + 4.);
+        hot.setTimeOutMinutes(2);
+        p.getTemperatureIssues().add(hot);
+
+        TemperatureIssue low = new TemperatureIssue(AlertType.Cold);
+        low.setTemperature(normalTemperature -10.);
+        low.setTimeOutMinutes(40);
+        p.getTemperatureIssues().add(low);
+
+        low = new TemperatureIssue(AlertType.Cold);
+        low.setTemperature(normalTemperature-8.);
+        low.setTimeOutMinutes(55);
+        p.getTemperatureIssues().add(low);
+
         context.getBean(AlertProfileDao.class).save(p);
 
         s.setAlertProfile(p);
@@ -99,17 +122,17 @@ public class NormalTemperatureRuleTest extends BaseRuleTest {
     @Test
     public void testAccept() {
         final DeviceState state = new DeviceState();
-        assertTrue(rule.accept(new RuleContext(createEvent(normalTemperature), state)));
 
-        final AlertProfile a = shipment.getAlertProfile();
-        assertFalse(rule.accept(new RuleContext(createEvent(a.getCriticalHighTemperature()), state)));
-        assertFalse(rule.accept(new RuleContext(createEvent(a.getCriticalHighTemperature2()), state)));
-        assertFalse(rule.accept(new RuleContext(createEvent(a.getCriticalLowTemperature()), state)));
-        assertFalse(rule.accept(new RuleContext(createEvent(a.getCriticalLowTemperature2()), state)));
-        assertFalse(rule.accept(new RuleContext(createEvent(a.getHighTemperature()), state)));
-        assertFalse(rule.accept(new RuleContext(createEvent(a.getHighTemperature2()), state)));
-        assertFalse(rule.accept(new RuleContext(createEvent(a.getLowTemperature()), state)));
-        assertFalse(rule.accept(new RuleContext(createEvent(a.getLowTemperature2()), state)));
+        final TrackerEvent e = createEvent(normalTemperature);
+        final Shipment s = e.getShipment();
+        e.setShipment(null);
+        assertFalse(rule.accept(new RuleContext(e, state)));
+
+        e.setShipment(s);
+        assertTrue(rule.accept(new RuleContext(e, state)));
+
+        s.setAlertProfile(null);
+        assertFalse(rule.accept(new RuleContext(e, state)));
     }
     @Test
     public void testHandle() {

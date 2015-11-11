@@ -29,7 +29,7 @@ import com.visfresh.services.RuleEngine;
  *
  */
 public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
-    private AnnotationConfigApplicationContext context = createContext();
+    private static AnnotationConfigApplicationContext context = createContext();
 
     /**
      * @param klass
@@ -42,7 +42,7 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
     /**
      * @return spring context.
      */
-    private AnnotationConfigApplicationContext createContext() {
+    private static  AnnotationConfigApplicationContext createContext() {
         final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
         ctxt.scan(JUnitDbConfig.class.getPackage().getName(),
             DroolsRuleEngine.class.getPackage().getName(),

@@ -14,11 +14,13 @@ import java.util.TimeZone;
 import org.junit.Before;
 
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureIssue;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
@@ -122,14 +124,49 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
     private AlertProfile createAlertProfile() {
         final AlertProfile ap = new AlertProfile();
         ap.setCompany(sharedCompany);
-        ap.setCriticalHighTemperature(10.);
-        ap.setCriticalHighTemperatureForMoreThen(10);
-        ap.setCriticalLowTemperature(-20.);
         ap.setDescription("JUnit test alert pforile");
-        ap.setHighTemperature(5.);
-        ap.setHighTemperatureForMoreThen(10);
-        ap.setLowTemperature(-10.);
-        ap.setLowTemperatureForMoreThen(7);
+
+        final int normalTemperature = 3;
+        TemperatureIssue criticalHot = new TemperatureIssue(AlertType.CriticalHot);
+        criticalHot.setTemperature(normalTemperature + 15);
+        criticalHot.setTimeOutMinutes(0);
+        ap.getTemperatureIssues().add(criticalHot);
+
+        criticalHot = new TemperatureIssue(AlertType.CriticalHot);
+        criticalHot.setTemperature(normalTemperature + 14);
+        criticalHot.setTimeOutMinutes(1);
+        ap.getTemperatureIssues().add(criticalHot);
+
+        TemperatureIssue criticalLow = new TemperatureIssue(AlertType.CriticalCold);
+        criticalLow.setTemperature(normalTemperature -15.);
+        criticalLow.setTimeOutMinutes(0);
+        ap.getTemperatureIssues().add(criticalLow);
+
+        criticalLow = new TemperatureIssue(AlertType.CriticalCold);
+        criticalLow.setTemperature(normalTemperature -14.);
+        criticalLow.setTimeOutMinutes(1);
+        ap.getTemperatureIssues().add(criticalLow);
+
+        TemperatureIssue hot = new TemperatureIssue(AlertType.Hot);
+        hot.setTemperature(normalTemperature + 3);
+        hot.setTimeOutMinutes(0);
+        ap.getTemperatureIssues().add(hot);
+
+        hot = new TemperatureIssue(AlertType.Hot);
+        hot.setTemperature(normalTemperature + 4.);
+        hot.setTimeOutMinutes(2);
+        ap.getTemperatureIssues().add(hot);
+
+        TemperatureIssue low = new TemperatureIssue(AlertType.Cold);
+        low.setTemperature(normalTemperature -10.);
+        low.setTimeOutMinutes(40);
+        ap.getTemperatureIssues().add(low);
+
+        low = new TemperatureIssue(AlertType.Cold);
+        low.setTemperature(normalTemperature-8.);
+        low.setTimeOutMinutes(55);
+        ap.getTemperatureIssues().add(low);
+
         ap.setName("JUnit-Alert");
         ap.setWatchBatteryLow(true);
         ap.setWatchMovementStart(true);

@@ -46,7 +46,6 @@ public class DeviceStateSerializerTest {
         s.getShipmentAutoStart().getProperties().put("key", "value");
 
         final String str = serializer.toString(s);
-        System.out.println(str);
         s = serializer.parseState(str);
 
         assertNotNull(s);

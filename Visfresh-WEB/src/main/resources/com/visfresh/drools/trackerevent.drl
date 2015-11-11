@@ -3,10 +3,6 @@ package com.visfresh.drools
 import com.visfresh.rules.AssignShipmentRule;
 import com.visfresh.rules.OpenJtsRule;
 import com.visfresh.rules.RuleContext;
-import com.visfresh.rules.HighTemperatureAlertRule;
-import com.visfresh.rules.CriticalHighTemperatureAlertRule;
-import com.visfresh.rules.LowTemperatureAlertRule;
-import com.visfresh.rules.CriticalLowTemperatureAlertRule;
 import com.visfresh.rules.EnterBrightEnvironmentAlertRule;
 import com.visfresh.rules.EnterDarkEnvironmentAlertRule;
 import com.visfresh.rules.BatteryLowAlertRule;
@@ -16,6 +12,7 @@ import com.visfresh.rules.MovementStartAlertRule;
 import com.visfresh.rules.MovementStopAlertRule;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.NormalTemperatureRule;
+import com.visfresh.rules.TemperatureAlertRule;
 
 global AbstractRuleEngine engine;
 
@@ -48,38 +45,11 @@ rule "OpenGts"
         }
 end
 
-rule "HighTemperatureAlert"
+rule "TemperatureAlert"
     when
-        context : RuleContext(engine.getRule(HighTemperatureAlertRule.NAME).accept(this));
+        context : RuleContext(engine.getRule(TemperatureAlertRule.NAME).accept(this));
     then
-    	if(engine.getRule(HighTemperatureAlertRule.NAME).handle(context)) {
-       		update(context);
-        }
-end
-
-rule "CriticalHighTemperatureAlert"
-    when
-        context : RuleContext(engine.getRule(CriticalHighTemperatureAlertRule.NAME).accept(this));
-    then
-    	if(engine.getRule(CriticalHighTemperatureAlertRule.NAME).handle(context)) {
-       		update(context);
-        }
-end
-
-rule "LowTemperatureAlert"
-    when
-        context : RuleContext(engine.getRule(LowTemperatureAlertRule.NAME).accept(this));
-    then
-    	if(engine.getRule(LowTemperatureAlertRule.NAME).handle(context)) {
-       		update(context);
-        }
-end
-
-rule "CriticalLowTemperatureAlert"
-    when
-        context : RuleContext(engine.getRule(CriticalLowTemperatureAlertRule.NAME).accept(this));
-    then
-    	if(engine.getRule(CriticalLowTemperatureAlertRule.NAME).handle(context)) {
+    	if(engine.getRule(TemperatureAlertRule.NAME).handle(context)) {
        		update(context);
         }
 end

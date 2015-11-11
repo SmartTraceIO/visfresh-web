@@ -50,14 +50,7 @@ public class ShipmentTemplateDaoTest
 
         final AlertProfile ap = new AlertProfile();
         ap.setCompany(sharedCompany);
-        ap.setCriticalHighTemperature(10.);
-        ap.setCriticalHighTemperatureForMoreThen(10);
-        ap.setCriticalLowTemperature(-20.);
         ap.setDescription("JUnit test alert pforile");
-        ap.setHighTemperature(5.);
-        ap.setHighTemperatureForMoreThen(10);
-        ap.setLowTemperature(-10.);
-        ap.setLowTemperatureForMoreThen(7);
         ap.setName("JUnit-Alert");
         ap.setWatchBatteryLow(true);
         ap.setWatchMovementStart(true);

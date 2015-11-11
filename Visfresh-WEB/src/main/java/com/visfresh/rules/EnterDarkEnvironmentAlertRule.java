@@ -37,11 +37,11 @@ public class EnterDarkEnvironmentAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#handleInternal(com.visfresh.entities.TrackerEvent)
      */
     @Override
-    protected Alert handleInternal(final TrackerEvent event) {
+    protected Alert[] handleInternal(final TrackerEvent event) {
         final Alert alert = new Alert();
         defaultAssign(event, alert);
         alert.setType(AlertType.LightOff);
-        return alert;
+        return new Alert[] {alert};
     }
 
     /* (non-Javadoc)

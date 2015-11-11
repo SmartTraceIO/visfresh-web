@@ -112,6 +112,10 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         final RuleContext context = new RuleContext(e, state == null ? new DeviceState() : state);
 
         invokeRules(context);
+
+        //update history.
+        state.addToHistory(new TemperaturePoint(e.getTemperature(), e.getTime()));
+
         deviceDao.saveState(imei, state);
     }
     /**

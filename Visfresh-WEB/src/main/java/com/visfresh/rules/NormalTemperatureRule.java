@@ -8,7 +8,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 
@@ -46,34 +45,6 @@ public class NormalTemperatureRule implements TrackerEventRule {
             return false;
         }
 
-        //check normal temperature.
-        final AlertProfile a = shipment.getAlertProfile();
-        final double t = e.getTemperature();
-
-        if (a.getCriticalHighTemperature() != null && a.getCriticalHighTemperature() <= t) {
-            return false;
-        }
-        if (a.getCriticalHighTemperature2() != null && a.getCriticalHighTemperature2() <= t) {
-            return false;
-        }
-        if (a.getHighTemperature() != null && a.getHighTemperature() <= t) {
-            return false;
-        }
-        if (a.getHighTemperature2() != null && a.getHighTemperature2() <= t) {
-            return false;
-        }
-        if (a.getCriticalLowTemperature() != null && a.getCriticalLowTemperature() >= t) {
-            return false;
-        }
-        if (a.getCriticalLowTemperature2() != null && a.getCriticalLowTemperature2() >= t) {
-            return false;
-        }
-        if (a.getLowTemperature() != null && a.getLowTemperature() >= t) {
-            return false;
-        }
-        if (a.getLowTemperature2() != null && a.getLowTemperature2() >= t) {
-            return false;
-        }
         return true;
     }
 
