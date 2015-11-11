@@ -15,6 +15,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.controllers.TrackerEventConstants;
+import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Shipment;
@@ -45,6 +46,8 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
 
     @Autowired
     private ShipmentDao shipmentDao;
+    @Autowired
+    private DeviceDao deviceDao;
 
     private final Map<String, String> propertyToDbMap = new HashMap<String, String>();
 
@@ -88,7 +91,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         paramMap.put(LATITUDE_FIELD, event.getLatitude());
         paramMap.put(LONGITUDE_FIELD, event.getLongitude());
         paramMap.put(DEVICE_FIELD, event.getDevice().getId());
-        paramMap.put(SHIPMENT_FIELD, event.getShipment().getId());
+        paramMap.put(SHIPMENT_FIELD, event.getShipment() == null ? null : event.getShipment().getId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -242,15 +245,21 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     @Override
     protected void resolveReferences(final TrackerEvent e, final Map<String, Object> row,
             final Map<String, Object> cache) {
-        final String shipmentId = row.get(SHIPMENT_FIELD).toString();
-        Shipment shipment = (Shipment) cache.get(shipmentId);
-        if (shipment == null) {
-            shipment = shipmentDao.findOne(Long.valueOf(shipmentId));
-            cache.put(shipmentId, shipment);
-        }
+        final Object tmp = row.get(SHIPMENT_FIELD);
+        if (tmp != null) {
+            final String shipmentId = tmp.toString();
+            Shipment shipment = (Shipment) cache.get(shipmentId);
+            if (shipment == null) {
+                shipment = shipmentDao.findOne(Long.valueOf(shipmentId));
+                cache.put(shipmentId, shipment);
+            }
 
-        e.setShipment(shipment);
-        e.setDevice(shipment.getDevice());
+            e.setShipment(shipment);
+            e.setDevice(shipment.getDevice());
+        } else {
+            final String imei = (String) row.get(DEVICE_FIELD);
+            e.setDevice(deviceDao.findByImei(imei));
+        }
     }
 
     /* (non-Javadoc)

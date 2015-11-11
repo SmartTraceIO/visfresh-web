@@ -19,8 +19,8 @@ import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
-import com.visfresh.dao.mock.MockDaoConfig;
 import com.visfresh.drools.DroolsRuleEngine;
+import com.visfresh.junit.db.JUnitDbConfig;
 import com.visfresh.mock.MockSmsService;
 import com.visfresh.services.RuleEngine;
 
@@ -44,7 +44,7 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
      */
     private AnnotationConfigApplicationContext createContext() {
         final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
-        ctxt.scan(MockDaoConfig.class.getPackage().getName(),
+        ctxt.scan(JUnitDbConfig.class.getPackage().getName(),
             DroolsRuleEngine.class.getPackage().getName(),
             MockSmsService.class.getPackage().getName());
         ctxt.refresh();
