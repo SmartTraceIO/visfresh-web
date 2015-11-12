@@ -30,15 +30,16 @@ An authentication can be performed as from REST client using login method, as fr
 ## Data model##
 1. [Authentication token](#markdown-header-authentication-token)  
 2. [Alert Profile](#markdown-header-alert-profile)  
-3. [Notification Schedule](#markdown-header-notification-schedule)   
-4. [Location](#markdown-header-location)  
-5. [Shipment Template](#markdown-header-shipment-template)  
-6. [Device](#markdown-header-device)  
-7. [Shipment](#markdown-header-shipment)  
-8. [Notification](#markdown-header-notification)  
-9. [Alert](#markdown-header-alert)  
-10. [Temperature Alert](#markdown-header-temperature-alert)  
-11. [Arrival](#markdown-header-arrival)  
+3. [Temperature Issue](#markdown-header-temperature-issue)  
+4. [Notification Schedule](#markdown-header-notification-schedule)  
+5. [Location](#markdown-header-location)  
+6. [Shipment Template](#markdown-header-shipment-template)  
+7. [Device](#markdown-header-device)  
+8. [Shipment](#markdown-header-shipment)  
+9. [Notification](#markdown-header-notification)  
+10. [Alert](#markdown-header-alert)  
+11. [Temperature Alert](#markdown-header-temperature-alert)  
+12. [Arrival](#markdown-header-arrival)  
 
 ## Lists ##
 List items is short representations of base entities, like as [Alert Profile](#markdown-header-alert-profile), [Location](#markdown-header-location), etc. Some of fields can be get from corresponding base entity and some can be synthetic fields.  
@@ -343,30 +344,25 @@ see [ResponseStatus](#markdown-header-response-status)
 ### Alert Profile ###
 ```json
 {
-  "alertProfileId": 2,
-  "alertProfileName": "AnyAlert",
-  "alertProfileDescription": "Any description",
-  "highTemperature": 5.0,
-  "highTemperatureMinutes": 0,
-  "highTemperature2": 4.0, //optional
-  "highTemperatureMinutes2": 2, //optional
-  "criticalHighTemperature": 10.0,
-  "criticalHighTemperatureMinutes": 0,
-  "criticalHighTemperature2": 9.0, //optional
-  "criticalHighTemperatureMinutes2": 1, //optional
-  "lowTemperature": -10.0,
-  "lowTemperatureMinutes": 40,
-  "lowTemperature2": -8.0, //optional
-  "lowTemperatureMinutes2": 55, //optional
-  "criticalLowTemperature": -15.0,
-  "criticalLowTemperatureMinutes": 0,
-  "criticalLowTemperature2": -14.0, //optional
-  "criticalLowTemperatureMinutes2": 1, //optional
-  "watchBatteryLow": true,
-  "watchEnterBrightEnvironment": true,
-  "watchEnterDarkEnvironment": true,
-  "watchMovementStart": true,
-  "watchMovementStop": true
+	"alertProfileId": 182,
+	"alertProfileName": "AnyAlert",
+	"alertProfileDescription": "Any description",
+	"watchBatteryLow": true,
+	"watchEnterBrightEnvironment": true,
+	"watchEnterDarkEnvironment": true,
+	"watchMovementStart": true,
+	"watchMovementStop": true,
+	"temperatureIssues": [/* Array of temperature issues */]
+}
+```
+[(See Temperature Issue)](#markdown-header-temperature-issue)
+### Temperature Issue ###
+```json
+{
+  "id": 1007,
+  "type": "CriticalHot",
+  "temperature": 17.0,
+  "timeOutMinutes": 1
 }
 ```
 ### Notification Schedule ###
@@ -718,27 +714,53 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 {
   "alertProfileName": "AnyAlert",
   "alertProfileDescription": "Any description",
-  "highTemperature": 5.0,
-  "highTemperatureMinutes": 0,
-  "highTemperature2": 4.0,
-  "highTemperatureMinutes2": 2,
-  "criticalHighTemperature": 10.0,
-  "criticalHighTemperatureMinutes": 0,
-  "criticalHighTemperature2": 9.0,
-  "criticalHighTemperatureMinutes2": 1,
-  "lowTemperature": -10.0,
-  "lowTemperatureMinutes": 40,
-  "lowTemperature2": -8.0,
-  "lowTemperatureMinutes2": 55,
-  "criticalLowTemperature": -15.0,
-  "criticalLowTemperatureMinutes": 0,
-  "criticalLowTemperature2": -14.0,
-  "criticalLowTemperatureMinutes2": 1,
   "watchBatteryLow": true,
   "watchEnterBrightEnvironment": true,
   "watchEnterDarkEnvironment": true,
   "watchMovementStart": true,
-  "watchMovementStop": true
+  "watchMovementStop": true,
+  "temperatureIssues": [
+    {
+      "type": "CriticalHot",
+      "temperature": 18.0,
+      "timeOutMinutes": 0
+    },
+    {
+      "type": "CriticalHot",
+      "temperature": 17.0,
+      "timeOutMinutes": 1
+    },
+    {
+      "type": "CriticalCold",
+      "temperature": -12.0,
+      "timeOutMinutes": 0
+    },
+    {
+      "type": "CriticalCold",
+      "temperature": -11.0,
+      "timeOutMinutes": 1
+    },
+    {
+      "type": "Hot",
+      "temperature": 6.0,
+      "timeOutMinutes": 0
+    },
+    {
+      "type": "Hot",
+      "temperature": 7.0,
+      "timeOutMinutes": 2
+    },
+    {
+      "type": "Cold",
+      "temperature": -7.0,
+      "timeOutMinutes": 40
+    },
+    {
+      "type": "Cold",
+      "temperature": -5.0,
+      "timeOutMinutes": 55
+    }
+  ]
 }
 ```
 **Response:** 
@@ -763,30 +785,64 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "message": "Success"
   },
   "response": {
-    "alertProfileId": 2,
+    "alertProfileId": 182,
     "alertProfileName": "AnyAlert",
     "alertProfileDescription": "Any description",
-    "highTemperature": 5.0,
-    "highTemperatureMinutes": 0,
-    "highTemperature2": 4.0,
-    "highTemperatureMinutes2": 2,
-    "criticalHighTemperature": 10.0,
-    "criticalHighTemperatureMinutes": 0,
-    "criticalHighTemperature2": 9.0,
-    "criticalHighTemperatureMinutes2": 1,
-    "lowTemperature": -10.0,
-    "lowTemperatureMinutes": 40,
-    "lowTemperature2": -8.0,
-    "lowTemperatureMinutes2": 55,
-    "criticalLowTemperature": -15.0,
-    "criticalLowTemperatureMinutes": 0,
-    "criticalLowTemperature2": -14.0,
-    "criticalLowTemperatureMinutes2": 1,
     "watchBatteryLow": true,
     "watchEnterBrightEnvironment": true,
     "watchEnterDarkEnvironment": true,
     "watchMovementStart": true,
-    "watchMovementStop": true
+    "watchMovementStop": true,
+    "temperatureIssues": [
+      {
+        "id": 982,
+        "type": "CriticalHot",
+        "temperature": 18.0,
+        "timeOutMinutes": 0
+      },
+      {
+        "id": 983,
+        "type": "CriticalHot",
+        "temperature": 17.0,
+        "timeOutMinutes": 1
+      },
+      {
+        "id": 984,
+        "type": "CriticalCold",
+        "temperature": -12.0,
+        "timeOutMinutes": 0
+      },
+      {
+        "id": 985,
+        "type": "CriticalCold",
+        "temperature": -11.0,
+        "timeOutMinutes": 1
+      },
+      {
+        "id": 986,
+        "type": "Hot",
+        "temperature": 6.0,
+        "timeOutMinutes": 0
+      },
+      {
+        "id": 987,
+        "type": "Hot",
+        "temperature": 7.0,
+        "timeOutMinutes": 2
+      },
+      {
+        "id": 988,
+        "type": "Cold",
+        "temperature": -7.0,
+        "timeOutMinutes": 40
+      },
+      {
+        "id": 989,
+        "type": "Cold",
+        "temperature": -5.0,
+        "timeOutMinutes": 55
+      }
+    ]
   }
 }
 ```
@@ -801,56 +857,124 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": [
     {
-      "alertProfileId": 2,
+      "alertProfileId": 179,
       "alertProfileName": "AnyAlert",
       "alertProfileDescription": "Any description",
-      "highTemperature": 5.0,
-      "highTemperatureMinutes": 0,
-      "highTemperature2": 4.0,
-      "highTemperatureMinutes2": 2,
-      "criticalHighTemperature": 10.0,
-      "criticalHighTemperatureMinutes": 0,
-      "criticalHighTemperature2": 9.0,
-      "criticalHighTemperatureMinutes2": 1,
-      "lowTemperature": -10.0,
-      "lowTemperatureMinutes": 40,
-      "lowTemperature2": -8.0,
-      "lowTemperatureMinutes2": 55,
-      "criticalLowTemperature": -15.0,
-      "criticalLowTemperatureMinutes": 0,
-      "criticalLowTemperature2": -14.0,
-      "criticalLowTemperatureMinutes2": 1,
       "watchBatteryLow": true,
       "watchEnterBrightEnvironment": true,
       "watchEnterDarkEnvironment": true,
       "watchMovementStart": true,
-      "watchMovementStop": true
+      "watchMovementStop": true,
+      "temperatureIssues": [
+        {
+          "id": 958,
+          "type": "CriticalHot",
+          "temperature": 18.0,
+          "timeOutMinutes": 0
+        },
+        {
+          "id": 959,
+          "type": "CriticalHot",
+          "temperature": 17.0,
+          "timeOutMinutes": 1
+        },
+        {
+          "id": 960,
+          "type": "CriticalCold",
+          "temperature": -12.0,
+          "timeOutMinutes": 0
+        },
+        {
+          "id": 961,
+          "type": "CriticalCold",
+          "temperature": -11.0,
+          "timeOutMinutes": 1
+        },
+        {
+          "id": 962,
+          "type": "Hot",
+          "temperature": 6.0,
+          "timeOutMinutes": 0
+        },
+        {
+          "id": 963,
+          "type": "Hot",
+          "temperature": 7.0,
+          "timeOutMinutes": 2
+        },
+        {
+          "id": 964,
+          "type": "Cold",
+          "temperature": -7.0,
+          "timeOutMinutes": 40
+        },
+        {
+          "id": 965,
+          "type": "Cold",
+          "temperature": -5.0,
+          "timeOutMinutes": 55
+        }
+      ]
     },
     {
-      "alertProfileId": 3,
+      "alertProfileId": 180,
       "alertProfileName": "AnyAlert",
       "alertProfileDescription": "Any description",
-      "highTemperature": 5.0,
-      "highTemperatureMinutes": 0,
-      "highTemperature2": 4.0,
-      "highTemperatureMinutes2": 2,
-      "criticalHighTemperature": 10.0,
-      "criticalHighTemperatureMinutes": 0,
-      "criticalHighTemperature2": 9.0,
-      "criticalHighTemperatureMinutes2": 1,
-      "lowTemperature": -10.0,
-      "lowTemperatureMinutes": 40,
-      "lowTemperature2": -8.0,
-      "lowTemperatureMinutes2": 55,
-      "criticalLowTemperature": -15.0,
-      "criticalLowTemperatureMinutes": 0,
-      "criticalLowTemperature2": -14.0,
-      "criticalLowTemperatureMinutes2": 1,
       "watchBatteryLow": true,
       "watchEnterBrightEnvironment": true,
       "watchEnterDarkEnvironment": true,
       "watchMovementStart": true,
-      "watchMovementStop": true
+      "watchMovementStop": true,
+      "temperatureIssues": [
+        {
+          "id": 966,
+          "type": "CriticalHot",
+          "temperature": 18.0,
+          "timeOutMinutes": 0
+        },
+        {
+          "id": 967,
+          "type": "CriticalHot",
+          "temperature": 17.0,
+          "timeOutMinutes": 1
+        },
+        {
+          "id": 968,
+          "type": "CriticalCold",
+          "temperature": -12.0,
+          "timeOutMinutes": 0
+        },
+        {
+          "id": 969,
+          "type": "CriticalCold",
+          "temperature": -11.0,
+          "timeOutMinutes": 1
+        },
+        {
+          "id": 970,
+          "type": "Hot",
+          "temperature": 6.0,
+          "timeOutMinutes": 0
+        },
+        {
+          "id": 971,
+          "type": "Hot",
+          "temperature": 7.0,
+          "timeOutMinutes": 2
+        },
+        {
+          "id": 972,
+          "type": "Cold",
+          "temperature": -7.0,
+          "timeOutMinutes": 40
+        },
+        {
+          "id": 973,
+          "type": "Cold",
+          "temperature": -5.0,
+          "timeOutMinutes": 55
+        }
+      ]
     }
   ],
   "totalCount": 2
