@@ -13,6 +13,7 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.constants.UserConstants;
 import com.visfresh.controllers.restclient.UserRestClient;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.UserDao;
@@ -25,6 +26,7 @@ import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
+import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -112,6 +114,30 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertNotNull(u2.getCompany());
     }
     @Test
+    public void testGetUsers() throws IOException, RestServiceException {
+        final Company c = new Company();
+        c.setName("Test");
+        c.setDescription("Test company");
+        context.getBean(CompanyDao.class).save(c);
+
+        createUser("u1", "A2", c);
+        createUser("u2", "A1", c);
+        final String token = client.login("u1", "");
+        client.setAuthToken(token);
+
+        //test limit
+        assertEquals(2, client.getUsers(1, 10000, null, null).size());
+        assertEquals(1, client.getUsers(1, 1, null, null).size());
+        assertEquals(1, client.getUsers(2, 1, null, null).size());
+
+        //test sort
+        assertEquals("u1", client.getUsers(1, 1, UserConstants.PROPERTY_LOGIN, "asc").get(0).getLogin());
+        assertEquals("u2", client.getUsers(1, 1, UserConstants.PROPERTY_LOGIN, "desc").get(0).getLogin());
+
+        assertEquals("u2", client.getUsers(1, 1, UserConstants.PROPERTY_FULL_NAME, "asc").get(0).getLogin());
+        assertEquals("u1", client.getUsers(1, 1, UserConstants.PROPERTY_FULL_NAME, "desc").get(0).getLogin());
+    }
+    @Test
     public void testUpdateUserDetails() throws IOException, RestServiceException {
         final TimeZone tz = TimeZone.getTimeZone("GMT+2");
         final String fullName = "Full User Name";
@@ -136,5 +162,19 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(fullName, u.getFullName());
         assertEquals(tz, u.getTimeZone());
         assertEquals(temperatureUnits, u.getTemperatureUnits());
+    }
+    /**
+     * @param login
+     * @param fullName
+     * @return user.
+     */
+    private User createUser(final String login, final String fullName, final Company company) {
+        final User u = new User();
+        u.setLogin(login);
+        u.setFullName(fullName);
+        u.setCompany(company);
+        u.getRoles().add(Role.CompanyAdmin);
+        context.getBean(AuthService.class).createUser(u, "");
+        return u;
     }
 }
