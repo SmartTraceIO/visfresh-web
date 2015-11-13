@@ -10,7 +10,7 @@ import com.visfresh.entities.UserProfile;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface UserDao extends DaoBase<User, String> {
+public interface UserDao extends EntityWithCompanyDaoBase<User, String> {
     /**
      * @param user user.
      * @return user profile.

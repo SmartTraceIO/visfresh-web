@@ -6,7 +6,6 @@ package com.visfresh.controllers;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -21,11 +20,11 @@ import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.EntityWithCompany;
 import com.visfresh.entities.User;
-import com.visfresh.io.EntityJSonSerializer;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -34,7 +33,6 @@ import com.visfresh.services.RestServiceException;
 @Component
 @ComponentScan(basePackageClasses = {AuthService.class})
 public abstract class AbstractController {
-    protected static final TimeZone UTС = TimeZone.getTimeZone("UTC");
     /**
      * Authentication service.
      */
@@ -72,7 +70,7 @@ public abstract class AbstractController {
      * @return JSON response.
      */
     protected String createIdResponse(final String idFieldName, final Long id) {
-        return createSuccessResponse(EntityJSonSerializer.idToJson(idFieldName, id));
+        return createSuccessResponse(SerializerUtils.idToJson(idFieldName, id));
     }
     /**
      * @param response.
@@ -123,7 +121,7 @@ public abstract class AbstractController {
         } else if (e instanceof RestServiceException) {
             code = ((RestServiceException) e).getErrorCode();
         }
-        return EntityJSonSerializer.createErrorStatus(code, e);
+        return SerializerUtils.createErrorStatus(code, e);
     }
     /**
      * @param code status code.
@@ -164,22 +162,11 @@ public abstract class AbstractController {
      */
     protected JsonElement getJSon(final String text) throws RestServiceException {
         try {
-            return EntityJSonSerializer.parseJson(text);
+            return SerializerUtils.parseJson(text);
         } catch (final Exception e) {
             throw new RestServiceException(ErrorCodes.INVALID_JSON, "Invalid JSON format");
         }
     }
-    /**
-     * @param user user.
-     * @return serializer.
-     */
-    protected EntityJSonSerializer getSerializer(final User user) {
-        final EntityJSonSerializer ser = new EntityJSonSerializer(
-                user == null ? UTС : user.getTimeZone());
-        ser.setReferenceResolver(resolver);
-        return ser;
-    }
-
     /**
      * @param sc
      * @param so

@@ -12,6 +12,7 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.controllers.restclient.DeviceRestClient;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.entities.Device;
 import com.visfresh.services.RestServiceException;
@@ -22,6 +23,7 @@ import com.visfresh.services.RestServiceException;
  */
 public class DeviceControllerTest extends AbstractRestServiceTest {
     private DeviceDao dao;
+    private DeviceRestClient client = new DeviceRestClient(UTC);
 
     /**
      * Default constructor.
@@ -33,6 +35,8 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
     @Before
     public void setUp() {
         dao = context.getBean(DeviceDao.class);
+        client.setServiceUrl(getServiceUrl());
+        client.setAuthToken(login());
     }
     //@RequestMapping(value = "/saveDevice/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveDevice(@PathVariable final String authToken,
@@ -40,18 +44,18 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
     @Test
     public void testSaveDevice() throws RestServiceException, IOException {
         final Device p = createDevice("0239487043987", false);
-        facade.saveDevice(p);
+        client.saveDevice(p);
         assertNotNull(dao.findOne(p.getImei()));
     }
     @Test
     public void testGetDevice() throws IOException, RestServiceException {
         final Device ap = createDevice("0239487043987", true);
-        assertNotNull(facade.getDevice(ap.getId()));
+        assertNotNull(client.getDevice(ap.getId()));
     }
     @Test
     public void testDeleteDevice() throws RestServiceException, IOException {
         final Device p = createDevice("0239487043987", true);
-        facade.deleteDevice(p);
+        client.deleteDevice(p);
         assertNull(dao.findOne(p.getId()));
     }
     //@RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
@@ -61,16 +65,16 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         createDevice("0239487043987", true);
         createDevice("0239487043222", true);
 
-        assertEquals(2, facade.getDevices(null, null).size());
-        assertEquals(1, facade.getDevices(1, 1).size());
-        assertEquals(1, facade.getDevices(2, 1).size());
-        assertEquals(0, facade.getDevices(3, 1).size());
+        assertEquals(2, client.getDevices(null, null).size());
+        assertEquals(1, client.getDevices(1, 1).size());
+        assertEquals(1, client.getDevices(2, 1).size());
+        assertEquals(0, client.getDevices(3, 1).size());
     }
     @Test
     public void testSendCommandToDevice() throws RestServiceException, IOException {
         final Device device = createDevice("089723409857032498", true);
-        facade.saveDevice(device);
+        client.saveDevice(device);
 
-        facade.sendCommandToDevice(device, "shutdown");
+        client.sendCommandToDevice(device, "shutdown");
     }
 }

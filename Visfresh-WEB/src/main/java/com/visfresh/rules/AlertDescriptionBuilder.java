@@ -15,7 +15,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
-import com.visfresh.io.AbstractJsonSerializer;
+import com.visfresh.io.json.AbstractJsonSerializer;
 import com.visfresh.l12n.XmlControl;
 import com.visfresh.utils.StringUtils;
 

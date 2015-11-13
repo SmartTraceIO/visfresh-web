@@ -25,7 +25,8 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.User;
-import com.visfresh.io.EntityJSonSerializer;
+import com.visfresh.io.DeviceResolver;
+import com.visfresh.io.json.DeviceSerializer;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -43,6 +44,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
     private DeviceDao dao;
     @Autowired
     private DeviceCommandDao deviceCommandDao;
+    @Autowired
+    private DeviceResolver deviceResolver;
 
     /**
      * Default constructor.
@@ -62,7 +65,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final User user = getLoggedInUser(authToken);
             security.checkCanManageDevices(user);
 
-            final Device d = getSerializer(user).parseDevice(getJSonObject(device));
+            final Device d = createSerializer(user).parseDevice(getJSonObject(device));
             checkCompanyAccess(user, d);
 
             d.setCompany(user.getCompany());
@@ -89,7 +92,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final User user = getLoggedInUser(authToken);
             security.checkCanGetDevices(user);
 
-            final EntityJSonSerializer ser = getSerializer(user);
+            final DeviceSerializer ser = createSerializer(user);
 
             final List<Device> devices = dao.findByCompany(user.getCompany(),
                     new Sorting(getDefaultSortOrder()),
@@ -133,7 +136,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final Device device = dao.findByImei(imei);
             checkCompanyAccess(user, device);
 
-            return createSuccessResponse(getSerializer(user).toJson(device));
+            return createSuccessResponse(createSerializer(user).toJson(device));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
@@ -174,7 +177,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final User user = getLoggedInUser(authToken);
             security.checkCanSendCommandToDevice(user);
 
-            final DeviceCommand cmd = getSerializer(user).parseDeviceCommand(getJSonObject(req));
+            final DeviceCommand cmd = createSerializer(user).parseDeviceCommand(getJSonObject(req));
             deviceCommandDao.save(cmd);
 
             return createSuccessResponse(null);
@@ -182,5 +185,14 @@ public class DeviceController extends AbstractController implements DeviceConsta
             log.error("Failed to send command to device", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param user
+     * @return
+     */
+    private DeviceSerializer createSerializer(final User user) {
+        final DeviceSerializer deviceSerializer = new DeviceSerializer(user.getTimeZone());
+        deviceSerializer.setDeviceResolver(deviceResolver);
+        return deviceSerializer;
     }
 }

@@ -12,13 +12,15 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ReferenceResolver;
+import com.visfresh.io.ShipmentResolver;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class MockReferenceResolver implements ReferenceResolver {
+public class MockReferenceResolver implements ReferenceResolver, CompanyResolver, ShipmentResolver {
     private final Map<Long, LocationProfile> locationProfiles = new HashMap<Long, LocationProfile>();
     private final Map<Long, AlertProfile> alertProfiles = new HashMap<Long, AlertProfile>();
     private final Map<Long, NotificationSchedule> notificationSchedules = new HashMap<Long, NotificationSchedule>();

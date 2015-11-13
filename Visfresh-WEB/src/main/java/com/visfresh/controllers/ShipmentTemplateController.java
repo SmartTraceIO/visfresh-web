@@ -23,7 +23,8 @@ import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
-import com.visfresh.io.EntityJSonSerializer;
+import com.visfresh.io.ReferenceResolver;
+import com.visfresh.io.json.ShipmentTemplateSerializer;
 import com.visfresh.services.lists.ListShipmentTemplateItem;
 
 /**
@@ -41,6 +42,8 @@ public class ShipmentTemplateController extends AbstractController implements Sh
     private ShipmentTemplateDao shipmentTemplateDao;
     @Autowired
     private AlertDao alertDao;
+    @Autowired
+    private ReferenceResolver referenceResolver;
 
     /**
      * Default constructor.
@@ -61,7 +64,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveShipmentTemplate(user);
 
-            final ShipmentTemplate t = getSerializer(user).parseShipmentTemplate(getJSonObject(tpl));
+            final ShipmentTemplate t = createSerializer(user).parseShipmentTemplate(getJSonObject(tpl));
             checkCompanyAccess(user, t);
 
             t.setCompany(user.getCompany());
@@ -97,7 +100,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
             final int total = shipmentTemplateDao.getEntityCount(user.getCompany(), null);
 
             final JsonArray array = new JsonArray();
-            final EntityJSonSerializer ser = getSerializer(user);
+            final ShipmentTemplateSerializer ser = createSerializer(user);
             for (final ShipmentTemplate tpl : templates) {
                 final ListShipmentTemplateItem item = new ListShipmentTemplateItem(tpl);
                 array.add(ser.toJson(item));
@@ -137,12 +140,22 @@ public class ShipmentTemplateController extends AbstractController implements Sh
             final ShipmentTemplate template = shipmentTemplateDao.findOne(shipmentTemplateId);
             checkCompanyAccess(user, template);
 
-            return createSuccessResponse(getSerializer(user).toJson(template));
+            return createSuccessResponse(createSerializer(user).toJson(template));
         } catch (final Exception e) {
             log.error("Failed to get shipment templates", e);
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param user
+     * @return
+     */
+    private ShipmentTemplateSerializer createSerializer(final User user) {
+        final ShipmentTemplateSerializer tpl = new ShipmentTemplateSerializer(user.getTimeZone());
+        tpl.setReferenceResolver(referenceResolver);
+        return tpl;
+    }
+
     /**
      * @param authToken authentication token.
      * @param shipmentTemplateId shipment template ID.

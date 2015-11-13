@@ -13,6 +13,7 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.controllers.restclient.UserRestClient;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Company;
@@ -21,6 +22,8 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.entities.UserProfile;
+import com.visfresh.io.CompanyResolver;
+import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.RestServiceException;
 
@@ -32,6 +35,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
     private User user;
     private UserDao dao;
     private CompanyDao companyDao;
+    private UserRestClient client;
 
     /**
      * Default constructor.
@@ -45,13 +49,19 @@ public class UserControllerTest extends AbstractRestServiceTest {
         dao = context.getBean(UserDao.class);
         companyDao = context.getBean(CompanyDao.class);
         user = dao.findAll(null, null, null).get(0);
+
+        client = new UserRestClient(UTC);
+        client.setAuthToken(login());
+        client.setServiceUrl(getServiceUrl());
+        client.setCompanyResolver(context.getBean(CompanyResolver.class));
+        client.setShipmentResolver(context.getBean(ShipmentResolver.class));
     }
     //@RequestMapping(value = "/getUser/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getUser(@PathVariable final String authToken,
     //        final @RequestParam String username) {
     @Test
     public void testGetUser() throws IOException, RestServiceException {
-        final User user = facade.getUser("anylogin");
+        final User user = client.getUser("anylogin");
         assertNotNull(user);
     }
     @Test
@@ -65,14 +75,14 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         dao.saveProfile(user, p);
 
-        p = facade.getProfile();
+        p = client.getProfile();
         assertEquals(1, p.getShipments().size());
 
         dao.saveProfile(user, null);
-        assertNull(facade.getProfile());
+        assertNull(client.getProfile());
 
-        facade.saveProfile(p);
-        assertNotNull(facade.getProfile());
+        client.saveProfile(p);
+        assertNotNull(client.getProfile());
         assertEquals(1, p.getShipments().size());
     }
     @Test
@@ -91,7 +101,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         final String password = "password";
 
-        facade.createUser(u, c, password);
+        client.createUser(u, c, password);
 
         final User u2 = dao.findOne(u.getLogin());
         assertNotNull(u2);
@@ -115,12 +125,12 @@ public class UserControllerTest extends AbstractRestServiceTest {
         req.setTemperatureUnits(temperatureUnits);
         req.setPassword(password);
 
-        facade.updateUserDetails(req);
+        client.updateUserDetails(req);
 
-        final String tokent = facade.login(user.getLogin(), password);
-        facade.setAuthToken(tokent);
+        final String tokent = client.login(user.getLogin(), password);
+        client.setAuthToken(tokent);
 
-        final User u = facade.getUser(user.getLogin());
+        final User u = client.getUser(user.getLogin());
 
         assertNotNull(u);
         assertEquals(fullName, u.getFullName());

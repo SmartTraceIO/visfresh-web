@@ -23,12 +23,13 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.io.EntityJSonSerializer;
+import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.SystemMessageDispatcher;
 import com.visfresh.services.SystemMessageHandler;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -47,7 +48,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     private TrackerEventDao trackerEventDao;
     @Autowired
     private DeviceDao deviceDao;
-    private final EntityJSonSerializer jsonParser = new EntityJSonSerializer(TimeZone.getDefault());
+    private final DeviceDcsNativeEventSerializer deviceEventParser = new DeviceDcsNativeEventSerializer();
     private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<String, TrackerEventRule>();
 
     private final TrackerEventRule emptyRule = new TrackerEventRule() {
@@ -79,10 +80,10 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
     @Override
     public void handle(final SystemMessage msg) throws RetryableException {
-        final JsonElement e = EntityJSonSerializer.parseJson(msg.getMessageInfo());
+        final JsonElement e = SerializerUtils.parseJson(msg.getMessageInfo());
         log.debug("Native DCS event has received " + e);
 
-        final DeviceDcsNativeEvent event = jsonParser.parseDeviceDcsNativeEvent(
+        final DeviceDcsNativeEvent event = deviceEventParser.parseDeviceDcsNativeEvent(
                 e.getAsJsonObject());
         //convert the UTC time to local
         event.setDate(new Date(event.getTime().getTime() + TIME_ZONE_OFSET));

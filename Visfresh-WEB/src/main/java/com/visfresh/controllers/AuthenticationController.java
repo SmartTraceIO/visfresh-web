@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.visfresh.entities.User;
+import com.visfresh.io.json.AuthTokenSerializer;
 import com.visfresh.services.AuthToken;
 
 /**
@@ -89,5 +90,12 @@ public class AuthenticationController extends AbstractController {
             log.error("Failed to refresh token " + authToken, e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param user
+     * @return
+     */
+    private AuthTokenSerializer getSerializer(final User user) {
+        return new AuthTokenSerializer(user.getTimeZone());
     }
 }

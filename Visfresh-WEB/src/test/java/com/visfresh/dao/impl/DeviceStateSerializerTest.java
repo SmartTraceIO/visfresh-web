@@ -12,6 +12,7 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.io.json.DeviceStateSerializer;
 import com.visfresh.rules.DeviceState;
 
 /**

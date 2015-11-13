@@ -19,7 +19,8 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.io.EntityJSonSerializer;
+import com.visfresh.io.json.AbstractJsonSerializer;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -161,7 +162,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      * @return
      */
     private Map<String, String> parseJsonMap(final String str) {
-        return EntityJSonSerializer.parseStringMap(EntityJSonSerializer.parseJson(str));
+        return AbstractJsonSerializer.parseStringMap(SerializerUtils.parseJson(str));
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#createParameterMap(com.visfresh.entities.ShipmentBase)
@@ -173,7 +174,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(PALETTID_FIELD, s.getPalletId());
         params.put(ASSETNUM_FIELD, s.getAssetNum());
         params.put(SHIPMENTDATE_FIELD, s.getShipmentDate());
-        params.put(CUSTOMFIELDS_FIELD, EntityJSonSerializer.toJson(s.getCustomFields()).toString());
+        params.put(CUSTOMFIELDS_FIELD, AbstractJsonSerializer.toJson(s.getCustomFields()).toString());
         params.put(STATUS_FIELD, s.getStatus().name());
         params.put(PONUM_FIELD, s.getPoNum());
         params.put(TRIPCOUNT_FIELD, s.getTripCount());

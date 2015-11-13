@@ -17,13 +17,11 @@ import com.visfresh.services.RestServiceException;
 public class Tool extends AbstractTool {
     /**
      * @param url REST service URL.
-     * @param userName user name.
-     * @param password password.
      * @throws IOException
      * @throws RestServiceException
      */
-    public Tool(final String url, final String userName, final String password) throws IOException, RestServiceException {
-        super(url, userName, password);
+    public Tool(final String url) throws IOException, RestServiceException {
+        super(url);
     }
 
     public void createDevices(final String... imeis) throws RestServiceException, IOException {
@@ -38,14 +36,12 @@ public class Tool extends AbstractTool {
      * @throws RestServiceException
      */
     private void createDevice(final String imei) throws RestServiceException, IOException {
-        initalize();
-
         final Device device = new Device();
         device.setImei(imei);
         device.setCompany(company);
         device.setName("DevTool/" + imei.substring(0, imei.length() - 6));
 
-        service.saveDevice(device);
+        deviceService.saveDevice(device);
     }
 
     /**
@@ -58,7 +54,9 @@ public class Tool extends AbstractTool {
         final String serviceUrl = "http://139.162.3.8:8080/web/vf";
 //        final String serviceUrl = "http://localhost:8080/web/vf";
 
-        final Tool tool = new Tool(serviceUrl, "globaladmin", args[0]);
+        final Tool tool = new Tool(serviceUrl);
+        tool.initalize("globaladmin", args[0]);
+
         final String[] devices = {
             "354188046489683",
             "354188048733062",
@@ -80,13 +78,11 @@ public class Tool extends AbstractTool {
      * @throws IOException
      */
     private void addUser(final String login, final String fullName, final String password) throws IOException, RestServiceException {
-        initalize();
-
         final User u = new User();
         u.setLogin(login);
         u.setFullName(fullName);
         u.getRoles().add(Role.CompanyAdmin);
 
-        service.createUser(u, company, password);
+        userService.createUser(u, company, password);
     }
 }

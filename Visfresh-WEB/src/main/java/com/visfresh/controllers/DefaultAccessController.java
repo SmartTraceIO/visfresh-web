@@ -265,6 +265,17 @@ public class DefaultAccessController implements AccessController {
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
                 "User has not permissions for update user detais for " + userName);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanListUsers(com.visfresh.entities.User)
+     */
+    @Override
+    public void checkCanListUsers(final User user) throws RestServiceException {
+        if (hasPermission(user, Role.CompanyAdmin)) {
+            return;
+        }
+        throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                "User has not permissions for list company users");
+    }
     /**
      * @param user
      * @param role

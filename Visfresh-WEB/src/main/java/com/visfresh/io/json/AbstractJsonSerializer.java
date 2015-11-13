@@ -1,21 +1,23 @@
 /**
  *
  */
-package com.visfresh.io;
+package com.visfresh.io.json;
 
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.visfresh.entities.EntityWithId;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -142,21 +144,27 @@ public class AbstractJsonSerializer {
         }
     }
     /**
+     * @param entities list of entity.
+     * @return JSON array with entity IDs.
+     */
+    protected <E extends EntityWithId<Long>> JsonArray getIdList(final List<E> entities) {
+        final JsonArray array= new JsonArray();
+        for (final E e : entities) {
+            array.add(new JsonPrimitive(e.getId()));
+        }
+        return array;
+    }
+    /**
      * @return date format.
      */
     protected SimpleDateFormat createDateFormat() {
         return new SimpleDateFormat(DATE_FORMAT);
     }
     /**
-     * @param text JSON text.
-     * @return JSON element.
+     * @param e
+     * @return
      */
-    public static JsonElement parseJson(final String text) {
-        if (text == null) {
-            return null;
-        }
-
-        final Reader in = new StringReader(text);
-        return new JsonParser().parse(in);
+    protected <IDD extends Serializable & Comparable<IDD>> IDD getId(final EntityWithId<IDD> e) {
+        return e == null ? null : (IDD) e.getId();
     }
 }

@@ -3,7 +3,9 @@
  */
 package com.visfresh.controllers;
 
+import java.net.URL;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.runner.RunWith;
 import org.springframework.web.context.WebApplicationContext;
@@ -15,6 +17,7 @@ import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
@@ -26,6 +29,9 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureIssue;
+import com.visfresh.entities.User;
+import com.visfresh.services.AuthService;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -33,9 +39,10 @@ import com.visfresh.entities.TemperatureIssue;
  */
 @RunWith(RestServiceRunner.class)
 public abstract class AbstractRestServiceTest {
+    protected static TimeZone UTC = SerializerUtils.UTС;
     protected WebApplicationContext context;
-    protected RestServiceFacade facade;
     private long lastLong;
+    private URL serviceUrl;
 
     /**
      * Default constructor.
@@ -55,18 +62,6 @@ public abstract class AbstractRestServiceTest {
      */
     public void setContext(final WebApplicationContext context) {
         this.context = context;
-    }
-    /**
-     * @return the facade
-     */
-    public RestServiceFacade getFacade() {
-        return facade;
-    }
-    /**
-     * @param facade the facade to set
-     */
-    public void setFacade(final RestServiceFacade facade) {
-        this.facade = facade;
     }
 
     /**
@@ -309,5 +304,25 @@ public abstract class AbstractRestServiceTest {
             }
         }
         return null;
+    }
+    protected String login() {
+        try {
+            final User user = context.getBean(UserDao.class).findAll(null, null, null).get(0);
+            return context.getBean(AuthService.class).login(user.getLogin(),"").getToken();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    /**
+     * @param url URL.
+     */
+    public void setServiceUrl(final URL url) {
+        serviceUrl = url;
+    }
+    /**
+     * @return the serviceUrl
+     */
+    public URL getServiceUrl() {
+        return serviceUrl;
     }
 }

@@ -22,7 +22,7 @@ import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.User;
-import com.visfresh.io.EntityJSonSerializer;
+import com.visfresh.io.json.LocationSerializer;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -55,7 +55,7 @@ public class LocationController extends AbstractController implements LocationCo
             final @RequestBody String profile) {
         try {
             final User user = getLoggedInUser(authToken);
-            final LocationProfile lp = getSerializer(user).parseLocationProfile(getJSonObject(profile));
+            final LocationProfile lp = createSerializer(user).parseLocationProfile(getJSonObject(profile));
 
             security.checkCanSaveLocation(user);
             checkCompanyAccess(user, lp);
@@ -87,7 +87,7 @@ public class LocationController extends AbstractController implements LocationCo
             final User user = getLoggedInUser(authToken);
             security.checkCanGetLocations(user);
 
-            final EntityJSonSerializer ser = getSerializer(user);
+            final LocationSerializer ser = createSerializer(user);
 
             final List<LocationProfile> locations = dao.findByCompany(user.getCompany(),
                     createSorting(sc, so, getDefaultSortOrder()),
@@ -107,6 +107,14 @@ public class LocationController extends AbstractController implements LocationCo
         }
     }
     /**
+     * @param user
+     * @return
+     */
+    private LocationSerializer createSerializer(final User user) {
+        return new LocationSerializer(user.getTimeZone());
+    }
+
+    /**
      * @param authToken authentication token.
      * @param locationId location profile ID.
      * @return location profile.
@@ -122,7 +130,7 @@ public class LocationController extends AbstractController implements LocationCo
             final LocationProfile p = dao.findOne(locationId);
             checkCompanyAccess(user, p);
 
-            return createSuccessResponse(getSerializer(user).toJson(p));
+            return createSuccessResponse(createSerializer(user).toJson(p));
         } catch (final Exception e) {
             log.error("Failed to get location profiles", e);
             return createErrorResponse(e);

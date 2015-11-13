@@ -40,11 +40,12 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
-import com.visfresh.io.ReportSerializer;
+import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.SingleShipmentDto;
 import com.visfresh.io.SingleShipmentTimeItem;
+import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.services.lists.ListShipmentItem;
 
 /**
@@ -71,6 +72,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private ArrivalDao arrivalDao;
     @Autowired
     private TrackerEventDao trackerEventDao;
+    @Autowired
+    private ReferenceResolver referenceResolver;
 
     /**
      * Default constructor.
@@ -145,7 +148,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipments(user);
 
-            final ReportSerializer ser = getReportSerializer(user);
+            final ShipmentSerializer ser = getSerializer(user);
 
             final Filter filter = createFilter(onlyWithAlerts, shippedFrom, shippedTo, goods, device, status);
             final List<ListShipmentItem> shipments = getShipments(
@@ -251,6 +254,15 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param user
+     * @return
+     */
+    private ShipmentSerializer getSerializer(final User user) {
+        final ShipmentSerializer s = new ShipmentSerializer(user);
+        s.setReferenceResolver(referenceResolver);
+        return s;
+    }
     @RequestMapping(value = "/deleteShipment/{authToken}", method = RequestMethod.GET)
     public @ResponseBody String deleteShipment(@PathVariable final String authToken,
             @RequestParam final Long shipmentId) {
@@ -281,7 +293,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipmentData(user);
 
-            final ReportSerializer ser = getReportSerializer(user);
+            final ShipmentSerializer ser = getSerializer(user);
             final Date startDate = ser.parseDate(fromDate);
             final Date endDate = ser.parseDate(toDate);
 
@@ -324,13 +336,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
-    }
-    /**
-     * @param user
-     * @return
-     */
-    protected ReportSerializer getReportSerializer(final User user) {
-        return new ReportSerializer(user);
     }
     /**
      * @param alerts

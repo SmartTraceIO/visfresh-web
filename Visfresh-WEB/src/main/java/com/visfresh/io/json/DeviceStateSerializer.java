@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.dao.impl;
+package com.visfresh.io.json;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,9 +11,9 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.visfresh.io.AbstractJsonSerializer;
 import com.visfresh.rules.DeviceState;
 import com.visfresh.rules.RulesState;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -40,7 +40,7 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
      * @return
      */
     public DeviceState parseState(final String state) {
-        return parseState(parseJson(state).getAsJsonObject());
+        return parseState(SerializerUtils.parseJson(state).getAsJsonObject());
     }
 
     /**

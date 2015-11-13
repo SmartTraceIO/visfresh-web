@@ -18,14 +18,16 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ReferenceResolver;
+import com.visfresh.io.ShipmentResolver;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class DefaultReferenceResolver implements ReferenceResolver {
+public class DefaultReferenceResolver implements ReferenceResolver, CompanyResolver, ShipmentResolver {
     @Autowired
     private LocationProfileDao locationProfileDao;
     @Autowired

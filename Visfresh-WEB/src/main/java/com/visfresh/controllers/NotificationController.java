@@ -25,7 +25,9 @@ import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.User;
-import com.visfresh.io.EntityJSonSerializer;
+import com.visfresh.io.DeviceResolver;
+import com.visfresh.io.ShipmentResolver;
+import com.visfresh.io.json.NotificationSerializer;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -41,6 +43,10 @@ public class NotificationController extends AbstractController implements Notifi
 
     @Autowired
     private NotificationDao dao;
+    @Autowired
+    private DeviceResolver deviceResolver;
+    @Autowired
+    private ShipmentResolver shipmentResolver;
 
     /**
      * Default constructor.
@@ -62,7 +68,7 @@ public class NotificationController extends AbstractController implements Notifi
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            final EntityJSonSerializer ser = getSerializer(user);
+            final NotificationSerializer ser = createSerializer(user);
 
             final List<Notification> ns = dao.findForUser(user,
                     new Sorting(getDefaultSortOrder()),
@@ -80,6 +86,16 @@ public class NotificationController extends AbstractController implements Notifi
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param user
+     * @return
+     */
+    private NotificationSerializer createSerializer(final User user) {
+        final NotificationSerializer s = new NotificationSerializer(user.getTimeZone());
+        s.setDeviceResolver(deviceResolver);
+        s.setShipmentResolver(shipmentResolver);
+        return s;
     }
     /**
      * @return

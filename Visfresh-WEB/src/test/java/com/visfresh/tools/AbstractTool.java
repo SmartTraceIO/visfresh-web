@@ -6,12 +6,16 @@ package com.visfresh.tools;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.TimeZone;
 
-import com.visfresh.controllers.RestServiceFacade;
+import com.visfresh.controllers.restclient.CompanyRestClient;
+import com.visfresh.controllers.restclient.DeviceRestClient;
+import com.visfresh.controllers.restclient.UserRestClient;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -19,24 +23,46 @@ import com.visfresh.services.RestServiceException;
  */
 public class AbstractTool {
 
+    /**
+     *
+     */
+    private static final TimeZone UTС = SerializerUtils.UTС;
     public static final String COMPANY_NAME = "Demo";
     protected String USER_NAME = "developer";
-    protected RestServiceFacade service;
+    protected UserRestClient userService;
+    protected CompanyRestClient companyService;
+    protected DeviceRestClient deviceService;
     protected Company company;
     protected User user;
 
     /**
      *
      */
-    public AbstractTool(final String url, final String userName, final String password)
+    public AbstractTool(final String url)
             throws IOException, RestServiceException {
         super();
-        final RestServiceFacade f = new RestServiceFacade();
-        f.setServiceUrl(new URL(url));
 
-        final String authToken = f.login(userName, password);
-        f.setAuthToken(authToken);
-        this.service = f;
+        final URL u = new URL(url);
+        //create user service.
+        userService = new UserRestClient(UTС);
+        userService.setServiceUrl(u);
+
+        //company service
+        companyService = new CompanyRestClient(UTС);
+        companyService.setServiceUrl(u);
+
+        //device client
+        deviceService = new DeviceRestClient(UTС);
+        deviceService.setServiceUrl(u);
+    }
+
+    /**
+     * @param authToken
+     */
+    protected void setAuthToken(final String authToken) {
+        companyService.setAuthToken(authToken);
+        userService.setAuthToken(authToken);
+        deviceService.setAuthToken(authToken);
     }
 
     /**
@@ -44,14 +70,18 @@ public class AbstractTool {
      * @throws IOException
      *
      */
-    protected void initalize() throws IOException, RestServiceException {
+    protected void initalize(final String userName, final String password)
+            throws IOException, RestServiceException {
+        final String authToken = userService.login(userName, password);
+        setAuthToken(authToken);
+
         if (user != null) {
             //initialized
             return;
         }
 
         Company c = null;
-        final List<Company> companies = service.getCompanies(1, 10000);
+        final List<Company> companies = companyService.getCompanies(1, 10000);
         for (final Company company : companies) {
             if (company.getName().equals(COMPANY_NAME)) {
                 c = company;
@@ -65,20 +95,19 @@ public class AbstractTool {
         company = c;
 
         //create user if need
-        final String password = "password";
-        User u = service.getUser(USER_NAME);
+        final String newPassword = "password";
+        User u = userService.getUser(USER_NAME);
         if (u == null) {
             u = new User();
             u.setLogin(USER_NAME);
             u.setFullName("Developer");
             u.getRoles().add(Role.CompanyAdmin);
 
-            service.createUser(u, c, password);
+            userService.createUser(u, c, newPassword);
         }
         user = u;
 
         //relogin
-        final String authToken = service.login(user.getLogin(), "password");
-        service.setAuthToken(authToken);
+        setAuthToken(userService.login(user.getLogin(), newPassword));
     }
 }

@@ -22,6 +22,7 @@ import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
+import com.visfresh.io.json.CompanySerializer;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -63,7 +64,7 @@ public class CompanyController extends AbstractController implements CompanyCons
             } else {
                 company = dao.findOne(companyId);
             }
-            return createSuccessResponse(getSerializer(user).toJson(company));
+            return createSuccessResponse(getCompanySerializer(user).toJson(company));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
@@ -91,13 +92,20 @@ public class CompanyController extends AbstractController implements CompanyCons
 
             final JsonArray array = new JsonArray();
             for (final Company c : companies) {
-                array.add(getSerializer(user).toJson(c));
+                array.add(getCompanySerializer(user).toJson(c));
             }
             return createListSuccessResponse(array, total);
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param user user.
+     * @return serializer.
+     */
+    private CompanySerializer getCompanySerializer(final User user) {
+        return new CompanySerializer(user.getTimeZone());
     }
     /**
      * @return default sort order.

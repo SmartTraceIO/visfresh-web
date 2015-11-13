@@ -14,6 +14,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
+import com.visfresh.controllers.restclient.ShipmentRestClient;
+import com.visfresh.controllers.restclient.ShipmentTemplateRestClient;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.ShipmentDao;
@@ -28,7 +30,10 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.User;
+import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -41,6 +46,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     private AlertDao alertDao;
     private ArrivalDao arrivalDao;
     private TrackerEventDao trackerEventDao;
+    private ShipmentTemplateRestClient shipmentTemplateClient = new ShipmentTemplateRestClient(UTC);
+    private ShipmentRestClient shipmentClient;
 
     /**
      * Default constructor.
@@ -56,6 +63,21 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         alertDao = context.getBean(AlertDao.class);
         arrivalDao = context.getBean(ArrivalDao.class);
         trackerEventDao = context.getBean(TrackerEventDao.class);
+
+        final String token = login();
+        final User user = context.getBean(AuthService.class).getUserForToken(token);
+        shipmentClient = new ShipmentRestClient(user);
+
+        shipmentClient.setServiceUrl(getServiceUrl());
+        shipmentTemplateClient.setServiceUrl(getServiceUrl());
+
+        final ReferenceResolver r = context.getBean(ReferenceResolver.class);
+
+        shipmentTemplateClient.setReferenceResolver(r);
+        shipmentClient.setReferenceResolver(r);
+
+        shipmentTemplateClient.setAuthToken(token);
+        shipmentClient.setAuthToken(token);
     }
 
     //@RequestMapping(value = "/saveShipmentTemplate/{authToken}", method = RequestMethod.POST)
@@ -65,7 +87,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testSaveShipmentTemplate() throws RestServiceException, IOException {
         final ShipmentTemplate t = createShipmentTemplate(true);
         t.setId(null);
-        final Long id = facade.saveShipmentTemplate(t);
+        final Long id = shipmentTemplateClient.saveShipmentTemplate(t);
         assertNotNull(id);
     }
     //@RequestMapping(value = "/getShipmentTemplates/{authToken}", method = RequestMethod.GET)
@@ -75,20 +97,20 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         createShipmentTemplate(true);
         createShipmentTemplate(true);
 
-        assertEquals(2, facade.getShipmentTemplates(1, 10000).size());
-        assertEquals(1, facade.getShipmentTemplates(1, 1).size());
-        assertEquals(1, facade.getShipmentTemplates(2, 1).size());
-        assertEquals(0, facade.getShipmentTemplates(3, 10000).size());
+        assertEquals(2, shipmentTemplateClient.getShipmentTemplates(1, 10000).size());
+        assertEquals(1, shipmentTemplateClient.getShipmentTemplates(1, 1).size());
+        assertEquals(1, shipmentTemplateClient.getShipmentTemplates(2, 1).size());
+        assertEquals(0, shipmentTemplateClient.getShipmentTemplates(3, 10000).size());
     }
     @Test
     public void testGetShipmentTemplate() throws IOException, RestServiceException {
         final ShipmentTemplate sp = createShipmentTemplate(true);
-        assertNotNull(facade.getShipmentTemplate(sp.getId()));
+        assertNotNull(shipmentTemplateClient.getShipmentTemplate(sp.getId()));
     }
     @Test
     public void testDeleteShipmentTemplate() throws IOException, RestServiceException {
         final ShipmentTemplate sp = createShipmentTemplate(true);
-        facade.deleteShipmentTemplate(sp.getId());
+        shipmentTemplateClient.deleteShipmentTemplate(sp.getId());
         assertNull(shipmentTemplateDao.findOne(sp.getId()));
     }
     //@RequestMapping(value = "/saveShipment/{authToken}", method = RequestMethod.POST)
@@ -98,7 +120,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testSaveShipment() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
         s.setId(null);
-        final SaveShipmentResponse resp = facade.saveShipment(s, "NewTemplate.tpl", true);
+        final SaveShipmentResponse resp = shipmentClient.saveShipment(s, "NewTemplate.tpl", true);
         assertNotNull(resp.getShipmentId());
 
         //check new template is saved
@@ -139,20 +161,20 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         createTemperatureAlert(s, d, AlertType.CriticalHot);
         createArrival(s, d);
 
-        assertEquals(2, facade.getShipments(null, null).size());
-        assertEquals(1, facade.getShipments(1, 1).size());
-        assertEquals(1, facade.getShipments(2, 1).size());
-        assertEquals(0, facade.getShipments(3, 10000).size());
+        assertEquals(2, shipmentClient.getShipments(null, null).size());
+        assertEquals(1, shipmentClient.getShipments(1, 1).size());
+        assertEquals(1, shipmentClient.getShipments(2, 1).size());
+        assertEquals(0, shipmentClient.getShipments(3, 10000).size());
     }
     @Test
     public void testGetShipment() throws IOException, RestServiceException {
         final Shipment sp = createShipment(true);
-        assertNotNull(facade.getShipment(sp.getId()));
+        assertNotNull(shipmentClient.getShipment(sp.getId()));
     }
     @Test
     public void testDeleteShipment() throws IOException, RestServiceException {
         final Shipment sp = createShipment(true);
-        facade.deleteShipment(sp.getId());
+        shipmentClient.deleteShipment(sp.getId());
         assertNull(shipmentDao.findOne(sp.getId()));
     }
     //@RequestMapping(value = "/getShipmentData/{authToken}", method = RequestMethod.GET)
@@ -177,7 +199,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         final Date fromTime = new Date(System.currentTimeMillis() - 100000000L);
         final Date toTime = new Date(System.currentTimeMillis() + 10000000l);
-        final JsonObject sd = facade.getSingleShipment(s, fromTime, toTime).getAsJsonObject();
+        final JsonObject sd = shipmentClient.getSingleShipment(s, fromTime, toTime).getAsJsonObject();
         assertNotNull(sd);
     }
     //@RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
@@ -192,15 +214,15 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final ShipmentStatus status = ShipmentStatus.InProgress;
         final String device = s.getDevice().getId();
 
-        assertEquals(1, facade.getShipments(1, 10000,
+        assertEquals(1, shipmentClient.getShipments(1, 10000,
                 shippedFrom, shippedTo, goods, device, status).size());
 //        assertEquals(0, facade.getShipments(1, 10000,
 //                shippedTo, shippedTo, goods, device, status).size());
-        assertEquals(0, facade.getShipments(1, 10000,
+        assertEquals(0, shipmentClient.getShipments(1, 10000,
                 shippedFrom, shippedFrom, "abrakadabra", device, status).size());
-        assertEquals(0, facade.getShipments(1, 10000,
+        assertEquals(0, shipmentClient.getShipments(1, 10000,
                 shippedFrom, shippedTo, goods, "11111111", status).size());
-        assertEquals(0, facade.getShipments(1, 10000,
+        assertEquals(0, shipmentClient.getShipments(1, 10000,
                 shippedFrom, shippedTo, goods, device, ShipmentStatus.Complete).size());
     }
     /**

@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.controllers.restclient.NotificationRestClient;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.DeviceDao;
@@ -27,6 +28,8 @@ import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.User;
+import com.visfresh.io.DeviceResolver;
+import com.visfresh.io.ShipmentResolver;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -39,6 +42,7 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
     private AlertDao alertDao;
     private ArrivalDao arrivalDao;
     private NotificationDao notificationDao;
+    private NotificationRestClient client = new NotificationRestClient(UTC);
 
     /**
      * Default constructor.
@@ -58,6 +62,11 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
         alertDao = context.getBean(AlertDao.class);
         arrivalDao = context.getBean(ArrivalDao.class);
         notificationDao = context.getBean(NotificationDao.class);
+
+        client.setServiceUrl(getServiceUrl());
+        client.setAuthToken(login());
+        client.setDeviceResolver(context.getBean(DeviceResolver.class));
+        client.setShipmentResolver(context.getBean(ShipmentResolver.class));
     }
     //@RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getNotifications(@PathVariable final String authToken,
@@ -113,10 +122,10 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
         notificationDao.save(n);
 
         //get notifications
-        assertEquals(3, facade.getNotifications(null, null).size());
-        assertEquals(1, facade.getNotifications(1, 1).size());
-        assertEquals(1, facade.getNotifications(2, 1).size());
-        assertEquals(0, facade.getNotifications(3, 10000).size());
+        assertEquals(3, client.getNotifications(null, null).size());
+        assertEquals(1, client.getNotifications(1, 1).size());
+        assertEquals(1, client.getNotifications(2, 1).size());
+        assertEquals(0, client.getNotifications(3, 10000).size());
     }
     //@RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String markNotificationsAsRead(@PathVariable final String authToken,
@@ -176,8 +185,8 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
         toReaden.add(n1);
         toReaden.add(n2);
 
-        facade.markNotificationsAsRead(toReaden);
+        client.markNotificationsAsRead(toReaden);
 
-        assertEquals(1, facade.getNotifications(null, null).size());
+        assertEquals(1, client.getNotifications(null, null).size());
     }
 }

@@ -38,15 +38,9 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
-import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
-import com.visfresh.entities.Device;
-import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Role;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
-import com.visfresh.io.ReferenceResolver;
 import com.visfresh.services.AuthService;
 
 /**
@@ -60,8 +54,8 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
      * WEB application context.
      */
     protected static WebApplicationContext context;
-    protected static RestServiceFacade facade;
     private static Server server;
+    protected static URL url;
 
     static {
         final int port = getFreePort();
@@ -75,40 +69,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
             context = ((FrameworkServlet) handler.getServlet("SpringDispatcher").getServlet())
                     .getWebApplicationContext();
 
-            facade = new RestServiceFacade();
-            facade.setServiceUrl(new URL("http://localhost:" + port + "/web/vf"));
-            facade.setReferenceResolver(new ReferenceResolver() {
-                @Override
-                public Shipment getShipment(final Long id) {
-                    final ShipmentDao dao = context.getBean(ShipmentDao.class);
-                    return dao.findOne(id);
-                }
-                @Override
-                public NotificationSchedule getNotificationSchedule(final Long id) {
-                    final NotificationScheduleDao dao = context.getBean(NotificationScheduleDao.class);
-                    return dao.findOne(id);
-                }
-                @Override
-                public LocationProfile getLocationProfile(final Long id) {
-                    final LocationProfileDao dao = context.getBean(LocationProfileDao.class);
-                    return dao.findOne(id);
-                }
-                @Override
-                public Device getDevice(final String id) {
-                    final DeviceDao dao = context.getBean(DeviceDao.class);
-                    return dao.findOne(id);
-                }
-                @Override
-                public Company getCompany(final Long id) {
-                    final CompanyDao dao = context.getBean(CompanyDao.class);
-                    return dao.findOne(id);
-                }
-                @Override
-                public AlertProfile getAlertProfile(final Long id) {
-                    final AlertProfileDao dao = context.getBean(AlertProfileDao.class);
-                    return dao.findOne(id);
-                }
-            });
+            url = new URL("http://localhost:" + port + "/web/vf");
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
@@ -205,9 +166,6 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
             service.createUser(user, "");
 
             try {
-                final String authToken = facade.login(user.getLogin(), "");
-                facade.setAuthToken(authToken);
-
                 super.runChild(method, notifier);
             } catch (final Exception e) {
                 e.printStackTrace();
@@ -225,11 +183,10 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
         if (test instanceof AbstractRestServiceTest) {
             final AbstractRestServiceTest rt = (AbstractRestServiceTest) test;
             rt.setContext(context);
-            rt.setFacade(facade);
+            rt.setServiceUrl(url);
         }
         return test;
     }
-
     /**
      *
      */

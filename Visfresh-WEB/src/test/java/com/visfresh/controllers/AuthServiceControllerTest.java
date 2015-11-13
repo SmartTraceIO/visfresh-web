@@ -10,6 +10,7 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.controllers.restclient.RestClient;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
@@ -19,8 +20,8 @@ import com.visfresh.services.RestServiceException;
  *
  */
 public class AuthServiceControllerTest extends AbstractRestServiceTest {
-
     private AuthService authService;
+    private RestClient client = new RestClient();
 
     /**
      * Default constructor.
@@ -35,6 +36,8 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
      */
     @Before
     public void setUp() throws Exception {
+        client.setServiceUrl(getServiceUrl());
+        client.setAuthToken(login());
         authService = context.getBean(AuthService.class);
     }
 
@@ -48,27 +51,26 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         user.setCompany(getCompany());
 
         authService.createUser(user, password);
-        final String token = facade.login(user.getLogin(), password);
+        final String token = client.login(user.getLogin(), password);
         assertNotNull(token);
     }
     //@RequestMapping(value = "/getToken", method = RequestMethod.GET)
     //public @ResponseBody String getAuthToken(final HttpSession session) {
     public void _testGetToken() throws IOException, RestServiceException {
-        final String token = facade.getToken();
+        final String token = client.getToken();
         assertNotNull(token);
     }
     //@RequestMapping(value = "/logout/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String logout(@PathVariable final String authToken) {
     @Test
     public void testLogout() throws RestServiceException, IOException {
-        facade.logout(facade.getAuthToken());
+        client.logout(client.getAuthToken());
     }
     //@RequestMapping(value = "/refreshToken/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String refreshToken(@PathVariable final String authToken) {
     @Test
     public void testRefreshToken() throws IOException, RestServiceException {
-        final String token = facade.refreshToken();
-        facade.setAuthToken(token);
+        final String token = client.refreshToken();
         assertNotNull(token);
     }
 }

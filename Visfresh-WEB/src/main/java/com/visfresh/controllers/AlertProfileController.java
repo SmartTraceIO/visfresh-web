@@ -22,7 +22,7 @@ import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.User;
-import com.visfresh.io.EntityJSonSerializer;
+import com.visfresh.io.json.AlertProfileSerializer;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -58,7 +58,7 @@ public class AlertProfileController extends AbstractController implements AlertP
             final @RequestBody String alert) {
         try {
             final User user = getLoggedInUser(authToken);
-            final AlertProfile p = getSerializer(user).parseAlertProfile(getJSonObject(alert));
+            final AlertProfile p = createSerializer(user).parseAlertProfile(getJSonObject(alert));
 
             security.checkCanSaveAlertProfile(user);
             checkCompanyAccess(user, p);
@@ -87,7 +87,7 @@ public class AlertProfileController extends AbstractController implements AlertP
             final AlertProfile alert = dao.findOne(alertProfileId);
             checkCompanyAccess(user, alert);
 
-            return createSuccessResponse(getSerializer(user).toJson(alert));
+            return createSuccessResponse(createSerializer(user).toJson(alert));
         } catch (final Exception e) {
             log.error("Failed to get alert profiles", e);
             return createErrorResponse(e);
@@ -135,7 +135,7 @@ public class AlertProfileController extends AbstractController implements AlertP
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetAlertProfiles(user);
-            final EntityJSonSerializer ser = getSerializer(user);
+            final AlertProfileSerializer ser = createSerializer(user);
 
             final List<AlertProfile> alerts = dao.findByCompany(
                     user.getCompany(),
@@ -155,6 +155,14 @@ public class AlertProfileController extends AbstractController implements AlertP
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param user
+     * @return
+     */
+    private AlertProfileSerializer createSerializer(final User user) {
+        return new AlertProfileSerializer(user.getTimeZone());
+    }
+
     /**
      * @return default sort order.
      */

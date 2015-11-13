@@ -118,4 +118,8 @@ public interface AccessController {
      * @throws RestServiceException
      */
     void checkUpdateUserDetails(User user, String userName) throws RestServiceException;
+    /**
+     * @param user user.
+     */
+    void checkCanListUsers(User user) throws RestServiceException;
 }

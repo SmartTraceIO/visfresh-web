@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -19,6 +20,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.visfresh.controllers.restclient.AlertProfileRestClient;
+import com.visfresh.controllers.restclient.NotificationScheduleRestClient;
+import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
@@ -30,12 +34,17 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureIssue;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.lists.NotificationScheduleListItem;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class DeviceEmulator extends AbstractTool implements Runnable {
+    /**
+     *
+     */
+    private static final TimeZone UTС = SerializerUtils.UTС;
     private final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
     private final Random random = new Random();
     private String imei;
@@ -46,6 +55,10 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private Point2D.Double v = new Point2D.Double(0.005, 0.);
     private long startTime;
 
+    private AlertProfileRestClient alertProfileClient = new AlertProfileRestClient(UTС);
+    private NotificationScheduleRestClient notificationScheduleClient = new NotificationScheduleRestClient(UTС);
+    private ShipmentRestClient service;
+
     /**
      * @param url
      * @param userName
@@ -53,19 +66,29 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
      * @throws IOException
      * @throws RestServiceException
      */
-    public DeviceEmulator(final String url, final String userName, final String password)
+    public DeviceEmulator(final String url)
             throws IOException, RestServiceException {
-        super(url, userName, password);
+        super(url);
         context.scan(SpringConfig.class.getPackage().getName());
         context.refresh();
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.tools.AbstractTool#initalize(java.lang.String, java.lang.String)
+     */
+    @Override
+    protected void initalize(final String userName, final String password)
+            throws IOException, RestServiceException {
+        super.initalize(userName, password);
 
-        initalize();
+        service = new ShipmentRestClient(user);
+        service.setAuthToken(userService.getAuthToken());
+        //TODO set reference resolver.
     }
 
     public AlertProfile createAlertProfileIfNeed() throws RestServiceException, IOException {
         final String name = "DevTools Alerts";
 
-        final List<AlertProfile> profiles = this.service.getAlertProfiles(1, 1000);
+        final List<AlertProfile> profiles = this.alertProfileClient.getAlertProfiles(1, 1000);
         for (final AlertProfile alertProfile : profiles) {
             if (name.equals(alertProfile.getName())) {
                 return alertProfile;
@@ -109,7 +132,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         profile.setWatchMovementStart(true);
         profile.setWatchMovementStop(true);
 
-        final Long id = service.saveAlertProfile(profile);
+        final Long id = alertProfileClient.saveAlertProfile(profile);
         profile.setId(id);
 
         return profile;
@@ -260,10 +283,10 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private NotificationSchedule createNotificationScheduleIfNeed() throws RestServiceException, IOException {
         final String name = "Test Schedule";
 
-        final List<NotificationScheduleListItem> schedules = service.getNotificationSchedules(null, null);
+        final List<NotificationScheduleListItem> schedules = notificationScheduleClient.getNotificationSchedules(null, null);
         for (final NotificationScheduleListItem s : schedules) {
             if (name.equals(s.getNotificationScheduleName())) {
-                return service.getNotificationSchedule(s.getId());
+                return notificationScheduleClient.getNotificationSchedule(s.getId());
             }
         }
 
@@ -275,7 +298,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         s.getSchedules().add(createSchedule("Vyacheslav", "Soldatov", "vyacheslav.soldatov@inbox.ru", null, "Java Developer"));
         s.getSchedules().add(createSchedule("James", "Richardson", "james@smarttrace.com.au", "+61414910052", "Manager"));
 
-        final Long id = service.saveNotificationSchedule(s);
+        final Long id = notificationScheduleClient.saveNotificationSchedule(s);
         s.setId(id);
         return s;
     }
@@ -311,7 +334,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private Device createDeviceIfNeed() throws RestServiceException, IOException {
         final String id = "111111";
 
-        final List<Device> devices = service.getDevices(1, 100000);
+        final List<Device> devices = deviceService.getDevices(1, 100000);
         for (final Device device : devices) {
             if (id.equals(device.getId())) {
                 return device;
@@ -325,12 +348,14 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         d.setName("DevTool Device");
         d.setSn("123");
 
-        service.saveDevice(d);
+        deviceService.saveDevice(d);
         return d;
     }
 
     public static void main(final String[] args) throws Exception {
-        final DeviceEmulator emulator = new DeviceEmulator("http://localhost:8080/web/vf", "globaladmin", args[0]);
+        final DeviceEmulator emulator = new DeviceEmulator("http://localhost:8080/web/vf");
+        emulator.initalize("globaladmin", args[0]);
+
         try {
             emulator.initializeShipment();
             emulator.run();

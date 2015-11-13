@@ -23,7 +23,7 @@ import com.visfresh.dao.Page;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.User;
-import com.visfresh.io.EntityJSonSerializer;
+import com.visfresh.io.json.NotificationScheduleSerializer;
 import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
@@ -62,7 +62,7 @@ public class NotificationScheduleController extends AbstractController implement
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveNotificationSchedule(user);
 
-            final NotificationSchedule s = getSerializer(user).parseNotificationSchedule(
+            final NotificationSchedule s = createSerializer(user).parseNotificationSchedule(
                     getJSonObject(schedule));
             checkCompanyAccess(user, s);
 
@@ -102,7 +102,7 @@ public class NotificationScheduleController extends AbstractController implement
 
             final int total = dao.getEntityCount(user.getCompany(), null);
 
-            final EntityJSonSerializer ser = getSerializer(user);
+            final NotificationScheduleSerializer ser = createSerializer(user);
             final JsonArray array = new JsonArray();
             for (final NotificationSchedule schedule : schedules) {
                 array.add(ser.toJson(new NotificationScheduleListItem(schedule)));
@@ -114,6 +114,14 @@ public class NotificationScheduleController extends AbstractController implement
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param user
+     * @return
+     */
+    private NotificationScheduleSerializer createSerializer(final User user) {
+        return new NotificationScheduleSerializer(user.getTimeZone());
+    }
+
     /**
      * @return
      */
@@ -175,7 +183,7 @@ public class NotificationScheduleController extends AbstractController implement
             final NotificationSchedule s = dao.findOne(notificationScheduleId);
             checkCompanyAccess(user, s);
 
-            return createSuccessResponse(getSerializer(user).toJson(s));
+            return createSuccessResponse(createSerializer(user).toJson(s));
         } catch (final Exception e) {
             log.error("Failed to get notification schedules", e);
             return createErrorResponse(e);

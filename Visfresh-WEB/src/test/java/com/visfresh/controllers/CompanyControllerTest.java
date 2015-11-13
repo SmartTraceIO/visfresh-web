@@ -10,9 +10,11 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.controllers.restclient.CompanyRestClient;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.Company;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -20,6 +22,7 @@ import com.visfresh.services.RestServiceException;
  */
 public class CompanyControllerTest extends AbstractRestServiceTest {
     private CompanyDao dao;
+    private CompanyRestClient client;
     /**
      * Default constructor.
      */
@@ -34,6 +37,9 @@ public class CompanyControllerTest extends AbstractRestServiceTest {
     @Before
     public void setUp() throws Exception {
         dao = context.getBean(CompanyDao.class);
+        client = new CompanyRestClient(SerializerUtils.UTС);
+        client.setServiceUrl(getServiceUrl());
+        client.setAuthToken(login());
     }
 
     @Test
@@ -47,7 +53,7 @@ public class CompanyControllerTest extends AbstractRestServiceTest {
 
         dao.save(c);
 
-        c = facade.getCompany(c.getId());
+        c = client.getCompany(c.getId());
 
         assertEquals(description, c.getDescription());
         assertEquals(name, c.getName());
@@ -66,9 +72,9 @@ public class CompanyControllerTest extends AbstractRestServiceTest {
         dao.save(c);
 
         //+ one default company existing on server
-        assertEquals(3, facade.getCompanies(null, null).size());
-        assertEquals(1, facade.getCompanies(1, 1).size());
-        assertEquals(1, facade.getCompanies(2, 1).size());
-        assertEquals(0, facade.getCompanies(3, 10000).size());
+        assertEquals(3, client.getCompanies(null, null).size());
+        assertEquals(1, client.getCompanies(1, 1).size());
+        assertEquals(1, client.getCompanies(2, 1).size());
+        assertEquals(0, client.getCompanies(3, 10000).size());
     }
 }

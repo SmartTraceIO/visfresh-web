@@ -9,11 +9,14 @@ import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.constants.LocationConstants;
+import com.visfresh.controllers.restclient.LocationRestClient;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.utils.SerializerUtils;
 
 
 /**
@@ -21,31 +24,44 @@ import com.visfresh.services.RestServiceException;
  *
  */
 public class LocationControllerTest extends AbstractRestServiceTest {
+    private LocationRestClient client;
+
     /**
      * Default constructor.
      */
     public LocationControllerTest() {
         super();
     }
+
+    /**
+     * Initializes the test.
+     */
+    @Before
+    public void setUp() {
+        client = new LocationRestClient(SerializerUtils.UTС);
+        client.setServiceUrl(getServiceUrl());
+        client.setAuthToken(login());
+    }
+
     //@RequestMapping(value = "/saveLocationProfile/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveLocationProfile(@PathVariable final String authToken,
     //        final @RequestBody String profile) {
     @Test
     public void testSaveLocationProfile() throws RestServiceException, IOException {
         final LocationProfile l = createLocationProfile(false);
-        final Long id = facade.saveLocationProfile(l);
+        final Long id = client.saveLocationProfile(l);
         assertNotNull(id);
     }
     @Test
     public void testGetLocationProfile() throws IOException, RestServiceException {
         final LocationProfile lp = createLocationProfile(true);
-        assertNotNull(facade.getLocation(lp.getId()));
+        assertNotNull(client.getLocation(lp.getId()));
     }
     @Test
     public void testDeleteLocationProfile() throws IOException, RestServiceException {
         final LocationProfile lp = createLocationProfile(true);
-        facade.deleteLocation(lp.getId());
-        assertNull(facade.getLocation(lp.getId()));
+        client.deleteLocation(lp.getId());
+        assertNull(client.getLocation(lp.getId()));
     }
     //@RequestMapping(value = "/getLocationProfiles/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getLocationProfiles(@PathVariable final String authToken) {
@@ -54,10 +70,10 @@ public class LocationControllerTest extends AbstractRestServiceTest {
         createLocationProfile(true);
         createLocationProfile(true);
 
-        assertEquals(2, facade.getLocations(null, null).size());
-        assertEquals(1, facade.getLocations(1, 1).size());
-        assertEquals(1, facade.getLocations(2, 1).size());
-        assertEquals(0, facade.getLocations(3, 10000).size());
+        assertEquals(2, client.getLocations(null, null).size());
+        assertEquals(1, client.getLocations(1, 1).size());
+        assertEquals(1, client.getLocations(2, 1).size());
+        assertEquals(0, client.getLocations(3, 10000).size());
     }
     @Test
     public void testGetSortedLocationProfiles() throws RestServiceException, IOException {
@@ -98,40 +114,40 @@ public class LocationControllerTest extends AbstractRestServiceTest {
 
         final int lastIndex = 4;
         //test sort by ID
-        LocationProfile loc = facade.getLocations(1, 10000,
+        LocationProfile loc = client.getLocations(1, 10000,
                 LocationConstants.PROPERTY_LOCATION_ID, "asc").get(0);
         assertEquals(p1.getId(), loc.getId());
 
-        loc = facade.getLocations(1, 10000,
+        loc = client.getLocations(1, 10000,
                 LocationConstants.PROPERTY_LOCATION_ID, "desc").get(lastIndex);
         assertEquals(p1.getId(), loc.getId());
 
         //location name
-        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_LOCATION_NAME, "asc").get(0);
+        loc = client.getLocations(1, 10000, LocationConstants.PROPERTY_LOCATION_NAME, "asc").get(0);
         assertEquals(p2.getId(), loc.getId());
 
-        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_LOCATION_NAME, "desc").get(lastIndex);
+        loc = client.getLocations(1, 10000, LocationConstants.PROPERTY_LOCATION_NAME, "desc").get(lastIndex);
         assertEquals(p2.getId(), loc.getId());
 
         //test sort by address
-        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_ADDRESS, "asc").get(0);
+        loc = client.getLocations(1, 10000, LocationConstants.PROPERTY_ADDRESS, "asc").get(0);
         assertEquals(p3.getId(), loc.getId());
 
-        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_ADDRESS, "desc").get(lastIndex);
+        loc = client.getLocations(1, 10000, LocationConstants.PROPERTY_ADDRESS, "desc").get(lastIndex);
         assertEquals(p3.getId(), loc.getId());
 
         //test sort by description
-        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_COMPANY_NAME, "asc").get(0);
+        loc = client.getLocations(1, 10000, LocationConstants.PROPERTY_COMPANY_NAME, "asc").get(0);
         assertEquals(p4.getId(), loc.getId());
 
-        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_COMPANY_NAME, "desc").get(lastIndex);
+        loc = client.getLocations(1, 10000, LocationConstants.PROPERTY_COMPANY_NAME, "desc").get(lastIndex);
         assertEquals(p4.getId(), loc.getId());
 
         //test sort by description
-        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_NOTES, "asc").get(0);
+        loc = client.getLocations(1, 10000, LocationConstants.PROPERTY_NOTES, "asc").get(0);
         assertEquals(p5.getId(), loc.getId());
 
-        loc = facade.getLocations(1, 10000, LocationConstants.PROPERTY_NOTES, "desc").get(lastIndex);
+        loc = client.getLocations(1, 10000, LocationConstants.PROPERTY_NOTES, "desc").get(lastIndex);
         assertEquals(p5.getId(), loc.getId());
     }
 }
