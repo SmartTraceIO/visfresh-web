@@ -47,44 +47,46 @@ List items is short representations of base entities, like as [Alert Profile](#m
 1. [Shipment Template list item](#markdown-header-shipment-template-list-item) 
 2. [Shipment List item](#markdown-header-shipment-list-item)  
 3. [Notification Schedule list item](#markdown-header-notification-schedule-list-item)  
+4. [User List item](#markdown-header-user-list-item)  
 
 ## Rest Service methods.
 1. [Authentication](#markdown-header-authentication).  
 2. [Get access token using existing GTS(e) session.](#markdown-header-get-access-token-using-existing-gts-e-session)  
-3. [Get User Info](#markdown-header-get-user-info)  
-4. [Update User details](#markdown-header-update-user-details)  
-5. [Logout](#markdown-header-logout)  
-6. [Refresh access token](#markdown-header-refresh-access-token)  
-7. [Save alert profile](#markdown-header-save-alert-profile)  
-8. [Get Alert Profile](#markdown-header-get-alert-profile)  
-9. [Get Alert Profiles](#markdown-header-get-alert-profiles)  
-10. [Delete Alert Profile](#markdown-header-delete-alert-profile)  
-11. [Save notification schedule](#markdown-header-save-notification-schedule)  
-12. [Get notification schedules](#markdown-header-get-notification-schedules)  
-13. [Get Notification Schedule](#markdown-header-get-notification-schedule)  
-14. [Delete Notification Schedule](#markdown-header-delete-notification-schedule)  
-15. [Delete Person Schedule](#markdown-header-delete-person-schedule)  
-16. [Save Location](#markdown-header-save-location)  
-17. [Get Locations](#markdown-header-get-locations)  
-18. [Get Location](#markdown-header-get-location)  
-19. [Delete Location](#markdown-header-delete-location)  
-20. [Save Shipment Template](#markdown-header-save-shipment-template)  
-21. [Get Shipment templates](#markdown-header-get-shipment-templates)  
-22. [Get Shipment Template](#markdown-header-get-shipment-template)  
-23. [Delete Shipment Template](#markdown-header-delete-shipment-template)  
-24. [Save Shipment](#markdown-header-save-shipment)  
-25. [Get Shipments](#markdown-header-get-shipments)  
-26. [Get Shipment](#markdown-header-get-shipment)  
-27. [Delete Shipment](#markdown-header-delete-shipment)  
-28. [Save Device](#markdown-header-save-device)  
-29. [Get Device](#markdown-header-get-device)  
-30. [Get Devices](#markdown-header-get-devices)  
-31. [Delete Device](#markdown-header-delete-device)  
-32. [Get Notifications](#markdown-header-get-notifications)  
-33. [Send Command to Device](#markdown-header-send-command-to-device)  
-34. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
-35. [Get Profile](#markdown-header-get-profile)  
-36. [Save Profile](#markdown-header-save-profile)  
+3. [Get User Info](#markdown-header-get-user-info) 
+4. [Get Users](#markdown-header-get-users)  
+5. [Update User details](#markdown-header-update-user-details)  
+6. [Logout](#markdown-header-logout)  
+7. [Refresh access token](#markdown-header-refresh-access-token)  
+8. [Save alert profile](#markdown-header-save-alert-profile)  
+9. [Get Alert Profile](#markdown-header-get-alert-profile)  
+10. [Get Alert Profiles](#markdown-header-get-alert-profiles)  
+11. [Delete Alert Profile](#markdown-header-delete-alert-profile)  
+12. [Save notification schedule](#markdown-header-save-notification-schedule)  
+13. [Get notification schedules](#markdown-header-get-notification-schedules)  
+14. [Get Notification Schedule](#markdown-header-get-notification-schedule)  
+15. [Delete Notification Schedule](#markdown-header-delete-notification-schedule)  
+16. [Delete Person Schedule](#markdown-header-delete-person-schedule)  
+17. [Save Location](#markdown-header-save-location)  
+18. [Get Locations](#markdown-header-get-locations)  
+19. [Get Location](#markdown-header-get-location)  
+20. [Delete Location](#markdown-header-delete-location)  
+21. [Save Shipment Template](#markdown-header-save-shipment-template)  
+22. [Get Shipment templates](#markdown-header-get-shipment-templates)  
+23. [Get Shipment Template](#markdown-header-get-shipment-template)  
+24. [Delete Shipment Template](#markdown-header-delete-shipment-template)  
+25. [Save Shipment](#markdown-header-save-shipment)  
+26. [Get Shipments](#markdown-header-get-shipments)  
+27. [Get Shipment](#markdown-header-get-shipment)  
+28. [Delete Shipment](#markdown-header-delete-shipment)  
+29. [Save Device](#markdown-header-save-device)  
+30. [Get Device](#markdown-header-get-device)  
+31. [Get Devices](#markdown-header-get-devices)  
+32. [Delete Device](#markdown-header-delete-device)  
+33. [Get Notifications](#markdown-header-get-notifications)  
+34. [Send Command to Device](#markdown-header-send-command-to-device)  
+35. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
+36. [Get Profile](#markdown-header-get-profile)  
+37. [Save Profile](#markdown-header-save-profile)  
 
 ## Reports ##
 1. [Get Single Shipment](#markdown-header-get-single-shipment)
@@ -113,6 +115,15 @@ Method returns:
 4. timeZone - user type zone.  
 5. temperatureUnits - temperature units.  
 [(example)](#markdown-header-get-user-info-example)
+
+### Get Users ###
+Method *GET*, method name *getUsers*, method parameters:  
+1. pageIndex - number of page  
+2. pageSize - size of page  
+3. sc - sort column  
+4. so - sort order  
+Method returns array of [User List items](#markdown-header-user-list-item)  
+[(example)](#markdown-header-get-users-example)
 
 ### Update User Details ###
 Method *POST*, method name *updateUserDetails*. JSON request body contains following properties:  
@@ -611,6 +622,13 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "peopleToNotify": "Alexander Suvorov, Mikhael Kutuzov"
 }
 ```
+### User List item ###
+```json
+{
+  "login": "userLogin",
+  "fullName": "Full User Name"
+}
+```
 ## Examples ##
 ### Authentication request example ###
 **GET /vf/rest/login?login=user&password=password**   
@@ -659,6 +677,24 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "timeZone": "GMT+2",
     "temperatureUnits": "Celsius"
   }
+}
+```
+### Get Users example ###
+**GET /vf/rest/getUsers/${authToken}?so=asc&pageSize=1&sc=login&pageIndex=1**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "login": "u2",
+      "fullName": "A1"
+    }
+  ],
+  "totalCount": 2
 }
 ```
 ### Update User Details example ###
