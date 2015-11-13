@@ -25,7 +25,6 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
-import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.CreateUserRequest;
 import com.visfresh.io.ShipmentResolver;
@@ -144,7 +143,11 @@ public class UserController extends AbstractController implements UserConstants 
     private String[] getDefaultListShipmentsSortingOrder() {
         return new String[] {
             PROPERTY_LOGIN,
-            PROPERTY_FULL_NAME
+            PROPERTY_FIRST_NAME,
+            PROPERTY_LAST_NAME,
+            PROPERTY_POSITION,
+            PROPERTY_PHONE,
+            PROPERTY_EMAIL,
         };
     }
     /**
@@ -170,43 +173,6 @@ public class UserController extends AbstractController implements UserConstants 
             return createErrorResponse(e);
         }
     }
-    /**
-     * @param authToken authentication token.
-     * @return profile for given user.
-     */
-    @RequestMapping(value = "/getProfile/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getProfile(@PathVariable final String authToken) {
-        try {
-            final User user = getLoggedInUser(authToken);
-            security.checkGetProfile(user);
-
-            final UserProfile profile = dao.getProfile(user);
-            return createSuccessResponse(getUserSerializer(user).toJson(profile));
-        } catch (final Exception e) {
-            log.error("Failed to send command to device", e);
-            return createErrorResponse(e);
-        }
-    }
-    /**
-     * @param authToken authentication token.
-     * @param profile to save.
-     * @return profile for given user.
-     */
-    @RequestMapping(value = "/saveProfile/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String getProfile(@PathVariable final String authToken,
-            @RequestBody final String profile) {
-        try {
-            final User user = getLoggedInUser(authToken);
-            security.checkSaveProfile(user);
-
-            final UserProfile p = getUserSerializer(user).parseUserProfile(getJSon(profile));
-            dao.saveProfile(user, p);
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to send command to device", e);
-            return createErrorResponse(e);
-        }
-    }
     @RequestMapping(value = "/updateUserDetails/{authToken}", method = RequestMethod.POST)
     public @ResponseBody String updateUserDetails(@PathVariable final String authToken,
             @RequestBody final String body) {
@@ -217,8 +183,20 @@ public class UserController extends AbstractController implements UserConstants 
             security.checkUpdateUserDetails(user, req.getUser());
 
             final User u = dao.findOne(req.getUser());
-            if (req.getFullName() != null) {
-                u.setFullName(req.getFullName());
+            if (req.getFirstName() != null) {
+                u.setFirstName(req.getFirstName());
+            }
+            if (req.getLastName() != null) {
+                u.setLastName(req.getLastName());
+            }
+            if (req.getEmail() != null) {
+                u.setEmail(req.getEmail());
+            }
+            if (req.getPhone() != null) {
+                u.setPhone(req.getPhone());
+            }
+            if (req.getPosition() != null) {
+                u.setPosition(req.getPosition());
             }
             if (req.getPassword() != null) {
                 u.setPassword(HashGenerator.createMd5Hash(req.getPassword()));

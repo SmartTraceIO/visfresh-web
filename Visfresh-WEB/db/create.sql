@@ -54,7 +54,11 @@ create table devicecommands (
 create table users (
     username varchar(127) not null,
     `password` varchar(127) default null,
-    fullname varchar(255),
+    firstname varchar(127),
+    lastname varchar(127),
+    position varchar(127),
+    email varchar(127),
+    phone varchar(20),
     roles varchar(255) not null,
     company bigint(20) not null,
     tempunits varchar(20) not null default 'Celsius',
@@ -62,14 +66,6 @@ create table users (
     primary key (username),
     FOREIGN KEY (company)
         REFERENCES companies (id)
-);
-
-create table userprofiles (
-    user varchar(127) not null,
-    primary key (user),
-    FOREIGN KEY (user)
-        REFERENCES users (username)
-        ON DELETE CASCADE
 );
 
 create table notifications (
@@ -261,18 +257,6 @@ create table arrivalnotifschedules (
         ON DELETE CASCADE,
     foreign key (notification)
         references notificationschedules (id)
-        ON DELETE CASCADE
-);
-
-create table usershipments (
-    shipment bigint(20) not null,
-    user varchar(20) not null,
-    primary key (shipment , user),
-    foreign key (shipment)
-        references shipments (id)
-        ON DELETE CASCADE,
-    foreign key (user)
-        references userprofiles (user)
         ON DELETE CASCADE
 );
 

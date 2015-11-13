@@ -24,7 +24,19 @@ public class ListUserItem {
      */
     public ListUserItem(final User u) {
         setLogin(u.getLogin());
-        setFullName(u.getFullName());
+        if (u.getFirstName() != null || u.getLastName() != null) {
+            final StringBuilder sb = new StringBuilder();
+            if (u.getFirstName() != null) {
+                sb.append(u.getFirstName());
+            }
+            if (u.getLastName() != null) {
+                if (sb.length() > 0) {
+                    sb.append(' ');
+                }
+                sb.append(u.getLastName());
+            }
+            setFullName(sb.toString());
+        }
     }
 
     /**

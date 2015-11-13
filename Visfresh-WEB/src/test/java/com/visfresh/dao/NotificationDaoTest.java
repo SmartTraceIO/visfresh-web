@@ -78,7 +78,8 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         final User u = new User();
         u.setCompany(sharedCompany);
         u.setLogin("asuvorov");
-        u.setFullName("Alexander Suvorov");
+        u.setFirstName("Alexande");
+        u.setLastName("Suvorov");
         u.setPassword("alskdj");
         this.user = userDao.save(u);
     }
@@ -111,7 +112,8 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         User u = new User();
         u.setCompany(sharedCompany);
         u.setLogin("mkutuzov");
-        u.setFullName("Michael Kutuzov");
+        u.setFirstName("Michael");
+        u.setLastName("Kutuzov");
         u.setPassword("alskdj");
         u = userDao.save(u);
 
@@ -129,7 +131,8 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         User u = new User();
         u.setCompany(sharedCompany);
         u.setLogin("mkutuzov");
-        u.setFullName("Michael Kutuzov");
+        u.setFirstName("Michael");
+        u.setLastName("Kutuzov");
         u.setPassword("alskdj");
         u = userDao.save(u);
 

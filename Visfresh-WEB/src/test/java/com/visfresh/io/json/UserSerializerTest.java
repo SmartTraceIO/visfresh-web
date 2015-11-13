@@ -17,7 +17,6 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
-import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CreateUserRequest;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.utils.SerializerUtils;
@@ -45,13 +44,21 @@ public class UserSerializerTest extends AbstractSerializerTest {
     @Test
     public void testUser() {
         final String login = "login";
-        final String fullName = "Full Name";
         final TimeZone timeZone = TimeZone.getTimeZone("Europe/Moscow");
         final TemperatureUnits temperatureUnits = TemperatureUnits.Fahrenheit;
+        final String firstName = "firstname";
+        final String lastName = "LastName";
+        final String email = "abra@cada.bra";
+        final String phone = "1111111117";
+        final String position = "Manager";
 
         User u = new User();
         u.setLogin(login);
-        u.setFullName(fullName);
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setEmail(email);
+        u.setPhone(phone);
+        u.setPosition(position);
         u.setTimeZone(timeZone);
         u.setTemperatureUnits(temperatureUnits);
         u.getRoles().add(Role.Dispatcher);
@@ -61,20 +68,14 @@ public class UserSerializerTest extends AbstractSerializerTest {
         u = serializer.parseUser(obj);
 
         assertEquals(login, u.getLogin());
-        assertEquals(fullName, u.getFullName());
         assertEquals(2, u.getRoles().size());
         assertEquals(timeZone, u.getTimeZone());
         assertEquals(temperatureUnits, u.getTemperatureUnits());
-    }
-    public void testUserProfile() {
-        UserProfile p = new UserProfile();
-        p.getShipments().add(createShipment());
-        p.getShipments().add(createShipment());
-
-        final JsonElement obj = serializer.toJson(p);
-        p = serializer.parseUserProfile(obj);
-
-        assertEquals(2, p.getShipments().size());
+        assertEquals(firstName, u.getFirstName());
+        assertEquals(lastName, u.getLastName());
+        assertEquals(email, u.getEmail());
+        assertEquals(phone, u.getPhone());
+        assertEquals(position, u.getPosition());
     }
     @Test
     public void testCreateUserRequest() {
@@ -85,13 +86,21 @@ public class UserSerializerTest extends AbstractSerializerTest {
         resolver.add(c);
 
         final String login = "newuser";
-        final String fullName = "Full User Name";
         final String password = "anypassword";
+        final String firstName = "firstname";
+        final String lastName = "LastName";
+        final String email = "abra@cada.bra";
+        final String phone = "1111111117";
+        final String position = "Manager";
 
         CreateUserRequest r = new CreateUserRequest();
         final User user = new User();
         user.setLogin(login);
-        user.setFullName(fullName);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setPosition(position);
 
         r.setCompany(c);
         r.setUser(user);
@@ -106,14 +115,22 @@ public class UserSerializerTest extends AbstractSerializerTest {
     }
     @Test
     public void getUpdateUserDetailsRequest() {
-        final String fullName = "Full User Name";
         final String password = "password";
         final TemperatureUnits tu = TemperatureUnits.Fahrenheit;
         final TimeZone tz = TimeZone.getTimeZone("GMT+3");
         final String login = "login";
+        final String firstName = "firstname";
+        final String lastName = "LastName";
+        final String email = "abra@cada.bra";
+        final String phone = "1111111117";
+        final String position = "Manager";
 
         UpdateUserDetailsRequest req = new UpdateUserDetailsRequest();
-        req.setFullName(fullName);
+        req.setFirstName(firstName);
+        req.setLastName(lastName);
+        req.setEmail(email);
+        req.setPhone(phone);
+        req.setPosition(position);
         req.setPassword(password);
         req.setTemperatureUnits(tu);
         req.setTimeZone(tz);
@@ -122,10 +139,14 @@ public class UserSerializerTest extends AbstractSerializerTest {
         final JsonElement json = serializer.toJson(req);
         req = serializer.parseUpdateUserDetailsRequest(json);
 
-        assertEquals(fullName, req.getFullName());
         assertEquals(password, req.getPassword());
         assertEquals(tu, req.getTemperatureUnits());
         assertEquals(tz, req.getTimeZone());
         assertEquals(login, req.getUser());
+        assertEquals(firstName, req.getFirstName());
+        assertEquals(lastName, req.getLastName());
+        assertEquals(email, req.getEmail());
+        assertEquals(phone, req.getPhone());
+        assertEquals(position, req.getPosition());
     }
 }

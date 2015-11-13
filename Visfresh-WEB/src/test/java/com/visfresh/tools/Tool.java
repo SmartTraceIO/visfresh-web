@@ -80,7 +80,9 @@ public class Tool extends AbstractTool {
     private void addUser(final String login, final String fullName, final String password) throws IOException, RestServiceException {
         final User u = new User();
         u.setLogin(login);
-        u.setFullName(fullName);
+        final String[] split = fullName.split(" *");
+        u.setFirstName(split[0]);
+        u.setLastName(split[1]);
         u.getRoles().add(Role.CompanyAdmin);
 
         userService.createUser(u, company, password);

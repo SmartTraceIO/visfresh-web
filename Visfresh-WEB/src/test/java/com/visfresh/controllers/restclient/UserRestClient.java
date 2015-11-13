@@ -8,10 +8,8 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
-import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.CreateUserRequest;
 import com.visfresh.io.ShipmentResolver;
@@ -64,17 +62,6 @@ public class UserRestClient extends RestClient {
                 serializer.toJson(req));
     }
     /**
-     * @return user profile.
-     * @throws RestServiceException
-     * @throws IOException
-     */
-    public UserProfile getProfile() throws IOException, RestServiceException {
-        final HashMap<String, String> params = new HashMap<String, String>();
-        final JsonElement response = sendGetRequest(getPathWithToken("getProfile"), params);
-        return response == JsonNull.INSTANCE ? null : serializer.parseUserProfile(
-                response.getAsJsonObject());
-    }
-    /**
      * @param req update user details request.
      * @throws RestServiceException
      * @throws IOException
@@ -82,15 +69,6 @@ public class UserRestClient extends RestClient {
     public void updateUserDetails(final UpdateUserDetailsRequest req) throws IOException, RestServiceException {
         sendPostRequest(getPathWithToken("updateUserDetails"),
                 serializer.toJson(req));
-    }
-    /**
-     * @param p user profile.
-     * @throws RestServiceException
-     * @throws IOException
-     */
-    public void saveProfile(final UserProfile p) throws IOException, RestServiceException {
-        sendPostRequest(getPathWithToken("saveProfile"),
-                serializer.toJson(p));
     }
     /**
      * @param r company resolver.

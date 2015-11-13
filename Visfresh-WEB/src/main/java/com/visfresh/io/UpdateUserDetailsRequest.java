@@ -13,9 +13,13 @@ import com.visfresh.entities.TemperatureUnits;
  */
 public class UpdateUserDetailsRequest {
     private String user;
-    private TimeZone timeZone;
-    private String fullName;
+    private String firstName;
+    private String lastName;
+    private String position;
+    private String email;
+    private String phone;
     private TemperatureUnits temperatureUnits;
+    private TimeZone timeZone;
     private String password;
 
     /**
@@ -50,18 +54,6 @@ public class UpdateUserDetailsRequest {
         return timeZone;
     }
     /**
-     * @param fullName full user name.
-     */
-    public void setFullName(final String fullName) {
-        this.fullName = fullName;
-    }
-    /**
-     * @return the fullName
-     */
-    public String getFullName() {
-        return fullName;
-    }
-    /**
      * @param tu
      */
     public void setTemperatureUnits(final TemperatureUnits tu) {
@@ -84,5 +76,65 @@ public class UpdateUserDetailsRequest {
      */
     public String getPassword() {
         return password;
+    }
+    /**
+     * @return the firstName
+     */
+    public String getFirstName() {
+        return firstName;
+    }
+    /**
+     * @param firstName the firstName to set
+     */
+    public void setFirstName(final String firstName) {
+        this.firstName = firstName;
+    }
+    /**
+     * @return the lastName
+     */
+    public String getLastName() {
+        return lastName;
+    }
+    /**
+     * @param lastName the lastName to set
+     */
+    public void setLastName(final String lastName) {
+        this.lastName = lastName;
+    }
+    /**
+     * @return the position
+     */
+    public String getPosition() {
+        return position;
+    }
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(final String position) {
+        this.position = position;
+    }
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(final String email) {
+        this.email = email;
+    }
+    /**
+     * @return the phone
+     */
+    public String getPhone() {
+        return phone;
+    }
+    /**
+     * @param phone the phone to set
+     */
+    public void setPhone(final String phone) {
+        this.phone = phone;
     }
 }

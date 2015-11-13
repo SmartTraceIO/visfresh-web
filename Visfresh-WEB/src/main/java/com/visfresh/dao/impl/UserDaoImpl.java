@@ -17,10 +17,8 @@ import com.visfresh.constants.UserConstants;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Role;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
-import com.visfresh.entities.UserProfile;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -28,13 +26,17 @@ import com.visfresh.entities.UserProfile;
  */
 @Component
 public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> implements UserDao {
+    private static final String FIRSTNAME_FIELD = "firstname";
+    private static final String LASTNAME_FIELD = "lastname";
+    private static final String POSITION_FIELD = "position";
+    private static final String EMAIL_FIELD = "email";
+    private static final String PHONE_FIELD = "phone";
     public static final String TABLE = "users";
     public static final String PROFILE_TABLE = "userprofiles";
     public static final String USER_SHIPMENTS = "usershipments";
 
     private static final String USERNAME_FIELD = "username";
     private static final String PASSWORD_FIELD = "password";
-    private static final String FULLNAME_FIELD = "fullname";
     private static final String COMPANY_FIELD = "company";
     private static final String ROLES_FIELD = "roles";
     private static final String TIME_ZONE_FIELD = "timezone";
@@ -49,11 +51,16 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
      */
     public UserDaoImpl() {
         super();
+
         propertyToDbFields.put(UserConstants.PROPERTY_ROLES, ROLES_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_TEMPERATURE_UNITS, TEMPERATURE_UNITS);
         propertyToDbFields.put(UserConstants.PROPERTY_TIME_ZONE, TIME_ZONE_FIELD);
-        propertyToDbFields.put(UserConstants.PROPERTY_FULL_NAME, FULLNAME_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_LOGIN, USERNAME_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_PHONE, PHONE_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_EMAIL, EMAIL_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_POSITION, POSITION_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_LAST_NAME, LASTNAME_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_FIRST_NAME, FIRSTNAME_FIELD);
     }
 
     public String convertToDatabaseColumn(final Collection<Role> roles) {
@@ -94,7 +101,11 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
             sql = "insert into " + TABLE + " (" + combine(
                     USERNAME_FIELD,
                     PASSWORD_FIELD,
-                    FULLNAME_FIELD,
+                    FIRSTNAME_FIELD,
+                    LASTNAME_FIELD,
+                    POSITION_FIELD,
+                    EMAIL_FIELD,
+                    PHONE_FIELD,
                     ROLES_FIELD,
                     TIME_ZONE_FIELD,
                     TEMPERATURE_UNITS,
@@ -102,7 +113,11 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
                 ) + ")" + " values("
                     + ":"+ USERNAME_FIELD
                     + ", :" + PASSWORD_FIELD
-                    + ", :" + FULLNAME_FIELD
+                    + ", :" + FIRSTNAME_FIELD
+                    + ", :" + LASTNAME_FIELD
+                    + ", :" + POSITION_FIELD
+                    + ", :" + EMAIL_FIELD
+                    + ", :" + PHONE_FIELD
                     + ", :" + ROLES_FIELD
                     + ", :" + TIME_ZONE_FIELD
                     + ", :" + TEMPERATURE_UNITS
@@ -112,7 +127,11 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
             //update
             sql = "update " + TABLE + " set "
                 + PASSWORD_FIELD + "=:" + PASSWORD_FIELD
-                + "," + FULLNAME_FIELD + "=:" + FULLNAME_FIELD
+                + "," + FIRSTNAME_FIELD + "=:" + FIRSTNAME_FIELD
+                + "," + LASTNAME_FIELD + "=:" + LASTNAME_FIELD
+                + "," + POSITION_FIELD + "=:" + POSITION_FIELD
+                + "," + EMAIL_FIELD + "=:" + EMAIL_FIELD
+                + "," + PHONE_FIELD + "=:" + PHONE_FIELD
                 + "," + ROLES_FIELD + "=:" + ROLES_FIELD
                 + "," + COMPANY_FIELD + "=:" + COMPANY_FIELD
                 + "," + TIME_ZONE_FIELD + "=:" + TIME_ZONE_FIELD
@@ -123,7 +142,11 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
 
         paramMap.put(USERNAME_FIELD, user.getLogin());
         paramMap.put(PASSWORD_FIELD, user.getPassword());
-        paramMap.put(FULLNAME_FIELD, user.getFullName());
+        paramMap.put(FIRSTNAME_FIELD, user.getFirstName());
+        paramMap.put(LASTNAME_FIELD, user.getLastName());
+        paramMap.put(POSITION_FIELD, user.getPosition());
+        paramMap.put(EMAIL_FIELD, user.getEmail());
+        paramMap.put(PHONE_FIELD, user.getPhone());
         paramMap.put(ROLES_FIELD, convertToDatabaseColumn(user.getRoles()));
         paramMap.put(COMPANY_FIELD, user.getCompany().getId());
         paramMap.put(TIME_ZONE_FIELD, user.getTimeZone().getID());
@@ -131,58 +154,6 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
         jdbc.update(sql, paramMap);
 
         return user;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.UserDao#getProfile(com.visfresh.entities.User)
-     */
-    @Override
-    public UserProfile getProfile(final User user) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("user", user.getLogin());
-
-        final String sql = "select * from " + PROFILE_TABLE + " where user = :user";
-        final List<Map<String, Object>> list = jdbc.queryForList(sql, params);
-        if (list.size() > 0) {
-            final UserProfile p = new UserProfile();
-            //load shipments
-
-            final List<Map<String, Object>> shipmentIds = jdbc.queryForList("select shipment from "
-                    + USER_SHIPMENTS + " where user = :user", params);
-            for (final Map<String, Object> map : shipmentIds) {
-                final Long id = ((Number) map.get("shipment")).longValue();
-                final Shipment s = shipmentDao.findOne(id);
-                p.getShipments().add(s);
-            }
-            return p;
-        }
-
-        return null;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.UserDao#saveProfile(com.visfresh.entities.UserProfile)
-     */
-    @Override
-    public void saveProfile(final User user, final UserProfile profile) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("user", user.getLogin());
-
-        if (profile == null) {
-            //create  profile record
-            jdbc.update("delete from " + PROFILE_TABLE + " where user = :user", params);
-        } else if (getProfile(user) == null) {
-            jdbc.update("insert into " + PROFILE_TABLE + "(user) values (:user)", params);
-        }
-
-        //clear shipment links
-        jdbc.update("delete from " + USER_SHIPMENTS + " where user = :user", params);
-
-        if (profile != null) {
-            //link with shipments
-            for (final Shipment s : profile.getShipments()) {
-                params.put("shipment", s.getId());
-                jdbc.update("insert into " + USER_SHIPMENTS + "(user,shipment) values(:user, :shipment)", params);
-            }
-        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#getCompanyFieldName()
@@ -219,7 +190,11 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
     protected User createEntity(final Map<String, Object> map) {
         final User u = new User();
         u.setLogin((String) map.get(USERNAME_FIELD));
-        u.setFullName((String) map.get(FULLNAME_FIELD));
+        u.setFirstName((String) map.get(FIRSTNAME_FIELD));
+        u.setLastName((String) map.get(LASTNAME_FIELD));
+        u.setPosition((String) map.get(POSITION_FIELD));
+        u.setEmail((String) map.get(EMAIL_FIELD));
+        u.setPhone((String) map.get(PHONE_FIELD));
         u.setPassword((String) map.get(PASSWORD_FIELD));
         u.setTimeZone(TimeZone.getTimeZone((String) map.get(TIME_ZONE_FIELD)));
         u.setTemperatureUnits(TemperatureUnits.valueOf((String) map.get(TEMPERATURE_UNITS)));

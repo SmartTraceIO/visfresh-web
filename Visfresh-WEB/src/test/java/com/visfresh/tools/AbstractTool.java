@@ -100,7 +100,8 @@ public class AbstractTool {
         if (u == null) {
             u = new User();
             u.setLogin(USER_NAME);
-            u.setFullName("Developer");
+            u.setFirstName("Java (JS)");
+            u.setLastName("Developer");
             u.getRoles().add(Role.CompanyAdmin);
 
             userService.createUser(u, c, newPassword);

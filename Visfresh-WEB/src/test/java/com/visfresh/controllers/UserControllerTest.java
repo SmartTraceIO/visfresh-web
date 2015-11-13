@@ -5,7 +5,6 @@ package com.visfresh.controllers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.TimeZone;
@@ -19,10 +18,8 @@ import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
-import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
@@ -67,37 +64,25 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertNotNull(user);
     }
     @Test
-    public void testUserProfile() throws IOException, RestServiceException {
-        //add shipment to service
-        final Shipment sp = createShipment(true);
-        //add profile to service
-
-        UserProfile p = new UserProfile();
-        p.getShipments().add(sp);
-
-        dao.saveProfile(user, p);
-
-        p = client.getProfile();
-        assertEquals(1, p.getShipments().size());
-
-        dao.saveProfile(user, null);
-        assertNull(client.getProfile());
-
-        client.saveProfile(p);
-        assertNotNull(client.getProfile());
-        assertEquals(1, p.getShipments().size());
-    }
-    @Test
     public void testCreateUser() throws IOException, RestServiceException {
         //create company
         final Company c = new Company();
         c.setDescription("JUnit test company");
         c.setName("JUnit-C");
         companyDao.save(c);
+        final String firstName = "firstname";
+        final String lastName = "LastName";
+        final String email = "abra@cada.bra";
+        final String phone = "1111111117";
+        final String position = "Manager";
 
         final User u = new User();
         u.setLogin("test-1");
-        u.setFullName("Junit Automat");
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setEmail(email);
+        u.setPhone(phone);
+        u.setPosition(position);
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.CompanyAdmin);
 
@@ -107,11 +92,15 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         final User u2 = dao.findOne(u.getLogin());
         assertNotNull(u2);
-        assertEquals(u.getFullName(), u2.getFullName());
         assertEquals(u.getId(), u2.getId());
         assertEquals(u.getLogin(), u2.getLogin());
         assertEquals(2, u2.getRoles().size());
         assertNotNull(u2.getCompany());
+        assertEquals(firstName, u2.getFirstName());
+        assertEquals(lastName, u2.getLastName());
+        assertEquals(email, u2.getEmail());
+        assertEquals(phone, u2.getPhone());
+        assertEquals(position, u2.getPosition());
     }
     @Test
     public void testGetUsers() throws IOException, RestServiceException {
@@ -120,8 +109,8 @@ public class UserControllerTest extends AbstractRestServiceTest {
         c.setDescription("Test company");
         context.getBean(CompanyDao.class).save(c);
 
-        createUser("u1", "A2", c);
-        createUser("u2", "A1", c);
+        createUser("u1", "A2", "LastA2", c);
+        createUser("u2", "A1", "LastA1", c);
         final String token = client.login("u1", "");
         client.setAuthToken(token);
 
@@ -134,20 +123,29 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals("u1", client.getUsers(1, 1, UserConstants.PROPERTY_LOGIN, "asc").get(0).getLogin());
         assertEquals("u2", client.getUsers(1, 1, UserConstants.PROPERTY_LOGIN, "desc").get(0).getLogin());
 
-        assertEquals("u2", client.getUsers(1, 1, UserConstants.PROPERTY_FULL_NAME, "asc").get(0).getLogin());
-        assertEquals("u1", client.getUsers(1, 1, UserConstants.PROPERTY_FULL_NAME, "desc").get(0).getLogin());
+        assertEquals("u2", client.getUsers(1, 1, UserConstants.PROPERTY_FIRST_NAME, "asc").get(0).getLogin());
+        assertEquals("u1", client.getUsers(1, 1, UserConstants.PROPERTY_FIRST_NAME, "desc").get(0).getLogin());
+        //TODO other sortings.
     }
     @Test
     public void testUpdateUserDetails() throws IOException, RestServiceException {
         final TimeZone tz = TimeZone.getTimeZone("GMT+2");
-        final String fullName = "Full User Name";
         final String password = "abrakadabra";
+        final String firstName = "firstname";
+        final String lastName = "LastName";
+        final String email = "abra@cada.bra";
+        final String phone = "1111111117";
+        final String position = "Manager";
         final TemperatureUnits temperatureUnits = TemperatureUnits.Fahrenheit;
 
         final UpdateUserDetailsRequest req = new UpdateUserDetailsRequest();
         req.setUser(user.getLogin());
         req.setTimeZone(tz);
-        req.setFullName(fullName);
+        req.setFirstName(firstName);
+        req.setLastName(lastName);
+        req.setEmail(email);
+        req.setPhone(phone);
+        req.setPosition(position);
         req.setTemperatureUnits(temperatureUnits);
         req.setPassword(password);
 
@@ -159,19 +157,25 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final User u = client.getUser(user.getLogin());
 
         assertNotNull(u);
-        assertEquals(fullName, u.getFullName());
         assertEquals(tz, u.getTimeZone());
         assertEquals(temperatureUnits, u.getTemperatureUnits());
+        assertEquals(firstName, u.getFirstName());
+        assertEquals(lastName, u.getLastName());
+        assertEquals(email, u.getEmail());
+        assertEquals(phone, u.getPhone());
+        assertEquals(position, u.getPosition());
     }
     /**
      * @param login
-     * @param fullName
+     * @param firstName
      * @return user.
      */
-    private User createUser(final String login, final String fullName, final Company company) {
+    private User createUser(final String login, final String firstName,
+            final String lastName, final Company company) {
         final User u = new User();
         u.setLogin(login);
-        u.setFullName(fullName);
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
         u.setCompany(company);
         u.getRoles().add(Role.CompanyAdmin);
         context.getBean(AuthService.class).createUser(u, "");

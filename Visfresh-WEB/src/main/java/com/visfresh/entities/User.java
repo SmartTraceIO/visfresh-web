@@ -21,9 +21,26 @@ public class User implements EntityWithId<String>, EntityWithCompany {
      */
     private Company company;
     /**
-     * Full user name.
+     * First user name.
      */
-    private String fullName;
+    private String firstName;
+    /**
+     * Last user name.
+     */
+    private String lastName;
+    /**
+     * User's position in company.
+     */
+    private String position;
+    /**
+     * Email address.
+     */
+    private String email;
+    /**
+     * Phone number
+     */
+    private String phone;
+
     /**
      * Encrypted password.
      */
@@ -66,18 +83,6 @@ public class User implements EntityWithId<String>, EntityWithCompany {
     @Override
     public String getId() {
         return getLogin();
-    }
-    /**
-     * @return the fullName
-     */
-    public String getFullName() {
-        return fullName;
-    }
-    /**
-     * @param fullName the fullName to set
-     */
-    public void setFullName(final String fullName) {
-        this.fullName = fullName;
     }
     /**
      * @return the roles
@@ -134,5 +139,65 @@ public class User implements EntityWithId<String>, EntityWithCompany {
      */
     public void setTemperatureUnits(final TemperatureUnits temperatureUnits) {
         this.temperatureUnits = temperatureUnits;
+    }
+    /**
+     * @return the firstName
+     */
+    public String getFirstName() {
+        return firstName;
+    }
+    /**
+     * @param firstName the firstName to set
+     */
+    public void setFirstName(final String firstName) {
+        this.firstName = firstName;
+    }
+    /**
+     * @return the lastName
+     */
+    public String getLastName() {
+        return lastName;
+    }
+    /**
+     * @param lastName the lastName to set
+     */
+    public void setLastName(final String lastName) {
+        this.lastName = lastName;
+    }
+    /**
+     * @return the position
+     */
+    public String getPosition() {
+        return position;
+    }
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(final String position) {
+        this.position = position;
+    }
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(final String email) {
+        this.email = email;
+    }
+    /**
+     * @return the phone
+     */
+    public String getPhone() {
+        return phone;
+    }
+    /**
+     * @param phone the phone to set
+     */
+    public void setPhone(final String phone) {
+        this.phone = phone;
     }
 }

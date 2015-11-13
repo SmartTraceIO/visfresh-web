@@ -12,10 +12,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.UserConstants;
 import com.visfresh.entities.Role;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
-import com.visfresh.entities.UserProfile;
 import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.CreateUserRequest;
 import com.visfresh.io.ShipmentResolver;
@@ -49,7 +47,11 @@ public class UserSerializer extends AbstractJsonSerializer {
         final JsonObject json = e.getAsJsonObject();
         final User u = new User();
         u.setLogin(asString(json.get(UserConstants.PROPERTY_LOGIN)));
-        u.setFullName(asString(json.get(UserConstants.PROPERTY_FULL_NAME)));
+        u.setFirstName(asString(json.get(UserConstants.PROPERTY_FIRST_NAME)));
+        u.setLastName(asString(json.get(UserConstants.PROPERTY_LAST_NAME)));
+        u.setPosition(asString(json.get(UserConstants.PROPERTY_POSITION)));
+        u.setEmail(asString(json.get(UserConstants.PROPERTY_EMAIL)));
+        u.setPhone(asString(json.get(UserConstants.PROPERTY_PHONE)));
         u.setTimeZone(TimeZone.getTimeZone(asString(json.get(UserConstants.PROPERTY_TIME_ZONE))));
         u.setTemperatureUnits(TemperatureUnits.valueOf(asString(json.get(
                 UserConstants.PROPERTY_TEMPERATURE_UNITS))));
@@ -69,7 +71,11 @@ public class UserSerializer extends AbstractJsonSerializer {
     public JsonObject toJson(final User u) {
         final JsonObject obj = new JsonObject();
         obj.addProperty(UserConstants.PROPERTY_LOGIN, u.getLogin());
-        obj.addProperty(UserConstants.PROPERTY_FULL_NAME, u.getFullName());
+        obj.addProperty(UserConstants.PROPERTY_FIRST_NAME, u.getFirstName());
+        obj.addProperty(UserConstants.PROPERTY_LAST_NAME, u.getLastName());
+        obj.addProperty(UserConstants.PROPERTY_POSITION, u.getPosition());
+        obj.addProperty(UserConstants.PROPERTY_EMAIL, u.getEmail());
+        obj.addProperty(UserConstants.PROPERTY_PHONE, u.getPhone());
 
         final JsonArray roleArray = new JsonArray();
         for (final Role r : u.getRoles()) {
@@ -81,36 +87,6 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.addProperty(UserConstants.PROPERTY_TEMPERATURE_UNITS, u.getTemperatureUnits().toString());
 
         return obj;
-    }
-    /**
-     * @param profile user profile.
-     * @return User pforile as JSON object.
-     */
-    public JsonElement toJson(final UserProfile profile) {
-        if (profile == null) {
-            return JsonNull.INSTANCE;
-        }
-        final JsonObject obj = new JsonObject();
-
-        final JsonArray array = new JsonArray();
-        for (final Shipment s : profile.getShipments()) {
-            array.add(new JsonPrimitive(s.getId()));
-        }
-
-        obj.add("shipments", array);
-        return obj;
-    }
-    public UserProfile parseUserProfile(final JsonElement e) {
-        if (e == null || e.isJsonNull()) {
-            return null;
-        }
-
-        final UserProfile p = new UserProfile();
-        final JsonArray array = ((JsonObject) e).get("shipments").getAsJsonArray();
-        for (final JsonElement id : array) {
-            p.getShipments().add(getShipmentResolver().getShipment(id.getAsLong()));
-        }
-        return p;
     }
     /**
      * @param e JSON element.
@@ -151,9 +127,13 @@ public class UserSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty(UserConstants.PROPERTY_FULL_NAME, req.getFullName());
-        obj.addProperty("password", req.getPassword());
         obj.addProperty("user", req.getUser());
+        obj.addProperty("password", req.getPassword());
+        obj.addProperty(UserConstants.PROPERTY_FIRST_NAME, req.getFirstName());
+        obj.addProperty(UserConstants.PROPERTY_LAST_NAME, req.getLastName());
+        obj.addProperty(UserConstants.PROPERTY_POSITION, req.getPosition());
+        obj.addProperty(UserConstants.PROPERTY_EMAIL, req.getEmail());
+        obj.addProperty(UserConstants.PROPERTY_PHONE, req.getPhone());
         obj.addProperty(UserConstants.PROPERTY_TEMPERATURE_UNITS, req.getTemperatureUnits().toString());
         obj.addProperty(UserConstants.PROPERTY_TIME_ZONE, req.getTimeZone().getID());
         return obj;
@@ -165,7 +145,11 @@ public class UserSerializer extends AbstractJsonSerializer {
         final JsonObject json = el.getAsJsonObject();
 
         final UpdateUserDetailsRequest req = new UpdateUserDetailsRequest();
-        req.setFullName(asString(json.get(UserConstants.PROPERTY_FULL_NAME)));
+        req.setFirstName(asString(json.get(UserConstants.PROPERTY_FIRST_NAME)));
+        req.setLastName(asString(json.get(UserConstants.PROPERTY_LAST_NAME)));
+        req.setPosition(asString(json.get(UserConstants.PROPERTY_POSITION)));
+        req.setEmail(asString(json.get(UserConstants.PROPERTY_EMAIL)));
+        req.setPhone(asString(json.get(UserConstants.PROPERTY_PHONE)));
         req.setPassword(asString(json.get("password")));
         req.setUser(asString(json.get("user")));
         if (json.has(UserConstants.PROPERTY_TEMPERATURE_UNITS)) {

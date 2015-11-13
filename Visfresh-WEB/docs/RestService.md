@@ -40,6 +40,7 @@ An authentication can be performed as from REST client using login method, as fr
 10. [Alert](#markdown-header-alert)  
 11. [Temperature Alert](#markdown-header-temperature-alert)  
 12. [Arrival](#markdown-header-arrival)  
+13. [User](#markdown-header-user)  
 
 ## Lists ##
 List items is short representations of base entities, like as [Alert Profile](#markdown-header-alert-profile), [Location](#markdown-header-location), etc. Some of fields can be get from corresponding base entity and some can be synthetic fields.  
@@ -85,8 +86,6 @@ List items is short representations of base entities, like as [Alert Profile](#m
 33. [Get Notifications](#markdown-header-get-notifications)  
 34. [Send Command to Device](#markdown-header-send-command-to-device)  
 35. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
-36. [Get Profile](#markdown-header-get-profile)  
-37. [Save Profile](#markdown-header-save-profile)  
 
 ## Reports ##
 1. [Get Single Shipment](#markdown-header-get-single-shipment)
@@ -108,12 +107,7 @@ Method *GET*, method name *getUser*, method parameters
 1. username - name of user  
 
 Method required associated privileges. The logged in user should be some as requested info user or should have admin role.  
-Method returns:  
-1. login - user login name  
-2. fullName - full user name  
-3. roles - array of user roles, one from GlobalAdmin, CompanyAdmin, Dispatcher, ReportViewer
-4. timeZone - user type zone.  
-5. temperatureUnits - temperature units.  
+Method returns [User Object](#markdown-header-user)   
 [(example)](#markdown-header-get-user-info-example)
 
 ### Get Users ###
@@ -127,11 +121,15 @@ Method returns array of [User List items](#markdown-header-user-list-item)
 
 ### Update User Details ###
 Method *POST*, method name *updateUserDetails*. JSON request body contains following properties:  
-1. fullName - full user name.  
-2. password - user password.  
-3. user - user login name. It is not changeable parameter. Is used for identify the user to change details.  
-4. temperatureUnits - user temparature units.  
-5. timeZone - user time zone.  
+1. firstName - first user name.  
+2. lastName - last user name.  
+3. position - position of user in company.  
+4. email - user email address.  
+5. phone - user phone number
+6. password - user password.  
+7. user - user login name. It is not changeable parameter. Is used for identify the user to change details.  
+8. temperatureUnits - user temperature units.  
+9. timeZone - user time zone.  
 [(example)](#markdown-header-update-user-details-example)
 
 ### Logout ###
@@ -312,15 +310,6 @@ Method *POST*, method name *markNotificationsAsRead*. Request body contains JSON
 ### Send Command to Device ###
 Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#markdown-header-device) ID and device specific command.  
 [(example)](#markdown-header-send-command-to-device-example)
-
-### Get Profile ###
-Method *GET*, method name *getProfile*, have not parameters. Return [Profile Object](#markdown-header-profile-object)
-of current logged in user  
-[(example)](#markdown-header-get-profile-example)
-
-### Save Profile ###
-Method *POST*, method name *saveProfile*. Request body contains JSON serialized [Profile Object](#markdown-header-profile-object)  
-[(example)](#markdown-header-save-profile-example)
 
 ## Objects
 ### Response message ###
@@ -590,12 +579,21 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 	"shipment": 11
 }
 ```
-### Profile Object ###
+### User ###
 ```json
 {
-    "shipments": [ //array of Shipment ID associated by given user
-      77
-    ]
+    "login": "test-1",
+    "firstName": "firstname",
+    "lastName": "LastName",
+    "position": "Manager",
+    "email": "abra@cada.bra",
+    "phone": "1111111117",
+    "roles": [
+      "CompanyAdmin",
+      "Dispatcher"
+    ],
+    "timeZone": "UTC",
+    "temperatureUnits": "Celsius"
 }
 ```
 ## List Items ##
@@ -702,9 +700,13 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 **Request body:**  
 ```json
 {
-  "fullName": "Full User Name",
-  "password": "abrakadabra",
   "user": "anylogin",
+  "password": "abrakadabra",
+  "firstName": "firstname",
+  "lastName": "LastName",
+  "position": "Manager",
+  "email": "abra@cada.bra",
+  "phone": "1111111117",
   "temperatureUnits": "Fahrenheit",
   "timeZone": "GMT+02:00"
 }
@@ -1733,41 +1735,6 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ```
 ### Delete Person Schedule example ###
 **GET /vf/rest/deletePersonSchedule/${accessToken}?notificationScheduleId=1&personScheduleId=3**  
-**Response:**  
-```json
-{
-  "status": {
-    "code": 0,
-    "message": "Success"
-  }
-}
-```
-### Get Profile example ###
-**GET /vf/rest/getProfile/${accessToken}**  
-**Response:**  
-```json
-{
-  "status": {
-    "code": 0,
-    "message": "Success"
-  },
-  "response": {
-    "shipments": [
-      77
-    ]
-  }
-}
-```
-### Save Profile example ###
-**POST /vf/rest/saveProfile/${accessToken}**  
-**Request body:**  
-```json
-{
-  "shipments": [
-    77
-  ]
-}
-```
 **Response:**  
 ```json
 {
