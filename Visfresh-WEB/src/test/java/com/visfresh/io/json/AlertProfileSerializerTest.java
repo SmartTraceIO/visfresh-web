@@ -4,6 +4,7 @@
 package com.visfresh.io.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -83,6 +84,7 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         issue.setTemperature(temperature);
         issue.setTimeOutMinutes(timeOutMinutes);
         issue.setType(type);
+        issue.setCumulativeFlag(true);
 
         final JsonObject obj = serializer.toJson(issue);
         issue = serializer.parseTemperatureIssue(obj);
@@ -91,5 +93,6 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         assertEquals(type, issue.getType());
         assertEquals(timeOutMinutes, issue.getTimeOutMinutes());
         assertEquals(id, issue.getId());
+        assertTrue(issue.isCumulativeFlag());
     }
 }

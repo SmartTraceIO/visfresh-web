@@ -51,41 +51,49 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         TemperatureIssue criticalHot = new TemperatureIssue(AlertType.CriticalHot);
         criticalHot.setTemperature(normalTemperature + 15);
         criticalHot.setTimeOutMinutes(0);
+        criticalHot.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(criticalHot);
 
         criticalHot = new TemperatureIssue(AlertType.CriticalHot);
         criticalHot.setTemperature(normalTemperature + 14);
         criticalHot.setTimeOutMinutes(1);
+        criticalHot.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(criticalHot);
 
         TemperatureIssue criticalLow = new TemperatureIssue(AlertType.CriticalCold);
         criticalLow.setTemperature(normalTemperature -15.);
         criticalLow.setTimeOutMinutes(0);
+        criticalLow.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(criticalLow);
 
         criticalLow = new TemperatureIssue(AlertType.CriticalCold);
         criticalLow.setTemperature(normalTemperature -14.);
         criticalLow.setTimeOutMinutes(1);
+        criticalLow.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(criticalLow);
 
         TemperatureIssue hot = new TemperatureIssue(AlertType.Hot);
         hot.setTemperature(normalTemperature + 3);
         hot.setTimeOutMinutes(0);
+        hot.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(hot);
 
         hot = new TemperatureIssue(AlertType.Hot);
         hot.setTemperature(normalTemperature + 4.);
         hot.setTimeOutMinutes(2);
+        hot.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(hot);
 
         TemperatureIssue low = new TemperatureIssue(AlertType.Cold);
         low.setTemperature(normalTemperature -10.);
         low.setTimeOutMinutes(40);
+        low.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(low);
 
         low = new TemperatureIssue(AlertType.Cold);
         low.setTemperature(normalTemperature-8.);
         low.setTimeOutMinutes(55);
+        low.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(low);
 
         ap.setWatchBatteryLow(true);
@@ -163,6 +171,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         final TemperatureIssue expected = new TemperatureIssue(AlertType.CriticalHot);
         expected.setTemperature(15);
         expected.setTimeOutMinutes(0);
+        expected.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(expected);
 
         dao.save(ap);
@@ -172,5 +181,6 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertEquals(expected.getTemperature(), actual.getTemperature(), 0.001);
         assertEquals(expected.getTimeOutMinutes(), actual.getTimeOutMinutes());
         assertEquals(expected.getType(), actual.getType());
+        assertEquals(expected.isCumulativeFlag(), actual.isCumulativeFlag());
     }
 }

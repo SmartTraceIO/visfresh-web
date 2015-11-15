@@ -362,7 +362,8 @@ see [ResponseStatus](#markdown-header-response-status)
   "id": 1007,
   "type": "CriticalHot",
   "temperature": 17.0,
-  "timeOutMinutes": 1
+  "timeOutMinutes": 1,
+  "cumulativeFlag": true
 }
 ```
 ### Notification Schedule ###
@@ -757,42 +758,50 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     {
       "type": "CriticalHot",
       "temperature": 18.0,
-      "timeOutMinutes": 0
+      "timeOutMinutes": 0,
+      "cumulativeFlag": true
     },
     {
       "type": "CriticalHot",
       "temperature": 17.0,
-      "timeOutMinutes": 1
+      "timeOutMinutes": 1,
+      "cumulativeFlag": true
     },
     {
       "type": "CriticalCold",
       "temperature": -12.0,
-      "timeOutMinutes": 0
+      "timeOutMinutes": 0,
+      "cumulativeFlag": true
     },
     {
       "type": "CriticalCold",
       "temperature": -11.0,
-      "timeOutMinutes": 1
+      "timeOutMinutes": 1,
+      "cumulativeFlag": false
     },
     {
       "type": "Hot",
       "temperature": 6.0,
-      "timeOutMinutes": 0
+      "timeOutMinutes": 0,
+      "cumulativeFlag": false
     },
     {
       "type": "Hot",
       "temperature": 7.0,
-      "timeOutMinutes": 2
+      "timeOutMinutes": 2,
+      "cumulativeFlag": true
     },
     {
       "type": "Cold",
       "temperature": -7.0,
-      "timeOutMinutes": 40
+      "timeOutMinutes": 40,
+      "cumulativeFlag": true
     },
     {
       "type": "Cold",
       "temperature": -5.0,
-      "timeOutMinutes": 55
+      "timeOutMinutes": 55,
+      "cumulativeFlag": true
     }
   ]
 }
@@ -832,49 +841,57 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         "id": 982,
         "type": "CriticalHot",
         "temperature": 18.0,
-        "timeOutMinutes": 0
+        "timeOutMinutes": 0,
+        "cumulativeFlag": true
       },
       {
         "id": 983,
         "type": "CriticalHot",
         "temperature": 17.0,
-        "timeOutMinutes": 1
+        "timeOutMinutes": 1,
+        "cumulativeFlag": true
       },
       {
         "id": 984,
         "type": "CriticalCold",
         "temperature": -12.0,
-        "timeOutMinutes": 0
+        "timeOutMinutes": 0,
+        "cumulativeFlag": true
       },
       {
         "id": 985,
         "type": "CriticalCold",
         "temperature": -11.0,
-        "timeOutMinutes": 1
+        "timeOutMinutes": 1,
+        "cumulativeFlag": true
       },
       {
         "id": 986,
         "type": "Hot",
         "temperature": 6.0,
-        "timeOutMinutes": 0
+        "timeOutMinutes": 0,
+        "cumulativeFlag": true
       },
       {
         "id": 987,
         "type": "Hot",
         "temperature": 7.0,
-        "timeOutMinutes": 2
+        "timeOutMinutes": 2,
+        "cumulativeFlag": true
       },
       {
         "id": 988,
         "type": "Cold",
         "temperature": -7.0,
-        "timeOutMinutes": 40
+        "timeOutMinutes": 40,
+        "cumulativeFlag": true
       },
       {
         "id": 989,
         "type": "Cold",
         "temperature": -5.0,
-        "timeOutMinutes": 55
+        "timeOutMinutes": 55,
+        "cumulativeFlag": true
       }
     ]
   }
@@ -904,49 +921,57 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
           "id": 958,
           "type": "CriticalHot",
           "temperature": 18.0,
-          "timeOutMinutes": 0
+          "timeOutMinutes": 0,
+          "cumulativeFlag": true
         },
         {
           "id": 959,
           "type": "CriticalHot",
           "temperature": 17.0,
-          "timeOutMinutes": 1
+          "timeOutMinutes": 1,
+          "cumulativeFlag": true
         },
         {
           "id": 960,
           "type": "CriticalCold",
           "temperature": -12.0,
-          "timeOutMinutes": 0
+          "timeOutMinutes": 0,
+          "cumulativeFlag": true
         },
         {
           "id": 961,
           "type": "CriticalCold",
           "temperature": -11.0,
-          "timeOutMinutes": 1
+          "timeOutMinutes": 1,
+          "cumulativeFlag": true
         },
         {
           "id": 962,
           "type": "Hot",
           "temperature": 6.0,
-          "timeOutMinutes": 0
+          "timeOutMinutes": 0,
+          "cumulativeFlag": true
         },
         {
           "id": 963,
           "type": "Hot",
           "temperature": 7.0,
-          "timeOutMinutes": 2
+          "timeOutMinutes": 2,
+          "cumulativeFlag": true
         },
         {
           "id": 964,
           "type": "Cold",
           "temperature": -7.0,
-          "timeOutMinutes": 40
+          "timeOutMinutes": 40,
+          "cumulativeFlag": true
         },
         {
           "id": 965,
           "type": "Cold",
           "temperature": -5.0,
-          "timeOutMinutes": 55
+          "timeOutMinutes": 55,
+          "cumulativeFlag": true
         }
       ]
     },
@@ -964,49 +989,57 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
           "id": 966,
           "type": "CriticalHot",
           "temperature": 18.0,
-          "timeOutMinutes": 0
+          "timeOutMinutes": 0,
+          "cumulativeFlag": true
         },
         {
           "id": 967,
           "type": "CriticalHot",
           "temperature": 17.0,
-          "timeOutMinutes": 1
+          "timeOutMinutes": 1,
+          "cumulativeFlag": true
         },
         {
           "id": 968,
           "type": "CriticalCold",
           "temperature": -12.0,
-          "timeOutMinutes": 0
+          "timeOutMinutes": 0,
+          "cumulativeFlag": true
         },
         {
           "id": 969,
           "type": "CriticalCold",
           "temperature": -11.0,
-          "timeOutMinutes": 1
+          "timeOutMinutes": 1,
+          "cumulativeFlag": true
         },
         {
           "id": 970,
           "type": "Hot",
           "temperature": 6.0,
-          "timeOutMinutes": 0
+          "timeOutMinutes": 0,
+          "cumulativeFlag": true
         },
         {
           "id": 971,
           "type": "Hot",
           "temperature": 7.0,
-          "timeOutMinutes": 2
+          "timeOutMinutes": 2,
+          "cumulativeFlag": true
         },
         {
           "id": 972,
           "type": "Cold",
           "temperature": -7.0,
-          "timeOutMinutes": 40
+          "timeOutMinutes": 40,
+          "cumulativeFlag": true
         },
         {
           "id": 973,
           "type": "Cold",
           "temperature": -5.0,
-          "timeOutMinutes": 55
+          "timeOutMinutes": 55,
+          "cumulativeFlag": true
         }
       ]
     }

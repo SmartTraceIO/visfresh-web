@@ -141,12 +141,14 @@ public class AbstractSerializerTest {
         issue.setTemperature(10);
         issue.setType(AlertType.CriticalHot);
         issue.setTimeOutMinutes(17);
+        issue.setCumulativeFlag(true);
         p.getTemperatureIssues().add(issue);
 
         issue = new TemperatureIssue();
         issue.setTemperature(-3);
         issue.setType(AlertType.Cold);
         issue.setTimeOutMinutes(18);
+        issue.setCumulativeFlag(true);
         p.getTemperatureIssues().add(issue);
 
         resolver.add(p);

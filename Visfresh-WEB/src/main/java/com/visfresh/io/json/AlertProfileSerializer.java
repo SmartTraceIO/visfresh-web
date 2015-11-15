@@ -85,7 +85,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         return p;
     }
     /**
-     * @param issue
+     * @param issue temperature issue.
      * @return
      */
     public JsonObject toJson(final TemperatureIssue issue) {
@@ -94,11 +94,12 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         obj.addProperty("type", issue.getType().toString());
         obj.addProperty("temperature", issue.getTemperature());
         obj.addProperty("timeOutMinutes", issue.getTimeOutMinutes());
+        obj.addProperty("cumulativeFlag", issue.isCumulativeFlag());
         return obj;
     }
     /**
-     * @param json
-     * @return
+     * @param json JSON object.
+     * @return temperature issue.
      */
     public TemperatureIssue parseTemperatureIssue(final JsonObject json) {
         final TemperatureIssue issue = new TemperatureIssue();
@@ -106,6 +107,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         issue.setType(AlertType.valueOf(json.get("type").getAsString()));
         issue.setTemperature(asDouble(json.get("temperature")));
         issue.setTimeOutMinutes(asInt(json.get("timeOutMinutes")));
+        issue.setCumulativeFlag(asBoolean(json.get("cumulativeFlag")));
         return issue;
     }
 }

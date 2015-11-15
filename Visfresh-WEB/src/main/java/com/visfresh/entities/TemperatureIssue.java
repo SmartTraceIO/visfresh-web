@@ -11,6 +11,7 @@ public class TemperatureIssue {
     private AlertType type;
     private double temperature;
     private int timeOutMinutes;
+    private boolean cumulativeFlag;
     private Long id;
 
     /**
@@ -84,5 +85,17 @@ public class TemperatureIssue {
      */
     public void setId(final Long id) {
         this.id = id;
+    }
+    /**
+     * @return the cumulativeFlag
+     */
+    public boolean isCumulativeFlag() {
+        return cumulativeFlag;
+    }
+    /**
+     * @param cumulativeFlag the cumulativeFlag to set
+     */
+    public void setCumulativeFlag(final boolean cumulativeFlag) {
+        this.cumulativeFlag = cumulativeFlag;
     }
 }

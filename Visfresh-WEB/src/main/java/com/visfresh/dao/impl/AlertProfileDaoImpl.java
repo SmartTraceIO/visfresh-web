@@ -201,6 +201,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             paramMap.put("temperature", issue.getTemperature());
             paramMap.put("type", issue.getType().toString());
             paramMap.put("timeOut", issue.getTimeOutMinutes());
+            paramMap.put("cumulative", issue.isCumulativeFlag());
             paramMap.put("apid", id);
 
             if (issueId != null) {
@@ -215,8 +216,8 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             } else {
                 final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
                 jdbc.update("insert into allerttemperatures"
-                        + "(type, temp, timeout, alertprofile)"
-                        + " values(:type, :temperature, :timeOut, :apid)",
+                        + "(type, temp, timeout, cumulative, alertprofile)"
+                        + " values(:type, :temperature, :timeOut, :cumulative, :apid)",
                         new MapSqlParameterSource(paramMap), keyHolder);
                 if (keyHolder.getKey() != null) {
                     issue.setId(keyHolder.getKey().longValue());
@@ -252,6 +253,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             final TemperatureIssue issue = new TemperatureIssue();
             issue.setId(((Number) row.get("id")).longValue());
             issue.setTemperature(((Number) row.get("temp")).doubleValue());
+            issue.setCumulativeFlag(Boolean.TRUE.equals(row.get("cumulative")));
             issue.setTimeOutMinutes(((Number) row.get("timeout")).intValue());
             issue.setType(AlertType.valueOf((String) row.get("type")));
 

@@ -104,6 +104,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         TemperatureIssue issue = new TemperatureIssue(AlertType.Hot);
         issue.setTemperature(15.);
         issue.setTimeOutMinutes(5);
+        issue.setCumulativeFlag(true);
         profile.getTemperatureIssues().add(issue);
 
         //critical hot
@@ -118,6 +119,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         issue = new TemperatureIssue(AlertType.Cold);
         issue.setTemperature(3.);
         issue.setTimeOutMinutes(10);
+        issue.setCumulativeFlag(true);
         profile.getTemperatureIssues().add(issue);
 
         //critical cold

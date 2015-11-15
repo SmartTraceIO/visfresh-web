@@ -104,41 +104,49 @@ public abstract class AbstractRestServiceTest {
         TemperatureIssue criticalHot = new TemperatureIssue(AlertType.CriticalHot);
         criticalHot.setTemperature(normalTemperature + 15);
         criticalHot.setTimeOutMinutes(0);
+        criticalHot.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(criticalHot);
 
         criticalHot = new TemperatureIssue(AlertType.CriticalHot);
         criticalHot.setTemperature(normalTemperature + 14);
+        criticalHot.setCumulativeFlag(true);
         criticalHot.setTimeOutMinutes(1);
         ap.getTemperatureIssues().add(criticalHot);
 
         TemperatureIssue criticalLow = new TemperatureIssue(AlertType.CriticalCold);
         criticalLow.setTemperature(normalTemperature -15.);
         criticalLow.setTimeOutMinutes(0);
+        criticalLow.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(criticalLow);
 
         criticalLow = new TemperatureIssue(AlertType.CriticalCold);
         criticalLow.setTemperature(normalTemperature -14.);
         criticalLow.setTimeOutMinutes(1);
+        criticalLow.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(criticalLow);
 
         TemperatureIssue hot = new TemperatureIssue(AlertType.Hot);
         hot.setTemperature(normalTemperature + 3);
         hot.setTimeOutMinutes(0);
+        hot.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(hot);
 
         hot = new TemperatureIssue(AlertType.Hot);
         hot.setTemperature(normalTemperature + 4.);
         hot.setTimeOutMinutes(2);
+        hot.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(hot);
 
         TemperatureIssue low = new TemperatureIssue(AlertType.Cold);
         low.setTemperature(normalTemperature -10.);
         low.setTimeOutMinutes(40);
+        low.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(low);
 
         low = new TemperatureIssue(AlertType.Cold);
         low.setTemperature(normalTemperature-8.);
         low.setTimeOutMinutes(55);
+        low.setCumulativeFlag(true);
         ap.getTemperatureIssues().add(low);
 
         ap.setWatchBatteryLow(true);

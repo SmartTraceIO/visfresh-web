@@ -116,6 +116,7 @@ create table allerttemperatures (
     `type` varchar(50) not null,
     temp float not null,
     timeout int not null,
+    cumulative boolean not null default false,
     alertprofile bigint(20) not null,
     primary key (id),
     foreign key (alertprofile)
