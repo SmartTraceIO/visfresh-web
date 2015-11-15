@@ -64,7 +64,7 @@ public class Tool extends AbstractTool {
             "358688000000158"
         };
 
-        tool.addUser("dan", "Dananjaya Kulathunga", "password");
+        tool.addUser("dan", "Dananjaya", "Kulathunga", "password");
         tool.createDevices(devices);
 
         System.out.println("Successfully created");
@@ -77,12 +77,12 @@ public class Tool extends AbstractTool {
      * @throws RestServiceException
      * @throws IOException
      */
-    private void addUser(final String login, final String fullName, final String password) throws IOException, RestServiceException {
+    private void addUser(final String login, final String firstName, final String lastName,
+            final String password) throws IOException, RestServiceException {
         final User u = new User();
         u.setLogin(login);
-        final String[] split = fullName.split(" *");
-        u.setFirstName(split[0]);
-        u.setLastName(split[1]);
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
         u.getRoles().add(Role.CompanyAdmin);
 
         userService.createUser(u, company, password);

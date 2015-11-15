@@ -10,7 +10,6 @@ drop table if exists arrivals;
 drop table if exists alerts;
 drop table if exists notifications;
 drop table if exists userprofiles;
-drop table if exists users;
 drop table if exists shipmentdevices;
 drop table if exists shipments;
 drop table if exists locationprofiles;
@@ -19,6 +18,7 @@ drop table if exists notificationschedules;
 drop table if exists allerttemperatures;
 drop table if exists alertprofiles;
 drop table if exists devices;
+drop table if exists users;
 drop table if exists companies;
 
 -- creates

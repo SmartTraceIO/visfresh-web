@@ -396,7 +396,7 @@ see [ResponseStatus](#markdown-header-response-status)
     ]
 }
 ```  
-See [User](#markdown-header-user)
+[(See User)](#markdown-header-user)
 ### Location ###
 ```json
 {
