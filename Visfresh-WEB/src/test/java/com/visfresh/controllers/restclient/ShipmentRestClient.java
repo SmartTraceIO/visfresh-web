@@ -17,6 +17,7 @@ import com.visfresh.entities.User;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.services.RestServiceException;
 
@@ -138,5 +139,8 @@ public class ShipmentRestClient extends RestClient {
      */
     public void setReferenceResolver(final ReferenceResolver r) {
         serializer.setReferenceResolver(r);
+    }
+    public void setUserResolver(final UserResolver r) {
+        serializer.setUserResolver(r);
     }
 }

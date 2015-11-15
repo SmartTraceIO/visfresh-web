@@ -109,7 +109,7 @@ public class ArrivalRule extends AbstractNotificationRule {
         final List<PersonSchedule> schedules = getAllPersonalSchedules(event.getShipment());
         for (final PersonSchedule s : schedules) {
             if (matchesTimeFrame(s, date)) {
-                sendNotification(s, "Arrival Notification", message);
+                sendNotification(s, "Arrival Notification", message, arrival);
             }
         }
 

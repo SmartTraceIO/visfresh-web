@@ -12,22 +12,26 @@ import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.User;
 import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.ShipmentResolver;
+import com.visfresh.io.UserResolver;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class DefaultReferenceResolver implements ReferenceResolver, CompanyResolver, ShipmentResolver {
+public class DefaultReferenceResolver implements ReferenceResolver, CompanyResolver,
+ShipmentResolver, UserResolver {
     @Autowired
     private LocationProfileDao locationProfileDao;
     @Autowired
@@ -40,6 +44,8 @@ public class DefaultReferenceResolver implements ReferenceResolver, CompanyResol
     private ShipmentDao shipmentDao;
     @Autowired
     private CompanyDao companyDao;
+    @Autowired
+    private UserDao userDao;
 
     /**
      * Default constructor.
@@ -90,5 +96,12 @@ public class DefaultReferenceResolver implements ReferenceResolver, CompanyResol
     @Override
     public Company getCompany(final Long id) {
         return companyDao.findOne(id);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.io.UserResolver#getUser(java.lang.String)
+     */
+    @Override
+    public User getUser(final String login) {
+        return userDao.findOne(login);
     }
 }

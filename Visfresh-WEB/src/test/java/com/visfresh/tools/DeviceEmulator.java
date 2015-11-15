@@ -32,6 +32,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureIssue;
+import com.visfresh.entities.User;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.lists.NotificationScheduleListItem;
 import com.visfresh.utils.SerializerUtils;
@@ -82,7 +83,6 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
 
         service = new ShipmentRestClient(user);
         service.setAuthToken(userService.getAuthToken());
-        //TODO set reference resolver.
     }
 
     public AlertProfile createAlertProfileIfNeed() throws RestServiceException, IOException {
@@ -310,18 +310,26 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
      * @param phone
      * @param position company position
      * @return
+     * @throws RestServiceException
+     * @throws IOException
      */
     private PersonSchedule createSchedule(final String firstName, final String lastName,
-            final String email, final String phone, final String position) {
+            final String email, final String phone, final String position)
+                    throws IOException, RestServiceException {
+        final User user = new User();
+        user.setLogin(email);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setPosition(position);
+        userService.createUser(user, company, "");
+
         final PersonSchedule s = new PersonSchedule();
-        s.setCompany("Smart Trace");
-        s.setEmailNotification(email);
-        s.setFirstName(firstName);
-        s.setLastName(lastName);
         s.setFromTime(1);
         s.setToTime(23 * 60 + 55);
-        s.setPosition(position);
         s.setPushToMobileApp(true);
+        s.setUser(user);
         Arrays.fill(s.getWeekDays(), true);
         return s;
     }

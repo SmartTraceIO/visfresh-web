@@ -27,6 +27,7 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.SingleShipmentDto;
 import com.visfresh.io.SingleShipmentTimeItem;
+import com.visfresh.io.UserResolver;
 import com.visfresh.rules.AlertDescriptionBuilder;
 import com.visfresh.services.lists.ListShipmentItem;
 import com.visfresh.services.lists.NotificationScheduleListItem;
@@ -385,5 +386,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      */
     public void setReferenceResolver(final ReferenceResolver referenceResolver) {
         this.referenceResolver = referenceResolver;
+    }
+    public void setUserResolver(final UserResolver r) {
+        notificationScheduleSerializer.setUserResolver(r);
     }
 }

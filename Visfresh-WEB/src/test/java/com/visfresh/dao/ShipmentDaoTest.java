@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +24,8 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.User;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -107,14 +110,9 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setDescription("Test schedule");
 
         PersonSchedule ps = new PersonSchedule();
-        ps.setCompany("Any Company");
-        ps.setEmailNotification("asuvoror");
-        ps.setFirstName("First");
         ps.setFromTime(45);
-        ps.setLastName("Last");
-        ps.setPosition("Manager");
         ps.setPushToMobileApp(true);
-        ps.setSmsNotification("11111111118");
+        ps.setUser(createUser());
         ps.setToTime(150);
 
         s.getSchedules().add(ps);
@@ -127,15 +125,10 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setDescription("Test schedule");
 
         ps = new PersonSchedule();
-        ps.setCompany("Any Company");
-        ps.setEmailNotification("asuvoror");
-        ps.setFirstName("First");
         ps.setFromTime(45);
-        ps.setLastName("Last");
-        ps.setPosition("Manager");
         ps.setPushToMobileApp(true);
-        ps.setSmsNotification("11111111118");
         ps.setToTime(150);
+        ps.setUser(createUser());
 
         s.getSchedules().add(ps);
 
@@ -145,6 +138,20 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         deviceDao = getContext().getBean(DeviceDao.class);
 
         device = createDevice("3984709382475");
+    }
+
+    private User createUser() {
+        final User u = new User();
+        u.setCompany(this.sharedCompany);
+        u.setEmail("asuvorov@mail.ru");
+        u.setFirstName("Alexander");
+        u.setLastName("Suvorov");
+        u.setLogin("asuvorov");
+        u.setPhone("11111111117");
+        u.setTemperatureUnits(TemperatureUnits.Celsius);
+        u.setTimeZone(TimeZone.getTimeZone("UTC"));
+        getContext().getBean(UserDao.class).save(u);
+        return u;
     }
 
     /**
@@ -358,6 +365,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         alertProfileDao.deleteAll();
         locationProfileDao.deleteAll();
         notificationScheduleDao.deleteAll();
+        getContext().getBean(UserDao.class).deleteAll();
         deviceDao.deleteAll();
     }
 }

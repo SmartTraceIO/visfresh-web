@@ -66,7 +66,7 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
             for (final PersonSchedule s : schedules) {
                 if (matchesTimeFrame(s, date)) {
                     sendNotification(s, alert.getType().toString(),
-                            descriptionBuilder.buildDescription(alert, null));
+                            descriptionBuilder.buildDescription(alert, null), alert);
                 }
             }
         }

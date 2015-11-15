@@ -14,6 +14,8 @@ import org.junit.Test;
 
 import com.visfresh.controllers.restclient.NotificationScheduleRestClient;
 import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.entities.User;
+import com.visfresh.io.UserResolver;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.lists.NotificationScheduleListItem;
 
@@ -23,6 +25,8 @@ import com.visfresh.services.lists.NotificationScheduleListItem;
  */
 public class NotificationScheduleControllerTest extends AbstractRestServiceTest {
     private NotificationScheduleRestClient client = new NotificationScheduleRestClient(UTC);
+    private User suvorov;
+    private User kutuzov;
 
     /**
      * Default constructor.
@@ -33,8 +37,11 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
 
     @Before
     public void setUp() {
+        client.setUserResolver(context.getBean(UserResolver.class));
         client.setServiceUrl(getServiceUrl());
         client.setAuthToken(login());
+        suvorov = createUser1();
+        kutuzov = createUser2();
     }
 
     //@RequestMapping(value = "/saveNotificationSchedule/{authToken}", method = RequestMethod.POST)
@@ -42,7 +49,7 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
     //        final @RequestBody String schedule) {
     @Test
     public void testSaveNotificationSchedule() throws RestServiceException, IOException {
-        final NotificationSchedule s = createNotificationSchedule(false);
+        final NotificationSchedule s = createNotificationSchedule(suvorov, false);
         final Long id = client.saveNotificationSchedule(s);
 
         assertNotNull(id);
@@ -51,8 +58,8 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
     //public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken) {
     @Test
     public void testGetNotificationSchedules() throws RestServiceException, IOException {
-        createNotificationSchedule(true);
-        createNotificationSchedule(true);
+        createNotificationSchedule(suvorov, true);
+        createNotificationSchedule(kutuzov, true);
 
         assertEquals(2, client.getNotificationSchedules(1, 10000).size());
         assertEquals(1, client.getNotificationSchedules(1, 1).size());
@@ -61,28 +68,28 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
     }
     @Test
     public void testGetNotificationSchedule() throws IOException, RestServiceException {
-        final NotificationSchedule s = createNotificationSchedule(true);
+        final NotificationSchedule s = createNotificationSchedule(suvorov, true);
         assertNotNull(client.getNotificationSchedule(s.getId()));
     }
     @Test
     public void testDeleteNotificationSchedule() throws IOException, RestServiceException {
-        final NotificationSchedule s = createNotificationSchedule(true);
+        final NotificationSchedule s = createNotificationSchedule(suvorov, true);
         client.deleteNotificationSchedule(s.getId());
         assertNull(client.getNotificationSchedule(s.getId()));
     }
     @Test
     public void testGetSortedNotificationSchedules() throws RestServiceException, IOException {
-        final NotificationSchedule p1 = createNotificationSchedule(false);
+        final NotificationSchedule p1 = createNotificationSchedule(suvorov, false);
         p1.setName("b");
         p1.setDescription("c");
         saveNotificationScheduleDirectly(p1);
 
-        final NotificationSchedule p2 = createNotificationSchedule(false);
+        final NotificationSchedule p2 = createNotificationSchedule(kutuzov, false);
         p2.setName("a");
         p2.setDescription("b");
         saveNotificationScheduleDirectly(p2);
 
-        final NotificationSchedule p3 = createNotificationSchedule(false);
+        final NotificationSchedule p3 = createNotificationSchedule(kutuzov, false);
         p3.setName("c");
         p3.setDescription("a");
         saveNotificationScheduleDirectly(p3);
@@ -115,7 +122,7 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
      */
     @Test
     public void testDeletePersonSchedule() throws IOException, RestServiceException {
-        final NotificationSchedule p = createNotificationSchedule(true);
+        final NotificationSchedule p = createNotificationSchedule(suvorov, true);
 
         client.deletePersonSchedule(p.getId(), p.getSchedules().get(1).getId());
 

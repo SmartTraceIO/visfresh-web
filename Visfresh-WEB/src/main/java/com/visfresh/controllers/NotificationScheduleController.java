@@ -23,6 +23,7 @@ import com.visfresh.dao.Page;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.User;
+import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.NotificationScheduleSerializer;
 import com.visfresh.services.lists.NotificationScheduleListItem;
 
@@ -42,6 +43,8 @@ public class NotificationScheduleController extends AbstractController implement
      */
     @Autowired
     private NotificationScheduleDao dao;
+    @Autowired
+    private UserResolver userResolver;
 
     /**
      * Default constructor.
@@ -119,7 +122,9 @@ public class NotificationScheduleController extends AbstractController implement
      * @return
      */
     private NotificationScheduleSerializer createSerializer(final User user) {
-        return new NotificationScheduleSerializer(user.getTimeZone());
+        final NotificationScheduleSerializer s = new NotificationScheduleSerializer(user.getTimeZone());
+        s.setUserResolver(userResolver);
+        return s;
     }
 
     /**

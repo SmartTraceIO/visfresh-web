@@ -14,33 +14,6 @@ public class PersonSchedule implements EntityWithId<Long> {
      */
     private Long id;
 
-    //person to notify
-    /**
-     * First name.
-     */
-    private String firstName;
-    /**
-     * Last name.
-     */
-    private String lastName;
-    /**
-     * Company description.
-     */
-    private String company;
-    /**
-     * Position
-     */
-    private String position;
-
-    //how to notify
-    /**
-     * Phone number for SMS notification.
-     */
-    private String smsNotification;
-    /**
-     * Email address for email notificaition
-     */
-    private String emailNotification;
     /**
      * Whether or not should
      */
@@ -60,6 +33,10 @@ public class PersonSchedule implements EntityWithId<Long> {
      * End minute from start of day.
      */
     private int toTime;
+    /**
+     * Person to notify.
+     */
+    private User user;
 
     /**
      *
@@ -80,78 +57,6 @@ public class PersonSchedule implements EntityWithId<Long> {
      */
     public void setId(final Long id) {
         this.id = id;
-    }
-    /**
-     * @return the firstName
-     */
-    public String getFirstName() {
-        return firstName;
-    }
-    /**
-     * @param firstName the firstName to set
-     */
-    public void setFirstName(final String firstName) {
-        this.firstName = firstName;
-    }
-    /**
-     * @return the lastName
-     */
-    public String getLastName() {
-        return lastName;
-    }
-    /**
-     * @param lastName the lastName to set
-     */
-    public void setLastName(final String lastName) {
-        this.lastName = lastName;
-    }
-    /**
-     * @return the company
-     */
-    public String getCompany() {
-        return company;
-    }
-    /**
-     * @param company the company to set
-     */
-    public void setCompany(final String company) {
-        this.company = company;
-    }
-    /**
-     * @return the position
-     */
-    public String getPosition() {
-        return position;
-    }
-    /**
-     * @param position the position to set
-     */
-    public void setPosition(final String position) {
-        this.position = position;
-    }
-    /**
-     * @return the smsNotification
-     */
-    public String getSmsNotification() {
-        return smsNotification;
-    }
-    /**
-     * @param smsNotification the smsNotification to set
-     */
-    public void setSmsNotification(final String smsNotification) {
-        this.smsNotification = smsNotification;
-    }
-    /**
-     * @return the emailNotification
-     */
-    public String getEmailNotification() {
-        return emailNotification;
-    }
-    /**
-     * @param emailNotification the emailNotification to set
-     */
-    public void setEmailNotification(final String emailNotification) {
-        this.emailNotification = emailNotification;
     }
     /**
      * @return the pushToMobileApp
@@ -194,5 +99,17 @@ public class PersonSchedule implements EntityWithId<Long> {
      */
     public boolean[] getWeekDays() {
         return weekDays;
+    }
+    /**
+     * @return the user
+     */
+    public User getUser() {
+        return user;
+    }
+    /**
+     * @param user the user to set
+     */
+    public void setUser(final User user) {
+        this.user = user;
     }
 }

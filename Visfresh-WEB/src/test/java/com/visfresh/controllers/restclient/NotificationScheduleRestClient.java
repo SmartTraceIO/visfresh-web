@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.NotificationScheduleSerializer;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.lists.NotificationScheduleListItem;
@@ -111,5 +112,8 @@ public class NotificationScheduleRestClient extends RestClient {
         params.put("personScheduleId", Long.toString(personScheduleId));
 
         sendGetRequest(getPathWithToken("deletePersonSchedule"), params);
+    }
+    public void setUserResolver(final UserResolver r) {
+        serializer.setUserResolver(r);
     }
 }

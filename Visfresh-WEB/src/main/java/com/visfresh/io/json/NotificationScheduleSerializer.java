@@ -14,6 +14,7 @@ import com.visfresh.constants.NotificationScheduleConstants;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.io.SavePersonScheduleRequest;
+import com.visfresh.io.UserResolver;
 import com.visfresh.services.lists.NotificationScheduleListItem;
 
 /**
@@ -22,6 +23,7 @@ import com.visfresh.services.lists.NotificationScheduleListItem;
  */
 public class NotificationScheduleSerializer extends AbstractJsonSerializer {
 
+    private UserResolver userResolver;
     /**
      * @param tz
      */
@@ -85,12 +87,7 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
 
         obj.addProperty("personScheduleId", s.getId());
-        obj.addProperty("firstName", s.getFirstName());
-        obj.addProperty("lastName", s.getLastName());
-        obj.addProperty("company", s.getCompany());
-        obj.addProperty("position", s.getPosition());
-        obj.addProperty("emailNotification", s.getEmailNotification());
-        obj.addProperty("smsNotification", s.getSmsNotification());
+        obj.addProperty("user", s.getUser().getLogin());
         obj.addProperty("pushToMobileApp", s.isPushToMobileApp());
         obj.addProperty("fromTime", s.getFromTime());
         obj.addProperty("toTime", s.getToTime());
@@ -116,12 +113,7 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
         final JsonObject obj = e.getAsJsonObject();
         final PersonSchedule s = new PersonSchedule();
 
-        s.setCompany(asString(obj.get("company")));
-        s.setEmailNotification(asString(obj.get("emailNotification")));
-        s.setFirstName(asString(obj.get("firstName")));
-        s.setLastName(asString(obj.get("lastName")));
-        s.setPosition(asString(obj.get("position")));
-        s.setSmsNotification(asString(obj.get("smsNotification")));
+        s.setUser(getUserResolver().getUser(asString(obj.get("user"))));
         s.setToTime(asInt(obj.get("toTime")));
         s.setFromTime(asInt(obj.get("fromTime")));
         s.setId(asLong(obj.get("personScheduleId")));
@@ -195,5 +187,17 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
                 NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_NAME)));
         item.setPeopleToNotify(asString(json.get("peopleToNotify")));
         return item;
+    }
+    /**
+     * @return
+     */
+    private UserResolver getUserResolver() {
+        return userResolver;
+    }
+    /**
+     * @param userResolver the userResolver to set
+     */
+    public void setUserResolver(final UserResolver userResolver) {
+        this.userResolver = userResolver;
     }
 }

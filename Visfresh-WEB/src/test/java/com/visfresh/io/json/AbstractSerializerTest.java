@@ -16,6 +16,7 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureIssue;
+import com.visfresh.entities.User;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -65,20 +66,29 @@ public class AbstractSerializerTest {
     protected PersonSchedule createPersonSchedule() {
         final PersonSchedule s = new PersonSchedule();
 
-        s.setCompany("Sun");
-        s.setEmailNotification("asuvorov@sun.com");
-        s.setFirstName("Alexander");
         s.setToTime(17);
         s.setFromTime(1);
         s.setId(generateId());
-        s.setLastName("Suvorov");
-        s.setPosition("Generalisimus");
         s.setPushToMobileApp(true);
-        s.setSmsNotification("1111111117");
+        s.setUser(createUser("asuvorov"));
         s.getWeekDays()[0] = true;
         s.getWeekDays()[3] = true;
 
         return s;
+    }
+    /**
+     * @param string
+     * @return
+     */
+    protected User createUser(final String string) {
+        final User user = new User();
+        user.setEmail("asuvorov@sun.com");
+        user.setFirstName("Alexander");
+        user.setLastName("Suvorov");
+        user.setPosition("Generalisimus");
+        user.setPhone("1111111117");
+        resolver.add(user);
+        return user;
     }
     /**
      * @return any location profile.

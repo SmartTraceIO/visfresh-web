@@ -4,15 +4,21 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.TimeZone;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
+import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.User;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -21,11 +27,31 @@ import com.visfresh.entities.PersonSchedule;
 public class NotificationScheduleDaoTest
     extends BaseCrudTest<NotificationScheduleDao, NotificationSchedule, Long> {
 
+    private User user;
     /**
      * Default constructor.
      */
     public NotificationScheduleDaoTest() {
         super(NotificationScheduleDao.class);
+    }
+
+    @Before
+    public void setUp() {
+        this.user = createUser();
+    }
+
+    public User createUser() {
+        final User u = new User();
+        u.setCompany(this.sharedCompany);
+        u.setEmail("asuvorov@mail.ru");
+        u.setFirstName("Alexander");
+        u.setLastName("Suvorov");
+        u.setLogin("asuvorov");
+        u.setPhone("11111111117");
+        u.setTemperatureUnits(TemperatureUnits.Celsius);
+        u.setTimeZone(TimeZone.getTimeZone("UTC"));
+        getContext().getBean(UserDao.class).save(u);
+        return u;
     }
 
     /* (non-Javadoc)
@@ -39,14 +65,9 @@ public class NotificationScheduleDaoTest
         s.setDescription("Test schedule");
 
         final PersonSchedule ps = new PersonSchedule();
-        ps.setCompany("Any Company");
-        ps.setEmailNotification("asuvoror");
-        ps.setFirstName("First");
+        ps.setUser(user);
         ps.setFromTime(45);
-        ps.setLastName("Last");
-        ps.setPosition("Manager");
         ps.setPushToMobileApp(true);
-        ps.setSmsNotification("11111111118");
         ps.setToTime(150);
 
         s.getSchedules().add(ps);
@@ -66,15 +87,10 @@ public class NotificationScheduleDaoTest
 
         final PersonSchedule ps = s.getSchedules().get(0);
 
-        assertEquals("Any Company", ps.getCompany());
-        assertEquals("asuvoror", ps.getEmailNotification());
-        assertEquals("First", ps.getFirstName());
         assertEquals(45, ps.getFromTime());
-        assertEquals("Last", ps.getLastName());
-        assertEquals("Manager", ps.getPosition());
         assertTrue(ps.isPushToMobileApp());
-        assertEquals("11111111118", ps.getSmsNotification());
         assertEquals(150, ps.getToTime());
+        assertNotNull(ps.getUser());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
@@ -93,15 +109,10 @@ public class NotificationScheduleDaoTest
 
         final PersonSchedule ps = s.getSchedules().get(0);
 
-        assertEquals("Any Company", ps.getCompany());
-        assertEquals("asuvoror", ps.getEmailNotification());
-        assertEquals("First", ps.getFirstName());
         assertEquals(45, ps.getFromTime());
-        assertEquals("Last", ps.getLastName());
-        assertEquals("Manager", ps.getPosition());
         assertTrue(ps.isPushToMobileApp());
-        assertEquals("11111111118", ps.getSmsNotification());
         assertEquals(150, ps.getToTime());
+        assertNotNull(ps.getUser());
     }
     @Test
     public void testFindByCompany() {
@@ -117,5 +128,10 @@ public class NotificationScheduleDaoTest
         left = companyDao.save(left);
 
         assertEquals(0, dao.findByCompany(left, null, null, null).size());
+    }
+
+    @After
+    public void tearDown() {
+        this.getContext().getBean(UserDao.class).deleteAll();
     }
 }

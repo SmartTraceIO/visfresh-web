@@ -37,10 +37,10 @@ public class NotificationScheduleListItem implements EntityWithId<Long> {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append(ps.getFirstName());
-            if (ps.getLastName() != null) {
+            sb.append(ps.getUser().getFirstName());
+            if (ps.getUser().getLastName() != null) {
                 sb.append(' ');
-                sb.append(ps.getLastName());
+                sb.append(ps.getUser().getLastName());
             }
         }
 

@@ -45,6 +45,7 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.SingleShipmentDto;
 import com.visfresh.io.SingleShipmentTimeItem;
+import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.services.lists.ListShipmentItem;
 
@@ -74,6 +75,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private TrackerEventDao trackerEventDao;
     @Autowired
     private ReferenceResolver referenceResolver;
+    @Autowired
+    private UserResolver userResolver;
 
     /**
      * Default constructor.
@@ -261,6 +264,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private ShipmentSerializer getSerializer(final User user) {
         final ShipmentSerializer s = new ShipmentSerializer(user);
         s.setReferenceResolver(referenceResolver);
+        s.setUserResolver(userResolver);
         return s;
     }
     @RequestMapping(value = "/deleteShipment/{authToken}", method = RequestMethod.GET)

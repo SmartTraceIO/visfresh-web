@@ -12,21 +12,24 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.User;
 import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.ShipmentResolver;
+import com.visfresh.io.UserResolver;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class MockReferenceResolver implements ReferenceResolver, CompanyResolver, ShipmentResolver {
+public class MockReferenceResolver implements ReferenceResolver, CompanyResolver, ShipmentResolver, UserResolver {
     private final Map<Long, LocationProfile> locationProfiles = new HashMap<Long, LocationProfile>();
     private final Map<Long, AlertProfile> alertProfiles = new HashMap<Long, AlertProfile>();
     private final Map<Long, NotificationSchedule> notificationSchedules = new HashMap<Long, NotificationSchedule>();
     private final Map<String, Device> devices = new HashMap<String, Device>();
     private final Map<Long, Shipment> shipments = new HashMap<Long, Shipment>();
     private final Map<Long, Company> companies = new HashMap<Long, Company>();
+    private final Map<String, User> users = new HashMap<String, User>();
 
     /**
      * Default constructor.
@@ -77,6 +80,13 @@ public class MockReferenceResolver implements ReferenceResolver, CompanyResolver
     public Company getCompany(final Long id) {
         return companies.get(id);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.io.UserResolver#getUser(java.lang.String)
+     */
+    @Override
+    public User getUser(final String login) {
+        return users.get(login);
+    }
 
     public void add(final Device t) {
         devices.put(t.getId(), t);
@@ -95,5 +105,8 @@ public class MockReferenceResolver implements ReferenceResolver, CompanyResolver
     }
     public void add(final Company s) {
         companies.put(s.getId(), s);
+    }
+    public void add(final User u) {
+        users.put(u.getLogin(), u);
     }
 }

@@ -135,12 +135,7 @@ create table notificationschedules (
 
 create table personalschedules (
     id bigint(20) auto_increment not null,
-    firstname varchar(31),
-    lastname varchar(31),
-    company varchar(127),
-    position varchar(127),
-    sms varchar(31),
-    email varchar(31),
+    user varchar(127) not null,
     pushtomobileapp boolean not null,
     weekdays varchar(50),
     fromtime int not null,
@@ -149,6 +144,9 @@ create table personalschedules (
     primary key (id),
     FOREIGN KEY (`schedule`)
         REFERENCES notificationschedules (id)
+		ON DELETE CASCADE,
+    FOREIGN KEY (`user`)
+        REFERENCES users (username)
 		ON DELETE CASCADE
 );
 

@@ -10,12 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.NotificationScheduleConstants;
 import com.visfresh.dao.NotificationScheduleDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 
@@ -35,11 +37,7 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
     private static final String DESCRIPTION_FIELD = "description";
 
     private static final String PERSONAL_SCHEDULE_TABLE = "personalschedules";
-    private static final String FIRSTNAME_FIELD = "firstname";
-    private static final String LASTNAME_FIELD = "lastname";
-    private static final String POSITION_FIELD = "position";
-    private static final String SMS_FIELD = "sms";
-    private static final String EMAIL_FIELD = "email";
+    private static final String USER_FIELD = "user";
     private static final String PUSHTOMOBILEAPP_FIELD = "pushtomobileapp";
     private static final String WEEKDAYS_FIELD = "weekdays";
     private static final String FROMTIME_FIELD = "fromtime";
@@ -47,6 +45,9 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
     private static final String SCHEDULE_FIELD = "schedule";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
+
+    @Autowired
+    private UserDao userDao;
 
     /**
      * Default constructor.
@@ -141,7 +142,7 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
 
     private void savePersonalSchedule(final Long schedId, final PersonSchedule ps) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
-        final List<String> fields = getPersonScheduleField(false);
+        final List<String> fields = getPersonScheduleFields(false);
 
         final String sql;
         if (ps.getId() == null) {
@@ -151,12 +152,7 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
             sql = createUpdateScript(PERSONAL_SCHEDULE_TABLE, fields, ID_FIELD);
         }
 
-        paramMap.put(COMPANY_FIELD, ps.getCompany());
-        paramMap.put(FIRSTNAME_FIELD, ps.getFirstName());
-        paramMap.put(LASTNAME_FIELD, ps.getLastName());
-        paramMap.put(POSITION_FIELD, ps.getPosition());
-        paramMap.put(SMS_FIELD, ps.getSmsNotification());
-        paramMap.put(EMAIL_FIELD, ps.getEmailNotification());
+        paramMap.put(USER_FIELD, ps.getUser().getLogin());
         paramMap.put(PUSHTOMOBILEAPP_FIELD, ps.isPushToMobileApp());
         paramMap.put(WEEKDAYS_FIELD, convertToDatabaseColumn(ps.getWeekDays()));
         paramMap.put(FROMTIME_FIELD, ps.getFromTime());
@@ -169,17 +165,12 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
             ps.setId(keyHolder.getKey().longValue());
         }
     }
-    private List<String> getPersonScheduleField(final boolean includeId) {
+    private List<String> getPersonScheduleFields(final boolean includeId) {
         final List<String> fields = new LinkedList<String>();
         if (includeId) {
             fields.add(ID_FIELD);
         }
-        fields.add(COMPANY_FIELD);
-        fields.add(FIRSTNAME_FIELD);
-        fields.add(LASTNAME_FIELD);
-        fields.add(POSITION_FIELD);
-        fields.add(SMS_FIELD);
-        fields.add(EMAIL_FIELD);
+        fields.add(USER_FIELD);
         fields.add(PUSHTOMOBILEAPP_FIELD);
         fields.add(WEEKDAYS_FIELD);
         fields.add(FROMTIME_FIELD);
@@ -204,12 +195,7 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
         for (final Map<String,Object> map : list) {
             final PersonSchedule ps = new PersonSchedule();
             ps.setId(((Number) map.get(ID_FIELD)).longValue());
-            ps.setCompany((String) map.get(COMPANY_FIELD));
-            ps.setFirstName((String) map.get(FIRSTNAME_FIELD));
-            ps.setLastName((String) map.get(LASTNAME_FIELD));
-            ps.setPosition((String) map.get(POSITION_FIELD));
-            ps.setSmsNotification((String) map.get(SMS_FIELD));
-            ps.setEmailNotification((String) map.get(EMAIL_FIELD));
+            ps.setUser(userDao.findOne((String) map.get(USER_FIELD)));
             ps.setPushToMobileApp((Boolean) map.get(PUSHTOMOBILEAPP_FIELD));
             final boolean[] b = convertToEntityAttribute((String) map.get(WEEKDAYS_FIELD));
             System.arraycopy(b, 0, ps.getWeekDays(), 0, b.length);

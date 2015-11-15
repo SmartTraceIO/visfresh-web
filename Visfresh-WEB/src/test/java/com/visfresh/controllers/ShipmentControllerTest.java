@@ -33,6 +33,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.io.UserResolver;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
 
@@ -75,6 +76,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         shipmentTemplateClient.setReferenceResolver(r);
         shipmentClient.setReferenceResolver(r);
+        shipmentClient.setUserResolver(context.getBean(UserResolver.class));
 
         shipmentTemplateClient.setAuthToken(token);
         shipmentClient.setAuthToken(token);

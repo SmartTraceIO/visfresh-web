@@ -46,6 +46,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
 
         serializer = new ShipmentSerializer(user);
         serializer.setReferenceResolver(resolver);
+        serializer.setUserResolver(resolver);
     }
 
     @Test

@@ -29,6 +29,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureIssue;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
 import com.visfresh.utils.SerializerUtils;
@@ -64,6 +65,32 @@ public abstract class AbstractRestServiceTest {
         this.context = context;
     }
 
+    public User createUser1() {
+        final User u = new User();
+        u.setCompany(getCompany());
+        u.setEmail("asuvorov@mail.ru");
+        u.setFirstName("Alexander");
+        u.setLastName("Suvorov");
+        u.setLogin("asuvorov");
+        u.setPhone("11111111117");
+        u.setTemperatureUnits(TemperatureUnits.Celsius);
+        u.setTimeZone(TimeZone.getTimeZone("UTC"));
+        getContext().getBean(UserDao.class).save(u);
+        return u;
+    }
+    public User createUser2() {
+        final User u = new User();
+        u.setCompany(getCompany());
+        u.setEmail("mkutuzov@mail.ru");
+        u.setFirstName("Mikhael");
+        u.setLastName("Kutuzov");
+        u.setLogin("mkutuzov");
+        u.setPhone("11111111118");
+        u.setTemperatureUnits(TemperatureUnits.Fahrenheit);
+        u.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        getContext().getBean(UserDao.class).save(u);
+        return u;
+    }
     /**
      * @param save TODO
      * @return any alert profile.
@@ -150,12 +177,12 @@ public abstract class AbstractRestServiceTest {
     /**
      * @return
      */
-    protected NotificationSchedule createNotificationSchedule(final boolean save) {
+    protected NotificationSchedule createNotificationSchedule(final User user, final boolean save) {
         final NotificationSchedule s = new NotificationSchedule();
         s.setDescription("JUnit schedule");
         s.setName("Sched");
-        s.getSchedules().add(createPersonSchedule());
-        s.getSchedules().add(createPersonSchedule());
+        s.getSchedules().add(createPersonSchedule(user));
+        s.getSchedules().add(createPersonSchedule(user));
         if (save) {
             saveNotificationScheduleDirectly(s);
         }
@@ -209,30 +236,25 @@ public abstract class AbstractRestServiceTest {
     /**
      * @return any schedule/person/how/when
      */
-    protected PersonSchedule createPersonSchedule() {
+    protected PersonSchedule createPersonSchedule(final User user) {
         final PersonSchedule s = new PersonSchedule();
 
-        s.setCompany("Sun");
-        s.setEmailNotification("asuvorov@sun.com");
-        s.setFirstName("Alexander");
         s.setToTime(17);
         s.setFromTime(1);
-        s.setLastName("Suvorov");
-        s.setPosition("Generalisimus");
         s.setPushToMobileApp(true);
-        s.setSmsNotification("1111111117");
         s.getWeekDays()[0] = true;
         s.getWeekDays()[3] = true;
+        s.setUser(user);
 
         return s;
     }
     protected Shipment createShipment(final boolean save) {
         final Shipment s = new Shipment();
         s.setAlertProfile(createAlertProfile(save));
-        s.getAlertsNotificationSchedules().add(createNotificationSchedule(save));
+        s.getAlertsNotificationSchedules().add(createNotificationSchedule(createUser1(), save));
         s.setAlertSuppressionMinutes(55);
         s.setArrivalNotificationWithinKm(111);
-        s.getArrivalNotificationSchedules().add(createNotificationSchedule(save));
+        s.getArrivalNotificationSchedules().add(createNotificationSchedule(createUser2(), save));
         s.setExcludeNotificationsIfNoAlerts(true);
         s.setShipmentDescription("Any Description");
         s.setShippedFrom(createLocationProfile(true));
@@ -258,10 +280,10 @@ public abstract class AbstractRestServiceTest {
         final ShipmentTemplate t = new ShipmentTemplate();
         t.setAddDateShipped(true);
         t.setAlertProfile(createAlertProfile(save));
-        t.getAlertsNotificationSchedules().add(createNotificationSchedule(save));
+        t.getAlertsNotificationSchedules().add(createNotificationSchedule(createUser1(), save));
         t.setAlertSuppressionMinutes(55);
         t.setArrivalNotificationWithinKm(11);
-        t.getArrivalNotificationSchedules().add(createNotificationSchedule(save));
+        t.getArrivalNotificationSchedules().add(createNotificationSchedule(createUser2(), save));
         t.setExcludeNotificationsIfNoAlerts(true);
         t.setName("JUnit-tpl");
         t.setShipmentDescription("Any Description");

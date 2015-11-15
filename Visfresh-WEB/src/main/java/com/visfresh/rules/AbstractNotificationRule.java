@@ -15,10 +15,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.NotificationDao;
+import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Notification;
+import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.User;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.SmsService;
 
@@ -36,6 +42,8 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
     protected EmailService emailService;
     @Autowired
     private AbstractRuleEngine engine;
+    @Autowired
+    private NotificationDao notificationDao;
 
     /**
      * Default constructor.
@@ -140,8 +148,9 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
      * @param message message body.
      */
     protected void sendNotification(final PersonSchedule s, final String subject,
-            final String message) {
-        final String email = s.getEmailNotification();
+            final String message, final NotificationIssue issue) {
+        final User u = s.getUser();
+        final String email = u.getEmail();
         final String person = getPersonDescription(s);
 
         boolean sent = false;
@@ -158,7 +167,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
         }
 
         //send SMS
-        final String phone = s.getSmsNotification();
+        final String phone = u.getPhone();
         if (phone != null && phone.length() > 0) {
             sent = true;
             smsService.sendMessage(phone, subject, message);
@@ -171,7 +180,14 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
                     + "/" + email + ") configuratio for " + person + ". Notification was not send");
         }
 
-        //TODO send application scope notification.
+        if (s.isPushToMobileApp()) {
+            final Notification n = new Notification();
+            n.setIssue(issue);
+            n.setType(issue instanceof Arrival? NotificationType.Arrival : NotificationType.Alert);
+            n.setUser(u);
+
+            notificationDao.save(n);
+        }
     }
 
     /**
@@ -179,7 +195,9 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
      * @return person description.
      */
     private String getPersonDescription(final PersonSchedule s) {
-        return s.getFirstName() + " " + s.getLastName() + ", "+ s.getPosition() + " of " + s.getCompany();
+        final User u = s.getUser();
+        return u.getFirstName() + " " + u.getLastName() + ", "+ u.getPosition() + " of "
+                + u.getCompany().getName();
     }
 
     /**

@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
@@ -28,47 +29,36 @@ public class NotificationScheduleSerializerTest extends AbstractSerializerTest {
         super();
     }
 
+    @Before
+    public void setUp() {
+        serializer.setUserResolver(resolver);
+    }
+
     @Test
     public void testSchedulePersonHowWhen() {
         PersonSchedule s = new PersonSchedule();
 
-        final String company = "Sun";
-        final String emailNotification = "anybody@sun.com";
-        final String firstName = "Alexander";
         final int forMinute = 17;
         final int fromMinute = 1;
         final Long id = 77l;
-        final String lastName = "Suvorov";
-        final String position = "General";
         final boolean pushToMobileApp = true;
-        final String smsNotification = "1111111117";
 
-        s.setCompany(company);
-        s.setEmailNotification(emailNotification);
-        s.setFirstName(firstName);
+        s.setUser(createUser("asuvorov"));
         s.setToTime(forMinute);
         s.setFromTime(fromMinute);
         s.setId(id);
-        s.setLastName(lastName);
-        s.setPosition(position);
         s.setPushToMobileApp(pushToMobileApp);
-        s.setSmsNotification(smsNotification);
         s.getWeekDays()[0] = true;
         s.getWeekDays()[3] = true;
 
         final JsonObject obj = serializer.toJson(s);
         s = serializer.parsePersonSchedule(obj);
 
-        assertEquals(company, s.getCompany());
-        assertEquals(emailNotification, s.getEmailNotification());
-        assertEquals(firstName, s.getFirstName());
         assertEquals(forMinute, s.getToTime());
         assertEquals(fromMinute, s.getFromTime());
         assertEquals(id, s.getId());
-        assertEquals(lastName, s.getLastName());
-        assertEquals(position, s.getPosition());
         assertEquals(pushToMobileApp, s.isPushToMobileApp());
-        assertEquals(smsNotification, s.getSmsNotification());
+        assertNotNull(s.getUser());
         assertTrue(s.getWeekDays()[0]);
         assertFalse(s.getWeekDays()[1]);
         assertFalse(s.getWeekDays()[2]);
