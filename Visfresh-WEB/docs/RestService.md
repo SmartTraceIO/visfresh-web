@@ -380,27 +380,23 @@ see [ResponseStatus](#markdown-header-response-status)
 ### Person Schedule ###
 ```json
 {
-  "personScheduleId": 13,
-  "firstName": "Alexander",
-  "lastName": "Suvorov",
-  "company": "Sun",
-  "position": "Generalisimus",
-  "emailNotification": "asuvorov@sun.com",
-  "smsNotification": "1111111117",
-  "pushToMobileApp": true,
-  "fromTime": 1,
-  "toTime": 17,
-  "weekDays": [
-    true,
-    false,
-    false,
-    true,
-    false,
-    false,
-    false
-  ]
+    "personScheduleId": 293,
+    "user": "asuvorov", // user name of linked system user
+    "pushToMobileApp": true,
+    "fromTime": 1,
+    "toTime": 17,
+    "weekDays": [
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false
+    ]
 }
-```
+```  
+See [User](#markdown-header-user)
 ### Location ###
 ```json
 {
@@ -1039,12 +1035,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "notificationScheduleName": "Sched",
   "schedules": [
     {
-      "firstName": "Alexander",
-      "lastName": "Suvorov",
-      "company": "Sun",
-      "position": "Generalisimus",
-      "emailNotification": "asuvorov@sun.com",
-      "smsNotification": "1111111117",
+      "user": "asuvorov",
       "pushToMobileApp": true,
       "fromTime": 1,
       "toTime": 17,
@@ -1059,12 +1050,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       ]
     },
     {
-      "firstName": "Alexander",
-      "lastName": "Suvorov",
-      "company": "Sun",
-      "position": "Generalisimus",
-      "emailNotification": "asuvorov@sun.com",
-      "smsNotification": "1111111117",
+      "user": "asuvorov",
       "pushToMobileApp": true,
       "fromTime": 1,
       "toTime": 17,
@@ -1130,17 +1116,12 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": {
     "notificationScheduleDescription": "JUnit schedule",
-    "notificationScheduleId": 2,
+    "notificationScheduleId": 231,
     "notificationScheduleName": "Sched",
     "schedules": [
       {
-        "personScheduleId": 3,
-        "firstName": "Alexander",
-        "lastName": "Suvorov",
-        "company": "Sun",
-        "position": "Generalisimus",
-        "emailNotification": "asuvorov@sun.com",
-        "smsNotification": "1111111117",
+        "personScheduleId": 285,
+        "user": "asuvorov",
         "pushToMobileApp": true,
         "fromTime": 1,
         "toTime": 17,
@@ -1155,13 +1136,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         ]
       },
       {
-        "personScheduleId": 4,
-        "firstName": "Alexander",
-        "lastName": "Suvorov",
-        "company": "Sun",
-        "position": "Generalisimus",
-        "emailNotification": "asuvorov@sun.com",
-        "smsNotification": "1111111117",
+        "personScheduleId": 286,
+        "user": "asuvorov",
         "pushToMobileApp": true,
         "fromTime": 1,
         "toTime": 17,
