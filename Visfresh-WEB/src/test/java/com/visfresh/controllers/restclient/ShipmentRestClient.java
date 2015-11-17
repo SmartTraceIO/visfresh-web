@@ -12,8 +12,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.User;
+import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -91,7 +91,10 @@ public class ShipmentRestClient extends RestClient {
      */
     public JsonArray getShipments(final Integer pageIndex, final Integer pageSize)
             throws RestServiceException, IOException {
-        return getShipments(pageIndex, pageSize, null, null, null, null, null);
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        req.setPageIndex(pageIndex);
+        req.setPageSize(pageSize);
+        return getShipments(req);
     }
     /**
      * @param pageIndex
@@ -105,33 +108,10 @@ public class ShipmentRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public JsonArray getShipments(final Integer pageIndex, final Integer pageSize, final Long shippedFrom,
-            final Long shippedTo, final String goods, final String device, final ShipmentStatus status)
-                    throws IOException, RestServiceException {
-        final HashMap<String, String> params = new HashMap<String, String>();
-        if (pageIndex != null) {
-            params.put("pageIndex", Integer.toString(pageIndex));
-            params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
-        }
-
-        if (shippedFrom != null) {
-            params.put("shippedFrom", shippedFrom.toString());
-        }
-        if (shippedTo != null) {
-            params.put("shippedTo", shippedTo.toString());
-        }
-        if (goods != null) {
-            params.put("goods", goods.toString());
-        }
-        if (device != null) {
-            params.put("device", device.toString());
-        }
-        if (status != null) {
-            params.put("status", status.toString());
-        }
-
-        return sendGetRequest(getPathWithToken("getShipments"),
-                params).getAsJsonArray();
+    public JsonArray getShipments(final GetFilteredShipmentsRequest req)
+            throws IOException, RestServiceException {
+        return sendPostRequest(getPathWithToken("getShipments"),
+                serializer.toJson(req)).getAsJsonArray();
     }
 
     /**

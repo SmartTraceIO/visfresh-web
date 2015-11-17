@@ -36,4 +36,8 @@ public interface ShipmentConstants {
     String PROPERTY_PALLET_ID = "palletId";
     String PROPERTY_SHIPMENT_ID = "shipmentId";
     String PROPERTY_ASSET_TYPE = "assetType";
+
+    //search criterias
+    String PROPERTY_SHIPPED_FROM_DATE = "shippedFromDate";
+    String PROPERTY_SHIPPED_TO_DATE = "shippedToDate";
 }

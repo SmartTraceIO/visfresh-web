@@ -9,6 +9,8 @@ import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +33,7 @@ import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UserResolver;
@@ -210,22 +213,128 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testGetShipmentsFiltered() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
 
-        final Long shippedFrom = s.getShippedFrom().getId();
-        final Long shippedTo = s.getShippedTo().getId();
-        final String goods = s.getShipmentDescription();
-        final ShipmentStatus status = ShipmentStatus.InProgress;
-        final String device = s.getDevice().getId();
+        GetFilteredShipmentsRequest req = createFilter(s);
+        assertEquals(1, shipmentClient.getShipments(req).size());
 
-        assertEquals(1, shipmentClient.getShipments(1, 10000,
-                shippedFrom, shippedTo, goods, device, status).size());
-//        assertEquals(0, facade.getShipments(1, 10000,
-//                shippedTo, shippedTo, goods, device, status).size());
-        assertEquals(0, shipmentClient.getShipments(1, 10000,
-                shippedFrom, shippedFrom, "abrakadabra", device, status).size());
-        assertEquals(0, shipmentClient.getShipments(1, 10000,
-                shippedFrom, shippedTo, goods, "11111111", status).size());
-        assertEquals(0, shipmentClient.getShipments(1, 10000,
-                shippedFrom, shippedTo, goods, device, ShipmentStatus.Complete).size());
+        //shipped from not matches
+        req = createFilter(s);
+        req.getShippedFrom().clear();
+        req.getShippedFrom().add(-77L);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+
+        //shipped to not matches
+        req = createFilter(s);
+        req.getShippedTo().clear();
+        req.getShippedTo().add(-77L);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+
+        //goods not matchers
+        req = createFilter(s);
+        req.setShipmentDescription("abrakadabra");
+        assertEquals(0, shipmentClient.getShipments(req).size());
+
+        //device not matches
+        req = createFilter(s);
+        req.setDeviceImei("0000000");
+        assertEquals(0, shipmentClient.getShipments(req).size());
+
+        //shipment status not matches
+        req = createFilter(s);
+        req.setStatus(ShipmentStatus.Complete);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+    }
+
+    @Test
+    public void testFilteredByDateRanges() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+
+        GetFilteredShipmentsRequest req = createFilter(s);
+        assertEquals(1, shipmentClient.getShipments(req).size());
+
+        //check default time ranges (2 weeks)
+        final long oneDay = 24 * 60 * 60 * 1000L;
+        s.setShipmentDate(new Date(System.currentTimeMillis() - 15 * oneDay));
+        saveShipmentDirectly(s);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+
+        //check one week date ranges
+        s.setShipmentDate(new Date());
+        saveShipmentDirectly(s);
+
+        req = createFilter(s);
+        req.setLastWeek(true);
+        assertEquals(1, shipmentClient.getShipments(req).size());
+
+        s.setShipmentDate(new Date(System.currentTimeMillis() - 8 * oneDay));
+        saveShipmentDirectly(s);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+
+        //check last day
+        s.setShipmentDate(new Date());
+        saveShipmentDirectly(s);
+
+        req = createFilter(s);
+        req.setLastDay(true);
+        assertEquals(1, shipmentClient.getShipments(req).size());
+
+        s.setShipmentDate(new Date(System.currentTimeMillis() - 2 * oneDay));
+        saveShipmentDirectly(s);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+
+        //check last 2 days
+        s.setShipmentDate(new Date());
+        saveShipmentDirectly(s);
+
+        req = createFilter(s);
+        req.setLast2Days(true);
+        assertEquals(1, shipmentClient.getShipments(req).size());
+
+        s.setShipmentDate(new Date(System.currentTimeMillis() - 3 * oneDay));
+        saveShipmentDirectly(s);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+
+        //check last one month
+        s.setShipmentDate(new Date());
+        saveShipmentDirectly(s);
+
+        req = createFilter(s);
+        req.setLastMonth(true);
+        assertEquals(1, shipmentClient.getShipments(req).size());
+
+        s.setShipmentDate(new Date(System.currentTimeMillis() - 32 * oneDay));
+        saveShipmentDirectly(s);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    protected GetFilteredShipmentsRequest createFilter(final Shipment s) {
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        req.setPageIndex(1);
+        req.setPageSize(10000);
+        req.setShipmentDescription(s.getShipmentDescription());
+        req.setStatus(ShipmentStatus.InProgress);
+
+        List<Long> ids = new LinkedList<Long>();
+        ids.add(s.getShippedFrom().getId());
+        ids.add(-1l);
+        ids.add(-2l);
+        ids.add(-3l);
+        ids.add(-4l);
+        req.setShippedFrom(ids);
+
+        ids = new LinkedList<Long>();
+        ids.add(s.getShippedTo().getId());
+        ids.add(-1l);
+        ids.add(-2l);
+        ids.add(-3l);
+        ids.add(-4l);
+        req.setShippedTo(ids);
+
+        req.setDeviceImei(s.getDevice().getId());
+        return req;
     }
     /**
      * @param s

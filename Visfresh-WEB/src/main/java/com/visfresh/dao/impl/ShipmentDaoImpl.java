@@ -21,6 +21,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.json.AbstractJsonSerializer;
 import com.visfresh.utils.SerializerUtils;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -54,8 +55,8 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
                 ARRIVALNOTIFWITHIN_FIELD);
         propertyToDbFields.put(ShipmentConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS,
                 NONOTIFSIFNOALERTS_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPPED_FROM, SHIPPEDFROM_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPPED_TO, SHIPPEDTO_FIELD);
+//        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPPED_FROM, SHIPPEDFROM_FIELD);
+//        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPPED_TO, SHIPPEDTO_FIELD);
         propertyToDbFields.put(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES,
                 SHUTDOWNTIMEOUT_FIELD);
 //        propertyToDbFields.put(ShipmentConstants.PROPERTY_MAX_TIMES_ALERT_FIRES,
@@ -257,15 +258,47 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.String, java.lang.Object, java.util.Map, java.util.List)
      */
     @Override
-    protected void addFilterValue(final String key, final String dbFieldName, final Object value,
+    protected void addFilterValue(final String key, final String fieldName, final Object value,
             final Map<String, Object> params, final List<String> filters) {
-        if (STATUS_FIELD.equals(dbFieldName)) {
-            super.addFilterValue(key, dbFieldName, value == null ? null : value.toString(), params, filters);
-        } else if (DESCRIPTION_FIELD.equals(dbFieldName)){
+        if (STATUS_FIELD.equals(fieldName)) {
+            super.addFilterValue(key, fieldName, value == null ? null : value.toString(), params, filters);
+        } else if (ShipmentConstants.PROPERTY_SHIPPED_TO.equals(fieldName)){
+            //create placeholder for 'in' operator
+            final List<String> in = new LinkedList<String>();
+            int num = 0;
+            for (final Object obj : ((List<?>) value)) {
+                final String k = key + "_" + num;
+                params.put(k, obj);
+                in.add(":" + k);
+                num++;
+            }
+
+            filters.add(SHIPPEDTO_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
+        } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM.equals(fieldName)){
+            //create placeholder for 'in' operator
+            final List<String> in = new LinkedList<String>();
+            int num = 0;
+            for (final Object obj : ((List<?>) value)) {
+                final String k = key + "_" + num;
+                params.put(k, obj);
+                in.add(":" + k);
+                num++;
+            }
+
+            filters.add(SHIPPEDFROM_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
+        } else if (ShipmentConstants.PROPERTY_SHIPPED_TO_DATE.equals(fieldName)){
+            //shipped to date
+            params.put(key, value);
+            filters.add(SHIPMENTDATE_FIELD + " <= :" + key);
+        } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM_DATE.equals(fieldName)){
+            //shipped from date
+            params.put(key, value);
+            filters.add(SHIPMENTDATE_FIELD + " >= :" + key);
+        } else if (DESCRIPTION_FIELD.equals(fieldName)){
             params.put(key, "%" + value + "%");
-            filters.add(dbFieldName + " like :" + key);
+            filters.add(fieldName + " like :" + key);
         } else {
-            super.addFilterValue(key, dbFieldName, value, params, filters);
+            super.addFilterValue(key, fieldName, value, params, filters);
         }
     }
 }

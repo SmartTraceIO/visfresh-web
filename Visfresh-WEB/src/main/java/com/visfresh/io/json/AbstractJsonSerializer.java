@@ -167,4 +167,10 @@ public class AbstractJsonSerializer {
     protected <IDD extends Serializable & Comparable<IDD>> IDD getId(final EntityWithId<IDD> e) {
         return e == null ? null : (IDD) e.getId();
     }
+    /**
+     * @return the timeZone
+     */
+    public TimeZone getTimeZone() {
+        return timeZone;
+    }
 }

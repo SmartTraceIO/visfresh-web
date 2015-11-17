@@ -36,10 +36,10 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -131,32 +131,28 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @param pageSize page size.
      * @return list of shipments.
      */
-    @RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.POST)
     public @ResponseBody String getShipments(@PathVariable final String authToken,
-            @RequestParam(required = false) final Integer pageIndex,
-            @RequestParam(required = false) final Integer pageSize,
-            @RequestParam(required = false) final boolean onlyWithAlerts,
-            @RequestParam(required = false) final Long shippedFrom,
-            @RequestParam(required = false) final Long shippedTo,
-            @RequestParam(required = false) final String goods,
-            @RequestParam(required = false) final String device,
-            @RequestParam(required = false) final String status,
-            @RequestParam(required = false) final String sc,
-            @RequestParam(required = false) final String so
-            ) {
-        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
-
+            @RequestBody final String request) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipments(user);
 
             final ShipmentSerializer ser = getSerializer(user);
+            final GetFilteredShipmentsRequest req = ser.parseGetFilteredShipmentsRequest(getJSonObject(request));
 
-            final Filter filter = createFilter(onlyWithAlerts, shippedFrom, shippedTo, goods, device, status);
+            final Integer pageIndex = req.getPageIndex();
+            final Integer pageSize = req.getPageSize();
+            final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
+
+            final Filter filter = createFilter(req, ser);
             final List<ListShipmentItem> shipments = getShipments(
                     user.getCompany(),
-                    createSorting(sc, so, getDefaultListShipmentsSortingOrder()),
+                    createSorting(
+                            req.getSortColumn(),
+                            req.getSortOrder(),
+                            getDefaultListShipmentsSortingOrder()),
                     filter,
                     page);
             final int total = shipmentDao.getEntityCount(user.getCompany(), filter);
@@ -185,32 +181,53 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             PROPERTY_ALERT_PROFILE
         };
     }
-    /**
-     * @param onlyWithAlerts
-     * @param shippedFrom
-     * @param shippedTo
-     * @param goods
-     * @param device
-     * @param status
-     * @return
-     */
-    private Filter createFilter(final boolean onlyWithAlerts, final Long shippedFrom,
-            final Long shippedTo, final String goods, final String device, final String status) {
+    private Filter createFilter(final GetFilteredShipmentsRequest req, final ShipmentSerializer ser) {
+        Date shippedFrom = req.getShipmentDateFrom();
+        Date shippedTo = req.getShipmentDateTo();
+
+        //date ranges
+        if (shippedFrom == null || shippedTo == null) {
+            shippedTo = new Date();
+            final long oneDay = 24 * 60 * 60 * 1000l;
+
+            if (Boolean.TRUE.equals(req.getLastDay())) {
+                shippedFrom = new Date(shippedTo.getTime() - oneDay);
+            } else if (Boolean.TRUE.equals(req.getLast2Days())) {
+                shippedFrom = new Date(shippedTo.getTime() - 2 * oneDay);
+            } else if (Boolean.TRUE.equals(req.getLastWeek())) {
+                shippedFrom = new Date(shippedTo.getTime() - 7 * oneDay);
+            } else if (Boolean.TRUE.equals(req.getLastMonth())) {
+                shippedFrom = new Date(shippedTo.getTime() - oneDay);
+            } else {
+                //two weeks by default
+                shippedFrom = new Date(shippedTo.getTime() - 14 * oneDay);
+            }
+        }
+
         final Filter f = new Filter();
         if (shippedFrom != null) {
-            f.addFilter(PROPERTY_SHIPPED_FROM, shippedFrom);
+            f.addFilter(PROPERTY_SHIPPED_FROM_DATE, shippedFrom);
         }
         if (shippedTo != null) {
-            f.addFilter(PROPERTY_SHIPPED_TO, shippedTo);
+            f.addFilter(PROPERTY_SHIPPED_TO_DATE, shippedTo);
         }
-        if (goods != null) {
-            f.addFilter(PROPERTY_SHIPMENT_DESCRIPTION, goods);
+        if (req.getShipmentDescription() != null) {
+            f.addFilter(PROPERTY_SHIPMENT_DESCRIPTION, req.getShipmentDescription());
         }
-        if (device != null) {
-            f.addFilter(PROPERTY_DEVICE_IMEI, device);
+        if (req.getDeviceImei() != null) {
+            f.addFilter(PROPERTY_DEVICE_IMEI, req.getDeviceImei());
         }
-        if (status != null) {
-            f.addFilter(PROPERTY_STATUS, ShipmentStatus.valueOf(status));
+        if (req.getStatus() != null) {
+            f.addFilter(PROPERTY_STATUS, req.getStatus());
+        }
+        if (req.isAlertsOnly()) {
+            f.addFilter(PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS, Boolean.TRUE);
+        }
+        if (req.getShippedFrom() != null && !req.getShippedFrom().isEmpty()) {
+            f.addFilter(PROPERTY_SHIPPED_FROM, req.getShippedFrom());
+        }
+        if (req.getShippedTo() != null && !req.getShippedTo().isEmpty()) {
+            f.addFilter(PROPERTY_SHIPPED_TO, req.getShippedTo());
         }
         return f;
     }

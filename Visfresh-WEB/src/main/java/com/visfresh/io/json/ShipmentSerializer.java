@@ -10,6 +10,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
@@ -22,6 +23,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -225,12 +227,12 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty("alertProfileName", dto.getAlertProfileName());
         obj.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
         obj.addProperty("maxTimesAlertFires", dto.getMaxTimesAlertFires());
-        obj.add("alertsNotificationSchedules", asJsonArray(dto.getAlertsNotificationSchedules()));
+        obj.add("alertsNotificationSchedules", scheduleItemsAsJsonArray(dto.getAlertsNotificationSchedules()));
         obj.add("alertSummary", toJson(dto.getAlertSummary()));
 
         obj.addProperty("arrivalNotificationWithinKm", dto.getArrivalNotificationWithInKm());
         obj.addProperty("excludeNotificationIfNoAlerts", dto.isExcludeNotificationsIfNoAlertsFired());
-        obj.add("arrivalNotificationSchedules", asJsonArray(dto.getArrivalNotificationSchedules()));
+        obj.add("arrivalNotificationSchedules", scheduleItemsAsJsonArray(dto.getArrivalNotificationSchedules()));
         obj.addProperty("commentsForReceiver", dto.getCommentsForReceiver());
 
         //serialize time items
@@ -363,10 +365,149 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         return json;
     }
     /**
+     * @param json JSON object.
+     * @return filtered shipment request.
+     */
+    public GetFilteredShipmentsRequest parseGetFilteredShipmentsRequest(final JsonObject json) {
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        req.setAlertsOnly(asBoolean(json.get("alertsOnly")));
+        req.setDeviceImei(asString(json.get("deviceImei")));
+        if (json.has("last2Days")) {
+            req.setLast2Days(asBoolean(json.get("last2Days")));
+        }
+        if (json.has("lastDay")) {
+            req.setLastDay(asBoolean(json.get("lastDay")));
+        }
+        if (json.has("lastMonth")) {
+            req.setLastMonth(asBoolean(json.get("lastMonth")));
+        }
+        if (json.has("lastWeek")) {
+            req.setLastWeek(asBoolean(json.get("lastWeek")));
+        }
+        if (json.has("shipmentDateFrom")) {
+            req.setShipmentDateFrom(parseDate(asString(json.get("shipmentDateFrom"))));
+        }
+        if (json.has("shipmentDateTo")) {
+            req.setShipmentDateTo(parseDate(asString(json.get("shipmentDateTo"))));
+        }
+        req.setShipmentDescription(asString(json.get("shipmentDescription")));
+        if (json.has("shippedFrom")) {
+            req.setShippedFrom(asLongList(json.get("shippedFrom")));
+        }
+        if (json.has("shippedTo")) {
+            req.setShippedTo(asLongList(json.get("shippedTo")));
+        }
+        if (json.has("status")) {
+            req.setStatus(ShipmentStatus.valueOf(asString(json.get("status"))));
+        }
+        if (json.has("pageIndex")) {
+            req.setPageIndex(asInt(json.get("pageIndex")));
+        }
+        if (json.has("pageSize")) {
+            req.setPageSize(asInt(json.get("pageSize")));
+        }
+        if (json.has("sortOrder")) {
+            req.setSortOrder(asString(json.get("sortOrder")));
+        }
+        if (json.has("sortColumn")) {
+            req.setSortColumn(asString(json.get("sortColumn")));
+        }
+
+        return req;
+    }
+    /**
+     * @param r filtered shipments request.
+     * @return request as JSON object.
+     */
+    public JsonObject toJson(final GetFilteredShipmentsRequest r) {
+        if (r == null) {
+            return null;
+        }
+
+        final JsonObject obj = new JsonObject();
+        obj.addProperty("alertsOnly", r.isAlertsOnly());
+        if (r.getDeviceImei() != null) {
+            obj.addProperty("deviceImei", r.getDeviceImei());
+        }
+        if (r.getLast2Days() != null) {
+            obj.addProperty("last2Days", r.getLast2Days());
+        }
+        if (r.getLastDay() != null) {
+            obj.addProperty("lastDay", r.getLastDay());
+        }
+        if (r.getLastMonth() != null) {
+            obj.addProperty("lastMonth", r.getLastMonth());
+        }
+        if (r.getLastWeek() != null) {
+            obj.addProperty("lastWeek", r.getLastWeek());
+        }
+        if (r.getShipmentDateFrom() != null) {
+            obj.addProperty("shipmentDateFrom", formatDate(r.getShipmentDateFrom()));
+        }
+        if (r.getShipmentDateTo() != null) {
+            obj.addProperty("shipmentDateTo", formatDate(r.getShipmentDateTo()));
+        }
+        if (r.getShipmentDescription() != null) {
+            obj.addProperty("shipmentDescription", r.getShipmentDescription());
+        }
+        if (r.getShippedFrom() != null && !r.getShippedFrom().isEmpty()) {
+            obj.add("shippedFrom", asJsonArray(r.getShippedFrom()));
+        }
+        if (r.getShippedTo() != null && !r.getShippedTo().isEmpty()) {
+            obj.add("shippedTo", asJsonArray(r.getShippedTo()));
+        }
+        if (r.getStatus() != null) {
+            obj.addProperty("status", r.getStatus().toString());
+        }
+        if (r.getPageIndex() != null) {
+            obj.addProperty("pageIndex", r.getPageIndex());
+        }
+        if (r.getPageSize() != null) {
+            obj.addProperty("pageSize", r.getPageSize());
+        }
+        if (r.getSortOrder() != null) {
+            obj.addProperty("sortOrder", r.getSortOrder());
+        }
+        if (r.getSortColumn() != null) {
+            obj.addProperty("sortColumn", r.getSortColumn());
+        }
+
+        return obj;
+    }
+    /**
+     * @param lsit
+     * @return
+     */
+    private JsonArray asJsonArray(final List<Long> lsit) {
+        final JsonArray array = new JsonArray();
+        for (final Long item : lsit) {
+            array.add(new JsonPrimitive(item));
+        }
+        return array;
+    }
+
+    /**
+     * @param e JSON elmeent.
+     * @return
+     */
+    private List<Long> asLongList(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonArray array = e.getAsJsonArray();
+        final List<Long> list = new LinkedList<Long>();
+        for (final JsonElement id : array) {
+            list.add(id.getAsLong());
+        }
+        return list;
+    }
+
+    /**
      * @param items
      * @return
      */
-    private JsonArray asJsonArray(final List<NotificationScheduleListItem> items) {
+    private JsonArray scheduleItemsAsJsonArray(final List<NotificationScheduleListItem> items) {
         final JsonArray array = new JsonArray();
         if (items != null) {
             for (final NotificationScheduleListItem i : items) {
