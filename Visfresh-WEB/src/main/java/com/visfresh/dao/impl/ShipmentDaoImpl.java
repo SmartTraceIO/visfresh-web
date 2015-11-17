@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.Filter;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Device;
@@ -299,6 +300,31 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             filters.add(fieldName + " like :" + key);
         } else {
             super.addFilterValue(key, fieldName, value, params, filters);
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#addFiltes(com.visfresh.dao.Filter, java.util.Map, java.util.List, java.util.Map)
+     */
+    @Override
+    protected void addFiltes(final Filter filter, final Map<String, Object> params,
+            final List<String> filters, final Map<String, String> propertyToDbFields) {
+        final Object value = filter.getFilter(ShipmentConstants.PROPERTY_ONLY_WITH_ALERTS);
+        if (value != null) {
+            filter.removeFilter(ShipmentConstants.PROPERTY_ONLY_WITH_ALERTS);
+        }
+
+        super.addFiltes(filter, params, filters, propertyToDbFields);
+
+        if (Boolean.TRUE.equals(value)) {
+            final String keyStartDate = DEFAULT_FILTER_KEY_PREFIX + "alertsOnlyStartDate";
+            final String keyEndDate = DEFAULT_FILTER_KEY_PREFIX + "alertsOnlyEndDate";
+
+            final String sql = "(select count(*) > 0 as hasAlerts from alerts"
+                    + " where alerts.shipment = shipments.id"
+                    + " and alerts.date >= :" + keyStartDate + " and alerts.date <= :" + keyEndDate + ")";
+            filters.add(sql);
+            params.put(keyStartDate, filter.getFilter(ShipmentConstants.PROPERTY_SHIPPED_FROM_DATE));
+            params.put(keyEndDate, filter.getFilter(ShipmentConstants.PROPERTY_SHIPPED_TO_DATE));
         }
     }
 }

@@ -50,6 +50,9 @@ List items is short representations of base entities, like as [Alert Profile](#m
 3. [Notification Schedule list item](#markdown-header-notification-schedule-list-item)  
 4. [User List item](#markdown-header-user-list-item)  
 
+## Special Request objects ##
+1. [Get Shipments filter](#markdown-header-get-shipments-filter)
+
 ## Rest Service methods.
 1. [Authentication](#markdown-header-authentication).  
 2. [Get access token using existing GTS(e) session.](#markdown-header-get-access-token-using-existing-gts-e-session)  
@@ -78,17 +81,15 @@ List items is short representations of base entities, like as [Alert Profile](#m
 25. [Save Shipment](#markdown-header-save-shipment)  
 26. [Get Shipments](#markdown-header-get-shipments)  
 27. [Get Shipment](#markdown-header-get-shipment)  
-28. [Delete Shipment](#markdown-header-delete-shipment)  
-29. [Save Device](#markdown-header-save-device)  
-30. [Get Device](#markdown-header-get-device)  
-31. [Get Devices](#markdown-header-get-devices)  
-32. [Delete Device](#markdown-header-delete-device)  
-33. [Get Notifications](#markdown-header-get-notifications)  
-34. [Send Command to Device](#markdown-header-send-command-to-device)  
-35. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
-
-## Reports ##
-1. [Get Single Shipment](#markdown-header-get-single-shipment)
+28. [Get Single Shipment](#markdown-header-get-single-shipment)
+29. [Delete Shipment](#markdown-header-delete-shipment)  
+30. [Save Device](#markdown-header-save-device)  
+31. [Get Device](#markdown-header-get-device)  
+32. [Get Devices](#markdown-header-get-devices)  
+33. [Delete Device](#markdown-header-delete-device)  
+34. [Get Notifications](#markdown-header-get-notifications)  
+35. [Send Command to Device](#markdown-header-send-command-to-device)  
+36. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
 
 ### Authentication.###
 Method *GET*, method name *login*, request parameters login - the user login name and password - the user password  
@@ -275,11 +276,7 @@ Returns [Shipment Object](#markdown-header-shipment)
 [(example)](#markdown-header-get-shipment-example)
 
 ### Get Shipments ###
-Method *GET*, method name getShipments, method parameters:  
-1. pageIndex - number of page  
-2. pageSize - size of page  
-3. sc - sort column  
-4. so - sort order  
+Method *POST*, method name getShipments, request body [Get Shipments filter](#markdown-header-get-shipments-filter)  
 Returns array of [Shipment List items](#markdown-header-shipment-list-item) and total items count,
 it is not same as [Shipment Object](#markdown-header-shipment).  
 [(example)](#markdown-header-get-shipments-example)
@@ -622,6 +619,21 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 {
   "login": "userLogin",
   "fullName": "Full User Name"
+}
+```
+## JSON Requests ##
+### Get Shipments filter ###
+```json
+{
+  "alertsOnly": false,
+  "deviceImei": "234908720394857",
+  "lastMonth": true,
+  "shipmentDescription": "Any Description",
+  "shippedFrom": [], //array of location ID
+  "shippedTo": [], //array of location ID
+  "status": "InProgress",
+  "pageIndex": 1,
+  "pageSize": 10000
 }
 ```
 ## Examples ##
@@ -1386,7 +1398,31 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```
 ### Get Shipments example ###
-**GET /vf/rest/getShipments/${accessToken}?pageSize=1&pageIndex=3**  
+**POST /vf/rest/getShipments/${accessToken}**  
+```json
+{
+  "alertsOnly": false,
+  "deviceImei": "234908720394857",
+  "shipmentDescription": "Any Description",
+  "shippedFrom": [
+    323,
+    1,
+    2,
+    3,
+    4
+  ],
+  "shippedTo": [
+    324,
+    1,
+    2,
+    3,
+    4
+  ],
+  "status": "InProgress",
+  "pageIndex": 1,
+  "pageSize": 10000
+}
+```
 **Response:**  
 ```json
 {

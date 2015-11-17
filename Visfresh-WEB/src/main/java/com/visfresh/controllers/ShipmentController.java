@@ -229,6 +229,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         if (req.getShippedTo() != null && !req.getShippedTo().isEmpty()) {
             f.addFilter(PROPERTY_SHIPPED_TO, req.getShippedTo());
         }
+        if (req.isAlertsOnly()) {
+            f.addFilter(PROPERTY_ONLY_WITH_ALERTS, Boolean.TRUE);
+        }
         return f;
     }
     /**

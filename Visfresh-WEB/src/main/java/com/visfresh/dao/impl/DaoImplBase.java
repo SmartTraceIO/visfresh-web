@@ -32,6 +32,8 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         implements DaoBase<T, ID> {
     private static final Logger log = LoggerFactory.getLogger(DaoImplBase.class);
 
+    protected static final String DEFAULT_FILTER_KEY_PREFIX = "filter_";
+
     /**
      * JDBC template.
      */
@@ -179,7 +181,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
             final List<String> filters, final Map<String, String> propertyToDbFields) {
         if (filter != null) {
             for (final String property : filter.getFilteredProperties()) {
-                final String key = "filter_" + property;
+                final String key = DEFAULT_FILTER_KEY_PREFIX + property;
                 final Object value = filter.getFilter(property);
                 String field = propertyToDbFields.get(property);
                 if (field == null) {

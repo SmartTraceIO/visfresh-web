@@ -26,7 +26,6 @@ import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
-import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -145,26 +144,24 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         s2.getShippedTo().setAddress("Coles Perth DC");
 
         //add alert
-        final Device d = s.getDevice();
-
-        createAlert(s, d, AlertType.Battery);
-        createAlert(s, d, AlertType.Battery);
-        createAlert(s, d, AlertType.MovementStart);
-        createAlert(s, d, AlertType.MovementStart);
-        createAlert(s, d, AlertType.MovementStart);
-        createAlert(s, d, AlertType.MovementStart);
+        createAlert(s, AlertType.Battery);
+        createAlert(s, AlertType.Battery);
+        createAlert(s, AlertType.MovementStart);
+        createAlert(s, AlertType.MovementStart);
+        createAlert(s, AlertType.MovementStart);
+        createAlert(s, AlertType.MovementStart);
 //        createAlert(s, d, AlertType.MovementStop);
-        createAlert(s, d, AlertType.LightOff);
-        createAlert(s, d, AlertType.LightOn);
+        createAlert(s, AlertType.LightOff);
+        createAlert(s, AlertType.LightOn);
 
-        createTemperatureAlert(s, d, AlertType.Hot);
-        createTemperatureAlert(s, d, AlertType.Hot);
-        createTemperatureAlert(s, d, AlertType.Cold);
-        createTemperatureAlert(s, d, AlertType.CriticalCold);
-        createTemperatureAlert(s, d, AlertType.CriticalCold);
-        createTemperatureAlert(s, d, AlertType.CriticalCold);
-        createTemperatureAlert(s, d, AlertType.CriticalHot);
-        createArrival(s, d);
+        createTemperatureAlert(s, AlertType.Hot);
+        createTemperatureAlert(s, AlertType.Hot);
+        createTemperatureAlert(s, AlertType.Cold);
+        createTemperatureAlert(s, AlertType.CriticalCold);
+        createTemperatureAlert(s, AlertType.CriticalCold);
+        createTemperatureAlert(s, AlertType.CriticalCold);
+        createTemperatureAlert(s, AlertType.CriticalHot);
+        createArrival(s);
 
         assertEquals(2, shipmentClient.getShipments(null, null).size());
         assertEquals(1, shipmentClient.getShipments(1, 1).size());
@@ -190,17 +187,15 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetSingleShipment() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
-        //get server device
-        final Device d = s.getDevice();
 
         //add tracker event.
-        createEvent(s, "AUT", d);
-        createEvent(s, "AUT", d);
+        createEvent(s, "AUT");
+        createEvent(s, "AUT");
 
         //add alert
-        createAlert(s, d, AlertType.Battery);
-        createTemperatureAlert(s, d, AlertType.Hot);
-        createArrival(s, d);
+        createAlert(s, AlertType.Battery);
+        createTemperatureAlert(s, AlertType.Hot);
+        createArrival(s);
 
         final Date fromTime = new Date(System.currentTimeMillis() - 100000000L);
         final Date toTime = new Date(System.currentTimeMillis() + 10000000l);
@@ -305,7 +300,31 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         saveShipmentDirectly(s);
         assertEquals(0, shipmentClient.getShipments(req).size());
     }
+    @Test
+    public void testFilteredByOnlyWithAlerts() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
 
+        final GetFilteredShipmentsRequest req = createFilter(s);
+        assertEquals(1, shipmentClient.getShipments(req).size());
+
+        req.setAlertsOnly(true);
+        assertEquals(0, shipmentClient.getShipments(req).size());
+
+        final long oneDay = 24 * 60 * 60 * 1000L;
+
+        //create alert
+        final Alert alert = createTemperatureAlert(s, AlertType.Hot);
+        alert.setDate(new Date(System.currentTimeMillis() - oneDay));
+        alertDao.save(alert);
+
+        assertEquals(1, shipmentClient.getShipments(req).size());
+
+        //move alert to out of date ranges
+        alert.setDate(new Date(System.currentTimeMillis() - 18 * oneDay));
+        alertDao.save(alert);
+
+        assertEquals(0, shipmentClient.getShipments(req).size());
+    }
     /**
      * @param s
      * @return
@@ -338,31 +357,28 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     }
     /**
      * @param s
-     * @param d
      * @param type
      * @return
      */
-    private TemperatureAlert createTemperatureAlert(final Shipment s, final Device d,
-            final AlertType type) {
+    private TemperatureAlert createTemperatureAlert(final Shipment s, final AlertType type) {
         final TemperatureAlert alert = new TemperatureAlert();
         alert.setDate(new Date());
         alert.setType(type);
         alert.setTemperature(5);
         alert.setMinutes(55);
-        alert.setDevice(d);
+        alert.setDevice(s.getDevice());
         alert.setShipment(s);
         alertDao.save(alert);
         return alert;
     }
     /**
      * @param shipment shipment.
-     * @param device device.
      * @return tracker event.
      */
-    private TrackerEvent createEvent(final Shipment shipment, final String type, final Device device) {
+    private TrackerEvent createEvent(final Shipment shipment, final String type) {
         final TrackerEvent e = new TrackerEvent();
         e.setShipment(shipment);
-        e.setDevice(device);
+        e.setDevice(shipment.getDevice());
         e.setBattery(1234);
         e.setTemperature(56);
         e.setTime(new Date());
@@ -375,12 +391,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     }
     /**
      * @param s shipment.
-     * @param d device.
      * @return
      */
-    private Arrival createArrival(final Shipment s, final Device d) {
+    private Arrival createArrival(final Shipment s) {
         final Arrival arrival = new Arrival();
-        arrival.setDevice(d);
+        arrival.setDevice(s.getDevice());
         arrival.setShipment(s);
         arrival.setNumberOfMettersOfArrival(400);
         arrival.setDate(new Date(System.currentTimeMillis() - 50000));
@@ -389,15 +404,14 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     }
     /**
      * @param s shipment
-     * @param device device
      * @param type alert type.
      * @return alert.
      */
-    private Alert createAlert(final Shipment s, final Device device, final AlertType type) {
+    private Alert createAlert(final Shipment s, final AlertType type) {
         final Alert alert = new Alert();
         alert.setShipment(s);
         alert.setDate(new Date(System.currentTimeMillis() - 100000000l));
-        alert.setDevice(device);
+        alert.setDevice(s.getDevice());
         alert.setType(type);
         alertDao.save(alert);
         return alert;

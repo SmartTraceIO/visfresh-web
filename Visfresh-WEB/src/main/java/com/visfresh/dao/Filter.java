@@ -40,6 +40,12 @@ public class Filter {
     }
     /**
      * @param propertyName property name.
+     */
+    public void removeFilter(final String propertyName) {
+        filters.remove(propertyName);
+    }
+    /**
+     * @param propertyName property name.
      * @return value filter.
      */
     public Object getFilter(final String propertyName) {

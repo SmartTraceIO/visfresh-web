@@ -40,4 +40,5 @@ public interface ShipmentConstants {
     //search criterias
     String PROPERTY_SHIPPED_FROM_DATE = "shippedFromDate";
     String PROPERTY_SHIPPED_TO_DATE = "shippedToDate";
+    String PROPERTY_ONLY_WITH_ALERTS = "alertsOnly";
 }
