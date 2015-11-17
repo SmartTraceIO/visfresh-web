@@ -233,8 +233,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(lastDay, req.getLastDay());
         assertEquals(lastMonth, req.getLastMonth());
         assertEquals(lastWeek, req.getLastWeek());
-        assertEquals(shipmentDateFrom.getTime(), req.getShipmentDateFrom().getTime(), 10);
-        assertEquals(shipmentDateTo.getTime(), req.getShipmentDateTo().getTime(), 10);
+        assertEquals(shipmentDateFrom.getTime(), req.getShipmentDateFrom().getTime(), 100);
+        assertEquals(shipmentDateTo.getTime(), req.getShipmentDateTo().getTime(), 100);
         assertEquals(shipmentDescription, req.getShipmentDescription());
         assertEquals(2, req.getShippedFrom().size());
         assertEquals(3, req.getShippedTo().size());
