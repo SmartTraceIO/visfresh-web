@@ -14,7 +14,7 @@ import org.junit.Test;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
-import com.visfresh.entities.TemperatureIssue;
+import com.visfresh.entities.AlertRule;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -48,53 +48,53 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         ap.setName("JUnit-Alert");
 
         final int normalTemperature = 3;
-        TemperatureIssue criticalHot = new TemperatureIssue(AlertType.CriticalHot);
+        AlertRule criticalHot = new AlertRule(AlertType.CriticalHot);
         criticalHot.setTemperature(normalTemperature + 15);
         criticalHot.setTimeOutMinutes(0);
         criticalHot.setCumulativeFlag(true);
-        ap.getTemperatureIssues().add(criticalHot);
+        ap.getAlertRules().add(criticalHot);
 
-        criticalHot = new TemperatureIssue(AlertType.CriticalHot);
+        criticalHot = new AlertRule(AlertType.CriticalHot);
         criticalHot.setTemperature(normalTemperature + 14);
         criticalHot.setTimeOutMinutes(1);
         criticalHot.setCumulativeFlag(true);
-        ap.getTemperatureIssues().add(criticalHot);
+        ap.getAlertRules().add(criticalHot);
 
-        TemperatureIssue criticalLow = new TemperatureIssue(AlertType.CriticalCold);
+        AlertRule criticalLow = new AlertRule(AlertType.CriticalCold);
         criticalLow.setTemperature(normalTemperature -15.);
         criticalLow.setTimeOutMinutes(0);
         criticalLow.setCumulativeFlag(true);
-        ap.getTemperatureIssues().add(criticalLow);
+        ap.getAlertRules().add(criticalLow);
 
-        criticalLow = new TemperatureIssue(AlertType.CriticalCold);
+        criticalLow = new AlertRule(AlertType.CriticalCold);
         criticalLow.setTemperature(normalTemperature -14.);
         criticalLow.setTimeOutMinutes(1);
         criticalLow.setCumulativeFlag(true);
-        ap.getTemperatureIssues().add(criticalLow);
+        ap.getAlertRules().add(criticalLow);
 
-        TemperatureIssue hot = new TemperatureIssue(AlertType.Hot);
+        AlertRule hot = new AlertRule(AlertType.Hot);
         hot.setTemperature(normalTemperature + 3);
         hot.setTimeOutMinutes(0);
         hot.setCumulativeFlag(true);
-        ap.getTemperatureIssues().add(hot);
+        ap.getAlertRules().add(hot);
 
-        hot = new TemperatureIssue(AlertType.Hot);
+        hot = new AlertRule(AlertType.Hot);
         hot.setTemperature(normalTemperature + 4.);
         hot.setTimeOutMinutes(2);
         hot.setCumulativeFlag(true);
-        ap.getTemperatureIssues().add(hot);
+        ap.getAlertRules().add(hot);
 
-        TemperatureIssue low = new TemperatureIssue(AlertType.Cold);
+        AlertRule low = new AlertRule(AlertType.Cold);
         low.setTemperature(normalTemperature -10.);
         low.setTimeOutMinutes(40);
         low.setCumulativeFlag(true);
-        ap.getTemperatureIssues().add(low);
+        ap.getAlertRules().add(low);
 
-        low = new TemperatureIssue(AlertType.Cold);
+        low = new AlertRule(AlertType.Cold);
         low.setTemperature(normalTemperature-8.);
         low.setTimeOutMinutes(55);
         low.setCumulativeFlag(true);
-        ap.getTemperatureIssues().add(low);
+        ap.getAlertRules().add(low);
 
         ap.setWatchBatteryLow(true);
         ap.setWatchMovementStart(true);
@@ -116,7 +116,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertTrue(p.isWatchMovementStop());
         assertTrue(p.isWatchEnterDarkEnvironment());
 
-        assertEquals(8, p.getTemperatureIssues().size());
+        assertEquals(8, p.getAlertRules().size());
     }
     @Test
     public void testFindByCompany() {
@@ -157,9 +157,9 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertTrue(p.isWatchMovementStop());
         assertTrue(p.isWatchEnterDarkEnvironment());
 
-        assertEquals(8, p.getTemperatureIssues().size());
+        assertEquals(8, p.getAlertRules().size());
         //test ID not null
-        assertNotNull(p.getTemperatureIssues().get(0).getId());
+        assertNotNull(p.getAlertRules().get(0).getId());
     }
     @Test
     public void testSaveTemperatureIssue() {
@@ -168,16 +168,16 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         ap.setDescription("JUnit test alert pforile");
         ap.setName("JUnit-Alert");
 
-        final TemperatureIssue expected = new TemperatureIssue(AlertType.CriticalHot);
+        final AlertRule expected = new AlertRule(AlertType.CriticalHot);
         expected.setTemperature(15);
         expected.setTimeOutMinutes(0);
         expected.setCumulativeFlag(true);
-        ap.getTemperatureIssues().add(expected);
+        ap.getAlertRules().add(expected);
 
         dao.save(ap);
         ap = dao.findOne(ap.getId());
 
-        final TemperatureIssue actual = ap.getTemperatureIssues().get(0);
+        final AlertRule actual = ap.getAlertRules().get(0);
         assertEquals(expected.getTemperature(), actual.getTemperature(), 0.001);
         assertEquals(expected.getTimeOutMinutes(), actual.getTimeOutMinutes());
         assertEquals(expected.getType(), actual.getType());

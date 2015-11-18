@@ -38,7 +38,9 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
 
     private static final String PERSONAL_SCHEDULE_TABLE = "personalschedules";
     private static final String USER_FIELD = "user";
-    private static final String PUSHTOMOBILEAPP_FIELD = "pushtomobileapp";
+    private static final String SENDAPP_FIELD = "sendapp";
+    private static final String SENDEMAIL_FIELD = "sendemail";
+    private static final String SENDSMS_FIELD = "sendsms";
     private static final String WEEKDAYS_FIELD = "weekdays";
     private static final String FROMTIME_FIELD = "fromtime";
     private static final String TOTIME_FIELD = "totime";
@@ -153,7 +155,9 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
         }
 
         paramMap.put(USER_FIELD, ps.getUser().getLogin());
-        paramMap.put(PUSHTOMOBILEAPP_FIELD, ps.isPushToMobileApp());
+        paramMap.put(SENDAPP_FIELD, ps.isSendApp());
+        paramMap.put(SENDEMAIL_FIELD, ps.isSendEmail());
+        paramMap.put(SENDSMS_FIELD, ps.isSendSms());
         paramMap.put(WEEKDAYS_FIELD, convertToDatabaseColumn(ps.getWeekDays()));
         paramMap.put(FROMTIME_FIELD, ps.getFromTime());
         paramMap.put(TOTIME_FIELD, ps.getToTime());
@@ -171,7 +175,9 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
             fields.add(ID_FIELD);
         }
         fields.add(USER_FIELD);
-        fields.add(PUSHTOMOBILEAPP_FIELD);
+        fields.add(SENDAPP_FIELD);
+        fields.add(SENDEMAIL_FIELD);
+        fields.add(SENDSMS_FIELD);
         fields.add(WEEKDAYS_FIELD);
         fields.add(FROMTIME_FIELD);
         fields.add(TOTIME_FIELD);
@@ -196,7 +202,9 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
             final PersonSchedule ps = new PersonSchedule();
             ps.setId(((Number) map.get(ID_FIELD)).longValue());
             ps.setUser(userDao.findOne((String) map.get(USER_FIELD)));
-            ps.setPushToMobileApp((Boolean) map.get(PUSHTOMOBILEAPP_FIELD));
+            ps.setSendApp((Boolean) map.get(SENDAPP_FIELD));
+            ps.setSendEmail((Boolean) map.get(SENDEMAIL_FIELD));
+            ps.setSendSms((Boolean) map.get(SENDSMS_FIELD));
             final boolean[] b = convertToEntityAttribute((String) map.get(WEEKDAYS_FIELD));
             System.arraycopy(b, 0, ps.getWeekDays(), 0, b.length);
             ps.setFromTime(((Number) map.get(FROMTIME_FIELD)).intValue());

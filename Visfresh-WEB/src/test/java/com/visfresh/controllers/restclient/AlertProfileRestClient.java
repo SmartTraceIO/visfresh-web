@@ -16,6 +16,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.io.json.AlertProfileSerializer;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.services.lists.ListAlertProfileItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -43,7 +44,7 @@ public class AlertProfileRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<AlertProfile> getAlertProfiles(final Integer pageIndex, final Integer pageSize,
+    public List<ListAlertProfileItem> getAlertProfiles(final Integer pageIndex, final Integer pageSize,
             final String sortColumn,
             final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
@@ -61,9 +62,9 @@ public class AlertProfileRestClient extends RestClient {
         final JsonArray response = sendGetRequest(getPathWithToken("getAlertProfiles"),
                 params).getAsJsonArray();
 
-        final List<AlertProfile> profiles = new ArrayList<AlertProfile>(response.size());
+        final List<ListAlertProfileItem> profiles = new ArrayList<ListAlertProfileItem>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            profiles.add(serializer.parseAlertProfile(response.get(i).getAsJsonObject()));
+            profiles.add(serializer.parseListAlertProfileItem(response.get(i).getAsJsonObject()));
         }
         return profiles;
     }
@@ -97,7 +98,7 @@ public class AlertProfileRestClient extends RestClient {
         sendGetRequest(getPathWithToken("deleteAlertProfile"), params);
     }
 
-    public List<AlertProfile> getAlertProfiles(final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
+    public List<ListAlertProfileItem> getAlertProfiles(final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
         return getAlertProfiles(pageIndex, pageSize, null, null);
     }
 }

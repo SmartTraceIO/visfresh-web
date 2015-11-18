@@ -43,6 +43,7 @@ public class RestClient  {
         super();
         final GsonBuilder b = new GsonBuilder();
         b.setPrettyPrinting();
+        b.disableHtmlEscaping();
         this.gson = b.create();
     }
     /**
@@ -147,9 +148,9 @@ public class RestClient  {
 
         final Writer wr = new OutputStreamWriter(con.getOutputStream());
         try {
-            final String requestBody = json.toString();
+            final String requestBody = gson.toJson(json);
             println("Request body:");
-            println(gson.toJson(json));
+            println(requestBody);
             wr.write(requestBody);
             wr.flush();
         } finally {
@@ -180,22 +181,21 @@ public class RestClient  {
     public final JsonElement parseResponse(final URLConnection con)
             throws IOException, RestServiceException {
         final String response = getContent(con.getInputStream());
+        printResponse(response);
+
         final JsonObject e = new JsonParser().parse(response).getAsJsonObject();
-
-        printJsonPretty(e);
-
         checkError(e);
         return e.get("response");
     }
-
     /**
-     * @param e GSON element.
+     * @param response
      */
-    private void printJsonPretty(final JsonElement e) {
-        println("Response:");
-        println(gson.toJson(e));
+    protected void printResponse(final String response) {
+        if (isPrintEnabled) {
+            println("Response:");
+            println(response);
+        }
     }
-
     /**
      * @param str
      */

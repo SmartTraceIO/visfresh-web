@@ -15,7 +15,7 @@ drop table if exists shipments;
 drop table if exists locationprofiles;
 drop table if exists personalschedules;
 drop table if exists notificationschedules;
-drop table if exists allerttemperatures;
+drop table if exists temperaturerules;
 drop table if exists alertprofiles;
 drop table if exists devices;
 drop table if exists users;
@@ -111,7 +111,7 @@ create table alertprofiles (
         REFERENCES companies (id)
 );
 
-create table allerttemperatures (
+create table temperaturerules (
     id bigint(20) auto_increment not null,
     `type` varchar(50) not null,
     temp float not null,
@@ -137,7 +137,9 @@ create table notificationschedules (
 create table personalschedules (
     id bigint(20) auto_increment not null,
     user varchar(127) not null,
-    pushtomobileapp boolean not null,
+    sendapp boolean not null default false,
+    sendemail boolean not null default false,
+    sendsms boolean not null default false,
     weekdays varchar(50),
     fromtime int not null,
     totime int not null,

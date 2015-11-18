@@ -17,7 +17,7 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.User;
 import com.visfresh.io.UserResolver;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.NotificationScheduleListItem;
+import com.visfresh.services.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -95,7 +95,7 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
         saveNotificationScheduleDirectly(p3);
 
         //test sort by ID
-        NotificationScheduleListItem first = client.getNotificationSchedules(1, 10000, "notificationScheduleId", "asc").get(0);
+        ListNotificationScheduleItem first = client.getNotificationSchedules(1, 10000, "notificationScheduleId", "asc").get(0);
         assertEquals(p1.getId(), first.getId());
 
         first = client.getNotificationSchedules(1, 10000, "notificationScheduleId", "desc").get(0);

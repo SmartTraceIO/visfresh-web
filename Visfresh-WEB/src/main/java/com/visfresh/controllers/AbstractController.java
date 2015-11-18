@@ -3,7 +3,6 @@
  */
 package com.visfresh.controllers;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -69,23 +68,14 @@ public abstract class AbstractController {
      * @param idFieldName ID field name.
      * @return JSON response.
      */
-    protected String createIdResponse(final String idFieldName, final Long id) {
+    protected JsonObject createIdResponse(final String idFieldName, final Long id) {
         return createSuccessResponse(SerializerUtils.idToJson(idFieldName, id));
     }
-    /**
-     * @param response.
-     * @return
-     */
-    protected String createSuccessResponse(final JsonElement response) {
-        final JsonObject obj = createSuccessResponseObject(response);
-        return obj.toString();
-    }
-
     /**
      * @param response
      * @return
      */
-    protected JsonObject createSuccessResponseObject(final JsonElement response) {
+    protected JsonObject createSuccessResponse(final JsonElement response) {
         final JsonObject obj = new JsonObject();
         //add status
         obj.add("status", createStatus(0, "Success"));
@@ -93,21 +83,26 @@ public abstract class AbstractController {
         obj.add("response", response == null ? JsonNull.INSTANCE : response);
         return obj;
     }
-    protected String createListSuccessResponse(final JsonArray array, final int total) {
-        final JsonObject obj = createSuccessResponseObject(array);
+    /**
+     * @param array
+     * @param total
+     * @return
+     */
+    protected JsonObject createListSuccessResponse(final JsonArray array,
+            final int total) {
+        final JsonObject obj = createSuccessResponse(array);
         obj.add("totalCount", new JsonPrimitive(total));
-        return obj.toString();
+        return obj;
     }
     /**
      * @param e
      * @return
      */
-    protected String createErrorResponse(final Exception e) {
+    protected JsonObject createErrorResponse(final Exception e) {
         final JsonObject obj = new JsonObject();
         //add status
         obj.add("status", createErrorStatus(e));
-        //add response
-        return obj.toString();
+        return obj;
     }
     /**
      * @param errorCode error code.
@@ -147,26 +142,26 @@ public abstract class AbstractController {
         }
         return user;
     }
-    /**
-     * @param text the resource name.
-     * @throws RestServiceException
-     * @throws IOException
-     */
-    protected JsonObject getJSonObject(final String text) throws RestServiceException {
-        return getJSon(text).getAsJsonObject();
-    }
-    /**
-     * @param text the resource name.
-     * @throws RestServiceException
-     * @throws IOException
-     */
-    protected JsonElement getJSon(final String text) throws RestServiceException {
-        try {
-            return SerializerUtils.parseJson(text);
-        } catch (final Exception e) {
-            throw new RestServiceException(ErrorCodes.INVALID_JSON, "Invalid JSON format");
-        }
-    }
+//    /**
+//     * @param text the resource name.
+//     * @throws RestServiceException
+//     * @throws IOException
+//     */
+//    protected JsonObject getJSonObject(final String text) throws RestServiceException {
+//        return getJSon(text).getAsJsonObject();
+//    }
+//    /**
+//     * @param text the resource name.
+//     * @throws RestServiceException
+//     * @throws IOException
+//     */
+//    protected JsonElement getJSon(final String text) throws RestServiceException {
+//        try {
+//            return SerializerUtils.parseJson(text);
+//        } catch (final Exception e) {
+//            throw new RestServiceException(ErrorCodes.INVALID_JSON, "Invalid JSON format");
+//        }
+//    }
     /**
      * @param sc
      * @param so

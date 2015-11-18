@@ -11,13 +11,12 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.NotificationScheduleSerializer;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.NotificationScheduleListItem;
+import com.visfresh.services.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -39,7 +38,7 @@ public class NotificationScheduleRestClient extends RestClient {
                 serializer.toJson(schedule)).getAsJsonObject();
         return parseId(e);
     }
-    public List<NotificationScheduleListItem> getNotificationSchedules(
+    public List<ListNotificationScheduleItem> getNotificationSchedules(
             final Integer pageIndex, final Integer pageSize)
             throws RestServiceException, IOException {
         return getNotificationSchedules(pageIndex, pageSize, null, null);
@@ -53,7 +52,7 @@ public class NotificationScheduleRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<NotificationScheduleListItem> getNotificationSchedules(
+    public List<ListNotificationScheduleItem> getNotificationSchedules(
             final Integer pageIndex, final Integer pageSize,
             final String sortColumn, final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
@@ -70,7 +69,7 @@ public class NotificationScheduleRestClient extends RestClient {
         final JsonArray response = sendGetRequest(getPathWithToken("getNotificationSchedules"),
                 params).getAsJsonArray();
 
-        final List<NotificationScheduleListItem> profiles = new ArrayList<NotificationScheduleListItem>(response.size());
+        final List<ListNotificationScheduleItem> profiles = new ArrayList<ListNotificationScheduleItem>(response.size());
         for (int i = 0; i < response.size(); i++) {
             profiles.add(serializer.parseNotificationScheduleListItem(response.get(i).getAsJsonObject()));
         }
@@ -85,7 +84,7 @@ public class NotificationScheduleRestClient extends RestClient {
         params.put("notificationScheduleId", id.toString());
 
         final JsonElement response = sendGetRequest(getPathWithToken("getNotificationSchedule"), params);
-        return response == JsonNull.INSTANCE ? null : serializer.parseNotificationSchedule(
+        return response == null || response.isJsonNull() ? null : serializer.parseNotificationSchedule(
                 response.getAsJsonObject());
     }
     /**

@@ -8,14 +8,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.visfresh.constants.CompanyConstants;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.Page;
@@ -28,7 +28,7 @@ import com.visfresh.io.json.CompanySerializer;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Controller("Company")
+@RestController("Company")
 @RequestMapping("/rest")
 public class CompanyController extends AbstractController implements CompanyConstants {
     /**
@@ -51,7 +51,7 @@ public class CompanyController extends AbstractController implements CompanyCons
      * @return company.
      */
     @RequestMapping(value = "/getCompany/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getCompany(@PathVariable final String authToken,
+    public JsonObject getCompany(@PathVariable final String authToken,
             @RequestParam final Long companyId) {
         try {
             //check logged in.
@@ -77,7 +77,7 @@ public class CompanyController extends AbstractController implements CompanyCons
      * @return company.
      */
     @RequestMapping(value = "/getCompanies/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getCompanies(@PathVariable final String authToken,
+    public JsonObject getCompanies(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize) {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;

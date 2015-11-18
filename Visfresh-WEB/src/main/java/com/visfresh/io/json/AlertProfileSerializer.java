@@ -3,15 +3,19 @@
  */
 package com.visfresh.io.json;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.TemperatureIssue;
+import com.visfresh.entities.AlertRule;
+import com.visfresh.services.lists.ListAlertProfileItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -52,7 +56,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
 
         final JsonArray tempIssues = new JsonArray();
         obj.add("temperatureIssues", tempIssues);
-        for (final TemperatureIssue issue : alert.getTemperatureIssues()) {
+        for (final AlertRule issue : alert.getAlertRules()) {
             tempIssues.add(toJson(issue));
         }
 
@@ -71,7 +75,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
 
         final JsonArray tempIssues = alert.get("temperatureIssues").getAsJsonArray();
         for (final JsonElement issue : tempIssues) {
-            p.getTemperatureIssues().add(parseTemperatureIssue(issue.getAsJsonObject()));
+            p.getAlertRules().add(parseTemperatureIssue(issue.getAsJsonObject()));
         }
 
         p.setWatchBatteryLow(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_BATTERY_LOW)));
@@ -88,7 +92,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
      * @param issue temperature issue.
      * @return
      */
-    public JsonObject toJson(final TemperatureIssue issue) {
+    public JsonObject toJson(final AlertRule issue) {
         final JsonObject obj = new JsonObject();
         obj.addProperty("id", issue.getId());
         obj.addProperty("type", issue.getType().toString());
@@ -101,13 +105,60 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
      * @param json JSON object.
      * @return temperature issue.
      */
-    public TemperatureIssue parseTemperatureIssue(final JsonObject json) {
-        final TemperatureIssue issue = new TemperatureIssue();
+    public AlertRule parseTemperatureIssue(final JsonObject json) {
+        final AlertRule issue = new AlertRule();
         issue.setId(asLong(json.get("id")));
         issue.setType(AlertType.valueOf(json.get("type").getAsString()));
         issue.setTemperature(asDouble(json.get("temperature")));
         issue.setTimeOutMinutes(asInt(json.get("timeOutMinutes")));
         issue.setCumulativeFlag(asBoolean(json.get("cumulativeFlag")));
         return issue;
+    }
+    public JsonObject toJson(final ListAlertProfileItem item) {
+        if (item == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("alertProfileId", item.getAlertProfileId());
+        json.addProperty("alertProfileName", item.getAlertProfileName());
+        json.addProperty("alertProfileDescription", item.getAlertProfileDescription());
+        json.add("alertRuleList", asJsonArray(item.getAlertRuleList()));
+        return json;
+    }
+    public ListAlertProfileItem parseListAlertProfileItem(final JsonObject json) {
+        if (json == null || json.isJsonNull()) {
+            return null;
+        }
+
+        final ListAlertProfileItem item = new ListAlertProfileItem();
+        item.setAlertProfileId(asLong(json.get("alertProfileId")));
+        item.setAlertProfileName(asString(json.get("alertProfileName")));
+        item.setAlertProfileDescription(asString(json.get("alertProfileDescription")));
+        item.getAlertRuleList().addAll(asStringList(json.get("alertRuleList").getAsJsonArray()));
+
+        return item;
+    }
+    /**
+     * @param array
+     * @return
+     */
+    private List<String> asStringList(final JsonArray array) {
+        final List<String> list = new LinkedList<String>();
+        for (final JsonElement e : array) {
+            list.add(e.getAsString());
+        }
+        return list;
+    }
+    /**
+     * @param list string list.
+     * @return JSON string array.
+     */
+    private JsonArray asJsonArray(final List<String> list) {
+        final JsonArray array = new JsonArray();
+        for (final String str : list) {
+            array.add(new JsonPrimitive(str));
+        }
+        return array;
     }
 }

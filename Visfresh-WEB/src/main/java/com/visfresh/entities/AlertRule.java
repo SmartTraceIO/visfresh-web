@@ -7,7 +7,7 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class TemperatureIssue {
+public class AlertRule {
     private AlertType type;
     private double temperature;
     private int timeOutMinutes;
@@ -17,14 +17,14 @@ public class TemperatureIssue {
     /**
      * Default constructor.
      */
-    public TemperatureIssue(final AlertType type) {
+    public AlertRule(final AlertType type) {
         super();
         setType(type);
     }
     /**
      * Default constructor.
      */
-    public TemperatureIssue() {
+    public AlertRule() {
         super();
     }
 

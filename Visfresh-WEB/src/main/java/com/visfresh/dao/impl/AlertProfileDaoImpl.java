@@ -19,8 +19,8 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.TemperatureIssue;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -175,27 +175,27 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             ap.setId(keyHolder.getKey().longValue());
         }
 
-        updateTemperatureIssues(ap.getId(), ap.getTemperatureIssues());
+        updateTemperatureIssues(ap.getId(), ap.getAlertRules());
         return ap;
     }
     /**
      * @param id alert profile ID.
      * @param issues temperature issues.
      */
-    private void updateTemperatureIssues(final Long id, final List<TemperatureIssue> issues) {
+    private void updateTemperatureIssues(final Long id, final List<AlertRule> issues) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("apid", id);
 
         //get old issues
         final List<Map<String, Object>> list = jdbc.queryForList(
-                "select id from allerttemperatures where alertprofile = :apid", params);
+                "select id from temperaturerules where alertprofile = :apid", params);
         final Set<Long> actual = new HashSet<Long>();
         for (final Map<String,Object> row : list) {
             actual.add(((Number) row.get("id")).longValue());
         }
 
         //process issues
-        for (final TemperatureIssue issue : issues) {
+        for (final AlertRule issue : issues) {
             final Long issueId = issue.getId();
             final Map<String, Object> paramMap = new HashMap<String, Object>();
             paramMap.put("temperature", issue.getTemperature());
@@ -208,14 +208,14 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
                 paramMap.put("id", issueId);
                 actual.remove(issueId);
 
-                jdbc.update("update allerttemperatures set"
+                jdbc.update("update temperaturerules set"
                         + " type = :type,"
                         + " temp = :temperature,"
                         + " timeout = :timeOut"
                         + " where id = :id", paramMap);
             } else {
                 final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-                jdbc.update("insert into allerttemperatures"
+                jdbc.update("insert into temperaturerules"
                         + "(type, temp, timeout, cumulative, alertprofile)"
                         + " values(:type, :temperature, :timeOut, :cumulative, :apid)",
                         new MapSqlParameterSource(paramMap), keyHolder);
@@ -231,7 +231,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
 
         for (final Long issueId : actual) {
             paramMap.put("id", issueId);
-            jdbc.update("delete from allerttemperatures where id = :id and alertprofile = :alertprofile",
+            jdbc.update("delete from temperaturerules where id = :id and alertprofile = :alertprofile",
                     paramMap);
         }
     }
@@ -240,17 +240,17 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
      * @param id alert profile ID.
      * @return list of temperature issues.
      */
-    private List<TemperatureIssue> loadTemperatureIssues(final Long id) {
-        final List<TemperatureIssue> list = new LinkedList<TemperatureIssue>();
+    private List<AlertRule> loadTemperatureIssues(final Long id) {
+        final List<AlertRule> list = new LinkedList<AlertRule>();
 
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("alertprofile", id);
-        final List<Map<String, Object>> rows = jdbc.queryForList("select * from allerttemperatures"
+        final List<Map<String, Object>> rows = jdbc.queryForList("select * from temperaturerules"
                 + " where alertprofile = :alertprofile", paramMap);
 
         //create temperature issues from DB rows
         for (final Map<String, Object> row : rows) {
-            final TemperatureIssue issue = new TemperatureIssue();
+            final AlertRule issue = new AlertRule();
             issue.setId(((Number) row.get("id")).longValue());
             issue.setTemperature(((Number) row.get("temp")).doubleValue());
             issue.setCumulativeFlag(Boolean.TRUE.equals(row.get("cumulative")));
@@ -321,7 +321,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         no.setName((String) map.get(NAME_FIELD));
         no.setDescription((String) map.get(DESCRIPTION_FIELD));
 
-        no.getTemperatureIssues().addAll(loadTemperatureIssues(no.getId()));
+        no.getAlertRules().addAll(loadTemperatureIssues(no.getId()));
 
         no.setWatchEnterBrightEnvironment((Boolean) map.get(ONENTERBRIGHT_FIELD));
         no.setWatchEnterDarkEnvironment((Boolean) map.get(ONENTERDARK_FIELD));

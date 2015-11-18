@@ -104,7 +104,7 @@ public class ShipmentTemplateDaoTest
 
         PersonSchedule ps = new PersonSchedule();
         ps.setFromTime(45);
-        ps.setPushToMobileApp(true);
+        ps.setSendApp(true);
         ps.setToTime(150);
         ps.setUser(user);
 
@@ -119,7 +119,7 @@ public class ShipmentTemplateDaoTest
 
         ps = new PersonSchedule();
         ps.setFromTime(45);
-        ps.setPushToMobileApp(true);
+        ps.setSendApp(true);
         ps.setToTime(150);
         ps.setUser(user);
 

@@ -8,15 +8,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentTemplateDao;
@@ -31,7 +31,7 @@ import com.visfresh.services.lists.ListShipmentTemplateItem;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Controller("ShipmentTemplate")
+@RestController("ShipmentTemplate")
 @RequestMapping("/rest")
 public class ShipmentTemplateController extends AbstractController implements ShipmentTemplateConstants {
     /**
@@ -58,13 +58,13 @@ public class ShipmentTemplateController extends AbstractController implements Sh
      * @return ID of saved shipment template.
      */
     @RequestMapping(value = "/saveShipmentTemplate/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String saveShipmentTemplate(@PathVariable final String authToken,
-            final @RequestBody String tpl) {
+    public JsonObject saveShipmentTemplate(@PathVariable final String authToken,
+            final @RequestBody JsonObject tpl) {
         try {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveShipmentTemplate(user);
 
-            final ShipmentTemplate t = createSerializer(user).parseShipmentTemplate(getJSonObject(tpl));
+            final ShipmentTemplate t = createSerializer(user).parseShipmentTemplate(tpl);
             checkCompanyAccess(user, t);
 
             t.setCompany(user.getCompany());
@@ -82,7 +82,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
      * @return list of shipment templates.
      */
     @RequestMapping(value = "/getShipmentTemplates/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getShipmentTemplates(@PathVariable final String authToken,
+    public JsonObject getShipmentTemplates(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize) {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
@@ -130,7 +130,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
      * @return shipment template.
      */
     @RequestMapping(value = "/getShipmentTemplate/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getShipmentTemplate(@PathVariable final String authToken,
+    public JsonObject getShipmentTemplate(@PathVariable final String authToken,
             @RequestParam final Long shipmentTemplateId) {
         try {
             //check logged in.
@@ -162,7 +162,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
      * @return shipment template.
      */
     @RequestMapping(value = "/deleteShipmentTemplate/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String deleteShipmentTemplate(@PathVariable final String authToken,
+    public JsonObject deleteShipmentTemplate(@PathVariable final String authToken,
             @RequestParam final Long shipmentTemplateId) {
         try {
             //check logged in.

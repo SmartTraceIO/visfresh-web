@@ -24,6 +24,7 @@ import com.visfresh.controllers.restclient.AlertProfileRestClient;
 import com.visfresh.controllers.restclient.NotificationScheduleRestClient;
 import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
@@ -31,10 +32,10 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.entities.TemperatureIssue;
 import com.visfresh.entities.User;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.NotificationScheduleListItem;
+import com.visfresh.services.lists.ListAlertProfileItem;
+import com.visfresh.services.lists.ListNotificationScheduleItem;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -88,10 +89,10 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     public AlertProfile createAlertProfileIfNeed() throws RestServiceException, IOException {
         final String name = "DevTools Alerts";
 
-        final List<AlertProfile> profiles = this.alertProfileClient.getAlertProfiles(1, 1000);
-        for (final AlertProfile alertProfile : profiles) {
-            if (name.equals(alertProfile.getName())) {
-                return alertProfile;
+        final List<ListAlertProfileItem> profiles = this.alertProfileClient.getAlertProfiles(1, 1000);
+        for (final ListAlertProfileItem alertProfile : profiles) {
+            if (name.equals(alertProfile.getAlertProfileName())) {
+                return alertProfileClient.getAlertProfile(alertProfile.getAlertProfileId());
             }
         }
 
@@ -101,32 +102,32 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         profile.setName(name);
 
         //hot
-        TemperatureIssue issue = new TemperatureIssue(AlertType.Hot);
+        AlertRule issue = new AlertRule(AlertType.Hot);
         issue.setTemperature(15.);
         issue.setTimeOutMinutes(5);
         issue.setCumulativeFlag(true);
-        profile.getTemperatureIssues().add(issue);
+        profile.getAlertRules().add(issue);
 
         //critical hot
-        issue = new TemperatureIssue(AlertType.CriticalHot);
+        issue = new AlertRule(AlertType.CriticalHot);
         issue.setTemperature(20.);
         issue.setTimeOutMinutes(1);
-        profile.getTemperatureIssues().add(issue);
+        profile.getAlertRules().add(issue);
 
         profile.setDescription("Development tool profile");
 
         //log
-        issue = new TemperatureIssue(AlertType.Cold);
+        issue = new AlertRule(AlertType.Cold);
         issue.setTemperature(3.);
         issue.setTimeOutMinutes(10);
         issue.setCumulativeFlag(true);
-        profile.getTemperatureIssues().add(issue);
+        profile.getAlertRules().add(issue);
 
         //critical cold
-        issue = new TemperatureIssue(AlertType.CriticalCold);
+        issue = new AlertRule(AlertType.CriticalCold);
         issue.setTemperature(-5.);
         issue.setTimeOutMinutes(1);
-        profile.getTemperatureIssues().add(issue);
+        profile.getAlertRules().add(issue);
 
         profile.setWatchBatteryLow(true);
         profile.setWatchEnterBrightEnvironment(true);
@@ -285,8 +286,8 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private NotificationSchedule createNotificationScheduleIfNeed() throws RestServiceException, IOException {
         final String name = "Test Schedule";
 
-        final List<NotificationScheduleListItem> schedules = notificationScheduleClient.getNotificationSchedules(null, null);
-        for (final NotificationScheduleListItem s : schedules) {
+        final List<ListNotificationScheduleItem> schedules = notificationScheduleClient.getNotificationSchedules(null, null);
+        for (final ListNotificationScheduleItem s : schedules) {
             if (name.equals(s.getNotificationScheduleName())) {
                 return notificationScheduleClient.getNotificationSchedule(s.getId());
             }
@@ -330,7 +331,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         final PersonSchedule s = new PersonSchedule();
         s.setFromTime(1);
         s.setToTime(23 * 60 + 55);
-        s.setPushToMobileApp(true);
+        s.setSendApp(true);
         s.setUser(user);
         Arrays.fill(s.getWeekDays(), true);
         return s;

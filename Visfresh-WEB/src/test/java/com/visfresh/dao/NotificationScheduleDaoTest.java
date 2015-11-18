@@ -67,7 +67,9 @@ public class NotificationScheduleDaoTest
         final PersonSchedule ps = new PersonSchedule();
         ps.setUser(user);
         ps.setFromTime(45);
-        ps.setPushToMobileApp(true);
+        ps.setSendApp(true);
+        ps.setSendEmail(true);
+        ps.setSendSms(true);
         ps.setToTime(150);
 
         s.getSchedules().add(ps);
@@ -88,7 +90,9 @@ public class NotificationScheduleDaoTest
         final PersonSchedule ps = s.getSchedules().get(0);
 
         assertEquals(45, ps.getFromTime());
-        assertTrue(ps.isPushToMobileApp());
+        assertTrue(ps.isSendApp());
+        assertTrue(ps.isSendEmail());
+        assertTrue(ps.isSendSms());
         assertEquals(150, ps.getToTime());
         assertNotNull(ps.getUser());
     }
@@ -110,7 +114,7 @@ public class NotificationScheduleDaoTest
         final PersonSchedule ps = s.getSchedules().get(0);
 
         assertEquals(45, ps.getFromTime());
-        assertTrue(ps.isPushToMobileApp());
+        assertTrue(ps.isSendApp());
         assertEquals(150, ps.getToTime());
         assertNotNull(ps.getUser());
     }

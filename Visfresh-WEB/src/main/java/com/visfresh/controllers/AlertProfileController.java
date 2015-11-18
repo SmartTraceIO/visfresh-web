@@ -8,27 +8,32 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
+import com.visfresh.rules.AlertDescriptionBuilder;
+import com.visfresh.services.lists.ListAlertProfileItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Controller("AlertProfile")
+@RestController("AlertProfile")
 @RequestMapping("/rest")
 public class AlertProfileController extends AbstractController implements AlertProfileConstants {
     /**
@@ -54,11 +59,11 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @return ID of saved alert profile.
      */
     @RequestMapping(value = "/saveAlertProfile/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String saveAlertProfile(@PathVariable final String authToken,
-            final @RequestBody String alert) {
+    public JsonObject saveAlertProfile(@PathVariable final String authToken,
+            final @RequestBody JsonObject alert) {
         try {
             final User user = getLoggedInUser(authToken);
-            final AlertProfile p = createSerializer(user).parseAlertProfile(getJSonObject(alert));
+            final AlertProfile p = createSerializer(user).parseAlertProfile(alert);
 
             security.checkCanSaveAlertProfile(user);
             checkCompanyAccess(user, p);
@@ -77,7 +82,7 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @return alert profile.
      */
     @RequestMapping(value = "/getAlertProfile/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getAlertProfile(@PathVariable final String authToken,
+    public JsonObject getAlertProfile(@PathVariable final String authToken,
             @RequestParam final Long alertProfileId) {
         try {
             //check logged in.
@@ -99,7 +104,7 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @return alert profile.
      */
     @RequestMapping(value = "/deleteAlertProfile/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String deleteAlertProfile(@PathVariable final String authToken,
+    public JsonObject deleteAlertProfile(@PathVariable final String authToken,
             @RequestParam final Long alertProfileId) {
         try {
             //check logged in.
@@ -123,7 +128,7 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @return list of alert profiles.
      */
     @RequestMapping(value = "/getAlertProfiles/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getAlertProfiles(@PathVariable final String authToken,
+    public JsonElement getAlertProfiles(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -146,7 +151,16 @@ public class AlertProfileController extends AbstractController implements AlertP
 
             final JsonArray array = new JsonArray();
             for (final AlertProfile a : alerts) {
-                array.add(ser.toJson(a));
+                //convert profile to profile list item.
+                final ListAlertProfileItem item = new ListAlertProfileItem();
+                item.setAlertProfileId(a.getId());
+                item.setAlertProfileName(a.getName());
+                item.setAlertProfileDescription(a.getDescription());
+                for (final AlertRule rule : a.getAlertRules()) {
+                    item.getAlertRuleList().add(alertRuleToString(rule, user.getTemperatureUnits()));
+                }
+
+                array.add(ser.toJson(item));
             }
 
             return createListSuccessResponse(array, total);
@@ -155,6 +169,42 @@ public class AlertProfileController extends AbstractController implements AlertP
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param rule
+     * @return
+     */
+    private String alertRuleToString(final AlertRule rule, final TemperatureUnits units) {
+        final StringBuilder sb = new StringBuilder();
+        switch (rule.getType()) {
+            case Cold:
+            case CriticalCold:
+                sb.append('<');
+                break;
+            case Hot:
+            case CriticalHot:
+                sb.append('>');
+                break;
+            case Battery:
+                return "battery low";
+            case LightOff:
+                return "light off";
+            case LightOn:
+                return "light on";
+                default:
+                    throw new IllegalArgumentException("Unexpected alert type: " + rule.getType());
+        }
+
+        //only temperature alert rules. Other should be returned before.
+        sb.append(AlertDescriptionBuilder.getTemperatureString(rule.getTemperature(), units));
+        //append time
+        sb.append(" for " + rule.getTimeOutMinutes() + " min");
+        //append total
+        if (rule.isCumulativeFlag()) {
+            sb.append(" in total");
+        }
+        return sb.toString();
+    }
+
     /**
      * @param user
      * @return

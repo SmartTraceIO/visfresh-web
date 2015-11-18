@@ -8,15 +8,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.DeviceDao;
@@ -32,7 +32,7 @@ import com.visfresh.io.json.DeviceSerializer;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Controller("Device")
+@RestController("Device")
 @RequestMapping("/rest")
 public class DeviceController extends AbstractController implements DeviceConstants {
     /**
@@ -59,13 +59,13 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return ID of saved device.
      */
     @RequestMapping(value = "/saveDevice/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String saveDevice(@PathVariable final String authToken,
-            final @RequestBody String device) {
+    public JsonObject saveDevice(@PathVariable final String authToken,
+            final @RequestBody JsonObject device) {
         try {
             final User user = getLoggedInUser(authToken);
             security.checkCanManageDevices(user);
 
-            final Device d = createSerializer(user).parseDevice(getJSonObject(device));
+            final Device d = createSerializer(user).parseDevice(device);
             checkCompanyAccess(user, d);
 
             d.setCompany(user.getCompany());
@@ -83,7 +83,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return list of devices.
      */
     @RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getDevices(@PathVariable final String authToken,
+    public JsonObject getDevices(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
@@ -126,7 +126,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return device.
      */
     @RequestMapping(value = "/getDevice/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getDevice(@PathVariable final String authToken,
+    public JsonObject getDevice(@PathVariable final String authToken,
             @RequestParam final String imei) {
         try {
             //check logged in.
@@ -148,7 +148,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return device.
      */
     @RequestMapping(value = "/deleteDevice/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String deleteDevice(@PathVariable final String authToken,
+    public JsonObject deleteDevice(@PathVariable final String authToken,
             @RequestParam final String imei) {
         try {
             //check logged in.
@@ -171,13 +171,13 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return status.
      */
     @RequestMapping(value = "/sendCommandToDevice/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String sendCommandToDevice(@PathVariable final String authToken,
-            final @RequestBody String req) {
+    public JsonObject sendCommandToDevice(@PathVariable final String authToken,
+            final @RequestBody JsonObject req) {
         try {
             final User user = getLoggedInUser(authToken);
             security.checkCanSendCommandToDevice(user);
 
-            final DeviceCommand cmd = createSerializer(user).parseDeviceCommand(getJSonObject(req));
+            final DeviceCommand cmd = createSerializer(user).parseDeviceCommand(req);
             deviceCommandDao.save(cmd);
 
             return createSuccessResponse(null);

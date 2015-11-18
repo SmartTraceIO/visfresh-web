@@ -8,15 +8,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.visfresh.constants.NotificationScheduleConstants;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.Page;
@@ -25,13 +25,13 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.User;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.NotificationScheduleSerializer;
-import com.visfresh.services.lists.NotificationScheduleListItem;
+import com.visfresh.services.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Controller("NotificationSchedule")
+@RestController("NotificationSchedule")
 @RequestMapping("/rest")
 public class NotificationScheduleController extends AbstractController implements NotificationScheduleConstants {
     /**
@@ -59,14 +59,13 @@ public class NotificationScheduleController extends AbstractController implement
      * @return ID of saved notification schedule.
      */
     @RequestMapping(value = "/saveNotificationSchedule/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String saveNotificationSchedule(@PathVariable final String authToken,
-            final @RequestBody String schedule) {
+    public JsonObject saveNotificationSchedule(@PathVariable final String authToken,
+            final @RequestBody JsonObject schedule) {
         try {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveNotificationSchedule(user);
 
-            final NotificationSchedule s = createSerializer(user).parseNotificationSchedule(
-                    getJSonObject(schedule));
+            final NotificationSchedule s = createSerializer(user).parseNotificationSchedule(schedule);
             checkCompanyAccess(user, s);
 
             s.setCompany(user.getCompany());
@@ -84,7 +83,7 @@ public class NotificationScheduleController extends AbstractController implement
      * @return list of notification schedules.
      */
     @RequestMapping(value = "/getNotificationSchedules/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken,
+    public JsonObject getNotificationSchedules(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -108,7 +107,7 @@ public class NotificationScheduleController extends AbstractController implement
             final NotificationScheduleSerializer ser = createSerializer(user);
             final JsonArray array = new JsonArray();
             for (final NotificationSchedule schedule : schedules) {
-                array.add(ser.toJson(new NotificationScheduleListItem(schedule)));
+                array.add(ser.toJson(new ListNotificationScheduleItem(schedule)));
             }
 
             return createListSuccessResponse(array, total);
@@ -144,7 +143,7 @@ public class NotificationScheduleController extends AbstractController implement
      * @return list of notification schedules.
      */
     @RequestMapping(value = "/deletePersonSchedule/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String deletePersonSchedule(@PathVariable final String authToken,
+    public JsonObject deletePersonSchedule(@PathVariable final String authToken,
             @RequestParam final long notificationScheduleId,
             @RequestParam final long personScheduleId) {
 
@@ -178,7 +177,7 @@ public class NotificationScheduleController extends AbstractController implement
      * @return notification schedule.
      */
     @RequestMapping(value = "/getNotificationSchedule/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getNotificationSchedule(@PathVariable final String authToken,
+    public JsonObject getNotificationSchedule(@PathVariable final String authToken,
             @RequestParam final Long notificationScheduleId) {
         try {
             //check logged in.
@@ -200,7 +199,7 @@ public class NotificationScheduleController extends AbstractController implement
      * @return notification schedule.
      */
     @RequestMapping(value = "/deleteNotificationSchedule/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String deleteNotificationSchedule(@PathVariable final String authToken,
+    public JsonObject deleteNotificationSchedule(@PathVariable final String authToken,
             @RequestParam final Long notificationScheduleId) {
         try {
             //check logged in.

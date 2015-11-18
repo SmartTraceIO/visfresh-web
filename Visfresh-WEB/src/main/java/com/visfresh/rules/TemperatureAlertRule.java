@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.TemperatureIssue;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.TrackerEvent;
 
 /**
@@ -43,7 +43,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
             final double t = req.getEvent().getTemperature();
 
             final AlertProfile p = req.getEvent().getShipment().getAlertProfile();
-            for (final TemperatureIssue issue : p.getTemperatureIssues()) {
+            for (final AlertRule issue : p.getAlertRules()) {
                 if (isMatches(issue, t)) {
                     return true;
                 }
@@ -57,7 +57,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param t
      * @return
      */
-    private boolean isMatches(final TemperatureIssue issue, final double t) {
+    private boolean isMatches(final AlertRule issue, final double t) {
         switch (issue.getType()) {
             case Cold:
             case CriticalCold:

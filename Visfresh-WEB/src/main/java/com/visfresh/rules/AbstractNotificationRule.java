@@ -180,7 +180,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
                     + "/" + email + ") configuratio for " + person + ". Notification was not send");
         }
 
-        if (s.isPushToMobileApp()) {
+        if (s.isSendApp()) {
             final Notification n = new Notification();
             n.setIssue(issue);
             n.setType(issue instanceof Arrival? NotificationType.Arrival : NotificationType.Alert);

@@ -12,7 +12,8 @@ import org.junit.Test;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.TemperatureIssue;
+import com.visfresh.entities.AlertRule;
+import com.visfresh.services.lists.ListAlertProfileItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -55,8 +56,8 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         p.setWatchEnterDarkEnvironment(watchEnterDarkEnvironment);
         p.setWatchMovementStart(watchMovementStart);
         p.setWatchMovementStop(watchMovementStop);
-        p.getTemperatureIssues().add(new TemperatureIssue(AlertType.Hot));
-        p.getTemperatureIssues().add(new TemperatureIssue(AlertType.CriticalHot));
+        p.getAlertRules().add(new AlertRule(AlertType.Hot));
+        p.getAlertRules().add(new AlertRule(AlertType.CriticalHot));
 
         final JsonObject json = serializer.toJson(p).getAsJsonObject();
         p = serializer.parseAlertProfile(json);
@@ -69,7 +70,7 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         assertEquals(watchEnterDarkEnvironment, p.isWatchEnterDarkEnvironment());
         assertEquals(watchMovementStart, p.isWatchMovementStart());
         assertEquals(watchMovementStop, p.isWatchMovementStop());
-        assertEquals(2, p.getTemperatureIssues().size());
+        assertEquals(2, p.getAlertRules().size());
     }
     @Test
     public void testTemperatureIssues() {
@@ -78,7 +79,7 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         final AlertType type = AlertType.CriticalCold;
         final Long id = 77l;
 
-        TemperatureIssue issue = new TemperatureIssue();
+        AlertRule issue = new AlertRule();
 
         issue.setId(id);
         issue.setTemperature(temperature);
@@ -94,5 +95,28 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         assertEquals(timeOutMinutes, issue.getTimeOutMinutes());
         assertEquals(id, issue.getId());
         assertTrue(issue.isCumulativeFlag());
+    }
+    @Test
+    public void testListAlertProfileItem() {
+        final String alertProfileDescription = "alertProfileDescription";
+        final long alertProfileId = 77l;
+        final String alertProfileName = "JUnit alert profile";
+
+        ListAlertProfileItem item = new ListAlertProfileItem();
+        item.setAlertProfileDescription(alertProfileDescription);
+        item.setAlertProfileId(alertProfileId);
+        item.setAlertProfileName(alertProfileName);
+        item.getAlertRuleList().add("abra");
+        item.getAlertRuleList().add("kadabra");
+
+        final JsonObject json = serializer.toJson(item);
+        item = serializer.parseListAlertProfileItem(json);
+
+        assertEquals(alertProfileDescription, item.getAlertProfileDescription());
+        assertEquals(alertProfileId, item.getAlertProfileId());
+        assertEquals(alertProfileName, item.getAlertProfileName());
+
+        assertEquals("abra", item.getAlertRuleList().get(0));
+        assertEquals("kadabra", item.getAlertRuleList().get(1));
     }
 }

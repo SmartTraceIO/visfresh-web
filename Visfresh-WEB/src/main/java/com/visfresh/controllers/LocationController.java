@@ -8,15 +8,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.visfresh.constants.LocationConstants;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.Page;
@@ -28,7 +28,7 @@ import com.visfresh.io.json.LocationSerializer;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Controller("Location")
+@RestController("Location")
 @RequestMapping("/rest")
 public class LocationController extends AbstractController implements LocationConstants {
     /**
@@ -51,11 +51,11 @@ public class LocationController extends AbstractController implements LocationCo
      * @return ID of saved location profile.
      */
     @RequestMapping(value = "/saveLocation/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String saveLocation(@PathVariable final String authToken,
-            final @RequestBody String profile) {
+    public JsonObject saveLocation(@PathVariable final String authToken,
+            final @RequestBody JsonObject profile) {
         try {
             final User user = getLoggedInUser(authToken);
-            final LocationProfile lp = createSerializer(user).parseLocationProfile(getJSonObject(profile));
+            final LocationProfile lp = createSerializer(user).parseLocationProfile(profile);
 
             security.checkCanSaveLocation(user);
             checkCompanyAccess(user, lp);
@@ -75,7 +75,7 @@ public class LocationController extends AbstractController implements LocationCo
      * @return list of location profiles.
      */
     @RequestMapping(value = "/getLocations/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getLocation(@PathVariable final String authToken,
+    public JsonObject getLocation(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
@@ -120,7 +120,7 @@ public class LocationController extends AbstractController implements LocationCo
      * @return location profile.
      */
     @RequestMapping(value = "/getLocation/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getLocation(@PathVariable final String authToken,
+    public JsonObject getLocation(@PathVariable final String authToken,
             @RequestParam final Long locationId) {
         try {
             //check logged in.
@@ -142,7 +142,7 @@ public class LocationController extends AbstractController implements LocationCo
      * @return location profile.
      */
     @RequestMapping(value = "/deleteLocation/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String deleteLocation(@PathVariable final String authToken,
+    public JsonObject deleteLocation(@PathVariable final String authToken,
             @RequestParam final Long locationId) {
         try {
             //check logged in.

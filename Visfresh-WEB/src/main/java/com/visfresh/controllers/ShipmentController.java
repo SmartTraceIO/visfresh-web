@@ -13,15 +13,15 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
@@ -53,7 +53,7 @@ import com.visfresh.services.lists.ListShipmentItem;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Controller("Shipment")
+@RestController("Shipment")
 @RequestMapping("/rest")
 public class ShipmentController extends AbstractController implements ShipmentConstants {
     /**
@@ -90,13 +90,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @return ID of saved shipment.
      */
     @RequestMapping(value = "/saveShipment/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String saveShipment(@PathVariable final String authToken,
-            final @RequestBody String shipment) {
+    public JsonObject saveShipment(@PathVariable final String authToken,
+            final @RequestBody JsonObject shipment) {
         try {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveShipment(user);
 
-            final SaveShipmentRequest req = getSerializer(user).parseSaveShipmentRequest(getJSonObject(shipment));
+            final SaveShipmentRequest req = getSerializer(user).parseSaveShipmentRequest(shipment);
             checkCompanyAccess(user, req.getShipment());
 
             req.getShipment().setCompany(user.getCompany());
@@ -132,15 +132,15 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @return list of shipments.
      */
     @RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String getShipments(@PathVariable final String authToken,
-            @RequestBody final String request) {
+    public JsonObject getShipments(@PathVariable final String authToken,
+            @RequestBody final JsonObject request) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipments(user);
 
             final ShipmentSerializer ser = getSerializer(user);
-            final GetFilteredShipmentsRequest req = ser.parseGetFilteredShipmentsRequest(getJSonObject(request));
+            final GetFilteredShipmentsRequest req = ser.parseGetFilteredShipmentsRequest(request);
 
             final Integer pageIndex = req.getPageIndex();
             final Integer pageSize = req.getPageSize();
@@ -261,7 +261,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @return shipment.
      */
     @RequestMapping(value = "/getShipment/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getShipment(@PathVariable final String authToken,
+    public JsonObject getShipment(@PathVariable final String authToken,
             @RequestParam final Long shipmentId) {
         try {
             //check logged in.
@@ -288,7 +288,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         return s;
     }
     @RequestMapping(value = "/deleteShipment/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String deleteShipment(@PathVariable final String authToken,
+    public JsonObject deleteShipment(@PathVariable final String authToken,
             @RequestParam final Long shipmentId) {
         try {
             //check logged in.
@@ -307,7 +307,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     }
 
     @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getShipmentData(@PathVariable final String authToken,
+    public JsonObject getShipmentData(@PathVariable final String authToken,
             @RequestParam final String fromDate,
             @RequestParam final String toDate,
             @RequestParam final Long shipment) {

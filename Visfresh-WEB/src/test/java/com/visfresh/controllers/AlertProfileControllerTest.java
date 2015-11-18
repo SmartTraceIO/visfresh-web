@@ -17,6 +17,7 @@ import com.visfresh.controllers.restclient.AlertProfileRestClient;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.services.lists.ListAlertProfileItem;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -93,30 +94,30 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         final int maxIndex = 2;
 
         //test sort by ID
-        AlertProfile first = client.getAlertProfiles(1, 10000,
+        ListAlertProfileItem first = client.getAlertProfiles(1, 10000,
                 AlertProfileConstants.PROPERTY_ALERT_PROFILE_ID, "asc").get(0);
-        assertEquals(p1.getId(), first.getId());
+        assertEquals((long) p1.getId(), first.getAlertProfileId());
 
         first = client.getAlertProfiles(1, 10000,
                 AlertProfileConstants.PROPERTY_ALERT_PROFILE_ID, "desc").get(maxIndex);
-        assertEquals(p1.getId(), first.getId());
+        assertEquals((long) p1.getId(), first.getAlertProfileId());
 
         //test sort by name
         first = client.getAlertProfiles(1, 10000,
                 AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME, "asc").get(0);
-        assertEquals(p2.getId(), first.getId());
+        assertEquals((long) p2.getId(), first.getAlertProfileId());
 
         first = client.getAlertProfiles(1, 10000,
                 AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME, "desc").get(maxIndex);
-        assertEquals(p2.getId(), first.getId());
+        assertEquals((long) p2.getId(), first.getAlertProfileId());
 
         //test sort by description
         first = client.getAlertProfiles(1, 10000,
                 AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION, "asc").get(0);
-        assertEquals(p3.getId(), first.getId());
+        assertEquals((long) p3.getId(), first.getAlertProfileId());
 
         first = client.getAlertProfiles(1, 10000,
                 AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION, "desc").get(maxIndex);
-        assertEquals(p3.getId(), first.getId());
+        assertEquals((long) p3.getId(), first.getAlertProfileId());
     }
 }

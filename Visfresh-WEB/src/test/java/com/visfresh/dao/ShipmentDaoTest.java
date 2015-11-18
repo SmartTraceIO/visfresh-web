@@ -111,7 +111,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         PersonSchedule ps = new PersonSchedule();
         ps.setFromTime(45);
-        ps.setPushToMobileApp(true);
+        ps.setSendApp(true);
         ps.setUser(createUser());
         ps.setToTime(150);
 
@@ -126,7 +126,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         ps = new PersonSchedule();
         ps.setFromTime(45);
-        ps.setPushToMobileApp(true);
+        ps.setSendApp(true);
         ps.setToTime(150);
         ps.setUser(createUser());
 

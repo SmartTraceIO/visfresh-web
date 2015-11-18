@@ -32,7 +32,7 @@ import com.visfresh.io.SingleShipmentTimeItem;
 import com.visfresh.io.UserResolver;
 import com.visfresh.rules.AlertDescriptionBuilder;
 import com.visfresh.services.lists.ListShipmentItem;
-import com.visfresh.services.lists.NotificationScheduleListItem;
+import com.visfresh.services.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -507,10 +507,10 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param items
      * @return
      */
-    private JsonArray scheduleItemsAsJsonArray(final List<NotificationScheduleListItem> items) {
+    private JsonArray scheduleItemsAsJsonArray(final List<ListNotificationScheduleItem> items) {
         final JsonArray array = new JsonArray();
         if (items != null) {
-            for (final NotificationScheduleListItem i : items) {
+            for (final ListNotificationScheduleItem i : items) {
                 array.add(notificationScheduleSerializer.toJson(i));
             }
         }

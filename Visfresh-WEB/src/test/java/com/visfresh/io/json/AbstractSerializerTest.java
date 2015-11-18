@@ -15,7 +15,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.TemperatureIssue;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.User;
 import com.visfresh.utils.SerializerUtils;
 
@@ -69,7 +69,7 @@ public class AbstractSerializerTest {
         s.setToTime(17);
         s.setFromTime(1);
         s.setId(generateId());
-        s.setPushToMobileApp(true);
+        s.setSendApp(true);
         s.setUser(createUser("asuvorov"));
         s.getWeekDays()[0] = true;
         s.getWeekDays()[3] = true;
@@ -137,19 +137,19 @@ public class AbstractSerializerTest {
         p.setWatchMovementStart(true);
         p.setWatchMovementStop(true);
 
-        TemperatureIssue issue = new TemperatureIssue();
+        AlertRule issue = new AlertRule();
         issue.setTemperature(10);
         issue.setType(AlertType.CriticalHot);
         issue.setTimeOutMinutes(17);
         issue.setCumulativeFlag(true);
-        p.getTemperatureIssues().add(issue);
+        p.getAlertRules().add(issue);
 
-        issue = new TemperatureIssue();
+        issue = new AlertRule();
         issue.setTemperature(-3);
         issue.setType(AlertType.Cold);
         issue.setTimeOutMinutes(18);
         issue.setCumulativeFlag(true);
-        p.getTemperatureIssues().add(issue);
+        p.getAlertRules().add(issue);
 
         resolver.add(p);
         return p;

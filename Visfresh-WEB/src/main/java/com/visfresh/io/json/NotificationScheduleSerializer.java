@@ -15,7 +15,7 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.io.SavePersonScheduleRequest;
 import com.visfresh.io.UserResolver;
-import com.visfresh.services.lists.NotificationScheduleListItem;
+import com.visfresh.services.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -88,7 +88,9 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
 
         obj.addProperty("personScheduleId", s.getId());
         obj.addProperty("user", s.getUser().getLogin());
-        obj.addProperty("pushToMobileApp", s.isPushToMobileApp());
+        obj.addProperty("sendApp", s.isSendApp());
+        obj.addProperty("sendEmail", s.isSendEmail());
+        obj.addProperty("sendSms", s.isSendSms());
         obj.addProperty("fromTime", s.getFromTime());
         obj.addProperty("toTime", s.getToTime());
 
@@ -117,7 +119,9 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
         s.setToTime(asInt(obj.get("toTime")));
         s.setFromTime(asInt(obj.get("fromTime")));
         s.setId(asLong(obj.get("personScheduleId")));
-        s.setPushToMobileApp(asBoolean(obj.get("pushToMobileApp")));
+        s.setSendApp(asBoolean(obj.get("sendApp")));
+        s.setSendEmail(asBoolean(obj.get("sendEmail")));
+        s.setSendSms(asBoolean(obj.get("sendSms")));
 
         final JsonArray weekDays = obj.get("weekDays").getAsJsonArray();
         for (int i = 0; i < weekDays.size(); i++) {
@@ -157,7 +161,7 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
      * @param item
      * @return
      */
-    public JsonObject toJson(final NotificationScheduleListItem item) {
+    public JsonObject toJson(final ListNotificationScheduleItem item) {
         if (item == null) {
             return null;
         }
@@ -172,13 +176,13 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
         obj.addProperty("peopleToNotify", item.getPeopleToNotify());
         return obj;
     }
-    public NotificationScheduleListItem parseNotificationScheduleListItem(final JsonElement el) {
+    public ListNotificationScheduleItem parseNotificationScheduleListItem(final JsonElement el) {
         if (el == null || el.isJsonNull()) {
             return null;
         }
 
         final JsonObject json = el.getAsJsonObject();
-        final NotificationScheduleListItem item = new NotificationScheduleListItem();
+        final ListNotificationScheduleItem item = new ListNotificationScheduleItem();
         item.setNotificationScheduleDescription(asString(json.get(
                 NotificationScheduleConstants.PROPERTY_NOTIFICATION_SCHEDULE_DESCRIPTION)));
         item.setNotificationScheduleId(asLong(json.get(

@@ -11,7 +11,6 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.io.json.LocationSerializer;
@@ -48,7 +47,7 @@ public class LocationRestClient extends RestClient {
         params.put("locationId", id.toString());
 
         final JsonElement response = sendGetRequest(getPathWithToken("getLocation"), params);
-        return response == JsonNull.INSTANCE ? null : serializer.parseLocationProfile(
+        return response == null || response.isJsonNull() ? null : serializer.parseLocationProfile(
                 response.getAsJsonObject());
     }
     /**

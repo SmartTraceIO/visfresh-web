@@ -42,12 +42,16 @@ public class NotificationScheduleSerializerTest extends AbstractSerializerTest {
         final int fromMinute = 1;
         final Long id = 77l;
         final boolean pushToMobileApp = true;
+        final boolean sendEmail = true;
+        final boolean sendSms = true;
 
         s.setUser(createUser("asuvorov"));
         s.setToTime(forMinute);
         s.setFromTime(fromMinute);
         s.setId(id);
-        s.setPushToMobileApp(pushToMobileApp);
+        s.setSendApp(pushToMobileApp);
+        s.setSendEmail(sendEmail);
+        s.setSendSms(sendSms);
         s.getWeekDays()[0] = true;
         s.getWeekDays()[3] = true;
 
@@ -57,7 +61,9 @@ public class NotificationScheduleSerializerTest extends AbstractSerializerTest {
         assertEquals(forMinute, s.getToTime());
         assertEquals(fromMinute, s.getFromTime());
         assertEquals(id, s.getId());
-        assertEquals(pushToMobileApp, s.isPushToMobileApp());
+        assertEquals(pushToMobileApp, s.isSendApp());
+        assertEquals(sendEmail, s.isSendEmail());
+        assertEquals(sendSms, s.isSendSms());
         assertNotNull(s.getUser());
         assertTrue(s.getWeekDays()[0]);
         assertFalse(s.getWeekDays()[1]);

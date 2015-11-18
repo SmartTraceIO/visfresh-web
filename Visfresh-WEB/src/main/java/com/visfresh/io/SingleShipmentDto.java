@@ -12,7 +12,7 @@ import java.util.Map;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
-import com.visfresh.services.lists.NotificationScheduleListItem;
+import com.visfresh.services.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,12 +32,12 @@ public class SingleShipmentDto {
     private String assetType;
 
     private long alertProfileId;
-    private final List<NotificationScheduleListItem> alertsNotificationSchedules
-        = new LinkedList<NotificationScheduleListItem>();
+    private final List<ListNotificationScheduleItem> alertsNotificationSchedules
+        = new LinkedList<ListNotificationScheduleItem>();
 
     private int arrivalNotificationWithinKm;
-    private final List<NotificationScheduleListItem> arrivalNotificationSchedules
-        = new LinkedList<NotificationScheduleListItem>();
+    private final List<ListNotificationScheduleItem> arrivalNotificationSchedules
+        = new LinkedList<ListNotificationScheduleItem>();
     private boolean excludeNotificationsIfNoAlertsFired;
 
     private String status;
@@ -220,7 +220,7 @@ public class SingleShipmentDto {
     /**
      * @return the alertsNotificationSchedules
      */
-    public List<NotificationScheduleListItem> getAlertsNotificationSchedules() {
+    public List<ListNotificationScheduleItem> getAlertsNotificationSchedules() {
         return alertsNotificationSchedules;
     }
     /**
@@ -238,7 +238,7 @@ public class SingleShipmentDto {
     /**
      * @return the arrivalNotificationSchedules
      */
-    public List<NotificationScheduleListItem> getArrivalNotificationSchedules() {
+    public List<ListNotificationScheduleItem> getArrivalNotificationSchedules() {
         return arrivalNotificationSchedules;
     }
     /**
@@ -415,10 +415,10 @@ public class SingleShipmentDto {
      * @param arrivalNotificationSchedules
      * @return
      */
-    private List<NotificationScheduleListItem> toListItems(final List<NotificationSchedule> entities) {
-        final List<NotificationScheduleListItem> items = new LinkedList<NotificationScheduleListItem>();
+    private List<ListNotificationScheduleItem> toListItems(final List<NotificationSchedule> entities) {
+        final List<ListNotificationScheduleItem> items = new LinkedList<ListNotificationScheduleItem>();
         for (final NotificationSchedule s : entities) {
-            items.add(new NotificationScheduleListItem(s));
+            items.add(new ListNotificationScheduleItem(s));
         }
         return items;
     }

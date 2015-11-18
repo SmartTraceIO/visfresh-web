@@ -11,7 +11,7 @@ import com.visfresh.entities.PersonSchedule;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class NotificationScheduleListItem implements EntityWithId<Long> {
+public class ListNotificationScheduleItem implements EntityWithId<Long> {
     private long notificationScheduleId;
     private String notificationScheduleName;
     private String notificationScheduleDescription;
@@ -20,13 +20,13 @@ public class NotificationScheduleListItem implements EntityWithId<Long> {
     /**
      * Default constructor.
      */
-    public NotificationScheduleListItem() {
+    public ListNotificationScheduleItem() {
         super();
     }
     /**
      * @param s notification schedule.
      */
-    public NotificationScheduleListItem(final NotificationSchedule s) {
+    public ListNotificationScheduleItem(final NotificationSchedule s) {
         super();
         setNotificationScheduleId(s.getId());
         setNotificationScheduleName(s.getName());

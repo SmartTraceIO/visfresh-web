@@ -15,9 +15,17 @@ public class PersonSchedule implements EntityWithId<Long> {
     private Long id;
 
     /**
-     * Whether or not should
+     * Whether or not should create notification object for user.
      */
-    private boolean pushToMobileApp;
+    private boolean sendApp;
+    /**
+     * Whether or not should send Email for user.
+     */
+    private boolean sendEmail;
+    /**
+     * Whether or not should send SMS to user.
+     */
+    private boolean sendSms;
 
     //when to notify
     /**
@@ -61,14 +69,14 @@ public class PersonSchedule implements EntityWithId<Long> {
     /**
      * @return the pushToMobileApp
      */
-    public boolean isPushToMobileApp() {
-        return pushToMobileApp;
+    public boolean isSendApp() {
+        return sendApp;
     }
     /**
      * @param pushToMobileApp the pushToMobileApp to set
      */
-    public void setPushToMobileApp(final boolean pushToMobileApp) {
-        this.pushToMobileApp = pushToMobileApp;
+    public void setSendApp(final boolean pushToMobileApp) {
+        this.sendApp = pushToMobileApp;
     }
     /**
      * @return the fromMinute
@@ -111,5 +119,29 @@ public class PersonSchedule implements EntityWithId<Long> {
      */
     public void setUser(final User user) {
         this.user = user;
+    }
+    /**
+     * @return the true if should send email to user.
+     */
+    public boolean isSendEmail() {
+        return sendEmail;
+    }
+    /**
+     * @return true if should send SMS to user, false otherwise.
+     */
+    public boolean isSendSms() {
+        return sendSms;
+    }
+    /**
+     * @param sendEmail the sendEmail to set
+     */
+    public void setSendEmail(final boolean sendEmail) {
+        this.sendEmail = sendEmail;
+    }
+    /**
+     * @param sendSms the sendSms to set
+     */
+    public void setSendSms(final boolean sendSms) {
+        this.sendSms = sendSms;
     }
 }

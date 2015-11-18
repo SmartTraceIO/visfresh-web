@@ -19,7 +19,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.TemperatureIssue;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.TrackerEvent;
 
 /**
@@ -55,45 +55,45 @@ public class NormalTemperatureRuleTest extends BaseRuleTest {
         p.setDescription("Any description");
         p.setCompany(company);
 
-        TemperatureIssue criticalHot = new TemperatureIssue(AlertType.CriticalHot);
+        AlertRule criticalHot = new AlertRule(AlertType.CriticalHot);
         criticalHot.setTemperature(normalTemperature + 15);
         criticalHot.setTimeOutMinutes(0);
-        p.getTemperatureIssues().add(criticalHot);
+        p.getAlertRules().add(criticalHot);
 
-        criticalHot = new TemperatureIssue(AlertType.CriticalHot);
+        criticalHot = new AlertRule(AlertType.CriticalHot);
         criticalHot.setTemperature(normalTemperature + 14);
         criticalHot.setTimeOutMinutes(1);
-        p.getTemperatureIssues().add(criticalHot);
+        p.getAlertRules().add(criticalHot);
 
-        TemperatureIssue criticalLow = new TemperatureIssue(AlertType.CriticalCold);
+        AlertRule criticalLow = new AlertRule(AlertType.CriticalCold);
         criticalLow.setTemperature(normalTemperature -15.);
         criticalLow.setTimeOutMinutes(0);
-        p.getTemperatureIssues().add(criticalLow);
+        p.getAlertRules().add(criticalLow);
 
-        criticalLow = new TemperatureIssue(AlertType.CriticalCold);
+        criticalLow = new AlertRule(AlertType.CriticalCold);
         criticalLow.setTemperature(normalTemperature -14.);
         criticalLow.setTimeOutMinutes(1);
-        p.getTemperatureIssues().add(criticalLow);
+        p.getAlertRules().add(criticalLow);
 
-        TemperatureIssue hot = new TemperatureIssue(AlertType.Hot);
+        AlertRule hot = new AlertRule(AlertType.Hot);
         hot.setTemperature(normalTemperature + 3);
         hot.setTimeOutMinutes(0);
-        p.getTemperatureIssues().add(hot);
+        p.getAlertRules().add(hot);
 
-        hot = new TemperatureIssue(AlertType.Hot);
+        hot = new AlertRule(AlertType.Hot);
         hot.setTemperature(normalTemperature + 4.);
         hot.setTimeOutMinutes(2);
-        p.getTemperatureIssues().add(hot);
+        p.getAlertRules().add(hot);
 
-        TemperatureIssue low = new TemperatureIssue(AlertType.Cold);
+        AlertRule low = new AlertRule(AlertType.Cold);
         low.setTemperature(normalTemperature -10.);
         low.setTimeOutMinutes(40);
-        p.getTemperatureIssues().add(low);
+        p.getAlertRules().add(low);
 
-        low = new TemperatureIssue(AlertType.Cold);
+        low = new AlertRule(AlertType.Cold);
         low.setTemperature(normalTemperature-8.);
         low.setTimeOutMinutes(55);
-        p.getTemperatureIssues().add(low);
+        p.getAlertRules().add(low);
 
         context.getBean(AlertProfileDao.class).save(p);
 

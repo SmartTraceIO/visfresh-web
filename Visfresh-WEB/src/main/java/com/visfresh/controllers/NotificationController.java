@@ -10,15 +10,16 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.visfresh.constants.NotificationConstants;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.Page;
@@ -33,7 +34,7 @@ import com.visfresh.io.json.NotificationSerializer;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Controller("Notification")
+@RestController("Notification")
 @RequestMapping("/rest")
 public class NotificationController extends AbstractController implements NotificationConstants {
     /**
@@ -61,7 +62,7 @@ public class NotificationController extends AbstractController implements Notifi
      * @return list of shipments.
      */
     @RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getNotifications(@PathVariable final String authToken,
+    public JsonObject getNotifications(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
@@ -107,19 +108,17 @@ public class NotificationController extends AbstractController implements Notifi
         };
     }
     @RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String markNotificationsAsRead(@PathVariable final String authToken,
-            @RequestBody final String notificationIds) {
+    public JsonObject markNotificationsAsRead(@PathVariable final String authToken,
+            @RequestBody final JsonArray notificationIds) {
         try {
             //check logged in.
             final User user = authService.getUserForToken(authToken);
             getLoggedInUser(authToken);
 
-            final JsonArray array = getJSon(notificationIds).getAsJsonArray();
             final Set<Long> ids = new HashSet<Long>();
 
-            final int size = array.size();
-            for (int i = 0; i < size; i++) {
-                ids.add(array.get(i).getAsLong());
+            for (final JsonElement e : notificationIds) {
+                ids.add(e.getAsLong());
             }
 
             dao.deleteByUserAndId(user, ids);

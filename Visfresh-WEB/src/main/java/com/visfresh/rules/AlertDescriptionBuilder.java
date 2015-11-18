@@ -94,16 +94,16 @@ public class AlertDescriptionBuilder {
      * @param units temperature units.
      * @return temperature string.
      */
-    private String getTemperatureString(final double t, final TemperatureUnits units) {
+    public static String getTemperatureString(final double t, final TemperatureUnits units) {
         double temp;
         String degree;
         switch (units) {
             case Fahrenheit:
-                degree = "F";
+                degree = "\u00B0F";
                 temp = t * 1.8 + 32;
                 break;
                 default:
-                    degree = "C";
+                    degree = "\u00B0C";
                     temp = t;
                     //nothing
                     break;

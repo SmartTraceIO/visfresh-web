@@ -9,15 +9,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.visfresh.constants.UserConstants;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
@@ -38,7 +38,7 @@ import com.visfresh.utils.SerializerUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@Controller("User")
+@RestController("User")
 @RequestMapping("/rest")
 public class UserController extends AbstractController implements UserConstants {
     /**
@@ -68,7 +68,7 @@ public class UserController extends AbstractController implements UserConstants 
      * @return user info
      */
     @RequestMapping(value = "/getUser/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getUser(@PathVariable final String authToken,
+    public JsonObject getUser(@PathVariable final String authToken,
             final @RequestParam String username) {
         try {
             final User user = getLoggedInUser(authToken);
@@ -90,7 +90,7 @@ public class UserController extends AbstractController implements UserConstants 
      * @return
      */
     @RequestMapping(value = "/getUsers/{authToken}", method = RequestMethod.GET)
-    public @ResponseBody String getUsers(@PathVariable final String authToken,
+    public JsonObject getUsers(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -156,11 +156,11 @@ public class UserController extends AbstractController implements UserConstants 
      * @return status.
      */
     @RequestMapping(value = "/createUser/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String createUser(@PathVariable final String authToken,
-            final @RequestBody String req) {
+    public JsonObject createUser(@PathVariable final String authToken,
+            final @RequestBody JsonObject req) {
         try {
             final User user = getLoggedInUser(authToken);
-            final CreateUserRequest r = getUserSerializer(user).parseCreateUserRequest(getJSonObject(req));
+            final CreateUserRequest r = getUserSerializer(user).parseCreateUserRequest(req);
             security.checkCanCreateUser(user, r);
 
             final User newUser = r.getUser();
@@ -174,11 +174,12 @@ public class UserController extends AbstractController implements UserConstants 
         }
     }
     @RequestMapping(value = "/updateUserDetails/{authToken}", method = RequestMethod.POST)
-    public @ResponseBody String updateUserDetails(@PathVariable final String authToken,
-            @RequestBody final String body) {
+    public JsonObject updateUserDetails(@PathVariable final String authToken,
+            @RequestBody final JsonObject body) {
         try {
             final User user = getLoggedInUser(authToken);
-            final UpdateUserDetailsRequest req = getUserSerializer(user).parseUpdateUserDetailsRequest(getJSon(body));
+            final UpdateUserDetailsRequest req = getUserSerializer(user).parseUpdateUserDetailsRequest(
+                    body);
 
             security.checkUpdateUserDetails(user, req.getUser());
 
