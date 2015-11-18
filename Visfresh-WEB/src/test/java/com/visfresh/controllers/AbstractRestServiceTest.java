@@ -19,6 +19,7 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -28,7 +29,6 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
-import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
@@ -247,8 +247,8 @@ public abstract class AbstractRestServiceTest {
     protected PersonSchedule createPersonSchedule(final User user) {
         final PersonSchedule s = new PersonSchedule();
 
-        s.setToTime(17);
-        s.setFromTime(1);
+        s.setToTime(1200);
+        s.setFromTime(800);
         s.setSendApp(true);
         s.getWeekDays()[0] = true;
         s.getWeekDays()[3] = true;

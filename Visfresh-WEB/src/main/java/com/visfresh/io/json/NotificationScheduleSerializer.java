@@ -91,8 +91,8 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
         obj.addProperty("sendApp", s.isSendApp());
         obj.addProperty("sendEmail", s.isSendEmail());
         obj.addProperty("sendSms", s.isSendSms());
-        obj.addProperty("fromTime", s.getFromTime());
-        obj.addProperty("toTime", s.getToTime());
+        obj.addProperty("fromTime", minutestToTime(s.getFromTime()));
+        obj.addProperty("toTime", minutestToTime(s.getToTime()));
 
         final JsonArray weekDays = new JsonArray();
         for (final boolean day : s.getWeekDays()) {
@@ -116,8 +116,8 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
         final PersonSchedule s = new PersonSchedule();
 
         s.setUser(getUserResolver().getUser(asString(obj.get("user"))));
-        s.setToTime(asInt(obj.get("toTime")));
-        s.setFromTime(asInt(obj.get("fromTime")));
+        s.setToTime(timeToMinutes(asString(obj.get("toTime"))));
+        s.setFromTime(timeToMinutes(asString(obj.get("fromTime"))));
         s.setId(asLong(obj.get("personScheduleId")));
         s.setSendApp(asBoolean(obj.get("sendApp")));
         s.setSendEmail(asBoolean(obj.get("sendEmail")));
@@ -129,6 +129,38 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
         }
 
         return s;
+    }
+    /**
+     * @param timeString
+     * @return
+     */
+    private int timeToMinutes(final String timeString) {
+        final int index = timeString.indexOf(':');
+        return 60 * Integer.parseInt(timeString.substring(0, index))
+                + Integer.parseInt(timeString.substring(index + 1));
+    }
+    /**
+     * @param minutes
+     * @return
+     */
+    private String minutestToTime(final int minutes) {
+        final StringBuilder sb = new StringBuilder();
+        final int hours = minutes / 60;
+
+        //add minutes
+        sb.append((minutes - hours * 60));
+        if (sb.length() < 2) {
+            sb.insert(0, '0');
+        }
+        sb.insert(0, ':');
+
+        //add hours
+        sb.insert(0, hours);
+        if (sb.length() < 5) {
+            sb.insert(0, '0');
+        }
+
+        return sb.toString();
     }
     /**
      * @param req
