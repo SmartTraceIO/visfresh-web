@@ -30,7 +30,7 @@ An authentication can be performed as from REST client using login method, as fr
 ## Data model##
 1. [Authentication token](#markdown-header-authentication-token)  
 2. [Alert Profile](#markdown-header-alert-profile)  
-3. [Temperature Issue](#markdown-header-temperature-issue)  
+3. [Temperature Rule](#markdown-header-temperature-rule)  
 4. [Notification Schedule](#markdown-header-notification-schedule)  
 5. [Location](#markdown-header-location)  
 6. [Shipment Template](#markdown-header-shipment-template)  
@@ -49,6 +49,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 2. [Shipment List item](#markdown-header-shipment-list-item)  
 3. [Notification Schedule list item](#markdown-header-notification-schedule-list-item)  
 4. [User List item](#markdown-header-user-list-item)  
+5. [Alert Profile list Item](#markdown-header-list-alert-profile-item)
 
 ## Special Request objects ##
 1. [Get Shipments filter](#markdown-header-get-shipments-filter)
@@ -349,11 +350,11 @@ see [ResponseStatus](#markdown-header-response-status)
 	"watchEnterDarkEnvironment": true,
 	"watchMovementStart": true,
 	"watchMovementStop": true,
-	"temperatureIssues": [/* Array of temperature issues */]
+	"temperatureIssues": [/* Array of temperature rules */]
 }
 ```
-[(See Temperature Issue)](#markdown-header-temperature-issue)
-### Temperature Issue ###
+[(See Temperature Rule)](#markdown-header-temperature-rule)
+### Temperature Rule ###
 ```json
 {
   "id": 1007,
@@ -361,6 +362,24 @@ see [ResponseStatus](#markdown-header-response-status)
   "temperature": 17.0,
   "timeOutMinutes": 1,
   "cumulativeFlag": true
+}
+```
+### List Alert Profile Item ###
+```json
+{
+  "alertProfileId": 848,
+  "alertProfileName": "Name",
+  "alertProfileDescription": "Description",
+  "alertRuleList": [
+    ">18,0°C for 0 min in total",
+    ">17,0°C for 1 min in total",
+    "<-12,0°C for 0 min in total",
+    "<-11,0°C for 1 min in total",
+    ">6,0°C for 0 min in total",
+    ">7,0°C for 2 min in total",
+    "<-7,0°C for 40 min in total",
+    "<-5,0°C for 55 min in total"
+  ]
 }
 ```
 ### Notification Schedule ###
@@ -378,11 +397,13 @@ see [ResponseStatus](#markdown-header-response-status)
 ### Person Schedule ###
 ```json
 {
-    "personScheduleId": 293,
-    "user": "asuvorov", // user name of linked system user
-    "pushToMobileApp": true,
-    "fromTime": 1,
-    "toTime": 17,
+    "personScheduleId": 2165,
+    "user": "asuvorov",
+    "sendApp": true,
+    "sendEmail": false,
+    "sendSms": false,
+    "fromTime": "13:20",
+    "toTime": "20:00",
     "weekDays": [
       true,
       false,
@@ -920,143 +941,52 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": [
     {
-      "alertProfileId": 179,
-      "alertProfileName": "AnyAlert",
-      "alertProfileDescription": "Any description",
-      "watchBatteryLow": true,
-      "watchEnterBrightEnvironment": true,
-      "watchEnterDarkEnvironment": true,
-      "watchMovementStart": true,
-      "watchMovementStop": true,
-      "temperatureIssues": [
-        {
-          "id": 958,
-          "type": "CriticalHot",
-          "temperature": 18.0,
-          "timeOutMinutes": 0,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 959,
-          "type": "CriticalHot",
-          "temperature": 17.0,
-          "timeOutMinutes": 1,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 960,
-          "type": "CriticalCold",
-          "temperature": -12.0,
-          "timeOutMinutes": 0,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 961,
-          "type": "CriticalCold",
-          "temperature": -11.0,
-          "timeOutMinutes": 1,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 962,
-          "type": "Hot",
-          "temperature": 6.0,
-          "timeOutMinutes": 0,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 963,
-          "type": "Hot",
-          "temperature": 7.0,
-          "timeOutMinutes": 2,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 964,
-          "type": "Cold",
-          "temperature": -7.0,
-          "timeOutMinutes": 40,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 965,
-          "type": "Cold",
-          "temperature": -5.0,
-          "timeOutMinutes": 55,
-          "cumulativeFlag": true
-        }
+      "alertProfileId": 846,
+      "alertProfileName": "b",
+      "alertProfileDescription": "c",
+      "alertRuleList": [
+        ">18,0°C for 0 min in total",
+        ">17,0°C for 1 min in total",
+        "<-12,0°C for 0 min in total",
+        "<-11,0°C for 1 min in total",
+        ">6,0°C for 0 min in total",
+        ">7,0°C for 2 min in total",
+        "<-7,0°C for 40 min in total",
+        "<-5,0°C for 55 min in total"
       ]
     },
     {
-      "alertProfileId": 180,
-      "alertProfileName": "AnyAlert",
-      "alertProfileDescription": "Any description",
-      "watchBatteryLow": true,
-      "watchEnterBrightEnvironment": true,
-      "watchEnterDarkEnvironment": true,
-      "watchMovementStart": true,
-      "watchMovementStop": true,
-      "temperatureIssues": [
-        {
-          "id": 966,
-          "type": "CriticalHot",
-          "temperature": 18.0,
-          "timeOutMinutes": 0,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 967,
-          "type": "CriticalHot",
-          "temperature": 17.0,
-          "timeOutMinutes": 1,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 968,
-          "type": "CriticalCold",
-          "temperature": -12.0,
-          "timeOutMinutes": 0,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 969,
-          "type": "CriticalCold",
-          "temperature": -11.0,
-          "timeOutMinutes": 1,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 970,
-          "type": "Hot",
-          "temperature": 6.0,
-          "timeOutMinutes": 0,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 971,
-          "type": "Hot",
-          "temperature": 7.0,
-          "timeOutMinutes": 2,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 972,
-          "type": "Cold",
-          "temperature": -7.0,
-          "timeOutMinutes": 40,
-          "cumulativeFlag": true
-        },
-        {
-          "id": 973,
-          "type": "Cold",
-          "temperature": -5.0,
-          "timeOutMinutes": 55,
-          "cumulativeFlag": true
-        }
+      "alertProfileId": 847,
+      "alertProfileName": "a",
+      "alertProfileDescription": "b",
+      "alertRuleList": [
+        ">18,0°C for 0 min in total",
+        ">17,0°C for 1 min in total",
+        "<-12,0°C for 0 min in total",
+        "<-11,0°C for 1 min in total",
+        ">6,0°C for 0 min in total",
+        ">7,0°C for 2 min in total",
+        "<-7,0°C for 40 min in total",
+        "<-5,0°C for 55 min in total"
+      ]
+    },
+    {
+      "alertProfileId": 848,
+      "alertProfileName": "c",
+      "alertProfileDescription": "a",
+      "alertRuleList": [
+        ">18,0°C for 0 min in total",
+        ">17,0°C for 1 min in total",
+        "<-12,0°C for 0 min in total",
+        "<-11,0°C for 1 min in total",
+        ">6,0°C for 0 min in total",
+        ">7,0°C for 2 min in total",
+        "<-7,0°C for 40 min in total",
+        "<-5,0°C for 55 min in total"
       ]
     }
   ],
-  "totalCount": 2
+  "totalCount": 3
 }
 ```
 ### Delete Alert Profile example ###
@@ -1081,9 +1011,11 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "schedules": [
     {
       "user": "asuvorov",
-      "pushToMobileApp": true,
-      "fromTime": 1,
-      "toTime": 17,
+      "sendApp": true,
+      "sendEmail": false,
+      "sendSms": false,
+      "fromTime": "13:20",
+      "toTime": "20:00",
       "weekDays": [
         true,
         false,
@@ -1096,9 +1028,11 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     },
     {
       "user": "asuvorov",
-      "pushToMobileApp": true,
-      "fromTime": 1,
-      "toTime": 17,
+      "sendApp": true,
+      "sendEmail": false,
+      "sendSms": false,
+      "fromTime": "13:20",
+      "toTime": "20:00",
       "weekDays": [
         true,
         false,
@@ -1161,15 +1095,17 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": {
     "notificationScheduleDescription": "JUnit schedule",
-    "notificationScheduleId": 231,
+    "notificationScheduleId": 1289,
     "notificationScheduleName": "Sched",
     "schedules": [
       {
-        "personScheduleId": 285,
+        "personScheduleId": 2157,
         "user": "asuvorov",
-        "pushToMobileApp": true,
-        "fromTime": 1,
-        "toTime": 17,
+        "sendApp": true,
+        "sendEmail": false,
+        "sendSms": false,
+        "fromTime": "13:20",
+        "toTime": "20:00",
         "weekDays": [
           true,
           false,
@@ -1181,11 +1117,13 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         ]
       },
       {
-        "personScheduleId": 286,
+        "personScheduleId": 2158,
         "user": "asuvorov",
-        "pushToMobileApp": true,
-        "fromTime": 1,
-        "toTime": 17,
+        "sendApp": true,
+        "sendEmail": false,
+        "sendSms": false,
+        "fromTime": "13:20",
+        "toTime": "20:00",
         "weekDays": [
           true,
           false,

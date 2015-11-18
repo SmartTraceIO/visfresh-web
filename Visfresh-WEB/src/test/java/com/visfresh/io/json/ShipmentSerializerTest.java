@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -191,7 +192,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final Boolean lastDay = true;
         final Boolean lastMonth = true;
         final Boolean lastWeek = true;
-        final Date shipmentDateFrom = new Date(System.currentTimeMillis() - 100000000000l);
+        final Date shipmentDateFrom = new Date(System.currentTimeMillis() - 1000000000l);
         final Date shipmentDateTo = new Date(System.currentTimeMillis() - 1000000l);
         final String shipmentDescription = "JUnit Shipment";
         final List<Long> shippedFrom = new LinkedList<Long>();
@@ -233,8 +234,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(lastDay, req.getLastDay());
         assertEquals(lastMonth, req.getLastMonth());
         assertEquals(lastWeek, req.getLastWeek());
-        assertEquals(shipmentDateFrom.getTime(), req.getShipmentDateFrom().getTime(), 1000);
-        assertEquals(shipmentDateTo.getTime(), req.getShipmentDateTo().getTime(), 1000);
+        assertEquals(formatDate(shipmentDateFrom), formatDate(req.getShipmentDateFrom()));
+        assertEquals(formatDate(shipmentDateTo), formatDate(req.getShipmentDateTo()));
         assertEquals(shipmentDescription, req.getShipmentDescription());
         assertEquals(2, req.getShippedFrom().size());
         assertEquals(3, req.getShippedTo().size());
@@ -243,5 +244,13 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(pageSize, req.getPageSize());
         assertEquals(sortColumn, req.getSortColumn());
         assertEquals(sortOrder, req.getSortOrder());
+    }
+
+    /**
+     * @param date
+     * @return
+     */
+    private String formatDate(final Date date) {
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(date);
     }
 }
