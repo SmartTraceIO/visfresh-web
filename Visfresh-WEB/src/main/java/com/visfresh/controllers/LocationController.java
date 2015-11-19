@@ -90,7 +90,7 @@ public class LocationController extends AbstractController implements LocationCo
             final LocationSerializer ser = createSerializer(user);
 
             final List<LocationProfile> locations = dao.findByCompany(user.getCompany(),
-                    createSorting(sc, so, getDefaultSortOrder()),
+                    createSorting(sc, so, getDefaultSortOrder(), 1),
                     page,
                     null);
 
@@ -164,11 +164,13 @@ public class LocationController extends AbstractController implements LocationCo
      */
     private String[] getDefaultSortOrder() {
         return new String[] {
-            PROPERTY_LOCATION_ID,
             PROPERTY_LOCATION_NAME,
             PROPERTY_COMPANY_NAME,
             PROPERTY_ADDRESS,
-            PROPERTY_NOTES
+            PROPERTY_RADIUS_METERS,
+            PROPERTY_START_FLAG,
+            PROPERTY_INTERIM_FLAG,
+            PROPERTY_END_FLAG
         };
     }
 }

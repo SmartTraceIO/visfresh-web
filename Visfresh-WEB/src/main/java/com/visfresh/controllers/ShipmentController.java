@@ -152,7 +152,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                     createSorting(
                             req.getSortColumn(),
                             req.getSortOrder(),
-                            getDefaultListShipmentsSortingOrder()),
+                            getDefaultListShipmentsSortingOrder(), 2),
                     filter,
                     page);
             final int total = shipmentDao.getEntityCount(user.getCompany(), filter);

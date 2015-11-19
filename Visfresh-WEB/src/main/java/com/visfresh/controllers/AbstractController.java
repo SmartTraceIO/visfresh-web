@@ -163,19 +163,21 @@ public abstract class AbstractController {
 //        }
 //    }
     /**
-     * @param sc
-     * @param so
+     * @param sc sort column
+     * @param so sorting order.
      * @param defaultSortOrder
+     * @param maxNumOfSortColumns max number of soring columns.
      * @return
      */
     protected Sorting createSorting(final String sc, final String so,
-            final String[] defaultSortOrder) {
+            final String[] defaultSortOrder, final int maxNumOfSortColumns) {
         final boolean ascent = !"desc".equalsIgnoreCase(so);
         if (sc == null) {
             return new Sorting(ascent, defaultSortOrder);
         }
 
-        final List<String> props = new LinkedList<String>();
+        //create ordered list of sorting columns.
+        List<String> props = new LinkedList<String>();
         for (final String prop : defaultSortOrder) {
             if (prop.equals(sc)) {
                 props.add(0, prop);
@@ -183,7 +185,11 @@ public abstract class AbstractController {
                 props.add(prop);
             }
         }
+        if (props.isEmpty()) {
+            return null;
+        }
 
+        props = props.subList(0, Math.min(props.size(), maxNumOfSortColumns));
         return new Sorting(ascent, props.toArray(new String[props.size()]));
     }
 }

@@ -106,7 +106,7 @@ public class UserController extends AbstractController implements UserConstants 
 
             final List<ListUserItem> shipments = getUserListItems(
                     user.getCompany(),
-                    createSorting(sc, so, getDefaultListShipmentsSortingOrder()),
+                    createSorting(sc, so, getDefaultListShipmentsSortingOrder(), 2),
                     null,
                     page);
             final int total = dao.getEntityCount(user.getCompany(), null);

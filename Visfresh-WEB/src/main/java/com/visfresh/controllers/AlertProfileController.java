@@ -144,7 +144,7 @@ public class AlertProfileController extends AbstractController implements AlertP
 
             final List<AlertProfile> alerts = dao.findByCompany(
                     user.getCompany(),
-                    createSorting(sc, so, getDefaultSortOrder()),
+                    createSorting(sc, so, getDefaultSortOrder(), 2),
                     page,
                     null);
             final int total = dao.getEntityCount(user.getCompany(), null);

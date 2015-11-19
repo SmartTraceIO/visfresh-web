@@ -98,7 +98,7 @@ public class NotificationScheduleController extends AbstractController implement
 
             final List<NotificationSchedule> schedules = dao.findByCompany(
                     user.getCompany(),
-                    createSorting(sc, so, getDefaultSortOrder()),
+                    createSorting(sc, so, getDefaultSortOrder(), 2),
                     page,
                     null);
 
