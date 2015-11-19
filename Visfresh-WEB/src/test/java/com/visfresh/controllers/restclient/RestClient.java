@@ -12,6 +12,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -34,7 +36,7 @@ public class RestClient  {
     private URL serviceUrl;
     private String authToken;
 
-    private boolean isPrintEnabled = true;
+    private final List<RestIoListener> listeners = new LinkedList<RestIoListener>();
 
     /**
      * Default constructor.
@@ -45,6 +47,9 @@ public class RestClient  {
         b.setPrettyPrinting();
         b.disableHtmlEscaping();
         this.gson = b.create();
+
+        //add logging
+        addRestIoListener(new RestIoLogger());
     }
     /**
      * @param login
@@ -101,29 +106,30 @@ public class RestClient  {
      */
     public final JsonElement sendGetRequest(final String path, final Map<String, String> params)
             throws IOException, RestServiceException {
-        final StringBuilder urlString = new StringBuilder(
+        final StringBuilder sb = new StringBuilder(
                 getServiceUrl().toExternalForm() + path);
 
         if (params.size() > 0) {
-            urlString.append('?');
+            sb.append('?');
 
             boolean first = true;
             for (final Map.Entry<String, String> e : params.entrySet()) {
                 if (!first) {
-                    urlString.append('&');
+                    sb.append('&');
                 } else {
                     first = false;
                 }
 
-                urlString.append(urlEncode(e.getKey()));
-                urlString.append('=');
-                urlString.append(urlEncode(e.getValue()));
+                sb.append(urlEncode(e.getKey()));
+                sb.append('=');
+                sb.append(urlEncode(e.getValue()));
             }
         }
 
-        println("GET " + urlString);
+        final String url = sb.toString();
+        fireRequestSending(url, "GET", null);
 
-        final URLConnection con = new URL(urlString.toString()).openConnection();
+        final URLConnection con = new URL(url).openConnection();
         con.setDoOutput(false);
         con.setDoInput(true);
 
@@ -137,11 +143,11 @@ public class RestClient  {
      * @throws RestServiceException
      */
     public final JsonElement sendPostRequest(final String path, final JsonElement json) throws IOException, RestServiceException {
-        final StringBuilder urlString = new StringBuilder(
+        final StringBuilder sb = new StringBuilder(
                 getServiceUrl().toExternalForm() + path);
 
-        println("POST " + urlString);
-        final URLConnection con = new URL(urlString.toString()).openConnection();
+        final String url = sb.toString();
+        final URLConnection con = new URL(url).openConnection();
         con.setRequestProperty("Content-Type", "application/json");
         con.setDoOutput(true);
         con.setDoInput(true);
@@ -149,8 +155,8 @@ public class RestClient  {
         final Writer wr = new OutputStreamWriter(con.getOutputStream());
         try {
             final String requestBody = gson.toJson(json);
-            println("Request body:");
-            println(requestBody);
+            //notify listeners
+            fireRequestSending(url, "POST", requestBody);
             wr.write(requestBody);
             wr.flush();
         } finally {
@@ -159,7 +165,6 @@ public class RestClient  {
 
         return parseResponse(con);
     }
-
     /**
      * @return
      */
@@ -181,30 +186,13 @@ public class RestClient  {
     public final JsonElement parseResponse(final URLConnection con)
             throws IOException, RestServiceException {
         final String response = getContent(con.getInputStream());
-        printResponse(response);
+        //notify listeners
+        fireResponseReceived(response);
 
         final JsonObject e = new JsonParser().parse(response).getAsJsonObject();
         checkError(e);
         return e.get("response");
     }
-    /**
-     * @param response
-     */
-    protected void printResponse(final String response) {
-        if (isPrintEnabled) {
-            println("Response:");
-            println(response);
-        }
-    }
-    /**
-     * @param str
-     */
-    private void println(final String str) {
-        if (isPrintEnabled) {
-            System.out.println(str);
-        }
-    }
-
     /**
      * @param response JSON response.
      * @throws RestServiceException
@@ -280,5 +268,29 @@ public class RestClient  {
             throw new RuntimeException("Unexpected ID format: " + e);
         }
         return set.iterator().next().getValue().getAsLong();
+    }
+    public void addRestIoListener(final RestIoListener l) {
+        listeners.add(l);
+    }
+    public void removeRestIoListener(final RestIoListener l) {
+        listeners.remove(l);
+    }
+    /**
+     * @param response
+     */
+    protected void fireResponseReceived(final String response) {
+        for (final RestIoListener l : listeners) {
+            l.receivedResponse(response);
+        }
+    }
+    /**
+     * @param url URL string.
+     * @param method method name.
+     * @param requestBody request body in case of POST request.
+     */
+    protected void fireRequestSending(final String url, final String method, final String requestBody) {
+        for (final RestIoListener l : listeners) {
+            l.sendingRequest(url, requestBody, method);
+        }
     }
 }

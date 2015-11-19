@@ -12,10 +12,13 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.visfresh.controllers.restclient.RestIoListener;
 import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.controllers.restclient.ShipmentTemplateRestClient;
 import com.visfresh.dao.AlertDao;
@@ -51,6 +54,17 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     private TrackerEventDao trackerEventDao;
     private ShipmentTemplateRestClient shipmentTemplateClient = new ShipmentTemplateRestClient(UTC);
     private ShipmentRestClient shipmentClient;
+    private JsonObject currentJsonResponse;
+    //response catcher
+    final RestIoListener l = new RestIoListener() {
+        @Override
+        public void sendingRequest(final String url, final String body, final String methodName) {
+        }
+        @Override
+        public void receivedResponse(final String responseBody) {
+            currentJsonResponse = new JsonParser().parse(responseBody).getAsJsonObject();
+        }
+    };
 
     /**
      * Default constructor.
@@ -82,6 +96,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         shipmentTemplateClient.setAuthToken(token);
         shipmentClient.setAuthToken(token);
+
+
+        shipmentTemplateClient.addRestIoListener(l);
+        shipmentClient.addRestIoListener(l);
+        currentJsonResponse = null;
     }
 
     //@RequestMapping(value = "/saveShipmentTemplate/{authToken}", method = RequestMethod.POST)
@@ -105,6 +124,24 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(1, shipmentTemplateClient.getShipmentTemplates(1, 1).size());
         assertEquals(1, shipmentTemplateClient.getShipmentTemplates(2, 1).size());
         assertEquals(0, shipmentTemplateClient.getShipmentTemplates(3, 10000).size());
+    }
+    /**
+     * The bug found where the count of item returned from server is not equals of real
+     * number of items
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    @Test
+    public void testItemCount() throws RestServiceException, IOException {
+        createShipmentTemplate(true);
+        createShipmentTemplate(true);
+        createShipment(true);
+
+        assertEquals(2, shipmentTemplateClient.getShipmentTemplates(1, 10000).size());
+        assertEquals(2, currentJsonResponse.get("totalCount").getAsInt());
+
+        assertEquals(1, shipmentClient.getShipments(1, 10000).size());
+        assertEquals(1, currentJsonResponse.get("totalCount").getAsInt());
     }
     @Test
     public void testGetShipmentTemplate() throws IOException, RestServiceException {
@@ -415,5 +452,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         alert.setType(type);
         alertDao.save(alert);
         return alert;
+    }
+
+    @After
+    public void tearDown() {
+        shipmentTemplateClient.removeRestIoListener(l);
+        shipmentClient.removeRestIoListener(l);
     }
 }

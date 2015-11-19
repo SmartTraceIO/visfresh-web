@@ -221,7 +221,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @see com.visfresh.dao.DaoBase#getEntityCount(com.visfresh.dao.Filter)
      */
     @Override
-    public final int getEntityCount(final Filter filter) {
+    public int getEntityCount(final Filter filter) {
         final Map<String, Object> params = new HashMap<String, Object>();
         final List<String> filters = new LinkedList<String>();
 

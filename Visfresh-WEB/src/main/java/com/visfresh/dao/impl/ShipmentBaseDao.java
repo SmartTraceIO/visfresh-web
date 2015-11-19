@@ -176,6 +176,15 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
         return super.findAll(f, sorting, page);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#getEntityCount(com.visfresh.dao.Filter)
+     */
+    @Override
+    public int getEntityCount(final Filter filter) {
+        final Filter f = new Filter(filter);
+        f.addFilter(ISTEMPLATE_FIELD, isTemplate());
+        return super.getEntityCount(f);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
      */
     @Override
