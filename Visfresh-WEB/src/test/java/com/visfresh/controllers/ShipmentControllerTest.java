@@ -20,7 +20,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.visfresh.controllers.restclient.RestIoListener;
 import com.visfresh.controllers.restclient.ShipmentRestClient;
-import com.visfresh.controllers.restclient.ShipmentTemplateRestClient;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.ShipmentDao;
@@ -48,11 +47,9 @@ import com.visfresh.services.RestServiceException;
  */
 public class ShipmentControllerTest extends AbstractRestServiceTest {
     private ShipmentDao shipmentDao;
-    private ShipmentTemplateDao shipmentTemplateDao;
     private AlertDao alertDao;
     private ArrivalDao arrivalDao;
     private TrackerEventDao trackerEventDao;
-    private ShipmentTemplateRestClient shipmentTemplateClient = new ShipmentTemplateRestClient(UTC);
     private ShipmentRestClient shipmentClient;
     private JsonObject currentJsonResponse;
     //response catcher
@@ -76,7 +73,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     @Before
     public void setUp() {
         shipmentDao = context.getBean(ShipmentDao.class);
-        shipmentTemplateDao = context.getBean(ShipmentTemplateDao.class);
         alertDao = context.getBean(AlertDao.class);
         arrivalDao = context.getBean(ArrivalDao.class);
         trackerEventDao = context.getBean(TrackerEventDao.class);
@@ -86,45 +82,14 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentClient = new ShipmentRestClient(user);
 
         shipmentClient.setServiceUrl(getServiceUrl());
-        shipmentTemplateClient.setServiceUrl(getServiceUrl());
-
-        final ReferenceResolver r = context.getBean(ReferenceResolver.class);
-
-        shipmentTemplateClient.setReferenceResolver(r);
-        shipmentClient.setReferenceResolver(r);
+        shipmentClient.setReferenceResolver(context.getBean(ReferenceResolver.class));
         shipmentClient.setUserResolver(context.getBean(UserResolver.class));
-
-        shipmentTemplateClient.setAuthToken(token);
         shipmentClient.setAuthToken(token);
-
-
-        shipmentTemplateClient.addRestIoListener(l);
         shipmentClient.addRestIoListener(l);
+
         currentJsonResponse = null;
     }
 
-    //@RequestMapping(value = "/saveShipmentTemplate/{authToken}", method = RequestMethod.POST)
-    //public @ResponseBody String saveShipmentTemplate(@PathVariable final String authToken,
-    //        final @RequestBody String tpl) {
-    @Test
-    public void testSaveShipmentTemplate() throws RestServiceException, IOException {
-        final ShipmentTemplate t = createShipmentTemplate(true);
-        t.setId(null);
-        final Long id = shipmentTemplateClient.saveShipmentTemplate(t);
-        assertNotNull(id);
-    }
-    //@RequestMapping(value = "/getShipmentTemplates/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getShipmentTemplates(@PathVariable final String authToken) {
-    @Test
-    public void testGetShipmentTemplates() throws RestServiceException, IOException {
-        createShipmentTemplate(true);
-        createShipmentTemplate(true);
-
-        assertEquals(2, shipmentTemplateClient.getShipmentTemplates(1, 10000).size());
-        assertEquals(1, shipmentTemplateClient.getShipmentTemplates(1, 1).size());
-        assertEquals(1, shipmentTemplateClient.getShipmentTemplates(2, 1).size());
-        assertEquals(0, shipmentTemplateClient.getShipmentTemplates(3, 10000).size());
-    }
     /**
      * The bug found where the count of item returned from server is not equals of real
      * number of items
@@ -137,22 +102,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         createShipmentTemplate(true);
         createShipment(true);
 
-        assertEquals(2, shipmentTemplateClient.getShipmentTemplates(1, 10000).size());
-        assertEquals(2, currentJsonResponse.get("totalCount").getAsInt());
-
         assertEquals(1, shipmentClient.getShipments(1, 10000).size());
         assertEquals(1, currentJsonResponse.get("totalCount").getAsInt());
-    }
-    @Test
-    public void testGetShipmentTemplate() throws IOException, RestServiceException {
-        final ShipmentTemplate sp = createShipmentTemplate(true);
-        assertNotNull(shipmentTemplateClient.getShipmentTemplate(sp.getId()));
-    }
-    @Test
-    public void testDeleteShipmentTemplate() throws IOException, RestServiceException {
-        final ShipmentTemplate sp = createShipmentTemplate(true);
-        shipmentTemplateClient.deleteShipmentTemplate(sp.getId());
-        assertNull(shipmentTemplateDao.findOne(sp.getId()));
     }
     //@RequestMapping(value = "/saveShipment/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveShipment(@PathVariable final String authToken,
@@ -166,7 +117,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         //check new template is saved
         final long id = resp.getTemplateId();
-        final ShipmentTemplate tpl = shipmentTemplateDao.findOne(id);
+        final ShipmentTemplate tpl = context.getBean(ShipmentTemplateDao.class).findOne(id);
 
         assertNotNull(tpl);
         assertNotNull(tpl.getName());
@@ -456,7 +407,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
     @After
     public void tearDown() {
-        shipmentTemplateClient.removeRestIoListener(l);
         shipmentClient.removeRestIoListener(l);
     }
 }

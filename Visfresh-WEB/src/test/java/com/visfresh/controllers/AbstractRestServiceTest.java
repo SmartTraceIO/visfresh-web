@@ -235,8 +235,20 @@ public abstract class AbstractRestServiceTest {
      * @param t
      */
     protected Long saveShipmentTemplateDirectly(final ShipmentTemplate t) {
-        final ShipmentTemplateDao dao = context.getBean(ShipmentTemplateDao.class);
+        //save notification schedules
+        for (final NotificationSchedule s : t.getAlertsNotificationSchedules()) {
+            if (s.getId() == null) {
+                saveNotificationScheduleDirectly(s);
+            }
+        }
+        for (final NotificationSchedule s : t.getArrivalNotificationSchedules()) {
+            if (s.getId() == null) {
+                saveNotificationScheduleDirectly(s);
+            }
+        }
+
         t.setCompany(getCompany());
+        final ShipmentTemplateDao dao = context.getBean(ShipmentTemplateDao.class);
         dao.save(t);
         return t.getId();
     }

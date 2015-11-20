@@ -41,12 +41,19 @@ public class ShipmentTemplateRestClient extends RestClient {
         return parseId(e);
     }
 
-    public List<ListShipmentTemplateItem> getShipmentTemplates(final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
+    public List<ListShipmentTemplateItem> getShipmentTemplates(final Integer pageIndex, final Integer pageSize, String sortColumn, String sortOrder) throws RestServiceException, IOException {
         final HashMap<String, String> params = new HashMap<String, String>();
         if (pageIndex != null) {
             params.put("pageIndex", Integer.toString(pageIndex));
             params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
         }
+        if (sortColumn != null) {
+            params.put("sc", sortColumn);
+        }
+        if (sortOrder != null) {
+            params.put("so", sortOrder);
+        }
+
         final JsonArray response = sendGetRequest(getPathWithToken("getShipmentTemplates"),
                 params).getAsJsonArray();
 
