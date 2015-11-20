@@ -105,12 +105,4 @@ public class DeviceCommandDaoTest extends BaseCrudTest<DeviceCommandDao, DeviceC
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.BaseCrudTest#clear()
-     */
-    @Override
-    public void clear() {
-        super.clear();
-        deviceDao.deleteAll();
-    }
 }

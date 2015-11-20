@@ -10,7 +10,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -132,10 +131,5 @@ public class NotificationScheduleDaoTest
         left = companyDao.save(left);
 
         assertEquals(0, dao.findByCompany(left, null, null, null).size());
-    }
-
-    @After
-    public void tearDown() {
-        this.getContext().getBean(UserDao.class).deleteAll();
     }
 }

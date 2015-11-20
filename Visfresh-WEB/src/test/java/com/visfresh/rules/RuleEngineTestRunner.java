@@ -9,16 +9,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.visfresh.dao.AlertDao;
-import com.visfresh.dao.AlertProfileDao;
-import com.visfresh.dao.ArrivalDao;
-import com.visfresh.dao.CompanyDao;
-import com.visfresh.dao.DeviceDao;
-import com.visfresh.dao.LocationProfileDao;
-import com.visfresh.dao.NotificationDao;
-import com.visfresh.dao.NotificationScheduleDao;
-import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.dao.DaoTestRunner;
 import com.visfresh.drools.DroolsRuleEngine;
 import com.visfresh.junit.db.JUnitDbConfig;
 import com.visfresh.mock.MockSmsService;
@@ -66,16 +57,7 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
      *
      */
     private void cleanUp() {
-        context.getBean(NotificationDao.class).deleteAll();
-        context.getBean(TrackerEventDao.class).deleteAll();
-        context.getBean(ArrivalDao.class).deleteAll();
-        context.getBean(AlertDao.class).deleteAll();
-        context.getBean(ShipmentDao.class).deleteAll();
-        context.getBean(LocationProfileDao.class).deleteAll();
-        context.getBean(AlertProfileDao.class).deleteAll();
-        context.getBean(NotificationScheduleDao.class).deleteAll();
-        context.getBean(DeviceDao.class).deleteAll();
-        context.getBean(CompanyDao.class).deleteAll();
+        DaoTestRunner.clearDb(context);
     }
 
     /* (non-Javadoc)

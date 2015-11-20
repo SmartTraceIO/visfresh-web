@@ -25,4 +25,7 @@ public interface ShipmentTemplateConstants {
     String PROPERTY_SHIPMENT_TEMPLATE_NAME = "shipmentTemplateName";
     String PROPERTY_SHIPMENT_TEMPLATE_ID = "shipmentTemplateId";
     String PROPERTY_ALERT_PROFILE_ID = "alertProfileId";
+
+    String PROPERTY_SHIPPEDTO_NAME = "shippedToName";
+    String PROPERTY_SHIPPEDFROM_NAME = "shippedFromName";
 }

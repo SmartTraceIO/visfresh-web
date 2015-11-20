@@ -151,25 +151,40 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         sb.append(" where id =:").append(idField);
         return sb.toString();
     }
+
+    /**
+     * @return
+     */
+    protected String buildSelectBlockForFindAll() {
+        return "select * from " + getTableName();
+    }
     /**
      * @param sorts
      * @param params
      * @param sorting
      */
-    protected void addSorts(final List<String> sorts, final Map<String, Object> params,
-            final Sorting sorting, final Map<String, String> propertyToDbFields) {
-        if (sorting != null) {
-            final boolean isAscent = sorting.isAscentDirection();
+    protected void addSortsForFindAll(final List<String> sorts, final Map<String, Object> params,
+            final Sorting sorting) {
+        final boolean isAscent = sorting.isAscentDirection();
+        for (final String property : sorting.getSortProperties()) {
+            addSortForFindAll(property, sorts, isAscent);
+        }
+    }
 
-            for (final String property : sorting.getSortProperties()) {
-                final String field = propertyToDbFields.get(property);
-                if (field != null) {
-                    sorts.add(field + (isAscent ? " asc" : " desc"));
-                } else {
-                    sorts.add(property + (isAscent ? " asc" : " desc"));
-                    log.warn("Field mapping for given property " + property + " not found");
-                }
-            }
+    /**
+     * @param property property.
+     * @param sorts sorts list.
+     * @param isAscent is accent.
+     */
+    protected void addSortForFindAll(final String property,
+            final List<String> sorts,
+            final boolean isAscent) {
+        final String field = getPropertyToDbMap().get(property);
+        if (field != null) {
+            sorts.add(field + (isAscent ? " asc" : " desc"));
+        } else {
+            sorts.add(property + (isAscent ? " asc" : " desc"));
+            log.warn("Field mapping for given property " + property + " not found");
         }
     }
     /**
@@ -177,34 +192,30 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @param params
      * @param filters
      */
-    protected void addFiltes(final Filter filter, final Map<String, Object> params,
-            final List<String> filters, final Map<String, String> propertyToDbFields) {
-        if (filter != null) {
-            for (final String property : filter.getFilteredProperties()) {
-                final String key = DEFAULT_FILTER_KEY_PREFIX + property;
-                final Object value = filter.getFilter(property);
-                String field = propertyToDbFields.get(property);
-                if (field == null) {
-                    field = property;
-                }
-
-                addFilterValue(key, field, value, params, filters);
-            }
+    protected void addFiltesForFindAll(final Filter filter, final Map<String, Object> params,
+            final List<String> filters) {
+        for (final String property : filter.getFilteredProperties()) {
+            final Object value = filter.getFilter(property);
+            addFilterValue(property, value, params, filters);
         }
     }
-
     /**
-     * @param key
-     * @param dbFieldName
-     * @param value
-     * @param params
-     * @param filters
+     * @param property property name.
+     * @param value property value.
+     * @param params parameter map.
+     * @param filters filter segments.
      */
-    protected void addFilterValue(final String key, final String dbFieldName,
-            final Object value, final Map<String, Object> params,
-            final List<String> filters) {
+    protected void addFilterValue(final String property, final Object value,
+            final Map<String, Object> params, final List<String> filters) {
+        final String key = DEFAULT_FILTER_KEY_PREFIX + property;
+
+        String dbFieldName = getPropertyToDbMap().get(property);
+        if (dbFieldName == null) {
+            dbFieldName = property;
+        }
+
         params.put(key, value);
-        filters.add(dbFieldName + "= :" + key);
+        filters.add(getTableName() + "." + dbFieldName + "= :" + key);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
@@ -225,7 +236,9 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         final Map<String, Object> params = new HashMap<String, Object>();
         final List<String> filters = new LinkedList<String>();
 
-        addFiltes(filter, params, filters, getPropertyToDbMap());
+        if (filter != null) {
+            addFiltesForFindAll(filter, params, filters);
+        }
 
         final List<Map<String, Object>> list = jdbc.queryForList(
                 "select count(*) as count from "
@@ -255,15 +268,16 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         final List<String> filters = new LinkedList<String>();
         final List<String> sorts = new LinkedList<String>();
 
-        addFiltes(filter, params, filters, getPropertyToDbMap());
-        addSorts(sorts, params, sorting, getPropertyToDbMap());
+        final String selectAll = buildSelectBlockForFindAll();
+        if (filter != null) {
+            addFiltesForFindAll(filter, params, filters);
+        }
+        if (sorting != null) {
+            addSortsForFindAll(sorts, params, sorting);
+        }
 
         final List<Map<String, Object>> list = jdbc.queryForList(
-                "select * from "
-                + getTableName()
-                + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and "))
-                + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ","))
-                + (page == null ? "" : " limit "
+                selectAll + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")) + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ",")) + (page == null ? "" : " limit "
                         + ((page.getPageNumber() - 1) * page.getPageSize())
                         + "," + page.getPageSize()),
                 params);
@@ -277,7 +291,6 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         }
         return result;
     }
-
     /**
      * @param t
      * @param map

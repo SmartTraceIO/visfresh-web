@@ -234,14 +234,4 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
     private TrackerEvent createAndSave(final Date date, final double temperature) {
         return dao.save(createEvent(date, temperature));
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.BaseCrudTest#clear()
-     */
-    @Override
-    public void clear() {
-        super.clear();
-        shipmentDao.deleteAll();
-        deviceDao.deleteAll();
-    }
 }

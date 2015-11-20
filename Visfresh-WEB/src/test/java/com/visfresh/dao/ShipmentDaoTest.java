@@ -43,7 +43,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
     private NotificationScheduleDao notificationScheduleDao;
     private Device device;
     private DeviceDao deviceDao;
-    private TrackerEventDao trackerEventDao;
     private ShipmentTemplateDao shipmentTemplateDao;
 
     /**
@@ -57,7 +56,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
     public void beforeTest() {
         //create alert profile
         alertProfileDao = getContext().getBean(AlertProfileDao.class);
-        trackerEventDao = getContext().getBean(TrackerEventDao.class);
         shipmentTemplateDao = getContext().getBean(ShipmentTemplateDao.class);
 
         final AlertProfile ap = new AlertProfile();
@@ -353,19 +351,5 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setDetectLocationForShippedFrom(true);
         s.setUseCurrentTimeForDateShipped(true);
         return shipmentTemplateDao.save(s);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.BaseCrudTest#clear()
-     */
-    @Override
-    public void clear() {
-        trackerEventDao.deleteAll();
-        super.clear();
-        shipmentTemplateDao.deleteAll();
-        alertProfileDao.deleteAll();
-        locationProfileDao.deleteAll();
-        notificationScheduleDao.deleteAll();
-        getContext().getBean(UserDao.class).deleteAll();
-        deviceDao.deleteAll();
     }
 }

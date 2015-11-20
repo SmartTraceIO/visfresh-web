@@ -66,9 +66,30 @@ public class DaoTestRunner extends BlockJUnit4ClassRunner {
         } finally {
             if (context != null) {
                 if (this.test != null) {
-                    this.test.handleFinished();
+                    clearDb(context);
                 }
             }
         }
+    }
+
+    /**
+     * @param context
+     *
+     */
+    public static void clearDb(final AbstractApplicationContext context) {
+        context.getBean(SystemMessageDao.class).deleteAll();
+        context.getBean(TrackerEventDao.class).deleteAll();
+        context.getBean(DeviceCommandDao.class).deleteAll();
+        context.getBean(NotificationDao.class).deleteAll();
+        context.getBean(AlertDao.class).deleteAll();
+        context.getBean(ArrivalDao.class).deleteAll();
+        context.getBean(ShipmentDao.class).deleteAll();
+        context.getBean(ShipmentTemplateDao.class).deleteAll();
+        context.getBean(AlertProfileDao.class).deleteAll();
+        context.getBean(LocationProfileDao.class).deleteAll();
+        context.getBean(NotificationScheduleDao.class).deleteAll();
+        context.getBean(DeviceDao.class).deleteAll();
+        context.getBean(UserDao.class).deleteAll();
+        context.getBean(CompanyDao.class).deleteAll();
     }
 }

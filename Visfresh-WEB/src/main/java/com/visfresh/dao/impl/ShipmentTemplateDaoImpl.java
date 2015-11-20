@@ -93,6 +93,29 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
         return params;
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
+     */
+    @Override
+    protected String buildSelectBlockForFindAll() {
+        return "select "
+                + getTableName()
+                + ".*"
+                + " , shipfrom." + LocationProfileDaoImpl.NAME_FIELD
+                + " as " + ShipmentTemplateConstants.PROPERTY_SHIPPEDFROM_NAME
+                + " , shipto." + LocationProfileDaoImpl.NAME_FIELD
+                + " as " + ShipmentTemplateConstants.PROPERTY_SHIPPEDTO_NAME
+                + " from " + getTableName()
+            //join alert profiles table
+            + " left outer join " + AlertProfileDaoImpl.TABLE + " ap on ap."
+            + AlertProfileDaoImpl.ID_FIELD + " = " + ALERT_FIELD + "\n"
+            //join location from
+            + " left outer join " + LocationProfileDaoImpl.TABLE + " shipfrom on shipfrom."
+            + LocationProfileDaoImpl.ID_FIELD + " = " + SHIPPEDFROM_FIELD
+            //join location to
+            + " left outer join " + LocationProfileDaoImpl.TABLE + " shipto on shipto."
+            + LocationProfileDaoImpl.ID_FIELD + " = " + SHIPPEDTO_FIELD;
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#isTemplate()
      */
     @Override

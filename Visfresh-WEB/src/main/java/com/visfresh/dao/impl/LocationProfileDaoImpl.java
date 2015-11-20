@@ -25,8 +25,8 @@ public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<Locatio
     public static final String TABLE = "locationprofiles";
 
     //field columns
-    private static final String ID_FIELD = "id";
-    private static final String NAME_FIELD = "name";
+    public static final String ID_FIELD = "id";
+    public static final String NAME_FIELD = "name";
     private static final String COMPANY_DESCRIPTION_FIELD = "companydetails";
     private static final String NOTES_FIELD = "notes";
     private static final String ADDRESS_FIELD = "address";

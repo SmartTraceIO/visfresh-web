@@ -226,17 +226,4 @@ public class ShipmentTemplateDaoTest
         assertTrue(tpl.isDetectLocationForShippedFrom());
         assertTrue(tpl.isUseCurrentTimeForDateShipped());
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.BaseCrudTest#clear()
-     */
-    @Override
-    public void clear() {
-        super.clear();
-
-        alertProfileDao.deleteAll();
-        locationProfileDao.deleteAll();
-        notificationScheduleDao.deleteAll();
-        getContext().getBean(UserDao.class).deleteAll();
-    }
 }

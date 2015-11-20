@@ -20,7 +20,6 @@ import com.google.gson.JsonObject;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentTemplateDao;
-import com.visfresh.dao.Sorting;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.io.ReferenceResolver;
@@ -84,7 +83,10 @@ public class ShipmentTemplateController extends AbstractController implements Sh
     @RequestMapping(value = "/getShipmentTemplates/{authToken}", method = RequestMethod.GET)
     public JsonObject getShipmentTemplates(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex,
-            @RequestParam(required = false) final Integer pageSize) {
+            @RequestParam(required = false) final Integer pageSize,
+            @RequestParam(required = false) final String sc,
+            @RequestParam(required = false) final String so) {
+
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
@@ -94,7 +96,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
 
             final List<ShipmentTemplate> templates = shipmentTemplateDao.findByCompany(
                     user.getCompany(),
-                    new Sorting(getDefaultSortOrder()),
+                    createSorting(sc, so, getDefaultSortOrder(), 1),
                     page,
                     null);
             final int total = shipmentTemplateDao.getEntityCount(user.getCompany(), null);
@@ -118,9 +120,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
             PROPERTY_SHIPMENT_DESCRIPTION,
             PROPERTY_SHIPPED_FROM,
             PROPERTY_SHIPPED_TO,
-            PROPERTY_SHIPMENT_TEMPLATE_ID,
-            PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM,
-            PROPERTY_USE_CURRENT_TIME_FOR_DATE_SHIPPED
+            PROPERTY_ALERT_PROFILE_ID
         };
     }
 

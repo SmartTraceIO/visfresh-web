@@ -185,13 +185,4 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         final Alert a = createAlert(AlertType.Hot, date);
         return dao.save(a);
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.BaseCrudTest#clear()
-     */
-    @Override
-    public void clear() {
-        super.clear();
-        shipmentDao.deleteAll();
-        deviceDao.deleteAll();
-    }
 }

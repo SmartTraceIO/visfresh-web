@@ -165,13 +165,4 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
 
         assertNotNull(a.getShipment());
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.BaseCrudTest#clear()
-     */
-    @Override
-    public void clear() {
-        super.clear();
-        shipmentDao.deleteAll();
-        deviceDao.deleteAll();
-    }
 }

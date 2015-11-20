@@ -8,7 +8,6 @@ import static org.junit.Assert.assertEquals;
 import java.io.Serializable;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -135,25 +134,4 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
     }
 
     protected abstract E createTestEntity();
-
-    /**
-     * Deletes all created entities.
-     */
-    @After
-    public void clear() {
-        dao.deleteAll();
-    }
-//    @AfterClass
-//    public static void afterClass() {
-//        System.out.println("!!!!!");
-//    }
-
-    /**
-     *
-     */
-    protected final void handleFinished() {
-        if (companyDao != null) {
-            companyDao.deleteAll();
-        }
-    }
 }

@@ -22,10 +22,7 @@ import com.visfresh.entities.User;
  */
 public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
     private int ids;
-    private ShipmentDao shipmentDao;
     private DeviceDao deviceDao;
-    private LocationProfileDao locationProfileDao;
-    private AlertProfileDao alertProfileDao;
 
     /**
      * Default constructor.
@@ -36,10 +33,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
 
     @Before
     public void beforeTest() {
-        shipmentDao = getContext().getBean(ShipmentDao.class);
         deviceDao = getContext().getBean(DeviceDao.class);
-        locationProfileDao = getContext().getBean(LocationProfileDao.class);
-        alertProfileDao = getContext().getBean(AlertProfileDao.class);
     }
 
     /* (non-Javadoc)
@@ -120,18 +114,5 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         assertEquals(sharedCompany.getId(), c.getId());
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.BaseCrudTest#clear()
-     */
-    @Override
-    public void clear() {
-        super.clear();
-
-        shipmentDao.deleteAll();
-        deviceDao.deleteAll();
-        locationProfileDao.deleteAll();
-        alertProfileDao.deleteAll();
     }
 }

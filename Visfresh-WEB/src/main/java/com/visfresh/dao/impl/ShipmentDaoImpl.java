@@ -259,61 +259,63 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.String, java.lang.Object, java.util.Map, java.util.List)
      */
     @Override
-    protected void addFilterValue(final String key, final String fieldName, final Object value,
-            final Map<String, Object> params, final List<String> filters) {
-        if (STATUS_FIELD.equals(fieldName)) {
-            super.addFilterValue(key, fieldName, value == null ? null : value.toString(), params, filters);
-        } else if (ShipmentConstants.PROPERTY_SHIPPED_TO.equals(fieldName)){
+    protected void addFilterValue(final String property, final Object value, final Map<String, Object> params,
+            final List<String> filters) {
+        final String defaultKey = DEFAULT_FILTER_KEY_PREFIX + property;
+
+        if (STATUS_FIELD.equals(property)) {
+            super.addFilterValue(property, value == null ? null : value.toString(), params, filters);
+        } else if (ShipmentConstants.PROPERTY_SHIPPED_TO.equals(property)){
             //create placeholder for 'in' operator
             final List<String> in = new LinkedList<String>();
             int num = 0;
             for (final Object obj : ((List<?>) value)) {
-                final String k = key + "_" + num;
-                params.put(k, obj);
-                in.add(":" + k);
+                final String key = defaultKey + "_" + num;
+                params.put(key, obj);
+                in.add(":" + key);
                 num++;
             }
 
             filters.add(SHIPPEDTO_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
-        } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM.equals(fieldName)){
+        } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM.equals(property)){
             //create placeholder for 'in' operator
             final List<String> in = new LinkedList<String>();
             int num = 0;
             for (final Object obj : ((List<?>) value)) {
-                final String k = key + "_" + num;
-                params.put(k, obj);
-                in.add(":" + k);
+                final String key = defaultKey + "_" + num;
+                params.put(key, obj);
+                in.add(":" + key);
                 num++;
             }
 
             filters.add(SHIPPEDFROM_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
-        } else if (ShipmentConstants.PROPERTY_SHIPPED_TO_DATE.equals(fieldName)){
+        } else if (ShipmentConstants.PROPERTY_SHIPPED_TO_DATE.equals(property)){
             //shipped to date
-            params.put(key, value);
-            filters.add(SHIPMENTDATE_FIELD + " <= :" + key);
-        } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM_DATE.equals(fieldName)){
+            params.put(defaultKey, value);
+            filters.add(SHIPMENTDATE_FIELD + " <= :" + defaultKey);
+        } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM_DATE.equals(property)){
             //shipped from date
-            params.put(key, value);
-            filters.add(SHIPMENTDATE_FIELD + " >= :" + key);
-        } else if (DESCRIPTION_FIELD.equals(fieldName)){
-            params.put(key, "%" + value + "%");
-            filters.add(fieldName + " like :" + key);
+            params.put(defaultKey, value);
+            filters.add(SHIPMENTDATE_FIELD + " >= :" + defaultKey);
+        } else if (ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION.equals(property)){
+            params.put(defaultKey, "%" + value + "%");
+            filters.add(DESCRIPTION_FIELD + " like :" + defaultKey);
         } else {
-            super.addFilterValue(key, fieldName, value, params, filters);
+            super.addFilterValue(property, value, params, filters);
         }
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#addFiltes(com.visfresh.dao.Filter, java.util.Map, java.util.List, java.util.Map)
      */
     @Override
-    protected void addFiltes(final Filter filter, final Map<String, Object> params,
-            final List<String> filters, final Map<String, String> propertyToDbFields) {
+    protected void addFiltesForFindAll(final Filter filter, final Map<String, Object> params,
+            final List<String> filters) {
         final Object value = filter.getFilter(ShipmentConstants.PROPERTY_ONLY_WITH_ALERTS);
         if (value != null) {
             filter.removeFilter(ShipmentConstants.PROPERTY_ONLY_WITH_ALERTS);
         }
 
-        super.addFiltes(filter, params, filters, propertyToDbFields);
+        super.addFiltesForFindAll(filter, params, filters);
 
         if (Boolean.TRUE.equals(value)) {
             final String keyStartDate = DEFAULT_FILTER_KEY_PREFIX + "alertsOnlyStartDate";

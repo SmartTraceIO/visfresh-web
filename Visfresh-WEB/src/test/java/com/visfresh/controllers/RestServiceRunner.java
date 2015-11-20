@@ -19,25 +19,14 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.FrameworkServlet;
 
 import com.visfresh.controllers.init.RestServicesTestConfig;
-import com.visfresh.dao.AlertDao;
-import com.visfresh.dao.AlertProfileDao;
-import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.CompanyDao;
-import com.visfresh.dao.DeviceCommandDao;
-import com.visfresh.dao.DeviceDao;
-import com.visfresh.dao.LocationProfileDao;
-import com.visfresh.dao.NotificationDao;
-import com.visfresh.dao.NotificationScheduleDao;
-import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.ShipmentTemplateDao;
-import com.visfresh.dao.TrackerEventDao;
-import com.visfresh.dao.UserDao;
+import com.visfresh.dao.DaoTestRunner;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
@@ -53,7 +42,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
     /**
      * WEB application context.
      */
-    protected static WebApplicationContext context;
+    protected static AbstractApplicationContext context;
     private static Server server;
     protected static URL url;
 
@@ -66,7 +55,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
             server.start();
 
             //get WEB application context.
-            context = ((FrameworkServlet) handler.getServlet("SpringDispatcher").getServlet())
+            context = (AbstractApplicationContext) ((FrameworkServlet) handler.getServlet("SpringDispatcher").getServlet())
                     .getWebApplicationContext();
 
             url = new URL("http://localhost:" + port + "/web/vf");
@@ -191,19 +180,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
      *
      */
     private void cleanUp() {
-        context.getBean(TrackerEventDao.class).deleteAll();
-        context.getBean(DeviceCommandDao.class).deleteAll();
-        context.getBean(NotificationDao.class).deleteAll();
-        context.getBean(AlertDao.class).deleteAll();
-        context.getBean(ArrivalDao.class).deleteAll();
-        context.getBean(ShipmentDao.class).deleteAll();
-        context.getBean(ShipmentTemplateDao.class).deleteAll();
-        context.getBean(AlertProfileDao.class).deleteAll();
-        context.getBean(LocationProfileDao.class).deleteAll();
-        context.getBean(NotificationScheduleDao.class).deleteAll();
-        context.getBean(DeviceDao.class).deleteAll();
-        context.getBean(UserDao.class).deleteAll();
-        context.getBean(CompanyDao.class).deleteAll();
+        DaoTestRunner.clearDb(context);
     }
     /* (non-Javadoc)
      * @see java.lang.Object#finalize()

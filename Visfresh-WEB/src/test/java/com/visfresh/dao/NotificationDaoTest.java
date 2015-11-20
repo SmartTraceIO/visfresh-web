@@ -173,15 +173,4 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         n.setUser(u);
         return n;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.BaseCrudTest#clear()
-     */
-    @Override
-    public void clear() {
-        super.clear();
-        arrivalDao.deleteAll();
-        shipmentDao.deleteAll();
-        deviceDao.deleteAll();
-        userDao.deleteAll();
-    }
 }

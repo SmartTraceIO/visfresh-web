@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.junit.runner.RunWith;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
@@ -41,7 +41,7 @@ import com.visfresh.utils.SerializerUtils;
 @RunWith(RestServiceRunner.class)
 public abstract class AbstractRestServiceTest {
     protected static TimeZone UTC = SerializerUtils.UTС;
-    protected WebApplicationContext context;
+    protected AbstractApplicationContext context;
     private long lastLong;
     private URL serviceUrl;
 
@@ -55,13 +55,13 @@ public abstract class AbstractRestServiceTest {
     /**
      * @return the context
      */
-    public WebApplicationContext getContext() {
+    public AbstractApplicationContext getContext() {
         return context;
     }
     /**
      * @param context the context to set
      */
-    public void setContext(final WebApplicationContext context) {
+    public void setContext(final AbstractApplicationContext context) {
         this.context = context;
     }
 
