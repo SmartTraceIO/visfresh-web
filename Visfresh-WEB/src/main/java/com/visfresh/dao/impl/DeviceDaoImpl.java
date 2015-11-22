@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.Filter;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceGroup;
 import com.visfresh.io.json.DeviceStateSerializer;
 import com.visfresh.rules.DeviceState;
 
@@ -49,6 +52,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
      * Device trip count.
      */
     public static final String TRIPCOUNT_FIELD = "tripcount";
+    private static final String PROPERTY_DEVICE_GROUP = "deviceGroup";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     private final DeviceStateSerializer stateSerializer = new DeviceStateSerializer();
@@ -195,6 +199,37 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
             jdbc.update("insert into devicestates(device, state) values (:device, :state)", params);
         } else {
             jdbc.update("update devicestates set steate = :state where device = :device", params);
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceGroupDao#getDevices(java.lang.String)
+     */
+    @Override
+    public List<Device> findByGroup(final DeviceGroup group) {
+        final Filter filter = new Filter();
+        filter.addFilter(COMPANY_FIELD, group.getCompany().getId());
+        filter.addFilter(PROPERTY_DEVICE_GROUP, group);
+        final Sorting sorting = new Sorting(NAME_FIELD);
+
+        return findAll(filter, sorting, null);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)
+     */
+    @Override
+    protected void addFilterValue(final String property, final Object value,
+            final Map<String, Object> params, final List<String> filters) {
+        if (PROPERTY_DEVICE_GROUP.equals(property)) {
+            final String group = value instanceof DeviceGroup
+                    ? ((DeviceGroup) value).getName() : value.toString();
+            final String key = DEFAULT_FILTER_KEY_PREFIX + "group";
+
+            filters.add(IMEI_FIELD + " in (select " + DeviceGroupDaoImpl.RELATIONS_DEVICE
+                    + " from " + DeviceGroupDaoImpl.RELATIONS_TABLE
+                    + " where `" + DeviceGroupDaoImpl.RELATIONS_GROUP + "` = :" + key + ")");
+            params.put(key, group);
+        } else {
+            super.addFilterValue(property, value, params, filters);
         }
     }
 }

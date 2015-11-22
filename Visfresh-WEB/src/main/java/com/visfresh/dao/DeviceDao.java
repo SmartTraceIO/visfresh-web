@@ -3,7 +3,10 @@
  */
 package com.visfresh.dao;
 
+import java.util.List;
+
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceGroup;
 import com.visfresh.rules.DeviceState;
 
 /**
@@ -27,4 +30,10 @@ public interface DeviceDao extends EntityWithCompanyDaoBase<Device, String> {
      * @param state device state.
      */
     void saveState(String imei, DeviceState state);
+    /**
+     * Get devices from given group.
+     * @param group device group.
+     * @return devices.
+     */
+    List<Device> findByGroup(DeviceGroup group);
 }

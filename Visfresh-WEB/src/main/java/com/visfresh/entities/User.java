@@ -57,6 +57,7 @@ public class User implements EntityWithId<String>, EntityWithCompany {
      * Temperature units
      */
     private TemperatureUnits temperatureUnits = TemperatureUnits.Celsius;
+    private String deviceGroup;
 
     /**
      * Default constructor.
@@ -199,5 +200,18 @@ public class User implements EntityWithId<String>, EntityWithCompany {
      */
     public void setPhone(final String phone) {
         this.phone = phone;
+    }
+
+    /**
+     * @return authorized device group.
+     */
+    public String getAuthorizedDeviceGroup() {
+        return deviceGroup;
+    }
+    /**
+     * @param group the authorizedDeviceGroup to set
+     */
+    public void setAuthorizedDeviceGroup(final String group) {
+        this.deviceGroup = group;
     }
 }

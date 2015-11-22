@@ -3,6 +3,7 @@
  */
 package com.visfresh.controllers;
 
+import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.User;
 import com.visfresh.io.CreateUserRequest;
 import com.visfresh.services.RestServiceException;
@@ -122,4 +123,18 @@ public interface AccessController {
      * @param user user.
      */
     void checkCanListUsers(User user) throws RestServiceException;
+    /**
+     * @param user user.
+     */
+    void checkCanManageDeviceGroups(User user) throws RestServiceException;
+    /**
+     * @param user user.
+     */
+    void checkCanViewDeviceGroups(User user) throws RestServiceException;
+    /**
+     * @param user user.
+     * @param group device group.
+     * @throws RestServiceException
+     */
+    void checkCanViewDeviceGroup(User user, DeviceGroup group) throws RestServiceException;
 }

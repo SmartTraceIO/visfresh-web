@@ -20,7 +20,7 @@ public enum Role {
     /**
      * @return
      */
-    public boolean hasPermissions(final Role r) {
+    public boolean havePermissions(final Role r) {
         return r == null || priority >= r.priority;
     }
 }

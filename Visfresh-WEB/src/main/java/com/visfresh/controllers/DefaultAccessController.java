@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.ErrorCodes;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.io.CreateUserRequest;
@@ -32,9 +33,9 @@ public class DefaultAccessController implements AccessController {
      */
     @Override
     public void checkCanGetUserInfo(final User user, final String username) throws RestServiceException {
-        if (!hasOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin) && !user.getLogin().equals(username)) {
+        if (!haveOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin) && !user.getLogin().equals(username)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not privileges for get user info for " + username);
+                    "User have not privileges for get user info for " + username);
         }
     }
 
@@ -46,7 +47,7 @@ public class DefaultAccessController implements AccessController {
             throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for send command to device");
+                    "User have not permissions for send command to device");
         }
     }
 
@@ -55,9 +56,9 @@ public class DefaultAccessController implements AccessController {
      */
     @Override
     public void checkCanGetShipmentData(final User user) throws RestServiceException {
-        if (!hasOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin, Role.Dispatcher, Role.ReportViewer)) {
+        if (!haveOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin, Role.Dispatcher, Role.ReportViewer)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for get shipment data");
+                    "User have not permissions for get shipment data");
         }
     }
 
@@ -66,9 +67,9 @@ public class DefaultAccessController implements AccessController {
      */
     @Override
     public void checkCanGetShipments(final User user) throws RestServiceException {
-        if (!hasOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin, Role.Dispatcher, Role.ReportViewer)) {
+        if (!haveOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin, Role.Dispatcher, Role.ReportViewer)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for view reports");
+                    "User have not permissions for view reports");
         }
     }
 
@@ -79,7 +80,7 @@ public class DefaultAccessController implements AccessController {
     public void checkCanSaveShipment(final User user) throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for save shipment");
+                    "User have not permissions for save shipment");
         }
     }
 
@@ -90,7 +91,7 @@ public class DefaultAccessController implements AccessController {
     public void checkCanGetDevices(final User user) throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for get device info");
+                    "User have not permissions for get device info");
         }
     }
 
@@ -101,7 +102,7 @@ public class DefaultAccessController implements AccessController {
     public void checkCanManageDevices(final User user) throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for save device");
+                    "User have not permissions for save device");
         }
     }
 
@@ -113,7 +114,7 @@ public class DefaultAccessController implements AccessController {
             throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for get shipment templates");
+                    "User have not permissions for get shipment templates");
         }
     }
 
@@ -125,7 +126,7 @@ public class DefaultAccessController implements AccessController {
             throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for save shipment template");
+                    "User have not permissions for save shipment template");
         }
     }
 
@@ -137,7 +138,7 @@ public class DefaultAccessController implements AccessController {
             throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for get notification schedules");
+                    "User have not permissions for get notification schedules");
         }
     }
 
@@ -149,7 +150,7 @@ public class DefaultAccessController implements AccessController {
             throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for save notification schedule");
+                    "User have not permissions for save notification schedule");
         }
     }
 
@@ -161,7 +162,7 @@ public class DefaultAccessController implements AccessController {
             throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for get location profiles");
+                    "User have not permissions for get location profiles");
         }
     }
 
@@ -173,7 +174,7 @@ public class DefaultAccessController implements AccessController {
             throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for location profile");
+                    "User have not permissions for location profile");
         }
     }
 
@@ -184,7 +185,7 @@ public class DefaultAccessController implements AccessController {
     public void checkCanGetAlertProfiles(final User user) throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for get alert profiles");
+                    "User have not permissions for get alert profiles");
         }
     }
 
@@ -195,7 +196,7 @@ public class DefaultAccessController implements AccessController {
     public void checkCanSaveAlertProfile(final User user) throws RestServiceException {
         if (!canDispatch(user)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for save alert profiles");
+                    "User have not permissions for save alert profiles");
         }
     }
     /* (non-Javadoc)
@@ -218,16 +219,16 @@ public class DefaultAccessController implements AccessController {
     @Override
     public void checkCanCreateUser(final User user, final CreateUserRequest r)
             throws RestServiceException {
-        if (hasPermission(user, Role.GlobalAdmin)) {
+        if (havePermission(user, Role.GlobalAdmin)) {
             return;
         }
         final Company company = r.getCompany();
-        if (company != null && hasPermission(user, Role.CompanyAdmin)
+        if (company != null && havePermission(user, Role.CompanyAdmin)
                 && user.getCompany().getId().equals(company.getId())) {
             return;
         }
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                "User has not permissions for create user");
+                "User have not permissions for create user");
 
     }
     /* (non-Javadoc)
@@ -235,23 +236,23 @@ public class DefaultAccessController implements AccessController {
      */
     @Override
     public void checkCanGetCompany(final User user, final Long id) throws RestServiceException {
-        if (hasPermission(user, Role.GlobalAdmin)) {
+        if (havePermission(user, Role.GlobalAdmin)) {
             return;
         }
         if (id != null && user.getCompany().getId().equals(id)) {
             return;
         }
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                "User has not permissions for create user");
+                "User have not permissions for create user");
     }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.AccessController#checkCanGetCompanies(com.visfresh.entities.User)
      */
     @Override
     public void checkCanGetCompanies(final User user) throws RestServiceException {
-        if (!hasPermission(user, Role.GlobalAdmin)) {
+        if (!havePermission(user, Role.GlobalAdmin)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User has not permissions for list companies");
+                    "User have not permissions for list companies");
         }
     }
     /* (non-Javadoc)
@@ -259,31 +260,65 @@ public class DefaultAccessController implements AccessController {
      */
     @Override
     public void checkUpdateUserDetails(final User user, final String userName) throws RestServiceException {
-        if (hasPermission(user, Role.GlobalAdmin) || user.getLogin().equals(userName)) {
+        if (havePermission(user, Role.GlobalAdmin) || user.getLogin().equals(userName)) {
             return;
         }
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                "User has not permissions for update user detais for " + userName);
+                "User have not permissions for update user detais for " + userName);
     }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.AccessController#checkCanListUsers(com.visfresh.entities.User)
      */
     @Override
     public void checkCanListUsers(final User user) throws RestServiceException {
-        if (hasPermission(user, Role.CompanyAdmin)) {
+        if (havePermission(user, Role.CompanyAdmin)) {
             return;
         }
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                "User has not permissions for list company users");
+                "User have not permissions for list company users");
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanManageDeviceGroups(com.visfresh.entities.User)
+     */
+    @Override
+    public void checkCanManageDeviceGroups(final User user)
+            throws RestServiceException {
+        if (havePermission(user, Role.CompanyAdmin)) {
+            return;
+        }
+        throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                "User have not permissions to manager device groups");
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanViewDeviceGroups(com.visfresh.entities.User)
+     */
+    @Override
+    public void checkCanViewDeviceGroups(final User user) throws RestServiceException {
+        if (havePermission(user, Role.CompanyAdmin)) {
+            return;
+        }
+        throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                "User have not permissions to manager device groups");
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanViewDeviceGroup(com.visfresh.entities.User, com.visfresh.entities.DeviceGroup)
+     */
+    @Override
+    public void checkCanViewDeviceGroup(final User user, final DeviceGroup group) throws RestServiceException {
+        if (havePermission(user, Role.CompanyAdmin) || group.getName().equals(user.getAuthorizedDeviceGroup())) {
+            return;
+        }
+        throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                "User have not permissions to view device group " + group.getName());
     }
     /**
      * @param user
      * @param role
      * @return
      */
-    private boolean hasPermission(final User user, final Role role) {
+    private boolean havePermission(final User user, final Role role) {
         for (final Role r : user.getRoles()) {
-            if (r.hasPermissions(role)) {
+            if (r.havePermissions(role)) {
                 return true;
             }
         }
@@ -295,13 +330,13 @@ public class DefaultAccessController implements AccessController {
      * @return true if have dispatcher privileges.
      */
     private boolean canDispatch(final User user) {
-        return hasOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin, Role.Dispatcher);
+        return haveOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin, Role.Dispatcher);
     }
 
     /**
      * @param user user.
      */
-    private boolean hasOneRoleFrom(final User user, final Role... roles) {
+    private boolean haveOneRoleFrom(final User user, final Role... roles) {
         final Set<Role> r = user.getRoles();
 
         //check contains role.

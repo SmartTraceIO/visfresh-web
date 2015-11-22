@@ -17,7 +17,9 @@ drop table if exists personalschedules;
 drop table if exists notificationschedules;
 drop table if exists temperaturerules;
 drop table if exists alertprofiles;
+drop table if exists devicegrouprelations;
 drop table if exists devices;
+drop table if exists devicegroups;
 drop table if exists users;
 drop table if exists companies;
 
@@ -39,6 +41,27 @@ create table devices (
     primary key (imei),
     FOREIGN KEY (company)
         REFERENCES companies (id)
+);
+
+create table devicegroups (
+    name varchar(127) not null,
+    description varchar(255),
+    company bigint(20),
+    primary key (name),
+    FOREIGN KEY (company)
+        REFERENCES companies (id)
+);
+
+create table devicegrouprelations (
+    device varchar(30) not null,
+    `group` varchar(127) not null,
+    primary key (device, `group`),
+    FOREIGN KEY (`device`)
+        REFERENCES devices (imei)
+		ON DELETE CASCADE,
+    FOREIGN KEY (`group`)
+        REFERENCES devicegroups (name)
+		ON DELETE CASCADE
 );
 
 create table devicecommands (
