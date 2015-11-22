@@ -35,12 +35,13 @@ An authentication can be performed as from REST client using login method, as fr
 5. [Location](#markdown-header-location)  
 6. [Shipment Template](#markdown-header-shipment-template)  
 7. [Device](#markdown-header-device)  
-8. [Shipment](#markdown-header-shipment)  
-9. [Notification](#markdown-header-notification)  
-10. [Alert](#markdown-header-alert)  
-11. [Temperature Alert](#markdown-header-temperature-alert)  
-12. [Arrival](#markdown-header-arrival)  
-13. [User](#markdown-header-user)  
+8. [Device group](#markdown-header-device-group)  
+9. [Shipment](#markdown-header-shipment)  
+10. [Notification](#markdown-header-notification)  
+11. [Alert](#markdown-header-alert)  
+12. [Temperature Alert](#markdown-header-temperature-alert)  
+13. [Arrival](#markdown-header-arrival)  
+14. [User](#markdown-header-user)  
 
 ## Lists ##
 List items is short representations of base entities, like as [Alert Profile](#markdown-header-alert-profile), [Location](#markdown-header-location), etc. Some of fields can be get from corresponding base entity and some can be synthetic fields.  
@@ -88,9 +89,17 @@ List items is short representations of base entities, like as [Alert Profile](#m
 31. [Get Device](#markdown-header-get-device)  
 32. [Get Devices](#markdown-header-get-devices)  
 33. [Delete Device](#markdown-header-delete-device)  
-34. [Get Notifications](#markdown-header-get-notifications)  
-35. [Send Command to Device](#markdown-header-send-command-to-device)  
-36. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
+34. [Save Device Group](#markdown-header-save-device-group)  
+35. [Get Device Group](#markdown-header-get-device-group)  
+36. [Get Device Groups](#markdown-header-get-device-groups)  
+37. [Delete Device Group](#markdown-header-delete-device-group)  
+38. [Add Device to Group](#markdown-header-add-device-to-group)  
+39. [Remove Device from Group](#markdown-header-remove-device-from-group)  
+40. [Get Devices of Group](#markdown-header-get-devices-of-group)    
+41. [Get Groups of Device](#markdown-header-get-groups-of-device)  
+42. [Get Notifications](#markdown-header-get-notifications)  
+43. [Send Command to Device](#markdown-header-send-command-to-device)  
+44. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
 
 ### Authentication.###
 Method *GET*, method name *login*, request parameters login - the user login name and password - the user password  
@@ -265,6 +274,52 @@ Returns [Device Object](#markdown-header-device)
 Method *GET*, method name *deleteDevice*. Request parameters:
 1. imei - device IMEI.  
 [(example)](#markdown-header-delete-device-example)
+
+### Save Device Group ###
+Method *POST*, method name *saveDeviceGroup*. Request body contains JSON serialized [Device Group Object](#markdown-header-device-group)  
+[(example)](#markdown-header-save-device-group-example)
+
+### Get Device Group ###
+Method *GET*, method name *getDeviceGroup*. Method parameters:  
+1. name - group name.  
+Returns [Device Group object](#markdown-header-device-group)  
+[(example)](#markdown-header-get-device-group-example)
+
+### Get Device Groups ###
+Method *GET*, method name *getDeviceGroups*. Method parameters:  
+1. pageIndex - page index  
+2. pageSize - page size  
+Returns list of [Device Group object](#markdown-header-device-group)  
+[(example)](#markdown-header-get-device-groups-example)  
+
+### Delete Device Group ###
+Method *GET*, method name *deleteDeviceGroup*. Method parameters:  
+1. name - group name  
+[(example)](#markdown-header-delete-device-group-example)
+
+### Add Device to Group ###
+Method *GET*, method name *addDeviceToGroup*. Method parameters:  
+1. groupName - group name.  
+2. device - device IMEI.  
+[(example)](add-device-to-group-example)
+
+### Remove Device from Group ###
+Method *GET*, method name *removeDeviceFromGroup*. Method parameters:  
+1. groupName - group name.  
+2. device - device IMEI.  
+[(example)](remove-device-from-group-example)
+
+### Get Devices of Group ###
+Method *GET*, method name *getDevicesOfGroup*. Method parameters:  
+1. groupName - name of group  
+Returns array of [Device Objects](#markdown-header-device)  
+[(example)](get-devices-of-group-example)
+
+### Get Groups of Device ###  
+Method *GET*, method name *getGroupsOfDevice*. Method parameters:  
+1. device - device IMEI code  
+Returns array of [Device Group Objects](#markdown-header-device-group)  
+[(example)](#markdown-header-get-groups-of-device-example)
 
 ### Save Shipment ###
 Method *POST*, method name saveShipment, request body contains JSON serialized [Save Shipment request](#markdown-header-save-shipment-request). Response contains ID of just saved Shipment and ID of shipment template if the shipment was saved with corresponding option.  
@@ -468,7 +523,14 @@ see [ResponseStatus](#markdown-header-response-status)
   "name": "Device Name",
   "sn": "043987"
 }
-```  
+```
+### Device Group ###
+```json
+{
+  "name": "G2",
+  "description": "JUnit device group"
+}
+```
 ### Save Shipment request ###
 ```json
 {
@@ -1486,6 +1548,142 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "code": 0,
     "message": "Success"
   }
+}
+```
+### Save Device Group example ###
+**POST /vf/rest/saveDeviceGroup/${accessToken}**  
+**Request:**  
+```json
+{
+  "name": "JUnit",
+  "description": "JUnit device group"
+}
+```  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
+### Get Device Group example ###
+**GET /vf/rest/getDeviceGroup/${accessToken}?name=G1**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "name": "G1",
+    "description": "JUnit device group"
+  }
+}
+```
+### Get Device Groups example ###
+**GET /vf/rest/getDeviceGroups/${accessTonek}**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "name": "G1",
+      "description": "JUnit device group"
+    },
+    {
+      "name": "G2",
+      "description": "JUnit device group"
+    }
+  ],
+  "totalCount": 2
+}
+```
+### Delete Device Group example ###
+**GET /vf/rest/deleteDeviceGroup/${accessToken}?name=G1**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
+### Add Device to Group example ###
+**GET /vf/rest/addDeviceToGroup/${accessToken}?groupName=JUnit&device=0238947023987**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
+### Remove Device from Group example ###
+**GET /vf/rest/removeDeviceFromGroup/${accessToken}?groupName=JUnit&device=0238947023987**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
+}
+```
+### Get Devices of Group example ###
+**GET /vf/rest/getDevicesOfGroup/${accessToken}?groupName=JUnit**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "description": "Device description",
+      "imei": "0238947023987",
+      "name": "Device Name",
+      "sn": "023987"
+    },
+    {
+      "description": "Device description",
+      "imei": "2398472903879",
+      "name": "Device Name",
+      "sn": "903879"
+    }
+  ],
+  "totalCount": 2
+}
+```
+### Get Groups of Device example ###
+**GET /vf/rest/getGroupsOfDevice/${accessToken}?device=0238947023987**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "name": "JUnit-1",
+      "description": "JUnit device group"
+    },
+    {
+      "name": "JUnit-2",
+      "description": "JUnit device group"
+    }
+  ],
+  "totalCount": 2
 }
 ```
 ### Get Notifications example ###

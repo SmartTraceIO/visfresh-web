@@ -165,7 +165,23 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
         dao.addDevice(group, d1);
         dao.addDevice(group, d2);
 
-        assertEquals(2, client.getGroupDevices(group.getName()).size());
+        assertEquals(2, client.getDevicesOfGroup(group.getName()).size());
+    }
+    /**
+     * Tests get group of given device.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    @Test
+    public void testGetGroupsOfDevice() throws IOException, RestServiceException {
+        final Device device = createDevice("0238947023987", true);
+        final DeviceGroup g1 = createGroup("JUnit-1", "JUnit device group");
+        final DeviceGroup g2 = createGroup("JUnit-2", "JUnit device group");
+
+        dao.addDevice(g1, device);
+        dao.addDevice(g2, device);
+
+        assertEquals(2, client.getGroupsOfDevice(device.getImei()).size());
     }
     /**
      * @param name

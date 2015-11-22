@@ -113,12 +113,10 @@ public class DeviceGroupController extends AbstractController implements DeviceG
     /**
      * @param authToken authentication token.
      * @param groupName group name.
-     * @param pageIndex page index.
-     * @param pageSize page size.
      * @return list of devices.
      */
-    @RequestMapping(value = "/getGroupDevices/{authToken}", method = RequestMethod.GET)
-    public JsonObject getGroupDevices(@PathVariable final String authToken,
+    @RequestMapping(value = "/getDevicesOfGroup/{authToken}", method = RequestMethod.GET)
+    public JsonObject getDevicesOfGroup(@PathVariable final String authToken,
             @RequestParam final String groupName) {
         try {
             //check logged in.
@@ -134,6 +132,36 @@ public class DeviceGroupController extends AbstractController implements DeviceG
             final JsonArray array = new JsonArray();
             for (final Device d : devices) {
                 array.add(ser.toJson(d));
+            }
+
+            return createListSuccessResponse(array, devices.size());
+        } catch (final Exception e) {
+            log.error("Failed to get device groups", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param device device IMEI.
+     * @return list of devices.
+     */
+    @RequestMapping(value = "/getGroupsOfDevice/{authToken}", method = RequestMethod.GET)
+    public JsonObject getGroupsOfDevice(@PathVariable final String authToken,
+            @RequestParam final String device) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanViewDeviceGroups(user);
+
+            final Device d = deviceDao.findOne(device);
+            checkCompanyAccess(user, d);
+
+            final List<DeviceGroup> devices = dao.findByDevice(d);
+
+            final DeviceGroupSerializer ser = createSerializer(user);
+            final JsonArray array = new JsonArray();
+            for (final DeviceGroup g : devices) {
+                array.add(ser.toJson(g));
             }
 
             return createListSuccessResponse(array, devices.size());

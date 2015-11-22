@@ -21,6 +21,10 @@ public class RestIoLogger implements RestIoListener {
     @Override
     public void sendingRequest(final String url, final String body, final String methodName) {
         System.out.println(methodName + " " + url);
+        if (body != null) {
+            System.out.println("Request:");
+            System.out.println(body);
+        }
     }
 
     /* (non-Javadoc)

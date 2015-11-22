@@ -130,16 +130,34 @@ public class DeviceGroupRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<Device> getGroupDevices(final String groupName) throws IOException, RestServiceException {
+    public List<Device> getDevicesOfGroup(final String groupName) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("groupName", groupName);
 
-        final JsonArray array = sendGetRequest(getPathWithToken("getGroupDevices"), params).getAsJsonArray();
+        final JsonArray array = sendGetRequest(getPathWithToken("getDevicesOfGroup"), params).getAsJsonArray();
 
         final DeviceSerializer devSer = new DeviceSerializer(TimeZone.getTimeZone("UTC"));
         final List<Device> list = new LinkedList<Device>();
         for (final JsonElement e : array) {
             list.add(devSer.parseDevice(e.getAsJsonObject()));
+        }
+        return list;
+    }
+    /**
+     * @param device device IMEI.
+     * @return list of groups for given device.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public List<DeviceGroup> getGroupsOfDevice(final String device) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("device", device);
+
+        final JsonArray array = sendGetRequest(getPathWithToken("getGroupsOfDevice"), params).getAsJsonArray();
+
+        final List<DeviceGroup> list = new LinkedList<DeviceGroup>();
+        for (final JsonElement e : array) {
+            list.add(serializer.parseDeviceGroup(e.getAsJsonObject()));
         }
         return list;
     }
