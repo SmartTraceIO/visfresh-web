@@ -365,6 +365,7 @@ Method *GET*, method *getSingleShipment*. Request parameters:
 Method *GET*, method name getNotifications, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
+3. includeRead - include notification which have mark as read  
 Returns array of [Notification Objects](#markdown-header-notification) and total items count  
 [(example)](#markdown-header-get-notifications-example)
 
@@ -1719,7 +1720,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```
 ### Get Notifications example ###
-**GET  /vf/rest/getNotifications/${accessToken}?shipment=11&pageSize=1&pageIndex=3**  
+**GET  /vf/rest/getNotifications/${accessToken}?includeRead=true&shipment=11&pageSize=1&pageIndex=3**  
 **Response:**  
 ```json
 {
@@ -1727,40 +1728,40 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "code": 0,
     "message": "Success"
   },
-  "response": [ //array of notifications id, notification type, issue (Alert/Arrival)
+  "response": [
     {
-      "id": 13,
+      "id": 7,
       "type": "Alert",
-      "issue": { //Temperature alert
-        "id": 12,
-        "date": "2015-11-05T13:57",
+      "issue": {
+        "id": 5,
+        "date": "2015-11-23T17:46",
         "device": "234908720394857",
-        "shipment": 11,
+        "shipment": 3,
         "type": "Hot",
         "temperature": 5.0,
         "minutes": 55
       }
     },
     {
-      "id": 15,
+      "id": 8,
       "type": "Alert",
-      "issue": { // Low Battery alert
-        "id": 14,
-        "date": "2015-11-05T13:57",
+      "issue": {
+        "id": 6,
+        "date": "2015-11-23T17:46",
         "device": "234908720394857",
-        "shipment": 11,
+        "shipment": 3,
         "type": "Battery"
       }
     },
     {
-      "id": 17,
+      "id": 9,
       "type": "Arrival",
-      "issue": { //Arrival
-        "id": 16,
+      "issue": {
+        "id": 3,
         "numberOfMetersOfArrival": 1500,
-        "date": "2015-11-05T13:57",
+        "date": "2015-11-23T17:46",
         "device": "234908720394857",
-        "shipment": 11
+        "shipment": 3
       }
     }
   ],

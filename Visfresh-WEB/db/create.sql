@@ -102,6 +102,7 @@ create table notifications (
     `type` varchar(20) not null,
     issue bigint(20) not null,
     user bigint(20) not null,
+    isread boolean not null default false,
     primary key (id),
     FOREIGN KEY (user)
         REFERENCES users (id)

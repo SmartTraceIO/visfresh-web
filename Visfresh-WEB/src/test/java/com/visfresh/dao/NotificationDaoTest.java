@@ -145,12 +145,12 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
 
         final Set<Long> ids = new HashSet<Long>();
         ids.add(n1.getId());
-        dao.deleteByUserAndId(u, ids);
+        dao.markAsReadenByUserAndId(u, ids);
 
         assertEquals(3, dao.findAll(null, null, null).size());
 
         ids.add(n2.getId());
-        dao.deleteByUserAndId(u, ids);
+        dao.markAsReadenByUserAndId(u, ids);
         assertEquals(2, dao.findAll(null, null, null).size());
     }
 

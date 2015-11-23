@@ -23,6 +23,10 @@ public class Notification implements EntityWithId<Long> {
      */
     private User user;
     /**
+     * Is notification read flag.
+     */
+    private boolean isRead;
+    /**
      * Notification issue.
      */
     private NotificationIssue issue;
@@ -82,5 +86,17 @@ public class Notification implements EntityWithId<Long> {
      */
     public void setUser(final User user) {
         this.user = user;
+    }
+    /**
+     * @return the isRead
+     */
+    public boolean isRead() {
+        return isRead;
+    }
+    /**
+     * @param isRead the isRead to set
+     */
+    public void setRead(final boolean isRead) {
+        this.isRead = isRead;
     }
 }

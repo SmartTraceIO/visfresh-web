@@ -21,6 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.NotificationConstants;
+import com.visfresh.dao.Filter;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
@@ -63,7 +64,9 @@ public class NotificationController extends AbstractController implements Notifi
      */
     @RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
     public JsonObject getNotifications(@PathVariable final String authToken,
-            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
+            @RequestParam(required = false) final Integer pageIndex,
+            @RequestParam(required = false) final Integer pageSize,
+            @RequestParam(required = false) final Boolean includeRead) {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
@@ -71,9 +74,17 @@ public class NotificationController extends AbstractController implements Notifi
             final User user = getLoggedInUser(authToken);
             final NotificationSerializer ser = createSerializer(user);
 
+            Filter filter;
+            if (Boolean.TRUE.equals(includeRead)) {
+                filter = null;
+            } else {
+                filter = new Filter();
+                filter.addFilter(PROPERTY_ISREAD, Boolean.FALSE);
+            }
+
             final List<Notification> ns = dao.findForUser(user,
                     new Sorting(getDefaultSortOrder()),
-                    null,
+                    filter,
                     page);
 
             final int total = dao.getEntityCount(user, null);
@@ -121,7 +132,7 @@ public class NotificationController extends AbstractController implements Notifi
                 ids.add(e.getAsLong());
             }
 
-            dao.deleteByUserAndId(user, ids);
+            dao.markAsReadenByUserAndId(user, ids);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to get devices", e);

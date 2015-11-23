@@ -122,10 +122,37 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
         notificationDao.save(n);
 
         //get notifications
-        assertEquals(3, client.getNotifications(null, null).size());
-        assertEquals(1, client.getNotifications(1, 1).size());
-        assertEquals(1, client.getNotifications(2, 1).size());
-        assertEquals(0, client.getNotifications(3, 10000).size());
+        assertEquals(3, client.getNotifications(false, null, null).size());
+        assertEquals(1, client.getNotifications(false, 1, 1).size());
+        assertEquals(1, client.getNotifications(false, 2, 1).size());
+        assertEquals(0, client.getNotifications(false, 3, 10000).size());
+    }
+    @Test
+    public void testIncludeRead() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        //get server device
+        final Device d = deviceDao.findOne(s.getDevice().getId());
+
+        //create temperature alert notification
+        final TemperatureAlert tempAlert = new TemperatureAlert();
+        tempAlert.setDate(new Date());
+        tempAlert.setType(AlertType.Hot);
+        tempAlert.setTemperature(5);
+        tempAlert.setMinutes(55);
+        tempAlert.setDevice(d);
+        tempAlert.setShipment(s);
+        alertDao.save(tempAlert);
+
+        final Notification n = new Notification();
+        n.setIssue(tempAlert);
+        n.setType(NotificationType.Alert);
+        n.setUser(user);
+        n.setRead(true);
+        notificationDao.save(n);
+
+        //get notifications
+        assertEquals(0, client.getNotifications(false, null, null).size());
+        assertEquals(1, client.getNotifications(true, null, null).size());
     }
     //@RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String markNotificationsAsRead(@PathVariable final String authToken,
@@ -187,6 +214,6 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
 
         client.markNotificationsAsRead(toReaden);
 
-        assertEquals(1, client.getNotifications(null, null).size());
+        assertEquals(1, client.getNotifications(false, null, null).size());
     }
 }

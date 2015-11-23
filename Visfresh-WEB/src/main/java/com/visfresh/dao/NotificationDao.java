@@ -28,7 +28,7 @@ public interface NotificationDao extends
      * @param user the user.
      * @param ids notification IDs.
      */
-    void deleteByUserAndId(User user, Set<Long> ids);
+    void markAsReadenByUserAndId(User user, Set<Long> ids);
     /**
      * @param user user.
      * @param filter filter.

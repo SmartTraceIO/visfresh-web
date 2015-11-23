@@ -4,6 +4,7 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.constants.NotificationConstants;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.Filter;
@@ -50,6 +52,10 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * Reference ID to user.
      */
     public static final String USER_FIELD = "user";
+    /**
+     * Is read flag.
+     */
+    public static final String ISREAD_FIELD = "isread";
 
     /**
      * User DAO.
@@ -67,11 +73,16 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
     @Autowired
     private AlertDao alertDao;
 
+    private final Map<String, String> propertyToDbMap = new HashMap<String, String>();
+
     /**
      * Default constructor.
      */
     public NotificationDaoImpl() {
         super();
+        propertyToDbMap.put(NotificationConstants.PROPERTY_ID, ID_FIELD);
+        propertyToDbMap.put(NotificationConstants.PROPERTY_TYPE, TYPE_FIELD);
+        propertyToDbMap.put(NotificationConstants.PROPERTY_ISREAD, ISREAD_FIELD);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.NotificationDao#findByShipment(java.lang.Long)
@@ -86,7 +97,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * @see com.visfresh.dao.NotificationDao#deleteByUserAndId(com.visfresh.entities.User, java.util.List)
      */
     @Override
-    public void deleteByUserAndId(final User user, final Set<Long> ids) {
+    public void markAsReadenByUserAndId(final User user, final Set<Long> ids) {
         if (ids.size() == 0) {
             return;
         }
@@ -104,7 +115,8 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
             i++;
         }
 
-        jdbc.update("delete from " + TABLE + " where user = :user and (" + idPart + ")", paramMap);
+        jdbc.update("update " + TABLE + " set "
+                + ISREAD_FIELD + " = true where user = :user and (" + idPart + ")", paramMap);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
@@ -114,33 +126,21 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;
+        final List<String> fields = getFields();
 
         if (no.getId() == null) {
             //insert
-            paramMap.put("id", no.getId());
-            sql = "insert into " + TABLE + " (" + combine(
-                    TYPE_FIELD
-                    , ISSUE_FIELD
-                    , USER_FIELD
-                ) + ")" + " values("
-                    + ":"+ TYPE_FIELD
-                    + ", :" + ISSUE_FIELD
-                    + ", :" + USER_FIELD
-                    + ")";
+            sql = createInsertScript(TABLE, fields);
         } else {
             //update
-            sql = "update " + TABLE + " set "
-                + TYPE_FIELD + "=:" + TYPE_FIELD + ","
-                + ISSUE_FIELD + "=:" + ISSUE_FIELD + ","
-                + USER_FIELD + "=:" + USER_FIELD
-                + " where " + ID_FIELD + " = :" + ID_FIELD
-            ;
+            sql = createUpdateScript(TABLE, fields, ID_FIELD);
         }
 
         paramMap.put(ID_FIELD, no.getId());
         paramMap.put(TYPE_FIELD, no.getType().name());
         paramMap.put(ISSUE_FIELD, no.getIssue().getId());
         paramMap.put(USER_FIELD, no.getUser().getId());
+        paramMap.put(ISREAD_FIELD, no.isRead());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -149,6 +149,18 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         }
 
         return no;
+    }
+    /**
+     * @return
+     */
+    private List<String> getFields() {
+        final List<String> fields = new LinkedList<String>();
+        fields.add(ID_FIELD);
+        fields.add(TYPE_FIELD);
+        fields.add(ISSUE_FIELD);
+        fields.add(USER_FIELD);
+        fields.add(ISREAD_FIELD);
+        return fields;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
@@ -169,7 +181,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      */
     @Override
     protected Map<String, String> getPropertyToDbMap() {
-        return new HashMap<String, String>();
+        return propertyToDbMap;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.NotificationDao#getEntityCount(com.visfresh.entities.User, com.visfresh.dao.Filter)
@@ -198,14 +210,17 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
      */
     @Override
-    protected Notification createEntity(final Map<String, Object> map) {
+    protected Notification createEntity(final Map<String, Object> row) {
         final Notification no = new Notification();
-        no.setId(((Number) map.get(ID_FIELD)).longValue());
-
-        final NotificationType type = NotificationType.valueOf((String) map.get(TYPE_FIELD));
+        //ID
+        no.setId(((Number) row.get(ID_FIELD)).longValue());
+        //type
+        final NotificationType type = NotificationType.valueOf((String) row.get(TYPE_FIELD));
         no.setType(type);
+        //is read
+        no.setRead(Boolean.TRUE.equals(row.get(ISREAD_FIELD)));
 
-        final long issueId = ((Number) map.get(ISSUE_FIELD)).longValue();
+        final long issueId = ((Number) row.get(ISSUE_FIELD)).longValue();
         if (type == NotificationType.Alert) {
             no.setIssue(alertDao.findOne(issueId));
         } else if (type == NotificationType.Arrival) {

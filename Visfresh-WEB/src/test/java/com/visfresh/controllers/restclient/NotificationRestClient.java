@@ -31,18 +31,23 @@ public class NotificationRestClient extends RestClient {
         serializer = new NotificationSerializer(tz);
     }
     /**
+     * @param includeRead include read flag
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return notifications for given shipment.
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<Notification> getNotifications(final Integer pageIndex, final Integer pageSize)
+    public List<Notification> getNotifications(final boolean includeRead,
+            final Integer pageIndex, final Integer pageSize)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         if (pageIndex != null) {
             params.put("pageIndex", Integer.toString(pageIndex));
             params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
+        }
+        if (includeRead) {
+            params.put("includeRead", "true");
         }
 
         final JsonArray response = sendGetRequest(getPathWithToken("getNotifications"),

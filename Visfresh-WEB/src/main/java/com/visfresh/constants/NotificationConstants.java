@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.visfresh.constants;
 
@@ -8,8 +8,7 @@ package com.visfresh.constants;
  *
  */
 public interface NotificationConstants {
-
-    public static final String PROPERTY_ID = "id";
-    public static final String PROPERTY_TYPE = "type";
-
+    String PROPERTY_ID = "id";
+    String PROPERTY_TYPE = "type";
+    String PROPERTY_ISREAD = "isRead";
 }
