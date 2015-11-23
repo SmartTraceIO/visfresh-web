@@ -52,17 +52,15 @@ public class RestClient  {
         addRestIoListener(new RestIoLogger());
     }
     /**
-     * @param login
-     *            login.
-     * @param password
-     *            password.
+     * @param email email address.
+     * @param password password.
      * @return authentication token.
      * @throws IOException
      * @throws AuthenticationException
      */
-    public final String login(final String login, final String password) throws RestServiceException, IOException {
+    public final String login(final String email, final String password) throws RestServiceException, IOException {
         final Map<String, String> req = new HashMap<String, String>();
-        req.put("login", login);
+        req.put("email", email);
         req.put("password", password);
 
         final JsonObject response = sendGetRequest(REST_SERVICE + "/login", req).getAsJsonObject();

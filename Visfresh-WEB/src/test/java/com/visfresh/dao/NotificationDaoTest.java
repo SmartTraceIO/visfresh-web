@@ -77,7 +77,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         //create User
         final User u = new User();
         u.setCompany(sharedCompany);
-        u.setLogin("asuvorov");
+        u.setEmail("asuvorov@google.com");
         u.setFirstName("Alexande");
         u.setLastName("Suvorov");
         u.setPassword("alskdj");
@@ -111,7 +111,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
     public void testFindForUser() {
         User u = new User();
         u.setCompany(sharedCompany);
-        u.setLogin("mkutuzov");
+        u.setEmail("mkutuzov@google.com");
         u.setFirstName("Michael");
         u.setLastName("Kutuzov");
         u.setPassword("alskdj");
@@ -130,7 +130,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
     public void testDeleteByUserAndId() {
         User u = new User();
         u.setCompany(sharedCompany);
-        u.setLogin("mkutuzov");
+        u.setEmail("mkutuzov@google.com");
         u.setFirstName("Michael");
         u.setLastName("Kutuzov");
         u.setPassword("alskdj");

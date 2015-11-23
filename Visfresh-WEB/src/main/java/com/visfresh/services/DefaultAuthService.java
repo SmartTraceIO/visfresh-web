@@ -54,8 +54,8 @@ public class DefaultAuthService extends AbstractAuthService {
      * @see com.visfresh.services.AuthService#getUser(java.lang.String)
      */
     @Override
-    public User getUser(final String username) {
-        return userDao.findOne(username);
+    public User findUserByImail(final String email) {
+        return userDao.findByEmail(email);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.AuthService#createUser(com.visfresh.entities.User, java.lang.String)

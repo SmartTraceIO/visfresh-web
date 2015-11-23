@@ -79,7 +79,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
     @Override
     public List<Notification> findForUser(final User user, final Sorting sorting, final Filter filter, final Page page) {
         final Filter f = new Filter(filter);
-        f.addFilter(USER_FIELD, user.getLogin());
+        f.addFilter(USER_FIELD, user.getId());
         return findAll(f, sorting, page);
     }
     /* (non-Javadoc)
@@ -92,7 +92,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         }
 
         final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("user", user.getLogin());
+        paramMap.put("user", user.getId());
         final StringBuilder idPart = new StringBuilder();
         int i = 0;
         for (final Long id: ids) {
@@ -177,7 +177,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
     @Override
     public int getEntityCount(final User user, final Filter filter) {
         final Filter f = new Filter(filter);
-        f.addFilter(USER_FIELD, user.getLogin());
+        f.addFilter(USER_FIELD, user.getId());
         return getEntityCount(f);
     }
     /* (non-Javadoc)
@@ -186,11 +186,11 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
     @Override
     protected void resolveReferences(final Notification t, final Map<String, Object> map,
             final Map<String, Object> userCache) {
-        final String userName = (String) map.get(USER_FIELD);
-        User user = (User) userCache.get(userName);
+        final Long userId = (Long) map.get(USER_FIELD);
+        User user = (User) userCache.get(userId.toString());
         if (user == null) {
-            user = userDao.findOne(userName);
-            userCache.put(userName, user);
+            user = userDao.findOne(userId);
+            userCache.put(userId.toString(), user);
         }
         t.setUser(user);
     }

@@ -15,6 +15,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.services.lists.ListUserItem;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -28,7 +29,7 @@ public class AbstractTool {
      */
     private static final TimeZone UTС = SerializerUtils.UTС;
     public static final String COMPANY_NAME = "Demo";
-    protected String USER_NAME = "developer";
+    protected String EMAIL = "developer@visfresh.com";
     protected UserRestClient userService;
     protected CompanyRestClient companyService;
     protected DeviceRestClient deviceService;
@@ -96,10 +97,10 @@ public class AbstractTool {
 
         //create user if need
         final String newPassword = "password";
-        User u = userService.getUser(USER_NAME);
+        User u = getUserByEmail(EMAIL);
         if (u == null) {
             u = new User();
-            u.setLogin(USER_NAME);
+            u.setEmail(EMAIL);
             u.setFirstName("Java (JS)");
             u.setLastName("Developer");
             u.getRoles().add(Role.CompanyAdmin);
@@ -109,6 +110,22 @@ public class AbstractTool {
         user = u;
 
         //relogin
-        setAuthToken(userService.login(user.getLogin(), newPassword));
+        setAuthToken(userService.login(user.getEmail(), newPassword));
+    }
+
+    /**
+     * @param email
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    private User getUserByEmail(final String email) throws IOException, RestServiceException {
+        for (final ListUserItem u : userService.getUsers(null, null, null, null)) {
+            final User user = userService.getUser(u.getId());
+            if (EMAIL.equals(user.getEmail())) {
+                return user;
+            }
+        }
+        return null;
     }
 }

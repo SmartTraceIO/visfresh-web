@@ -148,7 +148,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         }
 
         sb.insert(0, "update " + tableName + " set ");
-        sb.append(" where id =:").append(idField);
+        sb.append(" where " + idField + " =:").append(idField);
         return sb.toString();
     }
 

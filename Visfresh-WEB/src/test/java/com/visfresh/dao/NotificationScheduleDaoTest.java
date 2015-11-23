@@ -45,7 +45,7 @@ public class NotificationScheduleDaoTest
         u.setEmail("asuvorov@mail.ru");
         u.setFirstName("Alexander");
         u.setLastName("Suvorov");
-        u.setLogin("asuvorov");
+        u.setEmail("asuvorov@google.com");
         u.setPhone("11111111117");
         u.setTemperatureUnits(TemperatureUnits.Celsius);
         u.setTimeZone(TimeZone.getTimeZone("UTC"));

@@ -42,7 +42,7 @@ import com.visfresh.utils.SerializerUtils;
 public abstract class AbstractRestServiceTest {
     protected static TimeZone UTC = SerializerUtils.UTС;
     protected AbstractApplicationContext context;
-    private long lastLong;
+    protected long lastLong;
     private URL serviceUrl;
 
     /**
@@ -71,7 +71,7 @@ public abstract class AbstractRestServiceTest {
         u.setEmail("asuvorov@mail.ru");
         u.setFirstName("Alexander");
         u.setLastName("Suvorov");
-        u.setLogin("asuvorov");
+        u.setId(++lastLong);
         u.setPhone("11111111117");
         u.setTemperatureUnits(TemperatureUnits.Celsius);
         u.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -84,7 +84,7 @@ public abstract class AbstractRestServiceTest {
         u.setEmail("mkutuzov@mail.ru");
         u.setFirstName("Mikhael");
         u.setLastName("Kutuzov");
-        u.setLogin("mkutuzov");
+        u.setId(++lastLong);
         u.setPhone("11111111118");
         u.setTemperatureUnits(TemperatureUnits.Fahrenheit);
         u.setTimeZone(TimeZone.getTimeZone("GMT+3"));
@@ -350,7 +350,7 @@ public abstract class AbstractRestServiceTest {
     protected String login() {
         try {
             final User user = context.getBean(UserDao.class).findAll(null, null, null).get(0);
-            return context.getBean(AuthService.class).login(user.getLogin(),"").getToken();
+            return context.getBean(AuthService.class).login(user.getEmail(),"").getToken();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

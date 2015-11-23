@@ -11,11 +11,11 @@ import java.util.TimeZone;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class User implements EntityWithId<String>, EntityWithCompany {
+public class User implements EntityWithId<Long>, EntityWithCompany {
     /**
-     * User login.
+     * User ID.
      */
-    private String login;
+    private Long id;
     /**
      * Company.
      */
@@ -57,7 +57,26 @@ public class User implements EntityWithId<String>, EntityWithCompany {
      * Temperature units
      */
     private TemperatureUnits temperatureUnits = TemperatureUnits.Celsius;
+    /**
+     * Authorized device group.
+     */
     private String deviceGroup;
+    /**
+     * User title Mr/Mrs
+     */
+    private String title;
+    /**
+     * User scale
+     */
+    private String scale;
+    /**
+     * User language.
+     */
+    private Language language = Language.English;
+    /**
+     * User measurement units.
+     */
+    private MeasurementUnits measurementUnits = MeasurementUnits.Metric;
 
     /**
      * Default constructor.
@@ -66,24 +85,18 @@ public class User implements EntityWithId<String>, EntityWithCompany {
         super();
     }
 
-    /**
-     * @return the login
-     */
-    public String getLogin() {
-        return login;
-    }
-    /**
-     * @param login the login to set
-     */
-    public void setLogin(final String login) {
-        this.login = login;
-    }
     /* (non-Javadoc)
      * @see com.visfresh.entities.EntityWithId#getId()
      */
     @Override
-    public String getId() {
-        return getLogin();
+    public Long getId() {
+        return id;
+    }
+    /**
+     * @param id the id to set
+     */
+    public void setId(final Long id) {
+        this.id = id;
     }
     /**
      * @return the roles
@@ -213,5 +226,65 @@ public class User implements EntityWithId<String>, EntityWithCompany {
      */
     public void setAuthorizedDeviceGroup(final String group) {
         this.deviceGroup = group;
+    }
+    /**
+     * @return the deviceGroup
+     */
+    public String getDeviceGroup() {
+        return deviceGroup;
+    }
+    /**
+     * @param deviceGroup the deviceGroup to set
+     */
+    public void setDeviceGroup(final String deviceGroup) {
+        this.deviceGroup = deviceGroup;
+    }
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(final String title) {
+        this.title = title;
+    }
+    /**
+     * @return the scale
+     */
+    public String getScale() {
+        return scale;
+    }
+    /**
+     * @param scale the scale to set
+     */
+    public void setScale(final String scale) {
+        this.scale = scale;
+    }
+    /**
+     * @return the language
+     */
+    public Language getLanguage() {
+        return language;
+    }
+    /**
+     * @param language the language to set
+     */
+    public void setLanguage(final Language language) {
+        this.language = language;
+    }
+    /**
+     * @return the measurementUnits
+     */
+    public MeasurementUnits getMeasurementUnits() {
+        return measurementUnits;
+    }
+    /**
+     * @param measurementUnits the measurementUnits to set
+     */
+    public void setMeasurementUnits(final MeasurementUnits measurementUnits) {
+        this.measurementUnits = measurementUnits;
     }
 }

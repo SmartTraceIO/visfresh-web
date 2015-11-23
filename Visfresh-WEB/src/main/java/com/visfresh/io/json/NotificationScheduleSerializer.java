@@ -87,7 +87,7 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
 
         obj.addProperty("personScheduleId", s.getId());
-        obj.addProperty("user", s.getUser().getLogin());
+        obj.addProperty("user", s.getUser().getId());
         obj.addProperty("sendApp", s.isSendApp());
         obj.addProperty("sendEmail", s.isSendEmail());
         obj.addProperty("sendSms", s.isSendSms());
@@ -115,7 +115,7 @@ public class NotificationScheduleSerializer extends AbstractJsonSerializer {
         final JsonObject obj = e.getAsJsonObject();
         final PersonSchedule s = new PersonSchedule();
 
-        s.setUser(getUserResolver().getUser(asString(obj.get("user"))));
+        s.setUser(getUserResolver().getUser(asLong(obj.get("user"))));
         s.setToTime(timeToMinutes(asString(obj.get("toTime"))));
         s.setFromTime(timeToMinutes(asString(obj.get("fromTime"))));
         s.setId(asLong(obj.get("personScheduleId")));

@@ -75,18 +75,24 @@ create table devicecommands (
 );
 
 create table users (
-    username varchar(127) not null,
+    id bigint(20) auto_increment not null,
     `password` varchar(127) default null,
     firstname varchar(127),
     lastname varchar(127),
     position varchar(127),
-    email varchar(127),
+    email varchar(127) not null,
     phone varchar(20),
     roles varchar(255) not null,
     company bigint(20) not null,
     tempunits varchar(20) not null default 'Celsius',
     timezone varchar(31) not null default 'UTC',
-    primary key (username),
+    devicegroup varchar(127),
+    `language` varchar(20) not null default 'English',
+	measureunits varchar(20) not null default 'Metric',
+    scale varchar(127),
+	title varchar(10),
+    unique (email),
+    primary key (id),
     FOREIGN KEY (company)
         REFERENCES companies (id)
 );
@@ -95,10 +101,10 @@ create table notifications (
     id bigint(20) auto_increment not null,
     `type` varchar(20) not null,
     issue bigint(20) not null,
-    user varchar(20) not null,
+    user bigint(20) not null,
     primary key (id),
     FOREIGN KEY (user)
-        REFERENCES users (username)
+        REFERENCES users (id)
 );
 
 create table locationprofiles (
@@ -159,7 +165,7 @@ create table notificationschedules (
 
 create table personalschedules (
     id bigint(20) auto_increment not null,
-    user varchar(127) not null,
+    user  bigint(20) not null,
     sendapp boolean not null default false,
     sendemail boolean not null default false,
     sendsms boolean not null default false,
@@ -172,7 +178,7 @@ create table personalschedules (
         REFERENCES notificationschedules (id)
 		ON DELETE CASCADE,
     FOREIGN KEY (`user`)
-        REFERENCES users (username)
+        REFERENCES users (id)
 		ON DELETE CASCADE
 );
 

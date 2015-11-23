@@ -5,6 +5,8 @@ package com.visfresh.io;
 
 import java.util.TimeZone;
 
+import com.visfresh.entities.Language;
+import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.TemperatureUnits;
 
 /**
@@ -12,7 +14,7 @@ import com.visfresh.entities.TemperatureUnits;
  *
  */
 public class UpdateUserDetailsRequest {
-    private String user;
+    private Long user;
     private String firstName;
     private String lastName;
     private String position;
@@ -21,6 +23,10 @@ public class UpdateUserDetailsRequest {
     private TemperatureUnits temperatureUnits;
     private TimeZone timeZone;
     private String password;
+    private MeasurementUnits measurementUnits;
+    private Language language;
+    private String scale;
+    private String title;
 
     /**
      * Default constructor.
@@ -30,15 +36,15 @@ public class UpdateUserDetailsRequest {
     }
 
     /**
-     * @param login
+     * @param id
      */
-    public void setUser(final String login) {
-        this.user = login;
+    public void setUser(final Long id) {
+        this.user = id;
     }
     /**
      * @return the user
      */
-    public String getUser() {
+    public Long getUser() {
         return user;
     }
     /**
@@ -136,5 +142,55 @@ public class UpdateUserDetailsRequest {
      */
     public void setPhone(final String phone) {
         this.phone = phone;
+    }
+    /**
+     * @return measurement units.
+     */
+    public MeasurementUnits getMeasurementUnits() {
+        return measurementUnits;
+    }
+    /**
+     * @param units the measurement units.
+     */
+    public void setMeasurementUnits(final MeasurementUnits units) {
+        this.measurementUnits = units;
+    }
+
+    /**
+     * @return language.
+     */
+    public Language getLanguage() {
+        return language;
+    }
+    /**
+     * @param language the language to set
+     */
+    public void setLanguage(final Language language) {
+        this.language = language;
+    }
+
+    /**
+     * @return scale.
+     */
+    public String getScale() {
+        return scale;
+    }
+    /**
+     * @param scale the scale to set
+     */
+    public void setScale(final String scale) {
+        this.scale = scale;
+    }
+    /**
+     * @return title.
+     */
+    public String getTitle() {
+        return title;
+    }
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(final String title) {
+        this.title = title;
     }
 }

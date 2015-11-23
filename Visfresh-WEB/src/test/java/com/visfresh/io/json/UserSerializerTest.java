@@ -14,6 +14,8 @@ import org.junit.Test;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Language;
+import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
@@ -43,7 +45,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
 
     @Test
     public void testUser() {
-        final String login = "login";
+        final long login = 77l;
         final TimeZone timeZone = TimeZone.getTimeZone("Europe/Moscow");
         final TemperatureUnits temperatureUnits = TemperatureUnits.Fahrenheit;
         final String firstName = "firstname";
@@ -51,9 +53,14 @@ public class UserSerializerTest extends AbstractSerializerTest {
         final String email = "abra@cada.bra";
         final String phone = "1111111117";
         final String position = "Manager";
+        final String deviceGroup = "DeviceGroupName";
+        final Language language = Language.English;
+        final MeasurementUnits measurementUnits = MeasurementUnits.English;
+        final String scale = "scale";
+        final String title = "Mrs";
 
         User u = new User();
-        u.setLogin(login);
+        u.setId(login);
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
@@ -61,13 +68,18 @@ public class UserSerializerTest extends AbstractSerializerTest {
         u.setPosition(position);
         u.setTimeZone(timeZone);
         u.setTemperatureUnits(temperatureUnits);
+        u.setDeviceGroup(deviceGroup);
+        u.setLanguage(language);
+        u.setMeasurementUnits(measurementUnits);
+        u.setScale(scale);
+        u.setTitle(title);
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.ReportViewer);
 
         final JsonObject obj = serializer.toJson(u);
         u = serializer.parseUser(obj);
 
-        assertEquals(login, u.getLogin());
+        assertEquals((Long) login, u.getId());
         assertEquals(2, u.getRoles().size());
         assertEquals(timeZone, u.getTimeZone());
         assertEquals(temperatureUnits, u.getTemperatureUnits());
@@ -76,6 +88,11 @@ public class UserSerializerTest extends AbstractSerializerTest {
         assertEquals(email, u.getEmail());
         assertEquals(phone, u.getPhone());
         assertEquals(position, u.getPosition());
+        assertEquals(deviceGroup, u.getDeviceGroup());
+        assertEquals(language, u.getLanguage());
+        assertEquals(measurementUnits, u.getMeasurementUnits());
+        assertEquals(scale, u.getScale());
+        assertEquals(title, u.getTitle());
     }
     @Test
     public void testCreateUserRequest() {
@@ -85,7 +102,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         c.setDescription("Test company");
         resolver.add(c);
 
-        final String login = "newuser";
+        final Long login = 78l;
         final String password = "anypassword";
         final String firstName = "firstname";
         final String lastName = "LastName";
@@ -95,7 +112,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
 
         CreateUserRequest r = new CreateUserRequest();
         final User user = new User();
-        user.setLogin(login);
+        user.setId(login);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
@@ -118,12 +135,16 @@ public class UserSerializerTest extends AbstractSerializerTest {
         final String password = "password";
         final TemperatureUnits tu = TemperatureUnits.Fahrenheit;
         final TimeZone tz = TimeZone.getTimeZone("GMT+3");
-        final String login = "login";
+        final Long login = 79l;
         final String firstName = "firstname";
         final String lastName = "LastName";
         final String email = "abra@cada.bra";
         final String phone = "1111111117";
         final String position = "Manager";
+        final MeasurementUnits units = MeasurementUnits.English;
+        final Language language = Language.English;
+        final String scale = "scale";
+        final String title = "Developer";
 
         UpdateUserDetailsRequest req = new UpdateUserDetailsRequest();
         req.setFirstName(firstName);
@@ -135,6 +156,10 @@ public class UserSerializerTest extends AbstractSerializerTest {
         req.setTemperatureUnits(tu);
         req.setTimeZone(tz);
         req.setUser(login);
+        req.setMeasurementUnits(units);
+        req.setLanguage(language);
+        req.setScale(scale);
+        req.setTitle(title);
 
         final JsonElement json = serializer.toJson(req);
         req = serializer.parseUpdateUserDetailsRequest(json);
@@ -148,5 +173,9 @@ public class UserSerializerTest extends AbstractSerializerTest {
         assertEquals(email, req.getEmail());
         assertEquals(phone, req.getPhone());
         assertEquals(position, req.getPosition());
+        assertEquals(units, req.getMeasurementUnits());
+        assertEquals(language, req.getLanguage());
+        assertEquals(scale, req.getScale());
+        assertEquals(title, req.getTitle());
     }
 }

@@ -46,12 +46,13 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
     @Test
     public void testLogin() throws RestServiceException, IOException {
         final User user = new User();
-        user.setLogin("aldsklksadf");
+        user.setEmail("a@b.c");
+        user.setId(++lastLong);
         final String password = "lkasdlfkj";
         user.setCompany(getCompany());
 
         authService.createUser(user, password);
-        final String token = client.login(user.getLogin(), password);
+        final String token = client.login(user.getEmail(), password);
         assertNotNull(token);
     }
     //@RequestMapping(value = "/getToken", method = RequestMethod.GET)

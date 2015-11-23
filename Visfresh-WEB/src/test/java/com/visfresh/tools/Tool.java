@@ -64,23 +64,23 @@ public class Tool extends AbstractTool {
             "358688000000158"
         };
 
-        tool.addUser("dan", "Dananjaya", "Kulathunga", "password");
+        tool.addUser("dan@visfresh.com", "Dananjaya", "Kulathunga", "password");
         tool.createDevices(devices);
 
         System.out.println("Successfully created");
     }
 
     /**
-     * @param login
+     * @param email
      * @param fullName
      * @param password
      * @throws RestServiceException
      * @throws IOException
      */
-    private void addUser(final String login, final String firstName, final String lastName,
+    private void addUser(final String email, final String firstName, final String lastName,
             final String password) throws IOException, RestServiceException {
         final User u = new User();
-        u.setLogin(login);
+        u.setEmail(email);
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.getRoles().add(Role.CompanyAdmin);

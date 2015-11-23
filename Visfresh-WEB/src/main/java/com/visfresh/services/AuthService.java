@@ -40,11 +40,6 @@ public interface AuthService {
      */
     public User getUserForToken(String authToken);
     /**
-     * @param username the user name.
-     * @return user info or null if not found.
-     */
-    User getUser(String username);
-    /**
      * @param user user to create.
      * @param password user password.
      */

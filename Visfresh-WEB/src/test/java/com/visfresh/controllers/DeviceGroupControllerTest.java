@@ -47,7 +47,7 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
         deviceDao = context.getBean(DeviceDao.class);
 
         final User user = context.getBean(UserDao.class).findAll(null, null, null).get(0);
-        final String authToken = context.getBean(AuthService.class).login(user.getLogin(),"").getToken();
+        final String authToken = context.getBean(AuthService.class).login(user.getEmail(),"").getToken();
 
         client = new DeviceGroupRestClient(user);
         client.setServiceUrl(getServiceUrl());

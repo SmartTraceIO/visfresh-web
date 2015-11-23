@@ -11,6 +11,8 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.UserConstants;
+import com.visfresh.entities.Language;
+import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
@@ -46,7 +48,7 @@ public class UserSerializer extends AbstractJsonSerializer {
 
         final JsonObject json = e.getAsJsonObject();
         final User u = new User();
-        u.setLogin(asString(json.get(UserConstants.PROPERTY_LOGIN)));
+        u.setId(asLong(json.get(UserConstants.PROPERTY_ID)));
         u.setFirstName(asString(json.get(UserConstants.PROPERTY_FIRST_NAME)));
         u.setLastName(asString(json.get(UserConstants.PROPERTY_LAST_NAME)));
         u.setPosition(asString(json.get(UserConstants.PROPERTY_POSITION)));
@@ -55,6 +57,11 @@ public class UserSerializer extends AbstractJsonSerializer {
         u.setTimeZone(TimeZone.getTimeZone(asString(json.get(UserConstants.PROPERTY_TIME_ZONE))));
         u.setTemperatureUnits(TemperatureUnits.valueOf(asString(json.get(
                 UserConstants.PROPERTY_TEMPERATURE_UNITS))));
+        u.setDeviceGroup(asString(json.get("deviceGroup")));
+        u.setLanguage(Language.valueOf(asString(json.get("language"))));
+        u.setMeasurementUnits(MeasurementUnits.valueOf(asString(json.get("measurementUnits"))));
+        u.setScale(asString(json.get("scale")));
+        u.setTitle(asString(json.get("title")));
 
         final JsonArray array = json.get(UserConstants.PROPERTY_ROLES).getAsJsonArray();
         final int size = array.size();
@@ -70,7 +77,7 @@ public class UserSerializer extends AbstractJsonSerializer {
      */
     public JsonObject toJson(final User u) {
         final JsonObject obj = new JsonObject();
-        obj.addProperty(UserConstants.PROPERTY_LOGIN, u.getLogin());
+        obj.addProperty(UserConstants.PROPERTY_ID, u.getId());
         obj.addProperty(UserConstants.PROPERTY_FIRST_NAME, u.getFirstName());
         obj.addProperty(UserConstants.PROPERTY_LAST_NAME, u.getLastName());
         obj.addProperty(UserConstants.PROPERTY_POSITION, u.getPosition());
@@ -85,6 +92,11 @@ public class UserSerializer extends AbstractJsonSerializer {
 
         obj.addProperty(UserConstants.PROPERTY_TIME_ZONE, u.getTimeZone().getID());
         obj.addProperty(UserConstants.PROPERTY_TEMPERATURE_UNITS, u.getTemperatureUnits().toString());
+        obj.addProperty("measurementUnits", u.getMeasurementUnits().toString());
+        obj.addProperty("language", u.getLanguage().toString());
+        obj.addProperty("deviceGroup", u.getDeviceGroup());
+        obj.addProperty("scale", u.getScale());
+        obj.addProperty("title", u.getTitle());
 
         return obj;
     }
@@ -136,6 +148,10 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.addProperty(UserConstants.PROPERTY_PHONE, req.getPhone());
         obj.addProperty(UserConstants.PROPERTY_TEMPERATURE_UNITS, req.getTemperatureUnits().toString());
         obj.addProperty(UserConstants.PROPERTY_TIME_ZONE, req.getTimeZone().getID());
+        obj.addProperty("measurementUnits", req.getMeasurementUnits().toString());
+        obj.addProperty("language", req.getLanguage().toString());
+        obj.addProperty("scale", req.getScale());
+        obj.addProperty("title", req.getTitle());
         return obj;
     }
     public UpdateUserDetailsRequest parseUpdateUserDetailsRequest(final JsonElement el) {
@@ -151,7 +167,7 @@ public class UserSerializer extends AbstractJsonSerializer {
         req.setEmail(asString(json.get(UserConstants.PROPERTY_EMAIL)));
         req.setPhone(asString(json.get(UserConstants.PROPERTY_PHONE)));
         req.setPassword(asString(json.get("password")));
-        req.setUser(asString(json.get("user")));
+        req.setUser(asLong(json.get("user")));
         if (json.has(UserConstants.PROPERTY_TEMPERATURE_UNITS)) {
             req.setTemperatureUnits(TemperatureUnits.valueOf(
                     json.get(UserConstants.PROPERTY_TEMPERATURE_UNITS).getAsString()));
@@ -159,6 +175,14 @@ public class UserSerializer extends AbstractJsonSerializer {
         if (json.has(UserConstants.PROPERTY_TIME_ZONE)) {
             req.setTimeZone(TimeZone.getTimeZone(json.get(UserConstants.PROPERTY_TIME_ZONE).getAsString()));
         }
+        if (json.has("language")) {
+            req.setLanguage(Language.valueOf(asString(json.get("language"))));
+        }
+        if (json.has("measurementUnits")) {
+            req.setMeasurementUnits(MeasurementUnits.valueOf(asString(json.get("measurementUnits"))));
+        }
+        req.setScale(asString(json.get("scale")));
+        req.setTitle(asString(json.get("title")));
         return req;
     }
 
@@ -168,7 +192,7 @@ public class UserSerializer extends AbstractJsonSerializer {
      */
     public JsonObject toJson(final ListUserItem s) {
         final JsonObject json = new JsonObject();
-        json.addProperty("login", s.getLogin());
+        json.addProperty("id", s.getId());
         json.addProperty("fullName", s.getFullName());
         return json;
     }
@@ -178,7 +202,7 @@ public class UserSerializer extends AbstractJsonSerializer {
      */
     public ListUserItem parseListUserItem(final JsonObject obj) {
         final ListUserItem item = new ListUserItem();
-        item.setLogin(asString(obj.get("login")));
+        item.setId(asLong(obj.get("id")));
         item.setFullName(asString(obj.get("fullName")));
         return item;
     }

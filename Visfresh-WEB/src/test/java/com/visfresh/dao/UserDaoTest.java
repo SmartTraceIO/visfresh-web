@@ -5,6 +5,7 @@ package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.TimeZone;
@@ -20,7 +21,7 @@ import com.visfresh.entities.User;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
+public class UserDaoTest extends BaseCrudTest<UserDao, User, Long> {
     private int ids;
     private DeviceDao deviceDao;
 
@@ -46,9 +47,8 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         u.setLastName("Suvorov");
         u.setPosition("Manager");
         u.setPhone("1111111117");
-        u.setEmail("suvorov@mail.ru");
         u.setCompany(sharedCompany);
-        u.setLogin("asuvorov-" + (++ids));
+        u.setEmail("asuvorov-" + (++ids) + "@google.com");
         u.setPassword("abrakadabra");
         u.setTimeZone(TimeZone.getTimeZone("UTC"));
         u.setTemperatureUnits(TemperatureUnits.Fahrenheit);
@@ -72,12 +72,12 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
      */
     @Override
     protected void assertCreateTestEntityOk(final User user) {
-        assertEquals("asuvorov-1", user.getLogin());
+        assertNotNull(user.getId());
         assertEquals("Alexande", user.getFirstName());
         assertEquals("Suvorov", user.getLastName());
         assertEquals("Manager", user.getPosition());
         assertEquals("1111111117", user.getPhone());
-        assertEquals("suvorov@mail.ru", user.getEmail());
+        assertTrue(user.getEmail().endsWith("@google.com"));
         assertEquals("abrakadabra", user.getPassword());
         assertEquals(TimeZone.getTimeZone("UTC"), user.getTimeZone());
         assertEquals(TemperatureUnits.Fahrenheit, user.getTemperatureUnits());
@@ -99,12 +99,12 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, String> {
         //check first entity
         final User user = all.get(0);
 
-        assertNotNull(user.getLogin());
+        assertNotNull(user.getId());
         assertEquals("Alexande", user.getFirstName());
         assertEquals("Suvorov", user.getLastName());
         assertEquals("Manager", user.getPosition());
         assertEquals("1111111117", user.getPhone());
-        assertEquals("suvorov@mail.ru", user.getEmail());
+        assertTrue(user.getEmail().endsWith("@google.com"));
         assertEquals("abrakadabra", user.getPassword());
         assertEquals(TimeZone.getTimeZone("UTC"), user.getTimeZone());
         assertEquals(TemperatureUnits.Fahrenheit, user.getTemperatureUnits());

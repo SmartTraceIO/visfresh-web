@@ -17,6 +17,8 @@ import com.visfresh.controllers.restclient.UserRestClient;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Language;
+import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
@@ -60,7 +62,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
     //        final @RequestParam String username) {
     @Test
     public void testGetUser() throws IOException, RestServiceException {
-        final User user = client.getUser("anylogin");
+        final User user = client.getUser(this.user.getId());
         assertNotNull(user);
     }
     @Test
@@ -75,14 +77,25 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String email = "abra@cada.bra";
         final String phone = "1111111117";
         final String position = "Manager";
+        final String deviceGroup = "DeviceGroupName";
+        final Language language = Language.English;
+        final MeasurementUnits measurementUnits = MeasurementUnits.English;
+        final String scale = "scale";
+        final String title = "Mrs";
 
         final User u = new User();
-        u.setLogin("test-1");
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
         u.setPhone(phone);
         u.setPosition(position);
+        u.setDeviceGroup(deviceGroup);
+        u.setLanguage(language);
+        u.setMeasurementUnits(measurementUnits);
+        u.setScale(scale);
+        u.setTitle(title);
+        u.getRoles().add(Role.Dispatcher);
+        u.getRoles().add(Role.ReportViewer);
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.CompanyAdmin);
 
@@ -90,17 +103,20 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         client.createUser(u, c, password);
 
-        final User u2 = dao.findOne(u.getLogin());
+        final User u2 = dao.findByEmail(u.getEmail());
         assertNotNull(u2);
-        assertEquals(u.getId(), u2.getId());
-        assertEquals(u.getLogin(), u2.getLogin());
-        assertEquals(2, u2.getRoles().size());
+        assertEquals(3, u2.getRoles().size());
         assertNotNull(u2.getCompany());
         assertEquals(firstName, u2.getFirstName());
         assertEquals(lastName, u2.getLastName());
         assertEquals(email, u2.getEmail());
         assertEquals(phone, u2.getPhone());
         assertEquals(position, u2.getPosition());
+        assertEquals(deviceGroup, u.getDeviceGroup());
+        assertEquals(language, u.getLanguage());
+        assertEquals(measurementUnits, u.getMeasurementUnits());
+        assertEquals(scale, u.getScale());
+        assertEquals(title, u.getTitle());
     }
     @Test
     public void testGetUsers() throws IOException, RestServiceException {
@@ -109,9 +125,9 @@ public class UserControllerTest extends AbstractRestServiceTest {
         c.setDescription("Test company");
         context.getBean(CompanyDao.class).save(c);
 
-        createUser("u1", "A2", "LastA2", c);
-        createUser("u2", "A1", "LastA1", c);
-        final String token = client.login("u1", "");
+        final User u1 = createUser("u1@google.com", "A2", "LastA2", c);
+        final User u2 = createUser("u2@google.com", "A1", "LastA1", c);
+        final String token = client.login("u1@google.com", "");
         client.setAuthToken(token);
 
         //test limit
@@ -119,12 +135,10 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(1, client.getUsers(1, 1, null, null).size());
         assertEquals(1, client.getUsers(2, 1, null, null).size());
 
-        //test sort
-        assertEquals("u1", client.getUsers(1, 1, UserConstants.PROPERTY_LOGIN, "asc").get(0).getLogin());
-        assertEquals("u2", client.getUsers(1, 1, UserConstants.PROPERTY_LOGIN, "desc").get(0).getLogin());
-
-        assertEquals("u2", client.getUsers(1, 1, UserConstants.PROPERTY_FIRST_NAME, "asc").get(0).getLogin());
-        assertEquals("u1", client.getUsers(1, 1, UserConstants.PROPERTY_FIRST_NAME, "desc").get(0).getLogin());
+        assertEquals(u2.getId(), client.getUsers(1, 1,
+                UserConstants.PROPERTY_FIRST_NAME, "asc").get(0).getId());
+        assertEquals(u1.getId(), client.getUsers(1, 1,
+                UserConstants.PROPERTY_FIRST_NAME, "desc").get(0).getId());
         //TODO other sortings.
     }
     @Test
@@ -137,9 +151,13 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String phone = "1111111117";
         final String position = "Manager";
         final TemperatureUnits temperatureUnits = TemperatureUnits.Fahrenheit;
+        final MeasurementUnits units = MeasurementUnits.English;
+        final Language language = Language.English;
+        final String scale = "scale";
+        final String title = "Developer";
 
         final UpdateUserDetailsRequest req = new UpdateUserDetailsRequest();
-        req.setUser(user.getLogin());
+        req.setUser(user.getId());
         req.setTimeZone(tz);
         req.setFirstName(firstName);
         req.setLastName(lastName);
@@ -148,13 +166,17 @@ public class UserControllerTest extends AbstractRestServiceTest {
         req.setPosition(position);
         req.setTemperatureUnits(temperatureUnits);
         req.setPassword(password);
+        req.setMeasurementUnits(units);
+        req.setLanguage(language);
+        req.setScale(scale);
+        req.setTitle(title);
 
         client.updateUserDetails(req);
 
-        final String tokent = client.login(user.getLogin(), password);
+        final String tokent = client.login(req.getEmail(), password);
         client.setAuthToken(tokent);
 
-        final User u = client.getUser(user.getLogin());
+        final User u = client.getUser(user.getId());
 
         assertNotNull(u);
         assertEquals(tz, u.getTimeZone());
@@ -164,16 +186,20 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(email, u.getEmail());
         assertEquals(phone, u.getPhone());
         assertEquals(position, u.getPosition());
+        assertEquals(units, u.getMeasurementUnits());
+        assertEquals(language, u.getLanguage());
+        assertEquals(scale, u.getScale());
+        assertEquals(title, u.getTitle());
     }
     /**
-     * @param login
+     * @param email
      * @param firstName
      * @return user.
      */
-    private User createUser(final String login, final String firstName,
+    private User createUser(final String email, final String firstName,
             final String lastName, final Company company) {
         final User u = new User();
-        u.setLogin(login);
+        u.setEmail(email);
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setCompany(company);

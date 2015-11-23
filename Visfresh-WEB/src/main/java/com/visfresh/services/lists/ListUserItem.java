@@ -10,7 +10,7 @@ import com.visfresh.entities.User;
  *
  */
 public class ListUserItem {
-    private String login;
+    private Long id;
     private String fullName;
 
     /**
@@ -23,7 +23,7 @@ public class ListUserItem {
      * @param u
      */
     public ListUserItem(final User u) {
-        setLogin(u.getLogin());
+        setId(u.getId());
         if (u.getFirstName() != null || u.getLastName() != null) {
             final StringBuilder sb = new StringBuilder();
             if (u.getFirstName() != null) {
@@ -42,14 +42,14 @@ public class ListUserItem {
     /**
      * @return the login
      */
-    public String getLogin() {
-        return login;
+    public Long getId() {
+        return id;
     }
     /**
      * @param login the login to set
      */
-    public void setLogin(final String login) {
-        this.login = login;
+    public void setId(final Long login) {
+        this.id = login;
     }
     /**
      * @return the fullName

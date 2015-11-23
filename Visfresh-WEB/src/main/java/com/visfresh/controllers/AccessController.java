@@ -3,7 +3,10 @@
  */
 package com.visfresh.controllers;
 
+import java.util.Set;
+
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.io.CreateUserRequest;
 import com.visfresh.services.RestServiceException;
@@ -15,10 +18,10 @@ import com.visfresh.services.RestServiceException;
 public interface AccessController {
     /**
      * @param user current user.
-     * @param username user name which info should be get.
+     * @param userId user name which info should be get.
      * @throws RestServiceException
      */
-    void checkCanGetUserInfo(User user, String username) throws RestServiceException;
+    void checkCanGetUserInfo(User user, Long userId) throws RestServiceException;
     /**
      * @param user user to check permissions.
      * @throws RestServiceException
@@ -115,10 +118,10 @@ public interface AccessController {
     void checkCanGetCompanies(User user) throws RestServiceException;
     /**
      * @param user
-     * @param userName
+     * @param userId
      * @throws RestServiceException
      */
-    void checkUpdateUserDetails(User user, String userName) throws RestServiceException;
+    void checkUpdateUserDetails(User user, Long userId) throws RestServiceException;
     /**
      * @param user user.
      */
@@ -137,4 +140,10 @@ public interface AccessController {
      * @throws RestServiceException
      */
     void checkCanViewDeviceGroup(User user, DeviceGroup group) throws RestServiceException;
+    /**
+     * @param user user to check.
+     * @param roles
+     * @throws RestServiceException
+     */
+    void checkCanAssignRoles(User user, Set<Role> roles) throws RestServiceException;
 }

@@ -11,11 +11,16 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.UserConstants;
+import com.visfresh.dao.Filter;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.Language;
+import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
@@ -25,7 +30,7 @@ import com.visfresh.entities.User;
  *
  */
 @Component
-public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> implements UserDao {
+public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implements UserDao {
     private static final String FIRSTNAME_FIELD = "firstname";
     private static final String LASTNAME_FIELD = "lastname";
     private static final String POSITION_FIELD = "position";
@@ -35,12 +40,17 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
     public static final String PROFILE_TABLE = "userprofiles";
     public static final String USER_SHIPMENTS = "usershipments";
 
-    private static final String USERNAME_FIELD = "username";
+    private static final String ID_FIELD = "id";
     private static final String PASSWORD_FIELD = "password";
     private static final String COMPANY_FIELD = "company";
     private static final String ROLES_FIELD = "roles";
     private static final String TIME_ZONE_FIELD = "timezone";
     private static final String TEMPERATURE_UNITS = "tempunits";
+    private static final String DEVICEGROUP_FIELD = "devicegroup";
+    private static final String LANGUAGE_FIELD = "language";
+    private static final String MEASUREUNITS_FIELD = "measureunits";
+    private static final String SCALE_FIELD = "scale";
+    private static final String TITLE_FIELD = "title";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -55,7 +65,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
         propertyToDbFields.put(UserConstants.PROPERTY_ROLES, ROLES_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_TEMPERATURE_UNITS, TEMPERATURE_UNITS);
         propertyToDbFields.put(UserConstants.PROPERTY_TIME_ZONE, TIME_ZONE_FIELD);
-        propertyToDbFields.put(UserConstants.PROPERTY_LOGIN, USERNAME_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_ID, ID_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_PHONE, PHONE_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_EMAIL, EMAIL_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_POSITION, POSITION_FIELD);
@@ -96,51 +106,16 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
 
         String sql;
 
+        final List<String> fields = getFields();
         if (findOne(user.getId()) == null) {
             //insert
-            sql = "insert into " + TABLE + " (" + combine(
-                    USERNAME_FIELD,
-                    PASSWORD_FIELD,
-                    FIRSTNAME_FIELD,
-                    LASTNAME_FIELD,
-                    POSITION_FIELD,
-                    EMAIL_FIELD,
-                    PHONE_FIELD,
-                    ROLES_FIELD,
-                    TIME_ZONE_FIELD,
-                    TEMPERATURE_UNITS,
-                    COMPANY_FIELD
-                ) + ")" + " values("
-                    + ":"+ USERNAME_FIELD
-                    + ", :" + PASSWORD_FIELD
-                    + ", :" + FIRSTNAME_FIELD
-                    + ", :" + LASTNAME_FIELD
-                    + ", :" + POSITION_FIELD
-                    + ", :" + EMAIL_FIELD
-                    + ", :" + PHONE_FIELD
-                    + ", :" + ROLES_FIELD
-                    + ", :" + TIME_ZONE_FIELD
-                    + ", :" + TEMPERATURE_UNITS
-                    + ", :" + COMPANY_FIELD
-                    + ")";
+            sql = createInsertScript(TABLE, fields);
         } else {
             //update
-            sql = "update " + TABLE + " set "
-                + PASSWORD_FIELD + "=:" + PASSWORD_FIELD
-                + "," + FIRSTNAME_FIELD + "=:" + FIRSTNAME_FIELD
-                + "," + LASTNAME_FIELD + "=:" + LASTNAME_FIELD
-                + "," + POSITION_FIELD + "=:" + POSITION_FIELD
-                + "," + EMAIL_FIELD + "=:" + EMAIL_FIELD
-                + "," + PHONE_FIELD + "=:" + PHONE_FIELD
-                + "," + ROLES_FIELD + "=:" + ROLES_FIELD
-                + "," + COMPANY_FIELD + "=:" + COMPANY_FIELD
-                + "," + TIME_ZONE_FIELD + "=:" + TIME_ZONE_FIELD
-                + "," + TEMPERATURE_UNITS + "=:" + TEMPERATURE_UNITS
-                + " where " + USERNAME_FIELD + " = :" + USERNAME_FIELD
-            ;
+            sql = createUpdateScript(TABLE, fields, ID_FIELD);
         }
 
-        paramMap.put(USERNAME_FIELD, user.getLogin());
+        paramMap.put(ID_FIELD, user.getId());
         paramMap.put(PASSWORD_FIELD, user.getPassword());
         paramMap.put(FIRSTNAME_FIELD, user.getFirstName());
         paramMap.put(LASTNAME_FIELD, user.getLastName());
@@ -151,10 +126,44 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
         paramMap.put(COMPANY_FIELD, user.getCompany().getId());
         paramMap.put(TIME_ZONE_FIELD, user.getTimeZone().getID());
         paramMap.put(TEMPERATURE_UNITS, user.getTemperatureUnits().toString());
-        jdbc.update(sql, paramMap);
+        paramMap.put(DEVICEGROUP_FIELD, user.getDeviceGroup());
+        paramMap.put(LANGUAGE_FIELD, user.getLanguage().toString());
+        paramMap.put(MEASUREUNITS_FIELD, user.getMeasurementUnits().toString());
+        paramMap.put(SCALE_FIELD, user.getScale());
+        paramMap.put(TITLE_FIELD, user.getTitle());
+
+        final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
+        if (keyHolder.getKey() != null) {
+            user.setId(keyHolder.getKey().longValue());
+        }
 
         return user;
     }
+    /**
+     * @return
+     */
+    private List<String> getFields() {
+        final List<String> fields = new LinkedList<String>();
+        fields.add(ID_FIELD);
+        fields.add(PASSWORD_FIELD);
+        fields.add(FIRSTNAME_FIELD);
+        fields.add(LASTNAME_FIELD);
+        fields.add(POSITION_FIELD);
+        fields.add(EMAIL_FIELD);
+        fields.add(PHONE_FIELD);
+        fields.add(ROLES_FIELD);
+        fields.add(TIME_ZONE_FIELD);
+        fields.add(TEMPERATURE_UNITS);
+        fields.add(COMPANY_FIELD);
+        fields.add(DEVICEGROUP_FIELD);
+        fields.add(LANGUAGE_FIELD);
+        fields.add(MEASUREUNITS_FIELD);
+        fields.add(SCALE_FIELD);
+        fields.add(TITLE_FIELD);
+        return fields;
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#getCompanyFieldName()
      */
@@ -181,7 +190,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
      */
     @Override
     protected String getIdFieldName() {
-        return USERNAME_FIELD;
+        return ID_FIELD;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
@@ -189,7 +198,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
     @Override
     protected User createEntity(final Map<String, Object> map) {
         final User u = new User();
-        u.setLogin((String) map.get(USERNAME_FIELD));
+        u.setId(((Number) map.get(ID_FIELD)).longValue());
         u.setFirstName((String) map.get(FIRSTNAME_FIELD));
         u.setLastName((String) map.get(LASTNAME_FIELD));
         u.setPosition((String) map.get(POSITION_FIELD));
@@ -199,6 +208,22 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, String> impl
         u.setTimeZone(TimeZone.getTimeZone((String) map.get(TIME_ZONE_FIELD)));
         u.setTemperatureUnits(TemperatureUnits.valueOf((String) map.get(TEMPERATURE_UNITS)));
         u.getRoles().addAll(convertToEntityAttribute((String) map.get(ROLES_FIELD)));
+        u.setDeviceGroup((String) map.get(DEVICEGROUP_FIELD));
+        u.setLanguage(Language.valueOf((String) map.get(LANGUAGE_FIELD)));
+        u.setMeasurementUnits(MeasurementUnits.valueOf((String) map.get(MEASUREUNITS_FIELD)));
+        u.setScale((String) map.get(SCALE_FIELD));
+        u.setTitle((String) map.get(TITLE_FIELD));
         return u;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.UserDao#findByEmail(java.lang.String)
+     */
+    @Override
+    public User findByEmail(final String email) {
+        final Filter f = new Filter();
+        f.addFilter(EMAIL_FIELD, email);
+
+        final List<User> all = findAll(f, null, null);
+        return all.size() == 0 ? null : all.get(0);
     }
 }

@@ -64,17 +64,17 @@ public class UserController extends AbstractController implements UserConstants 
 
     /**
      * @param authToken authentication token.
-     * @param username name of user for request info.
+     * @param userId ID of user for request info.
      * @return user info
      */
     @RequestMapping(value = "/getUser/{authToken}", method = RequestMethod.GET)
     public JsonObject getUser(@PathVariable final String authToken,
-            final @RequestParam String username) {
+            final @RequestParam Long userId) {
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetUserInfo(user, username);
+            security.checkCanGetUserInfo(user, userId);
 
-            final User u = authService.getUser(username);
+            final User u = dao.findOne(userId);
             return createSuccessResponse(u == null ? null : getUserSerializer(user).toJson(u));
         } catch (final Exception e) {
             log.error("Failed to get user info", e);
@@ -142,12 +142,11 @@ public class UserController extends AbstractController implements UserConstants 
      */
     private String[] getDefaultListShipmentsSortingOrder() {
         return new String[] {
-            PROPERTY_LOGIN,
+            PROPERTY_EMAIL,
             PROPERTY_FIRST_NAME,
             PROPERTY_LAST_NAME,
             PROPERTY_POSITION,
-            PROPERTY_PHONE,
-            PROPERTY_EMAIL,
+            PROPERTY_PHONE
         };
     }
     /**
@@ -165,6 +164,7 @@ public class UserController extends AbstractController implements UserConstants 
 
             final User newUser = r.getUser();
             newUser.setCompany(r.getCompany());
+            security.checkCanAssignRoles(user, newUser.getRoles());
             authService.createUser(newUser, r.getPassword());
 
             return createSuccessResponse(null);
@@ -208,6 +208,19 @@ public class UserController extends AbstractController implements UserConstants 
             if (req.getTimeZone() != null) {
                 u.setTimeZone(req.getTimeZone());
             }
+            if (req.getMeasurementUnits() != null) {
+                u.setMeasurementUnits(req.getMeasurementUnits());
+            }
+            if (req.getLanguage() != null) {
+                u.setLanguage(req.getLanguage());
+            }
+            if (req.getScale() != null) {
+                u.setScale(req.getScale());
+            }
+            if (req.getTitle() != null) {
+                u.setTitle(req.getTitle());
+            }
+
             dao.save(u);
             return createSuccessResponse(null);
         } catch (final Exception e) {

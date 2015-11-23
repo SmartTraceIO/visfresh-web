@@ -101,7 +101,7 @@ ShipmentResolver, UserResolver {
      * @see com.visfresh.io.UserResolver#getUser(java.lang.String)
      */
     @Override
-    public User getUser(final String login) {
-        return userDao.findOne(login);
+    public User getUser(final Long id) {
+        return userDao.findOne(id);
     }
 }

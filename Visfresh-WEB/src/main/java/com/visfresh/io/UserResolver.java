@@ -10,5 +10,5 @@ import com.visfresh.entities.User;
  *
  */
 public interface UserResolver {
-    User getUser(String login);
+    User getUser(Long id);
 }

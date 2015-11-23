@@ -320,7 +320,6 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
             final String email, final String phone, final String position)
                     throws IOException, RestServiceException {
         final User user = new User();
-        user.setLogin(email);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);

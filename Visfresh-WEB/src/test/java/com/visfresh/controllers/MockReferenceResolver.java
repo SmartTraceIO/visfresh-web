@@ -29,7 +29,7 @@ public class MockReferenceResolver implements ReferenceResolver, CompanyResolver
     private final Map<String, Device> devices = new HashMap<String, Device>();
     private final Map<Long, Shipment> shipments = new HashMap<Long, Shipment>();
     private final Map<Long, Company> companies = new HashMap<Long, Company>();
-    private final Map<String, User> users = new HashMap<String, User>();
+    private final Map<Long, User> users = new HashMap<Long, User>();
 
     /**
      * Default constructor.
@@ -84,8 +84,8 @@ public class MockReferenceResolver implements ReferenceResolver, CompanyResolver
      * @see com.visfresh.io.UserResolver#getUser(java.lang.String)
      */
     @Override
-    public User getUser(final String login) {
-        return users.get(login);
+    public User getUser(final Long id) {
+        return users.get(id);
     }
 
     public void add(final Device t) {
@@ -107,6 +107,6 @@ public class MockReferenceResolver implements ReferenceResolver, CompanyResolver
         companies.put(s.getId(), s);
     }
     public void add(final User u) {
-        users.put(u.getLogin(), u);
+        users.put(u.getId(), u);
     }
 }

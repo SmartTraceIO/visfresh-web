@@ -154,7 +154,7 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
             sql = createUpdateScript(PERSONAL_SCHEDULE_TABLE, fields, ID_FIELD);
         }
 
-        paramMap.put(USER_FIELD, ps.getUser().getLogin());
+        paramMap.put(USER_FIELD, ps.getUser().getId());
         paramMap.put(SENDAPP_FIELD, ps.isSendApp());
         paramMap.put(SENDEMAIL_FIELD, ps.isSendEmail());
         paramMap.put(SENDSMS_FIELD, ps.isSendSms());
@@ -201,7 +201,7 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
         for (final Map<String,Object> map : list) {
             final PersonSchedule ps = new PersonSchedule();
             ps.setId(((Number) map.get(ID_FIELD)).longValue());
-            ps.setUser(userDao.findOne((String) map.get(USER_FIELD)));
+            ps.setUser(userDao.findOne(((Number) map.get(USER_FIELD)).longValue()));
             ps.setSendApp((Boolean) map.get(SENDAPP_FIELD));
             ps.setSendEmail((Boolean) map.get(SENDEMAIL_FIELD));
             ps.setSendSms((Boolean) map.get(SENDSMS_FIELD));

@@ -65,8 +65,8 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
         try {
             //create company account if need.
             final Account acc = createAccountIfNeed(user.getCompany());
-            org.opengts.db.tables.User.createNewUser(acc, user.getLogin(), null, password);
-            log.debug("OpenGTS user " + user.getLogin() + " has autocreated");
+            org.opengts.db.tables.User.createNewUser(acc, user.getEmail(), null, password);
+            log.debug("OpenGTS user " + user.getEmail() + " has autocreated");
         } catch (final DBException e) {
             log.error("Failed to create OpenGTS account " + createAccountId(user.getCompany()), e);
         }

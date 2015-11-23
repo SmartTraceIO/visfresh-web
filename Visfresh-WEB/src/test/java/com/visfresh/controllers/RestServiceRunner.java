@@ -148,7 +148,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
             //create user
             final AuthService service = context.getBean(AuthService.class);
             final User user = new User();
-            user.setLogin("anylogin");
+            user.setEmail("a@b.c");
             user.setCompany(c);
             user.getRoles().add(Role.GlobalAdmin);
 

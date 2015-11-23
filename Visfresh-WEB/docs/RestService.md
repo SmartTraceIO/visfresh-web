@@ -103,7 +103,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 
 ### Authentication.###
 Method *GET*, method name *login*, request parameters login - the user login name and password - the user password  
-1. login - user name of logged in user  
+1. email - email of logging in user  
 2. password - password  
 Returns [Authentication token](#markdown-header-authentication-token).  
 [(example)](#markdown-header-authentication-request-example)  
@@ -115,7 +115,7 @@ Method *POST*, method name *getToken*, no parameters. In case of this request th
 
 ### Get User Info ###
 Method *GET*, method name *getUser*, method parameters  
-1. username - name of user  
+1. userId - ID of user  
 
 Method required associated privileges. The logged in user should be some as requested info user or should have admin role.  
 Method returns [User Object](#markdown-header-user)   
@@ -132,15 +132,21 @@ Method returns array of [User List items](#markdown-header-user-list-item)
 
 ### Update User Details ###
 Method *POST*, method name *updateUserDetails*. JSON request body contains following properties:  
-1. firstName - first user name.  
-2. lastName - last user name.  
-3. position - position of user in company.  
-4. email - user email address.  
-5. phone - user phone number
-6. password - user password.  
-7. user - user login name. It is not changeable parameter. Is used for identify the user to change details.  
-8. temperatureUnits - user temperature units.  
-9. timeZone - user time zone.  
+1. user - user ID.  
+2. firstName - first user name.  
+3. lastName - last user name.  
+4. position - position of user in company.  
+5. email - user email address.  
+6. phone - user phone number.  
+7. temperatureUnits - temperature units.  
+8. measurementUnits - measurement units Metric/English  
+9. password - user password.  
+10. user - user login name. It is not changeable parameter. Is used for identify the user to change details.  
+11. temperatureUnits - user temperature units.  
+12. timeZone - user time zone.  
+13. language - user language.  
+14. scale - user schale.  
+15. title - user title.  
 [(example)](#markdown-header-update-user-details-example)
 
 ### Logout ###
@@ -453,7 +459,7 @@ see [ResponseStatus](#markdown-header-response-status)
 ```json
 {
     "personScheduleId": 2165,
-    "user": "asuvorov",
+    "user": 77, // user ID
     "sendApp": true,
     "sendEmail": false,
     "sendSms": false,
@@ -700,8 +706,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ### User List item ###
 ```json
 {
-  "login": "userLogin",
-  "fullName": "Full User Name"
+  "id": 289,
+  "fullName": "A1 LastA1"
 }
 ```
 ## JSON Requests ##
@@ -721,7 +727,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ```
 ## Examples ##
 ### Authentication request example ###
-**GET /vf/rest/login?login=user&password=password**   
+**GET /vf/rest/login?email=u1%40google.com&password=password**   
 **Response**  
 ```json
 {
@@ -751,7 +757,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```
 ### Get user info example ###
-**GET /vf/rest/getUser/${authToken}?username=asuvorov**  
+**GET /vf/rest/getUser/${authToken}?userId=290**  
 **Response:**  
 ```json
 {
@@ -760,12 +766,18 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "message": "Success"
   },
   "response": {
-    "login": "anylogin",
+    "id": 290,
+    "email": "a@b.c",
     "roles": [
       "GlobalAdmin"
     ],
-    "timeZone": "GMT+2",
-    "temperatureUnits": "Celsius"
+    "timeZone": "UTC",
+    "temperatureUnits": "Celsius",
+    "measurementUnits": "Metric",
+    "language": "English"
+    "deviceGroup": "DeviceGroupName",
+    "scale": "scale",
+    "title": "Mrs"
   }
 }
 ```
@@ -780,8 +792,12 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": [
     {
-      "login": "u2",
-      "fullName": "A1"
+      "id": 288,
+      "fullName": "A2 LastA2"
+    },
+    {
+      "id": 289,
+      "fullName": "A1 LastA1"
     }
   ],
   "totalCount": 2
@@ -792,7 +808,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 **Request body:**  
 ```json
 {
-  "user": "anylogin",
+  "user": 293,
   "password": "abrakadabra",
   "firstName": "firstname",
   "lastName": "LastName",
@@ -800,7 +816,11 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "email": "abra@cada.bra",
   "phone": "1111111117",
   "temperatureUnits": "Fahrenheit",
-  "timeZone": "GMT+02:00"
+  "timeZone": "GMT+02:00",
+  "measurementUnits": "English",
+  "language": "English",
+  "scale": "scale",
+  "title": "Developer"
 }
 ```
 **Response:**  
@@ -1072,7 +1092,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "notificationScheduleName": "Sched",
   "schedules": [
     {
-      "user": "asuvorov",
+      "user": 1,
       "sendApp": true,
       "sendEmail": false,
       "sendSms": false,
@@ -1089,7 +1109,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       ]
     },
     {
-      "user": "asuvorov",
+      "user": 2,
       "sendApp": true,
       "sendEmail": false,
       "sendSms": false,
@@ -1162,7 +1182,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "schedules": [
       {
         "personScheduleId": 2157,
-        "user": "asuvorov",
+        "user": 3,
         "sendApp": true,
         "sendEmail": false,
         "sendSms": false,
@@ -1180,7 +1200,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       },
       {
         "personScheduleId": 2158,
-        "user": "asuvorov",
+        "user": 4,
         "sendApp": true,
         "sendEmail": false,
         "sendSms": false,

@@ -33,14 +33,14 @@ public class UserRestClient extends RestClient {
         serializer = new UserSerializer(tz);
     }
     /**
-     * @param userName
+     * @param id
      * @return
      * @throws RestServiceException
      * @throws IOException
      */
-    public User getUser(final String userName) throws IOException, RestServiceException {
+    public User getUser(final Long id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("username", userName);
+        params.put("userId", id.toString());
         final JsonElement response = sendGetRequest(getPathWithToken( "getUser"),
                 params);
         return serializer.parseUser(response);

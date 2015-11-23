@@ -42,19 +42,19 @@ public abstract class AbstractAuthService implements AuthService {
      * @see com.visfresh.services.AuthService#login(java.lang.String, java.lang.String)
      */
     @Override
-    public AuthToken login(final String login, final String password)
+    public AuthToken login(final String email, final String password)
             throws AuthenticationException {
-        final User user = getUser(login);
+        final User user = findUserByImail(email);
         if (user == null) {
-            throw new AuthenticationException("Unknown user " + login);
+            throw new AuthenticationException("Unknown user " + email);
         }
 
         if (user.getPassword().equals(generateHash(password))) {
             synchronized (users) {
-                UserInfo u = users.get(login);
+                UserInfo u = users.get(email);
                 if (u == null) {
                     u = new UserInfo();
-                    users.put(login, u);
+                    users.put(email, u);
                 }
 
                 u.setUser(user);
@@ -66,6 +66,11 @@ public abstract class AbstractAuthService implements AuthService {
         throw new AuthenticationException("Authentication failed");
     }
 
+    /**
+     * @param email
+     * @return
+     */
+    protected abstract User findUserByImail(String email);
     /**
      * @param user user.
      * @return
@@ -112,7 +117,7 @@ public abstract class AbstractAuthService implements AuthService {
             while (iter.hasNext()) {
                 final UserInfo ui = iter.next().getValue();
                 if (ui.getToken().getExpirationTime().getTime() < time) {
-                    log.debug("Access token for user " + ui.getUser().getLogin()
+                    log.debug("Access token for user " + ui.getUser().getEmail()
                             + " has expired and will removed");
                     iter.remove();
                 }
@@ -126,7 +131,7 @@ public abstract class AbstractAuthService implements AuthService {
     @Override
     public AuthToken refreshToken(final User user)
             throws AuthenticationException {
-        final UserInfo info = getUserInfo(user.getLogin());
+        final UserInfo info = getUserInfo(user.getEmail());
         if (info == null) {
             throw new AuthenticationException("Not authorized or token expired");
         }
@@ -137,11 +142,11 @@ public abstract class AbstractAuthService implements AuthService {
     /* (non-Javadoc)
      * @see com.visfresh.services.RestService#getUser(java.lang.String)
      */
-    private UserInfo getUserInfo(final String username) {
+    private UserInfo getUserInfo(final String email) {
         synchronized (users) {
             for (final Map.Entry<String, UserInfo> e : users.entrySet()) {
                 final UserInfo ui = e.getValue();
-                if (ui.getUser().getLogin().equals(username)) {
+                if (ui.getUser().getEmail().equals(email)) {
                     return ui;
                 }
             }
@@ -206,7 +211,7 @@ public abstract class AbstractAuthService implements AuthService {
         final User user = getUserForToken(authToken);
         if (user != null) {
             synchronized (users) {
-                users.remove(user.getLogin());
+                users.remove(user.getEmail());
             }
         }
     }

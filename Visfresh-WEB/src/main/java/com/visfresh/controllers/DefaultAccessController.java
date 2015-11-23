@@ -32,10 +32,10 @@ public class DefaultAccessController implements AccessController {
      * @see com.visfresh.controllers.AccessController#checkCanGetUserInfo(com.visfresh.entities.User, java.lang.String)
      */
     @Override
-    public void checkCanGetUserInfo(final User user, final String username) throws RestServiceException {
-        if (!haveOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin) && !user.getLogin().equals(username)) {
+    public void checkCanGetUserInfo(final User user, final Long userId) throws RestServiceException {
+        if (!haveOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin) && !user.getId().equals(userId)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    "User have not privileges for get user info for " + username);
+                    "User have not privileges for get user info for " + userId);
         }
     }
 
@@ -259,12 +259,12 @@ public class DefaultAccessController implements AccessController {
      * @see com.visfresh.controllers.AccessController#checkUpdateUserDetails(com.visfresh.entities.User, java.lang.String)
      */
     @Override
-    public void checkUpdateUserDetails(final User user, final String userName) throws RestServiceException {
-        if (havePermission(user, Role.GlobalAdmin) || user.getLogin().equals(userName)) {
+    public void checkUpdateUserDetails(final User user, final Long userId) throws RestServiceException {
+        if (havePermission(user, Role.GlobalAdmin) || user.getId().equals(userId)) {
             return;
         }
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                "User have not permissions for update user detais for " + userName);
+                "User have not permissions for update user detais for " + userId);
     }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.AccessController#checkCanListUsers(com.visfresh.entities.User)
@@ -310,6 +310,19 @@ public class DefaultAccessController implements AccessController {
         }
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
                 "User have not permissions to view device group " + group.getName());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanAssignRoles(com.visfresh.entities.User, java.util.Set)
+     */
+    @Override
+    public void checkCanAssignRoles(final User user, final Set<Role> roles)
+            throws RestServiceException {
+        for (final Role role : roles) {
+            if (!havePermission(user, role)) {
+                throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                        "User have not permissions to assign role " + role);
+            }
+        }
     }
     /**
      * @param user

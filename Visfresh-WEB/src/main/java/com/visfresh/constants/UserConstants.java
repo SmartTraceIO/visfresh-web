@@ -11,7 +11,7 @@ public interface UserConstants {
     String PROPERTY_ROLES = "roles";
     String PROPERTY_TEMPERATURE_UNITS = "temperatureUnits";
     String PROPERTY_TIME_ZONE = "timeZone";
-    String PROPERTY_LOGIN = "login";
+    String PROPERTY_ID = "id";
     String PROPERTY_PHONE = "phone";
     String PROPERTY_EMAIL = "email";
     String PROPERTY_POSITION = "position";

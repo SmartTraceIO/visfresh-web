@@ -37,18 +37,18 @@ public class AuthenticationController extends AbstractController {
     }
     //authentication
     /**
-     * @param login login
+     * @param email login
      * @param password password.
      * @return authorization token.
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public JsonObject login(final @RequestParam String login, final @RequestParam String password) {
+    public JsonObject login(final @RequestParam String email, final @RequestParam String password) {
         try {
-            final AuthToken token = authService.login(login, password);
-            final User user = authService.getUser(login);
+            final AuthToken token = authService.login(email, password);
+            final User user = authService.getUserForToken(token.getToken());
             return createSuccessResponse(getSerializer(user).toJson(token));
         } catch (final Exception e) {
-            log.error("Faile to log in " + login, e);
+            log.error("Faile to log in " + email, e);
             return createErrorResponse(e);
         }
     }
