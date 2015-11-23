@@ -6,6 +6,7 @@ package com.visfresh.controllers;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -142,7 +143,7 @@ public class UtilitiesController extends AbstractController {
      * @return
      */
     private DateFormat createDateFormat(final String format, final TimeZone tz) {
-        final DateFormat fmt = new SimpleDateFormat(format);
+        final DateFormat fmt = new SimpleDateFormat(format, Locale.ENGLISH);
         fmt.setTimeZone(tz);
         return fmt;
     }

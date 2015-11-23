@@ -2118,11 +2118,11 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "message": "Success"
   },
   "response": {
-    "dateTimeIso": "2015-11-23T03:12",
-    "formattedDateTimeIso": "23 ноя 2015 03:12AM",
-    "dateTimeString": "23 ноя 2015",
-    "dateString": "03:12AM",
-    "dateString24": "03:12"
+    "dateTimeIso": "2015-11-23T15:46",
+    "formattedDateTimeIso": "23 Nov 2015 03:46PM",
+    "dateTimeString": "23 Nov 2015",
+    "dateString": "03:46PM",
+    "dateString24": "15:46"
   }
 }
 ```
