@@ -55,7 +55,7 @@ public class Tool extends AbstractTool {
 //        final String serviceUrl = "http://localhost:8080/web/vf";
 
         final Tool tool = new Tool(serviceUrl);
-        tool.initalize("globaladmin", args[0]);
+        tool.initalize("globaladmin@visfresh.com", args[0]);
 
         final String[] devices = {
             "354188046489683",
