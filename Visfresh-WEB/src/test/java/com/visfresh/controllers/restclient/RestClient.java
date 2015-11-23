@@ -232,7 +232,7 @@ public class RestClient  {
      * @return
      * @throws RestServiceException
      */
-    protected String getPathWithToken(final String methodPath) throws RestServiceException {
+    public String getPathWithToken(final String methodPath) throws RestServiceException {
         return REST_SERVICE + "/" + methodPath + "/" + getAuthToken();
     }
 
