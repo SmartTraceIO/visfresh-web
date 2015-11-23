@@ -26,6 +26,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.services.OpenJtsFacade;
 
@@ -36,7 +37,7 @@ import com.visfresh.services.OpenJtsFacade;
 @Component
 public class DefaultOpenJtsFacade implements OpenJtsFacade {
     private static final Logger log = LoggerFactory.getLogger(DefaultOpenJtsFacade.class);
-    private final Map<String, Integer> statusCodes;
+    private final Map<TrackerEventType, Integer> statusCodes;
     @Autowired
     private ShipmentDao shipmentDao;
 
@@ -46,13 +47,13 @@ public class DefaultOpenJtsFacade implements OpenJtsFacade {
     public DefaultOpenJtsFacade() {
         super();
 
-        final Map<String, Integer> map = new HashMap<String, Integer>();
-        map.put("AUT", StatusCodes.STATUS_LOCATION);
-        map.put("BRT", StatusCodes.STATUS_LIGHTING_BRIGHTER);
-        map.put("DRK", StatusCodes.STATUS_LIGHTING_DARKER);
-        map.put("INIT", StatusCodes.STATUS_INITIALIZED);
-        map.put("STP", StatusCodes.STATUS_ALARM_OFF);
-        map.put("VIB", StatusCodes.STATUS_VIBRATION_ON);
+        final Map<TrackerEventType, Integer> map = new HashMap<TrackerEventType, Integer>();
+        map.put(TrackerEventType.AUT, StatusCodes.STATUS_LOCATION);
+        map.put(TrackerEventType.BRT, StatusCodes.STATUS_LIGHTING_BRIGHTER);
+        map.put(TrackerEventType.DRK, StatusCodes.STATUS_LIGHTING_DARKER);
+        map.put(TrackerEventType.INIT, StatusCodes.STATUS_INITIALIZED);
+        map.put(TrackerEventType.STP, StatusCodes.STATUS_ALARM_OFF);
+        map.put(TrackerEventType.VIB, StatusCodes.STATUS_VIBRATION_ON);
 
         statusCodes = map;
     }

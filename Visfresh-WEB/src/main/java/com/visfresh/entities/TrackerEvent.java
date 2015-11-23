@@ -15,17 +15,9 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
      */
     private Long id;
     /**
-     * Message type.
-     *     INIT - means auto-collected-data at device starting,
-     *     AUT - means auto-collected-data by timer
-     *     RSP -means the RESPONSE that is replied to server
-     *     VIB - means the device start to vibrating
-     *     STP - means the device is stable
-     *     BRT - means the device enters bright environment
-     *     DRK -means the device enters dark environment
+     * Tracker event type.
      */
-
-    private String type;
+    private TrackerEventType type;
     /**
      * Time of creation.
      */
@@ -69,13 +61,13 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
     /**
      * @return the type
      */
-    public String getType() {
+    public TrackerEventType getType() {
         return type;
     }
     /**
      * @param type the type to set
      */
-    public void setType(final String type) {
+    public void setType(final TrackerEventType type) {
         this.type = type;
     }
     /**

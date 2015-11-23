@@ -46,8 +46,7 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
     @Test
     public void testLogin() throws RestServiceException, IOException {
         final User user = new User();
-        user.setEmail("a@b.c");
-        user.setId(++lastLong);
+        user.setEmail("a-" + (++lastLong) + "@b.c");
         final String password = "lkasdlfkj";
         user.setCompany(getCompany());
 

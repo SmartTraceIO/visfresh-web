@@ -17,6 +17,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -90,7 +91,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         e.setShipment(shipment);
         e.setTemperature(temperature);
         e.setTime(time);
-        e.setType("INIT");
+        e.setType(TrackerEventType.INIT);
         return e;
     }
     /* (non-Javadoc)
@@ -101,7 +102,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertNotNull(e.getTime());
         assertEquals(27, e.getBattery());
         assertEquals(5.5, e.getTemperature(), 0.00001);
-        assertEquals("INIT", e.getType());
+        assertEquals(TrackerEventType.INIT, e.getType());
 
         final Device d = e.getDevice();
         assertNotNull(d);
@@ -134,7 +135,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertNotNull(e.getTime());
         assertEquals(27, e.getBattery());
         assertEquals(5.5, e.getTemperature(), 0.00001);
-        assertEquals("INIT", e.getType());
+        assertEquals(TrackerEventType.INIT, e.getType());
 
         final Device d = e.getDevice();
         assertNotNull(d);

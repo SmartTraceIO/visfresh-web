@@ -16,11 +16,12 @@ import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -112,7 +113,7 @@ public class NormalTemperatureRuleTest extends BaseRuleTest {
         e.setLatitude(10);
         e.setLongitude(10);
         e.setTemperature(t);
-        e.setType("INIT");
+        e.setType(TrackerEventType.AUT);
         e.setDevice(device);
         e.setTime(new Date());
         e.setShipment(shipment);

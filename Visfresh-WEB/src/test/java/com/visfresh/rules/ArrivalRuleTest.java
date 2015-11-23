@@ -19,6 +19,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -49,7 +50,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         e.setDevice(shipment.getDevice());
         e.setShipment(shipment);
         e.setTime(new Date());
-        e.setType("AUT");
+        e.setType(TrackerEventType.AUT);
 
         final RuleContext req = new RuleContext(e, new DeviceState());
         //final location not set
@@ -82,7 +83,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         e.setDevice(shipment.getDevice());
         e.setShipment(shipment);
         e.setTime(new Date());
-        e.setType("AUT");
+        e.setType(TrackerEventType.AUT);
         e.setLatitude(10);
         e.setLongitude(10);
 

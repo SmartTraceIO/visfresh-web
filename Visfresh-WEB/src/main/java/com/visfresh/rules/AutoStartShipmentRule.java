@@ -4,22 +4,21 @@
 package com.visfresh.rules;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.constants.TrackerEventConstants;
-import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.utils.LocationUtils;
+import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -27,6 +26,10 @@ import com.visfresh.utils.LocationUtils;
  */
 @Component
 public class AutoStartShipmentRule implements TrackerEventRule {
+    /**
+     * Logger.
+     */
+    private static final Logger log = LoggerFactory.getLogger(AutoStartShipmentRule.class);
     /**
      * Rule name.
      */
@@ -37,11 +40,6 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     private TrackerEventDao trackerEventDao;
     @Autowired
     private AbstractRuleEngine engine;
-    /**
-     * Inactive time out.
-     */
-    private long inactiveTimeOut = 30 * 60 * 1000L;
-    private int autostartDistance = 200; //200 meters
 
     /**
      * Default constructor.
@@ -61,51 +59,11 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     @Override
     public boolean accept(final RuleContext context) {
         final TrackerEvent e = context.getEvent();
-        if(e.getShipment() == null && !context.isProcessed(this)) {
-            final List<TrackerEvent> events = trackerEventDao.findAll(
-                    null,
-                    new Sorting(false, TrackerEventConstants.PROPERTY_ID),
-                    new Page(1, 2));
-
-            //first event
-            if (events.size() == 1) {
-                return true;
-            }
-
-            //if activity after long inactivity return true.
-            final TrackerEvent e1 = events.get(0);
-            final TrackerEvent e2= events.get(1);
-
-            if (Math.abs(e1.getTime().getTime() - e2.getTime().getTime()) > getInactiveTimeOut()) {
-                return true;
-            }
-
-            //check device motion
-            final int radius = (int) Math.round(LocationUtils.distFrom(
-                    e2.getLatitude(), e2.getLongitude(),
-                    e1.getLatitude(), e1.getLongitude()));
-            if (radius > getAutostartDistance()) {
-                return true;
-            }
-
-            //TODO check may be device moving too slow
-            //find all event without shipment from now to past
-            //and check location is changed
+        if(!context.isProcessed(this) && e.getType() == TrackerEventType.INIT) {
+            return true;
         }
 
         return false;
-    }
-    /**
-     * @return autostart distance.
-     */
-    public int getAutostartDistance() {
-        return autostartDistance;
-    }
-    /**
-     * @param autostartDistance the autostartDistance to set
-     */
-    public void setAutostartDistance(final int autostartDistance) {
-        this.autostartDistance = autostartDistance;
     }
 
     /* (non-Javadoc)
@@ -115,31 +73,43 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     public boolean handle(final RuleContext context) {
         context.setProcessed(this);
 
+        log.debug("New INIT event occurred");
+
         final TrackerEvent event = context.getEvent();
         final Device device = event.getDevice();
 
-        final Shipment s = new Shipment();
-        s.setCompany(device.getCompany());
-        s.setDevice(device);
-        s.setShipmentDescription("Autocreated by autostart shipment rule");
-        s.setShipmentDate(new Date());
+        if (event.getShipment() != null) {
+            log.debug("Close old shipment for device " + device.getImei());
+            closeOldShipment(event.getShipment());
+        }
 
-        shipmentDao.save(s);
-        event.setShipment(s);
+        log.debug("Create new shipment for device " + device.getImei());
+        final Shipment shipment = startNewShipment(device);
+        event.setShipment(shipment);
         trackerEventDao.save(event);
 
         return true;
     }
+
     /**
-     * @return the inactiveTimeOut
+     * @param shipment
      */
-    public long getInactiveTimeOut() {
-        return inactiveTimeOut;
+    private void closeOldShipment(final Shipment shipment) {
+        shipment.setStatus(ShipmentStatus.Complete);
+        shipmentDao.save(shipment);
     }
+
     /**
-     * @param inactiveTimeOut the inactiveTimeOut to set
+     * @param device
      */
-    public void setInactiveTimeOut(final long inactiveTimeOut) {
-        this.inactiveTimeOut = inactiveTimeOut;
+    private Shipment startNewShipment(final Device device) {
+        final Shipment s = new Shipment();
+        s.setCompany(device.getCompany());
+        s.setDevice(device);
+        s.setShipmentDescription("Created by autostart shipment rule");
+        s.setShipmentDate(new Date());
+
+        shipmentDao.save(s);
+        return s;
     }
 }

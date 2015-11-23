@@ -20,6 +20,7 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -84,7 +85,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         }
 
         paramMap.put(ID_FIELD, event.getId());
-        paramMap.put(TYPE_FIELD, event.getType());
+        paramMap.put(TYPE_FIELD, event.getType().toString());
         paramMap.put(TIME_FIELD, event.getTime());
         paramMap.put(BATTERY_FIELD, event.getBattery());
         paramMap.put(TEMPERATURE_FIELD, event.getTemperature());
@@ -274,7 +275,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         a.setLatitude(((Number) map.get(LATITUDE_FIELD)).doubleValue());
         a.setLongitude(((Number) map.get(LONGITUDE_FIELD)).doubleValue());
         a.setTime((Date) map.get(TIME_FIELD));
-        a.setType((String) map.get(TYPE_FIELD));
+        a.setType(TrackerEventType.valueOf((String) map.get(TYPE_FIELD)));
         return a;
     }
 }

@@ -33,6 +33,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
@@ -177,8 +178,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Shipment s = createShipment(true);
 
         //add tracker event.
-        createEvent(s, "AUT");
-        createEvent(s, "AUT");
+        createEvent(s, TrackerEventType.AUT);
+        createEvent(s, TrackerEventType.AUT);
 
         //add alert
         createAlert(s, AlertType.Battery);
@@ -363,7 +364,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
      * @param shipment shipment.
      * @return tracker event.
      */
-    private TrackerEvent createEvent(final Shipment shipment, final String type) {
+    private TrackerEvent createEvent(final Shipment shipment, final TrackerEventType type) {
         final TrackerEvent e = new TrackerEvent();
         e.setShipment(shipment);
         e.setDevice(shipment.getDevice());

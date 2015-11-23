@@ -31,8 +31,8 @@ import com.visfresh.io.SingleShipmentDto;
 import com.visfresh.io.SingleShipmentTimeItem;
 import com.visfresh.io.UserResolver;
 import com.visfresh.rules.AlertDescriptionBuilder;
-import com.visfresh.services.lists.ListShipmentItem;
 import com.visfresh.services.lists.ListNotificationScheduleItem;
+import com.visfresh.services.lists.ListShipmentItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -262,7 +262,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         final double t = event.getTemperature();
         json.addProperty("temperature",
                 user.getTemperatureUnits() == TemperatureUnits.Fahrenheit ? t * 1.8 + 32 : t);
-        json.addProperty("type", event.getType());
+        json.addProperty("type", event.getType().toString());
 
         //add alerts.
         final JsonArray alerts = new JsonArray();

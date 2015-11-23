@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -29,7 +30,7 @@ public class EnterDarkEnvironmentAlertRule extends AbstractAlertRule {
      */
     @Override
     public boolean accept(final RuleContext e) {
-        return "DRK".equalsIgnoreCase(e.getEvent().getType()) && super.accept(e)
+        return e.getEvent().getType() == TrackerEventType.DRK && super.accept(e)
                 && e.getEvent().getShipment().getAlertProfile().isWatchEnterDarkEnvironment();
     }
 

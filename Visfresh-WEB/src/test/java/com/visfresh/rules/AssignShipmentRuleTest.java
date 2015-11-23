@@ -17,6 +17,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -44,7 +45,7 @@ public class AssignShipmentRuleTest extends BaseRuleTest {
         e.setLongitude(15.16);
         e.setTemperature(20.4);
         e.setTime(new Date());
-        e.setType("INIT");
+        e.setType(TrackerEventType.AUT);
         e.setDevice(device);
         this.event = e;
     }

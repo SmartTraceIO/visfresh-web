@@ -110,7 +110,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         PersonSchedule ps = new PersonSchedule();
         ps.setFromTime(45);
         ps.setSendApp(true);
-        ps.setUser(createUser());
+        ps.setUser(createUser("asuvorov-1@google.com"));
         ps.setToTime(150);
 
         s.getSchedules().add(ps);
@@ -126,7 +126,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         ps.setFromTime(45);
         ps.setSendApp(true);
         ps.setToTime(150);
-        ps.setUser(createUser());
+        ps.setUser(createUser("asuvorov-2@google.com"));
 
         s.getSchedules().add(ps);
 
@@ -138,13 +138,12 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         device = createDevice("3984709382475");
     }
 
-    private User createUser() {
+    private User createUser(final String email) {
         final User u = new User();
         u.setCompany(this.sharedCompany);
-        u.setEmail("asuvorov@mail.ru");
         u.setFirstName("Alexander");
         u.setLastName("Suvorov");
-        u.setEmail("asuvorov@google.com");
+        u.setEmail(email);
         u.setPhone("11111111117");
         u.setTemperatureUnits(TemperatureUnits.Celsius);
         u.setTimeZone(TimeZone.getTimeZone("UTC"));

@@ -15,6 +15,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.constants.NotificationConstants;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Notification;
@@ -127,7 +128,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         assertEquals(n2.getId(), list.get(0).getId());
     }
     @Test
-    public void testDeleteByUserAndId() {
+    public void testMarkAsReadenByUserAndId() {
         User u = new User();
         u.setCompany(sharedCompany);
         u.setEmail("mkutuzov@google.com");
@@ -151,7 +152,12 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
 
         ids.add(n2.getId());
         dao.markAsReadenByUserAndId(u, ids);
-        assertEquals(2, dao.findAll(null, null, null).size());
+
+        assertEquals(3, dao.findAll(null, null, null).size());
+
+        final Filter filter = new Filter();
+        filter.addFilter(NotificationConstants.PROPERTY_ISREAD, Boolean.FALSE);
+        assertEquals(2, dao.findAll(filter, null, null).size());
     }
 
     /* (non-Javadoc)

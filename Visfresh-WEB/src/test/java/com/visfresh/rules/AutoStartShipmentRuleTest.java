@@ -3,6 +3,7 @@
  */
 package com.visfresh.rules;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -15,7 +16,10 @@ import org.junit.Test;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -48,33 +52,19 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         e.setLatitude(lat);
         e.setLongitude(lon);
         e.setTemperature(20.4);
-        e.setType("INIT");
+        e.setType(TrackerEventType.AUT);
         e.setDevice(device);
         e.setTime(date);
         return context.getBean(TrackerEventDao.class).save(e);
     }
     @Test
-    public void testAutostartOnFirstEvent() {
+    public void testAccept() {
         final TrackerEvent e = createEvent(13.14, 15.16, new Date());
-        assertTrue(rule.accept(new RuleContext(e, new DeviceState())));
-    }
-    @Test
-    public void testAutostartAfterTimeOut() {
-        createEvent(13.14, 15.16, new Date(System.currentTimeMillis() - 10000000L));
-        final TrackerEvent e = createEvent(13.14, 15.16, new Date());
-        assertTrue(rule.accept(new RuleContext(e, new DeviceState())));
-    }
-    @Test
-    public void testAutostartWhenLocationChanged() {
-        createEvent(13.14, 15.16, new Date());
-        final TrackerEvent e = createEvent(17.14, 18.16, new Date());
-        assertTrue(rule.accept(new RuleContext(e, new DeviceState())));
-    }
-    @Test
-    public void testNotAutostart() {
-        createEvent(13.14, 15.16, new Date());
-        final TrackerEvent e = createEvent(13.14, 15.16, new Date());
+
         assertFalse(rule.accept(new RuleContext(e, new DeviceState())));
+
+        e.setType(TrackerEventType.INIT);
+        assertTrue(rule.accept(new RuleContext(e, new DeviceState())));
     }
     @Test
     public void testHandle() {
@@ -85,9 +75,23 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
 
         //check shipment created.
         assertNotNull(e.getShipment());
-        assertNotNull(context.getBean(ShipmentDao.class).findOne(e.getShipment().getId()));
+        final Long shipmentId = e.getShipment().getId();
+        final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
+
+        assertNotNull(shipmentDao.findOne(shipmentId));
 
         //check not duplicate handle
         assertFalse(rule.accept(c));
+
+        //check old shipment closed
+        rule.handle(c);
+
+        //check old shipment closed
+        final Shipment old = shipmentDao.findOne(shipmentId);
+        assertEquals(ShipmentStatus.Complete, old.getStatus());
+
+        //check new shipment created.
+        assertTrue(!shipmentId.equals(e.getShipment().getId()));
+        assertTrue(old.getTripCount() < e.getShipment().getTripCount());
     }
 }

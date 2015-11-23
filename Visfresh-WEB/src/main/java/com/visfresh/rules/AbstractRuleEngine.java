@@ -23,6 +23,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.services.RetryableException;
@@ -100,7 +101,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         e.setLongitude(event.getLocation().getLongitude());
         e.setTemperature(event.getBattery());
         e.setTime(event.getTime());
-        e.setType(event.getType());
+        e.setType(TrackerEventType.valueOf(event.getType()));
         final String imei = event.getImei();
 
         final Device device = deviceDao.findByImei(imei);

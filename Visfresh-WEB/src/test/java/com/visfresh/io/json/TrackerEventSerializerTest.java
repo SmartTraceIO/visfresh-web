@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.google.gson.JsonObject;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,7 +33,7 @@ public class TrackerEventSerializerTest extends AbstractSerializerTest {
         final Long id = 7l;
         final double temperature = 77.77;
         final Date time = new Date(System.currentTimeMillis() - 1000000000L);
-        final String type = "RSP";
+        final TrackerEventType type = TrackerEventType.RSP;
         final double latitude = 10.10;
         final double longitude = 11.11;
 

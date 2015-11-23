@@ -68,10 +68,9 @@ public abstract class AbstractRestServiceTest {
     public User createUser1() {
         final User u = new User();
         u.setCompany(getCompany());
-        u.setEmail("asuvorov@mail.ru");
+        u.setEmail("asuvorov-" + (++lastLong) + "@mail.ru");
         u.setFirstName("Alexander");
         u.setLastName("Suvorov");
-        u.setId(++lastLong);
         u.setPhone("11111111117");
         u.setTemperatureUnits(TemperatureUnits.Celsius);
         u.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -81,10 +80,9 @@ public abstract class AbstractRestServiceTest {
     public User createUser2() {
         final User u = new User();
         u.setCompany(getCompany());
-        u.setEmail("mkutuzov@mail.ru");
+        u.setEmail("mkutuzov-" + (++lastLong) + "@mail.ru");
         u.setFirstName("Mikhael");
         u.setLastName("Kutuzov");
-        u.setId(++lastLong);
         u.setPhone("11111111118");
         u.setTemperatureUnits(TemperatureUnits.Fahrenheit);
         u.setTimeZone(TimeZone.getTimeZone("GMT+3"));
