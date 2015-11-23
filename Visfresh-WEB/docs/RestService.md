@@ -101,7 +101,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 43. [Send Command to Device](#markdown-header-send-command-to-device)  
 44. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
 ### Utility methods ###
-1. [Get Launguages](#markdown-header-get-languates)  
+1. [Get Languages](#markdown-header-get-languages)  
 2. [Get Roles](#markdown-header-get-roles)  
 3. [Get Time Zones](#markdown-header-get-time-zones)  
 4. [Get User Time](#markdown-header-get-user-time)  
@@ -2047,7 +2047,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```
 ## Utility methods ##
-### Get Launguages ###
+### Get Languages ###
 **GET /vf/rest/getLanguages/${accessToken}**  
 **Response:**  
 ```json
