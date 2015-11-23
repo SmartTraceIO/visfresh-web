@@ -203,6 +203,9 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setCompany(company);
+        u.setAuthorizedDeviceGroup("AuthorizedDeviceGroup");
+        u.setTitle("Mr");
+        u.setScale("User Schale");
         u.getRoles().add(Role.CompanyAdmin);
         context.getBean(AuthService.class).createUser(u, "");
         return u;
