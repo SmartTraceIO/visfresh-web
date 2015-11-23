@@ -101,11 +101,11 @@ List items is short representations of base entities, like as [Alert Profile](#m
 43. [Send Command to Device](#markdown-header-send-command-to-device)  
 44. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
 ### Utility methods ###
-45. [Get Launguages](#markdown-header-get-languates)  
-46. [Get Roles](#markdown-header-get-roles)  
-47. [Get Time Zones](#markdown-header-get-time-zones)  
-48. [Get User Time](#markdown-header-get-user-time)  
-49. [Get Measurement Units](#markdown-header-get-measurement-units)  
+1. [Get Launguages](#markdown-header-get-languates)  
+2. [Get Roles](#markdown-header-get-roles)  
+3. [Get Time Zones](#markdown-header-get-time-zones)  
+4. [Get User Time](#markdown-header-get-user-time)  
+5. [Get Measurement Units](#markdown-header-get-measurement-units)  
 
 ### Authentication.###
 Method *GET*, method name *login*, request parameters login - the user login name and password - the user password  
