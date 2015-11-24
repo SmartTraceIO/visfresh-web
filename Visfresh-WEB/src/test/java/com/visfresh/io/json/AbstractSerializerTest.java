@@ -7,15 +7,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.visfresh.controllers.MockReferenceResolver;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.User;
 import com.visfresh.utils.SerializerUtils;
 
@@ -166,6 +168,12 @@ public class AbstractSerializerTest {
         t.setSn("1");
         resolver.add(t);
         return t;
+    }
+    protected static void dumpJson(final JsonElement json) {
+        final GsonBuilder b = new GsonBuilder();
+        b.setPrettyPrinting();
+        b.disableHtmlEscaping();
+        System.out.println(b.create().toJson(json));
     }
     /**
      * @param date

@@ -724,15 +724,22 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ### Get Shipments filter ###
 ```json
 {
-  "alertsOnly": false,
-  "deviceImei": "234908720394857",
+  "alertsOnly": true,
+  "deviceImei": "283409237873234",
+  "last2Days": true,
+  "lastDay": true,
   "lastMonth": true,
-  "shipmentDescription": "Any Description",
-  "shippedFrom": [], //array of location ID
-  "shippedTo": [], //array of location ID
+  "lastWeek": true,
+  "shipmentDateFrom": "2015-11-12T18:21",
+  "shipmentDateTo": "2015-11-24T07:51",
+  "shipmentDescription": "JUnit Shipment",
+  "shippedFrom": [], //array of ID of shipped from locations
+  "shippedTo": [], //array of ID of shipped to locations
   "status": "InProgress",
-  "pageIndex": 1,
-  "pageSize": 10000
+  "pageIndex": 10,
+  "pageSize": 200,
+  "sortOrder": "asc",
+  "sortColumn": "anyColumn"
 }
 ```
 ## Examples ##
@@ -1434,26 +1441,29 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 **POST /vf/rest/getShipments/${accessToken}**  
 ```json
 {
-  "alertsOnly": false,
-  "deviceImei": "234908720394857",
-  "shipmentDescription": "Any Description",
+  "alertsOnly": true,
+  "deviceImei": "283409237873234",
+  "last2Days": true,
+  "lastDay": true,
+  "lastMonth": true,
+  "lastWeek": true,
+  "shipmentDateFrom": "2015-11-12T18:21",
+  "shipmentDateTo": "2015-11-24T07:51",
+  "shipmentDescription": "JUnit Shipment",
   "shippedFrom": [
-    323,
-    1,
-    2,
-    3,
-    4
+    4,
+    5
   ],
   "shippedTo": [
-    324,
     1,
     2,
-    3,
-    4
+    3
   ],
   "status": "InProgress",
-  "pageIndex": 1,
-  "pageSize": 10000
+  "pageIndex": 10,
+  "pageSize": 200,
+  "sortOrder": "asc",
+  "sortColumn": "anyColumn"
 }
 ```
 **Response:**  
