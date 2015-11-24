@@ -61,10 +61,6 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      */
     private int shutdownDeviceAfterMinutes;
     /**
-     * Max count of alerts of given type.
-     */
-    private int maxTimesAlertFires = 4;
-    /**
      * Comments for receiver
      */
     private String commentsForReceiver;
@@ -227,6 +223,7 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
     /**
      * @param company the company to set
      */
+    @Override
     public void setCompany(final Company company) {
         this.company = company;
     }
@@ -242,18 +239,6 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      */
     public void setId(final Long id) {
         this.id = id;
-    }
-    /**
-     * @return the maxTimesAlertFires
-     */
-    public int getMaxTimesAlertFires() {
-        return maxTimesAlertFires;
-    }
-    /**
-     * @param maxTimesAlertFires the maxTimesAlertFires to set
-     */
-    public void setMaxTimesAlertFires(final int maxTimesAlertFires) {
-        this.maxTimesAlertFires = maxTimesAlertFires;
     }
     /**
      * @return the commentsForReceiver

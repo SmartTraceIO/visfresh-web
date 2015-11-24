@@ -72,7 +72,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         shp.setShippedFrom(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_FROM))));
         shp.setShippedTo(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_TO))));
         shp.setShutdownDeviceTimeOut(asInt(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES)));
-        shp.setMaxTimesAlertFires(asInt(obj.get(ShipmentConstants.PROPERTY_MAX_TIMES_ALERT_FIRES)));
         shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER)));
     }
     public Shipment parseShipment(final JsonObject json) {
@@ -126,7 +125,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         obj.addProperty(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID, getId(s.getAlertProfile()));
         obj.addProperty(ShipmentConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES, s.getAlertSuppressionMinutes());
-        obj.addProperty(ShipmentConstants.PROPERTY_MAX_TIMES_ALERT_FIRES, s.getMaxTimesAlertFires());
         obj.add(ShipmentConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES, getIdList(s.getAlertsNotificationSchedules()));
 
         obj.addProperty(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER, s.getCommentsForReceiver());

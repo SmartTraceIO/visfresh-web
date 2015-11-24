@@ -77,7 +77,6 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final String assetNum = "10515";
         final int poNum = 938498;
         final int tripCount = 11;
-        final int maxTimesAlertFires = 14;
         final String commentsForReceiver = "commentsForReceiver";
 
         Shipment s = new Shipment();
@@ -101,7 +100,6 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         s.setAssetNum(assetNum);
         s.setPoNum(poNum);
         s.setTripCount(tripCount);
-        s.setMaxTimesAlertFires(maxTimesAlertFires);
         s.setCommentsForReceiver(commentsForReceiver);
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
@@ -127,7 +125,6 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(assetNum, s.getAssetNum());
         assertEquals(poNum, s.getPoNum());
         assertEquals(tripCount, s.getTripCount());
-        assertEquals(maxTimesAlertFires, s.getMaxTimesAlertFires());
         assertEquals(commentsForReceiver, s.getCommentsForReceiver());
     }
     @Test

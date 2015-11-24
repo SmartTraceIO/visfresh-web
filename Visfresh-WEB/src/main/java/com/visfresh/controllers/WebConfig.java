@@ -6,10 +6,8 @@ package com.visfresh.controllers;
 import java.util.List;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -28,25 +26,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
      */
     public WebConfig() {
         super();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
-     * #
-     * configureContentNegotiation(org.springframework.web.servlet.config.annotation
-     * .ContentNegotiationConfigurer)
-     */
-    @Override
-    public void configureContentNegotiation(
-            final ContentNegotiationConfigurer configurer) {
-        configurer.favorPathExtension(false)
-            .ignoreAcceptHeader(true)
-            .useJaf(false)
-            .defaultContentType(MediaType.APPLICATION_JSON)
-            .mediaType("json", MediaType.APPLICATION_JSON);
     }
 
     @Override

@@ -16,7 +16,6 @@ public interface ShipmentTemplateConstants {
     String PROPERTY_ALERTS_NOTIFICATION_SCHEDULES = "alertsNotificationSchedules";
     String PROPERTY_MAX_TIMES_ALERT_FIRES = "maxTimesAlertFires";
     String PROPERTY_ALERT_SUPPRESSION_MINUTES = "alertSuppressionMinutes";
-    String PROPERTY_USE_CURRENT_TIME_FOR_DATE_SHIPPED = "useCurrentTimeForDateShipped";
     String PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM = "detectLocationForShippedFrom";
     String PROPERTY_SHIPPED_TO = "shippedTo";
     String PROPERTY_SHIPPED_FROM = "shippedFrom";

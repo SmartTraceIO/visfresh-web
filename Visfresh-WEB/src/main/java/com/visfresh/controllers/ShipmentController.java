@@ -121,7 +121,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         tpl.setCompany(company);
         tpl.setAddDateShipped(true);
         tpl.setDetectLocationForShippedFrom(true);
-        tpl.setUseCurrentTimeForDateShipped(true);
         tpl.setName(templateName);
         return shipmentTemplateDao.save(tpl).getId();
     }

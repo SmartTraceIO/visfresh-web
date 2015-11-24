@@ -22,7 +22,6 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
 
     private static final String ADDDATASHIPPED_FIELD = "adddatashipped";
     private static final String DETECTLOCATION_FIELD = "detectlocation";
-    private static final String USECURRENTTIME_FIELD = "usecurrenttime";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     /**
@@ -41,8 +40,6 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
 //        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_MAX_TIMES_ALERT_FIRES, );
         propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES,
                 NOALERTIFCOODOWN_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_USE_CURRENT_TIME_FOR_DATE_SHIPPED,
-                USECURRENTTIME_FIELD);
         propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM,
                 DETECTLOCATION_FIELD);
         propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPPED_TO,
@@ -76,7 +73,6 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
         final ShipmentTemplate tpl = super.createEntity(map);
         tpl.setAddDateShipped((Boolean) map.get(ADDDATASHIPPED_FIELD));
         tpl.setDetectLocationForShippedFrom((Boolean) map.get(DETECTLOCATION_FIELD));
-        tpl.setUseCurrentTimeForDateShipped((Boolean) map.get(USECURRENTTIME_FIELD));
         tpl.setName((String) map.get(NAME_FIELD));
         return tpl;
     }
@@ -88,7 +84,6 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
         final Map<String, Object> params = super.createParameterMap(s);
         params.put(ADDDATASHIPPED_FIELD, s.isAddDateShipped());
         params.put(DETECTLOCATION_FIELD, s.isDetectLocationForShippedFrom());
-        params.put(USECURRENTTIME_FIELD, s.isUseCurrentTimeForDateShipped());
         params.put(NAME_FIELD, s.getName());
         return params;
     }

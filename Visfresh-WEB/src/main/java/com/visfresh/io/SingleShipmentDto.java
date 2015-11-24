@@ -92,7 +92,6 @@ public class SingleShipmentDto {
         //TODO replace with autodetected
         setPercentageComplete(0);
         setAlertProfileName(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getName());
-        setMaxTimesAlertFires(shipment.getMaxTimesAlertFires());
         setAlertSuppressionMinutes(shipment.getAlertSuppressionMinutes());
         setCommentsForReceiver(shipment.getCommentsForReceiver());
     }

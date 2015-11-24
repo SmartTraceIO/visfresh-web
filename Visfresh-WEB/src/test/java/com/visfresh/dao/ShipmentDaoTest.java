@@ -348,7 +348,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.getArrivalNotificationSchedules().add(arrivalSched);
         s.setAddDateShipped(true);
         s.setDetectLocationForShippedFrom(true);
-        s.setUseCurrentTimeForDateShipped(true);
         return shipmentTemplateDao.save(s);
     }
 }

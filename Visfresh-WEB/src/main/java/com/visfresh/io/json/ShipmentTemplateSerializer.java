@@ -50,10 +50,8 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPPED_FROM, getId(tpl.getShippedFrom()));
         obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPPED_TO, getId(tpl.getShippedTo()));
         obj.addProperty(ShipmentTemplateConstants.PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM, tpl.isDetectLocationForShippedFrom());
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_USE_CURRENT_TIME_FOR_DATE_SHIPPED, tpl.isUseCurrentTimeForDateShipped());
         obj.addProperty(ShipmentTemplateConstants.PROPERTY_ALERT_PROFILE_ID, getId(tpl.getAlertProfile()));
         obj.addProperty(ShipmentTemplateConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES, tpl.getAlertSuppressionMinutes());
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_MAX_TIMES_ALERT_FIRES, tpl.getMaxTimesAlertFires());
         obj.add(ShipmentTemplateConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES, getIdList(tpl.getAlertsNotificationSchedules()));
         obj.addProperty(ShipmentTemplateConstants.PROPERTY_COMMENTS_FOR_RECEIVER, tpl.getCommentsForReceiver());
         obj.addProperty(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM, tpl.getArrivalNotificationWithinKm());
@@ -83,14 +81,12 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         shp.setShippedFrom(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_FROM))));
         shp.setShippedTo(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_TO))));
         shp.setShutdownDeviceTimeOut(asInt(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES)));
-        shp.setMaxTimesAlertFires(asInt(obj.get(ShipmentConstants.PROPERTY_MAX_TIMES_ALERT_FIRES)));
         shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER)));
 
         shp.setId(asLong(obj.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_ID)));
         shp.setName(asString(obj.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME)));
         shp.setShipmentDescription(asString(obj.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION)));
         shp.setAddDateShipped(asBoolean(obj.get(ShipmentTemplateConstants.PROPERTY_ADD_DATE_SHIPPED)));
-        shp.setUseCurrentTimeForDateShipped(asBoolean(obj.get(ShipmentTemplateConstants.PROPERTY_USE_CURRENT_TIME_FOR_DATE_SHIPPED)));
         shp.setDetectLocationForShippedFrom(asBoolean(obj.get(ShipmentTemplateConstants.PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM)));
 
         return shp;

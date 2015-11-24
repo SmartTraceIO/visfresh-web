@@ -18,10 +18,6 @@ public class ShipmentTemplate extends ShipmentBase {
      */
     private boolean detectLocationForShippedFrom;
     /**
-     * Use current time for shipped date.
-     */
-    private boolean useCurrentTimeForDateShipped;
-    /**
      * Name.
      */
     private String name;
@@ -74,17 +70,5 @@ public class ShipmentTemplate extends ShipmentBase {
      */
     public void setDetectLocationForShippedFrom(final boolean useLocationNearestToDevice) {
         this.detectLocationForShippedFrom = useLocationNearestToDevice;
-    }
-    /**
-     * @return the useCurrentTimeForDateShipped
-     */
-    public boolean isUseCurrentTimeForDateShipped() {
-        return useCurrentTimeForDateShipped;
-    }
-    /**
-     * @param useCurrentTimeForDateShipped the useCurrentTimeForDateShipped to set
-     */
-    public void setUseCurrentTimeForDateShipped(final boolean useCurrentTimeForDateShipped) {
-        this.useCurrentTimeForDateShipped = useCurrentTimeForDateShipped;
     }
 }

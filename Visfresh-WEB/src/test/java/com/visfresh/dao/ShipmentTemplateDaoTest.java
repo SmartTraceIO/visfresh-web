@@ -162,7 +162,6 @@ public class ShipmentTemplateDaoTest
         s.getArrivalNotificationSchedules().add(arrivalSched);
         s.setAddDateShipped(true);
         s.setDetectLocationForShippedFrom(true);
-        s.setUseCurrentTimeForDateShipped(true);
         return s;
     }
     /* (non-Javadoc)
@@ -184,7 +183,6 @@ public class ShipmentTemplateDaoTest
         assertEquals(1, tpl.getArrivalNotificationSchedules().size());
         assertTrue(tpl.isAddDateShipped());
         assertTrue(tpl.isDetectLocationForShippedFrom());
-        assertTrue(tpl.isUseCurrentTimeForDateShipped());
     }
     @Test
     public void testFindByCompany() {
@@ -224,6 +222,5 @@ public class ShipmentTemplateDaoTest
         assertEquals(1, tpl.getArrivalNotificationSchedules().size());
         assertTrue(tpl.isAddDateShipped());
         assertTrue(tpl.isDetectLocationForShippedFrom());
-        assertTrue(tpl.isUseCurrentTimeForDateShipped());
     }
 }

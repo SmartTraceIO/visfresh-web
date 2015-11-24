@@ -308,7 +308,6 @@ public abstract class AbstractRestServiceTest {
         t.setShippedFrom(createLocationProfile(save));
         t.setShippedTo(createLocationProfile(save));
         t.setShutdownDeviceTimeOut(155);
-        t.setUseCurrentTimeForDateShipped(true);
         t.setDetectLocationForShippedFrom(true);
         t.setCommentsForReceiver("Comments for receiver");
 

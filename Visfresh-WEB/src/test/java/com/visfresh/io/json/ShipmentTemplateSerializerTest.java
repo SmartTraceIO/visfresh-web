@@ -87,7 +87,6 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         final LocationProfile shippedFrom = createLocationProfile();
         final LocationProfile shippedTo = createLocationProfile();
         final int shutdownDeviceTimeOut = 155;
-        final boolean useCurrentTimeForDateShipped = true;
         final boolean useLocationNearestToDevice = true;
         final String commentsForReceiver = "commentsForReceiver";
 
@@ -105,7 +104,6 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         t.setShippedFrom(shippedFrom);
         t.setShippedTo(shippedTo);
         t.setShutdownDeviceTimeOut(shutdownDeviceTimeOut);
-        t.setUseCurrentTimeForDateShipped(useCurrentTimeForDateShipped);
         t.setDetectLocationForShippedFrom(useLocationNearestToDevice);
         t.setCommentsForReceiver(commentsForReceiver);
 
@@ -126,9 +124,7 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         assertNotNull(t.getShippedFrom());
         assertNotNull(t.getShippedTo());
         assertEquals(shutdownDeviceTimeOut, t.getShutdownDeviceTimeOut());
-        assertEquals(useCurrentTimeForDateShipped, t.isUseCurrentTimeForDateShipped());
         assertEquals(useLocationNearestToDevice, t.isDetectLocationForShippedFrom());
         assertEquals(commentsForReceiver, t.getCommentsForReceiver());
     }
-
 }
