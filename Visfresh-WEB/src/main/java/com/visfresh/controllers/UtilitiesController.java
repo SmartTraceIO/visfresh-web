@@ -130,6 +130,8 @@ public class UtilitiesController extends AbstractController {
             json.addProperty("dateString", createDateFormat("hh:mmaa", tz).format(date));
 //          dateString24: "16:33"
             json.addProperty("dateString24", createDateFormat("HH:mm", tz).format(date));
+            json.addProperty("timeZoneId", tz.getID());
+            json.addProperty("timeZoneString", tz.getDisplayName());
 
             return createSuccessResponse(json);
         } catch (final Exception e) {
