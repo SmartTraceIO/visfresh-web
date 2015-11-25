@@ -1975,39 +1975,39 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "deviceSN": "394857",
     "deviceName": "Device Name",
     "tripCount": 1,
-    "shipmentId": 403,
+    "shipmentId": 517,
     "shipmentDescription": "Any Description",
     "palletId": "palettid",
     "poNum": 893793487,
     "assetNum": "10515",
     "assetType": "SeaContainer",
-    "shippedFrom": 507,
-    "shippedTo": 508,
+    "shippedFrom": 651,
+    "shippedTo": 652,
     "currentLocation": "Not determined",
-    "estArrivalDate": "2015-11-26T12:11",
-    "actualArrivalDate": "2015-11-26T12:11",
+    "estArrivalDate": "2015-11-27T09:11",
+    "actualArrivalDate": "2015-11-27T09:11",
     "percentageComplete": 0,
-    "alertProfileId": 304,
+    "alertProfileId": 394,
     "alertProfileName": "AnyAlert",
     "alertSuppressionMinutes": 55,
     "maxTimesAlertFires": 0,
     "alertsNotificationSchedules": [
       {
-        "notificationScheduleId": 497,
+        "notificationScheduleId": 642,
         "notificationScheduleName": "Sched",
         "notificationScheduleDescription": "JUnit schedule",
         "peopleToNotify": "Alexander Suvorov, Alexander Suvorov"
       }
     ],
     "alertSummary": {
-      "Hot": "1",
-      "Battery": "1"
+      "Battery": "1",
+      "Hot": "1"
     },
     "arrivalNotificationWithinKm": 111,
     "excludeNotificationIfNoAlerts": false,
     "arrivalNotificationSchedules": [
       {
-        "notificationScheduleId": 498,
+        "notificationScheduleId": 643,
         "notificationScheduleName": "Sched",
         "notificationScheduleDescription": "JUnit schedule",
         "peopleToNotify": "Mikhael Kutuzov, Mikhael Kutuzov"
@@ -2016,7 +2016,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "commentsForReceiver": "Comments for receiver",
     "items": [
       {
-        "timestamp": "2015-11-24T12:11",
+        "timestamp": "2015-11-25T09:11",
         "location": {
           "latitude": 50.5,
           "longitude": 51.51
@@ -2025,7 +2025,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         "type": "AUT",
         "alerts": [
           {
-            "description": "Battery low at ${time}",
+            "description": "Battery low at 05:24",
             "type": "Battery"
           },
           {
@@ -2041,7 +2041,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         ]
       },
       {
-        "timestamp": "2015-11-24T12:11",
+        "timestamp": "2015-11-25T09:11",
         "location": {
           "latitude": 50.5,
           "longitude": 51.51
