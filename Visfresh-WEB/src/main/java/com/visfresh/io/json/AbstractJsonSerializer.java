@@ -134,6 +134,10 @@ public class AbstractJsonSerializer {
      * @return
      */
     public Date parseDate(final String str) {
+        if (str == null) {
+            return null;
+        }
+
         final SimpleDateFormat sdf = createDateFormat();
         sdf.setTimeZone(timeZone);
 

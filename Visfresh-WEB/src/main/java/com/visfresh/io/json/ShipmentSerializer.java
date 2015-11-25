@@ -397,7 +397,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             req.setShippedTo(asLongList(json.get("shippedTo")));
         }
         if (json.has("status")) {
-            req.setStatus(ShipmentStatus.valueOf(asString(json.get("status"))));
+            final String statusString = asString(json.get("status"));
+            req.setStatus(statusString == null ? null : ShipmentStatus.valueOf(statusString));
         }
         if (json.has("pageIndex")) {
             req.setPageIndex(asInt(json.get("pageIndex")));
