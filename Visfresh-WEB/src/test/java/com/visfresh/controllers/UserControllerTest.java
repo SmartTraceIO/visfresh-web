@@ -4,7 +4,9 @@
 package com.visfresh.controllers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.TimeZone;
@@ -26,6 +28,7 @@ import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.AuthService;
+import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -66,7 +69,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertNotNull(user);
     }
     @Test
-    public void testCreateUser() throws IOException, RestServiceException {
+    public void testSaveUser() throws IOException, RestServiceException, AuthenticationException {
         //create company
         final Company c = new Company();
         c.setDescription("JUnit test company");
@@ -94,6 +97,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setMeasurementUnits(measurementUnits);
         u.setScale(scale);
         u.setTitle(title);
+        u.setActive(false);
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.ReportViewer);
         u.getRoles().add(Role.Dispatcher);
@@ -101,9 +105,10 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         final String password = "password";
 
-        client.createUser(u, c, password);
+        final Long id = client.saveUser(u, c, password);
 
-        final User u2 = dao.findByEmail(u.getEmail());
+        assertNotNull(id);
+        User u2 = dao.findByEmail(u.getEmail());
         assertNotNull(u2);
         assertEquals(3, u2.getRoles().size());
         assertNotNull(u2.getCompany());
@@ -117,9 +122,52 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(measurementUnits, u.getMeasurementUnits());
         assertEquals(scale, u.getScale());
         assertEquals(title, u.getTitle());
+        assertFalse(u.isActive());
+
+        final AuthService auth = context.getBean(AuthService.class);
+
+        //check password
+        assertNotNull(auth.login(u.getEmail(), password));
+
+        //check update user
+        final String newPhone = "2930847093248";
+        final String newPassword = "newpassword";
+
+        u.setPhone(newPhone);
+        u.setId(u2.getId());
+        client.saveUser(u, getCompany(), newPassword);
+
+        u2 = dao.findByEmail(u.getEmail());
+        assertEquals(newPhone, u2.getPhone());
+
+        //check password
+        assertNotNull(auth.login(u.getEmail(), newPassword));
     }
     @Test
     public void testGetUsers() throws IOException, RestServiceException {
+        final Company c = new Company();
+        c.setName("Test");
+        c.setDescription("Test company");
+        context.getBean(CompanyDao.class).save(c);
+
+        final User u1 = createUser("u1@google.com", "A2", "LastA2", c);
+        final User u2 = createUser("u2@google.com", "A1", "LastA1", c);
+        final String token = client.login("u1@google.com", "");
+        client.setAuthToken(token);
+
+        //test limit
+        assertEquals(2, client.getUsers(1, 10000, null, null).size());
+        assertEquals(1, client.getUsers(1, 1, null, null).size());
+        assertEquals(1, client.getUsers(2, 1, null, null).size());
+
+        assertEquals(u2.getId(), client.getUsers(1, 1,
+                UserConstants.PROPERTY_FIRST_NAME, "asc").get(0).getId());
+        assertEquals(u1.getId(), client.getUsers(1, 1,
+                UserConstants.PROPERTY_FIRST_NAME, "desc").get(0).getId());
+        //TODO other sortings.
+    }
+    @Test
+    public void testListUsers() throws IOException, RestServiceException {
         final Company c = new Company();
         c.setName("Test");
         c.setDescription("Test company");
@@ -191,6 +239,13 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(scale, u.getScale());
         assertEquals(title, u.getTitle());
     }
+    @Test
+    public void testDeleteUser() throws IOException, RestServiceException {
+        final User u = createUser("asuvorov@mail.ru", "Alexandr", "Suvorov", getCompany());
+        client.deleteUser(u);
+
+        assertNull(dao.findOne(u.getId()));
+    }
     /**
      * @param email
      * @param firstName
@@ -207,7 +262,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setTitle("Mr");
         u.setScale("User Schale");
         u.getRoles().add(Role.CompanyAdmin);
-        context.getBean(AuthService.class).createUser(u, "");
+        context.getBean(AuthService.class).saveUser(u, "");
         return u;
     }
 }

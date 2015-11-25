@@ -43,5 +43,5 @@ public interface AuthService {
      * @param user user to create.
      * @param password user password.
      */
-    void createUser(User user, String password);
+    void saveUser(User user, String password);
 }

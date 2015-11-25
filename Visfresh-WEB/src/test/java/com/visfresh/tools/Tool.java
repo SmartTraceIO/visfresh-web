@@ -85,6 +85,6 @@ public class Tool extends AbstractTool {
         u.setLastName(lastName);
         u.getRoles().add(Role.CompanyAdmin);
 
-        userService.createUser(u, company, password);
+        userService.saveUser(u, company, password);
     }
 }

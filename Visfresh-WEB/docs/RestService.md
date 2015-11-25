@@ -57,49 +57,51 @@ List items is short representations of base entities, like as [Alert Profile](#m
 
 ## Rest Service methods.
 1. [Authentication](#markdown-header-authentication).  
-2. [Get access token using existing GTS(e) session.](#markdown-header-get-access-token-using-existing-gts-e-session)  
-3. [Get User Info](#markdown-header-get-user-info) 
+2. [Save user](#markdown-header-save-user)  
+3. [Get User](#markdown-header-get-user-info)  
 4. [Get Users](#markdown-header-get-users)  
-5. [Update User details](#markdown-header-update-user-details)  
-6. [Logout](#markdown-header-logout)  
-7. [Refresh access token](#markdown-header-refresh-access-token)  
-8. [Save alert profile](#markdown-header-save-alert-profile)  
-9. [Get Alert Profile](#markdown-header-get-alert-profile)  
-10. [Get Alert Profiles](#markdown-header-get-alert-profiles)  
-11. [Delete Alert Profile](#markdown-header-delete-alert-profile)  
-12. [Save notification schedule](#markdown-header-save-notification-schedule)  
-13. [Get notification schedules](#markdown-header-get-notification-schedules)  
-14. [Get Notification Schedule](#markdown-header-get-notification-schedule)  
-15. [Delete Notification Schedule](#markdown-header-delete-notification-schedule)  
-16. [Delete Person Schedule](#markdown-header-delete-person-schedule)  
-17. [Save Location](#markdown-header-save-location)  
-18. [Get Locations](#markdown-header-get-locations)  
-19. [Get Location](#markdown-header-get-location)  
-20. [Delete Location](#markdown-header-delete-location)  
-21. [Save Shipment Template](#markdown-header-save-shipment-template)  
-22. [Get Shipment templates](#markdown-header-get-shipment-templates)  
-23. [Get Shipment Template](#markdown-header-get-shipment-template)  
-24. [Delete Shipment Template](#markdown-header-delete-shipment-template)  
-25. [Save Shipment](#markdown-header-save-shipment)  
-26. [Get Shipments](#markdown-header-get-shipments)  
-27. [Get Shipment](#markdown-header-get-shipment)  
-28. [Get Single Shipment](#markdown-header-get-single-shipment)
-29. [Delete Shipment](#markdown-header-delete-shipment)  
-30. [Save Device](#markdown-header-save-device)  
-31. [Get Device](#markdown-header-get-device)  
-32. [Get Devices](#markdown-header-get-devices)  
-33. [Delete Device](#markdown-header-delete-device)  
-34. [Save Device Group](#markdown-header-save-device-group)  
-35. [Get Device Group](#markdown-header-get-device-group)  
-36. [Get Device Groups](#markdown-header-get-device-groups)  
-37. [Delete Device Group](#markdown-header-delete-device-group)  
-38. [Add Device to Group](#markdown-header-add-device-to-group)  
-39. [Remove Device from Group](#markdown-header-remove-device-from-group)  
-40. [Get Devices of Group](#markdown-header-get-devices-of-group)    
-41. [Get Groups of Device](#markdown-header-get-groups-of-device)  
-42. [Get Notifications](#markdown-header-get-notifications)  
-43. [Send Command to Device](#markdown-header-send-command-to-device)  
-44. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
+5. [List Users](#markdown-header-list-users)  
+6. [Delete User](#markdown-header-delete-user)
+7. [Update User details](#markdown-header-update-user-details)  
+8. [Logout](#markdown-header-logout)  
+9. [Refresh access token](#markdown-header-refresh-access-token)  
+10. [Save alert profile](#markdown-header-save-alert-profile)  
+11. [Get Alert Profile](#markdown-header-get-alert-profile)  
+12. [Get Alert Profiles](#markdown-header-get-alert-profiles)  
+13. [Delete Alert Profile](#markdown-header-delete-alert-profile)  
+14. [Save notification schedule](#markdown-header-save-notification-schedule)  
+15. [Get notification schedules](#markdown-header-get-notification-schedules)  
+16. [Get Notification Schedule](#markdown-header-get-notification-schedule)  
+17. [Delete Notification Schedule](#markdown-header-delete-notification-schedule)  
+18. [Delete Person Schedule](#markdown-header-delete-person-schedule)  
+19. [Save Location](#markdown-header-save-location)  
+20. [Get Locations](#markdown-header-get-locations)  
+21. [Get Location](#markdown-header-get-location)  
+22. [Delete Location](#markdown-header-delete-location)  
+23. [Save Shipment Template](#markdown-header-save-shipment-template)  
+24. [Get Shipment templates](#markdown-header-get-shipment-templates)  
+25. [Get Shipment Template](#markdown-header-get-shipment-template)  
+26. [Delete Shipment Template](#markdown-header-delete-shipment-template)  
+27. [Save Shipment](#markdown-header-save-shipment)  
+28. [Get Shipments](#markdown-header-get-shipments)  
+29. [Get Shipment](#markdown-header-get-shipment)  
+30. [Get Single Shipment](#markdown-header-get-single-shipment)
+31. [Delete Shipment](#markdown-header-delete-shipment)  
+32. [Save Device](#markdown-header-save-device)  
+33. [Get Device](#markdown-header-get-device)  
+34. [Get Devices](#markdown-header-get-devices)  
+35. [Delete Device](#markdown-header-delete-device)  
+36. [Save Device Group](#markdown-header-save-device-group)  
+37. [Get Device Group](#markdown-header-get-device-group)  
+38. [Get Device Groups](#markdown-header-get-device-groups)  
+39. [Delete Device Group](#markdown-header-delete-device-group)  
+40. [Add Device to Group](#markdown-header-add-device-to-group)  
+41. [Remove Device from Group](#markdown-header-remove-device-from-group)  
+42. [Get Devices of Group](#markdown-header-get-devices-of-group)    
+43. [Get Groups of Device](#markdown-header-get-groups-of-device)  
+44. [Get Notifications](#markdown-header-get-notifications)  
+45. [Send Command to Device](#markdown-header-send-command-to-device)  
+46. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
 2. [Get Roles](#markdown-header-get-roles)  
@@ -114,10 +116,10 @@ Method *GET*, method name *login*, request parameters login - the user login nam
 Returns [Authentication token](#markdown-header-authentication-token).  
 [(example)](#markdown-header-authentication-request-example)  
 
-### Get access token using existing GTS(e) session.###
-The user should be logged in to GTS(e). (not implemented now).
-Method *POST*, method name *getToken*, no parameters. In case of this request the service access a current user session, determines user info, log in as REST service user and returns authentication session.  
-[(example)](#markdown-header-attach-to-existing-session-example)
+### Save User ###
+Method *POST*, method name *saveUser*, request body JSON serialized [Save User Request](#markdown-header-save-user-request)  
+Returns ID of just saved user.  
+[(example)](#markdown-header-save-user-example)
 
 ### Get User Info ###
 Method *GET*, method name *getUser*, method parameters  
@@ -128,13 +130,27 @@ Method returns [User Object](#markdown-header-user)
 [(example)](#markdown-header-get-user-info-example)
 
 ### Get Users ###
-Method *GET*, method name *getUsers*, method parameters:  
+Method *GET*, method name *getUsers*, method parameters:
+1. pageIndex - number of page  
+2. pageSize - size of page  
+3. sc - sort column  
+4. so - sort order  
+Method returns array of [User Objects](#markdown-header-user)  
+[(example)](#markdown-header-get-users-example)
+
+### List Users ###
+Method *GET*, method name *listUsers*, method parameters:  
 1. pageIndex - number of page  
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order  
 Method returns array of [User List items](#markdown-header-user-list-item)  
-[(example)](#markdown-header-get-users-example)
+[(example)](#markdown-header-list-users-example)
+
+### Delete User ###
+Method *GET*, method name *deleteUser*, method parameters:  
+1 userId - ID of user to delete  
+[(example)](#markdown-header-delete-user-example)
 
 ### Update User Details ###
 Method *POST*, method name *updateUserDetails*. JSON request body contains following properties:  
@@ -669,23 +685,30 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ### User ###
 ```json
 {
-    "id": 433,
-    "firstName": "firstname",
-    "lastName": "LastName",
-    "position": "Manager",
-    "email": "abra@cada.bra",
-    "phone": "1111111117",
+    "id": 1725,
+    "email": "a@b.c",
     "roles": [
       "GlobalAdmin"
     ],
-    "timeZone": "GMT+02:00",
-    "temperatureUnits": "Fahrenheit",
-    "measurementUnits": "English",
+    "timeZone": "UTC",
+    "temperatureUnits": "Celsius",
+    "measurementUnits": "Metric",
     "language": "English",
-    "scale": "scale",
-    "title": "Developer"
+    "active": true,
+    "companyId": 1499,
+    "companyName": "Special JUnit Company"
 }
 ```
+### Save User Request ###
+```json
+{
+  "user": ${userObject},
+  "password": "newpassword",
+  "company": 1529 //company can be null, the company of current logged in user will used in this case.
+                  //not null company can be used only by GlobalAdministrator
+}
+```
+[(see)](#markdown-header-user)
 ## List Items ##
 ### Shipment Template List item ###
 ```json
@@ -771,7 +794,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```
 ### Get user info example ###
-**GET /vf/rest/getUser/${authToken}?userId=290**  
+**GET /vf/rest/getUser/${authToken}?userId=1725**  
 **Response:**  
 ```json
 {
@@ -780,26 +803,97 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "message": "Success"
   },
   "response": {
-    "id": 433,
+    "id": 1725,
+    "email": "a@b.c",
+    "roles": [
+      "GlobalAdmin"
+    ],
+    "timeZone": "UTC",
+    "temperatureUnits": "Celsius",
+    "measurementUnits": "Metric",
+    "language": "English",
+    "active": true,
+    "companyId": 1499,
+    "companyName": "Special JUnit Company"
+  }
+}
+```
+### Save User example ###
+**POST /vf/rest/saveUser/${accessToken}**  
+**Request:** 
+```json
+{
+  "user": {
     "firstName": "firstname",
     "lastName": "LastName",
     "position": "Manager",
     "email": "abra@cada.bra",
     "phone": "1111111117",
     "roles": [
-      "GlobalAdmin"
+      "ReportViewer",
+      "Dispatcher",
+      "CompanyAdmin"
     ],
-    "timeZone": "GMT+02:00",
-    "temperatureUnits": "Fahrenheit",
+    "timeZone": "UTC",
+    "temperatureUnits": "Celsius",
     "measurementUnits": "English",
     "language": "English",
+    "deviceGroup": "DeviceGroupName",
     "scale": "scale",
-    "title": "Developer"
+    "title": "Mrs",
+    "active": false
+  },
+  "password": "password",
+  "company": 1484
+}
+```  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "userId": 1705
   }
 }
 ```
 ### Get Users example ###
-**GET /vf/rest/getUsers/${authToken}?so=asc&pageSize=1&sc=login&pageIndex=1**  
+**GET /vf/rest/getUsers/${accessToken}?so=asc&pageSize=1&sc=firstName&pageIndex=1**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "id": 1739,
+      "firstName": "A2",
+      "lastName": "LastA2",
+      "email": "u1@google.com",
+      "roles": [
+        "CompanyAdmin"
+      ],
+      "timeZone": "UTC",
+      "temperatureUnits": "Celsius",
+      "measurementUnits": "Metric",
+      "language": "English",
+      "deviceGroup": "AuthorizedDeviceGroup",
+      "scale": "User Schale",
+      "title": "Mr",
+      "active": true,
+      "companyId": 1510,
+      "companyName": "Test"
+    }
+  ],
+  "totalCount": 2
+}
+```
+### List Users example ###
+**GET /vf/rest/listUsers/${authToken}?so=asc&pageSize=1&sc=login&pageIndex=1**  
 **Response:**  
 ```json
 {
@@ -818,6 +912,17 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     }
   ],
   "totalCount": 2
+}
+```
+### Delete User example ###
+**GET /vf/rest/deleteUser/${accessToken}?userId=1711**
+Response:
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  }
 }
 ```
 ### Update User Details example ###

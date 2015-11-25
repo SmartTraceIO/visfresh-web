@@ -12,7 +12,6 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
-import com.visfresh.io.CreateUserRequest;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -217,12 +216,11 @@ public class DefaultAccessController implements AccessController {
      * @see com.visfresh.controllers.AccessController#checkCanCreateUser(com.visfresh.entities.User, com.visfresh.io.CreateUserRequest)
      */
     @Override
-    public void checkCanCreateUser(final User user, final CreateUserRequest r)
+    public void checkCanManageUsers(final User user, final Company company)
             throws RestServiceException {
         if (havePermission(user, Role.GlobalAdmin)) {
             return;
         }
-        final Company company = r.getCompany();
         if (company != null && havePermission(user, Role.CompanyAdmin)
                 && user.getCompany().getId().equals(company.getId())) {
             return;

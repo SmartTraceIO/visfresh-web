@@ -61,9 +61,13 @@ public class DefaultAuthService extends AbstractAuthService {
      * @see com.visfresh.services.AuthService#createUser(com.visfresh.entities.User, java.lang.String)
      */
     @Override
-    public void createUser(final User user, final String password) {
+    public void saveUser(final User user, final String password) {
+        final boolean isNew = user.getId() == null;
         user.setPassword(generateHash(password));
         userDao.save(user);
-        openJts.addUser(user, password);
+
+        if (isNew) {
+            openJts.addUser(user, password);
+        }
     }
 }

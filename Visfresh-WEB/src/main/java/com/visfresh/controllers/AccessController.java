@@ -5,10 +5,10 @@ package com.visfresh.controllers;
 
 import java.util.Set;
 
+import com.visfresh.entities.Company;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
-import com.visfresh.io.CreateUserRequest;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -103,9 +103,9 @@ public interface AccessController {
     void checkSaveProfile(User user) throws RestServiceException;
     /**
      * @param user current user.
-     * @param r request for create another user..
+     * @param company TODO
      */
-    void checkCanCreateUser(User user, CreateUserRequest r) throws RestServiceException;
+    void checkCanManageUsers(User user, Company company) throws RestServiceException;
     /**
      * @param user user.
      * @param id company ID.

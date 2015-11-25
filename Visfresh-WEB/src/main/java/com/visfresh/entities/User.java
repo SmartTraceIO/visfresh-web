@@ -40,7 +40,6 @@ public class User implements EntityWithId<Long>, EntityWithCompany {
      * Phone number
      */
     private String phone;
-
     /**
      * Encrypted password.
      */
@@ -77,6 +76,10 @@ public class User implements EntityWithId<Long>, EntityWithCompany {
      * User measurement units.
      */
     private MeasurementUnits measurementUnits = MeasurementUnits.Metric;
+    /**
+     * Active Flag.
+     */
+    private boolean active = true;
 
     /**
      * Default constructor.
@@ -286,5 +289,17 @@ public class User implements EntityWithId<Long>, EntityWithCompany {
      */
     public void setMeasurementUnits(final MeasurementUnits measurementUnits) {
         this.measurementUnits = measurementUnits;
+    }
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+    /**
+     * @param active the active to set
+     */
+    public void setActive(final boolean active) {
+        this.active = active;
     }
 }

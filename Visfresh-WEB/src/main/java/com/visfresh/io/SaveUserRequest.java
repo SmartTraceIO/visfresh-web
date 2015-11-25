@@ -10,7 +10,7 @@ import com.visfresh.entities.User;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class CreateUserRequest {
+public class SaveUserRequest {
     private User user;
     private Company company;
     private String password;
@@ -18,7 +18,7 @@ public class CreateUserRequest {
     /**
      * Default constructor.
      */
-    public CreateUserRequest() {
+    public SaveUserRequest() {
         super();
     }
 

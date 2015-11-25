@@ -51,6 +51,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
     private static final String MEASUREUNITS_FIELD = "measureunits";
     private static final String SCALE_FIELD = "scale";
     private static final String TITLE_FIELD = "title";
+    private static final String ACTIVE_FIELD = "active";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -71,6 +72,10 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         propertyToDbFields.put(UserConstants.PROPERTY_POSITION, POSITION_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_LAST_NAME, LASTNAME_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_FIRST_NAME, FIRSTNAME_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_ACTIVE, ACTIVE_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_COMPANY_ID, COMPANY_FIELD);
+        //TODO correct
+        propertyToDbFields.put(UserConstants.PROPERTY_COMPANY_NAME, COMPANY_FIELD);
     }
 
     public String convertToDatabaseColumn(final Collection<Role> roles) {
@@ -131,6 +136,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         paramMap.put(MEASUREUNITS_FIELD, user.getMeasurementUnits().toString());
         paramMap.put(SCALE_FIELD, user.getScale());
         paramMap.put(TITLE_FIELD, user.getTitle());
+        paramMap.put(ACTIVE_FIELD, user.isActive());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -161,6 +167,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         fields.add(MEASUREUNITS_FIELD);
         fields.add(SCALE_FIELD);
         fields.add(TITLE_FIELD);
+        fields.add(ACTIVE_FIELD);
         return fields;
     }
 
@@ -196,23 +203,24 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
      * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
      */
     @Override
-    protected User createEntity(final Map<String, Object> map) {
+    protected User createEntity(final Map<String, Object> row) {
         final User u = new User();
-        u.setId(((Number) map.get(ID_FIELD)).longValue());
-        u.setFirstName((String) map.get(FIRSTNAME_FIELD));
-        u.setLastName((String) map.get(LASTNAME_FIELD));
-        u.setPosition((String) map.get(POSITION_FIELD));
-        u.setEmail((String) map.get(EMAIL_FIELD));
-        u.setPhone((String) map.get(PHONE_FIELD));
-        u.setPassword((String) map.get(PASSWORD_FIELD));
-        u.setTimeZone(TimeZone.getTimeZone((String) map.get(TIME_ZONE_FIELD)));
-        u.setTemperatureUnits(TemperatureUnits.valueOf((String) map.get(TEMPERATURE_UNITS)));
-        u.getRoles().addAll(convertToEntityAttribute((String) map.get(ROLES_FIELD)));
-        u.setDeviceGroup((String) map.get(DEVICEGROUP_FIELD));
-        u.setLanguage(Language.valueOf((String) map.get(LANGUAGE_FIELD)));
-        u.setMeasurementUnits(MeasurementUnits.valueOf((String) map.get(MEASUREUNITS_FIELD)));
-        u.setScale((String) map.get(SCALE_FIELD));
-        u.setTitle((String) map.get(TITLE_FIELD));
+        u.setId(((Number) row.get(ID_FIELD)).longValue());
+        u.setFirstName((String) row.get(FIRSTNAME_FIELD));
+        u.setLastName((String) row.get(LASTNAME_FIELD));
+        u.setPosition((String) row.get(POSITION_FIELD));
+        u.setEmail((String) row.get(EMAIL_FIELD));
+        u.setPhone((String) row.get(PHONE_FIELD));
+        u.setPassword((String) row.get(PASSWORD_FIELD));
+        u.setTimeZone(TimeZone.getTimeZone((String) row.get(TIME_ZONE_FIELD)));
+        u.setTemperatureUnits(TemperatureUnits.valueOf((String) row.get(TEMPERATURE_UNITS)));
+        u.getRoles().addAll(convertToEntityAttribute((String) row.get(ROLES_FIELD)));
+        u.setDeviceGroup((String) row.get(DEVICEGROUP_FIELD));
+        u.setLanguage(Language.valueOf((String) row.get(LANGUAGE_FIELD)));
+        u.setMeasurementUnits(MeasurementUnits.valueOf((String) row.get(MEASUREUNITS_FIELD)));
+        u.setScale((String) row.get(SCALE_FIELD));
+        u.setTitle((String) row.get(TITLE_FIELD));
+        u.setActive(!Boolean.FALSE.equals(row.get(ACTIVE_FIELD)));
         return u;
     }
     /* (non-Javadoc)

@@ -19,7 +19,7 @@ import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
-import com.visfresh.io.CreateUserRequest;
+import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.utils.SerializerUtils;
 
@@ -110,7 +110,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         final String phone = "1111111117";
         final String position = "Manager";
 
-        CreateUserRequest r = new CreateUserRequest();
+        SaveUserRequest r = new SaveUserRequest();
         final User user = new User();
         user.setId(login);
         user.setFirstName(firstName);
@@ -124,7 +124,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         r.setPassword(password);
 
         final JsonElement json = serializer.toJson(r);
-        r = serializer.parseCreateUserRequest(json);
+        r = serializer.parseSaveUserRequest(json);
 
         assertNotNull(user);
         assertNotNull(r.getCompany());

@@ -17,7 +17,7 @@ import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.CompanyResolver;
-import com.visfresh.io.CreateUserRequest;
+import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.lists.ListUserItem;
@@ -62,6 +62,7 @@ public class UserSerializer extends AbstractJsonSerializer {
         u.setMeasurementUnits(MeasurementUnits.valueOf(asString(json.get("measurementUnits"))));
         u.setScale(asString(json.get("scale")));
         u.setTitle(asString(json.get("title")));
+        u.setActive(!Boolean.FALSE.equals(asBoolean(json.get(UserConstants.PROPERTY_ACTIVE))));
 
         final JsonArray array = json.get(UserConstants.PROPERTY_ROLES).getAsJsonArray();
         final int size = array.size();
@@ -97,6 +98,13 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.addProperty("deviceGroup", u.getDeviceGroup());
         obj.addProperty("scale", u.getScale());
         obj.addProperty("title", u.getTitle());
+        obj.addProperty(UserConstants.PROPERTY_ACTIVE, u.isActive());
+
+        //company is readonly property, should not be serialized back
+        if (u.getCompany() != null) {
+            obj.addProperty(UserConstants.PROPERTY_COMPANY_ID, u.getCompany().getId());
+            obj.addProperty(UserConstants.PROPERTY_COMPANY_NAME, u.getCompany().getName());
+        }
 
         return obj;
     }
@@ -104,12 +112,12 @@ public class UserSerializer extends AbstractJsonSerializer {
      * @param e JSON element.
      * @return create user request.
      */
-    public CreateUserRequest parseCreateUserRequest(final JsonElement e) {
+    public SaveUserRequest parseSaveUserRequest(final JsonElement e) {
         if (e == null) {
             return null;
         }
         final JsonObject obj = e.getAsJsonObject();
-        final CreateUserRequest req = new CreateUserRequest();
+        final SaveUserRequest req = new SaveUserRequest();
         req.setUser(parseUser(obj.get("user").getAsJsonObject()));
         req.setCompany(getCompanyResolver().getCompany(obj.get("company").getAsLong()));
         req.setPassword(obj.get("password").getAsString());
@@ -119,7 +127,7 @@ public class UserSerializer extends AbstractJsonSerializer {
      * @param req create user request.
      * @return JSON object.
      */
-    public JsonElement toJson(final CreateUserRequest req) {
+    public JsonElement toJson(final SaveUserRequest req) {
         if (req == null) {
             return JsonNull.INSTANCE;
         }

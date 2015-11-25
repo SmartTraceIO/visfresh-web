@@ -152,7 +152,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
             user.setCompany(c);
             user.getRoles().add(Role.GlobalAdmin);
 
-            service.createUser(user, "");
+            service.saveUser(user, "");
 
             try {
                 super.runChild(method, notifier);

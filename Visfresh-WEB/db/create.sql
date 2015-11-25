@@ -91,7 +91,8 @@ create table users (
 	measureunits varchar(20) not null default 'Metric',
     scale varchar(127),
 	title varchar(10),
-    unique (email),
+	active boolean not null default true,
+	unique (email),
     primary key (id),
     FOREIGN KEY (company)
         REFERENCES companies (id)

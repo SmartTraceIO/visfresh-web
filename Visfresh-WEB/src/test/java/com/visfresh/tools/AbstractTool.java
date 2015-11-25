@@ -15,7 +15,6 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.ListUserItem;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -105,7 +104,7 @@ public class AbstractTool {
             u.setLastName("Developer");
             u.getRoles().add(Role.CompanyAdmin);
 
-            userService.createUser(u, c, newPassword);
+            userService.saveUser(u, c, newPassword);
         }
         user = u;
 
@@ -120,8 +119,7 @@ public class AbstractTool {
      * @throws IOException
      */
     private User getUserByEmail(final String email) throws IOException, RestServiceException {
-        for (final ListUserItem u : userService.getUsers(null, null, null, null)) {
-            final User user = userService.getUser(u.getId());
+        for (final User user : userService.getUsers(null, null, null, null)) {
             if (EMAIL.equals(user.getEmail())) {
                 return user;
             }

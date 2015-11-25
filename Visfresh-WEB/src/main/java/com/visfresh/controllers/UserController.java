@@ -26,7 +26,7 @@ import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
 import com.visfresh.io.CompanyResolver;
-import com.visfresh.io.CreateUserRequest;
+import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.io.json.UserSerializer;
@@ -102,9 +102,49 @@ public class UserController extends AbstractController implements UserConstants 
             final User user = getLoggedInUser(authToken);
             security.checkCanListUsers(user);
 
+            final int total = dao.getEntityCount(user.getCompany(), null);
+            final UserSerializer ser = getUserSerializer(user);
+            final JsonArray array = new JsonArray();
+
+            final List<User> users = dao.findByCompany(
+                    user.getCompany(),
+                    createSorting(sc, so, getDefaultListShipmentsSortingOrder(), 2),
+                    page,
+                    null);
+
+            for (final User u : users) {
+                array.add(ser.toJson(u));
+            }
+            return createListSuccessResponse(array, total);
+        } catch (final Exception e) {
+            log.error("Failed to get user info", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param pageIndex page index.
+     * @param pageSize page size.
+     * @param sc sort column
+     * @param so sort order.
+     * @return
+     */
+    @RequestMapping(value = "/listUsers/{authToken}", method = RequestMethod.GET)
+    public JsonObject listUsers(@PathVariable final String authToken,
+            @RequestParam(required = false) final Integer pageIndex,
+            @RequestParam(required = false) final Integer pageSize,
+            @RequestParam(required = false) final String sc,
+            @RequestParam(required = false) final String so
+            ) {
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
+
+        try {
+            final User user = getLoggedInUser(authToken);
+            security.checkCanListUsers(user);
+
             final UserSerializer ser = getUserSerializer(user);
 
-            final List<ListUserItem> shipments = getUserListItems(
+            final List<ListUserItem> users = getUserListItems(
                     user.getCompany(),
                     createSorting(sc, so, getDefaultListShipmentsSortingOrder(), 2),
                     null,
@@ -112,7 +152,7 @@ public class UserController extends AbstractController implements UserConstants 
             final int total = dao.getEntityCount(user.getCompany(), null);
 
             final JsonArray array = new JsonArray();
-            for (final ListUserItem s : shipments) {
+            for (final ListUserItem s : users) {
                 array.add(ser.toJson(s));
             }
             return createListSuccessResponse(array, total);
@@ -146,26 +186,46 @@ public class UserController extends AbstractController implements UserConstants 
             PROPERTY_FIRST_NAME,
             PROPERTY_LAST_NAME,
             PROPERTY_POSITION,
-            PROPERTY_PHONE
+            PROPERTY_PHONE,
+            PROPERTY_ACTIVE,
+            PROPERTY_COMPANY_ID,
+            PROPERTY_COMPANY_NAME
         };
     }
     /**
      * @param authToken authentication token.
-     * @param req shipment.
-     * @return status.
+     * @param req save user request.
+     * @return user ID.
      */
-    @RequestMapping(value = "/createUser/{authToken}", method = RequestMethod.POST)
-    public JsonObject createUser(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveUser/{authToken}", method = RequestMethod.POST)
+    public JsonObject saveUser(@PathVariable final String authToken,
             final @RequestBody JsonObject req) {
         try {
             final User user = getLoggedInUser(authToken);
-            final CreateUserRequest r = getUserSerializer(user).parseCreateUserRequest(req);
-            security.checkCanCreateUser(user, r);
+            final SaveUserRequest r = getUserSerializer(user).parseSaveUserRequest(req);
+            security.checkCanManageUsers(user, r.getCompany());
 
             final User newUser = r.getUser();
-            newUser.setCompany(r.getCompany());
+            newUser.setCompany(r.getCompany() == null ? user.getCompany() : r.getCompany());
             security.checkCanAssignRoles(user, newUser.getRoles());
-            authService.createUser(newUser, r.getPassword());
+            authService.saveUser(newUser, r.getPassword());
+
+            return createIdResponse("userId", newUser.getId());
+        } catch (final Exception e) {
+            log.error("Failed to send command to device", e);
+            return createErrorResponse(e);
+        }
+    }
+    @RequestMapping(value = "/deleteUser/{authToken}", method = RequestMethod.GET)
+    public JsonObject deleteUser(@PathVariable final String authToken,
+            final @RequestParam Long userId) {
+        try {
+            final User user = getLoggedInUser(authToken);
+
+            final User deletedUser = dao.findOne(userId);
+            security.checkCanManageUsers(user, deletedUser.getCompany());
+
+            dao.delete(userId);
 
             return createSuccessResponse(null);
         } catch (final Exception e) {
