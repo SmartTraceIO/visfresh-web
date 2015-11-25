@@ -3,6 +3,9 @@
  */
 package com.visfresh.controllers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,11 +38,14 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.MapChartData;
+import com.visfresh.io.MapChartItem;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -77,6 +83,28 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private ReferenceResolver referenceResolver;
     @Autowired
     private UserResolver userResolver;
+
+    //start time
+    private static ThreadLocal<DateFormat> ISO_FORMAT = new ThreadLocal<DateFormat>() {
+        /* (non-Javadoc)
+         * @see java.lang.ThreadLocal#initialValue()
+         */
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        }
+    };
+    private static ThreadLocal<DateFormat> PRETTY_FORMAT = new ThreadLocal<DateFormat>() {
+        /* (non-Javadoc)
+         * @see java.lang.ThreadLocal#initialValue()
+         */
+        @Override
+        protected DateFormat initialValue() {
+            //9:40pm 12-Aug-2014
+            return new SimpleDateFormat("h:mm d'-'MMM'-'yyyy");
+        }
+    };
+
 
     /**
      * Default constructor.
@@ -326,39 +354,124 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 return null;
             }
 
-            final SingleShipmentDto dto = creatSingleShipmentDto(s);
-
-            final List<TrackerEvent> events = trackerEventDao.getEvents(s, startDate, endDate);
-            for (final TrackerEvent e : events) {
-                final SingleShipmentTimeItem item = new SingleShipmentTimeItem();
-                item.setEvent(e);
-                dto.getItems().add(item);
-            }
-            Collections.sort(dto.getItems());
-
-            if (events.size() > 0) {
-                //add alerts
-                final List<Alert> alerts = alertDao.getAlerts(s, startDate, endDate);
-                for (final Alert alert : alerts) {
-                    final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), alert.getDate());
-                    item.getAlerts().add(alert);
-                }
-
-                //add arrivals
-                final List<Arrival> arrivals = arrivalDao.getArrivals(s, startDate, endDate);
-                for (final Arrival arrival : arrivals) {
-                    final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), arrival.getDate());
-                    item.getArrivals().add(arrival);
-                }
-
-                dto.getAlertSummary().putAll(toSummaryMap(alerts));
-            }
+            final SingleShipmentDto dto = getShipmentData(s, startDate, endDate);
 
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+    @RequestMapping(value = "/getDataForMapAndChart/{authToken}", method = RequestMethod.GET)
+    public JsonObject getDataForMapAndChart(@PathVariable final String authToken,
+            @RequestParam final Long shipmentId) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetShipmentData(user);
+
+            final ShipmentSerializer ser = getSerializer(user);
+
+            final Shipment shipment = shipmentDao.findOne(shipmentId);
+            checkCompanyAccess(user, shipment);
+
+            if (shipment == null) {
+                throw new IllegalArgumentException("Unable to find shipment by given ID " + shipmentId);
+            }
+
+            //create response
+            final MapChartData data = new MapChartData();
+
+            //start location
+            final LocationProfile startLocation = shipment.getShippedFrom();
+            if (startLocation != null) {
+                data.setStartLocation(startLocation.getAddress());
+                data.setStartLocationForMap(startLocation.getLocation());
+            }
+
+            //end location
+            final LocationProfile endLocation = shipment.getShippedTo();
+            if (endLocation != null) {
+                data.setEndLocation(endLocation.getAddress());
+                data.setEndLocationForMap(endLocation.getLocation());
+            }
+
+            final Date startTime = shipment.getShipmentDate();
+            data.setStartTimeISO(ISO_FORMAT.get().format(startTime));
+            data.setStartTimeStr(PRETTY_FORMAT.get().format(startTime));
+
+            //Add timed items
+            final SingleShipmentDto dto = getShipmentData(shipment,
+                    new Date(startTime.getTime() - 1000000l), new Date());
+            for (final SingleShipmentTimeItem item : dto.getItems()) {
+                final List<MapChartItem> mci = createMapChartItem(item, shipment);
+                data.getLocations().addAll(mci);
+            }
+
+            return createSuccessResponse(ser.toJson(data));
+        } catch (final Exception e) {
+            log.error("Failed to get devices", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param item single shipment time item.
+     * @param shipment shipment.
+     * @return the list of chart item.
+     */
+    private List<MapChartItem> createMapChartItem(final SingleShipmentTimeItem item,
+            final Shipment shipment) {
+        final TrackerEvent event = item.getEvent();
+
+        final ArrayList<MapChartItem> list = new ArrayList<MapChartItem>(item.getAlerts().size());
+        for (final Alert a : item.getAlerts()) {
+            final MapChartItem mci = new MapChartItem();
+            mci.setLat(event.getLatitude());
+            mci.setLon(event.getLongitude());
+            mci.setTemperature(event.getTemperature());
+            mci.setTimeISO(ISO_FORMAT.get().format(event.getTime()));
+
+
+        }
+
+        return list;
+    }
+    /**
+     * @param s shipment.
+     * @param startDate start shipment date.
+     * @param endDate end shipment date.
+     * @return single shipment data.
+     */
+    private SingleShipmentDto getShipmentData(final Shipment s,
+            final Date startDate, final Date endDate) {
+        final SingleShipmentDto dto = creatSingleShipmentDto(s);
+
+        final List<TrackerEvent> events = trackerEventDao.getEvents(s, startDate, endDate);
+        for (final TrackerEvent e : events) {
+            final SingleShipmentTimeItem item = new SingleShipmentTimeItem();
+            item.setEvent(e);
+            dto.getItems().add(item);
+        }
+        Collections.sort(dto.getItems());
+
+        if (events.size() > 0) {
+            //add alerts
+            final List<Alert> alerts = alertDao.getAlerts(s, startDate, endDate);
+            for (final Alert alert : alerts) {
+                final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), alert.getDate());
+                item.getAlerts().add(alert);
+            }
+
+            //add arrivals
+            final List<Arrival> arrivals = arrivalDao.getArrivals(s, startDate, endDate);
+            for (final Arrival arrival : arrivals) {
+                final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), arrival.getDate());
+                item.getArrivals().add(arrival);
+            }
+
+            dto.getAlertSummary().putAll(toSummaryMap(alerts));
+        }
+        return dto;
     }
     /**
      * @param alerts

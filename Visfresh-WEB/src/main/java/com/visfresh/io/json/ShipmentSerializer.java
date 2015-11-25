@@ -24,6 +24,7 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.MapChartData;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -528,5 +529,14 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     }
     public void setUserResolver(final UserResolver r) {
         notificationScheduleSerializer.setUserResolver(r);
+    }
+
+    /**
+     * @param data
+     * @return
+     */
+    public JsonElement toJson(final MapChartData data) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

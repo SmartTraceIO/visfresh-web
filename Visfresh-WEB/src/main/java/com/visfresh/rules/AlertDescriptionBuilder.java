@@ -68,7 +68,7 @@ public class AlertDescriptionBuilder {
         //${time} the time in scope of day.
         sdf = new SimpleDateFormat("HH:mm");
         sdf.setTimeZone(user.getTimeZone());
-        map.put("date", sdf.format(alert.getDate()));
+        map.put("time", sdf.format(alert.getDate()));
         //${type} alert type
         map.put("type", alert.getType().toString());
         //${device} device IMEI
@@ -77,7 +77,7 @@ public class AlertDescriptionBuilder {
         map.put("devicesn", alert.getDevice().getSn());
         //${tripCount} trip count for given device of shipment.
         map.put("tripCount", Integer.toString(alert.getShipment().getTripCount()));
-        //
+
         //for temperature alerts:
         if (alert instanceof TemperatureAlert) {
             final TemperatureAlert ta = (TemperatureAlert) alert;
