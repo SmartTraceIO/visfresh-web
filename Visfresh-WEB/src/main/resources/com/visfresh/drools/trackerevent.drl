@@ -11,7 +11,6 @@ import com.visfresh.rules.AutoStartShipmentRule;
 import com.visfresh.rules.MovementStartAlertRule;
 import com.visfresh.rules.MovementStopAlertRule;
 import com.visfresh.rules.AbstractRuleEngine;
-import com.visfresh.rules.NormalTemperatureRule;
 import com.visfresh.rules.TemperatureAlertRule;
 
 global AbstractRuleEngine engine;
@@ -104,15 +103,6 @@ rule "MovementStopAlert"
         context : RuleContext(engine.getRule(MovementStopAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(MovementStopAlertRule.NAME).handle(context)) {
-       		update(context);
-        }
-end
-
-rule "NormalTemperature"
-    when
-        context : RuleContext(engine.getRule(NormalTemperatureRule.NAME).accept(this));
-    then
-    	if(engine.getRule(NormalTemperatureRule.NAME).handle(context)) {
        		update(context);
         }
 end

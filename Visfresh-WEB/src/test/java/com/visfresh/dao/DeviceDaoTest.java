@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
-import com.visfresh.rules.DeviceState;
+import com.visfresh.rules.state.DeviceState;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

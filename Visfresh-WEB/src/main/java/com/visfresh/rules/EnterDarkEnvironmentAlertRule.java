@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 
 /**
@@ -38,9 +37,9 @@ public class EnterDarkEnvironmentAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#handleInternal(com.visfresh.entities.TrackerEvent)
      */
     @Override
-    protected Alert[] handleInternal(final TrackerEvent event) {
+    protected Alert[] handleInternal(final RuleContext context) {
         final Alert alert = new Alert();
-        defaultAssign(event, alert);
+        defaultAssign(context.getEvent(), alert);
         alert.setType(AlertType.LightOff);
         return new Alert[] {alert};
     }

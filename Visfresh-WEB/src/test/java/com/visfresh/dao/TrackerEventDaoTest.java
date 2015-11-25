@@ -173,60 +173,23 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(0, dao.getEvents(left, startDate, endDate).size());
     }
     @Test
-    public void testGetFirstHotOccurence() {
+    public void testGetPreviousEvent() {
         long time = System.currentTimeMillis() - 100000000l;
 
-        createAndSave(new Date((time+=10000)), 12);
+        final TrackerEvent first = createAndSave(new Date((time+=10000)), 12);
         createAndSave(new Date((time+=10000)), 11);
         createAndSave(new Date((time+=10000)), 10);
         createAndSave(new Date((time+=10000)), 9);
         createAndSave(new Date((time+=10000)), 8);
-        createAndSave(new Date((time+=10000)), 9);
-        final TrackerEvent firstOccurence = createAndSave(new Date((time+=10000)), 10);
-        createAndSave(new Date((time+=10000)), 11);
+        final TrackerEvent prev = createAndSave(new Date((time+=10000)), 9);
+        final TrackerEvent curr = createAndSave(new Date((time+=10000)), 11);
         createAndSave(new Date((time+=10000)), 12);
         createAndSave(new Date((time+=10000)), 13);
         createAndSave(new Date((time+=10000)), 12);
 
-        final TrackerEvent e = createAndSave(new Date(), 10);
-
-        assertEquals(firstOccurence.getTime().getTime(),
-                dao.getFirstHotOccurence(e, 10).getTime(), 2000);
-
-        //check left shipment
-        TrackerEvent eLeft = createEvent(new Date(), 10);
-        eLeft.setShipment(createShipment(device));
-        eLeft = dao.save(eLeft);
-
-        assertNull(dao.getFirstHotOccurence(eLeft, 10));
-    }
-    @Test
-    public void testGetFirstColdOccurence() {
-        long time = System.currentTimeMillis() - 100000000l;
-
-        createAndSave(new Date((time+=10000)), 9);
-        createAndSave(new Date((time+=10000)), 10);
-        createAndSave(new Date((time+=10000)), 11);
-        createAndSave(new Date((time+=10000)), 12);
-        createAndSave(new Date((time+=10000)), 12);
-        createAndSave(new Date((time+=10000)), 11);
-        final TrackerEvent firstOccurence = createAndSave(new Date((time+=10000)), 10);
-        createAndSave(new Date((time+=10000)), 9);
-        createAndSave(new Date((time+=10000)), 9);
-        createAndSave(new Date((time+=10000)), 9);
-        createAndSave(new Date((time+=10000)), 9);
-
-        final TrackerEvent e = createAndSave(new Date(), 10);
-
-        assertEquals(firstOccurence.getTime().getTime(),
-                dao.getFirstColdOccurence(e, 10).getTime(), 2000);
-
-        //check left shipment
-        TrackerEvent eLeft = createEvent(new Date(), 10);
-        eLeft.setShipment(createShipment(device));
-        eLeft = dao.save(eLeft);
-
-        assertNull(dao.getFirstColdOccurence(eLeft, 10));
+        final TrackerEvent e = dao.getPreviousEvent(curr);
+        assertEquals(prev.getId(), e.getId());
+        assertNull(dao.getPreviousEvent(first));
     }
     /**
      * @param date

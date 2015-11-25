@@ -145,75 +145,29 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         }
         return events;
     }
-
     /* (non-Javadoc)
-     * @see com.visfresh.dao.TrackerEventDao#getFirstHotOccurence(com.visfresh.entities.TrackerEvent, double)
+     * @see com.visfresh.dao.TrackerEventDao#getPreviousEvent(com.visfresh.entities.TrackerEvent)
      */
     @Override
-    public Date getFirstHotOccurence(final TrackerEvent e, final double minimalTemperature) {
+    public TrackerEvent getPreviousEvent(final TrackerEvent e) {
         final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("temperature", minimalTemperature);
         params.put("shipment", e.getShipment().getId());
         params.put("id", e.getId());
 
         //find first previous normal temperature.
-        List<Map<String, Object>> rows = jdbc.queryForList(
-                "select id from " + TABLE + " where "
-                + SHIPMENT_FIELD + " =:shipment and temperature < :temperature and id < :id order by id desc limit 1",
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                "select * from " + TABLE + " where "
+                + SHIPMENT_FIELD + " =:shipment and id < :id order by id desc limit 1",
                 params);
         if (rows.size() == 0) {
             return null;
         }
 
-        //select from first normal temperature
-        final long startId = ((Number) rows.get(0).get("id")).longValue();
-        params.put("startId", startId);
-        params.put("endId", e.getId());
-        rows = jdbc.queryForList(
-                "select time from " + TABLE + " where "
-                + SHIPMENT_FIELD + " =:shipment and id > :startId and id < :endId and temperature >= :temperature"
-                + " order by id limit 1",
-                params);
-        if (rows.size() == 0) {
-            return null;
-        }
-
-        return (Date) rows.get(0).get("time");
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.TrackerEventDao#getFirstColdOccurence(com.visfresh.entities.TrackerEvent, double)
-     */
-    @Override
-    public Date getFirstColdOccurence(final TrackerEvent e, final double maximalTemperature) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("temperature", maximalTemperature);
-        params.put("shipment", e.getShipment().getId());
-        params.put("id", e.getId());
-
-        //find first previous normal temperature.
-        List<Map<String, Object>> rows = jdbc.queryForList(
-                "select id from " + TABLE + " where "
-                + SHIPMENT_FIELD + " =:shipment and temperature > :temperature and id < :id order by id desc limit 1",
-                params);
-        if (rows.size() == 0) {
-            return null;
-        }
-
-        //select from first normal temperature
-        final long startId = ((Number) rows.get(0).get("id")).longValue();
-        params.put("startId", startId);
-        params.put("endId", e.getId());
-        rows = jdbc.queryForList(
-                "select time from " + TABLE + " where "
-                + SHIPMENT_FIELD + " =:shipment and id > :startId and id < :endId and temperature <= :temperature"
-                + " order by id limit 1",
-                params);
-        if (rows.size() == 0) {
-            return null;
-        }
-
-        return (Date) rows.get(0).get("time");
+        //create event.
+        final TrackerEvent prev = createEntity(rows.get(0));
+        prev.setShipment(e.getShipment());
+        prev.setDevice(e.getShipment().getDevice());
+        return prev;
     }
 
     /* (non-Javadoc)

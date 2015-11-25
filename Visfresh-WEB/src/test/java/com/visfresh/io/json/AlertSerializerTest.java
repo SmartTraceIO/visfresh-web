@@ -69,6 +69,7 @@ public class AlertSerializerTest extends AbstractSerializerTest {
         final AlertType type = AlertType.CriticalHot;
         final double temperature = -20.3;
         final int minutes = 30;
+        final boolean cumulative = true;
 
         TemperatureAlert alert = new TemperatureAlert();
         alert.setDate(date);
@@ -78,6 +79,7 @@ public class AlertSerializerTest extends AbstractSerializerTest {
         alert.setShipment(shipment);
         alert.setTemperature(temperature);
         alert.setMinutes(minutes);
+        alert.setCumulative(cumulative);
 
         final JsonElement json = serializer.toJson(alert);
         alert = (TemperatureAlert) serializer.parseAlert(json);
@@ -89,5 +91,6 @@ public class AlertSerializerTest extends AbstractSerializerTest {
         assertEquals(type, alert.getType());
         assertEquals(temperature, alert.getTemperature(), 0.00001);
         assertEquals(minutes, alert.getMinutes());
+        assertEquals(cumulative, alert.isCumulative());
     }
 }

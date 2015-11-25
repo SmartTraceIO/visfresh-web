@@ -36,6 +36,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
     protected static final String MINUTES_FIELD = "minutes";
     protected static final String ID_FIELD = "id";
     protected static final String DATE_FIELD = "date";
+    protected static final String CUMULATIVE_FIELD = "cumulative";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -72,9 +73,10 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         paramMap.put(TYPE_FIELD, alert.getType().name());
         paramMap.put(DEVICE_FIELD, alert.getDevice().getId());
         paramMap.put(SHIPMENT_FIELD, alert.getShipment().getId());
+        paramMap.put(DATE_FIELD, alert.getDate());
         paramMap.put(TEMPERATURE_FIELD, isTemperature ? ((TemperatureAlert) alert).getTemperature() : -1);
         paramMap.put(MINUTES_FIELD, isTemperature ? ((TemperatureAlert) alert).getMinutes() : -1);
-        paramMap.put(DATE_FIELD, alert.getDate());
+        paramMap.put(CUMULATIVE_FIELD, isTemperature ? ((TemperatureAlert) alert).isCumulative() : false);
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -93,6 +95,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         fields.add(TEMPERATURE_FIELD);
         fields.add(MINUTES_FIELD);
         fields.add(DATE_FIELD);
+        fields.add(CUMULATIVE_FIELD);
         if (includeId) {
             fields.add(ID_FIELD);
         }
@@ -191,6 +194,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
                 final TemperatureAlert ta = new TemperatureAlert();
                 ta.setTemperature(((Number) map.get(TEMPERATURE_FIELD)).doubleValue());
                 ta.setMinutes(((Number) map.get(MINUTES_FIELD)).intValue());
+                ta.setCumulative((Boolean) map.get(CUMULATIVE_FIELD));
                 a = ta;
                 break;
             default:

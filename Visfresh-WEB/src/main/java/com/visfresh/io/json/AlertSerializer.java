@@ -48,6 +48,7 @@ public class AlertSerializer extends AbstractJsonSerializer {
                 final TemperatureAlert ta = new TemperatureAlert();
                 ta.setTemperature(asDouble(json.get("temperature")));
                 ta.setMinutes(asInt(json.get("minutes")));
+                ta.setCumulative(asBoolean(json.get("cumulative")));
                 alert = ta;
                 break;
             default:
@@ -84,6 +85,7 @@ public class AlertSerializer extends AbstractJsonSerializer {
                 final TemperatureAlert ta = (TemperatureAlert) alert;
                 json.addProperty("temperature", ta.getTemperature());
                 json.addProperty("minutes", ta.getMinutes());
+                json.addProperty("cumulative", ta.isCumulative());
                 break;
 
                 default:

@@ -53,16 +53,16 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public final boolean handle(final RuleContext e) {
-        final Alert[] alerts = handleInternal(e.getEvent());
-        e.setProcessed(this);
+    public boolean handle(final RuleContext context) {
+        final Alert[] alerts = handleInternal(context);
+        context.setProcessed(this);
 
         for (final Alert alert : alerts) {
             saveAlert(alert);
 
             final Calendar date = new GregorianCalendar();
             //notify subscribers
-            final List<PersonSchedule> schedules = getAllPersonalSchedules(e.getEvent().getShipment());
+            final List<PersonSchedule> schedules = getAllPersonalSchedules(context.getEvent().getShipment());
             for (final PersonSchedule s : schedules) {
                 if (matchesTimeFrame(s, date)) {
                     sendNotification(s, alert.getType().toString(),
@@ -81,10 +81,10 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
         alertDao.save(a);
     }
     /**
-     * @param event event.
+     * @param context TODO
      * @return alert if created, null otherwise.
      */
-    protected abstract Alert[] handleInternal(TrackerEvent event);
+    protected abstract Alert[] handleInternal(RuleContext context);
 
     /**
      * @param shipment shipment.

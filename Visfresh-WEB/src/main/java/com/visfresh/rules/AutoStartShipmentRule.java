@@ -86,6 +86,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         log.debug("Create new shipment for device " + device.getImei());
         final Shipment shipment = startNewShipment(device);
         event.setShipment(shipment);
+
+        context.getState().possibleNewShipment(shipment);
         trackerEventDao.save(event);
 
         return true;

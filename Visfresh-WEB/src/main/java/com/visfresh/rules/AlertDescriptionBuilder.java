@@ -51,8 +51,20 @@ public class AlertDescriptionBuilder {
      */
     public String buildDescription(final Alert alert, final User user) {
         final ResourceBundle bundle = ResourceBundle.getBundle("alerts", XmlControl.INSTANCE);
-        final String str = bundle.getString(alert.getType().toString());
+        final String str = bundle.getString(createBundleKey(alert));
         return StringUtils.getMessage(str, createReplacementMap(alert, user));
+    }
+
+    /**
+     * @param alert
+     * @return
+     */
+    private String createBundleKey(final Alert alert) {
+        String key = alert.getType().toString();
+        if (alert instanceof TemperatureAlert && ((TemperatureAlert) alert).isCumulative()) {
+            key += ".cumulative";
+        }
+        return key;
     }
     /**
      * @param alert alert.

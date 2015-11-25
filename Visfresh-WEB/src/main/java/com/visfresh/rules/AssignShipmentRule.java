@@ -56,9 +56,10 @@ public class AssignShipmentRule implements TrackerEventRule {
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean handle(final RuleContext req) {
-        final Shipment shipment = (Shipment) req.getClientProperty(this);
-        req.getEvent().setShipment(shipment);
+    public boolean handle(final RuleContext context) {
+        final Shipment shipment = (Shipment) context.getClientProperty(this);
+        context.getEvent().setShipment(shipment);
+        context.getState().possibleNewShipment(shipment);
         return true;
     }
 }

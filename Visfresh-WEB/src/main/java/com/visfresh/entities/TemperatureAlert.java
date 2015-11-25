@@ -17,6 +17,10 @@ public class TemperatureAlert extends Alert {
      * The time interval for given temperature
      */
     private int minutes = 0;
+    /**
+     * Is cumulative.
+     */
+    private boolean cumulative;
 
     /**
      * Default constructor.
@@ -64,5 +68,17 @@ public class TemperatureAlert extends Alert {
      */
     public void setMinutes(final int minutes) {
         this.minutes = minutes;
+    }
+    /**
+     * @param cumulative the cumulative to set
+     */
+    public void setCumulative(final boolean cumulative) {
+        this.cumulative = cumulative;
+    }
+    /**
+     * @return the cumulative
+     */
+    public boolean isCumulative() {
+        return cumulative;
     }
 }

@@ -11,8 +11,8 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.visfresh.rules.DeviceState;
-import com.visfresh.rules.RulesState;
+import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.RulesState;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -60,8 +60,8 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject json = new JsonObject();
-        json.add("shipmentAutoStart", toJson(state.getShipmentAutoStart()));
         json.add("temperatureAlerts", toJson(state.getTemperatureAlerts()));
+        json.addProperty("shipmentId", state.getShipmentId());
         return json;
     }
     /**
@@ -70,11 +70,10 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
      */
     private DeviceState parseState(final JsonObject json) {
         final DeviceState s = new DeviceState();
-        s.setShipmentAutoStart(parseRulesState(json.get("shipmentAutoStart")));
-        s.setTemperatureAlerts(parseRulesState(json.get("shipmentAutoStart")));
+        s.setTemperatureAlerts(parseRulesState(json.get("temperatureAlerts")));
+        s.setShipmentId(asLong(json.get("shipmentId")));
         return s;
     }
-
     /**
      * @param e
      * @return
@@ -96,7 +95,6 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
         obj.add("properties", toJson(s.getProperties()));
         return obj;
     }
-
     /**
      * @param json
      * @return

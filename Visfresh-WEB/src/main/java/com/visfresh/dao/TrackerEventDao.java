@@ -15,22 +15,15 @@ import com.visfresh.entities.TrackerEvent;
  */
 public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
     /**
-     * @param e current event.
-     * @param minimalTemperature minimal critical temperature.
-     * @return first critical temperature issue date.
-     */
-    Date getFirstHotOccurence(TrackerEvent e, double minimalTemperature);
-    /**
-     * @param e current event.
-     * @param maximalTemperature maximal critical temperature.
-     * @return first critical temperature issue date.
-     */
-    Date getFirstColdOccurence(TrackerEvent e, double maximalTemperature);
-    /**
      * @param shipment
      * @param fromDate
      * @param toDate
      * @return
      */
     List<TrackerEvent> getEvents(Shipment shipment, Date fromDate, Date toDate);
+    /**
+     * @param event event.
+     * @return previous event for given.
+     */
+    TrackerEvent getPreviousEvent(TrackerEvent event);
 }

@@ -23,6 +23,17 @@
 	<entry key="CriticalCold">Critical cold alert - tracker ${devicesn}(${tripCount}) went below ${temperature} degrees for ${period} min</entry>
 	<!-- CriticalHot -->
 	<entry key="CriticalHot">Too hot alert - tracker ${devicesn}(${tripCount}) went above ${temperature} degrees for ${period} min</entry>
+
+	<!-- Cumulative -->
+	<entry key="Cold.cumulative">Too cold alert - tracker ${devicesn}(${tripCount}) went below ${temperature} degrees for ${period} min total</entry>
+	<!-- Hot -->
+	<!-- Example: Too hot alert - tracker 098324(12) went above 20,0°C degrees for 10 min -->
+	<entry key="Hot.cumulative">Too hot alert - tracker ${devicesn}(${tripCount}) went above ${temperature} degrees for ${period} min total</entry>
+	<!-- CriticalCold -->
+	<entry key="CriticalCold.cumulative">Critical cold alert - tracker ${devicesn}(${tripCount}) went below ${temperature} degrees for ${period} min total</entry>
+	<!-- CriticalHot -->
+	<entry key="CriticalHot.cumulative">Too hot alert - tracker ${devicesn}(${tripCount}) went above ${temperature} degrees for ${period} min total</entry>
+
 	<!-- LightOn -->
 	<entry key="LightOn">Light on at ${time}</entry>
 	<!-- LightOff -->

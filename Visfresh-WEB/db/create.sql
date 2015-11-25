@@ -229,6 +229,7 @@ create table alerts (
     temperature double not null,
     minutes int not null,
     `date` timestamp not null,
+	cumulative boolean not null default true,
     device varchar(127) not null,
     shipment bigint(20) not null,
     primary key (id),

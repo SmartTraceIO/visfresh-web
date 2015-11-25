@@ -1,10 +1,13 @@
 /**
  *
  */
-package com.visfresh.rules;
+package com.visfresh.rules.state;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import com.visfresh.entities.Shipment;
+import com.visfresh.rules.TemperaturePoint;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -12,8 +15,8 @@ import java.util.List;
  */
 public class DeviceState {
     private RulesState temperatureAlerts = new RulesState();
-    private RulesState shipmentAutoStart = new RulesState();
     private List<TemperaturePoint> temperatureHistory = new LinkedList<TemperaturePoint>();
+    private Long shipmentId;
 
     /**
      * Default constructor.
@@ -35,18 +38,6 @@ public class DeviceState {
         this.temperatureAlerts = temperatureAlerts;
     }
     /**
-     * @return the shipmentAutoStart
-     */
-    public RulesState getShipmentAutoStart() {
-        return shipmentAutoStart;
-    }
-    /**
-     * @param shipmentAutoStart the shipmentAutoStart to set
-     */
-    public void setShipmentAutoStart(final RulesState shipmentAutoStart) {
-        this.shipmentAutoStart = shipmentAutoStart;
-    }
-    /**
      * @param point temperature point.
      */
     public void addToHistory(final TemperaturePoint point) {
@@ -57,5 +48,28 @@ public class DeviceState {
      */
     public void clearTemperatureHistory() {
         temperatureHistory.clear();
+    }
+    /**
+     * Some operations if new shipment started. I.e. cleaning of alerts history.
+     * @param s shipments.
+     */
+    public void possibleNewShipment(final Shipment s) {
+        if (shipmentId == null || shipmentId.equals(s.getId())) {
+            shipmentId = s.getId();
+            this.temperatureAlerts.clear();
+            this.temperatureHistory.clear();
+        }
+    }
+    /**
+     * @return the shipmentId
+     */
+    public Long getShipmentId() {
+        return shipmentId;
+    }
+    /**
+     * @param shipmentId the shipmentId to set
+     */
+    public void setShipmentId(final Long shipmentId) {
+        this.shipmentId = shipmentId;
     }
 }

@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.rules;
+package com.visfresh.rules.state;
 
 import java.util.Date;
 import java.util.HashMap;

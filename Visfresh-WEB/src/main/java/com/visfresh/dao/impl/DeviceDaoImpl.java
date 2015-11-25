@@ -16,7 +16,7 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.io.json.DeviceStateSerializer;
-import com.visfresh.rules.DeviceState;
+import com.visfresh.rules.state.DeviceState;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

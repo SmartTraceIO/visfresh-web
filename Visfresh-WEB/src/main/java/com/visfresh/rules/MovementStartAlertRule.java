@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.TrackerEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -37,9 +36,9 @@ public class MovementStartAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#handleInternal(com.visfresh.entities.TrackerEvent)
      */
     @Override
-    protected Alert[] handleInternal(final TrackerEvent event) {
+    protected Alert[] handleInternal(final RuleContext context) {
         final Alert alert = new Alert();
-        defaultAssign(event, alert);
+        defaultAssign(context.getEvent(), alert);
         alert.setType(AlertType.MovementStart);
         return new Alert[] {alert};
     }
