@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -35,6 +36,8 @@ public class SystemMessageDao {
     public static final String RETRYON_FIELD = "retryon";
     public static final String NUMRETRY_FIELD = "numretry";
     public static final String MESSAGE_FIELD = "message";
+
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     /**
      * JDBC template.
@@ -91,11 +94,13 @@ public class SystemMessageDao {
     }
 
     public SystemMessage sendSystemMessageFor(final ResolvedDeviceMessage e) {
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        sdf.setTimeZone(UTC);
+
         final JsonObject obj = new JsonObject();
         obj.addProperty("battery", e.getBattery());
-        obj.addProperty("id", e.getId());
         obj.addProperty("temperature", e.getTemperature());
-        obj.addProperty("time", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(e.getTime()));
+        obj.addProperty("time", sdf.format(e.getTime()));
         obj.addProperty("type", e.getType().name());
         obj.addProperty("latitude", e.getLocation().getLatitude());
         obj.addProperty("longitude", e.getLocation().getLongitude());

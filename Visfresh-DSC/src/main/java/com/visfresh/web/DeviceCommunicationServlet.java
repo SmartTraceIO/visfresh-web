@@ -82,7 +82,7 @@ public class DeviceCommunicationServlet extends HttpServlet {
                 messageDao.create(msg);
             }
 
-            final List<DeviceCommand> commands = deviceCommandDao.getFoDevice(device.getId());
+            final List<DeviceCommand> commands = deviceCommandDao.getFoDevice(device.getImei());
             if (!commands.isEmpty()) {
                 final DeviceCommand cmd = commands.get(0);
                 final String command = cmd.getCommand();

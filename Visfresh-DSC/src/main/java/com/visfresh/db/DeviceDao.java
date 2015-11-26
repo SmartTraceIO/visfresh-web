@@ -23,7 +23,6 @@ public class DeviceDao {
 
     public static final String DESCRIPTION_FIELD = "description";
     public static final String NAME_FIELD = "name";
-    public static final String ID_FIELD = "id";
     public static final String IMEI_FIELD = "imei";
     public static final String SN_FIELD = "sn";
 
@@ -60,7 +59,6 @@ public class DeviceDao {
      */
     public static Device createDevice(final Map<String, Object> map) {
         final Device d = new Device();
-        d.setId((String) map.get(ID_FIELD));
         d.setName((String) map.get(NAME_FIELD));
         d.setDescription((String) map.get(DESCRIPTION_FIELD));
         d.setSn((String) map.get(SN_FIELD));
@@ -73,7 +71,6 @@ public class DeviceDao {
      */
     public static Map<String, String> createSelectAsMapping(final String entityName) {
         final Map<String, String> map = new HashMap<String, String>();
-        map.put(entityName + "." + ID_FIELD, ID_FIELD);
         map.put(entityName + "." + NAME_FIELD, NAME_FIELD);
         map.put(entityName + "." + DESCRIPTION_FIELD, DESCRIPTION_FIELD);
         map.put(entityName + "." + IMEI_FIELD, IMEI_FIELD);

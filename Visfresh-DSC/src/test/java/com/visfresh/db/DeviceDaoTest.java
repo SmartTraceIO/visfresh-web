@@ -57,7 +57,6 @@ public class DeviceDaoTest extends TestCase {
     public void testGetByImei() {
         final String description = "Any device";
         final String name = "DeviceName";
-        final String id = "device ID";
         final String imei = "9328749587";
         final String sn = "12345";
 
@@ -65,23 +64,20 @@ public class DeviceDaoTest extends TestCase {
 
         params.put("description", description);
         params.put("name", name);
-        params.put("id", id);
         params.put("imei", imei);
         params.put("sn", sn);
 
         final String sql = "insert into " + DeviceDao.TABLE + "("
                 + DeviceDao.DESCRIPTION_FIELD
                 + "," + DeviceDao.NAME_FIELD
-                + "," + DeviceDao.ID_FIELD
                 + "," + DeviceDao.IMEI_FIELD
                 + "," + DeviceDao.SN_FIELD
-                + ") values(:description, :name, :id, :imei, :sn)";
+                + ") values(:description, :name, :imei, :sn)";
 
         jdbc.update(sql, params);
 
         final Device device = dao.getByImei(imei);
         assertEquals(description, device.getDescription());
-        assertEquals(id, device.getId());
         assertEquals(imei, device.getImei());
         assertEquals(name, device.getName());
         assertEquals(sn, device.getSn());

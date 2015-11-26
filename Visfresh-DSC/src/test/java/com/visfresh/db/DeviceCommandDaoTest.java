@@ -52,7 +52,6 @@ public class DeviceCommandDaoTest extends TestCase {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("description", "Any Description");
         params.put("name", "JUnit");
-        params.put("id", "JUnit");
         final String imei = "923874984";
         params.put("imei", imei);
         params.put("sn", "12345");
@@ -60,10 +59,9 @@ public class DeviceCommandDaoTest extends TestCase {
         final String sql = "insert into " + DeviceDao.TABLE + "("
                 + DeviceDao.DESCRIPTION_FIELD
                 + "," + DeviceDao.NAME_FIELD
-                + "," + DeviceDao.ID_FIELD
                 + "," + DeviceDao.IMEI_FIELD
                 + "," + DeviceDao.SN_FIELD
-                + ") values(:description, :name, :id, :imei, :sn)";
+                + ") values(:description, :name, :imei, :sn)";
         jdbc.update(sql, params);
         this.device = spring.getBean(DeviceDao.class).getByImei(imei);
     }
@@ -73,16 +71,16 @@ public class DeviceCommandDaoTest extends TestCase {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("command", "stop");
         params.put("date", new Date());
-        params.put("device", device.getId());
+        params.put("device", device.getImei());
 
         jdbc.update("INSERT INTO devicecommands(command, device, date)"
                 + "VALUES(:command, :device, :date)" , params);
 
-        final List<DeviceCommand> list = dao.getFoDevice(device.getId());
+        final List<DeviceCommand> list = dao.getFoDevice(device.getImei());
         assertEquals(1, list.size());
 
         dao.delete(list.get(0));
-        assertEquals(0, dao.getFoDevice(device.getId()).size());
+        assertEquals(0, dao.getFoDevice(device.getImei()).size());
     }
 
     /* (non-Javadoc)
