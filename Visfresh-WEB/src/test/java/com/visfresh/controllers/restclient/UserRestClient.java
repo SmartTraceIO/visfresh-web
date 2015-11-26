@@ -41,7 +41,9 @@ public class UserRestClient extends RestClient {
      */
     public User getUser(final Long id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("userId", id.toString());
+        if (id != null) {
+            params.put("userId", id.toString());
+        }
         final JsonElement response = sendGetRequest(getPathWithToken( "getUser"),
                 params);
         return serializer.parseUser(response);

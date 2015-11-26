@@ -67,6 +67,9 @@ public class UserControllerTest extends AbstractRestServiceTest {
     public void testGetUser() throws IOException, RestServiceException {
         final User user = client.getUser(this.user.getId());
         assertNotNull(user);
+
+        //test without user ID.
+        assertNotNull(client.getUser(null));
     }
     @Test
     public void testSaveUser() throws IOException, RestServiceException, AuthenticationException {

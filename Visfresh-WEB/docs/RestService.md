@@ -123,9 +123,8 @@ Returns ID of just saved user.
 
 ### Get User Info ###
 Method *GET*, method name *getUser*, method parameters  
-1. userId - ID of user  
-
-Method required associated privileges. The logged in user should be some as requested info user or should have admin role.  
+1. userId - ID of user, can be null. If ID is null the info for currently logged in user will returned.  
+Method requires associated privileges. The logged in user should be some as requested info user or should have admin role.  
 Method returns [User Object](#markdown-header-user)   
 [(example)](#markdown-header-get-user-info-example)
 

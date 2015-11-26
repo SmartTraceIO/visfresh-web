@@ -69,12 +69,14 @@ public class UserController extends AbstractController implements UserConstants 
      */
     @RequestMapping(value = "/getUser/{authToken}", method = RequestMethod.GET)
     public JsonObject getUser(@PathVariable final String authToken,
-            final @RequestParam Long userId) {
+            final @RequestParam(required = false) Long userId) {
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetUserInfo(user, userId);
+            if (userId != null) {
+                security.checkCanGetUserInfo(user, userId);
+            }
 
-            final User u = dao.findOne(userId);
+            final User u = dao.findOne(userId == null ? user.getId() : userId);
             return createSuccessResponse(u == null ? null : getUserSerializer(user).toJson(u));
         } catch (final Exception e) {
             log.error("Failed to get user info", e);
