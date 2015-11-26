@@ -198,7 +198,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         if (getState(imei) == null) {
             jdbc.update("insert into devicestates(device, state) values (:device, :state)", params);
         } else {
-            jdbc.update("update devicestates set steate = :state where device = :device", params);
+            jdbc.update("update devicestates set state = :state where device = :device", params);
         }
     }
     /* (non-Javadoc)

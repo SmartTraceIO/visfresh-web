@@ -58,10 +58,17 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      */
     @Override
     public boolean accept(final RuleContext context) {
+        if (context.isProcessed(this)) {
+            return false;
+        }
+
+        //check init message.
         final TrackerEvent e = context.getEvent();
-        if(!context.isProcessed(this) && e.getType() == TrackerEventType.INIT) {
+        if(e.getShipment() == null || e.getType() == TrackerEventType.INIT) {
             return true;
         }
+
+        //check shipment is null
 
         return false;
     }

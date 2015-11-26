@@ -12,7 +12,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import com.visfresh.dao.DaoTestRunner;
 import com.visfresh.drools.DroolsRuleEngine;
 import com.visfresh.junit.db.JUnitDbConfig;
-import com.visfresh.mock.MockSmsService;
+import com.visfresh.mock.MockNotificationService;
 import com.visfresh.services.RuleEngine;
 
 /**
@@ -37,7 +37,7 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
         final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
         ctxt.scan(JUnitDbConfig.class.getPackage().getName(),
             DroolsRuleEngine.class.getPackage().getName(),
-            MockSmsService.class.getPackage().getName());
+            MockNotificationService.class.getPackage().getName());
         ctxt.refresh();
         return ctxt;
     }

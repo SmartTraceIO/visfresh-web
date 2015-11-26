@@ -104,12 +104,11 @@ public class ArrivalRule extends AbstractNotificationRule {
         saveArrival(arrival);
 
         final Calendar date = new GregorianCalendar();
-        final String message = "Device is in " + arrival.getNumberOfMettersOfArrival() + " meters for arrival";
         //notify subscribers
         final List<PersonSchedule> schedules = getAllPersonalSchedules(event.getShipment());
         for (final PersonSchedule s : schedules) {
             if (matchesTimeFrame(s, date)) {
-                sendNotification(s, "Arrival Notification", message, arrival);
+                sendNotification(s, arrival);
             }
         }
 

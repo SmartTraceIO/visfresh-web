@@ -149,6 +149,10 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         dao.saveState(d.getImei(), s);
         assertNotNull(dao.getState(d.getImei()));
 
+        //test update state
+        dao.saveState(d.getImei(), s);
+        assertNotNull(dao.getState(d.getImei()));
+
         //test on delete trigger
         dao.delete(d);
         assertNull(dao.getState(d.getImei()));

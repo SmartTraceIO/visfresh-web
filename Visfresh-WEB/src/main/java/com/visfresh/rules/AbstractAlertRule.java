@@ -26,8 +26,7 @@ import com.visfresh.entities.TrackerEvent;
 public abstract class AbstractAlertRule extends AbstractNotificationRule {
     @Autowired
     protected AlertDao alertDao;
-    @Autowired
-    protected AlertDescriptionBuilder descriptionBuilder;
+
     /**
      * Default constructor.
      */
@@ -65,8 +64,7 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
             final List<PersonSchedule> schedules = getAllPersonalSchedules(context.getEvent().getShipment());
             for (final PersonSchedule s : schedules) {
                 if (matchesTimeFrame(s, date)) {
-                    sendNotification(s, alert.getType().toString(),
-                            descriptionBuilder.buildDescription(alert, null), alert);
+                    sendNotification(s, alert);
                 }
             }
         }
@@ -81,7 +79,7 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
         alertDao.save(a);
     }
     /**
-     * @param context TODO
+     * @param context rule context.
      * @return alert if created, null otherwise.
      */
     protected abstract Alert[] handleInternal(RuleContext context);

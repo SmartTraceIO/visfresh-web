@@ -111,8 +111,11 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         trackerEventDao.save(e);
 
         //process tracker event with rule engine.
-        final DeviceState state = deviceDao.getState(imei);
-        final RuleContext context = new RuleContext(e, state == null ? new DeviceState() : state);
+        DeviceState state = deviceDao.getState(imei);
+        if (state == null) {
+            state = new DeviceState();
+        }
+        final RuleContext context = new RuleContext(e, state);
 
         invokeRules(context);
 

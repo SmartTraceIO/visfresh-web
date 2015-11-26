@@ -61,10 +61,17 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
     @Test
     public void testAccept() {
         final TrackerEvent e = createEvent(13.14, 15.16, new Date());
+        e.setShipment(new Shipment());
 
+        //ignores with shipment
         assertFalse(rule.accept(new RuleContext(e, new DeviceState())));
 
+        //accept with shipment if INIT message
         e.setType(TrackerEventType.INIT);
+        assertTrue(rule.accept(new RuleContext(e, new DeviceState())));
+
+        e.setShipment(null);
+        e.setType(TrackerEventType.AUT);
         assertTrue(rule.accept(new RuleContext(e, new DeviceState())));
     }
     @Test

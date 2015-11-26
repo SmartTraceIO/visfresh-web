@@ -110,7 +110,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         final Date firstIssue = dateProps.get(startIssueKey);
         if (firstIssue == null) {
             //if first issue, return immediately
-            dateProps.put(startIssueKey, firstIssue);
+            dateProps.put(startIssueKey, context.getEvent().getTime());
             return null;
         }
 
