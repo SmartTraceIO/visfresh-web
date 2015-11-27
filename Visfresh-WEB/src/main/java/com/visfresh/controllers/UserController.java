@@ -30,7 +30,8 @@ import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.io.json.UserSerializer;
-import com.visfresh.services.lists.ListUserItem;
+import com.visfresh.services.lists.ExpandedListUserItem;
+import com.visfresh.services.lists.ShortListUserItem;
 import com.visfresh.utils.HashGenerator;
 import com.visfresh.utils.SerializerUtils;
 
@@ -115,7 +116,7 @@ public class UserController extends AbstractController implements UserConstants 
                     null);
 
             for (final User u : users) {
-                array.add(ser.toJson(u));
+                array.add(ser.toJson(new ExpandedListUserItem(u)));
             }
             return createListSuccessResponse(array, total);
         } catch (final Exception e) {
@@ -146,7 +147,7 @@ public class UserController extends AbstractController implements UserConstants 
 
             final UserSerializer ser = getUserSerializer(user);
 
-            final List<ListUserItem> users = getUserListItems(
+            final List<ShortListUserItem> users = getUserListItems(
                     user.getCompany(),
                     createSorting(sc, so, getDefaultListShipmentsSortingOrder(), 2),
                     null,
@@ -154,7 +155,7 @@ public class UserController extends AbstractController implements UserConstants 
             final int total = dao.getEntityCount(user.getCompany(), null);
 
             final JsonArray array = new JsonArray();
-            for (final ListUserItem s : users) {
+            for (final ShortListUserItem s : users) {
                 array.add(ser.toJson(s));
             }
             return createListSuccessResponse(array, total);
@@ -170,11 +171,11 @@ public class UserController extends AbstractController implements UserConstants 
      * @param page
      * @return
      */
-    private List<ListUserItem> getUserListItems(final Company company,
+    private List<ShortListUserItem> getUserListItems(final Company company,
             final Sorting sorting, final Filter filter, final Page page) {
-        final List<ListUserItem> result = new LinkedList<ListUserItem>();
+        final List<ShortListUserItem> result = new LinkedList<ShortListUserItem>();
         for (final User u : dao.findByCompany(company, sorting, page, filter)) {
-            result.add(new ListUserItem(u));
+            result.add(new ShortListUserItem(u));
         }
         return result;
     }

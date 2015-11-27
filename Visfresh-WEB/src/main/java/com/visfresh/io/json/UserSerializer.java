@@ -3,6 +3,9 @@
  */
 package com.visfresh.io.json;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
@@ -20,7 +23,8 @@ import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
-import com.visfresh.services.lists.ListUserItem;
+import com.visfresh.services.lists.ExpandedListUserItem;
+import com.visfresh.services.lists.ShortListUserItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -65,12 +69,21 @@ public class UserSerializer extends AbstractJsonSerializer {
         u.setActive(!Boolean.FALSE.equals(asBoolean(json.get(UserConstants.PROPERTY_ACTIVE))));
 
         final JsonArray array = json.get(UserConstants.PROPERTY_ROLES).getAsJsonArray();
+        u.getRoles().addAll(parseRoles(array));
+        return u;
+    }
+
+    /**
+     * @param array
+     * @return
+     */
+    protected List<Role> parseRoles(final JsonArray array) {
+        final List<Role> roles = new LinkedList<Role>();
         final int size = array.size();
         for (int i = 0; i < size; i++) {
-            u.getRoles().add(Role.valueOf(array.get(i).getAsString()));
+            roles.add(Role.valueOf(array.get(i).getAsString()));
         }
-
-        return u;
+        return roles;
     }
     /**
      * @param u the user.
@@ -85,11 +98,7 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.addProperty(UserConstants.PROPERTY_EMAIL, u.getEmail());
         obj.addProperty(UserConstants.PROPERTY_PHONE, u.getPhone());
 
-        final JsonArray roleArray = new JsonArray();
-        for (final Role r : u.getRoles()) {
-            roleArray.add(new JsonPrimitive(r.name()));
-        }
-        obj.add(UserConstants.PROPERTY_ROLES, roleArray);
+        obj.add(UserConstants.PROPERTY_ROLES, toJson(u.getRoles()));
 
         obj.addProperty(UserConstants.PROPERTY_TIME_ZONE, u.getTimeZone().getID());
         obj.addProperty(UserConstants.PROPERTY_TEMPERATURE_UNITS, u.getTemperatureUnits().toString());
@@ -198,9 +207,9 @@ public class UserSerializer extends AbstractJsonSerializer {
      * @param s list user item.
      * @return JSON object.
      */
-    public JsonObject toJson(final ListUserItem s) {
+    public JsonObject toJson(final ShortListUserItem s) {
         final JsonObject json = new JsonObject();
-        json.addProperty("id", s.getId());
+        json.addProperty(UserConstants.PROPERTY_ID, s.getId());
         json.addProperty("fullName", s.getFullName());
         return json;
     }
@@ -208,13 +217,64 @@ public class UserSerializer extends AbstractJsonSerializer {
      * @param obj JSON object.
      * @return list user item.
      */
-    public ListUserItem parseListUserItem(final JsonObject obj) {
-        final ListUserItem item = new ListUserItem();
-        item.setId(asLong(obj.get("id")));
+    public ShortListUserItem parseListUserItem(final JsonObject obj) {
+        final ShortListUserItem item = new ShortListUserItem();
+        item.setId(asLong(obj.get(UserConstants.PROPERTY_ID)));
         item.setFullName(asString(obj.get("fullName")));
         return item;
     }
 
+    /**
+     * @param item
+     * @return
+     */
+    public JsonObject toJson(final ExpandedListUserItem item) {
+        if (item == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty(UserConstants.PROPERTY_ID, item.getId());
+        json.addProperty(UserConstants.PROPERTY_FIRST_NAME, item.getFirstName());
+        json.addProperty(UserConstants.PROPERTY_LAST_NAME, item.getLastName());
+        json.addProperty(UserConstants.PROPERTY_EMAIL, item.getEmail());
+        json.addProperty(UserConstants.PROPERTY_COMPANY_NAME, item.getCompanyName());
+        json.addProperty(UserConstants.PROPERTY_POSITION, item.getPosition());
+        json.add(UserConstants.PROPERTY_ROLES, toJson(item.getRoles()));
+        json.addProperty(UserConstants.PROPERTY_ACTIVE, item.isActive());
+
+        return json;
+    }
+    public ExpandedListUserItem parseExpandedListUserItem(final JsonObject json) {
+        if (json == null) {
+            return null;
+        }
+
+        final ExpandedListUserItem item = new ExpandedListUserItem();
+
+        item.setId(asLong(json.get(UserConstants.PROPERTY_ID)));
+        item.setFirstName(asString(json.get(UserConstants.PROPERTY_FIRST_NAME)));
+        item.setLastName(asString(json.get(UserConstants.PROPERTY_LAST_NAME)));
+        item.setEmail(asString(json.get(UserConstants.PROPERTY_EMAIL)));
+        item.setCompanyName(asString(json.get(UserConstants.PROPERTY_COMPANY_NAME)));
+        item.setPosition(asString(json.get(UserConstants.PROPERTY_POSITION)));
+        item.getRoles().addAll(parseRoles(json.get(UserConstants.PROPERTY_ROLES).getAsJsonArray()));
+        item.setActive(asBoolean(json.get(UserConstants.PROPERTY_ACTIVE)));
+
+        return item;
+    }
+
+    /**
+     * @param roles role set.
+     * @return roles as JSON array.
+     */
+    protected JsonArray toJson(final Set<Role> roles) {
+        final JsonArray roleArray = new JsonArray();
+        for (final Role r : roles) {
+            roleArray.add(new JsonPrimitive(r.name()));
+        }
+        return roleArray;
+    }
     /**
      * @return the referenceResolver
      */

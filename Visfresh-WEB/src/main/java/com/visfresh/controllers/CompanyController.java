@@ -52,14 +52,16 @@ public class CompanyController extends AbstractController implements CompanyCons
      */
     @RequestMapping(value = "/getCompany/{authToken}", method = RequestMethod.GET)
     public JsonObject getCompany(@PathVariable final String authToken,
-            @RequestParam final Long companyId) {
+            @RequestParam(required = false) final Long companyId) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetCompany(user, companyId);
+            if (companyId != null) {
+                security.checkCanGetCompany(user, companyId);
+            }
 
             final Company company;
-            if (user.getCompany().getId().equals(companyId)) {
+            if (companyId == null || user.getCompany().getId().equals(companyId)) {
                 company = user.getCompany();
             } else {
                 company = dao.findOne(companyId);

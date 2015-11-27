@@ -17,7 +17,8 @@ import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.io.json.UserSerializer;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.ListUserItem;
+import com.visfresh.services.lists.ExpandedListUserItem;
+import com.visfresh.services.lists.ShortListUserItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -81,7 +82,7 @@ public class UserRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<User> getUsers(final Integer pageIndex, final Integer pageSize,
+    public List<ExpandedListUserItem> getUsers(final Integer pageIndex, final Integer pageSize,
             final String sortColumn,
             final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
@@ -99,9 +100,9 @@ public class UserRestClient extends RestClient {
         final JsonArray response = sendGetRequest(getPathWithToken("getUsers"),
                 params).getAsJsonArray();
 
-        final List<User> users = new ArrayList<User>(response.size());
+        final List<ExpandedListUserItem> users = new ArrayList<ExpandedListUserItem>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            users.add(serializer.parseUser(response.get(i).getAsJsonObject()));
+            users.add(serializer.parseExpandedListUserItem(response.get(i).getAsJsonObject()));
         }
         return users;
     }
@@ -114,7 +115,7 @@ public class UserRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<ListUserItem> listUsers(final Integer pageIndex, final Integer pageSize,
+    public List<ShortListUserItem> listUsers(final Integer pageIndex, final Integer pageSize,
             final String sortColumn,
             final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
@@ -132,7 +133,7 @@ public class UserRestClient extends RestClient {
         final JsonArray response = sendGetRequest(getPathWithToken("listUsers"),
                 params).getAsJsonArray();
 
-        final List<ListUserItem> users = new ArrayList<ListUserItem>(response.size());
+        final List<ShortListUserItem> users = new ArrayList<ShortListUserItem>(response.size());
         for (int i = 0; i < response.size(); i++) {
             users.add(serializer.parseListUserItem(response.get(i).getAsJsonObject()));
         }

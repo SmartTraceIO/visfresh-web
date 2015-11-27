@@ -9,20 +9,20 @@ import com.visfresh.entities.User;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ListUserItem {
+public class ShortListUserItem {
     private Long id;
     private String fullName;
 
     /**
      * Default constructor.
      */
-    public ListUserItem() {
+    public ShortListUserItem() {
         super();
     }
     /**
      * @param u
      */
-    public ListUserItem(final User u) {
+    public ShortListUserItem(final User u) {
         setId(u.getId());
         if (u.getFirstName() != null || u.getLastName() != null) {
             final StringBuilder sb = new StringBuilder();

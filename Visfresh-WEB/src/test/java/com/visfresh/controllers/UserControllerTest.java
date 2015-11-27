@@ -261,6 +261,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setCompany(company);
+        u.setPosition("Manager");
         u.setAuthorizedDeviceGroup("AuthorizedDeviceGroup");
         u.setTitle("Mr");
         u.setScale("User Schale");

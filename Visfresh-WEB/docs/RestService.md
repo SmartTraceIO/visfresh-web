@@ -134,7 +134,7 @@ Method *GET*, method name *getUsers*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order  
-Method returns array of [User Objects](#markdown-header-user)  
+Method returns array of [User Objects](#markdown-header-expanded-list-user_item)  
 [(example)](#markdown-header-get-users-example)
 
 ### List Users ###
@@ -698,6 +698,21 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "companyName": "Special JUnit Company"
 }
 ```
+### Expanded List User Item ###
+```json
+{
+  "id": 3075,
+  "firstName": "A2",
+  "lastName": "LastA2",
+  "email": "u1@google.com",
+  "companyName": "Test",
+  "position": "Manager",
+  "roles": [
+    "CompanyAdmin"
+  ],
+  "active": true
+}
+```
 ### Save User Request ###
 ```json
 {
@@ -869,23 +884,28 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": [
     {
-      "id": 1739,
+      "id": 3075,
       "firstName": "A2",
       "lastName": "LastA2",
       "email": "u1@google.com",
+      "companyName": "Test",
+      "position": "Manager",
       "roles": [
         "CompanyAdmin"
       ],
-      "timeZone": "UTC",
-      "temperatureUnits": "Celsius",
-      "measurementUnits": "Metric",
-      "language": "English",
-      "deviceGroup": "AuthorizedDeviceGroup",
-      "scale": "User Schale",
-      "title": "Mr",
-      "active": true,
-      "companyId": 1510,
-      "companyName": "Test"
+      "active": true
+    },
+    {
+      "id": 3076,
+      "firstName": "A1",
+      "lastName": "LastA1",
+      "email": "u2@google.com",
+      "companyName": "Test",
+      "position": "Manager",
+      "roles": [
+        "CompanyAdmin"
+      ],
+      "active": true
     }
   ],
   "totalCount": 2

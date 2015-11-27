@@ -21,6 +21,7 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.UpdateUserDetailsRequest;
+import com.visfresh.services.lists.ExpandedListUserItem;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -93,6 +94,36 @@ public class UserSerializerTest extends AbstractSerializerTest {
         assertEquals(measurementUnits, u.getMeasurementUnits());
         assertEquals(scale, u.getScale());
         assertEquals(title, u.getTitle());
+    }
+    @Test
+    public void testExpandedListUserItem() {
+        final long login = 77l;
+        final String firstName = "firstname";
+        final String lastName = "LastName";
+        final String email = "abra@cada.bra";
+        final String position = "Manager";
+        final String companyName = "Unit Company";
+
+        ExpandedListUserItem u = new ExpandedListUserItem();
+        u.setId(login);
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setEmail(email);
+        u.setPosition(position);
+        u.getRoles().add(Role.Dispatcher);
+        u.getRoles().add(Role.ReportViewer);
+        u.setCompanyName(companyName);
+
+        final JsonObject obj = serializer.toJson(u);
+        u = serializer.parseExpandedListUserItem(obj);
+
+        assertEquals((Long) login, u.getId());
+        assertEquals(2, u.getRoles().size());
+        assertEquals(firstName, u.getFirstName());
+        assertEquals(lastName, u.getLastName());
+        assertEquals(email, u.getEmail());
+        assertEquals(position, u.getPosition());
+        assertEquals(companyName, u.getCompanyName());
     }
     @Test
     public void testCreateUserRequest() {
