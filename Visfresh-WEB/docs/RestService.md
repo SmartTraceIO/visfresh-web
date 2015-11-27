@@ -50,7 +50,8 @@ List items is short representations of base entities, like as [Alert Profile](#m
 2. [Shipment List item](#markdown-header-shipment-list-item)  
 3. [Notification Schedule list item](#markdown-header-notification-schedule-list-item)  
 4. [User List item](#markdown-header-user-list-item)  
-5. [Alert Profile list Item](#markdown-header-list-alert-profile-item)
+5. [Expanded User list item](#markdown-header-expanded-list-user-item)  
+6. [Alert Profile list Item](#markdown-header-list-alert-profile-item)
 
 ## Special Request objects ##
 1. [Get Shipments filter](#markdown-header-get-shipments-filter)
@@ -134,7 +135,7 @@ Method *GET*, method name *getUsers*, method parameters:
 2. pageSize - size of page  
 3. sc - sort column  
 4. so - sort order  
-Method returns array of [User Objects](#markdown-header-expanded-list-user_item)  
+Method returns array of [Expanded List User items](#markdown-header-expanded-list-user-item)  
 [(example)](#markdown-header-get-users-example)
 
 ### List Users ###
