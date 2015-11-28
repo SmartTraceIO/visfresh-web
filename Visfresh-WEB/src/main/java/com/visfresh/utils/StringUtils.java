@@ -3,6 +3,11 @@
  */
 package com.visfresh.utils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -60,5 +65,23 @@ public final class StringUtils {
             result = result.replaceAll(Pattern.quote("${" + e.getKey() + "}"), e.getValue());
         }
         return result;
+    }
+    /**
+     * @param in input string.
+     * @param encoding character encoding.
+     * @return stream content as string.
+     * @throws IOException
+     */
+    public static String getContent(final InputStream in, final String encoding) throws IOException {
+        final Reader r = new InputStreamReader(in, encoding);
+        final char[] buff = new char[128];
+        final StringWriter sw = new StringWriter();
+
+        int len;
+        while ((len = r.read(buff)) > -1) {
+            sw.write(buff, 0, len);
+        }
+
+        return sw.getBuffer().toString();
     }
 }
