@@ -3,6 +3,7 @@
  */
 package com.visfresh.entities;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
@@ -11,7 +12,7 @@ import java.util.TimeZone;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class User implements EntityWithId<Long>, EntityWithCompany {
+public class User implements EntityWithId<Long>, EntityWithCompany, Cloneable {
     /**
      * User ID.
      */
@@ -51,7 +52,7 @@ public class User implements EntityWithId<Long>, EntityWithCompany {
     /**
      * Set of roles.
      */
-    private Set<Role> roles = new HashSet<Role>();
+    private Set<Role> roles;
     /**
      * Temperature units
      */
@@ -79,7 +80,15 @@ public class User implements EntityWithId<Long>, EntityWithCompany {
     /**
      * Active Flag.
      */
-    private boolean active = true;
+    private Boolean active;
+    /**
+     * External company name.
+     */
+    private String externalCompany;
+    /**
+     * External flag.
+     */
+    private Boolean external;
 
     /**
      * Default constructor.
@@ -106,6 +115,13 @@ public class User implements EntityWithId<Long>, EntityWithCompany {
      */
     public Set<Role> getRoles() {
         return roles;
+    }
+    /**
+     * @param convertToEntityAttribute
+     */
+    public void setRoles(final Collection<Role> roles) {
+        this.roles = new HashSet<Role>();
+        this.roles.addAll(roles);
     }
     /**
      * @return the company
@@ -217,19 +233,6 @@ public class User implements EntityWithId<Long>, EntityWithCompany {
     public void setPhone(final String phone) {
         this.phone = phone;
     }
-
-    /**
-     * @return authorized device group.
-     */
-    public String getAuthorizedDeviceGroup() {
-        return deviceGroup;
-    }
-    /**
-     * @param group the authorizedDeviceGroup to set
-     */
-    public void setAuthorizedDeviceGroup(final String group) {
-        this.deviceGroup = group;
-    }
     /**
      * @return the deviceGroup
      */
@@ -293,13 +296,59 @@ public class User implements EntityWithId<Long>, EntityWithCompany {
     /**
      * @return the active
      */
-    public boolean isActive() {
+    public Boolean getActive() {
         return active;
+    }
+    public boolean isActive() {
+        return Boolean.TRUE.equals(getActive());
     }
     /**
      * @param active the active to set
      */
-    public void setActive(final boolean active) {
+    public void setActive(final Boolean active) {
         this.active = active;
+    }
+    /**
+     * @return the external company name
+     */
+    public String getExternalCompany() {
+        return externalCompany;
+    }
+    /**
+     * @param name the external company name.
+     */
+    public void setExternalCompany(final String name) {
+        this.externalCompany = name;
+    }
+    /**
+     * @return the external
+     */
+    public Boolean getExternal() {
+        return external;
+    }
+    public boolean isExternal() {
+        return Boolean.TRUE.equals(getExternal());
+    }
+    /**
+     * @param external the external to set
+     */
+    public void setExternal(final Boolean external) {
+        this.external = external;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public User clone() {
+        User u;
+        try {
+            u = (User) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            throw new InternalError(e.getMessage());
+        }
+
+        final Set<Role> r = new HashSet<Role>(u.getRoles());
+        u.roles = r;
+        return u;
     }
 }

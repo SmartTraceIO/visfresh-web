@@ -3,6 +3,7 @@
  */
 package com.visfresh.io.json;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +56,8 @@ public class UserSerializer extends AbstractJsonSerializer {
         u.setId(asLong(json.get(UserConstants.PROPERTY_ID)));
         u.setFirstName(asString(json.get(UserConstants.PROPERTY_FIRST_NAME)));
         u.setLastName(asString(json.get(UserConstants.PROPERTY_LAST_NAME)));
+        u.setExternal(asBoolean(json.get(UserConstants.PROPERTY_EXTERNAL)));
+        u.setExternalCompany(asString(json.get(UserConstants.PROPERTY_EXTERNAL_COMPANY)));
         u.setPosition(asString(json.get(UserConstants.PROPERTY_POSITION)));
         u.setEmail(asString(json.get(UserConstants.PROPERTY_EMAIL)));
         u.setPhone(asString(json.get(UserConstants.PROPERTY_PHONE)));
@@ -68,22 +71,12 @@ public class UserSerializer extends AbstractJsonSerializer {
         u.setTitle(asString(json.get("title")));
         u.setActive(!Boolean.FALSE.equals(asBoolean(json.get(UserConstants.PROPERTY_ACTIVE))));
 
-        final JsonArray array = json.get(UserConstants.PROPERTY_ROLES).getAsJsonArray();
-        u.getRoles().addAll(parseRoles(array));
-        return u;
-    }
-
-    /**
-     * @param array
-     * @return
-     */
-    protected List<Role> parseRoles(final JsonArray array) {
-        final List<Role> roles = new LinkedList<Role>();
-        final int size = array.size();
-        for (int i = 0; i < size; i++) {
-            roles.add(Role.valueOf(array.get(i).getAsString()));
+        final JsonElement roles = json.get(UserConstants.PROPERTY_ROLES);
+        if (roles != null && !roles.isJsonNull()) {
+            u.setRoles(new HashSet<Role>());
+            u.getRoles().addAll(parseRoles(roles.getAsJsonArray()));
         }
-        return roles;
+        return u;
     }
     /**
      * @param u the user.
@@ -94,11 +87,15 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.addProperty(UserConstants.PROPERTY_ID, u.getId());
         obj.addProperty(UserConstants.PROPERTY_FIRST_NAME, u.getFirstName());
         obj.addProperty(UserConstants.PROPERTY_LAST_NAME, u.getLastName());
+        obj.addProperty(UserConstants.PROPERTY_EXTERNAL, u.getExternal());
+        obj.addProperty(UserConstants.PROPERTY_EXTERNAL_COMPANY, u.getExternalCompany());
         obj.addProperty(UserConstants.PROPERTY_POSITION, u.getPosition());
         obj.addProperty(UserConstants.PROPERTY_EMAIL, u.getEmail());
         obj.addProperty(UserConstants.PROPERTY_PHONE, u.getPhone());
 
-        obj.add(UserConstants.PROPERTY_ROLES, toJson(u.getRoles()));
+        if (u.getRoles() != null) {
+            obj.add(UserConstants.PROPERTY_ROLES, toJson(u.getRoles()));
+        }
 
         obj.addProperty(UserConstants.PROPERTY_TIME_ZONE, u.getTimeZone().getID());
         obj.addProperty(UserConstants.PROPERTY_TEMPERATURE_UNITS, u.getTemperatureUnits().toString());
@@ -107,12 +104,11 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.addProperty("deviceGroup", u.getDeviceGroup());
         obj.addProperty("scale", u.getScale());
         obj.addProperty("title", u.getTitle());
-        obj.addProperty(UserConstants.PROPERTY_ACTIVE, u.isActive());
+        obj.addProperty(UserConstants.PROPERTY_ACTIVE, u.getActive());
 
         //company is readonly property, should not be serialized back
         if (u.getCompany() != null) {
-            obj.addProperty(UserConstants.PROPERTY_COMPANY_ID, u.getCompany().getId());
-            obj.addProperty(UserConstants.PROPERTY_COMPANY_NAME, u.getCompany().getName());
+            obj.addProperty(UserConstants.PROPERTY_INTERNAL_COMPANY_ID, u.getCompany().getId());
         }
 
         return obj;
@@ -128,8 +124,11 @@ public class UserSerializer extends AbstractJsonSerializer {
         final JsonObject obj = e.getAsJsonObject();
         final SaveUserRequest req = new SaveUserRequest();
         req.setUser(parseUser(obj.get("user").getAsJsonObject()));
-        req.setCompany(getCompanyResolver().getCompany(obj.get("company").getAsLong()));
-        req.setPassword(obj.get("password").getAsString());
+        final JsonElement companyId = obj.get(UserConstants.PROPERTY_INTERNAL_COMPANY_ID);
+        if (companyId != null && !companyId.isJsonNull()) {
+            req.setCompany(getCompanyResolver().getCompany(companyId.getAsLong()));
+        }
+        req.setPassword(asString(obj.get("password")));
         return req;
     }
     /**
@@ -143,7 +142,8 @@ public class UserSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
         obj.add("user", toJson(req.getUser()));
         obj.addProperty("password", req.getPassword());
-        obj.addProperty("company", req.getCompany().getId());
+        obj.addProperty(UserConstants.PROPERTY_INTERNAL_COMPANY_ID,
+                req.getCompany() == null ? null : req.getCompany().getId());
         return obj;
     }
     /**
@@ -238,7 +238,7 @@ public class UserSerializer extends AbstractJsonSerializer {
         json.addProperty(UserConstants.PROPERTY_FIRST_NAME, item.getFirstName());
         json.addProperty(UserConstants.PROPERTY_LAST_NAME, item.getLastName());
         json.addProperty(UserConstants.PROPERTY_EMAIL, item.getEmail());
-        json.addProperty(UserConstants.PROPERTY_COMPANY_NAME, item.getCompanyName());
+        json.addProperty(UserConstants.PROPERTY_EXTERNAL_COMPANY, item.getCompanyName());
         json.addProperty(UserConstants.PROPERTY_POSITION, item.getPosition());
         json.add(UserConstants.PROPERTY_ROLES, toJson(item.getRoles()));
         json.addProperty(UserConstants.PROPERTY_ACTIVE, item.isActive());
@@ -256,7 +256,7 @@ public class UserSerializer extends AbstractJsonSerializer {
         item.setFirstName(asString(json.get(UserConstants.PROPERTY_FIRST_NAME)));
         item.setLastName(asString(json.get(UserConstants.PROPERTY_LAST_NAME)));
         item.setEmail(asString(json.get(UserConstants.PROPERTY_EMAIL)));
-        item.setCompanyName(asString(json.get(UserConstants.PROPERTY_COMPANY_NAME)));
+        item.setCompanyName(asString(json.get(UserConstants.PROPERTY_EXTERNAL_COMPANY)));
         item.setPosition(asString(json.get(UserConstants.PROPERTY_POSITION)));
         item.getRoles().addAll(parseRoles(json.get(UserConstants.PROPERTY_ROLES).getAsJsonArray()));
         item.setActive(asBoolean(json.get(UserConstants.PROPERTY_ACTIVE)));
@@ -264,6 +264,18 @@ public class UserSerializer extends AbstractJsonSerializer {
         return item;
     }
 
+    /**
+     * @param array
+     * @return
+     */
+    protected List<Role> parseRoles(final JsonArray array) {
+        final List<Role> roles = new LinkedList<Role>();
+        final int size = array.size();
+        for (int i = 0; i < size; i++) {
+            roles.add(Role.valueOf(array.get(i).getAsString()));
+        }
+        return roles;
+    }
     /**
      * @param roles role set.
      * @return roles as JSON array.

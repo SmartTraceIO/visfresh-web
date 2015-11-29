@@ -18,6 +18,7 @@ public interface UserConstants {
     String PROPERTY_LAST_NAME = "lastName";
     String PROPERTY_FIRST_NAME = "firstName";
     String PROPERTY_ACTIVE = "active";
-    String PROPERTY_COMPANY_ID = "companyId";
-    String PROPERTY_COMPANY_NAME = "companyName";
+    String PROPERTY_INTERNAL_COMPANY_ID = "internalCompanyId";
+    String PROPERTY_EXTERNAL_COMPANY = "externalCompany";
+    String PROPERTY_EXTERNAL = "external";
 }

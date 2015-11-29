@@ -6,6 +6,7 @@ package com.visfresh.io.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.HashSet;
 import java.util.TimeZone;
 
 import org.junit.Before;
@@ -59,6 +60,8 @@ public class UserSerializerTest extends AbstractSerializerTest {
         final MeasurementUnits measurementUnits = MeasurementUnits.English;
         final String scale = "scale";
         final String title = "Mrs";
+        final String externalCompany = "JUnit External company";
+        final boolean external = true;
 
         User u = new User();
         u.setId(login);
@@ -66,6 +69,8 @@ public class UserSerializerTest extends AbstractSerializerTest {
         u.setLastName(lastName);
         u.setEmail(email);
         u.setPhone(phone);
+        u.setExternalCompany(externalCompany);
+        u.setExternal(external);
         u.setPosition(position);
         u.setTimeZone(timeZone);
         u.setTemperatureUnits(temperatureUnits);
@@ -74,6 +79,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         u.setMeasurementUnits(measurementUnits);
         u.setScale(scale);
         u.setTitle(title);
+        u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.ReportViewer);
 
@@ -94,6 +100,8 @@ public class UserSerializerTest extends AbstractSerializerTest {
         assertEquals(measurementUnits, u.getMeasurementUnits());
         assertEquals(scale, u.getScale());
         assertEquals(title, u.getTitle());
+        assertEquals(externalCompany, u.getExternalCompany());
+        assertEquals(external, u.getExternal());
     }
     @Test
     public void testExpandedListUserItem() {

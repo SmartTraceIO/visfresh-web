@@ -33,6 +33,7 @@ import com.visfresh.entities.User;
 public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implements UserDao {
     private static final String FIRSTNAME_FIELD = "firstname";
     private static final String LASTNAME_FIELD = "lastname";
+    private static final String EXTERNALCOMPANY_FIELD = "externalcompany";
     private static final String POSITION_FIELD = "position";
     private static final String EMAIL_FIELD = "email";
     private static final String PHONE_FIELD = "phone";
@@ -52,6 +53,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
     private static final String SCALE_FIELD = "scale";
     private static final String TITLE_FIELD = "title";
     private static final String ACTIVE_FIELD = "active";
+    private static final String EXTERNAL_FIELD = "external";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -69,23 +71,25 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         propertyToDbFields.put(UserConstants.PROPERTY_ID, ID_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_PHONE, PHONE_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_EMAIL, EMAIL_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_EXTERNAL_COMPANY, EXTERNALCOMPANY_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_POSITION, POSITION_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_LAST_NAME, LASTNAME_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_FIRST_NAME, FIRSTNAME_FIELD);
         propertyToDbFields.put(UserConstants.PROPERTY_ACTIVE, ACTIVE_FIELD);
-        propertyToDbFields.put(UserConstants.PROPERTY_COMPANY_ID, COMPANY_FIELD);
-        //TODO correct
-        propertyToDbFields.put(UserConstants.PROPERTY_COMPANY_NAME, COMPANY_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_INTERNAL_COMPANY_ID, COMPANY_FIELD);
+        propertyToDbFields.put(UserConstants.PROPERTY_EXTERNAL, EXTERNAL_FIELD);
     }
 
     public String convertToDatabaseColumn(final Collection<Role> roles) {
         final StringBuilder sb = new StringBuilder();
 
-        for (final Role role : roles) {
-            if (sb.length() > 0) {
-                sb.append(',');
+        if (roles != null) {
+            for (final Role role : roles) {
+                if (sb.length() > 0) {
+                    sb.append(',');
+                }
+                sb.append(role);
             }
-            sb.append(role);
         }
 
         return sb.toString();
@@ -124,6 +128,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         paramMap.put(PASSWORD_FIELD, user.getPassword());
         paramMap.put(FIRSTNAME_FIELD, user.getFirstName());
         paramMap.put(LASTNAME_FIELD, user.getLastName());
+        paramMap.put(EXTERNALCOMPANY_FIELD, user.getExternalCompany());
         paramMap.put(POSITION_FIELD, user.getPosition());
         paramMap.put(EMAIL_FIELD, user.getEmail());
         paramMap.put(PHONE_FIELD, user.getPhone());
@@ -136,7 +141,8 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         paramMap.put(MEASUREUNITS_FIELD, user.getMeasurementUnits().toString());
         paramMap.put(SCALE_FIELD, user.getScale());
         paramMap.put(TITLE_FIELD, user.getTitle());
-        paramMap.put(ACTIVE_FIELD, user.isActive());
+        paramMap.put(ACTIVE_FIELD, !Boolean.FALSE.equals(user.getActive()));
+        paramMap.put(EXTERNAL_FIELD, Boolean.TRUE.equals(user.getExternal()));
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -155,6 +161,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         fields.add(PASSWORD_FIELD);
         fields.add(FIRSTNAME_FIELD);
         fields.add(LASTNAME_FIELD);
+        fields.add(EXTERNALCOMPANY_FIELD);
         fields.add(POSITION_FIELD);
         fields.add(EMAIL_FIELD);
         fields.add(PHONE_FIELD);
@@ -168,6 +175,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         fields.add(SCALE_FIELD);
         fields.add(TITLE_FIELD);
         fields.add(ACTIVE_FIELD);
+        fields.add(EXTERNAL_FIELD);
         return fields;
     }
 
@@ -208,19 +216,21 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         u.setId(((Number) row.get(ID_FIELD)).longValue());
         u.setFirstName((String) row.get(FIRSTNAME_FIELD));
         u.setLastName((String) row.get(LASTNAME_FIELD));
+        u.setExternalCompany((String) row.get(EXTERNALCOMPANY_FIELD));
         u.setPosition((String) row.get(POSITION_FIELD));
         u.setEmail((String) row.get(EMAIL_FIELD));
         u.setPhone((String) row.get(PHONE_FIELD));
         u.setPassword((String) row.get(PASSWORD_FIELD));
         u.setTimeZone(TimeZone.getTimeZone((String) row.get(TIME_ZONE_FIELD)));
         u.setTemperatureUnits(TemperatureUnits.valueOf((String) row.get(TEMPERATURE_UNITS)));
-        u.getRoles().addAll(convertToEntityAttribute((String) row.get(ROLES_FIELD)));
+        u.setRoles(convertToEntityAttribute((String) row.get(ROLES_FIELD)));
         u.setDeviceGroup((String) row.get(DEVICEGROUP_FIELD));
         u.setLanguage(Language.valueOf((String) row.get(LANGUAGE_FIELD)));
         u.setMeasurementUnits(MeasurementUnits.valueOf((String) row.get(MEASUREUNITS_FIELD)));
         u.setScale((String) row.get(SCALE_FIELD));
         u.setTitle((String) row.get(TITLE_FIELD));
         u.setActive(!Boolean.FALSE.equals(row.get(ACTIVE_FIELD)));
+        u.setExternal((Boolean) row.get(EXTERNAL_FIELD));
         return u;
     }
     /* (non-Javadoc)

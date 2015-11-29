@@ -157,18 +157,19 @@ Method *POST*, method name *updateUserDetails*. JSON request body contains follo
 1. user - user ID.  
 2. firstName - first user name.  
 3. lastName - last user name.  
-4. position - position of user in company.  
-5. email - user email address.  
-6. phone - user phone number.  
-7. temperatureUnits - temperature units.  
-8. measurementUnits - measurement units Metric/English  
-9. password - user password.  
-10. user - user login name. It is not changeable parameter. Is used for identify the user to change details.  
-11. temperatureUnits - user temperature units.  
-12. timeZone - user time zone.  
-13. language - user language.  
-14. scale - user schale.  
-15. title - user title.  
+4. externalCompany - external company name.
+5. position - position of user in company.  
+6. email - user email address.  
+7. phone - user phone number.  
+8. temperatureUnits - temperature units.  
+9. measurementUnits - measurement units Metric/English  
+10. password - user password.  
+11. user - user login name. It is not changeable parameter. Is used for identify the user to change details.  
+12. temperatureUnits - user temperature units.  
+13. timeZone - user time zone.  
+14. language - user language.  
+15. scale - user schale.  
+16. title - user title.  
 [(example)](#markdown-header-update-user-details-example)
 
 ### Logout ###
@@ -841,6 +842,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "user": {
     "firstName": "firstname",
     "lastName": "LastName",
+    "externalCompany": "External JUnit company",
     "position": "Manager",
     "email": "abra@cada.bra",
     "phone": "1111111117",
@@ -859,7 +861,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "active": false
   },
   "password": "password",
-  "company": 1484
+  "company": 2934
 }
 ```  
 **Response:**  

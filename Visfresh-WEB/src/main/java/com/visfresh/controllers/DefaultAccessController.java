@@ -303,7 +303,7 @@ public class DefaultAccessController implements AccessController {
      */
     @Override
     public void checkCanViewDeviceGroup(final User user, final DeviceGroup group) throws RestServiceException {
-        if (havePermission(user, Role.CompanyAdmin) || group.getName().equals(user.getAuthorizedDeviceGroup())) {
+        if (havePermission(user, Role.CompanyAdmin) || group.getName().equals(user.getDeviceGroup())) {
             return;
         }
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,

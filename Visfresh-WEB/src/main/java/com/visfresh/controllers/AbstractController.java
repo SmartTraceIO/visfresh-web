@@ -18,6 +18,7 @@ import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.EntityWithCompany;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.services.AuthService;
@@ -59,7 +60,9 @@ public abstract class AbstractController {
      */
     protected void checkCompanyAccess(final User user,
             final EntityWithCompany s) throws RestServiceException {
-        if (s != null && s.getCompany() != null && !s.getCompany().getId().equals(user.getCompany().getId())) {
+        if (s != null && s.getCompany() != null && !(
+                user.getRoles().contains(Role.GlobalAdmin)
+                || s.getCompany().getId().equals(user.getCompany().getId()))) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
         }
     }

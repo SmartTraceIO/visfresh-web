@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.TimeZone;
 
 import org.junit.Before;
@@ -60,13 +61,73 @@ public class UserControllerTest extends AbstractRestServiceTest {
         client.setCompanyResolver(context.getBean(CompanyResolver.class));
         client.setShipmentResolver(context.getBean(ShipmentResolver.class));
     }
-    //@RequestMapping(value = "/getUser/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getUser(@PathVariable final String authToken,
-    //        final @RequestParam String username) {
+    /**
+     * Tests getUser method.
+     * @throws IOException
+     * @throws RestServiceException
+     */
     @Test
     public void testGetUser() throws IOException, RestServiceException {
-        final User user = client.getUser(this.user.getId());
-        assertNotNull(user);
+        //create company
+        final Company c = new Company();
+        c.setDescription("JUnit test company");
+        c.setName("JUnit-C");
+        companyDao.save(c);
+        final String firstName = "firstname";
+        final String lastName = "LastName";
+        final String email = "abra@cada.bra";
+        final String phone = "1111111117";
+        final String externalCompany = "External JUnit company";
+        final boolean external = true;
+        final String position = "Manager";
+        final String deviceGroup = "DeviceGroupName";
+        final Language language = Language.English;
+        final MeasurementUnits measurementUnits = MeasurementUnits.English;
+        final String scale = "scale";
+        final String title = "Mrs";
+
+        final User u = new User();
+        u.setCompany(c);
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setEmail(email);
+        u.setPhone(phone);
+        u.setPosition(position);
+        u.setDeviceGroup(deviceGroup);
+        u.setLanguage(language);
+        u.setMeasurementUnits(measurementUnits);
+        u.setScale(scale);
+        u.setTitle(title);
+        u.setActive(false);
+        u.setExternal(external);
+        u.setExternalCompany(externalCompany);
+        u.setRoles(new HashSet<Role>());
+        u.getRoles().add(Role.Dispatcher);
+        u.getRoles().add(Role.ReportViewer);
+        u.getRoles().add(Role.Dispatcher);
+        u.getRoles().add(Role.CompanyAdmin);
+
+        final String password = "password";
+
+        final AuthService auth = context.getBean(AuthService.class);
+        auth.saveUser(u, password);
+
+        final User u2 = client.getUser(u.getId());
+        assertNotNull(u2);
+        assertEquals(3, u2.getRoles().size());
+        assertEquals(firstName, u2.getFirstName());
+        assertEquals(lastName, u2.getLastName());
+        assertEquals(email, u2.getEmail());
+        assertEquals(phone, u2.getPhone());
+        assertEquals(externalCompany, u2.getExternalCompany());
+        assertEquals(position, u2.getPosition());
+        assertEquals(deviceGroup, u.getDeviceGroup());
+        assertEquals(language, u.getLanguage());
+        assertEquals(measurementUnits, u.getMeasurementUnits());
+        assertEquals(scale, u.getScale());
+        assertEquals(title, u.getTitle());
+        assertFalse(u.getActive());
+        assertEquals(external, u.getExternal());
 
         //test without user ID.
         assertNotNull(client.getUser(null));
@@ -82,6 +143,8 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String lastName = "LastName";
         final String email = "abra@cada.bra";
         final String phone = "1111111117";
+        final String externalCompany = "External JUnit company";
+        final boolean external = true;
         final String position = "Manager";
         final String deviceGroup = "DeviceGroupName";
         final Language language = Language.English;
@@ -101,6 +164,9 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setScale(scale);
         u.setTitle(title);
         u.setActive(false);
+        u.setExternal(external);
+        u.setExternalCompany(externalCompany);
+        u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.ReportViewer);
         u.getRoles().add(Role.Dispatcher);
@@ -119,13 +185,15 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(lastName, u2.getLastName());
         assertEquals(email, u2.getEmail());
         assertEquals(phone, u2.getPhone());
+        assertEquals(externalCompany, u2.getExternalCompany());
         assertEquals(position, u2.getPosition());
         assertEquals(deviceGroup, u.getDeviceGroup());
         assertEquals(language, u.getLanguage());
         assertEquals(measurementUnits, u.getMeasurementUnits());
         assertEquals(scale, u.getScale());
         assertEquals(title, u.getTitle());
-        assertFalse(u.isActive());
+        assertFalse(u.getActive());
+        assertEquals(external, u.getExternal());
 
         final AuthService auth = context.getBean(AuthService.class);
 
@@ -146,6 +214,69 @@ public class UserControllerTest extends AbstractRestServiceTest {
         //check password
         assertNotNull(auth.login(u.getEmail(), newPassword));
     }
+    @Test
+    public void testSaveWithNullValues() throws IOException, RestServiceException, AuthenticationException {
+        final String firstName = "firstname";
+        final String lastName = "LastName";
+        final String email = "abra@cada.bra";
+        final String phone = "1111111117";
+        final String externalCompany = "External JUnit company";
+        final boolean external = true;
+        final String position = "Manager";
+        final String deviceGroup = "DeviceGroupName";
+        final Language language = Language.English;
+        final MeasurementUnits measurementUnits = MeasurementUnits.English;
+        final String scale = "scale";
+        final String title = "Mrs";
+
+        final User u = new User();
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setEmail(email);
+        u.setPhone(phone);
+        u.setPosition(position);
+        u.setDeviceGroup(deviceGroup);
+        u.setLanguage(language);
+        u.setMeasurementUnits(measurementUnits);
+        u.setScale(scale);
+        u.setTitle(title);
+        u.setActive(false);
+        u.setExternal(external);
+        u.setExternalCompany(externalCompany);
+        u.setRoles(new HashSet<Role>());
+        u.getRoles().add(Role.Dispatcher);
+        u.getRoles().add(Role.ReportViewer);
+        u.getRoles().add(Role.Dispatcher);
+        u.getRoles().add(Role.CompanyAdmin);
+
+        final String password = "password";
+        final Long id = client.saveUser(u, getCompany(), password);
+
+        final User tmp = new User();
+        tmp.setId(id);
+        client.saveUser(tmp, null, null);
+        //save user by null values for check correct handling
+        //null values.
+
+        final User u2 = dao.findByEmail(u.getEmail());
+        assertNotNull(u2);
+        assertEquals(3, u2.getRoles().size());
+        assertNotNull(u2.getCompany());
+        assertEquals(firstName, u2.getFirstName());
+        assertEquals(lastName, u2.getLastName());
+        assertEquals(email, u2.getEmail());
+        assertEquals(phone, u2.getPhone());
+        assertEquals(externalCompany, u2.getExternalCompany());
+        assertEquals(position, u2.getPosition());
+        assertEquals(deviceGroup, u.getDeviceGroup());
+        assertEquals(language, u.getLanguage());
+        assertEquals(measurementUnits, u.getMeasurementUnits());
+        assertEquals(scale, u.getScale());
+        assertEquals(title, u.getTitle());
+        assertFalse(u.getActive());
+        assertEquals(external, u.getExternal());
+    }
+
     @Test
     public void testGetUsers() throws IOException, RestServiceException {
         final Company c = new Company();
@@ -212,9 +343,9 @@ public class UserControllerTest extends AbstractRestServiceTest {
         req.setTimeZone(tz);
         req.setFirstName(firstName);
         req.setLastName(lastName);
+        req.setPosition(position);
         req.setEmail(email);
         req.setPhone(phone);
-        req.setPosition(position);
         req.setTemperatureUnits(temperatureUnits);
         req.setPassword(password);
         req.setMeasurementUnits(units);
@@ -262,9 +393,11 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setLastName(lastName);
         u.setCompany(company);
         u.setPosition("Manager");
-        u.setAuthorizedDeviceGroup("AuthorizedDeviceGroup");
+        u.setExternalCompany("External JUnit company");
+        u.setDeviceGroup("AuthorizedDeviceGroup");
         u.setTitle("Mr");
         u.setScale("User Schale");
+        u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.CompanyAdmin);
         context.getBean(AuthService.class).saveUser(u, "");
         return u;

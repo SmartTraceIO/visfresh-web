@@ -63,7 +63,9 @@ public class DefaultAuthService extends AbstractAuthService {
     @Override
     public void saveUser(final User user, final String password) {
         final boolean isNew = user.getId() == null;
-        user.setPassword(generateHash(password));
+        if (password != null) {
+            user.setPassword(generateHash(password));
+        }
         userDao.save(user);
 
         if (isNew) {

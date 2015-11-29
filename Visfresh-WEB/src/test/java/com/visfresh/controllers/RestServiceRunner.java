@@ -6,6 +6,8 @@ package com.visfresh.controllers;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -150,7 +152,9 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
             final User user = new User();
             user.setEmail("a@b.c");
             user.setCompany(c);
-            user.getRoles().add(Role.GlobalAdmin);
+            final Set<Role> roles = new HashSet<Role>();
+            roles.add(Role.GlobalAdmin);
+            user.setRoles(roles);
 
             service.saveUser(user, "");
 

@@ -79,6 +79,8 @@ create table users (
     `password` varchar(127) default null,
     firstname varchar(127),
     lastname varchar(127),
+    external boolean not null default false,
+    externalcompany varchar(127) default null,
     position varchar(127),
     email varchar(127) not null,
     phone varchar(20),

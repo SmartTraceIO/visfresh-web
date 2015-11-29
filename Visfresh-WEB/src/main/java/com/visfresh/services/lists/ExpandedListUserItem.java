@@ -62,9 +62,9 @@ public class ExpandedListUserItem {
         setFirstName(user.getFirstName());
         setLastName(user.getLastName());
         setEmail(user.getEmail());
-        setCompanyName(user.getCompany() == null ? null : user.getCompany().getName());
+        setCompanyName(user.getExternalCompany());
         setPosition(user.getPosition());
-        setActive(user.isActive());
+        setActive(user.getActive());
         getRoles().addAll(user.getRoles());
     }
 

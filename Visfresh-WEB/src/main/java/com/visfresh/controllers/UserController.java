@@ -3,6 +3,7 @@
  */
 package com.visfresh.controllers;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.SaveUserRequest;
@@ -188,11 +190,11 @@ public class UserController extends AbstractController implements UserConstants 
             PROPERTY_EMAIL,
             PROPERTY_FIRST_NAME,
             PROPERTY_LAST_NAME,
+            PROPERTY_EXTERNAL_COMPANY,
             PROPERTY_POSITION,
             PROPERTY_PHONE,
             PROPERTY_ACTIVE,
-            PROPERTY_COMPANY_ID,
-            PROPERTY_COMPANY_NAME
+            PROPERTY_INTERNAL_COMPANY_ID
         };
     }
     /**
@@ -208,17 +210,88 @@ public class UserController extends AbstractController implements UserConstants 
             final SaveUserRequest r = getUserSerializer(user).parseSaveUserRequest(req);
             security.checkCanManageUsers(user, r.getCompany());
 
-            final User newUser = r.getUser();
+            User newUser = r.getUser();
+            if (newUser.getId() != null) {
+                newUser = dao.findOne(newUser.getId());
+                checkCompanyAccess(user, newUser);
+
+                newUser = merteUsers(newUser, r.getUser());
+            } else {
+                if (newUser.getRoles() == null) {
+                    newUser.setRoles(new HashSet<Role>());
+                }
+            }
+
             newUser.setCompany(r.getCompany() == null ? user.getCompany() : r.getCompany());
             security.checkCanAssignRoles(user, newUser.getRoles());
             authService.saveUser(newUser, r.getPassword());
 
             return createIdResponse("userId", newUser.getId());
         } catch (final Exception e) {
-            log.error("Failed to send command to device", e);
+            log.error("Failed to save user", e);
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param oldUser old user.
+     * @param newUser new user.
+     * @return
+     */
+    private User merteUsers(final User oldUser, final User newUser) {
+        if (newUser.getCompany() != null) {
+            oldUser.setCompany(newUser.getCompany());
+        }
+        if (newUser.getDeviceGroup() != null) {
+            oldUser.setDeviceGroup(newUser.getDeviceGroup());
+        }
+        if (newUser.getEmail() != null) {
+            oldUser.setEmail(newUser.getEmail());
+        }
+        if (newUser.getExternalCompany() != null) {
+            oldUser.setExternalCompany(newUser.getExternalCompany());
+        }
+        if (newUser.getFirstName() != null) {
+            oldUser.setFirstName(newUser.getFirstName());
+        }
+        if (newUser.getLanguage() != null) {
+            oldUser.setLanguage(newUser.getLanguage());
+        }
+        if (newUser.getLastName() != null) {
+            oldUser.setLastName(newUser.getLastName());
+        }
+        if (newUser.getMeasurementUnits() != null) {
+            oldUser.setMeasurementUnits(newUser.getMeasurementUnits());
+        }
+        if (newUser.getPhone() != null) {
+            oldUser.setPhone(newUser.getPhone());
+        }
+        if (newUser.getPosition() != null) {
+            oldUser.setPosition(newUser.getPosition());
+        }
+        if (newUser.getRoles() != null) {
+            oldUser.setRoles(newUser.getRoles());
+        }
+        if (newUser.getScale() != null) {
+            oldUser.setScale(newUser.getScale());
+        }
+        if (newUser.getTemperatureUnits() != null) {
+            oldUser.setTemperatureUnits(newUser.getTemperatureUnits());
+        }
+        if (newUser.getTimeZone() != null) {
+            oldUser.setTimeZone(newUser.getTimeZone());
+        }
+        if (newUser.getTitle() != null) {
+            oldUser.setTitle(newUser.getTitle());
+        }
+        if (newUser.getActive() != null) {
+            oldUser.setActive(newUser.getActive());
+        }
+        if (newUser.getExternal() != null) {
+            oldUser.setExternal(newUser.getExternal());
+        }
+        return oldUser;
+    }
+
     @RequestMapping(value = "/deleteUser/{authToken}", method = RequestMethod.GET)
     public JsonObject deleteUser(@PathVariable final String authToken,
             final @RequestParam Long userId) {
