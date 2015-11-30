@@ -83,7 +83,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String deviceGroup = "DeviceGroupName";
         final Language language = Language.English;
         final MeasurementUnits measurementUnits = MeasurementUnits.English;
-        final String scale = "scale";
         final String title = "Mrs";
 
         final User u = new User();
@@ -96,7 +95,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setDeviceGroup(deviceGroup);
         u.setLanguage(language);
         u.setMeasurementUnits(measurementUnits);
-        u.setScale(scale);
         u.setTitle(title);
         u.setActive(false);
         u.setExternal(external);
@@ -110,7 +108,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String password = "password";
 
         final AuthService auth = context.getBean(AuthService.class);
-        auth.saveUser(u, password);
+        auth.saveUser(u, password, true);
 
         final User u2 = client.getUser(u.getId());
         assertNotNull(u2);
@@ -124,7 +122,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(deviceGroup, u.getDeviceGroup());
         assertEquals(language, u.getLanguage());
         assertEquals(measurementUnits, u.getMeasurementUnits());
-        assertEquals(scale, u.getScale());
         assertEquals(title, u.getTitle());
         assertFalse(u.getActive());
         assertEquals(external, u.getExternal());
@@ -149,7 +146,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String deviceGroup = "DeviceGroupName";
         final Language language = Language.English;
         final MeasurementUnits measurementUnits = MeasurementUnits.English;
-        final String scale = "scale";
         final String title = "Mrs";
 
         final User u = new User();
@@ -161,7 +157,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setDeviceGroup(deviceGroup);
         u.setLanguage(language);
         u.setMeasurementUnits(measurementUnits);
-        u.setScale(scale);
         u.setTitle(title);
         u.setActive(false);
         u.setExternal(external);
@@ -174,7 +169,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         final String password = "password";
 
-        final Long id = client.saveUser(u, c, password);
+        final Long id = client.saveUser(u, c, password, true);
 
         assertNotNull(id);
         User u2 = dao.findByEmail(u.getEmail());
@@ -190,7 +185,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(deviceGroup, u.getDeviceGroup());
         assertEquals(language, u.getLanguage());
         assertEquals(measurementUnits, u.getMeasurementUnits());
-        assertEquals(scale, u.getScale());
         assertEquals(title, u.getTitle());
         assertFalse(u.getActive());
         assertEquals(external, u.getExternal());
@@ -206,7 +200,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         u.setPhone(newPhone);
         u.setId(u2.getId());
-        client.saveUser(u, getCompany(), newPassword);
+        client.saveUser(u, getCompany(), newPassword, true);
 
         u2 = dao.findByEmail(u.getEmail());
         assertEquals(newPhone, u2.getPhone());
@@ -226,7 +220,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String deviceGroup = "DeviceGroupName";
         final Language language = Language.English;
         final MeasurementUnits measurementUnits = MeasurementUnits.English;
-        final String scale = "scale";
         final String title = "Mrs";
 
         final User u = new User();
@@ -238,7 +231,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setDeviceGroup(deviceGroup);
         u.setLanguage(language);
         u.setMeasurementUnits(measurementUnits);
-        u.setScale(scale);
         u.setTitle(title);
         u.setActive(false);
         u.setExternal(external);
@@ -250,11 +242,11 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.getRoles().add(Role.CompanyAdmin);
 
         final String password = "password";
-        final Long id = client.saveUser(u, getCompany(), password);
+        final Long id = client.saveUser(u, getCompany(), password, false);
 
         final User tmp = new User();
         tmp.setId(id);
-        client.saveUser(tmp, null, null);
+        client.saveUser(tmp, null, null, false);
         //save user by null values for check correct handling
         //null values.
 
@@ -271,7 +263,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(deviceGroup, u.getDeviceGroup());
         assertEquals(language, u.getLanguage());
         assertEquals(measurementUnits, u.getMeasurementUnits());
-        assertEquals(scale, u.getScale());
         assertEquals(title, u.getTitle());
         assertFalse(u.getActive());
         assertEquals(external, u.getExternal());
@@ -370,7 +361,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(position, u.getPosition());
         assertEquals(units, u.getMeasurementUnits());
         assertEquals(language, u.getLanguage());
-        assertEquals(scale, u.getScale());
         assertEquals(title, u.getTitle());
     }
     @Test
@@ -396,10 +386,9 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternalCompany("External JUnit company");
         u.setDeviceGroup("AuthorizedDeviceGroup");
         u.setTitle("Mr");
-        u.setScale("User Schale");
         u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.CompanyAdmin);
-        context.getBean(AuthService.class).saveUser(u, "");
+        context.getBean(AuthService.class).saveUser(u, "", false);
         return u;
     }
 }

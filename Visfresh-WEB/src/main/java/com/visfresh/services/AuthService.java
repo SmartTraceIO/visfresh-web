@@ -3,8 +3,6 @@
  */
 package com.visfresh.services;
 
-import javax.servlet.http.HttpSession;
-
 import com.visfresh.entities.User;
 
 /**
@@ -19,11 +17,6 @@ public interface AuthService {
      * @throws AuthenticationException
      */
     public AuthToken login(final String login, final String password) throws AuthenticationException;
-    /**
-     * @param session HTTP session.
-     * @return authentication token for already logged in user.
-     */
-    public AuthToken attachToExistingSession(final HttpSession session) throws AuthenticationException;
     /**
      * @param authToken
      */
@@ -42,6 +35,7 @@ public interface AuthService {
     /**
      * @param user user to create.
      * @param password user password.
+     * @param resetOnLogin reset password on login flag.
      */
-    void saveUser(User user, String password);
+    void saveUser(User user, String password, boolean resetOnLogin);
 }

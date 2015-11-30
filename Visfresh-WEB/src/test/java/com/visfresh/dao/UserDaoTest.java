@@ -53,6 +53,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, Long> {
         u.setTimeZone(TimeZone.getTimeZone("UTC"));
         u.setTemperatureUnits(TemperatureUnits.Fahrenheit);
         u.setExternalCompany("Mocrosoft");
+        u.getSettings().put("key", "value");
         return u;
     }
     /**
@@ -83,6 +84,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, Long> {
         assertEquals(TimeZone.getTimeZone("UTC"), user.getTimeZone());
         assertEquals(TemperatureUnits.Fahrenheit, user.getTemperatureUnits());
         assertEquals("Mocrosoft", user.getExternalCompany());
+        assertEquals("value", user.getSettings().get("key"));
 
         //test company
         final Company c = user.getCompany();
@@ -111,6 +113,7 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, Long> {
         assertEquals(TimeZone.getTimeZone("UTC"), user.getTimeZone());
         assertEquals(TemperatureUnits.Fahrenheit, user.getTemperatureUnits());
         assertEquals("Mocrosoft", user.getExternalCompany());
+        assertEquals("value", user.getSettings().get("key"));
 
         //test company
         final Company c = user.getCompany();

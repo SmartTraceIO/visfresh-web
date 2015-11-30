@@ -325,7 +325,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         user.setEmail(email);
         user.setPhone(phone);
         user.setPosition(position);
-        userService.saveUser(user, company, "");
+        userService.saveUser(user, company, "", false);
 
         final PersonSchedule s = new PersonSchedule();
         s.setFromTime(1);

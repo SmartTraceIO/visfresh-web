@@ -50,7 +50,7 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         final String password = "lkasdlfkj";
         user.setCompany(getCompany());
 
-        authService.saveUser(user, password);
+        authService.saveUser(user, password, false);
         final String token = client.login(user.getEmail(), password);
         assertNotNull(token);
     }

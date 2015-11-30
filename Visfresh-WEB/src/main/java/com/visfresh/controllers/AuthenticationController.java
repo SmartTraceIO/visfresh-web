@@ -3,8 +3,6 @@
  */
 package com.visfresh.controllers;
 
-import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,22 +47,6 @@ public class AuthenticationController extends AbstractController {
             return createSuccessResponse(getSerializer(user).toJson(token));
         } catch (final Exception e) {
             log.error("Faile to log in " + email, e);
-            return createErrorResponse(e);
-        }
-    }
-    /**
-     * @param session this method can be used if the user was authorized out of the controller
-     * and wants to obtain an security token for REST service.
-     * @return authorization token.
-     */
-    @RequestMapping(value = "/getToken", method = RequestMethod.GET)
-    public JsonObject getAuthToken(final HttpSession session) {
-        try {
-            final AuthToken token = authService.attachToExistingSession(session);
-            final User user = authService.getUserForToken(token.getToken());
-            return createSuccessResponse(getSerializer(user).toJson(token));
-        } catch (final Exception e) {
-            log.error("Failed to get auth token. Possible not user has logged in", e);
             return createErrorResponse(e);
         }
     }

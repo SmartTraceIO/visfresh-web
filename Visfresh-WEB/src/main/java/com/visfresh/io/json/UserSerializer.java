@@ -54,6 +54,7 @@ public class UserSerializer extends AbstractJsonSerializer {
         final JsonObject json = e.getAsJsonObject();
         final User u = new User();
         u.setId(asLong(json.get(UserConstants.PROPERTY_ID)));
+        u.setTitle(asString(json.get("title")));
         u.setFirstName(asString(json.get(UserConstants.PROPERTY_FIRST_NAME)));
         u.setLastName(asString(json.get(UserConstants.PROPERTY_LAST_NAME)));
         u.setExternal(asBoolean(json.get(UserConstants.PROPERTY_EXTERNAL)));
@@ -67,8 +68,6 @@ public class UserSerializer extends AbstractJsonSerializer {
         u.setDeviceGroup(asString(json.get("deviceGroup")));
         u.setLanguage(Language.valueOf(asString(json.get("language"))));
         u.setMeasurementUnits(MeasurementUnits.valueOf(asString(json.get("measurementUnits"))));
-        u.setScale(asString(json.get("scale")));
-        u.setTitle(asString(json.get("title")));
         u.setActive(!Boolean.FALSE.equals(asBoolean(json.get(UserConstants.PROPERTY_ACTIVE))));
 
         final JsonElement roles = json.get(UserConstants.PROPERTY_ROLES);
@@ -102,12 +101,12 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.addProperty("measurementUnits", u.getMeasurementUnits().toString());
         obj.addProperty("language", u.getLanguage().toString());
         obj.addProperty("deviceGroup", u.getDeviceGroup());
-        obj.addProperty("scale", u.getScale());
         obj.addProperty("title", u.getTitle());
         obj.addProperty(UserConstants.PROPERTY_ACTIVE, u.getActive());
 
         //company is readonly property, should not be serialized back
         if (u.getCompany() != null) {
+            obj.addProperty("internalCompanyName", u.getCompany().getName());
             obj.addProperty(UserConstants.PROPERTY_INTERNAL_COMPANY_ID, u.getCompany().getId());
         }
 
@@ -129,6 +128,7 @@ public class UserSerializer extends AbstractJsonSerializer {
             req.setCompany(getCompanyResolver().getCompany(companyId.getAsLong()));
         }
         req.setPassword(asString(obj.get("password")));
+        req.setResetOnLogin(asBoolean(obj.get("resetOnLogin")));
         return req;
     }
     /**
@@ -142,6 +142,7 @@ public class UserSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
         obj.add("user", toJson(req.getUser()));
         obj.addProperty("password", req.getPassword());
+        obj.addProperty("resetOnLogin", req.getResetOnLogin());
         obj.addProperty(UserConstants.PROPERTY_INTERNAL_COMPANY_ID,
                 req.getCompany() == null ? null : req.getCompany().getId());
         return obj;
@@ -238,10 +239,11 @@ public class UserSerializer extends AbstractJsonSerializer {
         json.addProperty(UserConstants.PROPERTY_FIRST_NAME, item.getFirstName());
         json.addProperty(UserConstants.PROPERTY_LAST_NAME, item.getLastName());
         json.addProperty(UserConstants.PROPERTY_EMAIL, item.getEmail());
-        json.addProperty(UserConstants.PROPERTY_EXTERNAL_COMPANY, item.getCompanyName());
+        json.addProperty("companyName", item.getCompanyName());
         json.addProperty(UserConstants.PROPERTY_POSITION, item.getPosition());
         json.add(UserConstants.PROPERTY_ROLES, toJson(item.getRoles()));
         json.addProperty(UserConstants.PROPERTY_ACTIVE, item.isActive());
+        json.addProperty(UserConstants.PROPERTY_EXTERNAL, item.isExternal());
 
         return json;
     }
@@ -256,10 +258,11 @@ public class UserSerializer extends AbstractJsonSerializer {
         item.setFirstName(asString(json.get(UserConstants.PROPERTY_FIRST_NAME)));
         item.setLastName(asString(json.get(UserConstants.PROPERTY_LAST_NAME)));
         item.setEmail(asString(json.get(UserConstants.PROPERTY_EMAIL)));
-        item.setCompanyName(asString(json.get(UserConstants.PROPERTY_EXTERNAL_COMPANY)));
+        item.setCompanyName(asString(json.get("companyName")));
         item.setPosition(asString(json.get(UserConstants.PROPERTY_POSITION)));
         item.getRoles().addAll(parseRoles(json.get(UserConstants.PROPERTY_ROLES).getAsJsonArray()));
         item.setActive(asBoolean(json.get(UserConstants.PROPERTY_ACTIVE)));
+        item.setExternal(asBoolean(json.get(UserConstants.PROPERTY_EXTERNAL)));
 
         return item;
     }

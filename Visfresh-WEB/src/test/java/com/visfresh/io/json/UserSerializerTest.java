@@ -58,7 +58,6 @@ public class UserSerializerTest extends AbstractSerializerTest {
         final String deviceGroup = "DeviceGroupName";
         final Language language = Language.English;
         final MeasurementUnits measurementUnits = MeasurementUnits.English;
-        final String scale = "scale";
         final String title = "Mrs";
         final String externalCompany = "JUnit External company";
         final boolean external = true;
@@ -77,7 +76,6 @@ public class UserSerializerTest extends AbstractSerializerTest {
         u.setDeviceGroup(deviceGroup);
         u.setLanguage(language);
         u.setMeasurementUnits(measurementUnits);
-        u.setScale(scale);
         u.setTitle(title);
         u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.Dispatcher);
@@ -98,7 +96,6 @@ public class UserSerializerTest extends AbstractSerializerTest {
         assertEquals(deviceGroup, u.getDeviceGroup());
         assertEquals(language, u.getLanguage());
         assertEquals(measurementUnits, u.getMeasurementUnits());
-        assertEquals(scale, u.getScale());
         assertEquals(title, u.getTitle());
         assertEquals(externalCompany, u.getExternalCompany());
         assertEquals(external, u.getExternal());
@@ -111,6 +108,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         final String email = "abra@cada.bra";
         final String position = "Manager";
         final String companyName = "Unit Company";
+        final boolean external = true;
 
         ExpandedListUserItem u = new ExpandedListUserItem();
         u.setId(login);
@@ -121,6 +119,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.ReportViewer);
         u.setCompanyName(companyName);
+        u.setExternal(external);
 
         final JsonObject obj = serializer.toJson(u);
         u = serializer.parseExpandedListUserItem(obj);
@@ -132,6 +131,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         assertEquals(email, u.getEmail());
         assertEquals(position, u.getPosition());
         assertEquals(companyName, u.getCompanyName());
+        assertEquals(external, u.isExternal());
     }
     @Test
     public void testCreateUserRequest() {
@@ -148,6 +148,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         final String email = "abra@cada.bra";
         final String phone = "1111111117";
         final String position = "Manager";
+        final Boolean resetOnLogin = true;
 
         SaveUserRequest r = new SaveUserRequest();
         final User user = new User();
@@ -161,6 +162,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         r.setCompany(c);
         r.setUser(user);
         r.setPassword(password);
+        r.setResetOnLogin(resetOnLogin);
 
         final JsonElement json = serializer.toJson(r);
         r = serializer.parseSaveUserRequest(json);
@@ -168,6 +170,7 @@ public class UserSerializerTest extends AbstractSerializerTest {
         assertNotNull(user);
         assertNotNull(r.getCompany());
         assertEquals(password, r.getPassword());
+        assertEquals(resetOnLogin, r.getResetOnLogin());
     }
     @Test
     public void getUpdateUserDetailsRequest() {

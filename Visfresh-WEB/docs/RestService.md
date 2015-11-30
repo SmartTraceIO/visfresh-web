@@ -719,8 +719,9 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 {
   "user": ${userObject},
   "password": "newpassword",
-  "company": 1529 //company can be null, the company of current logged in user will used in this case.
+  "company": 1529, //company can be null, the company of current logged in user will used in this case.
                   //not null company can be used only by GlobalAdministrator
+  "resetOnLogin": true  //whether or not should user reset password on first login.
 }
 ```
 [(see)](#markdown-header-user)
@@ -839,7 +840,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ```json
 {
   "user": {
-    "id": 3985,
+    "id": 4594,
     "firstName": "firstname",
     "lastName": "LastName",
     "external": true,
@@ -849,20 +850,20 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "phone": "2930847093248",
     "roles": [
       "Dispatcher",
-      "CompanyAdmin",
-      "ReportViewer"
+      "ReportViewer",
+      "CompanyAdmin"
     ],
     "timeZone": "UTC",
     "temperatureUnits": "Celsius",
     "measurementUnits": "English",
     "language": "English",
     "deviceGroup": "DeviceGroupName",
-    "scale": "scale",
     "title": "Mrs",
     "active": false
   },
   "password": "newpassword",
-  "internalCompanyId": 3617
+  "resetOnLogin": true,
+  "internalCompanyId": 4160
 }
 ```  
 **Response:**  

@@ -14,6 +14,7 @@ public class SaveUserRequest {
     private User user;
     private Company company;
     private String password;
+    private Boolean resetOnLogin;
 
     /**
      * Default constructor.
@@ -57,5 +58,17 @@ public class SaveUserRequest {
      */
     public void setCompany(final Company company) {
         this.company = company;
+    }
+    /**
+     * @param resetOnLogin
+     */
+    public void setResetOnLogin(final Boolean resetOnLogin) {
+        this.resetOnLogin = resetOnLogin;
+    }
+    /**
+     * @return the resetOnLogin
+     */
+    public Boolean getResetOnLogin() {
+        return resetOnLogin;
     }
 }

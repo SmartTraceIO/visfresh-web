@@ -4,6 +4,7 @@
 package com.visfresh.tools;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Role;
@@ -83,8 +84,11 @@ public class Tool extends AbstractTool {
         u.setEmail(email);
         u.setFirstName(firstName);
         u.setLastName(lastName);
+        u.setTitle("Mr.");
+        u.setPosition("UI Developer");
+        u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.CompanyAdmin);
 
-        userService.saveUser(u, company, password);
+        userService.saveUser(u, company, password, false);
     }
 }

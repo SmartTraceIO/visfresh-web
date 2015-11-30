@@ -94,6 +94,7 @@ create table users (
     scale varchar(127),
 	title varchar(10),
 	active boolean not null default true,
+	settings longtext,
 	unique (email),
     primary key (id),
     FOREIGN KEY (company)

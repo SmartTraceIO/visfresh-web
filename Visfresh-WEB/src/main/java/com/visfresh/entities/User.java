@@ -4,7 +4,9 @@
 package com.visfresh.entities;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -66,10 +68,6 @@ public class User implements EntityWithId<Long>, EntityWithCompany, Cloneable {
      */
     private String title;
     /**
-     * User scale
-     */
-    private String scale;
-    /**
      * User language.
      */
     private Language language = Language.English;
@@ -89,6 +87,10 @@ public class User implements EntityWithId<Long>, EntityWithCompany, Cloneable {
      * External flag.
      */
     private Boolean external;
+    /**
+     * User settings.
+     */
+    private final Map<String, String> settings = new HashMap<String, String>();
 
     /**
      * Default constructor.
@@ -258,18 +260,6 @@ public class User implements EntityWithId<Long>, EntityWithCompany, Cloneable {
         this.title = title;
     }
     /**
-     * @return the scale
-     */
-    public String getScale() {
-        return scale;
-    }
-    /**
-     * @param scale the scale to set
-     */
-    public void setScale(final String scale) {
-        this.scale = scale;
-    }
-    /**
      * @return the language
      */
     public Language getLanguage() {
@@ -350,5 +340,11 @@ public class User implements EntityWithId<Long>, EntityWithCompany, Cloneable {
         final Set<Role> r = new HashSet<Role>(u.getRoles());
         u.roles = r;
         return u;
+    }
+    /**
+     * @return the settings
+     */
+    public Map<String, String> getSettings() {
+        return settings;
     }
 }

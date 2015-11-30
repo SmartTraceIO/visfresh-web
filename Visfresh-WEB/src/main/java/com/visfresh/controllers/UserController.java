@@ -224,7 +224,7 @@ public class UserController extends AbstractController implements UserConstants 
 
             newUser.setCompany(r.getCompany() == null ? user.getCompany() : r.getCompany());
             security.checkCanAssignRoles(user, newUser.getRoles());
-            authService.saveUser(newUser, r.getPassword());
+            authService.saveUser(newUser, r.getPassword(), Boolean.TRUE.equals(r.getResetOnLogin()));
 
             return createIdResponse("userId", newUser.getId());
         } catch (final Exception e) {
@@ -270,9 +270,6 @@ public class UserController extends AbstractController implements UserConstants 
         }
         if (newUser.getRoles() != null) {
             oldUser.setRoles(newUser.getRoles());
-        }
-        if (newUser.getScale() != null) {
-            oldUser.setScale(newUser.getScale());
         }
         if (newUser.getTemperatureUnits() != null) {
             oldUser.setTemperatureUnits(newUser.getTemperatureUnits());
@@ -349,9 +346,6 @@ public class UserController extends AbstractController implements UserConstants 
             }
             if (req.getLanguage() != null) {
                 u.setLanguage(req.getLanguage());
-            }
-            if (req.getScale() != null) {
-                u.setScale(req.getScale());
             }
             if (req.getTitle() != null) {
                 u.setTitle(req.getTitle());

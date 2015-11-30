@@ -39,6 +39,10 @@ public class ExpandedListUserItem {
      */
     private String position;
     /**
+     * External flag.
+     */
+    private boolean external;
+    /**
      * Set of roles.
      */
     private final Set<Role> roles = new HashSet<Role>();
@@ -62,10 +66,15 @@ public class ExpandedListUserItem {
         setFirstName(user.getFirstName());
         setLastName(user.getLastName());
         setEmail(user.getEmail());
-        setCompanyName(user.getExternalCompany());
+        if (user.isExternal()) {
+            setCompanyName(user.getExternalCompany());
+        } else {
+            setCompanyName(user.getCompany().getName());
+        }
         setPosition(user.getPosition());
         setActive(user.getActive());
         getRoles().addAll(user.getRoles());
+        setExternal(user.isExternal());
     }
 
     /**
@@ -151,6 +160,18 @@ public class ExpandedListUserItem {
      */
     public void setActive(final boolean active) {
         this.active = active;
+    }
+    /**
+     * @return the external
+     */
+    public boolean isExternal() {
+        return external;
+    }
+    /**
+     * @param external the external to set
+     */
+    public void setExternal(final boolean external) {
+        this.external = external;
     }
     /**
      * @return the roles

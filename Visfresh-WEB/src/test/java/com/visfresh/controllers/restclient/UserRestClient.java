@@ -53,14 +53,16 @@ public class UserRestClient extends RestClient {
      * @param u user.
      * @param c company.
      * @param password user password.
+     * @param resetPasswordOnLogin reset password on first login flag.
      * @throws RestServiceException
      * @throws IOException
      */
-    public Long saveUser(final User u, final Company c, final String password) throws IOException, RestServiceException {
+    public Long saveUser(final User u, final Company c, final String password, final boolean resetPasswordOnLogin) throws IOException, RestServiceException {
         final SaveUserRequest req = new SaveUserRequest();
         req.setCompany(c);
         req.setUser(u);
         req.setPassword(password);
+        req.setResetOnLogin(resetPasswordOnLogin);
 
         return parseId(sendPostRequest(getPathWithToken("saveUser"),
                 serializer.toJson(req)).getAsJsonObject());

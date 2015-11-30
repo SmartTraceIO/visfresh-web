@@ -24,6 +24,8 @@ import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
+import com.visfresh.io.json.AbstractJsonSerializer;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -50,10 +52,10 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
     private static final String DEVICEGROUP_FIELD = "devicegroup";
     private static final String LANGUAGE_FIELD = "language";
     private static final String MEASUREUNITS_FIELD = "measureunits";
-    private static final String SCALE_FIELD = "scale";
     private static final String TITLE_FIELD = "title";
     private static final String ACTIVE_FIELD = "active";
     private static final String EXTERNAL_FIELD = "external";
+    private static final String SETTINGS_FIELD = "settings";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -139,10 +141,10 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         paramMap.put(DEVICEGROUP_FIELD, user.getDeviceGroup());
         paramMap.put(LANGUAGE_FIELD, user.getLanguage().toString());
         paramMap.put(MEASUREUNITS_FIELD, user.getMeasurementUnits().toString());
-        paramMap.put(SCALE_FIELD, user.getScale());
         paramMap.put(TITLE_FIELD, user.getTitle());
         paramMap.put(ACTIVE_FIELD, !Boolean.FALSE.equals(user.getActive()));
         paramMap.put(EXTERNAL_FIELD, Boolean.TRUE.equals(user.getExternal()));
+        paramMap.put(SETTINGS_FIELD, AbstractJsonSerializer.toJson(user.getSettings()).toString());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -172,10 +174,10 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         fields.add(DEVICEGROUP_FIELD);
         fields.add(LANGUAGE_FIELD);
         fields.add(MEASUREUNITS_FIELD);
-        fields.add(SCALE_FIELD);
         fields.add(TITLE_FIELD);
         fields.add(ACTIVE_FIELD);
         fields.add(EXTERNAL_FIELD);
+        fields.add(SETTINGS_FIELD);
         return fields;
     }
 
@@ -227,10 +229,11 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         u.setDeviceGroup((String) row.get(DEVICEGROUP_FIELD));
         u.setLanguage(Language.valueOf((String) row.get(LANGUAGE_FIELD)));
         u.setMeasurementUnits(MeasurementUnits.valueOf((String) row.get(MEASUREUNITS_FIELD)));
-        u.setScale((String) row.get(SCALE_FIELD));
         u.setTitle((String) row.get(TITLE_FIELD));
         u.setActive(!Boolean.FALSE.equals(row.get(ACTIVE_FIELD)));
         u.setExternal((Boolean) row.get(EXTERNAL_FIELD));
+        u.getSettings().putAll(AbstractJsonSerializer.parseStringMap(
+                SerializerUtils.parseJson((String) row.get(SETTINGS_FIELD))));
         return u;
     }
     /* (non-Javadoc)
