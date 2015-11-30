@@ -129,9 +129,382 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
     }
     @Test
     public void testCumulativeHotTemperatureAlert() {
-        //провести так же как и первый тест, но сделать вставочки с нормальной температурой
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
 
-        //провести его два раза, чтобы убедиться, что второй раз оно не сработает
+        //create alert rule
+        final AlertRule r = new AlertRule(AlertType.Hot);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(true);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        final DeviceState state = new DeviceState();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 5);
+        rule.handle(new RuleContext(e, state));
+
+        //normal temperature occurrence should flush state
+        e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature - 3);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 5);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //check not handles already handled
+        alertDao.deleteAll();
+
+        e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+    }
+
+    @Test
+    public void testCriticalHotTemperatureAlert() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final AlertRule r = new AlertRule(AlertType.CriticalHot);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(false);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        DeviceState state = new DeviceState();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //check not handles already handled
+        alertDao.deleteAll();
+
+        e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        //check not handles already handled
+        alertDao.deleteAll();
+        state = new DeviceState();
+
+        e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        //normal temperature occurence should flush state
+        e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature - 3);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+    }
+    @Test
+    public void testCumulativeCriticalHotTemperatureAlert() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final AlertRule r = new AlertRule(AlertType.CriticalHot);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(true);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        final DeviceState state = new DeviceState();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 5);
+        rule.handle(new RuleContext(e, state));
+
+        //normal temperature occurrence should flush state
+        e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature - 3);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 5);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //check not handles already handled
+        alertDao.deleteAll();
+
+        e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+    }
+    @Test
+    public void testColdTemperatureAlert() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final AlertRule r = new AlertRule(AlertType.Cold);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(false);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        DeviceState state = new DeviceState();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //check not handles already handled
+        alertDao.deleteAll();
+
+        e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        //check not handles already handled
+        alertDao.deleteAll();
+        state = new DeviceState();
+
+        e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        //normal temperature occurence should flush state
+        e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature + 3);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+    }
+    @Test
+    public void testCumulativeColdTemperatureAlert() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final AlertRule r = new AlertRule(AlertType.Cold);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(true);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        final DeviceState state = new DeviceState();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 5);
+        rule.handle(new RuleContext(e, state));
+
+        //normal temperature occurrence should flush state
+        e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature + 3);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 5);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //check not handles already handled
+        alertDao.deleteAll();
+
+        e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+    }
+
+    @Test
+    public void testCriticalColdTemperatureAlert() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final AlertRule r = new AlertRule(AlertType.CriticalCold);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(false);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        DeviceState state = new DeviceState();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //check not handles already handled
+        alertDao.deleteAll();
+
+        e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        //check not handles already handled
+        alertDao.deleteAll();
+        state = new DeviceState();
+
+        e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        //normal temperature occurence should flush state
+        e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature + 3);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+    }
+    @Test
+    public void testCumulativeCriticalColdTemperatureAlert() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final AlertRule r = new AlertRule(AlertType.CriticalCold);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(true);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        final DeviceState state = new DeviceState();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 5);
+        rule.handle(new RuleContext(e, state));
+
+        //normal temperature occurrence should flush state
+        e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature + 3);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 5);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //check not handles already handled
+        alertDao.deleteAll();
+
+        e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, state));
     }
     /**
      * @param date date.
