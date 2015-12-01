@@ -7,12 +7,16 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 
+import junit.framework.AssertionFailedError;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.controllers.restclient.RestClient;
+import com.visfresh.controllers.restclient.UserRestClient;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
+import com.visfresh.services.DefaultAuthService;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -72,5 +76,39 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
     public void testRefreshToken() throws IOException, RestServiceException {
         final String token = client.refreshToken();
         assertNotNull(token);
+    }
+    @Test
+    public void testExpiredToken() throws RestServiceException, IOException, InterruptedException {
+        final String email = "a-" + (++lastLong) + "@b.c";
+
+        final User user = new User();
+        user.setEmail(email);
+        final String password = "lkasdlfkj";
+        user.setCompany(getCompany());
+
+        authService.saveUser(user, password, false);
+
+        final String token = client.login(user.getEmail(), password);
+        for (int i = 1; i < DefaultAuthService.USER_LOGIN_LIMIT; i++) {
+            //make small pause
+            Thread.sleep(10l);
+            client.login(user.getEmail(), password);
+        }
+
+        final UserRestClient userRest = new UserRestClient(UTC);
+        userRest.setServiceUrl(client.getServiceUrl());
+
+        //check first token is alive
+        userRest.setAuthToken(token);
+        assertNotNull(userRest.getUser(null));
+
+        //check next login expires old token
+        client.login(user.getEmail(), password);
+        try {
+            userRest.getUser(null);
+            throw new AssertionFailedError("Security exception expected");
+        } catch (final Exception e) {
+            //correct
+        }
     }
 }

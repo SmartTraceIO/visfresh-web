@@ -3,9 +3,12 @@
  */
 package com.visfresh.services;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -39,12 +42,14 @@ public class DefaultAuthService implements AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultAuthService.class);
 
-    private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 365 * 12 * 24 * 60 * 1000l;//10 min
-    private static final long TIMEOUT = 15000L;
+    private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 60 * 60 * 1000l; //one hour
+    private static final long TIMEOUT = 60000L;
+    public static final int USER_LOGIN_LIMIT = 10;
 
     private final AtomicBoolean isStopped = new AtomicBoolean();
 
     private final Map<String, UserInfo> users = new HashMap<String, UserInfo>();
+    private final Random random = new Random();
 
     /**
      * Default constructor.
@@ -73,19 +78,42 @@ public class DefaultAuthService implements AuthService {
             }
 
             synchronized (users) {
-                UserInfo u = users.get(email);
-                if (u == null) {
-                    u = new UserInfo();
-                    users.put(email, u);
-                }
-
+                final UserInfo u = new UserInfo();
                 u.setUser(user);
                 u.setToken(generateNewToken(user));
+                users.put(u.getToken().getToken(), u);
+                log.debug("Registering new token " + u);
+
+                removeExpiredUsers(email);
                 return u.getToken();
             }
         }
 
         throw new AuthenticationException("Authentication failed");
+    }
+
+    /**
+     * @param email user email.
+     */
+    private void removeExpiredUsers(final String email) {
+        final List<UserInfo> list = new LinkedList<UserInfo>();
+
+        for (final UserInfo ui : users.values()) {
+            if (ui.getUser().getEmail().equals(email)) {
+                list.add(ui);
+            }
+        }
+
+        if (list.size() > USER_LOGIN_LIMIT) {
+            //sort users and remove old
+            Collections.sort(list);
+            while (list.size() > USER_LOGIN_LIMIT) {
+                final UserInfo toRemove = list.remove(0);
+                users.remove(toRemove.getToken().getToken());
+                log.debug("Old auth token for " + toRemove.getUser().getEmail()
+                        + " has removed according of max logged in users limit");
+            }
+        }
     }
 
     /**
@@ -126,7 +154,7 @@ public class DefaultAuthService implements AuthService {
      * @return
      */
     protected AuthToken generateNewToken(final User user) {
-        final String token = user.hashCode() + "-" + generateHash(Long.toString(System.currentTimeMillis()));
+        final String token = user.getId() + "-" + generateHash(Long.toString(random.nextLong()));
         final AuthToken t = new AuthToken(token);
         t.setExpirationTime(new Date(System.currentTimeMillis() + DEFAULT_TOKEN_ACTIVE_TIMEOUT));
         return t;
@@ -164,13 +192,13 @@ public class DefaultAuthService implements AuthService {
         final long time = System.currentTimeMillis();
 
         synchronized (users) {
-            final Iterator<Map.Entry<String, UserInfo>> iter = users.entrySet().iterator();
-            while (iter.hasNext()) {
-                final UserInfo ui = iter.next().getValue();
+            final Iterator<UserInfo> userIterator = users.values().iterator();
+            while (userIterator.hasNext()) {
+                final UserInfo ui  = userIterator.next();
                 if (ui.getToken().getExpirationTime().getTime() < time) {
                     log.debug("Access token for user " + ui.getUser().getEmail()
                             + " has expired and will removed");
-                    iter.remove();
+                    userIterator.remove();
                 }
             }
         }
@@ -180,30 +208,15 @@ public class DefaultAuthService implements AuthService {
      * @see com.visfresh.services.AuthService#refreshToken(java.lang.String)
      */
     @Override
-    public AuthToken refreshToken(final User user)
+    public AuthToken refreshToken(final String oldToken)
             throws AuthenticationException {
-        final UserInfo info = getUserInfo(user.getEmail());
+        final UserInfo info = getUserInfoForToken(oldToken);
         if (info == null) {
             throw new AuthenticationException("Not authorized or token expired");
         }
 
-        info.setToken(generateNewToken(user));
+        info.setToken(generateNewToken(info.getUser()));
         return info.getToken();
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.RestService#getUser(java.lang.String)
-     */
-    private UserInfo getUserInfo(final String email) {
-        synchronized (users) {
-            for (final Map.Entry<String, UserInfo> e : users.entrySet()) {
-                final UserInfo ui = e.getValue();
-                if (ui.getUser().getEmail().equals(email)) {
-                    return ui;
-                }
-            }
-        }
-
-        return null;
     }
     /**
      * @param authToken
@@ -211,15 +224,8 @@ public class DefaultAuthService implements AuthService {
      */
     private UserInfo getUserInfoForToken(final String authToken) {
         synchronized (users) {
-            for (final Map.Entry<String, UserInfo> e : users.entrySet()) {
-                final UserInfo ui = e.getValue();
-                if (ui.getToken().getToken().equals(authToken)) {
-                    return ui;
-                }
-            }
+            return users.get(authToken);
         }
-
-        return null;
     }
 
     /* (non-Javadoc)

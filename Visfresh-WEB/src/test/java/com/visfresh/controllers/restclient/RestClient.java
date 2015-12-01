@@ -166,7 +166,7 @@ public class RestClient  {
     /**
      * @return
      */
-    private URL getServiceUrl() {
+    public URL getServiceUrl() {
         return serviceUrl;
     }
     /**

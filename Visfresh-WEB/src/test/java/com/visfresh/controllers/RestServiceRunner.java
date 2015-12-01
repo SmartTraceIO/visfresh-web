@@ -12,6 +12,7 @@ import java.util.Set;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -80,12 +81,13 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
         final ServletContextHandler contextHandler = new ServletContextHandler();
         contextHandler.setContextPath( "/web" );
         contextHandler.setHandler(handler);
+        contextHandler.setSessionHandler(new SessionHandler());
 
         final QueuedThreadPool pool = new QueuedThreadPool();
         pool.setDaemon(true); // it allows the server to be stopped after tests finished
         final Server server = new Server(pool);
 
-        final ServerConnector connector=new ServerConnector(server);
+        final ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
         server.setConnectors(new Connector[]{connector});
 
@@ -114,6 +116,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
         final ServletHandler handler = new ServletHandler();
         handler.addServlet(holder);
         handler.addServletMapping(mapping);
+
         return handler;
     }
 

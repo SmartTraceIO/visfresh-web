@@ -22,11 +22,11 @@ public interface AuthService {
      */
     public void logout(final String authToken);
     /**
-     * @param user user
+     * @param oldToken TODO
      * @return refreshed authentication token.
      * @exception AuthenticationException
      */
-    public AuthToken refreshToken(User user) throws AuthenticationException;
+    public AuthToken refreshToken(String oldToken) throws AuthenticationException;
     /**
      * @param authToken authentication token.
      * @return user.

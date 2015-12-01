@@ -3,6 +3,8 @@
  */
 package com.visfresh.controllers;
 
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,12 +39,27 @@ public class AuthenticationController extends AbstractController {
     /**
      * @param email login
      * @param password password.
+     * @param session HTTP session.
      * @return authorization token.
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public JsonObject login(final @RequestParam String email, final @RequestParam String password) {
+    public JsonObject login(
+            final @RequestParam String email,
+            final @RequestParam String password,
+            final HttpSession session) {
         try {
+            final AuthToken oldToken = (AuthToken) session.getAttribute("authToken");
+            if (oldToken != null) {
+                log.debug("Cleaning old auth token for " + email);
+                authService.logout(oldToken.getToken());
+            }
+
             final AuthToken token = authService.login(email, password);
+            log.debug("Login successes for " + email);
+
+            //save auth token to session
+            session.setAttribute("authToken", token);
+
             final User user = authService.getUserForToken(token.getToken());
             return createSuccessResponse(getSerializer(user).toJson(token));
         } catch (final Exception e) {
@@ -66,7 +83,7 @@ public class AuthenticationController extends AbstractController {
     public JsonObject refreshToken(@PathVariable final String authToken) {
         try {
             final User user = getLoggedInUser(authToken);
-            final AuthToken token = authService.refreshToken(user);
+            final AuthToken token = authService.refreshToken(authToken);
             return createSuccessResponse(getSerializer(user).toJson(token));
         } catch (final Exception e) {
             log.error("Failed to refresh token " + authToken, e);

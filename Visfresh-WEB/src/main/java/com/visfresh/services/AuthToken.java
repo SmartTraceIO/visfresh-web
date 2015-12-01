@@ -3,14 +3,16 @@
  */
 package com.visfresh.services;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class AuthToken {
+public class AuthToken implements Serializable {
     private static final long DEFAULT_EXPIRATION_TIMEOUT = 30 * 60 * 1000L;
+    private static final long serialVersionUID = 6619929326579791662L;
 
     /**
      * Expiration time.
@@ -19,7 +21,11 @@ public class AuthToken {
     /**
      * Security token string.
      */
-    private final String token;
+    private String token;
+    /**
+     * Created time.
+     */
+    private Date createdTime = new Date();
 
     /**
      * Default constructor.
@@ -47,5 +53,18 @@ public class AuthToken {
      */
     public String getToken() {
         return token;
+    }
+    /**
+     * @return created time.
+     */
+    public Date getCreatedTime() {
+        return createdTime;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getToken();
     }
 }
