@@ -35,4 +35,11 @@ public class MockSystemMessageDispatcher implements SystemMessageDispatcher {
     public void setSystemMessageHandler(final SystemMessageType type,
             final SystemMessageHandler h) {
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.SystemMessageDispatcher#sendSystemMessage(com.visfresh.entities.SystemMessageType, java.lang.String)
+     */
+    @Override
+    public void sendSystemMessage(final SystemMessageType type, final String messagePayload) {
+        // TODO Auto-generated method stub
+    }
 }

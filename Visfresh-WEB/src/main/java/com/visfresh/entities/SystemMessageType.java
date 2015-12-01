@@ -9,5 +9,7 @@ package com.visfresh.entities;
  */
 public enum SystemMessageType {
     Tracker,
+    SMS,
+    Email,
     Other
 }

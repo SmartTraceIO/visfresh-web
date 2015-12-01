@@ -4,10 +4,10 @@
 package com.visfresh.mpl.services;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
@@ -61,7 +61,7 @@ public class SystemMessageDispatcherImpl implements SystemMessageDispatcher {
     private final AtomicBoolean isStoped = new AtomicBoolean(false);
 
     private final Map<SystemMessageType, SystemMessageHandler> handlers
-        = new HashMap<SystemMessageType, SystemMessageHandler>();
+        = new ConcurrentHashMap<SystemMessageType, SystemMessageHandler>();
 
     @Autowired
     private SystemMessageDao messageDao;
@@ -277,6 +277,16 @@ public class SystemMessageDispatcherImpl implements SystemMessageDispatcher {
         } else {
             handlers.put(type, h);
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.SystemMessageDispatcher#sendSystemMessage(com.visfresh.entities.SystemMessage)
+     */
+    @Override
+    public void sendSystemMessage(final SystemMessageType type, final String messagePayload) {
+        final SystemMessage sm = new SystemMessage();
+        sm.setType(type);
+        sm.setMessageInfo(messagePayload);
+        messageDao.save(sm);
     }
     /**
      * @return the messageDao
