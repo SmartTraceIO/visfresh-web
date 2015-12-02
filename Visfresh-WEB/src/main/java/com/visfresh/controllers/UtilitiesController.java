@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,8 @@ public class UtilitiesController extends AbstractController {
                 array.add(obj);
 
                 obj.addProperty("id", tz.getID());
-                obj.addProperty("displayName", tz.getDisplayName());
+
+                obj.addProperty("displayName", displayTimeZone(tz.getRawOffset(), tz.getDisplayName()));
             }
 
             return createSuccessResponse(array);
@@ -64,6 +66,23 @@ public class UtilitiesController extends AbstractController {
             return createErrorResponse(e);
         }
     }
+    private static String displayTimeZone(final int rawOffset, final String description) {
+        final long hours = TimeUnit.MILLISECONDS.toHours(rawOffset);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(rawOffset)
+                - TimeUnit.HOURS.toMinutes(hours);
+        // avoid -4:-30 issue
+        minutes = Math.abs(minutes);
+
+        String result;
+        if (hours > 0) {
+            result = String.format("GMT+%d:%02d/%s", hours, minutes, description);
+        } else {
+            result = String.format("GMT%d:%02d/%s", hours, minutes, description);
+        }
+
+        return result;
+    }
+
     @RequestMapping(value = "/getLanguages/{authToken}", method = RequestMethod.GET)
     public JsonObject getLanguages(@PathVariable final String authToken) {
         try {
