@@ -186,6 +186,12 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
         assertEquals(sp2.getId(), client.getShipmentTemplates(1, 1000,
                 ShipmentTemplateConstants.PROPERTY_ALERT_PROFILE_ID, "desc").get(endIndex).getId());
     }
+    @Test
+    public void testSaveEmpty() throws RestServiceException, IOException {
+        final ShipmentTemplate t = new ShipmentTemplate();
+        final Long id = client.saveShipmentTemplate(t);
+        assertNotNull(id);
+    }
     @After
     public void tearDown() {
         client.removeRestIoListener(l);

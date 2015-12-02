@@ -74,6 +74,14 @@ public final class StringUtils {
      */
     public static String getContent(final InputStream in, final String encoding) throws IOException {
         final Reader r = new InputStreamReader(in, encoding);
+        return getContent(r);
+    }
+    /**
+     * @param r reader.
+     * @return stream content as string.
+     * @throws IOException
+     */
+    public static String getContent(final Reader r) throws IOException {
         final char[] buff = new char[128];
         final StringWriter sw = new StringWriter();
 

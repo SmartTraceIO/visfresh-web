@@ -29,6 +29,7 @@ import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.AuthService;
+import com.visfresh.services.AuthToken;
 import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 
@@ -196,6 +197,86 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         //check password
         assertNotNull(auth.login(u.getEmail(), password));
+
+        //check update user
+        final String newPhone = "2930847093248";
+        final String newPassword = "newpassword";
+
+        u.setPhone(newPhone);
+        u.setId(u2.getId());
+        u.setCompany(getCompany());
+        client.saveUser(u, newPassword, true);
+
+        u2 = dao.findByEmail(u.getEmail());
+        assertEquals(newPhone, u2.getPhone());
+
+        //check password
+        assertNotNull(auth.login(u.getEmail(), newPassword));
+    }
+    @Test
+    public void testSaveWithoutCompany() throws IOException, RestServiceException, AuthenticationException {
+        user.getRoles().clear();
+        user.getRoles().add(Role.CompanyAdmin);
+        dao.save(user);
+
+        final AuthService auth = context.getBean(AuthService.class);
+        final AuthToken authToken = auth.login(user.getEmail(), "");
+        client.setAuthToken(authToken.getToken());
+
+        //create company
+        final String firstName = "firstname";
+        final String lastName = "LastName";
+        final String email = "abra@cada.bra";
+        final String phone = "1111111117";
+        final String externalCompany = "External JUnit company";
+        final boolean external = true;
+        final String position = "Manager";
+        final String deviceGroup = "DeviceGroupName";
+        final Language language = Language.English;
+        final MeasurementUnits measurementUnits = MeasurementUnits.English;
+        final String title = "Mrs";
+
+        final User u = new User();
+        u.setCompany(null);
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setEmail(email);
+        u.setPhone(phone);
+        u.setPosition(position);
+        u.setDeviceGroup(deviceGroup);
+        u.setLanguage(language);
+        u.setMeasurementUnits(measurementUnits);
+        u.setTitle(title);
+        u.setActive(false);
+        u.setExternal(external);
+        u.setExternalCompany(externalCompany);
+        u.setRoles(new HashSet<Role>());
+        u.getRoles().add(Role.Dispatcher);
+        u.getRoles().add(Role.ReportViewer);
+        u.getRoles().add(Role.Dispatcher);
+        u.getRoles().add(Role.CompanyAdmin);
+
+        final String password = "password";
+
+        final Long id = client.saveUser(u, password, true);
+
+        assertNotNull(id);
+        User u2 = dao.findByEmail(u.getEmail());
+        assertNotNull(u2);
+        assertEquals(3, u2.getRoles().size());
+        assertNotNull(u2.getCompany());
+        assertEquals(firstName, u2.getFirstName());
+        assertEquals(lastName, u2.getLastName());
+        assertEquals(email, u2.getEmail());
+        assertEquals(phone, u2.getPhone());
+        assertEquals(externalCompany, u2.getExternalCompany());
+        assertEquals(position, u2.getPosition());
+        assertEquals(deviceGroup, u.getDeviceGroup());
+        assertEquals(language, u.getLanguage());
+        assertEquals(measurementUnits, u.getMeasurementUnits());
+        assertEquals(title, u.getTitle());
+        assertFalse(u.getActive());
+        assertEquals(external, u.getExternal());
 
         //check update user
         final String newPhone = "2930847093248";

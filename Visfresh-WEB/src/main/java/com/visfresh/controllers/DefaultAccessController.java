@@ -221,8 +221,8 @@ public class DefaultAccessController implements AccessController {
         if (havePermission(user, Role.GlobalAdmin)) {
             return;
         }
-        if (company != null && havePermission(user, Role.CompanyAdmin)
-                && user.getCompany().getId().equals(company.getId())) {
+        if (company == null || (havePermission(user, Role.CompanyAdmin)
+                && user.getCompany().getId().equals(company.getId()))) {
             return;
         }
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
