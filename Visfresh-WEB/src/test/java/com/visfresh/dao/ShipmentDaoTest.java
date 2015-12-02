@@ -214,7 +214,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertNotNull(s.getShipmentDate());
         assertNotNull(s.getShippedFrom());
         assertNotNull(s.getShippedTo());
-        assertEquals(70, s.getShutdownDeviceTimeOut());
+        assertEquals(70, s.getShutdownDeviceTimeOut().intValue());
         assertEquals(ShipmentStatus.InProgress, s.getStatus());
         assertEquals(1, s.getAlertsNotificationSchedules().size());
         assertEquals(1, s.getArrivalNotificationSchedules().size());
@@ -266,7 +266,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertNotNull(s.getShipmentDate());
         assertNotNull(s.getShippedFrom());
         assertNotNull(s.getShippedTo());
-        assertEquals(70, s.getShutdownDeviceTimeOut());
+        assertEquals(70, s.getShutdownDeviceTimeOut().intValue());
         assertEquals(ShipmentStatus.InProgress, s.getStatus());
         assertEquals(1, s.getAlertsNotificationSchedules().size());
         assertEquals(1, s.getArrivalNotificationSchedules().size());

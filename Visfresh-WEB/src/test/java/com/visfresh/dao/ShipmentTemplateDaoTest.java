@@ -178,7 +178,7 @@ public class ShipmentTemplateDaoTest
         assertEquals("Test Shipment", tpl.getShipmentDescription());
         assertNotNull(tpl.getShippedFrom());
         assertNotNull(tpl.getShippedTo());
-        assertEquals(70, tpl.getShutdownDeviceTimeOut());
+        assertEquals(70, tpl.getShutdownDeviceTimeOut().intValue());
         assertEquals(1, tpl.getAlertsNotificationSchedules().size());
         assertEquals(1, tpl.getArrivalNotificationSchedules().size());
         assertTrue(tpl.isAddDateShipped());
@@ -217,7 +217,7 @@ public class ShipmentTemplateDaoTest
         assertEquals("Test Shipment", tpl.getShipmentDescription());
         assertNotNull(tpl.getShippedFrom());
         assertNotNull(tpl.getShippedTo());
-        assertEquals(70, tpl.getShutdownDeviceTimeOut());
+        assertEquals(70, tpl.getShutdownDeviceTimeOut().intValue());
         assertEquals(1, tpl.getAlertsNotificationSchedules().size());
         assertEquals(1, tpl.getArrivalNotificationSchedules().size());
         assertTrue(tpl.isAddDateShipped());

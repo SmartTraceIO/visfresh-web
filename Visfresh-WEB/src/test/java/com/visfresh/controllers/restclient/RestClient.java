@@ -147,7 +147,8 @@ public class RestClient  {
 
         final String url = sb.toString();
         final URLConnection con = new URL(url).openConnection();
-        con.setRequestProperty("Content-Type", "application/json");
+//        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Content-Type", "text/plain");
         con.setDoOutput(true);
         con.setDoInput(true);
 

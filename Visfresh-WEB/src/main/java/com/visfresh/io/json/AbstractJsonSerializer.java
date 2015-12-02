@@ -82,6 +82,13 @@ public class AbstractJsonSerializer {
     protected int asInt(final JsonElement e) {
         return e == null || e.isJsonNull() ? 0 : e.getAsInt();
     }
+    /**
+     * @param e
+     * @return
+     */
+    protected Integer asInteger(final JsonElement e) {
+        return e == null || e.isJsonNull() ? null : e.getAsInt();
+    }
 
     /**
      * @param e JSON element.

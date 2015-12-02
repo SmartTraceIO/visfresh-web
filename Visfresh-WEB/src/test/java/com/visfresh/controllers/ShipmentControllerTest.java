@@ -314,6 +314,16 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         assertEquals(0, shipmentClient.getShipments(req).size());
     }
+    @Test
+    public void testSaveEmpty() throws RestServiceException, IOException {
+        final Shipment shipment = new Shipment();
+        shipment.setDevice(createDevice("123987230987", true));
+        final Long id = shipmentClient.saveShipment(shipment, null, false).getShipmentId();
+        assertNotNull(id);
+
+        final Shipment s = shipmentDao.findOne(id);
+        assertNull(s.getShutdownDeviceTimeOut());
+    }
     /**
      * @param s
      * @return

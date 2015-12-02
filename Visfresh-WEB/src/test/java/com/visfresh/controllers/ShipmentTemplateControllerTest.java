@@ -191,6 +191,9 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
         final ShipmentTemplate t = new ShipmentTemplate();
         final Long id = client.saveShipmentTemplate(t);
         assertNotNull(id);
+
+        final ShipmentTemplate tpl = dao.findOne(id);
+        assertNull(tpl.getShutdownDeviceTimeOut());
     }
     @After
     public void tearDown() {

@@ -6,7 +6,6 @@ package com.visfresh.controllers;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.Type;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -93,15 +92,15 @@ public class WebConfig extends WebMvcConfigurerAdapter {
                 return JsonElement.class.isAssignableFrom(clazz);
             }
             /* (non-Javadoc)
-             * @see org.springframework.http.converter.json.GsonHttpMessageConverter#read(java.lang.reflect.Type, java.lang.Class, org.springframework.http.HttpInputMessage)
+             * @see org.springframework.http.converter.json.GsonHttpMessageConverter#readInternal(java.lang.Class, org.springframework.http.HttpInputMessage)
              */
             @Override
-            public Object read(final Type type, final Class<?> contextClass,
+            protected Object readInternal(final Class<?> clazz,
                     final HttpInputMessage inputMessage) throws IOException,
                     HttpMessageNotReadableException {
                 final Object obj;
                 if (log.isDebugEnabled()) {
-                    final TypeToken<?> token = getTypeToken(type);
+                    final TypeToken<?> token = getTypeToken(clazz);
                     final Reader r = new InputStreamReader(inputMessage.getBody(), "UTF-8");
                     try {
                         final String json = StringUtils.getContent(r);
@@ -114,7 +113,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
                         r.close();
                     }
                 } else {
-                    obj = super.read(type, contextClass, inputMessage);
+                    obj = super.readInternal(clazz, inputMessage);
                 }
 
                 return obj;

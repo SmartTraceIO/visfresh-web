@@ -59,7 +59,7 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
     /**
      * Shutdown device time out in minutes.
      */
-    private int shutdownDeviceAfterMinutes;
+    private Integer shutdownDeviceAfterMinutes;
     /**
      * Comments for receiver
      */
@@ -203,14 +203,14 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
     /**
      * @return the shutdownDevice
      */
-    public int getShutdownDeviceTimeOut() {
+    public Integer getShutdownDeviceTimeOut() {
         return shutdownDeviceAfterMinutes;
     }
 
     /**
      * @param ninutes the shutdownDevice to set
      */
-    public void setShutdownDeviceTimeOut(final int ninutes) {
+    public void setShutdownDeviceTimeOut(final Integer ninutes) {
         this.shutdownDeviceAfterMinutes = ninutes;
     }
     /**

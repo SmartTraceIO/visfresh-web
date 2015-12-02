@@ -279,7 +279,10 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
         if (id != null) {
             no.setShippedTo(locationProfileDao.findOne(id.longValue()));
         }
-        no.setShutdownDeviceTimeOut(((Number) map.get(SHUTDOWNTIMEOUT_FIELD)).intValue());
+        final Number shutdownAfterMinutes = (Number) map.get(SHUTDOWNTIMEOUT_FIELD);
+        if (shutdownAfterMinutes != null) {
+            no.setShutdownDeviceTimeOut(shutdownAfterMinutes.intValue());
+        }
 
         no.getAlertsNotificationSchedules().addAll(findNotificationSchedules(no, ALERTNOTIFSCHEDULES_TABLE));
         no.getArrivalNotificationSchedules().addAll(findNotificationSchedules(no, ARRIVALNOTIFSCHEDULES_TABLE));
