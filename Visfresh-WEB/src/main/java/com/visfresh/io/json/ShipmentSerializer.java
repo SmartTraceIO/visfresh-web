@@ -64,7 +64,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         shp.setAlertProfile(getReferenceResolver().getAlertProfile(asLong(obj.get(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID))));
         shp.getAlertsNotificationSchedules().addAll(resolveNotificationSchedules(obj.get(
                 ShipmentConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES).getAsJsonArray()));
-        shp.setArrivalNotificationWithinKm(asInt(obj.get(
+        shp.setArrivalNotificationWithinKm(asInteger(obj.get(
                 ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM)));
         shp.getArrivalNotificationSchedules().addAll(resolveNotificationSchedules(
                 obj.get(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES).getAsJsonArray()));

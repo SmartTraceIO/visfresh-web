@@ -307,7 +307,7 @@ public class UserController extends AbstractController implements UserConstants 
 
             return createSuccessResponse(null);
         } catch (final Exception e) {
-            log.error("Failed to send command to device", e);
+            log.error("Failed to delete user " + userId, e);
             return createErrorResponse(e);
         }
     }
@@ -359,7 +359,7 @@ public class UserController extends AbstractController implements UserConstants 
             dao.save(u);
             return createSuccessResponse(null);
         } catch (final Exception e) {
-            log.error("Failed to send command to device", e);
+            log.error("Failed to update user details", e);
             return createErrorResponse(e);
         }
     }

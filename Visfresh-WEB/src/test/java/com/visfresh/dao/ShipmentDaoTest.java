@@ -202,7 +202,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(device.getId(), s.getDevice().getId());
         assertNotNull(s.getAlertProfile());
         assertEquals(5, s.getAlertSuppressionMinutes());
-        assertEquals(17, s.getArrivalNotificationWithinKm());
+        assertEquals(17, s.getArrivalNotificationWithinKm().intValue());
         assertEquals(sharedCompany.getId(), s.getCompany().getId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
         assertEquals(true, s.isExcludeNotificationsIfNoAlerts());
@@ -255,7 +255,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(device.getId(), s.getDevice().getId());
         assertNotNull(s.getAlertProfile());
         assertEquals(5, s.getAlertSuppressionMinutes());
-        assertEquals(17, s.getArrivalNotificationWithinKm());
+        assertEquals(17, s.getArrivalNotificationWithinKm().intValue());
         assertEquals(sharedCompany.getId(), s.getCompany().getId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
         assertEquals(true, s.isExcludeNotificationsIfNoAlerts());

@@ -108,7 +108,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertNotNull(s.getAlertProfile());
         assertNotNull(s.getAlertsNotificationSchedules());
         assertEquals(alertSuppressionDuringCoolDown, s.getAlertSuppressionMinutes());
-        assertEquals(arrivalNotification, s.getArrivalNotificationWithinKm());
+        assertEquals(arrivalNotification, s.getArrivalNotificationWithinKm().intValue());
         assertNotNull(s.getArrivalNotificationSchedules());
         assertEquals(excludeNotificationsIfNoAlertsFired, s.isExcludeNotificationsIfNoAlerts());
         assertEquals(id, s.getId());

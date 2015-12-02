@@ -267,7 +267,10 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
             no.setAlertProfile(alertProfileDao.findOne(id.longValue()));
         }
         no.setAlertSuppressionMinutes(((Number) map.get(NOALERTIFCOODOWN_FIELD)).intValue());
-        no.setArrivalNotificationWithinKm(((Number) map.get(ARRIVALNOTIFWITHIN_FIELD)).intValue());
+        final Number arrivalNotifWithIn = (Number) map.get(ARRIVALNOTIFWITHIN_FIELD);
+        if (arrivalNotifWithIn != null) {
+            no.setArrivalNotificationWithinKm(arrivalNotifWithIn.intValue());
+        }
         no.setExcludeNotificationsIfNoAlerts((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
         no.setShipmentDescription((String) map.get(DESCRIPTION_FIELD));
         no.setCommentsForReceiver((String) map.get(COMMENTS_FIELD));

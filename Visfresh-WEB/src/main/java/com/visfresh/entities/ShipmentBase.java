@@ -47,7 +47,7 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
     /**
      * Arrival notification with in.
      */
-    private int arrivalNotificationWithinKm;
+    private Integer arrivalNotificationWithinKm;
     /**
      * Arrival notification shedules.
      */
@@ -169,14 +169,14 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
     /**
      * @return the arrivalNotification
      */
-    public int getArrivalNotificationWithinKm() {
+    public Integer getArrivalNotificationWithinKm() {
         return arrivalNotificationWithinKm;
     }
 
     /**
      * @param km number of kilometers for arrival notification.
      */
-    public void setArrivalNotificationWithinKm(final int km) {
+    public void setArrivalNotificationWithinKm(final Integer km) {
         this.arrivalNotificationWithinKm = km;
     }
 
