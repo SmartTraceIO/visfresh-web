@@ -83,7 +83,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String deviceGroup = "DeviceGroupName";
         final Language language = Language.English;
         final MeasurementUnits measurementUnits = MeasurementUnits.English;
-        final String title = "Mrs";
+        final String title = "Mr";
 
         final User u = new User();
         u.setCompany(c);
@@ -125,7 +125,9 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(title, u.getTitle());
         assertFalse(u.getActive());
         assertEquals(external, u.getExternal());
-
+    }
+    @Test
+    public void testGetUserWithoutUserId() throws IOException, RestServiceException {
         //test without user ID.
         assertNotNull(client.getUser(null));
     }
@@ -149,6 +151,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String title = "Mrs";
 
         final User u = new User();
+        u.setCompany(c);
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
@@ -169,7 +172,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         final String password = "password";
 
-        final Long id = client.saveUser(u, c, password, true);
+        final Long id = client.saveUser(u, password, true);
 
         assertNotNull(id);
         User u2 = dao.findByEmail(u.getEmail());
@@ -200,7 +203,8 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         u.setPhone(newPhone);
         u.setId(u2.getId());
-        client.saveUser(u, getCompany(), newPassword, true);
+        u.setCompany(getCompany());
+        client.saveUser(u, newPassword, true);
 
         u2 = dao.findByEmail(u.getEmail());
         assertEquals(newPhone, u2.getPhone());
@@ -223,6 +227,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String title = "Mrs";
 
         final User u = new User();
+        u.setCompany(getCompany());
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
@@ -242,11 +247,11 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.getRoles().add(Role.CompanyAdmin);
 
         final String password = "password";
-        final Long id = client.saveUser(u, getCompany(), password, false);
+        final Long id = client.saveUser(u, password, false);
 
         final User tmp = new User();
         tmp.setId(id);
-        client.saveUser(tmp, null, null, false);
+        client.saveUser(tmp, null, false);
         //save user by null values for check correct handling
         //null values.
 
@@ -271,12 +276,17 @@ public class UserControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetUsers() throws IOException, RestServiceException {
         final Company c = new Company();
-        c.setName("Test");
+        c.setName("Internal JUnit Company");
         c.setDescription("Test company");
         context.getBean(CompanyDao.class).save(c);
 
         final User u1 = createUser("u1@google.com", "A2", "LastA2", c);
         final User u2 = createUser("u2@google.com", "A1", "LastA1", c);
+        u2.setExternal(true);
+        u2.setExternalCompany("External JUnit Company");
+        u2.setPosition("Driver");
+        context.getBean(UserDao.class).save(u2);
+
         final String token = client.login("u1@google.com", "");
         client.setAuthToken(token);
 

@@ -208,7 +208,7 @@ public class UserController extends AbstractController implements UserConstants 
         try {
             final User user = getLoggedInUser(authToken);
             final SaveUserRequest r = getUserSerializer(user).parseSaveUserRequest(req);
-            security.checkCanManageUsers(user, r.getCompany());
+            security.checkCanManageUsers(user, r.getUser().getCompany());
 
             User newUser = r.getUser();
             if (newUser.getId() != null) {
@@ -222,7 +222,9 @@ public class UserController extends AbstractController implements UserConstants 
                 }
             }
 
-            newUser.setCompany(r.getCompany() == null ? user.getCompany() : r.getCompany());
+            if (newUser.getCompany() == null) {
+                newUser.setCompany(user.getCompany());
+            }
             security.checkCanAssignRoles(user, newUser.getRoles());
             authService.saveUser(newUser, r.getPassword(), Boolean.TRUE.equals(r.getResetOnLogin()));
 
@@ -285,6 +287,9 @@ public class UserController extends AbstractController implements UserConstants 
         }
         if (newUser.getExternal() != null) {
             oldUser.setExternal(newUser.getExternal());
+        }
+        if (newUser.getCompany() != null) {
+            oldUser.setCompany(newUser.getCompany());
         }
         return oldUser;
     }

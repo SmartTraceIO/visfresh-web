@@ -6,8 +6,6 @@ package com.visfresh.drools;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +19,6 @@ import com.visfresh.rules.RuleContext;
 @Component
 @ComponentScan(basePackageClasses = {AbstractRuleEngine.class})
 public class DroolsRuleEngine extends AbstractRuleEngine {
-    private static final Logger log = LoggerFactory.getLogger(DroolsRuleEngine.class);
     private KieContainer kie;
 
     /**
@@ -45,7 +42,6 @@ public class DroolsRuleEngine extends AbstractRuleEngine {
 
     @Override
     public void invokeRules(final RuleContext context) {
-        log.debug("Tracker event has received " + context.getEvent());
         final KieSession session = kie.newKieSession("ksession-rules");
 
         try {

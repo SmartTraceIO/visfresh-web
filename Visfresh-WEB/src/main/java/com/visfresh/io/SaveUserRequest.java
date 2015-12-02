@@ -3,7 +3,6 @@
  */
 package com.visfresh.io;
 
-import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
 
 /**
@@ -12,7 +11,6 @@ import com.visfresh.entities.User;
  */
 public class SaveUserRequest {
     private User user;
-    private Company company;
     private String password;
     private Boolean resetOnLogin;
 
@@ -46,18 +44,6 @@ public class SaveUserRequest {
      */
     public void setUser(final User usr) {
         this.user = usr;
-    }
-    /**
-     * @return the company
-     */
-    public Company getCompany() {
-        return company;
-    }
-    /**
-     * @param company the company to set
-     */
-    public void setCompany(final Company company) {
-        this.company = company;
     }
     /**
      * @param resetOnLogin

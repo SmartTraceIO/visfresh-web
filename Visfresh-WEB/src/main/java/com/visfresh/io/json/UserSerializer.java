@@ -32,6 +32,7 @@ import com.visfresh.services.lists.ShortListUserItem;
  *
  */
 public class UserSerializer extends AbstractJsonSerializer {
+    private static final String INTERNAL_COMPANY_NAME = "internalCompany";
     private ShipmentResolver shipmentResolver;
     private CompanyResolver companyResolver;
 
@@ -75,6 +76,10 @@ public class UserSerializer extends AbstractJsonSerializer {
             u.setRoles(new HashSet<Role>());
             u.getRoles().addAll(parseRoles(roles.getAsJsonArray()));
         }
+        final JsonElement companyId = json.get(UserConstants.PROPERTY_INTERNAL_COMPANY_ID);
+        if (companyId != null && !companyId.isJsonNull()) {
+            u.setCompany(getCompanyResolver().getCompany(companyId.getAsLong()));
+        }
         return u;
     }
     /**
@@ -86,6 +91,14 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.addProperty(UserConstants.PROPERTY_ID, u.getId());
         obj.addProperty(UserConstants.PROPERTY_FIRST_NAME, u.getFirstName());
         obj.addProperty(UserConstants.PROPERTY_LAST_NAME, u.getLastName());
+        obj.addProperty("title", u.getTitle());
+
+        //company is readonly property, should not be serialized back
+        if (u.getCompany() != null) {
+            obj.addProperty(INTERNAL_COMPANY_NAME, u.getCompany().getName());
+            obj.addProperty(UserConstants.PROPERTY_INTERNAL_COMPANY_ID, u.getCompany().getId());
+        }
+
         obj.addProperty(UserConstants.PROPERTY_EXTERNAL, u.getExternal());
         obj.addProperty(UserConstants.PROPERTY_EXTERNAL_COMPANY, u.getExternalCompany());
         obj.addProperty(UserConstants.PROPERTY_POSITION, u.getPosition());
@@ -101,14 +114,7 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.addProperty("measurementUnits", u.getMeasurementUnits().toString());
         obj.addProperty("language", u.getLanguage().toString());
         obj.addProperty("deviceGroup", u.getDeviceGroup());
-        obj.addProperty("title", u.getTitle());
         obj.addProperty(UserConstants.PROPERTY_ACTIVE, u.getActive());
-
-        //company is readonly property, should not be serialized back
-        if (u.getCompany() != null) {
-            obj.addProperty("internalCompanyName", u.getCompany().getName());
-            obj.addProperty(UserConstants.PROPERTY_INTERNAL_COMPANY_ID, u.getCompany().getId());
-        }
 
         return obj;
     }
@@ -123,10 +129,6 @@ public class UserSerializer extends AbstractJsonSerializer {
         final JsonObject obj = e.getAsJsonObject();
         final SaveUserRequest req = new SaveUserRequest();
         req.setUser(parseUser(obj.get("user").getAsJsonObject()));
-        final JsonElement companyId = obj.get(UserConstants.PROPERTY_INTERNAL_COMPANY_ID);
-        if (companyId != null && !companyId.isJsonNull()) {
-            req.setCompany(getCompanyResolver().getCompany(companyId.getAsLong()));
-        }
         req.setPassword(asString(obj.get("password")));
         req.setResetOnLogin(asBoolean(obj.get("resetOnLogin")));
         return req;
@@ -143,8 +145,6 @@ public class UserSerializer extends AbstractJsonSerializer {
         obj.add("user", toJson(req.getUser()));
         obj.addProperty("password", req.getPassword());
         obj.addProperty("resetOnLogin", req.getResetOnLogin());
-        obj.addProperty(UserConstants.PROPERTY_INTERNAL_COMPANY_ID,
-                req.getCompany() == null ? null : req.getCompany().getId());
         return obj;
     }
     /**

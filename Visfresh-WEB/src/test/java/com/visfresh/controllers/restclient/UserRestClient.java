@@ -9,7 +9,6 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
 import com.visfresh.io.CompanyResolver;
 import com.visfresh.io.SaveUserRequest;
@@ -57,9 +56,8 @@ public class UserRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public Long saveUser(final User u, final Company c, final String password, final boolean resetPasswordOnLogin) throws IOException, RestServiceException {
+    public Long saveUser(final User u, final String password, final boolean resetPasswordOnLogin) throws IOException, RestServiceException {
         final SaveUserRequest req = new SaveUserRequest();
-        req.setCompany(c);
         req.setUser(u);
         req.setPassword(password);
         req.setResetOnLogin(resetPasswordOnLogin);

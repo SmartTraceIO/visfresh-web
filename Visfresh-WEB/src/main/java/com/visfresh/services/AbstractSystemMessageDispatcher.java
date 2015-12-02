@@ -1,17 +1,13 @@
 /**
  *
  */
-package com.visfresh.mpl.services;
+package com.visfresh.services;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,46 +18,39 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
-import com.visfresh.services.RetryableException;
-import com.visfresh.services.SystemMessageDispatcher;
-import com.visfresh.services.SystemMessageHandler;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class SystemMessageDispatcherImpl implements SystemMessageDispatcher {
+public abstract class AbstractSystemMessageDispatcher {
     /**
      * Logger.
      */
-    private static final Logger log = LoggerFactory.getLogger(SystemMessageDispatcherImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractSystemMessageDispatcher.class);
 
-    /**
-     * Processor ID.
-     */
-    private final String processorId;
     /**
      * Select messages limit.
      */
-    private int batchLimit;
+    protected int batchLimit;
     /**
      * Maximal inactivity time.
      */
-    private long inactiveTimeOut;
+    protected long inactiveTimeOut;
     /**
      * The limit of message retrying.
      */
-    private int retryLimit;
+    protected int retryLimit;
     /**
      * The time out before retry message.
      */
-    private long retryTimeOut;
+    protected long retryTimeOut;
 
     private final AtomicBoolean isStoped = new AtomicBoolean(false);
 
-    private final Map<SystemMessageType, SystemMessageHandler> handlers
-        = new ConcurrentHashMap<SystemMessageType, SystemMessageHandler>();
+    private SystemMessageHandler messageHandler;
+    private final SystemMessageType messageType;
 
     @Autowired
     private SystemMessageDao messageDao;
@@ -105,12 +94,13 @@ public class SystemMessageDispatcherImpl implements SystemMessageDispatcher {
         }
     };
     /**
-     * Default constructor..
+     * @param env spring environment.
+     * @param t message type.
      */
     @Autowired
-    public SystemMessageDispatcherImpl(final Environment env) {
+    public AbstractSystemMessageDispatcher(final Environment env, final SystemMessageType t) {
         super();
-        processorId = env.getProperty("system.dispatcher.baseProcessorId", "sys-dispatcher");
+        this.messageType = t;
         setBatchLimit(Integer.parseInt(env.getProperty("system.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("system.dispatcher.retryLimit", "5")));
         setNumThreads(Integer.parseInt(env.getProperty("system.dispatcher.numThreads", "1")));
@@ -144,9 +134,7 @@ public class SystemMessageDispatcherImpl implements SystemMessageDispatcher {
     /**
      * @return the processorId
      */
-    public String getProcessorId() {
-        return processorId;
-    }
+    protected abstract String getProcessorId();
     /**
      * @return the limit
      */
@@ -184,19 +172,22 @@ public class SystemMessageDispatcherImpl implements SystemMessageDispatcher {
         this.retryTimeOut = retryTimeOut;
     }
 
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.SystemMessageDispatcher#processMessages(java.lang.String)
+    /**
+     * @param processorId
+     * @return
      */
-    @Override
-    public int processMessages(final String processor) {
+    protected int processMessages(final String processorId) {
         final int count = 0;
 
-        final Set<SystemMessageType> processors = handlers.keySet();
-        if (!processors.isEmpty()) {
+        if (messageHandler != null) {
+            final Set<SystemMessageType> types = new HashSet<SystemMessageType>();
+            types.add(messageType);
+
             final List<SystemMessage> messages = messageDao.selectMessagesForProcessing(
-                    processors, processor, getBatchLimit(), new Date());
+                    types, processorId, getBatchLimit(), new Date());
+
+            final SystemMessageHandler h = getMessageHandler();
             for (final SystemMessage msg : messages) {
-                final SystemMessageHandler h = handlers.get(msg.getType());
                 try {
                     h.handle(msg);
                     handleSuccess(msg);
@@ -209,6 +200,18 @@ public class SystemMessageDispatcherImpl implements SystemMessageDispatcher {
         return count;
     }
 
+    /**
+     * @return the messageHandler
+     */
+    public SystemMessageHandler getMessageHandler() {
+        return messageHandler;
+    }
+    /**
+     * @return the messageType
+     */
+    public SystemMessageType getMessageType() {
+        return messageType;
+    }
     /**
      * @param msg the message.
      * @param e the exception.
@@ -246,15 +249,18 @@ public class SystemMessageDispatcherImpl implements SystemMessageDispatcher {
         messageDao.delete(msg);
     }
 
-    @PreDestroy
+    /**
+     * Stops the dispatcher.
+     */
     public void stop() {
         synchronized (isStoped) {
             isStoped.set(true);
             isStoped.notifyAll();
         }
     }
-
-    @PostConstruct
+    /**
+     * starts the dispatcher.
+     */
     public void start() {
         stop();
         synchronized (isStoped) {
@@ -266,25 +272,23 @@ public class SystemMessageDispatcherImpl implements SystemMessageDispatcher {
             }
         }
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.SystemMessageDispatcher#setSystemMessageHandler(com.visfresh.entities.SystemMessageType, com.visfresh.services.SystemMessageHandler)
+    /**
+     * @param type message type.
+     * @param h message handler.
      */
-    @Override
-    public void setSystemMessageHandler(final SystemMessageType type, final SystemMessageHandler h) {
-        if (h == null) {
-            handlers.remove(type);
-        } else {
-            handlers.put(type, h);
+    protected void setSystemMessageHandler(final SystemMessageType type, final SystemMessageHandler h) {
+        if (getMessageType() != type) {
+            throw new IllegalArgumentException("Unsupported message type for given processor "
+                    + type + ", expected " + getMessageType());
         }
+        this.messageHandler = h;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.SystemMessageDispatcher#sendSystemMessage(com.visfresh.entities.SystemMessage)
+    /**
+     * @param messagePayload message payload.
      */
-    @Override
-    public void sendSystemMessage(final SystemMessageType type, final String messagePayload) {
+    protected void sendSystemMessage(final String messagePayload) {
         final SystemMessage sm = new SystemMessage();
-        sm.setType(type);
+        sm.setType(getMessageType());
         sm.setMessageInfo(messagePayload);
         messageDao.save(sm);
     }

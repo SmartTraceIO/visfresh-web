@@ -3,43 +3,37 @@
  */
 package com.visfresh.mock;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.entities.SystemMessageType;
-import com.visfresh.services.SystemMessageDispatcher;
-import com.visfresh.services.SystemMessageHandler;
+import com.visfresh.mpl.services.TrackerMessageDispatcher;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class MockSystemMessageDispatcher implements SystemMessageDispatcher {
+public class MockSystemMessageDispatcher extends TrackerMessageDispatcher {
     /**
-     * Default constructor.
+     * @param env environment.
      */
-    public MockSystemMessageDispatcher() {
-        super();
+    @Autowired
+    public MockSystemMessageDispatcher(final Environment env) {
+        super(env);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.services.SystemMessageDispatcher#processMessages(java.lang.String)
+     * @see com.visfresh.services.AbstractSystemMessageDispatcher#start()
      */
     @Override
-    public int processMessages(final String processor) {
-        return 0;
+    public void start() {
+        // TODO Auto-generated method stub
     }
     /* (non-Javadoc)
-     * @see com.visfresh.services.SystemMessageDispatcher#setSystemMessageHandler(com.visfresh.entities.SystemMessageType, com.visfresh.services.SystemMessageHandler)
+     * @see com.visfresh.services.AbstractSystemMessageDispatcher#stop()
      */
     @Override
-    public void setSystemMessageHandler(final SystemMessageType type,
-            final SystemMessageHandler h) {
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.SystemMessageDispatcher#sendSystemMessage(com.visfresh.entities.SystemMessageType, java.lang.String)
-     */
-    @Override
-    public void sendSystemMessage(final SystemMessageType type, final String messagePayload) {
+    public void stop() {
         // TODO Auto-generated method stub
     }
 }

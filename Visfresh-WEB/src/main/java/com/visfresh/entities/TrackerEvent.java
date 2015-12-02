@@ -161,4 +161,20 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
     public int compareTo(final TrackerEvent o) {
         return getTime().compareTo(o.getTime());
     }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder()
+            .append("device: ")
+            .append(getDevice())
+            .append(", location: (lan ")
+            .append(getLatitude())
+            .append(", lon ")
+            .append(getLongitude())
+            .append("), temperature: ")
+            .append(getTemperature());
+        return sb.toString();
+    }
 }

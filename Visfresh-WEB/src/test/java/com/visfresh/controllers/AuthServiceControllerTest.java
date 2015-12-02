@@ -17,6 +17,7 @@ import com.visfresh.controllers.restclient.UserRestClient;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.DefaultAuthService;
+import com.visfresh.services.DefaultReferenceResolver;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -96,6 +97,7 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         }
 
         final UserRestClient userRest = new UserRestClient(UTC);
+        userRest.setCompanyResolver(context.getBean(DefaultReferenceResolver.class));
         userRest.setServiceUrl(client.getServiceUrl());
 
         //check first token is alive

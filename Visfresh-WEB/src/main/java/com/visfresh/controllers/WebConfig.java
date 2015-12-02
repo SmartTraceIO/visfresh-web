@@ -44,6 +44,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     private GsonHttpMessageConverter createGsonHttpMessageConverter() {
         final Gson gson = new GsonBuilder()
                 .disableHtmlEscaping()
+                .serializeNulls()
                 .setPrettyPrinting()
                 .create();
 

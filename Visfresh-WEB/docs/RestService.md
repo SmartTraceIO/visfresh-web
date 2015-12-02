@@ -685,33 +685,45 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ### User ###
 ```json
 {
-    "id": 1725,
-    "email": "a@b.c",
+    "id": 1423,
+    "firstName": "firstname",
+    "lastName": "LastName",
+    "title": "Mr",
+    "internalCompany": "JUnit-C", //read only property
+    "internalCompanyId": 1368,
+    "external": true,
+    "externalCompany": "External JUnit company",
+    "position": "Manager",
+    "email": "abra@cada.bra",
+    "phone": "1111111117",
     "roles": [
-      "GlobalAdmin"
+      "Dispatcher",
+      "CompanyAdmin",
+      "ReportViewer"
     ],
     "timeZone": "UTC",
     "temperatureUnits": "Celsius",
-    "measurementUnits": "Metric",
+    "measurementUnits": "English",
     "language": "English",
-    "active": true,
-    "companyId": 1499,
-    "companyName": "Special JUnit Company"
+    "deviceGroup": "DeviceGroupName",
+    "active": false
 }
 ```
 ### Expanded List User Item ###
 ```json
 {
-  "id": 3075,
+  "id": 1415,
   "firstName": "A2",
   "lastName": "LastA2",
   "email": "u1@google.com",
-  "companyName": "Test",
+  "companyName": "Internal JUnit Company", //name of internal company if the user is not external,
+                                           //name of external company otherwise
   "position": "Manager",
   "roles": [
     "CompanyAdmin"
   ],
-  "active": true
+  "active": true,
+  "external": false
 }
 ```
 ### Save User Request ###
@@ -840,30 +852,31 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ```json
 {
   "user": {
-    "id": 4594,
+    "id": null,
     "firstName": "firstname",
     "lastName": "LastName",
+    "title": "Mrs",
+    "internalCompany": "JUnit-C", //not required property, is read only and will ignored during save operation
+    "internalCompanyId": 1364,
     "external": true,
     "externalCompany": "External JUnit company",
     "position": "Manager",
     "email": "abra@cada.bra",
-    "phone": "2930847093248",
+    "phone": "1111111117",
     "roles": [
+      "CompanyAdmin",
       "Dispatcher",
-      "ReportViewer",
-      "CompanyAdmin"
+      "ReportViewer"
     ],
     "timeZone": "UTC",
     "temperatureUnits": "Celsius",
     "measurementUnits": "English",
     "language": "English",
     "deviceGroup": "DeviceGroupName",
-    "title": "Mrs",
     "active": false
   },
-  "password": "newpassword",
-  "resetOnLogin": true,
-  "internalCompanyId": 4160
+  "password": "password",
+  "resetOnLogin": true
 }
 ```  
 **Response:**  
@@ -889,28 +902,30 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": [
     {
-      "id": 3075,
+      "id": 1415,
       "firstName": "A2",
       "lastName": "LastA2",
       "email": "u1@google.com",
-      "companyName": "Test",
+      "companyName": "Internal JUnit Company",
       "position": "Manager",
       "roles": [
         "CompanyAdmin"
       ],
-      "active": true
+      "active": true,
+      "external": false
     },
     {
-      "id": 3076,
+      "id": 1416,
       "firstName": "A1",
       "lastName": "LastA1",
       "email": "u2@google.com",
-      "companyName": "Test",
-      "position": "Manager",
+      "companyName": "External JUnit Company",
+      "position": "Driver",
       "roles": [
         "CompanyAdmin"
       ],
-      "active": true
+      "active": true,
+      "external": true
     }
   ],
   "totalCount": 2
@@ -954,7 +969,7 @@ Response:
 **Request body:**  
 ```json
 {
-  "user": 293,
+  "user": 1429,
   "password": "abrakadabra",
   "firstName": "firstname",
   "lastName": "LastName",

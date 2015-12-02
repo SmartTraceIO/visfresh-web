@@ -106,6 +106,7 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
     /**
      * @param company the company to set
      */
+    @Override
     public void setCompany(final Company company) {
         this.company = company;
     }
@@ -120,5 +121,12 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      */
     public void setTripCount(final int tripCount) {
         this.tripCount = tripCount;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getImei() + " (" + getDescription() + ")";
     }
 }

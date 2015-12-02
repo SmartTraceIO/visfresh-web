@@ -46,6 +46,7 @@ public class RestClient  {
         final GsonBuilder b = new GsonBuilder();
         b.setPrettyPrinting();
         b.disableHtmlEscaping();
+        b.serializeNulls();
         this.gson = b.create();
 
         //add logging

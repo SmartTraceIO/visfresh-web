@@ -82,6 +82,7 @@ public class Tool extends AbstractTool {
             final String password) throws IOException, RestServiceException {
         final User u = new User();
         u.setEmail(email);
+        u.setCompany(company);
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setTitle("Mr.");
@@ -89,6 +90,6 @@ public class Tool extends AbstractTool {
         u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.CompanyAdmin);
 
-        userService.saveUser(u, company, password, false);
+        userService.saveUser(u, password, false);
     }
 }

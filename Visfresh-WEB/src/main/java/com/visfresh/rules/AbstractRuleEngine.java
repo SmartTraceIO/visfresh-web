@@ -19,17 +19,15 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonElement;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.TrackerEventDao;
-import com.visfresh.entities.Device;
 import com.visfresh.entities.SystemMessage;
-import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
+import com.visfresh.mpl.services.TrackerMessageDispatcher;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.RuleEngine;
-import com.visfresh.services.SystemMessageDispatcher;
 import com.visfresh.services.SystemMessageHandler;
 import com.visfresh.utils.SerializerUtils;
 
@@ -43,7 +41,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     private static final int TIME_ZONE_OFSET = TimeZone.getDefault().getRawOffset();
 
     @Autowired
-    private SystemMessageDispatcher dispatcher;
+    private TrackerMessageDispatcher dispatcher;
     @Autowired
     private TrackerEventDao eventDao;
     @Autowired
@@ -73,11 +71,11 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
     @PostConstruct
     public void initialize() {
-        dispatcher.setSystemMessageHandler(SystemMessageType.Tracker, this);
+        dispatcher.setHandler(this);
     }
     @PreDestroy
     public void shutdown() {
-        dispatcher.setSystemMessageHandler(SystemMessageType.Tracker, null);
+        dispatcher.setHandler(null);
     }
 
     @Override
@@ -103,12 +101,13 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         e.setTemperature(event.getBattery());
         e.setTime(event.getTime());
         e.setType(TrackerEventType.valueOf(event.getType()));
+
         final String imei = event.getImei();
 
-        final Device device = deviceDao.findByImei(imei);
-        e.setDevice(device);
-
+        //set device
+        e.setDevice(deviceDao.findByImei(imei));
         trackerEventDao.save(e);
+        log.debug("Tracker event accepted: " + e);
 
         //process tracker event with rule engine.
         DeviceState state = deviceDao.getState(imei);

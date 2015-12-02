@@ -104,8 +104,9 @@ public class AbstractTool {
             u.setFirstName("Java (JS)");
             u.setLastName("Developer");
             u.getRoles().add(Role.CompanyAdmin);
+            u.setCompany(c);
 
-            userService.saveUser(u, c, newPassword, false);
+            userService.saveUser(u, newPassword, false);
         }
         user = u;
 

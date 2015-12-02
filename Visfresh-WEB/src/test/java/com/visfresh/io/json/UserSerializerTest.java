@@ -159,7 +159,6 @@ public class UserSerializerTest extends AbstractSerializerTest {
         user.setPhone(phone);
         user.setPosition(position);
 
-        r.setCompany(c);
         r.setUser(user);
         r.setPassword(password);
         r.setResetOnLogin(resetOnLogin);
@@ -168,7 +167,6 @@ public class UserSerializerTest extends AbstractSerializerTest {
         r = serializer.parseSaveUserRequest(json);
 
         assertNotNull(user);
-        assertNotNull(r.getCompany());
         assertEquals(password, r.getPassword());
         assertEquals(resetOnLogin, r.getResetOnLogin());
     }
