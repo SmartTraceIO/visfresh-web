@@ -822,7 +822,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```
 ### Get user info example ###
-**GET /vf/rest/getUser/${authToken}?userId=1725**  
+**GET /vf/rest/getUser/${authToken}?userId=2585**  
 **Response:**  
 ```json
 {
@@ -831,18 +831,28 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "message": "Success"
   },
   "response": {
-    "id": 1725,
-    "email": "a@b.c",
+    "id": 2585,
+    "firstName": "firstname",
+    "lastName": "LastName",
+    "title": "Mr",
+    "internalCompany": "JUnit-C",
+    "internalCompanyId": 2323,
+    "external": true,
+    "externalCompany": "External JUnit company",
+    "position": "Manager",
+    "email": "abra@cada.bra",
+    "phone": "1111111117",
     "roles": [
-      "GlobalAdmin"
+      "ReportViewer",
+      "CompanyAdmin",
+      "Dispatcher"
     ],
     "timeZone": "UTC",
     "temperatureUnits": "Celsius",
-    "measurementUnits": "Metric",
+    "measurementUnits": "English",
     "language": "English",
-    "active": true,
-    "companyId": 1499,
-    "companyName": "Special JUnit Company"
+    "deviceGroup": "DeviceGroupName",
+    "active": false
   }
 }
 ```
