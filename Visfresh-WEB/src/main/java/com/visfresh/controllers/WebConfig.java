@@ -12,11 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -117,18 +115,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
                 }
 
                 return obj;
-            }
-            /* (non-Javadoc)
-             * @see org.springframework.http.converter.json.GsonHttpMessageConverter#writeInternal(java.lang.Object, org.springframework.http.HttpOutputMessage)
-             */
-            @Override
-            protected void writeInternal(final Object o,
-                    final HttpOutputMessage outputMessage) throws IOException,
-                    HttpMessageNotWritableException {
-                if (log.isDebugEnabled() && o instanceof JsonElement) {
-                    log.debug("Writing JSON response:\n" + gson.toJson(o));
-                }
-                super.writeInternal(o, outputMessage);
             }
         };
         gsonConverter.setGson(gson);

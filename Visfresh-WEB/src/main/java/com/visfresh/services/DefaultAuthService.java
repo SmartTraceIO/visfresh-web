@@ -44,7 +44,7 @@ public class DefaultAuthService implements AuthService {
 
     private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 60 * 60 * 1000l; //one hour
     private static final long TIMEOUT = 60000L;
-    public static final int USER_LOGIN_LIMIT = 10;
+    public static final int USER_LOGIN_LIMIT = 1000;
 
     private final AtomicBoolean isStopped = new AtomicBoolean();
 
