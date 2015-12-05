@@ -92,7 +92,7 @@ public class NotificationServiceImpl implements NotificationService {
         if (s.isSendEmail()) {
             if (email != null && email.length() > 0) {
                 try {
-                    emailService.sendMessage(email, subject, message);
+                    emailService.sendMessage(new String[] {email}, subject, message);
                 } catch (final MessagingException e) {
                     log.error("Failed to send email message to " + email, e);
                 }
@@ -105,7 +105,7 @@ public class NotificationServiceImpl implements NotificationService {
             //send SMS
             final String phone = u.getPhone();
             if (phone != null && phone.length() > 0) {
-                smsService.sendMessage(phone, subject, message);
+                smsService.sendMessage(new String[] {phone}, subject, message);
             } else {
                 log.warn("Phone number has not set for personal schedule for " + person + " , SMS can't be send");
             }

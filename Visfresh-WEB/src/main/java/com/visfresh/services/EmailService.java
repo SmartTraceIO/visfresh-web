@@ -11,10 +11,10 @@ import javax.mail.MessagingException;
  */
 public interface EmailService {
     /**
-     * @param email eMail.
+     * @param emails eMail.
      * @param subject subject.
      * @param message message.
      * @throws MessagingException
      */
-    public void sendMessage(String email, String subject, String message) throws MessagingException;
+    public void sendMessage(String[] emails, String subject, String message) throws MessagingException;
 }

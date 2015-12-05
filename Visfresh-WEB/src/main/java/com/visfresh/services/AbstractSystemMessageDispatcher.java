@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.SystemMessageDao;
@@ -94,23 +93,22 @@ public abstract class AbstractSystemMessageDispatcher {
         }
     };
     /**
-     * @param env spring environment.
      * @param t message type.
      */
     @Autowired
-    public AbstractSystemMessageDispatcher(final Environment env, final SystemMessageType t) {
+    public AbstractSystemMessageDispatcher(final SystemMessageType t) {
         super();
         this.messageType = t;
-        setBatchLimit(Integer.parseInt(env.getProperty("system.dispatcher.batchLimit", "10")));
-        setRetryLimit(Integer.parseInt(env.getProperty("system.dispatcher.retryLimit", "5")));
-        setNumThreads(Integer.parseInt(env.getProperty("system.dispatcher.numThreads", "1")));
-        setInactiveTimeOut(Long.parseLong(env.getProperty("system.dispatcher.retryLimit", "3000")));
+        setBatchLimit(10);
+        setRetryLimit(5);
+        setNumThreads(1);
+        setInactiveTimeOut(3000);
     }
 
     /**
      * @param parseInt
      */
-    private void setNumThreads(final int numThreads) {
+    protected void setNumThreads(final int numThreads) {
         this.numThreads = numThreads;
     }
     /**
@@ -286,7 +284,7 @@ public abstract class AbstractSystemMessageDispatcher {
     /**
      * @param messagePayload message payload.
      */
-    protected void sendSystemMessage(final String messagePayload) {
+    public void sendSystemMessage(final String messagePayload) {
         final SystemMessage sm = new SystemMessage();
         sm.setType(getMessageType());
         sm.setMessageInfo(messagePayload);

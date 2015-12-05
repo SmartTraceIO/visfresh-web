@@ -19,7 +19,7 @@ import com.visfresh.services.SystemMessageHandler;
  *
  */
 @Component
-public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
+public class SmsMessageDispatcher extends AbstractSystemMessageDispatcher {
     /**
      * Processor ID.
      */
@@ -29,22 +29,21 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
      * @param env spring environment.
      */
     @Autowired
-    public TrackerMessageDispatcher(final Environment env) {
-        super(SystemMessageType.Tracker);
-        processorId = env.getProperty("tracker.dispatcher.baseProcessorId", "tracker-dispatcher");
-        setBatchLimit(Integer.parseInt(env.getProperty("tracker.dispatcher.batchLimit", "10")));
-        setRetryLimit(Integer.parseInt(env.getProperty("tracker.dispatcher.retryLimit", "5")));
-        //number of threads should be hardcoded to 1
-        //setNumThreads(Integer.parseInt(env.getProperty("tracker.dispatcher.numThreads", "1")));
-        setNumThreads(1);
-        setInactiveTimeOut(Long.parseLong(env.getProperty("tracker.dispatcher.retryLimit", "3000")));
+    public SmsMessageDispatcher(final Environment env) {
+        super(SystemMessageType.SMS);
+        processorId = env.getProperty("sms.dispatcher.baseProcessorId", "sms");
+
+        setBatchLimit(Integer.parseInt(env.getProperty("sms.dispatcher.batchLimit", "10")));
+        setRetryLimit(Integer.parseInt(env.getProperty("sms.dispatcher.retryLimit", "5")));
+        setNumThreads(Integer.parseInt(env.getProperty("sms.dispatcher.numThreads", "1")));
+        setInactiveTimeOut(Long.parseLong(env.getProperty("sms.dispatcher.retryLimit", "3000")));
     }
 
-    /* (non-Javadoc)
-     * @see com.visfresh.services.SystemMessageDispatcher#setSystemMessageHandler(com.visfresh.entities.SystemMessageType, com.visfresh.services.SystemMessageHandler)
+    /**
+     * @param h SMS handler.
      */
-    public void setHandler(final SystemMessageHandler h) {
-        super.setSystemMessageHandler(SystemMessageType.Tracker, h);
+    public void setSmsHandler(final SystemMessageHandler h) {
+        super.setSystemMessageHandler(SystemMessageType.SMS, h);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.SystemMessageDispatcher#getProcessorId()

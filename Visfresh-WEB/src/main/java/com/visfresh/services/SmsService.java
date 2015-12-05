@@ -11,9 +11,9 @@ package com.visfresh.services;
 public interface SmsService {
     /**
      * Sends message to given phone.
-     * @param phone phone number.
+     * @param phones phone number.
      * @param subject TODO
      * @param message message.
      */
-    public void sendMessage(String phone, String subject, String message);
+    public void sendMessage(String[] phones, String subject, String message);
 }

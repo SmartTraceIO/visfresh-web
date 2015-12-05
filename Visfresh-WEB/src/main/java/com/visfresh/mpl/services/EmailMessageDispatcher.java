@@ -19,7 +19,7 @@ import com.visfresh.services.SystemMessageHandler;
  *
  */
 @Component
-public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
+public class EmailMessageDispatcher extends AbstractSystemMessageDispatcher {
     /**
      * Processor ID.
      */
@@ -29,22 +29,21 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
      * @param env spring environment.
      */
     @Autowired
-    public TrackerMessageDispatcher(final Environment env) {
-        super(SystemMessageType.Tracker);
-        processorId = env.getProperty("tracker.dispatcher.baseProcessorId", "tracker-dispatcher");
-        setBatchLimit(Integer.parseInt(env.getProperty("tracker.dispatcher.batchLimit", "10")));
-        setRetryLimit(Integer.parseInt(env.getProperty("tracker.dispatcher.retryLimit", "5")));
-        //number of threads should be hardcoded to 1
-        //setNumThreads(Integer.parseInt(env.getProperty("tracker.dispatcher.numThreads", "1")));
-        setNumThreads(1);
-        setInactiveTimeOut(Long.parseLong(env.getProperty("tracker.dispatcher.retryLimit", "3000")));
+    public EmailMessageDispatcher(final Environment env) {
+        super(SystemMessageType.Email);
+        processorId = env.getProperty("email.dispatcher.baseProcessorId", "email");
+
+        setBatchLimit(Integer.parseInt(env.getProperty("email.dispatcher.batchLimit", "10")));
+        setRetryLimit(Integer.parseInt(env.getProperty("email.dispatcher.retryLimit", "5")));
+        setNumThreads(Integer.parseInt(env.getProperty("email.dispatcher.numThreads", "1")));
+        setInactiveTimeOut(Long.parseLong(env.getProperty("email.dispatcher.retryLimit", "3000")));
     }
 
-    /* (non-Javadoc)
-     * @see com.visfresh.services.SystemMessageDispatcher#setSystemMessageHandler(com.visfresh.entities.SystemMessageType, com.visfresh.services.SystemMessageHandler)
+    /**
+     * @param h email handler.
      */
-    public void setHandler(final SystemMessageHandler h) {
-        super.setSystemMessageHandler(SystemMessageType.Tracker, h);
+    public void setEmailHandler(final SystemMessageHandler h) {
+        super.setSystemMessageHandler(SystemMessageType.Email, h);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.SystemMessageDispatcher#getProcessorId()
