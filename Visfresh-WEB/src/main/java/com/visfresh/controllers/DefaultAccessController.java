@@ -11,6 +11,7 @@ import com.visfresh.constants.ErrorCodes;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.Role;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.services.RestServiceException;
 
@@ -303,11 +304,52 @@ public class DefaultAccessController implements AccessController {
      */
     @Override
     public void checkCanViewDeviceGroup(final User user, final DeviceGroup group) throws RestServiceException {
-        if (havePermission(user, Role.CompanyAdmin) || group.getName().equals(user.getDeviceGroup())) {
+        if (havePermission(user, Role.CompanyAdmin)
+                && user.getCompany().getId().equals(group.getCompany().getId())
+                || group.getName().equals(user.getDeviceGroup())) {
             return;
         }
         throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
                 "User have not permissions to view device group " + group.getName());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanEditShipmentNotes(com.visfresh.entities.User, com.visfresh.entities.Shipment, com.visfresh.entities.User)
+     */
+    @Override
+    public void checkCanEditShipmentNotes(final User user, final Shipment shipment,
+            final User noteOwner) throws RestServiceException {
+        if (havePermission(user, Role.CompanyAdmin)
+                && shipment.getCompany().getId().equals(user.getCompany().getId())) {
+            return;
+        }
+        //check some user and correct company
+        if (user.getId().equals(noteOwner.getId())
+                && user.getCompany().getId().equals(shipment.getCompany().getId())) {
+            return;
+        }
+
+        throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                "User have not permissions to edit shipment notes for shipment "
+                 + shipment.getId());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanViewShipmentNotes(com.visfresh.entities.User, com.visfresh.entities.Shipment, com.visfresh.entities.User)
+     */
+    @Override
+    public void checkCanViewShipmentNotes(final User user, final Shipment shipment,
+            final User noteOwner) throws RestServiceException {
+        if (havePermission(user, Role.CompanyAdmin)
+                && shipment.getCompany().getId().equals(user.getCompany().getId())) {
+            return;
+        }
+        //check correct company
+        if (user.getCompany().getId().equals(shipment.getCompany().getId())) {
+            return;
+        }
+
+        throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                "User have not permissions to view shipment notes for shipment "
+                 + shipment.getId());
     }
     /* (non-Javadoc)
      * @see com.visfresh.controllers.AccessController#checkCanAssignRoles(com.visfresh.entities.User, java.util.Set)

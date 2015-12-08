@@ -8,6 +8,7 @@ import java.util.Set;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.Role;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.services.RestServiceException;
 
@@ -103,7 +104,7 @@ public interface AccessController {
     void checkSaveProfile(User user) throws RestServiceException;
     /**
      * @param user current user.
-     * @param company TODO
+     * @param company company.
      */
     void checkCanManageUsers(User user, Company company) throws RestServiceException;
     /**
@@ -146,4 +147,20 @@ public interface AccessController {
      * @throws RestServiceException
      */
     void checkCanAssignRoles(User user, Set<Role> roles) throws RestServiceException;
+    /**
+     * @param user user.
+     * @param shipment shipment.
+     * @param noteOwner shipment note owner.
+     * @throws RestServiceException
+     */
+    void checkCanViewShipmentNotes(User user, Shipment shipment, User noteOwner)
+            throws RestServiceException;
+    /**
+     * @param user user.
+     * @param shipment shipment
+     * @param noteOwner note owner.
+     * @throws RestServiceException
+     */
+    void checkCanEditShipmentNotes(User user, Shipment shipment, User noteOwner)
+            throws RestServiceException;
 }
