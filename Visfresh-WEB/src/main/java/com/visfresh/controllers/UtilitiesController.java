@@ -121,8 +121,10 @@ public class UtilitiesController extends AbstractController {
             getLoggedInUser(authToken);
 
             final JsonArray array = new JsonArray();
-            for (final Role units : Role.values()) {
-                array.add(new JsonPrimitive(units.toString()));
+            for (final Role roles : Role.values()) {
+                if (roles != Role.GlobalAdmin) {
+                    array.add(new JsonPrimitive(roles.toString()));
+                }
             }
 
             return createSuccessResponse(array);
