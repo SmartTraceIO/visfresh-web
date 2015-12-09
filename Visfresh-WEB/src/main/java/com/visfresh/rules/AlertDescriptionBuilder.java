@@ -4,8 +4,10 @@
 package com.visfresh.rules;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -120,6 +122,13 @@ public class AlertDescriptionBuilder {
                     //nothing
                     break;
         }
-        return new DecimalFormat("#0.0").format(temp) + degree;
+
+        //create US locale decimal format
+        final DecimalFormat fmt = new DecimalFormat("#0.0");
+        final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
+        fmt.setDecimalFormatSymbols(decimalFormatSymbols);
+
+        //format temperature string
+        return fmt.format(temp) + degree;
     }
 }
