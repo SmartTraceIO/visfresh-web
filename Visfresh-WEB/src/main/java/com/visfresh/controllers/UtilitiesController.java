@@ -144,7 +144,7 @@ public class UtilitiesController extends AbstractController {
             json.addProperty("dateTimeIso", createDateFormat("yyyy-MM-dd'T'HH:mm", tz).format(date));
 //          formattedDateTimeIso: "04 Dec 2015 4:33pm"
             json.addProperty("formattedDateTimeIso",
-                    createDateFormat("d MMM yyyy hh:mmaa", tz).format(date));
+                    createDateFormat("d-MMM-yyyy h:mmaa '('zzz')'", tz).format(date));
 //          dateTimeString: "04 Dec 2015"
             json.addProperty("dateTimeString", createDateFormat("d MMM yyyy", tz).format(date));
 //          dateString: "04:33am"

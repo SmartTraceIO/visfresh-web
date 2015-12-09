@@ -2283,11 +2283,11 @@ Response:
     "message": "Success"
   },
   "response": {
-    "dateTimeIso": "2015-11-24T09:42",
-    "formattedDateTimeIso": "24 Nov 2015 09:42AM",
-    "dateTimeString": "24 Nov 2015",
-    "dateString": "09:42AM",
-    "dateString24": "09:42",
+    "dateTimeIso": "2015-12-09T13:16",
+    "formattedDateTimeIso": "9-Dec-2015 1:16PM (UTC)",
+    "dateTimeString": "9 Dec 2015",
+    "dateString": "01:16PM",
+    "dateString24": "13:16",
     "timeZoneId": "UTC",
     "timeZoneString": "Coordinated Universal Time"
   }
