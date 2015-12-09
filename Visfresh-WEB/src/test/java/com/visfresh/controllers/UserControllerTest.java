@@ -385,23 +385,28 @@ public class UserControllerTest extends AbstractRestServiceTest {
     @Test
     public void testListUsers() throws IOException, RestServiceException {
         final Company c = new Company();
-        c.setName("Test");
+        c.setName("JUnit Internal Company");
         c.setDescription("Test company");
         context.getBean(CompanyDao.class).save(c);
 
         final User u1 = createUser("u1@google.com", "A2", "LastA2", c);
         final User u2 = createUser("u2@google.com", "A1", "LastA1", c);
+        u2.setExternal(true);
+        u2.setPosition("Docker");
+        u2.setExternalCompany("JUnit External Company");
+        context.getBean(UserDao.class).save(u2);
+
         final String token = client.login("u1@google.com", "");
         client.setAuthToken(token);
 
         //test limit
-        assertEquals(2, client.getUsers(1, 10000, null, null).size());
-        assertEquals(1, client.getUsers(1, 1, null, null).size());
-        assertEquals(1, client.getUsers(2, 1, null, null).size());
+        assertEquals(2, client.listUsers(1, 10000, null, null).size());
+        assertEquals(1, client.listUsers(1, 1, null, null).size());
+        assertEquals(1, client.listUsers(2, 1, null, null).size());
 
-        assertEquals(u2.getId(), client.getUsers(1, 1,
+        assertEquals(u2.getId(), client.listUsers(1, 1,
                 UserConstants.PROPERTY_FIRST_NAME, "asc").get(0).getId());
-        assertEquals(u1.getId(), client.getUsers(1, 1,
+        assertEquals(u1.getId(), client.listUsers(1, 1,
                 UserConstants.PROPERTY_FIRST_NAME, "desc").get(0).getId());
         //TODO other sortings.
     }

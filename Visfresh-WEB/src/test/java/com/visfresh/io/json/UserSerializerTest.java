@@ -23,6 +23,7 @@ import com.visfresh.entities.User;
 import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.lists.ExpandedListUserItem;
+import com.visfresh.services.lists.ShortListUserItem;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -217,5 +218,22 @@ public class UserSerializerTest extends AbstractSerializerTest {
         assertEquals(language, req.getLanguage());
         assertEquals(scale, req.getScale());
         assertEquals(title, req.getTitle());
+    }
+    public void testShortListUserItem() {
+        final String fullName = "Full User Name";
+        final String positionCompany = "Position in JUnit company";
+        final Long id = 7777l;
+
+        ShortListUserItem item = new ShortListUserItem();
+        item.setFullName(fullName);
+        item.setPositionCompany(positionCompany);
+        item.setId(id);
+
+        final JsonObject json = serializer.toJson(item);
+        item = serializer.parseListUserItem(json);
+
+        assertEquals(id, item.getId());
+        assertEquals(fullName, item.getFullName());
+        assertEquals(positionCompany, item.getPositionCompany());
     }
 }

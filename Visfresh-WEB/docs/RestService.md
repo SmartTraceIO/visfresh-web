@@ -952,12 +952,14 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   },
   "response": [
     {
-      "id": 288,
-      "fullName": "A2 LastA2"
+      "id": 273,
+      "fullName": "A2 LastA2",
+      "positionCompany": "Manager - JUnit Internal Company"
     },
     {
-      "id": 289,
-      "fullName": "A1 LastA1"
+      "id": 274,
+      "fullName": "A1 LastA1",
+      "positionCompany": "Docker - JUnit External Company"
     }
   ],
   "totalCount": 2

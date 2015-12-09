@@ -212,6 +212,7 @@ public class UserSerializer extends AbstractJsonSerializer {
         final JsonObject json = new JsonObject();
         json.addProperty(UserConstants.PROPERTY_ID, s.getId());
         json.addProperty("fullName", s.getFullName());
+        json.addProperty("positionCompany", s.getPositionCompany());
         return json;
     }
     /**
@@ -222,6 +223,7 @@ public class UserSerializer extends AbstractJsonSerializer {
         final ShortListUserItem item = new ShortListUserItem();
         item.setId(asLong(obj.get(UserConstants.PROPERTY_ID)));
         item.setFullName(asString(obj.get("fullName")));
+        item.setPositionCompany(asString(obj.get("positionCompany")));
         return item;
     }
 
