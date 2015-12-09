@@ -142,18 +142,19 @@ public class UtilitiesController extends AbstractController {
 
             final JsonObject json = new JsonObject();
             json.addProperty("dateTimeIso", createDateFormat("yyyy-MM-dd'T'HH:mm", tz).format(date));
-//          formattedDateTimeIso: "04 Dec 2015 4:33pm"
+            // formattedDateTimeIso: "9-Dec-2015 1:16PM (UTC)"
             json.addProperty("formattedDateTimeIso",
                     createDateFormat("d-MMM-yyyy h:mmaa '('zzz')'", tz).format(date));
-//          dateTimeString: "04 Dec 2015"
-            json.addProperty("dateTimeString", createDateFormat("d MMM yyyy", tz).format(date));
-//          dateString: "04:33am"
-            json.addProperty("dateString", createDateFormat("hh:mmaa", tz).format(date));
-//          dateString24: "16:33"
-            json.addProperty("dateString24", createDateFormat("HH:mm", tz).format(date));
+            // dateTimeString: "24-Nov-15 9:42am"
+            json.addProperty("dateTimeString", createDateFormat("d-MMM-yyyy h:mmaa", tz).format(date));
+            // dateString: "24-Nov-15"
+            json.addProperty("dateString", createDateFormat("d-MMM-yyyy", tz).format(date));
+            // timeString: "24-Nov-15"
+            json.addProperty("timeString", createDateFormat("h:mmaa", tz).format(date));
+            // v24: "16:33"
+            json.addProperty("timeString24", createDateFormat("HH:mm", tz).format(date));
             json.addProperty("timeZoneId", tz.getID());
             json.addProperty("timeZoneString", tz.getDisplayName());
-
             return createSuccessResponse(json);
         } catch (final Exception e) {
             log.error("Failed to list roles", e);
