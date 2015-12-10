@@ -36,13 +36,21 @@ public class ShortListUserItem {
      */
     public static String buildPositionCompany(final User u) {
         final StringBuilder sb = new StringBuilder();
-        sb.append(u.getPosition());
-        sb.append(" - ");
-        if (u.isExternal()) {
-            sb.append(u.getExternalCompany());
-        } else {
-            sb.append(u.getCompany().getName());
+        if (u.getPosition() != null) {
+            sb.append(u.getPosition());
         }
+        if (!u.isExternal()) {
+            if (sb.length() > 0) {
+                sb.append(" - ");
+            }
+            sb.append(u.getCompany().getName());
+        } else if (u.getExternalCompany() != null) {
+            if (sb.length() > 0) {
+                sb.append(" - ");
+            }
+            sb.append(u.getExternalCompany());
+        }
+
         return sb.toString();
     }
     /**
