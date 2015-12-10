@@ -14,7 +14,7 @@ import com.visfresh.entities.AlertType;
  */
 @Component
 public class BatteryLowAlertRule extends AbstractAlertRule {
-    private static final int LOW_BATTERY_LIMIT = 2;
+    public static final int LOW_BATTERY_LIMIT = 2;
     public static final String NAME = "BatteryLowAlert";
 
     /**
