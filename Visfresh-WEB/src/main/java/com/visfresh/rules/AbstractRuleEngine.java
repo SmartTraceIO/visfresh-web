@@ -98,7 +98,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         e.setBattery(event.getBattery());
         e.setLatitude(event.getLocation().getLatitude());
         e.setLongitude(event.getLocation().getLongitude());
-        e.setTemperature(event.getBattery());
+        e.setTemperature(event.getTemperature());
         e.setTime(event.getTime());
         e.setType(TrackerEventType.valueOf(event.getType()));
 
