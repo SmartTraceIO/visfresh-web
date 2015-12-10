@@ -32,14 +32,14 @@ import com.visfresh.rules.state.DeviceState;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
+public class EnterBrightEnvironmentAlertRuleTest extends BaseRuleTest {
     private TrackerEventRule rule;
     private Device device;
 
     /**
      * Default constructor.
      */
-    public EnterDarkEnvironmentAlertRuleTest() {
+    public EnterBrightEnvironmentAlertRuleTest() {
         super();
     }
     /**
@@ -47,7 +47,7 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
      */
     @Before
     public void setUp() {
-        this.rule = engine.getRule(EnterDarkEnvironmentAlertRule.NAME);
+        this.rule = engine.getRule(EnterBrightEnvironmentAlertRule.NAME);
         this.device = createDevice("90324870987");
     }
     /**
@@ -69,7 +69,7 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
     }
     @Test
     public void testAccept() {
-        final TrackerEvent e = createEvent(TrackerEventType.DRK);
+        final TrackerEvent e = createEvent(TrackerEventType.BRT);
         final Shipment s = createShipmentWithEnabledAlert(e.getDevice());
         e.setShipment(s);
 
@@ -109,7 +109,7 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
         assertEquals(1, alerts.size());
 
         final Alert alert = alerts.get(0);
-        assertEquals(AlertType.LightOff, alert.getType());
+        assertEquals(AlertType.LightOn, alert.getType());
         assertNotNull(alert.getDevice());
         assertNotNull(alert.getShipment());
     }
@@ -122,9 +122,9 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
         final Shipment s = createDefaultShipment(ShipmentStatus.InProgress, d);
         //enable battery low alerts
         final AlertProfile p = new AlertProfile();
-        p.setName("Enter dark environment alert rule");
+        p.setName("Enter bright environment alert rule");
         p.setCompany(s.getCompany());
-        p.setWatchEnterDarkEnvironment(true);
+        p.setWatchEnterBrightEnvironment(true);
         context.getBean(AlertProfileDao.class).save(p);
 
         s.setAlertProfile(p);
