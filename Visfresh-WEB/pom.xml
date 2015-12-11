@@ -157,6 +157,13 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.12</version>
 		</dependency>
+		
+		<!-- i18n -->
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>56.1</version>
+		</dependency>
 
 		<!-- Tests -->
 		<dependency>

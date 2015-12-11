@@ -49,10 +49,11 @@ import com.visfresh.io.MapChartItem;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
-import com.visfresh.io.SingleShipmentDto;
-import com.visfresh.io.SingleShipmentTimeItem;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.ShipmentSerializer;
+import com.visfresh.io.shipment.SingleShipmentDto;
+import com.visfresh.io.shipment.SingleShipmentDtoNew;
+import com.visfresh.io.shipment.SingleShipmentTimeItem;
 import com.visfresh.services.lists.ListShipmentItem;
 
 /**
@@ -333,7 +334,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
     }
 
-    @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getSingleShipmentOld/{authToken}", method = RequestMethod.GET)
     public JsonObject getShipmentData(@PathVariable final String authToken,
             @RequestParam final String fromDate,
             @RequestParam final String toDate,
@@ -362,6 +363,46 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             return createErrorResponse(e);
         }
     }
+    @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
+    public JsonObject getSingleShipment(@PathVariable final String authToken,
+            @RequestParam final String fromDate,
+            @RequestParam final String toDate,
+            @RequestParam final Long shipment) {
+
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            security.checkCanGetShipmentData(user);
+
+            final ShipmentSerializer ser = getSerializer(user);
+            final Date startDate = ser.parseDate(fromDate);
+            final Date endDate = ser.parseDate(toDate);
+
+            final Shipment s = shipmentDao.findOne(shipment);
+            checkCompanyAccess(user, s);
+            if (s == null) {
+                return null;
+            }
+
+            final SingleShipmentDto dtoOld = getShipmentData(s, startDate, endDate);
+            final SingleShipmentDtoNew dto = createNewSingleShipmentDate(dtoOld);
+
+            return createSuccessResponse(dto == null ? null : ser.toJson(dto));
+        } catch (final Exception e) {
+            log.error("Failed to get devices", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param dtoOld
+     * @return
+     */
+    private SingleShipmentDtoNew createNewSingleShipmentDate(
+            final SingleShipmentDto dtoOld) {
+        final SingleShipmentDtoNew dto = new SingleShipmentDtoNew();
+        return dto;
+    }
+
     @RequestMapping(value = "/getDataForMapAndChart/{authToken}", method = RequestMethod.GET)
     public JsonObject getDataForMapAndChart(@PathVariable final String authToken,
             @RequestParam final Long shipmentId) {

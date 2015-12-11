@@ -28,9 +28,12 @@ import com.visfresh.io.MapChartData;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
-import com.visfresh.io.SingleShipmentDto;
-import com.visfresh.io.SingleShipmentTimeItem;
 import com.visfresh.io.UserResolver;
+import com.visfresh.io.shipment.SingleShipmentAlert;
+import com.visfresh.io.shipment.SingleShipmentDto;
+import com.visfresh.io.shipment.SingleShipmentDtoNew;
+import com.visfresh.io.shipment.SingleShipmentLocation;
+import com.visfresh.io.shipment.SingleShipmentTimeItem;
 import com.visfresh.rules.AlertDescriptionBuilder;
 import com.visfresh.services.lists.ListNotificationScheduleItem;
 import com.visfresh.services.lists.ListShipmentItem;
@@ -531,6 +534,116 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     }
     public void setUserResolver(final UserResolver r) {
         notificationScheduleSerializer.setUserResolver(r);
+    }
+    /**
+     * @param dto
+     * @return
+     */
+    public JsonObject toJson(final SingleShipmentDtoNew dto) {
+        if (dto == null) {
+            return  null;
+        }
+
+        final JsonObject json = new JsonObject();
+
+        json.addProperty("shipmentId", dto.getShipmentId());
+        json.addProperty("deviceSN", dto.getDeviceSN());
+        json.addProperty("deviceName", dto.getDeviceName());
+        json.addProperty("tripCount", dto.getTripCount());
+        json.addProperty("shipmentDescription", dto.getShipmentDescription());
+        json.addProperty("palletId", dto.getPalletId());
+        json.addProperty("assetNum", dto.getAssetNum());
+        json.addProperty("assetType", dto.getAssetType());
+        json.addProperty("status", dto.getStatus().name());
+        json.addProperty("alertProfileId", dto.getAlertProfileId());
+        json.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
+        json.add("alertsNotificationSchedules", toJson(dto.getAlertsNotificationSchedules()));
+        json.addProperty("commentsForReceiver", dto.getCommentsForReceiver());
+        json.addProperty("arrivalNotificationWithinKm", dto.getArrivalNotificationWithinKm());
+        json.addProperty("excludeNotificationsIfNoAlerts", dto.isExcludeNotificationsIfNoAlerts());
+        json.add("arrivalNotificationSchedules", toJson(dto.getArrivalNotificationSchedules()));
+        json.addProperty("shutdownDeviceAfterMinutes", dto.getShutdownDeviceAfterMinutes());
+        json.addProperty("startLocation", dto.getStartLocation());
+        json.addProperty("startTimeStr:", dto.getStartTimeStr());
+        json.addProperty("startTimeISO", dto.getStartTimeISO());
+        json.addProperty("endLocation", dto.getEndLocation());
+        json.addProperty("eta", dto.getEta());
+        json.addProperty("etaStr", dto.getEtaStr());
+        json.addProperty("currentLocation", dto.getCurrentLocation());
+        json.add("startLocationForMap", toJson(dto.getStartLocationForMap()));
+        json.add("endLocationForMap", toJson(dto.getEndLocationForMap()));
+        json.add("currentLocationForMap", toJson(dto.getCurrentLocationForMap()));
+
+        final JsonArray locations = new JsonArray();
+        for (final SingleShipmentLocation l : dto.getLocations()) {
+            locations.add(toJson(l));
+        }
+
+        json.add("locations", locations);
+        return json;
+    }
+    /**
+     * @param l location.
+     * @return
+     */
+    private JsonObject toJson(final SingleShipmentLocation l) {
+        if (l == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("lat", l.getLatitude());
+        json.addProperty("long", l.getLongitude());
+        json.addProperty("temperature", l.getTemperature());
+        json.addProperty("timeISO", l.getTimeIso());
+        json.add("timeObj", JsonNull.INSTANCE);
+        json.add("alert", toJson(l.getAlert()));
+
+        return json;
+    }
+
+    /**
+     * @param alert
+     * @return
+     */
+    private JsonObject toJson(final SingleShipmentAlert alert) {
+        if (alert == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("title", alert.getTitle());
+        json.addProperty("temperature", alert.getTemperature());
+        json.addProperty("time", alert.getTime());
+        json.addProperty("date", alert.getDate());
+        json.addProperty("location", alert.getLocation());
+        json.addProperty("shippedTo", alert.getShippedTo());
+        json.addProperty("eta", alert.getEta());
+        json.addProperty("type", alert.getType());
+        return json;
+    }
+
+    /**
+     * @param longs
+     * @return
+     */
+    private JsonArray toJson(final List<Long> longs) {
+        final JsonArray array = new JsonArray();
+        for (final Long l : longs) {
+            array.add(new JsonPrimitive(l));
+        }
+        return array;
+    }
+
+    public SingleShipmentDtoNew parseSingleShipmentDtoNew(final JsonElement jsel) {
+        if (jsel == null || jsel.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = jsel.getAsJsonObject();
+
+        final SingleShipmentDtoNew dto = new SingleShipmentDtoNew();
+        return dto;
     }
 
     /**

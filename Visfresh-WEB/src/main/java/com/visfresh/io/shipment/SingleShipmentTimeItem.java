@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.io;
+package com.visfresh.io.shipment;
 
 import java.util.LinkedList;
 import java.util.List;
