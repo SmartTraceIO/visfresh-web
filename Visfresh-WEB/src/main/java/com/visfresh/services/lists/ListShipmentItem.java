@@ -35,6 +35,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private String alertProfileName;
     private final Map<AlertType, Integer> alertSummary = new HashMap<AlertType, Integer>();
     private ShipmentStatus status;
+    private int siblingCount;
 
     /**
      * Default constructor.
@@ -271,6 +272,18 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public Map<AlertType, Integer> getAlertSummary() {
         return alertSummary;
+    }
+    /**
+     * @return the siblingCount
+     */
+    public int getSiblingCount() {
+        return siblingCount;
+    }
+    /**
+     * @param siblingCount the siblingCount to set
+     */
+    public void setSiblingCount(final int siblingCount) {
+        this.siblingCount = siblingCount;
     }
     /* (non-Javadoc)
      * @see com.visfresh.entities.EntityWithId#getId()

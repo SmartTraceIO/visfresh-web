@@ -336,6 +336,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("alertProfileId", dto.getAlertProfileId());
         json.addProperty("alertProfileName", dto.getAlertProfileName());
         json.add("alertSummary", toJson(dto.getAlertSummary()));
+        json.addProperty("siblingCount", dto.getSiblingCount());
 
         return json;
     }

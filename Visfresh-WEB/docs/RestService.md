@@ -1593,29 +1593,64 @@ Response:
 **POST /vf/rest/getShipments/${accessToken}**  
 ```json
 {
-  "alertsOnly": true,
-  "deviceImei": "283409237873234",
-  "last2Days": true,
-  "lastDay": true,
-  "lastMonth": true,
-  "lastWeek": true,
-  "shipmentDateFrom": "2015-11-12T18:21",
-  "shipmentDateTo": "2015-11-24T07:51",
-  "shipmentDescription": "JUnit Shipment",
-  "shippedFrom": [
-    4,
-    5
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "status": "InProgress",
+      "deviceSN": "234908720394857",
+      "deviceName": "Device Name",
+      "tripCount": 1,
+      "shipmentId": 541,
+      "shipmentDescription": "Any Description",
+      "shipmentDate": "2015-11-29T21:01",
+      "palletId": "palettid",
+      "assetNum": "10515",
+      "assetType": "SeaContainer",
+      "shippedFrom": "Bankstown Warehouse",
+      "shippedTo": "Bankstown Warehouse",
+      "estArrivalDate": "2015-11-29T21:01",
+      "actualArrivalDate": null,
+      "percentageComplete": 0,
+      "alertProfileId": 384,
+      "alertProfileName": "AnyAlert",
+      "alertSummary": {
+        "CriticalCold": "3",
+        "MovementStart": "4",
+        "Hot": "2",
+        "CriticalHot": "1",
+        "LightOn": "1",
+        "LightOff": "1",
+        "Cold": "1",
+        "Battery": "2"
+      },
+      "siblingCount": 0
+    },
+    {
+      "status": "InProgress",
+      "deviceSN": "234908720394857",
+      "deviceName": "Device Name",
+      "tripCount": 1,
+      "shipmentId": 542,
+      "shipmentDescription": "Any Description",
+      "shipmentDate": "2015-11-29T21:01",
+      "palletId": "palettid",
+      "assetNum": "10515",
+      "assetType": "SeaContainer",
+      "shippedFrom": "Bankstown Warehouse",
+      "shippedTo": "Bankstown Warehouse",
+      "estArrivalDate": "2015-11-29T21:01",
+      "actualArrivalDate": null,
+      "percentageComplete": 0,
+      "alertProfileId": 385,
+      "alertProfileName": "AnyAlert",
+      "alertSummary": {},
+      "siblingCount": 0
+    }
   ],
-  "shippedTo": [
-    1,
-    2,
-    3
-  ],
-  "status": "InProgress",
-  "pageIndex": 10,
-  "pageSize": 200,
-  "sortOrder": "asc",
-  "sortColumn": "anyColumn"
+  "totalCount": 2
 }
 ```
 **Response:**  

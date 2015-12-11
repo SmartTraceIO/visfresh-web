@@ -66,7 +66,7 @@ public class UtilitiesController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    private static String displayTimeZone(final int rawOffset, final String description) {
+    public static String displayTimeZone(final int rawOffset, final String description) {
         final long hours = TimeUnit.MILLISECONDS.toHours(rawOffset);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(rawOffset)
                 - TimeUnit.HOURS.toMinutes(hours);
@@ -74,7 +74,7 @@ public class UtilitiesController extends AbstractController {
         minutes = Math.abs(minutes);
 
         String result;
-        if (hours > 0) {
+        if (hours >= 0) {
             result = String.format("GMT+%d:%02d/%s", hours, minutes, description);
         } else {
             result = String.format("GMT%d:%02d/%s", hours, minutes, description);
