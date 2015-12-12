@@ -191,6 +191,17 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final JsonObject sd = shipmentClient.getSingleShipment(s, fromTime, toTime).getAsJsonObject();
         assertNotNull(sd);
     }
+    @Test
+    public void testGetTestSingleShipment() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+        s.setShipmentDescription("JUnit test shipment");
+        context.getBean(ShipmentDao.class).save(s);
+
+        final Date fromTime = new Date(System.currentTimeMillis() - 100000000L);
+        final Date toTime = new Date(System.currentTimeMillis() + 10000000l);
+        final JsonObject sd = shipmentClient.getSingleShipment(s, fromTime, toTime).getAsJsonObject();
+        assertNotNull(sd);
+    }
     //@RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getShipments(@PathVariable final String authToken) {
     @Test

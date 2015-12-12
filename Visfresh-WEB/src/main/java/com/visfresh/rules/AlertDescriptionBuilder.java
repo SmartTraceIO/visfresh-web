@@ -109,16 +109,14 @@ public class AlertDescriptionBuilder {
      * @return temperature string.
      */
     public static String getTemperatureString(final double t, final TemperatureUnits units) {
-        double temp;
+        final double temp = getTemperature(t, units);
         String degree;
         switch (units) {
             case Fahrenheit:
                 degree = "\u00B0F";
-                temp = t * 1.8 + 32;
                 break;
                 default:
                     degree = "\u00B0C";
-                    temp = t;
                     //nothing
                     break;
         }
@@ -130,5 +128,24 @@ public class AlertDescriptionBuilder {
 
         //format temperature string
         return fmt.format(temp) + degree;
+    }
+
+    /**
+     * @param tCelsium
+     * @param units
+     * @return
+     */
+    public static double getTemperature(final double tCelsium, final TemperatureUnits units) {
+        double temp;
+        switch (units) {
+            case Fahrenheit:
+                temp = tCelsium * 1.8 + 32;
+                break;
+                default:
+                    temp = tCelsium;
+                    //nothing
+                    break;
+        }
+        return temp;
     }
 }

@@ -35,7 +35,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private String alertProfileName;
     private final Map<AlertType, Integer> alertSummary = new HashMap<AlertType, Integer>();
     private ShipmentStatus status;
-    private int siblingCount;
+    private int siblingCount = 5;
 
     /**
      * Default constructor.

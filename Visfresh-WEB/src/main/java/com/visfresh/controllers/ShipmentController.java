@@ -3,14 +3,17 @@
  */
 package com.visfresh.controllers;
 
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -38,10 +41,13 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.MapChartData;
@@ -51,9 +57,14 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.ShipmentSerializer;
+import com.visfresh.io.shipment.SingleShipmentAlert;
 import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentDtoNew;
+import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.io.shipment.SingleShipmentTimeItem;
+import com.visfresh.rules.AlertDescriptionBuilder;
+import com.visfresh.services.ArrivalEstimationService;
+import com.visfresh.services.LocationService;
 import com.visfresh.services.lists.ListShipmentItem;
 
 /**
@@ -84,27 +95,33 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private ReferenceResolver referenceResolver;
     @Autowired
     private UserResolver userResolver;
+    @Autowired
+    private ArrivalEstimationService arrivalEstimationService;
+    @Autowired
+    private AlertDescriptionBuilder alertDescriptionBuilder;
+    @Autowired
+    private LocationService locationService;
 
-    //start time
-    private static ThreadLocal<DateFormat> ISO_FORMAT = new ThreadLocal<DateFormat>() {
-        /* (non-Javadoc)
-         * @see java.lang.ThreadLocal#initialValue()
-         */
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        }
-    };
-    private static ThreadLocal<DateFormat> PRETTY_FORMAT = new ThreadLocal<DateFormat>() {
-        /* (non-Javadoc)
-         * @see java.lang.ThreadLocal#initialValue()
-         */
-        @Override
-        protected DateFormat initialValue() {
-            //9:40pm 12-Aug-2014
-            return new SimpleDateFormat("h:mm d'-'MMM'-'yyyy");
-        }
-    };
+//    //start time
+//    private static ThreadLocal<DateFormat> ISO_FORMAT = new ThreadLocal<DateFormat>() {
+//        /* (non-Javadoc)
+//         * @see java.lang.ThreadLocal#initialValue()
+//         */
+//        @Override
+//        protected DateFormat initialValue() {
+//            return new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//        }
+//    };
+//    private static ThreadLocal<DateFormat> PRETTY_FORMAT = new ThreadLocal<DateFormat>() {
+//        /* (non-Javadoc)
+//         * @see java.lang.ThreadLocal#initialValue()
+//         */
+//        @Override
+//        protected DateFormat initialValue() {
+//            //9:40pm 12-Aug-2014
+//            return new SimpleDateFormat("h:mm d'-'MMM'-'yyyy");
+//        }
+//    };
 
 
     /**
@@ -381,11 +398,16 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final Shipment s = shipmentDao.findOne(shipment);
             checkCompanyAccess(user, s);
             if (s == null) {
-                return null;
+                return createSuccessResponse(null);
             }
 
             final SingleShipmentDto dtoOld = getShipmentData(s, startDate, endDate);
-            final SingleShipmentDtoNew dto = createNewSingleShipmentDate(dtoOld);
+            final String description = dtoOld.getShipmentDescription();
+            if (description != null && description.toLowerCase().contains("test")) {
+                generateTestData(dtoOld, s);
+            }
+
+            final SingleShipmentDtoNew dto = createNewSingleShipmentDate(s, dtoOld, user);
 
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
@@ -394,15 +416,209 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
     }
     /**
+     * @param dto
+     */
+    private void generateTestData(final SingleShipmentDto dto, final Shipment s) {
+        final int count = 20;
+        final long ddate = 5 * 60 * 1000l;
+        final long t0 = System.currentTimeMillis() - ddate * count;
+        dto.setShipmentDate(new Date(t0));
+
+        if (s.getShippedFrom() == null || s.getShippedTo() == null) {
+            return;
+        }
+
+        final double lat0 = s.getShippedFrom().getLocation().getLatitude();
+        double nlat = lat0 - s.getShippedTo().getLocation().getLatitude();
+        final double lon0 = s.getShippedFrom().getLocation().getLongitude();
+        double nlon = lon0 - s.getShippedTo().getLocation().getLongitude();
+        final double norma = Math.sqrt(nlat * nlat + nlon * nlon);
+
+        //normalize n
+        nlat /= norma;
+        nlon /= norma;
+
+        final double dl = norma / (count + 5);
+        for (int i = 0; i < count; i++) {
+            final double lat = lat0 + i * dl * nlat;
+            final double lon = lon0 + i * dl * nlon;
+            final Date date = new Date(t0 + i * ddate);
+            final TrackerEvent e = new TrackerEvent();
+            e.setDevice(s.getDevice());
+            e.setId((long) i);
+            e.setTime(date);
+            e.setLatitude(lat);
+            e.setLongitude(lon);
+            e.setShipment(s);
+            e.setType(TrackerEventType.AUT);
+
+            final SingleShipmentTimeItem item = new SingleShipmentTimeItem();
+            item.setEvent(e);
+
+            if (i % 5 == 0) {
+                //create alert
+                final TemperatureAlert ta = new TemperatureAlert();
+                ta.setTemperature(10 + i);
+                ta.setDate(date);
+                ta.setId((long) i);
+                ta.setType(AlertType.Hot);
+                ta.setShipment(s);
+                ta.setDevice(s.getDevice());
+                item.getAlerts().add(ta);
+            }
+
+            dto.getItems().add(item);
+        }
+    }
+    /**
      * @param dtoOld
      * @return
      */
-    private SingleShipmentDtoNew createNewSingleShipmentDate(
-            final SingleShipmentDto dtoOld) {
+    private SingleShipmentDtoNew createNewSingleShipmentDate(final Shipment shipment,
+            final SingleShipmentDto dtoOld, final User user) {
+        //"startTimeISO": "2014-08-12 12:10",
+        final DateFormat isoFmt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        isoFmt.setTimeZone(user.getTimeZone());
+
+        //"startTimeStr:": "19:00 12 AUG 14",
+        final DateFormat descriptionFmt = new SimpleDateFormat("hh:mm dd MMM yy", Locale.US);
+        descriptionFmt.setTimeZone(user.getTimeZone());
+
         final SingleShipmentDtoNew dto = new SingleShipmentDtoNew();
+        dto.setAlertProfileId(dtoOld.getAlertProfileId());
+        dto.setAlertSuppressionMinutes(dtoOld.getAlertSuppressionMinutes());
+        dto.setArrivalNotificationWithinKm(dtoOld.getArrivalNotificationWithInKm());
+        dto.setAssetNum(dtoOld.getAssetNum());
+        dto.setAssetType(dtoOld.getAssetType());
+        dto.setCommentsForReceiver(dtoOld.getCommentsForReceiver());
+        dto.setCurrentLocation(dtoOld.getCurrentLocation());
+
+        final List<SingleShipmentTimeItem> items = dtoOld.getItems();
+        if (items.size() > 0) {
+            final TrackerEvent lastEvent = items.get(items.size() - 1).getEvent();
+            dto.setCurrentLocationForMap(new Location(lastEvent.getLatitude(), lastEvent.getLongitude()));
+        }
+
+        dto.setDeviceName(dtoOld.getDeviceName());
+        dto.setDeviceSN(dtoOld.getDeviceSn());
+        if (shipment.getShippedTo() != null) {
+            dto.setEndLocation(shipment.getShippedTo().getAddress());
+            dto.setEndLocationForMap(shipment.getShippedTo().getLocation());
+
+            if (shipment.getShippedFrom() != null && dto.getCurrentLocation() != null) {
+                //get last location
+                final Date eta = arrivalEstimationService.estimateArrivalDate(
+                        shipment, dto.getCurrentLocationForMap(), new Date());
+                if (eta != null) {
+                    //"eta": "2014-08-12 21:40",
+                    dto.setEta(isoFmt.format(eta));
+                    //"etaStr": "21:40 12 AUG 14",
+                    dto.setEtaStr(descriptionFmt.format(eta));
+                }
+            }
+        }
+
+        dto.setExcludeNotificationsIfNoAlerts(dtoOld.isExcludeNotificationsIfNoAlertsFired());
+        dto.setPalletId(dtoOld.getPalletId());
+        dto.setShipmentDescription(dtoOld.getShipmentDescription());
+        dto.setShipmentId(shipment.getId());
+        if (shipment.getAlertProfile() != null) {
+            dto.setShutdownDeviceAfterMinutes(shipment.getShutdownDeviceTimeOut());
+        }
+        if (shipment.getShippedFrom() != null) {
+            dto.setStartLocation(shipment.getShippedFrom().getAddress());
+            dto.setStartLocationForMap(shipment.getShippedTo().getLocation());
+        }
+        final Date date = shipment.getShipmentDate();
+
+        dto.setStartTimeISO(isoFmt.format(date));
+        dto.setStartTimeStr(descriptionFmt.format(date));
+
+        dto.setStatus(shipment.getStatus());
+        dto.setTripCount(dtoOld.getTripCount());
+
+        //"6:47pm"
+        final DateFormat shortFormat = new SimpleDateFormat("h:mmaa");
+        shortFormat.setTimeZone(user.getTimeZone());
+
+        for (final SingleShipmentTimeItem item : items) {
+            dto.getLocations().addAll(createLocations(item, isoFmt, shortFormat,
+                    user, dto.getEta(), dto.getEndLocation()));
+        }
         return dto;
     }
 
+    /**
+     * @param item
+     * @return
+     */
+    private List<SingleShipmentLocation> createLocations(
+            final SingleShipmentTimeItem item,
+            final DateFormat timeIsoFmt,
+            final DateFormat shortFormat,
+            final User user,
+            final String etaIso,
+            final String shippedTo) {
+        final List<SingleShipmentLocation> list = new LinkedList<SingleShipmentLocation>();
+
+        final TrackerEvent event = item.getEvent();
+
+        //create location
+        SingleShipmentLocation lo = new SingleShipmentLocation();
+        lo.setLatitude(event.getLatitude());
+        lo.setLongitude(event.getLongitude());
+        lo.setTemperature(event.getTemperature());
+        lo.setTimeIso(timeIsoFmt.format(event.getTime()));
+        list.add(lo);
+
+        String address = null;
+
+        final Iterator<Alert> iter = item.getAlerts().iterator();
+        while (iter.hasNext()) {
+            final Alert a = iter.next();
+            final SingleShipmentAlert alert = new SingleShipmentAlert();
+
+            //date: "2014-10-11T12:47",
+            alert.setDate(timeIsoFmt.format(a.getDate()));
+            //title: "#654321 went below 1°c for 60mins in total",
+            alert.setTitle(alertDescriptionBuilder.buildDescription(a, user));
+
+            //temperature: "0.62",
+            if (a instanceof TemperatureAlert) {
+                final TemperatureAlert ta = (TemperatureAlert) a;
+                alert.setTemperature(AlertDescriptionBuilder.getTemperature(
+                        ta.getTemperature(), user.getTemperatureUnits()));
+            }
+
+            //time: "6:47pm",
+            alert.setTime(shortFormat.format(a.getDate()));
+            //location: "Close to Orbost, Vic(+/-3000m)",
+            if (address == null) {
+                address = locationService.getLocationDescription(
+                        new Location(lo.getLatitude(), lo.getLongitude()));
+            }
+            alert.setLocation(address);
+            //shippedTo: "ABC Store Petersham",
+
+            alert.setEta(etaIso);
+            alert.setType(a.getType().name());
+
+            lo.setAlert(alert);
+
+            if (iter.hasNext()) {
+                final SingleShipmentLocation l = new SingleShipmentLocation();
+                l.setLatitude(lo.getLatitude());
+                l.setLongitude(lo.getLongitude());
+                l.setTemperature(lo.getTemperature());
+                l.setTimeIso(lo.getTimeIso());
+                list.add(l);
+
+                lo = l;
+            }
+        }
+
+        return list;
+    }
     @RequestMapping(value = "/getDataForMapAndChart/{authToken}", method = RequestMethod.GET)
     public JsonObject getDataForMapAndChart(@PathVariable final String authToken,
             @RequestParam final Long shipmentId) {
@@ -438,14 +654,20 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             }
 
             final Date startTime = shipment.getShipmentDate();
-            data.setStartTimeISO(ISO_FORMAT.get().format(startTime));
-            data.setStartTimeStr(PRETTY_FORMAT.get().format(startTime));
+
+            final DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            isoFormat.setTimeZone(user.getTimeZone());
+            data.setStartTimeISO(isoFormat.format(startTime));
+
+            final DateFormat prettyFormat = new SimpleDateFormat("h:mm d'-'MMM'-'yyyy", Locale.US);
+            prettyFormat.setTimeZone(user.getTimeZone());
+            data.setStartTimeStr(prettyFormat.format(startTime));
 
             //Add timed items
             final SingleShipmentDto dto = getShipmentData(shipment,
                     new Date(startTime.getTime() - 1000000l), new Date());
             for (final SingleShipmentTimeItem item : dto.getItems()) {
-                final List<MapChartItem> mci = createMapChartItem(item, shipment);
+                final List<MapChartItem> mci = createMapChartItem(item, shipment, isoFormat);
                 data.getLocations().addAll(mci);
             }
 
@@ -461,7 +683,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @return the list of chart item.
      */
     private List<MapChartItem> createMapChartItem(final SingleShipmentTimeItem item,
-            final Shipment shipment) {
+            final Shipment shipment, final DateFormat isoFormat) {
         final TrackerEvent event = item.getEvent();
 
         final ArrayList<MapChartItem> list = new ArrayList<MapChartItem>(item.getAlerts().size());
@@ -470,7 +692,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             mci.setLat(event.getLatitude());
             mci.setLon(event.getLongitude());
             mci.setTemperature(event.getTemperature());
-            mci.setTimeISO(ISO_FORMAT.get().format(event.getTime()));
+            mci.setTimeISO(isoFormat.format(event.getTime()));
 
 
         }
