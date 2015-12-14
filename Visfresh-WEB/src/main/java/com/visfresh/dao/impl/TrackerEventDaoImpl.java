@@ -121,19 +121,15 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      * @see com.visfresh.dao.TrackerEventDao#getEvents(com.visfresh.entities.Shipment, java.util.Date, java.util.Date)
      */
     @Override
-    public List<TrackerEvent> getEvents(final Shipment shipment, final Date fromDate,
-            final Date toDate) {
+    public List<TrackerEvent> getEvents(final Shipment shipment) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("shipment", shipment.getId());
-        params.put("fromDate", fromDate);
-        params.put("toDate", toDate);
 
         final List<Map<String, Object>> list = jdbc.queryForList(
                 "select * from "
                 + TABLE
                 + " where "
-                + SHIPMENT_FIELD + " =:shipment"
-                + " and time >= :fromDate and time <= :toDate order by time, id",
+                + SHIPMENT_FIELD + " =:shipment order by time, id",
                 params);
 
         final Map<String, Object> cache = new HashMap<String, Object>();

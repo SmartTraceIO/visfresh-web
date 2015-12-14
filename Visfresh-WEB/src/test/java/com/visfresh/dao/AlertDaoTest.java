@@ -173,11 +173,11 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         createAndSave(new Date(endDate.getTime()));
         createAndSave(new Date(endDate.getTime() + 1000l));
 
-        assertEquals(3, dao.getAlerts(shipment, startDate, endDate).size());
+        assertEquals(5, dao.getAlerts(shipment).size());
 
         //check left shipment
         final Shipment left = createShipment(device);
-        assertEquals(0, dao.getAlerts(left, startDate, endDate).size());
+        assertEquals(0, dao.getAlerts(left).size());
     }
 
     /**

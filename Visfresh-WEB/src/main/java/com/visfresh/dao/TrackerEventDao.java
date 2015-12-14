@@ -3,7 +3,6 @@
  */
 package com.visfresh.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import com.visfresh.entities.Shipment;
@@ -16,11 +15,9 @@ import com.visfresh.entities.TrackerEvent;
 public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
     /**
      * @param shipment
-     * @param fromDate
-     * @param toDate
      * @return
      */
-    List<TrackerEvent> getEvents(Shipment shipment, Date fromDate, Date toDate);
+    List<TrackerEvent> getEvents(Shipment shipment);
     /**
      * @param event event.
      * @return previous event for given.

@@ -39,7 +39,6 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
@@ -291,8 +290,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
         //add alerts to each shipment.
         for (final Shipment s : shipments) {
-            final List<Alert> alerts = alertDao.getAlerts(s,
-                    new Date(0L), new Date(System.currentTimeMillis() + 100000000l));
+            final List<Alert> alerts = alertDao.getAlerts(s);
             final ListShipmentItem dto = new ListShipmentItem(s);
             dto.getAlertSummary().putAll(toSummaryMap(alerts));
             result.add(dto);
@@ -353,9 +351,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
     @RequestMapping(value = "/getSingleShipmentOld/{authToken}", method = RequestMethod.GET)
     public JsonObject getShipmentData(@PathVariable final String authToken,
-            @RequestParam final String fromDate,
-            @RequestParam final String toDate,
-            @RequestParam final Long shipment) {
+            @RequestParam final Long shipmentId) {
 
         try {
             //check logged in.
@@ -363,16 +359,14 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             security.checkCanGetShipmentData(user);
 
             final ShipmentSerializer ser = getSerializer(user);
-            final Date startDate = ser.parseDate(fromDate);
-            final Date endDate = ser.parseDate(toDate);
 
-            final Shipment s = shipmentDao.findOne(shipment);
+            final Shipment s = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, s);
             if (s == null) {
                 return null;
             }
 
-            final SingleShipmentDto dto = getShipmentData(s, startDate, endDate);
+            final SingleShipmentDto dto = getShipmentData(s, true);
 
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
@@ -382,9 +376,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     }
     @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
     public JsonObject getSingleShipment(@PathVariable final String authToken,
-            @RequestParam final String fromDate,
-            @RequestParam final String toDate,
-            @RequestParam final Long shipment) {
+            @RequestParam final Long shipmentId) {
 
         try {
             //check logged in.
@@ -392,16 +384,14 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             security.checkCanGetShipmentData(user);
 
             final ShipmentSerializer ser = getSerializer(user);
-            final Date startDate = ser.parseDate(fromDate);
-            final Date endDate = ser.parseDate(toDate);
 
-            final Shipment s = shipmentDao.findOne(shipment);
+            final Shipment s = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, s);
             if (s == null) {
                 return createSuccessResponse(null);
             }
 
-            final SingleShipmentDto dtoOld = getShipmentData(s, startDate, endDate);
+            final SingleShipmentDto dtoOld = getShipmentData(s, true);
             final String description = dtoOld.getShipmentDescription();
             if (description != null && description.toLowerCase().contains("test")) {
                 generateTestData(dtoOld, s);
@@ -599,6 +589,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             }
             alert.setLocation(address);
             //shippedTo: "ABC Store Petersham",
+            alert.setShippedTo(shippedTo);
 
             alert.setEta(etaIso);
             alert.setType(a.getType().name());
@@ -664,8 +655,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             data.setStartTimeStr(prettyFormat.format(startTime));
 
             //Add timed items
-            final SingleShipmentDto dto = getShipmentData(shipment,
-                    new Date(startTime.getTime() - 1000000l), new Date());
+            final SingleShipmentDto dto = getShipmentData(shipment, true);
             for (final SingleShipmentTimeItem item : dto.getItems()) {
                 final List<MapChartItem> mci = createMapChartItem(item, shipment, isoFormat);
                 data.getLocations().addAll(mci);
@@ -701,15 +691,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     }
     /**
      * @param s shipment.
-     * @param startDate start shipment date.
-     * @param endDate end shipment date.
+     * @param includeAlerts whether or not should include alerts.
      * @return single shipment data.
      */
-    private SingleShipmentDto getShipmentData(final Shipment s,
-            final Date startDate, final Date endDate) {
+    private SingleShipmentDto getShipmentData(final Shipment s, final boolean includeAlerts) {
         final SingleShipmentDto dto = creatSingleShipmentDto(s);
 
-        final List<TrackerEvent> events = trackerEventDao.getEvents(s, startDate, endDate);
+        final List<TrackerEvent> events = trackerEventDao.getEvents(s);
         for (final TrackerEvent e : events) {
             final SingleShipmentTimeItem item = new SingleShipmentTimeItem();
             item.setEvent(e);
@@ -717,19 +705,12 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
         Collections.sort(dto.getItems());
 
-        if (events.size() > 0) {
+        if (includeAlerts && events.size() > 0) {
             //add alerts
-            final List<Alert> alerts = alertDao.getAlerts(s, startDate, endDate);
+            final List<Alert> alerts = alertDao.getAlerts(s);
             for (final Alert alert : alerts) {
                 final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), alert.getDate());
                 item.getAlerts().add(alert);
-            }
-
-            //add arrivals
-            final List<Arrival> arrivals = arrivalDao.getArrivals(s, startDate, endDate);
-            for (final Arrival arrival : arrivals) {
-                final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), arrival.getDate());
-                item.getArrivals().add(arrival);
             }
 
             dto.getAlertSummary().putAll(toSummaryMap(alerts));

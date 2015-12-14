@@ -372,9 +372,7 @@ Method *GET*, method name deleteShipment, method parameters:
 
 ### Get Single Shipment ###
 Method *GET*, method *getSingleShipment*. Request parameters:  
-1 fromDate start selection data  
-2. toDate end selection data  
-3. shipment shipment ID  
+1. shipmentId shipment ID  
 [(example)](#markdown-header-get-single-shipment-example)
 
 ### Get Notifications ###
@@ -2153,7 +2151,7 @@ Response:
 }
 ```
 ### Get Single Shipment example ###
-**GET /vf/rest/getSingleShipment/${accessToken}?fromDate=${startDate}&shipment=${shipmentId}&toDate=${endData}**  
+**GET /vf/rest/getSingleShipment/${accessToken}?shipmentId=858**  
 **Response:**  
 ```json
 {
@@ -2162,85 +2160,84 @@ Response:
     "message": "Success"
   },
   "response": {
-    "status": "In Progress",
+    "shipmentId": 858,
     "deviceSN": "394857",
     "deviceName": "Device Name",
     "tripCount": 1,
-    "shipmentId": 517,
     "shipmentDescription": "Any Description",
     "palletId": "palettid",
-    "poNum": 893793487,
     "assetNum": "10515",
     "assetType": "SeaContainer",
-    "shippedFrom": 651,
-    "shippedTo": 652,
-    "currentLocation": "Not determined",
-    "estArrivalDate": "2015-11-27T09:11",
-    "actualArrivalDate": "2015-11-27T09:11",
-    "percentageComplete": 0,
-    "alertProfileId": 394,
-    "alertProfileName": "AnyAlert",
+    "status": "InProgress",
+    "alertProfileId": 587,
     "alertSuppressionMinutes": 55,
-    "maxTimesAlertFires": 0,
-    "alertsNotificationSchedules": [
-      {
-        "notificationScheduleId": 642,
-        "notificationScheduleName": "Sched",
-        "notificationScheduleDescription": "JUnit schedule",
-        "peopleToNotify": "Alexander Suvorov, Alexander Suvorov"
-      }
-    ],
-    "alertSummary": {
-      "Battery": "1",
-      "Hot": "1"
-    },
-    "arrivalNotificationWithinKm": 111,
-    "excludeNotificationIfNoAlerts": false,
-    "arrivalNotificationSchedules": [
-      {
-        "notificationScheduleId": 643,
-        "notificationScheduleName": "Sched",
-        "notificationScheduleDescription": "JUnit schedule",
-        "peopleToNotify": "Mikhael Kutuzov, Mikhael Kutuzov"
-      }
-    ],
+    "alertsNotificationSchedules": [],
     "commentsForReceiver": "Comments for receiver",
-    "items": [
+    "arrivalNotificationWithinKm": 111,
+    "excludeNotificationsIfNoAlerts": false,
+    "arrivalNotificationSchedules": [],
+    "shutdownDeviceAfterMinutes": 155,
+    "startLocation": "Bankstown Warehouse",
+    "startTimeStr:": "09:15 02 Dec 15",
+    "startTimeISO": "2015-12-02 09:15",
+    "endLocation": "Bankstown Warehouse",
+    "eta": "2015-12-14 11:02",
+    "etaStr": "11:02 14 Dec 15",
+    "currentLocation": "Not determined",
+    "startLocationForMap": {
+      "latitude": 100.5,
+      "longitude": 100.501
+    },
+    "endLocationForMap": {
+      "latitude": 100.5,
+      "longitude": 100.501
+    },
+    "currentLocationForMap": {
+      "latitude": 50.5,
+      "longitude": 51.51
+    },
+    "locations": [
       {
-        "timestamp": "2015-11-25T09:11",
-        "location": {
-          "latitude": 50.5,
-          "longitude": 51.51
-        },
+        "lat": 50.5,
+        "long": 51.51,
         "temperature": 56.0,
-        "type": "AUT",
-        "alerts": [
-          {
-            "description": "Battery low at 05:24",
-            "type": "Battery"
-          },
-          {
-            "description": "Too hot alert - tracker 394857(1) went above 5,0°C degrees for 55 min",
-            "type": "Hot"
-          }
-        ],
-        "arrivas": [
-          {
-            "numberOfMetersOfArrival": 400,
-            "arrivalReportSentTo": ""
-          }
-        ]
+        "timeISO": "2015-12-14 11:02",
+        "timeObj": null,
+        "alert": {
+          "title": "Battery low at 07:15",
+          "temperature": 0.0,
+          "time": "7:15AM",
+          "date": "2015-12-13 07:15",
+          "location": "Bankstown Warehouse",
+          "shippedTo": "Bankstown Warehouse",
+          "eta": "2015-12-14 11:02",
+          "type": "Battery"
+        }
       },
       {
-        "timestamp": "2015-11-25T09:11",
-        "location": {
-          "latitude": 50.5,
-          "longitude": 51.51
-        },
+        "lat": 50.5,
+        "long": 51.51,
         "temperature": 56.0,
-        "type": "AUT",
-        "alerts": [],
-        "arrivas": []
+        "timeISO": "2015-12-14 11:02",
+        "timeObj": null,
+        "alert": {
+          "title": "Too hot alert - tracker 394857(1) went above 5.0°C degrees for 55 min",
+          "temperature": 5.0,
+          "time": "11:02AM",
+          "date": "2015-12-14 11:02",
+          "location": "Bankstown Warehouse",
+          "shippedTo": "Bankstown Warehouse",
+          "eta": "2015-12-14 11:02",
+          "type": "Hot"
+        }
+      },
+      {
+        "lat": 50.5,
+        "long": 51.51,
+        "temperature": 56.0,
+        "timeISO": "2015-12-14 11:02",
+        "timeObj": null,
+        "alert": null
       }
     ]
   }

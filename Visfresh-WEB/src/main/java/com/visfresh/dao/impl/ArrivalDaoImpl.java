@@ -124,12 +124,9 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
      * @see com.visfresh.dao.ArrivalDao#getArrivals(com.visfresh.entities.Shipment, java.util.Date, java.util.Date)
      */
     @Override
-    public List<Arrival> getArrivals(final Shipment shipment, final Date fromDate,
-            final Date toDate) {
+    public List<Arrival> getArrivals(final Shipment shipment) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("shipment", shipment.getId());
-        params.put("fromDate", fromDate);
-        params.put("toDate", toDate);
         final Map<String, String> fields = createSelectAsMapping();
 
         final List<Map<String, Object>> list = jdbc.queryForList(
@@ -138,8 +135,7 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
                 + " from "
                 + TABLE + " a"
                 + " where "
-                + "a." + SHIPMENT_FIELD + " =:shipment"
-                + " and date >= :fromDate and date <= :toDate order by date, id",
+                + "a." + SHIPMENT_FIELD + " =:shipment order by date, id",
                 params);
 
         final Map<String, Object> cache = new HashMap<String, Object>();

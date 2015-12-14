@@ -4,7 +4,6 @@
 package com.visfresh.controllers.restclient;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 
 import com.google.gson.JsonArray;
@@ -35,12 +34,10 @@ public class ShipmentRestClient extends RestClient {
         super();
         this.serializer = new ShipmentSerializer(user);
     }
-    public JsonElement getSingleShipment(final Shipment shipment, final Date from, final Date to)
+    public JsonElement getSingleShipment(final Shipment shipment)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("fromDate", serializer.formatDate(from));
-        params.put("toDate", serializer.formatDate(to));
-        params.put("shipment", shipment.getId().toString());
+        params.put("shipmentId", shipment.getId().toString());
 
         return sendGetRequest(getPathWithToken("getSingleShipment"), params);
     }

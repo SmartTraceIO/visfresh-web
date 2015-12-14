@@ -166,11 +166,11 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         createAndSave(new Date(endDate.getTime()), 5.5);
         createAndSave(new Date(endDate.getTime() + 1000l), 5.5);
 
-        assertEquals(3, dao.getEvents(shipment, startDate, endDate).size());
+        assertEquals(5, dao.getEvents(shipment).size());
 
         //check left shipment
         final Shipment left = createShipment(device);
-        assertEquals(0, dao.getEvents(left, startDate, endDate).size());
+        assertEquals(0, dao.getEvents(left).size());
     }
     @Test
     public void testGetPreviousEvent() {

@@ -151,11 +151,9 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
      * @see com.visfresh.dao.AlertDao#getAlerts(com.visfresh.entities.Shipment, java.util.Date, java.util.Date)
      */
     @Override
-    public List<Alert> getAlerts(final Shipment shipment, final Date fromDate, final Date toDate) {
+    public List<Alert> getAlerts(final Shipment shipment) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("shipment", shipment.getId());
-        params.put("fromDate", fromDate);
-        params.put("toDate", toDate);
         final Map<String, String> fields = createSelectAsMapping();
 
         final List<Map<String, Object>> list = jdbc.queryForList(
@@ -164,8 +162,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
                 + " from "
                 + TABLE + " a"
                 + " where "
-                + "a." + SHIPMENT_FIELD + " =:shipment"
-                + " and date >= :fromDate and date <= :toDate order by date, id",
+                + "a." + SHIPMENT_FIELD + " =:shipment order by date, id",
                 params);
         final List<Alert> alerts = new LinkedList<Alert>();
         for (final Map<String,Object> row : list) {

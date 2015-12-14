@@ -93,11 +93,11 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
         createAndSave(new Date(endDate.getTime()));
         createAndSave(new Date(endDate.getTime() + 1000l));
 
-        assertEquals(3, dao.getArrivals(shipment, startDate, endDate).size());
+        assertEquals(5, dao.getArrivals(shipment).size());
 
         //check left shipment
         final Shipment left = createShipment(device);
-        assertEquals(0, dao.getArrivals(left, startDate, endDate).size());
+        assertEquals(0, dao.getArrivals(left).size());
     }
 
     /**

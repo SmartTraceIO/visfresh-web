@@ -22,12 +22,15 @@ import com.visfresh.controllers.restclient.RestIoListener;
 import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Location;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -186,20 +189,24 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         createTemperatureAlert(s, AlertType.Hot);
         createArrival(s);
 
-        final Date fromTime = new Date(System.currentTimeMillis() - 100000000L);
-        final Date toTime = new Date(System.currentTimeMillis() + 10000000l);
-        final JsonObject sd = shipmentClient.getSingleShipment(s, fromTime, toTime).getAsJsonObject();
+        final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
         assertNotNull(sd);
     }
     @Test
     public void testGetTestSingleShipment() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
+
+        //correct location
+        final LocationProfile shippedTo = s.getShippedTo();
+        final Location loc = shippedTo.getLocation();
+        loc.setLatitude(loc.getLatitude() + 10);
+        loc.setLongitude(loc.getLongitude() + 10);
+        context.getBean(LocationProfileDao.class).save(shippedTo);
+
         s.setShipmentDescription("JUnit test shipment");
         context.getBean(ShipmentDao.class).save(s);
 
-        final Date fromTime = new Date(System.currentTimeMillis() - 100000000L);
-        final Date toTime = new Date(System.currentTimeMillis() + 10000000l);
-        final JsonObject sd = shipmentClient.getSingleShipment(s, fromTime, toTime).getAsJsonObject();
+        final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
         assertNotNull(sd);
     }
     //@RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
