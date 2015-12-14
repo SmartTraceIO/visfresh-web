@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ import com.visfresh.io.shipment.SingleShipmentTimeItem;
 import com.visfresh.rules.AlertDescriptionBuilder;
 import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.services.LocationService;
+import com.visfresh.services.SiblingDetectorService;
 import com.visfresh.services.lists.ListShipmentItem;
 
 /**
@@ -100,6 +102,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private AlertDescriptionBuilder alertDescriptionBuilder;
     @Autowired
     private LocationService locationService;
+    @Autowired
+    private SiblingDetectorService siblingService;
 
 //    //start time
 //    private static ThreadLocal<DateFormat> ISO_FORMAT = new ThreadLocal<DateFormat>() {
@@ -391,19 +395,34 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 return createSuccessResponse(null);
             }
 
-            final SingleShipmentDto dtoOld = getShipmentData(s, true);
-            final String description = dtoOld.getShipmentDescription();
-            if (description != null && description.toLowerCase().contains("test")) {
-                generateTestData(dtoOld, s);
-            }
+            final SingleShipmentDtoNew dto = createDto(s, user, true);
 
-            final SingleShipmentDtoNew dto = createNewSingleShipmentDate(s, dtoOld, user);
+            //add siblings
+            for (final Shipment sibling : siblingService.getSiblings(s)) {
+                dto.getSiblings().add(createDto(sibling, user, false));
+            }
 
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param s
+     * @param user
+     * @param addAlerts
+     * @return
+     */
+    protected SingleShipmentDtoNew createDto(final Shipment s, final User user,
+            final boolean addAlerts) {
+        final SingleShipmentDto dtoOld = getShipmentData(s, addAlerts);
+        final String description = dtoOld.getShipmentDescription();
+        if (description != null && description.toLowerCase().contains("test")) {
+            generateTestData(dtoOld, s);
+        }
+
+        return createNewSingleShipmentDate(s, dtoOld, user);
     }
     /**
      * @param dto
@@ -428,10 +447,20 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         nlat /= norma;
         nlon /= norma;
 
+        final Random random = new Random();
         final double dl = norma / (count + 5);
         for (int i = 0; i < count; i++) {
-            final double lat = lat0 + i * dl * nlat;
-            final double lon = lon0 + i * dl * nlon;
+            final double lat;
+            final double lon;
+
+            if (dl > 0) {
+                lat = lat0 + i * dl * nlat;
+                lon = lon0 + i * dl * nlon;
+            } else {
+                lat = lat0;
+                lon = lon0;
+            }
+
             final Date date = new Date(t0 + i * ddate);
             final TrackerEvent e = new TrackerEvent();
             e.setDevice(s.getDevice());
@@ -439,6 +468,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             e.setTime(date);
             e.setLatitude(lat);
             e.setLongitude(lon);
+            e.setTemperature(13. + 3. * (random.nextDouble() - 0.5));
             e.setShipment(s);
             e.setType(TrackerEventType.AUT);
 
@@ -448,7 +478,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             if (i % 5 == 0) {
                 //create alert
                 final TemperatureAlert ta = new TemperatureAlert();
-                ta.setTemperature(10 + i);
+                ta.setTemperature(e.getTemperature());
                 ta.setDate(date);
                 ta.setId((long) i);
                 ta.setType(AlertType.Hot);

@@ -2151,7 +2151,7 @@ Response:
 }
 ```
 ### Get Single Shipment example ###
-**GET /vf/rest/getSingleShipment/${accessToken}?shipmentId=858**  
+**GET /vf/rest/getSingleShipment/${accessToken}?shipmentId=1080**  
 **Response:**  
 ```json
 {
@@ -2160,16 +2160,16 @@ Response:
     "message": "Success"
   },
   "response": {
-    "shipmentId": 858,
+    "shipmentId": 1080,
     "deviceSN": "394857",
     "deviceName": "Device Name",
     "tripCount": 1,
-    "shipmentDescription": "Any Description",
+    "shipmentDescription": "JUnit test shipment",
     "palletId": "palettid",
     "assetNum": "10515",
     "assetType": "SeaContainer",
     "status": "InProgress",
-    "alertProfileId": 587,
+    "alertProfileId": 748,
     "alertSuppressionMinutes": 55,
     "alertsNotificationSchedules": [],
     "commentsForReceiver": "Comments for receiver",
@@ -2178,68 +2178,223 @@ Response:
     "arrivalNotificationSchedules": [],
     "shutdownDeviceAfterMinutes": 155,
     "startLocation": "Bankstown Warehouse",
-    "startTimeStr:": "09:15 02 Dec 15",
-    "startTimeISO": "2015-12-02 09:15",
+    "startTimeStr:": "12:52 03 Dec 15",
+    "startTimeISO": "2015-12-03 12:52",
     "endLocation": "Bankstown Warehouse",
-    "eta": "2015-12-14 11:02",
-    "etaStr": "11:02 14 Dec 15",
+    "eta": "2015-11-16 11:50",
+    "etaStr": "11:50 16 Nov 15",
     "currentLocation": "Not determined",
     "startLocationForMap": {
-      "latitude": 100.5,
-      "longitude": 100.501
+      "latitude": 110.5,
+      "longitude": 110.501
     },
     "endLocationForMap": {
-      "latitude": 100.5,
-      "longitude": 100.501
+      "latitude": 110.5,
+      "longitude": 110.501
     },
     "currentLocationForMap": {
-      "latitude": 50.5,
-      "longitude": 51.51
+      "latitude": 92.9,
+      "longitude": 92.90100000000001
     },
     "locations": [
       {
-        "lat": 50.5,
-        "long": 51.51,
-        "temperature": 56.0,
-        "timeISO": "2015-12-14 11:02",
+        "lat": 100.5,
+        "long": 100.501,
+        "temperature": 13.667114451111065,
+        "timeISO": "2015-12-14 12:59",
         "timeObj": null,
         "alert": {
-          "title": "Battery low at 07:15",
-          "temperature": 0.0,
-          "time": "7:15AM",
-          "date": "2015-12-13 07:15",
+          "title": "Too hot alert - tracker 394857(1) went above 13.7°C degrees for 0 min",
+          "temperature": 13.667114451111065,
+          "time": "12:59PM",
+          "date": "2015-12-14 12:59",
           "location": "Bankstown Warehouse",
           "shippedTo": "Bankstown Warehouse",
-          "eta": "2015-12-14 11:02",
-          "type": "Battery"
-        }
-      },
-      {
-        "lat": 50.5,
-        "long": 51.51,
-        "temperature": 56.0,
-        "timeISO": "2015-12-14 11:02",
-        "timeObj": null,
-        "alert": {
-          "title": "Too hot alert - tracker 394857(1) went above 5.0°C degrees for 55 min",
-          "temperature": 5.0,
-          "time": "11:02AM",
-          "date": "2015-12-14 11:02",
-          "location": "Bankstown Warehouse",
-          "shippedTo": "Bankstown Warehouse",
-          "eta": "2015-12-14 11:02",
+          "eta": "2015-11-16 11:50",
           "type": "Hot"
         }
       },
       {
-        "lat": 50.5,
-        "long": 51.51,
-        "temperature": 56.0,
-        "timeISO": "2015-12-14 11:02",
+        "lat": 100.1,
+        "long": 100.101,
+        "temperature": 14.19074677951267,
+        "timeISO": "2015-12-14 01:04",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 99.7,
+        "long": 99.70100000000001,
+        "temperature": 13.506365792657645,
+        "timeISO": "2015-12-14 01:09",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 99.3,
+        "long": 99.301,
+        "temperature": 13.988987196539275,
+        "timeISO": "2015-12-14 01:14",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 98.9,
+        "long": 98.90100000000001,
+        "temperature": 12.646709330869477,
+        "timeISO": "2015-12-14 01:19",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 98.5,
+        "long": 98.501,
+        "temperature": 13.97272211694214,
+        "timeISO": "2015-12-14 01:24",
+        "timeObj": null,
+        "alert": {
+          "title": "Too hot alert - tracker 394857(1) went above 14.0°C degrees for 0 min",
+          "temperature": 13.97272211694214,
+          "time": "1:24PM",
+          "date": "2015-12-14 01:24",
+          "location": "Bankstown Warehouse",
+          "shippedTo": "Bankstown Warehouse",
+          "eta": "2015-11-16 11:50",
+          "type": "Hot"
+        }
+      },
+      {
+        "lat": 98.1,
+        "long": 98.101,
+        "temperature": 14.418616344701418,
+        "timeISO": "2015-12-14 01:29",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 97.7,
+        "long": 97.70100000000001,
+        "temperature": 11.836380607694302,
+        "timeISO": "2015-12-14 01:34",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 97.3,
+        "long": 97.301,
+        "temperature": 13.102927532172721,
+        "timeISO": "2015-12-14 01:39",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 96.9,
+        "long": 96.90100000000001,
+        "temperature": 12.521330432768051,
+        "timeISO": "2015-12-14 01:44",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 96.5,
+        "long": 96.501,
+        "temperature": 13.730368548127004,
+        "timeISO": "2015-12-14 01:49",
+        "timeObj": null,
+        "alert": {
+          "title": "Too hot alert - tracker 394857(1) went above 13.7°C degrees for 0 min",
+          "temperature": 13.730368548127004,
+          "time": "1:49PM",
+          "date": "2015-12-14 01:49",
+          "location": "Bankstown Warehouse",
+          "shippedTo": "Bankstown Warehouse",
+          "eta": "2015-11-16 11:50",
+          "type": "Hot"
+        }
+      },
+      {
+        "lat": 96.1,
+        "long": 96.101,
+        "temperature": 11.849317281107107,
+        "timeISO": "2015-12-14 01:54",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 95.7,
+        "long": 95.70100000000001,
+        "temperature": 12.198636298638187,
+        "timeISO": "2015-12-14 01:59",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 95.3,
+        "long": 95.301,
+        "temperature": 12.761880881304654,
+        "timeISO": "2015-12-14 02:04",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 94.9,
+        "long": 94.90100000000001,
+        "temperature": 13.850667700756055,
+        "timeISO": "2015-12-14 02:09",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 94.5,
+        "long": 94.501,
+        "temperature": 14.393390179579875,
+        "timeISO": "2015-12-14 02:14",
+        "timeObj": null,
+        "alert": {
+          "title": "Too hot alert - tracker 394857(1) went above 14.4°C degrees for 0 min",
+          "temperature": 14.393390179579875,
+          "time": "2:14PM",
+          "date": "2015-12-14 02:14",
+          "location": "Bankstown Warehouse",
+          "shippedTo": "Bankstown Warehouse",
+          "eta": "2015-11-16 11:50",
+          "type": "Hot"
+        }
+      },
+      {
+        "lat": 94.1,
+        "long": 94.101,
+        "temperature": 11.677002755270825,
+        "timeISO": "2015-12-14 02:19",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 93.7,
+        "long": 93.70100000000001,
+        "temperature": 12.635982411904427,
+        "timeISO": "2015-12-14 02:24",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 93.3,
+        "long": 93.301,
+        "temperature": 13.97404836151939,
+        "timeISO": "2015-12-14 02:29",
+        "timeObj": null,
+        "alert": null
+      },
+      {
+        "lat": 92.9,
+        "long": 92.90100000000001,
+        "temperature": 12.4617896158671,
+        "timeISO": "2015-12-14 02:34",
         "timeObj": null,
         "alert": null
       }
-    ]
+    ],
+    "siblings": []
   }
 }
 ```

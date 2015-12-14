@@ -42,6 +42,7 @@ public class SingleShipmentDtoNew {
     private Location endLocationForMap;
     private Location currentLocationForMap;
     private final List<SingleShipmentLocation> locations = new LinkedList<>();
+    private final List<SingleShipmentDtoNew> siblings = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -368,5 +369,11 @@ public class SingleShipmentDtoNew {
      */
     public List<SingleShipmentLocation> getLocations() {
         return locations;
+    }
+    /**
+     * @return the siblings
+     */
+    public List<SingleShipmentDtoNew> getSiblings() {
+        return siblings;
     }
 }

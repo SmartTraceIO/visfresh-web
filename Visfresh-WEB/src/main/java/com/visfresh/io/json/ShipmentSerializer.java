@@ -540,6 +540,16 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @return
      */
     public JsonObject toJson(final SingleShipmentDtoNew dto) {
+        return toJson(dto, true);
+    }
+
+    /**
+     * @param dto
+     * @param includeSiblings
+     * @return
+     */
+    protected JsonObject toJson(final SingleShipmentDtoNew dto,
+            final boolean includeSiblings) {
         if (dto == null) {
             return  null;
         }
@@ -578,8 +588,17 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         for (final SingleShipmentLocation l : dto.getLocations()) {
             locations.add(toJson(l));
         }
-
         json.add("locations", locations);
+
+        if (includeSiblings) {
+            final JsonArray siblings = new JsonArray();
+            for (final SingleShipmentDtoNew sibling: dto.getSiblings()) {
+                siblings.add(toJson(sibling, false));
+            }
+
+            json.add("siblings", siblings);
+        }
+
         return json;
     }
     /**
