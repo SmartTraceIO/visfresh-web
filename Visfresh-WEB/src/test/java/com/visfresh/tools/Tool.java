@@ -37,10 +37,15 @@ public class Tool extends AbstractTool {
      * @throws RestServiceException
      */
     private void createDevice(final String imei) throws RestServiceException, IOException {
+        if (deviceService.getDevice(imei) != null) {
+            return;
+        }
+
         final Device device = new Device();
         device.setImei(imei);
         device.setCompany(company);
-        device.setName("DevTool/" + imei.substring(0, imei.length() - 6));
+        device.setName("Development/" + device.getSn());
+        device.setDescription("Development device sn: " + device.getSn());
 
         deviceService.saveDevice(device);
     }
@@ -62,10 +67,11 @@ public class Tool extends AbstractTool {
             "354188046489683",
             "354188048733062",
             "354188048733088",
-            "358688000000158"
+            "358688000000158",
+            "354430070005203"
         };
 
-        tool.addUser("dan@visfresh.com", "Dananjaya", "Kulathunga", "password");
+//        tool.addUser("dan@visfresh.com", "Dananjaya", "Kulathunga", "password");
         tool.createDevices(devices);
 
         System.out.println("Successfully created");
@@ -78,7 +84,7 @@ public class Tool extends AbstractTool {
      * @throws RestServiceException
      * @throws IOException
      */
-    private void addUser(final String email, final String firstName, final String lastName,
+    public void addUser(final String email, final String firstName, final String lastName,
             final String password) throws IOException, RestServiceException {
         final User u = new User();
         u.setEmail(email);

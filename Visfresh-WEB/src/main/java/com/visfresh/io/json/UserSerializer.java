@@ -77,7 +77,7 @@ public class UserSerializer extends AbstractJsonSerializer {
             u.getRoles().addAll(parseRoles(roles.getAsJsonArray()));
         }
         final JsonElement companyId = json.get(UserConstants.PROPERTY_INTERNAL_COMPANY_ID);
-        if (companyId != null && !companyId.isJsonNull()) {
+        if (getCompanyResolver() != null && companyId != null && !companyId.isJsonNull()) {
             u.setCompany(getCompanyResolver().getCompany(companyId.getAsLong()));
         }
         return u;

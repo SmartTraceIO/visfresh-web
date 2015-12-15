@@ -97,9 +97,11 @@ public class AbstractTool {
 
         //create user if need
         final String newPassword = "password";
-        User u = getUserByEmail(EMAIL);
-        if (u == null) {
-            u = new User();
+        String token;
+        try {
+            token = userService.login(EMAIL, newPassword);
+        } catch (final Exception e) {
+            final User u = new User();
             u.setEmail(EMAIL);
             u.setFirstName("Java (JS)");
             u.setLastName("Developer");
@@ -107,11 +109,11 @@ public class AbstractTool {
             u.setCompany(c);
 
             userService.saveUser(u, newPassword, false);
+            token = userService.login(user.getEmail(), newPassword);
         }
-        user = u;
 
-        //relogin
-        setAuthToken(userService.login(user.getEmail(), newPassword));
+        setAuthToken(token);
+        user = getUserByEmail(EMAIL);
     }
 
     /**
@@ -122,7 +124,7 @@ public class AbstractTool {
      */
     private User getUserByEmail(final String email) throws IOException, RestServiceException {
         for (final ExpandedListUserItem item : userService.getUsers(null, null, null, null)) {
-            if (EMAIL.equals(item.getEmail())) {
+            if (email.equals(item.getEmail())) {
                 return userService.getUser(item.getId());
             }
         }
