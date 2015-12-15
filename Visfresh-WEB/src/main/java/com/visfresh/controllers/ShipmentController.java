@@ -245,7 +245,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             } else if (Boolean.TRUE.equals(req.getLastWeek())) {
                 shippedFrom = new Date(shippedTo.getTime() - 7 * oneDay);
             } else if (Boolean.TRUE.equals(req.getLastMonth())) {
-                shippedFrom = new Date(shippedTo.getTime() - oneDay);
+                shippedFrom = new Date(shippedTo.getTime() - 31 * oneDay);
             } else {
                 //two weeks by default
                 shippedFrom = new Date(shippedTo.getTime() - 14 * oneDay);

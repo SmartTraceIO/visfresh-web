@@ -102,7 +102,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
                     final Reader r = new InputStreamReader(inputMessage.getBody(), "UTF-8");
                     try {
                         final String json = StringUtils.getContent(r);
-                        log.debug("USON request received:\n" + json);
+                        log.debug("JSON request received:\n" + json);
 
                         obj = gson.fromJson(json, token.getType());
                     } catch (final JsonParseException ex) {
