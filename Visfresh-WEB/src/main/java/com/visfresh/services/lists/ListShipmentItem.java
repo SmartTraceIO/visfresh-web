@@ -50,15 +50,15 @@ public class ListShipmentItem implements EntityWithId<Long> {
         this.setAssetNum(s.getAssetNum());
         this.setAssetType(s.getAssetType());
         this.setDeviceName(s.getDevice().getName());
-        this.setDeviceSN(s.getDevice().getId());
+        this.setDeviceSN(s.getDevice().getSn());
         this.setEstArrivalDate(s.getShipmentDate());
         this.setPalettid(s.getPalletId());
         this.setPercentageComplete(0);
         this.setShipmentDate(s.getShipmentDate());
         this.setShipmentDescription(s.getShipmentDescription());
         this.setShipmentId(s.getId());
-        this.setShippedFrom(s.getShippedFrom() == null ? null : s.getShippedFrom().getAddress());
-        this.setShippedTo(s.getShippedTo() == null ? null : s.getShippedTo().getAddress());
+        this.setShippedFrom(s.getShippedFrom() == null ? null : s.getShippedFrom().getName());
+        this.setShippedTo(s.getShippedTo() == null ? null : s.getShippedTo().getName());
         this.setStatus(s.getStatus());
         this.setTripcount(s.getTripCount());
     }
