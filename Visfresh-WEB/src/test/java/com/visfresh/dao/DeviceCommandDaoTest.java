@@ -39,7 +39,6 @@ public class DeviceCommandDaoTest extends BaseCrudTest<DeviceCommandDao, DeviceC
         d.setName("Test Device");
         d.setImei(imei);
         d.setDescription("JUnit device");
-        d.setSn("12345");
 
         this.device = deviceDao.save(d);
     }

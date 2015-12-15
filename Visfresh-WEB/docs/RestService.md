@@ -546,7 +546,7 @@ see [ResponseStatus](#markdown-header-response-status)
   "description": "Device description",
   "imei": "0239487043987",
   "name": "Device Name",
-  "sn": "043987"
+  "sn": "043987" // read only property
 }
 ```
 ### Device Group ###
@@ -570,7 +570,7 @@ see [Shipment Object](#markdown-header-shipment)
 {
 	"status": "InProgress",
 	"deviceImei": "234908720394857",
-	"deviceSN": "394857",
+	"deviceSN": "039485",
 	"deviceName": "Device Name",
 	"tripCount": 1,
 	"shipmentId": 401,
@@ -603,7 +603,7 @@ see [Shipment Object](#markdown-header-shipment)
 ```json
 {
   "status": "InProgress",
-  "deviceSN": "234908720394857",
+  "deviceSN": "039485",
   "deviceName": "Device Name",
   "tripCount": 1,
   "shipmentId": 390,
@@ -1545,7 +1545,7 @@ Response:
   "shipment": {
     "status": "InProgress",
     "deviceImei": "234908720394857",
-    "deviceSN": "394857",
+    "deviceSN": "039485",
     "deviceName": "Device Name",
     "tripCount": 1,
     "shipmentDescription": "Any Description",
@@ -1598,7 +1598,7 @@ Response:
   "response": [
     {
       "status": "InProgress",
-      "deviceSN": "234908720394857",
+      "deviceSN": "039485",
       "deviceName": "Device Name",
       "tripCount": 1,
       "shipmentId": 541,
@@ -1628,7 +1628,7 @@ Response:
     },
     {
       "status": "InProgress",
-      "deviceSN": "234908720394857",
+      "deviceSN": "039485",
       "deviceName": "Device Name",
       "tripCount": 1,
       "shipmentId": 542,
@@ -1661,7 +1661,7 @@ Response:
   "response": [
     {
       "status": "InProgress",
-      "deviceSN": "234908720394857",
+      "deviceSN": "039485",
       "deviceName": "Device Name",
       "tripCount": 1,
       "shipmentId": 390,
@@ -1689,7 +1689,7 @@ Response:
     },
     {
       "status": "InProgress",
-      "deviceSN": "234908720394857",
+      "deviceSN": "039485",
       "deviceName": "Device Name",
       "tripCount": 1,
       "shipmentId": 391,
@@ -1728,8 +1728,7 @@ Response:
 {
   "description": "Device description",
   "imei": "0239487043987",
-  "name": "Device Name",
-  "sn": "043987"
+  "name": "Device Name"
 }
 ```  
 **Response:**  

@@ -32,7 +32,6 @@ public class DeviceSerializer extends AbstractJsonSerializer {
      */
     public Device parseDevice(final JsonObject json) {
         final Device tr = new Device();
-        tr.setSn(asString(json.get(DeviceConstants.PROPERTY_SN)));
         tr.setImei(asString(json.get(DeviceConstants.PROPERTY_IMEI)));
         tr.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
         tr.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));

@@ -45,7 +45,6 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
         d.setImei(imei);
         d.setName("Test Device");
         d.setDescription("JUnit device");
-        d.setSn("12345");
 
         this.device = deviceDao.save(d);
         shipment = createShipment(d);

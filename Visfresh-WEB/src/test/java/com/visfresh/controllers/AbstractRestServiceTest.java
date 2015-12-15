@@ -325,7 +325,6 @@ public abstract class AbstractRestServiceTest {
         t.setDescription("Device description");
         t.setImei(imei);
         t.setName("Device Name");
-        t.setSn(imei.substring(imei.length() - 6));
         if (save) {
             t.setCompany(getCompany());
             context.getBean(DeviceDao.class).save(t);

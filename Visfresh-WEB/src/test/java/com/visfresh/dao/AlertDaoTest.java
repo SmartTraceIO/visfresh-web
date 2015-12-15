@@ -53,7 +53,6 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         final String imei = "932487032487";
         d.setImei(imei);
         d.setDescription("JUnit device");
-        d.setSn("12345");
         d.setName("Test device");
 
         this.device = deviceDao.save(d);

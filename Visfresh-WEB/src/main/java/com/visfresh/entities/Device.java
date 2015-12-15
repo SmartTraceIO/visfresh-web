@@ -10,10 +10,6 @@ package com.visfresh.entities;
  */
 public class Device implements EntityWithId<String>, EntityWithCompany {
     /**
-     * Device serial number.
-     */
-    private String sn;
-    /**
      * Device IMEI code
      */
     private String imei;
@@ -45,13 +41,13 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      * @return the sn
      */
     public String getSn() {
-        return sn;
-    }
-    /**
-     * @param sn the sn to set
-     */
-    public void setSn(final String sn) {
-        this.sn = sn;
+        final String im = getImei();
+        if (im == null) {
+            return null;
+        }
+
+        final int len = im.length();
+        return im.substring(len - 7, len - 1);
     }
     /**
      * @return the imei

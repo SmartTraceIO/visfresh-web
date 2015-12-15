@@ -44,7 +44,6 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         final Device d = new Device();
         d.setImei(imei);
         d.setName("Test Device");
-        d.setSn("124");
         d.setCompany(sharedCompany);
         d.setDescription("Test device");
         d.setTripCount(5);
@@ -57,7 +56,6 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
     protected void assertCreateTestEntityOk(final Device d) {
         assertNotNull(d.getImei());
         assertEquals("Test Device", d.getName());
-        assertEquals("124", d.getSn());
         assertEquals("Test device", d.getDescription());
         assertEquals(5, d.getTripCount());
 
@@ -80,7 +78,6 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
 
         assertNotNull(d.getImei());
         assertEquals("Test Device", d.getName());
-        assertEquals("124", d.getSn());
         assertEquals("Test device", d.getDescription());
         assertEquals(5, d.getTripCount());
 
@@ -130,7 +127,6 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
 
         //test one from found
         assertEquals("Test Device", d.getName());
-        assertEquals("124", d.getSn());
         assertEquals("Test device", d.getDescription());
 
         //test company

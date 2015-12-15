@@ -35,7 +35,6 @@ create table devices (
     description varchar(255),
     imei varchar(30) not null,
     name varchar(127) not null,
-    sn varchar(20) default null,
     company bigint(20),
     tripcount int not null default 0,
     primary key (imei),

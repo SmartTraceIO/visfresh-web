@@ -159,7 +159,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         final Device d = new Device();
         d.setName("Test Device");
         d.setImei(imei);
-        d.setSn("456");
         d.setCompany(sharedCompany);
         d.setDescription("Test device");
         return deviceDao.save(d);

@@ -357,7 +357,6 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         d.setDescription("Develment Tools virtual device");
         d.setImei("111111111111111");
         d.setName("DevTool Device");
-        d.setSn("123");
 
         deviceService.saveDevice(d);
         return d;

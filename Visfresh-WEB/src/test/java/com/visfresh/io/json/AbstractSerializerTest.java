@@ -165,7 +165,6 @@ public class AbstractSerializerTest {
         t.setDescription("Device description");
         t.setImei(imei);
         t.setName("Device Name");
-        t.setSn("1");
         resolver.add(t);
         return t;
     }

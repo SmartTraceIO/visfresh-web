@@ -117,7 +117,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
     private String[] getDefaultSortOrder() {
         return new String[] {
             PROPERTY_NAME,
-            PROPERTY_SN
+            PROPERTY_IMEI
         };
     }
     /**

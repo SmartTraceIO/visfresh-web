@@ -41,10 +41,6 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
      */
     public static final String IMEI_FIELD = "imei";
     /**
-     * Serial number field.
-     */
-    public static final String SN_FIELD = "sn";
-    /**
      * Company name.
      */
     public static final String COMPANY_FIELD = "company";
@@ -64,7 +60,6 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
 
         propertyToDbFields.put(DeviceConstants.PROPERTY_DESCRIPTION, DESCRIPTION_FIELD);
         propertyToDbFields.put(DeviceConstants.PROPERTY_NAME, NAME_FIELD);
-        propertyToDbFields.put(DeviceConstants.PROPERTY_SN, SN_FIELD);
         propertyToDbFields.put(DeviceConstants.PROPERTY_IMEI, IMEI_FIELD);
     }
 
@@ -82,14 +77,12 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
             sql = "insert into " + TABLE + " (" + combine(
                     NAME_FIELD,
                     IMEI_FIELD,
-                    SN_FIELD,
                     COMPANY_FIELD,
                     TRIPCOUNT_FIELD,
                     DESCRIPTION_FIELD
                 ) + ")" + " values("
                     + ":"+ NAME_FIELD
                     + ", :" + IMEI_FIELD
-                    + ", :" + SN_FIELD
                     + ", :" + COMPANY_FIELD
                     + ", :" + TRIPCOUNT_FIELD
                     + ", :" + DESCRIPTION_FIELD
@@ -99,7 +92,6 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
             sql = "update " + TABLE + " set "
                 + NAME_FIELD + "=:" + NAME_FIELD + ","
                 + IMEI_FIELD + "=:" + IMEI_FIELD + ","
-                + SN_FIELD + "=:" + SN_FIELD + ","
                 + COMPANY_FIELD + "=:" + COMPANY_FIELD + ","
                 + TRIPCOUNT_FIELD + "=:" + TRIPCOUNT_FIELD + ","
                 + DESCRIPTION_FIELD + "=:" + DESCRIPTION_FIELD
@@ -111,7 +103,6 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         paramMap.put(NAME_FIELD, device.getName());
         paramMap.put(DESCRIPTION_FIELD, device.getDescription());
         paramMap.put(IMEI_FIELD, device.getImei());
-        paramMap.put(SN_FIELD, device.getSn());
         paramMap.put(COMPANY_FIELD, device.getCompany().getId());
         paramMap.put(TRIPCOUNT_FIELD, device.getTripCount());
 
@@ -149,7 +140,6 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         final Device d = new Device();
         d.setName((String) map.get(NAME_FIELD));
         d.setDescription((String) map.get(DESCRIPTION_FIELD));
-        d.setSn((String) map.get(SN_FIELD));
         d.setImei((String) map.get(IMEI_FIELD));
         d.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         return d;
