@@ -60,8 +60,7 @@ public class DeviceCommandDaoTest extends TestCase {
                 + DeviceDao.DESCRIPTION_FIELD
                 + "," + DeviceDao.NAME_FIELD
                 + "," + DeviceDao.IMEI_FIELD
-                + "," + DeviceDao.SN_FIELD
-                + ") values(:description, :name, :imei, :sn)";
+                + ") values(:description, :name, :imei)";
         jdbc.update(sql, params);
         this.device = spring.getBean(DeviceDao.class).getByImei(imei);
     }

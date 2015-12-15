@@ -24,7 +24,6 @@ public class DeviceDao {
     public static final String DESCRIPTION_FIELD = "description";
     public static final String NAME_FIELD = "name";
     public static final String IMEI_FIELD = "imei";
-    public static final String SN_FIELD = "sn";
 
     @Autowired
     protected NamedParameterJdbcTemplate jdbc;
@@ -61,7 +60,6 @@ public class DeviceDao {
         final Device d = new Device();
         d.setName((String) map.get(NAME_FIELD));
         d.setDescription((String) map.get(DESCRIPTION_FIELD));
-        d.setSn((String) map.get(SN_FIELD));
         d.setImei((String) map.get(IMEI_FIELD));
         return d;
     }
@@ -74,7 +72,6 @@ public class DeviceDao {
         map.put(entityName + "." + NAME_FIELD, NAME_FIELD);
         map.put(entityName + "." + DESCRIPTION_FIELD, DESCRIPTION_FIELD);
         map.put(entityName + "." + IMEI_FIELD, IMEI_FIELD);
-        map.put(entityName + "." + SN_FIELD, SN_FIELD);
         return map ;
     }
 }

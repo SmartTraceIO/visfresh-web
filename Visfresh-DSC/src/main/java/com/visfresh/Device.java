@@ -9,10 +9,6 @@ package com.visfresh;
  */
 public class Device {
     /**
-     * Device serial number.
-     */
-    private String sn;
-    /**
      * Device IMEI code
      */
     private String imei;
@@ -32,18 +28,6 @@ public class Device {
         super();
     }
 
-    /**
-     * @return the sn
-     */
-    public String getSn() {
-        return sn;
-    }
-    /**
-     * @param sn the sn to set
-     */
-    public void setSn(final String sn) {
-        this.sn = sn;
-    }
     /**
      * @return the imei
      */

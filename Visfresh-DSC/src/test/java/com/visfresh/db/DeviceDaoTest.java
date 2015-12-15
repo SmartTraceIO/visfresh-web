@@ -58,21 +58,18 @@ public class DeviceDaoTest extends TestCase {
         final String description = "Any device";
         final String name = "DeviceName";
         final String imei = "9328749587";
-        final String sn = "12345";
 
         final Map<String, Object> params = new HashMap<String, Object>();
 
         params.put("description", description);
         params.put("name", name);
         params.put("imei", imei);
-        params.put("sn", sn);
 
         final String sql = "insert into " + DeviceDao.TABLE + "("
                 + DeviceDao.DESCRIPTION_FIELD
                 + "," + DeviceDao.NAME_FIELD
                 + "," + DeviceDao.IMEI_FIELD
-                + "," + DeviceDao.SN_FIELD
-                + ") values(:description, :name, :imei, :sn)";
+                + ") values(:description, :name, :imei)";
 
         jdbc.update(sql, params);
 
@@ -80,7 +77,6 @@ public class DeviceDaoTest extends TestCase {
         assertEquals(description, device.getDescription());
         assertEquals(imei, device.getImei());
         assertEquals(name, device.getName());
-        assertEquals(sn, device.getSn());
     }
 
     /* (non-Javadoc)
