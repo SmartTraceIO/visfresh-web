@@ -5,13 +5,18 @@ package com.visfresh.controllers;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +29,7 @@ import com.visfresh.entities.Language;
 import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
+import com.visfresh.services.TimeZoneService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -36,6 +42,8 @@ public class UtilitiesController extends AbstractController {
      * Logger.
      */
     private static final Logger log = LoggerFactory.getLogger(UtilitiesController.class);
+    @Autowired
+    private TimeZoneService timeZoneService;
 
     /**
      * Default constructor.
@@ -49,15 +57,13 @@ public class UtilitiesController extends AbstractController {
             getLoggedInUser(authToken);
 
             final JsonArray array = new JsonArray();
-            for (final String tzId : TimeZone.getAvailableIDs()) {
-                final TimeZone tz = TimeZone.getTimeZone(tzId);
+            //add other available time zones
+            final List<TimeZone> timeZones = timeZoneService.getSupportedTimeZones();
+            Collections.sort(timeZones, createTimeZoneComparator());
 
-                final JsonObject obj = new JsonObject();
+            for (final TimeZone tz : timeZones) {
+                final JsonObject obj = createTimeZoneElement(tz);
                 array.add(obj);
-
-                obj.addProperty("id", tz.getID());
-
-                obj.addProperty("displayName", displayTimeZone(tz.getRawOffset(), tz.getDisplayName()));
             }
 
             return createSuccessResponse(array);
@@ -66,7 +72,56 @@ public class UtilitiesController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    public static String displayTimeZone(final int rawOffset, final String description) {
+    /**
+     * @return
+     */
+    protected Comparator<TimeZone> createTimeZoneComparator() {
+        return new Comparator<TimeZone>() {
+            @Override
+            public int compare(final TimeZone a, final TimeZone b) {
+                //check UTC
+                if (a.getID().equals("UTC")) {
+                    return -1;
+                } else if (b.getID().equals("UTC")) {
+                    return 1;
+                }
+
+                //not UTC
+                int result = 0;
+                if (result == 0) {
+                    final String sega = getFirstSegment(a.getID());
+                    final String segb = getFirstSegment(b.getID());
+                    result = sega.compareTo(segb);
+                }
+                if (result == 0) {
+                    result = new Integer(a.getRawOffset()).compareTo(b.getRawOffset());
+                }
+                if (result == 0) {
+                    result = a.getID().compareTo(b.getID());
+                }
+                return result;
+            }
+            /**
+             * @param id
+             * @return
+             */
+            private String getFirstSegment(final String id) {
+                return id.split(Pattern.quote("/"))[0];
+            }
+        };
+    }
+    /**
+     * @param tz
+     * @return
+     */
+    private JsonObject createTimeZoneElement(final TimeZone tz) {
+        final JsonObject obj = new JsonObject();
+        obj.addProperty("id", tz.getID());
+        obj.addProperty("displayName", tz.getDisplayName());
+        obj.addProperty("offset", createOffsetString(tz.getRawOffset()));
+        return obj;
+    }
+    private static String createOffsetString(final int rawOffset) {
         final long hours = TimeUnit.MILLISECONDS.toHours(rawOffset);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(rawOffset)
                 - TimeUnit.HOURS.toMinutes(hours);
@@ -75,9 +130,9 @@ public class UtilitiesController extends AbstractController {
 
         String result;
         if (hours >= 0) {
-            result = String.format("GMT+%d:%02d/%s", hours, minutes, description);
+            result = String.format("GMT+%d:%02d", hours, minutes);
         } else {
-            result = String.format("GMT%d:%02d/%s", hours, minutes, description);
+            result = String.format("GMT%d:%02d", hours, minutes);
         }
 
         return result;

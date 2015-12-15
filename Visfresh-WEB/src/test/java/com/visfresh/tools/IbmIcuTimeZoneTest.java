@@ -5,16 +5,15 @@ package com.visfresh.tools;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import com.ibm.icu.util.TimeZone;
-import com.ibm.icu.util.TimeZone.SystemTimeZoneType;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -38,8 +37,8 @@ public final class IbmIcuTimeZoneTest {
 
     private static ArrayList<TimeZone> initTimeZones() {
         final ArrayList<TimeZone> timeZones = new ArrayList<TimeZone>();
-        final List<String> timeZoneIds = new LinkedList<String>(com.ibm.icu.util.TimeZone.getAvailableIDs(
-                SystemTimeZoneType.CANONICAL_LOCATION, null, null));
+        final List<String> timeZoneIds = new LinkedList<String>(
+                Arrays.asList(TimeZone.getAvailableIDs()));
 
         for (final String id : timeZoneIds) {
             if (id.matches(TIMEZONE_ID_PREFIXES)) {
@@ -99,14 +98,14 @@ public final class IbmIcuTimeZoneTest {
     }
 
     public static void main(final String[] args) {
-        final List<String> ids = new LinkedList<String>(com.ibm.icu.util.TimeZone.getAvailableIDs(
-                SystemTimeZoneType.CANONICAL_LOCATION, null, null));
+        final List<String> ids = new LinkedList<String>(Arrays.asList(TimeZone.getAvailableIDs()));
 
         for (final TimeZone tz : getTimeZones()) {
             System.out.println(
                     "("+ displayTimeZone(tz.getRawOffset()) + ") "
                     + tz.getID() + " "
-                    + tz.getDisplayName(Locale.US) + ", region: " + TimeZone.getRegion(tz.getID()));
+                    + tz.getDisplayName(Locale.US)
+                    + ", observes daylight time " + tz.observesDaylightTime());
         }
         System.out.println("Number of time zones = " + ids.size());
     }

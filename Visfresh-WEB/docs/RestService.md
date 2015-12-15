@@ -2441,22 +2441,26 @@ Response:
   },
   "response": [
     {
-      "id": "Etc/GMT+12",
-      "displayName": "GMT-12:00"
+      "id": "UTC",
+      "displayName": "Coordinated Universal Time",
+      "offset": "GMT+0:00"
     },
     {
-      "id": "Etc/GMT+11",
-      "displayName": "GMT-11:00"
+      "id": "America/Adak",
+      "displayName": "Hawaii-Aleutian Standard Time",
+      "offset": "GMT-10:00"
     },
     {
-      "id": "Pacific/Midway",
-      "displayName": "Samoa Standard Time"
+      "id": "America/Anchorage",
+      "displayName": "Alaska Standard Time",
+      "offset": "GMT-9:00"
     },
     {
-      "id": "Pacific/Niue",
-      "displayName": "Niue Time"
-    }
-    // etc
+      "id": "America/Los_Angeles",
+      "displayName": "Pacific Standard Time",
+      "offset": "GMT-8:00"
+    },
+    //etc
   ]
 }
 ```

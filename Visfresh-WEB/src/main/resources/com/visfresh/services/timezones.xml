@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timezones>
+	<tz id="America/Adak" />
+	<tz id="America/Anchorage" />
+	<tz id="America/Los_Angeles" />
+	<tz id="America/Denver" />
+	<tz id="America/Chicago" />
+	<tz id="America/El_Salvador" />
+	<tz id="America/Mexico_City" />
+	<tz id="America/Winnipeg" />
+	<tz id="America/Jamaica" />
+	<tz id="America/New_York" />
+	<tz id="America/Panama" />
+	<tz id="America/Toronto" />
+	<tz id="America/Caracas" />
+	<tz id="America/Halifax" />
+	<tz id="America/Puerto_Rico" />
+	<tz id="America/Santiago" />
+	<tz id="America/St_Johns" />
+	<tz id="America/Bahia" />
+	<tz id="America/Montevideo" />
+	<tz id="America/Sao_Paulo" />
+
+
+	<tz id="America/Noronha" />
+	<tz id="America/Scoresbysund" />
+	<tz id="America/Danmarkshavn" />
+
+	<tz id="Asia/Jerusalem" />
+	<tz id="Asia/Baghdad" />
+	<tz id="Asia/Tehran" />
+	<tz id="Asia/Baku" />
+	<tz id="Asia/Dubai" />
+	<tz id="Asia/Kabul" />
+	<tz id="Asia/Karachi" />
+	<tz id="Asia/Calcutta" />
+	<tz id="Asia/Kathmandu" />
+	<tz id="Asia/Dhaka" />
+	<tz id="Asia/Thimphu" />
+	<tz id="Asia/Rangoon" />
+	<tz id="Asia/Bangkok" />
+	<tz id="Asia/Jakarta" />
+	<tz id="Asia/Saigon" />
+	<tz id="Asia/Brunei" />
+	<tz id="Asia/Hong_Kong" />
+	<tz id="Asia/Kuala_Lumpur" />
+	<tz id="Asia/Manila" />
+	<tz id="Asia/Shanghai" />
+	<tz id="Asia/Singapore" />
+	<tz id="Asia/Seoul" />
+	<tz id="Asia/Tokyo" />
+	<tz id="Asia/Yakutsk" />
+	<tz id="Asia/Vladivostok" />
+	<tz id="Asia/Magadan" />
+
+	<tz id="Atlantic/Bermuda" />
+	<tz id="Atlantic/Stanley" />
+	<tz id="Atlantic/South_Georgia" />
+	<tz id="Atlantic/Azores" />
+	<tz id="Atlantic/Reykjavik" />
+	<tz id="Atlantic/Jan_Mayen" />
+
+	<tz id="Australia/Perth" />
+	<tz id="Australia/Eucla" />
+	<tz id="Australia/Adelaide" />
+	<tz id="Australia/Darwin" />
+	<tz id="Australia/Canberra" />
+	<tz id="Australia/Melbourne" />
+	<tz id="Australia/Brisbane" />
+	<tz id="Australia/Sydney" />
+	<tz id="Australia/Lord_Howe" />
+
+	<tz id="Europe/London" />
+	<tz id="Europe/Zurich" />
+	<tz id="Europe/Athens" />
+	<tz id="Europe/Minsk" />
+	<tz id="Europe/Moscow" />
+
+	<tz id="Indian/Comoro" />
+	<tz id="Indian/Mauritius" />
+	<tz id="Indian/Maldives" />
+	<tz id="Indian/Chagos" />
+	<tz id="Indian/Cocos" />
+	<tz id="Indian/Christmas" />
+
+	<tz id="Pacific/Samoa" />
+	<tz id="Pacific/Honolulu" />
+	<tz id="Pacific/Tahiti" />
+	<tz id="Pacific/Marquesas" />
+	<tz id="Pacific/Gambier" />
+	<tz id="Pacific/Pitcairn" />
+	<tz id="Pacific/Easter" />
+	<tz id="Pacific/Galapagos" />
+	<tz id="Pacific/Palau" />
+	<tz id="Pacific/Port_Moresby" />
+	<tz id="Pacific/Noumea" />
+	<tz id="Pacific/Norfolk" />
+	<tz id="Pacific/Auckland" />
+	<tz id="Pacific/Fiji" />
+	<tz id="Pacific/Chatham" />
+	<tz id="Pacific/Apia" />
+	<tz id="Pacific/Tongatapu" />
+	<tz id="Pacific/Kiritimati" />
+</timezones>
