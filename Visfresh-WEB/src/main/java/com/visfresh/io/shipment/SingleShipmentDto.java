@@ -35,7 +35,7 @@ public class SingleShipmentDto {
     private final List<ListNotificationScheduleItem> alertsNotificationSchedules
         = new LinkedList<ListNotificationScheduleItem>();
 
-    private int arrivalNotificationWithinKm;
+    private Integer arrivalNotificationWithinKm;
     private final List<ListNotificationScheduleItem> arrivalNotificationSchedules
         = new LinkedList<ListNotificationScheduleItem>();
     private boolean excludeNotificationsIfNoAlertsFired;
@@ -225,13 +225,13 @@ public class SingleShipmentDto {
     /**
      * @return the arrivalNotificationWithIn
      */
-    public int getArrivalNotificationWithInKm() {
+    public Integer getArrivalNotificationWithInKm() {
         return arrivalNotificationWithinKm;
     }
     /**
      * @param arrivalNotificationWithIn the arrivalNotificationWithIn to set
      */
-    public void setArrivalNotificationWithInKm(final int arrivalNotificationWithIn) {
+    public void setArrivalNotificationWithInKm(final Integer arrivalNotificationWithIn) {
         this.arrivalNotificationWithinKm = arrivalNotificationWithIn;
     }
     /**
