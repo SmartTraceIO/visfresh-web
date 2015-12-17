@@ -19,10 +19,9 @@
 		</layout>
 	</appender>
 	
-	<!-- Console loggers -->
 	<logger name="com.visfresh">
 		<level value="DEBUG"/>
-		<appender-ref ref="console"/>
+		<appender-ref ref="file"/>
 	</logger>
 	
 	<root>

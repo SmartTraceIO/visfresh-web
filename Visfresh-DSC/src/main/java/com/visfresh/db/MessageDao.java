@@ -158,8 +158,8 @@ public class MessageDao {
             //parse station signals
             final Location loc = new Location();
             msg.setLocation(loc);
-            loc.setLatitude(((Number) map.get(LATITUDE_FIELD)).intValue() / 10000);
-            loc.setLongitude(((Number) map.get(LONGITUDE_FIELD)).intValue() / 10000);
+            loc.setLatitude(((Number) map.get(LATITUDE_FIELD)).intValue() / 10000.);
+            loc.setLongitude(((Number) map.get(LONGITUDE_FIELD)).intValue() / 10000.);
 
             messages.add(msg);
         }
