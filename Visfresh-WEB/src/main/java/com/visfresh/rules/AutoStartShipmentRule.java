@@ -85,9 +85,12 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         final TrackerEvent event = context.getEvent();
         final Device device = event.getDevice();
 
-        if (event.getShipment() != null) {
-            log.debug("Close old shipment for device " + device.getImei());
-            closeOldShipment(event.getShipment());
+        for(final Shipment activeShipment: shipmentDao.findActiveShipments(device.getImei())) {
+            if (activeShipment != null) {
+                log.debug("Close old active shipment " + activeShipment.getShipmentDescription()
+                        + " for device " + device.getImei());
+                closeOldShipment(activeShipment);
+            }
         }
 
         log.debug("Create new shipment for device " + device.getImei());

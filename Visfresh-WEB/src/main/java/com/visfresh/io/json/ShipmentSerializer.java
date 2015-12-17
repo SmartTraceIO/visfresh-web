@@ -574,7 +574,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.add("arrivalNotificationSchedules", toJson(dto.getArrivalNotificationSchedules()));
         json.addProperty("shutdownDeviceAfterMinutes", dto.getShutdownDeviceAfterMinutes());
         json.addProperty("startLocation", dto.getStartLocation());
-        json.addProperty("startTimeStr:", dto.getStartTimeStr());
+        json.addProperty("startTimeStr", dto.getStartTimeStr());
         json.addProperty("startTimeISO", dto.getStartTimeISO());
         json.addProperty("endLocation", dto.getEndLocation());
         json.addProperty("eta", dto.getEta());
@@ -583,6 +583,11 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.add("startLocationForMap", toJson(dto.getStartLocationForMap()));
         json.add("endLocationForMap", toJson(dto.getEndLocationForMap()));
         json.add("currentLocationForMap", toJson(dto.getCurrentLocationForMap()));
+
+        json.addProperty("minTemp", dto.getMinTemp());
+        json.addProperty("maxTemp", dto.getMaxTemp());
+        json.addProperty("timeOfFirstReading", dto.getTimeOfFirstReading());
+        json.addProperty("timeOfLastReading", dto.getTimeOfLastReading());
 
         final JsonArray locations = new JsonArray();
         for (final SingleShipmentLocation l : dto.getLocations()) {

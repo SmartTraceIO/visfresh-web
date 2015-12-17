@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -205,6 +206,30 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      */
     @Override
     public Shipment findActiveShipment(final String imei) {
+        final List<Long> rows = findActiveShipmentIds(imei);
+
+        if (rows.size() > 0) {
+            final Long shipmentId = rows.get(0);
+            return findOne(shipmentId);
+        } else {
+            return null;
+        }
+    }
+    @Override
+    public List<Shipment> findActiveShipments(final String imei) {
+        final List<Long> ids = findActiveShipmentIds(imei);
+
+        final List<Shipment> result = new LinkedList<>();
+        for (final Long id : ids) {
+            result.add(findOne(id));
+        }
+        return result;
+    }
+    /**
+     * @param imei
+     * @return
+     */
+    private List<Long> findActiveShipmentIds(final String imei) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("imei", imei);
         params.put("status", ShipmentStatus.Complete.name());
@@ -213,15 +238,15 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
                 + " from " + TABLE + " s"
                 + " join " + DeviceDaoImpl.TABLE + " d on d." + DeviceDaoImpl.IMEI_FIELD + "= s.device"
                 + " and d." + DeviceDaoImpl.IMEI_FIELD + "= :imei"
-                + " where s." + STATUS_FIELD + "<> :status";
+                + " where s." + STATUS_FIELD + "<> :status order by s." + ID_FIELD + " desc";
         final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
 
-        if (rows.size() > 0) {
-            final Long shipmentId = ((Number) rows.get(0).get(ID_FIELD)).longValue();
-            return findOne(shipmentId);
-        } else {
-            return null;
+        final List<Long> result = new LinkedList<Long>();
+        for (final Map<String, Object> row : rows) {
+            final Entry<String, Object> firstEntry = row.entrySet().iterator().next();
+            result.add(((Number) firstEntry.getValue()).longValue());
         }
+        return result;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#isTemplate()

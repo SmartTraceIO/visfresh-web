@@ -302,7 +302,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        DeviceState state = new DeviceState();
+        final DeviceState state = new DeviceState();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
         rule.handle(new RuleContext(e, state));
@@ -327,17 +327,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         rule.handle(new RuleContext(e, state));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
-        //check not handles already handled
         alertDao.deleteAll();
-        state = new DeviceState();
-
-        e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
-        assertEquals(0, alertDao.findAll(null, null, null).size());
-
-        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
-        assertEquals(0, alertDao.findAll(null, null, null).size());
 
         //normal temperature occurence should flush state
         e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature + 3);
@@ -348,6 +338,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         assertEquals(0, alertDao.findAll(null, null, null).size());
     }
+
     @Test
     public void testCumulativeColdTemperatureAlert() {
         final long minute = 60000l;
@@ -513,6 +504,17 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
      * @return tracker event.
      */
     private TrackerEvent createEvent(final long date, final TrackerEventType type, final double temperature) {
+        final TrackerEvent e = createEventNotSave(date, type, temperature);
+        return context.getBean(TrackerEventDao.class).save(e);
+    }
+    /**
+     * @param date date.
+     * @param type type.
+     * @param temperature temperature.
+     * @return tracker event.
+     */
+    private TrackerEvent createEventNotSave(final long date,
+            final TrackerEventType type, final double temperature) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(100);
         e.setLatitude(10);
@@ -523,6 +525,6 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         e.setDevice(shipment.getDevice());
         e.setTime(new Date(date));
         e.setTemperature(temperature);
-        return context.getBean(TrackerEventDao.class).save(e);
+        return e;
     }
 }

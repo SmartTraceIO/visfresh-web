@@ -288,6 +288,8 @@ public abstract class AbstractSystemMessageDispatcher {
         final SystemMessage sm = new SystemMessage();
         sm.setType(getMessageType());
         sm.setMessageInfo(messagePayload);
+        sm.setTime(new Date());
+        sm.setRetryOn(sm.getTime());
         messageDao.save(sm);
     }
     /**

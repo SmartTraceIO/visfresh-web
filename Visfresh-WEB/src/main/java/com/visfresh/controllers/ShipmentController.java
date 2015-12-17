@@ -422,7 +422,40 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             generateTestData(dtoOld, s);
         }
 
-        return createNewSingleShipmentDate(s, dtoOld, user);
+        final SingleShipmentDtoNew dto = createNewSingleShipmentDate(s, dtoOld, user);
+
+        double minTemp = 1000.;
+        double maxTemp = -273.;
+        long timeOfFirstReading = System.currentTimeMillis();
+        long timeOfLastReading = 0;
+
+        for (final SingleShipmentTimeItem item : dtoOld.getItems()) {
+            final double t = item.getEvent().getTemperature();
+            final long time = item.getEvent().getTime().getTime();
+
+            if (t < minTemp) {
+                minTemp = t;
+            }
+            if (t > maxTemp) {
+                maxTemp = t;
+            }
+
+            if (timeOfFirstReading > time) {
+                timeOfFirstReading = time;
+            }
+            if (timeOfLastReading < time) {
+                timeOfLastReading = time;
+            }
+        }
+
+        dto.setMinTemp(minTemp);
+        dto.setMaxTemp(maxTemp);
+
+        final DateFormat isoFmt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
+        dto.setTimeOfLastReading(isoFmt.format(new Date(timeOfLastReading)));
+
+        return dto;
     }
     /**
      * @param dto
@@ -500,7 +533,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         final DateFormat isoFmt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         isoFmt.setTimeZone(user.getTimeZone());
 
-        //"startTimeStr:": "19:00 12 AUG 14",
+        //"startTimeStr": "19:00 12 AUG 14",
         final DateFormat descriptionFmt = new SimpleDateFormat("hh:mm dd MMM yy", Locale.US);
         descriptionFmt.setTimeZone(user.getTimeZone());
 
@@ -522,10 +555,12 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setDeviceName(dtoOld.getDeviceName());
         dto.setDeviceSN(dtoOld.getDeviceSn());
         if (shipment.getShippedTo() != null) {
-            dto.setEndLocation(shipment.getShippedTo().getAddress());
+            dto.setEndLocation(shipment.getShippedTo().getName());
             dto.setEndLocationForMap(shipment.getShippedTo().getLocation());
 
-            if (shipment.getShippedFrom() != null && dto.getCurrentLocation() != null) {
+            if (shipment.getShippedFrom() != null
+                    && dto.getCurrentLocation() != null
+                    && dto.getCurrentLocationForMap() != null) {
                 //get last location
                 final Date eta = arrivalEstimationService.estimateArrivalDate(
                         shipment, dto.getCurrentLocationForMap(), new Date());
@@ -546,8 +581,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             dto.setShutdownDeviceAfterMinutes(shipment.getShutdownDeviceTimeOut());
         }
         if (shipment.getShippedFrom() != null) {
-            dto.setStartLocation(shipment.getShippedFrom().getAddress());
-            dto.setStartLocationForMap(shipment.getShippedTo().getLocation());
+            dto.setStartLocation(shipment.getShippedFrom().getName());
+            dto.setStartLocationForMap(shipment.getShippedFrom().getLocation());
         }
         final Date date = shipment.getShipmentDate();
 
@@ -663,14 +698,14 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             //start location
             final LocationProfile startLocation = shipment.getShippedFrom();
             if (startLocation != null) {
-                data.setStartLocation(startLocation.getAddress());
+                data.setStartLocation(startLocation.getName());
                 data.setStartLocationForMap(startLocation.getLocation());
             }
 
             //end location
             final LocationProfile endLocation = shipment.getShippedTo();
             if (endLocation != null) {
-                data.setEndLocation(endLocation.getAddress());
+                data.setEndLocation(endLocation.getName());
                 data.setEndLocationForMap(endLocation.getLocation());
             }
 

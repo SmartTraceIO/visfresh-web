@@ -58,5 +58,4 @@ public class DefaultArrivalEstimationService implements
 
         return eta;
     }
-
 }

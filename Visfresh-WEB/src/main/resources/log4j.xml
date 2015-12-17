@@ -19,7 +19,6 @@
 		</layout>
 	</appender>
 	
-	<!-- Console loggers -->
 	<logger name="com.visfresh">
 		<level value="DEBUG"/>
 		<appender-ref ref="file"/>

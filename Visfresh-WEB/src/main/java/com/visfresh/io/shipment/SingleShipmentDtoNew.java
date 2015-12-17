@@ -41,6 +41,12 @@ public class SingleShipmentDtoNew {
     private Location startLocationForMap;
     private Location endLocationForMap;
     private Location currentLocationForMap;
+
+    private double minTemp;
+    private double maxTemp;
+    private String timeOfFirstReading;
+    private String timeOfLastReading;
+
     private final List<SingleShipmentLocation> locations = new LinkedList<>();
     private final List<SingleShipmentDtoNew> siblings = new LinkedList<>();
 
@@ -375,5 +381,54 @@ public class SingleShipmentDtoNew {
      */
     public List<SingleShipmentDtoNew> getSiblings() {
         return siblings;
+    }
+
+    /**
+     * @return the minTemp
+     */
+    public double getMinTemp() {
+        return minTemp;
+    }
+    /**
+     * @param minTemp the minTemp to set
+     */
+    public void setMinTemp(final double minTemp) {
+        this.minTemp = minTemp;
+    }
+    /**
+     * @return the maxTemp
+     */
+    public double getMaxTemp() {
+        return maxTemp;
+    }
+    /**
+     * @param maxTemp the maxTemp to set
+     */
+    public void setMaxTemp(final double maxTemp) {
+        this.maxTemp = maxTemp;
+    }
+    /**
+     * @return the timeOfFirstReading
+     */
+    public String getTimeOfFirstReading() {
+        return timeOfFirstReading;
+    }
+    /**
+     * @param timeOfFirstReading the timeOfFirstReading to set
+     */
+    public void setTimeOfFirstReading(final String timeOfFirstReading) {
+        this.timeOfFirstReading = timeOfFirstReading;
+    }
+    /**
+     * @return the timeOfLastReading
+     */
+    public String getTimeOfLastReading() {
+        return timeOfLastReading;
+    }
+    /**
+     * @param timeOfLastReading the timeOfLastReading to set
+     */
+    public void setTimeOfLastReading(final String timeOfLastReading) {
+        this.timeOfLastReading = timeOfLastReading;
     }
 }
