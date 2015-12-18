@@ -41,6 +41,9 @@ public class EmailServiceHelper {
 
         final Properties props = new Properties();
         Authenticator auth = null;
+        //enable debugging
+        props.put("mail.debug", "true");
+        //setup connection
         if (user != null && password != null) {
             props.put("mail.smtp.auth", "true");
             auth = new Authenticator() {

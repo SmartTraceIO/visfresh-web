@@ -23,8 +23,4 @@
 		<level value="DEBUG"/>
 		<appender-ref ref="file"/>
 	</logger>
-	<root>
-		<level value="DEBUG" />
-		<appender-ref ref="file" />
-	</root>
 </log4j:configuration>

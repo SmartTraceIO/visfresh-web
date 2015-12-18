@@ -24,14 +24,14 @@ public class SingleShipmentDto {
     private String palletId;
     private int poNum;
 
-    private long shippedFrom;
-    private long shippedTo;
+    private Long shippedFrom;
+    private Long shippedTo;
     private Date shipmentDate;
 
     private String assetNum;
     private String assetType;
 
-    private long alertProfileId;
+    private Long alertProfileId;
     private final List<ListNotificationScheduleItem> alertsNotificationSchedules
         = new LinkedList<ListNotificationScheduleItem>();
 
@@ -147,25 +147,25 @@ public class SingleShipmentDto {
     /**
      * @return the shippedFrom
      */
-    public long getShippedFrom() {
+    public Long getShippedFrom() {
         return shippedFrom;
     }
     /**
      * @param shippedFrom the shippedFrom to set
      */
-    public void setShippedFrom(final long shippedFrom) {
+    public void setShippedFrom(final Long shippedFrom) {
         this.shippedFrom = shippedFrom;
     }
     /**
      * @return the shippedTo
      */
-    public long getShippedTo() {
+    public Long getShippedTo() {
         return shippedTo;
     }
     /**
      * @param shippedTo the shippedTo to set
      */
-    public void setShippedTo(final long shippedTo) {
+    public void setShippedTo(final Long shippedTo) {
         this.shippedTo = shippedTo;
     }
     /**
@@ -207,13 +207,13 @@ public class SingleShipmentDto {
     /**
      * @return the alertProfile
      */
-    public long getAlertProfileId() {
+    public Long getAlertProfileId() {
         return alertProfileId;
     }
     /**
      * @param alertProfile the alertProfile to set
      */
-    public void setAlertProfileId(final long alertProfile) {
+    public void setAlertProfileId(final Long alertProfile) {
         this.alertProfileId = alertProfile;
     }
     /**

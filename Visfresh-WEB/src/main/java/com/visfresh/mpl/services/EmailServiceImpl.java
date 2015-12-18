@@ -88,9 +88,18 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
         final EmailMessage m = serializer.parseEmailMessage(
                 SerializerUtils.parseJson(msg.getMessageInfo()));
         log.debug("Email message dequeued: " + msg.getMessageInfo());
-
+        sendImediatelly(m.getEmails(), m.getSubject(), m.getMessage());
+    }
+    /**
+     * @param emails
+     * @param subject
+     * @param text
+     * @throws RetryableException
+     */
+    public void sendImediatelly(final String[] emails,
+            final String subject, final String text) throws RetryableException {
         try {
-            helper.sendMessage(m.getEmails(), m.getSubject(), m.getMessage());
+            helper.sendMessage(emails, subject, text);
         } catch (final MessagingException e) {
             log.error("Failed to send email", e);
             throw new RetryableException("Failed to send email", e);
