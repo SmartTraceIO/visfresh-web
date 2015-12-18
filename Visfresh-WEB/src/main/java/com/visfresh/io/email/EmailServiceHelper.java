@@ -41,8 +41,6 @@ public class EmailServiceHelper {
 
         final Properties props = new Properties();
         Authenticator auth = null;
-        //enable debugging
-        props.put("mail.debug", "true");
         //setup connection
         if (user != null && password != null) {
             props.put("mail.smtp.auth", "true");
@@ -84,19 +82,15 @@ public class EmailServiceHelper {
             final String textBody) throws MessagingException {
         // create some properties and get the default Session
         final Session session = Session.getInstance(props, auth);
-        session.setDebug(true);
-
         // create a message
         final Message msg = new MimeMessage(session);
 
         // set the from and to address
-        final InternetAddress addressFrom = new InternetAddress(from);
-        msg.setFrom(addressFrom);
+        msg.setFrom(new InternetAddress(from));
 
         //add receipts
         for (final String receipt : to) {
-            final InternetAddress addressTo = new InternetAddress(receipt);
-            msg.addRecipient(Message.RecipientType.TO, addressTo);
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(receipt));
         }
 
         // Setting the Subject and Content Type

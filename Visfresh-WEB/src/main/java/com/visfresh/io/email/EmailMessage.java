@@ -5,7 +5,7 @@ package com.visfresh.io.email;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
- *
+ * insert into systemmessages(type, time, retryon, message) values ('Email', now(), now(), '{"message":"Test","subject":"Test","emails":["vyacheslav.soldatov@inbox.ru"]}');
  */
 public class EmailMessage {
     private String[] emails;

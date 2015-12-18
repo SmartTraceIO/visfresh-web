@@ -45,6 +45,7 @@ public class EmailSerializerTest {
         m.setSubject(subject);
 
         final JsonObject json = serializer.toJson(m);
+        System.out.println(json);
         m = serializer.parseEmailMessage(json);
 
         assertEquals(firstEmail, m.getEmails()[0]);

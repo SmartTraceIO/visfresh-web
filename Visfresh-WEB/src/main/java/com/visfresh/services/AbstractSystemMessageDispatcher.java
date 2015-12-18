@@ -227,6 +227,7 @@ public abstract class AbstractSystemMessageDispatcher {
 
                 msg.setRetryOn(new Date(msg.getRetryOn().getTime() + timeOut));
                 msg.setNumberOfRetry(msg.getNumberOfRetry() + 1);
+                msg.setProcessor(null);//clear processor
                 messageDao.save(msg);
             } else {
                 log.error("Retry limit has exceed for message " + msg + ", will not dispatched next", e);

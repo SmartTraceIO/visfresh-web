@@ -69,58 +69,6 @@
 			<artifactId>gson</artifactId>
 			<version>2.2.4</version>
 		</dependency>
-
-		<!-- GTSe -->
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>custom</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>customtrack</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>dmtpserv</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>gtsdb</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>gtsutils</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>ruledb</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>ruletrack</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>track</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>warmaps</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opengts</groupId>
-			<artifactId>wartools</artifactId>
-			<version>${gtse.version}</version>
-		</dependency>
 		
 		<!-- Rules Engine -->
 		<dependency>
@@ -182,6 +130,10 @@
 					<groupId>org.eclipse.jetty.tests</groupId>
 					<artifactId>test-mock-resources</artifactId>
 				</exclusion>
+				<exclusion>
+					<artifactId>javax.mail.glassfish</artifactId>
+					<groupId>org.eclipse.jetty.orbit</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 	</dependencies>	
@@ -205,21 +157,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>in-project</id>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-			<name>In Project Repo</name>
-			<url>file://${project.basedir}/lib</url>
-		</repository>
-	</repositories>
 </project>
