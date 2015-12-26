@@ -216,6 +216,7 @@ create table shipments (
     palletid varchar(31),
     assetnum varchar(31),
     shipmentdate timestamp,
+    lasteventdate timestamp default '00-01-01 00:00:00',
     customfiels longtext,
     comments varchar(300),
     ponum int not null default 0,

@@ -18,7 +18,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonElement;
 import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
@@ -43,11 +45,12 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     @Autowired
     private TrackerMessageDispatcher dispatcher;
     @Autowired
-    private TrackerEventDao eventDao;
+    private ShipmentDao shipmentDao;
     @Autowired
     private TrackerEventDao trackerEventDao;
     @Autowired
     private DeviceDao deviceDao;
+
     private final DeviceDcsNativeEventSerializer deviceEventParser = new DeviceDcsNativeEventSerializer();
     private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<String, TrackerEventRule>();
 
@@ -118,6 +121,15 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         try {
             invokeRules(context);
+
+            //update last shipment date.
+            final Shipment shipment = e.getShipment();
+            if (shipment != null) {
+                shipment.setLastEventDate(e.getTime());
+                shipmentDao.save(shipment);
+                log.debug("Last shipment date of " + shipment.getShipmentDescription()
+                        + " has updated to " + shipment.getLastEventDate());
+            }
         } finally {
             //update history.
             state.addToHistory(new TemperaturePoint(e.getTemperature(), e.getTime()));

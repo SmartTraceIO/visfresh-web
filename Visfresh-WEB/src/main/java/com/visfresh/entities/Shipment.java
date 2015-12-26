@@ -43,9 +43,13 @@ public class Shipment extends ShipmentBase {
     private final Map<String, String> customFields = new HashMap<String, String>();
 
     /**
-     * Shipment description date
+     * Shipment description date.
      */
     private Date shipmentDate = new Date();
+    /**
+     * The date of last tracker event for given shipment.
+     */
+    private Date lastEventDate = new Date();
     /**
      * Shipment status.
      */
@@ -93,6 +97,18 @@ public class Shipment extends ShipmentBase {
      */
     public void setShipmentDate(final Date shipmentDate) {
         this.shipmentDate = shipmentDate;
+    }
+    /**
+     * @return the lastEventDate
+     */
+    public Date getLastEventDate() {
+        return lastEventDate;
+    }
+    /**
+     * @param lastEventDate the lastEventDate to set
+     */
+    public void setLastEventDate(final Date lastEventDate) {
+        this.lastEventDate = lastEventDate;
     }
     /**
      * @return the customFields

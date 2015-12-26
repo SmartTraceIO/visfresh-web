@@ -40,6 +40,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     private static final String STATUS_FIELD = "status";
     private static final String DEVICE_FIELD = "device";
     private static final String ASSETTYPE_FIELD = "assettype";
+    private static final String LASTEVENT_FIELD = "lasteventdate";
 
     @Autowired
     private DeviceDao deviceDao;
@@ -152,6 +153,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         e.setPalletId((String) map.get(PALETTID_FIELD));
         e.setAssetNum((String) map.get(ASSETNUM_FIELD));
         e.setShipmentDate((Date) map.get(SHIPMENTDATE_FIELD));
+        e.setLastEventDate((Date) map.get(LASTEVENT_FIELD));
         e.getCustomFields().putAll(parseJsonMap((String) map.get(CUSTOMFIELDS_FIELD)));
         e.setStatus(ShipmentStatus.valueOf((String) map.get(STATUS_FIELD)));
         e.setDevice(deviceDao.findOne((String) map.get(DEVICE_FIELD)));
@@ -177,6 +179,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(PALETTID_FIELD, s.getPalletId());
         params.put(ASSETNUM_FIELD, s.getAssetNum());
         params.put(SHIPMENTDATE_FIELD, s.getShipmentDate());
+        params.put(LASTEVENT_FIELD, s.getLastEventDate());
         params.put(CUSTOMFIELDS_FIELD, AbstractJsonSerializer.toJson(s.getCustomFields()).toString());
         params.put(STATUS_FIELD, s.getStatus().name());
         params.put(PONUM_FIELD, s.getPoNum());
@@ -321,7 +324,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM_DATE.equals(property)){
             //shipped from date
             params.put(defaultKey, value);
-            filters.add(SHIPMENTDATE_FIELD + " >= :" + defaultKey);
+            filters.add(LASTEVENT_FIELD + " >= :" + defaultKey);
         } else if (ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION.equals(property)){
             params.put(defaultKey, "%" + value + "%");
             filters.add(DESCRIPTION_FIELD + " like :" + defaultKey);

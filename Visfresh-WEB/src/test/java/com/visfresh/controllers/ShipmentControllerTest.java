@@ -126,8 +126,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(tpl);
         assertNotNull(tpl.getName());
     }
-    //@RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getShipments(@PathVariable final String authToken) {
     @Test
     public void testGetShipments() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
@@ -256,11 +254,13 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         //check default time ranges (2 weeks)
         final long oneDay = 24 * 60 * 60 * 1000L;
         s.setShipmentDate(new Date(System.currentTimeMillis() - 15 * oneDay));
+        s.setLastEventDate(new Date(s.getShipmentDate().getTime() + 2 * 60 * 60 * 1000L));
         saveShipmentDirectly(s);
         assertEquals(0, shipmentClient.getShipments(req).size());
 
         //check one week date ranges
         s.setShipmentDate(new Date());
+        s.setLastEventDate(new Date());
         saveShipmentDirectly(s);
 
         req = createFilter(s);
@@ -268,11 +268,13 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(1, shipmentClient.getShipments(req).size());
 
         s.setShipmentDate(new Date(System.currentTimeMillis() - 8 * oneDay));
+        s.setLastEventDate(new Date(s.getShipmentDate().getTime() + 2 * 60 * 60 * 1000L));
         saveShipmentDirectly(s);
         assertEquals(0, shipmentClient.getShipments(req).size());
 
         //check last day
-        s.setShipmentDate(new Date());
+        s.setShipmentDate(new Date(System.currentTimeMillis() - 3 * 60 * 60 * 1000L));
+        s.setLastEventDate(new Date(s.getShipmentDate().getTime() + 2 * 60 * 60 * 1000L));
         saveShipmentDirectly(s);
 
         req = createFilter(s);
@@ -280,6 +282,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(1, shipmentClient.getShipments(req).size());
 
         s.setShipmentDate(new Date(System.currentTimeMillis() - 2 * oneDay));
+        s.setLastEventDate(new Date(s.getShipmentDate().getTime() + 2 * 60 * 60 * 1000L));
         saveShipmentDirectly(s);
         assertEquals(0, shipmentClient.getShipments(req).size());
 
@@ -292,11 +295,13 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(1, shipmentClient.getShipments(req).size());
 
         s.setShipmentDate(new Date(System.currentTimeMillis() - 3 * oneDay));
+        s.setLastEventDate(new Date(s.getShipmentDate().getTime() + 2 * 60 * 60 * 1000L));
         saveShipmentDirectly(s);
         assertEquals(0, shipmentClient.getShipments(req).size());
 
         //check last one month
-        s.setShipmentDate(new Date());
+        s.setShipmentDate(new Date(System.currentTimeMillis() - 3 * 60 * 60 * 1000L));
+        s.setLastEventDate(new Date(s.getShipmentDate().getTime() + 2 * 60 * 60 * 1000L));
         saveShipmentDirectly(s);
 
         req = createFilter(s);
@@ -304,6 +309,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(1, shipmentClient.getShipments(req).size());
 
         s.setShipmentDate(new Date(System.currentTimeMillis() - 32 * oneDay));
+        s.setLastEventDate(new Date(s.getShipmentDate().getTime() + 2 * 60 * 60 * 1000L));
         saveShipmentDirectly(s);
         assertEquals(0, shipmentClient.getShipments(req).size());
     }

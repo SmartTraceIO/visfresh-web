@@ -6,7 +6,6 @@ package com.visfresh.controllers;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,7 +41,6 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Location;
-import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
@@ -50,8 +48,6 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
-import com.visfresh.io.MapChartData;
-import com.visfresh.io.MapChartItem;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -671,85 +667,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
                 lo = l;
             }
-        }
-
-        return list;
-    }
-    @RequestMapping(value = "/getDataForMapAndChart/{authToken}", method = RequestMethod.GET)
-    public JsonObject getDataForMapAndChart(@PathVariable final String authToken,
-            @RequestParam final Long shipmentId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser(authToken);
-            security.checkCanGetShipmentData(user);
-
-            final ShipmentSerializer ser = getSerializer(user);
-
-            final Shipment shipment = shipmentDao.findOne(shipmentId);
-            checkCompanyAccess(user, shipment);
-
-            if (shipment == null) {
-                throw new IllegalArgumentException("Unable to find shipment by given ID " + shipmentId);
-            }
-
-            //create response
-            final MapChartData data = new MapChartData();
-
-            //start location
-            final LocationProfile startLocation = shipment.getShippedFrom();
-            if (startLocation != null) {
-                data.setStartLocation(startLocation.getName());
-                data.setStartLocationForMap(startLocation.getLocation());
-            }
-
-            //end location
-            final LocationProfile endLocation = shipment.getShippedTo();
-            if (endLocation != null) {
-                data.setEndLocation(endLocation.getName());
-                data.setEndLocationForMap(endLocation.getLocation());
-            }
-
-            final Date startTime = shipment.getShipmentDate();
-
-            final DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            isoFormat.setTimeZone(user.getTimeZone());
-            data.setStartTimeISO(isoFormat.format(startTime));
-
-            final DateFormat prettyFormat = new SimpleDateFormat("h:mm d'-'MMM'-'yyyy", Locale.US);
-            prettyFormat.setTimeZone(user.getTimeZone());
-            data.setStartTimeStr(prettyFormat.format(startTime));
-
-            //Add timed items
-            final SingleShipmentDto dto = getShipmentData(shipment, true);
-            for (final SingleShipmentTimeItem item : dto.getItems()) {
-                final List<MapChartItem> mci = createMapChartItem(item, shipment, isoFormat);
-                data.getLocations().addAll(mci);
-            }
-
-            return createSuccessResponse(ser.toJson(data));
-        } catch (final Exception e) {
-            log.error("Failed to get devices", e);
-            return createErrorResponse(e);
-        }
-    }
-    /**
-     * @param item single shipment time item.
-     * @param shipment shipment.
-     * @return the list of chart item.
-     */
-    private List<MapChartItem> createMapChartItem(final SingleShipmentTimeItem item,
-            final Shipment shipment, final DateFormat isoFormat) {
-        final TrackerEvent event = item.getEvent();
-
-        final ArrayList<MapChartItem> list = new ArrayList<MapChartItem>(item.getAlerts().size());
-        for (final Alert a : item.getAlerts()) {
-            final MapChartItem mci = new MapChartItem();
-            mci.setLat(event.getLatitude());
-            mci.setLon(event.getLongitude());
-            mci.setTemperature(event.getTemperature());
-            mci.setTimeISO(isoFormat.format(event.getTime()));
-
-
         }
 
         return list;
