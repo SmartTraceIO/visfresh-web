@@ -114,7 +114,10 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     //        final @RequestBody String shipment) {
     @Test
     public void testSaveShipment() throws RestServiceException, IOException {
+        final String comments = "Some comments for receiver saved for shipment";
+
         final Shipment s = createShipment(true);
+        s.setCommentsForReceiver(comments);
         s.setId(null);
         final SaveShipmentResponse resp = shipmentClient.saveShipment(s, "NewTemplate.tpl", true);
         assertNotNull(resp.getShipmentId());
@@ -125,6 +128,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         assertNotNull(tpl);
         assertNotNull(tpl.getName());
+        assertEquals(comments, tpl.getCommentsForReceiver());
     }
     @Test
     public void testGetShipments() throws RestServiceException, IOException {
