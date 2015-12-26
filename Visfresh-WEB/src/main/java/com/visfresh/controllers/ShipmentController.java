@@ -292,6 +292,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         for (final Shipment s : shipments) {
             final List<Alert> alerts = alertDao.getAlerts(s);
             final ListShipmentItem dto = new ListShipmentItem(s);
+            dto.setSiblingCount(siblingService.getSiblingCount(s));
             dto.getAlertSummary().putAll(toSummaryMap(alerts));
             result.add(dto);
         }

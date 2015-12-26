@@ -72,6 +72,13 @@ public class SiblingDetectorServiceImpl implements SiblingDetectorService {
 
         return group;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.SiblingDetectorService#getSiblingCount(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public int getSiblingCount(final Shipment s) {
+        return getSiblings(s).size();
+    }
     /**
      * @param group group.
      * @param shipment shipment to remove.

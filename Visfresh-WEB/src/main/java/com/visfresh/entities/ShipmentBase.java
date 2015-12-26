@@ -88,6 +88,7 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
         arrivalNotificationSchedules.addAll((shipment.getArrivalNotificationSchedules()));
         setExcludeNotificationsIfNoAlerts(shipment.isExcludeNotificationsIfNoAlerts());
         setShutdownDeviceTimeOut(shipment.getShutdownDeviceTimeOut());
+        setCommentsForReceiver(shipment.getCommentsForReceiver());
     }
 
     /**

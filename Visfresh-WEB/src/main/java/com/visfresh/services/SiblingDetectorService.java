@@ -17,4 +17,9 @@ public interface SiblingDetectorService {
      * @return list of siblings for given shipment.
      */
     List<Shipment> getSiblings(Shipment shipment);
+    /**
+     * @param s shipment.
+     * @return number of proposed siblings.
+     */
+    int getSiblingCount(Shipment s);
 }
