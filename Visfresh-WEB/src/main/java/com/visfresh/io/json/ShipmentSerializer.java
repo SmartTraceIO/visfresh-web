@@ -3,8 +3,10 @@
  */
 package com.visfresh.io.json;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -13,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
@@ -24,7 +27,6 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
-import com.visfresh.io.MapChartData;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -37,6 +39,7 @@ import com.visfresh.io.shipment.SingleShipmentTimeItem;
 import com.visfresh.rules.AlertDescriptionBuilder;
 import com.visfresh.services.lists.ListNotificationScheduleItem;
 import com.visfresh.services.lists.ListShipmentItem;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -203,19 +206,20 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty("status", dto.getStatus());
 
+        obj.addProperty("shipmentId", dto.getShipmentId());
         obj.addProperty("deviceSN", dto.getDeviceSn());
         obj.addProperty("deviceName", dto.getDeviceName());
         obj.addProperty("tripCount", dto.getTripCount());
 
-        obj.addProperty("shipmentId", dto.getShipmentId());
         obj.addProperty("shipmentDescription", dto.getShipmentDescription());
 
         obj.addProperty("palletId", dto.getPalletId());
         obj.addProperty("poNum", dto.getPoNum());
         obj.addProperty("assetNum", dto.getAssetNum());
         obj.addProperty("assetType", dto.getAssetType());
+
+        obj.addProperty("status", dto.getStatus());
 
         obj.addProperty("shippedFrom", dto.getShippedFrom());
         obj.addProperty("shippedTo", dto.getShippedTo());
@@ -228,6 +232,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty("alertProfileId", dto.getAlertProfileId());
         obj.addProperty("alertProfileName", dto.getAlertProfileName());
         obj.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
+
         obj.addProperty("maxTimesAlertFires", dto.getMaxTimesAlertFires());
         obj.add("alertsNotificationSchedules", scheduleItemsAsJsonArray(dto.getAlertsNotificationSchedules()));
         obj.add("alertSummary", toJson(dto.getAlertSummary()));
@@ -245,6 +250,18 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
 
         return obj;
+    }
+
+    /**
+     * @param sched
+     * @return
+     */
+    private String createPeopleToNotifyString(final List<ListNotificationScheduleItem> sched) {
+        final List<String> list = new LinkedList<>();
+        for (final ListNotificationScheduleItem s : sched) {
+            list.add(s.getPeopleToNotify());
+        }
+        return StringUtils.combine(list, ", ");
     }
 
     /**
@@ -565,40 +582,90 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("assetNum", dto.getAssetNum());
         json.addProperty("assetType", dto.getAssetType());
         json.addProperty("status", dto.getStatus().name());
+
+        json.addProperty("trackerPositionFrontPercent", dto.getTrackerPositionFrontPercent());
+        json.addProperty("trackerPositionLeftPercent", dto.getTrackerPositionLeftPercent());
+
         json.addProperty("alertProfileId", dto.getAlertProfileId());
+        json.addProperty("alertProfileName", dto.getAlertProfileName());
         json.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
-        json.add("alertsNotificationSchedules", toJson(dto.getAlertsNotificationSchedules()));
-        json.addProperty("commentsForReceiver", dto.getCommentsForReceiver());
+
+        json.addProperty("alertPeopleToNotify", createPeopleToNotifyString(
+                dto.getAlertsNotificationSchedules()));
+
+        //alertsNotificationSchedules
+        JsonArray array = new JsonArray();
+        for (final ListNotificationScheduleItem item: dto.getAlertsNotificationSchedules()) {
+            array.add(toJson(item));
+        }
+        json.add("alertsNotificationSchedules", array);
+
+        //alert summary
+        json.add("alertSummary", createAlertSummaryArray(dto.getAlertSummary()));
+        json.addProperty("alertYetToFire", dto.getAlertYetToFire());
+
+        //"arrivalNotificationTimeStr": "9:00am 12 AUG 2014",
+        // NEW - the actual time arrival notification was sent out
+        json.addProperty("arrivalNotificationTimeStr", dto.getArrivalNotificationTimeStr());
+
+        //"arrivalNotificationTimeISO": "2014-08-12 12:10",
+        // NEW - ISO for actual time arrival notification sent out
+        json.addProperty("arrivalNotificationTimeISO", dto.getArrivalNotificationTimeIso());
+
         json.addProperty("arrivalNotificationWithinKm", dto.getArrivalNotificationWithinKm());
         json.addProperty("excludeNotificationsIfNoAlerts", dto.isExcludeNotificationsIfNoAlerts());
-        json.add("arrivalNotificationSchedules", toJson(dto.getArrivalNotificationSchedules()));
+
+        json.addProperty("arrivalPeopleToNotify", createPeopleToNotifyString(
+                dto.getArrivalNotificationSchedules()));
+
+        array = new JsonArray();
+        for (final ListNotificationScheduleItem item: dto.getArrivalNotificationSchedules()) {
+            array.add(toJson(item));
+        }
+
+        json.addProperty("commentsForReceiver", dto.getCommentsForReceiver());
+
+        json.add("arrivalNotificationSchedules", array);
         json.addProperty("shutdownDeviceAfterMinutes", dto.getShutdownDeviceAfterMinutes());
+
+        json.addProperty("shutdownTimeStr", dto.getShutdownTimeStr());
+        json.addProperty("shutdownTimeISO", dto.getShutdownTimeIso());
+
         json.addProperty("startLocation", dto.getStartLocation());
         json.addProperty("startTimeStr", dto.getStartTimeStr());
         json.addProperty("startTimeISO", dto.getStartTimeISO());
-        json.addProperty("endLocation", dto.getEndLocation());
-        json.addProperty("eta", dto.getEta());
-        json.addProperty("etaStr", dto.getEtaStr());
-        json.addProperty("currentLocation", dto.getCurrentLocation());
         json.add("startLocationForMap", toJson(dto.getStartLocationForMap()));
-        json.add("endLocationForMap", toJson(dto.getEndLocationForMap()));
-        json.add("currentLocationForMap", toJson(dto.getCurrentLocationForMap()));
 
+        json.addProperty("endLocation", dto.getEndLocation());
+        json.addProperty("etaStr", dto.getEtaStr());
+        json.addProperty("etaISO", dto.getEta());
+
+        json.addProperty("arrivalTimeStr", dto.getArrivalTimeStr());
+        json.addProperty("arrivalTimeISO", dto.getArrivalTimeIso());
+        json.add("endLocationForMap", toJson(dto.getEndLocationForMap()));
+
+        json.addProperty("lastReadingLocation", dto.getCurrentLocation());
+        json.addProperty("lastReadingTimeStr", dto.getLastReadingTimeStr());
+        json.addProperty("lastReadingTimeISO", dto.getLastReadingTimeIso());
+        json.addProperty("lastReadingTemperature", dto.getLastReadingTemperature());
+
+        json.add("lastReadingForMap", toJson(dto.getCurrentLocationForMap()));
+
+        //!!!!!!!
         json.addProperty("minTemp", dto.getMinTemp());
         json.addProperty("maxTemp", dto.getMaxTemp());
         json.addProperty("timeOfFirstReading", dto.getTimeOfFirstReading());
-        json.addProperty("timeOfLastReading", dto.getTimeOfLastReading());
 
         final JsonArray locations = new JsonArray();
         for (final SingleShipmentLocation l : dto.getLocations()) {
-            locations.add(toJson(l));
+            locations.add(toJson(l, !includeSiblings));
         }
         json.add("locations", locations);
 
         if (includeSiblings) {
             final JsonArray siblings = new JsonArray();
             for (final SingleShipmentDtoNew sibling: dto.getSiblings()) {
-                siblings.add(toJson(sibling, false));
+                siblings.add(toJson(sibling, true));
             }
 
             json.add("siblings", siblings);
@@ -607,10 +674,41 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         return json;
     }
     /**
-     * @param l location.
+     * @param summary
      * @return
      */
-    private JsonObject toJson(final SingleShipmentLocation l) {
+    private JsonArray createAlertSummaryArray(final Set<AlertType> summary) {
+        final JsonArray array = new JsonArray();
+        final List<AlertType> list = new LinkedList<>(summary);
+        Collections.sort(list);
+
+        for (final AlertType t : list) {
+            array.add(new JsonPrimitive(t.name()));
+        }
+        return array;
+    }
+
+    /**
+     * @param item list notification schedule item.
+     * @return
+     */
+    private JsonObject toJson(final ListNotificationScheduleItem item) {
+        if (item == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("notificationScheduleId", item.getNotificationScheduleId());
+        json.addProperty("notificationScheduleName", item.getNotificationScheduleName());
+        return json;
+    }
+
+    /**
+     * @param l location.
+     * @param isSibling TODO
+     * @return
+     */
+    private JsonObject toJson(final SingleShipmentLocation l, final boolean isSibling) {
         if (l == null) {
             return null;
         }
@@ -621,7 +719,23 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("temperature", l.getTemperature());
         json.addProperty("timeISO", l.getTimeIso());
         json.add("timeObj", JsonNull.INSTANCE);
-        json.add("alert", toJson(l.getAlert()));
+
+        if (!isSibling) {
+            final JsonArray alerts = new JsonArray();
+            for (final SingleShipmentAlert alert : l.getAlerts()) {
+                alerts.add(toJson(alert));
+            }
+            json.add("alerts", alerts);
+        } else {
+            final JsonArray alerts = new JsonArray();
+            final JsonObject obj = new JsonObject();
+            alerts.add(obj);
+
+            obj.addProperty("temp", l.getTemperature());
+            obj.addProperty("timeISO", l.getTimeIso());
+
+            json.add("readings", alerts);
+        }
 
         return json;
     }
@@ -637,45 +751,14 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         final JsonObject json = new JsonObject();
         json.addProperty("title", alert.getTitle());
-        json.addProperty("temperature", alert.getTemperature());
-        json.addProperty("time", alert.getTime());
-        json.addProperty("date", alert.getDate());
-        json.addProperty("location", alert.getLocation());
-        json.addProperty("shippedTo", alert.getShippedTo());
-        json.addProperty("eta", alert.getEta());
+
+        //add lines
+        int i = 1;
+        for (final String line : alert.getLines()) {
+            json.addProperty("Line" + i, line);
+            i++;
+        }
         json.addProperty("type", alert.getType());
         return json;
-    }
-
-    /**
-     * @param longs
-     * @return
-     */
-    private JsonArray toJson(final List<Long> longs) {
-        final JsonArray array = new JsonArray();
-        for (final Long l : longs) {
-            array.add(new JsonPrimitive(l));
-        }
-        return array;
-    }
-
-    public SingleShipmentDtoNew parseSingleShipmentDtoNew(final JsonElement jsel) {
-        if (jsel == null || jsel.isJsonNull()) {
-            return null;
-        }
-
-        final JsonObject json = jsel.getAsJsonObject();
-
-        final SingleShipmentDtoNew dto = new SingleShipmentDtoNew();
-        return dto;
-    }
-
-    /**
-     * @param data
-     * @return
-     */
-    public JsonElement toJson(final MapChartData data) {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

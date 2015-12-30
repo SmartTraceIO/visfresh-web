@@ -11,6 +11,11 @@ package com.visfresh.entities;
  */
 public class DeviceCommand implements EntityWithId<Long> {
     /**
+     * Shutdown command.
+     */
+    public static final String SHUTDOWN = "SHUTDOWN#";
+
+    /**
      * Command ID.
      */
     private Long id;

@@ -306,6 +306,20 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertNotNull(dao.findOne(s.getId()));
     }
     @Test
+    public void testSaveDeviceShutdownDate() {
+        final Date time = new Date(System.currentTimeMillis() - 100000000l);
+
+        final Shipment s = new Shipment();
+        s.setCompany(sharedCompany);
+        s.setDevice(device);
+        s.setDeviceShutdownTime(time);
+        dao.save(s);
+
+        final Shipment one = dao.findOne(s.getId());
+        assertNotNull(one);
+        assertEquals(time.getTime(), one.getDeviceShutdownTime().getTime(), 1000);
+    }
+    @Test
     public void testGetShipmentDeviceInfo() {
         final Shipment s1 = createTestEntity();
         final Shipment s2 = createTestEntity();

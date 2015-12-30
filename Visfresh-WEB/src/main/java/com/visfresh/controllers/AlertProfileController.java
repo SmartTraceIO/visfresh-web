@@ -23,7 +23,6 @@ import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
-import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
 import com.visfresh.rules.AlertDescriptionBuilder;
@@ -45,6 +44,8 @@ public class AlertProfileController extends AbstractController implements AlertP
      */
     @Autowired
     private AlertProfileDao dao;
+    @Autowired
+    private AlertDescriptionBuilder alertDescriptionBuilder;
 
     /**
      * Default constructor.
@@ -157,7 +158,8 @@ public class AlertProfileController extends AbstractController implements AlertP
                 item.setAlertProfileName(a.getName());
                 item.setAlertProfileDescription(a.getDescription());
                 for (final AlertRule rule : a.getAlertRules()) {
-                    item.getAlertRuleList().add(alertRuleToString(rule, user.getTemperatureUnits()));
+                    item.getAlertRuleList().add(
+                            alertDescriptionBuilder.alertRuleToString(rule, user.getTemperatureUnits()));
                 }
 
                 array.add(ser.toJson(item));
@@ -169,42 +171,6 @@ public class AlertProfileController extends AbstractController implements AlertP
             return createErrorResponse(e);
         }
     }
-    /**
-     * @param rule
-     * @return
-     */
-    private String alertRuleToString(final AlertRule rule, final TemperatureUnits units) {
-        final StringBuilder sb = new StringBuilder();
-        switch (rule.getType()) {
-            case Cold:
-            case CriticalCold:
-                sb.append('<');
-                break;
-            case Hot:
-            case CriticalHot:
-                sb.append('>');
-                break;
-            case Battery:
-                return "battery low";
-            case LightOff:
-                return "light off";
-            case LightOn:
-                return "light on";
-                default:
-                    throw new IllegalArgumentException("Unexpected alert type: " + rule.getType());
-        }
-
-        //only temperature alert rules. Other should be returned before.
-        sb.append(AlertDescriptionBuilder.getTemperatureString(rule.getTemperature(), units));
-        //append time
-        sb.append(" for " + rule.getTimeOutMinutes() + " min");
-        //append total
-        if (rule.isCumulativeFlag()) {
-            sb.append(" in total");
-        }
-        return sb.toString();
-    }
-
     /**
      * @param user
      * @return

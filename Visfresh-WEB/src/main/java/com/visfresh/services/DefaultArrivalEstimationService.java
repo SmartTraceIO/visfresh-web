@@ -29,10 +29,9 @@ public class DefaultArrivalEstimationService implements
      * @see com.visfresh.services.ArrivalEstimationService#estimateArrivalDate(com.visfresh.entities.Shipment, com.visfresh.entities.Location)
      */
     @Override
-    public Date estimateArrivalDate(final Shipment s,
+    public ArrivalEstimation estimateArrivalDate(final Shipment s,
             final Location currentLocation, final Date currentTime) {
         final Date startDate = s.getShipmentDate();
-        final Date eta = startDate;
 
         if (s.getShippedFrom() != null && s.getShippedTo() != null) {
             final Location from = s.getShippedFrom().getLocation();
@@ -41,7 +40,7 @@ public class DefaultArrivalEstimationService implements
             final double allPath = LocationUtils.distFrom(from.getLatitude(), from.getLongitude(),
                     to.getLatitude(), to.getLongitude());
             if (allPath == 0) {
-                return new Date(currentTime.getTime());
+                return new ArrivalEstimation(new Date(currentTime.getTime()), 100);
             }
 
             final double reminder = LocationUtils.distFrom(
@@ -53,9 +52,11 @@ public class DefaultArrivalEstimationService implements
 
             final long dt = (long) (reminder * (currentTime.getTime() - startDate.getTime())
                     / (allPath - reminder));
-            return new Date(currentTime.getTime() + dt);
+            return new ArrivalEstimation(
+                    new Date(currentTime.getTime() + dt),
+                    (int) Math.round((allPath - reminder) / allPath));
         }
 
-        return eta;
+        return new ArrivalEstimation(startDate, 0);
     }
 }

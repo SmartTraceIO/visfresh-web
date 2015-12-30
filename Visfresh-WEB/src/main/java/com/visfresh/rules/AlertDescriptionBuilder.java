@@ -3,6 +3,7 @@
  */
 package com.visfresh.rules;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -14,8 +15,11 @@ import java.util.ResourceBundle;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.Arrival;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AbstractJsonSerializer;
 import com.visfresh.l12n.XmlControl;
@@ -108,7 +112,7 @@ public class AlertDescriptionBuilder {
      * @param units temperature units.
      * @return temperature string.
      */
-    public static String getTemperatureString(final double t, final TemperatureUnits units) {
+    private String getTemperatureString(final double t, final TemperatureUnits units) {
         final double temp = getTemperature(t, units);
         String degree;
         switch (units) {
@@ -129,6 +133,43 @@ public class AlertDescriptionBuilder {
         //format temperature string
         return fmt.format(temp) + degree;
     }
+    /**
+     * TODO move to resource bundles.
+     * @param rule
+     * @return
+     */
+    public String alertRuleToString(final AlertRule rule, final TemperatureUnits units) {
+        final StringBuilder sb = new StringBuilder();
+        switch (rule.getType()) {
+            case Cold:
+            case CriticalCold:
+                sb.append('<');
+                break;
+            case Hot:
+            case CriticalHot:
+                sb.append('>');
+                break;
+            case Battery:
+                return "battery low";
+            case LightOff:
+                return "light off";
+            case LightOn:
+                return "light on";
+                default:
+                    throw new IllegalArgumentException("Unexpected alert type: " + rule.getType());
+        }
+
+        //only temperature alert rules. Other should be returned before.
+        sb.append(getTemperatureString(rule.getTemperature(), units));
+        //append time
+        sb.append(" for " + rule.getTimeOutMinutes() + " min");
+        //append total
+        if (rule.isCumulativeFlag()) {
+            sb.append(" in total");
+        }
+        return sb.toString();
+    }
+
 
     /**
      * @param tCelsium
@@ -147,5 +188,109 @@ public class AlertDescriptionBuilder {
                     break;
         }
         return temp;
+    }
+
+    /**
+     * @param a
+     * @param user
+     * @return
+     */
+    public String buildShortDescription(final Alert a, final User user) {
+        final StringBuilder sb = new StringBuilder();
+        //temperature: "0.62",
+        if (a instanceof TemperatureAlert) {
+            final TemperatureAlert ta = (TemperatureAlert) a;
+//            line1: "3.22°C at 12:01am on 12 Aug 2014",
+            sb.append(getTemperatureString(ta.getTemperature(), user.getTemperatureUnits()));
+        } else {
+            switch (a.getType()) {
+                case Battery:
+                    sb.append("battery low");
+                    break;
+                case LightOff:
+                    sb.append("light off");
+                    break;
+                case LightOn:
+                    sb.append("light on");
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unexpected alert type: " + a.getType());
+            }
+
+        }
+
+        sb.append(" at ");
+
+        final DateFormat fmt = new SimpleDateFormat("h:mmaa 'on' d MMM yyyy");
+        fmt.setTimeZone(user.getTimeZone());
+        sb.append(fmt.format(a.getDate()));
+
+        return sb.toString();
+    }
+
+    /**
+     * TODO move to resource bundles.
+     * @param event event.
+     * @param user user.
+     * @return
+     */
+    public String buildDescription(final TrackerEvent event, final User user) {
+        return "Last Reading for Tracker #"
+                + event.getDevice().getSn()
+                + "("
+                + event.getShipment().getTripCount()
+                + ")";
+    }
+
+    /**
+     * @param event event.
+     * @param user user.
+     * @return short tracker event description.
+     */
+    public String buildShortDescription(final TrackerEvent event, final User user) {
+        // 4.34°C at 9:20pm on 12 Aug 2014
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getTemperatureString(event.getTemperature(), user.getTemperatureUnits()));
+
+        sb.append(" at ");
+
+        final DateFormat fmt = new SimpleDateFormat("h:mmaa 'on' d MMM yyyy");
+        fmt.setTimeZone(user.getTimeZone());
+        sb.append(fmt.format(event.getTime()));
+
+        return sb.toString();
+    }
+
+    /**
+     * TODO localize
+     * @param a arrival.
+     * @param user user.
+     * @return arrival description.
+     */
+    public String buildDescription(final Arrival a, final User user) {
+        return "Arrival Notification for Tracker #"
+                + a.getDevice().getSn()
+                + "("
+                + a.getShipment().getTripCount()
+                + ")";
+    }
+    /**
+     * TODO localize
+     * @param a arrival.
+     * @param user user.
+     * @return short arrival description.
+     */
+    public String buildShortDescription(final Arrival a, final User user) {
+        //<20kms away at 7:20pm on 12 Aug 2015
+        final StringBuilder sb = new StringBuilder();
+        sb.append('<');
+        sb.append(a.getNumberOfMettersOfArrival());
+        sb.append("m away at ");
+
+        final DateFormat fmt = new SimpleDateFormat("h:mmaa 'on' d MMM yyyy");
+        fmt.setTimeZone(user.getTimeZone());
+        sb.append(fmt.format(a.getDate()));
+
+        return sb.toString();
     }
 }

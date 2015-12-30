@@ -5,11 +5,11 @@ package com.visfresh.controllers;
 
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -38,12 +38,16 @@ import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
@@ -59,10 +63,12 @@ import com.visfresh.io.shipment.SingleShipmentDtoNew;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.io.shipment.SingleShipmentTimeItem;
 import com.visfresh.rules.AlertDescriptionBuilder;
+import com.visfresh.services.ArrivalEstimation;
 import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.services.LocationService;
 import com.visfresh.services.SiblingDetectorService;
 import com.visfresh.services.lists.ListShipmentItem;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -423,6 +429,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         double minTemp = 1000.;
         double maxTemp = -273.;
+        Double lastReadingTemperature = null;
         long timeOfFirstReading = System.currentTimeMillis();
         long timeOfLastReading = 0;
 
@@ -442,6 +449,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             }
             if (timeOfLastReading < time) {
                 timeOfLastReading = time;
+                lastReadingTemperature = t;
             }
         }
 
@@ -449,10 +457,102 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setMaxTemp(maxTemp);
 
         final DateFormat isoFmt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        isoFmt.setTimeZone(user.getTimeZone());
+        final DateFormat prettyFmt = new SimpleDateFormat("h:mmaa dd MMM yyyy");
+        prettyFmt.setTimeZone(user.getTimeZone());
+
         dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
-        dto.setTimeOfLastReading(isoFmt.format(new Date(timeOfLastReading)));
+
+        //last readings
+        if (lastReadingTemperature != null) {
+            final Date lastReadingTime = new Date(timeOfFirstReading);
+
+            dto.setLastReadingTimeIso(isoFmt.format(lastReadingTime));
+            dto.setLastReadingTimeStr(prettyFmt.format(lastReadingTime));
+            dto.setLastReadingTemperature(formatTemperature(
+                    lastReadingTemperature.doubleValue(), user.getTemperatureUnits()));
+        }
+
+        dto.setPercentageComplete(dtoOld.getPercentageComplete());
+        dto.getAlertSummary().addAll(dtoOld.getAlertSummary().keySet());
+        dto.setAlertYetToFire(buildAlertYetToFire(s.getAlertProfile(), user));
+
+        final Arrival arrival = getArrival(dtoOld);
+        if (arrival != null) {
+            //"arrivalNotificationTimeStr": "9:00am 12 AUG 2014",
+            // NEW - the actual time arrival notification was sent out
+            dto.setArrivalNotificationTimeStr(prettyFmt.format(arrival.getDate()));
+
+            //"arrivalNotificationTimeISO": "2014-08-12 12:10",
+            // NEW - ISO for actual time arrival notification sent out
+            dto.setArrivalNotificationTimeIso(isoFmt.format(arrival.getDate()));
+
+            //TODO fix in future
+            dto.setArrivalTimeIso(dto.getArrivalNotificationTimeIso());
+            dto.setArrivalTimeStr(dto.getArrivalNotificationTimeStr());
+        }
+
+        final Date shutdownTime = s.getDeviceShutdownTime();
+        if (shutdownTime != null) {
+            dto.setShutdownTimeStr(prettyFmt.format(shutdownTime));
+            dto.setShutdownTimeIso(isoFmt.format(shutdownTime));
+        }
 
         return dto;
+    }
+    /**
+     * @param temp
+     * @param units
+     * @return
+     */
+    private String formatTemperature(final double temp,
+            final TemperatureUnits units) {
+        final double t = AlertDescriptionBuilder.getTemperature(temp, units);
+        return new DecimalFormat("#0.0").format(t);
+    }
+    /**
+     * @param dtoOld
+     * @return arrival if found
+     */
+    private Arrival getArrival(final SingleShipmentDto dtoOld) {
+        final LinkedList<SingleShipmentTimeItem> items = new LinkedList<SingleShipmentTimeItem>(
+                dtoOld.getItems());
+        Collections.reverse(items);
+
+        for (final SingleShipmentTimeItem item : items) {
+            final List<Arrival> arrivals = item.getArrivals();
+            if (!arrivals.isEmpty()) {
+                return arrivals.get(0);
+            }
+        }
+
+        return null;
+    }
+    /**
+     * @param p alert profile.
+     * @param user current user.
+     * @return temperature alerts yet to fire so user can suppress future notifications.
+     */
+    private String buildAlertYetToFire(final AlertProfile p, final User user) {
+        if (p == null) {
+            return null;
+        }
+
+        final List<String> list = new LinkedList<>();
+        for (final AlertRule rule: p.getAlertRules()) {
+            switch (rule.getType()) {
+                case Cold:
+                case CriticalCold:
+                case Hot:
+                case CriticalHot:
+                    list.add(alertDescriptionBuilder.alertRuleToString(
+                            rule, user.getTemperatureUnits()));
+                    break;
+                    default:
+                        //nothing
+            }
+        }
+        return StringUtils.combine(list, ", ");
     }
     /**
      * @param dto
@@ -536,6 +636,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         final SingleShipmentDtoNew dto = new SingleShipmentDtoNew();
         dto.setAlertProfileId(dtoOld.getAlertProfileId());
+        dto.setAlertProfileName(dtoOld.getAlertProfileName());
+
         dto.setAlertSuppressionMinutes(dtoOld.getAlertSuppressionMinutes());
         dto.setArrivalNotificationWithinKm(dtoOld.getArrivalNotificationWithInKm());
         dto.setAssetNum(dtoOld.getAssetNum());
@@ -559,13 +661,14 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                     && dto.getCurrentLocation() != null
                     && dto.getCurrentLocationForMap() != null) {
                 //get last location
-                final Date eta = arrivalEstimationService.estimateArrivalDate(
+                final ArrivalEstimation estimation = arrivalEstimationService.estimateArrivalDate(
                         shipment, dto.getCurrentLocationForMap(), new Date());
-                if (eta != null) {
+                if (estimation != null) {
                     //"eta": "2014-08-12 21:40",
-                    dto.setEta(isoFmt.format(eta));
+                    dto.setEta(isoFmt.format(estimation.getArrivalDate()));
                     //"etaStr": "21:40 12 AUG 14",
-                    dto.setEtaStr(descriptionFmt.format(eta));
+                    dto.setEtaStr(descriptionFmt.format(estimation.getArrivalDate()));
+                    dto.setPercentageComplete(estimation.getPercentageComplete());
                 }
             }
         }
@@ -597,9 +700,11 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             dto.getLocations().addAll(createLocations(item, isoFmt, shortFormat,
                     user, dto.getEta(), dto.getEndLocation()));
         }
+
+        dto.getAlertsNotificationSchedules().addAll(dtoOld.getAlertsNotificationSchedules());
+        dto.getArrivalNotificationSchedules().addAll(dtoOld.getArrivalNotificationSchedules());
         return dto;
     }
-
     /**
      * @param item
      * @return
@@ -616,61 +721,82 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         final TrackerEvent event = item.getEvent();
 
         //create location
-        SingleShipmentLocation lo = new SingleShipmentLocation();
+        final SingleShipmentLocation lo = new SingleShipmentLocation();
         lo.setLatitude(event.getLatitude());
         lo.setLongitude(event.getLongitude());
         lo.setTemperature(event.getTemperature());
         lo.setTimeIso(timeIsoFmt.format(event.getTime()));
         list.add(lo);
 
-        String address = null;
+        final String address = this.locationService.getLocationDescription(
+                new Location(event.getLatitude(), event.getLongitude()));
 
-        final Iterator<Alert> iter = item.getAlerts().iterator();
-        while (iter.hasNext()) {
-            final Alert a = iter.next();
-            final SingleShipmentAlert alert = new SingleShipmentAlert();
+        //add tracker event
+        lo.getAlerts().add(createSingleShipmentAlert(event, user, address, lo.getTimeIso()));
 
-            //date: "2014-10-11T12:47",
-            alert.setDate(timeIsoFmt.format(a.getDate()));
-            //title: "#654321 went below 1°c for 60mins in total",
-            alert.setTitle(alertDescriptionBuilder.buildDescription(a, user));
-
-            //temperature: "0.62",
-            if (a instanceof TemperatureAlert) {
-                final TemperatureAlert ta = (TemperatureAlert) a;
-                alert.setTemperature(AlertDescriptionBuilder.getTemperature(
-                        ta.getTemperature(), user.getTemperatureUnits()));
-            }
-
-            //time: "6:47pm",
-            alert.setTime(shortFormat.format(a.getDate()));
-            //location: "Close to Orbost, Vic(+/-3000m)",
-            if (address == null) {
-                address = locationService.getLocationDescription(
-                        new Location(lo.getLatitude(), lo.getLongitude()));
-            }
-            alert.setLocation(address);
-            //shippedTo: "ABC Store Petersham",
-            alert.setShippedTo(shippedTo);
-
-            alert.setEta(etaIso);
-            alert.setType(a.getType().name());
-
-            lo.setAlert(alert);
-
-            if (iter.hasNext()) {
-                final SingleShipmentLocation l = new SingleShipmentLocation();
-                l.setLatitude(lo.getLatitude());
-                l.setLongitude(lo.getLongitude());
-                l.setTemperature(lo.getTemperature());
-                l.setTimeIso(lo.getTimeIso());
-                list.add(l);
-
-                lo = l;
-            }
+        //add alerts
+        for (final Alert a : item.getAlerts()) {
+            lo.getAlerts().add(createSingleShipmentAlert(a, user, address));
+        }
+        //add arrivals
+        for (final Arrival a: item.getArrivals()) {
+            lo.getAlerts().add(createSingleShipmentAlert(a, user, address, lo.getTimeIso()));
         }
 
         return list;
+    }
+    /**
+     * @param event event.
+     * @param user user
+     * @param address address.
+     * @param timeIso time in ISO format
+     * @return
+     */
+    private SingleShipmentAlert createSingleShipmentAlert(final TrackerEvent event,
+            final User user, final String address, final String timeIso) {
+        final SingleShipmentAlert alert = new SingleShipmentAlert();
+
+        alert.setTitle(alertDescriptionBuilder.buildDescription(event, user));
+        alert.setType("LastReading");
+        alert.getLines().add(alertDescriptionBuilder.buildShortDescription(event, user));
+        alert.getLines().add(address);
+
+        return alert;
+    }
+    /**
+     * @param a arrival.
+     * @param user user.
+     * @param address address.
+     * @param timeIso time ISO.
+     * @return
+     */
+    private SingleShipmentAlert createSingleShipmentAlert(final Arrival a, final User user,
+            final String address, final String timeIso) {
+        final SingleShipmentAlert alert = new SingleShipmentAlert();
+
+        alert.setTitle(alertDescriptionBuilder.buildDescription(a, user));
+        alert.setType("ArrivalNotice");
+        alert.getLines().add(alertDescriptionBuilder.buildShortDescription(a, user));
+        alert.getLines().add(address);
+
+        return alert;
+    }
+    /**
+     * @param a
+     * @param user user.
+     * @param address address
+     * @return
+     */
+    private SingleShipmentAlert createSingleShipmentAlert(
+            final Alert a, final User user, final String address) {
+        final SingleShipmentAlert alert = new SingleShipmentAlert();
+
+        alert.setTitle(alertDescriptionBuilder.buildDescription(a, user));
+        alert.setType(a.getType().name());
+        alert.getLines().add(alertDescriptionBuilder.buildShortDescription(a, user));
+        alert.getLines().add(address);
+
+        return alert;
     }
     /**
      * @param s shipment.

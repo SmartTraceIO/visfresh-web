@@ -41,6 +41,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     private static final String DEVICE_FIELD = "device";
     private static final String ASSETTYPE_FIELD = "assettype";
     private static final String LASTEVENT_FIELD = "lasteventdate";
+    private static final String DEVICESHUTDOWNDATE_FIELD = "deviceshutdowndate";
 
     @Autowired
     private DeviceDao deviceDao;
@@ -154,6 +155,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         e.setAssetNum((String) map.get(ASSETNUM_FIELD));
         e.setShipmentDate((Date) map.get(SHIPMENTDATE_FIELD));
         e.setLastEventDate((Date) map.get(LASTEVENT_FIELD));
+        e.setDeviceShutdownTime((Date) map.get(DEVICESHUTDOWNDATE_FIELD));
         e.getCustomFields().putAll(parseJsonMap((String) map.get(CUSTOMFIELDS_FIELD)));
         e.setStatus(ShipmentStatus.valueOf((String) map.get(STATUS_FIELD)));
         e.setDevice(deviceDao.findOne((String) map.get(DEVICE_FIELD)));
@@ -180,6 +182,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(ASSETNUM_FIELD, s.getAssetNum());
         params.put(SHIPMENTDATE_FIELD, s.getShipmentDate());
         params.put(LASTEVENT_FIELD, s.getLastEventDate());
+        params.put(DEVICESHUTDOWNDATE_FIELD, s.getDeviceShutdownTime());
         params.put(CUSTOMFIELDS_FIELD, AbstractJsonSerializer.toJson(s.getCustomFields()).toString());
         params.put(STATUS_FIELD, s.getStatus().name());
         params.put(PONUM_FIELD, s.getPoNum());

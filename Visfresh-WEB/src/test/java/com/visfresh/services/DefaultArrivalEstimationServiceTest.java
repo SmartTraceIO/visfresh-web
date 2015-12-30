@@ -44,7 +44,10 @@ public class DefaultArrivalEstimationServiceTest {
         final Shipment s = createShipment(loc, loc);
 
         final Date currentDate = new Date(System.currentTimeMillis() - 1000000L);
-        assertEquals(currentDate, service.estimateArrivalDate(s, loc, currentDate));
+
+        final ArrivalEstimation est = service.estimateArrivalDate(s, loc, currentDate);
+        assertEquals(currentDate, est.getArrivalDate());
+        assertEquals(100, est.getPercentageComplete());
     }
 
     @Test
@@ -76,8 +79,9 @@ public class DefaultArrivalEstimationServiceTest {
 
         final Date currentDate = new Date(System.currentTimeMillis() - 100000L);
 
-        final Date eta = service.estimateArrivalDate(s, currentLoc, currentDate);
-        assertTrue(startDate.before(eta));
+        final ArrivalEstimation est = service.estimateArrivalDate(s, currentLoc, currentDate);
+        assertTrue(startDate.before(est.getArrivalDate()));
+        assertTrue(est.getPercentageComplete() > 0);
     }
     /**
      * @param from

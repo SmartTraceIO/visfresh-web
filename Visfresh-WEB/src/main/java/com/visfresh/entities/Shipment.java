@@ -54,6 +54,7 @@ public class Shipment extends ShipmentBase {
      * Shipment status.
      */
     private ShipmentStatus status = ShipmentStatus.Default;
+    private Date deviceShutdownTime;
 
     /**
      * Default constructor.
@@ -179,5 +180,17 @@ public class Shipment extends ShipmentBase {
      */
     public void setAssetType(final String assetType) {
         this.assetType = assetType;
+    }
+    /**
+     * @return device shutdown time.
+     */
+    public Date getDeviceShutdownTime() {
+        return deviceShutdownTime;
+    }
+    /**
+     * @param deviceShutdownTime the deviceShutdownTime to set
+     */
+    public void setDeviceShutdownTime(final Date deviceShutdownTime) {
+        this.deviceShutdownTime = deviceShutdownTime;
     }
 }

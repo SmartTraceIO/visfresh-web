@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
-import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
@@ -27,6 +26,7 @@ import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.User;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.json.DeviceSerializer;
+import com.visfresh.services.DeviceCommandService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -43,7 +43,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
     @Autowired
     private DeviceDao dao;
     @Autowired
-    private DeviceCommandDao deviceCommandDao;
+    private DeviceCommandService commandService;
     @Autowired
     private DeviceResolver deviceResolver;
 
@@ -178,7 +178,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             security.checkCanSendCommandToDevice(user);
 
             final DeviceCommand cmd = createSerializer(user).parseDeviceCommand(req);
-            deviceCommandDao.save(cmd);
+            commandService.sendCommand(cmd);
 
             return createSuccessResponse(null);
         } catch (final Exception e) {

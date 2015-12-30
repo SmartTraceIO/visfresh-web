@@ -3,11 +3,15 @@
  */
 package com.visfresh.io.shipment;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.services.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -25,11 +29,11 @@ public class SingleShipmentDtoNew {
     private ShipmentStatus status;
     private Long alertProfileId;
     private Integer alertSuppressionMinutes;
-    private final List<Long> alertsNotificationSchedules = new LinkedList<Long>();
+    private final List<ListNotificationScheduleItem> alertsNotificationSchedules = new LinkedList<>();
     private String commentsForReceiver;
     private Integer arrivalNotificationWithinKm;
     boolean excludeNotificationsIfNoAlerts;
-    private final List<Long> arrivalNotificationSchedules = new LinkedList<Long>();
+    private final List<ListNotificationScheduleItem> arrivalNotificationSchedules = new LinkedList<>();
     private Integer shutdownDeviceAfterMinutes;
     private String startLocation;
     private String startTimeStr;
@@ -41,14 +45,26 @@ public class SingleShipmentDtoNew {
     private Location startLocationForMap;
     private Location endLocationForMap;
     private Location currentLocationForMap;
+    private int percentageComplete;
 
     private double minTemp;
     private double maxTemp;
     private String timeOfFirstReading;
-    private String timeOfLastReading;
 
     private final List<SingleShipmentLocation> locations = new LinkedList<>();
     private final List<SingleShipmentDtoNew> siblings = new LinkedList<>();
+    private String alertProfileName;
+    private final Set<AlertType> alertSummary = new HashSet<>();
+    private String alertYetToFire;
+    private String arrivalNotificationTimeStr;
+    private String arrivalNotificationTimeIso;
+    private String shutdownTimeStr;
+    private String shutdownTimeIso;
+    private String arrivalTimeStr;
+    private String arrivalTimeIso;
+    private String lastReadingTimeStr;
+    private String lastReadingTimeIso;
+    private String lastReadingTemperature;
 
     /**
      * Default constructor.
@@ -176,6 +192,15 @@ public class SingleShipmentDtoNew {
      */
     public void setAlertProfileId(final Long alertProfileId) {
         this.alertProfileId = alertProfileId;
+    }
+    public String getAlertProfileName() {
+        return alertProfileName;
+    }
+    /**
+     * @param alertProfileName the alertProfileName to set
+     */
+    public void setAlertProfileName(final String alertProfileName) {
+        this.alertProfileName = alertProfileName;
     }
     /**
      * @return the alertSuppressionMinutes
@@ -361,13 +386,13 @@ public class SingleShipmentDtoNew {
     /**
      * @return the alertsNotificationSchedules
      */
-    public List<Long> getAlertsNotificationSchedules() {
+    public List<ListNotificationScheduleItem> getAlertsNotificationSchedules() {
         return alertsNotificationSchedules;
     }
     /**
      * @return the arrivalNotificationSchedules
      */
-    public List<Long> getArrivalNotificationSchedules() {
+    public List<ListNotificationScheduleItem> getArrivalNotificationSchedules() {
         return arrivalNotificationSchedules;
     }
     /**
@@ -420,15 +445,147 @@ public class SingleShipmentDtoNew {
         this.timeOfFirstReading = timeOfFirstReading;
     }
     /**
-     * @return the timeOfLastReading
+     * @return the percentageComplete
      */
-    public String getTimeOfLastReading() {
-        return timeOfLastReading;
+    public int getPercentageComplete() {
+        return percentageComplete;
     }
     /**
-     * @param timeOfLastReading the timeOfLastReading to set
+     * @param percentageComplete the percentageComplete to set
      */
-    public void setTimeOfLastReading(final String timeOfLastReading) {
-        this.timeOfLastReading = timeOfLastReading;
+    public void setPercentageComplete(final int percentageComplete) {
+        this.percentageComplete = percentageComplete;
+    }
+    public int getTrackerPositionFrontPercent() {
+        return getPercentageComplete();
+    }
+    public int getTrackerPositionLeftPercent() {
+        return Math.max(0, 100 - getTrackerPositionFrontPercent());
+    }
+    /**
+     * @return the alertSummary
+     */
+    public Set<AlertType> getAlertSummary() {
+        return alertSummary;
+    }
+    /**
+     * @return
+     */
+    public String getAlertYetToFire() {
+        return alertYetToFire;
+    }
+    /**
+     * @param alertYetToFire the alertYetToFire to set
+     */
+    public void setAlertYetToFire(final String alertYetToFire) {
+        this.alertYetToFire = alertYetToFire;
+    }
+    /**
+     * @return the arrivalNotificationTimeStr
+     */
+    public String getArrivalNotificationTimeStr() {
+        return arrivalNotificationTimeStr;
+    }
+    /**
+     * @param arrivalNotificationTimeStr the arrivalNotificationTimeStr to set
+     */
+    public void setArrivalNotificationTimeStr(final String arrivalNotificationTimeStr) {
+        this.arrivalNotificationTimeStr = arrivalNotificationTimeStr;
+    }
+    /**
+     * @return the arrivalNotificationTimeIso
+     */
+    public String getArrivalNotificationTimeIso() {
+        return arrivalNotificationTimeIso;
+    }
+    /**
+     * @param arrivalNotificationTimeIso the arrivalNotificationTimeIso to set
+     */
+    public void setArrivalNotificationTimeIso(final String arrivalNotificationTimeIso) {
+        this.arrivalNotificationTimeIso = arrivalNotificationTimeIso;
+    }
+    /**
+     * @return shutdown time displyable string.
+     */
+    public String getShutdownTimeStr() {
+        return shutdownTimeStr;
+    }
+    /**
+     * @param time shutdown time displyable string.
+     */
+    public void setShutdownTimeStr(final String time) {
+        this.shutdownTimeStr = time;
+    }
+    /**
+     * @return shutdown time ISO string.
+     */
+    public String getShutdownTimeIso() {
+        return shutdownTimeIso;
+    }
+    /**
+     * @param time shutdown time ISO string.
+     */
+    public void setShutdownTimeIso(final String time) {
+        this.shutdownTimeIso = time;
+    }
+    /**
+     * @return arrival time pretty string.
+     */
+    public String getArrivalTimeStr() {
+        return arrivalTimeStr;
+    }
+    /**
+     * @param time arrival time pretty string.
+     */
+    public void setArrivalTimeStr(final String time) {
+        this.arrivalTimeStr = time;
+    }
+    /**
+     * @return arrival time ISO string.
+     */
+    public String getArrivalTimeIso() {
+        return arrivalTimeIso;
+    }
+    /**
+     * @param time arrival time ISO string.
+     */
+    public void setArrivalTimeIso(final String time) {
+        this.arrivalTimeIso = time;
+    }
+    /**
+     * @return last event time in pretty format.
+     */
+    public String getLastReadingTimeStr() {
+        return lastReadingTimeStr;
+    }
+    /**
+     * @param time last event time in pretty format.
+     */
+    public void setLastReadingTimeStr(final String time) {
+        this.lastReadingTimeStr = time;
+    }
+    /**
+     * @return last event time in ISO format.
+     */
+    public String getLastReadingTimeIso() {
+        return lastReadingTimeIso;
+    }
+    /**
+     * @param time last event time in ISO format.
+     */
+    public void setLastReadingTimeIso(final String time) {
+        this.lastReadingTimeIso = time;
+    }
+    /**
+     * @return temperature of last event.
+     */
+    public String getLastReadingTemperature() {
+        return lastReadingTemperature;
+    }
+    /**
+     * @param temperature temperature of last event.
+     */
+    public void setLastReadingTemperature(final String temperature) {
+        this.lastReadingTemperature = temperature;
     }
 }

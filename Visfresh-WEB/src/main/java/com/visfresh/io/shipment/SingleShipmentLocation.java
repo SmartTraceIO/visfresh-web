@@ -3,6 +3,9 @@
  */
 package com.visfresh.io.shipment;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -12,7 +15,7 @@ public class SingleShipmentLocation {
     private double longitude;
     private double temperature;
     private String timeIso;
-    private SingleShipmentAlert alert;
+    private final List<SingleShipmentAlert> alerts = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -70,15 +73,9 @@ public class SingleShipmentLocation {
         this.timeIso = timeIso;
     }
     /**
-     * @return the alert
+     * @return the alerts
      */
-    public SingleShipmentAlert getAlert() {
-        return alert;
-    }
-    /**
-     * @param alert the alert to set
-     */
-    public void setAlert(final SingleShipmentAlert alert) {
-        this.alert = alert;
+    public List<SingleShipmentAlert> getAlerts() {
+        return alerts;
     }
 }
