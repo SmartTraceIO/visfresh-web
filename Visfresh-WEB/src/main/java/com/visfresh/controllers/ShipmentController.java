@@ -4,15 +4,16 @@
 package com.visfresh.controllers;
 
 
+import static com.visfresh.utils.DateTimeUtils.createDateFormat;
+
+import java.awt.Color;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -66,7 +67,7 @@ import com.visfresh.rules.AlertDescriptionBuilder;
 import com.visfresh.services.ArrivalEstimation;
 import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.services.LocationService;
-import com.visfresh.services.SiblingDetectorService;
+import com.visfresh.services.ShipmentSiblingService;
 import com.visfresh.services.lists.ListShipmentItem;
 import com.visfresh.utils.StringUtils;
 
@@ -105,7 +106,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     @Autowired
     private LocationService locationService;
     @Autowired
-    private SiblingDetectorService siblingService;
+    private ShipmentSiblingService siblingService;
 
 //    //start time
 //    private static ThreadLocal<DateFormat> ISO_FORMAT = new ThreadLocal<DateFormat>() {
@@ -355,32 +356,32 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             return createErrorResponse(e);
         }
     }
-
-    @RequestMapping(value = "/getSingleShipmentOld/{authToken}", method = RequestMethod.GET)
-    public JsonObject getShipmentData(@PathVariable final String authToken,
-            @RequestParam final Long shipmentId) {
-
-        try {
-            //check logged in.
-            final User user = getLoggedInUser(authToken);
-            security.checkCanGetShipmentData(user);
-
-            final ShipmentSerializer ser = getSerializer(user);
-
-            final Shipment s = shipmentDao.findOne(shipmentId);
-            checkCompanyAccess(user, s);
-            if (s == null) {
-                return null;
-            }
-
-            final SingleShipmentDto dto = getShipmentData(s, true);
-
-            return createSuccessResponse(dto == null ? null : ser.toJson(dto));
-        } catch (final Exception e) {
-            log.error("Failed to get devices", e);
-            return createErrorResponse(e);
-        }
-    }
+//
+//    @RequestMapping(value = "/getSingleShipmentOld/{authToken}", method = RequestMethod.GET)
+//    public JsonObject getShipmentData(@PathVariable final String authToken,
+//            @RequestParam final Long shipmentId) {
+//
+//        try {
+//            //check logged in.
+//            final User user = getLoggedInUser(authToken);
+//            security.checkCanGetShipmentData(user);
+//
+//            final ShipmentSerializer ser = getSerializer(user);
+//
+//            final Shipment s = shipmentDao.findOne(shipmentId);
+//            checkCompanyAccess(user, s);
+//            if (s == null) {
+//                return null;
+//            }
+//
+//            final SingleShipmentDto dto = getShipmentData(s, true);
+//
+//            return createSuccessResponse(dto == null ? null : ser.toJson(dto));
+//        } catch (final Exception e) {
+//            log.error("Failed to get devices", e);
+//            return createErrorResponse(e);
+//        }
+//    }
     @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
     public JsonObject getSingleShipment(@PathVariable final String authToken,
             @RequestParam final Long shipmentId) {
@@ -401,9 +402,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final SingleShipmentDtoNew dto = createDto(s, user, true);
 
             //add siblings
-            for (final Shipment sibling : siblingService.getSiblings(s)) {
+            final List<Shipment> siblings = siblingService.getSiblings(s);
+            for (final Shipment sibling : siblings) {
                 dto.getSiblings().add(createDto(sibling, user, false));
             }
+
+            //assign sibling colors
+            assingSiblingColors(dto, siblingService.getSiblingColors(s, siblings));
 
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
@@ -411,6 +416,18 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param shipment
+     * @param siblingColors sibling color map.
+     */
+    private void assingSiblingColors(
+            final SingleShipmentDtoNew shipment, final Map<Long, Color> siblingColors) {
+        shipment.setSiblingColor(StringUtils.toHtmlColor(siblingColors.get(shipment.getShipmentId())));
+        for (final SingleShipmentDtoNew sibling : shipment.getSiblings()) {
+            sibling.setSiblingColor(StringUtils.toHtmlColor(siblingColors.get(sibling.getShipmentId())));
+        }
+    }
+
     /**
      * @param s
      * @param user
@@ -456,10 +473,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setMinTemp(minTemp);
         dto.setMaxTemp(maxTemp);
 
-        final DateFormat isoFmt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-        isoFmt.setTimeZone(user.getTimeZone());
-        final DateFormat prettyFmt = new SimpleDateFormat("h:mmaa dd MMM yyyy");
-        prettyFmt.setTimeZone(user.getTimeZone());
+        final DateFormat isoFmt = createDateFormat(user, "yyyy-MM-dd hh:mm");
+        final DateFormat prettyFmt = createDateFormat(user, "h:mmaa dd MMM yyyy");
 
         dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
 
@@ -627,12 +642,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private SingleShipmentDtoNew createNewSingleShipmentDate(final Shipment shipment,
             final SingleShipmentDto dtoOld, final User user) {
         //"startTimeISO": "2014-08-12 12:10",
-        final DateFormat isoFmt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-        isoFmt.setTimeZone(user.getTimeZone());
+        final DateFormat isoFmt = createDateFormat(user, "yyyy-MM-dd hh:mm");
 
         //"startTimeStr": "19:00 12 AUG 14",
-        final DateFormat descriptionFmt = new SimpleDateFormat("hh:mm dd MMM yy", Locale.US);
-        descriptionFmt.setTimeZone(user.getTimeZone());
+        final DateFormat descriptionFmt = createDateFormat(user, "hh:mm dd MMM yy");
 
         final SingleShipmentDtoNew dto = new SingleShipmentDtoNew();
         dto.setAlertProfileId(dtoOld.getAlertProfileId());
@@ -693,8 +706,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setTripCount(dtoOld.getTripCount());
 
         //"6:47pm"
-        final DateFormat shortFormat = new SimpleDateFormat("h:mmaa");
-        shortFormat.setTimeZone(user.getTimeZone());
+        final DateFormat shortFormat = createDateFormat(user, "h:mmaa");
 
         for (final SingleShipmentTimeItem item : items) {
             dto.getLocations().addAll(createLocations(item, isoFmt, shortFormat,

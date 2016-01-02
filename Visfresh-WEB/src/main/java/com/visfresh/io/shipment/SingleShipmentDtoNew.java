@@ -65,6 +65,7 @@ public class SingleShipmentDtoNew {
     private String lastReadingTimeStr;
     private String lastReadingTimeIso;
     private String lastReadingTemperature;
+    private String siblingColor;
 
     /**
      * Default constructor.
@@ -587,5 +588,17 @@ public class SingleShipmentDtoNew {
      */
     public void setLastReadingTemperature(final String temperature) {
         this.lastReadingTemperature = temperature;
+    }
+    /**
+     * @return sibling color
+     */
+    public String getSiblingColor() {
+        return siblingColor;
+    }
+    /**
+     * @param siblingColor the siblingColor to set
+     */
+    public void setSiblingColor(final String siblingColor) {
+        this.siblingColor = siblingColor;
     }
 }

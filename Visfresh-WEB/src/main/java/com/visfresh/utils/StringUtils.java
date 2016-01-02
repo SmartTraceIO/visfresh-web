@@ -3,6 +3,7 @@
  */
 package com.visfresh.utils;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -91,5 +92,18 @@ public final class StringUtils {
         }
 
         return sw.getBuffer().toString();
+    }
+
+    /**
+     * @param color java color.
+     * @return HTML color string.
+     */
+    public static String toHtmlColor(final Color color) {
+        StringBuilder hex = new StringBuilder(Integer.toHexString(color.getRGB() & 0xffffff));
+        while (hex.length() < 6) {
+            hex = hex.insert(0, '0');
+        }
+        hex.insert(0, '#');
+        return hex.toString();
     }
 }

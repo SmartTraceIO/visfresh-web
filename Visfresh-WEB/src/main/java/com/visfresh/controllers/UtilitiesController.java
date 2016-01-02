@@ -3,13 +3,12 @@
  */
 package com.visfresh.controllers;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import static com.visfresh.utils.DateTimeUtils.createDateFormat;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -30,7 +29,6 @@ import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.services.TimeZoneService;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -196,18 +194,18 @@ public class UtilitiesController extends AbstractController {
             final Date date = new Date();
 
             final JsonObject json = new JsonObject();
-            json.addProperty("dateTimeIso", createDateFormat("yyyy-MM-dd'T'HH:mm", tz).format(date));
+            json.addProperty("dateTimeIso", createDateFormat(user, "yyyy-MM-dd'T'HH:mm").format(date));
             // formattedDateTimeIso: "9-Dec-2015 1:16PM (UTC)"
             json.addProperty("formattedDateTimeIso",
-                    createDateFormat("d-MMM-yyyy h:mmaa '('zzz')'", tz).format(date));
+                    createDateFormat(user, "d-MMM-yyyy h:mmaa '('zzz')'").format(date));
             // dateTimeString: "24-Nov-15 9:42am"
-            json.addProperty("dateTimeString", createDateFormat("d-MMM-yyyy h:mmaa", tz).format(date));
+            json.addProperty("dateTimeString", createDateFormat(user, "d-MMM-yyyy h:mmaa").format(date));
             // dateString: "24-Nov-15"
-            json.addProperty("dateString", createDateFormat("d-MMM-yyyy", tz).format(date));
+            json.addProperty("dateString", createDateFormat(user, "d-MMM-yyyy").format(date));
             // timeString: "24-Nov-15"
-            json.addProperty("timeString", createDateFormat("h:mmaa", tz).format(date));
+            json.addProperty("timeString", createDateFormat(user, "h:mmaa").format(date));
             // v24: "16:33"
-            json.addProperty("timeString24", createDateFormat("HH:mm", tz).format(date));
+            json.addProperty("timeString24", createDateFormat(user, "HH:mm").format(date));
             json.addProperty("timeZoneId", tz.getID());
             json.addProperty("timeZoneString", tz.getDisplayName());
             return createSuccessResponse(json);
@@ -215,15 +213,5 @@ public class UtilitiesController extends AbstractController {
             log.error("Failed to list roles", e);
             return createErrorResponse(e);
         }
-    }
-    /**
-     * @param format
-     * @param tz
-     * @return
-     */
-    private DateFormat createDateFormat(final String format, final TimeZone tz) {
-        final DateFormat fmt = new SimpleDateFormat(format, Locale.ENGLISH);
-        fmt.setTimeZone(tz);
-        return fmt;
     }
 }

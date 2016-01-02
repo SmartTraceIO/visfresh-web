@@ -3,6 +3,8 @@
  */
 package com.visfresh.mpl.services;
 
+import java.awt.Color;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +17,7 @@ import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Shipment;
-import com.visfresh.services.SiblingDetectorService;
+import com.visfresh.services.ShipmentSiblingService;
 import com.visfresh.utils.CollectionUtils;
 import com.visfresh.utils.Grouper;
 
@@ -24,7 +26,7 @@ import com.visfresh.utils.Grouper;
  *
  */
 @Component
-public class SiblingDetectorServiceImpl implements SiblingDetectorService {
+public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
     /**
      * Group name prefix.
      */
@@ -35,7 +37,7 @@ public class SiblingDetectorServiceImpl implements SiblingDetectorService {
     /**
      * Default constructor.
      */
-    public SiblingDetectorServiceImpl() {
+    public ShipmentSiblingServiceImpl() {
         super();
     }
     /* (non-Javadoc)
@@ -43,7 +45,7 @@ public class SiblingDetectorServiceImpl implements SiblingDetectorService {
      */
     @Override
     public List<Shipment> getSiblings(final Shipment shipment) {
-        final String groupKey = getGroup(shipment);
+        final String groupKey = getShipmentGroup(shipment);
         if (groupKey == null) {
             return new LinkedList<>();
         }
@@ -58,7 +60,7 @@ public class SiblingDetectorServiceImpl implements SiblingDetectorService {
                      */
                     @Override
                     public String getGroup(final Shipment obj) {
-                        return getGroup(obj);
+                        return getShipmentGroup(obj);
                     }
                 });
 
@@ -89,6 +91,34 @@ public class SiblingDetectorServiceImpl implements SiblingDetectorService {
 
         return count;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.ShipmentSiblingService#getSiblingColors(com.visfresh.entities.Shipment, java.util.List)
+     */
+    @Override
+    public Map<Long, Color> getSiblingColors(final Shipment masterShipment, final List<Shipment> siblings) {
+        // add master color
+        final Map<Long, Color> map = new HashMap<>();
+        map.put(masterShipment.getId(), Color.GREEN);
+
+        //create color list
+        final LinkedList<Color> colors = new LinkedList<Color>();
+        colors.add(Color.BLUE);
+        colors.add(Color.CYAN);
+        colors.add(Color.GRAY);
+        colors.add(Color.MAGENTA);
+        colors.add(Color.ORANGE);
+        colors.add(Color.PINK);
+        colors.add(Color.RED);
+        colors.add(Color.YELLOW);
+
+        for (final Shipment s : siblings) {
+            final Color color = colors.removeFirst();
+            map.put(s.getId(), color);
+            colors.add(color);
+        }
+
+        return map;
+    }
     /**
      * @param group group.
      * @param shipment shipment to remove.
@@ -106,7 +136,7 @@ public class SiblingDetectorServiceImpl implements SiblingDetectorService {
      * @param shipment
      * @return
      */
-    private String getGroup(final Shipment shipment) {
+    private String getShipmentGroup(final Shipment shipment) {
         final String desc = shipment.getShipmentDescription();
         return getGroup(desc);
     }

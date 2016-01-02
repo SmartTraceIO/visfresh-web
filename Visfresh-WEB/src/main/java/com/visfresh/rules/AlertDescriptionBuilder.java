@@ -3,10 +3,11 @@
  */
 package com.visfresh.rules;
 
+import static com.visfresh.utils.DateTimeUtils.createDateFormat;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -80,12 +81,10 @@ public class AlertDescriptionBuilder {
         final Map<String, String> map = new HashMap<String, String>();
         //supported place holders:
         //${date} alert issue date include day and year
-        SimpleDateFormat sdf = new SimpleDateFormat(AbstractJsonSerializer.DATE_FORMAT);
-        sdf.setTimeZone(user.getTimeZone());
+        DateFormat sdf = createDateFormat(user, AbstractJsonSerializer.DATE_FORMAT);
         map.put("date", sdf.format(alert.getDate()));
         //${time} the time in scope of day.
-        sdf = new SimpleDateFormat("HH:mm");
-        sdf.setTimeZone(user.getTimeZone());
+        sdf = createDateFormat(user, "HH:mm");
         map.put("time", sdf.format(alert.getDate()));
         //${type} alert type
         map.put("type", alert.getType().toString());
@@ -221,8 +220,7 @@ public class AlertDescriptionBuilder {
 
         sb.append(" at ");
 
-        final DateFormat fmt = new SimpleDateFormat("h:mmaa 'on' d MMM yyyy");
-        fmt.setTimeZone(user.getTimeZone());
+        final DateFormat fmt = createDateFormat(user, "h:mmaa 'on' d MMM yyyy");
         sb.append(fmt.format(a.getDate()));
 
         return sb.toString();
@@ -254,8 +252,7 @@ public class AlertDescriptionBuilder {
 
         sb.append(" at ");
 
-        final DateFormat fmt = new SimpleDateFormat("h:mmaa 'on' d MMM yyyy");
-        fmt.setTimeZone(user.getTimeZone());
+        final DateFormat fmt = createDateFormat(user, "h:mmaa 'on' d MMM yyyy");
         sb.append(fmt.format(event.getTime()));
 
         return sb.toString();
@@ -287,8 +284,7 @@ public class AlertDescriptionBuilder {
         sb.append(a.getNumberOfMettersOfArrival());
         sb.append("m away at ");
 
-        final DateFormat fmt = new SimpleDateFormat("h:mmaa 'on' d MMM yyyy");
-        fmt.setTimeZone(user.getTimeZone());
+        final DateFormat fmt = createDateFormat(user, "h:mmaa 'on' d MMM yyyy");
         sb.append(fmt.format(a.getDate()));
 
         return sb.toString();

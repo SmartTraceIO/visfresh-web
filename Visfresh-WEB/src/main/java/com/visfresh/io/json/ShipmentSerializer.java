@@ -562,113 +562,133 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
     /**
      * @param dto
-     * @param includeSiblings
+     * @param isNotSibling
      * @return
      */
     protected JsonObject toJson(final SingleShipmentDtoNew dto,
-            final boolean includeSiblings) {
+            final boolean isNotSibling) {
         if (dto == null) {
             return  null;
         }
 
         final JsonObject json = new JsonObject();
 
-        json.addProperty("shipmentId", dto.getShipmentId());
-        json.addProperty("deviceSN", dto.getDeviceSN());
-        json.addProperty("deviceName", dto.getDeviceName());
-        json.addProperty("tripCount", dto.getTripCount());
-        json.addProperty("shipmentDescription", dto.getShipmentDescription());
-        json.addProperty("palletId", dto.getPalletId());
-        json.addProperty("assetNum", dto.getAssetNum());
-        json.addProperty("assetType", dto.getAssetType());
-        json.addProperty("status", dto.getStatus().name());
-
-        json.addProperty("trackerPositionFrontPercent", dto.getTrackerPositionFrontPercent());
-        json.addProperty("trackerPositionLeftPercent", dto.getTrackerPositionLeftPercent());
-
-        json.addProperty("alertProfileId", dto.getAlertProfileId());
-        json.addProperty("alertProfileName", dto.getAlertProfileName());
-        json.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
-
-        json.addProperty("alertPeopleToNotify", createPeopleToNotifyString(
-                dto.getAlertsNotificationSchedules()));
-
-        //alertsNotificationSchedules
-        JsonArray array = new JsonArray();
-        for (final ListNotificationScheduleItem item: dto.getAlertsNotificationSchedules()) {
-            array.add(toJson(item));
+        json.addProperty("shipmentId", dto.getShipmentId()); /*+*/
+        json.addProperty("deviceSN", dto.getDeviceSN()); /*+*/
+        if (isNotSibling) {
+            json.addProperty("deviceName", dto.getDeviceName());
         }
-        json.add("alertsNotificationSchedules", array);
+        json.addProperty("tripCount", dto.getTripCount()); /*+*/
+        json.addProperty("siblingColor", dto.getSiblingColor());
+
+        if (isNotSibling) {
+            json.addProperty("shipmentDescription", dto.getShipmentDescription());
+            json.addProperty("palletId", dto.getPalletId());
+            json.addProperty("assetNum", dto.getAssetNum());
+            json.addProperty("assetType", dto.getAssetType());
+            json.addProperty("status", dto.getStatus().name());
+        }
+        json.addProperty("trackerPositionFrontPercent", dto.getTrackerPositionFrontPercent()); /*+*/
+        json.addProperty("trackerPositionLeftPercent", dto.getTrackerPositionLeftPercent()); /*+*/
+
+        if (isNotSibling) {
+            json.addProperty("alertProfileId", dto.getAlertProfileId());
+            json.addProperty("alertProfileName", dto.getAlertProfileName());
+            json.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
+
+            json.addProperty("alertPeopleToNotify", createPeopleToNotifyString(
+                    dto.getAlertsNotificationSchedules()));
+
+            //alertsNotificationSchedules
+            final JsonArray array = new JsonArray();
+            for (final ListNotificationScheduleItem item: dto.getAlertsNotificationSchedules()) {
+                array.add(toJson(item));
+            }
+            json.add("alertsNotificationSchedules", array);
+        }
 
         //alert summary
-        json.add("alertSummary", createAlertSummaryArray(dto.getAlertSummary()));
-        json.addProperty("alertYetToFire", dto.getAlertYetToFire());
+        json.add("alertSummary", createAlertSummaryArray(dto.getAlertSummary())); /*+*/
+        if (isNotSibling) {
+            json.addProperty("alertYetToFire", dto.getAlertYetToFire());
 
-        //"arrivalNotificationTimeStr": "9:00am 12 AUG 2014",
-        // NEW - the actual time arrival notification was sent out
-        json.addProperty("arrivalNotificationTimeStr", dto.getArrivalNotificationTimeStr());
+            //"arrivalNotificationTimeStr": "9:00am 12 AUG 2014",
+            // NEW - the actual time arrival notification was sent out
+            json.addProperty("arrivalNotificationTimeStr", dto.getArrivalNotificationTimeStr());
 
-        //"arrivalNotificationTimeISO": "2014-08-12 12:10",
-        // NEW - ISO for actual time arrival notification sent out
-        json.addProperty("arrivalNotificationTimeISO", dto.getArrivalNotificationTimeIso());
+            //"arrivalNotificationTimeISO": "2014-08-12 12:10",
+            // NEW - ISO for actual time arrival notification sent out
+            json.addProperty("arrivalNotificationTimeISO", dto.getArrivalNotificationTimeIso());
 
-        json.addProperty("arrivalNotificationWithinKm", dto.getArrivalNotificationWithinKm());
-        json.addProperty("excludeNotificationsIfNoAlerts", dto.isExcludeNotificationsIfNoAlerts());
+            json.addProperty("arrivalNotificationWithinKm", dto.getArrivalNotificationWithinKm());
+            json.addProperty("excludeNotificationsIfNoAlerts", dto.isExcludeNotificationsIfNoAlerts());
 
-        json.addProperty("arrivalPeopleToNotify", createPeopleToNotifyString(
-                dto.getArrivalNotificationSchedules()));
+            json.addProperty("arrivalPeopleToNotify", createPeopleToNotifyString(
+                    dto.getArrivalNotificationSchedules()));
 
-        array = new JsonArray();
-        for (final ListNotificationScheduleItem item: dto.getArrivalNotificationSchedules()) {
-            array.add(toJson(item));
+            final JsonArray array = new JsonArray();
+            for (final ListNotificationScheduleItem item: dto.getArrivalNotificationSchedules()) {
+                array.add(toJson(item));
+            }
+
+            json.addProperty("commentsForReceiver", dto.getCommentsForReceiver());
+
+            json.add("arrivalNotificationSchedules", array);
+            json.addProperty("shutdownDeviceAfterMinutes", dto.getShutdownDeviceAfterMinutes());
+
+            json.addProperty("shutdownTimeStr", dto.getShutdownTimeStr());
+            json.addProperty("shutdownTimeISO", dto.getShutdownTimeIso());
+
+            json.addProperty("startLocation", dto.getStartLocation());
+            json.addProperty("startTimeStr", dto.getStartTimeStr());
+            json.addProperty("startTimeISO", dto.getStartTimeISO());
+            json.add("startLocationForMap", toJson(dto.getStartLocationForMap()));
+
+            json.addProperty("endLocation", dto.getEndLocation());
+            json.addProperty("etaStr", dto.getEtaStr());
+            json.addProperty("etaISO", dto.getEta());
+
+            json.addProperty("arrivalTimeStr", dto.getArrivalTimeStr());
+            json.addProperty("arrivalTimeISO", dto.getArrivalTimeIso());
+            json.add("endLocationForMap", toJson(dto.getEndLocationForMap()));
+
+            json.addProperty("lastReadingLocation", dto.getCurrentLocation());
+            json.addProperty("lastReadingTimeStr", dto.getLastReadingTimeStr());
+            json.addProperty("lastReadingTimeISO", dto.getLastReadingTimeIso());
+            json.addProperty("lastReadingTemperature", dto.getLastReadingTemperature());
+
+            json.add("lastReadingForMap", toJson(dto.getCurrentLocationForMap()));
+
+            json.addProperty("minTemp", dto.getMinTemp());
+            json.addProperty("maxTemp", dto.getMaxTemp());
+            json.addProperty("firstReadingTimeISO", dto.getTimeOfFirstReading());
         }
 
-        json.addProperty("commentsForReceiver", dto.getCommentsForReceiver());
+        if (isNotSibling) {
+            final JsonArray locations = new JsonArray();
+            for (final SingleShipmentLocation l : dto.getLocations()) {
+                locations.add(toJson(l));
+            }
+            json.add("locations", locations);
 
-        json.add("arrivalNotificationSchedules", array);
-        json.addProperty("shutdownDeviceAfterMinutes", dto.getShutdownDeviceAfterMinutes());
-
-        json.addProperty("shutdownTimeStr", dto.getShutdownTimeStr());
-        json.addProperty("shutdownTimeISO", dto.getShutdownTimeIso());
-
-        json.addProperty("startLocation", dto.getStartLocation());
-        json.addProperty("startTimeStr", dto.getStartTimeStr());
-        json.addProperty("startTimeISO", dto.getStartTimeISO());
-        json.add("startLocationForMap", toJson(dto.getStartLocationForMap()));
-
-        json.addProperty("endLocation", dto.getEndLocation());
-        json.addProperty("etaStr", dto.getEtaStr());
-        json.addProperty("etaISO", dto.getEta());
-
-        json.addProperty("arrivalTimeStr", dto.getArrivalTimeStr());
-        json.addProperty("arrivalTimeISO", dto.getArrivalTimeIso());
-        json.add("endLocationForMap", toJson(dto.getEndLocationForMap()));
-
-        json.addProperty("lastReadingLocation", dto.getCurrentLocation());
-        json.addProperty("lastReadingTimeStr", dto.getLastReadingTimeStr());
-        json.addProperty("lastReadingTimeISO", dto.getLastReadingTimeIso());
-        json.addProperty("lastReadingTemperature", dto.getLastReadingTemperature());
-
-        json.add("lastReadingForMap", toJson(dto.getCurrentLocationForMap()));
-
-        //!!!!!!!
-        json.addProperty("minTemp", dto.getMinTemp());
-        json.addProperty("maxTemp", dto.getMaxTemp());
-        json.addProperty("timeOfFirstReading", dto.getTimeOfFirstReading());
-
-        final JsonArray locations = new JsonArray();
-        for (final SingleShipmentLocation l : dto.getLocations()) {
-            locations.add(toJson(l, !includeSiblings));
-        }
-        json.add("locations", locations);
-
-        if (includeSiblings) {
             final JsonArray siblings = new JsonArray();
             for (final SingleShipmentDtoNew sibling: dto.getSiblings()) {
-                siblings.add(toJson(sibling, true));
+                siblings.add(toJson(sibling, false));
             }
 
             json.add("siblings", siblings);
+        } else {
+            //is sibling
+            final JsonArray readings = new JsonArray();
+            for (final SingleShipmentLocation l : dto.getLocations()) {
+                final JsonObject obj = new JsonObject();
+                readings.add(obj);
+
+                obj.addProperty("temp", l.getTemperature());
+                obj.addProperty("timeISO", l.getTimeIso());
+            }
+
+            json.add("readings", readings);
         }
 
         return json;
@@ -705,10 +725,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
     /**
      * @param l location.
-     * @param isSibling TODO
      * @return
      */
-    private JsonObject toJson(final SingleShipmentLocation l, final boolean isSibling) {
+    private JsonObject toJson(final SingleShipmentLocation l) {
         if (l == null) {
             return null;
         }
@@ -720,22 +739,11 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("timeISO", l.getTimeIso());
         json.add("timeObj", JsonNull.INSTANCE);
 
-        if (!isSibling) {
-            final JsonArray alerts = new JsonArray();
-            for (final SingleShipmentAlert alert : l.getAlerts()) {
-                alerts.add(toJson(alert));
-            }
-            json.add("alerts", alerts);
-        } else {
-            final JsonArray alerts = new JsonArray();
-            final JsonObject obj = new JsonObject();
-            alerts.add(obj);
-
-            obj.addProperty("temp", l.getTemperature());
-            obj.addProperty("timeISO", l.getTimeIso());
-
-            json.add("readings", alerts);
+        final JsonArray alerts = new JsonArray();
+        for (final SingleShipmentAlert alert : l.getAlerts()) {
+            alerts.add(toJson(alert));
         }
+        json.add("alerts", alerts);
 
         return json;
     }

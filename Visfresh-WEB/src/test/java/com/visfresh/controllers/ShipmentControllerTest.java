@@ -205,8 +205,14 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         loc.setLongitude(loc.getLongitude() + 10);
         context.getBean(LocationProfileDao.class).save(shippedTo);
 
-        s.setShipmentDescription("JUnit test shipment");
+        s.setShipmentDescription("JUnit test shipment siblingGroup_test");
         context.getBean(ShipmentDao.class).save(s);
+
+        //create siblings
+        final Shipment sibling = createShipment(true);
+        sibling.setShippedTo(shippedTo);
+        sibling.setShipmentDescription("JUnit test sibling shipment siblingGroup_test");
+        context.getBean(ShipmentDao.class).save(sibling);
 
         final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
         assertNotNull(sd);

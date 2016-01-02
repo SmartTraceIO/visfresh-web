@@ -5,14 +5,14 @@ package com.visfresh.mock;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.mpl.services.SiblingDetectorServiceImpl;
+import com.visfresh.mpl.services.ShipmentSiblingServiceImpl;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class MockSiblingDetectorService extends SiblingDetectorServiceImpl {
+public class MockSiblingDetectorService extends ShipmentSiblingServiceImpl {
     /**
      * Default constructor.
      */
