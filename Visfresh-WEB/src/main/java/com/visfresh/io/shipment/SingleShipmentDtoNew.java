@@ -64,7 +64,7 @@ public class SingleShipmentDtoNew {
     private String arrivalTimeIso;
     private String lastReadingTimeStr;
     private String lastReadingTimeIso;
-    private String lastReadingTemperature;
+    private double lastReadingTemperature;
     private String siblingColor;
 
     /**
@@ -580,13 +580,13 @@ public class SingleShipmentDtoNew {
     /**
      * @return temperature of last event.
      */
-    public String getLastReadingTemperature() {
+    public double getLastReadingTemperature() {
         return lastReadingTemperature;
     }
     /**
      * @param temperature temperature of last event.
      */
-    public void setLastReadingTemperature(final String temperature) {
+    public void setLastReadingTemperature(final double temperature) {
         this.lastReadingTemperature = temperature;
     }
     /**

@@ -278,9 +278,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         json.addProperty("timestamp", formatDate(event.getTime()));
         json.add("location", toJson(new Location(event.getLatitude(), event.getLongitude())));
-        final double t = event.getTemperature();
-        json.addProperty("temperature",
-                user.getTemperatureUnits() == TemperatureUnits.Fahrenheit ? t * 1.8 + 32 : t);
+        json.addProperty("temperature", convertTemperature(event.getTemperature()));
         json.addProperty("type", event.getType().toString());
 
         //add alerts.
@@ -298,6 +296,17 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
 
         return json;
+    }
+
+    /**
+     * @param t
+     * @return
+     */
+    protected double convertTemperature(final double t) {
+        double value = user.getTemperatureUnits() == TemperatureUnits.Fahrenheit ? t * 1.8 + 32 : t;
+        //cut extra decimal signs.
+        value = (int) (value * 100) / 100.;
+        return value;
     }
     /**
      * @param a arrival
@@ -655,12 +664,12 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("lastReadingLocation", dto.getCurrentLocation());
             json.addProperty("lastReadingTimeStr", dto.getLastReadingTimeStr());
             json.addProperty("lastReadingTimeISO", dto.getLastReadingTimeIso());
-            json.addProperty("lastReadingTemperature", dto.getLastReadingTemperature());
+            json.addProperty("lastReadingTemperature", convertTemperature(dto.getLastReadingTemperature()));
 
             json.add("lastReadingForMap", toJson(dto.getCurrentLocationForMap()));
 
-            json.addProperty("minTemp", dto.getMinTemp());
-            json.addProperty("maxTemp", dto.getMaxTemp());
+            json.addProperty("minTemp", convertTemperature(dto.getMinTemp()));
+            json.addProperty("maxTemp", convertTemperature(dto.getMaxTemp()));
             json.addProperty("firstReadingTimeISO", dto.getTimeOfFirstReading());
         }
 
@@ -684,7 +693,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
                 final JsonObject obj = new JsonObject();
                 readings.add(obj);
 
-                obj.addProperty("temp", l.getTemperature());
+                obj.addProperty("temp", convertTemperature(l.getTemperature()));
                 obj.addProperty("timeISO", l.getTimeIso());
             }
 
@@ -735,7 +744,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         final JsonObject json = new JsonObject();
         json.addProperty("lat", l.getLatitude());
         json.addProperty("long", l.getLongitude());
-        json.addProperty("temperature", l.getTemperature());
+        json.addProperty("temperature", convertTemperature(l.getTemperature()));
         json.addProperty("timeISO", l.getTimeIso());
         json.add("timeObj", JsonNull.INSTANCE);
 

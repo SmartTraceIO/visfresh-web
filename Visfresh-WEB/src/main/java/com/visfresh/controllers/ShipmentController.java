@@ -484,8 +484,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
             dto.setLastReadingTimeIso(isoFmt.format(lastReadingTime));
             dto.setLastReadingTimeStr(prettyFmt.format(lastReadingTime));
-            dto.setLastReadingTemperature(formatTemperature(
-                    lastReadingTemperature.doubleValue(), user.getTemperatureUnits()));
+            dto.setLastReadingTemperature(lastReadingTemperature.doubleValue());
         }
 
         dto.setPercentageComplete(dtoOld.getPercentageComplete());
