@@ -3,92 +3,200 @@
  */
 package com.visfresh.mpl.services;
 
+
 import java.awt.Color;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.constants.ShipmentConstants;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.Sorting;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
+import com.visfresh.mpl.services.siblings.DefaultSiblingDetector;
+import com.visfresh.mpl.services.siblings.TestSiblingDetector;
 import com.visfresh.services.ShipmentSiblingService;
-import com.visfresh.utils.CollectionUtils;
-import com.visfresh.utils.Grouper;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
+@ComponentScan(basePackageClasses = {DefaultSiblingDetector.class})
 public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
     /**
-     * Group name prefix.
+     * The logger.
      */
-    private static final String GROUP_PREFIX = "siblingGroup_";
+    private static final Logger log = LoggerFactory.getLogger(ShipmentSiblingServiceImpl.class);
+
+    @Autowired
+    private TestSiblingDetector testDetector;
+    @Autowired
+    private DefaultSiblingDetector siblingDetector;
+    @Autowired
+    private CompanyDao companyDao;
     @Autowired
     private ShipmentDao shipmentDao;
 
     /**
+     * Sibling detection time out.
+     */
+    private long detectSiblingsTimeOut = -1;
+    /**
+     * Number of sibling detection threads.
+     */
+    private int numberOfThreads = 1;
+    /**
+     * Stopped flag.
+     */
+    private final AtomicBoolean stopped = new AtomicBoolean();
+    /**
      * Default constructor.
      */
-    public ShipmentSiblingServiceImpl() {
+    @Autowired
+    public ShipmentSiblingServiceImpl(final Environment env) {
+        super();
+        detectSiblingsTimeOut = Integer.parseInt(env.getProperty("sibling.detect.timeOut", "15")) * 1000l;
+        numberOfThreads = Integer.parseInt(env.getProperty("sibling.detect.numThreads", "1"));
+    }
+    /**
+     * Default constructor.
+     */
+    protected ShipmentSiblingServiceImpl() {
         super();
     }
+
+    /**
+     * Initializes the service.
+     */
+    @PostConstruct
+    public void startUp() {
+        if (detectSiblingsTimeOut > -1) {
+            log.debug("Starting sibling detection thread with " + (detectSiblingsTimeOut / 1000l)
+                    + " sec time out");
+
+            stopped.set(false);
+            final Thread t = new Thread("Sibling detection thread") {
+                /* (non-Javadoc)
+                 * @see java.lang.Thread#run()
+                 */
+                @Override
+                public void run() {
+                    while (true) {
+                        synchronized (stopped) {
+                            if (stopped.get()) {
+                                break;
+                            }
+                        }
+
+                        doDetectSiblings();
+
+                        synchronized (stopped) {
+                            if (detectSiblingsTimeOut > 0) {
+                                try {
+                                    stopped.wait(detectSiblingsTimeOut);
+                                } catch (final InterruptedException e) {
+                                    stopped.set(true);
+                                    log.debug("Sibbling detection thread is interrupted. Will cancaled");
+                                }
+                            }
+                        }
+                    }
+
+                    log.debug("Sibling detector thread has finished");
+                }
+            };
+
+            t.start();
+        } else {
+            log.warn("Sibling detection time out is negatieve " + (detectSiblingsTimeOut / 1000l)
+                    + ". Detection thread will not started");
+        }
+    }
+    /**
+     *
+     */
+    protected void doDetectSiblings() {
+        log.debug("Sibling detection has started");
+
+        final ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads);
+        try {
+            //TODO add pagination
+            final List<Company> compaines = companyDao.findAll(null, null, null);
+            for (final Company company : compaines) {
+                pool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        findShipmentSiblingsForCompany(company);
+                    }
+                });
+            }
+        } catch (final Throwable t) {
+            log.error("Failed to detect siblings", t);
+        } finally {
+            pool.shutdown();
+        }
+
+        log.debug("Sibling detection has finished");
+    }
+    /**
+     * @param company company to process.
+     */
+    public void findShipmentSiblingsForCompany(final Company company) {
+        log.debug("Start of search shipment siblings for company " + company.getName());
+
+        //TODO implement of sibling search
+//        final List<Shipment> shipments = shipmentDao.findActiveShipments(company);
+
+
+        log.debug("End of search shipment siblings for company " + company.getName());
+    }
+    /**
+     * Destroys the service.
+     */
+    @PreDestroy
+    public void shutDown() {
+        synchronized (stopped) {
+            stopped.set(true);
+            stopped.notify();
+        }
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.services.SiblingDetectorService#getSiblings(com.visfresh.entities.Shipment)
      */
     @Override
     public List<Shipment> getSiblings(final Shipment shipment) {
-        final String groupKey = getShipmentGroup(shipment);
-        if (groupKey == null) {
-            return new LinkedList<>();
+        final List<Shipment> siblings = testDetector.getSiblings(shipment);
+        if (!siblings.isEmpty()) {
+            return siblings;
         }
 
-        final Sorting sorting = new Sorting(ShipmentConstants.PROPERTY_SHIPMENT_ID);
-        //device all shipments to groups
-        final Map<String, List<Shipment>> groups = CollectionUtils.group(
-                shipmentDao.findByCompany(shipment.getCompany(), sorting, null, null),
-                new Grouper<Shipment>() {
-                    /* (non-Javadoc)
-                     * @see com.visfresh.utils.Grouper#getGroup(java.lang.Object)
-                     */
-                    @Override
-                    public String getGroup(final Shipment obj) {
-                        return getShipmentGroup(obj);
-                    }
-                });
-
-        List<Shipment> group = groups.get(groupKey);
-        if (group == null) {
-            group = new LinkedList<>();
-        } else {
-            //remove given shipment from group
-            removeGivenShipment(group, shipment);
-        }
-
-        return group;
+        return siblingDetector.getSiblings(shipment);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.SiblingDetectorService#getSiblingCount(com.visfresh.entities.Shipment)
      */
     @Override
     public int getSiblingCount(final Shipment s) {
-        int count = getSiblings(s).size();
-
+        final int count = testDetector.getSiblingCount(s);
         if (count == 0) {
-            //possible need hardcode
-            final String desc = s.getShipmentDescription();
-            if (desc != null && desc.contains("test")) {
-                count = 5; //hardcoded value
-            }
+            return siblingDetector.getSiblingCount(s);
         }
-
         return count;
     }
     /* (non-Javadoc)
@@ -118,40 +226,5 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
         }
 
         return map;
-    }
-    /**
-     * @param group group.
-     * @param shipment shipment to remove.
-     */
-    private void removeGivenShipment(final List<Shipment> group, final Shipment shipment) {
-        final Iterator<Shipment> iter = group.iterator();
-        while (iter.hasNext()) {
-            if (iter.next().getId().equals(shipment.getId())) {
-                iter.remove();
-                return;
-            }
-        }
-    }
-    /**
-     * @param shipment
-     * @return
-     */
-    private String getShipmentGroup(final Shipment shipment) {
-        final String desc = shipment.getShipmentDescription();
-        return getGroup(desc);
-    }
-    /**
-     * @param desc
-     * @return
-     */
-    private static String getGroup(final String desc) {
-        if (desc != null) {
-            for (final String seg: desc.split("[^\\w]+")) {
-                if (seg.startsWith(GROUP_PREFIX)) {
-                    return seg.substring(GROUP_PREFIX.length());
-                }
-            }
-        }
-        return null;
     }
 }

@@ -8,7 +8,6 @@ import static com.visfresh.utils.DateTimeUtils.createDateFormat;
 
 import java.awt.Color;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,7 +47,6 @@ import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
-import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
@@ -513,16 +511,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
 
         return dto;
-    }
-    /**
-     * @param temp
-     * @param units
-     * @return
-     */
-    private String formatTemperature(final double temp,
-            final TemperatureUnits units) {
-        final double t = AlertDescriptionBuilder.getTemperature(temp, units);
-        return new DecimalFormat("#0.0").format(t);
     }
     /**
      * @param dtoOld

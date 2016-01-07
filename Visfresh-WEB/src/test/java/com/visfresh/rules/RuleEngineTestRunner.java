@@ -34,7 +34,22 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
      * @return spring context.
      */
     private static  AnnotationConfigApplicationContext createContext() {
-        final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
+        final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext() {
+
+            /* (non-Javadoc)
+             * @see java.lang.Object#finalize()
+             */
+            @Override
+            protected void finalize() throws Throwable {
+                try {
+                    destroy();
+                    System.out.println("Application context for rule engine has destroyed");
+                } catch (final Throwable t) {
+                    t.printStackTrace();
+                }
+                super.finalize();
+            }
+        };
         ctxt.scan(JUnitDbConfig.class.getPackage().getName(),
             DroolsRuleEngine.class.getPackage().getName(),
             MockNotificationService.class.getPackage().getName());
@@ -72,19 +87,5 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
             rt.setRuleEngine(context.getBean(RuleEngine.class));
         }
         return test;
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#finalize()
-     */
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            context.destroy();
-            System.out.println("Application context for rule engine has destroyed");
-        } catch (final Throwable t) {
-            t.printStackTrace();
-        }
-        super.finalize();
     }
 }

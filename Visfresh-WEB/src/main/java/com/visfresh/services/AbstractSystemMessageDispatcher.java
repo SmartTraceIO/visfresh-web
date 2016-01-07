@@ -86,6 +86,11 @@ public abstract class AbstractSystemMessageDispatcher {
                     }
                 } catch (final Throwable e) {
                     log.error("Global exception during dispatch of messaegs", e);
+                    try {
+                        Thread.sleep(10000L);
+                    } catch (final InterruptedException ine) {
+                        ine.printStackTrace();
+                    }
                 }
             }
 
