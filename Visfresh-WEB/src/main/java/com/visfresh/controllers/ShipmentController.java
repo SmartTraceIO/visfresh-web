@@ -695,9 +695,11 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         //"6:47pm"
         final DateFormat shortFormat = createDateFormat(user, "h:mmaa");
 
+        int i = 0;
         for (final SingleShipmentTimeItem item : items) {
             dto.getLocations().addAll(createLocations(item, isoFmt, shortFormat,
-                    user, dto.getEta(), dto.getEndLocation()));
+                    user, dto.getEta(), dto.getEndLocation(), i == items.size() - 1));
+            i++;
         }
 
         dto.getAlertsNotificationSchedules().addAll(dtoOld.getAlertsNotificationSchedules());
@@ -714,7 +716,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final DateFormat shortFormat,
             final User user,
             final String etaIso,
-            final String shippedTo) {
+            final String shippedTo,
+            final boolean isLast) {
         final List<SingleShipmentLocation> list = new LinkedList<SingleShipmentLocation>();
 
         final TrackerEvent event = item.getEvent();
@@ -731,7 +734,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 new Location(event.getLatitude(), event.getLongitude()));
 
         //add tracker event
-        lo.getAlerts().add(createSingleShipmentAlert(event, user, address, lo.getTimeIso()));
+        lo.getAlerts().add(createSingleShipmentAlert(event, user, address, lo.getTimeIso(), isLast));
 
         //add alerts
         for (final Alert a : item.getAlerts()) {
@@ -752,11 +755,11 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @return
      */
     private SingleShipmentAlert createSingleShipmentAlert(final TrackerEvent event,
-            final User user, final String address, final String timeIso) {
+            final User user, final String address, final String timeIso, final boolean isLast) {
         final SingleShipmentAlert alert = new SingleShipmentAlert();
 
-        alert.setTitle(alertDescriptionBuilder.buildDescription(event, user));
-        alert.setType("LastReading");
+        alert.setTitle(alertDescriptionBuilder.buildDescription(event, user, isLast));
+        alert.setType(isLast? "LastReading" : "Reading");
         alert.getLines().add(alertDescriptionBuilder.buildShortDescription(event, user));
         alert.getLines().add(address);
 

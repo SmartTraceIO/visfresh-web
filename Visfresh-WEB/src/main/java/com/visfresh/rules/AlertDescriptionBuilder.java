@@ -230,14 +230,24 @@ public class AlertDescriptionBuilder {
      * TODO move to resource bundles.
      * @param event event.
      * @param user user.
+     * @param isLast is last reading flag.
      * @return
      */
-    public String buildDescription(final TrackerEvent event, final User user) {
-        return "Last Reading for Tracker #"
-                + event.getDevice().getSn()
-                + "("
-                + event.getShipment().getTripCount()
-                + ")";
+    public String buildDescription(final TrackerEvent event, final User user, final boolean isLast) {
+        final StringBuilder sb = new StringBuilder();
+            sb.append(" for Tracker #");
+            sb.append(event.getDevice().getSn());
+            sb.append("(");
+            sb.append(event.getShipment().getTripCount());
+            sb.append(")");
+
+        if (isLast) {
+            sb.insert(0, "Last reading");
+        } else {
+            sb.insert(0, "Reading");
+        }
+
+        return sb.toString();
     }
 
     /**
