@@ -190,6 +190,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.getAlertsNotificationSchedules().add(alertNotifSched);
         s.getArrivalNotificationSchedules().add(arrivalSched);
         s.setCommentsForReceiver("commentsForReceiver");
+        s.setSiblingGroup(77l);
         return s;
     }
 
@@ -218,6 +219,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(1, s.getAlertsNotificationSchedules().size());
         assertEquals(1, s.getArrivalNotificationSchedules().size());
         assertEquals("commentsForReceiver", s.getCommentsForReceiver());
+        assertEquals(77l, s.getSiblingGroup().longValue());
     }
 
     @Test
@@ -343,6 +345,58 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         left = companyDao.save(left);
 
         assertEquals(0, dao.findByCompany(left, null, null, null).size());
+    }
+    @Test
+    public void testFindActiveShipments() {
+        //create companies
+        final Company c1 = createCompany("C1");
+        final Company c2 = createCompany("C2");
+
+        //create shipments
+        createShipment(c1, ShipmentStatus.InProgress);
+        createShipment(c1, ShipmentStatus.Default);
+        createShipment(c1, ShipmentStatus.Complete);
+
+        createShipment(c2, ShipmentStatus.InProgress);
+        createShipment(c2, ShipmentStatus.Default);
+        createShipment(c2, ShipmentStatus.Complete);
+
+        assertEquals(2, dao.findActiveShipments(c1).size());
+    }
+    @Test
+    public void testGetSiblingGroup() {
+        //create companies
+        final long g1 = 7l;
+        final long g2 = 8l;
+
+        //create shipments
+        createShipmentByGroup(sharedCompany, g1);
+        createShipmentByGroup(sharedCompany, g1);
+        createShipmentByGroup(sharedCompany, g2);
+
+        assertEquals(2, dao.getSiblingGroup(g1).size());
+        assertEquals(0, dao.getSiblingGroup(1l).size());
+    }
+
+    /**
+     * @param c company.
+     * @param group sibling group.
+     */
+    private Shipment createShipmentByGroup(final Company c, final long group) {
+        final Shipment s = createTestEntity();
+        s.setCompany(c);
+        s.setSiblingGroup(group);
+        return dao.save(s);
+    }
+    /**
+     * @param c company.
+     * @param status shipment status.
+     */
+    private Shipment createShipment(final Company c, final ShipmentStatus status) {
+        final Shipment s = createTestEntity();
+        s.setCompany(c);
+        s.setStatus(status);
+        return dao.save(s);
     }
 
     public ShipmentTemplate createShipmentTemplate() {

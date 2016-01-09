@@ -3,10 +3,15 @@
  */
 package com.visfresh.utils;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import com.visfresh.entities.EntityWithId;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -40,5 +45,20 @@ public final class CollectionUtils {
             group.add(t);
         }
         return map;
+    }
+    /**
+     * @param list
+     */
+    public static <ID extends Serializable & Comparable<ID>, E extends EntityWithId<ID>> void sortById(
+            final List<E> list) {
+        Collections.sort(list, new Comparator<E>() {
+            /* (non-Javadoc)
+             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+             */
+            @Override
+            public int compare(final E o1, final E o2) {
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
     }
 }

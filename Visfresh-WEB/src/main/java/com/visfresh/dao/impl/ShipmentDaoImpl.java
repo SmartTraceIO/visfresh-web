@@ -18,6 +18,7 @@ import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -39,6 +40,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     private static final String CUSTOMFIELDS_FIELD = "customfiels";
     private static final String STATUS_FIELD = "status";
     private static final String DEVICE_FIELD = "device";
+    private static final String SIBLINGGROUP_FIELD = "siblinggroup";
     private static final String ASSETTYPE_FIELD = "assettype";
     private static final String LASTEVENT_FIELD = "lasteventdate";
     private static final String DEVICESHUTDOWNDATE_FIELD = "deviceshutdowndate";
@@ -85,6 +87,58 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     @Override
     protected Shipment createEntity() {
         return new Shipment();
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#findActiveShipments(com.visfresh.entities.Company)
+     */
+    @Override
+    public List<Shipment> findActiveShipments(final Company company) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("company", company.getId());
+        params.put("status", ShipmentStatus.Complete.name());
+
+        final String sql = "select * from " + TABLE + " s"
+                + " where s." + STATUS_FIELD + "<> :status"
+                + " and s." + ISTEMPLATE_FIELD + " = false"
+                + " and s.company = :company"
+                + " order by s." + ID_FIELD + " desc";
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+
+        final Map<String, Object> cache = new HashMap<String, Object>();
+        final List<Shipment> result = new LinkedList<Shipment>();
+
+        for (final Map<String, Object> row : rows) {
+            final Shipment s = createEntity(row);
+            result.add(s);
+            resolveReferences(s, row, cache);
+        }
+
+        return result;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#getSiblingGroup(java.lang.Long)
+     */
+    @Override
+    public List<Shipment> getSiblingGroup(final Long siblingGroup) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("siblings", siblingGroup);
+
+        final String sql = "select * from " + TABLE + " s"
+                + " where s." + ISTEMPLATE_FIELD + " = false"
+                + " and s." + SIBLINGGROUP_FIELD + " = :siblings"
+                + " order by s." + ID_FIELD + " desc";
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+
+        final Map<String, Object> cache = new HashMap<String, Object>();
+        final List<Shipment> result = new LinkedList<Shipment>();
+
+        for (final Map<String, Object> row : rows) {
+            final Shipment s = createEntity(row);
+            result.add(s);
+            resolveReferences(s, row, cache);
+        }
+
+        return result;
     }
     /**
      * @param params
@@ -159,6 +213,10 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         e.getCustomFields().putAll(parseJsonMap((String) map.get(CUSTOMFIELDS_FIELD)));
         e.setStatus(ShipmentStatus.valueOf((String) map.get(STATUS_FIELD)));
         e.setDevice(deviceDao.findOne((String) map.get(DEVICE_FIELD)));
+        final Number num = (Number) map.get(SIBLINGGROUP_FIELD);
+        if (num != null) {
+            e.setSiblingGroup(num.longValue());
+        }
         e.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         e.setPoNum(((Number) map.get(PONUM_FIELD)).intValue());
         e.setAssetType((String) map.get(ASSETTYPE_FIELD));
@@ -188,6 +246,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(PONUM_FIELD, s.getPoNum());
         params.put(TRIPCOUNT_FIELD, s.getTripCount());
         params.put(DEVICE_FIELD, s.getDevice().getId());
+        params.put(SIBLINGGROUP_FIELD, s.getSiblingGroup());
         params.put(ASSETTYPE_FIELD, s.getAssetType());
         return params;
     }

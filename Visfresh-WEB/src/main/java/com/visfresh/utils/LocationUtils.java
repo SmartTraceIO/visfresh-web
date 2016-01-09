@@ -15,7 +15,7 @@ public final class LocationUtils {
         super();
     }
 
-    public static double distFrom(final double lat1, final double lng1, final double lat2, final double lng2) {
+    public static double getDistanceMeters(final double lat1, final double lng1, final double lat2, final double lng2) {
         final double earthRadius = 6371000; // meters
         final double dLat = Math.toRadians(lat2 - lat1);
         final double dLng = Math.toRadians(lng2 - lng1);
@@ -25,5 +25,8 @@ public final class LocationUtils {
                 * Math.sin(dLng / 2);
         final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return earthRadius * c;
+    }
+    public static void main(final String[] args) {
+        System.out.println(getDistanceMeters(0, 0, 0.01, 0.01));
     }
 }

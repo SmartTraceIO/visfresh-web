@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
@@ -23,9 +21,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.dao.CompanyDao;
-import com.visfresh.dao.ShipmentDao;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
 import com.visfresh.mpl.services.siblings.DefaultSiblingDetector;
 import com.visfresh.mpl.services.siblings.TestSiblingDetector;
@@ -47,19 +42,11 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
     private TestSiblingDetector testDetector;
     @Autowired
     private DefaultSiblingDetector siblingDetector;
-    @Autowired
-    private CompanyDao companyDao;
-    @Autowired
-    private ShipmentDao shipmentDao;
 
     /**
      * Sibling detection time out.
      */
     private long detectSiblingsTimeOut = -1;
-    /**
-     * Number of sibling detection threads.
-     */
-    private int numberOfThreads = 1;
     /**
      * Stopped flag.
      */
@@ -71,7 +58,6 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
     public ShipmentSiblingServiceImpl(final Environment env) {
         super();
         detectSiblingsTimeOut = Integer.parseInt(env.getProperty("sibling.detect.timeOut", "15")) * 1000l;
-        numberOfThreads = Integer.parseInt(env.getProperty("sibling.detect.numThreads", "1"));
     }
     /**
      * Default constructor.
@@ -103,7 +89,7 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
                             }
                         }
 
-                        doDetectSiblings();
+                        siblingDetector.detectSiblings();
 
                         synchronized (stopped) {
                             if (detectSiblingsTimeOut > 0) {
@@ -126,44 +112,6 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
             log.warn("Sibling detection time out is negatieve " + (detectSiblingsTimeOut / 1000l)
                     + ". Detection thread will not started");
         }
-    }
-    /**
-     *
-     */
-    protected void doDetectSiblings() {
-        log.debug("Sibling detection has started");
-
-        final ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads);
-        try {
-            //TODO add pagination
-            final List<Company> compaines = companyDao.findAll(null, null, null);
-            for (final Company company : compaines) {
-                pool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        findShipmentSiblingsForCompany(company);
-                    }
-                });
-            }
-        } catch (final Throwable t) {
-            log.error("Failed to detect siblings", t);
-        } finally {
-            pool.shutdown();
-        }
-
-        log.debug("Sibling detection has finished");
-    }
-    /**
-     * @param company company to process.
-     */
-    public void findShipmentSiblingsForCompany(final Company company) {
-        log.debug("Start of search shipment siblings for company " + company.getName());
-
-        //TODO implement of sibling search
-//        final List<Shipment> shipments = shipmentDao.findActiveShipments(company);
-
-
-        log.debug("End of search shipment siblings for company " + company.getName());
     }
     /**
      * Destroys the service.

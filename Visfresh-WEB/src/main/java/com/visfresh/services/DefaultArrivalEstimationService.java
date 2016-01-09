@@ -37,13 +37,13 @@ public class DefaultArrivalEstimationService implements
             final Location from = s.getShippedFrom().getLocation();
             final Location to = s.getShippedTo().getLocation();
 
-            final double allPath = LocationUtils.distFrom(from.getLatitude(), from.getLongitude(),
+            final double allPath = LocationUtils.getDistanceMeters(from.getLatitude(), from.getLongitude(),
                     to.getLatitude(), to.getLongitude());
             if (allPath == 0) {
                 return new ArrivalEstimation(new Date(currentTime.getTime()), 100);
             }
 
-            final double reminder = LocationUtils.distFrom(
+            final double reminder = LocationUtils.getDistanceMeters(
                     currentLocation.getLatitude(), currentLocation.getLongitude(),
                     to.getLatitude(), to.getLongitude());
             if (allPath == reminder) {
