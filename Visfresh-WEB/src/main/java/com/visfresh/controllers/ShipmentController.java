@@ -734,7 +734,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 new Location(event.getLatitude(), event.getLongitude()));
 
         //add tracker event
-        lo.getAlerts().add(createSingleShipmentAlert(event, user, address, lo.getTimeIso(), isLast));
+        if (isLast) {
+            lo.getAlerts().add(createLastReadingAlert(event, user, address, lo.getTimeIso()));
+        }
 
         //add alerts
         for (final Alert a : item.getAlerts()) {
@@ -754,12 +756,12 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @param timeIso time in ISO format
      * @return
      */
-    private SingleShipmentAlert createSingleShipmentAlert(final TrackerEvent event,
-            final User user, final String address, final String timeIso, final boolean isLast) {
+    private SingleShipmentAlert createLastReadingAlert(final TrackerEvent event,
+            final User user, final String address, final String timeIso) {
         final SingleShipmentAlert alert = new SingleShipmentAlert();
 
-        alert.setTitle(alertDescriptionBuilder.buildDescription(event, user, isLast));
-        alert.setType(isLast? "LastReading" : "Reading");
+        alert.setTitle(alertDescriptionBuilder.buildLastReadingDescription(event, user));
+        alert.setType("LastReading");
         alert.getLines().add(alertDescriptionBuilder.buildShortDescription(event, user));
         alert.getLines().add(address);
 

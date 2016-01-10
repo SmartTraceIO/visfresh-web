@@ -2150,7 +2150,7 @@ Response:
 }
 ```
 ### Get Single Shipment example ###
-**GET /vf/rest/getSingleShipment/${accessToken}?shipmentId=214**  
+**GET /vf/rest/getSingleShipment/${accessToken}?shipmentId=455**  
 **Response:**  
 ```json
 {
@@ -2159,7 +2159,7 @@ Response:
     "message": "Success"
   },
   "response": {
-    "shipmentId": 214,
+    "shipmentId": 455,
     "deviceSN": "039485",
     "deviceName": "Device Name",
     "tripCount": 1,
@@ -2171,13 +2171,13 @@ Response:
     "status": "InProgress",
     "trackerPositionFrontPercent": 0,
     "trackerPositionLeftPercent": 100,
-    "alertProfileId": 154,
+    "alertProfileId": 320,
     "alertProfileName": "AnyAlert",
     "alertSuppressionMinutes": 55,
     "alertPeopleToNotify": "Alexander Suvorov, Alexander Suvorov",
     "alertsNotificationSchedules": [
       {
-        "notificationScheduleId": 240,
+        "notificationScheduleId": 486,
         "notificationScheduleName": "Sched"
       }
     ],
@@ -2191,7 +2191,7 @@ Response:
     "commentsForReceiver": "Comments for receiver",
     "arrivalNotificationSchedules": [
       {
-        "notificationScheduleId": 241,
+        "notificationScheduleId": 487,
         "notificationScheduleName": "Sched"
       }
     ],
@@ -2199,15 +2199,15 @@ Response:
     "shutdownTimeStr": null,
     "shutdownTimeISO": null,
     "startLocation": "Loc-3",
-    "startTimeStr": "09:51 29 Dec 15",
-    "startTimeISO": "2015-12-29 09:51",
+    "startTimeStr": "01:05 30 Dec 15",
+    "startTimeISO": "2015-12-30 01:05",
     "startLocationForMap": {
       "latitude": 100.5,
       "longitude": 100.501
     },
     "endLocation": "Loc-4",
-    "etaStr": "08:48 13 Dec 15",
-    "etaISO": "2015-12-13 08:48",
+    "etaStr": "12:02 14 Dec 15",
+    "etaISO": "2015-12-14 12:02",
     "arrivalTimeStr": null,
     "arrivalTimeISO": null,
     "endLocationForMap": {
@@ -2215,33 +2215,27 @@ Response:
       "longitude": 110.501
     },
     "lastReadingLocation": "Not determined",
-    "lastReadingTimeStr": "9:57PM 09 Jan 2016",
-    "lastReadingTimeISO": "2016-01-09 09:57",
-    "lastReadingTemperature": 12.33,
+    "lastReadingTimeStr": "1:12PM 10 Jan 2016",
+    "lastReadingTimeISO": "2016-01-10 01:12",
+    "lastReadingTemperature": 12.71,
     "lastReadingForMap": {
       "latitude": 92.9,
       "longitude": 92.90100000000001
     },
-    "minTemp": 11.58,
+    "minTemp": 11.52,
     "maxTemp": 14.4,
-    "firstReadingTimeISO": "2016-01-09 09:57",
+    "firstReadingTimeISO": "2016-01-10 01:12",
     "locations": [
       {
         "lat": 100.5,
         "long": 100.501,
-        "temperature": 14.4,
-        "timeISO": "2016-01-09 09:57",
+        "temperature": 14.27,
+        "timeISO": "2016-01-10 01:12",
         "timeObj": null,
         "alerts": [
           {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "14.4°C at 9:57PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          },
-          {
-            "title": "Hot Alert. Tracker 039485(1) went above 14.4°C for 0min",
-            "Line1": "14.4°C at 9:57PM on 9 Jan 2016",
+            "title": "Hot Alert. Tracker 039485(1) went above 14.3°C for 0min",
+            "Line1": "14.3°C at 1:12PM on 10 Jan 2016",
             "Line2": "Bankstown Warehouse",
             "type": "Hot"
           }
@@ -2250,79 +2244,45 @@ Response:
       {
         "lat": 100.1,
         "long": 100.101,
-        "temperature": 12.36,
-        "timeISO": "2016-01-09 10:02",
+        "temperature": 12.77,
+        "timeISO": "2016-01-10 01:17",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "12.4°C at 10:02PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 99.7,
         "long": 99.70100000000001,
-        "temperature": 13.93,
-        "timeISO": "2016-01-09 10:07",
+        "temperature": 12.01,
+        "timeISO": "2016-01-10 01:22",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "13.9°C at 10:07PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 99.3,
         "long": 99.301,
-        "temperature": 11.58,
-        "timeISO": "2016-01-09 10:12",
+        "temperature": 13.9,
+        "timeISO": "2016-01-10 01:27",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "11.6°C at 10:12PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 98.9,
         "long": 98.90100000000001,
-        "temperature": 13.45,
-        "timeISO": "2016-01-09 10:17",
+        "temperature": 11.79,
+        "timeISO": "2016-01-10 01:32",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "13.5°C at 10:17PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 98.5,
         "long": 98.501,
-        "temperature": 12.92,
-        "timeISO": "2016-01-09 10:22",
+        "temperature": 13.53,
+        "timeISO": "2016-01-10 01:37",
         "timeObj": null,
         "alerts": [
           {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "12.9°C at 10:22PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          },
-          {
-            "title": "Hot Alert. Tracker 039485(1) went above 12.9°C for 0min",
-            "Line1": "12.9°C at 10:22PM on 9 Jan 2016",
+            "title": "Hot Alert. Tracker 039485(1) went above 13.5°C for 0min",
+            "Line1": "13.5°C at 1:37PM on 10 Jan 2016",
             "Line2": "Bankstown Warehouse",
             "type": "Hot"
           }
@@ -2331,79 +2291,45 @@ Response:
       {
         "lat": 98.1,
         "long": 98.101,
-        "temperature": 11.64,
-        "timeISO": "2016-01-09 10:27",
+        "temperature": 11.69,
+        "timeISO": "2016-01-10 01:42",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "11.6°C at 10:27PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 97.7,
         "long": 97.70100000000001,
-        "temperature": 13.13,
-        "timeISO": "2016-01-09 10:32",
+        "temperature": 14.4,
+        "timeISO": "2016-01-10 01:47",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "13.1°C at 10:32PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 97.3,
         "long": 97.301,
-        "temperature": 14.35,
-        "timeISO": "2016-01-09 10:37",
+        "temperature": 13.27,
+        "timeISO": "2016-01-10 01:52",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "14.4°C at 10:37PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 96.9,
         "long": 96.90100000000001,
-        "temperature": 14.04,
-        "timeISO": "2016-01-09 10:42",
+        "temperature": 14.38,
+        "timeISO": "2016-01-10 01:57",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "14.0°C at 10:42PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 96.5,
         "long": 96.501,
-        "temperature": 13.68,
-        "timeISO": "2016-01-09 10:47",
+        "temperature": 13.16,
+        "timeISO": "2016-01-10 02:02",
         "timeObj": null,
         "alerts": [
           {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "13.7°C at 10:47PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          },
-          {
-            "title": "Hot Alert. Tracker 039485(1) went above 13.7°C for 0min",
-            "Line1": "13.7°C at 10:47PM on 9 Jan 2016",
+            "title": "Hot Alert. Tracker 039485(1) went above 13.2°C for 0min",
+            "Line1": "13.2°C at 2:02PM on 10 Jan 2016",
             "Line2": "Bankstown Warehouse",
             "type": "Hot"
           }
@@ -2412,79 +2338,45 @@ Response:
       {
         "lat": 96.1,
         "long": 96.101,
-        "temperature": 12.64,
-        "timeISO": "2016-01-09 10:52",
+        "temperature": 11.95,
+        "timeISO": "2016-01-10 02:07",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "12.6°C at 10:52PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 95.7,
         "long": 95.70100000000001,
-        "temperature": 12.85,
-        "timeISO": "2016-01-09 10:57",
+        "temperature": 13.66,
+        "timeISO": "2016-01-10 02:12",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "12.9°C at 10:57PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 95.3,
         "long": 95.301,
-        "temperature": 12.29,
-        "timeISO": "2016-01-09 11:02",
+        "temperature": 12.27,
+        "timeISO": "2016-01-10 02:17",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "12.3°C at 11:02PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 94.9,
         "long": 94.90100000000001,
-        "temperature": 14.08,
-        "timeISO": "2016-01-09 11:07",
+        "temperature": 12.36,
+        "timeISO": "2016-01-10 02:22",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "14.1°C at 11:07PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 94.5,
         "long": 94.501,
-        "temperature": 13.91,
-        "timeISO": "2016-01-09 11:12",
+        "temperature": 12.88,
+        "timeISO": "2016-01-10 02:27",
         "timeObj": null,
         "alerts": [
           {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "13.9°C at 11:12PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          },
-          {
-            "title": "Hot Alert. Tracker 039485(1) went above 13.9°C for 0min",
-            "Line1": "13.9°C at 11:12PM on 9 Jan 2016",
+            "title": "Hot Alert. Tracker 039485(1) went above 12.9°C for 0min",
+            "Line1": "12.9°C at 2:27PM on 10 Jan 2016",
             "Line2": "Bankstown Warehouse",
             "type": "Hot"
           }
@@ -2493,58 +2385,37 @@ Response:
       {
         "lat": 94.1,
         "long": 94.101,
-        "temperature": 13.76,
-        "timeISO": "2016-01-09 11:17",
+        "temperature": 11.54,
+        "timeISO": "2016-01-10 02:32",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "13.8°C at 11:17PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 93.7,
         "long": 93.70100000000001,
-        "temperature": 13.87,
-        "timeISO": "2016-01-09 11:22",
+        "temperature": 11.52,
+        "timeISO": "2016-01-10 02:37",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "13.9°C at 11:22PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 93.3,
         "long": 93.301,
-        "temperature": 11.95,
-        "timeISO": "2016-01-09 11:27",
+        "temperature": 12.91,
+        "timeISO": "2016-01-10 02:42",
         "timeObj": null,
-        "alerts": [
-          {
-            "title": "Reading for Tracker #039485(1)",
-            "Line1": "12.0°C at 11:27PM on 9 Jan 2016",
-            "Line2": "Bankstown Warehouse",
-            "type": "Reading"
-          }
-        ]
+        "alerts": []
       },
       {
         "lat": 92.9,
         "long": 92.90100000000001,
-        "temperature": 12.33,
-        "timeISO": "2016-01-09 11:32",
+        "temperature": 12.71,
+        "timeISO": "2016-01-10 02:47",
         "timeObj": null,
         "alerts": [
           {
             "title": "Last reading for Tracker #039485(1)",
-            "Line1": "12.3°C at 11:32PM on 9 Jan 2016",
+            "Line1": "12.7°C at 2:47PM on 10 Jan 2016",
             "Line2": "Bankstown Warehouse",
             "type": "LastReading"
           }
@@ -2553,7 +2424,7 @@ Response:
     ],
     "siblings": [
       {
-        "shipmentId": 215,
+        "shipmentId": 456,
         "deviceSN": "039485",
         "tripCount": 1,
         "siblingColor": "#0000ff",
@@ -2562,84 +2433,84 @@ Response:
         "alertSummary": [],
         "readings": [
           {
-            "temp": 11.84,
-            "timeISO": "2016-01-09 09:57"
+            "temp": 14.39,
+            "timeISO": "2016-01-10 01:12"
           },
           {
-            "temp": 14.12,
-            "timeISO": "2016-01-09 10:02"
+            "temp": 11.61,
+            "timeISO": "2016-01-10 01:17"
           },
           {
-            "temp": 13.96,
-            "timeISO": "2016-01-09 10:07"
+            "temp": 12.7,
+            "timeISO": "2016-01-10 01:22"
           },
           {
-            "temp": 12.32,
-            "timeISO": "2016-01-09 10:12"
+            "temp": 14.4,
+            "timeISO": "2016-01-10 01:27"
           },
           {
-            "temp": 12.98,
-            "timeISO": "2016-01-09 10:17"
+            "temp": 12.35,
+            "timeISO": "2016-01-10 01:32"
           },
           {
-            "temp": 13.1,
-            "timeISO": "2016-01-09 10:22"
+            "temp": 13.32,
+            "timeISO": "2016-01-10 01:37"
           },
           {
-            "temp": 12.18,
-            "timeISO": "2016-01-09 10:27"
+            "temp": 11.79,
+            "timeISO": "2016-01-10 01:42"
           },
           {
-            "temp": 14.09,
-            "timeISO": "2016-01-09 10:32"
+            "temp": 14.24,
+            "timeISO": "2016-01-10 01:47"
           },
           {
-            "temp": 13.93,
-            "timeISO": "2016-01-09 10:37"
+            "temp": 11.98,
+            "timeISO": "2016-01-10 01:52"
           },
           {
-            "temp": 13.12,
-            "timeISO": "2016-01-09 10:42"
+            "temp": 11.62,
+            "timeISO": "2016-01-10 01:57"
           },
           {
-            "temp": 13.62,
-            "timeISO": "2016-01-09 10:47"
+            "temp": 13.24,
+            "timeISO": "2016-01-10 02:02"
           },
           {
-            "temp": 13.77,
-            "timeISO": "2016-01-09 10:52"
+            "temp": 12.04,
+            "timeISO": "2016-01-10 02:07"
           },
           {
-            "temp": 13.22,
-            "timeISO": "2016-01-09 10:57"
+            "temp": 12.04,
+            "timeISO": "2016-01-10 02:12"
           },
           {
-            "temp": 11.77,
-            "timeISO": "2016-01-09 11:02"
+            "temp": 13.41,
+            "timeISO": "2016-01-10 02:17"
           },
           {
-            "temp": 12.87,
-            "timeISO": "2016-01-09 11:07"
+            "temp": 13.78,
+            "timeISO": "2016-01-10 02:22"
           },
           {
-            "temp": 12.72,
-            "timeISO": "2016-01-09 11:12"
+            "temp": 12.9,
+            "timeISO": "2016-01-10 02:27"
           },
           {
-            "temp": 13.9,
-            "timeISO": "2016-01-09 11:17"
+            "temp": 14.43,
+            "timeISO": "2016-01-10 02:32"
           },
           {
-            "temp": 13.66,
-            "timeISO": "2016-01-09 11:22"
+            "temp": 14.3,
+            "timeISO": "2016-01-10 02:37"
           },
           {
-            "temp": 12.49,
-            "timeISO": "2016-01-09 11:27"
+            "temp": 14.19,
+            "timeISO": "2016-01-10 02:42"
           },
           {
-            "temp": 11.84,
-            "timeISO": "2016-01-09 11:32"
+            "temp": 12.07,
+            "timeISO": "2016-01-10 02:47"
           }
         ]
       }
