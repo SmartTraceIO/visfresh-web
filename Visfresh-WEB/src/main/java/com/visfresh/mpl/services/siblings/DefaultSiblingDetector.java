@@ -101,6 +101,7 @@ public class DefaultSiblingDetector implements SiblingDetector {
                 });
             }
 
+            pool.shutdown();
             if (!pool.awaitTermination(1, TimeUnit.HOURS)) {
                 log.warn("End of sibling searching is not reached");
             }
