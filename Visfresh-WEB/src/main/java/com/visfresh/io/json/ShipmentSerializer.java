@@ -305,7 +305,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     protected double convertTemperature(final double t) {
         double value = user.getTemperatureUnits() == TemperatureUnits.Fahrenheit ? t * 1.8 + 32 : t;
         //cut extra decimal signs.
-        value = (int) (value * 100) / 100.;
+        value = Math.round(value * 100) / 100.;
         return value;
     }
     /**
@@ -673,31 +673,19 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("firstReadingTimeISO", dto.getTimeOfFirstReading());
         }
 
-        if (isNotSibling) {
-            final JsonArray locations = new JsonArray();
-            for (final SingleShipmentLocation l : dto.getLocations()) {
-                locations.add(toJson(l));
-            }
-            json.add("locations", locations);
+        final JsonArray locations = new JsonArray();
+        for (final SingleShipmentLocation l : dto.getLocations()) {
+            locations.add(toJson(l, isNotSibling));
+        }
+        json.add(isNotSibling ? "locations" : "readings", locations);
 
+        if (isNotSibling) {
             final JsonArray siblings = new JsonArray();
             for (final SingleShipmentDtoNew sibling: dto.getSiblings()) {
                 siblings.add(toJson(sibling, false));
             }
 
             json.add("siblings", siblings);
-        } else {
-            //is sibling
-            final JsonArray readings = new JsonArray();
-            for (final SingleShipmentLocation l : dto.getLocations()) {
-                final JsonObject obj = new JsonObject();
-                readings.add(obj);
-
-                obj.addProperty("temp", convertTemperature(l.getTemperature()));
-                obj.addProperty("timeISO", l.getTimeIso());
-            }
-
-            json.add("readings", readings);
         }
 
         return json;
@@ -734,19 +722,21 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
     /**
      * @param l location.
+     * @param isNotSibling is not sibling flag.
      * @return
      */
-    private JsonObject toJson(final SingleShipmentLocation l) {
+    private JsonObject toJson(final SingleShipmentLocation l, final boolean isNotSibling) {
         if (l == null) {
             return null;
         }
 
         final JsonObject json = new JsonObject();
-        json.addProperty("lat", l.getLatitude());
-        json.addProperty("long", l.getLongitude());
+        if (isNotSibling) {
+            json.addProperty("lat", l.getLatitude());
+            json.addProperty("long", l.getLongitude());
+        }
         json.addProperty("temperature", convertTemperature(l.getTemperature()));
         json.addProperty("timeISO", l.getTimeIso());
-        json.add("timeObj", JsonNull.INSTANCE);
 
         final JsonArray alerts = new JsonArray();
         for (final SingleShipmentAlert alert : l.getAlerts()) {

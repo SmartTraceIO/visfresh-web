@@ -4,9 +4,11 @@
 package com.visfresh.mpl.services.siblings;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -120,6 +122,8 @@ public class DefaultSiblingDetector implements SiblingDetector {
         log.debug("Start of search shipment siblings for company " + company.getName());
 
         final List<Shipment> shipments = findActiveShipments(company);
+        final Set<Long> alreadyUsedGroups = new HashSet<>();
+
         if (!shipments.isEmpty()) {
             //get shipments for group
             CollectionUtils.sortById(shipments);
@@ -128,12 +132,21 @@ public class DefaultSiblingDetector implements SiblingDetector {
 
                 int count = 1;
                 Long groupId = master.getSiblingGroup();
+
+                //check already used group
+                if (alreadyUsedGroups.contains(groupId)) {
+                    //clear group ID
+                    groupId = null;
+                }
                 if (groupId == null) {
                     //if the group ID is null, assign it to master shipment ID.
                     groupId = master.getId();
                     master.setSiblingGroup(groupId);
                     saveShipment(master);
                 }
+
+                //save group ID as already used
+                alreadyUsedGroups.add(groupId);
 
                 final TrackerEvent[] masterEvents = getTrackeEvents(master);
                 if (masterEvents.length > 0) {

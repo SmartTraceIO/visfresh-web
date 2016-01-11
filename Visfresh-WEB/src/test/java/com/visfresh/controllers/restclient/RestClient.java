@@ -3,7 +3,6 @@
  */
 package com.visfresh.controllers.restclient;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -17,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.drools.core.util.IoUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -212,14 +213,8 @@ public class RestClient  {
      * @return content of stream as string.
      */
     private String getContent(final InputStream in) throws IOException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int len;
-        final byte[] buff = new byte[256];
-        while ((len = in.read(buff)) > -1) {
-            out.write(buff, 0, len);
-        }
-
-        return new String(out.toByteArray(), "UTF-8");
+        final byte[] bytes = IoUtils.readBytesFromInputStream(in);
+        return new String(bytes, "UTF-8");
     }
 
     /**

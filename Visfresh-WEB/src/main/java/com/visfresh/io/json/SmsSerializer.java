@@ -10,7 +10,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.visfresh.io.sms.SmsMessage;
+import com.visfresh.sms.SmsMessage;
 import com.visfresh.utils.SerializerUtils;
 
 /**

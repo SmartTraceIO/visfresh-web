@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
-import com.visfresh.io.sms.SmsMessage;
+import com.visfresh.sms.SmsMessage;
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *

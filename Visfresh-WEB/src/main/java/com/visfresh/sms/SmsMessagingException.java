@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.io.sms;
+package com.visfresh.sms;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

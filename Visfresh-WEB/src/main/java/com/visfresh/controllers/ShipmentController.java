@@ -397,12 +397,12 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 return createSuccessResponse(null);
             }
 
-            final SingleShipmentDtoNew dto = createDto(s, user, true);
+            final SingleShipmentDtoNew dto = createDto(s, user);
 
             //add siblings
             final List<Shipment> siblings = siblingService.getSiblings(s);
             for (final Shipment sibling : siblings) {
-                dto.getSiblings().add(createDto(sibling, user, false));
+                dto.getSiblings().add(createDto(sibling, user));
             }
 
             //assign sibling colors
@@ -429,12 +429,11 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     /**
      * @param s
      * @param user
-     * @param addAlerts
+     * @param addAllReadings
      * @return
      */
-    protected SingleShipmentDtoNew createDto(final Shipment s, final User user,
-            final boolean addAlerts) {
-        final SingleShipmentDto dtoOld = getShipmentData(s, addAlerts);
+    protected SingleShipmentDtoNew createDto(final Shipment s, final User user) {
+        final SingleShipmentDto dtoOld = getShipmentData(s);
         final String description = dtoOld.getShipmentDescription();
         if (description != null && description.toLowerCase().contains("test")) {
             generateTestData(dtoOld, s);
@@ -471,7 +470,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setMinTemp(minTemp);
         dto.setMaxTemp(maxTemp);
 
-        final DateFormat isoFmt = createDateFormat(user, "yyyy-MM-dd hh:mm");
+        final DateFormat isoFmt = createDateFormat(user, "yyyy-MM-dd HH:mm");
         final DateFormat prettyFmt = createDateFormat(user, "h:mmaa dd MMM yyyy");
 
         dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
@@ -568,6 +567,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         if (s.getShippedFrom() == null || s.getShippedTo() == null) {
             return;
         }
+        final List<Alert> allAlerts = new LinkedList<>();
 
         final double lat0 = s.getShippedFrom().getLocation().getLatitude();
         double nlat = lat0 - s.getShippedTo().getLocation().getLatitude();
@@ -617,10 +617,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 ta.setShipment(s);
                 ta.setDevice(s.getDevice());
                 item.getAlerts().add(ta);
+                allAlerts.add(ta);
             }
 
             dto.getItems().add(item);
         }
+
+        dto.getAlertSummary().putAll(toSummaryMap(allAlerts));
     }
     /**
      * @param dtoOld
@@ -629,10 +632,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private SingleShipmentDtoNew createNewSingleShipmentDate(final Shipment shipment,
             final SingleShipmentDto dtoOld, final User user) {
         //"startTimeISO": "2014-08-12 12:10",
-        final DateFormat isoFmt = createDateFormat(user, "yyyy-MM-dd hh:mm");
+        final DateFormat isoFmt = createDateFormat(user, "yyyy-MM-dd ");
 
         //"startTimeStr": "19:00 12 AUG 14",
-        final DateFormat descriptionFmt = createDateFormat(user, "hh:mm dd MMM yy");
+        final DateFormat descriptionFmt = createDateFormat(user, " dd MMM yy");
 
         final SingleShipmentDtoNew dto = new SingleShipmentDtoNew();
         dto.setAlertProfileId(dtoOld.getAlertProfileId());
@@ -804,21 +807,21 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     }
     /**
      * @param s shipment.
-     * @param includeAlerts whether or not should include alerts.
+     * @param addAllReadings whether or not should include alerts.
      * @return single shipment data.
      */
-    private SingleShipmentDto getShipmentData(final Shipment s, final boolean includeAlerts) {
+    private SingleShipmentDto getShipmentData(final Shipment s) {
         final SingleShipmentDto dto = creatSingleShipmentDto(s);
 
+        //create best tracker event candidate/alert map
         final List<TrackerEvent> events = trackerEventDao.getEvents(s);
         for (final TrackerEvent e : events) {
             final SingleShipmentTimeItem item = new SingleShipmentTimeItem();
             item.setEvent(e);
             dto.getItems().add(item);
         }
-        Collections.sort(dto.getItems());
 
-        if (includeAlerts && events.size() > 0) {
+        if (events.size() > 0) {
             //add alerts
             final List<Alert> alerts = alertDao.getAlerts(s);
             for (final Alert alert : alerts) {

@@ -3,23 +3,26 @@
  */
 package com.visfresh.mpl.services;
 
+import java.util.Arrays;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.io.json.SmsSerializer;
-import com.visfresh.io.sms.SmsMessage;
-import com.visfresh.io.sms.SmsMessagingException;
-import com.visfresh.io.sms.SmsServiceHelper;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.SmsService;
 import com.visfresh.services.SystemMessageHandler;
+import com.visfresh.sms.SmsMessage;
+import com.visfresh.sms.SmsMessagingException;
+import com.visfresh.sms.SmsSender;
+import com.visfresh.sms.clicksend.ClickSendSmsAdapter;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -27,6 +30,7 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 @Component
+@ComponentScan(basePackageClasses = {ClickSendSmsAdapter.class})
 public class SmsServiceImpl implements SmsService, SystemMessageHandler {
     @Autowired
     private SmsMessageDispatcher dispatcher;
@@ -34,8 +38,8 @@ public class SmsServiceImpl implements SmsService, SystemMessageHandler {
      * The logger.
      */
     private static final Logger log = LoggerFactory.getLogger(SmsServiceImpl.class);
-
-    private final SmsServiceHelper helper = new SmsServiceHelper();
+    @Autowired
+    private SmsSender helper ;
     private final SmsSerializer serializer = new SmsSerializer();
 
     /**
@@ -46,8 +50,7 @@ public class SmsServiceImpl implements SmsService, SystemMessageHandler {
     /**
      * @param env spring environment.
      */
-    @Autowired
-    public SmsServiceImpl(final Environment env) {
+    public SmsServiceImpl() {
         super();
     }
     /* (non-Javadoc)
@@ -71,9 +74,8 @@ public class SmsServiceImpl implements SmsService, SystemMessageHandler {
         final SmsMessage m = serializer.parseSmsMessage(
                 SerializerUtils.parseJson(msg.getMessageInfo()));
         log.debug("SMS message dequeued: " + msg.getMessageInfo());
-
         try {
-            helper.sendMessage(m.getPhones(), m.getSubject(), m.getMessage());
+            helper.sendSms(Arrays.asList(m));
         } catch (final SmsMessagingException e) {
             log.error("Failed to send SMS", e);
             throw new RetryableException("Failed to send SMS", e);
