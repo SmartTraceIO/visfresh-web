@@ -76,6 +76,7 @@ import com.visfresh.utils.StringUtils;
 @RestController("Shipment")
 @RequestMapping("/rest")
 public class ShipmentController extends AbstractController implements ShipmentConstants {
+    private static final String ISO_FORMAT = "yyyy-MM-dd HH:mm";
     /**
      * Logger.
      */
@@ -470,7 +471,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setMinTemp(minTemp);
         dto.setMaxTemp(maxTemp);
 
-        final DateFormat isoFmt = createDateFormat(user, "yyyy-MM-dd HH:mm");
+        final DateFormat isoFmt = createDateFormat(user, ISO_FORMAT);
         final DateFormat prettyFmt = createDateFormat(user, "h:mmaa dd MMM yyyy");
 
         dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
@@ -632,10 +633,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private SingleShipmentDtoNew createNewSingleShipmentDate(final Shipment shipment,
             final SingleShipmentDto dtoOld, final User user) {
         //"startTimeISO": "2014-08-12 12:10",
-        final DateFormat isoFmt = createDateFormat(user, "yyyy-MM-dd ");
+        final DateFormat isoFmt = createDateFormat(user, ISO_FORMAT);
 
         //"startTimeStr": "19:00 12 AUG 14",
-        final DateFormat descriptionFmt = createDateFormat(user, " dd MMM yy");
+        final DateFormat descriptionFmt = createDateFormat(user, "HH:mm dd MMM yy");
 
         final SingleShipmentDtoNew dto = new SingleShipmentDtoNew();
         dto.setAlertProfileId(dtoOld.getAlertProfileId());
