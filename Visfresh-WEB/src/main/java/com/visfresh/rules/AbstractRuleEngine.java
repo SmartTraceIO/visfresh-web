@@ -131,8 +131,6 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                         + " has updated to " + shipment.getLastEventDate());
             }
         } finally {
-            //update history.
-            state.addToHistory(new TemperaturePoint(e.getTemperature(), e.getTime()));
             deviceDao.saveState(imei, state);
         }
     }
