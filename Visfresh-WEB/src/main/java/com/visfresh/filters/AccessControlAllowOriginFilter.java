@@ -4,7 +4,6 @@
 package com.visfresh.filters;
 
 import java.io.IOException;
-import java.util.Enumeration;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -52,14 +51,6 @@ public class AccessControlAllowOriginFilter implements Filter {
      */
     private void doFilter(final HttpServletRequest request, final HttpServletResponse response,
             final FilterChain chain) throws IOException, ServletException {
-        System.out.println("Context path: " + request.getContextPath());
-        System.out.println("Path info: " + request.getPathInfo());
-        final Enumeration<?> names = request.getHeaderNames();
-        while (names.hasMoreElements()) {
-            final String key = (String) names.nextElement();
-            System.out.println(key + ": " + request.getHeader(key));
-        }
-
         if (request.getHeader("origin") != null) {
             response.setHeader("Access-Control-Allow-Origin", "*");
         }
