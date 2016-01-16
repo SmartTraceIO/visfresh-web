@@ -7,23 +7,39 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.Shipment;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, LocationProfile, Long> {
+    private Device device;
     /**
      * Default constructor.
      */
     public LocationProfileDaoTest() {
         super(LocationProfileDao.class);
+    }
+
+    @Before
+    public void setUp() {
+        //create devcie.
+        device = new Device();
+        device.setName("JUnit device");
+        device.setCompany(sharedCompany);
+        device.setImei("0891237987987987");
+        device.setDescription("Test device");
+        device = getContext().getBean(DeviceDao.class).save(device);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()
@@ -77,6 +93,34 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
         left = companyDao.save(left);
 
         assertEquals(0, dao.findByCompany(left, null, null, null).size());
+    }
+    @Test
+    public void testGetOwnerShipments() {
+        //test null location
+        assertEquals(0, dao.getOwnerShipments(null).size());
+
+        createDefaultShipment();
+        final Shipment s2 = createDefaultShipment();
+        final Shipment s3 = createDefaultShipment();
+
+        final LocationProfile loc = createTestEntity();
+        dao.save(loc);
+
+        s2.setShippedFrom(loc);
+        s3.setShippedTo(loc);
+        getContext().getBean(ShipmentDao.class).save(Arrays.asList(s2, s3));
+
+        assertEquals(2, dao.getOwnerShipments(loc).size());
+    }
+    /**
+     * @return
+     */
+    private Shipment createDefaultShipment() {
+        final Shipment s = new Shipment();
+        s.setCompany(sharedCompany);
+        s.setDevice(device);
+        this.getContext().getBean(ShipmentDao.class).save(s);
+        return s;
     }
     /**
      * @param c

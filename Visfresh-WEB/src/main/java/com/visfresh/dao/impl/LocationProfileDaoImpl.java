@@ -4,6 +4,8 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.constants.LocationConstants;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.ShortShipmentInfo;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -132,6 +135,39 @@ public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<Locatio
         }
 
         return lp;
+    }
+
+    @Override
+    public List<ShortShipmentInfo> getOwnerShipments(final LocationProfile location) {
+        if (location == null || location.getId() == null) {
+            return new LinkedList<>();
+        }
+
+        //create request parameter map.
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("loc", location.getId());
+
+        //create SQL query
+        final String sql = "select "
+                + ShipmentDaoImpl.ID_FIELD + ", "
+                + ShipmentDaoImpl.DESCRIPTION_FIELD + ", "
+                + ShipmentDaoImpl.ISTEMPLATE_FIELD + " from " + ShipmentDaoImpl.TABLE
+                + " where " + ShipmentDaoImpl.SHIPPEDFROM_FIELD + " = :loc"
+                + " or " + ShipmentDaoImpl.SHIPPEDTO_FIELD + " = :loc"
+                + " group by " + ShipmentDaoImpl.ID_FIELD + " order by " + ShipmentDaoImpl.ID_FIELD;
+
+        //execute query
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+        final List<ShortShipmentInfo> info = new LinkedList<>();
+        for (final Map<String,Object> map : rows) {
+            final ShortShipmentInfo i = new ShortShipmentInfo();
+            i.setId(((Number) map.get(ShipmentDaoImpl.ID_FIELD)).longValue());
+            i.setShipmentDescription((String) map.get(ShipmentDaoImpl.DESCRIPTION_FIELD));
+            i.setTemplate((Boolean) map.get(ShipmentDaoImpl.ISTEMPLATE_FIELD));
+            info.add(i);
+        }
+
+        return info;
     }
 
     /* (non-Javadoc)

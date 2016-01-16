@@ -3,18 +3,25 @@
  */
 package com.visfresh.controllers;
 
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+
+import junit.framework.AssertionFailedError;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.constants.LocationConstants;
 import com.visfresh.controllers.restclient.LocationRestClient;
+import com.visfresh.dao.ShipmentDao;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.Shipment;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.SerializerUtils;
 
@@ -182,5 +189,71 @@ public class LocationControllerTest extends AbstractRestServiceTest {
 
         loc = client.getLocations(1, 10000, LocationConstants.PROPERTY_INTERIM_FLAG, "desc").get(lastIndex);
         assertEquals(p3.getId(), loc.getId());
+    }
+    @Test
+    public void testDeleteLocationInUseAsShippedFrom() {
+        //create location.
+        final LocationProfile loc = createLocationProfile(false);
+        loc.setName("c");
+        loc.setAddress("d");
+        loc.setCompanyName("a");
+        loc.setNotes("b");
+        loc.setRadius(1000);
+        loc.setStart(true);
+        loc.setStop(true);
+        loc.setInterim(true);
+        saveLocationDirectly(loc);
+
+        //create device
+        final Device device = createDevice("12345569989898", true);
+        //create owner shipment
+        final Shipment s = new Shipment();
+        s.setCompany(getCompany());
+        s.setDevice(device);
+        s.setShippedFrom(loc);
+        this.getContext().getBean(ShipmentDao.class).save(s);
+
+        String error = null;
+        try {
+            client.deleteLocation(loc.getId());
+            throw new AssertionFailedError("Exception should be thrown");
+        } catch (IOException | RestServiceException e) {
+            error = e.getMessage();
+        }
+
+        assertTrue(error.contains(s.getId().toString()));
+    }
+    @Test
+    public void testDeleteLocationInUseAsShippedTo() {
+        //create location.
+        final LocationProfile loc = createLocationProfile(false);
+        loc.setName("c");
+        loc.setAddress("d");
+        loc.setCompanyName("a");
+        loc.setNotes("b");
+        loc.setRadius(1000);
+        loc.setStart(true);
+        loc.setStop(true);
+        loc.setInterim(true);
+        saveLocationDirectly(loc);
+
+        //create device
+        final Device device = createDevice("12345569989898", true);
+        //create owner shipment
+        final Shipment s = new Shipment();
+        s.setCompany(getCompany());
+        s.setDevice(device);
+        s.setShippedTo(loc);
+        this.getContext().getBean(ShipmentDao.class).save(s);
+
+        String error = null;
+        try {
+            client.deleteLocation(loc.getId());
+            throw new AssertionFailedError("Exception should be thrown");
+        } catch (IOException | RestServiceException e) {
+            error = e.getMessage();
+        }
+
+        assertTrue(error.contains(s.getId().toString()));
     }
 }

@@ -3,6 +3,7 @@
  */
 package com.visfresh.controllers;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,12 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.LocationConstants;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.ShortShipmentInfo;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.LocationSerializer;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -151,14 +155,54 @@ public class LocationController extends AbstractController implements LocationCo
 
             final LocationProfile p = dao.findOne(locationId);
             checkCompanyAccess(user, p);
-            dao.delete(locationId);
+
+            //check in use
+            final List<ShortShipmentInfo> shipments = dao.getOwnerShipments(p);
+            if (!shipments.isEmpty()) {
+                return createErrorResponse(ErrorCodes.ENTITY_IN_USE, createLocationInUseMessage(shipments));
+            } else {
+                dao.delete(locationId);
+            }
 
             return createSuccessResponse(null);
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
             log.error("Failed to get location profiles", e);
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param list
+     * @return
+     */
+    private String createLocationInUseMessage(final List<ShortShipmentInfo> list) {
+        final List<Long> shipments = new LinkedList<>();
+        final List<Long> templates = new LinkedList<>();
+        for (final ShortShipmentInfo i : list) {
+            if (i.isTemplate()) {
+                templates.add(i.getId());
+            } else {
+                shipments.add(i.getId());
+            }
+        }
+
+        final StringBuilder sb = new StringBuilder("Location can't be deleted because is referenced by ");
+        if (!shipments.isEmpty()) {
+            sb.append("shipments (");
+            sb.append(StringUtils.combine(shipments, ", "));
+            sb.append(')');
+        }
+        if (!templates.isEmpty()) {
+            if (!shipments.isEmpty()) {
+                sb.append(" and");
+            }
+
+            sb.append("templates (");
+            sb.append(StringUtils.combine(templates, ", "));
+            sb.append(')');
+        }
+        return sb.toString();
+    }
+
     /**
      * @return default sort order.
      */

@@ -101,25 +101,27 @@ public abstract class AbstractController {
      * @param e
      * @return
      */
-    protected JsonObject createErrorResponse(final Exception e) {
-        final JsonObject obj = new JsonObject();
-        //add status
-        obj.add("status", createErrorStatus(e));
-        return obj;
-    }
-    /**
-     * @param errorCode error code.
-     * @param e error.
-     * @return encoded to JSON object error.
-     */
-    private JsonObject createErrorStatus(final Throwable e) {
+    protected JsonObject createErrorResponse(final Throwable e) {
         int code = -1;
         if (e instanceof AuthenticationException) {
             code = ErrorCodes.AUTHENTICATION_ERROR;
         } else if (e instanceof RestServiceException) {
             code = ((RestServiceException) e).getErrorCode();
         }
-        return SerializerUtils.createErrorStatus(code, e);
+        final String msg = e.getMessage() == null ? e.toString() : e.getMessage();
+        return createErrorResponse(code, msg);
+    }
+    /**
+     * @param code error code.
+     * @param msg error message.
+     * @return error response object.
+     */
+    protected JsonObject createErrorResponse(final int code, final String msg) {
+        final JsonObject obj = new JsonObject();
+        //add status
+        final JsonObject status =  SerializerUtils.createErrorStatus(code, msg);
+        obj.add("status", status);
+        return obj;
     }
     /**
      * @param code status code.

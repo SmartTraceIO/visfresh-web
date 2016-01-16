@@ -25,13 +25,13 @@ public final class SerializerUtils {
     }
     /**
      * @param errorCode error code.
-     * @param e error.
-     * @return encoded to JSON object error.
+     * @param msg error message.
+     * @return error object.
      */
-    public static JsonObject createErrorStatus(final int errorCode, final Throwable e) {
+    public static JsonObject createErrorStatus(final int errorCode, final String msg) {
         final JsonObject obj = new JsonObject();
         obj.addProperty("code", errorCode);
-        obj.addProperty("message", e.getMessage() == null ? e.toString() : e.getMessage());
+        obj.addProperty("message", msg);
         return obj;
     }
     /**
