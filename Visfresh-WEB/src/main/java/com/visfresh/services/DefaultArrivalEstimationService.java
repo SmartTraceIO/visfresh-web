@@ -43,15 +43,17 @@ public class DefaultArrivalEstimationService implements
                 return new ArrivalEstimation(new Date(currentTime.getTime()), 100);
             }
 
+            //calculate speed.
+            final double v = LocationUtils.getDistanceMeters(
+                    currentLocation.getLatitude(), currentLocation.getLongitude(),
+                    from.getLatitude(), from.getLongitude())
+                    / (currentTime.getTime() - startDate.getTime());
+            //calculate reminder distance
             final double reminder = LocationUtils.getDistanceMeters(
                     currentLocation.getLatitude(), currentLocation.getLongitude(),
                     to.getLatitude(), to.getLongitude());
-            if (allPath == reminder) {
-                return null;
-            }
 
-            final long dt = (long) (reminder * (currentTime.getTime() - startDate.getTime())
-                    / (allPath - reminder));
+            final long dt = (long) (reminder / v);
             return new ArrivalEstimation(
                     new Date(currentTime.getTime() + dt),
                     (int) Math.round((allPath - reminder) / allPath));

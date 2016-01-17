@@ -6,6 +6,8 @@ package com.visfresh.services;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.junit.Before;
@@ -83,6 +85,24 @@ public class DefaultArrivalEstimationServiceTest {
         assertTrue(startDate.before(est.getArrivalDate()));
         assertTrue(est.getPercentageComplete() > 0);
     }
+    @Test
+    //the dates have been got from estimation bug
+    public void testEstimationBug() throws ParseException {
+        final Date shipmentDate = parseDate("2016-01-16 18:46:00");
+
+        final Location currentLocation = new Location(-33.8885, 151.1625);
+        final Date currentTime = parseDate("2016-01-17 06:26:00");
+
+        final Shipment s = new Shipment();
+        s.setShipmentDate(shipmentDate);
+        s.setShippedFrom(createLocation(-33.886327594596395, 151.16012692451477));
+        s.setShippedTo(createLocation(-37.704684495316705, 145.162353515625));
+
+        final ArrivalEstimation eta = new DefaultArrivalEstimationService().estimateArrivalDate(
+                s, currentLocation, currentTime);
+
+        assertTrue(eta.getArrivalDate().after(parseDate("2016-01-16 18:46:00")));
+    }
     /**
      * @param from
      * @param to
@@ -101,17 +121,28 @@ public class DefaultArrivalEstimationServiceTest {
         return s;
     }
 
+    private static Date parseDate(final String dateStr) throws ParseException {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
+    }
     /**
-     * @param loc
-     * @return
+     * @param loc the location.
+     * @return location profile.
      */
     protected LocationProfile createLocation(final Location loc) {
+        return createLocation(loc.getLatitude(), loc.getLongitude());
+    }
+    /**
+     * @param lat
+     * @param lon
+     * @return
+     */
+    protected LocationProfile createLocation(final double lat, final double lon) {
         final LocationProfile p = new LocationProfile();
-        p.setName("JUnit location");
+        p.setName("JUnit location: " + lat + ", " + lon);
         p.setAddress("Any JUnit place");
         p.setStart(true);
-        p.getLocation().setLatitude(loc.getLatitude());
-        p.getLocation().setLongitude(loc.getLongitude());
+        p.getLocation().setLatitude(lat);
+        p.getLocation().setLongitude(lon);
         return p;
     }
 }
