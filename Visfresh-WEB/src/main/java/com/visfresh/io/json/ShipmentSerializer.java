@@ -621,10 +621,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         if (isNotSibling) {
             json.addProperty("alertYetToFire", dto.getAlertYetToFire());
 
-            //"arrivalNotificationTimeStr": "9:00am 12 AUG 2014",
-            // NEW - the actual time arrival notification was sent out
-            json.addProperty("arrivalNotificationTimeStr", dto.getArrivalNotificationTimeStr());
-
             //"arrivalNotificationTimeISO": "2014-08-12 12:10",
             // NEW - ISO for actual time arrival notification sent out
             json.addProperty("arrivalNotificationTimeISO", dto.getArrivalNotificationTimeIso());
@@ -645,24 +641,19 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.add("arrivalNotificationSchedules", array);
             json.addProperty("shutdownDeviceAfterMinutes", dto.getShutdownDeviceAfterMinutes());
 
-            json.addProperty("shutdownTimeStr", dto.getShutdownTimeStr());
             json.addProperty("shutdownTimeISO", dto.getShutdownTimeIso());
 
             json.addProperty("startLocation", dto.getStartLocation());
-            json.addProperty("startTimeStr", dto.getStartTimeStr());
             json.addProperty("startTimeISO", dto.getStartTimeISO());
             json.add("startLocationForMap", toJson(dto.getStartLocationForMap()));
 
             json.addProperty("endLocation", dto.getEndLocation());
-            json.addProperty("etaStr", dto.getEtaStr());
             json.addProperty("etaISO", dto.getEta());
 
-            json.addProperty("arrivalTimeStr", dto.getArrivalTimeStr());
             json.addProperty("arrivalTimeISO", dto.getArrivalTimeIso());
             json.add("endLocationForMap", toJson(dto.getEndLocationForMap()));
 
             json.addProperty("lastReadingLocation", dto.getCurrentLocation());
-            json.addProperty("lastReadingTimeStr", dto.getLastReadingTimeStr());
             json.addProperty("lastReadingTimeISO", dto.getLastReadingTimeIso());
             json.addProperty("lastReadingTemperature", convertTemperature(dto.getLastReadingTemperature()));
 
@@ -673,13 +664,13 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("firstReadingTimeISO", dto.getTimeOfFirstReading());
         }
 
-        final JsonArray locations = new JsonArray();
-        for (final SingleShipmentLocation l : dto.getLocations()) {
-            locations.add(toJson(l, isNotSibling));
-        }
-        json.add(isNotSibling ? "locations" : "readings", locations);
-
         if (isNotSibling) {
+            final JsonArray locations = new JsonArray();
+            for (final SingleShipmentLocation l : dto.getLocations()) {
+                locations.add(toJson(l));
+            }
+            json.add("locations", locations);
+
             final JsonArray siblings = new JsonArray();
             for (final SingleShipmentDtoNew sibling: dto.getSiblings()) {
                 siblings.add(toJson(sibling, false));
@@ -722,19 +713,16 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
     /**
      * @param l location.
-     * @param isNotSibling is not sibling flag.
      * @return
      */
-    private JsonObject toJson(final SingleShipmentLocation l, final boolean isNotSibling) {
+    private JsonObject toJson(final SingleShipmentLocation l) {
         if (l == null) {
             return null;
         }
 
         final JsonObject json = new JsonObject();
-        if (isNotSibling) {
-            json.addProperty("lat", l.getLatitude());
-            json.addProperty("long", l.getLongitude());
-        }
+        json.addProperty("lat", l.getLatitude());
+        json.addProperty("long", l.getLongitude());
         json.addProperty("temperature", convertTemperature(l.getTemperature()));
         json.addProperty("timeISO", l.getTimeIso());
 

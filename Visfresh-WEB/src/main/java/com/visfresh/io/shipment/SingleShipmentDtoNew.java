@@ -36,11 +36,9 @@ public class SingleShipmentDtoNew {
     private final List<ListNotificationScheduleItem> arrivalNotificationSchedules = new LinkedList<>();
     private Integer shutdownDeviceAfterMinutes;
     private String startLocation;
-    private String startTimeStr;
     private String startTimeISO;
     private String endLocation;
     private String eta;
-    private String etaStr;
     private String currentLocation;
     private Location startLocationForMap;
     private Location endLocationForMap;
@@ -56,13 +54,9 @@ public class SingleShipmentDtoNew {
     private String alertProfileName;
     private final Set<AlertType> alertSummary = new HashSet<>();
     private String alertYetToFire;
-    private String arrivalNotificationTimeStr;
     private String arrivalNotificationTimeIso;
-    private String shutdownTimeStr;
     private String shutdownTimeIso;
-    private String arrivalTimeStr;
     private String arrivalTimeIso;
-    private String lastReadingTimeStr;
     private String lastReadingTimeIso;
     private double lastReadingTemperature;
     private String siblingColor;
@@ -277,18 +271,6 @@ public class SingleShipmentDtoNew {
         this.startLocation = startLocation;
     }
     /**
-     * @return the startTimeStr
-     */
-    public String getStartTimeStr() {
-        return startTimeStr;
-    }
-    /**
-     * @param startTimeStr the startTimeStr to set
-     */
-    public void setStartTimeStr(final String startTimeStr) {
-        this.startTimeStr = startTimeStr;
-    }
-    /**
      * @return the startTimeISO
      */
     public String getStartTimeISO() {
@@ -323,18 +305,6 @@ public class SingleShipmentDtoNew {
      */
     public void setEta(final String eta) {
         this.eta = eta;
-    }
-    /**
-     * @return the etaStr
-     */
-    public String getEtaStr() {
-        return etaStr;
-    }
-    /**
-     * @param etaStr the etaStr to set
-     */
-    public void setEtaStr(final String etaStr) {
-        this.etaStr = etaStr;
     }
     /**
      * @return the currentLocation
@@ -482,18 +452,6 @@ public class SingleShipmentDtoNew {
         this.alertYetToFire = alertYetToFire;
     }
     /**
-     * @return the arrivalNotificationTimeStr
-     */
-    public String getArrivalNotificationTimeStr() {
-        return arrivalNotificationTimeStr;
-    }
-    /**
-     * @param arrivalNotificationTimeStr the arrivalNotificationTimeStr to set
-     */
-    public void setArrivalNotificationTimeStr(final String arrivalNotificationTimeStr) {
-        this.arrivalNotificationTimeStr = arrivalNotificationTimeStr;
-    }
-    /**
      * @return the arrivalNotificationTimeIso
      */
     public String getArrivalNotificationTimeIso() {
@@ -504,18 +462,6 @@ public class SingleShipmentDtoNew {
      */
     public void setArrivalNotificationTimeIso(final String arrivalNotificationTimeIso) {
         this.arrivalNotificationTimeIso = arrivalNotificationTimeIso;
-    }
-    /**
-     * @return shutdown time displyable string.
-     */
-    public String getShutdownTimeStr() {
-        return shutdownTimeStr;
-    }
-    /**
-     * @param time shutdown time displyable string.
-     */
-    public void setShutdownTimeStr(final String time) {
-        this.shutdownTimeStr = time;
     }
     /**
      * @return shutdown time ISO string.
@@ -530,18 +476,6 @@ public class SingleShipmentDtoNew {
         this.shutdownTimeIso = time;
     }
     /**
-     * @return arrival time pretty string.
-     */
-    public String getArrivalTimeStr() {
-        return arrivalTimeStr;
-    }
-    /**
-     * @param time arrival time pretty string.
-     */
-    public void setArrivalTimeStr(final String time) {
-        this.arrivalTimeStr = time;
-    }
-    /**
      * @return arrival time ISO string.
      */
     public String getArrivalTimeIso() {
@@ -552,18 +486,6 @@ public class SingleShipmentDtoNew {
      */
     public void setArrivalTimeIso(final String time) {
         this.arrivalTimeIso = time;
-    }
-    /**
-     * @return last event time in pretty format.
-     */
-    public String getLastReadingTimeStr() {
-        return lastReadingTimeStr;
-    }
-    /**
-     * @param time last event time in pretty format.
-     */
-    public void setLastReadingTimeStr(final String time) {
-        this.lastReadingTimeStr = time;
     }
     /**
      * @return last event time in ISO format.

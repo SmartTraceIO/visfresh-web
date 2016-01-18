@@ -472,16 +472,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setMaxTemp(maxTemp);
 
         final DateFormat isoFmt = createDateFormat(user, ISO_FORMAT);
-        final DateFormat prettyFmt = createDateFormat(user, "h:mmaa dd MMM yyyy");
 
         dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
 
         //last readings
         if (lastReadingTemperature != null) {
             final Date lastReadingTime = new Date(timeOfFirstReading);
-
             dto.setLastReadingTimeIso(isoFmt.format(lastReadingTime));
-            dto.setLastReadingTimeStr(prettyFmt.format(lastReadingTime));
             dto.setLastReadingTemperature(lastReadingTemperature.doubleValue());
         }
 
@@ -491,22 +488,14 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         final Arrival arrival = getArrival(dtoOld);
         if (arrival != null) {
-            //"arrivalNotificationTimeStr": "9:00am 12 AUG 2014",
-            // NEW - the actual time arrival notification was sent out
-            dto.setArrivalNotificationTimeStr(prettyFmt.format(arrival.getDate()));
-
             //"arrivalNotificationTimeISO": "2014-08-12 12:10",
             // NEW - ISO for actual time arrival notification sent out
             dto.setArrivalNotificationTimeIso(isoFmt.format(arrival.getDate()));
-
-            //TODO fix in future
             dto.setArrivalTimeIso(dto.getArrivalNotificationTimeIso());
-            dto.setArrivalTimeStr(dto.getArrivalNotificationTimeStr());
         }
 
         final Date shutdownTime = s.getDeviceShutdownTime();
         if (shutdownTime != null) {
-            dto.setShutdownTimeStr(prettyFmt.format(shutdownTime));
             dto.setShutdownTimeIso(isoFmt.format(shutdownTime));
         }
 
@@ -635,9 +624,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         //"startTimeISO": "2014-08-12 12:10",
         final DateFormat isoFmt = createDateFormat(user, ISO_FORMAT);
 
-        //"startTimeStr": "19:00 12 AUG 14",
-        final DateFormat descriptionFmt = createDateFormat(user, "HH:mm dd MMM yy");
-
         final SingleShipmentDtoNew dto = new SingleShipmentDtoNew();
         dto.setAlertProfileId(dtoOld.getAlertProfileId());
         dto.setAlertProfileName(dtoOld.getAlertProfileName());
@@ -668,10 +654,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 final ArrivalEstimation estimation = arrivalEstimationService.estimateArrivalDate(
                         shipment, dto.getCurrentLocationForMap(), new Date());
                 if (estimation != null) {
-                    //"eta": "2014-08-12 21:40",
                     dto.setEta(isoFmt.format(estimation.getArrivalDate()));
-                    //"etaStr": "21:40 12 AUG 14",
-                    dto.setEtaStr(descriptionFmt.format(estimation.getArrivalDate()));
                     dto.setPercentageComplete(estimation.getPercentageComplete());
                 }
             }
@@ -691,8 +674,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         final Date date = shipment.getShipmentDate();
 
         dto.setStartTimeISO(isoFmt.format(date));
-        dto.setStartTimeStr(descriptionFmt.format(date));
-
         dto.setStatus(shipment.getStatus());
         dto.setTripCount(dtoOld.getTripCount());
 
