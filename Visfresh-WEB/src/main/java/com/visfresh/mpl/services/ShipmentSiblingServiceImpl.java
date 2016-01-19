@@ -4,11 +4,7 @@
 package com.visfresh.mpl.services;
 
 
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
@@ -146,33 +142,5 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
             return siblingDetector.getSiblingCount(s);
         }
         return count;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.ShipmentSiblingService#getSiblingColors(com.visfresh.entities.Shipment, java.util.List)
-     */
-    @Override
-    public Map<Long, Color> getSiblingColors(final Shipment masterShipment, final List<Shipment> siblings) {
-        // add master color
-        final Map<Long, Color> map = new HashMap<>();
-        map.put(masterShipment.getId(), Color.GREEN);
-
-        //create color list
-        final LinkedList<Color> colors = new LinkedList<Color>();
-        colors.add(Color.BLUE);
-        colors.add(Color.CYAN);
-        colors.add(Color.GRAY);
-        colors.add(Color.MAGENTA);
-        colors.add(Color.ORANGE);
-        colors.add(Color.PINK);
-        colors.add(Color.RED);
-        colors.add(Color.YELLOW);
-
-        for (final Shipment s : siblings) {
-            final Color color = colors.removeFirst();
-            map.put(s.getId(), color);
-            colors.add(color);
-        }
-
-        return map;
     }
 }

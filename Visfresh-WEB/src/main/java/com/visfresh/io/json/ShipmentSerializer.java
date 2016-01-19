@@ -588,7 +588,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("deviceName", dto.getDeviceName());
         }
         json.addProperty("tripCount", dto.getTripCount()); /*+*/
-        json.addProperty("siblingColor", dto.getSiblingColor());
 
         if (isNotSibling) {
             json.addProperty("shipmentDescription", dto.getShipmentDescription());

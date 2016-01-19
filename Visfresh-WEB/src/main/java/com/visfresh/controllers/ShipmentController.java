@@ -6,7 +6,6 @@ package com.visfresh.controllers;
 
 import static com.visfresh.utils.DateTimeUtils.createDateFormat;
 
-import java.awt.Color;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -406,27 +405,12 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 dto.getSiblings().add(createDto(sibling, user));
             }
 
-            //assign sibling colors
-            assingSiblingColors(dto, siblingService.getSiblingColors(s, siblings));
-
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
     }
-    /**
-     * @param shipment
-     * @param siblingColors sibling color map.
-     */
-    private void assingSiblingColors(
-            final SingleShipmentDtoNew shipment, final Map<Long, Color> siblingColors) {
-        shipment.setSiblingColor(StringUtils.toHtmlColor(siblingColors.get(shipment.getShipmentId())));
-        for (final SingleShipmentDtoNew sibling : shipment.getSiblings()) {
-            sibling.setSiblingColor(StringUtils.toHtmlColor(siblingColors.get(sibling.getShipmentId())));
-        }
-    }
-
     /**
      * @param s
      * @param user
