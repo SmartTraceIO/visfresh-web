@@ -341,12 +341,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         alertDao.save(alert);
 
         assertEquals(1, shipmentClient.getShipments(req).size());
-
-        //move alert to out of date ranges
-        alert.setDate(new Date(System.currentTimeMillis() - 18 * oneDay));
-        alertDao.save(alert);
-
-        assertEquals(0, shipmentClient.getShipments(req).size());
     }
     @Test
     public void testSaveEmpty() throws RestServiceException, IOException {

@@ -408,15 +408,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         super.addFiltesForFindAll(filter, params, filters);
 
         if (Boolean.TRUE.equals(value)) {
-            final String keyStartDate = DEFAULT_FILTER_KEY_PREFIX + "alertsOnlyStartDate";
-            final String keyEndDate = DEFAULT_FILTER_KEY_PREFIX + "alertsOnlyEndDate";
-
-            final String sql = "(select count(*) > 0 as hasAlerts from alerts"
-                    + " where alerts.shipment = shipments.id"
-                    + " and alerts.date >= :" + keyStartDate + " and alerts.date <= :" + keyEndDate + ")";
-            filters.add(sql);
-            params.put(keyStartDate, filter.getFilter(ShipmentConstants.PROPERTY_SHIPPED_FROM_DATE));
-            params.put(keyEndDate, filter.getFilter(ShipmentConstants.PROPERTY_SHIPPED_TO_DATE));
+            filters.add("exists (select * from alerts where alerts.shipment = shipments.id)");
         }
     }
 }

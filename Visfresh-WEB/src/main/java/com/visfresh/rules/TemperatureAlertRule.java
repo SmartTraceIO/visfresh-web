@@ -16,6 +16,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.rules.state.DeviceState;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -47,7 +48,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#getName()
      */
     @Override
-    public String getName() {
+    public final String getName() {
         return NAME;
     }
 
@@ -66,8 +67,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         for (final AlertRule rule : event.getShipment().getAlertProfile().getAlertRules()) {
 
             //if rule is not already processed. Each rule should be processed one time.
-            final Map<String, String> props = context.getState().getTemperatureAlerts().getProperties();
-            if (!"true".equals(props.get(createProcessedKey(rule)))) {
+            if (!isProcessedRule(context.getState(), rule)) {
                 final boolean isCumulative = rule.isCumulativeFlag();
                 if (isMatches(rule, t)) {
                     Alert a = null;
@@ -88,6 +88,8 @@ public class TemperatureAlertRule extends AbstractAlertRule {
                 } else {
                     if (!isCumulative) {
                         //clear first issue date
+                        final Map<String, String> props = context.getState().getTemperatureAlerts()
+                                .getProperties();
                         props.remove(creaeStartIssueKey(rule));
                     }
                 }
@@ -95,6 +97,16 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         }
 
         return alerts.toArray(new Alert[alerts.size()]);
+    }
+
+    /**
+     * @param state TODO
+     * @param rule
+     * @return
+     */
+    public static boolean isProcessedRule(final DeviceState state,
+            final AlertRule rule) {
+        return "true".equals(state.getTemperatureAlerts().getProperties().get(createProcessedKey(rule)));
     }
 
     /**
@@ -172,7 +184,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param rule
      * @return
      */
-    protected String createProcessedKey(final AlertRule rule) {
+    protected static String createProcessedKey(final AlertRule rule) {
         final String ruleKey = createBaseRuleKey(rule);
         return ruleKey + "_processed";
     }
@@ -181,8 +193,8 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param rule
      * @return
      */
-    protected String createBaseRuleKey(final AlertRule rule) {
-        return getName() + "_" + rule.getType() + "_" + rule.getId();
+    protected static String createBaseRuleKey(final AlertRule rule) {
+        return NAME + "_" + rule.getType() + "_" + rule.getId();
     }
 
     /**
