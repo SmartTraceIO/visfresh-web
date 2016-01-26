@@ -463,7 +463,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             dto.setLastReadingTemperature(lastReadingTemperature.doubleValue());
         }
 
-        dto.setPercentageComplete(dtoOld.getPercentageComplete());
         dto.getAlertSummary().addAll(dtoOld.getAlertSummary().keySet());
         dto.setAlertYetToFire(buildAlertYetToFire(s.getAlertProfile(), user));
 
