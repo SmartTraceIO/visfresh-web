@@ -18,6 +18,11 @@ import com.visfresh.utils.LocationUtils;
 @Component
 public class DefaultArrivalEstimationService implements
         ArrivalEstimationService {
+
+    /**
+     * 60 km/h as meters/milliseconds
+     */
+    private static final double V_60_KM_H = 60. * 1000 / (60 * 60 * 1000);
     /**
      * Default constructor.
      */
@@ -44,10 +49,13 @@ public class DefaultArrivalEstimationService implements
             }
 
             //calculate speed.
-            final double v = LocationUtils.getDistanceMeters(
+            double v = LocationUtils.getDistanceMeters(
                     currentLocation.getLatitude(), currentLocation.getLongitude(),
                     from.getLatitude(), from.getLongitude())
                     / (currentTime.getTime() - startDate.getTime());
+            //v should be not less then 60km/h
+            v = Math.max(V_60_KM_H, v);
+
             //calculate reminder distance
             final double reminder = LocationUtils.getDistanceMeters(
                     currentLocation.getLatitude(), currentLocation.getLongitude(),
