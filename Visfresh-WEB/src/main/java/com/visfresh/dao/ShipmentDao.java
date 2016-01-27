@@ -33,4 +33,9 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @return list of siblings in given group
      */
     List<Shipment> getSiblingGroup(Long siblingGroup);
+    /**
+     * @param siblingGroup sibling group.
+     * @return count of siblings on given group.
+     */
+    int getGroupSize(Long siblingGroup);
 }

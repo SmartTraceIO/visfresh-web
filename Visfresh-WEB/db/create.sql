@@ -223,6 +223,7 @@ create table shipments (
     tripcount int not null default 0,
     `status` varchar(31) default null,
     siblinggroup bigint(20) default null,
+    siblingcount int not null default 0,
     foreign key (device)
         references devices (imei)
 );

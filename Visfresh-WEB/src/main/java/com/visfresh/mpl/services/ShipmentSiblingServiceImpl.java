@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Shipment;
 import com.visfresh.mpl.services.siblings.DefaultSiblingDetector;
-import com.visfresh.mpl.services.siblings.TestSiblingDetector;
 import com.visfresh.services.ShipmentSiblingService;
 
 /**
@@ -34,8 +33,6 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
      */
     private static final Logger log = LoggerFactory.getLogger(ShipmentSiblingServiceImpl.class);
 
-    @Autowired
-    private TestSiblingDetector testDetector;
     @Autowired
     private DefaultSiblingDetector siblingDetector;
 
@@ -125,11 +122,6 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
      */
     @Override
     public List<Shipment> getSiblings(final Shipment shipment) {
-        final List<Shipment> siblings = testDetector.getSiblings(shipment);
-        if (!siblings.isEmpty()) {
-            return siblings;
-        }
-
         return siblingDetector.getSiblings(shipment);
     }
     /* (non-Javadoc)
@@ -137,10 +129,6 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
      */
     @Override
     public int getSiblingCount(final Shipment s) {
-        final int count = testDetector.getSiblingCount(s);
-        if (count == 0) {
-            return siblingDetector.getSiblingCount(s);
-        }
-        return count;
+        return s.getSiblingCount();
     }
 }

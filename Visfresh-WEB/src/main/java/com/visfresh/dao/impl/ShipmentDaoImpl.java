@@ -41,6 +41,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     private static final String STATUS_FIELD = "status";
     private static final String DEVICE_FIELD = "device";
     private static final String SIBLINGGROUP_FIELD = "siblinggroup";
+    private static final String SIBLINGCOUNT_FIELD = "siblingcount";
     private static final String ASSETTYPE_FIELD = "assettype";
     private static final String LASTEVENT_FIELD = "lasteventdate";
     private static final String DEVICESHUTDOWNDATE_FIELD = "deviceshutdowndate";
@@ -140,6 +141,26 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
 
         return result;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#getSiblingCount(java.lang.Long)
+     */
+    @Override
+    public int getGroupSize(final Long siblingGroup) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("siblings", siblingGroup);
+
+        final String sql = "select s."
+                + SIBLINGCOUNT_FIELD
+                + " as count from " + TABLE + " s"
+                + " where"
+                + " s." + SIBLINGGROUP_FIELD + " = :siblings"
+                + " limit 1";
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+        if (rows.isEmpty()) {
+            return 0;
+        }
+        return ((Number) rows.get(0).get("count")).intValue() + 1;
+    }
     /**
      * @param params
      * @return
@@ -217,6 +238,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         if (num != null) {
             e.setSiblingGroup(num.longValue());
         }
+        e.setSiblingCount(((Number) map.get(SIBLINGCOUNT_FIELD)).intValue());
         e.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         e.setPoNum(((Number) map.get(PONUM_FIELD)).intValue());
         e.setAssetType((String) map.get(ASSETTYPE_FIELD));
@@ -247,6 +269,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(TRIPCOUNT_FIELD, s.getTripCount());
         params.put(DEVICE_FIELD, s.getDevice().getId());
         params.put(SIBLINGGROUP_FIELD, s.getSiblingGroup());
+        params.put(SIBLINGCOUNT_FIELD, s.getSiblingCount());
         params.put(ASSETTYPE_FIELD, s.getAssetType());
         return params;
     }

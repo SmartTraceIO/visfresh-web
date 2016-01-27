@@ -56,6 +56,7 @@ public class Shipment extends ShipmentBase {
     private ShipmentStatus status = ShipmentStatus.Default;
     private Date deviceShutdownTime;
     private Long siblingGroup;
+    private int siblingCount;
 
     /**
      * Default constructor.
@@ -205,5 +206,17 @@ public class Shipment extends ShipmentBase {
      */
     public void setSiblingGroup(final Long siblingGroup) {
         this.siblingGroup = siblingGroup;
+    }
+    /**
+     * @param count sibling count.
+     */
+    public void setSiblingCount(final int count) {
+        this.siblingCount = count;
+    }
+    /**
+     * @return the siblingCount
+     */
+    public int getSiblingCount() {
+        return siblingCount;
     }
 }

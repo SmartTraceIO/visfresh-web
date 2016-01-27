@@ -191,6 +191,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.getArrivalNotificationSchedules().add(arrivalSched);
         s.setCommentsForReceiver("commentsForReceiver");
         s.setSiblingGroup(77l);
+        s.setSiblingCount(11);
         return s;
     }
 
@@ -220,6 +221,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(1, s.getArrivalNotificationSchedules().size());
         assertEquals("commentsForReceiver", s.getCommentsForReceiver());
         assertEquals(77l, s.getSiblingGroup().longValue());
+        assertEquals(11, s.getSiblingCount());
     }
 
     @Test
@@ -377,7 +379,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(2, dao.getSiblingGroup(g1).size());
         assertEquals(0, dao.getSiblingGroup(1l).size());
     }
-
     /**
      * @param c company.
      * @param group sibling group.

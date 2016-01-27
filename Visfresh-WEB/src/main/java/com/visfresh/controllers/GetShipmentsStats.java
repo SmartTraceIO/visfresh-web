@@ -92,14 +92,14 @@ public class GetShipmentsStats {
     public String buildStats() {
         final StringBuilder sb = new StringBuilder(">>> Statistics for getShipments method:\n");
         final long shipmentsTotal = this.getShipmentEnd - this.getShipmentsStart;
-        sb.append("fetch shipments by filter: total=");
+        sb.append("fetch shipments by filter: total time=");
         sb.append(shipmentsTotal).append(" ms, avg=");
         if (alertStarts.isEmpty()) {
             sb.append(0);
         } else {
-            sb.append(shipmentsTotal / alertStarts.size());
+            sb.append((double) shipmentsTotal / alertStarts.size());
         }
-        sb.append(" ms\n");
+        sb.append(" ms").append(", number of shipments=" + alertStarts.size()).append('\n');
 
         sb.append("get alerts: ");
         buildStats(sb, alertStarts, alertEnds);

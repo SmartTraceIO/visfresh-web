@@ -109,6 +109,11 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         assertEquals(1l, master.getSiblingGroup().longValue());
         assertEquals(1l, sibling.getSiblingGroup().longValue());
         assertEquals(3l, notSibling.getSiblingGroup().longValue());
+
+        //check sibling count
+        assertEquals(1, getSiblingCount(master));
+        assertEquals(1, getSiblingCount(sibling));
+        assertEquals(0, getSiblingCount(notSibling));
     }
 
     /**

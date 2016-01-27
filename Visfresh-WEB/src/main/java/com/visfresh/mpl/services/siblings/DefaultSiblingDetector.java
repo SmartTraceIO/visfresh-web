@@ -40,6 +40,11 @@ public class DefaultSiblingDetector implements SiblingDetector {
     private static final Logger log = LoggerFactory.getLogger(DefaultSiblingDetector.class);
     protected static final double MAX_DISTANCE = 3000; //meters
     /**
+     * Group name prefix.
+     */
+    private static final String GROUP_PREFIX = "siblingGroup_";
+
+    /**
      * Number of sibling detection threads.
      */
     private int numberOfThreads = 1;
@@ -83,8 +88,8 @@ public class DefaultSiblingDetector implements SiblingDetector {
      * @see com.visfresh.services.SiblingDetectorService#getSiblingCount(com.visfresh.entities.Shipment)
      */
     @Override
-    public int getSiblingCount(final Shipment s) {
-        return getSiblings(s).size();
+    public int getSiblingCount(final Shipment shipment) {
+        return shipment.getSiblingCount();
     }
 
     public void detectSiblings() {
@@ -141,30 +146,35 @@ public class DefaultSiblingDetector implements SiblingDetector {
                 if (groupId == null) {
                     //if the group ID is null, assign it to master shipment ID.
                     groupId = master.getId();
-                    master.setSiblingGroup(groupId);
-                    saveShipment(master);
                 }
+
+                final List<Shipment> group = new LinkedList<>();
+                group.add(master);
 
                 //save group ID as already used
                 alreadyUsedGroups.add(groupId);
 
                 final TrackerEvent[] masterEvents = getTrackeEvents(master);
-                if (masterEvents.length > 0) {
-                    //find siblings for given shipment
-                    final Iterator<Shipment> iter = shipments.iterator();
-                    while (iter.hasNext()) {
-                        final Shipment s = iter.next();
-                        if (isSiblings(s, masterEvents)) {
-                            count++;
-                            iter.remove();
+                //find siblings for given shipment
+                final Iterator<Shipment> iter = shipments.iterator();
+                while (iter.hasNext()) {
+                    final Shipment s = iter.next();
+                    if (isSiblings(s, master, masterEvents)) {
+                        count++;
+                        iter.remove();
+                        group.add(s);
+                    }
+                }
 
-                            //set sibling group ID to sibling
-                            final Long oldId = s.getSiblingGroup();
-                            if (oldId == null || !oldId.equals(groupId)) {
-                               s.setSiblingGroup(groupId);
-                               saveShipment(s);
-                            }
-                        }
+                //save shipments if required.
+                final int siblingCount = count - 1;
+                for (final Shipment s : group) {
+                    //set sibling group ID to sibling
+                    final Long oldId = s.getSiblingGroup();
+                    if (s.getSiblingCount() != siblingCount || oldId == null || !oldId.equals(groupId)) {
+                       s.setSiblingGroup(groupId);
+                       s.setSiblingCount(siblingCount);
+                       saveShipment(s);
                     }
                 }
 
@@ -173,6 +183,29 @@ public class DefaultSiblingDetector implements SiblingDetector {
         }
 
         log.debug("End of search shipment siblings for company " + company.getName());
+    }
+
+    /**
+     * @param s shipment to test.
+     * @param master master shipment.
+     * @param masterEvents master shipment events.
+     * @return
+     */
+    private boolean isSiblings(final Shipment s, final Shipment master,
+            final TrackerEvent[] masterEvents) {
+        //check test group
+        final String masterTestGroup = getSiblingTestGroup(master);
+        final String testGroup = getSiblingTestGroup(s);
+
+        if (testGroup != null) {
+            return testGroup.equals(masterTestGroup);
+        }
+
+        //check ordinary group
+        if (masterEvents.length > 0) {
+            return isSiblings(s, masterEvents);
+        }
+        return false;
     }
 
     /**
@@ -329,5 +362,20 @@ public class DefaultSiblingDetector implements SiblingDetector {
                 break;
             }
         }
+    }
+    /**
+     * @param shipment
+     * @return
+     */
+    private String getSiblingTestGroup(final Shipment shipment) {
+        final String desc = shipment.getShipmentDescription();
+        if (desc != null) {
+            for (final String seg: desc.split("[^\\w]+")) {
+                if (seg.startsWith(GROUP_PREFIX)) {
+                    return seg.substring(GROUP_PREFIX.length());
+                }
+            }
+        }
+        return null;
     }
 }
