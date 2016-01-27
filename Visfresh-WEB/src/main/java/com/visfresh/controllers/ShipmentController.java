@@ -106,28 +106,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     @Autowired
     private ShipmentSiblingService siblingService;
 
-//    //start time
-//    private static ThreadLocal<DateFormat> ISO_FORMAT = new ThreadLocal<DateFormat>() {
-//        /* (non-Javadoc)
-//         * @see java.lang.ThreadLocal#initialValue()
-//         */
-//        @Override
-//        protected DateFormat initialValue() {
-//            return new SimpleDateFormat("yyyy-MM-dd HH:mm");
-//        }
-//    };
-//    private static ThreadLocal<DateFormat> PRETTY_FORMAT = new ThreadLocal<DateFormat>() {
-//        /* (non-Javadoc)
-//         * @see java.lang.ThreadLocal#initialValue()
-//         */
-//        @Override
-//        protected DateFormat initialValue() {
-//            //9:40pm 12-Aug-2014
-//            return new SimpleDateFormat("h:mm d'-'MMM'-'yyyy");
-//        }
-//    };
-
-
     /**
      * Default constructor.
      */
@@ -288,16 +266,31 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final Sorting sorting,
             final Filter filter,
             final Page page) {
+        //statistics
+        final GetShipmentsStats stats = new GetShipmentsStats();
+        stats.totalStart();
+
+        stats.startGetShipmentsByFilter();
         final List<Shipment> shipments = shipmentDao.findByCompany(company, sorting, page, filter);
+        stats.endGetShipmentsByFilter(shipments);
+
         final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
         //add alerts to each shipment.
         for (final Shipment s : shipments) {
+            stats.startAlerts(s);
             final List<Alert> alerts = alertDao.getAlerts(s);
             final ListShipmentItem dto = new ListShipmentItem(s);
+            stats.endAlerts(s);
+            stats.startSiblings(s);
             dto.setSiblingCount(siblingService.getSiblingCount(s));
+            stats.endSiblings(s);
             dto.getAlertSummary().putAll(toSummaryMap(alerts));
             result.add(dto);
         }
+
+        stats.totalEnd();
+
+        System.out.println(stats.buildStats());
         return result;
     }
 
@@ -351,32 +344,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             return createErrorResponse(e);
         }
     }
-//
-//    @RequestMapping(value = "/getSingleShipmentOld/{authToken}", method = RequestMethod.GET)
-//    public JsonObject getShipmentData(@PathVariable final String authToken,
-//            @RequestParam final Long shipmentId) {
-//
-//        try {
-//            //check logged in.
-//            final User user = getLoggedInUser(authToken);
-//            security.checkCanGetShipmentData(user);
-//
-//            final ShipmentSerializer ser = getSerializer(user);
-//
-//            final Shipment s = shipmentDao.findOne(shipmentId);
-//            checkCompanyAccess(user, s);
-//            if (s == null) {
-//                return null;
-//            }
-//
-//            final SingleShipmentDto dto = getShipmentData(s, true);
-//
-//            return createSuccessResponse(dto == null ? null : ser.toJson(dto));
-//        } catch (final Exception e) {
-//            log.error("Failed to get devices", e);
-//            return createErrorResponse(e);
-//        }
-//    }
     @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
     public JsonObject getSingleShipment(@PathVariable final String authToken,
             @RequestParam final Long shipmentId) {
