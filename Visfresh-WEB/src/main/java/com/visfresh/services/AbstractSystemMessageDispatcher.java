@@ -3,9 +3,12 @@
  */
 package com.visfresh.services;
 
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -48,8 +51,9 @@ public abstract class AbstractSystemMessageDispatcher {
 
     private final AtomicBoolean isStoped = new AtomicBoolean(false);
 
-    private SystemMessageHandler messageHandler;
-    private final SystemMessageType messageType;
+    private final Map<SystemMessageType, SystemMessageHandler> messageHandlers
+        = new HashMap<SystemMessageType, SystemMessageHandler>();
+    private final Set<SystemMessageType> messageTypes = new LinkedHashSet<>();
 
     @Autowired
     private SystemMessageDao messageDao;
@@ -101,9 +105,9 @@ public abstract class AbstractSystemMessageDispatcher {
      * @param t message type.
      */
     @Autowired
-    public AbstractSystemMessageDispatcher(final SystemMessageType t) {
+    public AbstractSystemMessageDispatcher(final SystemMessageType... t) {
         super();
-        this.messageType = t;
+        this.messageTypes.addAll(Arrays.asList(t));
         setBatchLimit(10);
         setRetryLimit(5);
         setNumThreads(1);
@@ -182,17 +186,13 @@ public abstract class AbstractSystemMessageDispatcher {
     protected int processMessages(final String processorId) {
         final int count = 0;
 
-        if (messageHandler != null) {
-            final Set<SystemMessageType> types = new HashSet<SystemMessageType>();
-            types.add(messageType);
-
+        if (!messageHandlers.isEmpty()) {
             final List<SystemMessage> messages = messageDao.selectMessagesForProcessing(
-                    types, processorId, getBatchLimit(), new Date());
+                    messageTypes, processorId, getBatchLimit(), new Date());
 
-            final SystemMessageHandler h = getMessageHandler();
             for (final SystemMessage msg : messages) {
                 try {
-                    h.handle(msg);
+                    messageHandlers.get(msg.getType()).handle(msg);
                     handleSuccess(msg);
                 } catch(final Throwable e) {
                     handleError(msg, e);
@@ -203,18 +203,6 @@ public abstract class AbstractSystemMessageDispatcher {
         return count;
     }
 
-    /**
-     * @return the messageHandler
-     */
-    public SystemMessageHandler getMessageHandler() {
-        return messageHandler;
-    }
-    /**
-     * @return the messageType
-     */
-    public SystemMessageType getMessageType() {
-        return messageType;
-    }
     /**
      * @param msg the message.
      * @param e the exception.
@@ -280,22 +268,32 @@ public abstract class AbstractSystemMessageDispatcher {
      * @param type message type.
      * @param h message handler.
      */
-    protected void setSystemMessageHandler(final SystemMessageType type, final SystemMessageHandler h) {
-        if (getMessageType() != type) {
+    public void setSystemMessageHandler(final SystemMessageType type, final SystemMessageHandler h) {
+        if (!messageTypes.contains(type)) {
             throw new IllegalArgumentException("Unsupported message type for given processor "
-                    + type + ", expected " + getMessageType());
+                    + type + ", expected types " + messageTypes);
         }
-        this.messageHandler = h;
+        this.messageHandlers.put(type, h);
     }
     /**
      * @param messagePayload message payload.
+     * @param type system message type.
      */
-    public void sendSystemMessage(final String messagePayload) {
+    public void sendSystemMessage(final String messagePayload, final SystemMessageType type) {
+        sendSystemMessage(messagePayload, type, new Date());
+    }
+    /**
+     * @param messagePayload message payload.
+     * @param type system message type.
+     * @param retryOn retry date.
+     */
+    public void sendSystemMessage(final String messagePayload,
+            final SystemMessageType type, final Date retryOn) {
         final SystemMessage sm = new SystemMessage();
-        sm.setType(getMessageType());
+        sm.setType(type);
         sm.setMessageInfo(messagePayload);
         sm.setTime(new Date());
-        sm.setRetryOn(sm.getTime());
+        sm.setRetryOn(retryOn);
         messageDao.save(sm);
     }
     /**

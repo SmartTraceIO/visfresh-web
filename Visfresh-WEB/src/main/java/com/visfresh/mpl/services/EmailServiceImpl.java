@@ -14,6 +14,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.SystemMessage;
+import com.visfresh.entities.SystemMessageType;
 import com.visfresh.io.email.EmailMessage;
 import com.visfresh.io.email.EmailServiceHelper;
 import com.visfresh.io.json.EmailSerializer;
@@ -78,7 +79,7 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
         msg.setSubject(subject);
 
         final String payload = serializer.toJson(msg).toString();
-        dispatcher.sendSystemMessage(payload);
+        dispatcher.sendSystemMessage(payload, SystemMessageType.Email);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.SystemMessageHandler#handle(com.visfresh.entities.SystemMessage)

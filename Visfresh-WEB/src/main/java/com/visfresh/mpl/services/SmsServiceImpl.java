@@ -15,6 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.SystemMessage;
+import com.visfresh.entities.SystemMessageType;
 import com.visfresh.io.json.SmsSerializer;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.SmsService;
@@ -64,7 +65,7 @@ public class SmsServiceImpl implements SmsService, SystemMessageHandler {
         msg.setSubject(subject);
 
         final String payload = serializer.toJson(msg).toString();
-        dispatcher.sendSystemMessage(payload);
+        dispatcher.sendSystemMessage(payload, SystemMessageType.SMS);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.SystemMessageHandler#handle(com.visfresh.entities.SystemMessage)

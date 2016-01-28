@@ -47,13 +47,31 @@ public class DeviceCommandDaoImpl extends DaoImplBase<DeviceCommand, Long> imple
      */
     @Override
     public <S extends DeviceCommand> S save(final S cmd) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
+        final Long commandId = cmd.getId();
+        final String command = cmd.getCommand();
+        final String deviceImei = cmd.getDevice().getImei();
 
+        final Long generatedId = saveCommand(commandId, command, deviceImei);
+        if (generatedId != null) {
+            cmd.setId(generatedId);
+        }
+
+        return cmd;
+    }
+
+    /**
+     * @param commandId
+     * @param command
+     * @param deviceImei
+     * @return
+     */
+    protected Long saveCommand(final Long commandId, final String command,
+            final String deviceImei) {
+        final Map<String, Object> paramMap = new HashMap<String, Object>();
         String sql;
 
-        if (cmd.getId() == null) {
+        if (commandId == null) {
             //insert
-            paramMap.put("id", cmd.getId());
             sql = "insert into " + TABLE + " (" + combine(
                     COMMAND_FIELD
                     , DEVICE_FIELD
@@ -70,19 +88,21 @@ public class DeviceCommandDaoImpl extends DaoImplBase<DeviceCommand, Long> imple
             ;
         }
 
-        paramMap.put(ID_FIELD, cmd.getId());
-        paramMap.put(COMMAND_FIELD, cmd.getCommand());
-        paramMap.put(DEVICE_FIELD, cmd.getDevice().getId());
+        paramMap.put(ID_FIELD, commandId);
+        paramMap.put(COMMAND_FIELD, command);
+        paramMap.put(DEVICE_FIELD, deviceImei);
+        final MapSqlParameterSource sqlParamMap = new MapSqlParameterSource(paramMap);
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
-        if (keyHolder.getKey() != null) {
-            cmd.setId(keyHolder.getKey().longValue());
-        }
+        jdbc.update(sql, sqlParamMap, keyHolder);
+        final Number generatedId = keyHolder.getKey();
 
-        return cmd;
+        return generatedId == null ? null : generatedId.longValue();
     }
-
+    @Override
+    public void saveCommand(final String command, final String imei) {
+        this.saveCommand(null, command, imei);
+    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
      */

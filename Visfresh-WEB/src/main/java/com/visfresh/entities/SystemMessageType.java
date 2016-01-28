@@ -11,5 +11,6 @@ public enum SystemMessageType {
     Tracker,
     SMS,
     Email,
+    DeviceCommand,
     Other
 }

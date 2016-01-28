@@ -102,6 +102,9 @@ public class ArrivalRule extends AbstractNotificationRule {
         arrival.setShipment(event.getShipment());
 
         saveArrival(arrival);
+        if (event.getShipment().getShutdownDeviceTimeOut() != null) {
+
+        }
 
         final Calendar date = new GregorianCalendar();
         //notify subscribers

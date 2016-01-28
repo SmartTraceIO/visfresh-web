@@ -3,6 +3,7 @@
  */
 package com.visfresh.controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -178,7 +179,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             security.checkCanSendCommandToDevice(user);
 
             final DeviceCommand cmd = createSerializer(user).parseDeviceCommand(req);
-            commandService.sendCommand(cmd);
+            commandService.sendCommand(cmd, new Date());
 
             return createSuccessResponse(null);
         } catch (final Exception e) {

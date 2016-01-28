@@ -10,4 +10,9 @@ import com.visfresh.entities.DeviceCommand;
  *
  */
 public interface DeviceCommandDao extends DaoBase<DeviceCommand, Long> {
+    /**
+     * @param command command.
+     * @param imei device IMEI.
+     */
+    void saveCommand(String command, String imei);
 }
