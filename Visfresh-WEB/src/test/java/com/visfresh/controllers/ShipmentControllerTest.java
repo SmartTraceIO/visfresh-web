@@ -350,7 +350,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(id);
 
         final Shipment s = shipmentDao.findOne(id);
-        assertNull(s.getShutdownDeviceTimeOut());
+        assertNull(s.getShutdownDeviceAfterMinutes());
         assertNull(s.getArrivalNotificationWithinKm());
     }
     /**

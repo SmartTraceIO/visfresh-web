@@ -277,7 +277,7 @@ public abstract class AbstractRestServiceTest {
         s.setShipmentDescription("Any Description");
         s.setShippedFrom(createLocationProfile(true));
         s.setShippedTo(createLocationProfile(true));
-        s.setShutdownDeviceTimeOut(155);
+        s.setShutdownDeviceAfterMinutes(155);
         s.setDevice(createDevice("234908720394857", save));
         s.setPalletId("palettid");
         s.setAssetNum("10515");
@@ -307,7 +307,7 @@ public abstract class AbstractRestServiceTest {
         t.setShipmentDescription("Any Description");
         t.setShippedFrom(createLocationProfile(save));
         t.setShippedTo(createLocationProfile(save));
-        t.setShutdownDeviceTimeOut(155);
+        t.setShutdownDeviceAfterMinutes(155);
         t.setDetectLocationForShippedFrom(true);
         t.setCommentsForReceiver("Comments for receiver");
 

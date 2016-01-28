@@ -48,7 +48,7 @@ public class AbstractSerializerTest {
         s.setShipmentDescription("Any Description");
         s.setShippedFrom(createLocationProfile());
         s.setShippedTo(createLocationProfile());
-        s.setShutdownDeviceTimeOut(155);
+        s.setShutdownDeviceAfterMinutes(155);
         s.setDevice(createDevice("234908720394857"));
         s.setPalletId("palettid");
         s.setShipmentDate(new Date(System.currentTimeMillis() - 1000000000l));

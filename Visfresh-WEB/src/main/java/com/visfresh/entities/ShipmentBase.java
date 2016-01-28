@@ -87,7 +87,7 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
         setArrivalNotificationWithinKm(shipment.getArrivalNotificationWithinKm());
         arrivalNotificationSchedules.addAll((shipment.getArrivalNotificationSchedules()));
         setExcludeNotificationsIfNoAlerts(shipment.isExcludeNotificationsIfNoAlerts());
-        setShutdownDeviceTimeOut(shipment.getShutdownDeviceTimeOut());
+        setShutdownDeviceAfterMinutes(shipment.getShutdownDeviceAfterMinutes());
         setCommentsForReceiver(shipment.getCommentsForReceiver());
     }
 
@@ -204,15 +204,15 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
     /**
      * @return the shutdownDevice
      */
-    public Integer getShutdownDeviceTimeOut() {
+    public Integer getShutdownDeviceAfterMinutes() {
         return shutdownDeviceAfterMinutes;
     }
 
     /**
-     * @param ninutes the shutdownDevice to set
+     * @param minutes the shutdownDevice to set
      */
-    public void setShutdownDeviceTimeOut(final Integer ninutes) {
-        this.shutdownDeviceAfterMinutes = ninutes;
+    public void setShutdownDeviceAfterMinutes(final Integer minutes) {
+        this.shutdownDeviceAfterMinutes = minutes;
     }
     /**
      * @return the company

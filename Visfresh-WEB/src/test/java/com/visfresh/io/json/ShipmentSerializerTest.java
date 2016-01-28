@@ -90,7 +90,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         s.setShipmentDescription(shipmentDescription);
         s.setShippedFrom(shippedFrom);
         s.setShippedTo(shippedTo);
-        s.setShutdownDeviceTimeOut(shutdownDeviceTimeOut);
+        s.setShutdownDeviceAfterMinutes(shutdownDeviceTimeOut);
         s.setDevice(device);
         s.setPalletId(palletId);
         s.setShipmentDate(shipmentDate);
@@ -115,7 +115,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(shipmentDescription, s.getShipmentDescription());
         assertNotNull(s.getShippedFrom());
         assertNotNull(s.getShippedTo());
-        assertEquals(shutdownDeviceTimeOut, s.getShutdownDeviceTimeOut().intValue());
+        assertEquals(shutdownDeviceTimeOut, s.getShutdownDeviceAfterMinutes().intValue());
         assertEquals(device.getId(), s.getDevice().getId());
         assertEquals(palletId, s.getPalletId());
         assertEquals(format(shipmentDate), format(s.getShipmentDate()));

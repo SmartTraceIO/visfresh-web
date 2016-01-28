@@ -8,19 +8,26 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.gson.JsonObject;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.SystemMessageDao;
+import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.SystemMessage;
+import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.state.DeviceState;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -106,5 +113,45 @@ public class ArrivalRuleTest extends BaseRuleTest {
 
         //check arrival created
         assertEquals(1, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
+    }
+    @Test
+    public void testShutdownDevice() {
+        shipment.setArrivalNotificationWithinKm(1);
+        shipment.setShutdownDeviceAfterMinutes(11);
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setDevice(shipment.getDevice());
+        e.setShipment(shipment);
+        e.setTime(new Date());
+        e.setType(TrackerEventType.AUT);
+        e.setLatitude(10);
+        e.setLongitude(10);
+
+        LocationProfile loc = new LocationProfile();
+        loc.setAddress("SPb");
+        loc.setCompany(company);
+        loc.setName("Finish location");
+        loc.getLocation().setLatitude(10);
+        loc.getLocation().setLongitude(10);
+        loc = context.getBean(LocationProfileDao.class).save(loc);
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        //set nearest location
+        final RuleContext req = new RuleContext(e, new DeviceState());
+        rule.accept(req);
+        rule.handle(req);
+
+        //check arrival created
+        final List<SystemMessage> systemMessages = context.getBean(SystemMessageDao.class).findAll(null, null, null);
+        assertEquals(1, systemMessages.size());
+
+        //check message is device shutdown.
+        final SystemMessage sm = systemMessages.get(0);
+        assertEquals(SystemMessageType.DeviceCommand, sm.getType());
+
+        final JsonObject json = SerializerUtils.parseJson(sm.getMessageInfo()).getAsJsonObject();
+        assertEquals(DeviceCommand.SHUTDOWN, json.get("command").getAsString());
     }
 }

@@ -185,7 +185,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setShipmentDate(new Date());
         s.setShippedFrom(shippedFrom);
         s.setShippedTo(shippedTo);
-        s.setShutdownDeviceTimeOut(70);
+        s.setShutdownDeviceAfterMinutes(70);
         s.setStatus(ShipmentStatus.InProgress);
         s.getAlertsNotificationSchedules().add(alertNotifSched);
         s.getArrivalNotificationSchedules().add(arrivalSched);
@@ -215,7 +215,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertNotNull(s.getShipmentDate());
         assertNotNull(s.getShippedFrom());
         assertNotNull(s.getShippedTo());
-        assertEquals(70, s.getShutdownDeviceTimeOut().intValue());
+        assertEquals(70, s.getShutdownDeviceAfterMinutes().intValue());
         assertEquals(ShipmentStatus.InProgress, s.getStatus());
         assertEquals(1, s.getAlertsNotificationSchedules().size());
         assertEquals(1, s.getArrivalNotificationSchedules().size());
@@ -269,7 +269,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertNotNull(s.getShipmentDate());
         assertNotNull(s.getShippedFrom());
         assertNotNull(s.getShippedTo());
-        assertEquals(70, s.getShutdownDeviceTimeOut().intValue());
+        assertEquals(70, s.getShutdownDeviceAfterMinutes().intValue());
         assertEquals(ShipmentStatus.InProgress, s.getStatus());
         assertEquals(1, s.getAlertsNotificationSchedules().size());
         assertEquals(1, s.getArrivalNotificationSchedules().size());
@@ -411,7 +411,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setShipmentDescription("Test Shipment");
         s.setShippedFrom(shippedFrom);
         s.setShippedTo(shippedTo);
-        s.setShutdownDeviceTimeOut(70);
+        s.setShutdownDeviceAfterMinutes(70);
         s.getAlertsNotificationSchedules().add(alertNotifSched);
         s.getArrivalNotificationSchedules().add(arrivalSched);
         s.setAddDateShipped(true);

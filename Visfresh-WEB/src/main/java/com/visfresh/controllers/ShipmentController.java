@@ -612,7 +612,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setShipmentDescription(dtoOld.getShipmentDescription());
         dto.setShipmentId(shipment.getId());
         if (shipment.getAlertProfile() != null) {
-            dto.setShutdownDeviceAfterMinutes(shipment.getShutdownDeviceTimeOut());
+            dto.setShutdownDeviceAfterMinutes(shipment.getShutdownDeviceAfterMinutes());
         }
         if (shipment.getShippedFrom() != null) {
             dto.setStartLocation(shipment.getShippedFrom().getName());

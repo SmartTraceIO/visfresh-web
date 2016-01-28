@@ -158,7 +158,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
         map.put(NOALERTIFCOODOWN_FIELD, s.getAlertSuppressionMinutes());
         map.put(ARRIVALNOTIFWITHIN_FIELD, s.getArrivalNotificationWithinKm());
         map.put(NONOTIFSIFNOALERTS_FIELD, s.isExcludeNotificationsIfNoAlerts());
-        map.put(SHUTDOWNTIMEOUT_FIELD, s.getShutdownDeviceTimeOut());
+        map.put(SHUTDOWNTIMEOUT_FIELD, s.getShutdownDeviceAfterMinutes());
         map.put(COMPANY_FIELD, s.getCompany().getId());
         map.put(SHIPPEDFROM_FIELD, s.getShippedFrom() == null ? null : s.getShippedFrom().getId());
         map.put(SHIPPEDTO_FIELD, s.getShippedTo() == null ? null : s.getShippedTo().getId());
@@ -284,7 +284,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
         }
         final Number shutdownAfterMinutes = (Number) map.get(SHUTDOWNTIMEOUT_FIELD);
         if (shutdownAfterMinutes != null) {
-            no.setShutdownDeviceTimeOut(shutdownAfterMinutes.intValue());
+            no.setShutdownDeviceAfterMinutes(shutdownAfterMinutes.intValue());
         }
 
         no.getAlertsNotificationSchedules().addAll(findNotificationSchedules(no, ALERTNOTIFSCHEDULES_TABLE));

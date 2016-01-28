@@ -103,7 +103,7 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         t.setShipmentDescription(shipmentDescription);
         t.setShippedFrom(shippedFrom);
         t.setShippedTo(shippedTo);
-        t.setShutdownDeviceTimeOut(shutdownDeviceTimeOut);
+        t.setShutdownDeviceAfterMinutes(shutdownDeviceTimeOut);
         t.setDetectLocationForShippedFrom(useLocationNearestToDevice);
         t.setCommentsForReceiver(commentsForReceiver);
 
@@ -123,7 +123,7 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         assertEquals(shipmentDescription, t.getShipmentDescription());
         assertNotNull(t.getShippedFrom());
         assertNotNull(t.getShippedTo());
-        assertEquals(shutdownDeviceTimeOut, t.getShutdownDeviceTimeOut().intValue());
+        assertEquals(shutdownDeviceTimeOut, t.getShutdownDeviceAfterMinutes().intValue());
         assertEquals(useLocationNearestToDevice, t.isDetectLocationForShippedFrom());
         assertEquals(commentsForReceiver, t.getCommentsForReceiver());
     }

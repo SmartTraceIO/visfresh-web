@@ -4,6 +4,7 @@
 package com.visfresh.rules;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,7 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.services.DeviceCommandService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -34,6 +36,8 @@ public class ArrivalRule extends AbstractNotificationRule {
 
     @Autowired
     protected ArrivalDao arrivalDao;
+    @Autowired
+    private DeviceCommandService commandService;
 
     /**
      * Default constructor.
@@ -102,8 +106,9 @@ public class ArrivalRule extends AbstractNotificationRule {
         arrival.setShipment(event.getShipment());
 
         saveArrival(arrival);
-        if (event.getShipment().getShutdownDeviceTimeOut() != null) {
-
+        if (event.getShipment().getShutdownDeviceAfterMinutes() != null) {
+            final long date = System.currentTimeMillis() + event.getShipment().getShutdownDeviceAfterMinutes() * 60 * 1000l;
+            commandService.shutdownDevice(event.getDevice(), new Date(date));
         }
 
         final Calendar date = new GregorianCalendar();
