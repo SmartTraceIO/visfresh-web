@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="passwordreset.reset.text">Please press to ${url} for reset password</entry>
+	<entry key="passwordreset.reset.subject">Reset password request</entry>
+	<entry key="passwordreset.userNotFound">User with given email '${email}' is not registered</entry>
+	<entry key="passwordreset.resetSuccesfully">New password has set successfully</entry>
+	<entry key="passwordreset.reset.requestNotFound">Password reset request not found for ${email}</entry>
+	<entry key="passwordreset.reset.tokenNotMatches">Security token not matches token from password request</entry>
+	<entry key="passwordreset.reset.successfully">New password has successfully saved</entry>
+</properties>

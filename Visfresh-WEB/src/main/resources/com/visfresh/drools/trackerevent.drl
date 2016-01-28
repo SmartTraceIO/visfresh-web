@@ -1,7 +1,6 @@
 package com.visfresh.drools
  
 import com.visfresh.rules.AssignShipmentRule;
-import com.visfresh.rules.OpenJtsRule;
 import com.visfresh.rules.RuleContext;
 import com.visfresh.rules.EnterBrightEnvironmentAlertRule;
 import com.visfresh.rules.EnterDarkEnvironmentAlertRule;
@@ -31,15 +30,6 @@ rule "AutoStartShipment"
         context : RuleContext(engine.getRule(AutoStartShipmentRule.NAME).accept(this));
     then
     	if(engine.getRule(AutoStartShipmentRule.NAME).handle(context)) {
-       		update(context);
-        }
-end
-
-rule "OpenGts"
-    when
-        context : RuleContext(engine.getRule(OpenJtsRule.NAME).accept(this));
-    then
-    	if(engine.getRule(OpenJtsRule.NAME).handle(context)) {
        		update(context);
         }
 end

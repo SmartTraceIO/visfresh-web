@@ -22,7 +22,7 @@ public interface AuthService {
      */
     public void logout(final String authToken);
     /**
-     * @param oldToken TODO
+     * @param oldToken old authentication token.
      * @return refreshed authentication token.
      * @exception AuthenticationException
      */
@@ -38,4 +38,17 @@ public interface AuthService {
      * @param resetOnLogin reset password on login flag.
      */
     void saveUser(User user, String password, boolean resetOnLogin);
+    /**
+     * @param email email.
+     * @param baseUrl part of URL for send to user.
+     * @throws AuthenticationException
+     */
+    public void startResetPassword(String email, String baseUrl) throws AuthenticationException;
+    /**
+     * @param email email.
+     * @param password password.
+     * @param token security token.
+     * @throws AuthenticationException
+     */
+    public void resetPassword(String email, String password, String token) throws AuthenticationException;
 }

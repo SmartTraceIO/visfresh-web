@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.visfresh.controllers.AbstractController;
 import com.visfresh.junit.db.JUnitDbConfig;
-import com.visfresh.mock.MockOpenJtsFacade;
+import com.visfresh.mock.MockSystemMessageDispatcher;
 import com.visfresh.services.RuleEngine;
 
 /**
@@ -22,7 +22,7 @@ import com.visfresh.services.RuleEngine;
         AbstractController.class,//controllers package
         RuleEngine.class, //services package
         JUnitDbConfig.class, //JUnit DB DAO configuration
-        MockOpenJtsFacade.class //OpenJts facade implementation.
+        MockSystemMessageDispatcher.class // mock services
         })
 @Configuration
 public class RestServicesTestConfig {

@@ -91,6 +91,41 @@ public class AuthenticationController extends AbstractController {
         }
     }
     /**
+     * @param email user email.
+     * @param baseUrl base URL for final page.
+     * @return JSON response.
+     */
+    @RequestMapping(value = "/forgetRequest", method = RequestMethod.GET)
+    public JsonObject startResetPassword(@RequestParam final String email, @RequestParam final String baseUrl) {
+        try {
+            authService.startResetPassword(email, baseUrl);
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to start of reset password for " + email, e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param email user email.
+     * @param password user password.
+     * @param token security token
+     * @return
+     */
+    @RequestMapping(value = "/resetRequest", method = RequestMethod.GET)
+    public JsonObject resetPassword(
+            @RequestParam final String email,
+            @RequestParam final String password,
+            @RequestParam final String token
+            ) {
+        try {
+            authService.resetPassword(email, password, token);
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to start of reset password for " + email, e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
      * @param user
      * @return
      */

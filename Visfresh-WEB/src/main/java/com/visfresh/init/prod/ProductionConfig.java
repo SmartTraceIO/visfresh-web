@@ -12,7 +12,6 @@ import com.visfresh.dao.impl.DaoImplBase;
 import com.visfresh.drools.DroolsRuleEngine;
 import com.visfresh.init.jdbc.JdbcConfig;
 import com.visfresh.mpl.services.TrackerMessageDispatcher;
-import com.visfresh.opengts.DefaultOpenJtsFacade;
 import com.visfresh.services.DefaultAuthService;
 
 /**
@@ -26,8 +25,7 @@ import com.visfresh.services.DefaultAuthService;
         JdbcConfig.class,
         DefaultAuthService.class,
         DaoImplBase.class,
-        TrackerMessageDispatcher.class,
-        DefaultOpenJtsFacade.class})
+        TrackerMessageDispatcher.class})
 @PropertySource("classpath:/app.properties")
 public class ProductionConfig {
     /**

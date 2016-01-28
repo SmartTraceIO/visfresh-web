@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.mail.MessagingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.User;
 import com.visfresh.utils.HashGenerator;
+import com.visfresh.utils.Messages;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -38,18 +40,20 @@ public class DefaultAuthService implements AuthService {
     @Autowired
     private UserDao userDao;
     @Autowired
-    private OpenJtsFacade openJts;
+    private EmailService emailService;
 
     private static final Logger log = LoggerFactory.getLogger(DefaultAuthService.class);
 
     private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 60 * 60 * 1000l; //one hour
-    private static final long TIMEOUT = 60000L;
     public static final int USER_LOGIN_LIMIT = 1000;
+
+    private static final long TIMEOUT = 60000L;
 
     private final AtomicBoolean isStopped = new AtomicBoolean();
 
     private final Map<String, UserInfo> users = new HashMap<String, UserInfo>();
-    private final Random random = new Random();
+    private final Map<String, PasswordResetRequest> passwordResets = new HashMap<String, PasswordResetRequest>();
+    private static final Random random = new Random();
 
     /**
      * Default constructor.
@@ -142,12 +146,7 @@ public class DefaultAuthService implements AuthService {
             user.getSettings().put(RESET_ON_LOGIN, "true");
         }
 
-        final boolean isNew = user.getId() == null;
         userDao.save(user);
-
-        if (isNew) {
-            openJts.addUser(user, password);
-        }
     }
     /**
      * @param user user.
@@ -162,6 +161,40 @@ public class DefaultAuthService implements AuthService {
 
     @PostConstruct
     public void start() {
+        startCheckTokensThread();
+        startPasswordResetsExpirationThread();
+    }
+
+    /**
+     *
+     */
+    private void startPasswordResetsExpirationThread() {
+        new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    removeExpiredPasswordResets();
+
+                    synchronized (isStopped) {
+                        try {
+                            isStopped.wait(TIMEOUT);
+                        } catch (final InterruptedException e) {
+                            log.error("Check password reset expiration thread has interrupted", e);
+                            return;
+                        }
+                        if (isStopped.get()) {
+                            log.debug("Check password reset expiration thread has stopped");
+                            return;
+                        }
+                    }
+                }
+            }
+        }.start();
+    }
+    /**
+     *
+     */
+    protected void startCheckTokensThread() {
         new Thread() {
             @Override
             public void run() {
@@ -203,6 +236,113 @@ public class DefaultAuthService implements AuthService {
             }
         }
     }
+    /**
+     *
+     */
+    protected void removeExpiredPasswordResets() {
+        final long time = System.currentTimeMillis();
+
+        synchronized (passwordResets) {
+            final Iterator<Map.Entry<String, PasswordResetRequest>> iter
+                = passwordResets.entrySet().iterator();
+            while (iter.hasNext()) {
+                final Map.Entry<String, PasswordResetRequest> e = iter.next();
+                if (e.getValue().getExpirationTime().getTime() < time) {
+                    log.debug("Password reset request for user " + e.getKey()
+                            + " has expired and will removed");
+                    iter.remove();
+                }
+            }
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.AuthService#startResetPassword(java.lang.String, java.lang.String)
+     */
+    @Override
+    public void startResetPassword(final String email, final String baseUrl) throws AuthenticationException {
+        final Map<String, String> replacements = new HashMap<>();
+        replacements.put("email", email);
+
+        final User user = userDao.findByEmail(email);
+        if (user == null) {
+            throw new AuthenticationException(Messages.getMessage("passwordreset.userNotFound", replacements));
+        }
+
+        PasswordResetRequest reset;
+        synchronized(passwordResets) {
+            reset = passwordResets.get(email);
+            if (reset == null) {
+                reset = new PasswordResetRequest(generateSecureString());
+                passwordResets.put(email, reset);
+            }
+        }
+
+        //send email to user
+        replacements.put("url", baseUrl + "token=" + reset.getSecureString());
+        try {
+            emailService.sendMessage(new String[]{email},
+                    Messages.getMessage("passwordreset.reset.subject", replacements),
+                    Messages.getMessage("passwordreset.reset.text", replacements));
+            log.debug("Reset password URL has send to " + email + " and contains the token "
+                    + reset.getSecureString());
+        } catch (final MessagingException e) {
+            throw new AuthenticationException("Failed to send password reset message to user " + email, e);
+        }
+    }
+    /**
+     * @return secure string.
+     */
+    private static String generateSecureString() {
+        final StringBuilder sb = new StringBuilder(Integer.toString(1 + random.nextInt(8)));
+        while (sb.length() < 5) {
+            sb.append(random.nextInt(9));
+        }
+        return sb.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.services.AuthService#resetPassword(java.lang.String, java.lang.String, java.lang.String)
+     */
+    @Override
+    public void resetPassword(final String email, final String password, final String token)
+            throws AuthenticationException {
+        final Map<String, String> replacements = new HashMap<>();
+        replacements.put("email", email);
+
+        PasswordResetRequest reset;
+        synchronized (passwordResets) {
+            reset = passwordResets.get(email);
+        }
+
+        //check request found
+        if (reset == null) {
+            throw new AuthenticationException(Messages.getMessage(
+                    "passwordreset.reset.requestNotFound", replacements));
+        }
+
+        //check token matches
+        if (!reset.getSecureString().equals(token)) {
+            throw new AuthenticationException(Messages.getMessage(
+                    "passwordreset.reset.tokenNotMatches", replacements));
+        }
+
+        final User user = userDao.findByEmail(email);
+        if (user == null) {
+            throw new AuthenticationException(Messages.getMessage("passwordreset.userNotFound", replacements));
+        }
+
+        saveUser(user, password, false);
+
+        try {
+            emailService.sendMessage(new String[]{email},
+                    Messages.getMessage("passwordreset.reset.subject", replacements),
+                    Messages.getMessage("passwordreset.reset.successfully", replacements));
+            log.debug("New password has reset for user " + email);
+        } catch (final MessagingException e) {
+            throw new AuthenticationException("Failed to send new password saved email to user " + email, e);
+        }
+    }
+
 
     /* (non-Javadoc)
      * @see com.visfresh.services.AuthService#refreshToken(java.lang.String)
@@ -244,7 +384,7 @@ public class DefaultAuthService implements AuthService {
     public void stop() {
         synchronized (isStopped) {
             isStopped.set(true);
-            isStopped.notify();
+            isStopped.notifyAll();
         }
     }
     /**
