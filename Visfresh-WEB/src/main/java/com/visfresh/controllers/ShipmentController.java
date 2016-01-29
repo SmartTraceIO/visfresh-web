@@ -266,31 +266,18 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final Sorting sorting,
             final Filter filter,
             final Page page) {
-        //statistics
-        final GetShipmentsStats stats = new GetShipmentsStats();
-        stats.totalStart();
-
-        stats.startGetShipmentsByFilter();
         final List<Shipment> shipments = shipmentDao.findByCompany(company, sorting, page, filter);
-        stats.endGetShipmentsByFilter(shipments);
-
         final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
+
         //add alerts to each shipment.
         for (final Shipment s : shipments) {
-            stats.startAlerts(s);
             final List<Alert> alerts = alertDao.getAlerts(s);
             final ListShipmentItem dto = new ListShipmentItem(s);
-            stats.endAlerts(s);
-            stats.startSiblings(s);
             dto.setSiblingCount(siblingService.getSiblingCount(s));
-            stats.endSiblings(s);
             dto.getAlertSummary().putAll(toSummaryMap(alerts));
             result.add(dto);
         }
 
-        stats.totalEnd();
-
-        System.out.println(stats.buildStats());
         return result;
     }
 

@@ -34,7 +34,7 @@ public class LocationProfile implements EntityWithId<Long>, EntityWithCompany {
      */
     private String address;
     /**
-     * Radius of location place.
+     * Radius of location place in meters.
      */
     private int radius = 500; //meters
     /**
@@ -111,13 +111,13 @@ public class LocationProfile implements EntityWithId<Long>, EntityWithCompany {
         this.notes = notes;
     }
     /**
-     * @return the radius
+     * @return the radius in meters
      */
     public int getRadius() {
         return radius;
     }
     /**
-     * @param radius the radius to set
+     * @param radius the radius to set in meters.
      */
     public void setRadius(final int radius) {
         this.radius = radius;
@@ -186,6 +186,7 @@ public class LocationProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * @param company the company to set
      */
+    @Override
     public void setCompany(final Company company) {
         this.company = company;
     }

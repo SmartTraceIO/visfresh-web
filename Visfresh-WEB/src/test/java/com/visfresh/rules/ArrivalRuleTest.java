@@ -108,7 +108,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
 
         //set nearest location
         final RuleContext req = new RuleContext(e, new DeviceState());
-        rule.accept(req);
+        assertTrue(rule.accept(req));
         rule.handle(req);
 
         //check arrival created
@@ -153,5 +153,32 @@ public class ArrivalRuleTest extends BaseRuleTest {
 
         final JsonObject json = SerializerUtils.parseJson(sm.getMessageInfo()).getAsJsonObject();
         assertEquals(DeviceCommand.SHUTDOWN, json.get("command").getAsString());
+    }
+    @Test
+    public void testArrivalWith0KmConfigured() {
+        shipment.setArrivalNotificationWithinKm(0);
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setDevice(shipment.getDevice());
+        e.setShipment(shipment);
+        e.setTime(new Date());
+        e.setType(TrackerEventType.AUT);
+        e.setLatitude(10);
+        e.setLongitude(10);
+
+        LocationProfile loc = new LocationProfile();
+        loc.setAddress("SPb");
+        loc.setCompany(company);
+        loc.setName("Finish location");
+        loc.getLocation().setLatitude(10);
+        loc.getLocation().setLongitude(10);
+        loc = context.getBean(LocationProfileDao.class).save(loc);
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        //set nearest location
+        final RuleContext req = new RuleContext(e, new DeviceState());
+        assertTrue(rule.accept(req));
     }
 }

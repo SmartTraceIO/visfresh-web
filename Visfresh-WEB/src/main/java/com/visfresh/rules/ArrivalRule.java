@@ -23,6 +23,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.services.DeviceCommandService;
+import com.visfresh.utils.LocationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -72,7 +73,7 @@ public class ArrivalRule extends AbstractNotificationRule {
         final LocationProfile endLocation = shipment.getShippedTo();
         if (shipment.getArrivalNotificationWithinKm() != null && endLocation != null) {
             final double distance = getNumberOfMetersForArrival(latitude, longitude, endLocation);
-            return distance < shipment.getArrivalNotificationWithinKm();
+            return distance <= shipment.getArrivalNotificationWithinKm();
         }
         return false;
     }
@@ -86,7 +87,8 @@ public class ArrivalRule extends AbstractNotificationRule {
     protected static int getNumberOfMetersForArrival(final double latitude,
             final double longitude, final LocationProfile endLocation) {
         final Location end = endLocation.getLocation();
-        final double distance = distFrom(latitude, longitude, end.getLatitude(), end.getLongitude());
+        double distance = LocationUtils.getDistanceMeters(latitude, longitude, end.getLatitude(), end.getLongitude());
+        distance = Math.max(0., distance - endLocation.getRadius());
         return (int) Math.round(distance);
     }
 
@@ -150,18 +152,5 @@ public class ArrivalRule extends AbstractNotificationRule {
     @Override
     public String getName() {
         return NAME;
-    }
-
-    public static double distFrom(final double lat1, final double lng1, final double lat2, final double lng2) {
-        final double dLat = Math.toRadians(lat2 - lat1);
-        final double dLng = Math.toRadians(lng2 - lng1);
-        final double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1))
-                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLng / 2)
-                * Math.sin(dLng / 2);
-        final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        final double earthRadius = 6371000; // meters
-        return earthRadius * c;
     }
 }

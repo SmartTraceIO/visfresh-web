@@ -1,14 +1,14 @@
 package com.clicksend.sdk.http;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 
 import com.clicksend.sdk.util.Definitions;
@@ -20,21 +20,22 @@ import com.clicksend.sdk.util.Definitions;
  *
  * @author  Hüseyin ZAHMACIOĞLU {@link http://www.bumin.com.tr}
  * @version 1.0
- * 
+ *
  */
+@SuppressWarnings("deprecation")
 public class HttpClientUtils {
 
     private final static Map<String, HttpClientUtils> instances = new HashMap<String, HttpClientUtils>();
 
     private final ThreadSafeClientConnManager threadSafeClientConnectionManager;
-    
+
     private final int connectionTimeout;
     private final int socketTimeout;
-    
-    private HttpClientUtils(int connectionTimeout, int socketTimeout) {        
+
+    private HttpClientUtils(final int connectionTimeout, final int socketTimeout) {
         this.connectionTimeout = connectionTimeout;
         this.socketTimeout = socketTimeout;
-        
+
         this.threadSafeClientConnectionManager = new ThreadSafeClientConnManager();
         this.threadSafeClientConnectionManager.setDefaultMaxPerRoute(200);
         this.threadSafeClientConnectionManager.setMaxTotal(200);
@@ -48,8 +49,8 @@ public class HttpClientUtils {
      *
      * @return HttpClientUtils an instance of the HttpClient factory primed with the requested timeout values
      */
-    public static HttpClientUtils getInstance(int connectionTimeout, int socketTimeout) {
-        String key = "ct-" + connectionTimeout + "-st-" + socketTimeout;
+    public static HttpClientUtils getInstance(final int connectionTimeout, final int socketTimeout) {
+        final String key = "ct-" + connectionTimeout + "-st-" + socketTimeout;
         HttpClientUtils instance = instances.get(key);
         if (instance == null) {
             instance = new HttpClientUtils(connectionTimeout, socketTimeout);
@@ -64,7 +65,7 @@ public class HttpClientUtils {
      * @return HttpClient a new HttpClient instance
      */
     public HttpClient getNewHttpClient() {
-        HttpParams httpClientParams = new BasicHttpParams();
+        final HttpParams httpClientParams = new BasicHttpParams();
         HttpProtocolParams.setUserAgent(httpClientParams, Definitions.SDK_USER_AGENT_STRING + " " + Definitions.SDK_USER_AGENT_VERSION);
         HttpConnectionParams.setConnectionTimeout(httpClientParams, this.connectionTimeout);
         HttpConnectionParams.setSoTimeout(httpClientParams, this.socketTimeout);

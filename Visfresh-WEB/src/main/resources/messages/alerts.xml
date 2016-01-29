@@ -42,4 +42,6 @@
 	<entry key="MovementStart">Movement Alert. Sudden movement occurred at ${time}</entry>
 	<!-- Battery -->
 	<entry key="Battery">Battery Alert. Low battery at ${time}</entry>
+	<!-- Arrival -->
+	<entry key="Arrival"></entry>
 </properties>
