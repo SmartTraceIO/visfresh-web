@@ -3,9 +3,13 @@
  */
 package com.visfresh.controllers;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.AssertionFailedError;
 
@@ -15,6 +19,8 @@ import org.junit.Test;
 import com.visfresh.controllers.restclient.RestClient;
 import com.visfresh.controllers.restclient.UserRestClient;
 import com.visfresh.entities.User;
+import com.visfresh.io.email.EmailMessage;
+import com.visfresh.mock.MockEmailService;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.DefaultAuthService;
 import com.visfresh.services.DefaultReferenceResolver;
@@ -78,7 +84,8 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         final String token = client.refreshToken();
         assertNotNull(token);
     }
-    @Test
+    //uncomment this test where will need to test the token expiration.
+    //@Test
     public void testExpiredToken() throws RestServiceException, IOException, InterruptedException {
         final String email = "a-" + (++lastLong) + "@b.c";
 
@@ -112,5 +119,70 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         } catch (final Exception e) {
             //correct
         }
+    }
+    @Test
+    public void testResetPassword() throws IOException, RestServiceException {
+        //create user
+        final User user = new User();
+        user.setEmail("a-" + (++lastLong) + "@b.c");
+        final String password = "lkasdlfkj";
+        user.setCompany(getCompany());
+
+        authService.saveUser(user, password, false);
+
+        //attempt to reset password without start reset
+        final String newpassword = "wpeijpgw";
+        try {
+            client.resetPassword(user.getEmail(), newpassword, "abrakadabra");
+            throw new AssertionFailedError("Authentication error should occurring");
+        } catch (final Exception e) {
+            // is ok
+        }
+
+        //start password reset
+        final String baseUrl = "http://abra.cadabra?";
+        client.forgetRequest(user.getEmail(), baseUrl);
+
+        //get security token
+        final EmailMessage msg = context.getBean(MockEmailService.class).getMessages().remove(0);
+        final String securityToken = getSecurityTokenFromEmail(msg, baseUrl);
+
+        assertEquals(1, msg.getEmails().length);
+        assertEquals(user.getEmail(), msg.getEmails()[0]);
+        assertNotNull(msg.getSubject());
+        assertTrue(msg.getSubject().length() > 0);
+
+        //attempt to reset password with incorrect token
+        try {
+            client.resetPassword(user.getEmail(), newpassword, securityToken + "abrakadabra");
+            throw new AssertionFailedError("Authentication error should occurring");
+        } catch (final Exception e) {
+            // is ok
+        }
+
+        //attempt to reset password with correct token
+        client.resetPassword(user.getEmail(), newpassword, securityToken);
+
+        final String token = client.login(user.getEmail(), newpassword);
+        assertNotNull(token);
+    }
+    /**
+     * @param msg email message.
+     * @param baseUrl
+     * @return
+     */
+    private String getSecurityTokenFromEmail(final EmailMessage msg, final String baseUrl) {
+        final String body = msg.getMessage();
+        final int offset = body.indexOf(baseUrl) + baseUrl.length();
+
+        final String paramString = body.substring(offset, body.indexOf(' ', offset));
+
+        final Map<String, String> params = new HashMap<>();
+        for (final String pairStr : paramString.split("&")) {
+            final String[] pair = pairStr.split("=");
+            params.put(pair[0].trim(), pair[1].trim());
+        }
+
+        return params.get("token");
     }
 }

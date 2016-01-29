@@ -111,7 +111,7 @@ public class AuthenticationController extends AbstractController {
      * @param token security token
      * @return
      */
-    @RequestMapping(value = "/resetRequest", method = RequestMethod.GET)
+    @RequestMapping(value = "/resetPassword", method = RequestMethod.GET)
     public JsonObject resetPassword(
             @RequestParam final String email,
             @RequestParam final String password,
@@ -121,7 +121,7 @@ public class AuthenticationController extends AbstractController {
             authService.resetPassword(email, password, token);
             return createSuccessResponse(null);
         } catch (final Exception e) {
-            log.error("Failed to start of reset password for " + email, e);
+            log.error("Failed to reset password for " + email, e);
             return createErrorResponse(e);
         }
     }

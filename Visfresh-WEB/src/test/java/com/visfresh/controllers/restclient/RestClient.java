@@ -98,6 +98,35 @@ public class RestClient  {
         return parseAuthToken(response);
     }
     /**
+     * @param email
+     * @param newpassword
+     * @param token
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void resetPassword(final String email, final String newpassword, final String token)
+            throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("email", email);
+        params.put("password", newpassword);
+        params.put("token", token);
+
+        sendGetRequest(REST_SERVICE + "/resetPassword", params);
+    }
+    /**
+     * @param email email.
+     * @param baseUrl base final URL.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void forgetRequest(final String email, final String baseUrl) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("email", email);
+        params.put("baseUrl", baseUrl);
+
+        sendGetRequest(REST_SERVICE + "/forgetRequest", params);
+    }
+    /**
      * @param path URL path.
      * @param params request parameters.
      * @return JSON response.

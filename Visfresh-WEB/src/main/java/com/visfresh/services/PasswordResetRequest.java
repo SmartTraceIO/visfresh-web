@@ -12,7 +12,7 @@ import java.util.Date;
 public class PasswordResetRequest {
     private static final long CHECK_PASSWORD_EXPIRATION_TIMEOUT = 15 * 60 * 1000l; //15 min
     private final String secureString;
-    private final Date creationDate = new Date(System.currentTimeMillis() + CHECK_PASSWORD_EXPIRATION_TIMEOUT);
+    private Date creationDate;
 
     /**
      * @param secureString security string.
@@ -20,8 +20,15 @@ public class PasswordResetRequest {
     public PasswordResetRequest(final String secureString) {
         super();
         this.secureString = secureString;
+        resetExpiration();
     }
 
+    /**
+     * Resets the request expiration.
+     */
+    public void resetExpiration() {
+        creationDate = new Date(System.currentTimeMillis() + CHECK_PASSWORD_EXPIRATION_TIMEOUT);
+    }
     /**
      * @return the creationDate
      */

@@ -274,6 +274,10 @@ public class DefaultAuthService implements AuthService {
             if (reset == null) {
                 reset = new PasswordResetRequest(generateSecureString());
                 passwordResets.put(email, reset);
+                log.debug("Passwort reset request has created for user " + email);
+            } else {
+                reset.resetExpiration();
+                log.debug("Found unexpired passwort reset request for user " + email);
             }
         }
 
@@ -326,6 +330,7 @@ public class DefaultAuthService implements AuthService {
                     "passwordreset.reset.tokenNotMatches", replacements));
         }
 
+        passwordResets.remove(email);
         final User user = userDao.findByEmail(email);
         if (user == null) {
             throw new AuthenticationException(Messages.getMessage("passwordreset.userNotFound", replacements));
@@ -342,7 +347,6 @@ public class DefaultAuthService implements AuthService {
             throw new AuthenticationException("Failed to send new password saved email to user " + email, e);
         }
     }
-
 
     /* (non-Javadoc)
      * @see com.visfresh.services.AuthService#refreshToken(java.lang.String)
