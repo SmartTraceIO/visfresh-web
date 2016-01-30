@@ -50,7 +50,7 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
     @Autowired
     public ShipmentSiblingServiceImpl(final Environment env) {
         super();
-        detectSiblingsTimeOut = Integer.parseInt(env.getProperty("sibling.detect.timeOut", "15")) * 1000l;
+        detectSiblingsTimeOut = Integer.parseInt(env.getProperty("sibling.detect.timeOut", "180")) * 1000l;
     }
     /**
      * Default constructor.

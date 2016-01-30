@@ -60,7 +60,7 @@ import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentDtoNew;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.io.shipment.SingleShipmentTimeItem;
-import com.visfresh.rules.AlertDescriptionBuilder;
+import com.visfresh.mpl.services.AlertDescriptionBuilder;
 import com.visfresh.services.ArrivalEstimation;
 import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.services.LocationService;
@@ -697,7 +697,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final String address, final String timeIso) {
         final SingleShipmentAlert alert = new SingleShipmentAlert();
 
-        alert.setTitle(alertDescriptionBuilder.buildDescription(a, user));
+        alert.setTitle(alertDescriptionBuilder.buildDescriptionForSingleShipment(a, user));
         alert.setType("ArrivalNotice");
         alert.getLines().add(alertDescriptionBuilder.buildShortDescription(a, user));
         alert.getLines().add(address);

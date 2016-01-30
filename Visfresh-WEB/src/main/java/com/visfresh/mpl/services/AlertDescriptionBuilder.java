@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.rules;
+package com.visfresh.mpl.services;
 
 import static com.visfresh.utils.DateTimeUtils.createDateFormat;
 
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.ShipmentIssue;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
@@ -52,56 +53,69 @@ public class AlertDescriptionBuilder {
      *    ${temperature}
      *    ${period}
      *
-     * @param alert alert
+     * @param issue alert
      * @param user target user.
      * @return description for given alert.
      */
-    public String buildDescription(final Alert alert, final User user) {
+    public String buildDescription(final ShipmentIssue issue, final User user) {
         final ResourceBundle bundle = ResourceBundle.getBundle("alerts", XmlControl.INSTANCE);
-        final String str = bundle.getString(createBundleKey(alert));
-        return StringUtils.getMessage(str, createReplacementMap(alert, user));
+        final String str = bundle.getString(createBundleKey(issue));
+        return StringUtils.getMessage(str, createReplacementMap(issue, user));
     }
 
     /**
      * @param alert
      * @return
      */
-    private String createBundleKey(final Alert alert) {
-        String key = alert.getType().toString();
-        if (alert instanceof TemperatureAlert && ((TemperatureAlert) alert).isCumulative()) {
-            key += ".cumulative";
+    private String createBundleKey(final ShipmentIssue issue) {
+        String key = "";
+
+        if (issue instanceof Alert) {
+            final Alert alert = (Alert) issue;
+            key = alert.getType().toString();
+            if (alert instanceof TemperatureAlert && ((TemperatureAlert) alert).isCumulative()) {
+                key += ".cumulative";
+            }
+        } else if (issue instanceof Arrival) {
+            return "Arrival";
         }
         return key;
     }
     /**
-     * @param alert alert.
+     * @param issue alert.
      * @return map of replacements.
      */
-    private Map<String, String> createReplacementMap(final Alert alert, final User user) {
+    private Map<String, String> createReplacementMap(final ShipmentIssue issue, final User user) {
         final Map<String, String> map = new HashMap<String, String>();
         //supported place holders:
         //${date} alert issue date include day and year
         DateFormat sdf = createDateFormat(user, AbstractJsonSerializer.DATE_FORMAT);
-        map.put("date", sdf.format(alert.getDate()));
+        map.put("date", sdf.format(issue.getDate()));
         //${time} the time in scope of day.
         sdf = createDateFormat(user, "HH:mm");
-        map.put("time", sdf.format(alert.getDate()));
-        //${type} alert type
-        map.put("type", alert.getType().toString());
+        map.put("time", sdf.format(issue.getDate()));
         //${device} device IMEI
-        map.put("device", alert.getDevice().getImei());
+        map.put("device", issue.getDevice().getImei());
         //${devicesn} device serial number
-        map.put("devicesn", alert.getDevice().getSn());
+        map.put("devicesn", issue.getDevice().getSn());
         //${tripCount} trip count for given device of shipment.
-        map.put("tripCount", Integer.toString(alert.getShipment().getTripCount()));
+        map.put("tripCount", Integer.toString(issue.getShipment().getTripCount()));
 
-        //for temperature alerts:
-        if (alert instanceof TemperatureAlert) {
-            final TemperatureAlert ta = (TemperatureAlert) alert;
-            //${temperature}
-            map.put("temperature", getTemperatureString(ta.getTemperature(), user.getTemperatureUnits()));
-            //${period}
-            map.put("period", Integer.toString(ta.getMinutes()));
+        if (issue instanceof Alert) {
+            //for temperature alerts:
+            //${type} alert type
+            map.put("type", ((Alert) issue).getType().toString());
+
+            if (issue instanceof TemperatureAlert) {
+                final TemperatureAlert ta = (TemperatureAlert) issue;
+                //${temperature}
+                map.put("temperature", getTemperatureString(ta.getTemperature(), user.getTemperatureUnits()));
+                //${period}
+                map.put("period", Integer.toString(ta.getMinutes()));
+            }
+        } else if (issue instanceof Arrival) {
+            final Arrival a = (Arrival) issue;
+            map.put("mettersForArrival", Integer.toString(a.getNumberOfMettersOfArrival()));
         }
 
         return map;
@@ -266,7 +280,7 @@ public class AlertDescriptionBuilder {
      * @param user user.
      * @return arrival description.
      */
-    public String buildDescription(final Arrival a, final User user) {
+    public String buildDescriptionForSingleShipment(final Arrival a, final User user) {
         return "Arrival Notification for Tracker #"
                 + a.getDevice().getSn()
                 + "("

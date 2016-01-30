@@ -2,17 +2,22 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 	<!-- 
-	supported place holders:
+	common shipment issue place holders:
 	${date} alert issue date include day and year
 	${time} the time in scope of day.
-	${type} alert type
 	${device} device IMEI
 	${devicesn} device serial number
 	${tripCount} trip count for given device of shipment.
-	
+
+	for alerts:
+	${type} alert type
+		
 	for temperature alerts:
 	${temperature}
 	${period}
+	
+	for arrivals:
+	${mettersForArrival} the number of meters for arrival
 	 -->
 	<!-- Cold -->
 	<entry key="Cold">Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min</entry>
@@ -43,5 +48,5 @@
 	<!-- Battery -->
 	<entry key="Battery">Battery Alert. Low battery at ${time}</entry>
 	<!-- Arrival -->
-	<entry key="Arrival"></entry>
+	<entry key="Arrival">Tracker ${devicesn}(${tripCount}) is in ${mettersForArrival} meters for arrival</entry>
 </properties>

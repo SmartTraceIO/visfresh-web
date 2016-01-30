@@ -36,7 +36,7 @@ import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentDtoNew;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.io.shipment.SingleShipmentTimeItem;
-import com.visfresh.rules.AlertDescriptionBuilder;
+import com.visfresh.mpl.services.AlertDescriptionBuilder;
 import com.visfresh.services.lists.ListNotificationScheduleItem;
 import com.visfresh.services.lists.ListShipmentItem;
 import com.visfresh.utils.StringUtils;

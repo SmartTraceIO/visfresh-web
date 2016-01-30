@@ -25,7 +25,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
-import com.visfresh.rules.AlertDescriptionBuilder;
+import com.visfresh.mpl.services.AlertDescriptionBuilder;
 import com.visfresh.services.lists.ListAlertProfileItem;
 
 /**

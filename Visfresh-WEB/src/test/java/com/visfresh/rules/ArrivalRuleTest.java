@@ -7,8 +7,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,16 +18,25 @@ import org.junit.Test;
 import com.google.gson.JsonObject;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.SystemMessageDao;
+import com.visfresh.dao.UserDao;
+import com.visfresh.entities.Arrival;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.entities.User;
+import com.visfresh.io.email.EmailMessage;
+import com.visfresh.mock.MockEmailService;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.services.RetryableException;
 import com.visfresh.utils.SerializerUtils;
@@ -82,15 +93,8 @@ public class ArrivalRuleTest extends BaseRuleTest {
     public void testHandle() {
         shipment.setArrivalNotificationWithinKm(1);
 
-        final TrackerEvent e = new TrackerEvent();
-        e.setDevice(shipment.getDevice());
-        e.setShipment(shipment);
-        e.setTime(new Date());
-        e.setType(TrackerEventType.AUT);
-        e.setLatitude(10);
-        e.setLongitude(10);
-
         final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
 
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
@@ -101,7 +105,63 @@ public class ArrivalRuleTest extends BaseRuleTest {
         rule.handle(req);
 
         //check arrival created
-        assertEquals(1, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
+        final List<Arrival> arrivals = context.getBean(ArrivalDao.class).findAll(null, null, null);
+        assertEquals(1, arrivals.size());
+
+        final Arrival arrival = arrivals.get(0);
+        assertEquals(shipment.getId(), arrival.getShipment().getId());
+    }
+    @Test
+    public void testNotification() {
+        shipment.setArrivalNotificationWithinKm(0);
+
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
+
+        //create user
+        final User user = new User();
+        user.setCompany(company);
+        user.setPassword("password");
+        user.setEmail("arrival.developer@visfresh.com");
+        user.setActive(true);
+        user.setLanguage(Language.English);
+        user.setTimeZone(TimeZone.getDefault());
+        user.setFirstName("Arrival");
+        user.setLastName("Developer");
+        context.getBean(UserDao.class).save(user);
+
+        //create notification schedule
+        final PersonSchedule schedule = new PersonSchedule();
+        schedule.setSendEmail(true);
+        schedule.setFromTime(0);
+        Arrays.fill(schedule.getWeekDays(), true);
+        schedule.setToTime(60 * 24 - 1);
+        schedule.setUser(user);
+
+        final NotificationSchedule s = new NotificationSchedule();
+        s.setName("Arrival Notification");
+        s.getSchedules().add(schedule);
+        s.setCompany(company);
+        context.getBean(NotificationScheduleDao.class).save(s);
+
+        shipment.setShippedTo(loc);
+        shipment.setAlertSuppressionMinutes(0);
+        shipment.getArrivalNotificationSchedules().add(s);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        //set nearest location
+        final RuleContext req = new RuleContext(e, new DeviceState());
+        assertTrue(rule.accept(req));
+        rule.handle(req);
+
+        //check notification send
+        final List<EmailMessage> emails = context.getBean(MockEmailService.class).getMessages();
+        assertEquals(1, emails.size());
+
+        final EmailMessage msg = emails.get(0);
+        assertEquals(1, msg.getEmails().length);
+        assertEquals(user.getEmail(), msg.getEmails()[0]);
+        assertTrue(msg.getMessage().contains(shipment.getDevice().getSn()));
     }
     @Test
     public void testShutdownDevice() {

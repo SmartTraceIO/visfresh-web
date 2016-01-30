@@ -18,7 +18,6 @@ import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.User;
-import com.visfresh.rules.AlertDescriptionBuilder;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.NotificationService;
 import com.visfresh.services.SmsService;
@@ -64,10 +63,9 @@ public class NotificationServiceImpl implements NotificationService {
      * @param arrival arrival.
      */
     private void sendArrivalNotification(final PersonSchedule s, final Arrival arrival) {
-        final String message = "Device is in " + arrival.getNumberOfMettersOfArrival() + " meters for arrival";
-        sendNotification(s, "Arrival Notification", message, arrival);
+        sendNotification(s, "Arrival Notification",
+                descriptionBuilder.buildDescription(arrival, s.getUser()), arrival);
     }
-
     /**
      * @param s person schedule.
      * @param alert alert.
