@@ -12,6 +12,7 @@ import com.visfresh.entities.Shipment;
 public class DeviceState {
     private RulesState temperatureAlerts = new RulesState();
     private Long shipmentId;
+    private boolean arrivalProcessed;
 
     /**
      * Default constructor.
@@ -40,6 +41,7 @@ public class DeviceState {
         if (shipmentId == null || !shipmentId.equals(s.getId())) {
             shipmentId = s.getId();
             this.temperatureAlerts.clear();
+            arrivalProcessed = false;
         }
     }
     /**
@@ -53,5 +55,14 @@ public class DeviceState {
      */
     public void setShipmentId(final Long shipmentId) {
         this.shipmentId = shipmentId;
+    }
+    public void setArrivalProcessed(final boolean p) {
+        arrivalProcessed = p;
+    }
+    /**
+     * @return the arrivalProcessed
+     */
+    public boolean isArrivalProcessed() {
+        return arrivalProcessed;
     }
 }

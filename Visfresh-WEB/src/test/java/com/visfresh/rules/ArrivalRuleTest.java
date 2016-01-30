@@ -27,6 +27,7 @@ import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.state.DeviceState;
+import com.visfresh.services.RetryableException;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -64,13 +65,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         //final location not set
         assertFalse(rule.accept(req));
 
-        LocationProfile loc = new LocationProfile();
-        loc.setAddress("SPb");
-        loc.setCompany(company);
-        loc.setName("Finish location");
-        loc.getLocation().setLatitude(10);
-        loc.getLocation().setLongitude(10);
-        loc = context.getBean(LocationProfileDao.class).save(loc);
+        final LocationProfile loc = createLocation();
 
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
@@ -95,13 +90,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         e.setLatitude(10);
         e.setLongitude(10);
 
-        LocationProfile loc = new LocationProfile();
-        loc.setAddress("SPb");
-        loc.setCompany(company);
-        loc.setName("Finish location");
-        loc.getLocation().setLatitude(10);
-        loc.getLocation().setLongitude(10);
-        loc = context.getBean(LocationProfileDao.class).save(loc);
+        final LocationProfile loc = createLocation();
 
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
@@ -119,21 +108,8 @@ public class ArrivalRuleTest extends BaseRuleTest {
         shipment.setArrivalNotificationWithinKm(1);
         shipment.setShutdownDeviceAfterMinutes(11);
 
-        final TrackerEvent e = new TrackerEvent();
-        e.setDevice(shipment.getDevice());
-        e.setShipment(shipment);
-        e.setTime(new Date());
-        e.setType(TrackerEventType.AUT);
-        e.setLatitude(10);
-        e.setLongitude(10);
-
-        LocationProfile loc = new LocationProfile();
-        loc.setAddress("SPb");
-        loc.setCompany(company);
-        loc.setName("Finish location");
-        loc.getLocation().setLatitude(10);
-        loc.getLocation().setLongitude(10);
-        loc = context.getBean(LocationProfileDao.class).save(loc);
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
 
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
@@ -143,7 +119,32 @@ public class ArrivalRuleTest extends BaseRuleTest {
         rule.accept(req);
         rule.handle(req);
 
-        //check arrival created
+        //check shipment shutdown request has sent
+        final List<SystemMessage> systemMessages = context.getBean(SystemMessageDao.class).findAll(null, null, null);
+        assertEquals(1, systemMessages.size());
+
+        //check message is device shutdown.
+        final SystemMessage sm = systemMessages.get(0);
+        assertEquals(SystemMessageType.ShutdownShipment, sm.getType());
+
+        final JsonObject json = SerializerUtils.parseJson(sm.getMessageInfo()).getAsJsonObject();
+        assertEquals(shipment.getId().longValue(), json.get("shipment").getAsLong());
+    }
+    @Test
+    public void testAcceptShipmentShutdown() throws RetryableException {
+        //create shutdown shipment message
+        JsonObject json = new JsonObject();
+        json.addProperty("shipment", shipment.getId());
+
+        final SystemMessage msg = new SystemMessage();
+        msg.setId(1l);
+        msg.setMessageInfo(json.toString());
+        msg.setRetryOn(new Date());
+        msg.setTime(new Date());
+        msg.setType(SystemMessageType.ShutdownShipment);
+
+        rule.handle(msg);
+
         final List<SystemMessage> systemMessages = context.getBean(SystemMessageDao.class).findAll(null, null, null);
         assertEquals(1, systemMessages.size());
 
@@ -151,28 +152,15 @@ public class ArrivalRuleTest extends BaseRuleTest {
         final SystemMessage sm = systemMessages.get(0);
         assertEquals(SystemMessageType.DeviceCommand, sm.getType());
 
-        final JsonObject json = SerializerUtils.parseJson(sm.getMessageInfo()).getAsJsonObject();
+        json = SerializerUtils.parseJson(sm.getMessageInfo()).getAsJsonObject();
         assertEquals(DeviceCommand.SHUTDOWN, json.get("command").getAsString());
     }
     @Test
     public void testArrivalWith0KmConfigured() {
         shipment.setArrivalNotificationWithinKm(0);
 
-        final TrackerEvent e = new TrackerEvent();
-        e.setDevice(shipment.getDevice());
-        e.setShipment(shipment);
-        e.setTime(new Date());
-        e.setType(TrackerEventType.AUT);
-        e.setLatitude(10);
-        e.setLongitude(10);
-
-        LocationProfile loc = new LocationProfile();
-        loc.setAddress("SPb");
-        loc.setCompany(company);
-        loc.setName("Finish location");
-        loc.getLocation().setLatitude(10);
-        loc.getLocation().setLongitude(10);
-        loc = context.getBean(LocationProfileDao.class).save(loc);
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
 
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
@@ -180,5 +168,60 @@ public class ArrivalRuleTest extends BaseRuleTest {
         //set nearest location
         final RuleContext req = new RuleContext(e, new DeviceState());
         assertTrue(rule.accept(req));
+    }
+    @Test
+    public void testPreventOfDoubleHandling() {
+        shipment.setArrivalNotificationWithinKm(0);
+
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        final DeviceState state = new DeviceState();
+        //set nearest location
+        final RuleContext req = new RuleContext(e, state);
+        assertTrue(rule.accept(req));
+        rule.handle(req);
+
+        assertFalse(rule.accept(new RuleContext(e, state)));
+    }
+
+    /**
+     * @param loc location.
+     * @return tracker event with latitude/longitude near the given location.
+     */
+    private TrackerEvent createEventNearLocation(final LocationProfile loc) {
+        final TrackerEvent e = createEvent(loc.getLocation().getLatitude(), loc.getLocation().getLongitude());
+        return e;
+    }
+    /**
+     * @param lat latitude.
+     * @param lon longitude
+     * @return tracker event with given latitude longitude.
+     */
+    private TrackerEvent createEvent(final double lat, final double lon) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setDevice(shipment.getDevice());
+        e.setShipment(shipment);
+        e.setTime(new Date());
+        e.setType(TrackerEventType.AUT);
+        e.setLatitude(lat);
+        e.setLongitude(lon);
+        return e;
+    }
+    /**
+     * @return location.
+     */
+    private LocationProfile createLocation() {
+        LocationProfile loc = new LocationProfile();
+        loc.setAddress("SPb");
+        loc.setCompany(company);
+        loc.setName("Finish location");
+        loc.getLocation().setLatitude(10);
+        loc.getLocation().setLongitude(10);
+        loc = context.getBean(LocationProfileDao.class).save(loc);
+        return loc;
     }
 }

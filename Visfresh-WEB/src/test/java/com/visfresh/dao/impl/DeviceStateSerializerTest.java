@@ -12,8 +12,10 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.gson.JsonObject;
 import com.visfresh.io.json.DeviceStateSerializer;
 import com.visfresh.rules.state.DeviceState;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -48,6 +50,7 @@ public class DeviceStateSerializerTest {
         s.getTemperatureAlerts().getDates().put("1", d1);
         s.getTemperatureAlerts().getDates().put("2", d2);
         s.getTemperatureAlerts().getProperties().put("key", "value");
+        s.setArrivalProcessed(true);
 
         final String str = serializer.toString(s);
         s = serializer.parseState(str);
@@ -58,6 +61,24 @@ public class DeviceStateSerializerTest {
         assertEquals(format(d2), format(s.getTemperatureAlerts().getDates().get("2")));
         assertEquals("value", s.getTemperatureAlerts().getProperties().get("key"));
         assertEquals(shipmentId, s.getShipmentId());
+        assertEquals(true, s.isArrivalProcessed());
+    }
+    @Test
+    public void testSupportsNullArrivalProcessed() {
+        DeviceState s = new DeviceState();
+        s.setShipmentId(0l);
+
+        final String str = serializer.toString(s);
+        //remove arrival processed property
+        final JsonObject obj = SerializerUtils.parseJson(str).getAsJsonObject();
+
+        assertNotNull(obj.get("arrivalProcessed"));
+        obj.remove("arrivalProcessed");
+
+        s = serializer.parseState(obj.toString());
+
+        assertNotNull(s);
+        assertEquals(false, s.isArrivalProcessed());
     }
     /**
      * @param date the date to format.

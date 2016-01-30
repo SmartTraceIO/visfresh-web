@@ -86,7 +86,7 @@ public class SystemMessageDaoTest extends
         dao.save(m1);
         //check message type
         types.clear();
-        types.add(SystemMessageType.Other);
+        types.add(SystemMessageType.DeviceCommand);
         assertEquals(0, dao.selectMessagesForProcessing(types, processor, 100,
                 new Date(m1.getRetryOn().getTime() + 10L)).size());
 

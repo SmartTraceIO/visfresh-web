@@ -29,7 +29,7 @@ public class MainSystemMessageDispatcher extends AbstractSystemMessageDispatcher
      */
     @Autowired
     public MainSystemMessageDispatcher(final Environment env) {
-        super(SystemMessageType.DeviceCommand);
+        super(SystemMessageType.ShutdownShipment, SystemMessageType.DeviceCommand);
         processorId = env.getProperty("main.dispatcher.baseProcessorId", "main-dispatcher");
         setBatchLimit(Integer.parseInt(env.getProperty("main.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("main.dispatcher.retryLimit", "5")));

@@ -12,5 +12,5 @@ public enum SystemMessageType {
     SMS,
     Email,
     DeviceCommand,
-    Other
+    ShutdownShipment
 }

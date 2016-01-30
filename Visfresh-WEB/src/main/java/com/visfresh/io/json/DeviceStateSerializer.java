@@ -20,6 +20,10 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 public class DeviceStateSerializer extends AbstractJsonSerializer {
+    private static final String ARRIVAL_PROCESSED = "arrivalProcessed";
+    private static final String SHIPMENT_ID = "shipmentId";
+    private static final String TEMPERATURE_ALERTS = "temperatureAlerts";
+
     /**
      * Default constructor.
      */
@@ -60,8 +64,9 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject json = new JsonObject();
-        json.add("temperatureAlerts", toJson(state.getTemperatureAlerts()));
-        json.addProperty("shipmentId", state.getShipmentId());
+        json.add(TEMPERATURE_ALERTS, toJson(state.getTemperatureAlerts()));
+        json.addProperty(SHIPMENT_ID, state.getShipmentId());
+        json.addProperty(ARRIVAL_PROCESSED, state.isArrivalProcessed());
         return json;
     }
     /**
@@ -70,8 +75,9 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
      */
     private DeviceState parseState(final JsonObject json) {
         final DeviceState s = new DeviceState();
-        s.setTemperatureAlerts(parseRulesState(json.get("temperatureAlerts")));
-        s.setShipmentId(asLong(json.get("shipmentId")));
+        s.setTemperatureAlerts(parseRulesState(json.get(TEMPERATURE_ALERTS)));
+        s.setShipmentId(asLong(json.get(SHIPMENT_ID)));
+        s.setArrivalProcessed(Boolean.TRUE.equals(asBoolean(json.get(ARRIVAL_PROCESSED))));
         return s;
     }
     /**

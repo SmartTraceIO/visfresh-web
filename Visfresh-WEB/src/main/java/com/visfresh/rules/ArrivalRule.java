@@ -9,28 +9,40 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonObject;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.SystemMessage;
+import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.mpl.services.MainSystemMessageDispatcher;
 import com.visfresh.services.DeviceCommandService;
+import com.visfresh.services.RetryableException;
+import com.visfresh.services.SystemMessageHandler;
 import com.visfresh.utils.LocationUtils;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class ArrivalRule extends AbstractNotificationRule {
+public class ArrivalRule extends AbstractNotificationRule implements SystemMessageHandler {
     private static final Logger log = LoggerFactory.getLogger(ArrivalRule.class);
 
     public static final String NAME = "Arrival";
@@ -38,7 +50,11 @@ public class ArrivalRule extends AbstractNotificationRule {
     @Autowired
     protected ArrivalDao arrivalDao;
     @Autowired
+    protected ShipmentDao shipmentDao;
+    @Autowired
     private DeviceCommandService commandService;
+    @Autowired
+    private MainSystemMessageDispatcher systemMessageDispatcher;
 
     /**
      * Default constructor.
@@ -53,8 +69,9 @@ public class ArrivalRule extends AbstractNotificationRule {
     @Override
     public boolean accept(final RuleContext req) {
         final TrackerEvent event = req.getEvent();
-        final boolean accept = super.accept(req) && isNearEndLocation(
-                event.getShipment(), event.getLatitude(), event.getLongitude());
+        final boolean accept = !req.getState().isArrivalProcessed()
+                && super.accept(req)
+                && isNearEndLocation(event.getShipment(), event.getLatitude(), event.getLongitude());
         if (accept) {
             log.debug("Arrival Rule matches for shipment "
                     + event.getShipment().getShipmentDescription()
@@ -100,6 +117,7 @@ public class ArrivalRule extends AbstractNotificationRule {
         final Arrival arrival = new Arrival();
         final TrackerEvent event = context.getEvent();
         context.setProcessed(this);
+        context.getState().setArrivalProcessed(true);
 
         arrival.setDate(event.getTime());
         arrival.setDevice(event.getDevice());
@@ -109,8 +127,9 @@ public class ArrivalRule extends AbstractNotificationRule {
 
         saveArrival(arrival);
         if (event.getShipment().getShutdownDeviceAfterMinutes() != null) {
-            final long date = System.currentTimeMillis() + event.getShipment().getShutdownDeviceAfterMinutes() * 60 * 1000l;
-            commandService.shutdownDevice(event.getDevice(), new Date(date));
+            final long date = System.currentTimeMillis()
+                    + event.getShipment().getShutdownDeviceAfterMinutes() * 60 * 1000l;
+            sendShipmentShutdown(event.getShipment(), new Date(date));
         }
 
         final Calendar date = new GregorianCalendar();
@@ -149,8 +168,49 @@ public class ArrivalRule extends AbstractNotificationRule {
         return all;
     }
 
+    @PostConstruct
+    public void listenSystemMessage() {
+        this.systemMessageDispatcher.setSystemMessageHandler(SystemMessageType.ShutdownShipment, this);
+    }
+    @PreDestroy
+    public void destroy() {
+        this.systemMessageDispatcher.setSystemMessageHandler(SystemMessageType.ShutdownShipment, null);
+    }
+    /**
+     * @param shipment shipment.
+     * @param date shutdown date.
+     */
+    private void sendShipmentShutdown(final Shipment shipment, final Date date) {
+        final JsonObject json = new JsonObject();
+        json.addProperty("shipment", shipment.getId());
+
+        systemMessageDispatcher.sendSystemMessage(json.toString(), SystemMessageType.ShutdownShipment, date);
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.services.SystemMessageHandler#handle(com.visfresh.entities.SystemMessage)
+     */
+    @Override
+    public void handle(final SystemMessage msg) throws RetryableException {
+        final JsonObject json = SerializerUtils.parseJson(msg.getMessageInfo()).getAsJsonObject();
+        final Shipment s = shipmentDao.findOne(json.get("shipment").getAsLong());
+
+        //send device shutdown command
+        commandService.shutdownDevice(s.getDevice(), new Date());
+
+        //update shipment status
+        s.setStatus(ShipmentStatus.Complete);
+        shipmentDao.save(s);
+    }
+
     @Override
     public String getName() {
         return NAME;
+    }
+    /**
+     * @return
+     */
+    protected static String createProcessedKey() {
+        return NAME + "_processed";
     }
 }
