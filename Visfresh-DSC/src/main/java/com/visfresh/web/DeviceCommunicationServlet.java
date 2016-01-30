@@ -75,18 +75,29 @@ public class DeviceCommunicationServlet extends HttpServlet {
         final Device device = deviceDao.getByImei(msg.getImei());
 
         if (device != null) {
+            final List<DeviceCommand> commands = deviceCommandDao.getFoDevice(device.getImei());
+            DeviceCommand cmd = null;
+            boolean hasShutdown = false;
+
+            if (!commands.isEmpty()) {
+                cmd = commands.get(0);
+                hasShutdown = cmd.getCommand().toLowerCase().contains("shutdown");
+            }
+
             if (msg.getType() == DeviceMessageType.RSP) {
                 //process response to server command
                 log.debug("Device response has received " + msg);
-            } else {
+            } else if (!hasShutdown){
                 messageDao.create(msg);
+            } else {
+                log.debug("Shutdown command found for device "
+                        + device.getImei() + ", current message "
+                        + msg + "will not pushed to system");
             }
 
-            final List<DeviceCommand> commands = deviceCommandDao.getFoDevice(device.getImei());
-            if (!commands.isEmpty()) {
-                final DeviceCommand cmd = commands.get(0);
+            if (cmd != null) {
                 final String command = cmd.getCommand();
-                log.debug("Found command " + command + " for device, sending to device");
+                log.debug("Sending command " + command + " to device " + device.getImei());
                 resp.getOutputStream().write(command.getBytes());
 
                 deviceCommandDao.delete(cmd);
