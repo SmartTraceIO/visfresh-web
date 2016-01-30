@@ -8,7 +8,7 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class Arrival extends ShipmentIssue {
+public class Arrival extends NotificationIssue {
     /**
      * Number of meters of arrival
      */

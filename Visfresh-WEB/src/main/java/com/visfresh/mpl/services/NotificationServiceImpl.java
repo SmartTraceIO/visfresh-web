@@ -118,6 +118,7 @@ public class NotificationServiceImpl implements NotificationService {
             notificationDao.save(n);
         }
     }
+
     /**
      * @param s personal schedule.
      * @return person description.

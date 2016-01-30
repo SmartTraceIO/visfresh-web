@@ -18,6 +18,14 @@ public abstract class NotificationIssue implements EntityWithId<Long>, Comparabl
      * Date of occurrence.
      */
     private Date date;
+    /**
+     * Device.
+     */
+    private Device device;
+    /**
+     * Shipment;
+     */
+    private Shipment shipment;
 
     /**
      * Default constructor.
@@ -50,6 +58,31 @@ public abstract class NotificationIssue implements EntityWithId<Long>, Comparabl
     public void setId(final Long id) {
         this.id = id;
     }
+    /**
+     * @return the device
+     */
+    public Device getDevice() {
+        return device;
+    }
+    /**
+     * @param device the device
+     */
+    public void setDevice(final Device device) {
+        this.device = device;
+    }
+    /**
+     * @return the shipment
+     */
+    public Shipment getShipment() {
+        return shipment;
+    }
+    /**
+     * @param shipment the shipment to set
+     */
+    public void setShipment(final Shipment shipment) {
+        this.shipment = shipment;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */

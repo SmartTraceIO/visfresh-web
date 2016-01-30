@@ -28,8 +28,6 @@ import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.User;
-import com.visfresh.io.DeviceResolver;
-import com.visfresh.io.ShipmentResolver;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -65,8 +63,6 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
 
         client.setServiceUrl(getServiceUrl());
         client.setAuthToken(login());
-        client.setDeviceResolver(context.getBean(DeviceResolver.class));
-        client.setShipmentResolver(context.getBean(ShipmentResolver.class));
     }
     //@RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getNotifications(@PathVariable final String authToken,

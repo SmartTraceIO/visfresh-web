@@ -8,7 +8,7 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class Alert extends ShipmentIssue {
+public class Alert extends NotificationIssue {
     /**
      * Alert type.
      */

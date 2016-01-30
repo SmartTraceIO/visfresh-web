@@ -155,7 +155,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         assertEquals(3, dao.findAll(null, null, null).size());
 
         final Filter filter = new Filter();
-        filter.addFilter(NotificationConstants.PROPERTY_ISREAD, Boolean.FALSE);
+        filter.addFilter(NotificationConstants.PROPERTY_CLOSED, Boolean.FALSE);
         assertEquals(2, dao.findAll(filter, null, null).size());
     }
 

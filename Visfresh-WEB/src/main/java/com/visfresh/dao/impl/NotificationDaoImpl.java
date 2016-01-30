@@ -80,9 +80,9 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      */
     public NotificationDaoImpl() {
         super();
-        propertyToDbMap.put(NotificationConstants.PROPERTY_ID, ID_FIELD);
+        propertyToDbMap.put(NotificationConstants.PROPERTY_NOTIFICATION_ID, ID_FIELD);
         propertyToDbMap.put(NotificationConstants.PROPERTY_TYPE, TYPE_FIELD);
-        propertyToDbMap.put(NotificationConstants.PROPERTY_ISREAD, ISREAD_FIELD);
+        propertyToDbMap.put(NotificationConstants.PROPERTY_CLOSED, ISREAD_FIELD);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.NotificationDao#findByShipment(java.lang.Long)

@@ -3,6 +3,8 @@
  */
 package com.visfresh.controllers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,11 +27,13 @@ import com.visfresh.dao.Filter;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
+import com.visfresh.entities.Alert;
 import com.visfresh.entities.Notification;
+import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.User;
-import com.visfresh.io.DeviceResolver;
-import com.visfresh.io.ShipmentResolver;
+import com.visfresh.io.NotificationItem;
 import com.visfresh.io.json.NotificationSerializer;
+import com.visfresh.mpl.services.AlertDescriptionBuilder;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -46,9 +50,7 @@ public class NotificationController extends AbstractController implements Notifi
     @Autowired
     private NotificationDao dao;
     @Autowired
-    private DeviceResolver deviceResolver;
-    @Autowired
-    private ShipmentResolver shipmentResolver;
+    private AlertDescriptionBuilder descriptionBuilder;
 
     /**
      * Default constructor.
@@ -79,7 +81,7 @@ public class NotificationController extends AbstractController implements Notifi
                 filter = null;
             } else {
                 filter = new Filter();
-                filter.addFilter(PROPERTY_ISREAD, Boolean.FALSE);
+                filter.addFilter(PROPERTY_CLOSED, Boolean.FALSE);
             }
 
             final List<Notification> ns = dao.findForUser(user,
@@ -87,10 +89,11 @@ public class NotificationController extends AbstractController implements Notifi
                     filter,
                     page);
 
-            final int total = dao.getEntityCount(user, null);
+            final int total = dao.getEntityCount(user, filter);
             final JsonArray array = new JsonArray();
+            final DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
             for (final Notification t : ns) {
-                array.add(ser.toJson(t));
+                array.add(ser.toJson(createNotificationItem(t, user, isoFormat)));
             }
 
             return createListSuccessResponse(array, total);
@@ -100,21 +103,48 @@ public class NotificationController extends AbstractController implements Notifi
         }
     }
     /**
-     * @param user
-     * @return
+     * @param n notification.
+     * @param user user.
+     * @return notification item.
+     */
+    private NotificationItem createNotificationItem(final Notification n, final User user, final DateFormat isoFormatter) {
+        final NotificationItem item = new NotificationItem();
+        item.setAlertId(n.getIssue().getId());
+        if (n.getType() == NotificationType.Alert) {
+            final Alert alert = (Alert) n.getIssue();
+            item.setAlertType(alert.getType());
+        }
+
+        item.setClosed(n.isRead());
+        item.setDate(isoFormatter.format(n.getIssue().getDate()));
+        item.setNotificationId(n.getId());
+        item.setShipmentId(n.getIssue().getShipment().getId());
+
+        //set description.
+        final String desc = descriptionBuilder.buildDescription(n.getIssue(), user);
+        final int offset = desc.indexOf('.');
+
+        item.setTitle(offset > -1 ? desc.substring(0, offset) : desc);
+        item.setType(n.getType());
+
+        item.getLines().add(offset > -1 ? desc.substring(offset + 1).trim() : desc);
+        item.getLines().add("Some long shipment description here");
+        item.getLines().add("About 200km from XYZ Warehouse");
+        return item;
+    }
+    /**
+     * @param user user.
+     * @return notification serializer.
      */
     private NotificationSerializer createSerializer(final User user) {
-        final NotificationSerializer s = new NotificationSerializer(user.getTimeZone());
-        s.setDeviceResolver(deviceResolver);
-        s.setShipmentResolver(shipmentResolver);
-        return s;
+        return new NotificationSerializer(user.getTimeZone());
     }
     /**
      * @return
      */
     private String[] getDefaultSortOrder() {
         return new String[] {
-            PROPERTY_ID,
+            PROPERTY_NOTIFICATION_ID,
             PROPERTY_TYPE
         };
     }

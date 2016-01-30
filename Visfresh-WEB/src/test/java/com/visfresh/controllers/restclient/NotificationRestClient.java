@@ -12,8 +12,7 @@ import java.util.TimeZone;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.entities.Notification;
-import com.visfresh.io.DeviceResolver;
-import com.visfresh.io.ShipmentResolver;
+import com.visfresh.io.NotificationItem;
 import com.visfresh.io.json.NotificationSerializer;
 import com.visfresh.services.RestServiceException;
 
@@ -38,7 +37,7 @@ public class NotificationRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<Notification> getNotifications(final boolean includeRead,
+    public List<NotificationItem> getNotifications(final boolean includeRead,
             final Integer pageIndex, final Integer pageSize)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
@@ -52,7 +51,7 @@ public class NotificationRestClient extends RestClient {
 
         final JsonArray response = sendGetRequest(getPathWithToken("getNotifications"),
                 params).getAsJsonArray();
-        final List<Notification> notifications = new ArrayList<Notification>(response.size());
+        final List<NotificationItem> notifications = new ArrayList<>(response.size());
         for (int i = 0; i < response.size(); i++) {
             notifications.add(serializer.parseNotification(response.get(i).getAsJsonObject()));
         }
@@ -70,12 +69,5 @@ public class NotificationRestClient extends RestClient {
         }
 
         sendPostRequest(getPathWithToken("markNotificationsAsRead"), req);
-    }
-
-    public void setDeviceResolver(final DeviceResolver r) {
-        serializer.setDeviceResolver(r);
-    }
-    public void setShipmentResolver(final ShipmentResolver r) {
-        serializer.setShipmentResolver(r);
     }
 }

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.Arrival;
-import com.visfresh.entities.ShipmentIssue;
+import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
@@ -57,7 +57,7 @@ public class AlertDescriptionBuilder {
      * @param user target user.
      * @return description for given alert.
      */
-    public String buildDescription(final ShipmentIssue issue, final User user) {
+    public String buildDescription(final NotificationIssue issue, final User user) {
         final ResourceBundle bundle = ResourceBundle.getBundle("alerts", XmlControl.INSTANCE);
         final String str = bundle.getString(createBundleKey(issue));
         return StringUtils.getMessage(str, createReplacementMap(issue, user));
@@ -67,7 +67,7 @@ public class AlertDescriptionBuilder {
      * @param alert
      * @return
      */
-    private String createBundleKey(final ShipmentIssue issue) {
+    private String createBundleKey(final NotificationIssue issue) {
         String key = "";
 
         if (issue instanceof Alert) {
@@ -85,7 +85,7 @@ public class AlertDescriptionBuilder {
      * @param issue alert.
      * @return map of replacements.
      */
-    private Map<String, String> createReplacementMap(final ShipmentIssue issue, final User user) {
+    private Map<String, String> createReplacementMap(final NotificationIssue issue, final User user) {
         final Map<String, String> map = new HashMap<String, String>();
         //supported place holders:
         //${date} alert issue date include day and year

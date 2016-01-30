@@ -48,5 +48,5 @@
 	<!-- Battery -->
 	<entry key="Battery">Battery Alert. Low battery at ${time}</entry>
 	<!-- Arrival -->
-	<entry key="Arrival">Tracker ${devicesn}(${tripCount}) is in ${mettersForArrival} meters for arrival</entry>
+	<entry key="Arrival">Arrival. Tracker ${devicesn}(${tripCount}) is in ${mettersForArrival} meters for arrival</entry>
 </properties>
