@@ -13,9 +13,8 @@ import junit.framework.TestCase;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageType;
-import com.visfresh.Location;
-import com.visfresh.ResolvedDeviceMessage;
 import com.visfresh.db.MessageDao;
 
 /**
@@ -55,48 +54,51 @@ public class AbstractDispatcherTest extends TestCase {
     }
 
     public void testHandleSuccess() {
-        final ResolvedDeviceMessage msg = createMessage();
+        final DeviceMessage msg = createMessage();
         dao.create(msg);
 
         dispatcher.handleSuccess(msg);
-        final List<Map<String, Object>> rows = jdbcTemplate.queryForList("select * from " + MessageDao.RESOLVED_MESSAGES_TABLE,
+        final List<Map<String, Object>> rows = jdbcTemplate.queryForList("select * from "
+                + MessageDao.DEVICE_MESSAGES_TABLE,
                 new HashMap<String, Object>());
 
         assertEquals(0, rows.size());
     }
     public void testHandleRetryableError() {
-        final ResolvedDeviceMessage msg = createMessage();
+        final DeviceMessage msg = createMessage();
         dao.create(msg);
 
         dispatcher.setRetryLimit(1);
 
         dispatcher.handleError(msg, new RetryableException());
-        assertEquals(1, jdbcTemplate.queryForList("select * from " + MessageDao.RESOLVED_MESSAGES_TABLE,
+        assertEquals(1, jdbcTemplate.queryForList("select * from "
+                + MessageDao.DEVICE_MESSAGES_TABLE,
                 new HashMap<String, Object>()).size());
 
         dispatcher.handleError(msg, new RetryableException());
-        assertEquals(0, jdbcTemplate.queryForList("select * from " + MessageDao.RESOLVED_MESSAGES_TABLE,
+        assertEquals(0, jdbcTemplate.queryForList("select * from "
+                + MessageDao.DEVICE_MESSAGES_TABLE,
                 new HashMap<String, Object>()).size());
     }
     public void testHandleNotRetryableError() {
-        final ResolvedDeviceMessage msg = createMessage();
+        final DeviceMessage msg = createMessage();
         dao.create(msg);
 
         dispatcher.setRetryLimit(1);
         dispatcher.handleError(msg, new Exception());
 
-        assertEquals(0, jdbcTemplate.queryForList("select * from " + MessageDao.RESOLVED_MESSAGES_TABLE,
+        assertEquals(0, jdbcTemplate.queryForList("select * from "
+                + MessageDao.DEVICE_MESSAGES_TABLE,
                 new HashMap<String, Object>()).size());
     }
     /**
      * @return message.
      */
-    private ResolvedDeviceMessage createMessage() {
-        final ResolvedDeviceMessage msg = new ResolvedDeviceMessage();
+    private DeviceMessage createMessage() {
+        final DeviceMessage msg = new DeviceMessage();
         msg.setImei("12345");
         msg.setType(DeviceMessageType.DRK);
         msg.setTime(new Date());
-        msg.setLocation(new Location());
         return msg;
     }
 
@@ -108,9 +110,6 @@ public class AbstractDispatcherTest extends TestCase {
         //clean up data base
         jdbcTemplate.update("delete from " + MessageDao.DEVICE_MESSAGES_TABLE,
                 new HashMap<String, Object>());
-        jdbcTemplate.update("delete from " + MessageDao.RESOLVED_MESSAGES_TABLE,
-                new HashMap<String, Object>());
-
         spring.close();
     }
 }

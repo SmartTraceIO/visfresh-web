@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.DeviceMessage;
 import com.visfresh.Location;
-import com.visfresh.ResolvedDeviceMessage;
+import com.visfresh.config.DeviceConstants;
+import com.visfresh.db.SystemMessageDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -28,6 +29,11 @@ public class DeviceMessageDispatcher extends AbstractDispatcher {
 
     @Autowired
     private LocationService locationService;
+    @Autowired
+    private DeviceConstants deviceConstants;
+    @Autowired
+    private SystemMessageDao systemMessageDao;
+
     /**
      * Default constructor..
      */
@@ -66,11 +72,7 @@ public class DeviceMessageDispatcher extends AbstractDispatcher {
     private void processMessage(final DeviceMessage m) throws RetryableException {
         final Location location = getLocationService().getLocation(m.getStations());
         log.debug("Location (" + location + ") has detected for message " + m);
-
-        final ResolvedDeviceMessage rm = new ResolvedDeviceMessage(m);
-        rm.setLocation(location);
-
-        dao.create(rm);
+        systemMessageDao.sendSystemMessageFor(m, location);
     }
 
     /**

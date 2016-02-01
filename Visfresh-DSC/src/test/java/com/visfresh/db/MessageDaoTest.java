@@ -3,7 +3,6 @@
  */
 package com.visfresh.db;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,8 +17,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageParser;
 import com.visfresh.DeviceMessageType;
-import com.visfresh.Location;
-import com.visfresh.ResolvedDeviceMessage;
 import com.visfresh.StationSignal;
 
 /**
@@ -140,51 +137,6 @@ public class MessageDaoTest extends TestCase {
         assertEquals(s2.getMcc(), ss2.getMcc());
         assertEquals(s2.getMnc(), ss2.getMnc());
     }
-    public void testSaveResolvedMessage() {
-        final ResolvedDeviceMessage message = new ResolvedDeviceMessage();
-
-        final int battery = 1014;
-        final String imei = "012345678901234";
-        final double temperature = 77.77;
-        final Date time = new Date(System.currentTimeMillis() - 1000000L);
-        final DeviceMessageType type = DeviceMessageType.BRT;
-        final Date retryOn = new Date(System.currentTimeMillis() + 11111111L);
-        final int numRetry = 135;
-        final double latitude = 100.500;
-        final double longitude = 100.501;
-
-        message.setBattery(battery);
-        message.setImei(imei);
-        message.setTemperature(temperature);
-        message.setTime(time);
-        message.setType(type);
-        message.setLocation(new Location());
-        message.setNumberOfRetry(numRetry);
-        message.setRetryOn(retryOn);
-        message.getLocation().setLatitude(latitude);
-        message.getLocation().setLongitude(longitude);
-
-        dao.create(message);
-
-        //check result
-        final List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from "
-                + MessageDao.RESOLVED_MESSAGES_TABLE, new HashMap<String, Object>());
-
-        assertEquals(1, list.size());
-
-        final Map<String, Object> row = list.get(0);
-        assertEquals(battery, row.get(MessageDao.BATTERY_FIELD));
-        assertEquals(imei, row.get(MessageDao.IMEI_FIELD));
-        assertEquals("" + temperature, "" + row.get(MessageDao.TEMPERATURE_FIELD));
-        assertEquals(format(time, "yyyyMMdd HHmmss"),
-                format((Date) row.get(MessageDao.TIME_FIELD), "yyyyMMdd HHmmss"));
-        assertEquals(type.toString(), row.get(MessageDao.TYPE_FIELD));
-        assertEquals(format(retryOn, "yyyyMMdd HHmmss"),
-                format((Date) row.get(MessageDao.RETRYON_FIELD), "yyyyMMdd HHmmss"));
-        assertEquals(numRetry, row.get(MessageDao.NUMRETRY_FIELD));
-        assertEquals((int) (latitude * 10000), row.get(MessageDao.LATITUDE_FIELD));
-        assertEquals((int) (longitude * 10000), row.get(MessageDao.LONGITUDE_FIELD));
-    }
 
     public void testMarkDeviceMessagesForProcess() {
         final DeviceMessage m1 = new DeviceMessage();
@@ -211,84 +163,6 @@ public class MessageDaoTest extends TestCase {
                 "select * from " + MessageDao.DEVICE_MESSAGES_TABLE
                 + " where " + MessageDao.PROCESSOR_FIELD + "='p2'",
                 new HashMap<String, Object>()).size());
-    }
-
-    public void testMarkResolvedDeviceMessagesForProcess() {
-        final ResolvedDeviceMessage m1 = new ResolvedDeviceMessage();
-        m1.setImei("11111");
-        m1.setTime(new Date());
-        m1.setType(DeviceMessageType.INIT);
-        m1.setLocation(new Location());
-
-        final ResolvedDeviceMessage m2 = new ResolvedDeviceMessage();
-        m2.setImei("22222");
-        m2.setTime(new Date());
-        m2.setType(DeviceMessageType.INIT);
-        m2.setLocation(new Location());
-
-        dao.create(m1);
-        dao.create(m2);
-
-        dao.markResolvedMessagesForProcess("p1", 1);
-        assertEquals(1, jdbcTemplate.queryForList(
-                "select * from " + MessageDao.RESOLVED_MESSAGES_TABLE
-                + " where " + MessageDao.PROCESSOR_FIELD + "='p1'",
-                new HashMap<String, Object>()).size());
-
-        dao.markResolvedMessagesForProcess("p2", 1000);
-        assertEquals(1, jdbcTemplate.queryForList(
-                "select * from " + MessageDao.RESOLVED_MESSAGES_TABLE
-                + " where " + MessageDao.PROCESSOR_FIELD + "='p2'",
-                new HashMap<String, Object>()).size());
-    }
-
-    public void testGetResolvedMessagesForProcess() {
-        long time = System.currentTimeMillis() + 3 * 100000L;
-
-        final ResolvedDeviceMessage m1 = new ResolvedDeviceMessage();
-        m1.setImei("11111");
-        m1.setTime(new Date((time += 100000L)));
-        m1.setType(DeviceMessageType.INIT);
-        m1.setBattery(101);
-        m1.setTemperature(500);
-        m1.setLocation(new Location());
-        m1.getLocation().setLatitude(33);
-        m1.getLocation().setLongitude(45);
-
-        final ResolvedDeviceMessage m2 = new ResolvedDeviceMessage();
-        m2.setImei("22222");
-        m2.setTime(new Date((time += 100000L)));
-        m2.setType(DeviceMessageType.INIT);
-        m2.setLocation(new Location());
-
-        final ResolvedDeviceMessage m3 = new ResolvedDeviceMessage();
-        m3.setImei("22222");
-        m3.setTime(new Date((time += 100000L)));
-        m3.setType(DeviceMessageType.INIT);
-        m3.setLocation(new Location());
-
-        dao.create(m1);
-        dao.create(m2);
-        dao.create(m3);
-
-        dao.markResolvedMessagesForProcess("p1", 2);
-        dao.markResolvedMessagesForProcess("p2", 1000);
-
-        final List<ResolvedDeviceMessage> list = dao.getResolvedMessagesForProcess("p1");
-
-        assertEquals(2, list.size());
-
-        //check first message
-        final ResolvedDeviceMessage msg = list.get(0);
-
-        //check first message
-        assertEquals(format(m1.getTime(), "yyyyMMdd:HH:mm:ss"), format(msg.getTime(), "yyyyMMdd:HH:mm:ss"));
-        assertEquals(m1.getBattery(), msg.getBattery());
-        assertEquals(m1.getImei(), msg.getImei());
-        assertEquals(m1.getLocation().getLatitude(), msg.getLocation().getLatitude());
-        assertEquals(m1.getLocation().getLongitude(), msg.getLocation().getLongitude());
-        assertEquals(m1.getTemperature(), msg.getTemperature());
-        assertEquals(m1.getType(), msg.getType());
     }
     public void testGetDeviceMessagesForProcess() {
         long time = System.currentTimeMillis() + 3 * 100000L;
@@ -341,40 +215,6 @@ public class MessageDaoTest extends TestCase {
         assertEquals(m1.getType(), msg.getType());
         assertEquals(1, msg.getStations().size());
     }
-    public void testSaveForRetry() throws ParseException {
-        ResolvedDeviceMessage message = new ResolvedDeviceMessage();
-        message.setImei("11111");
-        message.setTime(new Date((System.currentTimeMillis() + 100000L)));
-        message.setType(DeviceMessageType.INIT);
-        message.setBattery(101);
-        message.setTemperature(500);
-        message.setLocation(new Location());
-        message.getLocation().setLatitude(33);
-        message.getLocation().setLongitude(45);
-
-        final String processor = "p1";
-        dao.create(message);
-        dao.markResolvedMessagesForProcess(processor , 1);
-        message = dao.getResolvedMessagesForProcess(processor).get(0);
-
-        final String dateFormat = "yyyy-MM-dd HH:mm:ss";
-        final int numRetry = 50;
-        message.setNumberOfRetry(numRetry);
-        final Date retryOn = new SimpleDateFormat(dateFormat).parse("2021-03-22 11:11:11");
-        message.setRetryOn(retryOn);
-
-        dao.saveForRetry(message);
-
-        final List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from "
-                + MessageDao.RESOLVED_MESSAGES_TABLE, new HashMap<String, Object>());
-
-        assertEquals(1, list.size());
-
-        final Map<String, Object> row = list.get(0);
-        assertEquals(numRetry, row.get(MessageDao.NUMRETRY_FIELD));
-        assertEquals(format(retryOn, dateFormat),
-                format((Date) row.get(MessageDao.RETRYON_FIELD), dateFormat));
-    }
     /**
      * @param time the time to format.
      * @param format time format.
@@ -391,9 +231,6 @@ public class MessageDaoTest extends TestCase {
         //clean up data base
         jdbcTemplate.update("delete from " + MessageDao.DEVICE_MESSAGES_TABLE,
                 new HashMap<String, Object>());
-        jdbcTemplate.update("delete from " + MessageDao.RESOLVED_MESSAGES_TABLE,
-                new HashMap<String, Object>());
-
         spring.close();
     }
 }

@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.DeviceMessageBase;
+import com.visfresh.DeviceMessage;
 import com.visfresh.db.MessageDao;
 
 /**
@@ -165,7 +165,7 @@ public abstract class AbstractDispatcher {
      * @param msg the message.
      * @param e the exception.
      */
-    protected void handleError(final DeviceMessageBase msg, final Throwable e) {
+    protected void handleError(final DeviceMessage msg, final Throwable e) {
         if (e instanceof RetryableException && ((RetryableException) e).canRetry()) {
             if (msg.getNumberOfRetry() < getRetryLimit()) {
                 log.error("Retryable exception has occured for message " + msg + ", will retry later", e);
@@ -184,7 +184,7 @@ public abstract class AbstractDispatcher {
     /**
      * @param msg the message.
      */
-    protected void handleSuccess(final DeviceMessageBase msg) {
+    protected void handleSuccess(final DeviceMessage msg) {
         log.debug("The message " + msg.getId() + " successfylly processed by " + getProcessorId() + ", deleting it");
         dao.delete(msg);
     }

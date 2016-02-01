@@ -101,7 +101,7 @@ public class DeviceMessageParser {
      * @return stream content as string.
      * @throws IOException
      */
-    private String getContent(final Reader reader) throws IOException {
+    public static String getContent(final Reader reader) throws IOException {
         final StringWriter sw = new StringWriter();
 
         int len;

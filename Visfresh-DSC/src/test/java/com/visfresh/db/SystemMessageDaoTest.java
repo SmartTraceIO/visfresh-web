@@ -15,9 +15,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageType;
 import com.visfresh.Location;
-import com.visfresh.ResolvedDeviceMessage;
 import com.visfresh.SystemMessage;
 
 /**
@@ -63,17 +63,16 @@ public class SystemMessageDaoTest extends TestCase {
         final double temperature = 36.6;
 
         //create device command
-        final ResolvedDeviceMessage m = new ResolvedDeviceMessage();
+        final DeviceMessage m = new DeviceMessage();
         m.setBattery(battery);
         m.setImei(imei);
-        m.setLocation(location);
         m.setNumberOfRetry(numberOfRetry);
         m.setRetryOn(retryOn);
         m.setTemperature(temperature);
         m.setTime(new Date());
         m.setType(DeviceMessageType.AUT);
 
-        SystemMessage sm = dao.sendSystemMessageFor(m);
+        SystemMessage sm = dao.sendSystemMessageFor(m, location);
         sm = dao.findOne(sm.getId());
 
         final Reader in = new StringReader(sm.getMessageInfo());

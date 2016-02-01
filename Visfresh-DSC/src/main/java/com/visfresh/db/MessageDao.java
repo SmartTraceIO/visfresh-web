@@ -16,11 +16,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.DeviceMessage;
-import com.visfresh.DeviceMessageBase;
 import com.visfresh.DeviceMessageParser;
 import com.visfresh.DeviceMessageType;
-import com.visfresh.Location;
-import com.visfresh.ResolvedDeviceMessage;
 import com.visfresh.StationSignal;
 
 /**
@@ -45,7 +42,6 @@ public class MessageDao {
 
     //tables
     public static final String DEVICE_MESSAGES_TABLE = "devicemsg";
-    public static final String RESOLVED_MESSAGES_TABLE = "resolvedmsg";
 
     /**
      * JDBC template.
@@ -60,21 +56,13 @@ public class MessageDao {
         super();
     }
 
-    public void create(final DeviceMessageBase msg) {
-        if (msg instanceof DeviceMessage) {
-            createDeviceMessage((DeviceMessage) msg);
-        } else if (msg instanceof ResolvedDeviceMessage) {
-            createResolvedMessage((ResolvedDeviceMessage) msg);
-        }
+    public void create(final DeviceMessage msg) {
+        createDeviceMessage(msg);
     }
 
     public void markDeviceMessagesForProcess(final String processorId, final int limit) {
         markMessagesToProcess(DEVICE_MESSAGES_TABLE, processorId, limit);
     }
-    public void markResolvedMessagesForProcess(final String processorId, final int limit) {
-        markMessagesToProcess(RESOLVED_MESSAGES_TABLE, processorId, limit);
-    }
-
     /**
      * @param tableName table name.
      * @param processorId processor ID.
@@ -123,7 +111,14 @@ public class MessageDao {
         final List<DeviceMessage> messages = new LinkedList<DeviceMessage>();
         for (final Map<String,Object> map : list) {
             final DeviceMessage msg = new DeviceMessage();
-            addBaseParameters(msg, map);
+            msg.setId(((Number) map.get(ID_FIELD)).longValue());
+            msg.setImei((String) map.get(IMEI_FIELD));
+            msg.setType(DeviceMessageType.valueOf((String) map.get(TYPE_FIELD)));
+            msg.setTime(new Date(((Date) map.get(TIME_FIELD)).getTime()));
+            msg.setBattery((Integer) map.get(BATTERY_FIELD));
+            msg.setTemperature((Float) map.get(TEMPERATURE_FIELD));
+            msg.setRetryOn(new Date(((Date) map.get(RETRYON_FIELD)).getTime()));
+            msg.setNumberOfRetry((Integer) map.get(NUMRETRY_FIELD));
 
             //parse station signals
             final String encodedStations = ((String) map.get(STATIONS_FIELD)).trim();
@@ -138,60 +133,6 @@ public class MessageDao {
         }
 
         return messages;
-    }
-    public List<ResolvedDeviceMessage> getResolvedMessagesForProcess(final String processorId) {
-        //create query parameters
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("processor", processorId);
-
-        //run query
-        final List<Map<String, Object>> list = jdbcTemplate.queryForList(
-                "select * from " + RESOLVED_MESSAGES_TABLE
-                + " where " + PROCESSOR_FIELD + " = :processor order by "
-                + TIME_FIELD, params);
-
-        final List<ResolvedDeviceMessage> messages = new LinkedList<ResolvedDeviceMessage>();
-        for (final Map<String,Object> map : list) {
-            final ResolvedDeviceMessage msg = new ResolvedDeviceMessage();
-            addBaseParameters(msg, map);
-
-            //parse station signals
-            final Location loc = new Location();
-            msg.setLocation(loc);
-            loc.setLatitude(((Number) map.get(LATITUDE_FIELD)).intValue() / 10000.);
-            loc.setLongitude(((Number) map.get(LONGITUDE_FIELD)).intValue() / 10000.);
-
-            messages.add(msg);
-        }
-
-        return messages;
-    }
-    /**
-     * @param msg resolved device message.
-     */
-    private void createResolvedMessage(final ResolvedDeviceMessage msg) {
-        final Map<String, Object> params = createBaseMessageParameters(msg);
-
-        //encode station signals
-        params.put("latitude", msg.getLocation().getLatitude() * 10000);
-        params.put("longitude", msg.getLocation().getLongitude() * 10000);
-
-        final GeneratedKeyHolder holder = new GeneratedKeyHolder();
-        jdbcTemplate.update("INSERT INTO "
-                + RESOLVED_MESSAGES_TABLE
-            + "(" + IMEI_FIELD
-            + ", " + TYPE_FIELD
-            + ", " + TIME_FIELD
-            + ", " + BATTERY_FIELD
-            + ", " + TEMPERATURE_FIELD
-            + ", " + NUMRETRY_FIELD
-            + ", " + RETRYON_FIELD
-            + ", " + LATITUDE_FIELD
-            + ", " + LONGITUDE_FIELD + ") "
-            + "VALUES(:imei, :type, :time, :battery, :temperature, :numretry, :readyon, :latitude, :longitude)"
-            , new MapSqlParameterSource(params), holder);
-
-        msg.setId(holder.getKey().longValue());
     }
     /**
      * @param msg device message.
@@ -236,7 +177,7 @@ public class MessageDao {
      * @param msg
      * @return
      */
-    private Map<String, Object> createBaseMessageParameters(final DeviceMessageBase msg) {
+    private Map<String, Object> createBaseMessageParameters(final DeviceMessage msg) {
         final Map<String, Object> map = new HashMap<String, Object>();
         //imei varchar(15) NOT NULL,
         map.put("imei", msg.getImei());
@@ -255,55 +196,27 @@ public class MessageDao {
 
         return map;
     }
-    /**
-     * @param msg
-     * @param map
-     */
-    private void addBaseParameters(final DeviceMessageBase msg,
-            final Map<String, Object> map) {
-        msg.setId(((Number) map.get(ID_FIELD)).longValue());
-        msg.setImei((String) map.get(IMEI_FIELD));
-        msg.setType(DeviceMessageType.valueOf((String) map.get(TYPE_FIELD)));
-        msg.setTime(new Date(((Date) map.get(TIME_FIELD)).getTime()));
-        msg.setBattery((Integer) map.get(BATTERY_FIELD));
-        msg.setTemperature((Float) map.get(TEMPERATURE_FIELD));
-        msg.setRetryOn(new Date(((Date) map.get(RETRYON_FIELD)).getTime()));
-        msg.setNumberOfRetry((Integer) map.get(NUMRETRY_FIELD));
-    }
 
     /**
      * @param msg the message.
      */
-    public void delete(final DeviceMessageBase msg) {
-        String table = null;
-        if (msg instanceof ResolvedDeviceMessage) {
-            table = RESOLVED_MESSAGES_TABLE;
-        } else {
-            table = DEVICE_MESSAGES_TABLE;
-        }
-
+    public void delete(final DeviceMessage msg) {
         final HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("msgid", msg.getId());
-        jdbcTemplate.update("delete from " + table + " where id = :msgid", params);
+        jdbcTemplate.update("delete from " + DEVICE_MESSAGES_TABLE
+                + " where id = :msgid", params);
     }
 
     /**
      * @param msg message.
      */
-    public void saveForRetry(final DeviceMessageBase msg) {
-        String table = null;
-        if (msg instanceof ResolvedDeviceMessage) {
-            table = RESOLVED_MESSAGES_TABLE;
-        } else {
-            table = DEVICE_MESSAGES_TABLE;
-        }
-
+    public void saveForRetry(final DeviceMessage msg) {
         final HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("msgid", msg.getId());
         params.put("retryOn", msg.getRetryOn());
         params.put("numRetry", msg.getNumberOfRetry());
 
-        jdbcTemplate.update("update " + table + " set "
+        jdbcTemplate.update("update " + DEVICE_MESSAGES_TABLE + " set "
                 + RETRYON_FIELD + " = :retryOn, "
                 + NUMRETRY_FIELD + " = :numRetry "
                 + "where " + ID_FIELD + " = :msgid", params);

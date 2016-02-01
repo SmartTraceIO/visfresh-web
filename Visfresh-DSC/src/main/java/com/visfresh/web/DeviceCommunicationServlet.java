@@ -68,10 +68,11 @@ public class DeviceCommunicationServlet extends HttpServlet {
      * @throws IOException
      */
     private void processMessage(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final DeviceMessage msg = getParser().parse(new InputStreamReader(req.getInputStream()));
+        final String rawData = DeviceMessageParser.getContent(new InputStreamReader(req.getInputStream()));
+        final DeviceMessage msg = getParser().parse(rawData);
 
         //attempt to load device
-        log.debug("device message has received: " + msg);
+        log.debug("device message has received: " + rawData);
         final Device device = deviceDao.getByImei(msg.getImei());
 
         if (device != null) {
@@ -86,13 +87,13 @@ public class DeviceCommunicationServlet extends HttpServlet {
 
             if (msg.getType() == DeviceMessageType.RSP) {
                 //process response to server command
-                log.debug("Device response has received " + msg);
+                log.debug("Device response has received for " + msg.getImei());
             } else if (!hasShutdown){
                 messageDao.create(msg);
             } else {
                 log.debug("Shutdown command found for device "
                         + device.getImei() + ", current message "
-                        + msg + "will not pushed to system");
+                        + rawData + "will not pushed to system");
             }
 
             if (cmd != null) {
@@ -103,7 +104,7 @@ public class DeviceCommunicationServlet extends HttpServlet {
                 deviceCommandDao.delete(cmd);
             }
         } else {
-            log.warn("Not found registered device for received message " + msg);
+            log.warn("Not found registered device for received message " + rawData);
         }
 
         resp.setStatus(HttpServletResponse.SC_OK);

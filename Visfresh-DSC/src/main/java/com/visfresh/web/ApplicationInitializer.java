@@ -13,7 +13,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.visfresh.dispatcher.DeviceMessageDispatcher;
-import com.visfresh.dispatcher.ResolvedMessageDispatcher;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -43,7 +42,6 @@ public class ApplicationInitializer implements ServletContextListener {
 
         //initialize dispatcher
         ctx.getBean(DeviceMessageDispatcher.class).start();
-        ctx.getBean(ResolvedMessageDispatcher.class).start();
 
         log.debug("Application has initialized. Spring config: " + springConfig);
     }
@@ -57,7 +55,6 @@ public class ApplicationInitializer implements ServletContextListener {
         final ConfigurableApplicationContext ctx = getBeanContext(servletContext);
 
         ctx.getBean(DeviceMessageDispatcher.class).stop();
-        ctx.getBean(ResolvedMessageDispatcher.class).stop();
 
         //destroy spring context
         servletContext.removeAttribute(BEAN_FACTORY_PROPERTY);

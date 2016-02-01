@@ -18,7 +18,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
-import com.visfresh.ResolvedDeviceMessage;
+import com.visfresh.DeviceMessage;
+import com.visfresh.Location;
 import com.visfresh.SystemMessage;
 
 /**
@@ -93,7 +94,7 @@ public class SystemMessageDao {
         return msg;
     }
 
-    public SystemMessage sendSystemMessageFor(final ResolvedDeviceMessage e) {
+    public SystemMessage sendSystemMessageFor(final DeviceMessage e, final Location loc) {
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         sdf.setTimeZone(UTC);
 
@@ -102,8 +103,8 @@ public class SystemMessageDao {
         obj.addProperty("temperature", e.getTemperature());
         obj.addProperty("time", sdf.format(e.getTime()));
         obj.addProperty("type", e.getType().name());
-        obj.addProperty("latitude", e.getLocation().getLatitude());
-        obj.addProperty("longitude", e.getLocation().getLongitude());
+        obj.addProperty("latitude", loc.getLatitude());
+        obj.addProperty("longitude", loc.getLongitude());
         obj.addProperty("imei", e.getImei());
 
         final SystemMessage sm = new SystemMessage();
