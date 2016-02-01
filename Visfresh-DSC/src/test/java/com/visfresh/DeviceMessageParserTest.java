@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -47,11 +48,11 @@ public class DeviceMessageParserTest extends TestCase {
      * @throws IOException
      */
     public void testParse() throws IOException {
-        final DeviceMessage msg;
+        final List<DeviceMessage> msgs;
         final Reader r = new InputStreamReader(DeviceMessageParserTest.class.getClassLoader()
                 .getResourceAsStream("msg.txt"));
         try {
-            msg = parser.parse(r);
+            msgs = parser.parse(r);
         } finally {
             r.close();
         }
@@ -66,7 +67,9 @@ public class DeviceMessageParserTest extends TestCase {
         //460|1|9533|16113|23|
         //460|1|9533|16142|21|
         //460|1|9533|16526|18|
+        assertEquals(3, msgs.size());
 
+        final DeviceMessage msg = msgs.get(2);
         assertEquals("358688000000158", msg.getImei());
         assertEquals(DeviceMessageType.AUT, msg.getType());
         assertEquals("2013/10/18 13:28:29", new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(msg.getTime()));

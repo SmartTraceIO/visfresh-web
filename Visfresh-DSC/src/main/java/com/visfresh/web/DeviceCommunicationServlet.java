@@ -69,42 +69,54 @@ public class DeviceCommunicationServlet extends HttpServlet {
      */
     private void processMessage(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final String rawData = DeviceMessageParser.getContent(new InputStreamReader(req.getInputStream()));
-        final DeviceMessage msg = getParser().parse(rawData);
 
-        //attempt to load device
-        log.debug("device message has received: " + rawData);
-        final Device device = deviceDao.getByImei(msg.getImei());
+        List<DeviceMessage> msgs;
+        try {
+            msgs = getParser().parse(rawData);
+        } catch (final Exception e) {
+            log.error("Failed to parse device message: " + rawData);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
 
-        if (device != null) {
-            final List<DeviceCommand> commands = deviceCommandDao.getFoDevice(device.getImei());
-            DeviceCommand cmd = null;
-            boolean hasShutdown = false;
+        boolean haveShutdown = false;
+        for (final DeviceMessage msg : msgs) {
+            //attempt to load device
+            log.debug("device message has received: " + rawData);
+            final Device device = deviceDao.getByImei(msg.getImei());
 
-            if (!commands.isEmpty()) {
-                cmd = commands.get(0);
-                hasShutdown = cmd.getCommand().toLowerCase().contains("shutdown");
-            }
+            if (device != null) {
+                final List<DeviceCommand> commands = deviceCommandDao.getFoDevice(device.getImei());
+                DeviceCommand cmd = null;
 
-            if (msg.getType() == DeviceMessageType.RSP) {
-                //process response to server command
-                log.debug("Device response has received for " + msg.getImei());
-            } else if (!hasShutdown){
-                messageDao.create(msg);
+                if (!commands.isEmpty()) {
+                    cmd = commands.get(0);
+                    if (cmd.getCommand().toLowerCase().contains("shutdown")) {
+                        haveShutdown = true;
+                    }
+                }
+
+                if (msg.getType() == DeviceMessageType.RSP) {
+                    //process response to server command
+                    log.debug("Device response has received for " + msg.getImei());
+                } else if (!haveShutdown){
+                    messageDao.create(msg);
+                } else {
+                    log.debug("Shutdown command found for device "
+                            + device.getImei() + ", current(s) message "
+                            + rawData + "will not pushed to system");
+                }
+
+                if (cmd != null) {
+                    final String command = cmd.getCommand();
+                    log.debug("Sending command " + command + " to device " + device.getImei());
+                    resp.getOutputStream().write(command.getBytes());
+
+                    deviceCommandDao.delete(cmd);
+                }
             } else {
-                log.debug("Shutdown command found for device "
-                        + device.getImei() + ", current message "
-                        + rawData + "will not pushed to system");
+                log.warn("Not found registered device for received message " + rawData);
             }
-
-            if (cmd != null) {
-                final String command = cmd.getCommand();
-                log.debug("Sending command " + command + " to device " + device.getImei());
-                resp.getOutputStream().write(command.getBytes());
-
-                deviceCommandDao.delete(cmd);
-            }
-        } else {
-            log.warn("Not found registered device for received message " + rawData);
         }
 
         resp.setStatus(HttpServletResponse.SC_OK);
