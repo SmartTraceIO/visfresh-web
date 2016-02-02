@@ -605,18 +605,20 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             dto.setStartLocation(shipment.getShippedFrom().getName());
             dto.setStartLocationForMap(shipment.getShippedFrom().getLocation());
         }
-        final Date date = shipment.getShipmentDate();
 
-        dto.setStartTimeISO(isoFmt.format(date));
+        if (items.size() > 0) {
+            final TrackerEvent lastEvent = items.get(items.size() - 1).getEvent();
+            dto.setStartTimeISO(isoFmt.format(lastEvent.getTime()));
+        } else {
+            dto.setStartTimeISO(isoFmt.format(shipment.getShipmentDate()));
+        }
+
         dto.setStatus(shipment.getStatus());
         dto.setTripCount(dtoOld.getTripCount());
 
-        //"6:47pm"
-        final DateFormat shortFormat = createDateFormat(user, "h:mmaa");
-
         int i = 0;
         for (final SingleShipmentTimeItem item : items) {
-            dto.getLocations().addAll(createLocations(item, isoFmt, shortFormat,
+            dto.getLocations().addAll(createLocations(item, isoFmt,
                     user, dto.getEta(), dto.getEndLocation(), i == items.size() - 1));
             i++;
         }
@@ -632,7 +634,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private List<SingleShipmentLocation> createLocations(
             final SingleShipmentTimeItem item,
             final DateFormat timeIsoFmt,
-            final DateFormat shortFormat,
             final User user,
             final String etaIso,
             final String shippedTo,
