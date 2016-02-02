@@ -52,6 +52,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 4. [User List item](#markdown-header-user-list-item)  
 5. [Expanded User list item](#markdown-header-expanded-list-user-item)  
 6. [Alert Profile list Item](#markdown-header-list-alert-profile-item)
+7. [Notification list Item](#markdown-header-list-notification-item)
 
 ## Special Request objects ##
 1. [Get Shipments filter](#markdown-header-get-shipments-filter)
@@ -380,7 +381,7 @@ Method *GET*, method name getNotifications, method parameters:
 1. pageIndex - number of page  
 2. pageSize - size of page  
 3. includeRead - include notification which have mark as read  
-Returns array of [Notification Objects](#markdown-header-notification) and total items count  
+Returns array of [Notification List items](#markdown-header-list-notification-item) and total items count  
 [(example)](#markdown-header-get-notifications-example)
 
 ### Mark Notification as read ###
@@ -462,6 +463,22 @@ see [ResponseStatus](#markdown-header-response-status)
     "<-7,0°C for 40 min in total",
     "<-5,0°C for 55 min in total"
   ]
+}
+```
+### list-notification-item ###
+```json
+{
+  "notificationId": 28,
+  "closed": false,
+  "date": "2016-02-02T18:34",
+  "type": "Arrival",
+  "alertType": null,
+  "alertId": 35,
+  "shipmentId": 164,
+  "title": "Arrival",
+  "Line1": "Tracker 039485(1) is in 1500 meters for arrival",
+  "Line2": "Some long shipment description here",
+  "Line3": "About 200km from XYZ Warehouse"
 }
 ```
 ### Notification Schedule ###
@@ -1924,39 +1941,43 @@ Response:
   },
   "response": [
     {
-      "id": 7,
+      "notificationId": 26,
+      "closed": false,
+      "date": "2016-02-02T18:34",
       "type": "Alert",
-      "issue": {
-        "id": 5,
-        "date": "2015-11-23T17:46",
-        "device": "234908720394857",
-        "shipment": 3,
-        "type": "Hot",
-        "temperature": 5.0,
-        "minutes": 55
-      }
+      "alertType": "Hot",
+      "alertId": 96,
+      "shipmentId": 164,
+      "title": "Hot Alert",
+      "Line1": "Tracker 039485(1) went above 5.0°C for 55min",
+      "Line2": "Some long shipment description here",
+      "Line3": "About 200km from XYZ Warehouse"
     },
     {
-      "id": 8,
+      "notificationId": 27,
+      "closed": false,
+      "date": "2016-02-02T18:34",
       "type": "Alert",
-      "issue": {
-        "id": 6,
-        "date": "2015-11-23T17:46",
-        "device": "234908720394857",
-        "shipment": 3,
-        "type": "Battery"
-      }
+      "alertType": "Battery",
+      "alertId": 97,
+      "shipmentId": 164,
+      "title": "Battery Alert",
+      "Line1": "Low battery at 16:34",
+      "Line2": "Some long shipment description here",
+      "Line3": "About 200km from XYZ Warehouse"
     },
     {
-      "id": 9,
+      "notificationId": 28,
+      "closed": false,
+      "date": "2016-02-02T18:34",
       "type": "Arrival",
-      "issue": {
-        "id": 3,
-        "numberOfMetersOfArrival": 1500,
-        "date": "2015-11-23T17:46",
-        "device": "234908720394857",
-        "shipment": 3
-      }
+      "alertType": null,
+      "alertId": 35,
+      "shipmentId": 164,
+      "title": "Arrival",
+      "Line1": "Tracker 039485(1) is in 1500 meters for arrival",
+      "Line2": "Some long shipment description here",
+      "Line3": "About 200km from XYZ Warehouse"
     }
   ],
   "totalCount": 3
