@@ -607,8 +607,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
 
         if (items.size() > 0) {
-            final TrackerEvent lastEvent = items.get(items.size() - 1).getEvent();
-            dto.setStartTimeISO(isoFmt.format(lastEvent.getTime()));
+            final TrackerEvent firstEvent = items.get(0).getEvent();
+            dto.setStartTimeISO(isoFmt.format(firstEvent.getTime()));
         } else {
             dto.setStartTimeISO(isoFmt.format(shipment.getShipmentDate()));
         }
