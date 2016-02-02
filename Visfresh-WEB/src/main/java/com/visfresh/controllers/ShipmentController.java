@@ -746,7 +746,15 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             }
 
             dto.getAlertSummary().putAll(toSummaryMap(alerts));
+
+            //add arrivals
+            final List<Arrival> arrivals = arrivalDao.getArrivals(s);
+            for (final Arrival arrival : arrivals) {
+                final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), arrival.getDate());
+                item.getArrivals().add(arrival);
+            }
         }
+
         return dto;
     }
     /**
