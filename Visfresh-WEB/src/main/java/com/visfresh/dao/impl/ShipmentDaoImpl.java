@@ -16,7 +16,9 @@ import org.springframework.stereotype.Component;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Filter;
+import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -96,10 +98,13 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     public List<Shipment> findActiveShipments(final Company company) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("company", company.getId());
-        params.put("status", ShipmentStatus.Complete.name());
+        params.put("st1", ShipmentStatus.Complete.name());
+        params.put("st2", ShipmentStatus.Arrived.name());
 
         final String sql = "select * from " + TABLE + " s"
-                + " where s." + STATUS_FIELD + "<> :status"
+                + " where"
+                + " s." + STATUS_FIELD + "<> :st1"
+                + " and s." + STATUS_FIELD + "<> :st2"
                 + " and s." + ISTEMPLATE_FIELD + " = false"
                 + " and s.company = :company"
                 + " order by s." + ID_FIELD + " desc";
@@ -293,12 +298,17 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      * @see com.visfresh.dao.ShipmentDao#findActiveShipment(java.lang.String)
      */
     @Override
-    public Shipment findActiveShipment(final String imei) {
-        final List<Long> rows = findActiveShipmentIds(imei);
+    public Shipment findLastShipment(final String imei) {
+        //sorting
+        final Sorting sort = new Sorting(false, ShipmentConstants.PROPERTY_SHIPMENT_ID);
+        //filter
+        final Filter filter = new Filter();
+        filter.addFilter(ShipmentConstants.PROPERTY_DEVICE_IMEI, imei);
+        //page
+        final List<Shipment> rows = findAll(filter, sort, new Page(1, 1));
 
         if (rows.size() > 0) {
-            final Long shipmentId = rows.get(0);
-            return findOne(shipmentId);
+            return rows.get(0);
         } else {
             return null;
         }
@@ -320,13 +330,16 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     private List<Long> findActiveShipmentIds(final String imei) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("imei", imei);
-        params.put("status", ShipmentStatus.Complete.name());
+        params.put("st1", ShipmentStatus.Complete.name());
+        params.put("st2", ShipmentStatus.Arrived.name());
 
         final String sql = "select s." + ID_FIELD
                 + " from " + TABLE + " s"
-                + " join " + DeviceDaoImpl.TABLE + " d on d." + DeviceDaoImpl.IMEI_FIELD + "= s.device"
-                + " and d." + DeviceDaoImpl.IMEI_FIELD + "= :imei"
-                + " where s." + STATUS_FIELD + "<> :status order by s." + ID_FIELD + " desc";
+                + " where"
+                + " s." + DEVICE_FIELD + "= :imei"
+                + " and s." + STATUS_FIELD + "<> :st1"
+                + " and s." + STATUS_FIELD + "<> :st2"
+                + " order by s." + ID_FIELD + " desc";
         final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
 
         final List<Long> result = new LinkedList<Long>();

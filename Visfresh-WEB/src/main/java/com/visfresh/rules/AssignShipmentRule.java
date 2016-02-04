@@ -52,7 +52,7 @@ public class AssignShipmentRule implements TrackerEventRule {
     @Override
     public boolean accept(final RuleContext context) {
         if(context.getEvent().getShipment() == null && !context.isProcessed(this)) {
-            final Shipment s = shipmentDao.findActiveShipment(context.getEvent().getDevice().getImei());
+            final Shipment s = shipmentDao.findLastShipment(context.getEvent().getDevice().getImei());
             if (s != null) {
                 //cache shipment to request.
                 context.putClientProperty(this, s);

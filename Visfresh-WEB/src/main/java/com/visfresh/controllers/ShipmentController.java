@@ -570,9 +570,15 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setCurrentLocation(dtoOld.getCurrentLocation());
 
         final List<SingleShipmentTimeItem> items = dtoOld.getItems();
+        Date startTime;
         if (items.size() > 0) {
             final TrackerEvent lastEvent = items.get(items.size() - 1).getEvent();
             dto.setCurrentLocationForMap(new Location(lastEvent.getLatitude(), lastEvent.getLongitude()));
+            //set start time
+            final TrackerEvent firstEvent = items.get(0).getEvent();
+            startTime = firstEvent.getTime();
+        } else {
+            startTime = shipment.getShipmentDate();
         }
 
         dto.setDeviceName(dtoOld.getDeviceName());
@@ -586,7 +592,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                     && dto.getCurrentLocationForMap() != null) {
                 //get last location
                 final ArrivalEstimation estimation = arrivalEstimationService.estimateArrivalDate(
-                        shipment, dto.getCurrentLocationForMap(), new Date());
+                        shipment, dto.getCurrentLocationForMap(), startTime, new Date());
                 if (estimation != null) {
                     dto.setEta(isoFmt.format(estimation.getArrivalDate()));
                     dto.setPercentageComplete(estimation.getPercentageComplete());
@@ -606,13 +612,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             dto.setStartLocationForMap(shipment.getShippedFrom().getLocation());
         }
 
-        if (items.size() > 0) {
-            final TrackerEvent firstEvent = items.get(0).getEvent();
-            dto.setStartTimeISO(isoFmt.format(firstEvent.getTime()));
-        } else {
-            dto.setStartTimeISO(isoFmt.format(shipment.getShipmentDate()));
-        }
-
+        dto.setStartTimeISO(isoFmt.format(startTime));
         dto.setStatus(shipment.getStatus());
         dto.setTripCount(dtoOld.getTripCount());
 

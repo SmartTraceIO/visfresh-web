@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.TrackerEventType;
 
 /**
@@ -42,6 +44,13 @@ public class EnterDarkEnvironmentAlertRule extends AbstractAlertRule {
         defaultAssign(context.getEvent(), alert);
         alert.setType(AlertType.LightOff);
         return new Alert[] {alert};
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.AbstractNotificationRule#sendNotification(com.visfresh.entities.PersonSchedule, com.visfresh.entities.NotificationIssue)
+     */
+    @Override
+    protected void sendNotification(final PersonSchedule s, final NotificationIssue issue) {
+        // disable notifications
     }
 
     /* (non-Javadoc)

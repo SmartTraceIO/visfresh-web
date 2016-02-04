@@ -59,7 +59,7 @@ public class AssignShipmentRuleTest extends BaseRuleTest {
 
         //create shipment but in final state
         final Shipment s = createDefaultShipment(ShipmentStatus.Complete, event.getDevice());
-        assertFalse(rule.accept(req));
+        assertTrue(rule.accept(req));
 
         s.setStatus(ShipmentStatus.InProgress);
         context.getBean(ShipmentDao.class).save(s);

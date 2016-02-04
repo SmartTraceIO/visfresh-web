@@ -18,7 +18,6 @@ import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.services.DeviceCommandService;
@@ -98,9 +97,6 @@ public class DeviceCommandServiceImpl implements DeviceCommandService, SystemMes
      */
     protected void processCommand(final String command, final String imei) {
         saveCommand(command, imei);
-        if (command.equalsIgnoreCase(DeviceCommand.SHUTDOWN)) {
-            notifyDeviceShuttingDown(imei);
-        }
     }
 
     /**
@@ -108,6 +104,7 @@ public class DeviceCommandServiceImpl implements DeviceCommandService, SystemMes
      * @param imei
      */
     protected void saveCommand(final String command, final String imei) {
+        log.debug("Save to send command " + command + " for device " + imei);
         deviceCommandDao.saveCommand(command, imei);
     }
     /* (non-Javadoc)
@@ -120,19 +117,5 @@ public class DeviceCommandServiceImpl implements DeviceCommandService, SystemMes
         cmd.setDevice(device);
 
         sendCommand(cmd, date);
-    }
-    /**
-     * @param imei device IMEI.
-     */
-    protected void notifyDeviceShuttingDown(final String imei) {
-        final Shipment s = shipmentDao.findActiveShipment(imei);
-        if (s != null) {
-            log.debug("Device shutdown event has sent for " + imei);
-            s.setDeviceShutdownTime(new Date());
-            shipmentDao.save(s);
-        } else {
-            log.warn("Failed to find active shipment for device "
-                    + imei + " for set device shutdown time.");
-        }
     }
 }

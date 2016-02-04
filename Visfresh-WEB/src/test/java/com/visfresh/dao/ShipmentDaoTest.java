@@ -5,6 +5,7 @@ package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -277,29 +278,30 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
     }
 
     @Test
-    public void testFindActiveShipment() {
+    public void testFindLastShipment() {
         //test ignores shipment templates
         createShipmentTemplate();
-        assertNull(dao.findActiveShipment(device.getImei()));
+        assertNull(dao.findLastShipment(device.getImei()));
 
         //check found active
+        dao.save(createTestEntity());
+        dao.save(createTestEntity());
+        dao.save(createTestEntity());
+
         final Shipment s = createTestEntity();
-        s.setStatus(ShipmentStatus.Complete);
         dao.save(s);
 
         //check ignores in complete state
-        assertNull(dao.findActiveShipment(device.getImei()));
-
-        s.setStatus(ShipmentStatus.InProgress);
-        dao.save(s);
-        assertNotNull(dao.findActiveShipment(device.getImei()));
+        assertEquals(s.getId(), dao.findLastShipment(device.getImei()).getId());
 
         //check ignores other devices
         final Device d = createDevice("2340982349");
         s.setDevice(d);
         dao.save(s);
-        assertNull(dao.findActiveShipment(device.getImei()));
+        assertNotSame(s.getId(), dao.findLastShipment(device.getImei()).getId());
+        assertEquals(s.getId(), dao.findLastShipment(d.getImei()).getId());
     }
+
     @Test
     public void testSaveDefaultShipment() {
         final Shipment s = new Shipment();
@@ -358,12 +360,33 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         createShipment(c1, ShipmentStatus.InProgress);
         createShipment(c1, ShipmentStatus.Default);
         createShipment(c1, ShipmentStatus.Complete);
+        createShipment(c1, ShipmentStatus.Arrived);
 
         createShipment(c2, ShipmentStatus.InProgress);
         createShipment(c2, ShipmentStatus.Default);
         createShipment(c2, ShipmentStatus.Complete);
+        createShipment(c2, ShipmentStatus.Arrived);
 
         assertEquals(2, dao.findActiveShipments(c1).size());
+    }
+    @Test
+    public void testFindActiveShipmentsByImei() {
+        //create companies
+        final Device c1 = createDevice("1029837012897");
+        final Device c2 = createDevice("9890832408744");
+
+        //create shipments
+        createShipment(c1, ShipmentStatus.InProgress);
+        createShipment(c1, ShipmentStatus.Default);
+        createShipment(c1, ShipmentStatus.Complete);
+        createShipment(c1, ShipmentStatus.Arrived);
+
+        createShipment(c2, ShipmentStatus.InProgress);
+        createShipment(c2, ShipmentStatus.Default);
+        createShipment(c2, ShipmentStatus.Complete);
+        createShipment(c2, ShipmentStatus.Arrived);
+
+        assertEquals(2, dao.findActiveShipments(c1.getImei()).size());
     }
     @Test
     public void testGetSiblingGroup() {
@@ -399,6 +422,18 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setStatus(status);
         return dao.save(s);
     }
+    /**
+     * @param d device.
+     * @param status status.
+     */
+    private Shipment createShipment(final Device d, final ShipmentStatus status) {
+        final Shipment s = createTestEntity();
+        s.setCompany(sharedCompany);
+        s.setStatus(status);
+        s.setDevice(d);
+        return dao.save(s);
+    }
+
 
     public ShipmentTemplate createShipmentTemplate() {
         final ShipmentTemplate s = new ShipmentTemplate();

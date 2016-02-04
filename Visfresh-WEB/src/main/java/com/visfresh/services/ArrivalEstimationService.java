@@ -13,5 +13,5 @@ import com.visfresh.entities.Shipment;
  *
  */
 public interface ArrivalEstimationService {
-    ArrivalEstimation estimateArrivalDate(Shipment s, Location currentLocation, Date currentTime);
+    ArrivalEstimation estimateArrivalDate(Shipment s, Location currentLocation, Date startTime, Date currentTime);
 }

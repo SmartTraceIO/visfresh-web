@@ -17,7 +17,7 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @param imei device IMEI.
      * @return active shipment for given devcie.
      */
-    Shipment findActiveShipment(String imei);
+    Shipment findLastShipment(String imei);
     /**
      * @param imei device IMEI.
      * @return active shipments for given devcie.

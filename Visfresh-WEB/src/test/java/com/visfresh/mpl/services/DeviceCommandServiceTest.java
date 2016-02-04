@@ -29,7 +29,6 @@ public class DeviceCommandServiceTest extends DeviceCommandServiceImpl {
      * List of saved commands.
      */
     private final List<String> savedCommands = new LinkedList<>();
-    private final List<String> deviceShutDownNotifications = new LinkedList<>();
     private final List<SystemMessage> systemMessages = new LinkedList<>();
     private Device device;
 
@@ -55,13 +54,6 @@ public class DeviceCommandServiceTest extends DeviceCommandServiceImpl {
      */
     protected String prepareToSave(final String command, final String imei) {
         return command + ": " + imei;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.DeviceCommandServiceImpl#notifyDeviceShuttingDown(java.lang.String)
-     */
-    @Override
-    protected void notifyDeviceShuttingDown(final String imei) {
-        deviceShutDownNotifications.add(imei);
     }
     /* (non-Javadoc)
      * @see com.visfresh.mpl.services.DeviceCommandServiceImpl#dispatcherSendSystemMessage(java.lang.String, com.visfresh.entities.SystemMessageType, java.util.Date)
@@ -94,16 +86,6 @@ public class DeviceCommandServiceTest extends DeviceCommandServiceImpl {
 
         assertEquals(1, savedCommands.size());
         assertEquals(prepareToSave(command, device.getImei()), savedCommands.get(0));
-    }
-    @Test
-    public void testHandleDeviceShutdownMessage() throws RetryableException {
-        final String command = DeviceCommand.SHUTDOWN;
-        final SystemMessage msg = createSystemMessage(command);
-        handle(msg);
-
-        assertEquals(1, savedCommands.size());
-        assertEquals(1, this.deviceShutDownNotifications.size());
-        assertEquals(device.getImei(), this.deviceShutDownNotifications.get(0));
     }
     @Test
     public void testSendDeviceCommand() {

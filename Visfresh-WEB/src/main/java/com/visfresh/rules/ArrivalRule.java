@@ -126,6 +126,9 @@ public class ArrivalRule extends AbstractNotificationRule implements SystemMessa
         arrival.setShipment(event.getShipment());
 
         saveArrival(arrival);
+        event.getShipment().setStatus(ShipmentStatus.Arrived);
+        shipmentDao.save(event.getShipment());
+
         if (event.getShipment().getShutdownDeviceAfterMinutes() != null) {
             final long date = System.currentTimeMillis()
                     + event.getShipment().getShutdownDeviceAfterMinutes() * 60 * 1000l;
@@ -194,13 +197,22 @@ public class ArrivalRule extends AbstractNotificationRule implements SystemMessa
     public void handle(final SystemMessage msg) throws RetryableException {
         final JsonObject json = SerializerUtils.parseJson(msg.getMessageInfo()).getAsJsonObject();
         final Shipment s = shipmentDao.findOne(json.get("shipment").getAsLong());
+        final String imei = s.getDevice().getImei();
 
-        //send device shutdown command
-        commandService.shutdownDevice(s.getDevice(), new Date());
+        final Shipment lastShipment = shipmentDao.findLastShipment(imei);
+        if (lastShipment.getId().equals(s.getId())) {
+            log.debug("Shutdown device " + imei + " for shipment " + s.getId());
 
-        //update shipment status
-        s.setStatus(ShipmentStatus.Complete);
-        shipmentDao.save(s);
+            //send device shutdown command
+            commandService.shutdownDevice(s.getDevice(), new Date());
+
+            s.setDeviceShutdownTime(new Date());
+            shipmentDao.save(s);
+        } else {
+            log.warn("Shutting down shipment " + s.getId()
+                    + " is not latest shipment for shitting down device"
+                    + ". Scheduled shutdown event will ignored");
+        }
     }
 
     @Override

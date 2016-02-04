@@ -22,6 +22,11 @@ public enum ShipmentStatus {
      */
     Complete("Complete"),
     /**
+     * new shipment data has been uploaded and the device has reached its destination
+     * (device may or may not be switched off)
+     */
+    Arrived("Arrived"),
+    /**
      * new shipment data has been uploaded but for a future time of shipment
      */
     Pending("Pending");

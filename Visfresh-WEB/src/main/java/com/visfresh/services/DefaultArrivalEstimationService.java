@@ -35,36 +35,33 @@ public class DefaultArrivalEstimationService implements
      */
     @Override
     public ArrivalEstimation estimateArrivalDate(final Shipment s,
-            final Location currentLocation, final Date currentTime) {
-        final Date startDate = s.getShipmentDate();
-
-        if (s.getShippedFrom() != null && s.getShippedTo() != null) {
+            final Location currentLocation, final Date startDate, final Date currentTime) {
+        final long dt = currentTime.getTime() - startDate.getTime();
+        if (dt > 0 && s.getShippedFrom() != null && s.getShippedTo() != null) {
             final Location from = s.getShippedFrom().getLocation();
             final Location to = s.getShippedTo().getLocation();
 
-            final double allPath = LocationUtils.getDistanceMeters(from.getLatitude(), from.getLongitude(),
+            //calculate speed.
+            final double pathDone = LocationUtils.getDistanceMeters(
+                    currentLocation.getLatitude(), currentLocation.getLongitude(),
+                    from.getLatitude(), from.getLongitude());
+
+            //v should be not less then 60km/h
+            final double v = Math.max(V_60_KM_H, pathDone / dt);
+
+            //calculate reminder distance
+            double reminder = LocationUtils.getDistanceMeters(
+                    currentLocation.getLatitude(), currentLocation.getLongitude(),
                     to.getLatitude(), to.getLongitude());
-            if (allPath == 0) {
+            reminder = Math.max(reminder - s.getShippedTo().getRadius(), 0);
+            if (reminder == 0) {
                 return new ArrivalEstimation(new Date(currentTime.getTime()), 100);
             }
 
-            //calculate speed.
-            double v = LocationUtils.getDistanceMeters(
-                    currentLocation.getLatitude(), currentLocation.getLongitude(),
-                    from.getLatitude(), from.getLongitude())
-                    / (currentTime.getTime() - startDate.getTime());
-            //v should be not less then 60km/h
-            v = Math.max(V_60_KM_H, v);
-
-            //calculate reminder distance
-            final double reminder = LocationUtils.getDistanceMeters(
-                    currentLocation.getLatitude(), currentLocation.getLongitude(),
-                    to.getLatitude(), to.getLongitude());
-
-            final long dt = (long) (reminder / v);
+            final int percentageComplete = (int) Math.round(100. * (pathDone / (reminder + pathDone)));
             return new ArrivalEstimation(
-                    new Date(currentTime.getTime() + dt),
-                    (int) Math.round((allPath - reminder) / allPath));
+                    new Date(currentTime.getTime() + (long) (reminder / v)),
+                    percentageComplete);
         }
 
         return new ArrivalEstimation(startDate, 0);
