@@ -43,7 +43,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     protected static final String LATITUDE_FIELD = "latitude";
     protected static final String LONGITUDE_FIELD = "longitude";
     protected static final String DEVICE_FIELD = "device";
-    private static final String SHIPMENT_FIELD = "shipment";
+    protected static final String SHIPMENT_FIELD = "shipment";
 
     @Autowired
     private ShipmentDao shipmentDao;

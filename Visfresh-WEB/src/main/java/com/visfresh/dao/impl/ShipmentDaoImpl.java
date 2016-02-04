@@ -122,6 +122,55 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         return result;
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#findNextShipmentFor(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public Shipment findNextShipmentFor(final Shipment s) {
+        //first of all find the last tracker event for given shipment
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("shipment", s.getId());
+        params.put("device", s.getDevice().getImei());
+
+        String sql = "select id from " + TrackerEventDaoImpl.TABLE + " e"
+                + " where"
+                + " e." + TrackerEventDaoImpl.SHIPMENT_FIELD + "= :shipment"
+                + " order by e." + TrackerEventDaoImpl.ID_FIELD + " desc limit 1";
+        List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+
+        if (!rows.isEmpty()) {
+            final Long lastEventId = ((Number) rows.get(0).get("id")).longValue();
+            params.put("lastEvent", lastEventId);
+
+            //this query selects shipment ID of nearest event to given with other shipment.
+            sql = "select shipment from " + TrackerEventDaoImpl.TABLE + " e"
+                    + " where"
+                    + " e." + TrackerEventDaoImpl.SHIPMENT_FIELD + "<> :shipment"
+                    + " and not e." + TrackerEventDaoImpl.SHIPMENT_FIELD + " is NULL"
+                    + " and " + TrackerEventDaoImpl.ID_FIELD + " > :lastEvent"
+                    + " and " + TrackerEventDaoImpl.DEVICE_FIELD + " = :device"
+                    + " order by e." + TrackerEventDaoImpl.ID_FIELD + " limit 1";
+            rows = jdbc.queryForList(sql, params);
+            if (!rows.isEmpty()) {
+                final Long nextShipmentId = ((Number) rows.get(0).get("shipment")).longValue();
+                return findOne(nextShipmentId);
+            }
+        }
+
+        sql = "select id from " + TABLE + " s"
+                + " where"
+                + " s." + ISTEMPLATE_FIELD + " = false"
+                + " and s." + ID_FIELD + "> :shipment"
+                + " and s." + DEVICE_FIELD + "= :device"
+                + " order by s." + ID_FIELD + " limit 1";
+        rows = jdbc.queryForList(sql, params);
+        if (!rows.isEmpty()) {
+            final Long nextShipmentId = ((Number) rows.get(0).get("id")).longValue();
+            return findOne(nextShipmentId);
+        }
+
+        return null;
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#getSiblingGroup(java.lang.Long)
      */
     @Override
@@ -299,16 +348,31 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      */
     @Override
     public Shipment findLastShipment(final String imei) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("device", imei);
+
+        //first of all attempt to find last tracker event.
+        final String sql = "select shipment from " + TrackerEventDaoImpl.TABLE + " e"
+                + " where"
+                + " e." + TrackerEventDaoImpl.DEVICE_FIELD + " = :device"
+                + " and not e." + TrackerEventDaoImpl.SHIPMENT_FIELD + " is NULL"
+                + " order by e." + TrackerEventDaoImpl.ID_FIELD + " desc limit 1";
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+        if (!rows.isEmpty()) {
+            final Long id = ((Number) rows.get(0).get("shipment")).longValue();
+            return findOne(id);
+        }
+
         //sorting
         final Sorting sort = new Sorting(false, ShipmentConstants.PROPERTY_SHIPMENT_ID);
         //filter
         final Filter filter = new Filter();
         filter.addFilter(ShipmentConstants.PROPERTY_DEVICE_IMEI, imei);
         //page
-        final List<Shipment> rows = findAll(filter, sort, new Page(1, 1));
+        final List<Shipment> shipments = findAll(filter, sort, new Page(1, 1));
 
-        if (rows.size() > 0) {
-            return rows.get(0);
+        if (shipments.size() > 0) {
+            return shipments.get(0);
         } else {
             return null;
         }

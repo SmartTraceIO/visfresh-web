@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonObject;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
@@ -51,6 +52,8 @@ public class ArrivalRule extends AbstractNotificationRule implements SystemMessa
     protected ArrivalDao arrivalDao;
     @Autowired
     protected ShipmentDao shipmentDao;
+    @Autowired
+    protected TrackerEventDao trackerEventDao;
     @Autowired
     private DeviceCommandService commandService;
     @Autowired
@@ -199,20 +202,28 @@ public class ArrivalRule extends AbstractNotificationRule implements SystemMessa
         final Shipment s = shipmentDao.findOne(json.get("shipment").getAsLong());
         final String imei = s.getDevice().getImei();
 
-        final Shipment lastShipment = shipmentDao.findLastShipment(imei);
-        if (lastShipment.getId().equals(s.getId())) {
+        final Shipment next = shipmentDao.findNextShipmentFor(s);
+        if (next == null) {
             log.debug("Shutdown device " + imei + " for shipment " + s.getId());
 
             //send device shutdown command
             commandService.shutdownDevice(s.getDevice(), new Date());
 
             s.setDeviceShutdownTime(new Date());
-            shipmentDao.save(s);
         } else {
             log.warn("Shutting down shipment " + s.getId()
-                    + " is not latest shipment for shitting down device"
-                    + ". Scheduled shutdown event will ignored");
+                    + " is not latest shipment for given device " + imei
+                    + ". Device will not shutting down");
+            //calculate start shipment date
+            final List<TrackerEvent> events = trackerEventDao.getEvents(next);
+            if (events.isEmpty()) {
+                s.setDeviceShutdownTime(new Date());
+            } else {
+                s.setDeviceShutdownTime(events.get(0).getTime());
+            }
         }
+
+        shipmentDao.save(s);
     }
 
     @Override

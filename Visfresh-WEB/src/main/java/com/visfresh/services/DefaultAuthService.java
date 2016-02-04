@@ -44,7 +44,7 @@ public class DefaultAuthService implements AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultAuthService.class);
 
-    private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 60 * 60 * 1000l; //one hour
+    private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 4 * 60 * 60 * 1000l; //one hour
     public static final int USER_LOGIN_LIMIT = 1000;
 
     private static final long TIMEOUT = 60000L;
