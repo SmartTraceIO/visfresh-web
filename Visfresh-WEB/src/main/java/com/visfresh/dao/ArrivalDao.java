@@ -14,8 +14,13 @@ import com.visfresh.entities.Shipment;
  */
 public interface ArrivalDao extends DaoBase<Arrival, Long> {
     /**
-     * @param shipment
+     * @param shipment shipment.
      * @return
      */
     List<Arrival> getArrivals(Shipment shipment);
+    /**
+     * @param shipment shipment.
+     * @return arrival.
+     */
+    Arrival getArrival(Shipment shipment);
 }

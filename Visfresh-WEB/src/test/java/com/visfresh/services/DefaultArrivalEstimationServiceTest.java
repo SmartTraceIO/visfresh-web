@@ -13,6 +13,7 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
@@ -24,6 +25,7 @@ import com.visfresh.entities.ShipmentStatus;
  */
 public class DefaultArrivalEstimationServiceTest {
     private DefaultArrivalEstimationService service;
+    private Arrival currentArrival;
 
     /**
      * Default constructor.
@@ -37,7 +39,19 @@ public class DefaultArrivalEstimationServiceTest {
      */
     @Before
     public void setUp() {
-        service = new DefaultArrivalEstimationService();
+        service = new DefaultArrivalEstimationService() {
+            /* (non-Javadoc)
+             * @see com.visfresh.services.DefaultArrivalEstimationService#findArrival(com.visfresh.entities.Shipment)
+             */
+            @Override
+            protected Arrival findArrival(final Shipment s) {
+                if (currentArrival != null) {
+                    currentArrival.setShipment(s);
+                    currentArrival.setDevice(s.getDevice());
+                }
+                return currentArrival;
+            }
+        };
     }
 
     @Test

@@ -219,4 +219,11 @@ public class Shipment extends ShipmentBase {
     public int getSiblingCount() {
         return siblingCount;
     }
+
+    /**
+     * @return
+     */
+    public boolean hasFinalStatus() {
+        return status == ShipmentStatus.Arrived || status == ShipmentStatus.Complete;
+    }
 }

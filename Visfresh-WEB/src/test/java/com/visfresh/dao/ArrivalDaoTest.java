@@ -5,6 +5,7 @@ package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Date;
 import java.util.List;
@@ -82,7 +83,7 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
         return a;
     }
     @Test
-    public void testGetAlertsByShipmentAndTimeRanges() {
+    public void testGetArrivals() {
         final Date startDate = new Date(System.currentTimeMillis() - 1000000000l);
         final Date endDate = new Date(System.currentTimeMillis() - 1000000l);
 
@@ -97,6 +98,22 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
         //check left shipment
         final Shipment left = createShipment(device);
         assertEquals(0, dao.getArrivals(left).size());
+    }
+    @Test
+    public void testGetArrival() {
+        final Date startDate = new Date(System.currentTimeMillis() - 1000000000l);
+        final Date endDate = new Date(System.currentTimeMillis() - 1000000l);
+
+        final Arrival arrival = createAndSave(new Date(startDate.getTime() - 1000l));
+        createAndSave(new Date(startDate.getTime()));
+        createAndSave(new Date(startDate.getTime() + 10000l));
+        createAndSave(new Date(endDate.getTime()));
+        createAndSave(new Date(endDate.getTime() + 1000l));
+
+        assertEquals(arrival.getId(), dao.getArrival(shipment).getId());
+        //check left shipment
+        final Shipment left = createShipment(device);
+        assertNull(dao.getArrival(left));
     }
 
     /**

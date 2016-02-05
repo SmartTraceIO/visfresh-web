@@ -15,7 +15,10 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.Filter;
+import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Shipment;
 
@@ -109,43 +112,28 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
     protected String getTableName() {
         return TABLE;
     }
-    /**
-     * @return
-     */
-    private Map<String, String> createSelectAsMapping() {
-        final Map<String, String> map = new HashMap<String, String>();
-        map.put(ID_FIELD, ID_FIELD);
-        map.put(DATE_FIELD, DATE_FIELD);
-        map.put(NUMMETERS_FIELD, NUMMETERS_FIELD);
-        map.put(SHIPMENT_FIELD, SHIPMENT_FIELD);
-        return map;
-    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ArrivalDao#getArrivals(com.visfresh.entities.Shipment, java.util.Date, java.util.Date)
      */
     @Override
     public List<Arrival> getArrivals(final Shipment shipment) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("shipment", shipment.getId());
-        final Map<String, String> fields = createSelectAsMapping();
+        final Filter filter = new Filter();
+        filter.addFilter(SHIPMENT_FIELD, shipment.getId());
 
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select "
-                + buildSelectAs(fields)
-                + " from "
-                + TABLE + " a"
-                + " where "
-                + "a." + SHIPMENT_FIELD + " =:shipment order by date, id",
-                params);
+        final Sorting sorting = new Sorting(DATE_FIELD, ID_FIELD);
+        return findAll(filter, sorting, null);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ArrivalDao#getArrival(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public Arrival getArrival(final Shipment shipment) {
+        final Filter filter = new Filter();
+        filter.addFilter(SHIPMENT_FIELD, shipment.getId());
 
-        final Map<String, Object> cache = new HashMap<String, Object>();
-        final List<Arrival> alerts = new LinkedList<Arrival>();
-        for (final Map<String,Object> row : list) {
-            final Arrival a = createEntity(row);
-            resolveReferences(a, row, cache);
-            alerts.add(a);
-        }
-        return alerts;
+        final Sorting sorting = new Sorting(DATE_FIELD, ID_FIELD);
+        final List<Arrival> arrivals = findAll(filter, sorting, new Page(1, 1));
+        return arrivals.isEmpty() ? null : arrivals.get(0);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)

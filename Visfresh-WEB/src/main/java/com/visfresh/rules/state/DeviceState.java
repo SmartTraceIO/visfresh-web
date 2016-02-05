@@ -3,6 +3,8 @@
  */
 package com.visfresh.rules.state;
 
+import java.util.Date;
+
 import com.visfresh.entities.Shipment;
 
 /**
@@ -13,6 +15,7 @@ public class DeviceState {
     private RulesState temperatureAlerts = new RulesState();
     private Long shipmentId;
     private boolean arrivalProcessed;
+    private Date startShipmentDate;
 
     /**
      * Default constructor.
@@ -40,7 +43,8 @@ public class DeviceState {
     public void possibleNewShipment(final Shipment s) {
         if (shipmentId == null || !shipmentId.equals(s.getId())) {
             shipmentId = s.getId();
-            this.temperatureAlerts.clear();
+            startShipmentDate = new Date();
+            temperatureAlerts.clear();
             arrivalProcessed = false;
         }
     }
@@ -64,5 +68,17 @@ public class DeviceState {
      */
     public boolean isArrivalProcessed() {
         return arrivalProcessed;
+    }
+    /**
+     * @return start shipment date.
+     */
+    public Date getStartShipmentDate() {
+        return startShipmentDate;
+    }
+    /**
+     * @param startShipmentDate the startShipmentDate to set
+     */
+    public void setStartShipmentDate(final Date startShipmentDate) {
+        this.startShipmentDate = startShipmentDate;
     }
 }

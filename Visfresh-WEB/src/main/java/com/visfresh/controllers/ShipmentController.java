@@ -269,13 +269,30 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         final List<Shipment> shipments = shipmentDao.findByCompany(company, sorting, page, filter);
         final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
 
+        final Date currentTime = new Date();
+
         //add alerts to each shipment.
         for (final Shipment s : shipments) {
-            final List<Alert> alerts = alertDao.getAlerts(s);
             final ListShipmentItem dto = new ListShipmentItem(s);
-            dto.setSiblingCount(siblingService.getSiblingCount(s));
-            dto.getAlertSummary().putAll(toSummaryMap(alerts));
             result.add(dto);
+
+            //siblings.
+            dto.setSiblingCount(siblingService.getSiblingCount(s));
+            //alerts
+            final List<Alert> alerts = alertDao.getAlerts(s);
+            dto.getAlertSummary().putAll(toSummaryMap(alerts));
+
+            //percentage complete.
+            final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
+            if (lastEvent != null) {
+                final TrackerEvent firstEvent = trackerEventDao.getFirstEvent(s);
+                final ArrivalEstimation est = arrivalEstimationService.estimateArrivalDate(s,
+                        new Location(lastEvent.getLatitude(), lastEvent.getLongitude()),
+                        firstEvent.getTime(),
+                        currentTime);
+
+                dto.setPercentageComplete(est.getPercentageComplete());
+            }
         }
 
         return result;

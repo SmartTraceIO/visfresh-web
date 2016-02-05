@@ -217,6 +217,34 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(e.getId(), dao.getLastEvent(shipment).getId());
     }
     @Test
+    public void testGetFirstEvent() {
+        long time = System.currentTimeMillis() - 100000000l;
+
+
+        //add event for left shipment
+
+        //create left shipment.
+        Shipment s = shipmentDao.findOne(shipment.getId());
+        s.setId(null);
+        s = shipmentDao.save(s);
+
+        final TrackerEvent eLeft = createEvent(new Date((time+=10000)), 10);
+        eLeft.setShipment(s);
+        dao.save(eLeft);
+
+        //first event.
+        final TrackerEvent e = createAndSave(new Date((time+=10000)), 10);
+        //other events.
+        createAndSave(new Date((time+=10000)), 10);
+        createAndSave(new Date((time+=10000)), 10);
+        createAndSave(new Date((time+=10000)), 10);
+        createAndSave(new Date((time+=10000)), 10);
+        createAndSave(new Date((time+=10000)), 10);
+        createAndSave(new Date((time+=10000)), 10);
+
+        assertEquals(e.getId(), dao.getFirstEvent(shipment).getId());
+    }
+    @Test
     public void testGetEvents() {
         long time = System.currentTimeMillis() - 100000000l;
 

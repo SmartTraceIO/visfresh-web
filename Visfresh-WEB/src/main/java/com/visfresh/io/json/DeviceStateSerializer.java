@@ -22,6 +22,7 @@ import com.visfresh.utils.SerializerUtils;
 public class DeviceStateSerializer extends AbstractJsonSerializer {
     private static final String ARRIVAL_PROCESSED = "arrivalProcessed";
     private static final String SHIPMENT_ID = "shipmentId";
+    private static final String SHIPMENT_START_DATE = "shipmentStart";
     private static final String TEMPERATURE_ALERTS = "temperatureAlerts";
 
     /**
@@ -67,6 +68,7 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
         json.add(TEMPERATURE_ALERTS, toJson(state.getTemperatureAlerts()));
         json.addProperty(SHIPMENT_ID, state.getShipmentId());
         json.addProperty(ARRIVAL_PROCESSED, state.isArrivalProcessed());
+        json.addProperty(SHIPMENT_START_DATE, formatDate(state.getStartShipmentDate()));
         return json;
     }
     /**
@@ -78,6 +80,7 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
         s.setTemperatureAlerts(parseRulesState(json.get(TEMPERATURE_ALERTS)));
         s.setShipmentId(asLong(json.get(SHIPMENT_ID)));
         s.setArrivalProcessed(Boolean.TRUE.equals(asBoolean(json.get(ARRIVAL_PROCESSED))));
+        s.setStartShipmentDate(parseDate(asString(json.get(SHIPMENT_START_DATE))));
         return s;
     }
     /**

@@ -4,6 +4,8 @@
 package com.visfresh.rules;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
@@ -496,6 +498,39 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
         rule.handle(new RuleContext(e, state));
+    }
+    @Test
+    public void testSuppressionTimeOut() {
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final AlertRule r = new AlertRule(AlertType.CriticalCold);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(true);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        final DeviceState state = new DeviceState();
+        state.possibleNewShipment(shipment);
+
+        final TrackerEvent e = createEvent(System.currentTimeMillis(), TrackerEventType.AUT, temperature - 1);
+
+        //check without suppressed alert time
+        assertTrue(rule.accept(new RuleContext(e, state)));
+
+        //check with suppressed alert time.
+        shipment.setAlertSuppressionMinutes(10);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        assertFalse(rule.accept(new RuleContext(e, state)));
+
+        //shift the start shipment date.
+        state.setStartShipmentDate(new Date(System.currentTimeMillis() - 10 * 60 * 1000l - 1l));
+
+        assertTrue(rule.accept(new RuleContext(e, state)));
     }
     /**
      * @param date date.

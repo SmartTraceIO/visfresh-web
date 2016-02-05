@@ -11,8 +11,19 @@ import com.visfresh.rules.MovementStartAlertRule;
 import com.visfresh.rules.MovementStopAlertRule;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.TemperatureAlertRule;
+import com.visfresh.rules.StartShipmentTimeCorrectRule;
 
 global AbstractRuleEngine engine;
+
+rule "StartShipmentTimeCorrect"
+	salience 150
+    when
+        context : RuleContext(engine.getRule(StartShipmentTimeCorrectRule.NAME).accept(this));
+    then
+    	if(engine.getRule(StartShipmentTimeCorrectRule.NAME).handle(context)) {
+       		update(context);
+        }
+end
 
 rule "AssignShipment"
 	salience 100

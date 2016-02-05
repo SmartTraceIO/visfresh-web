@@ -17,6 +17,7 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.rules.state.DeviceState;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -38,8 +39,28 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      * @see com.visfresh.drools.TrackerEventRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final RuleContext e) {
-        return super.accept(e) && e.getEvent().getShipment().getAlertProfile() != null;
+    public boolean accept(final RuleContext context) {
+        return super.accept(context)
+                && context.getEvent().getShipment().getAlertProfile() != null
+                && !isSuppressedAllerts(context);
+    }
+
+    /**
+     * @param context rule context.
+     * @return
+     */
+    private boolean isSuppressedAllerts(final RuleContext context) {
+        final Shipment shipment = context.getEvent().getShipment();
+
+        if (shipment.getAlertSuppressionMinutes() > 0) {
+            final DeviceState state = context.getState();
+            final long allowed = state.getStartShipmentDate().getTime()
+                    + shipment.getAlertSuppressionMinutes() * 60 * 1000l;
+
+            return System.currentTimeMillis() < allowed;
+        }
+
+        return false;
     }
 
     protected void defaultAssign(final TrackerEvent e, final Alert a) {

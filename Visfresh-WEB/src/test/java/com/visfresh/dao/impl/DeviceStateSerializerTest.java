@@ -43,6 +43,7 @@ public class DeviceStateSerializerTest {
         final Long shipmentId = 77L;
 
         DeviceState s = new DeviceState();
+        final Date startShipment = new Date(System.currentTimeMillis() - 10000);
         final Date d1 = new Date(System.currentTimeMillis() - 100000);
         final Date d2 = new Date(System.currentTimeMillis() - 1000);
         s.setShipmentId(shipmentId);
@@ -50,6 +51,7 @@ public class DeviceStateSerializerTest {
         s.getTemperatureAlerts().getDates().put("1", d1);
         s.getTemperatureAlerts().getDates().put("2", d2);
         s.getTemperatureAlerts().getProperties().put("key", "value");
+        s.setStartShipmentDate(startShipment);
         s.setArrivalProcessed(true);
 
         final String str = serializer.toString(s);
@@ -59,6 +61,7 @@ public class DeviceStateSerializerTest {
 
         assertEquals(format(d1), format(s.getTemperatureAlerts().getDates().get("1")));
         assertEquals(format(d2), format(s.getTemperatureAlerts().getDates().get("2")));
+        assertEquals(format(startShipment), format(s.getStartShipmentDate()));
         assertEquals("value", s.getTemperatureAlerts().getProperties().get("key"));
         assertEquals(shipmentId, s.getShipmentId());
         assertEquals(true, s.isArrivalProcessed());

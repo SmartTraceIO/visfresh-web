@@ -148,6 +148,20 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         return events.isEmpty() ? null : events.get(0);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getFirstEvent(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public TrackerEvent getFirstEvent(final Shipment s) {
+        //filtering
+        final Filter filter = new Filter();
+        filter.addFilter(TrackerEventConstants.PROPERTY_SHIPMENT, s);
+        //sorting
+        final Sorting sort = new Sorting(true, TIME_FIELD, ID_FIELD);
+        final List<TrackerEvent> events = findAll(filter, sort, new Page(1, 1));
+
+        return events.isEmpty() ? null : events.get(0);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.TrackerEventDao#getPreviousEvent(com.visfresh.entities.TrackerEvent)
      */
     @Override

@@ -5,8 +5,11 @@ package com.visfresh.services;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.ArrivalDao;
+import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 import com.visfresh.utils.LocationUtils;
@@ -18,6 +21,8 @@ import com.visfresh.utils.LocationUtils;
 @Component
 public class DefaultArrivalEstimationService implements
         ArrivalEstimationService {
+    @Autowired
+    private ArrivalDao arrivalDao;
 
     /**
      * 60 km/h as meters/milliseconds
@@ -36,6 +41,37 @@ public class DefaultArrivalEstimationService implements
     @Override
     public ArrivalEstimation estimateArrivalDate(final Shipment s,
             final Location currentLocation, final Date startDate, final Date currentTime) {
+        final ArrivalEstimation e = estimateImpl(s, currentLocation, startDate, currentTime);
+        if (e.getArrivalDate() == null && s.hasFinalStatus()) {
+            final Arrival a = findArrival(s);
+            if (a != null) {
+                e.setArrivalDate(a.getDate());
+            }
+        }
+        return e;
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    protected Arrival findArrival(final Shipment s) {
+        return arrivalDao.getArrival(s);
+    }
+
+    /**
+     * @param s shipment.
+     * @param currentLocation current location.
+     * @param startDate start date.
+     * @param currentTime current date.
+     * @return estimate.
+     */
+    protected ArrivalEstimation estimateImpl(final Shipment s,
+            final Location currentLocation, final Date startDate,
+            final Date currentTime) {
+        if (s.hasFinalStatus()) {
+            return new ArrivalEstimation(null, 100);
+        }
         final long dt = currentTime.getTime() - startDate.getTime();
         if (dt > 0 && s.getShippedFrom() != null && s.getShippedTo() != null) {
             final Location from = s.getShippedFrom().getLocation();
@@ -64,6 +100,6 @@ public class DefaultArrivalEstimationService implements
                     percentageComplete);
         }
 
-        return new ArrivalEstimation(startDate, 0);
+        return new ArrivalEstimation(null, 0);
     }
 }
