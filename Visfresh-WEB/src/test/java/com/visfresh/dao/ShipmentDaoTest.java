@@ -26,8 +26,6 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureUnits;
-import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 
 /**
@@ -304,48 +302,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(s.getId(), dao.findLastShipment(d.getImei()).getId());
     }
     @Test
-    public void testFindLastShipmentByTrackerEvents() {
-        final Shipment s1 = dao.save(createTestEntity());
-        final Shipment s2 = dao.save(createTestEntity());
-        createShipmentTemplate();
-
-        //check ignores in complete state
-        final TrackerEventDao ted = this.getContext().getBean(TrackerEventDao.class);
-
-        final TrackerEvent e1 = createTrackerEvent(null);
-        final TrackerEvent e2 = createTrackerEvent(null);
-
-        assertEquals(s2.getId(), dao.findLastShipment(device.getImei()).getId());
-
-        //set first shipment has tracker events, but second not
-        e1.setShipment(s1);
-        ted.save(e1);
-        assertEquals(s1.getId(), dao.findLastShipment(device.getImei()).getId());
-
-        //set first have not tracker events, but second has
-        e1.setShipment(null);
-        ted.save(e1);
-        e2.setShipment(s2);
-        ted.save(e2);
-
-        assertEquals(s2.getId(), dao.findLastShipment(device.getImei()).getId());
-
-        //test both have tracker events
-        e2.setShipment(s1);
-        ted.save(e2);
-        e1.setShipment(s2);
-        ted.save(e1);
-
-        assertEquals(s1.getId(), dao.findLastShipment(device.getImei()).getId());
-
-        //check ignores other devices
-        final Device d = createDevice("2340982349");
-        final Shipment s3 = createShipment(d, ShipmentStatus.Arrived);
-        createTrackerEvent(s3);
-
-        assertEquals(s1.getId(), dao.findLastShipment(device.getImei()).getId());
-    }
-    @Test
     public void testFindNextShipmentFor() {
         final Shipment s = createTestEntity();
         dao.save(s);
@@ -360,62 +316,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         //check ignores in complete state
         assertEquals(next.getId(), dao.findNextShipmentFor(s).getId());
     }
-    @Test
-    public void testFindNextShipmentForByTrackerEvent() {
-        final Shipment s1 = dao.save(createTestEntity());
-        final Shipment s = dao.save(createTestEntity());
-        createShipmentTemplate();
-        final Shipment s2 = dao.save(createTestEntity());
-        dao.save(createTestEntity());
-
-        //check ignores in complete state
-        final TrackerEventDao ted = this.getContext().getBean(TrackerEventDao.class);
-
-        final TrackerEvent e1 = createTrackerEvent(null);
-        final TrackerEvent e2 = createTrackerEvent(null);
-
-        assertEquals(s2.getId(), dao.findNextShipmentFor(s).getId());
-
-        //set first shipment has tracker events, but second not
-        e1.setShipment(s);
-        ted.save(e1);
-        assertEquals(s2.getId(), dao.findNextShipmentFor(s).getId());
-
-        //set first have not tracker events, but second has
-        e1.setShipment(s1);
-        ted.save(e1);
-
-        assertEquals(s2.getId(), dao.findNextShipmentFor(s).getId());
-
-        //test both have tracker events but given shipment latest
-        e1.setShipment(s1);
-        ted.save(e1);
-        e2.setShipment(s);
-        ted.save(e2);
-
-        //test both have tracker event and next shipment latest
-        e1.setShipment(s);
-        ted.save(e1);
-        e2.setShipment(s1);
-        ted.save(e2);
-
-        assertEquals(s1.getId(), dao.findNextShipmentFor(s).getId());
-
-        //check ignores other devices
-        e1.setShipment(s);
-        ted.save(e1);
-
-        final Device d = createDevice("2340982349");
-        final Shipment s3 = createShipment(d, ShipmentStatus.Arrived);
-        //set nearest event to left shipment
-        e2.setShipment(s3);
-        e2.setDevice(d);
-        ted.save(e2);
-
-        createTrackerEvent(s1);
-        assertEquals(s1.getId(), dao.findNextShipmentFor(s).getId());
-    }
-
     @Test
     public void testSaveDefaultShipment() {
         final Shipment s = new Shipment();
@@ -515,21 +415,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         assertEquals(2, dao.getSiblingGroup(g1).size());
         assertEquals(0, dao.getSiblingGroup(1l).size());
-    }
-    /**
-     * @param shipment shipment.
-     * @return tracker event.
-     */
-    private TrackerEvent createTrackerEvent(final Shipment shipment) {
-        final TrackerEvent e = new TrackerEvent();
-        e.setShipment(shipment);
-        if (shipment != null) {
-            e.setDevice(shipment.getDevice());
-        } else {
-            e.setDevice(device);
-        }
-        e.setType(TrackerEventType.AUT);
-        return this.getContext().getBean(TrackerEventDao.class).save(e);
     }
     /**
      * @param c company.

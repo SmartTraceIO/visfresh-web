@@ -202,24 +202,22 @@ public class ArrivalRule extends AbstractNotificationRule implements SystemMessa
         final Shipment s = shipmentDao.findOne(json.get("shipment").getAsLong());
         final String imei = s.getDevice().getImei();
 
-        final Shipment next = shipmentDao.findNextShipmentFor(s);
-        if (next == null) {
+        if (shipmentDao.findNextShipmentFor(s) == null) {
             log.debug("Shutdown device " + imei + " for shipment " + s.getId());
 
             //send device shutdown command
             commandService.shutdownDevice(s.getDevice(), new Date());
-
             s.setDeviceShutdownTime(new Date());
         } else {
             log.warn("Shutting down shipment " + s.getId()
                     + " is not latest shipment for given device " + imei
                     + ". Device will not shutting down");
             //calculate start shipment date
-            final List<TrackerEvent> events = trackerEventDao.getEvents(next);
+            final List<TrackerEvent> events = trackerEventDao.getEvents(s);
             if (events.isEmpty()) {
                 s.setDeviceShutdownTime(new Date());
             } else {
-                s.setDeviceShutdownTime(events.get(0).getTime());
+                s.setDeviceShutdownTime(events.get(events.size() - 1).getTime());
             }
         }
 
