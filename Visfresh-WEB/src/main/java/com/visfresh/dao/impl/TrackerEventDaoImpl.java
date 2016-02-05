@@ -16,7 +16,10 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.TrackerEventConstants;
 import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.Filter;
+import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
@@ -65,6 +68,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         propertyToDbMap.put(TrackerEventConstants.PROPERTY_ID, ID_FIELD);
         propertyToDbMap.put(TrackerEventConstants.PROPERTY_TIME, TIME_FIELD);
         propertyToDbMap.put(TrackerEventConstants.PROPERTY_TYPE, TYPE_FIELD);
+        propertyToDbMap.put(TrackerEventConstants.PROPERTY_SHIPMENT, SHIPMENT_FIELD);
     }
 
     /* (non-Javadoc)
@@ -122,24 +126,26 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      */
     @Override
     public List<TrackerEvent> getEvents(final Shipment shipment) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("shipment", shipment.getId());
+        //filtering
+        final Filter filter = new Filter();
+        filter.addFilter(SHIPMENT_FIELD, shipment.getId());
+        //sorting
+        final Sorting sort = new Sorting(true, TIME_FIELD, ID_FIELD);
+        return findAll(filter, sort, null);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getLastEvent(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public TrackerEvent getLastEvent(final Shipment s) {
+        //filtering
+        final Filter filter = new Filter();
+        filter.addFilter(TrackerEventConstants.PROPERTY_SHIPMENT, s);
+        //sorting
+        final Sorting sort = new Sorting(false, TIME_FIELD, ID_FIELD);
+        final List<TrackerEvent> events = findAll(filter, sort, new Page(1, 1));
 
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select * from "
-                + TABLE
-                + " where "
-                + SHIPMENT_FIELD + " =:shipment order by time, id",
-                params);
-
-        final Map<String, Object> cache = new HashMap<String, Object>();
-        final List<TrackerEvent> events = new LinkedList<TrackerEvent>();
-        for (final Map<String,Object> row : list) {
-            final TrackerEvent e = createEntity(row);
-            resolveReferences(e, row, cache);
-            events.add(e);
-        }
-        return events;
+        return events.isEmpty() ? null : events.get(0);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.TrackerEventDao#getPreviousEvent(com.visfresh.entities.TrackerEvent)
@@ -210,6 +216,18 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         } else {
             final String imei = (String) row.get(DEVICE_FIELD);
             e.setDevice(deviceDao.findByImei(imei));
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)
+     */
+    @Override
+    protected void addFilterValue(final String property, final Object value,
+            final Map<String, Object> params, final List<String> filters) {
+        if (value instanceof Shipment) {
+            super.addFilterValue(property, ((Shipment) value).getId(), params, filters);
+        } else {
+            super.addFilterValue(property, value, params, filters);
         }
     }
 

@@ -23,4 +23,9 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
      * @return previous event for given.
      */
     TrackerEvent getPreviousEvent(TrackerEvent event);
+    /**
+     * @param s shipment.
+     * @return last event for given shipment.
+     */
+    TrackerEvent getLastEvent(Shipment s);
 }

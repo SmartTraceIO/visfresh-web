@@ -213,11 +213,11 @@ public class ArrivalRule extends AbstractNotificationRule implements SystemMessa
                     + " is not latest shipment for given device " + imei
                     + ". Device will not shutting down");
             //calculate start shipment date
-            final List<TrackerEvent> events = trackerEventDao.getEvents(s);
-            if (events.isEmpty()) {
+            final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
+            if (lastEvent == null) {
                 s.setDeviceShutdownTime(new Date());
             } else {
-                s.setDeviceShutdownTime(events.get(events.size() - 1).getTime());
+                s.setDeviceShutdownTime(lastEvent.getTime());
             }
         }
 
