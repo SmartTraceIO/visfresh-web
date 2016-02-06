@@ -14,9 +14,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ShipmentConstants;
-import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -24,7 +22,6 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
-import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
@@ -32,11 +29,8 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.shipment.SingleShipmentAlert;
-import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentDtoNew;
 import com.visfresh.io.shipment.SingleShipmentLocation;
-import com.visfresh.io.shipment.SingleShipmentTimeItem;
-import com.visfresh.mpl.services.AlertDescriptionBuilder;
 import com.visfresh.services.lists.ListNotificationScheduleItem;
 import com.visfresh.services.lists.ListShipmentItem;
 import com.visfresh.utils.StringUtils;
@@ -48,7 +42,6 @@ import com.visfresh.utils.StringUtils;
 public class ShipmentSerializer extends AbstractJsonSerializer {
     private ReferenceResolver referenceResolver;
     private NotificationScheduleSerializer notificationScheduleSerializer;
-    private final AlertDescriptionBuilder alertBuilder;
     private final User user;
 
     /**
@@ -58,7 +51,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         super(user.getTimeZone());
         notificationScheduleSerializer = new NotificationScheduleSerializer(user.getTimeZone());
         this.user = user;
-        alertBuilder = new AlertDescriptionBuilder();
     }
 
     /**
@@ -199,59 +191,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
         return list;
     }
-
-    public JsonObject toJson(final SingleShipmentDto dto) {
-        if (dto == null) {
-            return null;
-        }
-
-        final JsonObject obj = new JsonObject();
-
-        obj.addProperty("shipmentId", dto.getShipmentId());
-        obj.addProperty("deviceSN", dto.getDeviceSn());
-        obj.addProperty("deviceName", dto.getDeviceName());
-        obj.addProperty("tripCount", dto.getTripCount());
-
-        obj.addProperty("shipmentDescription", dto.getShipmentDescription());
-
-        obj.addProperty("palletId", dto.getPalletId());
-        obj.addProperty("poNum", dto.getPoNum());
-        obj.addProperty("assetNum", dto.getAssetNum());
-        obj.addProperty("assetType", dto.getAssetType());
-
-        obj.addProperty("status", dto.getStatus());
-
-        obj.addProperty("shippedFrom", dto.getShippedFrom());
-        obj.addProperty("shippedTo", dto.getShippedTo());
-        obj.addProperty("shipmentDate", formatDate(dto.getShipmentDate()));
-        obj.addProperty("currentLocation", dto.getCurrentLocation());
-        obj.addProperty("estArrivalDate", formatDate(dto.getEstArrivalDate()));
-        obj.addProperty("actualArrivalDate", formatDate(dto.getActualArrivalDate()));
-        obj.addProperty("percentageComplete", dto.getPercentageComplete());
-
-        obj.addProperty("alertProfileId", dto.getAlertProfileId());
-        obj.addProperty("alertProfileName", dto.getAlertProfileName());
-        obj.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
-
-        obj.addProperty("maxTimesAlertFires", dto.getMaxTimesAlertFires());
-        obj.add("alertsNotificationSchedules", scheduleItemsAsJsonArray(dto.getAlertsNotificationSchedules()));
-        obj.add("alertSummary", toJson(dto.getAlertSummary()));
-
-        obj.addProperty("arrivalNotificationWithinKm", dto.getArrivalNotificationWithInKm());
-        obj.addProperty("excludeNotificationIfNoAlerts", dto.isExcludeNotificationsIfNoAlertsFired());
-        obj.add("arrivalNotificationSchedules", scheduleItemsAsJsonArray(dto.getArrivalNotificationSchedules()));
-        obj.addProperty("commentsForReceiver", dto.getCommentsForReceiver());
-
-        //serialize time items
-        final JsonArray items = new JsonArray();
-        obj.add("items", items);
-        for (final SingleShipmentTimeItem item : dto.getItems()) {
-            items.add(toJson(item));
-        }
-
-        return obj;
-    }
-
     /**
      * @param sched
      * @return
@@ -265,40 +204,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     }
 
     /**
-     * @param item
-     * @return
-     */
-    private JsonObject toJson(final SingleShipmentTimeItem item) {
-        if (item == null) {
-            return null;
-        }
-
-        final JsonObject json = new JsonObject();
-        final TrackerEvent event = item.getEvent();
-
-        json.addProperty("timestamp", formatDate(event.getTime()));
-        json.add("location", toJson(new Location(event.getLatitude(), event.getLongitude())));
-        json.addProperty("temperature", convertTemperature(event.getTemperature()));
-        json.addProperty("type", event.getType().toString());
-
-        //add alerts.
-        final JsonArray alerts = new JsonArray();
-        json.add("alerts", alerts);
-        for (final Alert a : item.getAlerts()) {
-            alerts.add(toJsonAlertDescription(a));
-        }
-
-        //add arrivals
-        final JsonArray arrivals = new JsonArray();
-        json.add("arrivas", arrivals);
-        for (final Arrival a : item.getArrivals()) {
-            arrivals.add(toJsonArrivalDescription(a));
-        }
-
-        return json;
-    }
-
-    /**
      * @param t
      * @return
      */
@@ -307,29 +212,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         //cut extra decimal signs.
         value = Math.round(value * 100) / 100.;
         return value;
-    }
-    /**
-     * @param a arrival
-     * @return
-     */
-    private JsonObject toJsonArrivalDescription(final Arrival a) {
-        final JsonObject obj = new JsonObject();
-        obj.addProperty("numberOfMetersOfArrival", a.getNumberOfMettersOfArrival());
-
-        final StringBuilder sb = new StringBuilder();
-        obj.addProperty("arrivalReportSentTo", sb.toString());
-        return obj;
-    }
-    /**
-     * @param a
-     * @return
-     */
-    private JsonObject toJsonAlertDescription(final Alert a) {
-        final JsonObject obj = new JsonObject();
-        obj.addProperty("description", this.alertBuilder.buildDescription(a, user));
-        obj.addProperty("type", a.getType().toString());
-        return obj;
-
     }
 
     /**
@@ -531,20 +413,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             list.add(id.getAsLong());
         }
         return list;
-    }
-
-    /**
-     * @param items
-     * @return
-     */
-    private JsonArray scheduleItemsAsJsonArray(final List<ListNotificationScheduleItem> items) {
-        final JsonArray array = new JsonArray();
-        if (items != null) {
-            for (final ListNotificationScheduleItem i : items) {
-                array.add(notificationScheduleSerializer.toJson(i));
-            }
-        }
-        return array;
     }
     /**
      * @return the referenceResolver

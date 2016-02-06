@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.NotificationDao;
-import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationIssue;
@@ -37,7 +36,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private NotificationDao notificationDao;
     @Autowired
-    protected AlertDescriptionBuilder descriptionBuilder;
+    protected NotificationBundle bundle;
 
     /**
      * Default constructor.
@@ -51,43 +50,15 @@ public class NotificationServiceImpl implements NotificationService {
      */
     @Override
     public void sendNotification(final PersonSchedule s, final NotificationIssue issue) {
-        if (issue instanceof Alert) {
-            sendAlertNotification(s, (Alert) issue);
-        } else if (issue instanceof Arrival) {
-            sendArrivalNotification(s, (Arrival) issue);
-        }
-    }
-
-    /**
-     * @param s person schedule.
-     * @param arrival arrival.
-     */
-    private void sendArrivalNotification(final PersonSchedule s, final Arrival arrival) {
-        sendNotification(s, "Arrival Notification",
-                descriptionBuilder.buildDescription(arrival, s.getUser()), arrival);
-    }
-    /**
-     * @param s person schedule.
-     * @param alert alert.
-     */
-    private void sendAlertNotification(final PersonSchedule s, final Alert alert) {
-        sendNotification(s, alert.getType().toString(),
-                descriptionBuilder.buildDescription(alert, s.getUser()), alert);
-    }
-
-    /**
-     * @param s personal schedule.
-     * @param subject message subject.
-     * @param message message body.
-     */
-    protected void sendNotification(final PersonSchedule s, final String subject,
-            final String message, final NotificationIssue issue) {
-        final User u = s.getUser();
-        final String email = u.getEmail();
+        final User user = s.getUser();
+        final String email = user.getEmail();
         final String person = getPersonDescription(s);
 
         //send email
         if (s.isSendEmail()) {
+            final String subject = bundle.getEmailSubject(issue, user);
+            final String message = bundle.getEmailMessage(issue, user);
+
             if (email != null && email.length() > 0) {
                 try {
                     emailService.sendMessage(new String[] {email}, subject, message);
@@ -100,8 +71,11 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         if (s.isSendSms()) {
+            final String subject = bundle.getSmsSubject(issue, user);
+            final String message = bundle.getSmsMessage(issue, user);
+
             //send SMS
-            final String phone = u.getPhone();
+            final String phone = user.getPhone();
             if (phone != null && phone.length() > 0) {
                 smsService.sendMessage(new String[] {phone}, subject, message);
             } else {
@@ -113,12 +87,11 @@ public class NotificationServiceImpl implements NotificationService {
             final Notification n = new Notification();
             n.setIssue(issue);
             n.setType(issue instanceof Arrival? NotificationType.Arrival : NotificationType.Alert);
-            n.setUser(u);
+            n.setUser(user);
 
             notificationDao.save(n);
         }
     }
-
     /**
      * @param s personal schedule.
      * @return person description.

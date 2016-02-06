@@ -18,5 +18,20 @@ public enum AlertType {
     LightOn,
     LightOff,
 //    MovementStop,
-    Battery
+    Battery;
+
+    /**
+     * @return true if the alert type is temperature alert.
+     */
+    public boolean isTemperatureAlert() {
+        switch (this) {
+            case Hot:
+            case CriticalHot:
+            case Cold:
+            case CriticalCold:
+                return true;
+            default:
+                return false;
+        }
+    }
 }

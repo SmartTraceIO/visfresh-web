@@ -5,18 +5,18 @@ package com.visfresh.mock;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.mpl.services.AlertDescriptionBuilder;
+import com.visfresh.mpl.services.AlertBundle;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class MockAlertDescriptionBuilder extends AlertDescriptionBuilder {
+public class MockAlertBundle extends AlertBundle {
     /**
      * Default constructor.
      */
-    public MockAlertDescriptionBuilder() {
+    public MockAlertBundle() {
         super();
     }
 }

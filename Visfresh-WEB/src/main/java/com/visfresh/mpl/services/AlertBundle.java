@@ -4,13 +4,9 @@
 package com.visfresh.mpl.services;
 
 import static com.visfresh.utils.DateTimeUtils.createDateFormat;
+import static com.visfresh.utils.LocalizationUtils.getTemperatureString;
 
 import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.springframework.stereotype.Component;
@@ -23,7 +19,6 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
-import com.visfresh.io.json.AbstractJsonSerializer;
 import com.visfresh.l12n.XmlControl;
 import com.visfresh.utils.StringUtils;
 
@@ -32,11 +27,11 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class AlertDescriptionBuilder {
+public class AlertBundle extends NotificationIssueBundle {
     /**
      * Default constructor.
      */
-    public AlertDescriptionBuilder() {
+    public AlertBundle() {
         super();
     }
 
@@ -61,90 +56,6 @@ public class AlertDescriptionBuilder {
         final ResourceBundle bundle = ResourceBundle.getBundle("alerts", XmlControl.INSTANCE);
         final String str = bundle.getString(createBundleKey(issue));
         return StringUtils.getMessage(str, createReplacementMap(issue, user));
-    }
-
-    /**
-     * @param alert
-     * @return
-     */
-    private String createBundleKey(final NotificationIssue issue) {
-        String key = "";
-
-        if (issue instanceof Alert) {
-            final Alert alert = (Alert) issue;
-            key = alert.getType().toString();
-            if (alert instanceof TemperatureAlert && ((TemperatureAlert) alert).isCumulative()) {
-                key += ".cumulative";
-            }
-        } else if (issue instanceof Arrival) {
-            return "Arrival";
-        }
-        return key;
-    }
-    /**
-     * @param issue alert.
-     * @return map of replacements.
-     */
-    private Map<String, String> createReplacementMap(final NotificationIssue issue, final User user) {
-        final Map<String, String> map = new HashMap<String, String>();
-        //supported place holders:
-        //${date} alert issue date include day and year
-        DateFormat sdf = createDateFormat(user, AbstractJsonSerializer.DATE_FORMAT);
-        map.put("date", sdf.format(issue.getDate()));
-        //${time} the time in scope of day.
-        sdf = createDateFormat(user, "HH:mm");
-        map.put("time", sdf.format(issue.getDate()));
-        //${device} device IMEI
-        map.put("device", issue.getDevice().getImei());
-        //${devicesn} device serial number
-        map.put("devicesn", issue.getDevice().getSn());
-        //${tripCount} trip count for given device of shipment.
-        map.put("tripCount", Integer.toString(issue.getShipment().getTripCount()));
-
-        if (issue instanceof Alert) {
-            //for temperature alerts:
-            //${type} alert type
-            map.put("type", ((Alert) issue).getType().toString());
-
-            if (issue instanceof TemperatureAlert) {
-                final TemperatureAlert ta = (TemperatureAlert) issue;
-                //${temperature}
-                map.put("temperature", getTemperatureString(ta.getTemperature(), user.getTemperatureUnits()));
-                //${period}
-                map.put("period", Integer.toString(ta.getMinutes()));
-            }
-        } else if (issue instanceof Arrival) {
-            final Arrival a = (Arrival) issue;
-            map.put("mettersForArrival", Integer.toString(a.getNumberOfMettersOfArrival()));
-        }
-
-        return map;
-    }
-    /**
-     * @param t temperature.
-     * @param units temperature units.
-     * @return temperature string.
-     */
-    private String getTemperatureString(final double t, final TemperatureUnits units) {
-        final double temp = getTemperature(t, units);
-        String degree;
-        switch (units) {
-            case Fahrenheit:
-                degree = "\u00B0F";
-                break;
-                default:
-                    degree = "\u00B0C";
-                    //nothing
-                    break;
-        }
-
-        //create US locale decimal format
-        final DecimalFormat fmt = new DecimalFormat("#0.0");
-        final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
-        fmt.setDecimalFormatSymbols(decimalFormatSymbols);
-
-        //format temperature string
-        return fmt.format(temp) + degree;
     }
     /**
      * TODO move to resource bundles.
@@ -182,8 +93,6 @@ public class AlertDescriptionBuilder {
         }
         return sb.toString();
     }
-
-
     /**
      * @param tCelsium
      * @param units
@@ -202,7 +111,6 @@ public class AlertDescriptionBuilder {
         }
         return temp;
     }
-
     /**
      * @param a
      * @param user

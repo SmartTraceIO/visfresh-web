@@ -5,8 +5,11 @@ package com.visfresh.controllers;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -27,13 +30,18 @@ import com.visfresh.dao.Filter;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
+import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
+import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.NotificationItem;
 import com.visfresh.io.json.NotificationSerializer;
-import com.visfresh.mpl.services.AlertDescriptionBuilder;
+import com.visfresh.mpl.services.AlertBundle;
+import com.visfresh.mpl.services.NotificationBundle;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -50,7 +58,11 @@ public class NotificationController extends AbstractController implements Notifi
     @Autowired
     private NotificationDao dao;
     @Autowired
-    private AlertDescriptionBuilder descriptionBuilder;
+    private AlertBundle descriptionBuilder;
+    @Autowired
+    private NotificationBundle notificationBundle;
+    @Autowired
+    private TrackerEventDao trackerEventDao;
 
     /**
      * Default constructor.
@@ -88,12 +100,14 @@ public class NotificationController extends AbstractController implements Notifi
                     new Sorting(getDefaultSortOrder()),
                     filter,
                     page);
+            //create notification to location map
+            final Map<Long, Location> locations = createLocationMap(ns);
 
             final int total = dao.getEntityCount(user, filter);
             final JsonArray array = new JsonArray();
             final DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
             for (final Notification t : ns) {
-                array.add(ser.toJson(createNotificationItem(t, user, isoFormat)));
+                array.add(ser.toJson(createNotificationItem(t, user, locations.get(t.getId()), isoFormat)));
             }
 
             return createListSuccessResponse(array, total);
@@ -101,52 +115,6 @@ public class NotificationController extends AbstractController implements Notifi
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
-    }
-    /**
-     * @param n notification.
-     * @param user user.
-     * @return notification item.
-     */
-    private NotificationItem createNotificationItem(final Notification n, final User user, final DateFormat isoFormatter) {
-        final NotificationItem item = new NotificationItem();
-        item.setAlertId(n.getIssue().getId());
-        if (n.getType() == NotificationType.Alert) {
-            final Alert alert = (Alert) n.getIssue();
-            item.setAlertType(alert.getType());
-        }
-
-        item.setClosed(n.isRead());
-        item.setDate(isoFormatter.format(n.getIssue().getDate()));
-        item.setNotificationId(n.getId());
-        item.setShipmentId(n.getIssue().getShipment().getId());
-
-        //set description.
-        final String desc = descriptionBuilder.buildDescription(n.getIssue(), user);
-        final int offset = desc.indexOf('.');
-
-        item.setTitle(offset > -1 ? desc.substring(0, offset) : desc);
-        item.setType(n.getType());
-
-        item.getLines().add(offset > -1 ? desc.substring(offset + 1).trim() : desc);
-        item.getLines().add("Some long shipment description here");
-        item.getLines().add("About 200km from XYZ Warehouse");
-        return item;
-    }
-    /**
-     * @param user user.
-     * @return notification serializer.
-     */
-    private NotificationSerializer createSerializer(final User user) {
-        return new NotificationSerializer(user.getTimeZone());
-    }
-    /**
-     * @return
-     */
-    private String[] getDefaultSortOrder() {
-        return new String[] {
-            PROPERTY_NOTIFICATION_ID,
-            PROPERTY_TYPE
-        };
     }
     @RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.POST)
     public JsonObject markNotificationsAsRead(@PathVariable final String authToken,
@@ -168,5 +136,103 @@ public class NotificationController extends AbstractController implements Notifi
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param n notification.
+     * @param user user.
+     * @return notification item.
+     */
+    private NotificationItem createNotificationItem(final Notification n, final User user,
+            final Location location, final DateFormat isoFormatter) {
+        final NotificationItem item = new NotificationItem();
+        item.setAlertId(n.getIssue().getId());
+        if (n.getType() == NotificationType.Alert) {
+            final Alert alert = (Alert) n.getIssue();
+            item.setAlertType(alert.getType());
+        }
+
+        item.setClosed(n.isRead());
+        item.setDate(isoFormatter.format(n.getIssue().getDate()));
+        item.setNotificationId(n.getId());
+
+        final Shipment shipment = n.getIssue().getShipment();
+        item.setShipmentId(shipment.getId());
+
+        //set description.
+        item.setTitle(notificationBundle.getAppSubject(n.getIssue(), user));
+        item.setType(n.getType());
+
+        item.getLines().add(notificationBundle.getAppMessage(n.getIssue(), user));
+        item.getLines().add(notificationBundle.getShipmentDescription(shipment, user));
+        item.getLines().add(notificationBundle.getLocationDescription(
+                shipment.getShippedTo(), location, user));
+        return item;
+    }
+    /**
+     * @param user user.
+     * @return notification serializer.
+     */
+    private NotificationSerializer createSerializer(final User user) {
+        return new NotificationSerializer(user.getTimeZone());
+    }
+    /**
+     * @return
+     */
+    private String[] getDefaultSortOrder() {
+        return new String[] {
+            PROPERTY_NOTIFICATION_ID,
+            PROPERTY_TYPE
+        };
+    }
+    /**
+     * @param ns list of notifications.
+     * @return map of notification to location.
+     */
+    private Map<Long, Location> createLocationMap(final List<Notification> ns) {
+        final Map<Long, List<TrackerEvent>> eventsCache = new HashMap<>();
+        final Map<Long, Location> map = new HashMap<>();
+
+        for (final Notification n : ns) {
+            //get events for given shipment.
+            final Shipment shipment = n.getIssue().getShipment();
+            List<TrackerEvent> events = eventsCache.get(shipment.getId());
+            if (events == null) {
+                events = trackerEventDao.getEvents(shipment);
+                eventsCache.put(shipment.getId(), events);
+            }
+
+            //find nearest event for given shipment.
+            final TrackerEvent e = getNearestEvent(events, n.getIssue().getDate());
+            if (e != null) {
+                map.put(n.getId(), new Location(e.getLatitude(), e.getLongitude()));
+            }
+        }
+
+        return map;
+    }
+    /**
+     * @param items list of tracker events.
+     * @param date date.
+     * @return nearest event for given date.
+     */
+    private TrackerEvent getNearestEvent(final List<TrackerEvent> items, final Date date) {
+        if (items.isEmpty()) {
+            return null;
+        }
+
+        for (final TrackerEvent i : items) {
+            if (near(i.getTime(), date) || i.getTime().after(date)) {
+                return i;
+            }
+        }
+        return items.get(items.size() - 1);
+    }
+    /**
+     * @param d1 first date.
+     * @param d2 second date.
+     * @return true if the difference between two dates is less then one second.
+     */
+    private boolean near(final Date d1, final Date d2) {
+        return Math.abs(d1.getTime() - d2.getTime()) < 1000l;
     }
 }
