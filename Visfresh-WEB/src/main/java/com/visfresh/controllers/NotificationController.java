@@ -112,7 +112,7 @@ public class NotificationController extends AbstractController implements Notifi
 
             return createListSuccessResponse(array, total);
         } catch (final Exception e) {
-            log.error("Failed to get devices", e);
+            log.error("Failed to get notifications", e);
             return createErrorResponse(e);
         }
     }
@@ -133,7 +133,7 @@ public class NotificationController extends AbstractController implements Notifi
             dao.markAsReadenByUserAndId(user, ids);
             return createSuccessResponse(null);
         } catch (final Exception e) {
-            log.error("Failed to get devices", e);
+            log.error("Failed to mark notificaiton as read", e);
             return createErrorResponse(e);
         }
     }
