@@ -51,8 +51,5 @@ public class MessagesTest {
         //check token matches
         msg = Messages.getMessage("passwordreset.reset.tokenNotMatches", replacements);
         assertNotNull(msg);
-
-        msg = Messages.getMessage("passwordreset.reset.successfully", replacements);
-        assertNotNull(msg);
     }
 }

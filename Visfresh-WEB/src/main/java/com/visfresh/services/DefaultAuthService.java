@@ -337,15 +337,7 @@ public class DefaultAuthService implements AuthService {
         }
 
         saveUser(user, password, false);
-
-        try {
-            emailService.sendMessage(new String[]{email},
-                    Messages.getMessage("passwordreset.reset.subject", replacements),
-                    Messages.getMessage("passwordreset.reset.successfully", replacements));
-            log.debug("New password has reset for user " + email);
-        } catch (final MessagingException e) {
-            throw new AuthenticationException("Failed to send new password saved email to user " + email, e);
-        }
+        log.debug("New password has reset for user " + email);
     }
 
     /* (non-Javadoc)
