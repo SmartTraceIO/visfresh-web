@@ -53,6 +53,7 @@ public class DeviceStateSerializerTest {
         s.getTemperatureAlerts().getProperties().put("key", "value");
         s.setStartShipmentDate(startShipment);
         s.setArrivalProcessed(true);
+        s.setOldShipmentsClean(true);
 
         final String str = serializer.toString(s);
         s = serializer.parseState(str);
@@ -65,6 +66,7 @@ public class DeviceStateSerializerTest {
         assertEquals("value", s.getTemperatureAlerts().getProperties().get("key"));
         assertEquals(shipmentId, s.getShipmentId());
         assertEquals(true, s.isArrivalProcessed());
+        assertEquals(true, s.isOldShipmentsClean());
     }
     @Test
     public void testSupportsNullArrivalProcessed() {

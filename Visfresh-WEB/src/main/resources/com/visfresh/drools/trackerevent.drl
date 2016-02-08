@@ -12,6 +12,7 @@ import com.visfresh.rules.MovementStopAlertRule;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.TemperatureAlertRule;
 import com.visfresh.rules.StartShipmentTimeCorrectRule;
+import com.visfresh.rules.CloseOldShipmentsRule;
 
 global AbstractRuleEngine engine;
 
@@ -104,6 +105,15 @@ rule "MovementStopAlert"
         context : RuleContext(engine.getRule(MovementStopAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(MovementStopAlertRule.NAME).handle(context)) {
+       		update(context);
+        }
+end
+
+rule "CloseOldShipments"
+    when
+        context : RuleContext(engine.getRule(CloseOldShipmentsRule.NAME).accept(this));
+    then
+    	if(engine.getRule(CloseOldShipmentsRule.NAME).handle(context)) {
        		update(context);
         }
 end

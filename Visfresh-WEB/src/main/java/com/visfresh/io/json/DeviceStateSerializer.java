@@ -24,6 +24,7 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
     private static final String SHIPMENT_ID = "shipmentId";
     private static final String SHIPMENT_START_DATE = "shipmentStart";
     private static final String TEMPERATURE_ALERTS = "temperatureAlerts";
+    private static final String OLD_SHIPMENTS_CLEAN = "oldShipmentsClean";
 
     /**
      * Default constructor.
@@ -69,6 +70,7 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
         json.addProperty(SHIPMENT_ID, state.getShipmentId());
         json.addProperty(ARRIVAL_PROCESSED, state.isArrivalProcessed());
         json.addProperty(SHIPMENT_START_DATE, formatDate(state.getStartShipmentDate()));
+        json.addProperty(OLD_SHIPMENTS_CLEAN, state.isOldShipmentsClean());
         return json;
     }
     /**
@@ -81,6 +83,7 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
         s.setShipmentId(asLong(json.get(SHIPMENT_ID)));
         s.setArrivalProcessed(Boolean.TRUE.equals(asBoolean(json.get(ARRIVAL_PROCESSED))));
         s.setStartShipmentDate(parseDate(asString(json.get(SHIPMENT_START_DATE))));
+        s.setOldShipmentsClean(Boolean.TRUE.equals(asBoolean(json.get(OLD_SHIPMENTS_CLEAN))));
         return s;
     }
     /**

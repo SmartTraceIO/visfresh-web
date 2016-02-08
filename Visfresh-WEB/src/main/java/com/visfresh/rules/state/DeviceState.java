@@ -13,9 +13,10 @@ import com.visfresh.entities.Shipment;
  */
 public class DeviceState {
     private RulesState temperatureAlerts = new RulesState();
-    private Long shipmentId;
-    private boolean arrivalProcessed;
-    private Date startShipmentDate;
+    private volatile Long shipmentId;
+    private volatile boolean arrivalProcessed;
+    private volatile Date startShipmentDate;
+    private volatile boolean oldShipmentsClean;
 
     /**
      * Default constructor.
@@ -46,6 +47,7 @@ public class DeviceState {
             startShipmentDate = new Date();
             temperatureAlerts.clear();
             arrivalProcessed = false;
+            setOldShipmentsClean(false);
         }
     }
     /**
@@ -80,5 +82,17 @@ public class DeviceState {
      */
     public void setStartShipmentDate(final Date startShipmentDate) {
         this.startShipmentDate = startShipmentDate;
+    }
+    /**
+     * @return true if old shipments alredy clean.
+     */
+    public boolean isOldShipmentsClean() {
+        return oldShipmentsClean;
+    }
+    /**
+     * @param clean the oldShipmentsClean to set
+     */
+    public void setOldShipmentsClean(final boolean clean) {
+        this.oldShipmentsClean = clean;
     }
 }

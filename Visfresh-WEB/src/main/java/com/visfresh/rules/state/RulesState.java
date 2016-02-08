@@ -4,8 +4,8 @@
 package com.visfresh.rules.state;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The class for persists the current rules properties. The key goal is the properties map.
@@ -15,8 +15,8 @@ import java.util.Map;
  *
  */
 public class RulesState {
-    private final Map<String, Date> dates = new HashMap<String, Date>();
-    private final Map<String, String> properties = new HashMap<String, String>();
+    private final Map<String, Date> dates = new ConcurrentHashMap<String, Date>();
+    private final Map<String, String> properties = new ConcurrentHashMap<String, String>();
 
     /**
      * Default consructor.
