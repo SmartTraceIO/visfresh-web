@@ -7,8 +7,6 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonObject;
 import com.visfresh.constants.NotificationConstants;
-import com.visfresh.entities.AlertType;
-import com.visfresh.entities.NotificationType;
 import com.visfresh.io.NotificationItem;
 
 /**
@@ -33,11 +31,8 @@ public class NotificationSerializer extends AbstractJsonSerializer {
         n.setNotificationId(asLong(json.get(NotificationConstants.PROPERTY_NOTIFICATION_ID)));
         n.setClosed(asBoolean(json.get(NotificationConstants.PROPERTY_CLOSED)));
         n.setDate(asString(json.get(NotificationConstants.PROPERTY_DATE)));
-        n.setType(NotificationType.valueOf(asString(json.get(NotificationConstants.PROPERTY_TYPE))));
-        final String alertType = asString(json.get(NotificationConstants.PROPERTY_ALERT_TYPE));
-        if (alertType != null) {
-            n.setAlertType(AlertType.valueOf(alertType));
-        }
+        n.setType(asString(json.get(NotificationConstants.PROPERTY_TYPE)));
+        n.setAlertType(asString(json.get(NotificationConstants.PROPERTY_ALERT_TYPE)));
         n.setAlertId(asLong(json.get(NotificationConstants.PROPERTY_ALERT_ID)));
         n.setShipmentId(asLong(json.get(NotificationConstants.PROPERTY_SHIPMENT_ID)));
         n.setTitle(asString(json.get(NotificationConstants.PROPERTY_TITLE)));
@@ -69,9 +64,8 @@ public class NotificationSerializer extends AbstractJsonSerializer {
         obj.addProperty(NotificationConstants.PROPERTY_NOTIFICATION_ID, n.getNotificationId());
         obj.addProperty(NotificationConstants.PROPERTY_CLOSED, n.isClosed());
         obj.addProperty(NotificationConstants.PROPERTY_DATE, n.getDate());
-        obj.addProperty(NotificationConstants.PROPERTY_TYPE, n.getType().name());
-        obj.addProperty(NotificationConstants.PROPERTY_ALERT_TYPE,
-                n.getAlertType() == null ? null : n.getAlertType().name());
+        obj.addProperty(NotificationConstants.PROPERTY_TYPE, n.getType());
+        obj.addProperty(NotificationConstants.PROPERTY_ALERT_TYPE, n.getAlertType());
         obj.addProperty(NotificationConstants.PROPERTY_ALERT_ID, n.getAlertId());
         obj.addProperty(NotificationConstants.PROPERTY_SHIPMENT_ID, n.getShipmentId());
         obj.addProperty(NotificationConstants.PROPERTY_TITLE, n.getTitle());

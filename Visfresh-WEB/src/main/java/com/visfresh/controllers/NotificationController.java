@@ -97,7 +97,7 @@ public class NotificationController extends AbstractController implements Notifi
             }
 
             final List<Notification> ns = dao.findForUser(user,
-                    new Sorting(getDefaultSortOrder()),
+                    new Sorting(false, getDefaultSortOrder()),
                     filter,
                     page);
             //create notification to location map
@@ -148,7 +148,9 @@ public class NotificationController extends AbstractController implements Notifi
         item.setAlertId(n.getIssue().getId());
         if (n.getType() == NotificationType.Alert) {
             final Alert alert = (Alert) n.getIssue();
-            item.setAlertType(alert.getType());
+            item.setAlertType(alert.getType().name());
+        } else if (n.getType() == NotificationType.Arrival) {
+            item.setAlertType("ArrivalNotice");
         }
 
         item.setClosed(n.isRead());
@@ -160,7 +162,7 @@ public class NotificationController extends AbstractController implements Notifi
 
         //set description.
         item.setTitle(notificationBundle.getAppSubject(n.getIssue(), user));
-        item.setType(n.getType());
+        item.setType("Alert");
 
         item.getLines().add(notificationBundle.getAppMessage(n.getIssue(), user));
         item.getLines().add(notificationBundle.getShipmentDescription(shipment, user));

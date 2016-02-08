@@ -6,9 +6,6 @@ package com.visfresh.io;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.visfresh.entities.AlertType;
-import com.visfresh.entities.NotificationType;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -17,8 +14,8 @@ public class NotificationItem {
     private Long notificationId;
     private boolean closed;
     private String date;
-    private NotificationType type;
-    private AlertType alertType;
+    private String type;
+    private String alertType;
     private String title;
     private Long alertId;
     private Long shipmentId;
@@ -70,25 +67,25 @@ public class NotificationItem {
     /**
      * @return the type
      */
-    public NotificationType getType() {
+    public String getType() {
         return type;
     }
     /**
      * @param type the type to set
      */
-    public void setType(final NotificationType type) {
+    public void setType(final String type) {
         this.type = type;
     }
     /**
      * @return the alertType
      */
-    public AlertType getAlertType() {
+    public String getAlertType() {
         return alertType;
     }
     /**
      * @param alertType the alertType to set
      */
-    public void setAlertType(final AlertType alertType) {
+    public void setAlertType(final String alertType) {
         this.alertType = alertType;
     }
     /**

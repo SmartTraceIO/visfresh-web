@@ -33,13 +33,13 @@ public class NotificationSerializerTest extends AbstractSerializerTest {
     @Test
     public void testAlertNotification() {
         final Long alertId = 9l;
-        final AlertType alertType = AlertType.CriticalCold;
+        final String alertType = AlertType.CriticalCold.name();
         final boolean closed = true;
         final String date = "2015-11-23T17:46";
         final Long notificationId = 8l;
         final Long shipmentId = 7l;
         final String title = "JUnit Alert";
-        final NotificationType type = NotificationType.Alert;
+        final String type = NotificationType.Alert.name();
         final String line1 = "line 1";
         final String line2 = "line 2";
 
@@ -79,7 +79,6 @@ public class NotificationSerializerTest extends AbstractSerializerTest {
         final Long notificationId = 8l;
         final Long shipmentId = 7l;
         final String title = "JUnit Alert";
-        final NotificationType type = NotificationType.Arrival;
 
         NotificationItem n= new NotificationItem();
         n.setAlertId(alertId);
@@ -88,7 +87,8 @@ public class NotificationSerializerTest extends AbstractSerializerTest {
         n.setNotificationId(notificationId);
         n.setShipmentId(shipmentId);
         n.setTitle(title);
-        n.setType(type);
+        n.setType("Alert");
+        n.setAlertType("ArrivalNotice");
 
         final JsonObject json = serializer.toJson(n);
         n = serializer.parseNotification(json);
@@ -100,6 +100,7 @@ public class NotificationSerializerTest extends AbstractSerializerTest {
         assertEquals(notificationId, n.getNotificationId());
         assertEquals(shipmentId, n.getShipmentId());
         assertEquals(title, n.getTitle());
-        assertEquals(type, n.getType());
+        assertEquals("Alert", n.getType());
+        assertEquals("ArrivalNotice", n.getAlertType());
     }
 }
