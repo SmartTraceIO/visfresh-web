@@ -44,6 +44,7 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
@@ -283,15 +284,33 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             dto.getAlertSummary().putAll(toSummaryMap(alerts));
 
             //percentage complete.
-            final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
-            if (lastEvent != null) {
-                final TrackerEvent firstEvent = trackerEventDao.getFirstEvent(s);
-                final ArrivalEstimation est = arrivalEstimationService.estimateArrivalDate(s,
-                        new Location(lastEvent.getLatitude(), lastEvent.getLongitude()),
-                        firstEvent.getTime(),
-                        currentTime);
+            if (s.hasFinalStatus()) {
+                dto.setPercentageComplete(100);
+            } else {
+                final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
+                if (lastEvent != null) {
+                    final TrackerEvent firstEvent = trackerEventDao.getFirstEvent(s);
+                    final ArrivalEstimation est = arrivalEstimationService.estimateArrivalDate(s,
+                            new Location(lastEvent.getLatitude(), lastEvent.getLongitude()),
+                            firstEvent.getTime(),
+                            currentTime);
 
-                dto.setPercentageComplete(est.getPercentageComplete());
+                    dto.setPercentageComplete(est.getPercentageComplete());
+                }
+            }
+
+            if (s.getStatus() == ShipmentStatus.Default || s.getStatus() == ShipmentStatus.Ended) {
+                dto.setEstArrivalDate(null);
+                dto.setActualArrivalDate(null);
+                if (s.getStatus() == ShipmentStatus.Default) {
+                    dto.setShippedTo(null);
+                }
+            } else if (s.getStatus() == ShipmentStatus.Arrived) {
+                //arrival date.
+                final Arrival arrival = arrivalDao.getArrival(s);
+                if (arrival != null) {
+                    dto.setActualArrivalDate(arrival.getDate());
+                }
             }
         }
 
