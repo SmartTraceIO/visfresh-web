@@ -72,7 +72,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final Device device = createDevice("234908720394857");
         final String palletId = "palettid";
         final Date shipmentDate = new Date(System.currentTimeMillis() - 1000000000l);
-        final ShipmentStatus status = ShipmentStatus.Complete;
+        final ShipmentStatus status = ShipmentStatus.Ended;
         final String assetType = "Trailer";
         final String assetNum = "10515";
         final int poNum = 938498;

@@ -250,7 +250,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         //shipment status not matches
         req = createFilter(s);
-        req.setStatus(ShipmentStatus.Complete);
+        req.setStatus(ShipmentStatus.Ended);
         assertEquals(0, shipmentClient.getShipments(req).size());
     }
 

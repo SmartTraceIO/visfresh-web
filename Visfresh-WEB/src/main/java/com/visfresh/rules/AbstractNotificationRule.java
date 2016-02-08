@@ -51,7 +51,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
 
         final boolean accept = !e.isProcessed(this)
                 && shipment != null
-                && shipment.getStatus() != ShipmentStatus.Complete;
+                && shipment.getStatus() != ShipmentStatus.Ended;
 
         if (accept) {
             final List<PersonSchedule> schedules = getAllPersonalSchedules(shipment);

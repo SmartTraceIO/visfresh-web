@@ -107,7 +107,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      * @param shipment
      */
     private void closeOldShipment(final Shipment shipment) {
-        shipment.setStatus(ShipmentStatus.Complete);
+        shipment.setStatus(ShipmentStatus.Ended);
         shipmentDao.save(shipment);
     }
 

@@ -373,12 +373,12 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         //create shipments
         createShipment(c1, ShipmentStatus.InProgress);
         createShipment(c1, ShipmentStatus.Default);
-        createShipment(c1, ShipmentStatus.Complete);
+        createShipment(c1, ShipmentStatus.Ended);
         createShipment(c1, ShipmentStatus.Arrived);
 
         createShipment(c2, ShipmentStatus.InProgress);
         createShipment(c2, ShipmentStatus.Default);
-        createShipment(c2, ShipmentStatus.Complete);
+        createShipment(c2, ShipmentStatus.Ended);
         createShipment(c2, ShipmentStatus.Arrived);
 
         assertEquals(2, dao.findActiveShipments(c1).size());
@@ -392,12 +392,12 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         //create shipments
         createShipment(c1, ShipmentStatus.InProgress);
         createShipment(c1, ShipmentStatus.Default);
-        createShipment(c1, ShipmentStatus.Complete);
+        createShipment(c1, ShipmentStatus.Ended);
         createShipment(c1, ShipmentStatus.Arrived);
 
         createShipment(c2, ShipmentStatus.InProgress);
         createShipment(c2, ShipmentStatus.Default);
-        createShipment(c2, ShipmentStatus.Complete);
+        createShipment(c2, ShipmentStatus.Ended);
         createShipment(c2, ShipmentStatus.Arrived);
 
         assertEquals(2, dao.findActiveShipments(c1.getImei()).size());

@@ -79,7 +79,7 @@ public class SingleShipmentDto {
         setShipmentId(shipment.getId());
         setShippedFrom(shipment.getShippedFrom() == null ? null : shipment.getShippedFrom().getId());
         setShippedTo(shipment.getShippedTo() == null ? null : shipment.getShippedTo().getId());
-        setStatus(shipment.getStatus().getLabel());
+        setStatus(shipment.getStatus().name());
         setTripCount(shipment.getTripCount());
         setCurrentLocation("Not determined");
         setDeviceSn(shipment.getDevice().getSn());

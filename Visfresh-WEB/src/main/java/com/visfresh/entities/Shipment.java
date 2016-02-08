@@ -224,6 +224,6 @@ public class Shipment extends ShipmentBase {
      * @return
      */
     public boolean hasFinalStatus() {
-        return status == ShipmentStatus.Arrived || status == ShipmentStatus.Complete;
+        return status == ShipmentStatus.Arrived || status == ShipmentStatus.Ended;
     }
 }

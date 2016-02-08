@@ -98,7 +98,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     public List<Shipment> findActiveShipments(final Company company) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("company", company.getId());
-        params.put("st1", ShipmentStatus.Complete.name());
+        params.put("st1", ShipmentStatus.Ended.name());
         params.put("st2", ShipmentStatus.Arrived.name());
 
         final String sql = "select * from " + TABLE + " s"
@@ -354,7 +354,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     private List<Long> findActiveShipmentIds(final String imei) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("imei", imei);
-        params.put("st1", ShipmentStatus.Complete.name());
+        params.put("st1", ShipmentStatus.Ended.name());
         params.put("st2", ShipmentStatus.Arrived.name());
 
         final String sql = "select s." + ID_FIELD

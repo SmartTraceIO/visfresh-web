@@ -258,7 +258,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
             final Long id = obj.get("shipmentId").getAsLong();
             final Shipment shipment = service.getShipment(id);
             if (description.equals(shipment.getShipmentDescription())
-                    && shipment.getStatus() != ShipmentStatus.Complete) {
+                    && shipment.getStatus() != ShipmentStatus.Ended) {
                 return shipment;
             }
         }

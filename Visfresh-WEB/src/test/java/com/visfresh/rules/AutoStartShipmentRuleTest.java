@@ -96,7 +96,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
 
         //check old shipment closed
         final Shipment old = shipmentDao.findOne(shipmentId);
-        assertEquals(ShipmentStatus.Complete, old.getStatus());
+        assertEquals(ShipmentStatus.Ended, old.getStatus());
 
         //check new shipment created.
         assertTrue(!shipmentId.equals(e.getShipment().getId()));

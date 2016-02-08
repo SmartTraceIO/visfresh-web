@@ -58,7 +58,7 @@ public class AssignShipmentRuleTest extends BaseRuleTest {
         assertFalse(rule.accept(req));
 
         //create shipment but in final state
-        final Shipment s = createDefaultShipment(ShipmentStatus.Complete, event.getDevice());
+        final Shipment s = createDefaultShipment(ShipmentStatus.Ended, event.getDevice());
         assertTrue(rule.accept(req));
 
         s.setStatus(ShipmentStatus.InProgress);
