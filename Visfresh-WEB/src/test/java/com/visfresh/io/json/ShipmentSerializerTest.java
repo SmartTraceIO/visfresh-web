@@ -147,17 +147,20 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final boolean saveAsNewTemplate = true;
         final Shipment shipment = createShipment();
         final String templateName = "JUnit Shipment Template";
+        final Boolean includePreviousData = true;
 
         SaveShipmentRequest req = new SaveShipmentRequest();
         req.setSaveAsNewTemplate(saveAsNewTemplate);
         req.setShipment(shipment);
         req.setTemplateName(templateName);
+        req.setIncludePreviousData(includePreviousData);
 
         final JsonObject obj = serializer.toJson(req);
         req = serializer.parseSaveShipmentRequest(obj);
 
         assertEquals(saveAsNewTemplate, req.isSaveAsNewTemplate());
         assertEquals(templateName, req.getTemplateName());
+        assertEquals(includePreviousData, req.isIncludePreviousData());
         assertNotNull(req.getShipment());
     }
     @Test

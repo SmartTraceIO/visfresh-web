@@ -102,4 +102,23 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertTrue(!shipmentId.equals(e.getShipment().getId()));
         assertTrue(old.getTripCount() < e.getShipment().getTripCount());
     }
+    @Test
+    public void testReuseInProgressShipment() {
+        final TrackerEvent e = createEvent(17.14, 18.16, new Date());
+
+        final RuleContext c = new RuleContext(e, new DeviceState());
+
+        //create in progress shipment
+        final Shipment s = createDefaultShipment(ShipmentStatus.InProgress, device);
+
+        rule.handle(c);
+
+        //check shipment created.
+        assertNotNull(e.getShipment());
+        assertEquals(s.getId(), e.getShipment().getId());
+
+        //check not new shipments created
+        final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
+        assertEquals(1, shipmentDao.findAll(null, null, null).size());
+    }
 }

@@ -54,6 +54,16 @@ public class ShipmentRestClient extends RestClient {
         req.setTemplateName(templateName);
         req.setSaveAsNewTemplate(saveTemplate);
 
+        return saveShipment(req);
+    }
+    /**
+     * @param req save shipment request.
+     * @return save shipment response.
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    public SaveShipmentResponse saveShipment(final SaveShipmentRequest req)
+            throws IOException, RestServiceException {
         final JsonObject e = sendPostRequest(getPathWithToken("saveShipment"),
                 serializer.toJson(req)).getAsJsonObject();
         final SaveShipmentResponse resp = serializer.parseSaveShipmentResponse(e);

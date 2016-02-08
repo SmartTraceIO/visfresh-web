@@ -5,6 +5,7 @@ package com.visfresh.controllers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
@@ -129,6 +130,72 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(tpl);
         assertNotNull(tpl.getName());
         assertEquals(comments, tpl.getCommentsForReceiver());
+    }
+    @Test
+    public void testSaveShipmentOverDefault() throws RestServiceException, IOException {
+        final String comments = "Some comments for receiver saved for shipment";
+
+        final Shipment s = createShipment(true);
+        s.setStatus(ShipmentStatus.Default);
+        getContext().getBean(ShipmentDao.class).save(s);
+        final long oldId = s.getId();
+
+        s.setCommentsForReceiver(comments);
+        s.setId(null);
+
+        final SaveShipmentResponse resp = shipmentClient.saveShipment(s, null, false);
+        assertEquals(oldId, resp.getShipmentId().longValue());
+
+        //check new template is saved
+        final Shipment saved = context.getBean(ShipmentDao.class).findOne(oldId);
+
+        assertEquals(comments, saved.getCommentsForReceiver());
+    }
+    @Test
+    public void testSaveShipmentOverInProgress() throws RestServiceException, IOException {
+        final String comments = "Some comments for receiver saved for shipment";
+
+        final Shipment s = createShipment(true);
+        s.setStatus(ShipmentStatus.InProgress);
+        getContext().getBean(ShipmentDao.class).save(s);
+        final long oldId = s.getId();
+
+        s.setCommentsForReceiver(comments);
+        s.setId(null);
+
+        final SaveShipmentResponse resp = shipmentClient.saveShipment(s, null, false);
+        assertNotSame(oldId, resp.getShipmentId().longValue());
+
+        //check old shipment closed
+        final Shipment old = context.getBean(ShipmentDao.class).findOne(oldId);
+        assertEquals(ShipmentStatus.Ended, old.getStatus());
+    }
+    @Test
+    public void testSaveShipmentOverDefaultWithExpiredEvent() throws RestServiceException, IOException {
+        final String comments = "Some comments for receiver saved for shipment";
+
+        final Shipment s = createShipment(true);
+        s.setStatus(ShipmentStatus.Default);
+        getContext().getBean(ShipmentDao.class).save(s);
+        final long oldId = s.getId();
+
+        //create tracker event
+        final TrackerEvent event = new TrackerEvent();
+        event.setDevice(s.getDevice());
+        event.setShipment(s);
+        event.setType(TrackerEventType.AUT);
+        event.setTime(new Date(System.currentTimeMillis() - 3 * 60 * 60 * 1000l));
+        getContext().getBean(TrackerEventDao.class).save(event);
+
+        s.setCommentsForReceiver(comments);
+        s.setId(null);
+
+        final SaveShipmentResponse resp = shipmentClient.saveShipment(s, null, false);
+        assertNotSame(oldId, resp.getShipmentId().longValue());
+
+        //check old shipment closed
+        final Shipment old = context.getBean(ShipmentDao.class).findOne(oldId);
+        assertEquals(ShipmentStatus.Ended, old.getStatus());
     }
     @Test
     public void testGetShipments() throws RestServiceException, IOException {

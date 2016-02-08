@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -53,7 +54,7 @@ public class AssignShipmentRule implements TrackerEventRule {
     public boolean accept(final RuleContext context) {
         if(context.getEvent().getShipment() == null && !context.isProcessed(this)) {
             final Shipment s = shipmentDao.findLastShipment(context.getEvent().getDevice().getImei());
-            if (s != null) {
+            if (s != null && s.getStatus() != ShipmentStatus.Ended) {
                 //cache shipment to request.
                 context.putClientProperty(this, s);
                 return true;

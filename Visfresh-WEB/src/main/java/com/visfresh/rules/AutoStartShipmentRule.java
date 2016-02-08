@@ -85,22 +85,41 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         final TrackerEvent event = context.getEvent();
         final Device device = event.getDevice();
 
-        for(final Shipment activeShipment: shipmentDao.findActiveShipments(device.getImei())) {
-            if (activeShipment != null) {
-                log.debug("Close old active shipment " + activeShipment.getShipmentDescription()
+        final Shipment last = shipmentDao.findLastShipment(device.getImei());
+
+        final boolean reuseOld = canReuseOldShipment(last);
+
+        final Shipment shipment;
+        if (!reuseOld) {
+            log.debug("Create new shipment for device " + device.getImei());
+            shipment = startNewShipment(device);
+
+            if (last != null && !last.hasFinalStatus()) {
+                log.debug("Close old active shipment " + last.getShipmentDescription()
                         + " for device " + device.getImei());
-                closeOldShipment(activeShipment);
+                closeOldShipment(last);
             }
+        } else {
+            shipment = last;
         }
 
-        log.debug("Create new shipment for device " + device.getImei());
-        final Shipment shipment = startNewShipment(device);
-        event.setShipment(shipment);
-
         context.getState().possibleNewShipment(shipment);
+        event.setShipment(shipment);
         trackerEventDao.save(event);
 
         return true;
+    }
+
+    /**
+     * TODO update.
+     * @param s shipment.
+     * @return true if the shipment can be reused.
+     */
+    protected boolean canReuseOldShipment(final Shipment s) {
+        if (s != null && s.getStatus() == ShipmentStatus.InProgress) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -117,6 +136,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     private Shipment startNewShipment(final Device device) {
         final Shipment s = new Shipment();
         s.setCompany(device.getCompany());
+        s.setStatus(ShipmentStatus.Default);
         s.setDevice(device);
         s.setShipmentDescription("Created by autostart shipment rule");
         s.setShipmentDate(new Date());

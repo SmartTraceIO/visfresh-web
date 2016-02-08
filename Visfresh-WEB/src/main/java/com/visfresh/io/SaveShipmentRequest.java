@@ -22,6 +22,7 @@ public class SaveShipmentRequest {
      * Indicates whether or not should save the shipment as new template.
      */
     private boolean saveAsNewTemplate;
+    private Boolean includePreviousData;
 
     /**
      * Default constructor.
@@ -67,5 +68,17 @@ public class SaveShipmentRequest {
      */
     public void setSaveAsNewTemplate(final boolean saveAsNewTemplate) {
         this.saveAsNewTemplate = saveAsNewTemplate;
+    }
+    /**
+     * @return true if should include previous data, false otherwise.
+     */
+    public Boolean isIncludePreviousData() {
+        return includePreviousData;
+    }
+    /**
+     * @param includePreviousData the includePreviousData to set
+     */
+    public void setIncludePreviousData(final Boolean includePreviousData) {
+        this.includePreviousData = includePreviousData;
     }
 }

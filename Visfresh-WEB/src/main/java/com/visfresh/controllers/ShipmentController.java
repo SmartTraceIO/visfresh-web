@@ -76,6 +76,10 @@ import com.visfresh.utils.StringUtils;
 @RestController("Shipment")
 @RequestMapping("/rest")
 public class ShipmentController extends AbstractController implements ShipmentConstants {
+    /**
+     * 2 hours by default.
+     */
+    private static final long MAX_DEFAULT_SHIPMENT_INACTIVE_TIME = 2 * 60 * 60 * 1000L;
     private static final String ISO_FORMAT = "yyyy-MM-dd HH:mm";
     /**
      * Logger.
@@ -126,17 +130,18 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             security.checkCanSaveShipment(user);
 
             final SaveShipmentRequest req = getSerializer(user).parseSaveShipmentRequest(shipment);
-            checkCompanyAccess(user, req.getShipment());
+            final Shipment newShipment = req.getShipment();
+            checkCompanyAccess(user, newShipment);
 
-            req.getShipment().setCompany(user.getCompany());
-            final Long id = shipmentDao.save(req.getShipment()).getId();
+            newShipment.setCompany(user.getCompany());
+            final Long id = saveShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
 
             final SaveShipmentResponse resp = new SaveShipmentResponse();
             resp.setShipmentId(id);
 
             if (req.isSaveAsNewTemplate()) {
                 final Long tplId = createShipmentTemplate(
-                        user.getCompany(), req.getShipment(), req.getTemplateName());
+                        user.getCompany(), newShipment, req.getTemplateName());
                 resp.setTemplateId(tplId);
             }
             return createSuccessResponse(getSerializer(user).toJson(resp));
@@ -145,6 +150,46 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param newShipment
+     * @return
+     */
+    private Long saveShipment(final Shipment newShipment, final boolean includePreviousData) {
+        final String imei = newShipment.getDevice().getImei();
+        final Shipment current = shipmentDao.findLastShipment(imei);
+
+        boolean shouldOverwritePrevious =
+                includePreviousData
+                && current != null
+                && current.getStatus() == ShipmentStatus.Default;
+        if (shouldOverwritePrevious) {
+            final TrackerEvent e = trackerEventDao.getLastEvent(current);
+            // e == null is not mandatory check because the Default shipment can be created only
+            // by autocreate rule in case of INIT event.
+            shouldOverwritePrevious = e == null
+                    || e.getTime().getTime() + MAX_DEFAULT_SHIPMENT_INACTIVE_TIME > System.currentTimeMillis();
+        }
+
+        if (shouldOverwritePrevious) {
+            log.debug("Found Default shipment " + current.getId()
+                    + " for device " + imei + ". Will reused instead of crate new");
+            //copy all settings from created shipment to current.
+            newShipment.setId(current.getId());
+        }
+
+        newShipment.setStatus(ShipmentStatus.InProgress);
+        final Long resultId = shipmentDao.save(newShipment).getId();
+
+        if (!shouldOverwritePrevious && current != null && !current.hasFinalStatus()) {
+            log.debug("Status " + ShipmentStatus.Ended + " has set for " + current.getId()
+                    + " after create new shipment for device " + imei);
+            current.setStatus(ShipmentStatus.Ended);
+            shipmentDao.save(current);
+        }
+
+        return resultId;
+    }
+
     private Long createShipmentTemplate(final Company company, final Shipment shipment, final String templateName) {
         final ShipmentTemplate tpl = new ShipmentTemplate(shipment);
         tpl.setCompany(company);
