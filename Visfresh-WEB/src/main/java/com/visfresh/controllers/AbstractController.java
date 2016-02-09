@@ -184,7 +184,7 @@ public abstract class AbstractController {
         //create ordered list of sorting columns.
         List<String> props = new LinkedList<String>();
         for (final String prop : defaultSortOrder) {
-            if (prop.equals(sc)) {
+            if (prop.equalsIgnoreCase(sc)) {
                 props.add(0, prop);
             } else {
                 props.add(prop);

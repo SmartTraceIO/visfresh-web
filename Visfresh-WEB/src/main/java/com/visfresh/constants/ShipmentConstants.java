@@ -26,6 +26,7 @@ public interface ShipmentConstants {
     String PROPERTY_SHIPPED_TO_LOCATION_NAME = "shippedToLocationName";
     String PROPERTY_SHIPPED_FROM_LOCATION_NAME = "shippedFromLocationName";
     String PROPERTY_DEVICE_IMEI = "deviceImei";
+    String PROPERTY_DEVICE_SN = "deviceSN";
     String PROPERTY_STATUS = "status";
     String PROPERTY_CUSTOM_FIELDS = "customFields";
     String PROPERTY_SHIPMENT_DATE = "shipmentDate";

@@ -10,8 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -30,8 +28,6 @@ import com.visfresh.utils.StringUtils;
 @Component
 public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Serializable&Comparable<ID>>
         implements DaoBase<T, ID> {
-    private static final Logger log = LoggerFactory.getLogger(DaoImplBase.class);
-
     protected static final String DEFAULT_FILTER_KEY_PREFIX = "filter_";
 
     /**
@@ -181,11 +177,20 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
             final boolean isAscent) {
         final String field = getPropertyToDbMap().get(property);
         if (field != null) {
-            sorts.add(field + (isAscent ? " asc" : " desc"));
+            addSortForDbField(field, sorts, isAscent);
         } else {
-            sorts.add(property + (isAscent ? " asc" : " desc"));
-            log.warn("Field mapping for given property " + property + " not found");
+            addSortForDbField(property, sorts, isAscent);
         }
+    }
+
+    /**
+     * @param field
+     * @param sorts
+     * @param isAscent
+     */
+    protected void addSortForDbField(final String field,
+            final List<String> sorts, final boolean isAscent) {
+        sorts.add(field + (isAscent ? " asc" : " desc"));
     }
     /**
      * @param filter

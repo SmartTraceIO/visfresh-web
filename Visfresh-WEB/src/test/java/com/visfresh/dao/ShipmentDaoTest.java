@@ -16,6 +16,7 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -415,6 +416,44 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         assertEquals(2, dao.getSiblingGroup(g1).size());
         assertEquals(0, dao.getSiblingGroup(1l).size());
+    }
+    @Test
+    public void testSelectIfNullDevice() {
+        final Shipment s = createShipment(sharedCompany, ShipmentStatus.Arrived);
+        s.setDevice(null);
+        dao.save(s);
+
+        assertNotNull(dao.findOne(s.getId()));
+    }
+    @Test
+    public void testOrderByDeviceSN() {
+        final Shipment s1 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+        final Shipment s2 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+        final Shipment s3 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+
+        final Device d1 = createDevice("11111111111113");
+        final Device d2 = createDevice("11111111111122");
+        final Device d3 = createDevice("11111111111131");
+
+        s3.setDevice(d1);
+        s2.setDevice(d2);
+        s1.setDevice(d3);
+
+        dao.save(s1);
+        dao.save(s2);
+        dao.save(s3);
+
+        List<Shipment> result = dao.findAll(null, new Sorting(true, ShipmentConstants.PROPERTY_DEVICE_SN), null);
+
+        assertEquals(s3.getId(), result.get(0).getId());
+        assertEquals(s2.getId(), result.get(1).getId());
+        assertEquals(s1.getId(), result.get(2).getId());
+
+        result = dao.findAll(null, new Sorting(false, ShipmentConstants.PROPERTY_DEVICE_SN), null);
+
+        assertEquals(s1.getId(), result.get(0).getId());
+        assertEquals(s2.getId(), result.get(1).getId());
+        assertEquals(s3.getId(), result.get(2).getId());
     }
     /**
      * @param c company.

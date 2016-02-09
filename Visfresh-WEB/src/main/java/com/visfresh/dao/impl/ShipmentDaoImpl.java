@@ -315,7 +315,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(STATUS_FIELD, s.getStatus().name());
         params.put(PONUM_FIELD, s.getPoNum());
         params.put(TRIPCOUNT_FIELD, s.getTripCount());
-        params.put(DEVICE_FIELD, s.getDevice().getId());
+        params.put(DEVICE_FIELD, s.getDevice() == null ? null : s.getDevice().getId());
         params.put(SIBLINGGROUP_FIELD, s.getSiblingGroup());
         params.put(SIBLINGCOUNT_FIELD, s.getSiblingCount());
         params.put(ASSETTYPE_FIELD, s.getAssetType());
@@ -426,7 +426,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
                 num++;
             }
 
-            filters.add(SHIPPEDTO_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
+            filters.add(TABLE + "." + SHIPPEDTO_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
         } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM.equals(property)){
             //create placeholder for 'in' operator
             final List<String> in = new LinkedList<String>();
@@ -442,14 +442,16 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         } else if (ShipmentConstants.PROPERTY_SHIPPED_TO_DATE.equals(property)){
             //shipped to date
             params.put(defaultKey, value);
-            filters.add(SHIPMENTDATE_FIELD + " <= :" + defaultKey);
+            filters.add(TABLE + "." + SHIPMENTDATE_FIELD + " <= :" + defaultKey);
         } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM_DATE.equals(property)){
             //shipped from date
             params.put(defaultKey, value);
-            filters.add(LASTEVENT_FIELD + " >= :" + defaultKey);
+            filters.add(TABLE + "." + LASTEVENT_FIELD + " >= :" + defaultKey);
         } else if (ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION.equals(property)){
             params.put(defaultKey, "%" + value + "%");
-            filters.add(DESCRIPTION_FIELD + " like :" + defaultKey);
+            filters.add(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
+        } else if (ShipmentConstants.PROPERTY_DEVICE_SN.equals(property)){
+            filters.add(ShipmentConstants.PROPERTY_DEVICE_SN + " = :" + defaultKey);
         } else {
             super.addFilterValue(property, value, params, filters);
         }
@@ -469,6 +471,35 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
 
         if (Boolean.TRUE.equals(value)) {
             filters.add("exists (select * from alerts where alerts.shipment = shipments.id)");
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
+     */
+    @Override
+    protected String buildSelectBlockForFindAll() {
+        return "select "
+                + getTableName()
+                + ".*"
+                + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -2, 6)"
+                + " as " + ShipmentConstants.PROPERTY_DEVICE_SN
+                + " from " + getTableName()
+                + " left outer join " + DeviceDaoImpl.TABLE + " as d"
+                + " on " + getTableName() + "." + DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
+                ;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#addSortForDbField(java.lang.String, java.util.List, boolean)
+     */
+    @Override
+    protected void addSortForDbField(final String field, final List<String> sorts,
+            final boolean isAscent) {
+        if (ShipmentConstants.PROPERTY_DEVICE_SN.equals(field)) {
+            //also add the trip count to sort
+            super.addSortForDbField(field, sorts, isAscent);
+            super.addSortForDbField(TABLE + "." + TRIPCOUNT_FIELD, sorts, isAscent);
+        } else {
+            super.addSortForDbField(TABLE + "." + field, sorts, isAscent);
         }
     }
 }
