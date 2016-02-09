@@ -227,7 +227,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                             req.getSortOrder(),
                             getDefaultListShipmentsSortingOrder(), 2),
                     filter,
-                    page);
+                    page, user);
             final int total = shipmentDao.getEntityCount(user.getCompany(), filter);
 
             final JsonArray array = new JsonArray();
@@ -306,16 +306,18 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     }
     /**
      * @param company
+     * @param user the user.
      * @return
      */
     private List<ListShipmentItem> getShipments(final Company company,
             final Sorting sorting,
             final Filter filter,
-            final Page page) {
+            final Page page, final User user) {
         final List<Shipment> shipments = shipmentDao.findByCompany(company, sorting, page, filter);
         final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
 
         final Date currentTime = new Date();
+        final DateFormat isoFmt = createDateFormat(user, ISO_FORMAT);
 
         //add alerts to each shipment.
         for (final Shipment s : shipments) {
@@ -341,6 +343,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                             currentTime);
 
                     dto.setPercentageComplete(est.getPercentageComplete());
+                    if (est.getArrivalDate() != null) {
+                        dto.setEstArrivalDate(isoFmt.format(est.getArrivalDate()));
+                    }
                 }
             }
 
@@ -354,9 +359,11 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 //arrival date.
                 final Arrival arrival = arrivalDao.getArrival(s);
                 if (arrival != null) {
-                    dto.setActualArrivalDate(arrival.getDate());
+                    dto.setActualArrivalDate(isoFmt.format(arrival.getDate()));
                 }
             }
+
+            dto.setShipmentDate(isoFmt.format(s.getShipmentDate()));
         }
 
         return result;
@@ -651,16 +658,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setCurrentLocation(dtoOld.getCurrentLocation());
 
         final List<SingleShipmentTimeItem> items = dtoOld.getItems();
-        Date startTime;
-        if (items.size() > 0) {
-            final TrackerEvent lastEvent = items.get(items.size() - 1).getEvent();
-            dto.setCurrentLocationForMap(new Location(lastEvent.getLatitude(), lastEvent.getLongitude()));
-            //set start time
-            final TrackerEvent firstEvent = items.get(0).getEvent();
-            startTime = firstEvent.getTime();
-        } else {
-            startTime = shipment.getShipmentDate();
-        }
+        final Date startTime = shipment.getShipmentDate();
 
         dto.setDeviceName(dtoOld.getDeviceName());
         dto.setDeviceSN(dtoOld.getDeviceSn());

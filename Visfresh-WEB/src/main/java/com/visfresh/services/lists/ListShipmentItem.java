@@ -3,7 +3,6 @@
  */
 package com.visfresh.services.lists;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,9 +24,9 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private String palettid;
     private String shippedFrom;
     private String shippedTo;
-    private Date shipmentDate;
-    private Date estArrivalDate;
-    private Date actualArrivalDate;
+    private String shipmentDate;
+    private String estArrivalDate;
+    private String actualArrivalDate;
     private int percentageComplete;
     private String assetNum;
     private String assetType;
@@ -51,10 +50,8 @@ public class ListShipmentItem implements EntityWithId<Long> {
         this.setAssetType(s.getAssetType());
         this.setDeviceName(s.getDevice().getName());
         this.setDeviceSN(s.getDevice().getSn());
-        this.setEstArrivalDate(s.getShipmentDate());
         this.setPalettid(s.getPalletId());
         this.setPercentageComplete(0);
-        this.setShipmentDate(s.getShipmentDate());
         this.setShipmentDescription(s.getShipmentDescription());
         this.setShipmentId(s.getId());
         this.setShippedFrom(s.getShippedFrom() == null ? null : s.getShippedFrom().getName());
@@ -161,37 +158,37 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @return the shipmentDate
      */
-    public Date getShipmentDate() {
+    public String getShipmentDate() {
         return shipmentDate;
     }
     /**
      * @param shipmentDate the shipmentDate to set
      */
-    public void setShipmentDate(final Date shipmentDate) {
+    public void setShipmentDate(final String shipmentDate) {
         this.shipmentDate = shipmentDate;
     }
     /**
      * @return the estArrivalDate
      */
-    public Date getEstArrivalDate() {
+    public String getEstArrivalDate() {
         return estArrivalDate;
     }
     /**
      * @param estArrivalDate the estArrivalDate to set
      */
-    public void setEstArrivalDate(final Date estArrivalDate) {
+    public void setEstArrivalDate(final String estArrivalDate) {
         this.estArrivalDate = estArrivalDate;
     }
     /**
      * @return the actualArrivalDate
      */
-    public Date getActualArrivalDate() {
+    public String getActualArrivalDate() {
         return actualArrivalDate;
     }
     /**
      * @param actualArrivalDate the actualArrivalDate to set
      */
-    public void setActualArrivalDate(final Date actualArrivalDate) {
+    public void setActualArrivalDate(final String actualArrivalDate) {
         this.actualArrivalDate = actualArrivalDate;
     }
 

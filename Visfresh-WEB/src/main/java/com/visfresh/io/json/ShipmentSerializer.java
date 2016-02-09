@@ -234,7 +234,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         json.addProperty("shipmentId", dto.getShipmentId());
         json.addProperty("shipmentDescription", dto.getShipmentDescription());
-        json.addProperty("shipmentDate", formatDate(dto.getShipmentDate()));
+        json.addProperty("shipmentDate", dto.getShipmentDate());
 
         json.addProperty("palletId", dto.getPalettId());
         json.addProperty("assetNum", dto.getAssetNum());
@@ -242,8 +242,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         json.addProperty("shippedFrom", dto.getShippedFrom());
         json.addProperty("shippedTo", dto.getShippedTo());
-        json.addProperty("estArrivalDate", formatDate(dto.getEstArrivalDate()));
-        json.addProperty("actualArrivalDate", formatDate(dto.getActualArrivalDate()));
+        json.addProperty("estArrivalDate", dto.getEstArrivalDate());
+        json.addProperty("actualArrivalDate", dto.getActualArrivalDate());
         json.addProperty("percentageComplete", dto.getPercentageComplete());
 
         json.addProperty("alertProfileId", dto.getAlertProfileId());
