@@ -250,6 +250,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             PROPERTY_ALERT_PROFILE_ID,
             PROPERTY_SHIPPED_FROM,
             PROPERTY_SHIPPED_TO,
+            PROPERTY_DEVICE_SN,
             PROPERTY_COMMENTS_FOR_RECEIVER,
             PROPERTY_ALERT_PROFILE
         };

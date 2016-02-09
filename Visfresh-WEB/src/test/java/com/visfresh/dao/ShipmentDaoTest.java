@@ -431,8 +431,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         final Shipment s2 = createShipment(sharedCompany, ShipmentStatus.Arrived);
         final Shipment s3 = createShipment(sharedCompany, ShipmentStatus.Arrived);
 
-        final Device d1 = createDevice("11111111111113");
-        final Device d2 = createDevice("11111111111122");
+        final Device d1 = createDevice("11111131111113");
+        final Device d2 = createDevice("11111121111122");
         final Device d3 = createDevice("11111111111131");
 
         s3.setDevice(d1);

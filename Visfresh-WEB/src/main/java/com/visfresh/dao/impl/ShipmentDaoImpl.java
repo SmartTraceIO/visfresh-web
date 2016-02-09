@@ -481,7 +481,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         return "select "
                 + getTableName()
                 + ".*"
-                + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -2, 6)"
+                + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6)"
                 + " as " + ShipmentConstants.PROPERTY_DEVICE_SN
                 + " from " + getTableName()
                 + " left outer join " + DeviceDaoImpl.TABLE + " as d"

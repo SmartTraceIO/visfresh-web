@@ -40,6 +40,8 @@ import com.visfresh.utils.StringUtils;
  *
  */
 public class ShipmentSerializer extends AbstractJsonSerializer {
+    private static final String JSON_SORT_COLUMN = "sc";
+    private static final String JSON_SORT_ORDER = "so";
     private ReferenceResolver referenceResolver;
     private NotificationScheduleSerializer notificationScheduleSerializer;
     private final User user;
@@ -320,11 +322,11 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         if (json.has("pageSize")) {
             req.setPageSize(asInt(json.get("pageSize")));
         }
-        if (json.has("sortOrder")) {
-            req.setSortOrder(asString(json.get("sortOrder")));
+        if (json.has(JSON_SORT_ORDER)) {
+            req.setSortOrder(asString(json.get(JSON_SORT_ORDER)));
         }
-        if (json.has("sortColumn")) {
-            req.setSortColumn(asString(json.get("sortColumn")));
+        if (json.has(JSON_SORT_COLUMN)) {
+            req.setSortColumn(asString(json.get(JSON_SORT_COLUMN)));
         }
 
         return req;
@@ -380,10 +382,10 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             obj.addProperty("pageSize", r.getPageSize());
         }
         if (r.getSortOrder() != null) {
-            obj.addProperty("sortOrder", r.getSortOrder());
+            obj.addProperty(JSON_SORT_ORDER, r.getSortOrder());
         }
         if (r.getSortColumn() != null) {
-            obj.addProperty("sortColumn", r.getSortColumn());
+            obj.addProperty(JSON_SORT_COLUMN, r.getSortColumn());
         }
 
         return obj;
