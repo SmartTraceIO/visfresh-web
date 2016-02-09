@@ -15,10 +15,13 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.services.ArrivalEstimation;
+import com.visfresh.services.ArrivalEstimationService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -40,6 +43,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     private TrackerEventDao trackerEventDao;
     @Autowired
     private AbstractRuleEngine engine;
+    @Autowired
+    private ArrivalEstimationService estimationService;
 
     /**
      * Default constructor.
@@ -111,13 +116,25 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     }
 
     /**
-     * TODO update.
      * @param s shipment.
      * @return true if the shipment can be reused.
      */
     protected boolean canReuseOldShipment(final Shipment s) {
         if (s != null && s.getStatus() == ShipmentStatus.InProgress) {
-            return true;
+            final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
+            if (lastEvent == null) {
+                return true;
+            }
+
+            final TrackerEvent firstEvent = trackerEventDao.getFirstEvent(s);
+
+            final ArrivalEstimation est = estimationService.estimateArrivalDate(s,
+                    new Location(lastEvent.getLatitude(), lastEvent.getLongitude()),
+                    firstEvent.getTime(),
+                    lastEvent.getTime());
+
+            return est.getArrivalDate() == null
+                    || System.currentTimeMillis() > est.getArrivalDate().getTime();
         }
         return false;
     }

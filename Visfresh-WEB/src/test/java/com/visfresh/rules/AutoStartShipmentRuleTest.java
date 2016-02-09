@@ -13,9 +13,11 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
@@ -48,14 +50,21 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
      * @return event.
      */
     private TrackerEvent createEvent(final double lat, final double lon, final Date date) {
+        final Device d = device;
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(100);
         e.setLatitude(lat);
         e.setLongitude(lon);
         e.setTemperature(20.4);
         e.setType(TrackerEventType.AUT);
-        e.setDevice(device);
+        e.setDevice(d);
         e.setTime(date);
+        return context.getBean(TrackerEventDao.class).save(e);
+    }
+    private TrackerEvent createEvent(final Shipment s, final double lat, final double lon, final Date date) {
+        final TrackerEvent e = createEvent(lat, lon, date);
+        e.setShipment(s);
+        e.setDevice(s.getDevice());
         return context.getBean(TrackerEventDao.class).save(e);
     }
     @Test
@@ -104,12 +113,12 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
     }
     @Test
     public void testReuseInProgressShipment() {
+        //create in progress shipment
+        final Shipment s = createDefaultShipment(ShipmentStatus.InProgress, device);
+
         final TrackerEvent e = createEvent(17.14, 18.16, new Date());
 
         final RuleContext c = new RuleContext(e, new DeviceState());
-
-        //create in progress shipment
-        final Shipment s = createDefaultShipment(ShipmentStatus.InProgress, device);
 
         rule.handle(c);
 
@@ -120,5 +129,70 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         //check not new shipments created
         final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
         assertEquals(1, shipmentDao.findAll(null, null, null).size());
+    }
+    @Test
+    public void testReuseExpiredPreviousShipment() {
+        //create in progress shipment
+        final Shipment s = createDefaultShipment(ShipmentStatus.InProgress, device);
+        final LocationProfile l1 = createLocationProfile(17.14, 18.16);
+        final LocationProfile l2 = createLocationProfile(18.14, 19.16);
+        s.setShippedFrom(l1);
+        s.setShippedTo(l2);
+        context.getBean(ShipmentDao.class).save(s);
+
+        createEvent(s, 17.14, 18.16, new Date(System.currentTimeMillis() - 10000000l));
+        createEvent(s, 18.139, 19.159, new Date(System.currentTimeMillis() - 10000000l + 60000));
+
+        final TrackerEvent e = createEvent(18.139, 19.159, new Date());
+        final RuleContext c = new RuleContext(e, new DeviceState());
+
+        rule.handle(c);
+
+        //check shipment created.
+        assertNotNull(e.getShipment());
+        assertEquals(s.getId(), e.getShipment().getId());
+
+        //check not new shipments created
+        final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
+        assertEquals(1, shipmentDao.findAll(null, null, null).size());
+    }
+    @Test
+    public void testNotReuseNotExpiredPreviousShipment() {
+        //create in progress shipment
+        final Shipment s = createDefaultShipment(ShipmentStatus.InProgress, device);
+        final LocationProfile l1 = createLocationProfile(17.14, 18.16);
+        final LocationProfile l2 = createLocationProfile(18.14, 19.16);
+        s.setShippedFrom(l1);
+        s.setShippedTo(l2);
+        context.getBean(ShipmentDao.class).save(s);
+
+        createEvent(s, 17.14, 18.16, new Date(System.currentTimeMillis() - 10000000l));
+        createEvent(s, 17.1401, 18.1601, new Date(System.currentTimeMillis()));
+
+        final TrackerEvent e = createEvent(18.14, 19.16, new Date());
+        final RuleContext c = new RuleContext(e, new DeviceState());
+
+        rule.handle(c);
+
+        //check shipment created.
+        assertNotNull(e.getShipment());
+
+        //check not new shipments created
+        final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
+        assertEquals(2, shipmentDao.findAll(null, null, null).size());
+    }
+    /**
+     * @param lat latitude.
+     * @param lon longitude.
+     * @return location profile.
+     */
+    private LocationProfile createLocationProfile(final double lat, final double lon) {
+        final LocationProfile l = new LocationProfile();
+        l.setAddress("Any address");
+        l.setCompany(company);
+        l.setName("Loc (" + lat + ", " + lon + ")");
+        l.getLocation().setLatitude(lat);
+        l.getLocation().setLongitude(lon);
+        return context.getBean(LocationProfileDao.class).save(l);
     }
 }
