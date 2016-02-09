@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services;
+package com.visfresh.mpl.services;
 
 import java.util.Date;
 
@@ -12,6 +12,8 @@ import com.visfresh.dao.ArrivalDao;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
+import com.visfresh.services.ArrivalEstimation;
+import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.utils.LocationUtils;
 
 /**

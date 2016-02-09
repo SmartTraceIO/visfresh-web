@@ -18,6 +18,7 @@ import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.mpl.services.DefaultArrivalEstimationService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
