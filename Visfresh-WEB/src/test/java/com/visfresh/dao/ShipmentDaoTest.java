@@ -455,6 +455,47 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(s2.getId(), result.get(1).getId());
         assertEquals(s3.getId(), result.get(2).getId());
     }
+    @Test
+    public void testOrderByLocation() {
+        final LocationProfile l1 = createLocationProfile("A");
+        final LocationProfile l2 = createLocationProfile("B");
+        final LocationProfile l3 = createLocationProfile("C");
+
+        final Shipment s1 = createShipment(l1, l3);
+        final Shipment s2 = createShipment(l2, l2);
+        final Shipment s3 = createShipment(l3, l1);
+
+        //test shipped from.
+        List<Shipment> result = dao.findAll(null, new Sorting(true,
+                ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME), null);
+
+        assertEquals(s1.getId(), result.get(0).getId());
+        assertEquals(s2.getId(), result.get(1).getId());
+        assertEquals(s3.getId(), result.get(2).getId());
+
+        result = dao.findAll(null, new Sorting(false,
+                ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME), null);
+
+        assertEquals(s3.getId(), result.get(0).getId());
+        assertEquals(s2.getId(), result.get(1).getId());
+        assertEquals(s1.getId(), result.get(2).getId());
+
+        //test shipped to.
+        result = dao.findAll(null, new Sorting(true,
+                ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME), null);
+
+        assertEquals(s3.getId(), result.get(0).getId());
+        assertEquals(s2.getId(), result.get(1).getId());
+        assertEquals(s1.getId(), result.get(2).getId());
+
+        result = dao.findAll(null, new Sorting(false,
+                ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME), null);
+
+        assertEquals(s1.getId(), result.get(0).getId());
+        assertEquals(s2.getId(), result.get(1).getId());
+        assertEquals(s3.getId(), result.get(2).getId());
+    }
+
     /**
      * @param c company.
      * @param group sibling group.
@@ -474,6 +515,38 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setCompany(c);
         s.setStatus(status);
         return dao.save(s);
+    }
+    /**
+     * @param shippedFrom shipped from location.
+     * @param shippedTo shipped to location.
+     * @return shipment.
+     */
+    private Shipment createShipment(final LocationProfile shippedFrom, final LocationProfile shippedTo) {
+        final Shipment s = createTestEntity();
+        s.setStatus(ShipmentStatus.InProgress);
+        s.setShippedFrom(shippedFrom);
+        s.setShippedTo(shippedTo);
+        return dao.save(s);
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    private LocationProfile createLocationProfile(final String name) {
+        final LocationProfile p = new LocationProfile();
+        p.setAddress("Address of " + name);
+        p.setCompany(sharedCompany);
+        p.setInterim(true);
+        p.setName(name);
+        p.setNotes("Any notes");
+        p.setRadius(700);
+        p.setStart(true);
+        p.setStop(true);
+        p.getLocation().setLatitude(100.200);
+        p.getLocation().setLongitude(300.400);
+
+        return locationProfileDao.save(p);
     }
     /**
      * @param d device.

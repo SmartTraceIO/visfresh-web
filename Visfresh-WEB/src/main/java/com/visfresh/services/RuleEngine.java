@@ -20,4 +20,5 @@ public interface RuleEngine {
      * @return rule.
      */
     TrackerEventRule getRule(String name);
+//    boolean isRuleTriggered(Shipment s, );
 }

@@ -483,9 +483,17 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
                 + ".*"
                 + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6)"
                 + " as " + ShipmentConstants.PROPERTY_DEVICE_SN
+                + " , sfrom." + LocationProfileDaoImpl.NAME_FIELD
+                + " as " + ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME
+                + " , sto." + LocationProfileDaoImpl.NAME_FIELD
+                + " as " + ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME
                 + " from " + getTableName()
                 + " left outer join " + DeviceDaoImpl.TABLE + " as d"
                 + " on " + getTableName() + "." + DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
+                + " left outer join " + LocationProfileDaoImpl.TABLE + " as sfrom"
+                + " on " + getTableName() + "." + SHIPPEDFROM_FIELD + " = sfrom." + LocationProfileDaoImpl.ID_FIELD
+                + " left outer join " + LocationProfileDaoImpl.TABLE + " as sto"
+                + " on " + getTableName() + "." + SHIPPEDTO_FIELD + " = sto." + LocationProfileDaoImpl.ID_FIELD
                 ;
     }
     /* (non-Javadoc)
@@ -498,6 +506,10 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             //also add the trip count to sort
             super.addSortForDbField(field, sorts, isAscent);
             super.addSortForDbField(TABLE + "." + TRIPCOUNT_FIELD, sorts, isAscent);
+        } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME.equals(field)){
+            super.addSortForDbField(field, sorts, isAscent);
+        } else if (ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME.equals(field)){
+            super.addSortForDbField(field, sorts, isAscent);
         } else {
             super.addSortForDbField(TABLE + "." + field, sorts, isAscent);
         }

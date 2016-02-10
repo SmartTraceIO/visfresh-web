@@ -222,7 +222,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final Filter filter = createFilter(req, ser);
             final List<ListShipmentItem> shipments = getShipments(
                     user.getCompany(),
-                    createSorting(
+                    createSortingShipments(
                             req.getSortColumn(),
                             req.getSortOrder(),
                             getDefaultListShipmentsSortingOrder(), 2),
@@ -240,6 +240,18 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             return createErrorResponse(e);
         }
     }
+    private Sorting createSortingShipments(final String sc, final String so,
+            final String[] defaultSortOrder, final int maxNumOfSortColumns) {
+        String sortColumn;
+        if (PROPERTY_SHIPPED_FROM.equals(sc)) {
+            sortColumn = PROPERTY_SHIPPED_FROM_LOCATION_NAME;
+        } else if (PROPERTY_SHIPPED_TO.equals(sc)) {
+            sortColumn = PROPERTY_SHIPPED_TO_LOCATION_NAME;
+        } else {
+            sortColumn = sc;
+        }
+        return super.createSorting(sortColumn, so, defaultSortOrder, maxNumOfSortColumns);
+    }
     /**
      * @return
      */
@@ -248,8 +260,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             PROPERTY_SHIPMENT_DESCRIPTION,
             PROPERTY_SHIPMENT_ID,
             PROPERTY_ALERT_PROFILE_ID,
-            PROPERTY_SHIPPED_FROM,
-            PROPERTY_SHIPPED_TO,
+            PROPERTY_SHIPPED_FROM_LOCATION_NAME,
+            PROPERTY_SHIPPED_TO_LOCATION_NAME,
             PROPERTY_DEVICE_SN,
             PROPERTY_COMMENTS_FOR_RECEIVER,
             PROPERTY_ALERT_PROFILE
