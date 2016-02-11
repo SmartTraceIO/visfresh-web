@@ -158,7 +158,11 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param rule rule.
      */
     protected void setRule(final String name, final TrackerEventRule rule) {
-        rules.put(name, rule);
+        if (rule == null) {
+            rules.remove(name);
+        } else {
+            rules.put(name, rule);
+        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RuleEngine#getAlertYetFoFire(com.visfresh.entities.Shipment)
