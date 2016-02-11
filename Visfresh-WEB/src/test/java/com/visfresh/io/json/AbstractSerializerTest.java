@@ -11,7 +11,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.visfresh.controllers.MockReferenceResolver;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
@@ -139,14 +139,14 @@ public class AbstractSerializerTest {
         p.setWatchMovementStart(true);
         p.setWatchMovementStop(true);
 
-        AlertRule issue = new AlertRule();
+        TemperatureRule issue = new TemperatureRule();
         issue.setTemperature(10);
         issue.setType(AlertType.CriticalHot);
         issue.setTimeOutMinutes(17);
         issue.setCumulativeFlag(true);
         p.getAlertRules().add(issue);
 
-        issue = new AlertRule();
+        issue = new TemperatureRule();
         issue.setTemperature(-3);
         issue.setType(AlertType.Cold);
         issue.setTimeOutMinutes(18);

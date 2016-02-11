@@ -15,6 +15,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
@@ -83,13 +84,16 @@ public class AlertBundle extends NotificationIssueBundle {
                     throw new IllegalArgumentException("Unexpected alert type: " + rule.getType());
         }
 
-        //only temperature alert rules. Other should be returned before.
-        sb.append(getTemperatureString(rule.getTemperature(), units));
-        //append time
-        sb.append(" for " + rule.getTimeOutMinutes() + " min");
-        //append total
-        if (rule.isCumulativeFlag()) {
-            sb.append(" in total");
+        if (rule instanceof TemperatureRule) {
+            final TemperatureRule tr = (TemperatureRule) rule;
+            //only temperature alert rules. Other should be returned before.
+            sb.append(getTemperatureString(tr.getTemperature(), units));
+            //append time
+            sb.append(" for " + tr.getTimeOutMinutes() + " min");
+            //append total
+            if (tr.isCumulativeFlag()) {
+                sb.append(" in total");
+            }
         }
         return sb.toString();
     }

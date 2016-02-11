@@ -37,7 +37,6 @@ import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
@@ -65,6 +64,7 @@ import com.visfresh.mpl.services.AlertBundle;
 import com.visfresh.services.ArrivalEstimation;
 import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.services.LocationService;
+import com.visfresh.services.RuleEngine;
 import com.visfresh.services.ShipmentSiblingService;
 import com.visfresh.services.lists.ListShipmentItem;
 import com.visfresh.utils.StringUtils;
@@ -110,6 +110,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private LocationService locationService;
     @Autowired
     private ShipmentSiblingService siblingService;
+    @Autowired
+    private RuleEngine ruleEngine;
 
     /**
      * Default constructor.
@@ -519,7 +521,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
 
         dto.getAlertSummary().addAll(dtoOld.getAlertSummary().keySet());
-        dto.setAlertYetToFire(buildAlertYetToFire(s.getAlertProfile(), user));
+        dto.setAlertYetToFire(buildAlertYetToFire(ruleEngine.getAlertYetFoFire(s), user));
 
         final Arrival arrival = getArrival(dtoOld);
         if (arrival != null) {
@@ -555,29 +557,17 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         return null;
     }
     /**
-     * @param p alert profile.
+     * @param rules alert profile.
      * @param user current user.
      * @return temperature alerts yet to fire so user can suppress future notifications.
      */
-    private String buildAlertYetToFire(final AlertProfile p, final User user) {
-        if (p == null) {
-            return null;
+    private String buildAlertYetToFire(final List<AlertRule> rules, final User user) {
+        final List<String> list = new LinkedList<>();
+        for (final AlertRule rule: rules) {
+            list.add(alertDescriptionBuilder.alertRuleToString(
+                    rule, user.getTemperatureUnits()));
         }
 
-        final List<String> list = new LinkedList<>();
-        for (final AlertRule rule: p.getAlertRules()) {
-            switch (rule.getType()) {
-                case Cold:
-                case CriticalCold:
-                case Hot:
-                case CriticalHot:
-                    list.add(alertDescriptionBuilder.alertRuleToString(
-                            rule, user.getTemperatureUnits()));
-                    break;
-                    default:
-                        //nothing
-            }
-        }
         return StringUtils.combine(list, ", ");
     }
     /**

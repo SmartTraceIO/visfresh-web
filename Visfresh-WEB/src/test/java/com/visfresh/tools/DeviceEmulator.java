@@ -24,7 +24,7 @@ import com.visfresh.controllers.restclient.AlertProfileRestClient;
 import com.visfresh.controllers.restclient.NotificationScheduleRestClient;
 import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
@@ -102,14 +102,14 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         profile.setName(name);
 
         //hot
-        AlertRule issue = new AlertRule(AlertType.Hot);
+        TemperatureRule issue = new TemperatureRule(AlertType.Hot);
         issue.setTemperature(15.);
         issue.setTimeOutMinutes(5);
         issue.setCumulativeFlag(true);
         profile.getAlertRules().add(issue);
 
         //critical hot
-        issue = new AlertRule(AlertType.CriticalHot);
+        issue = new TemperatureRule(AlertType.CriticalHot);
         issue.setTemperature(20.);
         issue.setTimeOutMinutes(1);
         profile.getAlertRules().add(issue);
@@ -117,14 +117,14 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         profile.setDescription("Development tool profile");
 
         //log
-        issue = new AlertRule(AlertType.Cold);
+        issue = new TemperatureRule(AlertType.Cold);
         issue.setTemperature(3.);
         issue.setTimeOutMinutes(10);
         issue.setCumulativeFlag(true);
         profile.getAlertRules().add(issue);
 
         //critical cold
-        issue = new AlertRule(AlertType.CriticalCold);
+        issue = new TemperatureRule(AlertType.CriticalCold);
         issue.setTemperature(-5.);
         issue.setTimeOutMinutes(1);
         profile.getAlertRules().add(issue);

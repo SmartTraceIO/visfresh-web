@@ -13,10 +13,9 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.rules.state.DeviceState;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -64,10 +63,10 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         final List<Alert> alerts = new LinkedList<Alert>();
 
         //process alert rules
-        for (final AlertRule rule : event.getShipment().getAlertProfile().getAlertRules()) {
+        for (final TemperatureRule rule : event.getShipment().getAlertProfile().getAlertRules()) {
 
             //if rule is not already processed. Each rule should be processed one time.
-            if (!isProcessedRule(context.getState(), rule)) {
+            if (!AbstractRuleEngine.isTemperatureProcessedRule(context.getState(), rule)) {
                 final boolean isCumulative = rule.isCumulativeFlag();
                 if (isMatches(rule, t)) {
                     Alert a = null;
@@ -100,21 +99,11 @@ public class TemperatureAlertRule extends AbstractAlertRule {
     }
 
     /**
-     * @param state TODO
-     * @param rule
-     * @return
-     */
-    public static boolean isProcessedRule(final DeviceState state,
-            final AlertRule rule) {
-        return "true".equals(state.getTemperatureAlerts().getProperties().get(createProcessedKey(rule)));
-    }
-
-    /**
      * @param rule rule.
      * @param context rule context.
      * @return alert.
      */
-    private Alert processNormalRule(final AlertRule rule, final RuleContext context) {
+    private Alert processNormalRule(final TemperatureRule rule, final RuleContext context) {
         final Map<String, Date> dateProps = context.getState().getTemperatureAlerts()
                 .getDates();
 
@@ -129,12 +118,9 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         final TrackerEvent event = context.getEvent();
         final long total = (event.getTime().getTime() - firstIssue.getTime()) / MINUTE;
         if (total >= rule.getTimeOutMinutes()) {
-            final Map<String, String> props = context.getState().getTemperatureAlerts()
-                    .getProperties();
-
             final TemperatureAlert a = createAlert(rule, event);
             a.setMinutes((int) total);
-            props.put(createProcessedKey(rule), "true");
+            AbstractRuleEngine.setProcessedTemperatureRule(context.getState(), rule);
             return a;
         }
 
@@ -146,7 +132,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param context rule context.
      * @param prev previous event.
      */
-    private Alert processComulativeRule(final AlertRule rule, final RuleContext context,
+    private Alert processComulativeRule(final TemperatureRule rule, final RuleContext context,
             final TrackerEvent prev) {
         final Map<String, String> props = context.getState().getTemperatureAlerts()
                 .getProperties();
@@ -163,7 +149,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         if (total >= rule.getTimeOutMinutes() * 60000L) {
             final TemperatureAlert alert = createAlert(rule, event);
             alert.setMinutes((int) (total / 60000l));
-            props.put(createProcessedKey(rule), "true");
+            AbstractRuleEngine.setProcessedTemperatureRule(context.getState(), rule);
             return alert;
         } else {
             props.put(cumulativeTotalKey, Long.toString(total));
@@ -176,24 +162,16 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param rule
      * @return
      */
-    protected String creaeStartIssueKey(final AlertRule rule) {
+    protected String creaeStartIssueKey(final TemperatureRule rule) {
         final String ruleKey = createBaseRuleKey(rule);
         return ruleKey + "_start";
-    }
-    /**
-     * @param rule
-     * @return
-     */
-    protected static String createProcessedKey(final AlertRule rule) {
-        final String ruleKey = createBaseRuleKey(rule);
-        return ruleKey + "_processed";
     }
 
     /**
      * @param rule
      * @return
      */
-    protected static String createBaseRuleKey(final AlertRule rule) {
+    protected static String createBaseRuleKey(final TemperatureRule rule) {
         return NAME + "_" + rule.getType() + "_" + rule.getId();
     }
 
@@ -202,7 +180,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param event event.
      * @return temperature alert.
      */
-    private TemperatureAlert createAlert(final AlertRule rule, final TrackerEvent event) {
+    private TemperatureAlert createAlert(final TemperatureRule rule, final TrackerEvent event) {
         final TemperatureAlert alert = new TemperatureAlert();
         defaultAssign(event, alert);
         alert.setMinutes(rule.getTimeOutMinutes());
@@ -227,7 +205,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param t
      * @return
      */
-    private boolean isMatches(final AlertRule rule, final double t) {
+    private boolean isMatches(final TemperatureRule rule, final double t) {
         switch (rule.getType()) {
             case Cold:
             case CriticalCold:

@@ -3,6 +3,10 @@
  */
 package com.visfresh.services;
 
+import java.util.List;
+
+import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.Shipment;
 import com.visfresh.rules.RuleContext;
 import com.visfresh.rules.TrackerEventRule;
 
@@ -20,5 +24,9 @@ public interface RuleEngine {
      * @return rule.
      */
     TrackerEventRule getRule(String name);
-//    boolean isRuleTriggered(Shipment s, );
+    /**
+     * @param s shipment
+     * @return map of alert yet to fire.
+     */
+    List<AlertRule> getAlertYetFoFire(Shipment s);
 }

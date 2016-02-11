@@ -31,7 +31,7 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * List of temperature issues.
      */
-    private List<AlertRule> temperatureIssues = new LinkedList<AlertRule>();
+    private List<TemperatureRule> temperatureIssues = new LinkedList<TemperatureRule>();
     /**
      * Alert for enter bright environment.
      */
@@ -169,7 +169,7 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * @return the temperatureIssues
      */
-    public List<AlertRule> getAlertRules() {
+    public List<TemperatureRule> getAlertRules() {
         return temperatureIssues;
     }
 }

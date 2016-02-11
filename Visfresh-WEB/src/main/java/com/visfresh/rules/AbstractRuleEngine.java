@@ -4,6 +4,8 @@
 package com.visfresh.rules;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,8 +22,12 @@ import com.google.gson.JsonElement;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
@@ -153,5 +159,78 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     protected void setRule(final String name, final TrackerEventRule rule) {
         rules.put(name, rule);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RuleEngine#getAlertYetFoFire(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public List<AlertRule> getAlertYetFoFire(final Shipment s) {
+        final String imei = s.getDevice().getImei();
+        final List<AlertRule> alerts = new LinkedList<AlertRule>();
+
+        //check alert profile exists
+        final AlertProfile alertProfile = s.getAlertProfile();
+        if (alertProfile == null) {
+            return alerts;
+        }
+
+        //check this shipment is active
+        final Shipment lastShipment = shipmentDao.findLastShipment(imei);
+        if (!lastShipment.getId().equals(s.getId())) {
+            return alerts;
+        }
+
+        //check device state is set.
+        final DeviceState state = deviceDao.getState(imei);
+        for (final TemperatureRule rule: alertProfile.getAlertRules()) {
+            switch (rule.getType()) {
+                case Cold:
+                case CriticalCold:
+                case Hot:
+                case CriticalHot:
+                    if (state == null || !isTemperatureProcessedRule(state, rule)) {
+                        alerts.add(rule);
+                    }
+                    break;
+                    default:
+                        //nothing
+            }
+        }
+
+        //add continuously rules
+        if (alertProfile.isWatchBatteryLow()) {
+            alerts.add(new AlertRule(AlertType.Battery));
+        }
+        if (alertProfile.isWatchEnterBrightEnvironment()) {
+            alerts.add(new AlertRule(AlertType.LightOn));
+        }
+        if (alertProfile.isWatchEnterBrightEnvironment()) {
+            alerts.add(new AlertRule(AlertType.LightOff));
+        }
+
+        return alerts;
+    }
+    /**
+     * @param rule
+     * @return
+     */
+    protected static String createProcessedKey(final TemperatureRule rule) {
+        return TemperatureAlertRule.NAME + "_" + rule.getType() + "_" + rule.getId() + "_processed";
+    }
+    /**
+     * @param state device state.
+     * @param rule alert rule.
+     * @return
+     */
+    protected static boolean isTemperatureProcessedRule(final DeviceState state,
+            final TemperatureRule rule) {
+        return "true".equals(state.getTemperatureAlerts().getProperties().get(createProcessedKey(rule)));
+    }
+    /**
+     * @param deviceState
+     * @param rule
+     */
+    protected static void setProcessedTemperatureRule(final DeviceState deviceState, final TemperatureRule rule) {
+        deviceState.getTemperatureAlerts().getProperties().put(createProcessedKey(rule), "true");
     }
 }

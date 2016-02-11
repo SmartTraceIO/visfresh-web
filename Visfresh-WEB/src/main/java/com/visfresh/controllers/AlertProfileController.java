@@ -22,7 +22,7 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
 import com.visfresh.mpl.services.AlertBundle;
@@ -157,7 +157,7 @@ public class AlertProfileController extends AbstractController implements AlertP
                 item.setAlertProfileId(a.getId());
                 item.setAlertProfileName(a.getName());
                 item.setAlertProfileDescription(a.getDescription());
-                for (final AlertRule rule : a.getAlertRules()) {
+                for (final TemperatureRule rule : a.getAlertRules()) {
                     item.getAlertRuleList().add(
                             alertDescriptionBuilder.alertRuleToString(rule, user.getTemperatureUnits()));
                 }

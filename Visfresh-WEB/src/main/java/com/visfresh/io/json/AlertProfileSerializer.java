@@ -14,7 +14,7 @@ import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.services.lists.ListAlertProfileItem;
 
 /**
@@ -56,7 +56,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
 
         final JsonArray tempIssues = new JsonArray();
         obj.add("temperatureIssues", tempIssues);
-        for (final AlertRule issue : alert.getAlertRules()) {
+        for (final TemperatureRule issue : alert.getAlertRules()) {
             tempIssues.add(toJson(issue));
         }
 
@@ -92,7 +92,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
      * @param issue temperature issue.
      * @return
      */
-    public JsonObject toJson(final AlertRule issue) {
+    public JsonObject toJson(final TemperatureRule issue) {
         final JsonObject obj = new JsonObject();
         obj.addProperty("id", issue.getId());
         obj.addProperty("type", issue.getType().toString());
@@ -105,8 +105,8 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
      * @param json JSON object.
      * @return temperature issue.
      */
-    public AlertRule parseTemperatureIssue(final JsonObject json) {
-        final AlertRule issue = new AlertRule();
+    public TemperatureRule parseTemperatureIssue(final JsonObject json) {
+        final TemperatureRule issue = new TemperatureRule();
         issue.setId(asLong(json.get("id")));
         issue.setType(AlertType.valueOf(json.get("type").getAsString()));
         issue.setTemperature(asDouble(json.get("temperature")));

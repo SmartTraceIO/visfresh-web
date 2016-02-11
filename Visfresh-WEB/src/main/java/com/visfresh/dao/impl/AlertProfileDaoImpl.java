@@ -19,7 +19,7 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.AlertType;
 
 /**
@@ -182,7 +182,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
      * @param id alert profile ID.
      * @param issues temperature issues.
      */
-    private void updateTemperatureIssues(final Long id, final List<AlertRule> issues) {
+    private void updateTemperatureIssues(final Long id, final List<TemperatureRule> issues) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("apid", id);
 
@@ -195,7 +195,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         }
 
         //process issues
-        for (final AlertRule issue : issues) {
+        for (final TemperatureRule issue : issues) {
             final Long issueId = issue.getId();
             final Map<String, Object> paramMap = new HashMap<String, Object>();
             paramMap.put("temperature", issue.getTemperature());
@@ -240,8 +240,8 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
      * @param id alert profile ID.
      * @return list of temperature issues.
      */
-    private List<AlertRule> loadTemperatureIssues(final Long id) {
-        final List<AlertRule> list = new LinkedList<AlertRule>();
+    private List<TemperatureRule> loadTemperatureIssues(final Long id) {
+        final List<TemperatureRule> list = new LinkedList<TemperatureRule>();
 
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("alertprofile", id);
@@ -250,7 +250,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
 
         //create temperature issues from DB rows
         for (final Map<String, Object> row : rows) {
-            final AlertRule issue = new AlertRule();
+            final TemperatureRule issue = new TemperatureRule();
             issue.setId(((Number) row.get("id")).longValue());
             issue.setTemperature(((Number) row.get("temp")).doubleValue());
             issue.setCumulativeFlag(Boolean.TRUE.equals(row.get("cumulative")));

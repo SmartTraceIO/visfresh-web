@@ -17,7 +17,7 @@ import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
@@ -73,7 +73,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final int timeOutMinutes = 30;
 
         //create alert rule
-        final AlertRule r = new AlertRule(AlertType.Hot);
+        final TemperatureRule r = new TemperatureRule(AlertType.Hot);
         r.setTemperature(temperature);
         r.setTimeOutMinutes(timeOutMinutes);
         r.setCumulativeFlag(false);
@@ -136,7 +136,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final int timeOutMinutes = 30;
 
         //create alert rule
-        final AlertRule r = new AlertRule(AlertType.Hot);
+        final TemperatureRule r = new TemperatureRule(AlertType.Hot);
         r.setTemperature(temperature);
         r.setTimeOutMinutes(timeOutMinutes);
         r.setCumulativeFlag(true);
@@ -184,7 +184,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final int timeOutMinutes = 30;
 
         //create alert rule
-        final AlertRule r = new AlertRule(AlertType.CriticalHot);
+        final TemperatureRule r = new TemperatureRule(AlertType.CriticalHot);
         r.setTemperature(temperature);
         r.setTimeOutMinutes(timeOutMinutes);
         r.setCumulativeFlag(false);
@@ -247,7 +247,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final int timeOutMinutes = 30;
 
         //create alert rule
-        final AlertRule r = new AlertRule(AlertType.CriticalHot);
+        final TemperatureRule r = new TemperatureRule(AlertType.CriticalHot);
         r.setTemperature(temperature);
         r.setTimeOutMinutes(timeOutMinutes);
         r.setCumulativeFlag(true);
@@ -294,7 +294,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final int timeOutMinutes = 30;
 
         //create alert rule
-        final AlertRule r = new AlertRule(AlertType.Cold);
+        final TemperatureRule r = new TemperatureRule(AlertType.Cold);
         r.setTemperature(temperature);
         r.setTimeOutMinutes(timeOutMinutes);
         r.setCumulativeFlag(false);
@@ -348,7 +348,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final int timeOutMinutes = 30;
 
         //create alert rule
-        final AlertRule r = new AlertRule(AlertType.Cold);
+        final TemperatureRule r = new TemperatureRule(AlertType.Cold);
         r.setTemperature(temperature);
         r.setTimeOutMinutes(timeOutMinutes);
         r.setCumulativeFlag(true);
@@ -396,7 +396,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final int timeOutMinutes = 30;
 
         //create alert rule
-        final AlertRule r = new AlertRule(AlertType.CriticalCold);
+        final TemperatureRule r = new TemperatureRule(AlertType.CriticalCold);
         r.setTemperature(temperature);
         r.setTimeOutMinutes(timeOutMinutes);
         r.setCumulativeFlag(false);
@@ -459,7 +459,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final int timeOutMinutes = 30;
 
         //create alert rule
-        final AlertRule r = new AlertRule(AlertType.CriticalCold);
+        final TemperatureRule r = new TemperatureRule(AlertType.CriticalCold);
         r.setTemperature(temperature);
         r.setTimeOutMinutes(timeOutMinutes);
         r.setCumulativeFlag(true);
@@ -505,7 +505,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final int timeOutMinutes = 30;
 
         //create alert rule
-        final AlertRule r = new AlertRule(AlertType.CriticalCold);
+        final TemperatureRule r = new TemperatureRule(AlertType.CriticalCold);
         r.setTemperature(temperature);
         r.setTimeOutMinutes(timeOutMinutes);
         r.setCumulativeFlag(true);

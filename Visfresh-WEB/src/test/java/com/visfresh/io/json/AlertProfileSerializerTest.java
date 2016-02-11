@@ -12,7 +12,7 @@ import org.junit.Test;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.services.lists.ListAlertProfileItem;
 
 /**
@@ -56,8 +56,8 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         p.setWatchEnterDarkEnvironment(watchEnterDarkEnvironment);
         p.setWatchMovementStart(watchMovementStart);
         p.setWatchMovementStop(watchMovementStop);
-        p.getAlertRules().add(new AlertRule(AlertType.Hot));
-        p.getAlertRules().add(new AlertRule(AlertType.CriticalHot));
+        p.getAlertRules().add(new TemperatureRule(AlertType.Hot));
+        p.getAlertRules().add(new TemperatureRule(AlertType.CriticalHot));
 
         final JsonObject json = serializer.toJson(p).getAsJsonObject();
         p = serializer.parseAlertProfile(json);
@@ -79,7 +79,7 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         final AlertType type = AlertType.CriticalCold;
         final Long id = 77l;
 
-        AlertRule issue = new AlertRule();
+        TemperatureRule issue = new TemperatureRule();
 
         issue.setId(id);
         issue.setTemperature(temperature);
