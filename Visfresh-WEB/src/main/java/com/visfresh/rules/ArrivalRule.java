@@ -18,9 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
+import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
@@ -30,6 +32,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
+import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.mpl.services.MainSystemMessageDispatcher;
 import com.visfresh.services.DeviceCommandService;
@@ -50,6 +53,8 @@ public class ArrivalRule extends AbstractNotificationRule implements SystemMessa
 
     @Autowired
     protected ArrivalDao arrivalDao;
+    @Autowired
+    protected AlertDao alertDao;
     @Autowired
     protected ShipmentDao shipmentDao;
     @Autowired
@@ -119,35 +124,61 @@ public class ArrivalRule extends AbstractNotificationRule implements SystemMessa
     public final boolean handle(final RuleContext context) {
         final Arrival arrival = new Arrival();
         final TrackerEvent event = context.getEvent();
+        final Shipment shipment = event.getShipment();
+
         context.setProcessed(this);
         context.getState().setArrivalProcessed(true);
 
         arrival.setDate(event.getTime());
         arrival.setDevice(event.getDevice());
         arrival.setNumberOfMettersOfArrival(getNumberOfMetersForArrival(
-                event.getLatitude(), event.getLongitude(), event.getShipment().getShippedTo()));
-        arrival.setShipment(event.getShipment());
+                event.getLatitude(), event.getLongitude(), shipment.getShippedTo()));
+        arrival.setShipment(shipment);
 
         saveArrival(arrival);
-        event.getShipment().setStatus(ShipmentStatus.Arrived);
-        shipmentDao.save(event.getShipment());
+        shipment.setStatus(ShipmentStatus.Arrived);
+        shipmentDao.save(shipment);
 
-        if (event.getShipment().getShutdownDeviceAfterMinutes() != null) {
+        if (shipment.getShutdownDeviceAfterMinutes() != null) {
             final long date = System.currentTimeMillis()
-                    + event.getShipment().getShutdownDeviceAfterMinutes() * 60 * 1000l;
-            sendShipmentShutdown(event.getShipment(), new Date(date));
+                    + shipment.getShutdownDeviceAfterMinutes() * 60 * 1000l;
+            sendShipmentShutdown(shipment, new Date(date));
         }
 
+        if (!shipment.isExcludeNotificationsIfNoAlerts() || hasTemperatureAlerts(shipment)) {
+            sendNotificaion(shipment, arrival);
+        }
+
+        return false;
+    }
+
+    /**
+     * @param shipment
+     * @return
+     */
+    private boolean hasTemperatureAlerts(final Shipment shipment) {
+        final List<Alert> alerts = alertDao.getAlerts(shipment);
+        for (final Alert a : alerts) {
+            if (a instanceof TemperatureAlert) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * @param shipment
+     * @param arrival
+     */
+    protected void sendNotificaion(final Shipment shipment,
+            final Arrival arrival) {
         final Calendar date = new GregorianCalendar();
         //notify subscribers
-        final List<PersonSchedule> schedules = getAllPersonalSchedules(event.getShipment());
+        final List<PersonSchedule> schedules = getAllPersonalSchedules(shipment);
         for (final PersonSchedule s : schedules) {
             if (matchesTimeFrame(s, date)) {
                 sendNotification(s, arrival);
             }
         }
-
-        return false;
     }
 
     /**

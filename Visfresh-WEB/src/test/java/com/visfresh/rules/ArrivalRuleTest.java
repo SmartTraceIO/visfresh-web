@@ -12,16 +12,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
+import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.Language;
@@ -32,6 +36,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
+import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
@@ -118,35 +123,11 @@ public class ArrivalRuleTest extends BaseRuleTest {
         final LocationProfile loc = createLocation();
         final TrackerEvent e = createEventNearLocation(loc);
 
-        //create user
-        final User user = new User();
-        user.setCompany(company);
-        user.setPassword("password");
-        user.setEmail("arrival.developer@visfresh.com");
-        user.setActive(true);
-        user.setLanguage(Language.English);
-        user.setTimeZone(TimeZone.getDefault());
-        user.setFirstName("Arrival");
-        user.setLastName("Developer");
-        context.getBean(UserDao.class).save(user);
-
-        //create notification schedule
-        final PersonSchedule schedule = new PersonSchedule();
-        schedule.setSendEmail(true);
-        schedule.setFromTime(0);
-        Arrays.fill(schedule.getWeekDays(), true);
-        schedule.setToTime(60 * 24 - 1);
-        schedule.setUser(user);
-
-        final NotificationSchedule s = new NotificationSchedule();
-        s.setName("Arrival Notification");
-        s.getSchedules().add(schedule);
-        s.setCompany(company);
-        context.getBean(NotificationScheduleDao.class).save(s);
+        final String email = "arrival.developer@visfresh.com";
+        final NotificationSchedule sched = createEmailNotificaitonSchedule(email);
 
         shipment.setShippedTo(loc);
-        shipment.setAlertSuppressionMinutes(0);
-        shipment.getArrivalNotificationSchedules().add(s);
+        shipment.getArrivalNotificationSchedules().add(sched);
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
@@ -160,8 +141,52 @@ public class ArrivalRuleTest extends BaseRuleTest {
 
         final EmailMessage msg = emails.get(0);
         assertEquals(1, msg.getEmails().length);
-        assertEquals(user.getEmail(), msg.getEmails()[0]);
+        assertEquals(email, msg.getEmails()[0]);
         assertTrue(msg.getMessage().contains(shipment.getDevice().getSn()));
+    }
+    @Test
+    public void testExcludeNotificationIfNotAlerts() {
+        shipment.setArrivalNotificationWithinKm(0);
+        shipment.setExcludeNotificationsIfNoAlerts(true);
+
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
+
+        final String email = "arrival.developer@visfresh.com";
+        final NotificationSchedule sched = createEmailNotificaitonSchedule(email);
+
+        shipment.setShippedTo(loc);
+        shipment.getArrivalNotificationSchedules().add(sched);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        //set nearest location
+        final RuleContext req = new RuleContext(e, new DeviceState());
+        rule.handle(req);
+
+        //check notification send
+        List<EmailMessage> emails = context.getBean(MockEmailService.class).getMessages();
+        assertEquals(0, emails.size());
+
+        //create not temperature alert
+        Alert a = new Alert();
+        a.setType(AlertType.LightOn);
+        a.setDevice(shipment.getDevice());
+        a.setShipment(shipment);
+        context.getBean(AlertDao.class).save(a);
+
+        rule.handle(req);
+        emails = context.getBean(MockEmailService.class).getMessages();
+        assertEquals(0, emails.size());
+
+        a = new TemperatureAlert();
+        a.setType(AlertType.CriticalHot);
+        a.setDevice(shipment.getDevice());
+        a.setShipment(shipment);
+        context.getBean(AlertDao.class).save(a);
+
+        rule.handle(req);
+        emails = context.getBean(MockEmailService.class).getMessages();
+        assertEquals(1, emails.size());
     }
     @Test
     public void testShutdownDevice() {
@@ -283,5 +308,40 @@ public class ArrivalRuleTest extends BaseRuleTest {
         loc.getLocation().setLongitude(10);
         loc = context.getBean(LocationProfileDao.class).save(loc);
         return loc;
+    }
+    /**
+     * @param email email.
+     * @return notification schedule.
+     */
+    private NotificationSchedule createEmailNotificaitonSchedule(final String email) {
+        //create user
+        final User user = new User();
+        user.setCompany(company);
+        user.setPassword("password");
+        user.setEmail(email);
+        user.setActive(true);
+        user.setLanguage(Language.English);
+        user.setTimeZone(TimeZone.getDefault());
+        user.setFirstName("Arrival");
+        user.setLastName("Developer");
+        context.getBean(UserDao.class).save(user);
+
+        //create notification schedule
+        final PersonSchedule schedule = new PersonSchedule();
+        schedule.setSendEmail(true);
+        schedule.setFromTime(0);
+        Arrays.fill(schedule.getWeekDays(), true);
+        schedule.setToTime(60 * 24 - 1);
+        schedule.setUser(user);
+
+        final NotificationSchedule s = new NotificationSchedule();
+        s.setName("Arrival Notification");
+        s.getSchedules().add(schedule);
+        s.setCompany(company);
+        return context.getBean(NotificationScheduleDao.class).save(s);
+    }
+    @After
+    public void tearDown() {
+        context.getBean(MockEmailService.class).getMessages().clear();
     }
 }
