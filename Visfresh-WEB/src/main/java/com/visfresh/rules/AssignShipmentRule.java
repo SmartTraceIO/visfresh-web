@@ -69,7 +69,7 @@ public class AssignShipmentRule implements TrackerEventRule {
     public boolean handle(final RuleContext context) {
         final Shipment shipment = (Shipment) context.getClientProperty(this);
 
-        log.debug("Assign new shipment " + shipment.getId() + " to event " + context.getEvent());
+        log.debug("Assign shipment " + shipment.getId() + " to event " + context.getEvent());
         context.getEvent().setShipment(shipment);
         context.getState().possibleNewShipment(shipment);
         trackerEventDao.save(context.getEvent());

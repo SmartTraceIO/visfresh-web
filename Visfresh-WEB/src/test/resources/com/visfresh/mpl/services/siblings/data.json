@@ -1,0 +1,8583 @@
+[
+{
+	"id" : 17409,
+	"battery" : 4058,
+	"temperature" : 23.25,
+	"time" : "2016-02-10 23:01:37",
+	"type" : "INIT",
+	"latitude" : -33.855881,
+	"longitude" : 151.049713,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17414,
+	"battery" : 4128,
+	"temperature" : 23.1200008392334,
+	"time" : "2016-02-10 23:02:07",
+	"type" : "INIT",
+	"latitude" : -33.85149,
+	"longitude" : 151.049728,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17422,
+	"battery" : 4128,
+	"temperature" : 17.5,
+	"time" : "2016-02-10 23:12:12",
+	"type" : "AUT",
+	"latitude" : -33.849718,
+	"longitude" : 151.056389,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17428,
+	"battery" : 3932,
+	"temperature" : 17.25,
+	"time" : "2016-02-10 23:12:25",
+	"type" : "AUT",
+	"latitude" : -33.841629,
+	"longitude" : 151.05017,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17429,
+	"battery" : 4063,
+	"temperature" : 23.1200008392334,
+	"time" : "2016-02-10 23:02:08",
+	"type" : "VIB",
+	"latitude" : -33.85527,
+	"longitude" : 151.049388,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17430,
+	"battery" : 4063,
+	"temperature" : 17.75,
+	"time" : "2016-02-10 23:11:51",
+	"type" : "AUT",
+	"latitude" : -33.854009,
+	"longitude" : 151.051867,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17448,
+	"battery" : 4133,
+	"temperature" : 14.5,
+	"time" : "2016-02-10 23:22:30",
+	"type" : "AUT",
+	"latitude" : -33.845065,
+	"longitude" : 151.053321,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17449,
+	"battery" : 3932,
+	"temperature" : 14.5,
+	"time" : "2016-02-10 23:22:33",
+	"type" : "AUT",
+	"latitude" : -33.844542,
+	"longitude" : 151.05503,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17451,
+	"battery" : 4063,
+	"temperature" : 14.369999885559082,
+	"time" : "2016-02-10 23:21:47",
+	"type" : "AUT",
+	"latitude" : -33.85396,
+	"longitude" : 151.051817,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17452,
+	"battery" : 4064,
+	"temperature" : 12.119999885559082,
+	"time" : "2016-02-10 23:31:55",
+	"type" : "AUT",
+	"latitude" : -33.853532,
+	"longitude" : 151.052378,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17480,
+	"battery" : 4133,
+	"temperature" : 12.5,
+	"time" : "2016-02-10 23:32:27",
+	"type" : "AUT",
+	"latitude" : -33.845842,
+	"longitude" : 151.055941,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17481,
+	"battery" : 4133,
+	"temperature" : 11.5,
+	"time" : "2016-02-10 23:42:22",
+	"type" : "AUT",
+	"latitude" : -33.844113,
+	"longitude" : 151.055424,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17484,
+	"battery" : 3932,
+	"temperature" : 12.619999885559082,
+	"time" : "2016-02-10 23:32:19",
+	"type" : "AUT",
+	"latitude" : -33.844835,
+	"longitude" : 151.054816,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17485,
+	"battery" : 3932,
+	"temperature" : 12.119999885559082,
+	"time" : "2016-02-10 23:36:30",
+	"type" : "STP",
+	"latitude" : -33.844174,
+	"longitude" : 151.055587,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17486,
+	"battery" : 3927,
+	"temperature" : 11.619999885559082,
+	"time" : "2016-02-10 23:42:29",
+	"type" : "AUT",
+	"latitude" : -33.83861,
+	"longitude" : 151.064219,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17487,
+	"battery" : 3927,
+	"temperature" : 11.369999885559082,
+	"time" : "2016-02-10 23:45:41",
+	"type" : "VIB",
+	"latitude" : -33.848708,
+	"longitude" : 151.051642,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17495,
+	"battery" : 4063,
+	"temperature" : 11.619999885559082,
+	"time" : "2016-02-10 23:36:47",
+	"type" : "STP",
+	"latitude" : -33.853857,
+	"longitude" : 151.052089,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17496,
+	"battery" : 4065,
+	"temperature" : 11.119999885559082,
+	"time" : "2016-02-10 23:41:48",
+	"type" : "AUT",
+	"latitude" : -33.853549,
+	"longitude" : 151.052437,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17497,
+	"battery" : 4062,
+	"temperature" : 11,
+	"time" : "2016-02-10 23:45:33",
+	"type" : "VIB",
+	"latitude" : -33.854833,
+	"longitude" : 151.050604,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17500,
+	"battery" : 4132,
+	"temperature" : 10.25,
+	"time" : "2016-02-10 23:52:07",
+	"type" : "AUT",
+	"latitude" : -33.844394,
+	"longitude" : 151.044958,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17502,
+	"battery" : 3932,
+	"temperature" : 10.5,
+	"time" : "2016-02-10 23:52:21",
+	"type" : "AUT",
+	"latitude" : -33.846286,
+	"longitude" : 151.044969,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17503,
+	"battery" : 3932,
+	"temperature" : 9.25,
+	"time" : "2016-02-11 00:02:20",
+	"type" : "AUT",
+	"latitude" : -33.796573,
+	"longitude" : 150.916266,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17508,
+	"battery" : 4062,
+	"temperature" : 10.119999885559082,
+	"time" : "2016-02-10 23:51:37",
+	"type" : "AUT",
+	"latitude" : -33.846874,
+	"longitude" : 151.041722,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17509,
+	"battery" : 4063,
+	"temperature" : 10,
+	"time" : "2016-02-10 23:52:21",
+	"type" : "STP",
+	"latitude" : -33.846874,
+	"longitude" : 151.041722,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17510,
+	"battery" : 4063,
+	"temperature" : 10,
+	"time" : "2016-02-10 23:52:43",
+	"type" : "VIB",
+	"latitude" : -33.846874,
+	"longitude" : 151.041722,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17511,
+	"battery" : 4062,
+	"temperature" : 8.869999885559082,
+	"time" : "2016-02-11 00:01:50",
+	"type" : "AUT",
+	"latitude" : -33.806347,
+	"longitude" : 150.923442,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17515,
+	"battery" : 4133,
+	"temperature" : 8.869999885559082,
+	"time" : "2016-02-11 00:02:23",
+	"type" : "AUT",
+	"latitude" : -33.796573,
+	"longitude" : 150.916266,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17517,
+	"battery" : 4133,
+	"temperature" : 8,
+	"time" : "2016-02-11 00:12:14",
+	"type" : "AUT",
+	"latitude" : -33.894935,
+	"longitude" : 150.848855,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17519,
+	"battery" : 3932,
+	"temperature" : 8.25,
+	"time" : "2016-02-11 00:12:29",
+	"type" : "AUT",
+	"latitude" : -33.890878,
+	"longitude" : 150.853068,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17539,
+	"battery" : 4063,
+	"temperature" : 7.869999885559082,
+	"time" : "2016-02-11 00:11:48",
+	"type" : "AUT",
+	"latitude" : -33.891825,
+	"longitude" : 150.852791,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17540,
+	"battery" : 4062,
+	"temperature" : 7.119999885559082,
+	"time" : "2016-02-11 00:21:45",
+	"type" : "AUT",
+	"latitude" : -34.004772,
+	"longitude" : 150.836293,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17545,
+	"battery" : 4133,
+	"temperature" : 7.25,
+	"time" : "2016-02-11 00:22:07",
+	"type" : "AUT",
+	"latitude" : -33.994282,
+	"longitude" : 150.849365,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17546,
+	"battery" : 4132,
+	"temperature" : 6.5,
+	"time" : "2016-02-11 00:32:30",
+	"type" : "AUT",
+	"latitude" : -34.17756,
+	"longitude" : 150.749351,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17552,
+	"battery" : 3926,
+	"temperature" : 7.5,
+	"time" : "2016-02-11 00:22:34",
+	"type" : "AUT",
+	"latitude" : -34.013805,
+	"longitude" : 150.830212,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17553,
+	"battery" : 3927,
+	"temperature" : 6.869999885559082,
+	"time" : "2016-02-11 00:32:18",
+	"type" : "AUT",
+	"latitude" : -34.178247,
+	"longitude" : 150.746885,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17559,
+	"battery" : 4063,
+	"temperature" : 6.5,
+	"time" : "2016-02-11 00:31:48",
+	"type" : "AUT",
+	"latitude" : -34.129182,
+	"longitude" : 150.715486,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17560,
+	"battery" : 4126,
+	"temperature" : 6.119999885559082,
+	"time" : "2016-02-11 00:42:26",
+	"type" : "AUT",
+	"latitude" : -34.218222,
+	"longitude" : 150.685706,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17561,
+	"battery" : 3923,
+	"temperature" : 6.369999885559082,
+	"time" : "2016-02-11 00:42:37",
+	"type" : "AUT",
+	"latitude" : -34.218222,
+	"longitude" : 150.685706,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17572,
+	"battery" : 4063,
+	"temperature" : 6,
+	"time" : "2016-02-11 00:41:56",
+	"type" : "AUT",
+	"latitude" : -34.241253,
+	"longitude" : 150.651779,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17573,
+	"battery" : 4063,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 00:52:01",
+	"type" : "AUT",
+	"latitude" : -34.36415,
+	"longitude" : 150.517092,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17581,
+	"battery" : 4128,
+	"temperature" : 5.75,
+	"time" : "2016-02-11 00:52:24",
+	"type" : "AUT",
+	"latitude" : -34.383965,
+	"longitude" : 150.525277,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17582,
+	"battery" : 4132,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 01:02:25",
+	"type" : "AUT",
+	"latitude" : -34.439067,
+	"longitude" : 150.437406,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17583,
+	"battery" : 3923,
+	"temperature" : 6.119999885559082,
+	"time" : "2016-02-11 00:52:35",
+	"type" : "AUT",
+	"latitude" : -34.34232,
+	"longitude" : 150.537115,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17584,
+	"battery" : 3926,
+	"temperature" : 5.75,
+	"time" : "2016-02-11 01:02:29",
+	"type" : "AUT",
+	"latitude" : -34.435908,
+	"longitude" : 150.432096,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17594,
+	"battery" : 4063,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 01:01:43",
+	"type" : "AUT",
+	"latitude" : -34.447406,
+	"longitude" : 150.449277,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17597,
+	"battery" : 4129,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 01:12:17",
+	"type" : "AUT",
+	"latitude" : -34.528217,
+	"longitude" : 150.300936,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17598,
+	"battery" : 3926,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 01:12:22",
+	"type" : "AUT",
+	"latitude" : -34.535252,
+	"longitude" : 150.28793,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17599,
+	"battery" : 3924,
+	"temperature" : 5.5,
+	"time" : "2016-02-11 01:22:38",
+	"type" : "AUT",
+	"latitude" : -34.62362,
+	"longitude" : 150.207469,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17606,
+	"battery" : 4056,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 01:11:48",
+	"type" : "AUT",
+	"latitude" : -34.524322,
+	"longitude" : 150.266075,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17607,
+	"battery" : 4062,
+	"temperature" : 5,
+	"time" : "2016-02-11 01:21:49",
+	"type" : "AUT",
+	"latitude" : -34.642759,
+	"longitude" : 150.170157,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17614,
+	"battery" : 4128,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 01:22:31",
+	"type" : "AUT",
+	"latitude" : -34.645619,
+	"longitude" : 150.176235,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17615,
+	"battery" : 4128,
+	"temperature" : 5,
+	"time" : "2016-02-11 01:32:10",
+	"type" : "AUT",
+	"latitude" : -34.716179,
+	"longitude" : 149.997101,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17616,
+	"battery" : 4124,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 01:38:07",
+	"type" : "STP",
+	"latitude" : -34.716179,
+	"longitude" : 149.997101,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17617,
+	"battery" : 3926,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 01:32:44",
+	"type" : "AUT",
+	"latitude" : -34.719204,
+	"longitude" : 149.991318,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17618,
+	"battery" : 3926,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 01:36:53",
+	"type" : "STP",
+	"latitude" : -34.720743,
+	"longitude" : 149.988375,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17627,
+	"battery" : 4063,
+	"temperature" : 5,
+	"time" : "2016-02-11 01:31:52",
+	"type" : "AUT",
+	"latitude" : -34.71204,
+	"longitude" : 150.010452,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17628,
+	"battery" : 4061,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 01:38:01",
+	"type" : "STP",
+	"latitude" : -34.696256,
+	"longitude" : 150.037361,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17629,
+	"battery" : 4061,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 01:41:42",
+	"type" : "AUT",
+	"latitude" : -34.698409,
+	"longitude" : 150.033692,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17630,
+	"battery" : 4063,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 01:43:10",
+	"type" : "VIB",
+	"latitude" : -34.699993,
+	"longitude" : 150.030992,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17631,
+	"battery" : 4062,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 01:45:28",
+	"type" : "STP",
+	"latitude" : -34.71204,
+	"longitude" : 150.010452,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17635,
+	"battery" : 4128,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 01:42:24",
+	"type" : "AUT",
+	"latitude" : -34.716179,
+	"longitude" : 149.997101,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17636,
+	"battery" : 4127,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 01:43:05",
+	"type" : "VIB",
+	"latitude" : -34.716179,
+	"longitude" : 149.997101,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17637,
+	"battery" : 4128,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 01:52:29",
+	"type" : "AUT",
+	"latitude" : -34.73264,
+	"longitude" : 149.985193,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17639,
+	"battery" : 3926,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 01:42:35",
+	"type" : "AUT",
+	"latitude" : -34.719974,
+	"longitude" : 149.989846,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17640,
+	"battery" : 3925,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 01:43:07",
+	"type" : "VIB",
+	"latitude" : -34.721144,
+	"longitude" : 149.987608,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17641,
+	"battery" : 3926,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 01:46:24",
+	"type" : "STP",
+	"latitude" : -34.739917,
+	"longitude" : 149.982841,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17642,
+	"battery" : 3925,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 01:52:19",
+	"type" : "AUT",
+	"latitude" : -34.746326,
+	"longitude" : 149.981384,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17643,
+	"battery" : 3923,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 01:54:10",
+	"type" : "VIB",
+	"latitude" : -34.739588,
+	"longitude" : 149.983787,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17662,
+	"battery" : 4059,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 01:51:54",
+	"type" : "AUT",
+	"latitude" : -34.71204,
+	"longitude" : 150.010452,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17663,
+	"battery" : 4062,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 01:54:11",
+	"type" : "VIB",
+	"latitude" : -34.71204,
+	"longitude" : 150.010452,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17664,
+	"battery" : 4061,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 02:01:55",
+	"type" : "AUT",
+	"latitude" : -34.744894,
+	"longitude" : 149.865593,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17668,
+	"battery" : 4128,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 02:02:26",
+	"type" : "AUT",
+	"latitude" : -34.75043,
+	"longitude" : 149.877297,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17669,
+	"battery" : 4128,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 02:12:17",
+	"type" : "AUT",
+	"latitude" : -34.767496,
+	"longitude" : 149.683799,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17670,
+	"battery" : 3923,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 02:02:21",
+	"type" : "AUT",
+	"latitude" : -34.75043,
+	"longitude" : 149.877297,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17671,
+	"battery" : 3921,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 02:12:33",
+	"type" : "AUT",
+	"latitude" : -34.770327,
+	"longitude" : 149.686256,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17675,
+	"battery" : 4059,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 02:11:50",
+	"type" : "AUT",
+	"latitude" : -34.771265,
+	"longitude" : 149.695492,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17688,
+	"battery" : 4128,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 02:22:25",
+	"type" : "AUT",
+	"latitude" : -34.774396,
+	"longitude" : 149.670133,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17689,
+	"battery" : 3923,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 02:22:23",
+	"type" : "AUT",
+	"latitude" : -34.779215,
+	"longitude" : 149.666952,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17695,
+	"battery" : 4056,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 02:21:52",
+	"type" : "AUT",
+	"latitude" : -34.809103,
+	"longitude" : 149.639008,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17697,
+	"battery" : 4058,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 02:31:38",
+	"type" : "AUT",
+	"latitude" : -34.846261,
+	"longitude" : 149.451807,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17702,
+	"battery" : 4128,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 02:32:14",
+	"type" : "AUT",
+	"latitude" : -34.873716,
+	"longitude" : 149.457997,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17704,
+	"battery" : 4128,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 02:42:17",
+	"type" : "AUT",
+	"latitude" : -34.797043,
+	"longitude" : 149.27355,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17705,
+	"battery" : 3921,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 02:32:35",
+	"type" : "AUT",
+	"latitude" : -34.853542,
+	"longitude" : 149.476668,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17706,
+	"battery" : 3921,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 02:42:27",
+	"type" : "AUT",
+	"latitude" : -34.797674,
+	"longitude" : 149.275505,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17710,
+	"battery" : 4058,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 02:41:44",
+	"type" : "AUT",
+	"latitude" : -34.801668,
+	"longitude" : 149.33506,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17711,
+	"battery" : 4058,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 02:51:42",
+	"type" : "AUT",
+	"latitude" : -34.882088,
+	"longitude" : 149.002838,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17715,
+	"battery" : 4127,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 02:52:27",
+	"type" : "AUT",
+	"latitude" : -34.535496,
+	"longitude" : 149.397817,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17716,
+	"battery" : 4128,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 03:02:16",
+	"type" : "AUT",
+	"latitude" : -34.836787,
+	"longitude" : 148.925173,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17717,
+	"battery" : 3917,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 02:52:30",
+	"type" : "AUT",
+	"latitude" : -34.885834,
+	"longitude" : 149.127365,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17718,
+	"battery" : 3919,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 03:02:19",
+	"type" : "AUT",
+	"latitude" : -34.837541,
+	"longitude" : 148.922489,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17726,
+	"battery" : 4058,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 03:01:48",
+	"type" : "AUT",
+	"latitude" : -34.818059,
+	"longitude" : 148.680099,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17733,
+	"battery" : 4127,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 03:12:23",
+	"type" : "AUT",
+	"latitude" : -34.753081,
+	"longitude" : 148.739106,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17739,
+	"battery" : 3921,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 03:12:23",
+	"type" : "AUT",
+	"latitude" : -34.755279,
+	"longitude" : 148.741926,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17745,
+	"battery" : 4057,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 03:11:44",
+	"type" : "AUT",
+	"latitude" : -34.780045,
+	"longitude" : 148.838409,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17746,
+	"battery" : 4057,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 03:21:40",
+	"type" : "AUT",
+	"latitude" : -34.7951,
+	"longitude" : 148.627646,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17755,
+	"battery" : 4126,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 03:22:30",
+	"type" : "AUT",
+	"latitude" : -34.815199,
+	"longitude" : 148.628143,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17756,
+	"battery" : 4125,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 03:32:31",
+	"type" : "AUT",
+	"latitude" : -34.831278,
+	"longitude" : 148.337798,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17757,
+	"battery" : 3917,
+	"temperature" : 5.75,
+	"time" : "2016-02-11 03:22:36",
+	"type" : "AUT",
+	"latitude" : -34.815886,
+	"longitude" : 148.625799,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17758,
+	"battery" : 3921,
+	"temperature" : 6.25,
+	"time" : "2016-02-11 03:32:35",
+	"type" : "AUT",
+	"latitude" : -34.825066,
+	"longitude" : 148.358368,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17765,
+	"battery" : 4058,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 03:31:43",
+	"type" : "AUT",
+	"latitude" : -34.804638,
+	"longitude" : 148.35432,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17766,
+	"battery" : 4057,
+	"temperature" : 5.5,
+	"time" : "2016-02-11 03:41:50",
+	"type" : "AUT",
+	"latitude" : -34.802771,
+	"longitude" : 148.338671,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17778,
+	"battery" : 4123,
+	"temperature" : 5.5,
+	"time" : "2016-02-11 03:42:09",
+	"type" : "AUT",
+	"latitude" : -34.831075,
+	"longitude" : 148.338471,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17779,
+	"battery" : 4124,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 03:52:09",
+	"type" : "AUT",
+	"latitude" : -34.945844,
+	"longitude" : 148.158818,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17780,
+	"battery" : 3918,
+	"temperature" : 6,
+	"time" : "2016-02-11 03:42:25",
+	"type" : "AUT",
+	"latitude" : -34.832815,
+	"longitude" : 148.332706,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17781,
+	"battery" : 3920,
+	"temperature" : 5.75,
+	"time" : "2016-02-11 03:52:21",
+	"type" : "AUT",
+	"latitude" : -34.94531,
+	"longitude" : 148.159851,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17783,
+	"battery" : 4058,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 03:52:00",
+	"type" : "AUT",
+	"latitude" : -34.986488,
+	"longitude" : 148.140644,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17791,
+	"battery" : 4124,
+	"temperature" : 5,
+	"time" : "2016-02-11 04:02:18",
+	"type" : "AUT",
+	"latitude" : -35.090589,
+	"longitude" : 148.07243,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17792,
+	"battery" : 3916,
+	"temperature" : 5.5,
+	"time" : "2016-02-11 04:02:26",
+	"type" : "AUT",
+	"latitude" : -35.068485,
+	"longitude" : 148.090167,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17793,
+	"battery" : 3916,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 04:12:24",
+	"type" : "AUT",
+	"latitude" : -35.125725,
+	"longitude" : 148.043839,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17799,
+	"battery" : 4058,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 04:01:52",
+	"type" : "AUT",
+	"latitude" : -35.07399,
+	"longitude" : 148.097076,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17801,
+	"battery" : 4056,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 04:11:55",
+	"type" : "AUT",
+	"latitude" : -35.115108,
+	"longitude" : 148.036942,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17809,
+	"battery" : 4124,
+	"temperature" : 5,
+	"time" : "2016-02-11 04:02:18",
+	"type" : "AUT",
+	"latitude" : -35.090589,
+	"longitude" : 148.07243,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17810,
+	"battery" : 4123,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 04:12:14",
+	"type" : "AUT",
+	"latitude" : -35.141125,
+	"longitude" : 147.954964,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17811,
+	"battery" : 4123,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 04:22:12",
+	"type" : "AUT",
+	"latitude" : -35.177428,
+	"longitude" : 147.858699,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17813,
+	"battery" : 3916,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 04:22:17",
+	"type" : "AUT",
+	"latitude" : -35.177428,
+	"longitude" : 147.858699,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17818,
+	"battery" : 4054,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 04:21:44",
+	"type" : "AUT",
+	"latitude" : -35.208609,
+	"longitude" : 147.808643,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17819,
+	"battery" : 4053,
+	"temperature" : 4.5,
+	"time" : "2016-02-11 04:31:54",
+	"type" : "AUT",
+	"latitude" : -35.297115,
+	"longitude" : 147.703964,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17824,
+	"battery" : 4117,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 04:32:18",
+	"type" : "AUT",
+	"latitude" : -35.290974,
+	"longitude" : 147.728565,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17825,
+	"battery" : 4123,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 04:33:08",
+	"type" : "STP",
+	"latitude" : -35.290974,
+	"longitude" : 147.728565,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17826,
+	"battery" : 4123,
+	"temperature" : 4.369999885559082,
+	"time" : "2016-02-11 04:42:16",
+	"type" : "AUT",
+	"latitude" : -35.290974,
+	"longitude" : 147.728565,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17830,
+	"battery" : 3915,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 04:32:24",
+	"type" : "AUT",
+	"latitude" : -35.271759,
+	"longitude" : 147.745704,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17831,
+	"battery" : 3915,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 04:42:21",
+	"type" : "AUT",
+	"latitude" : -35.271759,
+	"longitude" : 147.745704,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17837,
+	"battery" : 4056,
+	"temperature" : 4.369999885559082,
+	"time" : "2016-02-11 04:42:03",
+	"type" : "AUT",
+	"latitude" : -35.297115,
+	"longitude" : 147.703964,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17838,
+	"battery" : 4055,
+	"temperature" : 4.25,
+	"time" : "2016-02-11 04:51:46",
+	"type" : "AUT",
+	"latitude" : -35.297115,
+	"longitude" : 147.703964,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17847,
+	"battery" : 4123,
+	"temperature" : 4.25,
+	"time" : "2016-02-11 04:52:31",
+	"type" : "AUT",
+	"latitude" : -35.290974,
+	"longitude" : 147.728565,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17848,
+	"battery" : 4122,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:02:33",
+	"type" : "AUT",
+	"latitude" : -35.290974,
+	"longitude" : 147.728565,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17851,
+	"battery" : 3915,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 04:52:39",
+	"type" : "AUT",
+	"latitude" : -35.271759,
+	"longitude" : 147.745704,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17852,
+	"battery" : 3915,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 05:02:37",
+	"type" : "AUT",
+	"latitude" : -35.271759,
+	"longitude" : 147.745704,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17854,
+	"battery" : 4051,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:01:56",
+	"type" : "AUT",
+	"latitude" : -35.296883,
+	"longitude" : 147.704224,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17858,
+	"battery" : 4122,
+	"temperature" : 4.25,
+	"time" : "2016-02-11 05:03:37",
+	"type" : "VIB",
+	"latitude" : -35.296897,
+	"longitude" : 147.724384,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17859,
+	"battery" : 4123,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:12:17",
+	"type" : "AUT",
+	"latitude" : -35.296897,
+	"longitude" : 147.724384,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17869,
+	"battery" : 3914,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 05:12:34",
+	"type" : "AUT",
+	"latitude" : -35.346373,
+	"longitude" : 147.650498,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17870,
+	"battery" : 3915,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 05:22:23",
+	"type" : "AUT",
+	"latitude" : -35.455936,
+	"longitude" : 147.542018,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17871,
+	"battery" : 4052,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:11:50",
+	"type" : "AUT",
+	"latitude" : -35.296883,
+	"longitude" : 147.704224,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17872,
+	"battery" : 4052,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:22:01",
+	"type" : "AUT",
+	"latitude" : -35.483563,
+	"longitude" : 147.586485,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17876,
+	"battery" : 4123,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:22:12",
+	"type" : "AUT",
+	"latitude" : -35.417463,
+	"longitude" : 147.613246,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17878,
+	"battery" : 4121,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:32:11",
+	"type" : "AUT",
+	"latitude" : -35.63895,
+	"longitude" : 147.453124,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17882,
+	"battery" : 3915,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 05:32:21",
+	"type" : "AUT",
+	"latitude" : -35.63895,
+	"longitude" : 147.453124,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17883,
+	"battery" : 4052,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:31:41",
+	"type" : "AUT",
+	"latitude" : -35.616995,
+	"longitude" : 147.48261,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17884,
+	"battery" : 4052,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:41:45",
+	"type" : "AUT",
+	"latitude" : -35.701036,
+	"longitude" : 147.339706,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17892,
+	"battery" : 4122,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:42:20",
+	"type" : "AUT",
+	"latitude" : -35.63895,
+	"longitude" : 147.453124,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17895,
+	"battery" : 4121,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:52:17",
+	"type" : "AUT",
+	"latitude" : -35.714769,
+	"longitude" : 147.3222,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17902,
+	"battery" : 3910,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 05:42:23",
+	"type" : "AUT",
+	"latitude" : -35.634595,
+	"longitude" : 147.386499,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17903,
+	"battery" : 3910,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 05:52:24",
+	"type" : "AUT",
+	"latitude" : -35.714769,
+	"longitude" : 147.3222,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17905,
+	"battery" : 4052,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 05:51:39",
+	"type" : "AUT",
+	"latitude" : -35.700066,
+	"longitude" : 147.34566,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17912,
+	"battery" : 4118,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 06:02:19",
+	"type" : "AUT",
+	"latitude" : -35.714769,
+	"longitude" : 147.3222,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17913,
+	"battery" : 4118,
+	"temperature" : 4,
+	"time" : "2016-02-11 06:12:18",
+	"type" : "AUT",
+	"latitude" : -35.804335,
+	"longitude" : 147.092198,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17915,
+	"battery" : 3911,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 06:02:42",
+	"type" : "AUT",
+	"latitude" : -35.714769,
+	"longitude" : 147.3222,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17916,
+	"battery" : 3910,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 06:12:25",
+	"type" : "AUT",
+	"latitude" : -35.804335,
+	"longitude" : 147.092198,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17917,
+	"battery" : 4051,
+	"temperature" : 4,
+	"time" : "2016-02-11 06:01:50",
+	"type" : "AUT",
+	"latitude" : -35.709113,
+	"longitude" : 147.331467,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17918,
+	"battery" : 4052,
+	"temperature" : 4,
+	"time" : "2016-02-11 06:12:01",
+	"type" : "AUT",
+	"latitude" : -35.922394,
+	"longitude" : 147.06639,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17927,
+	"battery" : 4114,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 06:22:31",
+	"type" : "AUT",
+	"latitude" : -35.948205,
+	"longitude" : 147.039496,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17928,
+	"battery" : 3910,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 06:22:41",
+	"type" : "AUT",
+	"latitude" : -35.953126,
+	"longitude" : 147.03558,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17929,
+	"battery" : 3910,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 06:32:27",
+	"type" : "AUT",
+	"latitude" : -36.052617,
+	"longitude" : 146.942081,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17930,
+	"battery" : 4049,
+	"temperature" : 4,
+	"time" : "2016-02-11 06:21:38",
+	"type" : "AUT",
+	"latitude" : -35.957165,
+	"longitude" : 147.057922,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17931,
+	"battery" : 4052,
+	"temperature" : 4,
+	"time" : "2016-02-11 06:31:46",
+	"type" : "AUT",
+	"latitude" : -36.068244,
+	"longitude" : 146.972465,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17938,
+	"battery" : 4117,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 06:32:10",
+	"type" : "AUT",
+	"latitude" : -36.044159,
+	"longitude" : 146.989853,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17940,
+	"battery" : 4116,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 06:42:21",
+	"type" : "AUT",
+	"latitude" : -36.096992,
+	"longitude" : 146.81311,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17941,
+	"battery" : 3908,
+	"temperature" : 4.75,
+	"time" : "2016-02-11 06:42:33",
+	"type" : "AUT",
+	"latitude" : -36.096992,
+	"longitude" : 146.81311,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17942,
+	"battery" : 4049,
+	"temperature" : 4,
+	"time" : "2016-02-11 06:41:40",
+	"type" : "AUT",
+	"latitude" : -36.125266,
+	"longitude" : 146.855744,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17950,
+	"battery" : 4117,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 06:52:17",
+	"type" : "AUT",
+	"latitude" : -36.133911,
+	"longitude" : 146.671478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17956,
+	"battery" : 4049,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 06:51:55",
+	"type" : "AUT",
+	"latitude" : -36.10223,
+	"longitude" : 146.675774,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17957,
+	"battery" : 4050,
+	"temperature" : 4,
+	"time" : "2016-02-11 07:01:47",
+	"type" : "AUT",
+	"latitude" : -36.095608,
+	"longitude" : 146.505895,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17958,
+	"battery" : 3908,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 06:52:34",
+	"type" : "AUT",
+	"latitude" : -36.133257,
+	"longitude" : 146.671157,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17959,
+	"battery" : 3910,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 07:02:17",
+	"type" : "AUT",
+	"latitude" : -36.132654,
+	"longitude" : 146.573257,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17961,
+	"battery" : 4050,
+	"temperature" : 4,
+	"time" : "2016-02-11 07:11:51",
+	"type" : "AUT",
+	"latitude" : -36.350226,
+	"longitude" : 146.34514,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17963,
+	"battery" : 4116,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 07:02:09",
+	"type" : "AUT",
+	"latitude" : -36.141754,
+	"longitude" : 146.581025,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17964,
+	"battery" : 4117,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 07:12:31",
+	"type" : "AUT",
+	"latitude" : -36.303722,
+	"longitude" : 146.377167,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 17967,
+	"battery" : 4048,
+	"temperature" : 4,
+	"time" : "2016-02-11 07:21:38",
+	"type" : "AUT",
+	"latitude" : -36.38499,
+	"longitude" : 146.304155,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17968,
+	"battery" : 4051,
+	"temperature" : 4,
+	"time" : "2016-02-11 07:31:51",
+	"type" : "AUT",
+	"latitude" : -36.407945,
+	"longitude" : 146.289192,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17969,
+	"battery" : 3906,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 07:12:32",
+	"type" : "AUT",
+	"latitude" : -36.338265,
+	"longitude" : 146.656539,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17970,
+	"battery" : 3898,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 07:22:31",
+	"type" : "AUT",
+	"latitude" : -36.380861,
+	"longitude" : 146.320782,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17971,
+	"battery" : 3900,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 07:32:35",
+	"type" : "AUT",
+	"latitude" : -36.509392,
+	"longitude" : 146.090208,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 17977,
+	"battery" : 4046,
+	"temperature" : 4,
+	"time" : "2016-02-11 07:41:53",
+	"type" : "AUT",
+	"latitude" : -36.559919,
+	"longitude" : 146.016066,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17989,
+	"battery" : 4052,
+	"temperature" : 4,
+	"time" : "2016-02-11 07:51:37",
+	"type" : "AUT",
+	"latitude" : -36.596207,
+	"longitude" : 145.894689,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17990,
+	"battery" : 4048,
+	"temperature" : 4,
+	"time" : "2016-02-11 08:01:44",
+	"type" : "AUT",
+	"latitude" : -36.649907,
+	"longitude" : 145.70913,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17991,
+	"battery" : 4048,
+	"temperature" : 4,
+	"time" : "2016-02-11 08:11:37",
+	"type" : "AUT",
+	"latitude" : -36.780243,
+	"longitude" : 145.557813,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17998,
+	"battery" : 4047,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-11 08:21:47",
+	"type" : "AUT",
+	"latitude" : -36.796688,
+	"longitude" : 145.49655,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 17999,
+	"battery" : 3903,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 07:42:17",
+	"type" : "AUT",
+	"latitude" : -36.547156,
+	"longitude" : 146.031156,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18000,
+	"battery" : 3903,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 07:42:17",
+	"type" : "AUT",
+	"latitude" : -36.547156,
+	"longitude" : 146.031156,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18001,
+	"battery" : 3900,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 07:52:19",
+	"type" : "AUT",
+	"latitude" : -36.599144,
+	"longitude" : 145.869354,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18002,
+	"battery" : 3900,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 07:52:19",
+	"type" : "AUT",
+	"latitude" : -36.599144,
+	"longitude" : 145.869354,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18003,
+	"battery" : 3897,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 08:02:17",
+	"type" : "AUT",
+	"latitude" : -36.659676,
+	"longitude" : 145.671465,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18004,
+	"battery" : 3897,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 08:02:17",
+	"type" : "AUT",
+	"latitude" : -36.659676,
+	"longitude" : 145.671465,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18005,
+	"battery" : 3888,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 08:12:17",
+	"type" : "AUT",
+	"latitude" : -36.755672,
+	"longitude" : 145.57312,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18006,
+	"battery" : 3888,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 08:12:17",
+	"type" : "AUT",
+	"latitude" : -36.755672,
+	"longitude" : 145.57312,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18007,
+	"battery" : 3884,
+	"temperature" : 5.75,
+	"time" : "2016-02-11 08:22:34",
+	"type" : "AUT",
+	"latitude" : -36.810216,
+	"longitude" : 145.452384,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18008,
+	"battery" : 4116,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 07:02:09",
+	"type" : "AUT",
+	"latitude" : -36.141754,
+	"longitude" : 146.581025,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18009,
+	"battery" : 4117,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 07:12:31",
+	"type" : "AUT",
+	"latitude" : -36.303722,
+	"longitude" : 146.377167,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18010,
+	"battery" : 4113,
+	"temperature" : 4.5,
+	"time" : "2016-02-11 07:22:21",
+	"type" : "AUT",
+	"latitude" : -36.385216,
+	"longitude" : 146.31674,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18011,
+	"battery" : 4116,
+	"temperature" : 4.25,
+	"time" : "2016-02-11 07:32:08",
+	"type" : "AUT",
+	"latitude" : -36.510434,
+	"longitude" : 146.087895,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18012,
+	"battery" : 4110,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 07:42:11",
+	"type" : "AUT",
+	"latitude" : -36.545884,
+	"longitude" : 146.032011,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18013,
+	"battery" : 4105,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 07:52:25",
+	"type" : "AUT",
+	"latitude" : -36.604329,
+	"longitude" : 145.863241,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18014,
+	"battery" : 4104,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 08:02:10",
+	"type" : "AUT",
+	"latitude" : -36.665193,
+	"longitude" : 145.669374,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18015,
+	"battery" : 4106,
+	"temperature" : 5.5,
+	"time" : "2016-02-11 08:12:08",
+	"type" : "AUT",
+	"latitude" : -36.755672,
+	"longitude" : 145.57312,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18016,
+	"battery" : 4095,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 08:22:11",
+	"type" : "AUT",
+	"latitude" : -36.822468,
+	"longitude" : 145.421906,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18017,
+	"battery" : 4096,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 08:32:20",
+	"type" : "AUT",
+	"latitude" : -36.829486,
+	"longitude" : 145.295535,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18018,
+	"battery" : 4048,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-11 08:31:57",
+	"type" : "AUT",
+	"latitude" : -36.846959,
+	"longitude" : 145.207654,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18019,
+	"battery" : 4045,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-11 08:41:50",
+	"type" : "AUT",
+	"latitude" : -37.015793,
+	"longitude" : 145.105568,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18030,
+	"battery" : 4047,
+	"temperature" : 3.75,
+	"time" : "2016-02-11 08:51:40",
+	"type" : "AUT",
+	"latitude" : -37.017726,
+	"longitude" : 145.14211,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18039,
+	"battery" : 4046,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-11 09:01:43",
+	"type" : "AUT",
+	"latitude" : -37.18412,
+	"longitude" : 145.045521,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18059,
+	"battery" : 4044,
+	"temperature" : 3.75,
+	"time" : "2016-02-11 09:11:40",
+	"type" : "AUT",
+	"latitude" : -37.325316,
+	"longitude" : 145.025431,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18060,
+	"battery" : 4047,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-11 09:21:48",
+	"type" : "AUT",
+	"latitude" : -37.468422,
+	"longitude" : 144.950471,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18061,
+	"battery" : 3888,
+	"temperature" : 5.75,
+	"time" : "2016-02-11 08:32:28",
+	"type" : "AUT",
+	"latitude" : -36.861997,
+	"longitude" : 145.209926,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18062,
+	"battery" : 3893,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 08:42:35",
+	"type" : "AUT",
+	"latitude" : -36.999075,
+	"longitude" : 145.147436,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18063,
+	"battery" : 3883,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 08:52:18",
+	"type" : "AUT",
+	"latitude" : -37.061797,
+	"longitude" : 145.102722,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18064,
+	"battery" : 3876,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 09:02:21",
+	"type" : "AUT",
+	"latitude" : -37.210278,
+	"longitude" : 145.061906,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18065,
+	"battery" : 3882,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 09:12:19",
+	"type" : "AUT",
+	"latitude" : -37.373641,
+	"longitude" : 144.987007,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18066,
+	"battery" : 3877,
+	"temperature" : 5.5,
+	"time" : "2016-02-11 09:22:31",
+	"type" : "AUT",
+	"latitude" : -37.495712,
+	"longitude" : 144.950531,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18083,
+	"battery" : 4100,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 08:42:11",
+	"type" : "AUT",
+	"latitude" : -37.017457,
+	"longitude" : 145.146988,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18084,
+	"battery" : 4101,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 08:52:09",
+	"type" : "AUT",
+	"latitude" : -37.060363,
+	"longitude" : 145.10281,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18085,
+	"battery" : 4095,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 09:02:10",
+	"type" : "AUT",
+	"latitude" : -37.197388,
+	"longitude" : 145.065424,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18086,
+	"battery" : 4093,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 09:12:10",
+	"type" : "AUT",
+	"latitude" : -37.354079,
+	"longitude" : 145.018334,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18087,
+	"battery" : 4095,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 09:22:28",
+	"type" : "AUT",
+	"latitude" : -37.495712,
+	"longitude" : 144.950531,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18155,
+	"battery" : 4100,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 08:42:11",
+	"type" : "AUT",
+	"latitude" : -37.017457,
+	"longitude" : 145.146988,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18156,
+	"battery" : 4101,
+	"temperature" : 4.869999885559082,
+	"time" : "2016-02-11 08:52:09",
+	"type" : "AUT",
+	"latitude" : -37.060363,
+	"longitude" : 145.10281,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18157,
+	"battery" : 4095,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 09:02:10",
+	"type" : "AUT",
+	"latitude" : -37.197388,
+	"longitude" : 145.065424,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18158,
+	"battery" : 4093,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 09:12:10",
+	"type" : "AUT",
+	"latitude" : -37.354079,
+	"longitude" : 145.018334,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18159,
+	"battery" : 4095,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 09:22:28",
+	"type" : "AUT",
+	"latitude" : -37.495712,
+	"longitude" : 144.950531,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18160,
+	"battery" : 4094,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 09:32:10",
+	"type" : "AUT",
+	"latitude" : -37.611236,
+	"longitude" : 144.973061,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18162,
+	"battery" : 3888,
+	"temperature" : 5.75,
+	"time" : "2016-02-11 08:32:28",
+	"type" : "AUT",
+	"latitude" : -36.861997,
+	"longitude" : 145.209926,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18163,
+	"battery" : 3893,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 08:42:35",
+	"type" : "AUT",
+	"latitude" : -36.999075,
+	"longitude" : 145.147436,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18164,
+	"battery" : 3883,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-11 08:52:18",
+	"type" : "AUT",
+	"latitude" : -37.061797,
+	"longitude" : 145.102722,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18165,
+	"battery" : 3876,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 09:02:21",
+	"type" : "AUT",
+	"latitude" : -37.210278,
+	"longitude" : 145.061906,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18166,
+	"battery" : 3882,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 09:12:19",
+	"type" : "AUT",
+	"latitude" : -37.373641,
+	"longitude" : 144.987007,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18167,
+	"battery" : 3877,
+	"temperature" : 5.5,
+	"time" : "2016-02-11 09:22:31",
+	"type" : "AUT",
+	"latitude" : -37.495712,
+	"longitude" : 144.950531,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18168,
+	"battery" : 3880,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 09:32:31",
+	"type" : "AUT",
+	"latitude" : -37.631281,
+	"longitude" : 144.992179,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18171,
+	"battery" : 4044,
+	"temperature" : 4,
+	"time" : "2016-02-11 09:31:43",
+	"type" : "AUT",
+	"latitude" : -37.626819,
+	"longitude" : 144.954001,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18172,
+	"battery" : 4047,
+	"temperature" : 4.25,
+	"time" : "2016-02-11 09:41:55",
+	"type" : "AUT",
+	"latitude" : -37.691302,
+	"longitude" : 144.954417,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18182,
+	"battery" : 4095,
+	"temperature" : 5.369999885559082,
+	"time" : "2016-02-11 09:42:09",
+	"type" : "AUT",
+	"latitude" : -37.691121,
+	"longitude" : 144.959438,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18183,
+	"battery" : 4095,
+	"temperature" : 5.869999885559082,
+	"time" : "2016-02-11 09:51:43",
+	"type" : "STP",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18184,
+	"battery" : 4091,
+	"temperature" : 5.869999885559082,
+	"time" : "2016-02-11 09:52:24",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18186,
+	"battery" : 3882,
+	"temperature" : 5.5,
+	"time" : "2016-02-11 09:42:37",
+	"type" : "AUT",
+	"latitude" : -37.690673,
+	"longitude" : 144.959291,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18187,
+	"battery" : 3879,
+	"temperature" : 6.5,
+	"time" : "2016-02-11 09:51:42",
+	"type" : "STP",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18188,
+	"battery" : 3883,
+	"temperature" : 6.369999885559082,
+	"time" : "2016-02-11 09:52:20",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18189,
+	"battery" : 4047,
+	"temperature" : 5.5,
+	"time" : "2016-02-11 09:51:35",
+	"type" : "STP",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18190,
+	"battery" : 4047,
+	"temperature" : 5.5,
+	"time" : "2016-02-11 09:51:51",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18199,
+	"battery" : 4094,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 10:02:28",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18202,
+	"battery" : 3883,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-11 10:02:40",
+	"type" : "AUT",
+	"latitude" : -37.689418,
+	"longitude" : 144.958813,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18203,
+	"battery" : 3881,
+	"temperature" : 5,
+	"time" : "2016-02-11 10:12:18",
+	"type" : "AUT",
+	"latitude" : -37.688907,
+	"longitude" : 144.958635,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18204,
+	"battery" : 4047,
+	"temperature" : 5.25,
+	"time" : "2016-02-11 10:02:01",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18205,
+	"battery" : 4047,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 10:11:41",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18211,
+	"battery" : 4093,
+	"temperature" : 4.619999885559082,
+	"time" : "2016-02-11 10:12:30",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18212,
+	"battery" : 4091,
+	"temperature" : 4,
+	"time" : "2016-02-11 10:22:30",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18217,
+	"battery" : 4046,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-11 10:21:59",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18218,
+	"battery" : 3881,
+	"temperature" : 4.369999885559082,
+	"time" : "2016-02-11 10:22:32",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18219,
+	"battery" : 4047,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-11 10:26:05",
+	"type" : "VIB",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18220,
+	"battery" : 4045,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-11 10:28:48",
+	"type" : "STP",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18221,
+	"battery" : 4047,
+	"temperature" : 3.5,
+	"time" : "2016-02-11 10:31:38",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18222,
+	"battery" : 3880,
+	"temperature" : 3.75,
+	"time" : "2016-02-11 10:32:28",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18236,
+	"battery" : 4093,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-11 10:32:12",
+	"type" : "AUT",
+	"latitude" : -37.688627,
+	"longitude" : 144.958471,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18238,
+	"battery" : 4091,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 10:42:25",
+	"type" : "AUT",
+	"latitude" : -37.686375,
+	"longitude" : 144.937454,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18241,
+	"battery" : 4047,
+	"temperature" : 3,
+	"time" : "2016-02-11 10:42:01",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18242,
+	"battery" : 3881,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 10:42:39",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18248,
+	"battery" : 4089,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 10:52:25",
+	"type" : "AUT",
+	"latitude" : -37.690139,
+	"longitude" : 144.959064,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18249,
+	"battery" : 4091,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 11:02:28",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18252,
+	"battery" : 4047,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 10:51:56",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18254,
+	"battery" : 4047,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 11:01:51",
+	"type" : "AUT",
+	"latitude" : -37.674068,
+	"longitude" : 144.943255,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18255,
+	"battery" : 3878,
+	"temperature" : 3,
+	"time" : "2016-02-11 10:52:29",
+	"type" : "AUT",
+	"latitude" : -37.690684,
+	"longitude" : 144.95929,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18256,
+	"battery" : 3877,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 11:02:24",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18263,
+	"battery" : 4091,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 11:12:21",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18270,
+	"battery" : 4047,
+	"temperature" : 2.369999885559082,
+	"time" : "2016-02-11 11:11:49",
+	"type" : "AUT",
+	"latitude" : -37.673925,
+	"longitude" : 144.943313,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18271,
+	"battery" : 4047,
+	"temperature" : 2.369999885559082,
+	"time" : "2016-02-11 11:21:46",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18276,
+	"battery" : 3878,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 11:12:26",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18277,
+	"battery" : 3878,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 11:22:38",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18281,
+	"battery" : 4091,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 11:22:13",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18282,
+	"battery" : 4090,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 11:32:20",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18285,
+	"battery" : 4047,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 11:31:58",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18288,
+	"battery" : 3877,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 11:32:39",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18289,
+	"battery" : 3877,
+	"temperature" : 3,
+	"time" : "2016-02-11 11:42:28",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18292,
+	"battery" : 4091,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 11:42:23",
+	"type" : "AUT",
+	"latitude" : -37.689072,
+	"longitude" : 144.958604,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18294,
+	"battery" : 4090,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 11:52:25",
+	"type" : "AUT",
+	"latitude" : -37.689022,
+	"longitude" : 144.958589,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18302,
+	"battery" : 4047,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 11:42:01",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18303,
+	"battery" : 4043,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 11:51:59",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18304,
+	"battery" : 3877,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 11:52:32",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18308,
+	"battery" : 4090,
+	"temperature" : 3,
+	"time" : "2016-02-11 12:02:19",
+	"type" : "AUT",
+	"latitude" : -37.689086,
+	"longitude" : 144.958608,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18309,
+	"battery" : 4087,
+	"temperature" : 3,
+	"time" : "2016-02-11 12:12:10",
+	"type" : "AUT",
+	"latitude" : -37.688976,
+	"longitude" : 144.958575,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18312,
+	"battery" : 4045,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 12:01:38",
+	"type" : "AUT",
+	"latitude" : -37.672354,
+	"longitude" : 144.94395,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18313,
+	"battery" : 4045,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 12:11:47",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18315,
+	"battery" : 3877,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 12:02:43",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18316,
+	"battery" : 3877,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 12:12:31",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18323,
+	"battery" : 4090,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 12:22:07",
+	"type" : "AUT",
+	"latitude" : -37.689183,
+	"longitude" : 144.958637,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18326,
+	"battery" : 4044,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 12:21:55",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18331,
+	"battery" : 3877,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 12:22:29",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18332,
+	"battery" : 3877,
+	"temperature" : 3.5,
+	"time" : "2016-02-11 12:32:43",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18339,
+	"battery" : 4090,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 12:32:14",
+	"type" : "AUT",
+	"latitude" : -37.689183,
+	"longitude" : 144.958637,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18340,
+	"battery" : 4089,
+	"temperature" : 3.5,
+	"time" : "2016-02-11 12:42:23",
+	"type" : "AUT",
+	"latitude" : -37.689516,
+	"longitude" : 144.958736,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18341,
+	"battery" : 4041,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 12:31:51",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18342,
+	"battery" : 4040,
+	"temperature" : 3.5,
+	"time" : "2016-02-11 12:41:44",
+	"type" : "AUT",
+	"latitude" : -37.68787,
+	"longitude" : 144.957256,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18344,
+	"battery" : 3877,
+	"temperature" : 3.75,
+	"time" : "2016-02-11 12:42:33",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18352,
+	"battery" : 4089,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-11 12:52:13",
+	"type" : "AUT",
+	"latitude" : -37.688248,
+	"longitude" : 144.95845,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18353,
+	"battery" : 4090,
+	"temperature" : 3.5,
+	"time" : "2016-02-11 13:02:30",
+	"type" : "AUT",
+	"latitude" : -37.688267,
+	"longitude" : 144.958459,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18354,
+	"battery" : 4045,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-11 12:52:00",
+	"type" : "AUT",
+	"latitude" : -37.675728,
+	"longitude" : 144.942581,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18355,
+	"battery" : 4041,
+	"temperature" : 3.5,
+	"time" : "2016-02-11 13:01:39",
+	"type" : "AUT",
+	"latitude" : -37.675728,
+	"longitude" : 144.942581,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18360,
+	"battery" : 3873,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-11 12:52:32",
+	"type" : "AUT",
+	"latitude" : -37.689133,
+	"longitude" : 144.958622,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18361,
+	"battery" : 3877,
+	"temperature" : 3.75,
+	"time" : "2016-02-11 13:02:33",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18367,
+	"battery" : 4042,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 13:11:37",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18368,
+	"battery" : 4042,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 13:21:38",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18369,
+	"battery" : 4090,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 13:12:32",
+	"type" : "AUT",
+	"latitude" : -37.689222,
+	"longitude" : 144.958726,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18370,
+	"battery" : 4086,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 13:22:21",
+	"type" : "AUT",
+	"latitude" : -37.688444,
+	"longitude" : 144.958543,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18372,
+	"battery" : 3875,
+	"temperature" : 3.5,
+	"time" : "2016-02-11 13:12:35",
+	"type" : "AUT",
+	"latitude" : -37.68831,
+	"longitude" : 144.958479,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18374,
+	"battery" : 3875,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 13:22:38",
+	"type" : "AUT",
+	"latitude" : -37.688501,
+	"longitude" : 144.95857,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18380,
+	"battery" : 4040,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 13:31:50",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18381,
+	"battery" : 4087,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 13:32:15",
+	"type" : "AUT",
+	"latitude" : -37.688288,
+	"longitude" : 144.958468,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18384,
+	"battery" : 3877,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 13:32:34",
+	"type" : "AUT",
+	"latitude" : -37.689813,
+	"longitude" : 144.958962,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18385,
+	"battery" : 3874,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 13:42:23",
+	"type" : "AUT",
+	"latitude" : -37.689626,
+	"longitude" : 144.958906,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18395,
+	"battery" : 4041,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 13:41:57",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18396,
+	"battery" : 4041,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 13:51:41",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18398,
+	"battery" : 4086,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 13:42:13",
+	"type" : "AUT",
+	"latitude" : -37.689318,
+	"longitude" : 144.95876,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18400,
+	"battery" : 4086,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 13:52:18",
+	"type" : "AUT",
+	"latitude" : -37.689386,
+	"longitude" : 144.958831,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18401,
+	"battery" : 3873,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 13:52:17",
+	"type" : "AUT",
+	"latitude" : -37.688691,
+	"longitude" : 144.958661,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18408,
+	"battery" : 4041,
+	"temperature" : 3,
+	"time" : "2016-02-11 14:01:40",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18409,
+	"battery" : 4040,
+	"temperature" : 3,
+	"time" : "2016-02-11 14:11:50",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18410,
+	"battery" : 4085,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:02:21",
+	"type" : "AUT",
+	"latitude" : -37.689449,
+	"longitude" : 144.958796,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18411,
+	"battery" : 4087,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:12:09",
+	"type" : "AUT",
+	"latitude" : -37.689418,
+	"longitude" : 144.958813,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18413,
+	"battery" : 3871,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:02:28",
+	"type" : "AUT",
+	"latitude" : -37.689626,
+	"longitude" : 144.958906,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18414,
+	"battery" : 3873,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:12:35",
+	"type" : "AUT",
+	"latitude" : -37.689659,
+	"longitude" : 144.958889,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18424,
+	"battery" : 4040,
+	"temperature" : 3,
+	"time" : "2016-02-11 14:21:45",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18425,
+	"battery" : 4085,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:22:14",
+	"type" : "AUT",
+	"latitude" : -37.689392,
+	"longitude" : 144.958794,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18426,
+	"battery" : 4085,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:32:16",
+	"type" : "AUT",
+	"latitude" : -37.689367,
+	"longitude" : 144.958795,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18428,
+	"battery" : 3873,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 14:22:33",
+	"type" : "AUT",
+	"latitude" : -37.688501,
+	"longitude" : 144.95857,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18429,
+	"battery" : 3873,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 14:32:19",
+	"type" : "AUT",
+	"latitude" : -37.68953,
+	"longitude" : 144.958854,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18436,
+	"battery" : 4041,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:31:55",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18437,
+	"battery" : 4041,
+	"temperature" : 3,
+	"time" : "2016-02-11 14:42:01",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18438,
+	"battery" : 4085,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:42:21",
+	"type" : "AUT",
+	"latitude" : -37.689367,
+	"longitude" : 144.958795,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18441,
+	"battery" : 3870,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:42:20",
+	"type" : "AUT",
+	"latitude" : -37.68953,
+	"longitude" : 144.958854,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18442,
+	"battery" : 3872,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:52:32",
+	"type" : "AUT",
+	"latitude" : -37.688691,
+	"longitude" : 144.958661,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18451,
+	"battery" : 4041,
+	"temperature" : 3,
+	"time" : "2016-02-11 14:51:38",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18452,
+	"battery" : 4040,
+	"temperature" : 3,
+	"time" : "2016-02-11 15:01:38",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18455,
+	"battery" : 4085,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 14:52:33",
+	"type" : "AUT",
+	"latitude" : -37.689269,
+	"longitude" : 144.958742,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18456,
+	"battery" : 4085,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 15:02:22",
+	"type" : "AUT",
+	"latitude" : -37.689489,
+	"longitude" : 144.958828,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18457,
+	"battery" : 3872,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 15:02:29",
+	"type" : "AUT",
+	"latitude" : -37.689689,
+	"longitude" : 144.95893,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18462,
+	"battery" : 4041,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 15:11:49",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18463,
+	"battery" : 4085,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 15:12:30",
+	"type" : "AUT",
+	"latitude" : -37.689418,
+	"longitude" : 144.958813,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18464,
+	"battery" : 4085,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 15:22:16",
+	"type" : "AUT",
+	"latitude" : -37.689542,
+	"longitude" : 144.958847,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18466,
+	"battery" : 3863,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 15:12:18",
+	"type" : "AUT",
+	"latitude" : -37.688567,
+	"longitude" : 144.958601,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18467,
+	"battery" : 3872,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 15:22:24",
+	"type" : "AUT",
+	"latitude" : -37.688731,
+	"longitude" : 144.95868,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18479,
+	"battery" : 4040,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 15:21:57",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18480,
+	"battery" : 4041,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 15:31:50",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18481,
+	"battery" : 4085,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 15:32:32",
+	"type" : "AUT",
+	"latitude" : -37.689269,
+	"longitude" : 144.958742,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18482,
+	"battery" : 4085,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 15:42:21",
+	"type" : "AUT",
+	"latitude" : -37.689427,
+	"longitude" : 144.958798,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18484,
+	"battery" : 3872,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 15:32:20",
+	"type" : "AUT",
+	"latitude" : -37.688567,
+	"longitude" : 144.958601,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18485,
+	"battery" : 3872,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 15:42:25",
+	"type" : "AUT",
+	"latitude" : -37.688774,
+	"longitude" : 144.9587,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18487,
+	"battery" : 4041,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 15:51:38",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18490,
+	"battery" : 4041,
+	"temperature" : 3,
+	"time" : "2016-02-11 15:41:54",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18495,
+	"battery" : 4084,
+	"temperature" : 3,
+	"time" : "2016-02-11 15:52:19",
+	"type" : "AUT",
+	"latitude" : -37.689472,
+	"longitude" : 144.958833,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18496,
+	"battery" : 3872,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 15:52:32",
+	"type" : "AUT",
+	"latitude" : -37.688731,
+	"longitude" : 144.95868,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18497,
+	"battery" : 3871,
+	"temperature" : 3,
+	"time" : "2016-02-11 16:02:38",
+	"type" : "AUT",
+	"latitude" : -37.688605,
+	"longitude" : 144.958619,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18505,
+	"battery" : 4041,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 16:01:56",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18506,
+	"battery" : 4040,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 16:11:49",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18510,
+	"battery" : 4083,
+	"temperature" : 3,
+	"time" : "2016-02-11 16:02:26",
+	"type" : "AUT",
+	"latitude" : -37.688501,
+	"longitude" : 144.95857,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18511,
+	"battery" : 4085,
+	"temperature" : 3,
+	"time" : "2016-02-11 16:12:17",
+	"type" : "AUT",
+	"latitude" : -37.689472,
+	"longitude" : 144.958833,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18512,
+	"battery" : 3872,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 16:12:22",
+	"type" : "AUT",
+	"latitude" : -37.688691,
+	"longitude" : 144.958661,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18519,
+	"battery" : 4040,
+	"temperature" : 3,
+	"time" : "2016-02-11 16:21:40",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18520,
+	"battery" : 4082,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 16:22:27",
+	"type" : "AUT",
+	"latitude" : -37.688471,
+	"longitude" : 144.958556,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18522,
+	"battery" : 4079,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 16:32:19",
+	"type" : "AUT",
+	"latitude" : -37.688471,
+	"longitude" : 144.958556,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18523,
+	"battery" : 3872,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 16:22:40",
+	"type" : "AUT",
+	"latitude" : -37.688731,
+	"longitude" : 144.95868,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18524,
+	"battery" : 3872,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 16:32:20",
+	"type" : "AUT",
+	"latitude" : -37.688774,
+	"longitude" : 144.9587,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18534,
+	"battery" : 4041,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 16:31:44",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18536,
+	"battery" : 4040,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 16:41:41",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18537,
+	"battery" : 4080,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 16:42:21",
+	"type" : "AUT",
+	"latitude" : -37.688334,
+	"longitude" : 144.95849,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18538,
+	"battery" : 4080,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 16:52:15",
+	"type" : "AUT",
+	"latitude" : -37.689367,
+	"longitude" : 144.958795,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18540,
+	"battery" : 3870,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 16:42:37",
+	"type" : "AUT",
+	"latitude" : -37.689723,
+	"longitude" : 144.958911,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18541,
+	"battery" : 3867,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 16:52:17",
+	"type" : "AUT",
+	"latitude" : -37.688532,
+	"longitude" : 144.958585,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18545,
+	"battery" : 4037,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 16:51:42",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18546,
+	"battery" : 4041,
+	"temperature" : 3,
+	"time" : "2016-02-11 17:01:46",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18549,
+	"battery" : 4079,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 17:02:15",
+	"type" : "AUT",
+	"latitude" : -37.688471,
+	"longitude" : 144.958556,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18550,
+	"battery" : 4072,
+	"temperature" : 3,
+	"time" : "2016-02-11 17:12:23",
+	"type" : "AUT",
+	"latitude" : -37.688471,
+	"longitude" : 144.958556,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18551,
+	"battery" : 3869,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 17:02:31",
+	"type" : "AUT",
+	"latitude" : -37.688532,
+	"longitude" : 144.958585,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18552,
+	"battery" : 3870,
+	"temperature" : 3,
+	"time" : "2016-02-11 17:12:36",
+	"type" : "AUT",
+	"latitude" : -37.688655,
+	"longitude" : 144.958643,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18558,
+	"battery" : 4038,
+	"temperature" : 3,
+	"time" : "2016-02-11 17:11:42",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18566,
+	"battery" : 4079,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 17:22:24",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18567,
+	"battery" : 3867,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 17:22:21",
+	"type" : "AUT",
+	"latitude" : -37.689229,
+	"longitude" : 144.958651,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18574,
+	"battery" : 4030,
+	"temperature" : 3,
+	"time" : "2016-02-11 17:21:40",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18575,
+	"battery" : 4036,
+	"temperature" : 3,
+	"time" : "2016-02-11 17:31:58",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18576,
+	"battery" : 4079,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 17:32:14",
+	"type" : "AUT",
+	"latitude" : -37.688288,
+	"longitude" : 144.958468,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18577,
+	"battery" : 4079,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 17:42:18",
+	"type" : "AUT",
+	"latitude" : -37.68831,
+	"longitude" : 144.958479,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18579,
+	"battery" : 3867,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 17:32:18",
+	"type" : "AUT",
+	"latitude" : -37.688471,
+	"longitude" : 144.958556,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18580,
+	"battery" : 3866,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 17:42:20",
+	"type" : "AUT",
+	"latitude" : -37.688388,
+	"longitude" : 144.958516,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18585,
+	"battery" : 4036,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 17:41:54",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18586,
+	"battery" : 4036,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 17:51:41",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18596,
+	"battery" : 4079,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 17:52:12",
+	"type" : "AUT",
+	"latitude" : -37.688444,
+	"longitude" : 144.958543,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18597,
+	"battery" : 4079,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 18:02:17",
+	"type" : "AUT",
+	"latitude" : -37.688444,
+	"longitude" : 144.958543,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18598,
+	"battery" : 3869,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 17:52:37",
+	"type" : "AUT",
+	"latitude" : -37.688532,
+	"longitude" : 144.958585,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18599,
+	"battery" : 3864,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 18:02:28",
+	"type" : "AUT",
+	"latitude" : -37.688471,
+	"longitude" : 144.958556,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18602,
+	"battery" : 4036,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 18:01:56",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18603,
+	"battery" : 4034,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 18:11:54",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18608,
+	"battery" : 4079,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 18:12:19",
+	"type" : "AUT",
+	"latitude" : -37.688419,
+	"longitude" : 144.958531,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18609,
+	"battery" : 3866,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 18:12:28",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18610,
+	"battery" : 3866,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 18:22:28",
+	"type" : "AUT",
+	"latitude" : -37.688152,
+	"longitude" : 144.958404,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18614,
+	"battery" : 4032,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 18:21:50",
+	"type" : "AUT",
+	"latitude" : -37.675728,
+	"longitude" : 144.942581,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18622,
+	"battery" : 4072,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 18:22:29",
+	"type" : "AUT",
+	"latitude" : -37.688419,
+	"longitude" : 144.958531,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18623,
+	"battery" : 4079,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 18:32:17",
+	"type" : "AUT",
+	"latitude" : -37.688419,
+	"longitude" : 144.958531,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18624,
+	"battery" : 3865,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 18:32:29",
+	"type" : "AUT",
+	"latitude" : -37.689133,
+	"longitude" : 144.958622,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18629,
+	"battery" : 4035,
+	"temperature" : 3,
+	"time" : "2016-02-11 18:31:40",
+	"type" : "AUT",
+	"latitude" : -37.675728,
+	"longitude" : 144.942581,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18630,
+	"battery" : 4036,
+	"temperature" : 3,
+	"time" : "2016-02-11 18:41:58",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18636,
+	"battery" : 4078,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 18:42:24",
+	"type" : "AUT",
+	"latitude" : -37.688724,
+	"longitude" : 144.958676,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18637,
+	"battery" : 4078,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 18:52:16",
+	"type" : "AUT",
+	"latitude" : -37.68856,
+	"longitude" : 144.958598,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18639,
+	"battery" : 3866,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 18:42:42",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18640,
+	"battery" : 3866,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 18:52:37",
+	"type" : "AUT",
+	"latitude" : -37.689133,
+	"longitude" : 144.958622,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18641,
+	"battery" : 4036,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 18:51:51",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18642,
+	"battery" : 4035,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 19:01:40",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18651,
+	"battery" : 4075,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 19:02:18",
+	"type" : "AUT",
+	"latitude" : -37.68856,
+	"longitude" : 144.958598,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18652,
+	"battery" : 4075,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 19:12:26",
+	"type" : "AUT",
+	"latitude" : -37.68856,
+	"longitude" : 144.958598,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18655,
+	"battery" : 3865,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 19:02:34",
+	"type" : "AUT",
+	"latitude" : -37.689356,
+	"longitude" : 144.958689,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18656,
+	"battery" : 3866,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 19:12:40",
+	"type" : "AUT",
+	"latitude" : -37.689416,
+	"longitude" : 144.958706,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18658,
+	"battery" : 4036,
+	"temperature" : 3,
+	"time" : "2016-02-11 19:11:43",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18665,
+	"battery" : 4074,
+	"temperature" : 3,
+	"time" : "2016-02-11 19:22:23",
+	"type" : "AUT",
+	"latitude" : -37.68856,
+	"longitude" : 144.958598,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18666,
+	"battery" : 4075,
+	"temperature" : 3,
+	"time" : "2016-02-11 19:32:27",
+	"type" : "AUT",
+	"latitude" : -37.68856,
+	"longitude" : 144.958598,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18667,
+	"battery" : 3866,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 19:22:34",
+	"type" : "AUT",
+	"latitude" : -37.689229,
+	"longitude" : 144.958651,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18668,
+	"battery" : 3866,
+	"temperature" : 3,
+	"time" : "2016-02-11 19:32:34",
+	"type" : "AUT",
+	"latitude" : -37.689183,
+	"longitude" : 144.958637,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18670,
+	"battery" : 4035,
+	"temperature" : 3,
+	"time" : "2016-02-11 19:21:52",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18671,
+	"battery" : 4035,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 19:31:38",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18682,
+	"battery" : 4074,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 19:42:34",
+	"type" : "AUT",
+	"latitude" : -37.689438,
+	"longitude" : 144.958713,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18683,
+	"battery" : 3866,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 19:42:26",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18686,
+	"battery" : 4030,
+	"temperature" : 3,
+	"time" : "2016-02-11 19:41:47",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18687,
+	"battery" : 4031,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 19:52:00",
+	"type" : "AUT",
+	"latitude" : -37.687564,
+	"longitude" : 144.956937,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18703,
+	"battery" : 4074,
+	"temperature" : 3,
+	"time" : "2016-02-11 19:52:29",
+	"type" : "AUT",
+	"latitude" : -37.689986,
+	"longitude" : 144.958876,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18704,
+	"battery" : 4074,
+	"temperature" : 3,
+	"time" : "2016-02-11 20:02:20",
+	"type" : "AUT",
+	"latitude" : -37.690118,
+	"longitude" : 144.958916,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18706,
+	"battery" : 3866,
+	"temperature" : 3,
+	"time" : "2016-02-11 19:52:31",
+	"type" : "AUT",
+	"latitude" : -37.688873,
+	"longitude" : 144.958747,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18707,
+	"battery" : 3865,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 20:02:37",
+	"type" : "AUT",
+	"latitude" : -37.68886,
+	"longitude" : 144.958741,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18710,
+	"battery" : 4031,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 20:01:42",
+	"type" : "AUT",
+	"latitude" : -37.687013,
+	"longitude" : 144.956361,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18721,
+	"battery" : 4072,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 20:12:14",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18722,
+	"battery" : 4074,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 20:22:08",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18723,
+	"battery" : 3864,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 20:12:19",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18724,
+	"battery" : 3865,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 20:22:33",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18732,
+	"battery" : 4030,
+	"temperature" : 3,
+	"time" : "2016-02-11 20:11:55",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18733,
+	"battery" : 4031,
+	"temperature" : 3,
+	"time" : "2016-02-11 20:21:51",
+	"type" : "AUT",
+	"latitude" : -37.687367,
+	"longitude" : 144.956731,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18743,
+	"battery" : 4074,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 20:32:28",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18744,
+	"battery" : 3866,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-11 20:32:23",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18745,
+	"battery" : 3863,
+	"temperature" : 3.25,
+	"time" : "2016-02-11 20:42:36",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18749,
+	"battery" : 4030,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 20:31:45",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18750,
+	"battery" : 4031,
+	"temperature" : 3,
+	"time" : "2016-02-11 20:42:00",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18760,
+	"battery" : 4072,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-11 20:42:19",
+	"type" : "AUT",
+	"latitude" : -37.689389,
+	"longitude" : 144.958699,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18761,
+	"battery" : 4074,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 20:52:33",
+	"type" : "AUT",
+	"latitude" : -37.689279,
+	"longitude" : 144.958666,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18762,
+	"battery" : 3861,
+	"temperature" : 3,
+	"time" : "2016-02-11 20:52:38",
+	"type" : "AUT",
+	"latitude" : -37.688453,
+	"longitude" : 144.958547,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18765,
+	"battery" : 4030,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 20:51:55",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18767,
+	"battery" : 4030,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 21:01:46",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18770,
+	"battery" : 4071,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 21:02:14",
+	"type" : "AUT",
+	"latitude" : -37.69005,
+	"longitude" : 144.958896,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18771,
+	"battery" : 4074,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 21:12:35",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18772,
+	"battery" : 3861,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 21:02:40",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18773,
+	"battery" : 3862,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 21:12:28",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18775,
+	"battery" : 4030,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 21:12:00",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18782,
+	"battery" : 4072,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 21:22:13",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18783,
+	"battery" : 4072,
+	"temperature" : 2.369999885559082,
+	"time" : "2016-02-11 21:32:30",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18785,
+	"battery" : 3862,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 21:22:40",
+	"type" : "AUT",
+	"latitude" : -37.689424,
+	"longitude" : 144.958709,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18788,
+	"battery" : 3860,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 21:32:31",
+	"type" : "AUT",
+	"latitude" : -37.689665,
+	"longitude" : 144.958781,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18789,
+	"battery" : 4030,
+	"temperature" : 2.369999885559082,
+	"time" : "2016-02-11 21:21:51",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18790,
+	"battery" : 4030,
+	"temperature" : 2.369999885559082,
+	"time" : "2016-02-11 21:32:03",
+	"type" : "AUT",
+	"latitude" : -37.687336,
+	"longitude" : 144.956699,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18797,
+	"battery" : 3861,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 21:42:25",
+	"type" : "AUT",
+	"latitude" : -37.686375,
+	"longitude" : 144.937454,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18798,
+	"battery" : 4073,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 21:42:12",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18799,
+	"battery" : 4072,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 21:52:07",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18800,
+	"battery" : 4030,
+	"temperature" : 2.369999885559082,
+	"time" : "2016-02-11 21:41:53",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18801,
+	"battery" : 4030,
+	"temperature" : 2.369999885559082,
+	"time" : "2016-02-11 21:51:57",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18807,
+	"battery" : 3859,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 21:52:31",
+	"type" : "AUT",
+	"latitude" : -37.689588,
+	"longitude" : 144.958758,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18808,
+	"battery" : 3861,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 22:02:36",
+	"type" : "AUT",
+	"latitude" : -37.690005,
+	"longitude" : 144.958882,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18809,
+	"battery" : 4066,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 22:02:23",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18810,
+	"battery" : 4028,
+	"temperature" : 2.5,
+	"time" : "2016-02-11 22:01:42",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.957117,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18815,
+	"battery" : 3861,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 22:12:38",
+	"type" : "AUT",
+	"latitude" : -37.688239,
+	"longitude" : 144.958445,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18816,
+	"battery" : 3861,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 22:22:34",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18817,
+	"battery" : 4026,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 22:11:37",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18818,
+	"battery" : 4026,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 22:21:55",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18819,
+	"battery" : 4069,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 22:12:09",
+	"type" : "AUT",
+	"latitude" : -37.688579,
+	"longitude" : 144.958607,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18821,
+	"battery" : 4068,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 22:22:13",
+	"type" : "AUT",
+	"latitude" : -37.689098,
+	"longitude" : 144.958612,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18829,
+	"battery" : 4025,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 22:31:56",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18830,
+	"battery" : 4026,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 22:41:39",
+	"type" : "AUT",
+	"latitude" : -37.68798,
+	"longitude" : 144.957371,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18831,
+	"battery" : 4068,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 22:32:14",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18832,
+	"battery" : 4068,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 22:42:33",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18837,
+	"battery" : 3861,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 22:32:32",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18838,
+	"battery" : 3861,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 22:42:19",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18839,
+	"battery" : 3861,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 22:52:38",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18840,
+	"battery" : 4025,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 22:52:00",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18841,
+	"battery" : 4025,
+	"temperature" : 2.619999885559082,
+	"time" : "2016-02-11 23:01:59",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18842,
+	"battery" : 4068,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 22:52:31",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18843,
+	"battery" : 4068,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 23:02:09",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18851,
+	"battery" : 3861,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 23:02:25",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18852,
+	"battery" : 3861,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 23:12:35",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18853,
+	"battery" : 4025,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 23:11:43",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18854,
+	"battery" : 4068,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 23:12:18",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18858,
+	"battery" : 3859,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 23:22:18",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18859,
+	"battery" : 3859,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 23:32:29",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18860,
+	"battery" : 4025,
+	"temperature" : 2.75,
+	"time" : "2016-02-11 23:21:45",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18861,
+	"battery" : 4025,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 23:31:57",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18862,
+	"battery" : 4064,
+	"temperature" : 3,
+	"time" : "2016-02-11 23:22:17",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18864,
+	"battery" : 4067,
+	"temperature" : 3,
+	"time" : "2016-02-11 23:32:13",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18871,
+	"battery" : 3859,
+	"temperature" : 3,
+	"time" : "2016-02-11 23:42:42",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18872,
+	"battery" : 3859,
+	"temperature" : 3,
+	"time" : "2016-02-11 23:52:34",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18873,
+	"battery" : 4065,
+	"temperature" : 3,
+	"time" : "2016-02-11 23:42:11",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18874,
+	"battery" : 4067,
+	"temperature" : 3,
+	"time" : "2016-02-11 23:52:24",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18875,
+	"battery" : 4024,
+	"temperature" : 2.869999885559082,
+	"time" : "2016-02-11 23:41:58",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18876,
+	"battery" : 4025,
+	"temperature" : 3,
+	"time" : "2016-02-11 23:51:53",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18880,
+	"battery" : 3858,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-12 00:02:43",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18881,
+	"battery" : 4068,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-12 00:02:23",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18882,
+	"battery" : 4068,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 00:12:08",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18883,
+	"battery" : 4023,
+	"temperature" : 3,
+	"time" : "2016-02-12 00:01:57",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18884,
+	"battery" : 4025,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-12 00:11:48",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18894,
+	"battery" : 3843,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-12 00:12:25",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18895,
+	"battery" : 3857,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 00:22:34",
+	"type" : "AUT",
+	"latitude" : -37.689802,
+	"longitude" : 144.958822,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18896,
+	"battery" : 4019,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 00:21:53",
+	"type" : "AUT",
+	"latitude" : -37.687866,
+	"longitude" : 144.957252,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18897,
+	"battery" : 4063,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 00:22:07",
+	"type" : "AUT",
+	"latitude" : -37.689314,
+	"longitude" : 144.958676,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18901,
+	"battery" : 3860,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 00:32:20",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18902,
+	"battery" : 3858,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 00:42:37",
+	"type" : "AUT",
+	"latitude" : -37.689485,
+	"longitude" : 144.958727,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18903,
+	"battery" : 4019,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 00:31:54",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18904,
+	"battery" : 4017,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 00:41:51",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18905,
+	"battery" : 4064,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 00:32:28",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18906,
+	"battery" : 4066,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 00:42:31",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18913,
+	"battery" : 4019,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 00:51:48",
+	"type" : "AUT",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18914,
+	"battery" : 4019,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 01:00:05",
+	"type" : "VIB",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18915,
+	"battery" : 4019,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 01:01:46",
+	"type" : "STP",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18916,
+	"battery" : 4019,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 01:01:59",
+	"type" : "AUT",
+	"latitude" : -37.675728,
+	"longitude" : 144.942581,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18917,
+	"battery" : 3856,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 00:52:19",
+	"type" : "AUT",
+	"latitude" : -37.689885,
+	"longitude" : 144.958846,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18918,
+	"battery" : 3856,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 01:02:37",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18919,
+	"battery" : 4063,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 00:52:07",
+	"type" : "AUT",
+	"latitude" : -37.689244,
+	"longitude" : 144.958924,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18920,
+	"battery" : 4062,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 01:02:15",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18925,
+	"battery" : 4019,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 01:11:40",
+	"type" : "AUT",
+	"latitude" : -37.68765,
+	"longitude" : 144.957026,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18926,
+	"battery" : 3855,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 01:12:21",
+	"type" : "AUT",
+	"latitude" : -37.688501,
+	"longitude" : 144.95857,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18927,
+	"battery" : 4063,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 01:12:08",
+	"type" : "AUT",
+	"latitude" : -37.689139,
+	"longitude" : 144.958624,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18934,
+	"battery" : 4018,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 01:21:55",
+	"type" : "AUT",
+	"latitude" : -37.675728,
+	"longitude" : 144.942581,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18935,
+	"battery" : 4018,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 01:27:52",
+	"type" : "VIB",
+	"latitude" : -37.685989,
+	"longitude" : 144.955291,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18936,
+	"battery" : 4019,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 01:31:02",
+	"type" : "STP",
+	"latitude" : -37.688223,
+	"longitude" : 144.957625,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18937,
+	"battery" : 4017,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 01:31:41",
+	"type" : "AUT",
+	"latitude" : -37.688275,
+	"longitude" : 144.957679,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18938,
+	"battery" : 3851,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 01:22:36",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18940,
+	"battery" : 3855,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 01:32:29",
+	"type" : "AUT",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18941,
+	"battery" : 3855,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 01:36:17",
+	"type" : "VIB",
+	"latitude" : -37.691154,
+	"longitude" : 144.959521,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18942,
+	"battery" : 4063,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 01:22:24",
+	"type" : "AUT",
+	"latitude" : -37.688808,
+	"longitude" : 144.958525,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18943,
+	"battery" : 4063,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 01:27:55",
+	"type" : "VIB",
+	"latitude" : -37.689623,
+	"longitude" : 144.958768,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18944,
+	"battery" : 4063,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 01:30:56",
+	"type" : "STP",
+	"latitude" : -37.687737,
+	"longitude" : 144.958206,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18945,
+	"battery" : 4062,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 01:32:23",
+	"type" : "AUT",
+	"latitude" : -37.690319,
+	"longitude" : 144.958976,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18946,
+	"battery" : 4063,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 01:36:34",
+	"type" : "VIB",
+	"latitude" : -37.691153,
+	"longitude" : 144.959462,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18949,
+	"battery" : 4017,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 01:36:28",
+	"type" : "VIB",
+	"latitude" : -37.688507,
+	"longitude" : 144.957922,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18950,
+	"battery" : 4016,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 01:41:40",
+	"type" : "AUT",
+	"latitude" : -37.672775,
+	"longitude" : 144.943779,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18951,
+	"battery" : 4015,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 01:50:56",
+	"type" : "STP",
+	"latitude" : -37.644724,
+	"longitude" : 144.948994,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18952,
+	"battery" : 4018,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 01:51:45",
+	"type" : "AUT",
+	"latitude" : -37.644724,
+	"longitude" : 144.948994,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18953,
+	"battery" : 3855,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 01:42:29",
+	"type" : "AUT",
+	"latitude" : -37.668022,
+	"longitude" : 144.950562,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18954,
+	"battery" : 3855,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 01:45:36",
+	"type" : "STP",
+	"latitude" : -37.63092,
+	"longitude" : 144.950351,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18955,
+	"battery" : 3852,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 01:45:56",
+	"type" : "VIB",
+	"latitude" : -37.636551,
+	"longitude" : 144.96679,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18956,
+	"battery" : 3855,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 01:50:45",
+	"type" : "STP",
+	"latitude" : -37.64498,
+	"longitude" : 144.972467,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18957,
+	"battery" : 3855,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 01:52:32",
+	"type" : "AUT",
+	"latitude" : -37.64498,
+	"longitude" : 144.972467,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18958,
+	"battery" : 4063,
+	"temperature" : 4,
+	"time" : "2016-02-12 01:42:22",
+	"type" : "AUT",
+	"latitude" : -37.668071,
+	"longitude" : 144.94664,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18959,
+	"battery" : 4059,
+	"temperature" : 4,
+	"time" : "2016-02-12 01:50:49",
+	"type" : "STP",
+	"latitude" : -37.638026,
+	"longitude" : 144.954479,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18960,
+	"battery" : 4062,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 01:52:23",
+	"type" : "AUT",
+	"latitude" : -37.637952,
+	"longitude" : 144.954483,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18969,
+	"battery" : 4016,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 02:02:01",
+	"type" : "AUT",
+	"latitude" : -37.644724,
+	"longitude" : 144.948994,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18970,
+	"battery" : 3855,
+	"temperature" : 4,
+	"time" : "2016-02-12 02:02:22",
+	"type" : "AUT",
+	"latitude" : -37.644788,
+	"longitude" : 144.972302,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18971,
+	"battery" : 4063,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 02:02:31",
+	"type" : "AUT",
+	"latitude" : -37.637989,
+	"longitude" : 144.954616,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18975,
+	"battery" : 4016,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 02:11:43",
+	"type" : "AUT",
+	"latitude" : -37.644798,
+	"longitude" : 144.949071,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18976,
+	"battery" : 4014,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 02:21:59",
+	"type" : "AUT",
+	"latitude" : -37.644798,
+	"longitude" : 144.949071,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18978,
+	"battery" : 3855,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 02:12:34",
+	"type" : "AUT",
+	"latitude" : -37.638263,
+	"longitude" : 144.956215,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18979,
+	"battery" : 3855,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 02:22:38",
+	"type" : "AUT",
+	"latitude" : -37.644378,
+	"longitude" : 144.971412,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18980,
+	"battery" : 4063,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 02:12:21",
+	"type" : "AUT",
+	"latitude" : -37.637989,
+	"longitude" : 144.954616,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18981,
+	"battery" : 4062,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 02:22:10",
+	"type" : "AUT",
+	"latitude" : -37.637989,
+	"longitude" : 144.954616,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18987,
+	"battery" : 4014,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 02:31:45",
+	"type" : "AUT",
+	"latitude" : -37.648575,
+	"longitude" : 144.953049,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18988,
+	"battery" : 4014,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 02:34:36",
+	"type" : "VIB",
+	"latitude" : -37.648575,
+	"longitude" : 144.953049,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18989,
+	"battery" : 4014,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 02:41:39",
+	"type" : "AUT",
+	"latitude" : -37.644724,
+	"longitude" : 144.948994,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 18990,
+	"battery" : 4063,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 02:32:27",
+	"type" : "AUT",
+	"latitude" : -37.636599,
+	"longitude" : 144.959792,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18991,
+	"battery" : 3854,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 02:32:31",
+	"type" : "AUT",
+	"latitude" : -37.645208,
+	"longitude" : 144.973724,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18992,
+	"battery" : 4063,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 02:34:27",
+	"type" : "VIB",
+	"latitude" : -37.636634,
+	"longitude" : 144.960002,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18993,
+	"battery" : 4063,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-12 02:42:22",
+	"type" : "AUT",
+	"latitude" : -37.637952,
+	"longitude" : 144.954483,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 18994,
+	"battery" : 3855,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 02:42:28",
+	"type" : "AUT",
+	"latitude" : -37.645007,
+	"longitude" : 144.973292,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 18999,
+	"battery" : 4013,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 02:51:42",
+	"type" : "AUT",
+	"latitude" : -37.622044,
+	"longitude" : 144.932686,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19000,
+	"battery" : 3855,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 02:47:30",
+	"type" : "VIB",
+	"latitude" : -37.637916,
+	"longitude" : 144.954376,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19001,
+	"battery" : 4063,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-12 02:52:31",
+	"type" : "AUT",
+	"latitude" : -37.605309,
+	"longitude" : 144.951867,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19002,
+	"battery" : 3855,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 02:52:39",
+	"type" : "AUT",
+	"latitude" : -37.605309,
+	"longitude" : 144.951867,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19010,
+	"battery" : 4011,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 03:01:44",
+	"type" : "AUT",
+	"latitude" : -37.551941,
+	"longitude" : 144.933956,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19011,
+	"battery" : 4014,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 03:11:54",
+	"type" : "AUT",
+	"latitude" : -37.457327,
+	"longitude" : 144.969798,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19012,
+	"battery" : 3854,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 03:02:34",
+	"type" : "AUT",
+	"latitude" : -37.516097,
+	"longitude" : 144.94938,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19014,
+	"battery" : 3855,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 03:12:32",
+	"type" : "AUT",
+	"latitude" : -37.399738,
+	"longitude" : 145.002901,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19015,
+	"battery" : 4057,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-12 03:02:11",
+	"type" : "AUT",
+	"latitude" : -37.495064,
+	"longitude" : 144.953157,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19016,
+	"battery" : 4058,
+	"temperature" : 3.119999885559082,
+	"time" : "2016-02-12 03:12:07",
+	"type" : "AUT",
+	"latitude" : -37.404672,
+	"longitude" : 145.000914,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19022,
+	"battery" : 4014,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 03:21:44",
+	"type" : "AUT",
+	"latitude" : -37.324266,
+	"longitude" : 145.025393,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19025,
+	"battery" : 3851,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 03:22:33",
+	"type" : "AUT",
+	"latitude" : -37.224125,
+	"longitude" : 145.055923,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19026,
+	"battery" : 3854,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 03:32:42",
+	"type" : "AUT",
+	"latitude" : -37.101994,
+	"longitude" : 145.096832,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19027,
+	"battery" : 4055,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 03:22:29",
+	"type" : "AUT",
+	"latitude" : -37.218202,
+	"longitude" : 145.059002,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19028,
+	"battery" : 4059,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 03:32:14",
+	"type" : "AUT",
+	"latitude" : -37.101994,
+	"longitude" : 145.096832,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19031,
+	"battery" : 4014,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 03:31:46",
+	"type" : "AUT",
+	"latitude" : -37.16195,
+	"longitude" : 145.062225,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19032,
+	"battery" : 4011,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 03:41:38",
+	"type" : "AUT",
+	"latitude" : -37.017726,
+	"longitude" : 145.14211,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19039,
+	"battery" : 3853,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 03:42:33",
+	"type" : "AUT",
+	"latitude" : -36.944534,
+	"longitude" : 145.130239,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19040,
+	"battery" : 4060,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 03:42:29",
+	"type" : "AUT",
+	"latitude" : -37.003666,
+	"longitude" : 145.147346,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19044,
+	"battery" : 4008,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 03:51:37",
+	"type" : "AUT",
+	"latitude" : -36.878575,
+	"longitude" : 145.250453,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19046,
+	"battery" : 3855,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 03:52:25",
+	"type" : "AUT",
+	"latitude" : -36.900642,
+	"longitude" : 145.188942,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19048,
+	"battery" : 3855,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 04:02:29",
+	"type" : "AUT",
+	"latitude" : -36.809276,
+	"longitude" : 145.454721,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19049,
+	"battery" : 4058,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 03:52:30",
+	"type" : "AUT",
+	"latitude" : -36.898542,
+	"longitude" : 145.193347,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19050,
+	"battery" : 4058,
+	"temperature" : 3.25,
+	"time" : "2016-02-12 04:02:18",
+	"type" : "AUT",
+	"latitude" : -36.805676,
+	"longitude" : 145.463669,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19053,
+	"battery" : 4008,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 04:01:58",
+	"type" : "AUT",
+	"latitude" : -36.803848,
+	"longitude" : 145.440442,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19054,
+	"battery" : 4008,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 04:11:51",
+	"type" : "AUT",
+	"latitude" : -36.779475,
+	"longitude" : 145.560004,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19063,
+	"battery" : 3855,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 04:12:42",
+	"type" : "AUT",
+	"latitude" : -36.755672,
+	"longitude" : 145.57312,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19064,
+	"battery" : 3854,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 04:22:31",
+	"type" : "AUT",
+	"latitude" : -36.616604,
+	"longitude" : 145.752498,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19065,
+	"battery" : 4058,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 04:12:31",
+	"type" : "AUT",
+	"latitude" : -36.755672,
+	"longitude" : 145.57312,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19066,
+	"battery" : 4008,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 04:21:39",
+	"type" : "AUT",
+	"latitude" : -36.645105,
+	"longitude" : 145.715027,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19067,
+	"battery" : 4055,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 04:22:28",
+	"type" : "AUT",
+	"latitude" : -36.621869,
+	"longitude" : 145.750026,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19078,
+	"battery" : 4008,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 04:31:47",
+	"type" : "AUT",
+	"latitude" : -36.596207,
+	"longitude" : 145.894689,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19079,
+	"battery" : 3855,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 04:32:20",
+	"type" : "AUT",
+	"latitude" : -36.599144,
+	"longitude" : 145.869354,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19080,
+	"battery" : 4058,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 04:32:17",
+	"type" : "AUT",
+	"latitude" : -36.599144,
+	"longitude" : 145.869354,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19081,
+	"battery" : 4058,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 04:42:09",
+	"type" : "AUT",
+	"latitude" : -36.546714,
+	"longitude" : 146.031453,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19085,
+	"battery" : 4007,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 04:41:37",
+	"type" : "AUT",
+	"latitude" : -36.551658,
+	"longitude" : 146.001052,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19086,
+	"battery" : 4007,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 04:51:38",
+	"type" : "AUT",
+	"latitude" : -36.406445,
+	"longitude" : 146.291054,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19094,
+	"battery" : 3850,
+	"temperature" : 4,
+	"time" : "2016-02-12 04:42:37",
+	"type" : "AUT",
+	"latitude" : -36.544165,
+	"longitude" : 146.033166,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19095,
+	"battery" : 3850,
+	"temperature" : 4,
+	"time" : "2016-02-12 04:52:22",
+	"type" : "AUT",
+	"latitude" : -36.507081,
+	"longitude" : 146.095339,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19099,
+	"battery" : 4000,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 05:01:49",
+	"type" : "AUT",
+	"latitude" : -36.406746,
+	"longitude" : 146.28302,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19107,
+	"battery" : 3852,
+	"temperature" : 4,
+	"time" : "2016-02-12 05:02:32",
+	"type" : "AUT",
+	"latitude" : -36.390275,
+	"longitude" : 146.306116,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19108,
+	"battery" : 3850,
+	"temperature" : 4,
+	"time" : "2016-02-12 05:12:27",
+	"type" : "AUT",
+	"latitude" : -36.303722,
+	"longitude" : 146.377167,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19109,
+	"battery" : 4058,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 04:52:16",
+	"type" : "AUT",
+	"latitude" : -36.507518,
+	"longitude" : 146.094367,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19110,
+	"battery" : 4058,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 05:02:12",
+	"type" : "AUT",
+	"latitude" : -36.382427,
+	"longitude" : 146.319777,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19111,
+	"battery" : 4058,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 05:12:11",
+	"type" : "AUT",
+	"latitude" : -36.303722,
+	"longitude" : 146.377167,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19113,
+	"battery" : 4003,
+	"temperature" : 4,
+	"time" : "2016-02-12 05:11:54",
+	"type" : "AUT",
+	"latitude" : -36.338429,
+	"longitude" : 146.358805,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19114,
+	"battery" : 4001,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 05:21:46",
+	"type" : "AUT",
+	"latitude" : -36.09983,
+	"longitude" : 146.579719,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19120,
+	"battery" : 3850,
+	"temperature" : 4,
+	"time" : "2016-02-12 05:22:33",
+	"type" : "AUT",
+	"latitude" : -36.147689,
+	"longitude" : 146.579399,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19121,
+	"battery" : 4058,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 05:22:27",
+	"type" : "AUT",
+	"latitude" : -36.148217,
+	"longitude" : 146.586056,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19122,
+	"battery" : 4056,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 05:32:28",
+	"type" : "AUT",
+	"latitude" : -36.109184,
+	"longitude" : 146.683685,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19125,
+	"battery" : 4002,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 05:31:55",
+	"type" : "AUT",
+	"latitude" : -36.097347,
+	"longitude" : 146.690125,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19133,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 05:32:39",
+	"type" : "AUT",
+	"latitude" : -36.123413,
+	"longitude" : 146.678778,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19134,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 05:42:25",
+	"type" : "AUT",
+	"latitude" : -36.120282,
+	"longitude" : 146.856617,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19138,
+	"battery" : 4057,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 05:42:27",
+	"type" : "AUT",
+	"latitude" : -36.120614,
+	"longitude" : 146.868372,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19139,
+	"battery" : 4003,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 05:41:55",
+	"type" : "AUT",
+	"latitude" : -36.124968,
+	"longitude" : 146.855477,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19140,
+	"battery" : 4003,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 05:51:40",
+	"type" : "AUT",
+	"latitude" : -36.076529,
+	"longitude" : 146.966744,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19154,
+	"battery" : 3848,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 05:52:32",
+	"type" : "AUT",
+	"latitude" : -36.044159,
+	"longitude" : 146.989853,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19155,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 06:02:38",
+	"type" : "AUT",
+	"latitude" : -35.964346,
+	"longitude" : 147.03012,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19156,
+	"battery" : 4057,
+	"temperature" : 4,
+	"time" : "2016-02-12 05:52:19",
+	"type" : "AUT",
+	"latitude" : -36.044159,
+	"longitude" : 146.989853,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19157,
+	"battery" : 4053,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:02:13",
+	"type" : "AUT",
+	"latitude" : -35.967173,
+	"longitude" : 147.02679,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19160,
+	"battery" : 4003,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:01:37",
+	"type" : "AUT",
+	"latitude" : -35.957165,
+	"longitude" : 147.057922,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19163,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 06:12:20",
+	"type" : "AUT",
+	"latitude" : -35.915029,
+	"longitude" : 147.106884,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19164,
+	"battery" : 4053,
+	"temperature" : 4,
+	"time" : "2016-02-12 06:12:33",
+	"type" : "AUT",
+	"latitude" : -35.903183,
+	"longitude" : 147.141411,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19165,
+	"battery" : 4052,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:22:26",
+	"type" : "AUT",
+	"latitude" : -35.697456,
+	"longitude" : 147.17363,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19168,
+	"battery" : 4001,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:11:43",
+	"type" : "AUT",
+	"latitude" : -35.933739,
+	"longitude" : 147.098231,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19169,
+	"battery" : 4002,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:21:43",
+	"type" : "AUT",
+	"latitude" : -35.713153,
+	"longitude" : 147.327345,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19179,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 06:22:35",
+	"type" : "AUT",
+	"latitude" : -35.697456,
+	"longitude" : 147.17363,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19181,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 06:32:31",
+	"type" : "AUT",
+	"latitude" : -35.63895,
+	"longitude" : 147.453124,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19183,
+	"battery" : 4052,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:32:33",
+	"type" : "AUT",
+	"latitude" : -35.63895,
+	"longitude" : 147.453124,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19186,
+	"battery" : 3999,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:31:38",
+	"type" : "AUT",
+	"latitude" : -35.640278,
+	"longitude" : 147.441008,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19187,
+	"battery" : 4002,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:41:58",
+	"type" : "AUT",
+	"latitude" : -35.630124,
+	"longitude" : 147.462929,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19191,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 06:42:37",
+	"type" : "AUT",
+	"latitude" : -35.540394,
+	"longitude" : 147.54554,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19192,
+	"battery" : 3850,
+	"temperature" : 4,
+	"time" : "2016-02-12 06:52:26",
+	"type" : "AUT",
+	"latitude" : -35.417463,
+	"longitude" : 147.613246,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19195,
+	"battery" : 4052,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:42:15",
+	"type" : "AUT",
+	"latitude" : -35.540394,
+	"longitude" : 147.54554,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19196,
+	"battery" : 4052,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:52:29",
+	"type" : "AUT",
+	"latitude" : -35.417463,
+	"longitude" : 147.613246,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19197,
+	"battery" : 3998,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 06:51:38",
+	"type" : "AUT",
+	"latitude" : -35.475533,
+	"longitude" : 147.570938,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19205,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 07:02:26",
+	"type" : "AUT",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19206,
+	"battery" : 3850,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:08:57",
+	"type" : "STP",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19207,
+	"battery" : 3848,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:12:21",
+	"type" : "AUT",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19210,
+	"battery" : 4052,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:02:13",
+	"type" : "AUT",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19211,
+	"battery" : 4052,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 07:08:49",
+	"type" : "STP",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19212,
+	"battery" : 4052,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 07:12:28",
+	"type" : "AUT",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19213,
+	"battery" : 3997,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 07:01:52",
+	"type" : "AUT",
+	"latitude" : -35.296883,
+	"longitude" : 147.704224,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19214,
+	"battery" : 3997,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 07:08:49",
+	"type" : "STP",
+	"latitude" : -35.260175,
+	"longitude" : 147.731922,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19215,
+	"battery" : 3997,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 07:12:01",
+	"type" : "AUT",
+	"latitude" : -35.255374,
+	"longitude" : 147.735543,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19219,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 07:22:37",
+	"type" : "AUT",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19222,
+	"battery" : 4052,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:22:22",
+	"type" : "AUT",
+	"latitude" : -35.417463,
+	"longitude" : 147.613246,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19223,
+	"battery" : 4052,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:32:17",
+	"type" : "AUT",
+	"latitude" : -35.417463,
+	"longitude" : 147.613246,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19224,
+	"battery" : 3997,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:21:45",
+	"type" : "AUT",
+	"latitude" : -35.258763,
+	"longitude" : 147.732987,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19225,
+	"battery" : 3997,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:31:43",
+	"type" : "AUT",
+	"latitude" : -35.267235,
+	"longitude" : 147.726598,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19236,
+	"battery" : 3850,
+	"temperature" : 4.25,
+	"time" : "2016-02-12 07:32:19",
+	"type" : "AUT",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19237,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 07:41:01",
+	"type" : "VIB",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19238,
+	"battery" : 3848,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 07:42:21",
+	"type" : "AUT",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19239,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 07:43:12",
+	"type" : "STP",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19240,
+	"battery" : 4051,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:42:19",
+	"type" : "AUT",
+	"latitude" : -35.296897,
+	"longitude" : 147.724384,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19241,
+	"battery" : 3997,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:40:52",
+	"type" : "VIB",
+	"latitude" : -35.296883,
+	"longitude" : 147.704224,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19242,
+	"battery" : 3997,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:41:41",
+	"type" : "AUT",
+	"latitude" : -35.262742,
+	"longitude" : 147.729986,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19243,
+	"battery" : 3997,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:43:24",
+	"type" : "STP",
+	"latitude" : -35.250761,
+	"longitude" : 147.73902,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19244,
+	"battery" : 3997,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 07:51:56",
+	"type" : "AUT",
+	"latitude" : -35.250068,
+	"longitude" : 147.739543,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19257,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 07:52:35",
+	"type" : "AUT",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19258,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 07:53:09",
+	"type" : "VIB",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19259,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 08:02:34",
+	"type" : "AUT",
+	"latitude" : -35.177428,
+	"longitude" : 147.858699,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19260,
+	"battery" : 4052,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 07:52:30",
+	"type" : "AUT",
+	"latitude" : -35.296897,
+	"longitude" : 147.724384,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19261,
+	"battery" : 4052,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 07:53:19",
+	"type" : "VIB",
+	"latitude" : -35.296897,
+	"longitude" : 147.724384,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19262,
+	"battery" : 4052,
+	"temperature" : 4,
+	"time" : "2016-02-12 08:02:13",
+	"type" : "AUT",
+	"latitude" : -35.279646,
+	"longitude" : 147.73276,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19263,
+	"battery" : 3996,
+	"temperature" : 4,
+	"time" : "2016-02-12 07:53:45",
+	"type" : "VIB",
+	"latitude" : -35.296883,
+	"longitude" : 147.704224,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19264,
+	"battery" : 3996,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 08:01:46",
+	"type" : "AUT",
+	"latitude" : -35.237582,
+	"longitude" : 147.748955,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19270,
+	"battery" : 3850,
+	"temperature" : 4.25,
+	"time" : "2016-02-12 08:12:17",
+	"type" : "AUT",
+	"latitude" : -35.14178,
+	"longitude" : 147.957031,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19271,
+	"battery" : 3845,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 08:22:25",
+	"type" : "AUT",
+	"latitude" : -35.124415,
+	"longitude" : 148.044931,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19272,
+	"battery" : 4051,
+	"temperature" : 4,
+	"time" : "2016-02-12 08:12:28",
+	"type" : "AUT",
+	"latitude" : -35.144003,
+	"longitude" : 147.946146,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19273,
+	"battery" : 4051,
+	"temperature" : 4,
+	"time" : "2016-02-12 08:22:16",
+	"type" : "AUT",
+	"latitude" : -35.119475,
+	"longitude" : 148.04905,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19274,
+	"battery" : 3993,
+	"temperature" : 4,
+	"time" : "2016-02-12 08:11:55",
+	"type" : "AUT",
+	"latitude" : -34.83792,
+	"longitude" : 148.122794,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19275,
+	"battery" : 3995,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 08:21:40",
+	"type" : "AUT",
+	"latitude" : -35.077525,
+	"longitude" : 148.093994,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19287,
+	"battery" : 3845,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 08:32:40",
+	"type" : "AUT",
+	"latitude" : -34.944622,
+	"longitude" : 148.161359,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19288,
+	"battery" : 4050,
+	"temperature" : 4,
+	"time" : "2016-02-12 08:32:17",
+	"type" : "AUT",
+	"latitude" : -34.944327,
+	"longitude" : 148.16195,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19289,
+	"battery" : 3993,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 08:31:54",
+	"type" : "AUT",
+	"latitude" : -34.979828,
+	"longitude" : 148.145293,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19290,
+	"battery" : 3994,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 08:41:49",
+	"type" : "AUT",
+	"latitude" : -34.800997,
+	"longitude" : 148.345229,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19301,
+	"battery" : 3850,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 08:42:37",
+	"type" : "AUT",
+	"latitude" : -34.836213,
+	"longitude" : 148.322408,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19302,
+	"battery" : 3848,
+	"temperature" : 4,
+	"time" : "2016-02-12 08:52:19",
+	"type" : "AUT",
+	"latitude" : -34.834081,
+	"longitude" : 148.32933,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19303,
+	"battery" : 3992,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 08:51:39",
+	"type" : "AUT",
+	"latitude" : -34.800262,
+	"longitude" : 148.343,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19304,
+	"battery" : 4042,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 08:42:20",
+	"type" : "AUT",
+	"latitude" : -34.837106,
+	"longitude" : 148.319508,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19305,
+	"battery" : 4048,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 08:52:16",
+	"type" : "AUT",
+	"latitude" : -34.834624,
+	"longitude" : 148.327565,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19311,
+	"battery" : 3845,
+	"temperature" : 4,
+	"time" : "2016-02-12 09:02:33",
+	"type" : "AUT",
+	"latitude" : -34.818628,
+	"longitude" : 148.616804,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19312,
+	"battery" : 3844,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 09:12:17",
+	"type" : "AUT",
+	"latitude" : -34.808109,
+	"longitude" : 148.652336,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19313,
+	"battery" : 3992,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 09:01:56",
+	"type" : "AUT",
+	"latitude" : -34.808384,
+	"longitude" : 148.61547,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19314,
+	"battery" : 3992,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 09:11:44",
+	"type" : "AUT",
+	"latitude" : -34.778042,
+	"longitude" : 148.637787,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19315,
+	"battery" : 4046,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 09:02:18",
+	"type" : "AUT",
+	"latitude" : -34.817028,
+	"longitude" : 148.622212,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19316,
+	"battery" : 4048,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 09:12:17",
+	"type" : "AUT",
+	"latitude" : -34.765091,
+	"longitude" : 148.754613,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19326,
+	"battery" : 3845,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 09:22:22",
+	"type" : "AUT",
+	"latitude" : -34.83319,
+	"longitude" : 148.925155,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19327,
+	"battery" : 3991,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 09:21:47",
+	"type" : "AUT",
+	"latitude" : -34.818059,
+	"longitude" : 148.680099,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19328,
+	"battery" : 3992,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 09:31:42",
+	"type" : "AUT",
+	"latitude" : -34.845107,
+	"longitude" : 148.938187,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19329,
+	"battery" : 4046,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 09:22:28",
+	"type" : "AUT",
+	"latitude" : -34.835211,
+	"longitude" : 148.923019,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19330,
+	"battery" : 4047,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 09:32:29",
+	"type" : "AUT",
+	"latitude" : -34.935513,
+	"longitude" : 148.973899,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19337,
+	"battery" : 3847,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 09:32:42",
+	"type" : "AUT",
+	"latitude" : -34.896061,
+	"longitude" : 148.957734,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19338,
+	"battery" : 3844,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 09:42:33",
+	"type" : "AUT",
+	"latitude" : -34.787965,
+	"longitude" : 149.242652,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19340,
+	"battery" : 4047,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 09:42:18",
+	"type" : "AUT",
+	"latitude" : -34.790213,
+	"longitude" : 149.250146,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19348,
+	"battery" : 3844,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 09:52:36",
+	"type" : "AUT",
+	"latitude" : -34.793904,
+	"longitude" : 149.262456,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19349,
+	"battery" : 3845,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 10:02:26",
+	"type" : "AUT",
+	"latitude" : -34.815668,
+	"longitude" : 149.52273,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19354,
+	"battery" : 3992,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 09:51:54",
+	"type" : "AUT",
+	"latitude" : -34.852998,
+	"longitude" : 149.434794,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19355,
+	"battery" : 3988,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 10:01:39",
+	"type" : "AUT",
+	"latitude" : -34.753704,
+	"longitude" : 149.701863,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19356,
+	"battery" : 4046,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 09:52:30",
+	"type" : "AUT",
+	"latitude" : -34.794434,
+	"longitude" : 149.264224,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19357,
+	"battery" : 4047,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 10:02:28",
+	"type" : "AUT",
+	"latitude" : -34.811147,
+	"longitude" : 149.543859,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19361,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 10:12:34",
+	"type" : "AUT",
+	"latitude" : -34.767784,
+	"longitude" : 149.689205,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19364,
+	"battery" : 3987,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 10:11:51",
+	"type" : "AUT",
+	"latitude" : -34.768108,
+	"longitude" : 149.69719,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19365,
+	"battery" : 3986,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 10:21:37",
+	"type" : "AUT",
+	"latitude" : -34.726909,
+	"longitude" : 149.800899,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19366,
+	"battery" : 4047,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 10:12:27",
+	"type" : "AUT",
+	"latitude" : -34.769948,
+	"longitude" : 149.683091,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19367,
+	"battery" : 4047,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 10:22:35",
+	"type" : "AUT",
+	"latitude" : -34.730844,
+	"longitude" : 149.792253,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19370,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 10:22:24",
+	"type" : "AUT",
+	"latitude" : -34.729801,
+	"longitude" : 149.792494,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19371,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 10:32:39",
+	"type" : "AUT",
+	"latitude" : -34.716179,
+	"longitude" : 149.997101,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19372,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 10:34:01",
+	"type" : "STP",
+	"latitude" : -34.717568,
+	"longitude" : 149.994445,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19376,
+	"battery" : 3986,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 10:31:54",
+	"type" : "AUT",
+	"latitude" : -34.71204,
+	"longitude" : 150.010452,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19377,
+	"battery" : 3986,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 10:34:05",
+	"type" : "STP",
+	"latitude" : -34.71204,
+	"longitude" : 150.010452,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19378,
+	"battery" : 4047,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 10:32:12",
+	"type" : "AUT",
+	"latitude" : -34.719235,
+	"longitude" : 149.991259,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19379,
+	"battery" : 4047,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 10:34:01",
+	"type" : "STP",
+	"latitude" : -34.717735,
+	"longitude" : 149.994127,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19380,
+	"battery" : 4045,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 10:40:51",
+	"type" : "VIB",
+	"latitude" : -34.716179,
+	"longitude" : 149.997101,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19391,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 10:41:12",
+	"type" : "VIB",
+	"latitude" : -34.721252,
+	"longitude" : 149.987402,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19392,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 10:42:25",
+	"type" : "AUT",
+	"latitude" : -34.740764,
+	"longitude" : 149.984008,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19393,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 10:52:21",
+	"type" : "AUT",
+	"latitude" : -34.646237,
+	"longitude" : 150.150923,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19394,
+	"battery" : 3986,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 10:41:19",
+	"type" : "VIB",
+	"latitude" : -34.71204,
+	"longitude" : 150.010452,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19395,
+	"battery" : 3986,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 10:41:45",
+	"type" : "AUT",
+	"latitude" : -34.71204,
+	"longitude" : 150.010452,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19396,
+	"battery" : 3983,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 10:51:51",
+	"type" : "AUT",
+	"latitude" : -34.659765,
+	"longitude" : 150.120382,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19397,
+	"battery" : 4044,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 10:42:22",
+	"type" : "AUT",
+	"latitude" : -34.722471,
+	"longitude" : 149.985072,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19398,
+	"battery" : 4046,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 10:52:07",
+	"type" : "AUT",
+	"latitude" : -34.647389,
+	"longitude" : 150.125958,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19402,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 11:02:41",
+	"type" : "AUT",
+	"latitude" : -34.524308,
+	"longitude" : 150.286255,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19405,
+	"battery" : 4046,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 11:02:21",
+	"type" : "AUT",
+	"latitude" : -34.579088,
+	"longitude" : 150.266635,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19406,
+	"battery" : 4047,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 11:12:18",
+	"type" : "AUT",
+	"latitude" : -34.474832,
+	"longitude" : 150.319702,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19407,
+	"battery" : 3986,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 11:01:38",
+	"type" : "AUT",
+	"latitude" : -34.548081,
+	"longitude" : 150.202705,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19408,
+	"battery" : 3986,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 11:12:00",
+	"type" : "AUT",
+	"latitude" : -34.438687,
+	"longitude" : 150.376559,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19415,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 11:12:21",
+	"type" : "AUT",
+	"latitude" : -34.477766,
+	"longitude" : 150.324558,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19416,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 11:22:42",
+	"type" : "AUT",
+	"latitude" : -34.391871,
+	"longitude" : 150.51789,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19418,
+	"battery" : 4046,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 11:22:19",
+	"type" : "AUT",
+	"latitude" : -34.392336,
+	"longitude" : 150.517348,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19419,
+	"battery" : 3982,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 11:21:57",
+	"type" : "AUT",
+	"latitude" : -34.390526,
+	"longitude" : 150.514313,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19420,
+	"battery" : 3981,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 11:31:47",
+	"type" : "AUT",
+	"latitude" : -34.2373,
+	"longitude" : 150.624483,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19422,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 11:32:20",
+	"type" : "AUT",
+	"latitude" : -34.284419,
+	"longitude" : 150.611556,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19423,
+	"battery" : 3844,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 11:42:19",
+	"type" : "AUT",
+	"latitude" : -34.123727,
+	"longitude" : 150.700844,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19426,
+	"battery" : 4043,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 11:32:29",
+	"type" : "AUT",
+	"latitude" : -34.284419,
+	"longitude" : 150.611556,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19427,
+	"battery" : 4042,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 11:42:20",
+	"type" : "AUT",
+	"latitude" : -34.193349,
+	"longitude" : 150.704506,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19428,
+	"battery" : 3983,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 11:41:56",
+	"type" : "AUT",
+	"latitude" : -34.026603,
+	"longitude" : 150.59752,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19435,
+	"battery" : 3844,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 11:52:20",
+	"type" : "AUT",
+	"latitude" : -34.029664,
+	"longitude" : 150.825217,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19438,
+	"battery" : 4044,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 11:52:08",
+	"type" : "AUT",
+	"latitude" : -34.031474,
+	"longitude" : 150.824637,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19439,
+	"battery" : 4042,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 12:00:51",
+	"type" : "STP",
+	"latitude" : -33.989379,
+	"longitude" : 150.854111,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19440,
+	"battery" : 4042,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 12:02:21",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19441,
+	"battery" : 3981,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 11:51:38",
+	"type" : "AUT",
+	"latitude" : -34.044093,
+	"longitude" : 150.821063,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19442,
+	"battery" : 3980,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 12:00:48",
+	"type" : "STP",
+	"latitude" : -34.004772,
+	"longitude" : 150.836293,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19443,
+	"battery" : 3983,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 12:01:50",
+	"type" : "AUT",
+	"latitude" : -34.004772,
+	"longitude" : 150.836293,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19446,
+	"battery" : 3843,
+	"temperature" : 3.75,
+	"time" : "2016-02-12 12:00:41",
+	"type" : "STP",
+	"latitude" : -33.985499,
+	"longitude" : 150.855869,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19447,
+	"battery" : 3844,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 12:02:32",
+	"type" : "AUT",
+	"latitude" : -33.98549,
+	"longitude" : 150.855832,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19448,
+	"battery" : 3844,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 12:12:25",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19450,
+	"battery" : 4046,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 12:12:08",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19451,
+	"battery" : 3981,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 12:11:41",
+	"type" : "AUT",
+	"latitude" : -34.004772,
+	"longitude" : 150.836293,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19457,
+	"battery" : 3843,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 12:22:25",
+	"type" : "AUT",
+	"latitude" : -33.989951,
+	"longitude" : 150.853557,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19458,
+	"battery" : 3842,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 12:32:36",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19461,
+	"battery" : 4042,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 12:22:22",
+	"type" : "AUT",
+	"latitude" : -33.989801,
+	"longitude" : 150.853701,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19462,
+	"battery" : 4042,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 12:32:11",
+	"type" : "AUT",
+	"latitude" : -33.989557,
+	"longitude" : 150.853938,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19463,
+	"battery" : 3978,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 12:21:52",
+	"type" : "AUT",
+	"latitude" : -33.992611,
+	"longitude" : 150.863469,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19464,
+	"battery" : 3978,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 12:31:49",
+	"type" : "AUT",
+	"latitude" : -33.992745,
+	"longitude" : 150.863611,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19467,
+	"battery" : 3842,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 12:42:17",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19470,
+	"battery" : 4042,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 12:42:23",
+	"type" : "AUT",
+	"latitude" : -33.989557,
+	"longitude" : 150.853938,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19471,
+	"battery" : 4041,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 12:52:22",
+	"type" : "AUT",
+	"latitude" : -33.989557,
+	"longitude" : 150.853938,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19472,
+	"battery" : 3981,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 12:42:01",
+	"type" : "AUT",
+	"latitude" : -33.992638,
+	"longitude" : 150.863539,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19473,
+	"battery" : 3980,
+	"temperature" : 3.369999885559082,
+	"time" : "2016-02-12 12:51:58",
+	"type" : "AUT",
+	"latitude" : -33.992638,
+	"longitude" : 150.863539,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19479,
+	"battery" : 3843,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 12:52:19",
+	"type" : "AUT",
+	"latitude" : -33.989951,
+	"longitude" : 150.853557,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19480,
+	"battery" : 3842,
+	"temperature" : 3.869999885559082,
+	"time" : "2016-02-12 13:02:23",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19482,
+	"battery" : 4041,
+	"temperature" : 3.619999885559082,
+	"time" : "2016-02-12 13:02:08",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19483,
+	"battery" : 4041,
+	"temperature" : 4.119999885559082,
+	"time" : "2016-02-12 13:06:56",
+	"type" : "VIB",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19484,
+	"battery" : 4041,
+	"temperature" : 5.119999885559082,
+	"time" : "2016-02-12 13:10:42",
+	"type" : "STP",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19485,
+	"battery" : 3981,
+	"temperature" : 3.5,
+	"time" : "2016-02-12 13:01:42",
+	"type" : "AUT",
+	"latitude" : -33.994376,
+	"longitude" : 150.865304,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19486,
+	"battery" : 3981,
+	"temperature" : 4,
+	"time" : "2016-02-12 13:06:53",
+	"type" : "VIB",
+	"latitude" : -33.991136,
+	"longitude" : 150.862203,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19487,
+	"battery" : 3981,
+	"temperature" : 5,
+	"time" : "2016-02-12 13:10:35",
+	"type" : "STP",
+	"latitude" : -33.990423,
+	"longitude" : 150.860844,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19488,
+	"battery" : 3981,
+	"temperature" : 5.25,
+	"time" : "2016-02-12 13:11:49",
+	"type" : "AUT",
+	"latitude" : -33.990882,
+	"longitude" : 150.861876,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19491,
+	"battery" : 3842,
+	"temperature" : 4.369999885559082,
+	"time" : "2016-02-12 13:06:56",
+	"type" : "VIB",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19492,
+	"battery" : 3843,
+	"temperature" : 5.619999885559082,
+	"time" : "2016-02-12 13:10:42",
+	"type" : "STP",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19493,
+	"battery" : 3841,
+	"temperature" : 5.869999885559082,
+	"time" : "2016-02-12 13:12:39",
+	"type" : "AUT",
+	"latitude" : -33.988753,
+	"longitude" : 150.854716,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19494,
+	"battery" : 3843,
+	"temperature" : 6.75,
+	"time" : "2016-02-12 13:22:33",
+	"type" : "AUT",
+	"latitude" : -33.988507,
+	"longitude" : 150.854954,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19497,
+	"battery" : 3981,
+	"temperature" : 6.369999885559082,
+	"time" : "2016-02-12 13:21:43",
+	"type" : "AUT",
+	"latitude" : -34.003073,
+	"longitude" : 150.840927,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19498,
+	"battery" : 4041,
+	"temperature" : 5.5,
+	"time" : "2016-02-12 13:12:30",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19499,
+	"battery" : 4041,
+	"temperature" : 6.369999885559082,
+	"time" : "2016-02-12 13:22:25",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19501,
+	"battery" : 3844,
+	"temperature" : 7.25,
+	"time" : "2016-02-12 13:32:34",
+	"type" : "AUT",
+	"latitude" : -33.988633,
+	"longitude" : 150.854833,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19508,
+	"battery" : 3979,
+	"temperature" : 7,
+	"time" : "2016-02-12 13:31:55",
+	"type" : "AUT",
+	"latitude" : -34.003073,
+	"longitude" : 150.840927,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19509,
+	"battery" : 3981,
+	"temperature" : 7.369999885559082,
+	"time" : "2016-02-12 13:41:50",
+	"type" : "AUT",
+	"latitude" : -33.992485,
+	"longitude" : 150.863343,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19510,
+	"battery" : 4040,
+	"temperature" : 7,
+	"time" : "2016-02-12 13:32:08",
+	"type" : "AUT",
+	"latitude" : -33.988095,
+	"longitude" : 150.855353,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19511,
+	"battery" : 4041,
+	"temperature" : 7.25,
+	"time" : "2016-02-12 13:42:19",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19514,
+	"battery" : 3838,
+	"temperature" : 7.5,
+	"time" : "2016-02-12 13:42:28",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19515,
+	"battery" : 3842,
+	"temperature" : 7.869999885559082,
+	"time" : "2016-02-12 13:52:24",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19517,
+	"battery" : 3979,
+	"temperature" : 7.75,
+	"time" : "2016-02-12 13:51:51",
+	"type" : "AUT",
+	"latitude" : -33.992687,
+	"longitude" : 150.863516,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19518,
+	"battery" : 3976,
+	"temperature" : 8,
+	"time" : "2016-02-12 14:01:44",
+	"type" : "AUT",
+	"latitude" : -33.991967,
+	"longitude" : 150.862991,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19519,
+	"battery" : 4041,
+	"temperature" : 7.75,
+	"time" : "2016-02-12 13:52:25",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19520,
+	"battery" : 4041,
+	"temperature" : 8,
+	"time" : "2016-02-12 14:02:24",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19523,
+	"battery" : 3840,
+	"temperature" : 8.119999885559082,
+	"time" : "2016-02-12 14:02:40",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19524,
+	"battery" : 3840,
+	"temperature" : 8.119999885559082,
+	"time" : "2016-02-12 14:12:43",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19532,
+	"battery" : 3979,
+	"temperature" : 8.119999885559082,
+	"time" : "2016-02-12 14:11:39",
+	"type" : "AUT",
+	"latitude" : -34.004364,
+	"longitude" : 150.837405,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19533,
+	"battery" : 4041,
+	"temperature" : 8.119999885559082,
+	"time" : "2016-02-12 14:12:25",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19534,
+	"battery" : 4041,
+	"temperature" : 8.369999885559082,
+	"time" : "2016-02-12 14:22:34",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19537,
+	"battery" : 3840,
+	"temperature" : 8.5,
+	"time" : "2016-02-12 14:22:37",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19539,
+	"battery" : 3840,
+	"temperature" : 8.369999885559082,
+	"time" : "2016-02-12 14:32:19",
+	"type" : "AUT",
+	"latitude" : -33.988868,
+	"longitude" : 150.854605,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19540,
+	"battery" : 3977,
+	"temperature" : 8.369999885559082,
+	"time" : "2016-02-12 14:21:56",
+	"type" : "AUT",
+	"latitude" : -34.004405,
+	"longitude" : 150.837292,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19541,
+	"battery" : 3977,
+	"temperature" : 8.369999885559082,
+	"time" : "2016-02-12 14:31:48",
+	"type" : "AUT",
+	"latitude" : -34.004364,
+	"longitude" : 150.837405,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19542,
+	"battery" : 4041,
+	"temperature" : 8.369999885559082,
+	"time" : "2016-02-12 14:32:13",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19546,
+	"battery" : 3840,
+	"temperature" : 8.619999885559082,
+	"time" : "2016-02-12 14:42:41",
+	"type" : "AUT",
+	"latitude" : -33.988868,
+	"longitude" : 150.854605,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19547,
+	"battery" : 3976,
+	"temperature" : 8.5,
+	"time" : "2016-02-12 14:41:55",
+	"type" : "AUT",
+	"latitude" : -34.004364,
+	"longitude" : 150.837405,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19548,
+	"battery" : 3977,
+	"temperature" : 8.5,
+	"time" : "2016-02-12 14:51:44",
+	"type" : "AUT",
+	"latitude" : -34.004364,
+	"longitude" : 150.837405,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19553,
+	"battery" : 4041,
+	"temperature" : 8.5,
+	"time" : "2016-02-12 14:42:27",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19554,
+	"battery" : 4040,
+	"temperature" : 8.619999885559082,
+	"time" : "2016-02-12 14:52:24",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19559,
+	"battery" : 3839,
+	"temperature" : 8.75,
+	"time" : "2016-02-12 14:52:31",
+	"type" : "AUT",
+	"latitude" : -33.988868,
+	"longitude" : 150.854605,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19560,
+	"battery" : 3839,
+	"temperature" : 8.619999885559082,
+	"time" : "2016-02-12 15:02:18",
+	"type" : "AUT",
+	"latitude" : -33.988868,
+	"longitude" : 150.854605,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19561,
+	"battery" : 3976,
+	"temperature" : 8.5,
+	"time" : "2016-02-12 15:01:59",
+	"type" : "AUT",
+	"latitude" : -34.004364,
+	"longitude" : 150.837405,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19562,
+	"battery" : 4037,
+	"temperature" : 8.619999885559082,
+	"time" : "2016-02-12 15:02:32",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19563,
+	"battery" : 4040,
+	"temperature" : 8.869999885559082,
+	"time" : "2016-02-12 15:12:26",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19567,
+	"battery" : 3839,
+	"temperature" : 9,
+	"time" : "2016-02-12 15:12:43",
+	"type" : "AUT",
+	"latitude" : -33.988753,
+	"longitude" : 150.854716,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19568,
+	"battery" : 3839,
+	"temperature" : 9.25,
+	"time" : "2016-02-12 15:22:29",
+	"type" : "AUT",
+	"latitude" : -33.988979,
+	"longitude" : 150.854498,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19569,
+	"battery" : 3975,
+	"temperature" : 8.75,
+	"time" : "2016-02-12 15:11:41",
+	"type" : "AUT",
+	"latitude" : -34.004364,
+	"longitude" : 150.837405,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19570,
+	"battery" : 3973,
+	"temperature" : 9.119999885559082,
+	"time" : "2016-02-12 15:21:42",
+	"type" : "AUT",
+	"latitude" : -34.004364,
+	"longitude" : 150.837405,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19575,
+	"battery" : 4039,
+	"temperature" : 9.25,
+	"time" : "2016-02-12 15:22:14",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19576,
+	"battery" : 4039,
+	"temperature" : 9.75,
+	"time" : "2016-02-12 15:32:26",
+	"type" : "AUT",
+	"latitude" : -33.988095,
+	"longitude" : 150.855353,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19581,
+	"battery" : 3839,
+	"temperature" : 9.75,
+	"time" : "2016-02-12 15:32:41",
+	"type" : "AUT",
+	"latitude" : -33.988868,
+	"longitude" : 150.854605,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19582,
+	"battery" : 3839,
+	"temperature" : 10.25,
+	"time" : "2016-02-12 15:42:34",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19583,
+	"battery" : 3976,
+	"temperature" : 9.619999885559082,
+	"time" : "2016-02-12 15:31:51",
+	"type" : "AUT",
+	"latitude" : -34.00452,
+	"longitude" : 150.836979,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19584,
+	"battery" : 3976,
+	"temperature" : 10.119999885559082,
+	"time" : "2016-02-12 15:41:45",
+	"type" : "AUT",
+	"latitude" : -34.004654,
+	"longitude" : 150.836612,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19585,
+	"battery" : 4039,
+	"temperature" : 10.25,
+	"time" : "2016-02-12 15:42:33",
+	"type" : "AUT",
+	"latitude" : -33.988376,
+	"longitude" : 150.855081,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19589,
+	"battery" : 3839,
+	"temperature" : 10.75,
+	"time" : "2016-02-12 15:52:26",
+	"type" : "AUT",
+	"latitude" : -33.988753,
+	"longitude" : 150.854716,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19590,
+	"battery" : 3975,
+	"temperature" : 10.619999885559082,
+	"time" : "2016-02-12 15:51:40",
+	"type" : "AUT",
+	"latitude" : -34.004445,
+	"longitude" : 150.837184,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19591,
+	"battery" : 3974,
+	"temperature" : 10.619999885559082,
+	"time" : "2016-02-12 16:01:44",
+	"type" : "AUT",
+	"latitude" : -34.00452,
+	"longitude" : 150.836979,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19595,
+	"battery" : 4036,
+	"temperature" : 10.75,
+	"time" : "2016-02-12 15:52:28",
+	"type" : "AUT",
+	"latitude" : -33.988633,
+	"longitude" : 150.854833,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19597,
+	"battery" : 4036,
+	"temperature" : 10.75,
+	"time" : "2016-02-12 16:02:23",
+	"type" : "AUT",
+	"latitude" : -33.988507,
+	"longitude" : 150.854954,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19600,
+	"battery" : 3839,
+	"temperature" : 10.75,
+	"time" : "2016-02-12 16:02:43",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19601,
+	"battery" : 3839,
+	"temperature" : 10.619999885559082,
+	"time" : "2016-02-12 16:12:35",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19602,
+	"battery" : 3976,
+	"temperature" : 10.5,
+	"time" : "2016-02-12 16:12:00",
+	"type" : "AUT",
+	"latitude" : -33.995413,
+	"longitude" : 150.865112,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19605,
+	"battery" : 4036,
+	"temperature" : 10.619999885559082,
+	"time" : "2016-02-12 16:12:30",
+	"type" : "AUT",
+	"latitude" : -33.988238,
+	"longitude" : 150.855214,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19606,
+	"battery" : 4036,
+	"temperature" : 10.5,
+	"time" : "2016-02-12 16:22:28",
+	"type" : "AUT",
+	"latitude" : -33.988753,
+	"longitude" : 150.854716,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19609,
+	"battery" : 3839,
+	"temperature" : 10.619999885559082,
+	"time" : "2016-02-12 16:22:25",
+	"type" : "AUT",
+	"latitude" : -34.012004,
+	"longitude" : 150.856674,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19610,
+	"battery" : 3839,
+	"temperature" : 10.619999885559082,
+	"time" : "2016-02-12 16:32:30",
+	"type" : "AUT",
+	"latitude" : -34.012004,
+	"longitude" : 150.856674,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19611,
+	"battery" : 3976,
+	"temperature" : 10.5,
+	"time" : "2016-02-12 16:22:00",
+	"type" : "AUT",
+	"latitude" : -33.993707,
+	"longitude" : 150.864717,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19612,
+	"battery" : 3976,
+	"temperature" : 10.5,
+	"time" : "2016-02-12 16:31:43",
+	"type" : "AUT",
+	"latitude" : -33.993707,
+	"longitude" : 150.864717,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19619,
+	"battery" : 4036,
+	"temperature" : 10.619999885559082,
+	"time" : "2016-02-12 16:32:24",
+	"type" : "AUT",
+	"latitude" : -33.988753,
+	"longitude" : 150.854716,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19620,
+	"battery" : 4036,
+	"temperature" : 10.25,
+	"time" : "2016-02-12 16:42:30",
+	"type" : "AUT",
+	"latitude" : -33.988507,
+	"longitude" : 150.854954,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19621,
+	"battery" : 4035,
+	"temperature" : 10.25,
+	"time" : "2016-02-12 16:43:27",
+	"type" : "VIB",
+	"latitude" : -33.988868,
+	"longitude" : 150.854605,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19624,
+	"battery" : 3839,
+	"temperature" : 10.369999885559082,
+	"time" : "2016-02-12 16:42:24",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19625,
+	"battery" : 3839,
+	"temperature" : 10.369999885559082,
+	"time" : "2016-02-12 16:43:27",
+	"type" : "VIB",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19626,
+	"battery" : 3839,
+	"temperature" : 10,
+	"time" : "2016-02-12 16:52:20",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19627,
+	"battery" : 3972,
+	"temperature" : 10.369999885559082,
+	"time" : "2016-02-12 16:41:43",
+	"type" : "AUT",
+	"latitude" : -34.003073,
+	"longitude" : 150.840927,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19628,
+	"battery" : 3974,
+	"temperature" : 10.25,
+	"time" : "2016-02-12 16:43:25",
+	"type" : "VIB",
+	"latitude" : -34.004654,
+	"longitude" : 150.836612,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19629,
+	"battery" : 3975,
+	"temperature" : 10.25,
+	"time" : "2016-02-12 16:47:02",
+	"type" : "STP",
+	"latitude" : -33.994573,
+	"longitude" : 150.865536,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19630,
+	"battery" : 3976,
+	"temperature" : 10,
+	"time" : "2016-02-12 16:51:58",
+	"type" : "AUT",
+	"latitude" : -33.994538,
+	"longitude" : 150.865511,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19633,
+	"battery" : 4036,
+	"temperature" : 10.119999885559082,
+	"time" : "2016-02-12 16:52:24",
+	"type" : "AUT",
+	"latitude" : -33.989801,
+	"longitude" : 150.853701,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19634,
+	"battery" : 4036,
+	"temperature" : 10,
+	"time" : "2016-02-12 16:55:08",
+	"type" : "STP",
+	"latitude" : -33.989801,
+	"longitude" : 150.853701,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19635,
+	"battery" : 4036,
+	"temperature" : 10.119999885559082,
+	"time" : "2016-02-12 17:01:23",
+	"type" : "VIB",
+	"latitude" : -33.990091,
+	"longitude" : 150.853422,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19637,
+	"battery" : 3839,
+	"temperature" : 10.119999885559082,
+	"time" : "2016-02-12 17:02:32",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19638,
+	"battery" : 3838,
+	"temperature" : 9.75,
+	"time" : "2016-02-12 17:07:53",
+	"type" : "STP",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19639,
+	"battery" : 3973,
+	"temperature" : 10.119999885559082,
+	"time" : "2016-02-12 17:01:19",
+	"type" : "VIB",
+	"latitude" : -33.994607,
+	"longitude" : 150.865561,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19640,
+	"battery" : 3975,
+	"temperature" : 10.119999885559082,
+	"time" : "2016-02-12 17:01:58",
+	"type" : "AUT",
+	"latitude" : -34.003073,
+	"longitude" : 150.840927,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19645,
+	"battery" : 4033,
+	"temperature" : 10.119999885559082,
+	"time" : "2016-02-12 17:02:21",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19646,
+	"battery" : 4036,
+	"temperature" : 10,
+	"time" : "2016-02-12 17:06:47",
+	"type" : "STP",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19647,
+	"battery" : 4036,
+	"temperature" : 8.619999885559082,
+	"time" : "2016-02-12 17:12:27",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19650,
+	"battery" : 3835,
+	"temperature" : 8.369999885559082,
+	"time" : "2016-02-12 17:12:39",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19651,
+	"battery" : 3838,
+	"temperature" : 6.369999885559082,
+	"time" : "2016-02-12 17:19:11",
+	"type" : "VIB",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19652,
+	"battery" : 3839,
+	"temperature" : 5.75,
+	"time" : "2016-02-12 17:22:19",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001558",
+	"shipment" : 365
+}, {
+	"id" : 19653,
+	"battery" : 3971,
+	"temperature" : 9,
+	"time" : "2016-02-12 17:11:48",
+	"type" : "AUT",
+	"latitude" : -34.003073,
+	"longitude" : 150.840927,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19654,
+	"battery" : 3970,
+	"temperature" : 6.5,
+	"time" : "2016-02-12 17:21:53",
+	"type" : "AUT",
+	"latitude" : -34.003073,
+	"longitude" : 150.840927,
+	"imei" : "354430070002333",
+	"shipment" : 366
+}, {
+	"id" : 19657,
+	"battery" : 4036,
+	"temperature" : 6.25,
+	"time" : "2016-02-12 17:22:18",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}, {
+	"id" : 19658,
+	"battery" : 4036,
+	"temperature" : 4.369999885559082,
+	"time" : "2016-02-12 17:32:07",
+	"type" : "AUT",
+	"latitude" : -33.985899,
+	"longitude" : 150.857478,
+	"imei" : "354430070001293",
+	"shipment" : 375
+}
+]

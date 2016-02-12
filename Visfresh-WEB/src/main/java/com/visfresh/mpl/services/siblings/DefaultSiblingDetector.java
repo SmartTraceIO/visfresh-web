@@ -38,7 +38,7 @@ public class DefaultSiblingDetector implements SiblingDetector {
      * The logger.
      */
     private static final Logger log = LoggerFactory.getLogger(DefaultSiblingDetector.class);
-    protected static final double MAX_DISTANCE = 3000; //meters
+    protected static final double MAX_DISTANCE_AVERAGE = 3000; //meters
     /**
      * Group name prefix.
      */
@@ -232,28 +232,32 @@ public class DefaultSiblingDetector implements SiblingDetector {
         return list.toArray(new TrackerEvent[list.size()]);
     }
     /**
-     * TODO implement more accurate
      * @param s other sibling.
      * @param master master sibling events.
      * @return true if shipments are siblings.
      */
     //set as protected only for testing purposes.
     protected boolean isSiblings(final Shipment s, final TrackerEvent[] masterEvents) {
-        int near = 0;
-        int far = 0;
+        final List<Double> distances = new LinkedList<>();
 
         for (final TrackerEvent e: getTrackeEvents(s)) {
             final Double distance = getDistanceMeters(e, masterEvents);
             if (distance != null) {
-                if (distance < MAX_DISTANCE) {
-                    near++;
-                } else {
-                    far++;
-                }
+                distances.add(distance);
             }
         }
 
-        return ((double) far / (double) near < 0.01);
+        if (distances.isEmpty()) {
+            return false;
+        }
+
+        double summ = 0;
+        final double norma = distances.size();
+        for (final Double d : distances) {
+            summ += d / norma;
+        }
+
+        return summ < MAX_DISTANCE_AVERAGE;
     }
 
     /**
@@ -271,13 +275,6 @@ public class DefaultSiblingDetector implements SiblingDetector {
         //check out of last event.
         final TrackerEvent lastEvent = masterEvents[masterEvents.length - 1];
         if (e.getTime().after(lastEvent.getTime())) {
-            if (masterEvents.length > 1) {
-                final long eventTimeOut = masterEvents[0].getTime().getTime()
-                        - lastEvent.getTime().getTime();
-                if (e.getTime().getTime() - lastEvent.getTime().getTime() <= eventTimeOut) {
-                    return getDistance(e, lastEvent);
-                }
-            }
             return null;
         }
 
@@ -286,22 +283,23 @@ public class DefaultSiblingDetector implements SiblingDetector {
         int high = masterEvents.length - 1;
         final long key = e.getTime().getTime();
 
-        while (low <= high) {
-            final int mid = (low + high) >>> 1;
+        while (low + 1 < high) {
+            final int mid = (low + high) / 2;
             final long midVal = masterEvents[mid].getTime().getTime();
 
             if (midVal < key) {
-                low = mid + 1;
+                low = mid;
             } else if (midVal > key) {
-                high = mid - 1;
+                high = mid;
             } else {
                 low = mid;
+                high = low + 1;
                 break;
             }
         }
 
         if (low + 1 < masterEvents.length) {
-            return getDistance(e, masterEvents[low], masterEvents[low + 1]);
+            return getDistance(e, masterEvents[low], masterEvents[high]);
         } else {
             return getDistance(e, masterEvents[low]);
         }
@@ -333,8 +331,8 @@ public class DefaultSiblingDetector implements SiblingDetector {
         //ordinary situation
         final double delta = (double) (t.getTime() - mt1.getTime()) / (mt2.getTime() - mt1.getTime());
 
-        final long lat = Math.round(me1.getLatitude() + delta * (me2.getLatitude() - me1.getLatitude()));
-        final long lon = Math.round(me1.getLongitude() + delta * (me2.getLongitude() - me1.getLongitude()));
+        final double lat = me1.getLatitude() + delta * (me2.getLatitude() - me1.getLatitude());
+        final double lon = me1.getLongitude() + delta * (me2.getLongitude() - me1.getLongitude());
 
         return LocationUtils.getDistanceMeters(e.getLatitude(), e.getLongitude(), lat, lon);
     }

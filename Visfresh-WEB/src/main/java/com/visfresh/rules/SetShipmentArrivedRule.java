@@ -69,7 +69,7 @@ public class SetShipmentArrivedRule implements SystemMessageHandler, TrackerEven
         final boolean accept = !req.isProcessed(this)
                 && shipment != null
                 && !shipment.hasFinalStatus()
-                && isNearEndLocation(event.getShipment(), event.getLatitude(), event.getLongitude());
+                && isNearEndLocation(shipment, event.getLatitude(), event.getLongitude());
 
         return accept;
     }
@@ -84,7 +84,7 @@ public class SetShipmentArrivedRule implements SystemMessageHandler, TrackerEven
         final LocationProfile endLocation = shipment.getShippedTo();
         if (endLocation != null) {
             final double distance = getNumberOfMetersForArrival(latitude, longitude, endLocation);
-            return distance <= shipment.getArrivalNotificationWithinKm();
+            return distance < 1.0;
         }
         return false;
     }

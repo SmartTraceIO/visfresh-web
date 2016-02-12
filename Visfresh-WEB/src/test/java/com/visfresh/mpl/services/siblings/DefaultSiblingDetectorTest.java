@@ -70,8 +70,8 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
 
         //add tracker events for given shipment
         addEvent(trackerEvents, notSibling, x0, y0, t0);
-        addEvent(trackerEvents, notSibling, x0 - 0.015, y0 - 0.015, t0 + dt + 60 * 1000l);
-        addEvent(trackerEvents, notSibling, x0 - 0.025, y0 - 0.025, t0 + 2 * dt + 60 * 1000l);
+        addEvent(trackerEvents, notSibling, x0 - 0.15, y0 - 0.15, t0 + dt + 60 * 1000l);
+        addEvent(trackerEvents, notSibling, x0 - 0.25, y0 - 0.25, t0 + 2 * dt + 60 * 1000l);
 
         assertTrue(isSiblings(sibling, masterEvents.toArray(new TrackerEvent[masterEvents.size()])));
         assertFalse(isSiblings(notSibling, masterEvents.toArray(new TrackerEvent[masterEvents.size()])));
@@ -101,8 +101,8 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
 
         //add tracker events for given shipment
         addEvent(trackerEvents, notSibling, x0, y0, t0);
-        addEvent(trackerEvents, notSibling, x0 - 0.015, y0 - 0.015, t0 + dt + 60 * 1000l);
-        addEvent(trackerEvents, notSibling, x0 - 0.025, y0 - 0.025, t0 + 2 * dt + 60 * 1000l);
+        addEvent(trackerEvents, notSibling, x0 - 0.15, y0 - 0.15, t0 + dt + 60 * 1000l);
+        addEvent(trackerEvents, notSibling, x0 - 0.25, y0 - 0.25, t0 + 2 * dt + 60 * 1000l);
 
         this.updateShipmentSiblingsForCompany(company);
 

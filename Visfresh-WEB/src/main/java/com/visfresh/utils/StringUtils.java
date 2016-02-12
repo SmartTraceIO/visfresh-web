@@ -63,7 +63,8 @@ public final class StringUtils {
     public static String getMessage(final String template, final Map<String, String> replacements) {
         String result = template;
         for (final Map.Entry<String, String> e : replacements.entrySet()) {
-            result = result.replaceAll(Pattern.quote("${" + e.getKey() + "}"), e.getValue());
+            final String v = e.getValue() != null ? e.getValue() : "";
+            result = result.replaceAll(Pattern.quote("${" + e.getKey() + "}"), v);
         }
         return result;
     }
