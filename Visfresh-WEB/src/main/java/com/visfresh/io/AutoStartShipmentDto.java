@@ -6,14 +6,14 @@ package com.visfresh.io;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.visfresh.entities.DefaultShipment;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DefaultShipmentDto {
+public class AutoStartShipmentDto {
     /**
      * The list of start location ID.
      */
@@ -28,13 +28,13 @@ public class DefaultShipmentDto {
     /**
      * Default constructor.
      */
-    public DefaultShipmentDto() {
+    public AutoStartShipmentDto() {
         super();
     }
     /**
      * @param cfg default shipment configuration.
      */
-    public DefaultShipmentDto(final DefaultShipment cfg) {
+    public AutoStartShipmentDto(final AutoStartShipment cfg) {
         super();
 
         setId(cfg.getId());

@@ -15,11 +15,11 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.constants.DefaultShipmentConstants;
-import com.visfresh.dao.DefaultShipmentDao;
+import com.visfresh.constants.AutoStartShipmentConstants;
+import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentTemplateDao;
-import com.visfresh.entities.DefaultShipment;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.utils.StringUtils;
@@ -29,17 +29,17 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class DefaultShipmentDaoImpl
-    extends EntityWithCompanyDaoImplBase<DefaultShipment, Long>
-    implements DefaultShipmentDao {
+public class AutoStartShipmentDaoImpl
+    extends EntityWithCompanyDaoImplBase<AutoStartShipment, Long>
+    implements AutoStartShipmentDao {
 
-    public static final String TABLE = "defaultshipments";
+    public static final String TABLE = "autostartshipments";
 
     protected static final String ID_FIELD = "id";
     protected static final String COMPANY_FIELD = "company";
     protected static final String TEMPLATE_FIELD = "template";
 
-    private static final String LOCATION_REL_TABLE = "defaultshipmentlocations";
+    private static final String LOCATION_REL_TABLE = "autostartlocations";
     private static final String LOCATION_DIRECTION = "direction";
     private static final String LOCATION_LOCATION = "location";
     private static final String LOCATION_CONFIG = "config";
@@ -53,17 +53,17 @@ public class DefaultShipmentDaoImpl
     /**
      * Default constructor.
      */
-    public DefaultShipmentDaoImpl() {
+    public AutoStartShipmentDaoImpl() {
         super();
-        propertyToDbMap.put(DefaultShipmentConstants.ID, ID_FIELD);
-        propertyToDbMap.put(DefaultShipmentConstants.TEMPLATE, TEMPLATE_FIELD);
+        propertyToDbMap.put(AutoStartShipmentConstants.ID, ID_FIELD);
+        propertyToDbMap.put(AutoStartShipmentConstants.TEMPLATE, TEMPLATE_FIELD);
     }
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <E extends DefaultShipment> E save(final E cfg) {
+    public <E extends AutoStartShipment> E save(final E cfg) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         paramMap.put(ID_FIELD, cfg.getId());
@@ -90,7 +90,7 @@ public class DefaultShipmentDaoImpl
         mergeLocations(cfg);
         return cfg;
     }
-    private void mergeLocations(final DefaultShipment cfg) {
+    private void mergeLocations(final AutoStartShipment cfg) {
         final Set<Long> oldLocFrom = new HashSet<>();
         final Set<Long> oldLocTo = new HashSet<>();
 
@@ -203,8 +203,8 @@ public class DefaultShipmentDaoImpl
      * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
      */
     @Override
-    protected DefaultShipment createEntity(final Map<String, Object> map) {
-        final DefaultShipment cfg = new DefaultShipment();
+    protected AutoStartShipment createEntity(final Map<String, Object> map) {
+        final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setId(((Number) map.get(ID_FIELD)).longValue());
         return cfg;
     }
@@ -212,7 +212,7 @@ public class DefaultShipmentDaoImpl
      * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
      */
     @Override
-    protected void resolveReferences(final DefaultShipment t,
+    protected void resolveReferences(final AutoStartShipment t,
             final Map<String, Object> row, final Map<String, Object> cache) {
         super.resolveReferences(t, row, cache);
         resolveTemplate(t, row, cache);
@@ -224,7 +224,7 @@ public class DefaultShipmentDaoImpl
      * @param row row.
      * @param cache cache.
      */
-    private void resolveLocations(final DefaultShipment t,
+    private void resolveLocations(final AutoStartShipment t,
             final Map<String, Object> row, final Map<String, Object> cache) {
         final Set<Long> locFrom = new HashSet<>();
         final Set<Long> locTo = new HashSet<>();
@@ -247,7 +247,7 @@ public class DefaultShipmentDaoImpl
      * @param locFrom
      * @param locTo
      */
-    protected void getLocationIds(final DefaultShipment t,
+    protected void getLocationIds(final AutoStartShipment t,
             final Set<Long> locFrom, final Set<Long> locTo) {
         final Map<String, Object> params = new HashMap<>();
         params.put("cfg", t.getId());
@@ -287,7 +287,7 @@ public class DefaultShipmentDaoImpl
      * @param row
      * @param cache
      */
-    protected void resolveTemplate(final DefaultShipment t,
+    protected void resolveTemplate(final AutoStartShipment t,
             final Map<String, Object> row, final Map<String, Object> cache) {
         final String id = ((Number) row.get(TEMPLATE_FIELD)).toString();
         final String cacheKey = "template_" + id;

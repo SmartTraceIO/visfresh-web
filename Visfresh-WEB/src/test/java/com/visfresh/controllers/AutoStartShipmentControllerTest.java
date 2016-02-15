@@ -13,50 +13,50 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.visfresh.controllers.restclient.DefaultShipmentRestClient;
-import com.visfresh.dao.DefaultShipmentDao;
+import com.visfresh.controllers.restclient.AutoStartShipmentRestClient;
+import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentTemplateDao;
-import com.visfresh.entities.DefaultShipment;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentTemplate;
-import com.visfresh.io.DefaultShipmentDto;
+import com.visfresh.io.AutoStartShipmentDto;
 import com.visfresh.services.RestServiceException;
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DefaultShipmentControllerTest extends AbstractRestServiceTest {
-    private DefaultShipmentRestClient client;
-    private DefaultShipmentDao dao;
+public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
+    private AutoStartShipmentRestClient client;
+    private AutoStartShipmentDao dao;
 
     /**
      * Default constructor.
      */
-    public DefaultShipmentControllerTest() {
+    public AutoStartShipmentControllerTest() {
         super();
     }
 
     @Before
     public void setUp() {
         //login to service.
-        client = new DefaultShipmentRestClient(TimeZone.getDefault());
+        client = new AutoStartShipmentRestClient(TimeZone.getDefault());
         client.setServiceUrl(getServiceUrl());
         client.setAuthToken(login());
 
-        dao = context.getBean(DefaultShipmentDao.class);
+        dao = context.getBean(AutoStartShipmentDao.class);
     }
 
     @Test
-    public void testGetDefaultShipment() throws IOException, RestServiceException {
+    public void testGetAutoStartShipment() throws IOException, RestServiceException {
         final ShipmentTemplate template = createTemplate();
         final LocationProfile locTo = createLocation("From");
         final LocationProfile locFrom = createLocation("TO");
 
-        createDefaultShipment(template, locFrom, locTo);
-        final DefaultShipment ds = createDefaultShipment(template, locFrom, locTo);
+        createAutoStartShipment(template, locFrom, locTo);
+        final AutoStartShipment ds = createAutoStartShipment(template, locFrom, locTo);
 
-        final DefaultShipmentDto dto = client.getDefaultShipment(ds.getId());
+        final AutoStartShipmentDto dto = client.getAutoStartShipment(ds.getId());
 
         assertEquals(ds.getId(), dto.getId());
         assertEquals(ds.getTemplate().getId(), dto.getTemplate());
@@ -64,36 +64,36 @@ public class DefaultShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(ds.getShippedTo().get(0).getId(), locTo.getId());
     }
     @Test
-    public void testDeleteDefaultShipment() throws IOException, RestServiceException {
+    public void testDeleteAutoStartShipment() throws IOException, RestServiceException {
         final ShipmentTemplate template = createTemplate();
         final LocationProfile locTo = createLocation("From");
         final LocationProfile locFrom = createLocation("TO");
 
-        final DefaultShipment ds1 = createDefaultShipment(template, locFrom, locTo);
-        final DefaultShipment ds2 = createDefaultShipment(template, locFrom, locTo);
+        final AutoStartShipment ds1 = createAutoStartShipment(template, locFrom, locTo);
+        final AutoStartShipment ds2 = createAutoStartShipment(template, locFrom, locTo);
 
-        client.deleteDefaultShipment(ds2.getId());
+        client.deleteAutoStartShipment(ds2.getId());
 
         assertEquals(1, dao.getEntityCount(null));
         assertEquals(ds1.getId(), dao.findAll(null, null, null).get(0).getId());
     }
 
     @Test
-    public void testSaveDefaultShipment() throws IOException, RestServiceException {
+    public void testSaveAutoStartShipment() throws IOException, RestServiceException {
         final ShipmentTemplate template = createTemplate();
         final LocationProfile locTo = createLocation("From");
         final LocationProfile locFrom = createLocation("TO");
 
-        final DefaultShipmentDto dto = new DefaultShipmentDto();
+        final AutoStartShipmentDto dto = new AutoStartShipmentDto();
         dto.setTemplate(template.getId());
         dto.getStartLocations().add(locFrom.getId());
         dto.getEndLocations().add(locTo.getId());
 
-        final Long id = client.saveDefaultShipment(dto);
+        final Long id = client.saveAutoStartShipment(dto);
 
         assertNotNull(id);
 
-        final DefaultShipment ds = dao.findOne(id);
+        final AutoStartShipment ds = dao.findOne(id);
         assertEquals(id, ds.getId());
         assertEquals(dto.getTemplate(), ds.getTemplate().getId());
         assertEquals(locFrom.getId(), ds.getShippedFrom().get(0).getId());
@@ -101,23 +101,23 @@ public class DefaultShipmentControllerTest extends AbstractRestServiceTest {
     }
 
     @Test
-    public void testGetDefaultShipments() throws IOException, RestServiceException {
+    public void testGetAutoStartShipments() throws IOException, RestServiceException {
         final ShipmentTemplate template = createTemplate();
         final LocationProfile locTo = createLocation("From");
         final LocationProfile locFrom = createLocation("TO");
 
-        final DefaultShipment ds1 = createDefaultShipment(template, locFrom, locTo);
-        final DefaultShipment ds2 = createDefaultShipment(template, locFrom, locTo);
+        final AutoStartShipment ds1 = createAutoStartShipment(template, locFrom, locTo);
+        final AutoStartShipment ds2 = createAutoStartShipment(template, locFrom, locTo);
 
-        final List<DefaultShipmentDto> dss = client.getDefaultShipments(null, null);
+        final List<AutoStartShipmentDto> dss = client.getAutoStartShipments(null, null);
         assertEquals(2, dss.size());
         assertEquals(ds1.getId(), dss.get(0).getId());
         assertEquals(ds2.getId(), dss.get(1).getId());
     }
 
-    private DefaultShipment createDefaultShipment(final ShipmentTemplate template,
+    private AutoStartShipment createAutoStartShipment(final ShipmentTemplate template,
             final LocationProfile locFrom, final LocationProfile locTo) {
-        final DefaultShipment cfg = new DefaultShipment();
+        final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setCompany(getCompany());
         cfg.setTemplate(template);
         cfg.getShippedFrom().add(locFrom);

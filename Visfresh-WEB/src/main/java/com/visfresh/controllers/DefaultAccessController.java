@@ -365,19 +365,19 @@ public class DefaultAccessController implements AccessController {
         }
     }
     /* (non-Javadoc)
-     * @see com.visfresh.controllers.AccessController#checkCanSaveDefaultShipment(com.visfresh.entities.User)
+     * @see com.visfresh.controllers.AccessController#checkCanSaveAutoStartShipment(com.visfresh.entities.User)
      */
     @Override
-    public void checkCanSaveDefaultShipment(final User user) {
+    public void checkCanSaveAutoStartShipment(final User user) {
         if (havePermission(user, Role.CompanyAdmin)) {
             return;
         }
     }
     /* (non-Javadoc)
-     * @see com.visfresh.controllers.AccessController#checkCanViewDefaultShipments(com.visfresh.entities.User)
+     * @see com.visfresh.controllers.AccessController#checkCanViewAutoStartShipments(com.visfresh.entities.User)
      */
     @Override
-    public void checkCanViewDefaultShipments(final User user) {
+    public void checkCanViewAutoStartShipments(final User user) {
     }
     /**
      * @param user

@@ -8,15 +8,15 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.visfresh.entities.DefaultShipment;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentTemplate;
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DefaultShipmentDaoTest extends
-        BaseCrudTest<DefaultShipmentDao, DefaultShipment, Long> {
+public class AutoStartShipmentDaoTest extends
+        BaseCrudTest<AutoStartShipmentDao, AutoStartShipment, Long> {
     private LocationProfile locFrom;
     private LocationProfile locTo;
     private ShipmentTemplate template;
@@ -24,8 +24,8 @@ public class DefaultShipmentDaoTest extends
     /**
      * @param clazz the DAO class.
      */
-    public DefaultShipmentDaoTest() {
-        super(DefaultShipmentDao.class);
+    public AutoStartShipmentDaoTest() {
+        super(AutoStartShipmentDao.class);
     }
 
     @Before
@@ -37,7 +37,7 @@ public class DefaultShipmentDaoTest extends
 
     @Test
     public void testUpdateLocations() {
-        DefaultShipment cfg = createTestEntity();
+        AutoStartShipment cfg = createTestEntity();
         cfg.getShippedFrom().clear();
         cfg.getShippedTo().clear();
 
@@ -91,7 +91,7 @@ public class DefaultShipmentDaoTest extends
      * @see com.visfresh.dao.BaseCrudTest#assertCreateTestEntityOk(com.visfresh.entities.EntityWithId)
      */
     @Override
-    protected void assertCreateTestEntityOk(final DefaultShipment cfg) {
+    protected void assertCreateTestEntityOk(final AutoStartShipment cfg) {
         assertEquals(sharedCompany.getId(), cfg.getCompany().getId());
         assertEquals(template.getId(), cfg.getTemplate().getId());
         assertEquals(1, cfg.getShippedFrom().size());
@@ -104,8 +104,8 @@ public class DefaultShipmentDaoTest extends
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()
      */
     @Override
-    protected DefaultShipment createTestEntity() {
-        final DefaultShipment cfg = new DefaultShipment();
+    protected AutoStartShipment createTestEntity() {
+        final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setCompany(sharedCompany);
         cfg.setTemplate(template);
         cfg.getShippedFrom().add(locFrom);

@@ -10,30 +10,30 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.visfresh.io.DefaultShipmentDto;
+import com.visfresh.io.AutoStartShipmentDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DefaultShipmentSerializerTest {
-    private DefaultShipmentSerializer serializer;
+public class AutoStartShipmentSerializerTest {
+    private AutoStartShipmentSerializer serializer;
 
     /**
      * Default constructor.
      */
-    public DefaultShipmentSerializerTest() {
+    public AutoStartShipmentSerializerTest() {
         super();
     }
 
     @Before
     public void setUp() {
-        serializer = new DefaultShipmentSerializer(TimeZone.getDefault());
+        serializer = new AutoStartShipmentSerializer(TimeZone.getDefault());
     }
 
     @Test
     public void testSerialize() {
-        DefaultShipmentDto dto = new DefaultShipmentDto();
+        AutoStartShipmentDto dto = new AutoStartShipmentDto();
         final Long id = 7l;
         final Long template = 8l;
         final Long loc1 = 1l;
@@ -48,7 +48,7 @@ public class DefaultShipmentSerializerTest {
         dto.getEndLocations().add(loc3);
         dto.getEndLocations().add(loc4);
 
-        dto = serializer.parseDefaultShipmentDto(serializer.toJson(dto));
+        dto = serializer.parseAutoStartShipmentDto(serializer.toJson(dto));
 
         assertEquals(id, dto.getId());
         assertEquals(template, dto.getTemplate());

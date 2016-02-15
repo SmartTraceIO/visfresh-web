@@ -10,7 +10,7 @@ import java.util.List;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DefaultShipment implements EntityWithCompany, EntityWithId<Long> {
+public class AutoStartShipment implements EntityWithCompany, EntityWithId<Long> {
     private Long id;
     private Company company;
     private ShipmentTemplate template;
@@ -20,7 +20,7 @@ public class DefaultShipment implements EntityWithCompany, EntityWithId<Long> {
     /**
      * Default constructor.
      */
-    public DefaultShipment() {
+    public AutoStartShipment() {
         super();
     }
 

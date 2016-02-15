@@ -21,34 +21,34 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.visfresh.constants.DefaultShipmentConstants;
-import com.visfresh.dao.DefaultShipmentDao;
+import com.visfresh.constants.AutoStartShipmentConstants;
+import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentTemplateDao;
-import com.visfresh.entities.DefaultShipment;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
-import com.visfresh.io.DefaultShipmentDto;
-import com.visfresh.io.json.DefaultShipmentSerializer;
+import com.visfresh.io.AutoStartShipmentDto;
+import com.visfresh.io.json.AutoStartShipmentSerializer;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-@RestController("DefaultShipment")
+@RestController("AutoStartShipment")
 @RequestMapping("/rest")
-public class DefaultShipmentController extends AbstractController
-        implements DefaultShipmentConstants {
+public class AutoStartShipmentController extends AbstractController
+        implements AutoStartShipmentConstants {
     /**
      * Logger.
      */
-    private static final Logger log = LoggerFactory.getLogger(DefaultShipmentController.class);
+    private static final Logger log = LoggerFactory.getLogger(AutoStartShipmentController.class);
 
     @Autowired
-    private DefaultShipmentDao dao;
+    private AutoStartShipmentDao dao;
     @Autowired
     private LocationProfileDao locationProfileDao;
     @Autowired
@@ -57,7 +57,7 @@ public class DefaultShipmentController extends AbstractController
     /**
      * Default constructor.
      */
-    public DefaultShipmentController() {
+    public AutoStartShipmentController() {
         super();
     }
 
@@ -66,15 +66,15 @@ public class DefaultShipmentController extends AbstractController
      * @param defShipment alert profile.
      * @return ID of saved alert profile.
      */
-    @RequestMapping(value = "/saveDefaultShipment/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveAlertProfile(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveAutoStartShipment/{authToken}", method = RequestMethod.POST)
+    public JsonObject saveAutoStartShipment(@PathVariable final String authToken,
             final @RequestBody JsonObject defShipment) {
         try {
             final User user = getLoggedInUser(authToken);
-            final DefaultShipmentDto dto = createSerializer(user)
-                    .parseDefaultShipmentDto(defShipment);
+            final AutoStartShipmentDto dto = createSerializer(user)
+                    .parseAutoStartShipmentDto(defShipment);
 
-            security.checkCanSaveDefaultShipment(user);
+            security.checkCanSaveAutoStartShipment(user);
 
             final ShipmentTemplate tpl = template.findOne(dto.getTemplate());
             checkCompanyAccess(user, tpl);
@@ -93,7 +93,7 @@ public class DefaultShipmentController extends AbstractController
                 checkCompanyAccess(user, l);
             }
 
-            final DefaultShipment cfg = new DefaultShipment();
+            final AutoStartShipment cfg = new AutoStartShipment();
             cfg.setCompany(user.getCompany());
             cfg.setTemplate(tpl);
             cfg.setId(dto.getId());
@@ -116,22 +116,22 @@ public class DefaultShipmentController extends AbstractController
     }
     /**
      * @param authToken authentication token.
-     * @param defaultShipmentId default shipment ID.
+     * @param autoStartShipmentId default shipment ID.
      * @return default shipment as JSON.
      */
-    @RequestMapping(value = "/getDefaultShipment/{authToken}", method = RequestMethod.GET)
-    public JsonObject getDefaultShipment(@PathVariable final String authToken,
-            @RequestParam final Long defaultShipmentId) {
+    @RequestMapping(value = "/getAutoStartShipment/{authToken}", method = RequestMethod.GET)
+    public JsonObject getAutoStartShipment(@PathVariable final String authToken,
+            @RequestParam final Long autoStartShipmentId) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanViewDefaultShipments(user);
+            security.checkCanViewAutoStartShipments(user);
 
-            final DefaultShipment cfg = dao.findOne(defaultShipmentId);
+            final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
             checkCompanyAccess(user, cfg);
 
             return createSuccessResponse(createSerializer(user).toJson(
-                    new DefaultShipmentDto(cfg)));
+                    new AutoStartShipmentDto(cfg)));
         } catch (final Exception e) {
             log.error("Failed to get default shipment", e);
             return createErrorResponse(e);
@@ -139,18 +139,18 @@ public class DefaultShipmentController extends AbstractController
     }
     /**
      * @param authToken authentication token.
-     * @param defaultShipmentId default shipment ID.
+     * @param autoStartShipmentId default shipment ID.
      * @return default shipment.
      */
-    @RequestMapping(value = "/deleteDefaultShipment/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteDefaultShipment(@PathVariable final String authToken,
-            @RequestParam final Long defaultShipmentId) {
+    @RequestMapping(value = "/deleteAutoStartShipment/{authToken}", method = RequestMethod.GET)
+    public JsonObject deleteAutoStartShipment(@PathVariable final String authToken,
+            @RequestParam final Long autoStartShipmentId) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveDefaultShipment(user);
+            security.checkCanSaveAutoStartShipment(user);
 
-            final DefaultShipment cfg = dao.findOne(defaultShipmentId);
+            final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
             checkCompanyAccess(user, cfg);
             dao.delete(cfg);
 
@@ -166,8 +166,8 @@ public class DefaultShipmentController extends AbstractController
      * @param pageSize the page size.
      * @return list of default shipments.
      */
-    @RequestMapping(value = "/getDefaultShipments/{authToken}", method = RequestMethod.GET)
-    public JsonElement getDefaultShipments(@PathVariable final String authToken,
+    @RequestMapping(value = "/getAutoStartShipments/{authToken}", method = RequestMethod.GET)
+    public JsonElement getAutoStartShipments(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -179,9 +179,9 @@ public class DefaultShipmentController extends AbstractController
             //check logged in.
             final User user = getLoggedInUser(authToken);
             security.checkCanGetAlertProfiles(user);
-            final DefaultShipmentSerializer ser = createSerializer(user);
+            final AutoStartShipmentSerializer ser = createSerializer(user);
 
-            final List<DefaultShipment> configs = dao.findByCompany(
+            final List<AutoStartShipment> configs = dao.findByCompany(
                     user.getCompany(),
                     createSorting(sc, so, getDefaultSortOrder(), 2),
                     page,
@@ -189,8 +189,8 @@ public class DefaultShipmentController extends AbstractController
             final int total = dao.getEntityCount(user.getCompany(), null);
 
             final JsonArray array = new JsonArray();
-            for (final DefaultShipment cfg : configs) {
-                array.add(ser.toJson(new DefaultShipmentDto(cfg)));
+            for (final AutoStartShipment cfg : configs) {
+                array.add(ser.toJson(new AutoStartShipmentDto(cfg)));
             }
 
             return createListSuccessResponse(array, total);
@@ -203,8 +203,8 @@ public class DefaultShipmentController extends AbstractController
      * @param user
      * @return
      */
-    private DefaultShipmentSerializer createSerializer(final User user) {
-        return new DefaultShipmentSerializer(user.getTimeZone());
+    private AutoStartShipmentSerializer createSerializer(final User user) {
+        return new AutoStartShipmentSerializer(user.getTimeZone());
     }
 
     /**

@@ -9,19 +9,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.visfresh.constants.DefaultShipmentConstants;
-import com.visfresh.io.DefaultShipmentDto;
+import com.visfresh.constants.AutoStartShipmentConstants;
+import com.visfresh.io.AutoStartShipmentDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DefaultShipmentSerializer extends AbstractJsonSerializer
-        implements DefaultShipmentConstants {
+public class AutoStartShipmentSerializer extends AbstractJsonSerializer
+        implements AutoStartShipmentConstants {
     /**
      * @param tz time zone.
      */
-    public DefaultShipmentSerializer(final TimeZone tz) {
+    public AutoStartShipmentSerializer(final TimeZone tz) {
         super(tz);
     }
 
@@ -29,14 +29,14 @@ public class DefaultShipmentSerializer extends AbstractJsonSerializer
      * @param e JSON element to parse.
      * @return default shipment DTO.
      */
-    public DefaultShipmentDto parseDefaultShipmentDto(final JsonElement e) {
+    public AutoStartShipmentDto parseAutoStartShipmentDto(final JsonElement e) {
         if (e == null || e.isJsonNull()) {
             return null;
         }
 
         final JsonObject json = e.getAsJsonObject();
 
-        final DefaultShipmentDto dto = new DefaultShipmentDto();
+        final AutoStartShipmentDto dto = new AutoStartShipmentDto();
         dto.setId(asLong(json.get(ID)));
         dto.setTemplate(json.get(TEMPLATE).getAsLong());
 
@@ -59,7 +59,7 @@ public class DefaultShipmentSerializer extends AbstractJsonSerializer
      * @param ds
      * @return
      */
-    public JsonObject toJson(final DefaultShipmentDto ds) {
+    public JsonObject toJson(final AutoStartShipmentDto ds) {
         if (ds == null) {
             return null;
         }

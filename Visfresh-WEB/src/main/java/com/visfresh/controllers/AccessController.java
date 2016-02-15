@@ -166,9 +166,9 @@ public interface AccessController {
     /**
      * @param user the user.
      */
-    void checkCanSaveDefaultShipment(User user);
+    void checkCanSaveAutoStartShipment(User user);
     /**
      * @param user the user.
      */
-    void checkCanViewDefaultShipments(User user);
+    void checkCanViewAutoStartShipments(User user);
 }

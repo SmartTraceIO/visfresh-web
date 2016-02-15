@@ -99,9 +99,9 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
         //test null location
         assertEquals(0, dao.getOwnerShipments(null).size());
 
-        createDefaultShipment();
-        final Shipment s2 = createDefaultShipment();
-        final Shipment s3 = createDefaultShipment();
+        createAutoStartShipment();
+        final Shipment s2 = createAutoStartShipment();
+        final Shipment s3 = createAutoStartShipment();
 
         final LocationProfile loc = createTestEntity();
         dao.save(loc);
@@ -115,7 +115,7 @@ public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, Loc
     /**
      * @return
      */
-    private Shipment createDefaultShipment() {
+    private Shipment createAutoStartShipment() {
         final Shipment s = new Shipment();
         s.setCompany(sharedCompany);
         s.setDevice(device);

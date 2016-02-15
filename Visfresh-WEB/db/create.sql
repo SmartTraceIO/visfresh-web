@@ -11,8 +11,8 @@ drop table if exists alerts;
 drop table if exists notifications;
 drop table if exists userprofiles;
 drop table if exists shipmentdevices;
-drop table if exists defaultshipmentlocations;
-drop table if exists defaultshipments;
+drop table if exists autostartlocations;
+drop table if exists autostartshipments;
 drop table if exists shipments;
 drop table if exists locationprofiles;
 drop table if exists personalschedules;
@@ -230,7 +230,7 @@ create table shipments (
         references devices (imei)
 );
 
-create table defaultshipments (
+create table autostartshipments (
     id bigint(20) auto_increment not null,
     company bigint(20) not null,
     template bigint(20) not null,
@@ -241,7 +241,7 @@ create table defaultshipments (
         REFERENCES shipments (id) ON DELETE CASCADE
 );
 
-create table defaultshipmentlocations (
+create table autostartlocations (
     config bigint(20) not null,
     location bigint(20) not null,
     direction varchar(8) not null,
@@ -249,7 +249,7 @@ create table defaultshipmentlocations (
     FOREIGN KEY (location)
         REFERENCES locationprofiles (id) ON DELETE CASCADE,
     FOREIGN KEY (config)
-        REFERENCES defaultshipments (id) ON DELETE CASCADE
+        REFERENCES autostartshipments (id) ON DELETE CASCADE
 );
 
 create table alerts (

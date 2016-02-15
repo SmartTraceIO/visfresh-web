@@ -11,23 +11,23 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.visfresh.io.DefaultShipmentDto;
-import com.visfresh.io.json.DefaultShipmentSerializer;
+import com.visfresh.io.AutoStartShipmentDto;
+import com.visfresh.io.json.AutoStartShipmentSerializer;
 import com.visfresh.services.RestServiceException;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DefaultShipmentRestClient extends RestClient {
-    private DefaultShipmentSerializer serializer;
+public class AutoStartShipmentRestClient extends RestClient {
+    private AutoStartShipmentSerializer serializer;
 
     /**
      * @param tz time zone.
      */
-    public DefaultShipmentRestClient(final TimeZone tz) {
+    public AutoStartShipmentRestClient(final TimeZone tz) {
         super();
-        this.serializer = new DefaultShipmentSerializer(tz);
+        this.serializer = new AutoStartShipmentSerializer(tz);
     }
 
     /**
@@ -36,26 +36,26 @@ public class DefaultShipmentRestClient extends RestClient {
      * @throws IOException
      * @throws RestServiceException
      */
-    public DefaultShipmentDto getDefaultShipment(final Long id)
+    public AutoStartShipmentDto getAutoStartShipment(final Long id)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("defaultShipmentId", id.toString());
+        params.put("autoStartShipmentId", id.toString());
 
-        final JsonElement response = sendGetRequest(getPathWithToken("getDefaultShipment"),
+        final JsonElement response = sendGetRequest(getPathWithToken("getAutoStartShipment"),
                 params);
-        return serializer.parseDefaultShipmentDto(response);
+        return serializer.parseAutoStartShipmentDto(response);
     }
     /**
      * @param id default shipment ID.
      * @throws IOException
      * @throws RestServiceException
      */
-    public void deleteDefaultShipment(final Long id)
+    public void deleteAutoStartShipment(final Long id)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("defaultShipmentId", id.toString());
+        params.put("autoStartShipmentId", id.toString());
 
-        sendGetRequest(getPathWithToken("deleteDefaultShipment"), params);
+        sendGetRequest(getPathWithToken("deleteAutoStartShipment"), params);
     }
     /**
      * @param dto default shipment.
@@ -63,9 +63,9 @@ public class DefaultShipmentRestClient extends RestClient {
      * @throws IOException
      * @throws RestServiceException
      */
-    public Long saveDefaultShipment(final DefaultShipmentDto dto)
+    public Long saveAutoStartShipment(final AutoStartShipmentDto dto)
             throws IOException, RestServiceException {
-        final JsonElement response = sendPostRequest(getPathWithToken("saveDefaultShipment"),
+        final JsonElement response = sendPostRequest(getPathWithToken("saveAutoStartShipment"),
                 serializer.toJson(dto));
         return parseId(response.getAsJsonObject());
     }
@@ -76,7 +76,7 @@ public class DefaultShipmentRestClient extends RestClient {
      * @throws IOException
      * @throws RestServiceException
      */
-    public List<DefaultShipmentDto> getDefaultShipments(
+    public List<AutoStartShipmentDto> getAutoStartShipments(
             final Integer pageIndex, final Integer pageSize)
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
@@ -85,11 +85,11 @@ public class DefaultShipmentRestClient extends RestClient {
             params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
         }
         final JsonArray response = sendGetRequest(
-                getPathWithToken("getDefaultShipments"), params).getAsJsonArray();
+                getPathWithToken("getAutoStartShipments"), params).getAsJsonArray();
 
-        final List<DefaultShipmentDto> result = new LinkedList<DefaultShipmentDto>();
+        final List<AutoStartShipmentDto> result = new LinkedList<AutoStartShipmentDto>();
         for (final JsonElement e : response) {
-            result.add(serializer.parseDefaultShipmentDto(e));
+            result.add(serializer.parseAutoStartShipmentDto(e));
         }
         return result;
     }
