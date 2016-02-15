@@ -88,7 +88,6 @@ public class UnwiredLabsLocationService implements LocationService {
         Location loc;
         try {
             loc = parseLocation(response);
-            log.error("Parsed location: " + loc);
         } catch (final Exception e) {
             log.error("Failed to parse location from response: " + response, e);
             throw new RetryableException(e);
