@@ -364,6 +364,21 @@ public class DefaultAccessController implements AccessController {
             }
         }
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanSaveDefaultShipment(com.visfresh.entities.User)
+     */
+    @Override
+    public void checkCanSaveDefaultShipment(final User user) {
+        if (havePermission(user, Role.CompanyAdmin)) {
+            return;
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AccessController#checkCanViewDefaultShipments(com.visfresh.entities.User)
+     */
+    @Override
+    public void checkCanViewDefaultShipments(final User user) {
+    }
     /**
      * @param user
      * @param role

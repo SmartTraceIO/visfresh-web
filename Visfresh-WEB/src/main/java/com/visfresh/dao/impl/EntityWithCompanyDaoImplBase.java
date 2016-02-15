@@ -60,10 +60,11 @@ public abstract class EntityWithCompanyDaoImplBase<
     protected void resolveReferences(final T t, final Map<String, Object> row,
             final Map<String, Object> cache) {
         final String id = ((Number) row.get(getCompanyFieldName())).toString();
-        Company company = (Company) cache.get(id);
+        final String cacheKey = "company_" + id;
+        Company company = (Company) cache.get(cacheKey);
         if (company == null) {
             company = companyDao.findOne(Long.valueOf(id));
-            cache.put(id, company);
+            cache.put(cacheKey, company);
         }
         t.setCompany(company);
     }

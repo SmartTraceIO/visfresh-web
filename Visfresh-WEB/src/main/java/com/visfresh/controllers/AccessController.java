@@ -163,4 +163,12 @@ public interface AccessController {
      */
     void checkCanEditShipmentNotes(User user, Shipment shipment, User noteOwner)
             throws RestServiceException;
+    /**
+     * @param user the user.
+     */
+    void checkCanSaveDefaultShipment(User user);
+    /**
+     * @param user the user.
+     */
+    void checkCanViewDefaultShipments(User user);
 }

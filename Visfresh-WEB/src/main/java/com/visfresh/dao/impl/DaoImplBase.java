@@ -6,6 +6,7 @@ package com.visfresh.dao.impl;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -59,11 +60,38 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      */
     @Override
     public List<T> findAll(final Collection<ID> ids) {
-        final List<T> result = new LinkedList<T>();
-        for (final ID id : ids) {
-            result.add(findOne(id));
+        if (ids.size() == 0) {
+            return new LinkedList<T>();
         }
-        return result;
+
+        final String[] keys = new String[ids.size()];
+        final Iterator<ID> iter = ids.iterator();
+        int i = 0;
+        while(iter.hasNext()) {
+            keys[i] = DEFAULT_FILTER_KEY_PREFIX + "_id_" + iter.next();
+            i++;
+        }
+
+        final Filter f = new Filter();
+        f.addFilter(DEFAULT_FILTER_KEY_PREFIX + ".getAllById",
+                new SynteticFilter() {
+
+                    @Override
+                    public Object[] getValues() {
+                        return ids.toArray();
+                    }
+                    @Override
+                    public String[] getKeys() {
+                        return keys;
+                    }
+                    @Override
+                    public String getFilter() {
+                        return getTableName() + "." + getIdFieldName()
+                                + " in (:" + StringUtils.combine(getKeys(), ",:") + ")";
+                    }
+                });
+
+        return findAll(f, null, null);
     }
     /* (non-Javadoc)
      * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Object)
@@ -212,15 +240,27 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      */
     protected void addFilterValue(final String property, final Object value,
             final Map<String, Object> params, final List<String> filters) {
-        final String key = DEFAULT_FILTER_KEY_PREFIX + property;
+        if (!(value instanceof SynteticFilter)) {
+            final String key = DEFAULT_FILTER_KEY_PREFIX + property;
 
-        String dbFieldName = getPropertyToDbMap().get(property);
-        if (dbFieldName == null) {
-            dbFieldName = property;
+            String dbFieldName = getPropertyToDbMap().get(property);
+            if (dbFieldName == null) {
+                dbFieldName = property;
+            }
+
+            params.put(key, value);
+            filters.add(getTableName() + "." + dbFieldName + "= :" + key);
+        } else {
+            final SynteticFilter sf = (SynteticFilter) value;
+            final String[] keys = sf.getKeys();
+            final Object[] values = sf.getValues();
+
+            for (int i = 0; i < keys.length; i++) {
+                params.put(keys[i], values[i]);
+            }
+
+            filters.add(sf.getFilter());
         }
-
-        params.put(key, value);
-        filters.add(getTableName() + "." + dbFieldName + "= :" + key);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
@@ -296,6 +336,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         }
         return result;
     }
+
     /**
      * @param t
      * @param map

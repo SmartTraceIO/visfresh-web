@@ -6,6 +6,7 @@ package com.visfresh.dao;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
@@ -74,6 +75,23 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
         final E e2 = createTestEntity();
         dao.save(e2);
         assertTestGetAllOk(2, dao.findAll(null, null, null));
+    }
+    /**
+     * Tests get all method.
+     */
+    @Test
+    public void testGetAllById() {
+        final E e1 = createTestEntity();
+        dao.save(e1);
+        final E e2 = createTestEntity();
+        dao.save(e2);
+
+        final List<ID> ids = new LinkedList<>();
+        ids.add(e1.getId());
+        assertTestGetAllOk(1, dao.findAll(ids));
+
+        ids.add(e2.getId());
+        assertTestGetAllOk(2, dao.findAll(ids));
     }
 
     /**
