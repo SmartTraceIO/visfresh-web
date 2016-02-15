@@ -25,7 +25,7 @@ public class UnwiredLabsLocationServiceTool {
         final DeviceMessage msg = parseDeviceMessage();
 
         final UnwiredLabsLocationService svc = createClient();
-        final Location location = svc.getLocation(msg.getStations());
+        final Location location = svc.getLocation(msg.getImei(), msg.getStations());
         System.out.println(location);
     }
 

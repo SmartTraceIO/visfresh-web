@@ -70,7 +70,8 @@ public class DeviceMessageDispatcher extends AbstractDispatcher {
      * @throws RetryableException exception.
      */
     private void processMessage(final DeviceMessage m) throws RetryableException {
-        final Location location = getLocationService().getLocation(m.getStations());
+        final Location location = getLocationService().getLocation(
+                m.getImei(), m.getStations());
         log.debug("Location (" + location + ") has detected for message " + m);
         systemMessageDao.sendSystemMessageFor(m, location);
     }

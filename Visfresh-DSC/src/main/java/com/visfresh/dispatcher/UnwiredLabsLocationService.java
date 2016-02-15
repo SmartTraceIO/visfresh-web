@@ -32,6 +32,7 @@ import com.visfresh.StationSignal;
 @Component
 public class UnwiredLabsLocationService implements LocationService {
     private static final Logger log = LoggerFactory.getLogger(UnwiredLabsLocationService.class);
+    private static final int CRITICAL_BALANCE = 50;
 
     private String url;
     private String token;
@@ -46,14 +47,15 @@ public class UnwiredLabsLocationService implements LocationService {
      * @see com.visfresh.dispatcher.LocationService#getLocation(java.util.List)
      */
     @Override
-    public Location getLocation(final List<StationSignal> stations) throws RetryableException {
+    public Location getLocation(final String imei, final List<StationSignal> stations)
+            throws RetryableException {
         if (stations.size() == 0) {
             final RetryableException exc = new RetryableException("The number of stations can't be 0");
             exc.setCanRetry(false);
             throw exc;
         }
 
-        final JsonObject req = buildRequest(stations);
+        final JsonObject req = buildRequest(imei, stations);
 
         //read response
         String response;
@@ -105,6 +107,13 @@ public class UnwiredLabsLocationService implements LocationService {
         final Location loc = new Location();
         loc.setLatitude(json.get("lat").getAsDouble());
         loc.setLongitude(json.get("lon").getAsDouble());
+
+        //check balance
+        final int balance = json.get("balance").getAsInt();
+        if (balance < CRITICAL_BALANCE) {
+            log.error("Critical balance for UnwiredLabs: " + balance);
+        }
+
         return loc;
     }
 
@@ -134,10 +143,11 @@ public class UnwiredLabsLocationService implements LocationService {
     }
 
     /**
+     * @param imei TODO
      * @param stations
      * @return
      */
-    protected JsonObject buildRequest(final List<StationSignal> stations) {
+    protected JsonObject buildRequest(final String imei, final List<StationSignal> stations) {
         final JsonObject req= new JsonObject();
         //{
         //    "token": "939828b28b7f32",
@@ -150,6 +160,7 @@ public class UnwiredLabsLocationService implements LocationService {
         //    }],
         //    "address": 1
         //}
+        req.addProperty("id", generateId(imei));
         req.addProperty("token", getToken());
         req.addProperty("radio", "gsm");
         req.addProperty("mcc", stations.get(0).getMcc());
@@ -179,6 +190,25 @@ public class UnwiredLabsLocationService implements LocationService {
         req.addProperty("address", 0);
 
         return req;
+    }
+
+    /**
+     * @param imei IMEI code for given device.
+     * @return uique ID for given device.
+     */
+    private String generateId(final String imei) {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 1; i < imei.length() - 1; i++) {
+            final int cipher = imei.charAt(i) - '0';
+            sb.append((char) ('0' + (9 - cipher)));
+        }
+
+        //remove leading '0'
+        while (sb.length() > 1 && sb.charAt(0) == '0') {
+            sb.delete(0, 0);
+        }
+
+        return sb.toString();
     }
 
     /**

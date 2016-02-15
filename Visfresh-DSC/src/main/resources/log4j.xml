@@ -24,7 +24,7 @@
 		<param name="SMTPPort" value="465" />
 		<param name="SMTPProtocol" value="smtps"/>
 		<param name="from" value="smarttraceapi@yahoo.com" />
-		<param name="to" value="vyacheslav.soldatov@inbox.ru" />
+		<param name="to" value="vyacheslav.soldatov@inbox.ru,james@smartTrace.com.au" />
 		<param name="subject" value="DCS Service error" />
 		<param name="SMTPUsername" value="smarttraceapi@yahoo.com" />
 		<param name="SMTPPassword" value="govisfresh20151217" />
