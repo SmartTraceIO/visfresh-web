@@ -42,6 +42,7 @@ An authentication can be performed as from REST client using login method, as fr
 12. [Temperature Alert](#markdown-header-temperature-alert)  
 13. [Arrival](#markdown-header-arrival)  
 14. [User](#markdown-header-user)  
+15. [AutoStart Shipment](#markdown-autostart-shipment)
 
 ## Lists ##
 List items is short representations of base entities, like as [Alert Profile](#markdown-header-alert-profile), [Location](#markdown-header-location), etc. Some of fields can be get from corresponding base entity and some can be synthetic fields.  
@@ -103,7 +104,12 @@ List items is short representations of base entities, like as [Alert Profile](#m
 43. [Get Groups of Device](#markdown-header-get-groups-of-device)  
 44. [Get Notifications](#markdown-header-get-notifications)  
 45. [Send Command to Device](#markdown-header-send-command-to-device)  
-46. [Mark Notification as read](#markdown-header-mark-notification-as-read)  
+46. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
+47. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
+48. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
+49. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
+50. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
+
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
 2. [Get Roles](#markdown-header-get-roles)  
@@ -391,6 +397,29 @@ Method *POST*, method name *markNotificationsAsRead*. Request body contains JSON
 ### Send Command to Device ###
 Method *POST*, method name *sendCommandToDevice*. Request body contains [Device](#markdown-header-device) ID and device specific command.  
 [(example)](#markdown-header-send-command-to-device-example)
+
+### Save AutoStart Shipment ###
+Method *POST*, method name *saveAutoStartShipment*. Request body contains [AutoStart Shipment](#markdown-header-autostart-shipment).  
+[(example)](#markdown-header-save-autostart-shipment-example)
+
+### Get AutoStart Shipment ###
+Method *GET*, method *getAutoStartShipment*. Request parameters:  
+1. autoStartShipmentId autostart shipment ID  
+[(example)](#markdown-header-get-autostart-shipment-example)
+
+### Get AutoStart Shipments ###
+Method *GET*, method *getAutoStartShipments*. Request parameters:  
+1. autoStartShipmentId autostart shipment ID  
+2. pageIndex - number of page  
+3. pageSize - size of page  
+Returns array of [AutoStart Shipments](#markdown-header-autostart-shipment)  
+[(example)](#markdown-header-get-autostart-shipments-example)
+
+### Delete AutoStart Shipment ###
+Method *GET*, method *deleteAutoStartShipment*. Request parameters:  
+1. autoStartShipmentId autostart shipment ID  
+[(example)](#markdown-header-delete-autostart-shipment-example)
+
 
 ## Objects
 ### Response message ###
@@ -722,6 +751,19 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "language": "English",
     "deviceGroup": "DeviceGroupName",
     "active": false
+}
+```
+### AutoStart Shipment ###
+```json
+{
+    "template": 1320, //shipment template ID
+    "id": 37, //AutoStart Shipment ID.
+    "startLocations": [
+      1185 //List of location ID
+    ],
+    "endLocations": [
+      1184 //List of location ID
+    ]
 }
 ```
 ### Expanded List User Item ###
@@ -2534,5 +2576,98 @@ Response:
     "English"
   ]
 }
-
+```
+### Save AutoStart Shipment example ###
+**POST /rest/saveAutoStartShipment/${accessToken}**  
+**Request:**  
+```json
+{
+  "template": 1319,
+  "id": null,
+  "startLocations": [
+    1183
+  ],
+  "endLocations": [
+    1182
+  ]
+}
+```  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "defaultShipmentId": 35
+  }
+}
+```
+### Get AutoStart Shipment example ###
+**GET /vf/rest/getAutoStartShipment/${accessToken}?autoStartShipmentId=37**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "template": 1320,
+    "id": 37,
+    "startLocations": [
+      1185
+    ],
+    "endLocations": [
+      1184
+    ]
+  }
+}
+```
+### Get AutoStart Shipments example ###
+**GET /vf/rest/getAutoStartShipments/${accessToken}?pageSize=100&pageIndex=1**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "template": 1317,
+      "id": 31,
+      "startLocations": [
+        1179
+      ],
+      "endLocations": [
+        1178
+      ]
+    },
+    {
+      "template": 1317,
+      "id": 32,
+      "startLocations": [
+        1179
+      ],
+      "endLocations": [
+        1178
+      ]
+    }
+  ],
+  "totalCount": 2
+}
+```
+### Delete AutoStart Shipment example ###
+**GET /vf/rest/deleteAutoStartShipment/${accessToken}?autoStartShipmentId=34**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
+}
 ```
