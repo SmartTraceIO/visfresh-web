@@ -14,6 +14,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,8 @@ import com.visfresh.StationSignal;
  */
 @Component
 public class UnwiredLabsLocationService implements LocationService {
+    private static final Logger log = LoggerFactory.getLogger(UnwiredLabsLocationService.class);
+
     private String url;
     private String token;
     /**
@@ -79,12 +83,28 @@ public class UnwiredLabsLocationService implements LocationService {
         }
 
         //parse JSON to location object
+        Location loc;
+        try {
+            loc = parseLocation(response);
+            log.error("Parsed location: " + loc);
+        } catch (final Exception e) {
+            log.error("Failed to parse location from response: " + response, e);
+            throw new RetryableException(e);
+        }
+
+        return loc;
+    }
+
+    /**
+     * @param response
+     * @return
+     */
+    protected Location parseLocation(final String response) {
         final JsonObject json = getJson(response);
 
         final Location loc = new Location();
         loc.setLatitude(json.get("lat").getAsDouble());
         loc.setLongitude(json.get("lon").getAsDouble());
-
         return loc;
     }
 

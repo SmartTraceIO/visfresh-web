@@ -18,9 +18,31 @@
 			<param name="ConversionPattern" value="%d %-5p [%c{1}] %m%n" />
 		</layout>
 	</appender>
-	
+	<appender name="email" class="org.apache.log4j.net.SMTPAppender">
+		<param name="bufferSize" value="512" />
+		<param name="SMTPHost" value="smtp.mail.yahoo.com" />
+		<param name="SMTPPort" value="465" />
+		<param name="SMTPProtocol" value="smtps"/>
+		<param name="from" value="smarttraceapi@yahoo.com" />
+		<param name="to" value="vyacheslav.soldatov@inbox.ru" />
+		<param name="subject" value="DCS Service error" />
+		<param name="SMTPUsername" value="smarttraceapi@yahoo.com" />
+		<param name="SMTPPassword" value="govisfresh20151217" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p [%c{1}] %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="error" />
+			<param name="LevelMax" value="fatal" />
+		</filter>
+	</appender>
+
+	<logger name="com.visfresh.dispatcher.UnwiredLabsLocationService">
+		<level value="ERROR" />
+		<appender-ref ref="email" />
+	</logger>
 	<logger name="com.visfresh">
-		<level value="DEBUG"/>
-		<appender-ref ref="file"/>
+		<level value="DEBUG" />
+		<appender-ref ref="file" />
 	</logger>
 </log4j:configuration>
