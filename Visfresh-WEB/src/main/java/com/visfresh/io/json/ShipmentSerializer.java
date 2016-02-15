@@ -73,6 +73,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         shp.setShippedFrom(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_FROM))));
         shp.setShippedTo(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_TO))));
         shp.setShutdownDeviceAfterMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES)));
+        shp.setNoAlertsAfterArrivalMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES)));
+        shp.setShutDownAfterStartMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES)));
         shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER)));
     }
     public Shipment parseShipment(final JsonObject json) {
@@ -134,6 +136,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.add(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES, getIdList(s.getArrivalNotificationSchedules()));
 
         obj.addProperty(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES, s.getShutdownDeviceAfterMinutes());
+        obj.addProperty(ShipmentConstants.PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES, s.getNoAlertsAfterArrivalMinutes());
+        obj.addProperty(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES, s.getShutDownAfterStartMinutes());
 
         obj.add(ShipmentConstants.PROPERTY_CUSTOM_FIELDS, toJson(s.getCustomFields()));
         return obj;
@@ -511,6 +515,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
             json.add("arrivalNotificationSchedules", array);
             json.addProperty("shutdownDeviceAfterMinutes", dto.getShutdownDeviceAfterMinutes());
+
+            json.addProperty("noAlertsAfterArrivalMinutes", dto.getNoAlertsAfterArrivalMinutes());
+            json.addProperty("shutDownAfterStartMinutes", dto.getShutDownAfterStartMinutes());
 
             json.addProperty("shutdownTimeISO", dto.getShutdownTimeIso());
 

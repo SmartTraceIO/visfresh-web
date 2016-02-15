@@ -78,6 +78,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final int poNum = 938498;
         final int tripCount = 11;
         final String commentsForReceiver = "commentsForReceiver";
+        final Integer noAlertsAfterArrivalMinutes = 3;
+        final Integer shutDownAfterStartMinutes = 5;
 
         Shipment s = new Shipment();
         s.setAlertProfile(alertProfile);
@@ -101,6 +103,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         s.setPoNum(poNum);
         s.setTripCount(tripCount);
         s.setCommentsForReceiver(commentsForReceiver);
+        s.setNoAlertsAfterArrivalMinutes(noAlertsAfterArrivalMinutes);
+        s.setShutDownAfterStartMinutes(shutDownAfterStartMinutes);
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
         s = serializer.parseShipment(obj);
@@ -126,6 +130,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(poNum, s.getPoNum());
         assertEquals(tripCount, s.getTripCount());
         assertEquals(commentsForReceiver, s.getCommentsForReceiver());
+        assertEquals(noAlertsAfterArrivalMinutes, s.getNoAlertsAfterArrivalMinutes());
+        assertEquals(shutDownAfterStartMinutes, s.getShutDownAfterStartMinutes());
     }
     @Test
     public void testSaveShipmentResponse() {

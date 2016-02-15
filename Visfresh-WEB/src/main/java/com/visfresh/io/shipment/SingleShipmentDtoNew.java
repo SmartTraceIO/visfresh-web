@@ -35,6 +35,8 @@ public class SingleShipmentDtoNew {
     boolean excludeNotificationsIfNoAlerts;
     private final List<ListNotificationScheduleItem> arrivalNotificationSchedules = new LinkedList<>();
     private Integer shutdownDeviceAfterMinutes;
+    private Integer noAlertsAfterArrivalMinutes;
+    private Integer shutDownAfterStartMinutes;
     private String startLocation;
     private String startTimeISO;
     private String endLocation;
@@ -509,5 +511,29 @@ public class SingleShipmentDtoNew {
      */
     public void setLastReadingTemperature(final double temperature) {
         this.lastReadingTemperature = temperature;
+    }
+    /**
+     * @return the noAlertsAfterArrivalMinutes
+     */
+    public Integer getNoAlertsAfterArrivalMinutes() {
+        return noAlertsAfterArrivalMinutes;
+    }
+    /**
+     * @param noAlertsAfterArrivalMinutes the noAlertsAfterArrivalMinutes to set
+     */
+    public void setNoAlertsAfterArrivalMinutes(final Integer noAlertsAfterArrivalMinutes) {
+        this.noAlertsAfterArrivalMinutes = noAlertsAfterArrivalMinutes;
+    }
+    /**
+     * @return the shutDownAfterStartMinutes
+     */
+    public Integer getShutDownAfterStartMinutes() {
+        return shutDownAfterStartMinutes;
+    }
+    /**
+     * @param shutDownAfterStartMinutes the shutDownAfterStartMinutes to set
+     */
+    public void setShutDownAfterStartMinutes(final Integer shutDownAfterStartMinutes) {
+        this.shutDownAfterStartMinutes = shutDownAfterStartMinutes;
     }
 }

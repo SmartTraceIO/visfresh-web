@@ -18,6 +18,8 @@ public interface ShipmentConstants {
     String PROPERTY_SHIPPED_FROM = "shippedFrom";
     String PROPERTY_SHIPPED_TO = "shippedTo";
     String PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES = "shutdownDeviceAfterMinutes";
+    String PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES = "noAlertsAfterArrivalMinutes";
+    String PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES = "shutDownAfterStartMinutes";
     String PROPERTY_COMMENTS_FOR_RECEIVER = "commentsForReceiver";
     String PROPERTY_SHIPMENT_DESCRIPTION = "shipmentDescription";
     String PROPERTY_SHIPMENT_TEMPLATE_ID = "shipmentTemplateId";

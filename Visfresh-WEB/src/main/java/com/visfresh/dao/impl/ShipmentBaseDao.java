@@ -47,7 +47,10 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
     protected static final String NOALERTIFCOODOWN_FIELD = "noalertsifcooldown";
     protected static final String ARRIVALNOTIFWITHIN_FIELD = "arrivalnotifwithIn";
     protected static final String NONOTIFSIFNOALERTS_FIELD = "nonotifsifnoalerts";
-    protected static final String SHUTDOWNTIMEOUT_FIELD = "shutdowntimeout";
+    protected static final String SHUTDOWNTIMEOUT_FIELD = "shutdownafterarrivalminutes";
+    protected static final String NOALERT_AFTER_ARRIVAL_TIMOUT_FIELD = "noalertsafterarrivalminutes";
+    protected static final String SHUTDOWN_AFTER_START_TIMOUT_FIELD = "shutdownafterstartminutes";
+
     protected static final String COMPANY_FIELD = "company";
     protected static final String SHIPPEDTO_FIELD = "shippedto";
     protected static final String SHIPPEDFROM_FIELD = "shippedfrom";
@@ -159,6 +162,8 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
         map.put(ARRIVALNOTIFWITHIN_FIELD, s.getArrivalNotificationWithinKm());
         map.put(NONOTIFSIFNOALERTS_FIELD, s.isExcludeNotificationsIfNoAlerts());
         map.put(SHUTDOWNTIMEOUT_FIELD, s.getShutdownDeviceAfterMinutes());
+        map.put(NOALERT_AFTER_ARRIVAL_TIMOUT_FIELD, s.getNoAlertsAfterArrivalMinutes());
+        map.put(SHUTDOWN_AFTER_START_TIMOUT_FIELD, s.getShutDownAfterStartMinutes());
         map.put(COMPANY_FIELD, s.getCompany().getId());
         map.put(SHIPPEDFROM_FIELD, s.getShippedFrom() == null ? null : s.getShippedFrom().getId());
         map.put(SHIPPEDTO_FIELD, s.getShippedTo() == null ? null : s.getShippedTo().getId());
@@ -285,6 +290,14 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
         final Number shutdownAfterMinutes = (Number) map.get(SHUTDOWNTIMEOUT_FIELD);
         if (shutdownAfterMinutes != null) {
             no.setShutdownDeviceAfterMinutes(shutdownAfterMinutes.intValue());
+        }
+        final Number noalertAfterArrivalTimeOut = (Number) map.get(NOALERT_AFTER_ARRIVAL_TIMOUT_FIELD);
+        if (noalertAfterArrivalTimeOut != null) {
+            no.setNoAlertsAfterArrivalMinutes(noalertAfterArrivalTimeOut.intValue());
+        }
+        final Number shutDownAfterStartMinutes = (Number) map.get(SHUTDOWN_AFTER_START_TIMOUT_FIELD);
+        if (noalertAfterArrivalTimeOut != null) {
+            no.setShutDownAfterStartMinutes(shutDownAfterStartMinutes.intValue());
         }
 
         no.getAlertsNotificationSchedules().addAll(findNotificationSchedules(no, ALERTNOTIFSCHEDULES_TABLE));

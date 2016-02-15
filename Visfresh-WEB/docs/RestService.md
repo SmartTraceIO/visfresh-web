@@ -583,7 +583,10 @@ see [ResponseStatus](#markdown-header-response-status)
     "arrivalNotificationSchedules": [
       446
     ],
-    "shutdownDeviceAfterMinutes": 155
+    "shutdownDeviceAfterMinutes": 155,
+    "noAlertsAfterArrivalMinutes": null,
+    "noAlertsAfterStartMinutes": null,
+    "shutDownAfterStartMinutes": null
 }
 ```  
 ### Device ###
@@ -640,6 +643,8 @@ see [Shipment Object](#markdown-header-shipment)
 	  494
 	],
 	"shutdownDeviceAfterMinutes": 155,
+    "noAlertsAfterArrivalMinutes": null,
+    "shutDownAfterStartMinutes": null,
 	"customFields": {
 	  "field1": "value1"
 	}
@@ -1532,7 +1537,9 @@ Response:
   "arrivalNotificationSchedules": [
     432
   ],
-  "shutdownDeviceAfterMinutes": 155
+  "shutdownDeviceAfterMinutes": 155,
+  "noAlertsAfterArrivalMinutes": null,
+  "shutDownAfterStartMinutes": null
 }
 ```  
 **Response:**  
@@ -1627,6 +1634,8 @@ Response:
       490
     ],
     "shutdownDeviceAfterMinutes": 155,
+    "noAlertsAfterArrivalMinutes": null,
+    "shutDownAfterStartMinutes": null,
     "customFields": {
       "field1": "value1"
     }
@@ -2126,7 +2135,9 @@ Response:
     "arrivalNotificationSchedules": [
       446
     ],
-    "shutdownDeviceAfterMinutes": 155
+    "shutdownDeviceAfterMinutes": 155,
+    "noAlertsAfterArrivalMinutes": null,
+    "shutDownAfterStartMinutes": null
   }
 }
 ```
@@ -2184,6 +2195,8 @@ Response:
       494
     ],
     "shutdownDeviceAfterMinutes": 155,
+    "noAlertsAfterArrivalMinutes": null,
+    "shutDownAfterStartMinutes": null,
     "customFields": {
       "field1": "value1"
     }
@@ -2259,6 +2272,8 @@ Response:
       }
     ],
     "shutdownDeviceAfterMinutes": 155,
+    "noAlertsAfterArrivalMinutes": null,
+    "shutDownAfterStartMinutes": null
     "shutdownTimeISO": null,
     "startLocation": "Loc-3",
     "startTimeISO": "2016-01-07 18:11",

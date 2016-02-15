@@ -478,7 +478,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             generateTestData(dtoOld, s);
         }
 
-        final SingleShipmentDtoNew dto = createNewSingleShipmentDate(s, dtoOld, user);
+        final SingleShipmentDtoNew dto = createNewSingleShipmentData(s, dtoOld, user);
 
         double minTemp = 1000.;
         double maxTemp = -273.;
@@ -644,7 +644,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @param dtoOld
      * @return
      */
-    private SingleShipmentDtoNew createNewSingleShipmentDate(final Shipment shipment,
+    private SingleShipmentDtoNew createNewSingleShipmentData(final Shipment shipment,
             final SingleShipmentDto dtoOld, final User user) {
         //"startTimeISO": "2014-08-12 12:10",
         final DateFormat isoFmt = createDateFormat(user, ISO_FORMAT);
@@ -659,6 +659,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setAssetType(dtoOld.getAssetType());
         dto.setCommentsForReceiver(dtoOld.getCommentsForReceiver());
         dto.setCurrentLocation(dtoOld.getCurrentLocation());
+        dto.setNoAlertsAfterArrivalMinutes(shipment.getNoAlertsAfterArrivalMinutes());
+        dto.setShutDownAfterStartMinutes(shipment.getShutDownAfterStartMinutes());
 
         final List<SingleShipmentTimeItem> items = dtoOld.getItems();
         final Date startTime = shipment.getShipmentDate();

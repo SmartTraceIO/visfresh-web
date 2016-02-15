@@ -61,6 +61,15 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      */
     private Integer shutdownDeviceAfterMinutes;
     /**
+     * Not alerts after arrival time out in minutes.
+     */
+    private Integer noAlertsAfterArrivalMinutes;
+    /**
+     * Shutdown after start minutes.
+     */
+    private Integer shutDownAfterStartMinutes;
+
+    /**
      * Comments for receiver
      */
     private String commentsForReceiver;
@@ -252,5 +261,29 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      */
     public void setCommentsForReceiver(final String comments) {
         this.commentsForReceiver = comments;
+    }
+    /**
+     * @return the noAlertsAfterArrivalMinutes
+     */
+    public Integer getNoAlertsAfterArrivalMinutes() {
+        return noAlertsAfterArrivalMinutes;
+    }
+    /**
+     * @param noAlertsAfterArrivalMinutes the noAlertsAfterArrivalMinutes to set
+     */
+    public void setNoAlertsAfterArrivalMinutes(final Integer noAlertsAfterArrivalMinutes) {
+        this.noAlertsAfterArrivalMinutes = noAlertsAfterArrivalMinutes;
+    }
+    /**
+     * @return the shutDownAfterStartMinutes
+     */
+    public Integer getShutDownAfterStartMinutes() {
+        return shutDownAfterStartMinutes;
+    }
+    /**
+     * @param shutDownAfterStartMinutes the shutDownAfterStartMinutes to set
+     */
+    public void setShutDownAfterStartMinutes(final Integer shutDownAfterStartMinutes) {
+        this.shutDownAfterStartMinutes = shutDownAfterStartMinutes;
     }
 }

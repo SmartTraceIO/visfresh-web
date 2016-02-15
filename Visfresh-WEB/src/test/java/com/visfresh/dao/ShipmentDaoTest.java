@@ -194,6 +194,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setCommentsForReceiver("commentsForReceiver");
         s.setSiblingGroup(77l);
         s.setSiblingCount(11);
+        s.setNoAlertsAfterArrivalMinutes(7);
+        s.setShutDownAfterStartMinutes(9);
         return s;
     }
 
@@ -224,6 +226,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals("commentsForReceiver", s.getCommentsForReceiver());
         assertEquals(77l, s.getSiblingGroup().longValue());
         assertEquals(11, s.getSiblingCount());
+        assertEquals(new Integer(7), s.getNoAlertsAfterArrivalMinutes());
+        assertEquals(new Integer(9), s.getShutDownAfterStartMinutes());
     }
 
     @Test
@@ -276,7 +280,9 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(1, s.getAlertsNotificationSchedules().size());
         assertEquals(1, s.getArrivalNotificationSchedules().size());
         assertEquals("commentsForReceiver", s.getCommentsForReceiver());
-    }
+        assertEquals(new Integer(7), s.getNoAlertsAfterArrivalMinutes());
+        assertEquals(new Integer(9), s.getShutDownAfterStartMinutes());
+   }
 
     @Test
     public void testFindLastShipment() {

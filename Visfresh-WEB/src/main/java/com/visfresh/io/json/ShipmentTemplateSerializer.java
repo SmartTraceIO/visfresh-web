@@ -58,6 +58,8 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentTemplateConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS, tpl.isExcludeNotificationsIfNoAlerts());
         obj.add(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES, getIdList(tpl.getArrivalNotificationSchedules()));
         obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES, tpl.getShutdownDeviceAfterMinutes());
+        obj.addProperty(ShipmentConstants.PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES, tpl.getNoAlertsAfterArrivalMinutes());
+        obj.addProperty(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES, tpl.getShutDownAfterStartMinutes());
 
         return obj;
     }
@@ -81,6 +83,8 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         shp.setShippedFrom(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_FROM))));
         shp.setShippedTo(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_TO))));
         shp.setShutdownDeviceAfterMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES)));
+        shp.setNoAlertsAfterArrivalMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES)));
+        shp.setShutDownAfterStartMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES)));
         shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER)));
 
         shp.setId(asLong(obj.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_ID)));

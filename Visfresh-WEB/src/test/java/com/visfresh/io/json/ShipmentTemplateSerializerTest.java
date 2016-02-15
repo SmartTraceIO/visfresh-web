@@ -89,6 +89,8 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         final int shutdownDeviceTimeOut = 155;
         final boolean useLocationNearestToDevice = true;
         final String commentsForReceiver = "commentsForReceiver";
+        final Integer noAlertsAfterArrivalMinutes = 3;
+        final Integer shutDownAfterStartMinutes = 5;
 
         ShipmentTemplate t = new ShipmentTemplate();
         t.setAddDateShipped(addDateShipped);
@@ -106,6 +108,8 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         t.setShutdownDeviceAfterMinutes(shutdownDeviceTimeOut);
         t.setDetectLocationForShippedFrom(useLocationNearestToDevice);
         t.setCommentsForReceiver(commentsForReceiver);
+        t.setNoAlertsAfterArrivalMinutes(noAlertsAfterArrivalMinutes);
+        t.setShutDownAfterStartMinutes(shutDownAfterStartMinutes);
 
         final JsonObject obj = serializer.toJson(t).getAsJsonObject();
 
@@ -126,5 +130,7 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         assertEquals(shutdownDeviceTimeOut, t.getShutdownDeviceAfterMinutes().intValue());
         assertEquals(useLocationNearestToDevice, t.isDetectLocationForShippedFrom());
         assertEquals(commentsForReceiver, t.getCommentsForReceiver());
+        assertEquals(noAlertsAfterArrivalMinutes, t.getNoAlertsAfterArrivalMinutes());
+        assertEquals(shutDownAfterStartMinutes, t.getShutDownAfterStartMinutes());
     }
 }
