@@ -42,7 +42,7 @@ An authentication can be performed as from REST client using login method, as fr
 12. [Temperature Alert](#markdown-header-temperature-alert)  
 13. [Arrival](#markdown-header-arrival)  
 14. [User](#markdown-header-user)  
-15. [AutoStart Shipment](#markdown-autostart-shipment)
+15. [AutoStart Shipment](#markdown-header-autostart-shipment)
 
 ## Lists ##
 List items is short representations of base entities, like as [Alert Profile](#markdown-header-alert-profile), [Location](#markdown-header-location), etc. Some of fields can be get from corresponding base entity and some can be synthetic fields.  
