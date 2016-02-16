@@ -3,7 +3,9 @@
  */
 package com.visfresh.rules;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -12,14 +14,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.services.ArrivalEstimationService;
+import com.visfresh.utils.LocationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -37,6 +44,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     public static final String NAME = "AutoStartShipment";
     @Autowired
     private ShipmentDao shipmentDao;
+    @Autowired
+    private AutoStartShipmentDao autoStartShipmentDao;
     @Autowired
     private TrackerEventDao trackerEventDao;
     @Autowired
@@ -89,21 +98,33 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         final Device device = event.getDevice();
 
         final Shipment last = shipmentDao.findLastShipment(device.getImei());
+        Shipment shipment;
 
-        final boolean reuseOld = canReuseOldShipment(last);
-
-        final Shipment shipment;
-        if (!reuseOld) {
-            log.debug("Create new shipment for device " + device.getImei());
-            shipment = startNewShipment(device);
-
-            if (last != null && !last.hasFinalStatus()) {
-                log.debug("Close old active shipment " + last.getShipmentDescription()
-                        + " for device " + device.getImei());
-                closeOldShipment(last);
+        //first of all attempt to select autostart shipment template
+        final List<AutoStartShipment> autoStarts = autoStartShipmentDao.findByCompany(
+                device.getCompany(), null, null, null);
+        if (!autoStarts.isEmpty()) {
+            shipment = findByStartLocation(
+                    autoStarts, event.getLatitude(), event.getLongitude(), device);
+            //if not found, create new shipment from most priority template
+            if (shipment == null) {
+                shipment = createNewShipment(autoStarts.get(0).getTemplate(), null, device);
             }
         } else {
-            shipment = last;
+            final boolean reuseOld = canReuseOldShipment(last);
+            if (!reuseOld) {
+                log.debug("Create new shipment for device " + device.getImei());
+                shipment = startNewShipment(device);
+            } else {
+                shipment = last;
+            }
+        }
+
+        //close old shipment if need
+        if (last != null && last != shipment && !last.hasFinalStatus()) {
+            log.debug("Close old active shipment " + last.getShipmentDescription()
+                    + " for device " + device.getImei());
+            closeOldShipment(last);
         }
 
         context.getState().possibleNewShipment(shipment);
@@ -111,6 +132,57 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         trackerEventDao.save(event);
 
         return true;
+    }
+
+    /**
+     * @param autoStarts list of autostart templates.
+     * @param latitude latitude.
+     * @param longitude longitude.
+     * @param device device.
+     * @return shipment.
+     */
+    private Shipment findByStartLocation(final List<AutoStartShipment> autoStarts,
+            final double latitude, final double longitude, final Device device) {
+        Collections.sort(autoStarts);
+        for (final AutoStartShipment auto : autoStarts) {
+            for (final LocationProfile loc : auto.getShippedFrom()) {
+                int distance = (int) LocationUtils.getDistanceMeters(
+                        loc.getLocation().getLatitude(),
+                        loc.getLocation().getLongitude(),
+                        latitude,
+                        longitude);
+                distance = Math.max(0, distance - loc.getRadius());
+                if (distance == 0) {
+                    return createNewShipment(auto.getTemplate(), loc, device);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param tpl template
+     * @param startLocation start location.
+     * @param device device
+     * @return
+     */
+    private Shipment createNewShipment(final ShipmentTemplate tpl,
+            final LocationProfile startLocation, final Device device) {
+        final Shipment s = shipmentDao.createNewFrom(tpl);
+        s.setStatus(ShipmentStatus.InProgress);
+        s.setDevice(device);
+        s.setShippedFrom(startLocation);
+        s.setShipmentDate(new Date());
+
+        if (tpl.getShipmentDescription() != null) {
+            s.setShipmentDescription(tpl.getShipmentDescription());
+        } else if (tpl.getName() != null) {
+            s.setShipmentDescription("Auto created from '" + tpl.getName() + "'");
+        } else {
+            s.setShipmentDescription("Created by autostart shipment rule");
+        }
+        return shipmentDao.save(s);
     }
 
     /**

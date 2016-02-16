@@ -24,6 +24,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.io.json.AbstractJsonSerializer;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
@@ -280,7 +281,10 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         e.setLastEventDate((Date) map.get(LASTEVENT_FIELD));
         e.setDeviceShutdownTime((Date) map.get(DEVICESHUTDOWNDATE_FIELD));
         e.getCustomFields().putAll(parseJsonMap((String) map.get(CUSTOMFIELDS_FIELD)));
-        e.setStatus(ShipmentStatus.valueOf((String) map.get(STATUS_FIELD)));
+        final Object statusObject = map.get(STATUS_FIELD);
+        if (statusObject != null) {
+            e.setStatus(ShipmentStatus.valueOf((String) statusObject));
+        }
         e.setDevice(deviceDao.findOne((String) map.get(DEVICE_FIELD)));
         final Number num = (Number) map.get(SIBLINGGROUP_FIELD);
         if (num != null) {
@@ -513,5 +517,26 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         } else {
             super.addSortForDbField(TABLE + "." + field, sorts, isAscent);
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#createNewFrom(com.visfresh.entities.ShipmentTemplate)
+     */
+    @Override
+    public Shipment createNewFrom(final ShipmentTemplate tpl) {
+        if (tpl == null || tpl.getId() == null) {
+            return null;
+        }
+
+        //in fact the template and the shipment is some table.
+        final Filter f = new Filter();
+        f.addFilter(ID_FIELD, tpl.getId());
+
+        final List<Shipment> list = daoBaseFindAll(f, null, null);
+        if (!list.isEmpty()) {
+            final Shipment s = list.get(0);
+            s.setId(null);
+            return s;
+        }
+        return null;
     }
 }

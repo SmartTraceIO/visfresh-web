@@ -38,6 +38,7 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
 
         final AutoStartShipmentDto dto = new AutoStartShipmentDto();
         dto.setId(asLong(json.get(ID)));
+        dto.setPriority(asInt(json.get(PRIORITY)));
         dto.setTemplate(json.get(TEMPLATE).getAsLong());
 
         //start locations.
@@ -66,6 +67,7 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
 
         final JsonObject json = new JsonObject();
         json.addProperty(TEMPLATE, ds.getTemplate());
+        json.addProperty(PRIORITY, ds.getPriority());
         json.addProperty(ID, ds.getId());
 
         //start locations

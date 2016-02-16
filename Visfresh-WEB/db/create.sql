@@ -221,6 +221,7 @@ create table shipments (
     assetnum varchar(31),
     shipmentdate timestamp,
     lasteventdate timestamp default '00-01-01 00:00:00',
+    arrivaldate timestamp default '00-01-01 00:00:00',
     customfiels longtext,
     comments varchar(300),
     ponum int not null default 0,
@@ -236,6 +237,7 @@ create table autostartshipments (
     id bigint(20) auto_increment not null,
     company bigint(20) not null,
     template bigint(20) not null,
+    priority int not null default 0,
     primary key (id),
     FOREIGN KEY (company)
         REFERENCES companies (id),

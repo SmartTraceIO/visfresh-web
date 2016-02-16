@@ -34,6 +34,7 @@ public class AutoStartShipmentSerializerTest {
     @Test
     public void testSerialize() {
         AutoStartShipmentDto dto = new AutoStartShipmentDto();
+        final int priority = 5;
         final Long id = 7l;
         final Long template = 8l;
         final Long loc1 = 1l;
@@ -43,6 +44,7 @@ public class AutoStartShipmentSerializerTest {
 
         dto.setId(id);
         dto.setTemplate(template);
+        dto.setPriority(priority);
         dto.getStartLocations().add(loc1);
         dto.getStartLocations().add(loc2);
         dto.getEndLocations().add(loc3);
@@ -51,6 +53,7 @@ public class AutoStartShipmentSerializerTest {
         dto = serializer.parseAutoStartShipmentDto(serializer.toJson(dto));
 
         assertEquals(id, dto.getId());
+        assertEquals(priority, dto.getPriority());
         assertEquals(template, dto.getTemplate());
         assertEquals(loc1, dto.getStartLocations().get(0));
         assertEquals(loc2, dto.getStartLocations().get(1));

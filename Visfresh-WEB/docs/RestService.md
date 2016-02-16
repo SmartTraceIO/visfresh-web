@@ -762,6 +762,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ```json
 {
     "template": 1320, //shipment template ID
+    "priority": 99, //priority of given template in scope of company
     "id": 37, //AutoStart Shipment ID.
     "startLocations": [
       1185 //List of location ID
@@ -2598,6 +2599,7 @@ Response:
 ```json
 {
   "template": 1319,
+  "priority": 99,
   "id": null,
   "startLocations": [
     1183
@@ -2630,6 +2632,7 @@ Response:
   },
   "response": {
     "template": 1320,
+    "priority": 99,
     "id": 37,
     "startLocations": [
       1185

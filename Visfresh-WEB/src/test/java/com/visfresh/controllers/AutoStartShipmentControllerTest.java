@@ -59,6 +59,7 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
         final AutoStartShipmentDto dto = client.getAutoStartShipment(ds.getId());
 
         assertEquals(ds.getId(), dto.getId());
+        assertEquals(ds.getPriority(), dto.getPriority());
         assertEquals(ds.getTemplate().getId(), dto.getTemplate());
         assertEquals(ds.getShippedFrom().get(0).getId(), locFrom.getId());
         assertEquals(ds.getShippedTo().get(0).getId(), locTo.getId());
@@ -83,9 +84,11 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
         final ShipmentTemplate template = createTemplate();
         final LocationProfile locTo = createLocation("From");
         final LocationProfile locFrom = createLocation("TO");
+        final int priority = 99;
 
         final AutoStartShipmentDto dto = new AutoStartShipmentDto();
         dto.setTemplate(template.getId());
+        dto.setPriority(priority);
         dto.getStartLocations().add(locFrom.getId());
         dto.getEndLocations().add(locTo.getId());
 
@@ -95,6 +98,7 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
 
         final AutoStartShipment ds = dao.findOne(id);
         assertEquals(id, ds.getId());
+        assertEquals(priority, ds.getPriority());
         assertEquals(dto.getTemplate(), ds.getTemplate().getId());
         assertEquals(locFrom.getId(), ds.getShippedFrom().get(0).getId());
         assertEquals(locTo.getId(), ds.getShippedTo().get(0).getId());
@@ -119,6 +123,7 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
             final LocationProfile locFrom, final LocationProfile locTo) {
         final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setCompany(getCompany());
+        cfg.setPriority(77);
         cfg.setTemplate(template);
         cfg.getShippedFrom().add(locFrom);
         cfg.getShippedTo().add(locTo);

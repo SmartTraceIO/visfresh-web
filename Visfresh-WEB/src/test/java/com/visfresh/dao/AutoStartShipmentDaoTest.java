@@ -94,6 +94,7 @@ public class AutoStartShipmentDaoTest extends
     protected void assertCreateTestEntityOk(final AutoStartShipment cfg) {
         assertEquals(sharedCompany.getId(), cfg.getCompany().getId());
         assertEquals(template.getId(), cfg.getTemplate().getId());
+        assertEquals(10, cfg.getPriority());
         assertEquals(1, cfg.getShippedFrom().size());
         assertEquals(locFrom.getId(), cfg.getShippedFrom().get(0).getId());
         assertEquals(1, cfg.getShippedTo().size());
@@ -107,6 +108,7 @@ public class AutoStartShipmentDaoTest extends
     protected AutoStartShipment createTestEntity() {
         final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setCompany(sharedCompany);
+        cfg.setPriority(10);
         cfg.setTemplate(template);
         cfg.getShippedFrom().add(locFrom);
         cfg.getShippedTo().add(locTo);

@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentTemplate;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -43,4 +44,9 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @return next shipment for given.
      */
     Shipment findNextShipmentFor(Shipment s);
+    /**
+     * @param tpl shipment template.
+     * @return new shipment from given template.
+     */
+    Shipment createNewFrom(ShipmentTemplate tpl);
 }

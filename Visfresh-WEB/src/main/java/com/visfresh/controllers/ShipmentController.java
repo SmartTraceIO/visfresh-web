@@ -158,7 +158,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private Long saveShipment(final Shipment newShipment, final boolean includePreviousData) {
         final String imei = newShipment.getDevice().getImei();
-        final Shipment current = shipmentDao.findLastShipment(imei);
+        final Shipment current = includePreviousData ? shipmentDao.findLastShipment(imei) : null;
 
         boolean shouldOverwritePrevious =
                 includePreviousData
@@ -177,9 +177,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                     + " for device " + imei + ". Will reused instead of crate new");
             //copy all settings from created shipment to current.
             newShipment.setId(current.getId());
+            newShipment.setStatus(ShipmentStatus.InProgress);
         }
 
-        newShipment.setStatus(ShipmentStatus.InProgress);
         final Long resultId = shipmentDao.save(newShipment).getId();
 
         if (!shouldOverwritePrevious && current != null && !current.hasFinalStatus()) {

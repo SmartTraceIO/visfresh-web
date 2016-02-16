@@ -35,9 +35,10 @@ public class AutoStartShipmentDaoImpl
 
     public static final String TABLE = "autostartshipments";
 
-    protected static final String ID_FIELD = "id";
-    protected static final String COMPANY_FIELD = "company";
-    protected static final String TEMPLATE_FIELD = "template";
+    private static final String ID_FIELD = "id";
+    private static final String COMPANY_FIELD = "company";
+    private static final String TEMPLATE_FIELD = "template";
+    private static final String PRIORITY_FIELD = "priority";
 
     private static final String LOCATION_REL_TABLE = "autostartlocations";
     private static final String LOCATION_DIRECTION = "direction";
@@ -56,6 +57,7 @@ public class AutoStartShipmentDaoImpl
     public AutoStartShipmentDaoImpl() {
         super();
         propertyToDbMap.put(AutoStartShipmentConstants.ID, ID_FIELD);
+        propertyToDbMap.put(AutoStartShipmentConstants.PRIORITY, PRIORITY_FIELD);
         propertyToDbMap.put(AutoStartShipmentConstants.TEMPLATE, TEMPLATE_FIELD);
     }
 
@@ -63,17 +65,18 @@ public class AutoStartShipmentDaoImpl
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <E extends AutoStartShipment> E save(final E cfg) {
+    public <E extends AutoStartShipment> E save(final E aut) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
-        paramMap.put(ID_FIELD, cfg.getId());
-        paramMap.put(COMPANY_FIELD, cfg.getCompany().getId());
-        paramMap.put(TEMPLATE_FIELD, cfg.getTemplate().getId());
+        paramMap.put(ID_FIELD, aut.getId());
+        paramMap.put(COMPANY_FIELD, aut.getCompany().getId());
+        paramMap.put(TEMPLATE_FIELD, aut.getTemplate().getId());
+        paramMap.put(PRIORITY_FIELD, aut.getPriority());
 
         String sql;
         final List<String> fields = new LinkedList<String>(paramMap.keySet());
 
-        if (cfg.getId() == null) {
+        if (aut.getId() == null) {
             //insert
             sql = createInsertScript(TABLE, fields);
         } else {
@@ -84,11 +87,11 @@ public class AutoStartShipmentDaoImpl
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
         if (keyHolder.getKey() != null) {
-            cfg.setId(keyHolder.getKey().longValue());
+            aut.setId(keyHolder.getKey().longValue());
         }
 
-        mergeLocations(cfg);
-        return cfg;
+        mergeLocations(aut);
+        return aut;
     }
     private void mergeLocations(final AutoStartShipment cfg) {
         final Set<Long> oldLocFrom = new HashSet<>();
@@ -151,7 +154,6 @@ public class AutoStartShipmentDaoImpl
             jdbc.update(sql, params);
         }
     }
-
     /**
      * @param locations full location list.
      * @param oldLocTo old locations.
@@ -206,6 +208,7 @@ public class AutoStartShipmentDaoImpl
     protected AutoStartShipment createEntity(final Map<String, Object> map) {
         final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setId(((Number) map.get(ID_FIELD)).longValue());
+        cfg.setPriority(((Number) map.get(PRIORITY_FIELD)).intValue());
         return cfg;
     }
     /* (non-Javadoc)

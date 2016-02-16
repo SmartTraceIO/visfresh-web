@@ -95,6 +95,7 @@ public class AutoStartShipmentController extends AbstractController
 
             final AutoStartShipment cfg = new AutoStartShipment();
             cfg.setCompany(user.getCompany());
+            cfg.setPriority(dto.getPriority());
             cfg.setTemplate(tpl);
             cfg.setId(dto.getId());
 

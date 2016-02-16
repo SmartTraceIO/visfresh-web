@@ -178,6 +178,16 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
     public List<E> findAll(final Filter filter, final Sorting sorting, final Page page) {
         final Filter f = new Filter(filter);
         f.addFilter(ISTEMPLATE_FIELD, isTemplate());
+        return daoBaseFindAll(f, sorting, page);
+    }
+    /**
+     * @param f
+     * @param sorting
+     * @param page
+     * @return
+     */
+    protected List<E> daoBaseFindAll(final Filter f, final Sorting sorting,
+            final Page page) {
         return super.findAll(f, sorting, page);
     }
     /* (non-Javadoc)

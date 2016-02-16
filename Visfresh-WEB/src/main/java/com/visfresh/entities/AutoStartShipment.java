@@ -10,8 +10,10 @@ import java.util.List;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class AutoStartShipment implements EntityWithCompany, EntityWithId<Long> {
+public class AutoStartShipment implements EntityWithCompany,
+        EntityWithId<Long>, Comparable<AutoStartShipment> {
     private Long id;
+    private int priority = 0;
     private Company company;
     private ShipmentTemplate template;
     private final List<LocationProfile> shippedFrom = new LinkedList<>();
@@ -64,6 +66,18 @@ public class AutoStartShipment implements EntityWithCompany, EntityWithId<Long> 
         this.template = template;
     }
     /**
+     * @return the priority
+     */
+    public int getPriority() {
+        return priority;
+    }
+    /**
+     * @param priority the priority to set
+     */
+    public void setPriority(final int priority) {
+        this.priority = priority;
+    }
+    /**
      * @return the shippedFrom
      */
     public List<LocationProfile> getShippedFrom() {
@@ -74,5 +88,18 @@ public class AutoStartShipment implements EntityWithCompany, EntityWithId<Long> 
      */
     public List<LocationProfile> getShippedTo() {
         return shippedTo;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(final AutoStartShipment o) {
+        if (getPriority() > o.getPriority()) {
+            return -1;
+        }
+        if (o.getPriority() > getPriority()) {
+            return 1;
+        }
+        return getId().compareTo(o.getId());
     }
 }

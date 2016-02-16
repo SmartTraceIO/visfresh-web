@@ -23,6 +23,7 @@ public class AutoStartShipmentDto {
      */
     private final List<Long> endLocations = new LinkedList<>();
     private Long template;
+    private int priority;
     private Long id;
 
     /**
@@ -39,6 +40,7 @@ public class AutoStartShipmentDto {
 
         setId(cfg.getId());
         setTemplate(cfg.getTemplate().getId());
+        setPriority(cfg.getPriority());
 
         //add start locations.
         for (final LocationProfile loc : cfg.getShippedFrom()) {
@@ -84,5 +86,17 @@ public class AutoStartShipmentDto {
      */
     public Long getId() {
         return id;
+    }
+    /**
+     * @param priority the priority to set
+     */
+    public void setPriority(final int priority) {
+        this.priority = priority;
+    }
+    /**
+     * @return the priority
+     */
+    public int getPriority() {
+        return priority;
     }
 }

@@ -501,7 +501,15 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(s2.getId(), result.get(1).getId());
         assertEquals(s3.getId(), result.get(2).getId());
     }
+    @Test
+    public void testCreateNewFrom() {
+        final ShipmentTemplate tpl = createShipmentTemplate();
+        final Shipment s = dao.createNewFrom(tpl);
 
+        assertNotNull(s);
+        assertNotSame(tpl.getId(), s.getId());
+        assertEquals(tpl.getShipmentDescription(), s.getShipmentDescription());
+    }
     /**
      * @param c company.
      * @param group sibling group.
