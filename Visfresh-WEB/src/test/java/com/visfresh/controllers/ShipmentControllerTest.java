@@ -203,6 +203,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         s.getShippedTo().setAddress("Coles Perth DC");
         final Shipment s2 = createShipment(true);
         s2.getShippedTo().setAddress("Coles Perth DC");
+        s2.setStatus(ShipmentStatus.Arrived);
+        s2.setArrivalDate(new Date(System.currentTimeMillis() - 1000000));
+
+        shipmentDao.save(s);
+        shipmentDao.save(s2);
 
         //add alert
         createAlert(s, AlertType.Battery);
@@ -273,6 +278,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         context.getBean(LocationProfileDao.class).save(shippedTo);
 
         s.setShipmentDescription("JUnit test shipment siblingGroup_test");
+        s.setStatus(ShipmentStatus.Arrived);
+        s.setArrivalDate(new Date());
         context.getBean(ShipmentDao.class).save(s);
 
         //create siblings

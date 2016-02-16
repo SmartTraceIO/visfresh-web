@@ -127,11 +127,11 @@ public class AbstractJsonSerializer {
      * @return
      */
     public String formatDate(final Date date) {
-        final TimeZone t = this.timeZone;
         if (date == null) {
             return null;
         }
 
+        final TimeZone t = this.timeZone;
         final SimpleDateFormat sdf = createDateFormat();
         sdf.setTimeZone(t);
         return sdf.format(date);

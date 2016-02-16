@@ -89,6 +89,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         s.setTripCount(asInt(json.get(ShipmentConstants.PROPERTY_TRIP_COUNT)));
         s.setPoNum(asInt(json.get(ShipmentConstants.PROPERTY_PO_NUM)));
         s.setShipmentDate(asDate(json.get(ShipmentConstants.PROPERTY_SHIPMENT_DATE)));
+        s.setArrivalDate(asDate(json.get(ShipmentConstants.PROPERTY_ARRIVAL_DATE)));
         s.getCustomFields().putAll(parseStringMap(json.get(ShipmentConstants.PROPERTY_CUSTOM_FIELDS)));
         s.setStatus(ShipmentStatus.valueOf(json.get(ShipmentConstants.PROPERTY_STATUS).getAsString()));
         s.setDevice(getReferenceResolver().getDevice(asString(json.get(ShipmentConstants.PROPERTY_DEVICE_IMEI))));
@@ -125,6 +126,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.PROPERTY_SHIPPED_FROM, getId(s.getShippedFrom()));
         obj.addProperty(ShipmentConstants.PROPERTY_SHIPPED_TO, getId(s.getShippedTo()));
         obj.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_DATE, formatDate(s.getShipmentDate()));
+        obj.addProperty(ShipmentConstants.PROPERTY_ARRIVAL_DATE, formatDate(s.getArrivalDate()));
 
         obj.addProperty(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID, getId(s.getAlertProfile()));
         obj.addProperty(ShipmentConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES, s.getAlertSuppressionMinutes());

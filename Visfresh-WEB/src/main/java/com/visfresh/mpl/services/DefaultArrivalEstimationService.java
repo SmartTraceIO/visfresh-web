@@ -72,7 +72,7 @@ public class DefaultArrivalEstimationService implements
             final Location currentLocation, final Date startDate,
             final Date currentTime) {
         if (s.hasFinalStatus()) {
-            return new ArrivalEstimation(null, 100);
+            return new ArrivalEstimation(s.getArrivalDate(), 100);
         }
         final long dt = currentTime.getTime() - startDate.getTime();
         if (dt > 0 && s.getShippedFrom() != null && s.getShippedTo() != null) {

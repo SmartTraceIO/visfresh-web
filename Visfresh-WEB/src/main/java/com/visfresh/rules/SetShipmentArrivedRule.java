@@ -114,6 +114,7 @@ public class SetShipmentArrivedRule implements SystemMessageHandler, TrackerEven
         context.setProcessed(this);
 
         shipment.setStatus(ShipmentStatus.Arrived);
+        shipment.setArrivalDate(new Date());
         shipmentDao.save(shipment);
         log.debug("Shipment status for " + shipment.getId() + " has set to "+ ShipmentStatus.Arrived);
 

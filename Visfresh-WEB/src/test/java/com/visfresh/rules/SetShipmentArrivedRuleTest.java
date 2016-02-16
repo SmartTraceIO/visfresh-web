@@ -5,6 +5,7 @@ package com.visfresh.rules;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
@@ -94,6 +95,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         rule.handle(req);
 
         assertEquals(ShipmentStatus.Arrived, shipment.getStatus());
+        assertNotNull(shipment.getArrivalDate());
     }
     @Test
     public void testShutdownDevice() {

@@ -40,6 +40,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     private static final String PALETTID_FIELD = "palletid";
     private static final String ASSETNUM_FIELD = "assetnum";
     private static final String SHIPMENTDATE_FIELD = "shipmentdate";
+    private static final String ARRIVALDATE_FIELD = "arrivaldate";
     private static final String CUSTOMFIELDS_FIELD = "customfiels";
     private static final String STATUS_FIELD = "status";
     private static final String DEVICE_FIELD = "device";
@@ -78,6 +79,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         propertyToDbFields.put(ShipmentConstants.PROPERTY_STATUS, STATUS_FIELD);
         propertyToDbFields.put(ShipmentConstants.PROPERTY_CUSTOM_FIELDS, CUSTOMFIELDS_FIELD);
         propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPMENT_DATE, SHIPMENTDATE_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PROPERTY_ARRIVAL_DATE, ARRIVALDATE_FIELD);
         propertyToDbFields.put(ShipmentConstants.PROPERTY_PO_NUM, PONUM_FIELD);
         propertyToDbFields.put(ShipmentConstants.PROPERTY_TRIP_COUNT, TRIPCOUNT_FIELD);
         propertyToDbFields.put(ShipmentConstants.PROPERTY_ASSET_NUM, ASSETNUM_FIELD);
@@ -278,6 +280,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         e.setPalletId((String) map.get(PALETTID_FIELD));
         e.setAssetNum((String) map.get(ASSETNUM_FIELD));
         e.setShipmentDate((Date) map.get(SHIPMENTDATE_FIELD));
+        e.setArrivalDate((Date) map.get(ARRIVALDATE_FIELD));
         e.setLastEventDate((Date) map.get(LASTEVENT_FIELD));
         e.setDeviceShutdownTime((Date) map.get(DEVICESHUTDOWNDATE_FIELD));
         e.getCustomFields().putAll(parseJsonMap((String) map.get(CUSTOMFIELDS_FIELD)));
@@ -313,6 +316,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(PALETTID_FIELD, s.getPalletId());
         params.put(ASSETNUM_FIELD, s.getAssetNum());
         params.put(SHIPMENTDATE_FIELD, s.getShipmentDate());
+        params.put(ARRIVALDATE_FIELD, s.getArrivalDate());
         params.put(LASTEVENT_FIELD, s.getLastEventDate());
         params.put(DEVICESHUTDOWNDATE_FIELD, s.getDeviceShutdownTime());
         params.put(CUSTOMFIELDS_FIELD, AbstractJsonSerializer.toJson(s.getCustomFields()).toString());

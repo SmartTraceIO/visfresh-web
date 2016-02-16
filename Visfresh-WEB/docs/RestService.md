@@ -631,6 +631,7 @@ see [Shipment Object](#markdown-header-shipment)
 	"shippedFrom": 503,
 	"shippedTo": 504,
 	"shipmentDate": "2015-11-12T22:24",
+    "arrivalTime": "2016-02-16T20:29",
 	"alertProfileId": 302,
 	"alertSuppressionMinutes": 55,
 	"alertsNotificationSchedules": [
@@ -1623,6 +1624,7 @@ Response:
     "shippedFrom": 499,
     "shippedTo": 500,
     "shipmentDate": "2015-11-12T22:24",
+    "arrivalTime": "2016-02-16T20:29",
     "alertProfileId": 300,
     "alertSuppressionMinutes": 55,
     "alertsNotificationSchedules": [
@@ -1709,7 +1711,7 @@ Response:
       "shippedFrom": "Bankstown Warehouse",
       "shippedTo": "Bankstown Warehouse",
       "estArrivalDate": "2015-11-29T21:01",
-      "actualArrivalDate": null,
+      "actualArrivalDate": "2016-02-16T20:29",
       "percentageComplete": 0,
       "alertProfileId": 385,
       "alertProfileName": "AnyAlert",
@@ -2184,6 +2186,7 @@ Response:
     "shippedFrom": 503,
     "shippedTo": 504,
     "shipmentDate": "2015-11-12T22:24",
+    "arrivalTime": "2016-02-16T20:29",
     "alertProfileId": 302,
     "alertSuppressionMinutes": 55,
     "alertsNotificationSchedules": [

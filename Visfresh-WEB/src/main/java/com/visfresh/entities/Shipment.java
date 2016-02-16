@@ -57,6 +57,7 @@ public class Shipment extends ShipmentBase {
     private Date deviceShutdownTime;
     private Long siblingGroup;
     private int siblingCount;
+    private Date arrivalDate;
 
     /**
      * Default constructor.
@@ -218,6 +219,18 @@ public class Shipment extends ShipmentBase {
      */
     public int getSiblingCount() {
         return siblingCount;
+    }
+    /**
+     * @param date arrival date.
+     */
+    public void setArrivalDate(final Date date) {
+        this.arrivalDate = date;
+    }
+    /**
+     * @return the arrivalDate
+     */
+    public Date getArrivalDate() {
+        return arrivalDate;
     }
 
     /**

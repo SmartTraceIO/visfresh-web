@@ -370,12 +370,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 if (s.getStatus() == ShipmentStatus.Default) {
                     dto.setShippedTo(null);
                 }
-            } else if (s.getStatus() == ShipmentStatus.Arrived) {
+            } else if (s.getStatus() == ShipmentStatus.Arrived && s.getArrivalDate() != null) {
                 //arrival date.
-                final Arrival arrival = arrivalDao.getArrival(s);
-                if (arrival != null) {
-                    dto.setActualArrivalDate(isoFmt.format(arrival.getDate()));
-                }
+                dto.setActualArrivalDate(isoFmt.format(s.getArrivalDate()));
             }
 
             dto.setShipmentDate(isoFmt.format(s.getShipmentDate()));
@@ -528,7 +525,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             //"arrivalNotificationTimeISO": "2014-08-12 12:10",
             // NEW - ISO for actual time arrival notification sent out
             dto.setArrivalNotificationTimeIso(isoFmt.format(arrival.getDate()));
-            dto.setArrivalTimeIso(dto.getArrivalNotificationTimeIso());
+        }
+        if (s.getArrivalDate() != null) {
+            dto.setArrivalTimeIso(isoFmt.format(s.getArrivalDate()));
         }
 
         final Date shutdownTime = s.getDeviceShutdownTime();
