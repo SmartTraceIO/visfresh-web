@@ -33,6 +33,7 @@ import com.visfresh.StationSignal;
 public class UnwiredLabsLocationService implements LocationService {
     private static final Logger log = LoggerFactory.getLogger(UnwiredLabsLocationService.class);
     private static final int CRITICAL_BALANCE = 50;
+    private boolean criticalBalanceHasReported;
 
     private String url;
     private String token;
@@ -110,7 +111,12 @@ public class UnwiredLabsLocationService implements LocationService {
         //check balance
         final int balance = json.get("balance").getAsInt();
         if (balance < CRITICAL_BALANCE) {
-            log.error("Critical balance for UnwiredLabs: " + balance);
+            if (!criticalBalanceHasReported) {
+                log.error("Critical balance for UnwiredLabs: " + balance);
+                criticalBalanceHasReported = true;
+            }
+        } else {
+            criticalBalanceHasReported = false;
         }
 
         return loc;
