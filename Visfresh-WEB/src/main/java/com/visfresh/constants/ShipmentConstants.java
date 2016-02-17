@@ -43,5 +43,6 @@ public interface ShipmentConstants {
     String PROPERTY_SHIPPED_FROM_DATE = "shippedFromDate";
     String PROPERTY_SHIPPED_TO_DATE = "shippedToDate";
     String PROPERTY_ONLY_WITH_ALERTS = "alertsOnly";
-    String PROPERTY_ARRIVAL_DATE = "arrivalTime";
+    String PROPERTY_ARRIVAL_DATE = "actualArrivalDate";
+    String PROPERTY_ETA = "eta";
 }

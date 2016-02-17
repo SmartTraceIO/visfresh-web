@@ -5,9 +5,13 @@ package com.visfresh.utils;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.TimeZone;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -55,5 +59,40 @@ public final class SerializerUtils {
         final JsonObject obj = new JsonObject();
         obj.addProperty(idFieldName, id);
         return obj;
+    }
+    /**
+     * Warning!!! This feature does not support of merging of arrays.
+     * @param from source object.
+     * @param pattern pattern object.
+     * @return result JSON.
+     */
+    public static JsonObject merge(final JsonObject from,
+            final JsonObject pattern) {
+        final JsonObject result = parseJson(pattern.toString()).getAsJsonObject();
+
+        //extract keys.
+        final List<String> keys = new LinkedList<String>();
+        for (final Entry<String, JsonElement> e : result.entrySet()) {
+            keys.add(e.getKey());
+        }
+
+        //do merge
+        for (final String key : keys) {
+            final JsonElement e = result.get(key);
+            if (from.has(key)) {
+                final JsonElement newValue = from.get(key);
+                if (newValue.isJsonNull()) {
+                    result.add(key, JsonNull.INSTANCE);
+                } else if (e.isJsonObject() && newValue.isJsonObject()) {
+                    final JsonObject newObject = merge(newValue.getAsJsonObject(),
+                            e.getAsJsonObject());
+                    result.add(key, newObject);
+                } else {
+                    result.add(key, newValue);
+                }
+            }
+        }
+
+        return result;
     }
 }

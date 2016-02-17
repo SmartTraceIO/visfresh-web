@@ -609,6 +609,7 @@ see [ResponseStatus](#markdown-header-response-status)
 ```json
 {
   "saveAsNewTemplate": true,
+  "includePreviousData": true, // can be blank, default is true
   "templateName": "NewTemplate.tpl", // template name in case of save also as new template
   "shipment": ${EmbeddedShipmentObject} //this shipment object to save
 }
@@ -1609,6 +1610,7 @@ Response:
 ```json
 {
   "saveAsNewTemplate": true,
+  "includePreviousData": true,
   "templateName": "NewTemplate.tpl",
   "shipment": {
     "status": "InProgress",

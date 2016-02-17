@@ -104,6 +104,20 @@ public class ShipmentRestClient extends RestClient {
         return getShipments(req);
     }
     /**
+     * @param column sorting column.
+     * @param ascent sort order
+     * @return array of shipments.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public JsonArray getShipmentsSorted(final String column, final boolean ascent)
+            throws RestServiceException, IOException {
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        req.setSortColumn(column);
+        req.setSortOrder(ascent ? "asc": "desc");
+        return getShipments(req);
+    }
+    /**
      * @param pageIndex
      * @param pageSize
      * @param shippedFrom

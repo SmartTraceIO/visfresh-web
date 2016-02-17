@@ -17,8 +17,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.controllers.restclient.RestIoListener;
 import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.dao.AlertDao;
@@ -233,6 +236,124 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(1, shipmentClient.getShipments(1, 1).size());
         assertEquals(1, shipmentClient.getShipments(2, 1).size());
         assertEquals(0, shipmentClient.getShipments(3, 10000).size());
+    }
+    @Test
+    public void testGetShipmentsSorted() throws RestServiceException, IOException {
+        final Shipment s1 = createShipment(true);
+        final Shipment s2 = createShipment(true);
+        final Shipment s3 = createShipment(true);
+
+        //CreationDate ascent
+        List<Long> ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPMENT_ID, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s3.getId(), ids.get(2));
+
+        //CreationDate descent
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPMENT_ID, false);
+        assertEquals(s3.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+
+        //Date Shipped (Oldest at top) not working
+        final long currentTime = System.currentTimeMillis();
+        s2.setShipmentDate(new Date(currentTime - 3 * 10000000L));
+        s3.setShipmentDate(new Date(currentTime - 2 * 10000000L));
+        s1.setShipmentDate(new Date(currentTime - 1 * 10000000L));
+
+        shipmentDao.save(s1);
+        shipmentDao.save(s2);
+        shipmentDao.save(s3);
+
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPMENT_DATE, true);
+        assertEquals(s2.getId(), ids.get(0));
+        assertEquals(s3.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPMENT_DATE, false);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s3.getId(), ids.get(1));
+        assertEquals(s2.getId(), ids.get(2));
+
+        //Date of Arrival (Oldest at top)
+        s1.setArrivalDate(new Date(currentTime - 3 * 10000000L));
+        s3.setArrivalDate(new Date(currentTime - 2 * 10000000L));
+        s2.setArrivalDate(new Date(currentTime - 1 * 10000000L));
+
+        shipmentDao.save(s1);
+        shipmentDao.save(s2);
+        shipmentDao.save(s3);
+
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_ARRIVAL_DATE, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s3.getId(), ids.get(1));
+        assertEquals(s2.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_ARRIVAL_DATE, false);
+        assertEquals(s2.getId(), ids.get(0));
+        assertEquals(s3.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+
+        //Status not working
+        s2.setStatus(ShipmentStatus.Ended);
+        s3.setStatus(ShipmentStatus.Default);
+        s1.setStatus(ShipmentStatus.Arrived);
+
+        shipmentDao.save(s1);
+        shipmentDao.save(s2);
+        shipmentDao.save(s3);
+
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_STATUS, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s3.getId(), ids.get(1));
+        assertEquals(s2.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_STATUS, false);
+        assertEquals(s2.getId(), ids.get(0));
+        assertEquals(s3.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+
+        //ShippedFrom not working (using location name)
+        final LocationProfile la = createLocationProfile("A");
+        final LocationProfile lb = createLocationProfile("B");
+        final LocationProfile lc = createLocationProfile("C");
+
+        s2.setShippedFrom(lc);
+        s3.setShippedFrom(lb);
+        s1.setShippedFrom(la);
+
+        shipmentDao.save(s1);
+        shipmentDao.save(s2);
+        shipmentDao.save(s3);
+
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPPED_FROM, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s3.getId(), ids.get(1));
+        assertEquals(s2.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPPED_FROM, false);
+        assertEquals(s2.getId(), ids.get(0));
+        assertEquals(s3.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+
+        //ShippedTo not working (using location name)
+        s2.setShippedTo(lc);
+        s3.setShippedTo(lb);
+        s1.setShippedTo(la);
+
+        shipmentDao.save(s1);
+        shipmentDao.save(s2);
+        shipmentDao.save(s3);
+
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPPED_TO, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s3.getId(), ids.get(1));
+        assertEquals(s2.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPPED_TO, false);
+        assertEquals(s2.getId(), ids.get(0));
+        assertEquals(s3.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
     }
     @Test
     public void testGetShipment() throws IOException, RestServiceException {
@@ -517,6 +638,32 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         alert.setType(type);
         alertDao.save(alert);
         return alert;
+    }
+    /**
+     * @param name location name.
+     * @return location profile.
+     */
+    private LocationProfile createLocationProfile(final String name) {
+        final LocationProfile loc = createLocationProfile(false);
+        loc.setName(name);
+        loc.setAddress("");
+        return getContext().getBean(LocationProfileDao.class).save(loc);
+    }
+    /**
+     * @param column
+     * @param sortOrder
+     * @return
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    private List<Long> getSortedShipmentId(final String column, final boolean sortOrder) throws RestServiceException, IOException {
+        final JsonArray items = shipmentClient.getShipmentsSorted(column, sortOrder);
+        final List<Long> ids = new LinkedList<>();
+        for (final JsonElement e : items) {
+            final Long id = e.getAsJsonObject().get("shipmentId").getAsLong();
+            ids.add(id);
+        }
+        return ids;
     }
 
     @After

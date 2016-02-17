@@ -67,6 +67,7 @@ import com.visfresh.services.LocationService;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.ShipmentSiblingService;
 import com.visfresh.services.lists.ListShipmentItem;
+import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -121,22 +122,43 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     }
     /**
      * @param authToken authentication token.
-     * @param shipment shipment.
+     * @param jsonRequest JSON save shipment request.
      * @return ID of saved shipment.
      */
     @RequestMapping(value = "/saveShipment/{authToken}", method = RequestMethod.POST)
     public JsonObject saveShipment(@PathVariable final String authToken,
-            final @RequestBody JsonObject shipment) {
+            final @RequestBody JsonObject jsonRequest) {
         try {
             final User user = getLoggedInUser(authToken);
             security.checkCanSaveShipment(user);
 
-            final SaveShipmentRequest req = getSerializer(user).parseSaveShipmentRequest(shipment);
+            final ShipmentSerializer serializer = getSerializer(user);
+
+            Long id = serializer.getShipmentIdFromSaveRequest(jsonRequest);
+            if (id != null) {
+                //merge the shipment from request by existing shipment
+                //it is required to avoid the set to null the fields
+                //which are absent in save request.
+                final Shipment s = shipmentDao.findOne(id);
+                if (s != null) {
+                    checkCompanyAccess(user, s);
+
+                    final JsonObject shipmentFromReqest = serializer.getShipmentFromRequest(
+                            jsonRequest);
+                    final JsonObject merged = SerializerUtils.merge(
+                            shipmentFromReqest,
+                            serializer.toJson(s).getAsJsonObject());
+                    //correct shipment to save in request
+                    serializer.setShipmentToRequest(jsonRequest, merged);
+                }
+            }
+
+            final SaveShipmentRequest req = serializer.parseSaveShipmentRequest(jsonRequest);
             final Shipment newShipment = req.getShipment();
             checkCompanyAccess(user, newShipment);
 
             newShipment.setCompany(user.getCompany());
-            final Long id = saveShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
+            id = saveShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
 
             final SaveShipmentResponse resp = new SaveShipmentResponse();
             resp.setShipmentId(id);
@@ -146,7 +168,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                         user.getCompany(), newShipment, req.getTemplateName());
                 resp.setTemplateId(tplId);
             }
-            return createSuccessResponse(getSerializer(user).toJson(resp));
+            return createSuccessResponse(serializer.toJson(resp));
         } catch (final Exception e) {
             log.error("Failed to save device", e);
             return createErrorResponse(e);
@@ -259,13 +281,17 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private String[] getDefaultListShipmentsSortingOrder() {
         return new String[] {
-            PROPERTY_SHIPMENT_DESCRIPTION,
             PROPERTY_SHIPMENT_ID,
-            PROPERTY_ALERT_PROFILE_ID,
+            PROPERTY_SHIPMENT_DATE,
+            PROPERTY_STATUS,
             PROPERTY_SHIPPED_FROM_LOCATION_NAME,
             PROPERTY_SHIPPED_TO_LOCATION_NAME,
             PROPERTY_DEVICE_SN,
+            PROPERTY_ARRIVAL_DATE,
             PROPERTY_COMMENTS_FOR_RECEIVER,
+//            PROPERTY_ETA,
+            PROPERTY_SHIPMENT_DESCRIPTION,
+            PROPERTY_ALERT_PROFILE_ID,
             PROPERTY_ALERT_PROFILE
         };
     }

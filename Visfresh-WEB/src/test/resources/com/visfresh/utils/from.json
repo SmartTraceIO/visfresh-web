@@ -1,0 +1,10 @@
+{
+   "existingField": 11,
+   "notExistingField": 12,
+   "replaceByPrimitive": 77,
+   "nullPrimitive": null,
+   "nullObject": null,
+   "replaceRecursive": {
+        "recursive": 99
+    }
+}

@@ -153,7 +153,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         req.setSaveAsNewTemplate(asBoolean(json.get("saveAsNewTemplate")));
         req.setIncludePreviousData(asBoolean(json.get("includePreviousData")));
         req.setTemplateName(asString(json.get("templateName")));
-        req.setShipment(parseShipment(json.get("shipment").getAsJsonObject()));
+        req.setShipment(parseShipment(getShipmentFromRequest(json)));
         return req;
     }
     public JsonObject toJson(final SaveShipmentRequest req) {
@@ -165,6 +165,28 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.remove("deviceSN");
         obj.remove("deviceName");
         return obj;
+    }
+    /**
+     * @param json
+     * @return
+     */
+    public Long getShipmentIdFromSaveRequest(final JsonObject json) {
+        final JsonObject shipment = getShipmentFromRequest(json);
+        return asLong(shipment.get(ShipmentConstants.PROPERTY_SHIPMENT_ID));
+    }
+    /**
+     * @param json JSON save shipment request.
+     * @return
+     */
+    public JsonObject getShipmentFromRequest(final JsonObject json) {
+        return json.get("shipment").getAsJsonObject();
+    }
+    /**
+     * @param req
+     * @param shipment
+     */
+    public void setShipmentToRequest(final JsonObject req, final JsonObject shipment) {
+        req.add("shipment", shipment);
     }
 
     public SaveShipmentResponse parseSaveShipmentResponse(final JsonObject json) {
