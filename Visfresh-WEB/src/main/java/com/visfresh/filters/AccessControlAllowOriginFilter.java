@@ -53,7 +53,11 @@ public class AccessControlAllowOriginFilter implements Filter {
             final FilterChain chain) throws IOException, ServletException {
         if (request.getHeader("origin") != null) {
             response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
+//            response.setHeader("Access-Control-Allow-Credentials", "true");
         }
+
         chain.doFilter(request, response);
     }
 
