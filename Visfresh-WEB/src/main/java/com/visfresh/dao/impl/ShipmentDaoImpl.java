@@ -544,4 +544,27 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         }
         return null;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#updateSiblingInfo(com.visfresh.entities.Shipment, java.lang.Long, int)
+     */
+    @Override
+    public void updateSiblingInfo(final List<Shipment> shipments, final Long siblingGroup,
+            final int siblingCount) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("group", siblingGroup);
+        params.put("count", siblingCount);
+
+        final List<String> placeHolders = new LinkedList<String>();
+        for (final Shipment s : shipments) {
+            final String key = "id_" + s.getId();
+            placeHolders.add(key);
+            params.put(key, s.getId());
+        }
+
+        jdbc.update("update "
+                + TABLE
+                + " set " + SIBLINGGROUP_FIELD + " = :group, "
+                + SIBLINGCOUNT_FIELD + " = :count where "
+                + ID_FIELD + " in (:" + StringUtils.combine(placeHolders, ",:") + ")", params);
+    }
 }

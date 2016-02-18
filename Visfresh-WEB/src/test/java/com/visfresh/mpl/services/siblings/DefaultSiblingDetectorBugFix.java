@@ -126,8 +126,19 @@ public class DefaultSiblingDetectorBugFix extends DefaultSiblingDetector {
      * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#saveShipment(com.visfresh.entities.Shipment)
      */
     @Override
-    protected void saveShipment(final Shipment shipment) {
-        savedShipments.put(shipment.getId(), shipment);
+    protected void updateSiblingInfo(final List<Shipment> shipments, final Long siblingGroup, final int siblingCount) {
+        for (final Shipment shipment : shipments) {
+            shipment.setSiblingGroup(siblingGroup);
+            shipment.setSiblingCount(siblingCount);
+            savedShipments.put(shipment.getId(), shipment);
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#getInactiveSiblings(java.lang.Long)
+     */
+    @Override
+    protected List<Shipment> getInactiveSiblings(final Long groupId) {
+        return new LinkedList<Shipment>();
     }
     /* (non-Javadoc)
      * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#getTrackeEvents(com.visfresh.entities.Shipment)

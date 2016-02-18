@@ -239,4 +239,20 @@ public class Shipment extends ShipmentBase {
     public boolean hasFinalStatus() {
         return status == ShipmentStatus.Arrived || status == ShipmentStatus.Ended;
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder().append(getId());
+        if (getDevice() != null) {
+            sb.append(": ");
+            sb.append(getDevice().getImei());
+            sb.append("(");
+            sb.append(getTripCount());
+            sb.append(")");
+        }
+        return sb.toString();
+    }
 }

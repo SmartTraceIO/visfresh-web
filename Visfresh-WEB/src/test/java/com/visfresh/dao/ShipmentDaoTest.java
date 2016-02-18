@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -509,6 +510,45 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertNotNull(s);
         assertNotSame(tpl.getId(), s.getId());
         assertEquals(tpl.getShipmentDescription(), s.getShipmentDescription());
+    }
+    @Test
+    public void testUpdateSiblingInfo() {
+        Shipment s1 = createShipment(null, 0);
+        Shipment s2 = createShipment(null, 0);
+        Shipment s3 = createShipment(null, 0);
+
+        final List<Shipment> list = new LinkedList<Shipment>();
+        list.add(s1);
+        list.add(s3);
+
+        final Long siblingGroup = 777l;
+        final int siblingCount = 3;
+        dao.updateSiblingInfo(list, siblingGroup, siblingCount);
+
+        //check sibling group and sibling count updated
+        s1 = dao.findOne(s1.getId());
+        s2 = dao.findOne(s2.getId());
+        s3 = dao.findOne(s3.getId());
+
+        assertEquals(siblingGroup, s1.getSiblingGroup());
+        assertEquals(siblingCount, s1.getSiblingCount());
+
+        assertEquals(null, s2.getSiblingGroup());
+        assertEquals(0, s2.getSiblingCount());
+
+        assertEquals(siblingGroup, s3.getSiblingGroup());
+        assertEquals(siblingCount, s3.getSiblingCount());
+    }
+    /**
+     * @param siblingGroup sibling group.
+     * @param siblingCount sibling count.
+     * @return shipment.
+     */
+    private Shipment createShipment(final Long siblingGroup, final int siblingCount) {
+        final Shipment s = createTestEntity();
+        s.setSiblingGroup(siblingGroup);
+        s.setSiblingCount(siblingCount);
+        return dao.save(s);
     }
     /**
      * @param c company.

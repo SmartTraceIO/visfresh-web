@@ -49,4 +49,10 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @return new shipment from given template.
      */
     Shipment createNewFrom(ShipmentTemplate tpl);
+    /**
+     * @param shipments shipment.
+     * @param siblingGroup sibling group.
+     * @param siblingCount sibling count.
+     */
+    void updateSiblingInfo(List<Shipment> shipments, Long siblingGroup, int siblingCount);
 }

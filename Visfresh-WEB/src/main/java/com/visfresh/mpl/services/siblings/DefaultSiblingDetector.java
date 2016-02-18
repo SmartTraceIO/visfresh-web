@@ -135,54 +135,120 @@ public class DefaultSiblingDetector implements SiblingDetector {
             while (!shipments.isEmpty()) {
                 final Shipment master = shipments.remove(0);
 
-                int count = 1;
-                Long groupId = master.getSiblingGroup();
+                // get group ID for given master shipment
+                final Long groupId = getGroupId(master, alreadyUsedGroups);
 
-                //check already used group
-                if (alreadyUsedGroups.contains(groupId)) {
-                    //clear group ID
-                    groupId = null;
-                }
-                if (groupId == null) {
-                    //if the group ID is null, assign it to master shipment ID.
-                    groupId = master.getId();
-                }
-
+                //create group
                 final List<Shipment> group = new LinkedList<>();
                 group.add(master);
 
-                //save group ID as already used
-                alreadyUsedGroups.add(groupId);
+                //cut siblings for group from active shipment list.
+                group.addAll(cutSiblings(master, shipments));
 
-                final TrackerEvent[] masterEvents = getTrackeEvents(master);
-                //find siblings for given shipment
-                final Iterator<Shipment> iter = shipments.iterator();
-                while (iter.hasNext()) {
-                    final Shipment s = iter.next();
-                    if (isSiblings(s, master, masterEvents)) {
-                        count++;
-                        iter.remove();
-                        group.add(s);
-                    }
-                }
+                //get inactive siblings
+                final List<Shipment> inactive = getInactiveSiblings(groupId);
+                final List<Shipment> toRemoveFromGroup = cutBySomeDevice(inactive, group);
 
                 //save shipments if required.
-                final int siblingCount = count - 1;
-                for (final Shipment s : group) {
+                final int siblingCount = group.size() + inactive.size() - 1;
+                final List<Shipment> toUpdate = new LinkedList<Shipment>();
+
+                final List<Shipment> all = new LinkedList<>(group);
+                all.addAll(inactive);
+
+                for (final Shipment s : all) {
                     //set sibling group ID to sibling
                     final Long oldId = s.getSiblingGroup();
-                    if (s.getSiblingCount() != siblingCount || oldId == null || !oldId.equals(groupId)) {
-                       s.setSiblingGroup(groupId);
-                       s.setSiblingCount(siblingCount);
-                       saveShipment(s);
+                    if (s.getSiblingCount() != siblingCount || !groupId.equals(oldId)) {
+                        toUpdate.add(s);
                     }
                 }
 
-                log.debug("Found " + count + " siblings for group " + groupId);
+                updateSiblingInfo(toUpdate, groupId, siblingCount);
+
+                if (!toRemoveFromGroup.isEmpty()) {
+                    updateSiblingInfo(toRemoveFromGroup,
+                            -toRemoveFromGroup.get(0).getId(), toRemoveFromGroup.size() - 1);
+                }
+
+                log.debug("Found " + group.size() + " siblings for group " + groupId);
             }
         }
 
         log.debug("End of search shipment siblings for company " + company.getName());
+    }
+
+    /**
+     * @param inactive
+     * @param group
+     * @return
+     */
+    private List<Shipment> cutBySomeDevice(final List<Shipment> inactive,
+            final List<Shipment> group) {
+        //create device set.
+        final Set<String> devices = new HashSet<String>();
+        for (final Shipment s : group) {
+            devices.add(s.getDevice().getImei());
+        }
+
+        final List<Shipment> bySomeDevice = new LinkedList<Shipment>();
+        final Iterator<Shipment> iter = inactive.iterator();
+        while (iter.hasNext()) {
+            final Shipment s = iter.next();
+            if (devices.contains(s.getDevice().getImei())) {
+                iter.remove();
+                bySomeDevice.add(s);
+            }
+        }
+
+        return bySomeDevice;
+    }
+
+    /**
+     * @param master master shipment.
+     * @param shipments active shipment list.
+     * @return list of siblings for given master shipment.
+     */
+    private List<Shipment> cutSiblings(final Shipment master,
+            final List<Shipment> shipments) {
+        final List<Shipment> siblings = new LinkedList<Shipment>();
+
+        final TrackerEvent[] masterEvents = getTrackeEvents(master);
+        //find siblings for given shipment
+        final Iterator<Shipment> iter = shipments.iterator();
+        while (iter.hasNext()) {
+            final Shipment s = iter.next();
+            if (isSiblings(s, master, masterEvents)) {
+                iter.remove();
+                siblings.add(s);
+            }
+        }
+
+        return siblings;
+    }
+
+    /**
+     * @param master
+     * @param alreadyUsedGroups
+     * @return
+     */
+    protected Long getGroupId(final Shipment master,
+            final Set<Long> alreadyUsedGroups) {
+        Long groupId = master.getSiblingGroup();
+
+        //check already used group
+        if (alreadyUsedGroups.contains(groupId)) {
+            //clear group ID
+            groupId = null;
+        }
+        if (groupId == null) {
+            //if the group ID is null, assign it to master shipment ID.
+            groupId = master.getId();
+        }
+
+        //save group ID as already used
+        alreadyUsedGroups.add(groupId);
+        return groupId;
     }
 
     /**
@@ -210,10 +276,13 @@ public class DefaultSiblingDetector implements SiblingDetector {
 
     /**
      * save shipments has moved to separate method only for test purposes.
-     * @param shipment shipment.
+     * @param shipments shipment.
+     * @param siblingGroup sibling group.
+     * @param siblingCount sibling count.
      */
-    protected void saveShipment(final Shipment shipment) {
-        shipmentDao.save(shipment);
+    protected void updateSiblingInfo(final List<Shipment> shipments,
+            final Long siblingGroup, final int siblingCount) {
+        shipmentDao.updateSiblingInfo(shipments, siblingGroup, siblingCount);
     }
     /**
      * Find active shipments has moved to separate method only for test purposes.
@@ -224,6 +293,23 @@ public class DefaultSiblingDetector implements SiblingDetector {
         return shipmentDao.findActiveShipments(company);
     }
     /**
+     * @param groupId group ID.
+     * @return list of inactive siblings in group.
+     */
+    protected List<Shipment> getInactiveSiblings(final Long groupId) {
+        final List<Shipment> group = shipmentDao.getSiblingGroup(groupId);
+
+        final List<Shipment> inactive = new LinkedList<Shipment>();
+        for (final Shipment s : group) {
+            if (s.hasFinalStatus()) {
+                inactive.add(s);
+            }
+        }
+
+        return inactive;
+    }
+
+    /**
      * @param shipment shipment.
      * @return array of tracker events.
      */
@@ -233,7 +319,7 @@ public class DefaultSiblingDetector implements SiblingDetector {
     }
     /**
      * @param s other sibling.
-     * @param master master sibling events.
+   )  * @param master master sibling events.
      * @return true if shipments are siblings.
      */
     //set as protected only for testing purposes.
