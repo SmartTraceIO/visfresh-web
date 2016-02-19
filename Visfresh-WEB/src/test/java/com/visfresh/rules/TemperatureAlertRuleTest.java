@@ -16,12 +16,13 @@ import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.state.DeviceState;
@@ -128,6 +129,40 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         rule.handle(new RuleContext(e, state));
 
         assertEquals(0, alertDao.findAll(null, null, null).size());
+    }
+    @Test
+    public void testEventIdSet() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final TemperatureRule r = new TemperatureRule(AlertType.Hot);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(false);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        final DeviceState state = new DeviceState();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        final Alert alert = alertDao.findAll(null, null, null).get(0);
+        assertEquals(e.getId(), alert.getTrackerEventId());
     }
     @Test
     public void testCumulativeHotTemperatureAlert() {
@@ -528,7 +563,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         assertFalse(rule.accept(new RuleContext(e, state)));
 
         //shift the start shipment date.
-        state.setStartShipmentDate(new Date(System.currentTimeMillis() - 10 * 60 * 1000l - 1l));
+        state.setStartShipmentDate(new Date(e.getTime().getTime() - 10 * 60 * 1000l - 1l));
 
         assertTrue(rule.accept(new RuleContext(e, state)));
     }

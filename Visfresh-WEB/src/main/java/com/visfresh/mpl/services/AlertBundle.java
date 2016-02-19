@@ -15,8 +15,8 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.NotificationIssue;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
@@ -48,15 +48,16 @@ public class AlertBundle extends NotificationIssueBundle {
      *  for temperature alerts:
      *    ${temperature}
      *    ${period}
-     *
-     * @param issue alert
      * @param user target user.
+     * @param issue alert
+     * @param trackerEvent tracker event.
      * @return description for given alert.
      */
-    public String buildDescription(final NotificationIssue issue, final User user) {
+    public String buildDescription(final User user, final NotificationIssue issue,
+            final TrackerEvent trackerEvent) {
         final ResourceBundle bundle = ResourceBundle.getBundle("alerts", XmlControl.INSTANCE);
         final String str = bundle.getString(createBundleKey(issue));
-        return StringUtils.getMessage(str, createReplacementMap(issue, user));
+        return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
     }
     /**
      * TODO move to resource bundles.

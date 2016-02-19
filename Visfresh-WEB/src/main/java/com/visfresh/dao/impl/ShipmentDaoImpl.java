@@ -550,6 +550,10 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     @Override
     public void updateSiblingInfo(final List<Shipment> shipments, final Long siblingGroup,
             final int siblingCount) {
+        if (shipments.isEmpty()) {
+            return;
+        }
+
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("group", siblingGroup);
         params.put("count", siblingCount);

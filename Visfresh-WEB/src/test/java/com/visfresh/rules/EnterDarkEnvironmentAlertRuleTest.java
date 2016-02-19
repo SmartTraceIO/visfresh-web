@@ -112,6 +112,7 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
         assertEquals(AlertType.LightOff, alert.getType());
         assertNotNull(alert.getDevice());
         assertNotNull(alert.getShipment());
+        assertEquals(e.getId(), alert.getTrackerEventId());
     }
 
     /**

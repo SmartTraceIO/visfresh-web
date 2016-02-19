@@ -265,6 +265,7 @@ create table alerts (
 	cumulative boolean not null default true,
     device varchar(127) not null,
     shipment bigint(20) not null,
+    event bigint(20),
     primary key (id),
     foreign key (shipment)
         references shipments (id),
@@ -278,6 +279,7 @@ create table arrivals (
     `date` timestamp not null,
     device varchar(127) not null,
     shipment bigint(20) not null,
+    event bigint(20),
     primary key (id),
     foreign key (shipment)
         references shipments (id),

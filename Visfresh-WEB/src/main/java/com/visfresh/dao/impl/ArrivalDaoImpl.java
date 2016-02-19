@@ -38,6 +38,7 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
     private static final String DATE_FIELD = "date";
     private static final String DEVICE_FIELD = "device";
     private static final String SHIPMENT_FIELD = "shipment";
+    private static final String TRACKER_EVENT_FIELD = "event";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -72,6 +73,7 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
         paramMap.put(NUMMETERS_FIELD, arrival.getNumberOfMettersOfArrival());
         paramMap.put(DEVICE_FIELD, arrival.getDevice().getId());
         paramMap.put(SHIPMENT_FIELD, arrival.getShipment().getId());
+        paramMap.put(TRACKER_EVENT_FIELD, arrival.getTrackerEventId());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -88,6 +90,7 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
         fields.add(NUMMETERS_FIELD);
         fields.add(DEVICE_FIELD);
         fields.add(SHIPMENT_FIELD);
+        fields.add(TRACKER_EVENT_FIELD);
         return fields;
     }
 
@@ -161,6 +164,10 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
         a.setId(((Number) map.get(ID_FIELD)).longValue());
         a.setDate((Date) map.get(DATE_FIELD));
         a.setNumberOfMettersOfArrival(((Number) map.get(NUMMETERS_FIELD)).intValue());
+        final Number trackerEventId = (Number) map.get(TRACKER_EVENT_FIELD);
+        if (trackerEventId != null) {
+            a.setTrackerEventId(trackerEventId.longValue());
+        }
         return a;
     }
 }

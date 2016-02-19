@@ -108,6 +108,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
 
         final Arrival arrival = arrivals.get(0);
         assertEquals(shipment.getId(), arrival.getShipment().getId());
+        assertEquals(e.getId(), arrival.getTrackerEventId());
     }
     @Test
     public void testNotification() {

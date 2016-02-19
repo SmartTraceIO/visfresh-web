@@ -26,6 +26,10 @@ public abstract class NotificationIssue implements EntityWithId<Long>, Comparabl
      * Shipment;
      */
     private Shipment shipment;
+    /**
+     * The trackere event ID.
+     */
+    private Long trackerEventId;
 
     /**
      * Default constructor.
@@ -81,6 +85,18 @@ public abstract class NotificationIssue implements EntityWithId<Long>, Comparabl
      */
     public void setShipment(final Shipment shipment) {
         this.shipment = shipment;
+    }
+    /**
+     * @return the trackerEventId
+     */
+    public Long getTrackerEventId() {
+        return trackerEventId;
+    }
+    /**
+     * @param trackerEventId the trackerEventId to set
+     */
+    public void setTrackerEventId(final Long trackerEventId) {
+        this.trackerEventId = trackerEventId;
     }
 
     /* (non-Javadoc)

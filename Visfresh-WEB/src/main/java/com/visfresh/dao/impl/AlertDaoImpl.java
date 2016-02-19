@@ -37,6 +37,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
     protected static final String ID_FIELD = "id";
     protected static final String DATE_FIELD = "date";
     protected static final String CUMULATIVE_FIELD = "cumulative";
+    protected static final String TRACKER_EVENT_FIELD = "event";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -62,7 +63,6 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
             //insert
             sql = createInsertScript(TABLE, fields);
         } else {
-            paramMap.put(ID_FIELD, alert.getId());
             //update
             sql = createUpdateScript(TABLE, fields, ID_FIELD);
         }
@@ -74,6 +74,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         paramMap.put(DEVICE_FIELD, alert.getDevice().getId());
         paramMap.put(SHIPMENT_FIELD, alert.getShipment().getId());
         paramMap.put(DATE_FIELD, alert.getDate());
+        paramMap.put(TRACKER_EVENT_FIELD, alert.getTrackerEventId());
         paramMap.put(TEMPERATURE_FIELD, isTemperature ? ((TemperatureAlert) alert).getTemperature() : -1);
         paramMap.put(MINUTES_FIELD, isTemperature ? ((TemperatureAlert) alert).getMinutes() : -1);
         paramMap.put(CUMULATIVE_FIELD, isTemperature ? ((TemperatureAlert) alert).isCumulative() : false);
@@ -92,6 +93,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         fields.add(TYPE_FIELD);
         fields.add(DEVICE_FIELD);
         fields.add(SHIPMENT_FIELD);
+        fields.add(TRACKER_EVENT_FIELD);
         fields.add(TEMPERATURE_FIELD);
         fields.add(MINUTES_FIELD);
         fields.add(DATE_FIELD);
@@ -201,6 +203,8 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         a.setId(((Number) map.get(ID_FIELD)).longValue());
         a.setType(type);
         a.setDate((Date) map.get(DATE_FIELD));
+        final Number teid = (Number) map.get(TRACKER_EVENT_FIELD);
+        a.setTrackerEventId(teid == null ? null : teid.longValue());
         return a;
     }
 

@@ -138,8 +138,10 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
     /**
      * @param s notification schedule.
      * @param issue notification issue.
+     * @param trackerEvent tracker event.
      */
-    protected void sendNotification(final PersonSchedule s, final NotificationIssue issue) {
-        notificationService.sendNotification(s, issue);
+    protected void sendNotification(final PersonSchedule s, final NotificationIssue issue,
+            final TrackerEvent trackerEvent) {
+        notificationService.sendNotification(s, issue, trackerEvent);
     }
 }

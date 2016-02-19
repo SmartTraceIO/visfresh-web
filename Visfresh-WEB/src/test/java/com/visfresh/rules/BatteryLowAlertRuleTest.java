@@ -112,6 +112,7 @@ public class BatteryLowAlertRuleTest extends BaseRuleTest {
         assertEquals(AlertType.Battery, alert.getType());
         assertNotNull(alert.getDevice());
         assertNotNull(alert.getShipment());
+        assertEquals(e.getId(), alert.getTrackerEventId());
     }
 
     /**

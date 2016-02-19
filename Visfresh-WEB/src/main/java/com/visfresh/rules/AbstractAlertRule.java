@@ -57,7 +57,7 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
             final long allowed = state.getStartShipmentDate().getTime()
                     + shipment.getAlertSuppressionMinutes() * 60 * 1000l;
 
-            return System.currentTimeMillis() < allowed;
+            return context.getEvent().getTime().getTime() < allowed;
         }
 
         return false;
@@ -67,6 +67,7 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
         a.setDate(e.getTime());
         a.setDevice(e.getDevice());
         a.setShipment(e.getShipment());
+        a.setTrackerEventId(e.getId());
     }
 
     /* (non-Javadoc)
@@ -82,10 +83,11 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
 
             final Calendar date = new GregorianCalendar();
             //notify subscribers
-            final List<PersonSchedule> schedules = getAllPersonalSchedules(context.getEvent().getShipment());
+            final List<PersonSchedule> schedules = getAllPersonalSchedules(
+                    context.getEvent().getShipment());
             for (final PersonSchedule s : schedules) {
                 if (matchesTimeFrame(s, date)) {
-                    sendNotification(s, alert);
+                    sendNotification(s, alert, context.getEvent());
                 }
             }
         }

@@ -16,6 +16,7 @@ import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.PersonSchedule;
+import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.NotificationService;
@@ -49,15 +50,16 @@ public class NotificationServiceImpl implements NotificationService {
      * @see com.visfresh.services.NotificationService#sendNotification(com.visfresh.entities.PersonSchedule, com.visfresh.entities.NotificationIssue)
      */
     @Override
-    public void sendNotification(final PersonSchedule s, final NotificationIssue issue) {
+    public void sendNotification(final PersonSchedule s, final NotificationIssue issue,
+            final TrackerEvent trackerEvent) {
         final User user = s.getUser();
         final String email = user.getEmail();
         final String person = getPersonDescription(s);
 
         //send email
         if (s.isSendEmail()) {
-            final String subject = bundle.getEmailSubject(issue, user);
-            final String message = bundle.getEmailMessage(issue, user);
+            final String subject = bundle.getEmailSubject(user, issue, trackerEvent);
+            final String message = bundle.getEmailMessage(user, issue, trackerEvent);
 
             if (email != null && email.length() > 0) {
                 try {
@@ -71,13 +73,12 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         if (s.isSendSms()) {
-            final String subject = bundle.getSmsSubject(issue, user);
-            final String message = bundle.getSmsMessage(issue, user);
+            final String message = bundle.getSmsMessage(user, issue, trackerEvent);
 
             //send SMS
             final String phone = user.getPhone();
             if (phone != null && phone.length() > 0) {
-                smsService.sendMessage(new String[] {phone}, subject, message);
+                smsService.sendMessage(new String[] {phone}, null, message);
             } else {
                 log.warn("Phone number has not set for personal schedule for " + person + " , SMS can't be send");
             }

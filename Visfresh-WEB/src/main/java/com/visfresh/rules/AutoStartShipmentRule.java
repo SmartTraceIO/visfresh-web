@@ -96,8 +96,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
 
         final TrackerEvent event = context.getEvent();
         final Device device = event.getDevice();
-
         final Shipment last = shipmentDao.findLastShipment(device.getImei());
+
         Shipment shipment;
 
         //first of all attempt to select autostart shipment template
@@ -111,17 +111,12 @@ public class AutoStartShipmentRule implements TrackerEventRule {
                 shipment = createNewShipment(autoStarts.get(0).getTemplate(), null, device);
             }
         } else {
-            final boolean reuseOld = canReuseOldShipment(last);
-            if (!reuseOld) {
-                log.debug("Create new shipment for device " + device.getImei());
-                shipment = startNewShipment(device);
-            } else {
-                shipment = last;
-            }
+            log.debug("Create new shipment for device " + device.getImei());
+            shipment = startNewShipment(device);
         }
 
         //close old shipment if need
-        if (last != null && last != shipment && !last.hasFinalStatus()) {
+        if (last != null && !last.hasFinalStatus()) {
             log.debug("Close old active shipment " + last.getShipmentDescription()
                     + " for device " + device.getImei());
             closeOldShipment(last);
@@ -183,31 +178,6 @@ public class AutoStartShipmentRule implements TrackerEventRule {
             s.setShipmentDescription("Created by autostart shipment rule");
         }
         return shipmentDao.save(s);
-    }
-
-    /**
-     * @param s shipment.
-     * @return true if the shipment can be reused.
-     */
-    protected boolean canReuseOldShipment(final Shipment s) {
-        if (s != null && s.getStatus() == ShipmentStatus.InProgress) {
-            return true;
-//            final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
-//            if (lastEvent == null) {
-//                return true;
-//            }
-//
-//            final TrackerEvent firstEvent = trackerEventDao.getFirstEvent(s);
-//
-//            final ArrivalEstimation est = estimationService.estimateArrivalDate(s,
-//                    new Location(lastEvent.getLatitude(), lastEvent.getLongitude()),
-//                    firstEvent.getTime(),
-//                    lastEvent.getTime());
-//
-//            return est.getArrivalDate() == null
-//                    || System.currentTimeMillis() > est.getArrivalDate().getTime();
-        }
-        return false;
     }
 
     /**

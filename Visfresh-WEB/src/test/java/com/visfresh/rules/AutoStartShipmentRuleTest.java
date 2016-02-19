@@ -128,57 +128,6 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
     }
 
     @Test
-    public void testReuseInProgressShipment() {
-        // create in progress shipment
-        final Shipment s = createDefaultShipment(ShipmentStatus.InProgress,
-                device);
-
-        final TrackerEvent e = createEvent(17.14, 18.16, new Date());
-
-        final RuleContext c = new RuleContext(e, new DeviceState());
-
-        rule.handle(c);
-
-        // check shipment created.
-        assertNotNull(e.getShipment());
-        assertEquals(s.getId(), e.getShipment().getId());
-
-        // check not new shipments created
-        final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
-        assertEquals(1, shipmentDao.findAll(null, null, null).size());
-    }
-
-    @Test
-    public void testReuseExpiredPreviousShipment() {
-        // create in progress shipment
-        final Shipment s = createDefaultShipment(ShipmentStatus.InProgress,
-                device);
-        final LocationProfile l1 = createLocationProfile(17.14, 18.16, 0);
-        final LocationProfile l2 = createLocationProfile(18.14, 19.16, 0);
-        s.setShippedFrom(l1);
-        s.setShippedTo(l2);
-        context.getBean(ShipmentDao.class).save(s);
-
-        createEvent(s, 17.14, 18.16, new Date(
-                System.currentTimeMillis() - 10000000l));
-        createEvent(s, 18.139, 19.159, new Date(
-                System.currentTimeMillis() - 10000000l + 60000));
-
-        final TrackerEvent e = createEvent(18.139, 19.159, new Date());
-        final RuleContext c = new RuleContext(e, new DeviceState());
-
-        rule.handle(c);
-
-        // check shipment created.
-        assertNotNull(e.getShipment());
-        assertEquals(s.getId(), e.getShipment().getId());
-
-        // check not new shipments created
-        final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
-        assertEquals(1, shipmentDao.findAll(null, null, null).size());
-    }
-
-    @Test
     public void testSelectAutoStartShipment() {
         // create locations
         final LocationProfile l1 = createLocationProfile(2, 2, 1000);

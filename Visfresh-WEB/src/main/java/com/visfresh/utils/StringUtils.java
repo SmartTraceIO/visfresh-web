@@ -61,6 +61,10 @@ public final class StringUtils {
      * @return
      */
     public static String getMessage(final String template, final Map<String, String> replacements) {
+        if (template == null) {
+            return null;
+        }
+
         String result = template;
         for (final Map.Entry<String, String> e : replacements.entrySet()) {
             final String v = e.getValue() != null ? e.getValue() : "";

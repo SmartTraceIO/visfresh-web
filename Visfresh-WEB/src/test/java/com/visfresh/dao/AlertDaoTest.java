@@ -76,7 +76,9 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
     protected Alert createTestEntity() {
         final Date date = new Date(System.currentTimeMillis() - 100000000l);
         final AlertType type = AlertType.CriticalHot;
-        return createAlert(type, date);
+        final Alert a = createAlert(type, date);
+        a.setTrackerEventId(77777l);
+        return a;
     }
 
     /**
@@ -108,6 +110,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         assertEquals(100, a.getTemperature(), 0.00001);
         assertEquals(15, a.getMinutes());
         assertTrue(a.isCumulative());
+        assertEquals(77777l, alert.getTrackerEventId().longValue());
 
         final Device d = a.getDevice();
         assertNotNull(d);
@@ -142,6 +145,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         assertEquals(AlertType.CriticalHot, a.getType());
         assertEquals(100, a.getTemperature(), 0.00001);
         assertEquals(15, a.getMinutes());
+        assertEquals(77777l, a.getTrackerEventId().longValue());
 
         final Device d = a.getDevice();
         assertNotNull(d);

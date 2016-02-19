@@ -67,7 +67,9 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
     @Override
     protected Arrival createTestEntity() {
         final Date date = new Date(System.currentTimeMillis() - 1000000l);
-        return createArrival(date);
+        final Arrival a = createArrival(date);
+        a.setTrackerEventId(77777l);
+        return a;
     }
 
     /**
@@ -131,6 +133,7 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
     protected void assertCreateTestEntityOk(final Arrival a) {
         assertNotNull(a.getDate());
         assertEquals(78, a.getNumberOfMettersOfArrival());
+        assertEquals(77777l, a.getTrackerEventId().longValue());
 
         final Device d = a.getDevice();
         assertNotNull(d);
@@ -162,6 +165,7 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
 
         assertNotNull(a.getDate());
         assertEquals(78, a.getNumberOfMettersOfArrival());
+        assertEquals(77777l, a.getTrackerEventId().longValue());
 
         final Device d = a.getDevice();
         assertNotNull(d);

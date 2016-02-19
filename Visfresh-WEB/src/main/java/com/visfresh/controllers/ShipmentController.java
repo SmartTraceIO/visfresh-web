@@ -769,7 +769,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         //add alerts
         for (final Alert a : item.getAlerts()) {
-            lo.getAlerts().add(createSingleShipmentAlert(a, user, address));
+            lo.getAlerts().add(createSingleShipmentAlert(a, event, user, address));
         }
         //add arrivals
         for (final Arrival a: item.getArrivals()) {
@@ -821,10 +821,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @return
      */
     private SingleShipmentAlert createSingleShipmentAlert(
-            final Alert a, final User user, final String address) {
+            final Alert a, final TrackerEvent trackerEvent, final User user, final String address) {
         final SingleShipmentAlert alert = new SingleShipmentAlert();
 
-        alert.setTitle(alertDescriptionBuilder.buildDescription(a, user));
+        alert.setTitle(alertDescriptionBuilder.buildDescription(user, a, trackerEvent));
         alert.setType(a.getType().name());
         alert.getLines().add(alertDescriptionBuilder.buildShortDescription(a, user));
         alert.getLines().add(address);

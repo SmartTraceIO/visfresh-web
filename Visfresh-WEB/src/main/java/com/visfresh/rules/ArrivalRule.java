@@ -114,11 +114,12 @@ public class ArrivalRule extends AbstractNotificationRule {
         arrival.setNumberOfMettersOfArrival(getNumberOfMetersForArrival(
                 event.getLatitude(), event.getLongitude(), shipment.getShippedTo()));
         arrival.setShipment(shipment);
+        arrival.setTrackerEventId(event.getId());
 
         saveArrival(arrival);
 
         if (!shipment.isExcludeNotificationsIfNoAlerts() || hasTemperatureAlerts(shipment)) {
-            sendNotificaion(shipment, arrival);
+            sendNotificaion(arrival, event);
         }
 
         return false;
@@ -138,17 +139,15 @@ public class ArrivalRule extends AbstractNotificationRule {
         return false;
     }
     /**
-     * @param shipment
      * @param arrival
      */
-    protected void sendNotificaion(final Shipment shipment,
-            final Arrival arrival) {
+    protected void sendNotificaion(final Arrival arrival, final TrackerEvent event) {
         final Calendar date = new GregorianCalendar();
         //notify subscribers
-        final List<PersonSchedule> schedules = getAllPersonalSchedules(shipment);
+        final List<PersonSchedule> schedules = getAllPersonalSchedules(event.getShipment());
         for (final PersonSchedule s : schedules) {
             if (matchesTimeFrame(s, date)) {
-                sendNotification(s, arrival);
+                sendNotification(s, arrival, event);
             }
         }
     }

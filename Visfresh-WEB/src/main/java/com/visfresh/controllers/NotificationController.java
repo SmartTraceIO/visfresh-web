@@ -102,12 +102,14 @@ public class NotificationController extends AbstractController implements Notifi
                     page);
             //create notification to location map
             final Map<Long, Location> locations = createLocationMap(ns);
+            final Map<Long, TrackerEvent> events = getTrackerEvents(ns);
 
             final int total = dao.getEntityCount(user, filter);
             final JsonArray array = new JsonArray();
             final DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
             for (final Notification t : ns) {
-                array.add(ser.toJson(createNotificationItem(t, user, locations.get(t.getId()), isoFormat)));
+                array.add(ser.toJson(createNotificationItem(t, user, locations.get(t.getId()),
+                        isoFormat, events)));
             }
 
             return createListSuccessResponse(array, total);
@@ -115,6 +117,26 @@ public class NotificationController extends AbstractController implements Notifi
             log.error("Failed to get notifications", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param ns notifications.
+     * @return
+     */
+    private Map<Long, TrackerEvent> getTrackerEvents(final List<Notification> ns) {
+        final Set<Long> ids = new HashSet<Long>();
+        for (final Notification n : ns) {
+            final Long trackerEventId = n.getIssue().getTrackerEventId();
+            if (trackerEventId != null) {
+                ids.add(trackerEventId);
+            }
+        }
+
+        final List<TrackerEvent> events = trackerEventDao.findAll(ids);
+        final Map<Long, TrackerEvent> map = new HashMap<Long, TrackerEvent>();
+        for (final TrackerEvent e : events) {
+            map.put(e.getId(), e);
+        }
+        return map;
     }
     @RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.POST)
     public JsonObject markNotificationsAsRead(@PathVariable final String authToken,
@@ -143,7 +165,8 @@ public class NotificationController extends AbstractController implements Notifi
      * @return notification item.
      */
     private NotificationItem createNotificationItem(final Notification n, final User user,
-            final Location location, final DateFormat isoFormatter) {
+            final Location location, final DateFormat isoFormatter,
+            final Map<Long, TrackerEvent> trackerEvents) {
         final NotificationItem item = new NotificationItem();
         item.setAlertId(n.getIssue().getId());
         if (n.getType() == NotificationType.Alert) {
@@ -160,14 +183,23 @@ public class NotificationController extends AbstractController implements Notifi
         final Shipment shipment = n.getIssue().getShipment();
         item.setShipmentId(shipment.getId());
 
+        final TrackerEvent trackerEvent = trackerEvents.get(n.getIssue().getTrackerEventId());
+
         //set description.
-        item.setTitle(notificationBundle.getAppSubject(n.getIssue(), user));
+        String title = "";
+        if (n.getType() == NotificationType.Alert) {
+            title = ((Alert) n.getIssue()).getType().name();
+        } else if (n.getType() == NotificationType.Arrival) {
+            title = "Arrival notification";
+        }
+
+        item.setTitle(title);
         item.setType("Alert");
 
-        item.getLines().add(notificationBundle.getAppMessage(n.getIssue(), user));
-        item.getLines().add(notificationBundle.getShipmentDescription(shipment, user));
-        item.getLines().add(notificationBundle.getLocationDescription(
-                shipment.getShippedTo(), location, user));
+        final String[] lines = notificationBundle.getAppMessage(user, n.getIssue(), trackerEvent).split("\n");
+        for (final String line : lines) {
+            item.getLines().add(line);
+        }
         return item;
     }
     /**

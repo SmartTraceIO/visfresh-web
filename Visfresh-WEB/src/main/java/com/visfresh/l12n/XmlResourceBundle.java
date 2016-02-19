@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.InvalidPropertiesFormatException;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -35,6 +36,25 @@ public class XmlResourceBundle extends ResourceBundle {
     public XmlResourceBundle(final InputStream in) throws InvalidPropertiesFormatException, IOException {
         super();
         this.properties.loadFromXML(in);
+        final Iterator<Object> keys = new HashSet<>(properties.keySet()).iterator();
+        //remove white spaces
+        while (keys.hasNext()) {
+            final String key = (String) keys.next();
+            final String value = properties.getProperty(key).trim();
+
+            final String[] split = value.split("\n");
+            if (split.length > 1) {
+                final StringBuilder sb = new StringBuilder();
+                for (final String s : split) {
+                    if (sb.length() > 0) {
+                        sb.append('\n');
+                    }
+                    sb.append(s.trim());
+                }
+
+                properties.setProperty(key, sb.toString());
+            }
+        }
     }
 
     /* (non-Javadoc)

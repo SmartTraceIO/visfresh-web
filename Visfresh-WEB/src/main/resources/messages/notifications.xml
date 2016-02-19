@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
+
 	<!-- 
-	common shipment issue place holders:
+	supported place holders:
+
 	${date} alert issue date include day and year
 	${time} the time in scope of day.
 	${device} device IMEI
@@ -11,223 +13,296 @@
 
 	for alerts:
 	${type} alert type
-		
+	
 	for temperature alerts:
 	${temperature}
 	${period}
-	
+
 	for arrivals:
-	${mettersForArrival} the number of meters for arrival
-	 -->
-	<!-- Email notifications -->
+	${metersForArrival} the number of meters for arrival
+
+	James: new placeholders
+	${ruletemperature}  the temperature in alert rule
+	${ruleperiod}		the time period in alert rule
+    ${readingTime}    	the time reading occured in user's timezone - eg. 4:34am
+    ${readingDate}    	the date reading occured in user's timezone - eg. 12 Feb 2016
+    ${readingTemperature}  the temperature in user's temperature scale (C/F) at time of alert 
+    ${shippedFrom}		location shipped from
+    ${shippedTo}		location shipped to
+    ${shipmentDescription}	the shipment desc
+    -->
+
+
+
+	<!-- *************************************** Email notifications ***********************************************************-->
+	<!-- Example: Too hot alert - tracker 098324(12) went above 20,0°C degrees for 10 min -->
+
 	<!-- Cold -->
-	<entry key="Email.Cold">Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min</entry>
+	<entry key="Email.Cold">
+		Cold Alert for Tracker ${devicesn}(${tripCount}) 
+		Alert Rule: Below ${ruletemperature} continuously for more than ${ruleperiod}min
+		Time of Alert: ${readingTime} ${readingDate}
+		Temperature: ${readingTemperature}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}' >View chart</a>]]>
+	</entry>
 	<!-- Hot -->
-	<!-- Example: Too hot alert - tracker 098324(12) went above 20,0°C degrees for 10 min -->
-	<entry key="Email.Hot">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min</entry>
+	<entry key="Email.Hot">
+		Hot Alert for Tracker ${devicesn}(${tripCount})
+		Alert Rule: Above ${ruletemperature} continuously for more than ${ruleperiod}min
+		Time of Alert: ${readingTime} ${readingDate}
+		Temperature: ${readingTemperature}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}' >View chart</a>]]>
+	</entry>
 	<!-- CriticalCold -->
-	<entry key="Email.CriticalCold">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min</entry>
+	<entry key="Email.CriticalCold">
+		Critical Cold Alert for Tracker ${devicesn}(${tripCount})
+		Alert Rule: Below ${ruletemperature} continuously for more than ${ruleperiod}min
+		Time of Alert: ${readingTime} ${readingDate}
+		Temperature: ${readingTemperature}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}' >View chart</a>]]>
+	</entry>
 	<!-- CriticalHot -->
-	<entry key="Email.CriticalHot">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min</entry>
+	<entry key="Email.CriticalHot">
+		Critical Hot Alert for Tracker ${devicesn}(${tripCount})
+		Alert Rule: Above ${ruletemperature} continuously for more than ${ruleperiod}min
+		Time of Alert: ${readingTime} ${readingDate}
+		Temperature: ${readingTemperature}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}' >View chart</a>]]>
+	</entry>
+	<!-- Cold cumulative-->
+	<entry key="Email.Cold.cumulative">
+		Cold Alert for Tracker ${devicesn}(${tripCount})
+		Alert Rule: Below ${ruletemperature} for more than ${ruleperiod}min in total
+		Time of Alert: ${readingTime} ${readingDate}
+		Temperature: ${readingTemperature}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}' >View chart</a>]]>
+	</entry>
+	<!-- Hot cumulative -->
+	<entry key="Email.Hot.cumulative">
+		Hot Alert for Tracker ${devicesn}(${tripCount})
+		Alert Rule: Above ${ruletemperature} for more than ${ruleperiod}min in total
+		Time of Alert: ${readingTime} ${readingDate}
+		Temperature: ${readingTemperature}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}' >View chart</a>]]>
+	</entry>
+	<!-- CriticalCold cumulative -->
+	<entry key="Email.CriticalCold.cumulative">
+		Cold Alert for Tracker ${devicesn}(${tripCount})
+		Alert Rule: Below ${ruletemperature} for more than ${ruleperiod}min in total
+		Time of Alert: ${readingTime} ${readingDate}
+		Temperature: ${readingTemperature}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}' >View chart</a>]]>
+	</entry>
+	<!-- CriticalHot cumulative -->
+	<entry key="Email.CriticalHot.cumulative">
+		Hot Alert for Tracker ${devicesn}(${tripCount})
+		Alert Rule: Above ${ruletemperature} for more than ${ruleperiod}min in total
+		Time of Alert: ${readingTime} ${readingDate}
+		Temperature: ${readingTemperature}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}' >View chart</a>]]>
+	</entry>	
 
-	<!-- Cumulative -->
-	<entry key="Email.Cold.cumulative">Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min in total</entry>
-	<!-- Hot -->
-	<!-- Example: Too hot alert - tracker 098324(12) went above 20,0°C degrees for 10 min -->
-	<entry key="Email.Hot.cumulative">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min in total</entry>
-	<!-- CriticalCold -->
-	<entry key="Email.CriticalCold.cumulative">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min in total</entry>
-	<!-- CriticalHot -->
-	<entry key="Email.CriticalHot.cumulative">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min in total</entry>
+	<!-- Battery Email -->
+	<entry key="Email.Battery">
+		Low Battery Alert for Tracker ${devicesn}(${tripCount}) 
+		Time of Alert: ${readingTime} ${readingDate}
+		Temperature: ${readingTemperature}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}' > View chart</a>]]>
+	</entry>
 
-	<!-- LightOn -->
-	<entry key="Email.LightOn">Light Alert. Entered bright environment at ${time}</entry>
-	<!-- LightOff -->
-	<entry key="Email.LightOff">Light Off Alert. Entered dark environment at ${time}</entry>
-	<!-- MovementStart -->
-	<entry key="Email.MovementStart">Movement Alert. Sudden movement occurred at ${time}</entry>
-	<!-- Battery -->
-	<entry key="Email.Battery">Battery Alert. Low battery at ${time}</entry>
-	<!-- Arrival -->
-	<entry key="Email.Arrival">Arrival. Tracker ${devicesn}(${tripCount}) is in ${mettersForArrival} meters for arrival</entry>
+	<!-- Arrival Email -->
+	<entry key="Email.Arrival">
+		Arrival Alert for Tracker ${devicesn}(${tripCount}) 
+		Time of Alert: ${readingTime} ${readingDate}
+		Temperature: ${readingTemperature}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}' > View chart</a>]]>
+	</entry>
 
 	<!-- Subjects -->	
+
 	<!-- Cold -->
-	<entry key="Email.Subject.Cold">${type}</entry>
+	<entry key="Email.Subject.Cold">
+		Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod}min
+	</entry>
 	<!-- Hot -->
-	<entry key="Email.Subject.Hot">${type}</entry>
+	<entry key="Email.Subject.Hot">
+		Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod}min
+	</entry>
 	<!-- CriticalCold -->
-	<entry key="Email.Subject.CriticalCold">${type}</entry>
+	<entry key="Email.Subject.CriticalCold">
+		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod}min
+	</entry>
 	<!-- CriticalHot -->
-	<entry key="Email.Subject.CriticalHot">${type}</entry>
+	<entry key="Email.Subject.CriticalHot">
+		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod}min
+	</entry>
+	<!-- Cold Cumulative -->
+	<entry key="Email.Subject.Cold.cumulative">
+		Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod}min in total 
+	</entry>
+	<!-- Hot Cumulative -->
+	<entry key="Email.Subject.Hot.cumulative">
+		Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod}min in total 
+	</entry>
+	<!-- CriticalCold Cumulative -->
+	<entry key="Email.Subject.CriticalCold.cumulative">
+		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod}min in total
+	</entry>
+	<!-- CriticalHot Cumulative -->
+	<entry key="Email.Subject.CriticalHot.cumulative">
+		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod}min in total 
+	</entry>	
 
-	<!-- Cumulative -->
-	<entry key="Email.Subject.Cold.cumulative">${type}</entry>
-	<!-- Hot -->
-	<entry key="Email.Subject.Hot.cumulative">${type}</entry>
-	<!-- CriticalCold -->
-	<entry key="Email.Subject.CriticalCold.cumulative">${type}</entry>
-	<!-- CriticalHot -->
-	<entry key="Email.Subject.CriticalHot.cumulative">${type}</entry>
-
-	<!-- LightOn -->
-	<entry key="Email.Subject.LightOn">${type}</entry>
-	<!-- LightOff -->
-	<entry key="Email.Subject.LightOff">${type}</entry>
-	<!-- MovementStart -->
-	<entry key="Email.Subject.MovementStart">${type}</entry>
 	<!-- Battery -->
-	<entry key="Email.Subject.Battery">${type}</entry>
+	<entry key="Email.Subject.Battery">
+		${type}
+		Low Battery Alert for Tracker ${devicesn}(${tripCount}) 		
+	</entry>
 	<!-- Arrival -->
-	<entry key="Email.Subject.Arrival">Arrival</entry>
+	<entry key="Email.Subject.Arrival">
+		Arrival Notification for Tracker ${devicesn}(${tripCount}) 		
+	</entry>
 	
-	<!-- SMS notifications -->
+	<!-- *********************************************************** SMS notifications *************************************************** -->
 	<!-- Cold -->
-	<entry key="SMS.Cold">Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min</entry>
+	<entry key="SMS.Cold">Cold Alert. Tracker ${devicesn}(${tripCount}) below ${ruletemperature} for ${ruleperiod}min</entry>
 	<!-- Hot -->
-	<!-- Example: Too hot alert - tracker 098324(12) went above 20,0°C degrees for 10 min -->
-	<entry key="SMS.Hot">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min</entry>
+	<entry key="SMS.Hot">Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min</entry>
 	<!-- CriticalCold -->
-	<entry key="SMS.CriticalCold">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min</entry>
+	<entry key="SMS.CriticalCold">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) below ${temperature} for ${period}min</entry>
 	<!-- CriticalHot -->
-	<entry key="SMS.CriticalHot">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min</entry>
+	<entry key="SMS.CriticalHot">Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min</entry>
+	<!-- Cold Cumulative -->
+	<entry key="SMS.Cold.cumulative">Cold Alert. Tracker ${devicesn}(${tripCount}) below ${temperature} for ${period}min in total</entry>
+	<!-- Hot Cumulative-->
+	<entry key="SMS.Hot.cumulative">Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min in total</entry>
+	<!-- CriticalCold Cumulative -->
+	<entry key="SMS.CriticalCold.cumulative">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) below ${temperature} for ${period}min in total</entry>
+	<!-- CriticalHot Cumulative -->
+	<entry key="SMS.CriticalHot.cumulative">Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min in total</entry>
 
-	<!-- Cumulative -->
-	<entry key="SMS.Cold.cumulative">Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min in total</entry>
-	<!-- Hot -->
-	<!-- Example: Too hot alert - tracker 098324(12) went above 20,0°C degrees for 10 min -->
-	<entry key="SMS.Hot.cumulative">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min in total</entry>
-	<!-- CriticalCold -->
-	<entry key="SMS.CriticalCold.cumulative">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min in total</entry>
-	<!-- CriticalHot -->
-	<entry key="SMS.CriticalHot.cumulative">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min in total</entry>
-
-	<!-- LightOn -->
-	<entry key="SMS.LightOn">Light Alert. Entered bright environment at ${time}</entry>
-	<!-- LightOff -->
-	<entry key="SMS.LightOff">Light Off Alert. Entered dark environment at ${time}</entry>
-	<!-- MovementStart -->
-	<entry key="SMS.MovementStart">Movement Alert. Sudden movement occurred at ${time}</entry>
 	<!-- Battery -->
-	<entry key="SMS.Battery">Battery Alert. Low battery at ${time}</entry>
+	<entry key="SMS.Battery">Low Battery Alert for Tracker ${devicesn}(${tripCount})</entry>
 	<!-- Arrival -->
-	<entry key="SMS.Arrival">Arrival. Tracker ${devicesn}(${tripCount}) is in ${mettersForArrival} meters for arrival</entry>
+	<entry key="SMS.Arrival">Arrival Alert for Tracker ${devicesn}(${tripCount})</entry>
 
-	<!-- Subjects -->	
+	<!-- ***************************************************** App notifications *********************************************************** -->
+
 	<!-- Cold -->
-	<entry key="SMS.Subject.Cold">${type}</entry>
-	<!-- Hot -->
-	<entry key="SMS.Subject.Hot">${type}</entry>
+	<entry key="App.Cold">
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Cold Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Below ${ruletemperature} for more than ${ruleperiod}min
+		Description: ${shipmentDescription}
+	</entry>
+	<!-- Hot -->	
+	<entry key="App.Hot">
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Hot Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Above ${ruletemperature} for more than ${ruleperiod}min
+		Description: ${shipmentDescription}
+	</entry>
 	<!-- CriticalCold -->
-	<entry key="SMS.Subject.CriticalCold">${type}</entry>
+	<entry key="App.CriticalCold">
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Critical Cold Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Below ${ruletemperature} for more than ${ruleperiod}min
+		Description: ${shipmentDescription}
+	</entry>
 	<!-- CriticalHot -->
-	<entry key="SMS.Subject.CriticalHot">${type}</entry>
+	<entry key="App.CriticalHot">
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Critical Hot Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Above ${ruletemperature} for more than ${ruleperiod}min
+		Description: ${shipmentDescription}
+	</entry>
+	<!-- Cold Cumulative -->
+	<entry key="App.Cold.cumulative">
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Cold Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Below ${ruletemperature} for more than ${ruleperiod}min
+		Description: ${shipmentDescription}
+	</entry>
+	<!-- Hot Cumulative -->
+	<entry key="App.Hot.cumulative">
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Hot Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Above ${ruletemperature} for more than ${ruleperiod}min
+		Description: ${shipmentDescription}
+	</entry>
+	<!-- CriticalCold Cumulative -->
+	<entry key="App.CriticalCold.cumulative">
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Critical Cold Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Below ${ruletemperature} for more than ${ruleperiod}min
+		Description: ${shipmentDescription}
+	</entry>
+	<!-- CriticalHot Cumulative -->
+	<entry key="App.CriticalHot.cumulative">
+		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Critical Hot Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Above ${ruletemperature} for more than ${ruleperiod}min
+		Description: ${shipmentDescription}
+	</entry>
 
-	<!-- Cumulative -->
-	<entry key="SMS.Subject.Cold.cumulative">${type}</entry>
-	<!-- Hot -->
-	<entry key="SMS.Subject.Hot.cumulative">${type}</entry>
-	<!-- CriticalCold -->
-	<entry key="SMS.Subject.CriticalCold.cumulative">${type}</entry>
-	<!-- CriticalHot -->
-	<entry key="SMS.Subject.CriticalHot.cumulative">${type}</entry>
-
-	<!-- LightOn -->
-	<entry key="SMS.Subject.LightOn">${type}</entry>
-	<!-- LightOff -->
-	<entry key="SMS.Subject.LightOff">${type}</entry>
-	<!-- MovementStart -->
-	<entry key="SMS.Subject.MovementStart">${type}</entry>
 	<!-- Battery -->
-	<entry key="SMS.Subject.Battery">${type}</entry>
+	<entry key="App.Battery">
+		Low Battery Alert for Tracker ${devicesn}(${tripCount})
+		Description: ${shipmentDescription}
+	</entry>
 	<!-- Arrival -->
-	<entry key="SMS.Subject.Arrival">Arrival</entry>
-
-	<!-- App notifications -->
-	<!-- Cold -->
-	<entry key="App.Cold">Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min</entry>
-	<!-- Hot -->
-	<!-- Example: Too hot alert - tracker 098324(12) went above 20,0°C degrees for 10 min -->
-	<entry key="App.Hot">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min</entry>
-	<!-- CriticalCold -->
-	<entry key="App.CriticalCold">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min</entry>
-	<!-- CriticalHot -->
-	<entry key="App.CriticalHot">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min</entry>
-
-	<!-- Cumulative -->
-	<entry key="App.Cold.cumulative">Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min in total</entry>
-	<!-- Hot -->
-	<!-- Example: Too hot alert - tracker 098324(12) went above 20,0°C degrees for 10 min -->
-	<entry key="App.Hot.cumulative">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min in total</entry>
-	<!-- CriticalCold -->
-	<entry key="App.CriticalCold.cumulative">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) went below ${temperature} for ${period}min in total</entry>
-	<!-- CriticalHot -->
-	<entry key="App.CriticalHot.cumulative">Hot Alert. Tracker ${devicesn}(${tripCount}) went above ${temperature} for ${period}min in total</entry>
-
-	<!-- LightOn -->
-	<entry key="App.LightOn">Light Alert. Entered bright environment at ${time}</entry>
-	<!-- LightOff -->
-	<entry key="App.LightOff">Light Off Alert. Entered dark environment at ${time}</entry>
+	<entry key="App.Arrival">
+		Arrival Alert for Tracker ${devicesn}(${tripCount})
+		Description: ${shipmentDescription}	
+	</entry>
 	<!-- MovementStart -->
-	<entry key="App.MovementStart">Movement Alert. Sudden movement occurred at ${time}</entry>
-	<!-- Battery -->
-	<entry key="App.Battery">Battery Alert. Low battery at ${time}</entry>
-	<!-- Arrival -->
-	<entry key="App.Arrival">Arrival. Tracker ${devicesn}(${tripCount}) is in ${mettersForArrival} meters for arrival</entry>
+	<entry key="Email.Subject.MovementStart">Movement Alert</entry>
+	<entry key="App.Subject.MovementStart">Movement Alert</entry>
+	<entry key="SMS.Subject.MovementStart">Movement Alert</entry>
 
-	<!-- Subjects -->	
-	<!-- Cold -->
-	<entry key="App.Subject.Cold">${type}</entry>
-	<!-- Hot -->
-	<entry key="App.Subject.Hot">${type}</entry>
-	<!-- CriticalCold -->
-	<entry key="App.Subject.CriticalCold">${type}</entry>
-	<!-- CriticalHot -->
-	<entry key="App.Subject.CriticalHot">${type}</entry>
-
-	<!-- Cumulative -->
-	<entry key="App.Subject.Cold.cumulative">${type}</entry>
-	<!-- Hot -->
-	<entry key="App.Subject.Hot.cumulative">${type}</entry>
-	<!-- CriticalCold -->
-	<entry key="App.Subject.CriticalCold.cumulative">${type}</entry>
-	<!-- CriticalHot -->
-	<entry key="App.Subject.CriticalHot.cumulative">${type}</entry>
-
-	<!-- LightOn -->
-	<entry key="App.Subject.LightOn">${type}</entry>
-	<!-- LightOff -->
-	<entry key="App.Subject.LightOff">${type}</entry>
-	<!-- MovementStart -->
-	<entry key="App.Subject.MovementStart">${type}</entry>
-	<!-- Battery -->
-	<entry key="App.Subject.Battery">${type}</entry>
-	<!-- Arrival -->
-	<entry key="App.Subject.Arrival">Arrival</entry>
+	<entry key="Email.MovementStart">Sudden movement occurred at ${time}</entry>
+	<entry key="App.MovementStart">Sudden movement occurred at ${time}</entry>
+	<entry key="SMS.MovementStart">Sudden movement occurred at ${time}</entry>
 	
-	<!-- Shipment description for application notifications -->
-	<!--
-	Supported placeholders:
-        description - shipment description.
-        device - device IMEI
-        devicesn - device SN
-        tripCount - device trip count for given shipment.
-	-->
-	<entry key="App.Shipment">${description}</entry>
+	<!-- Light On -->
+	<entry key="Email.Subject.LightOn">Light Alert</entry>
+	<entry key="Email.LightOn">Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
+
+	<entry key="SMS.Subject.LightOn">Light Alert</entry>
+	<entry key="SMS.LightOn">Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
+
+	<entry key="App.Subject.LightOn">Light Alert</entry>
+	<entry key="App.LightOn">Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
+
+	<!-- Light off -->	
+	<entry key="Email.Subject.LightOff">Light Off Alert</entry>
+	<entry key="Email.LightOff">Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
 	
-	<!-- Current location description -->
-	<!-- 
-	Supported placeholders:
-        latitude - latitude of current location.
-        longitude - longitude of current location.
-
-        targetLatitude - latitude of target location.
-        targetLongitude - longitude of target location.
-
-        targetName - name of target location.
-        targetAddress - address of target location.
-
-        distance - distance between current location and target location in current user's units.
-	-->
-	<entry key="App.Location">In ${distance} to ${targetName}</entry>
+	<entry key="SMS.Subject.LightOff">Light Off Alert</entry>
+	<entry key="SMS.LightOff">Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
+	
+	<entry key="App.Subject.LightOff">Light Off Alert</entry>
+	<entry key="App.LightOff">Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
 </properties>
