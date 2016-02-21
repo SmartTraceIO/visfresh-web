@@ -9,6 +9,7 @@ package com.visfresh.dispatcher;
  */
 public class RetryableException extends Exception {
     private static final long serialVersionUID = -6333136803281304890L;
+    private int numberOfRetry = -1;
 
     /**
      * Can retry message.
@@ -61,5 +62,17 @@ public class RetryableException extends Exception {
      */
     public void setCanRetry(final boolean canRetry) {
         this.canRetry = canRetry;
+    }
+    /**
+     * @return the numberOfRetry
+     */
+    public int getNumberOfRetry() {
+        return numberOfRetry;
+    }
+    /**
+     * @param numberOfRetry the numberOfRetry to set
+     */
+    public void setNumberOfRetry(final int numberOfRetry) {
+        this.numberOfRetry = numberOfRetry;
     }
 }

@@ -167,7 +167,10 @@ public abstract class AbstractDispatcher {
      */
     protected void handleError(final DeviceMessage msg, final Throwable e) {
         if (e instanceof RetryableException && ((RetryableException) e).canRetry()) {
-            if (msg.getNumberOfRetry() < getRetryLimit()) {
+            final RetryableException re = (RetryableException) e;
+            final int retryLimit = re.getNumberOfRetry() > -1 ? re.getNumberOfRetry() : getRetryLimit();
+
+            if (msg.getNumberOfRetry() < retryLimit) {
                 log.error("Retryable exception has occured for message " + msg + ", will retry later", e);
                 msg.setRetryOn(new Date(msg.getRetryOn().getTime() + getRetryTimeOut()));
                 msg.setNumberOfRetry(msg.getNumberOfRetry() + 1);

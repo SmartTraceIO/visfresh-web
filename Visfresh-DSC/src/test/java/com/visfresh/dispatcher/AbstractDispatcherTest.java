@@ -80,6 +80,25 @@ public class AbstractDispatcherTest extends TestCase {
                 + MessageDao.DEVICE_MESSAGES_TABLE,
                 new HashMap<String, Object>()).size());
     }
+    public void testHandleRetryableErrorWithSetRetryLimit() {
+        final DeviceMessage msg = createMessage();
+        dao.create(msg);
+
+        dispatcher.setRetryLimit(1);
+
+        final RetryableException exc = new RetryableException();
+        exc.setNumberOfRetry(1000);
+
+        dispatcher.handleError(msg, exc);
+        assertEquals(1, jdbcTemplate.queryForList("select * from "
+                + MessageDao.DEVICE_MESSAGES_TABLE,
+                new HashMap<String, Object>()).size());
+
+        dispatcher.handleError(msg, exc);
+        assertEquals(1, jdbcTemplate.queryForList("select * from "
+                + MessageDao.DEVICE_MESSAGES_TABLE,
+                new HashMap<String, Object>()).size());
+    }
     public void testHandleNotRetryableError() {
         final DeviceMessage msg = createMessage();
         dao.create(msg);

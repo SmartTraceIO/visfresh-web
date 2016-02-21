@@ -82,7 +82,10 @@ public class UnwiredLabsLocationService implements LocationService {
                 r.close();
             }
         } catch (final Exception e) {
-            throw new RetryableException(e);
+            final RetryableException exc = new RetryableException(e);
+            //parsing error or I/O error should have unlimited retry.
+            exc.setNumberOfRetry(Integer.MAX_VALUE);
+            throw exc;
         }
 
         //parse JSON to location object
