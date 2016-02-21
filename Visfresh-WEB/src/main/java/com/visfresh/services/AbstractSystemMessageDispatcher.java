@@ -236,7 +236,7 @@ public abstract class AbstractSystemMessageDispatcher {
      * @param msg the message.
      */
     protected void handleSuccess(final SystemMessage msg) {
-        log.debug("The message " + msg.getId() + " successfylly processed by " + getProcessorId()
+        log.debug("The message " + msg.getId() + " successfully processed by " + getProcessorId()
                 + ", will not dispatched next");
         messageDao.delete(msg);
     }
