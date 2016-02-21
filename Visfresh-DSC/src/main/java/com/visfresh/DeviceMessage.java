@@ -18,19 +18,6 @@ public class DeviceMessage {
     private final List<StationSignal> stations = new LinkedList<StationSignal>();
 
     /**
-     * Default constructor.
-     */
-    public DeviceMessage() {
-        super();
-    }
-
-    /**
-     * @return the stations
-     */
-    public List<StationSignal> getStations() {
-        return stations;
-    }
-    /**
      * The message ID.
      */
     private long id = -1;
@@ -62,7 +49,22 @@ public class DeviceMessage {
      * The ready on date.
      */
     private Date retryOn = new Date();
+    private String message;
+    private String typeString;
 
+    /**
+     * Default constructor.
+     */
+    public DeviceMessage() {
+        super();
+    }
+
+    /**
+     * @return the stations
+     */
+    public List<StationSignal> getStations() {
+        return stations;
+    }
     /**
      * @return the imei
      */
@@ -87,6 +89,19 @@ public class DeviceMessage {
     public void setType(final DeviceMessageType type) {
         this.type = type;
     }
+    /**
+     * @param typeString the typeString to set
+     */
+    public void setTypeString(final String typeString) {
+        this.typeString = typeString;
+    }
+    /**
+     * @return the typeString
+     */
+    public String getTypeString() {
+        return typeString;
+    }
+
     /**
      * @return the time
      */
@@ -182,5 +197,18 @@ public class DeviceMessage {
             sb.append(station).append('\n');
         }
         return sb.toString();
+    }
+
+    /**
+     * @param msg
+     */
+    public void setMessage(final String msg) {
+        this.message = msg;
+    }
+    /**
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
     }
 }

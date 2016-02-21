@@ -42,26 +42,43 @@ public class DeviceMessageParser {
             //<IMEI>|<DATA_TYPE>|<TIME>|
             String[] line = lines[0].split(Pattern.quote("|"));
             msg.setImei(line[0]);
-            msg.setType(DeviceMessageType.valueOf(line[1]));
+            msg.setTypeString(line[1]);
+            msg.setType(getType(line[1]));
             msg.setTime(parseDate(line[2]));
 
-            //second line
-            //<BATTERY>|<TEMPERATURE>|
-            line = lines[1].split(Pattern.quote("|"));
-            msg.setBattery(Integer.parseInt(line[0]));
-            msg.setTemperature(Double.parseDouble(line[1]));
+            if (DeviceMessageType.RSP == msg.getType()) {
+                msg.setMessage(lines[1]);
+            } else {
+                //second line
+                //<BATTERY>|<TEMPERATURE>|
+                line = lines[1].split(Pattern.quote("|"));
+                msg.setBattery(Integer.parseInt(line[0]));
+                msg.setTemperature(Double.parseDouble(line[1]));
 
-            //stations
-            for (int i = 2; i < lines.length; i++) {
-                //parse station
-                final StationSignal station = parseStationSignal(lines[i]);
-                msg.getStations().add(station);
+                //stations
+                for (int i = 2; i < lines.length; i++) {
+                    //parse station
+                    final StationSignal station = parseStationSignal(lines[i]);
+                    msg.getStations().add(station);
+                }
             }
 
             messages.add(msg);
         }
 
         return messages;
+    }
+
+    /**
+     * @param typeString
+     * @return
+     */
+    private DeviceMessageType getType(final String typeString) {
+        try {
+            return DeviceMessageType.valueOf(typeString);
+        } catch (final Exception e) {
+            return DeviceMessageType.AUT;
+        }
     }
 
     /**

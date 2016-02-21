@@ -16,14 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.visfresh.Device;
 import com.visfresh.DeviceCommand;
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageParser;
-import com.visfresh.DeviceMessageType;
-import com.visfresh.db.DeviceCommandDao;
-import com.visfresh.db.DeviceDao;
-import com.visfresh.db.MessageDao;
+import com.visfresh.service.DeviceMessageService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -34,9 +30,7 @@ public class DeviceCommunicationServlet extends HttpServlet {
     private static final long serialVersionUID = -2549581331796018692L;
 
     private DeviceMessageParser parser;
-    private MessageDao messageDao;
-    private DeviceDao deviceDao;
-    private DeviceCommandDao deviceCommandDao;
+    private DeviceMessageService service;
 
     /**
      * Default constructor.
@@ -80,50 +74,15 @@ public class DeviceCommunicationServlet extends HttpServlet {
             return;
         }
 
-        boolean haveShutdown = false;
-        for (final DeviceMessage msg : msgs) {
-            //attempt to load device
-            final Device device = deviceDao.getByImei(msg.getImei());
+        final DeviceCommand cmd = service.process(msgs);
+        resp.setStatus(HttpServletResponse.SC_OK);
 
-            if (device != null) {
-                final List<DeviceCommand> commands = deviceCommandDao.getFoDevice(device.getImei());
-                DeviceCommand cmd = null;
-
-                if (!commands.isEmpty()) {
-                    cmd = commands.get(0);
-                    if (cmd.getCommand().toLowerCase().contains("shutdown")) {
-                        haveShutdown = true;
-                    }
-                }
-
-                if (msg.getType() == DeviceMessageType.RSP) {
-                    //process response to server command
-                    log.debug("Device response has received for " + msg.getImei());
-                } else if (!haveShutdown){
-                    messageDao.create(msg);
-                } else {
-                    log.debug("Shutdown command found for device "
-                            + device.getImei() + ", current(s) message "
-                            + rawData + " will not pushed to system");
-                }
-
-                if (cmd != null) {
-                    final String command = cmd.getCommand();
-                    log.debug("Sending command " + command + " to device " + device.getImei());
-                    resp.getOutputStream().write(command.getBytes());
-
-                    deviceCommandDao.delete(cmd);
-
-                    if (haveShutdown) {
-                        break;
-                    }
-                }
-            } else {
-                log.warn("Not found registered device " + msg.getImei());
-            }
+        if (cmd != null) {
+            final String command = cmd.getCommand();
+            log.debug("Sending command " + command + " to device " + msgs.get(0).getImei());
+            resp.getOutputStream().write(command.getBytes());
         }
 
-        resp.setStatus(HttpServletResponse.SC_OK);
         resp.getOutputStream().flush();
         resp.getOutputStream().close();
     }
@@ -147,14 +106,11 @@ public class DeviceCommunicationServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-
         setParser(new DeviceMessageParser());
 
         final ConfigurableApplicationContext ctxt = ApplicationInitializer.getBeanContext(
                 getServletContext());
-        messageDao = ctxt.getBean(MessageDao.class);
-        deviceDao = ctxt.getBean(DeviceDao.class);
-        deviceCommandDao = ctxt.getBean(DeviceCommandDao.class);
+        service = ctxt.getBean(DeviceMessageService.class);
 
         log.debug("Device communication servlet has initialized");
     }

@@ -67,7 +67,7 @@ public class DeviceMessageParserTest extends TestCase {
         //460|1|9533|16113|23|
         //460|1|9533|16142|21|
         //460|1|9533|16526|18|
-        assertEquals(3, msgs.size());
+        assertEquals(6, msgs.size());
 
         final DeviceMessage msg = msgs.get(2);
         assertEquals("358688000000158", msg.getImei());

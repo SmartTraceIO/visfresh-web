@@ -185,7 +185,7 @@ public abstract class AbstractDispatcher {
      * @param msg the message.
      */
     protected void handleSuccess(final DeviceMessage msg) {
-        log.debug("The message " + msg.getId() + " successfylly processed by " + getProcessorId() + ", deleting it");
+        log.debug("The message " + msg.getId() + " successfully processed by " + getProcessorId() + ", deleting it");
         dao.delete(msg);
     }
     public void stop() {

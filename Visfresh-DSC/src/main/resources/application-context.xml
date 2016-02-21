@@ -19,6 +19,7 @@
 	<context:property-placeholder location="classpath:application.properties" />
 	<context:component-scan base-package="com.visfresh.config"/>
 	<context:component-scan base-package="com.visfresh.db"/>
+	<context:component-scan base-package="com.visfresh.service"/>
 	<context:component-scan base-package="com.visfresh.dispatcher"/>
 	
 	<!-- Database and transactions -->
