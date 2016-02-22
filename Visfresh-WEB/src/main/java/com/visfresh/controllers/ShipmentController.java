@@ -67,6 +67,7 @@ import com.visfresh.services.LocationService;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.ShipmentSiblingService;
 import com.visfresh.services.lists.ListShipmentItem;
+import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -372,10 +373,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             dto.getAlertSummary().putAll(toSummaryMap(alerts));
 
             //percentage complete.
+            final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
             if (s.hasFinalStatus()) {
                 dto.setPercentageComplete(100);
             } else {
-                final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
                 if (lastEvent != null) {
                     final TrackerEvent firstEvent = trackerEventDao.getFirstEvent(s);
                     final ArrivalEstimation est = arrivalEstimationService.estimateArrivalDate(s,
@@ -388,6 +389,16 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                         dto.setEstArrivalDate(isoFmt.format(est.getArrivalDate()));
                     }
                 }
+            }
+
+            if (lastEvent != null) {
+                //set last reading data
+                dto.setLastReadingTimeISO(isoFmt.format(lastEvent.getTime()));
+                dto.setLastReadingTemperature(LocalizationUtils.getTemperature(
+                        lastEvent.getTemperature(), user.getTemperatureUnits()));
+                dto.setLastReadingBattery(lastEvent.getBattery());
+                dto.setLastReadingLat(lastEvent.getLatitude());
+                dto.setLastReadingLong(lastEvent.getLongitude());
             }
 
             if (s.getStatus() == ShipmentStatus.Default || s.getStatus() == ShipmentStatus.Ended) {

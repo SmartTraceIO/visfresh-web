@@ -212,6 +212,9 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentDao.save(s);
         shipmentDao.save(s2);
 
+        //create last reading
+        createEvent(s, TrackerEventType.AUT);
+
         //add alert
         createAlert(s, AlertType.Battery);
         createAlert(s, AlertType.Battery);

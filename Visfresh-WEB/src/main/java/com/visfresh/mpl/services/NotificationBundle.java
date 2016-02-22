@@ -20,11 +20,6 @@ import com.visfresh.utils.StringUtils;
 @Component
 public class NotificationBundle extends NotificationIssueBundle {
     /**
-     * The bundles.
-     */
-    private final ResourceBundle bundle = ResourceBundle.getBundle("notifications", XmlControl.INSTANCE);
-
-    /**
      * Default constructor.
      */
     public NotificationBundle() {
@@ -50,7 +45,7 @@ public class NotificationBundle extends NotificationIssueBundle {
      */
     public String getEmailMessage(final User user, final NotificationIssue issue,
             final TrackerEvent trackerEvent) {
-        final String str = bundle.getString("Email." + createBundleKey(issue));
+        final String str = getBundle().getString("Email." + createBundleKey(issue));
         return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
     }
     /**
@@ -72,7 +67,7 @@ public class NotificationBundle extends NotificationIssueBundle {
      */
     public String getSmsMessage(final User user, final NotificationIssue issue,
             final TrackerEvent trackerEvent) {
-        final String str = bundle.getString("SMS." + createBundleKey(issue));
+        final String str = getBundle().getString("SMS." + createBundleKey(issue));
         return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
     }
     /**
@@ -83,17 +78,23 @@ public class NotificationBundle extends NotificationIssueBundle {
      */
     public String getAppMessage(final User user, final NotificationIssue issue,
             final TrackerEvent trackerEvent) {
-        final String str = bundle.getString("App." + createBundleKey(issue));
+        final String str = getBundle().getString("App." + createBundleKey(issue));
         return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
     }
     /**
      * @param user the user.
      * @param issue notification issue.
-     * @param trackerEvent TODO
+     * @param trackerEvent tracker event, can be NULL
      * @return
      */
     public String getEmailSubject(final User user, final NotificationIssue issue, final TrackerEvent trackerEvent) {
-        final String str = bundle.getString("Email.Subject." + createBundleKey(issue));
+        final String str = getBundle().getString("Email.Subject." + createBundleKey(issue));
         return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
+    }
+    /**
+     * @return resource bundle.
+     */
+    private ResourceBundle getBundle() {
+        return ResourceBundle.getBundle("notifications", XmlControl.INSTANCE);
     }
 }

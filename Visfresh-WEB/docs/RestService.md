@@ -1697,7 +1697,12 @@ Response:
         "Cold": "1",
         "Battery": "2"
       },
-      "siblingCount": 0
+      "siblingCount": 0,
+      "lastReadingTimeISO": "2016-02-22 12:45",
+      "lastReadingTemperature": 56.0,
+      "lastReadingBattery": 1234,
+      "lastReadingLat": 50.5,
+      "lastReadingLong": 51.51
     },
     {
       "status": "InProgress",
@@ -1718,7 +1723,12 @@ Response:
       "alertProfileId": 385,
       "alertProfileName": "AnyAlert",
       "alertSummary": {},
-      "siblingCount": 0
+      "siblingCount": 0,
+      "lastReadingTimeISO": null,
+      "lastReadingTemperature": null,
+      "lastReadingBattery": null,
+      "lastReadingLat": null,
+      "lastReadingLong": null
     }
   ],
   "totalCount": 2

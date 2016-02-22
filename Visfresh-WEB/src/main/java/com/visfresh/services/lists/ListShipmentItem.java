@@ -36,6 +36,13 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private ShipmentStatus status;
     private int siblingCount = 5;
 
+    //last reading data
+    private String lastReadingTimeISO;
+    private Double lastReadingTemperature;
+    private Integer lastReadingBattery;
+    private Double lastReadingLat;
+    private Double lastReadingLong;
+
     /**
      * Default constructor.
      */
@@ -281,6 +288,66 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public void setSiblingCount(final int siblingCount) {
         this.siblingCount = siblingCount;
+    }
+    /**
+     * @return the lastReadingTimeISO
+     */
+    public String getLastReadingTimeISO() {
+        return lastReadingTimeISO;
+    }
+    /**
+     * @param lastReadingTimeISO the lastReadingTimeISO to set
+     */
+    public void setLastReadingTimeISO(final String lastReadingTimeISO) {
+        this.lastReadingTimeISO = lastReadingTimeISO;
+    }
+    /**
+     * @return the lastReadingTemperature
+     */
+    public Double getLastReadingTemperature() {
+        return lastReadingTemperature;
+    }
+    /**
+     * @param lastReadingTemperature the lastReadingTemperature to set
+     */
+    public void setLastReadingTemperature(final double lastReadingTemperature) {
+        this.lastReadingTemperature = lastReadingTemperature;
+    }
+    /**
+     * @return the lastReadingBattery
+     */
+    public Integer getLastReadingBattery() {
+        return lastReadingBattery;
+    }
+    /**
+     * @param lastReadingBattery the lastReadingBattery to set
+     */
+    public void setLastReadingBattery(final int lastReadingBattery) {
+        this.lastReadingBattery = lastReadingBattery;
+    }
+    /**
+     * @return the lastReadingLat
+     */
+    public Double getLastReadingLat() {
+        return lastReadingLat;
+    }
+    /**
+     * @param lastReadingLat the lastReadingLat to set
+     */
+    public void setLastReadingLat(final double lastReadingLat) {
+        this.lastReadingLat = lastReadingLat;
+    }
+    /**
+     * @return the lastReadingLong
+     */
+    public Double getLastReadingLong() {
+        return lastReadingLong;
+    }
+    /**
+     * @param lastReadingLong the lastReadingLong to set
+     */
+    public void setLastReadingLong(final double lastReadingLong) {
+        this.lastReadingLong = lastReadingLong;
     }
     /* (non-Javadoc)
      * @see com.visfresh.entities.EntityWithId#getId()

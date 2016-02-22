@@ -4,7 +4,6 @@
 package com.visfresh.rules;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -104,7 +103,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         final List<AutoStartShipment> autoStarts = autoStartShipmentDao.findByCompany(
                 device.getCompany(), null, null, null);
         if (!autoStarts.isEmpty()) {
-            shipment = findByStartLocation(
+            shipment = createForStartLocation(
                     autoStarts, event.getLatitude(), event.getLongitude(), device);
             //if not found, create new shipment from most priority template
             if (shipment == null) {
@@ -112,8 +111,9 @@ public class AutoStartShipmentRule implements TrackerEventRule {
             }
         } else {
             log.debug("Create new shipment for device " + device.getImei());
-            shipment = startNewShipment(device);
+            shipment = createNewDefaultShipment(device);
         }
+        shipment.setShipmentDate(event.getTime());
 
         //close old shipment if need
         if (last != null && !last.hasFinalStatus()) {
@@ -136,7 +136,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      * @param device device.
      * @return shipment.
      */
-    private Shipment findByStartLocation(final List<AutoStartShipment> autoStarts,
+    private Shipment createForStartLocation(final List<AutoStartShipment> autoStarts,
             final double latitude, final double longitude, final Device device) {
         Collections.sort(autoStarts);
         for (final AutoStartShipment auto : autoStarts) {
@@ -168,7 +168,6 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         s.setStatus(ShipmentStatus.InProgress);
         s.setDevice(device);
         s.setShippedFrom(startLocation);
-        s.setShipmentDate(new Date());
 
         if (tpl.getShipmentDescription() != null) {
             s.setShipmentDescription(tpl.getShipmentDescription());
@@ -191,13 +190,12 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     /**
      * @param device
      */
-    private Shipment startNewShipment(final Device device) {
+    private Shipment createNewDefaultShipment(final Device device) {
         final Shipment s = new Shipment();
         s.setCompany(device.getCompany());
         s.setStatus(ShipmentStatus.Default);
         s.setDevice(device);
         s.setShipmentDescription("Created by autostart shipment rule");
-        s.setShipmentDate(new Date());
 
         shipmentDao.save(s);
         return s;

@@ -110,7 +110,9 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         final Long shipmentId = e.getShipment().getId();
         final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
 
-        assertNotNull(shipmentDao.findOne(shipmentId));
+        Shipment shipment = shipmentDao.findOne(shipmentId);
+        assertNotNull(shipment);
+        assertEquals(e.getTime().getTime(), shipment.getShipmentDate().getTime(), 1000);
 
         // check not duplicate handle
         assertFalse(rule.accept(c));
@@ -123,8 +125,10 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertEquals(ShipmentStatus.Ended, old.getStatus());
 
         // check new shipment created.
-        assertTrue(!shipmentId.equals(e.getShipment().getId()));
-        assertTrue(old.getTripCount() < e.getShipment().getTripCount());
+        shipment = shipmentDao.findOne(e.getShipment().getId());
+        assertTrue(!shipmentId.equals(shipment.getId()));
+        assertTrue(old.getTripCount() < shipment.getTripCount());
+        assertEquals(e.getTime().getTime(), shipment.getShipmentDate().getTime(), 1000);
     }
 
     @Test
@@ -154,12 +158,13 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         final Long shipmentId = e.getShipment().getId();
         final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
 
-        final Shipment s = shipmentDao.findOne(shipmentId);
-        assertNotNull(s);
+        Shipment shipment = shipmentDao.findOne(shipmentId);
+        assertNotNull(shipment);
+        assertEquals(e.getTime().getTime(), shipment.getShipmentDate().getTime(), 1000);
         // check correct start location selected.
-        assertEquals(lok.getId(), s.getShippedFrom().getId());
+        assertEquals(lok.getId(), shipment.getShippedFrom().getId());
         // check created from correct template
-        assertEquals(tok.getShipmentDescription(), s.getShipmentDescription());
+        assertEquals(tok.getShipmentDescription(), shipment.getShipmentDescription());
 
         // check not duplicate handle
         assertFalse(rule.accept(c));
@@ -172,8 +177,10 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertEquals(ShipmentStatus.Ended, old.getStatus());
 
         // check new shipment created.
-        assertTrue(!shipmentId.equals(e.getShipment().getId()));
-        assertTrue(old.getTripCount() < e.getShipment().getTripCount());
+        shipment = shipmentDao.findOne(e.getShipment().getId());
+        assertTrue(!shipmentId.equals(shipment.getId()));
+        assertTrue(old.getTripCount() < shipment.getTripCount());
+        assertEquals(e.getTime().getTime(), shipment.getShipmentDate().getTime(), 1000);
     }
 
     @Test
@@ -202,6 +209,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
 
         final Shipment s = shipmentDao.findOne(shipmentId);
         assertNotNull(s);
+        assertEquals(e.getTime().getTime(), s.getShipmentDate().getTime(), 1000);
         // check correct start location selected.
         assertNull(s.getShippedFrom());
         // check created from correct template

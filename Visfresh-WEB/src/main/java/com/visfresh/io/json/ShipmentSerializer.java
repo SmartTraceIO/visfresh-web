@@ -281,6 +281,13 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.add("alertSummary", toJson(dto.getAlertSummary()));
         json.addProperty("siblingCount", dto.getSiblingCount());
 
+        //last reading data
+        json.addProperty("lastReadingTimeISO", dto.getLastReadingTimeISO());
+        json.addProperty("lastReadingTemperature", dto.getLastReadingTemperature());
+        json.addProperty("lastReadingBattery", dto.getLastReadingBattery());
+        json.addProperty("lastReadingLat", dto.getLastReadingLat());
+        json.addProperty("lastReadingLong", dto.getLastReadingLong());
+
         return json;
     }
     /**
