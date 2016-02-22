@@ -31,8 +31,8 @@ import com.visfresh.io.UserResolver;
 import com.visfresh.io.shipment.SingleShipmentAlert;
 import com.visfresh.io.shipment.SingleShipmentDtoNew;
 import com.visfresh.io.shipment.SingleShipmentLocation;
-import com.visfresh.services.lists.ListNotificationScheduleItem;
-import com.visfresh.services.lists.ListShipmentItem;
+import com.visfresh.lists.ListNotificationScheduleItem;
+import com.visfresh.lists.ListShipmentItem;
 import com.visfresh.utils.StringUtils;
 
 /**

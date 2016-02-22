@@ -32,8 +32,8 @@ import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.io.json.UserSerializer;
-import com.visfresh.services.lists.ExpandedListUserItem;
-import com.visfresh.services.lists.ShortListUserItem;
+import com.visfresh.lists.ExpandedListUserItem;
+import com.visfresh.lists.ShortListUserItem;
 import com.visfresh.utils.HashGenerator;
 import com.visfresh.utils.SerializerUtils;
 

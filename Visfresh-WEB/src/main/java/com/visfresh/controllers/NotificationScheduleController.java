@@ -25,7 +25,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.User;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.NotificationScheduleSerializer;
-import com.visfresh.services.lists.ListNotificationScheduleItem;
+import com.visfresh.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

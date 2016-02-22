@@ -195,6 +195,7 @@ public class NotificationController extends AbstractController implements Notifi
 
         item.setTitle(title);
         item.setType("Alert");
+        item.setLink(notificationBundle.getLinkToShipment(shipment.getId()));
 
         final String[] lines = notificationBundle.getAppMessage(user, n.getIssue(), trackerEvent).split("\n");
         for (final String line : lines) {

@@ -24,7 +24,7 @@ import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.json.ShipmentTemplateSerializer;
-import com.visfresh.services.lists.ListShipmentTemplateItem;
+import com.visfresh.lists.ListShipmentTemplateItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services.lists;
+package com.visfresh.lists;
 
 import java.util.HashMap;
 import java.util.Map;

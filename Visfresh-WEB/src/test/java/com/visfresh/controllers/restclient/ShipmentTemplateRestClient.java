@@ -16,8 +16,8 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.json.ShipmentTemplateSerializer;
+import com.visfresh.lists.ListShipmentTemplateItem;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.ListShipmentTemplateItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

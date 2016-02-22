@@ -217,52 +217,52 @@
 	<entry key="SMS.Arrival">Arrival Alert for Tracker ${devicesn}(${tripCount})</entry>
 
 	<!-- ***************************************************** App notifications *********************************************************** -->
-
+	<entry key="LinkToShipment">http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}</entry>
 	<!-- Cold -->
 	<entry key="App.Cold">
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Cold Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Cold Alert for Tracker ${devicesn}(${tripCount})
 		Below ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- Hot -->	
 	<entry key="App.Hot">
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Hot Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Hot Alert for Tracker ${devicesn}(${tripCount})
 		Above ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- CriticalCold -->
 	<entry key="App.CriticalCold">
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Critical Cold Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Critical Cold Alert for Tracker ${devicesn}(${tripCount})
 		Below ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- CriticalHot -->
 	<entry key="App.CriticalHot">
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Critical Hot Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Critical Hot Alert for Tracker ${devicesn}(${tripCount})
 		Above ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- Cold Cumulative -->
 	<entry key="App.Cold.cumulative">
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Cold Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Cold Alert for Tracker ${devicesn}(${tripCount})
 		Below ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- Hot Cumulative -->
 	<entry key="App.Hot.cumulative">
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Hot Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Hot Alert for Tracker ${devicesn}(${tripCount})
 		Above ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- CriticalCold Cumulative -->
 	<entry key="App.CriticalCold.cumulative">
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Critical Cold Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Critical Cold Alert for Tracker ${devicesn}(${tripCount})
 		Below ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- CriticalHot Cumulative -->
 	<entry key="App.CriticalHot.cumulative">
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/{shipmentId}'>Critical Hot Alert for Tracker ${devicesn}(${tripCount}) </a>]]>
+		Critical Hot Alert for Tracker ${devicesn}(${tripCount})
 		Above ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>

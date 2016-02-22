@@ -8,8 +8,15 @@ package com.visfresh.constants;
  *
  */
 public interface DeviceConstants {
-    public static final String PROPERTY_DESCRIPTION = "description";
-    public static final String PROPERTY_NAME = "name";
-    public static final String PROPERTY_SN = "sn";
-    public static final String PROPERTY_IMEI = "imei";
+    String PROPERTY_DESCRIPTION = "description";
+    String PROPERTY_NAME = "name";
+    String PROPERTY_SN = "sn";
+    String PROPERTY_IMEI = "imei";
+
+    String PROPERTY_LAST_READING_LONG = "lastReadingLong";
+    String PROPERTY_LAST_READING_LAT = "lastReadingLat";
+    String PROPERTY_LAST_READING_BATTERY = "lastReadingBattery";
+    String PROPERTY_LAST_READING_TEMPERATURE = "lastReadingTemperature";
+    String PROPERTY_LAST_READING_TIME = "lastReadingTimeISO";
+    String PROPERTY_LAST_SHIPMENT = "lastShipmentId";
 }

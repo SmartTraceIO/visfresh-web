@@ -11,7 +11,7 @@ import java.util.Set;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.services.lists.ListNotificationScheduleItem;
+import com.visfresh.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

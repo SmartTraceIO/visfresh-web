@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services.lists;
+package com.visfresh.lists;
 
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.NotificationSchedule;

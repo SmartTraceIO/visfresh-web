@@ -14,8 +14,8 @@ import com.visfresh.controllers.restclient.UserRestClient;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
+import com.visfresh.lists.ExpandedListUserItem;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.ExpandedListUserItem;
 import com.visfresh.utils.SerializerUtils;
 
 /**

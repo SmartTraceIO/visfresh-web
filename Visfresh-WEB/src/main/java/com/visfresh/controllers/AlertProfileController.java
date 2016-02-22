@@ -25,8 +25,8 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
+import com.visfresh.lists.ListAlertProfileItem;
 import com.visfresh.mpl.services.AlertBundle;
-import com.visfresh.services.lists.ListAlertProfileItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

@@ -12,7 +12,7 @@ import java.util.Map;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
-import com.visfresh.services.lists.ListNotificationScheduleItem;
+import com.visfresh.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

@@ -15,7 +15,7 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.io.SavePersonScheduleRequest;
 import com.visfresh.io.UserResolver;
-import com.visfresh.services.lists.ListNotificationScheduleItem;
+import com.visfresh.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

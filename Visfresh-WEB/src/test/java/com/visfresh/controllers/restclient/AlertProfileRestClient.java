@@ -15,8 +15,8 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.io.json.AlertProfileSerializer;
+import com.visfresh.lists.ListAlertProfileItem;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.ListAlertProfileItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

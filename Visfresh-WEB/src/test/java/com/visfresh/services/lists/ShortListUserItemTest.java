@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
+import com.visfresh.lists.ShortListUserItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

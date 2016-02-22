@@ -33,9 +33,9 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.User;
+import com.visfresh.lists.ListAlertProfileItem;
+import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.ListAlertProfileItem;
-import com.visfresh.services.lists.ListNotificationScheduleItem;
 import com.visfresh.utils.SerializerUtils;
 
 /**

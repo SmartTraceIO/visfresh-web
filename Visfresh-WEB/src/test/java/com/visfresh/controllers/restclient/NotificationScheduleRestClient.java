@@ -15,8 +15,8 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.NotificationScheduleSerializer;
+import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

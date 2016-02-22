@@ -16,8 +16,8 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.controllers.restclient.AlertProfileRestClient;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.lists.ListAlertProfileItem;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.ListAlertProfileItem;
 import com.visfresh.utils.SerializerUtils;
 
 /**

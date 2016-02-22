@@ -20,6 +20,7 @@ public class NotificationItem {
     private Long alertId;
     private Long shipmentId;
     private final List<String> lines = new LinkedList<>();
+    private String link;
 
     /**
      * Default constructor.
@@ -123,6 +124,18 @@ public class NotificationItem {
      */
     public void setTitle(final String title) {
         this.title = title;
+    }
+    /**
+     * @param link the link to anywhere.
+     */
+    public void setLink(final String link) {
+        this.link = link;
+    }
+    /**
+     * @return the link
+     */
+    public String getLink() {
+        return link;
     }
     /**
      * @return the lines

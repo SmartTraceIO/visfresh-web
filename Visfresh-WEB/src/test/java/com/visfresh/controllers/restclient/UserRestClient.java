@@ -15,9 +15,9 @@ import com.visfresh.io.SaveUserRequest;
 import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.io.json.UserSerializer;
+import com.visfresh.lists.ExpandedListUserItem;
+import com.visfresh.lists.ShortListUserItem;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.ExpandedListUserItem;
-import com.visfresh.services.lists.ShortListUserItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

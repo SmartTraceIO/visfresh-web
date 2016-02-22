@@ -16,8 +16,8 @@ import com.visfresh.controllers.restclient.NotificationScheduleRestClient;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.User;
 import com.visfresh.io.UserResolver;
+import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.services.lists.ListNotificationScheduleItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

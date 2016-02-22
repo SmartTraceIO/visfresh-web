@@ -3,6 +3,8 @@
  */
 package com.visfresh.mpl.services;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.springframework.stereotype.Component;
@@ -80,6 +82,18 @@ public class NotificationBundle extends NotificationIssueBundle {
             final TrackerEvent trackerEvent) {
         final String str = getBundle().getString("App." + createBundleKey(issue));
         return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
+    }
+    /**
+     * @param user user.
+     * @param issue notification issue.
+     * @param trackerEvent tracker event.
+     * @return message.
+     */
+    public String getLinkToShipment(final Long sipmentId) {
+        final String str = getBundle().getString("LinkToShipment");
+        final Map<String, String> map = new HashMap<String, String>();
+        map.put("shipmentId", sipmentId.toString());
+        return StringUtils.getMessage(str, map);
     }
     /**
      * @param user the user.

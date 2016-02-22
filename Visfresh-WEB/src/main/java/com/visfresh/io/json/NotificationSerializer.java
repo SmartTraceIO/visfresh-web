@@ -14,6 +14,8 @@ import com.visfresh.io.NotificationItem;
  *
  */
 public class NotificationSerializer extends AbstractJsonSerializer {
+    private static final String PROPERTY_LINK = "link";
+
     /**
      * @param tz time zone.
      */
@@ -36,6 +38,7 @@ public class NotificationSerializer extends AbstractJsonSerializer {
         n.setAlertId(asLong(json.get(NotificationConstants.PROPERTY_ALERT_ID)));
         n.setShipmentId(asLong(json.get(NotificationConstants.PROPERTY_SHIPMENT_ID)));
         n.setTitle(asString(json.get(NotificationConstants.PROPERTY_TITLE)));
+        n.setLink(asString(json.get(PROPERTY_LINK)));
 
         int i = 1;
         while (true) {
@@ -69,6 +72,7 @@ public class NotificationSerializer extends AbstractJsonSerializer {
         obj.addProperty(NotificationConstants.PROPERTY_ALERT_ID, n.getAlertId());
         obj.addProperty(NotificationConstants.PROPERTY_SHIPMENT_ID, n.getShipmentId());
         obj.addProperty(NotificationConstants.PROPERTY_TITLE, n.getTitle());
+        obj.addProperty(PROPERTY_LINK, n.getLink());
 
         int i = 1;
         for (final String line : n.getLines()) {

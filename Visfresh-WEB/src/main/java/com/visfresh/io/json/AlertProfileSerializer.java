@@ -15,7 +15,7 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureRule;
-import com.visfresh.services.lists.ListAlertProfileItem;
+import com.visfresh.lists.ListAlertProfileItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

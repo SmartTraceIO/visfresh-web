@@ -17,7 +17,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.io.ReferenceResolver;
-import com.visfresh.services.lists.ListShipmentTemplateItem;
+import com.visfresh.lists.ListShipmentTemplateItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

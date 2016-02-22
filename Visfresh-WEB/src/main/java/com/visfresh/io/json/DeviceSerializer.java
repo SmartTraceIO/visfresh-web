@@ -12,6 +12,7 @@ import com.visfresh.constants.DeviceConstants;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.io.DeviceResolver;
+import com.visfresh.lists.ListDeviceItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -51,6 +52,51 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_IMEI, d.getImei());
         obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
         obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
+        return obj;
+    }
+    public ListDeviceItem parseListDeviceItem(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
+
+        final ListDeviceItem d = new ListDeviceItem();
+        d.setImei(asString(json.get(DeviceConstants.PROPERTY_IMEI)));
+        d.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
+        d.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));
+        d.setSn(asString(json.get(DeviceConstants.PROPERTY_SN)));
+
+        d.setLastShipmentId(asLong(json.get(DeviceConstants.PROPERTY_LAST_SHIPMENT)));
+        d.setLastReadingTimeISO(asString(json.get(DeviceConstants.PROPERTY_LAST_READING_TIME)));
+        d.setLastReadingTemperature(asDouble(json.get(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE)));
+        d.setLastReadingBattery(asInteger(json.get(DeviceConstants.PROPERTY_LAST_READING_BATTERY)));
+        d.setLastReadingLat(asDouble(json.get(DeviceConstants.PROPERTY_LAST_READING_LAT)));
+        d.setLastReadingLong(asDouble(json.get(DeviceConstants.PROPERTY_LAST_READING_LONG)));
+
+        return d;
+    }
+    /**
+     * @param d device.
+     * @return device serialized to JSON format.
+     */
+    public JsonElement toJson(final ListDeviceItem d) {
+        if (d == null) {
+            return JsonNull.INSTANCE;
+        }
+
+        final JsonObject obj = new JsonObject();
+        obj.addProperty(DeviceConstants.PROPERTY_DESCRIPTION, d.getDescription());
+        obj.addProperty(DeviceConstants.PROPERTY_IMEI, d.getImei());
+        obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
+        obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
+
+        obj.addProperty(DeviceConstants.PROPERTY_LAST_SHIPMENT, d.getLastShipmentId());
+        obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TIME, d.getLastReadingTimeISO());
+        obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE, d.getLastReadingTemperature());
+        obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_BATTERY, d.getLastReadingBattery());
+        obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_LAT, d.getLastReadingLat());
+        obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_LONG, d.getLastReadingLong());
         return obj;
     }
     /**
