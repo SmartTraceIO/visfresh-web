@@ -159,7 +159,7 @@ public class UnresolvedTrackerEvent implements EntityWithId<Long>, Comparable<Un
      */
     @Override
     public int compareTo(final UnresolvedTrackerEvent o) {
-        return getTime().compareTo(o.getTime());
+        return getId().compareTo(o.getId());
     }
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

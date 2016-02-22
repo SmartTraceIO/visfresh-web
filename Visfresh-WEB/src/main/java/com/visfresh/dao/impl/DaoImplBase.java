@@ -117,20 +117,6 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         delete(findAll(null, null, null));
     }
     /**
-     * @param fields
-     * @return
-     */
-    protected String buildSelectAs(final Map<String, String> fields) {
-        final StringBuilder sb = new StringBuilder();
-        for (final Map.Entry<String, String> e : fields.entrySet()) {
-            if (sb.length() > 0) {
-                sb.append(',');
-            }
-            sb.append(e.getKey() + " as " + e.getValue());
-        }
-        return sb.toString();
-    }
-    /**
      * @param tableName table name.
      * @param fields fields.
      * @param idFieldName ID field name.

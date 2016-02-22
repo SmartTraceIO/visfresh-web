@@ -7,7 +7,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Before;
@@ -18,6 +20,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.entities.UnresolvedTrackerEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -47,15 +50,22 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         deviceDao = getContext().getBean(DeviceDao.class);
         shipmentDao = getContext().getBean(ShipmentDao.class);
 
+        this.device = createDevice("932487032487");
+        shipment = createShipment(device);
+    }
+
+    /**
+     * @param imei
+     * @return
+     */
+    protected Device createDevice(final String imei) {
         final Device d = new Device();
         d.setCompany(sharedCompany);
-        final String imei = "932487032487";
         d.setImei(imei);
         d.setName("Test Device");
         d.setDescription("JUnit device");
-
-        this.device = deviceDao.save(d);
-        shipment = createShipment(d);
+        deviceDao.save(d);
+        return d;
     }
     /**
      * @param d
@@ -270,6 +280,64 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
 
         assertEquals(7, dao.getEvents(shipment).size());
     }
+    @Test
+    public void testGetLastEvents() {
+        final Device d1 = createDevice("230984752039847");
+        final Device d2 = createDevice("329048750298374");
+
+        final Shipment s1 = createShipment(d1);
+        createEvent(d1, s1);
+        createEvent(d1, s1);
+        createEvent(d1, s1);
+        createEvent(d1, s1);
+        final TrackerEvent e1 = createEvent(d1, s1);
+
+        createEvent(d2, null);
+        createEvent(d2, null);
+        createEvent(d2, null);
+        createEvent(d2, null);
+        final TrackerEvent e2 = createEvent(d2, null);
+
+        final List<Device> devices = new LinkedList<>();
+        devices.add(d1);
+        devices.add(d2);
+
+        final List<UnresolvedTrackerEvent> events = dao.getLastEvents(devices);
+        assertEquals(2, events.size());
+
+        Collections.sort(events);
+
+        final UnresolvedTrackerEvent ute1 = events.get(0);
+        final UnresolvedTrackerEvent ute2 = events.get(1);
+
+        //check any fields of second event
+        assertEquals(e2.getId(), ute2.getId());
+        assertEquals(e2.getDevice().getImei(), ute2.getDeviceImei());
+        assertNull(ute2.getShipmentId());
+
+        //fully check fields of first tracker event.
+        assertEquals(e1.getId(), ute1.getId());
+        assertEquals(e1.getDevice().getImei(), ute1.getDeviceImei());
+        assertEquals(e1.getShipment().getId(), ute1.getShipmentId());
+        assertEquals(e1.getBattery(), ute1.getBattery());
+        assertEquals(e1.getLatitude(), ute1.getLatitude(), 0.001);
+        assertEquals(e1.getLongitude(), ute1.getLongitude(), 0.001);
+        assertEquals(e1.getTemperature(), ute1.getTemperature(), 0.001);
+        assertEquals(e1.getTime().getTime(), ute1.getTime().getTime(), 1000);
+        assertEquals(e1.getType(), ute1.getType());
+    }
+    /**
+     * @param device device.
+     * @param shipment shipment.
+     * @return tracker event.
+     */
+    private TrackerEvent createEvent(final Device device, final Shipment shipment) {
+        final TrackerEvent e = createTestEntity();
+        e.setDevice(device);
+        e.setShipment(shipment);
+        return dao.save(e);
+    }
+
     /**
      * @param date
      * @param temperature temperature

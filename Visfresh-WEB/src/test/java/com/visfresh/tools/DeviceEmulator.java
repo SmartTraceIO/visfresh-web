@@ -24,7 +24,6 @@ import com.visfresh.controllers.restclient.AlertProfileRestClient;
 import com.visfresh.controllers.restclient.NotificationScheduleRestClient;
 import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
@@ -32,8 +31,10 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.lists.ListAlertProfileItem;
+import com.visfresh.lists.ListDeviceItem;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.SerializerUtils;
@@ -345,9 +346,14 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private Device createDeviceIfNeed() throws RestServiceException, IOException {
         final String id = "111111";
 
-        final List<Device> devices = deviceService.getDevices(1, 100000);
-        for (final Device device : devices) {
-            if (id.equals(device.getId())) {
+        final List<ListDeviceItem> devices = deviceService.getDevices(1, 100000);
+        for (final ListDeviceItem d : devices) {
+            if (id.equals(d.getImei())) {
+                final Device device = new Device();
+                device.setCompany(company);
+                device.setDescription(d.getDescription());
+                device.setImei(d.getImei());
+                device.setName(d.getName());
                 return device;
             }
         }

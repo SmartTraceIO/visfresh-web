@@ -5,9 +5,11 @@ package com.visfresh.dao.impl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -21,9 +23,12 @@ import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.entities.UnresolvedTrackerEvent;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -259,5 +264,63 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         a.setTime((Date) map.get(TIME_FIELD));
         a.setType(TrackerEventType.valueOf((String) map.get(TYPE_FIELD)));
         return a;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getLastEvents(java.util.List)
+     */
+    @Override
+    public List<UnresolvedTrackerEvent> getLastEvents(final List<Device> devices) {
+        if (devices.isEmpty()) {
+            return new LinkedList<>();
+        }
+
+        //create set of device IMEI for avoid of duplicates.
+        final Set<String> imeis = new HashSet<>();
+        for (final Device d : devices) {
+            imeis.add(d.getImei());
+        }
+
+        final Map<String, Object> params = new HashMap<>();
+        final List<String> sqls = new LinkedList<>();
+
+        int index = 0;
+        for (final String imei : imeis) {
+            final String key = "imei_" + index;
+
+            final String sql = "(" + buildSelectBlockForFindAll()
+                    + " where " + DEVICE_FIELD + "=:" + key
+                    + " order by " + ID_FIELD + " desc limit 1"
+                    + ")";
+            params.put(key, imei);
+            index++;
+            sqls.add(sql);
+        }
+
+        final List<UnresolvedTrackerEvent> result = new LinkedList<>();
+        final List<Map<String, Object>> rows = jdbc.queryForList(StringUtils.combine(sqls, " UNION "), params);
+
+        for (final Map<String, Object> row : rows) {
+            final TrackerEvent e = createEntity(row);
+
+            final UnresolvedTrackerEvent ue = new UnresolvedTrackerEvent();
+            ue.setBattery(e.getBattery());
+            ue.setId(e.getId());
+            ue.setLatitude(e.getLatitude());
+            ue.setLongitude(e.getLongitude());
+            ue.setTemperature(e.getTemperature());
+            ue.setTime(e.getTime());
+            ue.setType(e.getType());
+
+            final Object shipmentField = row.get(SHIPMENT_FIELD);
+            //possible null if not shipment assigned for given event. It is possible
+            if (shipmentField != null) {
+                ue.setShipmentId(((Number) shipmentField).longValue());
+            }
+            ue.setDeviceImei((String) row.get(DEVICE_FIELD));
+
+            result.add(ue);
+        }
+
+        return result;
     }
 }

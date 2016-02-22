@@ -5,8 +5,10 @@ package com.visfresh.dao;
 
 import java.util.List;
 
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.UnresolvedTrackerEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -33,4 +35,9 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
      * @return first event for given shipment.
      */
     TrackerEvent getFirstEvent(Shipment s);
+    /**
+     * @param devices list of devices.
+     * @return list of tracker events.
+     */
+    List<UnresolvedTrackerEvent> getLastEvents(List<Device> devices);
 }

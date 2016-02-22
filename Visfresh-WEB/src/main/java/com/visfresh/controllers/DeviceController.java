@@ -3,8 +3,11 @@
  */
 package com.visfresh.controllers;
 
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +25,17 @@ import com.visfresh.constants.DeviceConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
+import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.UnresolvedTrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.json.DeviceSerializer;
+import com.visfresh.lists.ListDeviceItem;
 import com.visfresh.services.DeviceCommandService;
+import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.utils.LocalizationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -43,6 +51,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
     @Autowired
     private DeviceDao dao;
+    @Autowired
+    private TrackerEventDao trackerEventDao;
     @Autowired
     private DeviceCommandService commandService;
     @Autowired
@@ -94,16 +104,32 @@ public class DeviceController extends AbstractController implements DeviceConsta
             security.checkCanGetDevices(user);
 
             final DeviceSerializer ser = createSerializer(user);
+            final DateFormat isoFormat = DateTimeUtils.createDateFormat(user, "yyyy-MM-dd HH:mm");
 
             final List<Device> devices = dao.findByCompany(user.getCompany(),
                     new Sorting(getDefaultSortOrder()),
                     page,
                     null);
-
             final int total = dao.getEntityCount(user.getCompany(), null);
+
+            final Map<String, UnresolvedTrackerEvent> lastReadingsMap = getLastEvents(devices);
+
             final JsonArray array = new JsonArray();
             for (final Device t : devices) {
-                array.add(ser.toJson(t));
+                final ListDeviceItem item = new ListDeviceItem(t);
+
+                final UnresolvedTrackerEvent e = lastReadingsMap.get(t.getImei());
+                if (e != null) {
+                    item.setLastShipmentId(e.getShipmentId());
+                    item.setLastReadingBattery(e.getBattery());
+                    item.setLastReadingLat(e.getLatitude());
+                    item.setLastReadingLong(e.getLongitude());
+                    item.setLastReadingTemperature(LocalizationUtils.getTemperature(
+                            e.getTemperature(), user.getTemperatureUnits()));
+                    item.setLastReadingTimeISO(isoFormat.format(e.getTime()));
+                }
+
+                array.add(ser.toJson(item));
             }
 
             return createListSuccessResponse(array, total);
@@ -111,6 +137,19 @@ public class DeviceController extends AbstractController implements DeviceConsta
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param devices
+     * @return
+     */
+    private Map<String, UnresolvedTrackerEvent> getLastEvents(final List<Device> devices) {
+        final List<UnresolvedTrackerEvent> events = trackerEventDao.getLastEvents(devices);
+
+        final Map<String, UnresolvedTrackerEvent> map = new HashMap<>();
+        for (final UnresolvedTrackerEvent e : events) {
+            map.put(e.getDeviceImei(), e);
+        }
+        return map;
     }
     /**
      * @return default sort order.
