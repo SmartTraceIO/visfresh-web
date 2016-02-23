@@ -11,7 +11,8 @@ public enum Role {
     GlobalAdmin(100),
     CompanyAdmin(70),
     Dispatcher(40),
-    ReportViewer(25);
+    ReportViewer(25),
+    Setup(24);
 
     private int priority;
     Role(final int priority) {

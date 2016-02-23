@@ -172,6 +172,7 @@ public class UtilitiesController extends AbstractController {
     public JsonObject getRoles(@PathVariable final String authToken) {
         try {
             getLoggedInUser(authToken);
+//            final TODO
 
             final JsonArray array = new JsonArray();
             for (final Role roles : Role.values()) {

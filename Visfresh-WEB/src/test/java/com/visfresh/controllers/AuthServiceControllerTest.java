@@ -67,6 +67,17 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         assertNotNull(token);
     }
     @Test
+    public void testCaseInsensitiveLogin() throws RestServiceException, IOException {
+        final User user = new User();
+        user.setEmail("a-" + (++lastLong) + "@b.c");
+        final String password = "lkasdlfkj";
+        user.setCompany(getCompany());
+
+        authService.saveUser(user, password, false);
+        final String token = client.login(user.getEmail().toUpperCase(), password);
+        assertNotNull(token);
+    }
+    @Test
     public void testSupportOfMultipleSessions() throws RestServiceException, IOException {
         final String password = "lkasdlfkj";
 

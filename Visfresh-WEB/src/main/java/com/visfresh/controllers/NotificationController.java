@@ -40,7 +40,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.NotificationItem;
 import com.visfresh.io.json.NotificationSerializer;
-import com.visfresh.mpl.services.AlertBundle;
+import com.visfresh.mpl.services.ChartBundle;
 import com.visfresh.mpl.services.NotificationBundle;
 
 /**
@@ -58,7 +58,7 @@ public class NotificationController extends AbstractController implements Notifi
     @Autowired
     private NotificationDao dao;
     @Autowired
-    private AlertBundle descriptionBuilder;
+    private ChartBundle descriptionBuilder;
     @Autowired
     private NotificationBundle notificationBundle;
     @Autowired

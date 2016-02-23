@@ -26,7 +26,7 @@ import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
 import com.visfresh.lists.ListAlertProfileItem;
-import com.visfresh.mpl.services.AlertBundle;
+import com.visfresh.mpl.services.ChartBundle;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -45,7 +45,7 @@ public class AlertProfileController extends AbstractController implements AlertP
     @Autowired
     private AlertProfileDao dao;
     @Autowired
-    private AlertBundle alertDescriptionBuilder;
+    private ChartBundle alertDescriptionBuilder;
 
     /**
      * Default constructor.

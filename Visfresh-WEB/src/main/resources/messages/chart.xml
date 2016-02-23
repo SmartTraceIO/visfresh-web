@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<!-- 
+	supported place holders:
+	${date} alert issue date include day and year
+	${time} the time in scope of day.
+	${type} alert type
+	${device} device IMEI
+	${devicesn} device serial number
+	${tripCount} trip count for given device of shipment.
+	
+	for temperature alerts:
+	${temperature}
+	${period}
+
+	James: new placeholders
+	${ruletemperature}  the temperature in alert rule
+	${ruleperiod}		the time period in alert rule
+    ${readingTime}    	the time reading occured in user's timezone - eg. 4:34am
+    ${readingDate}    	the date reading occured in user's timezone - eg. 12 Feb 2016
+    ${readingTemperature}  the temperature in user's temperature scale (C/F) at time of alert 
+    ${shippedFrom}		location shipped from
+    ${shippedTo}		location shipped to
+    ${shipmentDescription}	the shipment desc
+    ${status}			shipment status - inProgress, Arrived, etc
+    -->
+
+	<!-- //////////////////////////////////////////// Cold  //////////////////////////////////////////////////////////////////-->
+	<entry key="Cold">
+		Cold Alert for Tracker ${devicesn}(${tripCount}) 
+		Below ${ruletemperature}°C for more than ${ruleperiod} mins 
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+
+	<!-- CriticalCold chart -->
+	<entry key="CriticalCold">
+		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) 
+		Below ${ruletemperature}°C for more than ${ruleperiod} mins 
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+
+	<!-- Cold Cumulative chart -->
+	<entry key="Cold.cumulative">
+		Cold Alert for Tracker ${devicesn}(${tripCount}) 
+		Below ${ruletemperature}°C for more than ${ruleperiod} total minutes  
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+
+	<!-- CriticalCold Cumulative chart -->
+	<entry key="CriticalCold.cumulative">
+		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) 
+		Below ${ruletemperature}°C for more than ${ruleperiod} total minutes  
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+
+	<!-- //////////////////////////////////////////// Hot  //////////////////////////////////////////////////////////////////-->
+	<entry key="Hot">
+		Hot Alert for Tracker ${devicesn}(${tripCount}) 
+		Above ${ruletemperature}°C for more than ${ruleperiod} mins 
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+
+	<!-- CriticalHot chart -->
+	<entry key="CriticalHot">
+		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) 
+		Above ${ruletemperature}°C for more than ${ruleperiod} mins 
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+
+	<!-- Hot Cumulative chart -->
+	<entry key="Hot.cumulative">
+		Hot Alert for Tracker ${devicesn}(${tripCount}) 
+		Above ${ruletemperature}°C for more than ${ruleperiod} total minutes  
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+
+	<!-- CriticalHot Cumulative chart -->
+	<entry key="CriticalHot.cumulative">
+		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) 
+		Above ${ruletemperature}°C for more than ${ruleperiod} total minutes  
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+	
+	<!-- Not temperature alerts -->
+	<entry key="MovementStart">Sudden movement occurred at ${time}</entry>
+	<entry key="LightOn">Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
+	<entry key="LightOff">Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
+
+	<!-- //////////////////////////////////////////// Arrival  //////////////////////////////////////////////////////////////////-->
+	<!-- Arrival -->
+	<!-- Arrival chart -->
+	<entry key="Arrival">
+		Arrival Alert for Tracker ${devicesn}(${tripCount}) 
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+
+	<!-- //////////////////////////////////////////// Battery  //////////////////////////////////////////////////////////////////-->
+	<!-- Battery -->
+	<!-- Battery chart -->
+	<entry key="Battery">
+		Low Battery Alert for Tracker ${devicesn}(${tripCount}) 
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+</properties>

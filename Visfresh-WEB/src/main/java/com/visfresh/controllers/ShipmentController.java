@@ -61,7 +61,7 @@ import com.visfresh.io.shipment.SingleShipmentDtoNew;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.io.shipment.SingleShipmentTimeItem;
 import com.visfresh.lists.ListShipmentItem;
-import com.visfresh.mpl.services.AlertBundle;
+import com.visfresh.mpl.services.ChartBundle;
 import com.visfresh.services.ArrivalEstimation;
 import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.services.LocationService;
@@ -107,7 +107,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     @Autowired
     private ArrivalEstimationService arrivalEstimationService;
     @Autowired
-    private AlertBundle alertDescriptionBuilder;
+    private ChartBundle alertDescriptionBuilder;
     @Autowired
     private LocationService locationService;
     @Autowired

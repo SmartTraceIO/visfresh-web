@@ -29,7 +29,7 @@ import com.visfresh.entities.User;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class NotificationBundleTest extends NotificationBundle {
+public class ChartBundleTest extends ChartBundle {
     private Shipment shipment;
     private User user;
     private TrackerEvent trackerEvent;
@@ -37,7 +37,7 @@ public class NotificationBundleTest extends NotificationBundle {
     /**
      * Default constructor.
      */
-    public NotificationBundleTest() {
+    public ChartBundleTest() {
         super();
     }
 
@@ -79,8 +79,9 @@ public class NotificationBundleTest extends NotificationBundle {
         trackerEvent.setTime(new Date());
         trackerEvent.setType(TrackerEventType.AUT);
     }
+
     @Test
-    public void testBundles() {
+    public void testGetBundle() {
         for (final AlertType type : AlertType.values()) {
             if (type.isTemperatureAlert()) {
                 //Temperature alerts
@@ -94,21 +95,7 @@ public class NotificationBundleTest extends NotificationBundle {
                 alert.setCumulative(false);
 
                 //mail
-                String msg = getEmailMessage(user, alert, trackerEvent);
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
-                msg = getEmailSubject(user, alert, trackerEvent);
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
-                //SMS
-                msg = getSmsMessage(user, alert, trackerEvent);
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
-                //App
-                msg = getAppMessage(user, alert, trackerEvent);
+                String msg = buildDescription(user, alert, trackerEvent);
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
@@ -116,21 +103,7 @@ public class NotificationBundleTest extends NotificationBundle {
                 alert.setCumulative(true);
 
                 //mail
-                msg = getEmailMessage(user, alert, trackerEvent);
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
-                msg = getEmailSubject(user, alert, trackerEvent);
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
-                //SMS
-                msg = getSmsMessage(user, alert, trackerEvent);
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
-                //App
-                msg = getAppMessage(user, alert, trackerEvent);
+                msg = buildDescription(user, alert, trackerEvent);
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
             }
@@ -147,21 +120,7 @@ public class NotificationBundleTest extends NotificationBundle {
                 alert.setType(type);
 
                 //mail
-                String msg = getEmailMessage(user, alert, trackerEvent);
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
-                msg = getEmailSubject(user, alert, trackerEvent);
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
-                //SMS
-                msg = getSmsMessage(user, alert, trackerEvent);
-                assertNotNull(msg);
-                assertPlaceholdersResolved(alert, msg);
-
-                //App
-                msg = getAppMessage(user, alert, trackerEvent);
+                final String msg = buildDescription(user, alert, trackerEvent);
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
             }
@@ -174,24 +133,11 @@ public class NotificationBundleTest extends NotificationBundle {
         arrival.setShipment(shipment);
 
         //mail
-        String msg = getEmailMessage(user, arrival, trackerEvent);
-        assertNotNull(msg);
-        assertPlaceholdersResolved(arrival, msg);
-
-        msg = getEmailSubject(user, arrival, trackerEvent);
-        assertNotNull(msg);
-        assertPlaceholdersResolved(arrival, msg);
-
-        //SMS
-        msg = getSmsMessage(user, arrival, trackerEvent);
-        assertNotNull(msg);
-        assertPlaceholdersResolved(arrival, msg);
-
-        //App
-        msg = getAppMessage(user, arrival, trackerEvent);
+        final String msg = buildDescription(user, arrival, trackerEvent);
         assertNotNull(msg);
         assertPlaceholdersResolved(arrival, msg);
     }
+
     /**
      * @param issue notification issue.
      * @param msg message.
@@ -202,7 +148,6 @@ public class NotificationBundleTest extends NotificationBundle {
                     + msg +"' of " + createBundleKey(issue));
         }
     }
-
     /**
      * @param name
      * @param latitude
