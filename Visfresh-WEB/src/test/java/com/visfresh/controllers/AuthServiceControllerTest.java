@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import junit.framework.AssertionFailedError;
 
@@ -64,6 +65,33 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         authService.saveUser(user, password, false);
         final String token = client.login(user.getEmail(), password);
         assertNotNull(token);
+    }
+    @Test
+    public void testSupportOfMultipleSessions() throws RestServiceException, IOException {
+        final String password = "lkasdlfkj";
+
+        final User u1 = new User();
+        u1.setEmail("user1@visfresh.com");
+        u1.setCompany(getCompany());
+
+        final User u2 = new User();
+        u2.setEmail("user2@visfresh.com");
+        u2.setCompany(getCompany());
+
+        authService.saveUser(u1, password, false);
+        authService.saveUser(u2, password, false);
+
+        //login both
+        final String token1 = client.login(u1.getEmail(), password);
+        final String token2 = client.login(u2.getEmail(), password);
+
+        final UserRestClient userClient = new UserRestClient(TimeZone.getDefault());
+        userClient.setServiceUrl(client.getServiceUrl());
+
+        userClient.setAuthToken(token1);
+        assertEquals(u1.getEmail(), userClient.getUser(null).getEmail());
+        userClient.setAuthToken(token2);
+        assertEquals(u2.getEmail(), userClient.getUser(null).getEmail());
     }
     //@RequestMapping(value = "/getToken", method = RequestMethod.GET)
     //public @ResponseBody String getAuthToken(final HttpSession session) {
