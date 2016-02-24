@@ -3,7 +3,10 @@
  */
 package com.visfresh.controllers;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +23,15 @@ import com.google.gson.JsonObject;
 import com.visfresh.constants.NotificationScheduleConstants;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.Page;
+import com.visfresh.dao.impl.ShipmentBaseDao;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
+import com.visfresh.entities.ReferenceInfo;
 import com.visfresh.entities.User;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.NotificationScheduleSerializer;
 import com.visfresh.lists.ListNotificationScheduleItem;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -212,8 +218,49 @@ public class NotificationScheduleController extends AbstractController implement
             dao.delete(s);
             return createSuccessResponse(null);
         } catch (final Exception e) {
-            log.error("Failed to get notification schedules", e);
+            log.error("Failed to delete notification schedule " + notificationScheduleId, e);
+            //TODO uncomment
+//            final List<ReferenceInfo> refs = dao.getDbReferences(notificationScheduleId);
+//            if (!refs.isEmpty()) {
+//                return createErrorResponse(ErrorCodes.ENTITY_IN_USE, createEntityInUseMessage(refs));
+//            }
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param refs list of references.
+     * @return
+     */
+    private String createEntityInUseMessage(final List<ReferenceInfo> refs) {
+        final String alerts = ShipmentBaseDao.ALERTNOTIFSCHEDULES_TABLE;
+        final String arrivals = ShipmentBaseDao.ARRIVALNOTIFSCHEDULES_TABLE;
+
+        //create references map
+        final Map<String, List<Long>> refMap = new HashMap<>();
+        refMap.put(alerts, new LinkedList<Long>());
+        refMap.put(arrivals, new LinkedList<Long>());
+
+        //group references by tables
+        for (final ReferenceInfo ref : refs) {
+            refMap.get(ref.getType()).add((Long) ref.getId());
+        }
+
+        final StringBuilder sb = new StringBuilder("Notificatino schedule can't be deleted because"
+                + " is referenced by ");
+        if (!refMap.get(alerts).isEmpty()) {
+            sb.append("alert notification schedules (");
+            sb.append(StringUtils.combine(refMap.get(alerts), ", "));
+            sb.append(')');
+        }
+        if (!refMap.get(arrivals).isEmpty()) {
+            if (!refMap.get(alerts).isEmpty()) {
+                sb.append("and ");
+            }
+
+            sb.append("arrivals notification schedules (");
+            sb.append(StringUtils.combine(refMap.get(arrivals), ", "));
+            sb.append(')');
+        }
+        return sb.toString();
     }
 }

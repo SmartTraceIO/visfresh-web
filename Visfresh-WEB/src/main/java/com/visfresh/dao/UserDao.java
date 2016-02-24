@@ -3,6 +3,9 @@
  */
 package com.visfresh.dao;
 
+import java.util.List;
+
+import com.visfresh.entities.ReferenceInfo;
 import com.visfresh.entities.User;
 
 /**
@@ -15,4 +18,10 @@ public interface UserDao extends EntityWithCompanyDaoBase<User, Long> {
      * @return user by given email.
      */
     User findByEmail(String email);
+
+    /**
+     * @param userId user ID.
+     * @return list of references to user.
+     */
+    List<ReferenceInfo> getDbReferences(Long userId);
 }

@@ -3,9 +3,11 @@
  */
 package com.visfresh.controllers;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.UserConstants;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.UserDao;
+import com.visfresh.dao.impl.NotificationDaoImpl;
+import com.visfresh.dao.impl.NotificationScheduleDaoImpl;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.ReferenceInfo;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.io.CompanyResolver;
@@ -36,6 +42,7 @@ import com.visfresh.lists.ExpandedListUserItem;
 import com.visfresh.lists.ShortListUserItem;
 import com.visfresh.utils.HashGenerator;
 import com.visfresh.utils.SerializerUtils;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -308,9 +315,48 @@ public class UserController extends AbstractController implements UserConstants 
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete user " + userId, e);
+            //possible is referenced
+            final List<ReferenceInfo> refs = dao.getDbReferences(userId);
+            if (!refs.isEmpty()) {
+                return createErrorResponse(ErrorCodes.ENTITY_IN_USE, createEntityInUseMessage(refs));
+            }
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param refs list of references.
+     * @return
+     */
+    private String createEntityInUseMessage(final List<ReferenceInfo> refs) {
+        final String notifications = NotificationDaoImpl.TABLE;
+        final String personalSchedules = NotificationScheduleDaoImpl.PERSONAL_SCHEDULE_TABLE;
+
+        //create references map
+        final Map<String, List<Long>> refMap = new HashMap<>();
+        refMap.put(notifications, new LinkedList<Long>());
+        refMap.put(personalSchedules, new LinkedList<Long>());
+
+        //group references by tables
+        for (final ReferenceInfo ref : refs) {
+            refMap.get(ref.getType()).add((Long) ref.getId());
+        }
+
+        final StringBuilder sb = new StringBuilder("User can't be deleted because is referenced by ");
+        if (!refMap.get(notifications).isEmpty()) {
+            sb.append("several notifications ");
+        }
+        if (!refMap.get(personalSchedules).isEmpty()) {
+            if (!refMap.get(notifications).isEmpty()) {
+                sb.append("and ");
+            }
+
+            sb.append("personal schedules (");
+            sb.append(StringUtils.combine(refMap.get(personalSchedules), ", "));
+            sb.append(')');
+        }
+        return sb.toString();
+    }
+
     @RequestMapping(value = "/updateUserDetails/{authToken}", method = RequestMethod.POST)
     public JsonObject updateUserDetails(@PathVariable final String authToken,
             @RequestBody final JsonObject body) {

@@ -11,9 +11,18 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.junit.Before;
+import org.junit.Test;
 
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Notification;
+import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.entities.NotificationType;
+import com.visfresh.entities.PersonSchedule;
+import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 
@@ -23,7 +32,8 @@ import com.visfresh.entities.User;
  */
 public class UserDaoTest extends BaseCrudTest<UserDao, User, Long> {
     private int ids;
-    private DeviceDao deviceDao;
+    private NotificationSchedule notificationSchedule;
+    private Alert alert;
 
     /**
      * Default constructor.
@@ -34,7 +44,32 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, Long> {
 
     @Before
     public void beforeTest() {
-        deviceDao = getContext().getBean(DeviceDao.class);
+        final NotificationSchedule ns = new NotificationSchedule();
+        ns.setCompany(sharedCompany);
+        ns.setDescription("Test");
+        ns.setName("JUnit");
+        notificationSchedule = getContext().getBean(NotificationScheduleDao.class).save(ns);
+
+        Device d = new Device();
+        d.setName("Test Device");
+        d.setImei("2938479898989834");
+        d.setCompany(sharedCompany);
+        d.setDescription("Test device");
+        d = getContext().getBean(DeviceDao.class).save(d);
+
+        Shipment s = new Shipment();
+        s.setCompany(sharedCompany);
+        s.setStatus(ShipmentStatus.Default);
+        s.setDevice(d);
+        s.setShipmentDescription("Created by autostart shipment rule");
+        s = getContext().getBean(ShipmentDao.class).save(s);
+
+        //create alert
+        final Alert a = new Alert();
+        a.setDevice(d);
+        a.setShipment(s);
+        a.setType(AlertType.LightOff);
+        alert = getContext().getBean(AlertDao.class).save(a);
     }
 
     /* (non-Javadoc)
@@ -55,18 +90,6 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, Long> {
         u.setExternalCompany("Mocrosoft");
         u.getSettings().put("key", "value");
         return u;
-    }
-    /**
-     * @param imei
-     * @return
-     */
-    protected Device createDevice(final String imei) {
-        final Device d = new Device();
-        d.setName("Test Device");
-        d.setImei(imei);
-        d.setCompany(sharedCompany);
-        d.setDescription("Test device");
-        return deviceDao.save(d);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertCreateTestEntityOk(com.visfresh.entities.EntityWithId)
@@ -119,5 +142,41 @@ public class UserDaoTest extends BaseCrudTest<UserDao, User, Long> {
         assertEquals(sharedCompany.getId(), c.getId());
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
+    }
+    @Test
+    public void testgetDbReferences() {
+        final User u = dao.save(createTestEntity());
+        createNotification(u);
+        createNotification(u);
+        createNotification(u);
+
+        createPersonSchedule(u);
+        createPersonSchedule(u);
+
+        assertEquals(5, dao.getDbReferences(u.getId()).size());
+    }
+
+    /**
+     * @param u user the user.
+     * @return notification for given user.
+     */
+    private Notification createNotification(final User u) {
+        final Notification n = new Notification();
+        n.setType(NotificationType.Alert);
+        n.setUser(u);
+        n.setIssue(alert);
+        return getContext().getBean(NotificationDao.class).save(n);
+    }
+    /**
+     * @param u
+     * @return personal schedule.
+     */
+    private PersonSchedule createPersonSchedule(final User u) {
+        final PersonSchedule ps = new PersonSchedule();
+        ps.setUser(u);
+
+        notificationSchedule.getSchedules().add(ps);
+        getContext().getBean(NotificationScheduleDao.class).save(notificationSchedule);
+        return ps;
     }
 }

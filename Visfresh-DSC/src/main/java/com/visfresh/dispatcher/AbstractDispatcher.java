@@ -77,13 +77,12 @@ public abstract class AbstractDispatcher {
                 while (!isStoped()) {
                     try {
                         final int numProcessed = processMessages();
-                        if (numProcessed > 0) {
-                            log.debug(numProcessed + " messages is processed by " + getProcessorId());
-                        } else if (getInactiveTimeOut() > 0){
-                            log.debug("0 messages has processed, dispatcher "
-                                    + getProcessorId() + " will paused for " + getInactiveTimeOut() + " ms");
+                        if (numProcessed == 0 && getInactiveTimeOut() > 0){
                             sleep(getInactiveTimeOut());
                         }
+                    } catch (final InterruptedException e) {
+                        log.warn("Dispatcher " + getProcessorId() + " thread is interrupted");
+                        isStoped.set(true);
                     } catch (final Throwable e) {
                         log.error("Global exception during dispatch of messaegs", e);
                     }

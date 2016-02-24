@@ -21,6 +21,7 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.MeasurementUnits;
+import com.visfresh.entities.ReferenceInfo;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
@@ -264,5 +265,40 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
 
         final List<User> all = findAll(f, null, null);
         return all.size() == 0 ? null : all.get(0);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.UserDao#getDbReferences(java.lang.Long)
+     */
+    @Override
+    public List<ReferenceInfo> getDbReferences(final Long userId) {
+        if (userId == null) {
+            return new LinkedList<>();
+        }
+
+        final String sql = //notifications
+                "(select " + NotificationDaoImpl.ID_FIELD + " as id, '"
+                + NotificationDaoImpl.TABLE
+                + "' as type from " + NotificationDaoImpl.TABLE + " where "
+                + NotificationDaoImpl.USER_FIELD + "=:user order by "
+                + NotificationDaoImpl.ID_FIELD + ") UNION "
+                //personal schedules
+                + "(select " + NotificationScheduleDaoImpl.ID_FIELD + " as id, '"
+                + NotificationScheduleDaoImpl.PERSONAL_SCHEDULE_TABLE
+                + "' as type from " + NotificationScheduleDaoImpl.PERSONAL_SCHEDULE_TABLE + " where "
+                + NotificationScheduleDaoImpl.USER_FIELD + "=:user order by "
+                + NotificationScheduleDaoImpl.ID_FIELD + ")";
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("user", userId);
+
+        final List<ReferenceInfo> refs = new LinkedList<>();
+
+        for (final Map<String,Object> row : jdbc.queryForList(sql, params)) {
+            final ReferenceInfo ref = new ReferenceInfo();
+            ref.setType((String) row.get("type"));
+            ref.setId(((Number) row.get("id")).longValue());
+
+            refs.add(ref);
+        }
+        return refs;
     }
 }

@@ -36,8 +36,8 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
     implements DaoBase<E, Long> {
 
     public static final String TABLE = "shipments";
-    protected static final String ARRIVALNOTIFSCHEDULES_TABLE = "arrivalnotifschedules";
-    protected static final String ALERTNOTIFSCHEDULES_TABLE = "alertnotifschedules";
+    public static final String ARRIVALNOTIFSCHEDULES_TABLE = "arrivalnotifschedules";
+    public static final String ALERTNOTIFSCHEDULES_TABLE = "alertnotifschedules";
 
     protected static final String ID_FIELD = "id";
     protected static final String ISTEMPLATE_FIELD = "istemplate";

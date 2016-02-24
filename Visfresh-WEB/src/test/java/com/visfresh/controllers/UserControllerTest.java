@@ -15,14 +15,22 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.UserConstants;
 import com.visfresh.controllers.restclient.UserRestClient;
+import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.CompanyDao;
+import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.MeasurementUnits;
+import com.visfresh.entities.Notification;
+import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.Role;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.CompanyResolver;
@@ -465,6 +473,36 @@ public class UserControllerTest extends AbstractRestServiceTest {
         client.deleteUser(u);
 
         assertNull(dao.findOne(u.getId()));
+    }
+    @Test
+    public void testDeleteUserWithLiveRefs() throws IOException, RestServiceException {
+        final User u = createUser("asuvorov@mail.ru", "Alexandr", "Suvorov", getCompany());
+
+        //create references to user
+        createNotificationSchedule(u, true);
+
+        //create notification
+        final Shipment s = createShipment(true);
+
+        Alert a = new Alert();
+        a.setDevice(s.getDevice());
+        a.setShipment(s);
+        a.setType(AlertType.LightOff);
+        a = getContext().getBean(AlertDao.class).save(a);
+
+        final Notification n = new Notification();
+        n.setType(NotificationType.Alert);
+        n.setUser(u);
+        n.setIssue(a);
+        getContext().getBean(NotificationDao.class).save(n);
+
+        try {
+            client.deleteUser(u);
+        } catch (final RestServiceException e) {
+            assertEquals(ErrorCodes.ENTITY_IN_USE, e.getErrorCode());
+        }
+
+        assertNotNull(dao.findOne(u.getId()));
     }
     /**
      * @param email

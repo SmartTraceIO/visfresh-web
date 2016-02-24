@@ -20,6 +20,7 @@ import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
+import com.visfresh.entities.ReferenceInfo;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -31,13 +32,13 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
 
     public static final String TABLE = "notificationschedules";
 
-    private static final String ID_FIELD = "id";
+    public static final String ID_FIELD = "id";
     private static final String COMPANY_FIELD = "company";
     private static final String NAME_FIELD = "name";
     private static final String DESCRIPTION_FIELD = "description";
 
-    private static final String PERSONAL_SCHEDULE_TABLE = "personalschedules";
-    private static final String USER_FIELD = "user";
+    public static final String PERSONAL_SCHEDULE_TABLE = "personalschedules";
+    public static final String USER_FIELD = "user";
     private static final String SENDAPP_FIELD = "sendapp";
     private static final String SENDEMAIL_FIELD = "sendemail";
     private static final String SENDSMS_FIELD = "sendsms";
@@ -275,5 +276,40 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
 
         no.getSchedules().addAll(findPersonalSchedulesFor(no.getId()));
         return no;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.NotificationScheduleDao#getDbReferences(java.lang.Long)
+     */
+    @Override
+    public List<ReferenceInfo> getDbReferences(final Long id) {
+        if (id == null) {
+            return new LinkedList<>();
+        }
+
+//        final String sql = //notifications
+//                "(select " + ShipmentBaseDao.ID_FIELD + " as id, '"
+//                + ShipmentBaseDao.ALERTNOTIFSCHEDULES_TABLE
+//                + "' as type from " + ShipmentBaseDao.TABLE + " where "
+//                + ShipmentBaseDao.USER_FIELD + "=:user order by "
+//                + ShipmentBaseDao.ID_FIELD + ") UNION "
+//                //personal schedules
+//                + "(select " + ShipmentBaseDao.ID_FIELD + " as id, '"
+//                + ShipmentBaseDao.PERSONAL_SCHEDULE_TABLE
+//                + "' as type from " + ShipmentBaseDao.PERSONAL_SCHEDULE_TABLE + " where "
+//                + ShipmentBaseDao.USER_FIELD + "=:user order by "
+//                + ShipmentBaseDao.ID_FIELD + ")";
+//        final Map<String, Object> params = new HashMap<String, Object>();
+//        params.put("user", id);
+
+        final List<ReferenceInfo> refs = new LinkedList<>();
+
+//        for (final Map<String,Object> row : jdbc.queryForList(sql, params)) {
+//            final ReferenceInfo ref = new ReferenceInfo();
+//            ref.setType((String) row.get("type"));
+//            ref.setId(((Number) row.get("id")).longValue());
+//
+//            refs.add(ref);
+//        }
+        return refs;
     }
 }

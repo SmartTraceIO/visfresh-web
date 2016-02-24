@@ -78,22 +78,21 @@ public abstract class AbstractSystemMessageDispatcher {
             while (!isStoped.get()) {
                 try {
                     final int numProcessed = processMessages(id);
-                    if (numProcessed > 0) {
-                        log.debug(numProcessed + " messages is processed by " + id);
-                    } else if (getInactiveTimeOut() > 0){
-                        log.debug("0 messages has processed, dispatcher "
-                                + id + " will paused for " + getInactiveTimeOut() + " ms");
-
+                    if (numProcessed == 0 && getInactiveTimeOut() > 0){
                         synchronized (isStoped) {
                             isStoped.wait(getInactiveTimeOut());
                         }
                     }
+                } catch (final InterruptedException e) {
+                    log.warn("Dispatcher " + id + " thread is interrupted");
+                    isStoped.set(true);
                 } catch (final Throwable e) {
                     log.error("Global exception during dispatch of messaegs", e);
                     try {
                         Thread.sleep(10000L);
                     } catch (final InterruptedException ine) {
-                        ine.printStackTrace();
+                        log.warn("Dispatcher " + id + " thread is interrupted");
+                        isStoped.set(true);
                     }
                 }
             }
