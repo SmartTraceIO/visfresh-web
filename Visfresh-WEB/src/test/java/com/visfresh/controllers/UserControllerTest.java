@@ -110,7 +110,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.ReportViewer);
+        u.getRoles().add(Role.ShipmentViewer);
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.CompanyAdmin);
 
@@ -175,7 +175,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.ReportViewer);
+        u.getRoles().add(Role.ShipmentViewer);
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.CompanyAdmin);
 
@@ -260,7 +260,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.ReportViewer);
+        u.getRoles().add(Role.ShipmentViewer);
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.CompanyAdmin);
 
@@ -331,7 +331,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
         u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.ReportViewer);
+        u.getRoles().add(Role.ShipmentViewer);
         u.getRoles().add(Role.Dispatcher);
         u.getRoles().add(Role.CompanyAdmin);
 

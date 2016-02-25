@@ -56,7 +56,7 @@ public class DefaultAccessController implements AccessController {
      */
     @Override
     public void checkCanGetShipmentData(final User user) throws RestServiceException {
-        if (!haveOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin, Role.Dispatcher, Role.ReportViewer)) {
+        if (!haveOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin, Role.Dispatcher, Role.ShipmentViewer)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
                     "User have not permissions for get shipment data");
         }
@@ -67,7 +67,7 @@ public class DefaultAccessController implements AccessController {
      */
     @Override
     public void checkCanGetShipments(final User user) throws RestServiceException {
-        if (!haveOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin, Role.Dispatcher, Role.ReportViewer)) {
+        if (!haveOneRoleFrom(user, Role.GlobalAdmin, Role.CompanyAdmin, Role.Dispatcher, Role.ShipmentViewer)) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
                     "User have not permissions for view reports");
         }

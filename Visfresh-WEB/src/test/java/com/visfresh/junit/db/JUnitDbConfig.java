@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.visfresh.dao.impl.DaoImplBase;
 import com.visfresh.init.jdbc.JdbcConfig;
+import com.visfresh.l12n.XmlResourceBundle;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -17,7 +18,10 @@ import com.visfresh.init.jdbc.JdbcConfig;
  */
 @Configuration
 @EnableTransactionManagement
-@ComponentScan(basePackageClasses = {JdbcConfig.class, DaoImplBase.class})
+@ComponentScan(basePackageClasses = {
+        JdbcConfig.class,
+        XmlResourceBundle.class,
+        DaoImplBase.class})
 @PropertySource("classpath:/junit.app.properties")
 public class JUnitDbConfig {
     /**

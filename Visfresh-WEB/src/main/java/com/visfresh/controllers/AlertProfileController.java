@@ -25,8 +25,9 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
+import com.visfresh.l12n.ChartBundle;
+import com.visfresh.l12n.RuleBundle;
 import com.visfresh.lists.ListAlertProfileItem;
-import com.visfresh.mpl.services.ChartBundle;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -46,6 +47,8 @@ public class AlertProfileController extends AbstractController implements AlertP
     private AlertProfileDao dao;
     @Autowired
     private ChartBundle alertDescriptionBuilder;
+    @Autowired
+    private RuleBundle ruleBundle;
 
     /**
      * Default constructor.
@@ -159,7 +162,7 @@ public class AlertProfileController extends AbstractController implements AlertP
                 item.setAlertProfileDescription(a.getDescription());
                 for (final TemperatureRule rule : a.getAlertRules()) {
                     item.getAlertRuleList().add(
-                            alertDescriptionBuilder.alertRuleToString(rule, user.getTemperatureUnits()));
+                            ruleBundle.buildDescription(rule, user.getTemperatureUnits()));
                 }
 
                 array.add(ser.toJson(item));

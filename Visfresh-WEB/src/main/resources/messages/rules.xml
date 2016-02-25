@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<!-- 
+	supported place holders:
+
+	${type} alert type
+	
+	For temperature rules:
+	${temperature} rule temperature
+	${minutes} number of minutes before rule triggered
+
+        final StringBuilder sb = new StringBuilder();
+        switch (rule.getType()) {
+            case Cold:
+            case CriticalCold:
+                sb.append('<');
+                break;
+            case Hot:
+            case CriticalHot:
+                sb.append('>');
+                break;
+            case Battery:
+                return "battery low";
+            case LightOff:
+                return "light off";
+            case LightOn:
+                return "light on";
+                default:
+                    throw new IllegalArgumentException("Unexpected alert type: " + rule.getType());
+        }
+
+        if (rule instanceof TemperatureRule) {
+            final TemperatureRule tr = (TemperatureRule) rule;
+            //only temperature alert rules. Other should be returned before.
+            sb.append(getTemperatureString(tr.getTemperature(), units));
+            //append time
+            sb.append(" for " + tr.getTimeOutMinutes() + " min");
+            //append total
+            if (tr.isCumulativeFlag()) {
+                sb.append(" in total");
+            }
+        }
+        return sb.toString();
+    -->
+	<!-- //////////////////////////////////////////// Cold  //////////////////////////////////////////////////////////////////-->
+	<entry key="Cold">&lt;${temperature} for ${minutes} min</entry>
+	<!-- CriticalCold chart -->
+	<entry key="CriticalCold">&lt;&lt;${temperature} for ${minutes} min</entry>
+	<!-- Cold Cumulative chart -->
+	<entry key="Cold.cumulative">&lt;&lt;${temperature} for ${minutes} min</entry>
+
+	<!-- CriticalCold Cumulative chart -->
+	<entry key="CriticalCold.cumulative">&lt;&lt;${temperature} for ${minutes} min</entry>
+
+	<!-- //////////////////////////////////////////// Hot  //////////////////////////////////////////////////////////////////-->
+	<entry key="Hot">&gt;&lt;${temperature} for ${minutes} min</entry>
+	<!-- CriticalHot chart -->
+	<entry key="CriticalHot">&gt;&lt;${temperature} for ${minutes} min</entry>
+	<!-- Hot Cumulative chart -->
+	<entry key="Hot.cumulative">&gt;&lt;${temperature} for ${minutes} min</entry>
+	<!-- CriticalHot Cumulative chart -->
+	<entry key="CriticalHot.cumulative">&gt;&lt;${temperature} for ${minutes} min</entry>
+	
+	<!-- Not temperature alerts -->
+	<entry key="MovementStart">Movement start</entry>
+	<entry key="LightOn">entering bright environment</entry>
+	<entry key="LightOff">entering dark environment</entry>
+
+	<!-- //////////////////////////////////////////// Battery  //////////////////////////////////////////////////////////////////-->
+	<!-- Battery -->
+	<entry key="Battery">battery low</entry>
+</properties>        

@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.mpl.services;
+package com.visfresh.l12n;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -24,12 +24,13 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.l12n.NotificationBundle;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ChartBundleTest extends ChartBundle {
+public class NotificationBundleTest extends NotificationBundle {
     private Shipment shipment;
     private User user;
     private TrackerEvent trackerEvent;
@@ -37,7 +38,7 @@ public class ChartBundleTest extends ChartBundle {
     /**
      * Default constructor.
      */
-    public ChartBundleTest() {
+    public NotificationBundleTest() {
         super();
     }
 
@@ -79,9 +80,8 @@ public class ChartBundleTest extends ChartBundle {
         trackerEvent.setTime(new Date());
         trackerEvent.setType(TrackerEventType.AUT);
     }
-
     @Test
-    public void testGetBundle() {
+    public void testBundles() {
         for (final AlertType type : AlertType.values()) {
             if (type.isTemperatureAlert()) {
                 //Temperature alerts
@@ -95,7 +95,21 @@ public class ChartBundleTest extends ChartBundle {
                 alert.setCumulative(false);
 
                 //mail
-                String msg = buildDescription(user, alert, trackerEvent);
+                String msg = getEmailMessage(user, alert, trackerEvent);
+                assertNotNull(msg);
+                assertPlaceholdersResolved(alert, msg);
+
+                msg = getEmailSubject(user, alert, trackerEvent);
+                assertNotNull(msg);
+                assertPlaceholdersResolved(alert, msg);
+
+                //SMS
+                msg = getSmsMessage(user, alert, trackerEvent);
+                assertNotNull(msg);
+                assertPlaceholdersResolved(alert, msg);
+
+                //App
+                msg = getAppMessage(user, alert, trackerEvent);
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
@@ -103,7 +117,21 @@ public class ChartBundleTest extends ChartBundle {
                 alert.setCumulative(true);
 
                 //mail
-                msg = buildDescription(user, alert, trackerEvent);
+                msg = getEmailMessage(user, alert, trackerEvent);
+                assertNotNull(msg);
+                assertPlaceholdersResolved(alert, msg);
+
+                msg = getEmailSubject(user, alert, trackerEvent);
+                assertNotNull(msg);
+                assertPlaceholdersResolved(alert, msg);
+
+                //SMS
+                msg = getSmsMessage(user, alert, trackerEvent);
+                assertNotNull(msg);
+                assertPlaceholdersResolved(alert, msg);
+
+                //App
+                msg = getAppMessage(user, alert, trackerEvent);
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
             }
@@ -120,7 +148,21 @@ public class ChartBundleTest extends ChartBundle {
                 alert.setType(type);
 
                 //mail
-                final String msg = buildDescription(user, alert, trackerEvent);
+                String msg = getEmailMessage(user, alert, trackerEvent);
+                assertNotNull(msg);
+                assertPlaceholdersResolved(alert, msg);
+
+                msg = getEmailSubject(user, alert, trackerEvent);
+                assertNotNull(msg);
+                assertPlaceholdersResolved(alert, msg);
+
+                //SMS
+                msg = getSmsMessage(user, alert, trackerEvent);
+                assertNotNull(msg);
+                assertPlaceholdersResolved(alert, msg);
+
+                //App
+                msg = getAppMessage(user, alert, trackerEvent);
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
             }
@@ -133,11 +175,24 @@ public class ChartBundleTest extends ChartBundle {
         arrival.setShipment(shipment);
 
         //mail
-        final String msg = buildDescription(user, arrival, trackerEvent);
+        String msg = getEmailMessage(user, arrival, trackerEvent);
+        assertNotNull(msg);
+        assertPlaceholdersResolved(arrival, msg);
+
+        msg = getEmailSubject(user, arrival, trackerEvent);
+        assertNotNull(msg);
+        assertPlaceholdersResolved(arrival, msg);
+
+        //SMS
+        msg = getSmsMessage(user, arrival, trackerEvent);
+        assertNotNull(msg);
+        assertPlaceholdersResolved(arrival, msg);
+
+        //App
+        msg = getAppMessage(user, arrival, trackerEvent);
         assertNotNull(msg);
         assertPlaceholdersResolved(arrival, msg);
     }
-
     /**
      * @param issue notification issue.
      * @param msg message.
@@ -148,6 +203,7 @@ public class ChartBundleTest extends ChartBundle {
                     + msg +"' of " + createBundleKey(issue));
         }
     }
+
     /**
      * @param name
      * @param latitude

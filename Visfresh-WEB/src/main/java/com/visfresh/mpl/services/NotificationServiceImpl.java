@@ -18,6 +18,7 @@ import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.l12n.NotificationBundle;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.NotificationService;
 import com.visfresh.services.SmsService;

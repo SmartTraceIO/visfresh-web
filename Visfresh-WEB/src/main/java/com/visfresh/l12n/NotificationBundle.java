@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.mpl.services;
+package com.visfresh.l12n;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
-import com.visfresh.l12n.XmlControl;
+import com.visfresh.mpl.services.NotificationIssueBundle;
 import com.visfresh.utils.StringUtils;
 
 /**

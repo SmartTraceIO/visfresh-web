@@ -6,11 +6,13 @@ package com.visfresh.mpl.services;
 import static com.visfresh.utils.DateTimeUtils.createDateFormat;
 
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
@@ -39,31 +41,52 @@ public class NotificationIssueBundle {
      */
     protected Map<String, String> createReplacementMap(final User user,
             final NotificationIssue issue, final TrackerEvent trackerEvent) {
-        final Shipment shipment = issue.getShipment();
+        final Shipment shipment;
+        final Date issueDate;
+        final Device device;
+
+        if (issue != null) {
+            shipment = issue.getShipment();
+            issueDate = issue.getDate();
+            device = issue.getDevice();
+        } else {
+            shipment = trackerEvent.getShipment();
+            device = trackerEvent.getDevice();
+            issueDate = trackerEvent.getTime();
+        }
+
         final Map<String, String> map = new HashMap<String, String>();
 
         //supported place holders:
         //${date} alert issue date include day and year
         DateFormat sdf = createDateFormat(user, AbstractJsonSerializer.DATE_FORMAT);
-        map.put("date", sdf.format(issue.getDate()));
+        map.put("date", sdf.format(issueDate));
         //${time} the time in scope of day.
         sdf = createDateFormat(user, "HH:mm");
-        map.put("time", sdf.format(issue.getDate()));
+        map.put("time", sdf.format(issueDate));
         //${device} device IMEI
-        map.put("device", issue.getDevice().getImei());
+        map.put("device", device.getImei());
         //${devicesn} device serial number
-        map.put("devicesn", issue.getDevice().getSn());
-        //${tripCount} trip count for given device of shipment.
-        map.put("tripCount", Integer.toString(shipment.getTripCount()));
-        //${shippedFrom}      location shipped from
-        map.put("shippedFrom", shipment.getShippedFrom() == null
-                ? "" : shipment.getShippedFrom().getName());
-        //${shippedTo}        location shipped to
-        map.put("shippedTo", shipment.getShippedTo() == null
-                ? "" : shipment.getShippedTo().getName());
-        //${shipmentDescription}  the shipment desc
-        map.put("shipmentDescription", shipment.getShipmentDescription() == null
-                ? "" : shipment.getShipmentDescription());
+        map.put("devicesn", device.getSn());
+
+        if (shipment != null) {
+            //${tripCount} trip count for given device of shipment.
+            map.put("tripCount", Integer.toString(shipment.getTripCount()));
+            //${shippedFrom}      location shipped from
+            map.put("shippedFrom", shipment.getShippedFrom() == null
+                    ? "" : shipment.getShippedFrom().getName());
+            //${shippedTo}        location shipped to
+            map.put("shippedTo", shipment.getShippedTo() == null
+                    ? "" : shipment.getShippedTo().getName());
+            //${shipmentDescription}  the shipment desc
+            map.put("shipmentDescription", shipment.getShipmentDescription() == null
+                    ? "" : shipment.getShipmentDescription());
+        } else {
+            map.put("tripCount", "");
+            map.put("shippedFrom", "");
+            map.put("shippedTo", "");
+            map.put("shipmentDescription", "");
+        }
 
         if (trackerEvent != null) {
             //${readingTime}      the time reading occured in user's timezone - eg. 4:34am
@@ -106,14 +129,12 @@ public class NotificationIssueBundle {
 
         return map;
     }
-
     /**
-     * @param alert
-     * @return
+     * @param issue notification issue alert/arrival
+     * @return bundle key.
      */
     protected String createBundleKey(final NotificationIssue issue) {
         String key = "";
-
         if (issue instanceof Alert) {
             final Alert alert = (Alert) issue;
             key = alert.getType().toString();

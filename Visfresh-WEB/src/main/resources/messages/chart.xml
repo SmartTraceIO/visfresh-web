@@ -83,13 +83,21 @@
 	</entry>
 	
 	<!-- Not temperature alerts -->
-	<entry key="MovementStart">Sudden movement occurred at ${time}</entry>
-	<entry key="LightOn">Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
-	<entry key="LightOff">Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
+	<entry key="MovementStart">
+		Sudden movement occurred at ${time}
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+	<entry key="LightOn">
+		Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+	<entry key="LightOff">
+		Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
 
 	<!-- //////////////////////////////////////////// Arrival  //////////////////////////////////////////////////////////////////-->
 	<!-- Arrival -->
-	<!-- Arrival chart -->
 	<entry key="Arrival">
 		Arrival Alert for Tracker ${devicesn}(${tripCount}) 
 		${readingTemperature} | ${readingTime} ${readingDate}
@@ -97,9 +105,14 @@
 
 	<!-- //////////////////////////////////////////// Battery  //////////////////////////////////////////////////////////////////-->
 	<!-- Battery -->
-	<!-- Battery chart -->
 	<entry key="Battery">
 		Low Battery Alert for Tracker ${devicesn}(${tripCount}) 
+		${readingTemperature} | ${readingTime} ${readingDate}
+	</entry>
+	
+	<!-- Last reading -->
+	<entry key="TrackerEvent">
+		Last reading for Tracker #${devicesn}(${tripCount})
 		${readingTemperature} | ${readingTime} ${readingDate}
 	</entry>
 </properties>

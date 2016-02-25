@@ -60,8 +60,9 @@ import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentDtoNew;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.io.shipment.SingleShipmentTimeItem;
+import com.visfresh.l12n.ChartBundle;
+import com.visfresh.l12n.RuleBundle;
 import com.visfresh.lists.ListShipmentItem;
-import com.visfresh.mpl.services.ChartBundle;
 import com.visfresh.services.ArrivalEstimation;
 import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.services.LocationService;
@@ -114,6 +115,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private ShipmentSiblingService siblingService;
     @Autowired
     private RuleEngine ruleEngine;
+    @Autowired
+    private RuleBundle ruleBundle;
 
     /**
      * Default constructor.
@@ -600,10 +603,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private String buildAlertYetToFire(final List<AlertRule> rules, final User user) {
         final List<String> list = new LinkedList<>();
         for (final AlertRule rule: rules) {
-            list.add(alertDescriptionBuilder.alertRuleToString(
-                    rule, user.getTemperatureUnits()));
+            list.add(ruleBundle.buildDescription(rule, user.getTemperatureUnits()));
         }
-
         return StringUtils.combine(list, ", ");
     }
     /**
@@ -780,11 +781,11 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         //add alerts
         for (final Alert a : item.getAlerts()) {
-            lo.getAlerts().add(createSingleShipmentAlert(a, event, user, address));
+            lo.getAlerts().add(createSingleShipmentAlert(a, event, user));
         }
         //add arrivals
         for (final Arrival a: item.getArrivals()) {
-            lo.getAlerts().add(createSingleShipmentAlert(a, user, address, lo.getTimeIso()));
+            lo.getAlerts().add(createSingleShipmentAlert(a, event, user));
         }
 
         return list;
@@ -798,48 +799,46 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private SingleShipmentAlert createLastReadingAlert(final TrackerEvent event,
             final User user, final String address, final String timeIso) {
-        final SingleShipmentAlert alert = new SingleShipmentAlert();
-
-        alert.setTitle(alertDescriptionBuilder.buildLastReadingDescription(event, user));
-        alert.setType("LastReading");
-        alert.getLines().add(alertDescriptionBuilder.buildShortDescription(event, user));
-        alert.getLines().add(address);
-
-        return alert;
+        final String text = alertDescriptionBuilder.buildTrackerEventDescription(user, event);
+        return createSingleShipmentAlert("LastReading", text);
     }
     /**
      * @param a arrival.
      * @param user user.
-     * @param address address.
-     * @param timeIso time ISO.
      * @return
      */
-    private SingleShipmentAlert createSingleShipmentAlert(final Arrival a, final User user,
-            final String address, final String timeIso) {
-        final SingleShipmentAlert alert = new SingleShipmentAlert();
-
-        alert.setTitle(alertDescriptionBuilder.buildDescriptionForSingleShipment(a, user));
-        alert.setType("ArrivalNotice");
-        alert.getLines().add(alertDescriptionBuilder.buildShortDescription(a, user));
-        alert.getLines().add(address);
-
-        return alert;
+    private SingleShipmentAlert createSingleShipmentAlert(final Arrival a, final TrackerEvent trackerEvent,
+            final User user) {
+        final String text = alertDescriptionBuilder.buildDescription(user, a, trackerEvent);
+        return createSingleShipmentAlert("ArrivalNotice", text);
     }
     /**
-     * @param a
+     * @param a alert.
      * @param user user.
-     * @param address address
-     * @return
+     * @return single shipment alert.
      */
     private SingleShipmentAlert createSingleShipmentAlert(
-            final Alert a, final TrackerEvent trackerEvent, final User user, final String address) {
+            final Alert a, final TrackerEvent trackerEvent, final User user) {
+        final String text = alertDescriptionBuilder.buildDescription(user, a, trackerEvent);
+        return createSingleShipmentAlert(a.getType().name(), text);
+    }
+    /**
+     * @param type the type.
+     * @param text the text.
+     * @return single shipment alert.
+     */
+    protected SingleShipmentAlert createSingleShipmentAlert(final String type,
+            final String text) {
         final SingleShipmentAlert alert = new SingleShipmentAlert();
+        alert.setType(type);
 
-        alert.setTitle(alertDescriptionBuilder.buildDescription(user, a, trackerEvent));
-        alert.setType(a.getType().name());
-        alert.getLines().add(alertDescriptionBuilder.buildShortDescription(a, user));
-        alert.getLines().add(address);
+        //set title and lines
+        final String[] lines = text.split("\n");
+        alert.setTitle(lines[0]);
 
+        for (int i = 1; i < lines.length; i++) {
+            alert.getLines().add(lines[i]);
+        }
         return alert;
     }
     /**
