@@ -55,4 +55,6 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @param siblingCount sibling count.
      */
     void updateSiblingInfo(List<Shipment> shipments, Long siblingGroup, int siblingCount);
+    @Override
+    <S extends Shipment> S save(S s);
 }

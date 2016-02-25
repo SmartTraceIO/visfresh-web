@@ -165,7 +165,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     private Shipment createNewShipment(final ShipmentTemplate tpl,
             final LocationProfile startLocation, final Device device) {
         final Shipment s = shipmentDao.createNewFrom(tpl);
-        s.setStatus(ShipmentStatus.InProgress);
+        s.setStatus(ShipmentStatus.Default);
         s.setDevice(device);
         s.setShippedFrom(startLocation);
 
