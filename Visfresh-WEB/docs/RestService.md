@@ -2788,24 +2788,50 @@ Request:
   },
   "response": [
     {
-      "template": 1317,
-      "id": 31,
+      "priority": 77,
+      "id": 331,
       "startLocations": [
-        1179
+        1663
       ],
       "endLocations": [
-        1178
-      ]
+        1662
+      ],
+      "shipmentTemplateName": "JUnit template",
+      "shipmentDescription": null,
+      "addDateShipped": false,
+      "alertProfileId": null,
+      "alertSuppressionMinutes": 0,
+      "alertsNotificationSchedules": [],
+      "commentsForReceiver": null,
+      "arrivalNotificationWithinKm": null,
+      "excludeNotificationsIfNoAlerts": false,
+      "arrivalNotificationSchedules": [],
+      "shutdownDeviceAfterMinutes": null,
+      "noAlertsAfterArrivalMinutes": null,
+      "shutDownAfterStartMinutes": null
     },
     {
-      "template": 1317,
-      "id": 32,
+      "priority": 77,
+      "id": 332,
       "startLocations": [
-        1179
+        1663
       ],
       "endLocations": [
-        1178
-      ]
+        1662
+      ],
+      "shipmentTemplateName": "JUnit template",
+      "shipmentDescription": null,
+      "addDateShipped": false,
+      "alertProfileId": null,
+      "alertSuppressionMinutes": 0,
+      "alertsNotificationSchedules": [],
+      "commentsForReceiver": null,
+      "arrivalNotificationWithinKm": null,
+      "excludeNotificationsIfNoAlerts": false,
+      "arrivalNotificationSchedules": [],
+      "shutdownDeviceAfterMinutes": null,
+      "noAlertsAfterArrivalMinutes": null,
+      "shutDownAfterStartMinutes": null
     }
   ],
   "totalCount": 2
