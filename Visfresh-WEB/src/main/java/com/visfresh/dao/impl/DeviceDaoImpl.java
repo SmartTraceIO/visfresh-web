@@ -4,6 +4,7 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
      */
     public static final String TRIPCOUNT_FIELD = "tripcount";
     private static final String PROPERTY_DEVICE_GROUP = "deviceGroup";
+    private static final String ACTIVE_FIELD = "active";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     private final DeviceStateSerializer stateSerializer = new DeviceStateSerializer();
@@ -57,10 +59,10 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
      */
     public DeviceDaoImpl() {
         super();
-
         propertyToDbFields.put(DeviceConstants.PROPERTY_DESCRIPTION, DESCRIPTION_FIELD);
         propertyToDbFields.put(DeviceConstants.PROPERTY_NAME, NAME_FIELD);
         propertyToDbFields.put(DeviceConstants.PROPERTY_IMEI, IMEI_FIELD);
+        propertyToDbFields.put(DeviceConstants.PROPERTY_ACTIVE, ACTIVE_FIELD);
     }
 
     /* (non-Javadoc)
@@ -69,45 +71,26 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
     @Override
     public <S extends Device> S save(final S device) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
-
-        String sql;
-
-        if (findOne(device.getId()) == null) {
-            //insert
-            sql = "insert into " + TABLE + " (" + combine(
-                    NAME_FIELD,
-                    IMEI_FIELD,
-                    COMPANY_FIELD,
-                    TRIPCOUNT_FIELD,
-                    DESCRIPTION_FIELD
-                ) + ")" + " values("
-                    + ":"+ NAME_FIELD
-                    + ", :" + IMEI_FIELD
-                    + ", :" + COMPANY_FIELD
-                    + ", :" + TRIPCOUNT_FIELD
-                    + ", :" + DESCRIPTION_FIELD
-                    + ")";
-        } else {
-            //update
-            sql = "update " + TABLE + " set "
-                + NAME_FIELD + "=:" + NAME_FIELD + ","
-                + IMEI_FIELD + "=:" + IMEI_FIELD + ","
-                + COMPANY_FIELD + "=:" + COMPANY_FIELD + ","
-                + TRIPCOUNT_FIELD + "=:" + TRIPCOUNT_FIELD + ","
-                + DESCRIPTION_FIELD + "=:" + DESCRIPTION_FIELD
-                + " where imei = :" + IMEI_FIELD
-            ;
-        }
-
         paramMap.put(IMEI_FIELD, device.getId());
         paramMap.put(NAME_FIELD, device.getName());
         paramMap.put(DESCRIPTION_FIELD, device.getDescription());
         paramMap.put(IMEI_FIELD, device.getImei());
         paramMap.put(COMPANY_FIELD, device.getCompany().getId());
         paramMap.put(TRIPCOUNT_FIELD, device.getTripCount());
+        paramMap.put(ACTIVE_FIELD, device.isActive());
+
+        final LinkedList<String> fields = new LinkedList<String>(paramMap.keySet());
+
+        String sql;
+        if (findOne(device.getId()) == null) {
+            //insert
+            sql = createInsertScript(TABLE, fields);
+        } else {
+            //update
+            sql = createUpdateScript(TABLE, fields, IMEI_FIELD);
+        }
 
         jdbc.update(sql, paramMap);
-
         return device;
     }
     /* (non-Javadoc)
@@ -142,6 +125,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         d.setDescription((String) map.get(DESCRIPTION_FIELD));
         d.setImei((String) map.get(IMEI_FIELD));
         d.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
+        d.setActive(Boolean.TRUE.equals(map.get(ACTIVE_FIELD)));
         return d;
     }
     /* (non-Javadoc)

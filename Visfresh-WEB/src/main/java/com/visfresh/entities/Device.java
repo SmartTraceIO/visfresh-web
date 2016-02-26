@@ -29,6 +29,10 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      * Current device trip count.
      */
     private int tripCount;
+    /**
+     * Active flag.
+     */
+    private boolean active = true;
 
     /**
      * Default constructor.
@@ -117,6 +121,18 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      */
     public void setTripCount(final int tripCount) {
         this.tripCount = tripCount;
+    }
+    /**
+     * @param active the active to set
+     */
+    public void setActive(final boolean active) {
+        this.active = active;
+    }
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
     }
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

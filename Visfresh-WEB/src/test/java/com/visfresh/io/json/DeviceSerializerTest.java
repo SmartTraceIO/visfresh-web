@@ -33,14 +33,17 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
     }
     @Test
     public void testDevice() {
+        Device t = new Device();
+
         final String description = "Device description";
         final String imei = "018923475076";
         final String name = "Device Name";
+        final boolean active = !t.isActive();
 
-        Device t = new Device();
         t.setDescription(description);
         t.setImei(imei);
         t.setName(name);
+        t.setActive(active);
 
         final JsonObject json = serializer.toJson(t).getAsJsonObject();
         t= serializer.parseDevice(json);
@@ -49,6 +52,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         assertEquals(imei, t.getImei());
         assertEquals(name, t.getName());
         assertNotNull(t.getSn());
+        assertEquals(active, t.isActive());
     }
     @Test
     public void testDeviceCommand() {

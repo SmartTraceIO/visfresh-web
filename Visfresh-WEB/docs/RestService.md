@@ -595,6 +595,7 @@ see [ResponseStatus](#markdown-header-response-status)
   "description": "Device description",
   "imei": "0239487043987",
   "name": "Device Name",
+  "enabled": true,
   "sn": "043987" // read only property
 }
 ```
@@ -762,16 +763,61 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ```
 ### AutoStart Shipment ###
 ```json
+Request:
 {
-    "template": 1320, //shipment template ID
-    "priority": 99, //priority of given template in scope of company
-    "id": 37, //AutoStart Shipment ID.
-    "startLocations": [
-      1185 //List of location ID
-    ],
-    "endLocations": [
-      1184 //List of location ID
-    ]
+  "priority": 99,
+  "id": null,
+  "startLocations": [
+    1239
+  ],
+  "endLocations": [
+    1238
+  ],
+  "shipmentTemplateName": "JUnit name",
+  "shipmentDescription": "JUnit shipment",
+  "addDateShipped": true,
+  "alertProfileId": 525,
+  "alertSuppressionMinutes": 25,
+  "alertsNotificationSchedules": [
+    873
+  ],
+  "commentsForReceiver": "Any comments for receiver",
+  "arrivalNotificationWithinKm": 15,
+  "excludeNotificationsIfNoAlerts": true,
+  "arrivalNotificationSchedules": [
+    874
+  ],
+  "shutdownDeviceAfterMinutes": 99,
+  "noAlertsAfterArrivalMinutes": 43,
+  "shutDownAfterStartMinutes": 47
+}
+2016-02-26 21:05:55,801 DEBUG [WebConfig] JSON request received:
+{
+  "priority": 99,
+  "id": 77, // authostart shipment ID.
+  "startLocations": [ // array of ID of locations
+    1239
+  ],
+  "endLocations": [ // array of ID of locations
+    1238
+  ],
+  "shipmentTemplateName": "JUnit name",
+  "shipmentDescription": "JUnit shipment",
+  "addDateShipped": true,
+  "alertProfileId": 525,
+  "alertSuppressionMinutes": 25,
+  "alertsNotificationSchedules": [ //array of ID of notification schedules
+    873
+  ],
+  "commentsForReceiver": "Any comments for receiver",
+  "arrivalNotificationWithinKm": 15,
+  "excludeNotificationsIfNoAlerts": true,
+  "arrivalNotificationSchedules": [ //array of ID of notification schedules
+    874
+  ],
+  "shutdownDeviceAfterMinutes": 99,
+  "noAlertsAfterArrivalMinutes": 43,
+  "shutDownAfterStartMinutes": 47
 }
 ```
 ### Expanded List User Item ###
@@ -1811,6 +1857,7 @@ Response:
 {
   "description": "Device description",
   "imei": "0239487043987",
+  "enabled": true,
   "name": "Device Name"
 }
 ```  
@@ -1835,15 +1882,29 @@ Response:
   "response": [
     {
       "description": "Device description",
-      "imei": "0239487043222",
+      "imei": "3333333333333",
       "name": "Device Name",
-      "sn": "043222"
+      "sn": "333333",
+      "enabled": true,
+      "lastShipmentId": 1246,
+      "lastReadingTimeISO": "2016-02-26 18:57",
+      "lastReadingTemperature": 11.0,
+      "lastReadingBattery": 27,
+      "lastReadingLat": 0.0,
+      "lastReadingLong": 0.0
     },
     {
       "description": "Device description",
-      "imei": "0239487043987",
+      "imei": "4444444444444",
       "name": "Device Name",
-      "sn": "043987"
+      "sn": "444444",
+      "enabled": true,
+      "lastShipmentId": 1246,
+      "lastReadingTimeISO": "2016-02-26 18:57",
+      "lastReadingTemperature": 11.0,
+      "lastReadingBattery": 27,
+      "lastReadingLat": 0.0,
+      "lastReadingLong": 0.0
     }
   ],
   "totalCount": 2
@@ -2170,6 +2231,7 @@ Response:
     "id": "923487509328",
     "imei": "923487509328",
     "name": "Device Name",
+    "enabled": true,
     "sn": "1"
   }
 }
@@ -2612,16 +2674,61 @@ Response:
 **POST /rest/saveAutoStartShipment/${accessToken}**  
 **Request:**  
 ```json
+Request:
 {
-  "template": 1319,
   "priority": 99,
   "id": null,
   "startLocations": [
-    1183
+    1239
   ],
   "endLocations": [
-    1182
-  ]
+    1238
+  ],
+  "shipmentTemplateName": "JUnit name",
+  "shipmentDescription": "JUnit shipment",
+  "addDateShipped": true,
+  "alertProfileId": 525,
+  "alertSuppressionMinutes": 25,
+  "alertsNotificationSchedules": [
+    873
+  ],
+  "commentsForReceiver": "Any comments for receiver",
+  "arrivalNotificationWithinKm": 15,
+  "excludeNotificationsIfNoAlerts": true,
+  "arrivalNotificationSchedules": [
+    874
+  ],
+  "shutdownDeviceAfterMinutes": 99,
+  "noAlertsAfterArrivalMinutes": 43,
+  "shutDownAfterStartMinutes": 47
+}
+2016-02-26 21:05:55,801 DEBUG [WebConfig] JSON request received:
+{
+  "priority": 99,
+  "id": null,
+  "startLocations": [
+    1239
+  ],
+  "endLocations": [
+    1238
+  ],
+  "shipmentTemplateName": "JUnit name",
+  "shipmentDescription": "JUnit shipment",
+  "addDateShipped": true,
+  "alertProfileId": 525,
+  "alertSuppressionMinutes": 25,
+  "alertsNotificationSchedules": [
+    873
+  ],
+  "commentsForReceiver": "Any comments for receiver",
+  "arrivalNotificationWithinKm": 15,
+  "excludeNotificationsIfNoAlerts": true,
+  "arrivalNotificationSchedules": [
+    874
+  ],
+  "shutdownDeviceAfterMinutes": 99,
+  "noAlertsAfterArrivalMinutes": 43,
+  "shutDownAfterStartMinutes": 47
 }
 ```  
 **Response:**  
@@ -2637,7 +2744,7 @@ Response:
 }
 ```
 ### Get AutoStart Shipment example ###
-**GET /vf/rest/getAutoStartShipment/${accessToken}?autoStartShipmentId=37**  
+**GET /vf/rest/getAutoStartShipment/${accessToken}?autoStartShipmentId=237**  
 **Response:**  
 ```json
 {
@@ -2646,15 +2753,27 @@ Response:
     "message": "Success"
   },
   "response": {
-    "template": 1320,
-    "priority": 99,
-    "id": 37,
+    "priority": 77,
+    "id": 273,
     "startLocations": [
-      1185
+      1253
     ],
     "endLocations": [
-      1184
-    ]
+      1252
+    ],
+    "shipmentTemplateName": "JUnit template",
+    "shipmentDescription": null,
+    "addDateShipped": false,
+    "alertProfileId": 528,
+    "alertSuppressionMinutes": 0,
+    "alertsNotificationSchedules": [],
+    "commentsForReceiver": null,
+    "arrivalNotificationWithinKm": null,
+    "excludeNotificationsIfNoAlerts": false,
+    "arrivalNotificationSchedules": [],
+    "shutdownDeviceAfterMinutes": null,
+    "noAlertsAfterArrivalMinutes": null,
+    "shutDownAfterStartMinutes": null
   }
 }
 ```

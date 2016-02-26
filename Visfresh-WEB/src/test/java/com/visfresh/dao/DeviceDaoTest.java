@@ -102,7 +102,14 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
 
         assertEquals(0, dao.findByCompany(left, null, null, null).size());
     }
-
+    @Test
+    public void testEnabledField() {
+        final Device d = createAndSaveDevice(sharedCompany, "293487032784");
+        final boolean active = !d.isActive();
+        d.setActive(active);
+        dao.save(d);
+        assertEquals(active, d.isActive());
+    }
     /**
      * @param c
      * @param imei

@@ -36,6 +36,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         tr.setImei(asString(json.get(DeviceConstants.PROPERTY_IMEI)));
         tr.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
         tr.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));
+        tr.setActive(!Boolean.FALSE.equals(asBoolean(json.get(DeviceConstants.PROPERTY_ACTIVE))));
         return tr;
     }
     /**
@@ -51,6 +52,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_DESCRIPTION, d.getDescription());
         obj.addProperty(DeviceConstants.PROPERTY_IMEI, d.getImei());
         obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
+        obj.addProperty(DeviceConstants.PROPERTY_ACTIVE, d.isActive());
         obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
         return obj;
     }
@@ -66,6 +68,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         d.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
         d.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));
         d.setSn(asString(json.get(DeviceConstants.PROPERTY_SN)));
+        d.setActive(!Boolean.FALSE.equals(json.get(DeviceConstants.PROPERTY_ACTIVE)));
 
         d.setLastShipmentId(asLong(json.get(DeviceConstants.PROPERTY_LAST_SHIPMENT)));
         d.setLastReadingTimeISO(asString(json.get(DeviceConstants.PROPERTY_LAST_READING_TIME)));
@@ -90,6 +93,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_IMEI, d.getImei());
         obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
         obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
+        obj.addProperty(DeviceConstants.PROPERTY_ACTIVE, d.isActive());
 
         obj.addProperty(DeviceConstants.PROPERTY_LAST_SHIPMENT, d.getLastShipmentId());
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TIME, d.getLastReadingTimeISO());

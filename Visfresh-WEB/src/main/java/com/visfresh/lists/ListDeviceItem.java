@@ -30,6 +30,10 @@ public class ListDeviceItem {
      * Current device trip count.
      */
     private int tripCount;
+    /**
+     * Active flag.
+     */
+    private boolean active;
 
     //last reading data
     private String lastReadingTimeISO;
@@ -55,8 +59,21 @@ public class ListDeviceItem {
         setName(d.getName());
         setSn(d.getSn());
         setTripCount(d.getTripCount());
+        setActive(d.isActive());
     }
 
+    /**
+     * @param active the active to set
+     */
+    public void setActive(final boolean active) {
+        this.active = active;
+    }
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
     /**
      * @return the imei
      */

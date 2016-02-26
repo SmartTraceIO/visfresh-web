@@ -12,6 +12,7 @@ public interface DeviceConstants {
     String PROPERTY_NAME = "name";
     String PROPERTY_SN = "sn";
     String PROPERTY_IMEI = "imei";
+    String PROPERTY_ACTIVE = "enabled";
 
     String PROPERTY_LAST_READING_LONG = "lastReadingLong";
     String PROPERTY_LAST_READING_LAT = "lastReadingLat";
