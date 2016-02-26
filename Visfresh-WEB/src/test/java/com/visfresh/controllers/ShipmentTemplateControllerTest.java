@@ -196,6 +196,16 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
         assertNull(tpl.getShutdownDeviceAfterMinutes());
         assertNull(tpl.getArrivalNotificationWithinKm());
     }
+    @Test
+    public void testAutoStartTemplatesInvisible() throws RestServiceException, IOException {
+        final ShipmentTemplate sp = createShipmentTemplate(true);
+        sp.setAutostart(true);
+        context.getBean(ShipmentTemplateDao.class).save(sp);
+
+        assertNotNull(client.getShipmentTemplate(sp.getId()));
+        //but not occurrence in list
+        assertEquals(0, client.getShipmentTemplates(null, null, null, null).size());
+    }
     @After
     public void tearDown() {
         client.removeRestIoListener(l);

@@ -58,7 +58,6 @@ public class AutoStartShipmentDaoImpl
         super();
         propertyToDbMap.put(AutoStartShipmentConstants.ID, ID_FIELD);
         propertyToDbMap.put(AutoStartShipmentConstants.PRIORITY, PRIORITY_FIELD);
-        propertyToDbMap.put(AutoStartShipmentConstants.TEMPLATE, TEMPLATE_FIELD);
     }
 
     /* (non-Javadoc)
@@ -70,8 +69,10 @@ public class AutoStartShipmentDaoImpl
 
         paramMap.put(ID_FIELD, aut.getId());
         paramMap.put(COMPANY_FIELD, aut.getCompany().getId());
-        paramMap.put(TEMPLATE_FIELD, aut.getTemplate().getId());
         paramMap.put(PRIORITY_FIELD, aut.getPriority());
+        if (aut.getId() == null) {
+            paramMap.put(TEMPLATE_FIELD, aut.getTemplate().getId());
+        }
 
         String sql;
         final List<String> fields = new LinkedList<String>(paramMap.keySet());
@@ -284,7 +285,6 @@ public class AutoStartShipmentDaoImpl
             }
         }
     }
-
     /**
      * @param t
      * @param row
@@ -300,5 +300,13 @@ public class AutoStartShipmentDaoImpl
             cache.put(cacheKey, tpl);
         }
         t.setTemplate(tpl);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#delete(com.visfresh.entities.EntityWithId)
+     */
+    @Override
+    public void delete(final AutoStartShipment entity) {
+        //delete template, entity should be deleted by DB trigger
+        shipmentTemplateDao.delete(entity.getTemplate().getId());
     }
 }

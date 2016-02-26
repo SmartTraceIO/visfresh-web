@@ -39,6 +39,7 @@ create table devices (
     name varchar(127) not null,
     company bigint(20),
     tripcount int not null default 0,
+    active boolean not null default true,
     primary key (imei),
     FOREIGN KEY (company)
         REFERENCES companies (id)
@@ -191,6 +192,7 @@ create table personalschedules (
 create table shipments (
     id bigint(20) auto_increment not null,
     istemplate boolean not null default true,
+    isautostart boolean not null default false,
     `name` varchar(50),
     description varchar(120) default null,
     alert bigint(20),

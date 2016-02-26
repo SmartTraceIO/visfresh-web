@@ -22,16 +22,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.AutoStartShipmentConstants;
+import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.io.AutoStartShipmentDto;
 import com.visfresh.io.json.AutoStartShipmentSerializer;
+import com.visfresh.services.RestServiceException;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -53,6 +58,12 @@ public class AutoStartShipmentController extends AbstractController
     private LocationProfileDao locationProfileDao;
     @Autowired
     private ShipmentTemplateDao template;
+    @Autowired
+    private AlertProfileDao alertProfileDao;
+    @Autowired
+    private NotificationScheduleDao notificationScheduleDao;
+    @Autowired
+    private ShipmentTemplateDao shipmentTemplateDao;
 
     /**
      * Default constructor.
@@ -76,43 +87,121 @@ public class AutoStartShipmentController extends AbstractController
 
             security.checkCanSaveAutoStartShipment(user);
 
-            final ShipmentTemplate tpl = template.findOne(dto.getTemplate());
-            checkCompanyAccess(user, tpl);
+            AutoStartShipment cfg;
+            ShipmentTemplate tpl;
+            if (dto.getId() != null) {
+                cfg = dao.findOne(dto.getId());
+                tpl = cfg.getTemplate();
 
-            //get locations.
-            final Set<Long> locFroms = new HashSet<>(dto.getStartLocations());
-            final Set<Long> locTos = new HashSet<>(dto.getEndLocations());
+                checkCompanyAccess(user, cfg);
+                checkCompanyAccess(user, tpl);
+            } else {
+                cfg = new AutoStartShipment();
+                cfg.setCompany(user.getCompany());
 
-            final Set<Long> allLoctions = new HashSet<Long>();
-            allLoctions.addAll(locFroms);
-            allLoctions.addAll(locTos);
+                tpl = new ShipmentTemplate();
+                tpl.setCompany(user.getCompany());
 
-            final List<LocationProfile> loctions = locationProfileDao.findAll(allLoctions);
-            //check company access
-            for (final LocationProfile l : loctions) {
-                checkCompanyAccess(user, l);
+                cfg.setTemplate(tpl);
             }
 
-            final AutoStartShipment cfg = new AutoStartShipment();
-            cfg.setCompany(user.getCompany());
+            setLocations(cfg, dto, user);
+
+            //set autostart fields
             cfg.setPriority(dto.getPriority());
             cfg.setTemplate(tpl);
             cfg.setId(dto.getId());
 
-            //resolve locations
-            for (final LocationProfile l : loctions) {
-                if (locFroms.contains(l.getId())) {
-                    cfg.getShippedFrom().add(l);
-                } else {
-                    cfg.getShippedTo().add(l);
-                }
-            }
+            //set template fields
+            fillTemplate(dto, tpl, user);
+            shipmentTemplateDao.save(tpl);
 
             final Long id = dao.save(cfg).getId();
             return createIdResponse("defaultShipmentId", id);
         } catch (final Exception e) {
             log.error("Failed to save default shipment", e);
             return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param cfg
+     * @param dto
+     * @param user
+     * @throws RestServiceException
+     */
+    private void setLocations(final AutoStartShipment cfg, final AutoStartShipmentDto dto, final User user)
+            throws RestServiceException {
+        //get locations.
+        final Set<Long> locFroms = new HashSet<>(dto.getStartLocations());
+        final Set<Long> locTos = new HashSet<>(dto.getEndLocations());
+
+        final Set<Long> allLoctions = new HashSet<Long>();
+        allLoctions.addAll(locFroms);
+        allLoctions.addAll(locTos);
+
+        final List<LocationProfile> loctions = locationProfileDao.findAll(allLoctions);
+        //check company access
+        for (final LocationProfile l : loctions) {
+            checkCompanyAccess(user, l);
+        }
+
+        //resolve locations
+        cfg.getShippedFrom().clear();
+        cfg.getShippedTo().clear();
+        for (final LocationProfile l : loctions) {
+            if (locFroms.contains(l.getId())) {
+                cfg.getShippedFrom().add(l);
+            } else {
+                cfg.getShippedTo().add(l);
+            }
+        }
+    }
+    /**
+     * @param dto
+     * @param tpl
+     * @param user
+     * @throws RestServiceException
+     */
+    private void fillTemplate(final AutoStartShipmentDto dto, final ShipmentTemplate tpl,
+            final User user) throws RestServiceException {
+        final AlertProfile ap = alertProfileDao.findOne(dto.getAlertProfile());
+        checkCompanyAccess(user, ap);
+
+        tpl.setAlertProfile(ap);
+        tpl.setAlertSuppressionMinutes(dto.getAlertSuppressionMinutes());
+        tpl.setArrivalNotificationWithinKm(dto.getArrivalNotificationWithinKm());
+        tpl.setCommentsForReceiver(dto.getCommentsForReceiver());
+        tpl.setName(dto.getName());
+        tpl.setNoAlertsAfterArrivalMinutes(dto.getNoAlertsAfterArrivalMinutes());
+        tpl.setShipmentDescription(dto.getShipmentDescription());
+        tpl.setShutDownAfterStartMinutes(dto.getShutDownAfterStartMinutes());
+        tpl.setShutdownDeviceAfterMinutes(dto.getShutdownDeviceAfterMinutes());
+        tpl.setExcludeNotificationsIfNoAlerts(dto.isExcludeNotificationsIfNoAlerts());
+        tpl.setAddDateShipped(dto.isAddDateShipped());
+
+        //get locations.
+        final Set<Long> alerts = new HashSet<>(dto.getAlertsNotificationSchedules());
+        final Set<Long> arrivals = new HashSet<>(dto.getArrivalNotificationSchedules());
+
+        final Set<Long> allLoctions = new HashSet<Long>();
+        allLoctions.addAll(alerts);
+        allLoctions.addAll(arrivals);
+
+        final List<NotificationSchedule> schedules = notificationScheduleDao.findAll(allLoctions);
+        //check company access
+        for (final NotificationSchedule n : schedules) {
+            checkCompanyAccess(user, n);
+        }
+
+        //resolve locations
+        tpl.getAlertsNotificationSchedules().clear();
+        tpl.getArrivalNotificationSchedules().clear();
+        for (final NotificationSchedule n : schedules) {
+            if (alerts.contains(n.getId())) {
+                tpl.getAlertsNotificationSchedules().add(n);
+            } else {
+                tpl.getArrivalNotificationSchedules().add(n);
+            }
         }
     }
     /**
@@ -213,8 +302,7 @@ public class AutoStartShipmentController extends AbstractController
      */
     private String[] getDefaultSortOrder() {
         return new String[] {
-            ID,
-            TEMPLATE
+            ID
         };
     }
 }

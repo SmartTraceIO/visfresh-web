@@ -22,6 +22,7 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
 
     private static final String ADDDATASHIPPED_FIELD = "adddatashipped";
     private static final String DETECTLOCATION_FIELD = "detectlocation";
+    public static final String AUTOSTART_FIELD = "isautostart";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     /**
@@ -74,6 +75,7 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
         tpl.setAddDateShipped((Boolean) map.get(ADDDATASHIPPED_FIELD));
         tpl.setDetectLocationForShippedFrom((Boolean) map.get(DETECTLOCATION_FIELD));
         tpl.setName((String) map.get(NAME_FIELD));
+        tpl.setAutostart(Boolean.TRUE.equals(map.get(AUTOSTART_FIELD)));
         return tpl;
     }
     /* (non-Javadoc)
@@ -85,6 +87,7 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
         params.put(ADDDATASHIPPED_FIELD, s.isAddDateShipped());
         params.put(DETECTLOCATION_FIELD, s.isDetectLocationForShippedFrom());
         params.put(NAME_FIELD, s.getName());
+        params.put(AUTOSTART_FIELD, s.isAutostart());
         return params;
     }
     /* (non-Javadoc)

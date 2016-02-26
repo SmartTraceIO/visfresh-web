@@ -4,6 +4,8 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +21,6 @@ public class AutoStartShipmentDaoTest extends
         BaseCrudTest<AutoStartShipmentDao, AutoStartShipment, Long> {
     private LocationProfile locFrom;
     private LocationProfile locTo;
-    private ShipmentTemplate template;
 
     /**
      * @param clazz the DAO class.
@@ -32,7 +33,6 @@ public class AutoStartShipmentDaoTest extends
     public void setUp() {
         locFrom = createLocation("From");
         locTo = createLocation("To");
-        template = createTemplate();
     }
 
     @Test
@@ -64,6 +64,16 @@ public class AutoStartShipmentDaoTest extends
         assertEquals(l2.getId(), cfg.getShippedFrom().get(0).getId());
         assertEquals(l1.getId(), cfg.getShippedTo().get(0).getId());
     }
+    @Test
+    public void testTemplateDeleted() {
+        final AutoStartShipment cfg = createTestEntity();
+        dao.save(cfg);
+
+        final ShipmentTemplateDao templateDao = getContext().getBean(ShipmentTemplateDao.class);
+        assertNotNull(templateDao.findOne(cfg.getTemplate().getId()));
+        dao.delete(cfg);
+        assertNull(templateDao.findOne(cfg.getTemplate().getId()));
+    }
 
     /**
      * @return shipment template.
@@ -93,7 +103,7 @@ public class AutoStartShipmentDaoTest extends
     @Override
     protected void assertCreateTestEntityOk(final AutoStartShipment cfg) {
         assertEquals(sharedCompany.getId(), cfg.getCompany().getId());
-        assertEquals(template.getId(), cfg.getTemplate().getId());
+        assertNotNull(cfg.getTemplate());
         assertEquals(10, cfg.getPriority());
         assertEquals(1, cfg.getShippedFrom().size());
         assertEquals(locFrom.getId(), cfg.getShippedFrom().get(0).getId());
@@ -109,7 +119,7 @@ public class AutoStartShipmentDaoTest extends
         final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setCompany(sharedCompany);
         cfg.setPriority(10);
-        cfg.setTemplate(template);
+        cfg.setTemplate(createTemplate());
         cfg.getShippedFrom().add(locFrom);
         cfg.getShippedTo().add(locTo);
         return cfg;

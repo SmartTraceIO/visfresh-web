@@ -18,6 +18,10 @@ public class ShipmentTemplate extends ShipmentBase {
      */
     private boolean detectLocationForShippedFrom;
     /**
+     * Is autostart template flag.
+     */
+    private boolean isAutostart;
+    /**
      * Name.
      */
     private String name;
@@ -70,5 +74,17 @@ public class ShipmentTemplate extends ShipmentBase {
      */
     public void setDetectLocationForShippedFrom(final boolean useLocationNearestToDevice) {
         this.detectLocationForShippedFrom = useLocationNearestToDevice;
+    }
+    /**
+     * @return the isAutostart
+     */
+    public boolean isAutostart() {
+        return isAutostart;
+    }
+    /**
+     * @param isAutostart the isAutostart to set
+     */
+    public void setAutostart(final boolean isAutostart) {
+        this.isAutostart = isAutostart;
     }
 }

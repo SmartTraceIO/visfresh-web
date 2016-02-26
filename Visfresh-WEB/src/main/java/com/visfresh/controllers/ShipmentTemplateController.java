@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.impl.ShipmentTemplateDaoImpl;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.io.ReferenceResolver;
@@ -94,12 +96,14 @@ public class ShipmentTemplateController extends AbstractController implements Sh
             final User user = getLoggedInUser(authToken);
             security.checkCanGetShipmentTemplates(user);
 
+            final Filter filter = new Filter();
+            filter.addFilter(ShipmentTemplateDaoImpl.AUTOSTART_FIELD, false);
             final List<ShipmentTemplate> templates = shipmentTemplateDao.findByCompany(
                     user.getCompany(),
                     createSorting(sc, so, getDefaultSortOrder(), 1),
                     page,
-                    null);
-            final int total = shipmentTemplateDao.getEntityCount(user.getCompany(), null);
+                    filter);
+            final int total = shipmentTemplateDao.getEntityCount(user.getCompany(), filter);
 
             final JsonArray array = new JsonArray();
             final ShipmentTemplateSerializer ser = createSerializer(user);

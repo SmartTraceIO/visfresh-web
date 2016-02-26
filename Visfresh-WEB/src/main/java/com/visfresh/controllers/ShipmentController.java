@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +44,7 @@ import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
-import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
@@ -108,7 +105,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     @Autowired
     private ArrivalEstimationService arrivalEstimationService;
     @Autowired
-    private ChartBundle alertDescriptionBuilder;
+    private ChartBundle chartBundle;
     @Autowired
     private LocationService locationService;
     @Autowired
@@ -174,7 +171,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             }
             return createSuccessResponse(serializer.toJson(resp));
         } catch (final Exception e) {
-            log.error("Failed to save device", e);
+            log.error("Failed to save shipment by request: " + jsonRequest, e);
             return createErrorResponse(e);
         }
     }
@@ -511,11 +508,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     protected SingleShipmentDtoNew createDto(final Shipment s, final User user) {
         final SingleShipmentDto dtoOld = getShipmentData(s);
-        final String description = dtoOld.getShipmentDescription();
-        if (description != null && description.toLowerCase().contains("test")) {
-            generateTestData(dtoOld, s);
-        }
-
         final SingleShipmentDtoNew dto = createNewSingleShipmentData(s, dtoOld, user);
 
         double minTemp = 1000.;
@@ -607,76 +599,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             list.add(ruleBundle.buildDescription(rule, user.getTemperatureUnits()));
         }
         return StringUtils.combine(list, ", ");
-    }
-    /**
-     * @param dto
-     */
-    private void generateTestData(final SingleShipmentDto dto, final Shipment s) {
-        final int count = 20;
-        final long ddate = 5 * 60 * 1000l;
-        final long t0 = System.currentTimeMillis() - ddate * count;
-        dto.setShipmentDate(new Date(t0));
-
-        if (s.getShippedFrom() == null || s.getShippedTo() == null) {
-            return;
-        }
-        final List<Alert> allAlerts = new LinkedList<>();
-
-        final double lat0 = s.getShippedFrom().getLocation().getLatitude();
-        double nlat = lat0 - s.getShippedTo().getLocation().getLatitude();
-        final double lon0 = s.getShippedFrom().getLocation().getLongitude();
-        double nlon = lon0 - s.getShippedTo().getLocation().getLongitude();
-        final double norma = Math.sqrt(nlat * nlat + nlon * nlon);
-
-        //normalize n
-        nlat /= norma;
-        nlon /= norma;
-
-        final Random random = new Random();
-        final double dl = norma / (count + 5);
-        for (int i = 0; i < count; i++) {
-            final double lat;
-            final double lon;
-
-            if (dl > 0) {
-                lat = lat0 + i * dl * nlat;
-                lon = lon0 + i * dl * nlon;
-            } else {
-                lat = lat0;
-                lon = lon0;
-            }
-
-            final Date date = new Date(t0 + i * ddate);
-            final TrackerEvent e = new TrackerEvent();
-            e.setDevice(s.getDevice());
-            e.setId((long) i);
-            e.setTime(date);
-            e.setLatitude(lat);
-            e.setLongitude(lon);
-            e.setTemperature(13. + 3. * (random.nextDouble() - 0.5));
-            e.setShipment(s);
-            e.setType(TrackerEventType.AUT);
-
-            final SingleShipmentTimeItem item = new SingleShipmentTimeItem();
-            item.setEvent(e);
-
-            if (i % 5 == 0) {
-                //create alert
-                final TemperatureAlert ta = new TemperatureAlert();
-                ta.setTemperature(e.getTemperature());
-                ta.setDate(date);
-                ta.setId((long) i);
-                ta.setType(AlertType.Hot);
-                ta.setShipment(s);
-                ta.setDevice(s.getDevice());
-                item.getAlerts().add(ta);
-                allAlerts.add(ta);
-            }
-
-            dto.getItems().add(item);
-        }
-
-        dto.getAlertSummary().putAll(toSummaryMap(allAlerts));
     }
     /**
      * @param dtoOld
@@ -800,7 +722,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private SingleShipmentAlert createLastReadingAlert(final TrackerEvent event,
             final User user, final String address, final String timeIso) {
-        final String text = alertDescriptionBuilder.buildTrackerEventDescription(user, event);
+        final String text = chartBundle.buildTrackerEventDescription(user, event);
         return createSingleShipmentAlert("LastReading", text);
     }
     /**
@@ -810,7 +732,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private SingleShipmentAlert createSingleShipmentAlert(final Arrival a, final TrackerEvent trackerEvent,
             final User user) {
-        final String text = alertDescriptionBuilder.buildDescription(user, a, trackerEvent);
+        final String text = chartBundle.buildDescription(user, a, trackerEvent);
         return createSingleShipmentAlert("ArrivalNotice", text);
     }
     /**
@@ -820,7 +742,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private SingleShipmentAlert createSingleShipmentAlert(
             final Alert a, final TrackerEvent trackerEvent, final User user) {
-        final String text = alertDescriptionBuilder.buildDescription(user, a, trackerEvent);
+        final String text = chartBundle.buildDescription(user, a, trackerEvent);
         return createSingleShipmentAlert(a.getType().name(), text);
     }
     /**

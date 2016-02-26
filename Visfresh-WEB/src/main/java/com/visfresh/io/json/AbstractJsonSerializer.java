@@ -166,6 +166,17 @@ public class AbstractJsonSerializer {
         return array;
     }
     /**
+     * @param entities list of entity.
+     * @return JSON array with entity IDs.
+     */
+    protected JsonArray toJsonArray(final List<Long> entities) {
+        final JsonArray array= new JsonArray();
+        for (final Long e : entities) {
+            array.add(new JsonPrimitive(e));
+        }
+        return array;
+    }
+    /**
      * @return date format.
      */
     protected SimpleDateFormat createDateFormat() {

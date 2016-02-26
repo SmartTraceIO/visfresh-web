@@ -68,7 +68,7 @@ public class RuleBundle extends NotificationIssueBundle {
             //only temperature alert rules. Other should be returned before.
             map.put("temperature", LocalizationUtils.getTemperatureString(tr.getTemperature(), units));
             //append time
-            map.put("minutes", Integer.toString(tr.getTimeOutMinutes()));
+            map.put("ruleperiod", Integer.toString(tr.getTimeOutMinutes()));
         }
 
         return map;

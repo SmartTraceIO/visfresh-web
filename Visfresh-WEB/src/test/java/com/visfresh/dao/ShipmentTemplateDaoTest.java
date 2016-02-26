@@ -4,6 +4,7 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -183,6 +184,7 @@ public class ShipmentTemplateDaoTest
         assertEquals(1, tpl.getArrivalNotificationSchedules().size());
         assertTrue(tpl.isAddDateShipped());
         assertTrue(tpl.isDetectLocationForShippedFrom());
+        assertFalse(tpl.isAutostart());
     }
     @Test
     public void testFindByCompany() {
@@ -222,5 +224,15 @@ public class ShipmentTemplateDaoTest
         assertEquals(1, tpl.getArrivalNotificationSchedules().size());
         assertTrue(tpl.isAddDateShipped());
         assertTrue(tpl.isDetectLocationForShippedFrom());
+        assertFalse(tpl.isAutostart());
+    }
+    @Test
+    public void autoStartShipment() {
+        ShipmentTemplate t = createTestEntity();
+        t.setAutostart(true);
+        t = dao.save(t);
+
+        assertEquals(1, dao.findAll(null, null, null).size());
+        assertNotNull(dao.findOne(t.getId()));
     }
 }

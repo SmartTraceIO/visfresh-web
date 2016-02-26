@@ -36,14 +36,41 @@ public class AutoStartShipmentSerializerTest {
         AutoStartShipmentDto dto = new AutoStartShipmentDto();
         final int priority = 5;
         final Long id = 7l;
-        final Long template = 8l;
         final Long loc1 = 1l;
         final Long loc2 = 2l;
         final Long loc3 = 3l;
         final Long loc4 = 4l;
 
+        //template
+        final int alertSuppressionMinutes = 25;
+        final Long alertProfile = 7l;
+        final Integer arrivalNotificationWithinKm = 15;
+        final boolean excludeNotificationsIfNoAlerts = true;
+        final Integer shutdownDeviceAfterMinutes = 99;
+        final Integer noAlertsAfterArrivalMinutes = 43;
+        final Integer shutDownAfterStartMinutes = 47;
+        final String commentsForReceiver = "Any comments for receiver";
+        final String name = "JUnit name";
+        final String shipmentDescription = "JUnit shipment";
+        final boolean addDateShipped = true;
+
+        dto.setAlertSuppressionMinutes(alertSuppressionMinutes);
+        dto.setAlertProfile(alertProfile);
+        dto.getAlertsNotificationSchedules().add(1L);
+        dto.getAlertsNotificationSchedules().add(2L);
+        dto.setArrivalNotificationWithinKm(arrivalNotificationWithinKm);
+        dto.getArrivalNotificationSchedules().add(3l);
+        dto.getArrivalNotificationSchedules().add(4l);
+        dto.setExcludeNotificationsIfNoAlerts(excludeNotificationsIfNoAlerts);
+        dto.setShutdownDeviceAfterMinutes(shutdownDeviceAfterMinutes);
+        dto.setNoAlertsAfterArrivalMinutes(noAlertsAfterArrivalMinutes);
+        dto.setShutDownAfterStartMinutes(shutDownAfterStartMinutes);
+        dto.setCommentsForReceiver(commentsForReceiver);
+        dto.setName(name);
+        dto.setShipmentDescription(shipmentDescription);
+        dto.setAddDateShipped(addDateShipped);
+
         dto.setId(id);
-        dto.setTemplate(template);
         dto.setPriority(priority);
         dto.getStartLocations().add(loc1);
         dto.getStartLocations().add(loc2);
@@ -54,10 +81,26 @@ public class AutoStartShipmentSerializerTest {
 
         assertEquals(id, dto.getId());
         assertEquals(priority, dto.getPriority());
-        assertEquals(template, dto.getTemplate());
         assertEquals(loc1, dto.getStartLocations().get(0));
         assertEquals(loc2, dto.getStartLocations().get(1));
         assertEquals(loc3, dto.getEndLocations().get(0));
         assertEquals(loc4, dto.getEndLocations().get(1));
+
+        //template
+        assertEquals(alertSuppressionMinutes, dto.getAlertSuppressionMinutes());
+        assertEquals(alertProfile, dto.getAlertProfile());
+        assertEquals(1l, dto.getAlertsNotificationSchedules().get(0).longValue());
+        assertEquals(2l, dto.getAlertsNotificationSchedules().get(1).longValue());
+        assertEquals(arrivalNotificationWithinKm, dto.getArrivalNotificationWithinKm());
+        assertEquals(3l, dto.getArrivalNotificationSchedules().get(0).longValue());
+        assertEquals(4l, dto.getArrivalNotificationSchedules().get(1).longValue());
+        assertEquals(excludeNotificationsIfNoAlerts, dto.isExcludeNotificationsIfNoAlerts());
+        assertEquals(shutdownDeviceAfterMinutes, dto.getShutdownDeviceAfterMinutes());
+        assertEquals(noAlertsAfterArrivalMinutes, dto.getNoAlertsAfterArrivalMinutes());
+        assertEquals(shutDownAfterStartMinutes, dto.getShutDownAfterStartMinutes());
+        assertEquals(commentsForReceiver, dto.getCommentsForReceiver());
+        assertEquals(name, dto.getName());
+        assertEquals(shipmentDescription, dto.getShipmentDescription());
+        assertEquals(addDateShipped, dto.isAddDateShipped());
     }
 }
