@@ -595,7 +595,7 @@ see [ResponseStatus](#markdown-header-response-status)
   "description": "Device description",
   "imei": "0239487043987",
   "name": "Device Name",
-  "enabled": true,
+  "active": true,
   "sn": "043987" // read only property
 }
 ```
@@ -1857,7 +1857,7 @@ Response:
 {
   "description": "Device description",
   "imei": "0239487043987",
-  "enabled": true,
+  "active": true,
   "name": "Device Name"
 }
 ```  
@@ -1885,7 +1885,7 @@ Response:
       "imei": "3333333333333",
       "name": "Device Name",
       "sn": "333333",
-      "enabled": true,
+      "active": true,
       "lastShipmentId": 1246,
       "lastReadingTimeISO": "2016-02-26 18:57",
       "lastReadingTemperature": 11.0,
@@ -1898,7 +1898,7 @@ Response:
       "imei": "4444444444444",
       "name": "Device Name",
       "sn": "444444",
-      "enabled": true,
+      "active": true,
       "lastShipmentId": 1246,
       "lastReadingTimeISO": "2016-02-26 18:57",
       "lastReadingTemperature": 11.0,
@@ -2231,7 +2231,7 @@ Response:
     "id": "923487509328",
     "imei": "923487509328",
     "name": "Device Name",
-    "enabled": true,
+    "active": true,
     "sn": "1"
   }
 }
