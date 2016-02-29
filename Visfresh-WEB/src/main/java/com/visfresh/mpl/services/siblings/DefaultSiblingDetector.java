@@ -39,10 +39,6 @@ public class DefaultSiblingDetector implements SiblingDetector {
      */
     private static final Logger log = LoggerFactory.getLogger(DefaultSiblingDetector.class);
     protected static final double MAX_DISTANCE_AVERAGE = 3000; //meters
-    /**
-     * Group name prefix.
-     */
-    private static final String GROUP_PREFIX = "siblingGroup_";
 
     /**
      * Number of sibling detection threads.
@@ -259,14 +255,6 @@ public class DefaultSiblingDetector implements SiblingDetector {
      */
     private boolean isSiblings(final Shipment s, final Shipment master,
             final TrackerEvent[] masterEvents) {
-        //check test group
-        final String masterTestGroup = getSiblingTestGroup(master);
-        final String testGroup = getSiblingTestGroup(s);
-
-        if (testGroup != null) {
-            return testGroup.equals(masterTestGroup);
-        }
-
         //check ordinary group
         if (masterEvents.length > 0) {
             return isSiblings(s, masterEvents);
@@ -446,20 +434,5 @@ public class DefaultSiblingDetector implements SiblingDetector {
                 break;
             }
         }
-    }
-    /**
-     * @param shipment
-     * @return
-     */
-    private String getSiblingTestGroup(final Shipment shipment) {
-        final String desc = shipment.getShipmentDescription();
-        if (desc != null) {
-            for (final String seg: desc.split("[^\\w]+")) {
-                if (seg.startsWith(GROUP_PREFIX)) {
-                    return seg.substring(GROUP_PREFIX.length());
-                }
-            }
-        }
-        return null;
     }
 }

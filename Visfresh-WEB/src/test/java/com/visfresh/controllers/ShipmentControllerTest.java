@@ -33,7 +33,6 @@ import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
-import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -390,33 +389,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
         assertNotNull(sd);
     }
-    @Test
-    public void testGetTestSingleShipment() throws RestServiceException, IOException {
-        final Shipment s = createShipment(true);
-
-        //correct location
-        final LocationProfile shippedTo = s.getShippedTo();
-        final Location loc = shippedTo.getLocation();
-        loc.setLatitude(loc.getLatitude() + 10);
-        loc.setLongitude(loc.getLongitude() + 10);
-        context.getBean(LocationProfileDao.class).save(shippedTo);
-
-        s.setShipmentDescription("JUnit test shipment siblingGroup_test");
-        s.setStatus(ShipmentStatus.Arrived);
-        s.setArrivalDate(new Date());
-        context.getBean(ShipmentDao.class).save(s);
-
-        //create siblings
-        final Shipment sibling = createShipment(true);
-        sibling.setShippedTo(shippedTo);
-        sibling.setShipmentDescription("JUnit test sibling shipment siblingGroup_test");
-        context.getBean(ShipmentDao.class).save(sibling);
-
-        final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
-        assertNotNull(sd);
-    }
-    //@RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getShipments(@PathVariable final String authToken) {
     @Test
     public void testGetShipmentsFiltered() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);

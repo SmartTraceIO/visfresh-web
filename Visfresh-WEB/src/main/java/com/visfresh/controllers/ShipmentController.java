@@ -41,6 +41,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Location;
+import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -202,6 +203,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             newShipment.setId(current.getId());
             newShipment.setStatus(ShipmentStatus.InProgress);
             newShipment.setTripCount(current.getTripCount());
+            if (current.getShipmentDate() != null) {
+                newShipment.setShipmentDate(current.getShipmentDate());
+            }
         }
 
         final Long resultId = shipmentDao.save(newShipment).getId();
@@ -770,7 +774,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @return single shipment data.
      */
     private SingleShipmentDto getShipmentData(final Shipment s) {
-        final SingleShipmentDto dto = creatSingleShipmentDto(s);
+        final SingleShipmentDto dto = new SingleShipmentDto(s);
 
         //create best tracker event candidate/alert map
         final List<TrackerEvent> events = trackerEventDao.getEvents(s);
@@ -784,7 +788,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             //add alerts
             final List<Alert> alerts = alertDao.getAlerts(s);
             for (final Alert alert : alerts) {
-                final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), alert.getDate());
+                final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), alert);
                 item.getAlerts().add(alert);
             }
 
@@ -793,7 +797,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             //add arrivals
             final List<Arrival> arrivals = arrivalDao.getArrivals(s);
             for (final Arrival arrival : arrivals) {
-                final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), arrival.getDate());
+                final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), arrival);
                 item.getArrivals().add(arrival);
             }
         }
@@ -818,24 +822,35 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         return map;
     }
     /**
-     * @param items
-     * @param date
+     * @param items tracker events.
+     * @param issue notification issue.
      * @return
      */
-    private SingleShipmentTimeItem getBestCandidate(final List<SingleShipmentTimeItem> items, final Date date) {
-        for (final SingleShipmentTimeItem i : items) {
-            if (i.getEvent().getTime().equals(date) || i.getEvent().getTime().after(date)) {
-                return i;
+    private SingleShipmentTimeItem getBestCandidate(final List<SingleShipmentTimeItem> items, final NotificationIssue issue) {
+        //first of all attempt to found by tracker event ID.
+        final Long trackerEventId = issue.getTrackerEventId();
+        if (trackerEventId != null) {
+            //for new alerts the tracker event ID should not be null.
+            for (final SingleShipmentTimeItem i : items) {
+                if (i.getEvent().getId().equals(trackerEventId)) {
+                    return i;
+                }
             }
         }
-        return items.get(items.size() - 1);
-    }
 
-    /**
-     * @param shipment
-     * @return
-     */
-    private SingleShipmentDto creatSingleShipmentDto(final Shipment shipment) {
-        return new SingleShipmentDto(shipment);
+        //support of old version where tracker event ID is null.
+        final long time = issue.getDate().getTime();
+        long distance = Long.MAX_VALUE;
+
+        SingleShipmentTimeItem best = null;
+        for (final SingleShipmentTimeItem i : items) {
+            final long currentDistance = Math.abs(i.getEvent().getTime().getTime() - time);
+            if (currentDistance < distance) {
+                distance = currentDistance;
+                best = i;
+            }
+        }
+
+        return best;
     }
 }
