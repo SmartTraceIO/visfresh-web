@@ -92,7 +92,7 @@ public class NotificationIssueBundle {
             //${readingTime}      the time reading occured in user's timezone - eg. 4:34am
             map.put("readingTime", createDateFormat(user, "K:mma").format(trackerEvent.getTime()));
             //${readingDate}      the date reading occured in user's timezone - eg. 12 Feb 2016
-            map.put("readingDate", createDateFormat(user, "yyyy-HH-mm").format(trackerEvent.getTime()));
+            map.put("readingDate", createDateFormat(user, "dd MMM yyyy").format(trackerEvent.getTime()));
             //${temperature}
             //${readingTemperature}  the temperature in user's temperature scale (C/F) at time of alert
             final String t = LocalizationUtils.getTemperatureString(

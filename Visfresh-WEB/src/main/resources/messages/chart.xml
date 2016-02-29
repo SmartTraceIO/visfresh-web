@@ -30,89 +30,89 @@
 	<entry key="Cold">
 		Cold Alert for Tracker ${devicesn}(${tripCount}) 
 		Below ${ruletemperature}°C for more than ${ruleperiod} mins 
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- CriticalCold chart -->
 	<entry key="CriticalCold">
 		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) 
 		Below ${ruletemperature}°C for more than ${ruleperiod} mins 
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- Cold Cumulative chart -->
 	<entry key="Cold.cumulative">
 		Cold Alert for Tracker ${devicesn}(${tripCount}) 
 		Below ${ruletemperature}°C for more than ${ruleperiod} total minutes  
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- CriticalCold Cumulative chart -->
 	<entry key="CriticalCold.cumulative">
 		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) 
 		Below ${ruletemperature}°C for more than ${ruleperiod} total minutes  
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- //////////////////////////////////////////// Hot  //////////////////////////////////////////////////////////////////-->
 	<entry key="Hot">
 		Hot Alert for Tracker ${devicesn}(${tripCount}) 
 		Above ${ruletemperature}°C for more than ${ruleperiod} mins 
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- CriticalHot chart -->
 	<entry key="CriticalHot">
 		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) 
 		Above ${ruletemperature}°C for more than ${ruleperiod} mins 
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- Hot Cumulative chart -->
 	<entry key="Hot.cumulative">
 		Hot Alert for Tracker ${devicesn}(${tripCount}) 
 		Above ${ruletemperature}°C for more than ${ruleperiod} total minutes  
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- CriticalHot Cumulative chart -->
 	<entry key="CriticalHot.cumulative">
 		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) 
 		Above ${ruletemperature}°C for more than ${ruleperiod} total minutes  
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 	
 	<!-- Not temperature alerts -->
 	<entry key="MovementStart">
 		Sudden movement occurred at ${time}
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 	<entry key="LightOn">
 		Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 	<entry key="LightOff">
 		Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- //////////////////////////////////////////// Arrival  //////////////////////////////////////////////////////////////////-->
 	<!-- Arrival -->
 	<entry key="Arrival">
 		Arrival Alert for Tracker ${devicesn}(${tripCount}) 
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- //////////////////////////////////////////// Battery  //////////////////////////////////////////////////////////////////-->
 	<!-- Battery -->
 	<entry key="Battery">
 		Low Battery Alert for Tracker ${devicesn}(${tripCount}) 
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 	
 	<!-- Last reading -->
 	<entry key="TrackerEvent">
 		Last reading for Tracker #${devicesn}(${tripCount})
-		${readingTemperature} | ${readingTime} ${readingDate}
+		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 </properties>
