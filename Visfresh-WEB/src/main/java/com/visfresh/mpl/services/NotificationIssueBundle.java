@@ -16,6 +16,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AbstractJsonSerializer;
@@ -114,13 +115,23 @@ public class NotificationIssueBundle {
 
             if (issue instanceof TemperatureAlert) {
                 final TemperatureAlert ta = (TemperatureAlert) issue;
-                //${ruletemperature}  the temperature in alert rule
-                map.put("ruletemperature", LocalizationUtils.getTemperatureString(
-                        ta.getTemperature(), user.getTemperatureUnits()));
-                //${ruleperiod}       the time period in alert rule
                 final String period = Integer.toString(ta.getMinutes());
-                map.put("ruleperiod", period);
                 map.put("period", period);
+
+                //find rule
+                final TemperatureRule rule = getRule(ta);
+                if (rule == null) {//old version
+                    //${ruleperiod}       the time period in alert rule
+                    map.put("ruleperiod", period);
+                    //${ruletemperature}  the temperature in alert rule
+                    map.put("ruletemperature", LocalizationUtils.getTemperatureString(
+                            ta.getTemperature(), user.getTemperatureUnits()));
+                } else {//new version which supports the rule ID.
+                    map.put("ruleperiod", Integer.toString(rule.getTimeOutMinutes()));
+                    //${ruletemperature}  the temperature in alert rule
+                    map.put("ruletemperature", LocalizationUtils.getTemperatureString(
+                            rule.getTemperature(), user.getTemperatureUnits()));
+                }
             }
         } else if (issue instanceof Arrival) {
             final Arrival a = (Arrival) issue;
@@ -128,6 +139,20 @@ public class NotificationIssueBundle {
         }
 
         return map;
+    }
+    /**
+     * @param ta temperature alert.
+     * @return temperature rule.
+     */
+    private TemperatureRule getRule(final TemperatureAlert ta) {
+        if (ta.getRuleId() != null && ta.getShipment().getAlertProfile() != null) {
+            for (final TemperatureRule rule: ta.getShipment().getAlertProfile().getAlertRules()) {
+                if (ta.getRuleId().equals(rule.getId())) {
+                    return rule;
+                }
+            }
+        }
+        return null;
     }
     /**
      * @param issue notification issue alert/arrival

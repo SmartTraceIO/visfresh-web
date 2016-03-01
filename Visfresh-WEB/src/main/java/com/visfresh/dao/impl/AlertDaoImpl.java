@@ -38,6 +38,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
     protected static final String DATE_FIELD = "date";
     protected static final String CUMULATIVE_FIELD = "cumulative";
     protected static final String TRACKER_EVENT_FIELD = "event";
+    protected static final String RULE_FIELD = "rule";
 
     @Autowired
     private ShipmentDao shipmentDao;
@@ -78,6 +79,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         paramMap.put(TEMPERATURE_FIELD, isTemperature ? ((TemperatureAlert) alert).getTemperature() : -1);
         paramMap.put(MINUTES_FIELD, isTemperature ? ((TemperatureAlert) alert).getMinutes() : -1);
         paramMap.put(CUMULATIVE_FIELD, isTemperature ? ((TemperatureAlert) alert).isCumulative() : false);
+        paramMap.put(RULE_FIELD, isTemperature ? ((TemperatureAlert) alert).getRuleId() : null);
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -98,6 +100,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         fields.add(MINUTES_FIELD);
         fields.add(DATE_FIELD);
         fields.add(CUMULATIVE_FIELD);
+        fields.add(RULE_FIELD);
         if (includeId) {
             fields.add(ID_FIELD);
         }
@@ -207,6 +210,9 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
                 ta.setTemperature(((Number) map.get(TEMPERATURE_FIELD)).doubleValue());
                 ta.setMinutes(((Number) map.get(MINUTES_FIELD)).intValue());
                 ta.setCumulative((Boolean) map.get(CUMULATIVE_FIELD));
+                if (map.get(RULE_FIELD) != null) {
+                    ta.setRuleId(((Number) map.get(RULE_FIELD)).longValue());
+                }
                 a = ta;
                 break;
             default:

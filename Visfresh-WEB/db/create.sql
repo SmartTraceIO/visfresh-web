@@ -267,6 +267,7 @@ create table alerts (
 	cumulative boolean not null default true,
     device varchar(127) not null,
     shipment bigint(20) not null,
+    rule bigint(20) default null, -- reference to rule for temperature alerts
     event bigint(20),
     primary key (id),
     foreign key (shipment)

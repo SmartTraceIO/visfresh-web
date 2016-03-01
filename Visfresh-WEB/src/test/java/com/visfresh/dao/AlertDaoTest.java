@@ -95,6 +95,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         alert.setTemperature(100);
         alert.setCumulative(true);
         alert.setMinutes(15);
+        alert.setRuleId(77l);
         return alert;
     }
     /* (non-Javadoc)
@@ -111,6 +112,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         assertEquals(15, a.getMinutes());
         assertTrue(a.isCumulative());
         assertEquals(77777l, alert.getTrackerEventId().longValue());
+        assertEquals(77l, a.getRuleId().longValue());
 
         final Device d = a.getDevice();
         assertNotNull(d);
@@ -146,6 +148,7 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         assertEquals(100, a.getTemperature(), 0.00001);
         assertEquals(15, a.getMinutes());
         assertEquals(77777l, a.getTrackerEventId().longValue());
+        assertEquals(77l, a.getRuleId().longValue());
 
         final Device d = a.getDevice();
         assertNotNull(d);

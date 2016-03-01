@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 
 /**
@@ -187,6 +187,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         alert.setCumulative(true);
         alert.setTemperature(rule.getTemperature());
         alert.setType(rule.getType());
+        alert.setRuleId(rule.getId());
         return alert;
     }
     /**

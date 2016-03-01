@@ -21,6 +21,10 @@ public class TemperatureAlert extends Alert {
      * Is cumulative.
      */
     private boolean cumulative;
+    /**
+     * ID of rule which creates given alert..
+     */
+    private Long ruleId;
 
     /**
      * Default constructor.
@@ -80,5 +84,17 @@ public class TemperatureAlert extends Alert {
      */
     public boolean isCumulative() {
         return cumulative;
+    }
+    /**
+     * @return the ruleId
+     */
+    public Long getRuleId() {
+        return ruleId;
+    }
+    /**
+     * @param ruleId the ruleId to set
+     */
+    public void setRuleId(final Long ruleId) {
+        this.ruleId = ruleId;
     }
 }

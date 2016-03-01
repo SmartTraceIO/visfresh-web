@@ -3,7 +3,9 @@
  */
 package com.visfresh.l12n;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
@@ -13,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
@@ -21,10 +24,11 @@ import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
-import com.visfresh.l12n.ChartBundle;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -70,6 +74,7 @@ public class ChartBundleTest extends ChartBundle {
         user.setEmail("developer@visfresh.com");
         user.setFirstName("JUnit");
         user.setLastName("JUnit");
+        user.setTemperatureUnits(TemperatureUnits.Fahrenheit);
 
         trackerEvent = new TrackerEvent();
         trackerEvent.setId(7l);
@@ -143,6 +148,42 @@ public class ChartBundleTest extends ChartBundle {
         final String msg = buildTrackerEventDescription(user, trackerEvent);
         assertNotNull(msg);
         assertPlaceholdersResolved(null, msg);
+    }
+    @Test
+    public void testRuleVariablesSupport() {
+        final int period = 15;
+        final double temperature = 123.456;
+
+        //Temperature alerts
+        final TemperatureAlert alert = new TemperatureAlert();
+        alert.setDate(new Date());
+        alert.setDevice(shipment.getDevice());
+        alert.setShipment(shipment);
+        alert.setType(AlertType.Hot);
+        alert.setMinutes(period);
+        alert.setTemperature(temperature);
+
+        //check without rule set
+        String msg = buildDescription(user, alert, trackerEvent);
+        assertTrue(msg.indexOf(Integer.toString(period)) > 0);
+
+        //check with rule set
+        final TemperatureRule rule = new TemperatureRule(AlertType.Hot);
+        this.shipment.setAlertProfile(new AlertProfile());
+        this.shipment.getAlertProfile().getAlertRules().add(rule);
+
+        final Long ruleId = 125l;
+        final double ruleTemperature = 654.321;
+        final int rulePeriod = 98;
+
+        rule.setId(ruleId);
+        rule.setTemperature(ruleTemperature);
+        rule.setTimeOutMinutes(rulePeriod);
+        alert.setRuleId(ruleId);
+
+        msg = buildDescription(user, alert, trackerEvent);
+        assertFalse(msg.indexOf(Integer.toString(period)) > 0);
+        assertTrue(msg.indexOf(Integer.toString(rulePeriod)) > 0);
     }
 
     /**

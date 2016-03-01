@@ -3,6 +3,7 @@
  */
 package com.visfresh.io.json;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +15,9 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ShipmentConstants;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -33,6 +36,7 @@ import com.visfresh.io.shipment.SingleShipmentDtoNew;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.lists.ListShipmentItem;
+import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -664,5 +668,39 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
         json.addProperty("type", alert.getType());
         return json;
+    }
+    public static void main(final String[] args) throws Exception {
+        final ShipmentSerializer ser = new ShipmentSerializer(new User());
+        ser.setReferenceResolver(new ReferenceResolver() {
+            @Override
+            public Device getDevice(final String id) {
+                return null;
+            }
+            @Override
+            public NotificationSchedule getNotificationSchedule(final Long id) {
+                return null;
+            }
+            @Override
+            public LocationProfile getLocationProfile(final Long id) {
+                return null;
+            }
+            @Override
+            public AlertProfile getAlertProfile(final Long id) {
+                return null;
+            }
+        });
+
+        final String req;
+        final InputStream in = ShipmentSerializer.class.getResourceAsStream("req.json");
+        try {
+            req = StringUtils.getContent(in, "UTF-8");
+        } finally {
+            in.close();
+        }
+
+        final JsonObject json = SerializerUtils.parseJson(req).getAsJsonObject();
+
+        final SaveShipmentRequest s = ser.parseSaveShipmentRequest(json);
+        System.out.println(s);
     }
 }

@@ -22,6 +22,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
@@ -163,6 +164,40 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         final Alert alert = alertDao.findAll(null, null, null).get(0);
         assertEquals(e.getId(), alert.getTrackerEventId());
+    }
+    @Test
+    public void testRuleIdSet() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final TemperatureRule r = new TemperatureRule(AlertType.Hot);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(false);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        final DeviceState state = new DeviceState();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(0, alertDao.findAll(null, null, null).size());
+
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
+        rule.handle(new RuleContext(e, state));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        final TemperatureAlert alert = (TemperatureAlert) alertDao.findAll(null, null, null).get(0);
+        assertEquals(r.getId(), alert.getRuleId());
     }
     @Test
     public void testCumulativeHotTemperatureAlert() {

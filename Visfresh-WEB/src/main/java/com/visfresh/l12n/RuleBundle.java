@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
-import com.visfresh.mpl.services.NotificationIssueBundle;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -21,7 +20,7 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class RuleBundle extends NotificationIssueBundle {
+public class RuleBundle {
     private static final String BUNDLE_NAME = "rules";
 
     /**

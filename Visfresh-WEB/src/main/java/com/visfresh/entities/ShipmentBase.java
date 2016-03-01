@@ -204,10 +204,10 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
     }
 
     /**
-     * @param excludeNotificationsIfNoAlertsFired the excludeNotificationsIfNoAlertsFired to set
+     * @param b the excludeNotificationsIfNoAlertsFired to set
      */
-    public void setExcludeNotificationsIfNoAlerts(final boolean excludeNotificationsIfNoAlertsFired) {
-        this.excludeNotificationsIfNoAlerts = excludeNotificationsIfNoAlertsFired;
+    public void setExcludeNotificationsIfNoAlerts(final Boolean b) {
+        this.excludeNotificationsIfNoAlerts = Boolean.TRUE.equals(b);
     }
 
     /**
