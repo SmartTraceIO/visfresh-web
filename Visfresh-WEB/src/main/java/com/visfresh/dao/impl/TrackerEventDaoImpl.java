@@ -27,7 +27,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.entities.UnresolvedTrackerEvent;
+import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -269,7 +269,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      * @see com.visfresh.dao.TrackerEventDao#getLastEvents(java.util.List)
      */
     @Override
-    public List<UnresolvedTrackerEvent> getLastEvents(final List<Device> devices) {
+    public List<ShortTrackerEvent> getLastEvents(final List<Device> devices) {
         if (devices.isEmpty()) {
             return new LinkedList<>();
         }
@@ -296,13 +296,13 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
             sqls.add(sql);
         }
 
-        final List<UnresolvedTrackerEvent> result = new LinkedList<>();
+        final List<ShortTrackerEvent> result = new LinkedList<>();
         final List<Map<String, Object>> rows = jdbc.queryForList(StringUtils.combine(sqls, " UNION "), params);
 
         for (final Map<String, Object> row : rows) {
             final TrackerEvent e = createEntity(row);
 
-            final UnresolvedTrackerEvent ue = new UnresolvedTrackerEvent();
+            final ShortTrackerEvent ue = new ShortTrackerEvent();
             ue.setBattery(e.getBattery());
             ue.setId(e.getId());
             ue.setLatitude(e.getLatitude());

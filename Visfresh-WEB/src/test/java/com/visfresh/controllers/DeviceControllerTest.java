@@ -80,13 +80,13 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         context.getBean(DeviceDao.class).delete(toRemove);
 
         //create readings with shipment
-        createTrackerEvent(d1, s1);
-        final TrackerEvent e1 = createTrackerEvent(d1, s1);
+        createTrackerEvent(d1, s1, 11.);
+        final TrackerEvent e1 = createTrackerEvent(d1, s1, 23.456);
 
         final Device d2 = createDevice("4444444444444", true);
         //create readings without shipment
-        createTrackerEvent(d2, null);
-        createTrackerEvent(d2, null);
+        createTrackerEvent(d2, null, 11.);
+        createTrackerEvent(d2, null, 11.);
 
         assertEquals(4, client.getDevices(null, null).size());
         assertEquals(1, client.getDevices(1, 1).size());
@@ -105,7 +105,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(e1.getBattery(), item.getLastReadingBattery().intValue());
         assertEquals(e1.getLatitude(), item.getLastReadingLat(), 0.0001);
         assertEquals(e1.getLongitude(), item.getLastReadingLong(), 0.0001);
-        assertEquals(e1.getTemperature(), item.getLastReadingTemperature(), 0.0001);
+        assertEquals(23.46, item.getLastReadingTemperature(), 0.0001);
         assertNotNull(item.getLastReadingTimeISO());
         assertEquals(e1.getShipment().getId(), item.getLastShipmentId());
     }
@@ -120,12 +120,12 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
      * @param device device.
      * @param shipment shipment.
      */
-    private TrackerEvent createTrackerEvent(final Device device, final Shipment shipment) {
+    private TrackerEvent createTrackerEvent(final Device device, final Shipment shipment, final double t) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(27);
         e.setDevice(device);
         e.setShipment(shipment);
-        e.setTemperature(11);
+        e.setTemperature(t);
         e.setTime(new Date());
         e.setType(TrackerEventType.INIT);
         return context.getBean(TrackerEventDao.class).save(e);

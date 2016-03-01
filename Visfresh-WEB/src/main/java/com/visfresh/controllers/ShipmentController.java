@@ -266,7 +266,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             }
             return createListSuccessResponse(array, total);
         } catch (final Exception e) {
-            log.error("Failed to get devices", e);
+            log.error("Failed to get shipments", e);
             return createErrorResponse(e);
         }
     }
@@ -441,7 +441,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
             return createSuccessResponse(getSerializer(user).toJson(shipment));
         } catch (final Exception e) {
-            log.error("Failed to get devices", e);
+            log.error("Failed to get shipment " + shipmentId, e);
             return createErrorResponse(e);
         }
     }
@@ -469,7 +469,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             shipmentDao.delete(s);
             return createSuccessResponse(null);
         } catch (final Exception e) {
-            log.error("Failed to get devices", e);
+            log.error("Failed to delete shipment " + shipmentId, e);
             return createErrorResponse(e);
         }
     }
@@ -500,7 +500,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
-            log.error("Failed to get devices", e);
+            log.error("Failed to get single shipment: " + shipmentId, e);
             return createErrorResponse(e);
         }
     }

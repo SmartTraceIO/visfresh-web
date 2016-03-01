@@ -28,7 +28,8 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
-import com.visfresh.entities.UnresolvedTrackerEvent;
+import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.json.DeviceSerializer;
@@ -112,19 +113,19 @@ public class DeviceController extends AbstractController implements DeviceConsta
                     null);
             final int total = dao.getEntityCount(user.getCompany(), null);
 
-            final Map<String, UnresolvedTrackerEvent> lastReadingsMap = getLastEvents(devices);
+            final Map<String, ShortTrackerEvent> lastReadingsMap = getLastEvents(devices);
 
             final JsonArray array = new JsonArray();
             for (final Device t : devices) {
                 final ListDeviceItem item = new ListDeviceItem(t);
 
-                final UnresolvedTrackerEvent e = lastReadingsMap.get(t.getImei());
+                final ShortTrackerEvent e = lastReadingsMap.get(t.getImei());
                 if (e != null) {
                     item.setLastShipmentId(e.getShipmentId());
                     item.setLastReadingBattery(e.getBattery());
                     item.setLastReadingLat(e.getLatitude());
                     item.setLastReadingLong(e.getLongitude());
-                    item.setLastReadingTemperature(LocalizationUtils.getTemperature(
+                    item.setLastReadingTemperature(formatTemperature(
                             e.getTemperature(), user.getTemperatureUnits()));
                     item.setLastReadingTimeISO(isoFormat.format(e.getTime()));
                 }
@@ -139,14 +140,22 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
     }
     /**
+     * @param temperature
+     * @return
+     */
+    private double formatTemperature(final double temperature, final TemperatureUnits units) {
+        final double t = LocalizationUtils.getTemperature(temperature, units);
+        return Math.round(t * 100) / 100.;
+    }
+    /**
      * @param devices
      * @return
      */
-    private Map<String, UnresolvedTrackerEvent> getLastEvents(final List<Device> devices) {
-        final List<UnresolvedTrackerEvent> events = trackerEventDao.getLastEvents(devices);
+    private Map<String, ShortTrackerEvent> getLastEvents(final List<Device> devices) {
+        final List<ShortTrackerEvent> events = trackerEventDao.getLastEvents(devices);
 
-        final Map<String, UnresolvedTrackerEvent> map = new HashMap<>();
-        for (final UnresolvedTrackerEvent e : events) {
+        final Map<String, ShortTrackerEvent> map = new HashMap<>();
+        for (final ShortTrackerEvent e : events) {
             map.put(e.getDeviceImei(), e);
         }
         return map;

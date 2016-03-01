@@ -9,7 +9,7 @@ import java.util.Date;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class UnresolvedTrackerEvent implements EntityWithId<Long>, Comparable<UnresolvedTrackerEvent> {
+public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTrackerEvent> {
     /**
      * Event ID.
      */
@@ -41,7 +41,7 @@ public class UnresolvedTrackerEvent implements EntityWithId<Long>, Comparable<Un
     /**
      * Default constructor.
      */
-    public UnresolvedTrackerEvent() {
+    public ShortTrackerEvent() {
         super();
     }
 
@@ -158,7 +158,7 @@ public class UnresolvedTrackerEvent implements EntityWithId<Long>, Comparable<Un
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
-    public int compareTo(final UnresolvedTrackerEvent o) {
+    public int compareTo(final ShortTrackerEvent o) {
         return getId().compareTo(o.getId());
     }
     /* (non-Javadoc)

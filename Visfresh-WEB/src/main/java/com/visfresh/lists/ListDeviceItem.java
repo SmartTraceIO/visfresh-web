@@ -42,6 +42,7 @@ public class ListDeviceItem {
     private Double lastReadingLat;
     private Double lastReadingLong;
     private Long lastShipmentId;
+    private String shipmentStatus;
 
     /**
      * Default constructor.
@@ -205,5 +206,17 @@ public class ListDeviceItem {
      */
     public Long getLastShipmentId() {
         return lastShipmentId;
+    }
+    public String getShipmentStatus() {
+        return this.shipmentStatus;
+    }
+    /**
+     * @param s the shipment status.
+     */
+    public void setShipmentStatus(final String s) {
+        this.shipmentStatus = s;
+    }
+    public String getShipmentNumber() {
+        return getSn() + "(" + getTripCount() + ")";
     }
 }

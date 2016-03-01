@@ -20,7 +20,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.entities.UnresolvedTrackerEvent;
+import com.visfresh.entities.ShortTrackerEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -302,13 +302,13 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         devices.add(d1);
         devices.add(d2);
 
-        final List<UnresolvedTrackerEvent> events = dao.getLastEvents(devices);
+        final List<ShortTrackerEvent> events = dao.getLastEvents(devices);
         assertEquals(2, events.size());
 
         Collections.sort(events);
 
-        final UnresolvedTrackerEvent ute1 = events.get(0);
-        final UnresolvedTrackerEvent ute2 = events.get(1);
+        final ShortTrackerEvent ute1 = events.get(0);
+        final ShortTrackerEvent ute2 = events.get(1);
 
         //check any fields of second event
         assertEquals(e2.getId(), ute2.getId());

@@ -101,6 +101,8 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_BATTERY, d.getLastReadingBattery());
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_LAT, d.getLastReadingLat());
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_LONG, d.getLastReadingLong());
+        obj.addProperty(DeviceConstants.PROPERTY_SHIPMENT_NUMBER, d.getShipmentNumber());
+        obj.addProperty(DeviceConstants.PROPERTY_SHIPMENT_STATUS, d.getShipmentStatus());
         return obj;
     }
     /**
