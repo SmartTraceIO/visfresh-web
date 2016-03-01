@@ -44,19 +44,10 @@ public class CompanyControllerTest extends AbstractRestServiceTest {
 
     @Test
     public void testGetCompany() throws IOException, RestServiceException {
-        final String description = "JUnit test company";
-        final String name = "Test Company";
+        final Company c = client.getCompany(getCompany().getId());
 
-        Company c = new Company();
-        c.setDescription(description);
-        c.setName(name);
-
-        dao.save(c);
-
-        c = client.getCompany(c.getId());
-
-        assertEquals(description, c.getDescription());
-        assertEquals(name, c.getName());
+        assertEquals(getCompany().getDescription(), c.getDescription());
+        assertEquals(getCompany().getName(), c.getName());
     }
     @Test
     public void testGetCompanies() throws IOException, RestServiceException {

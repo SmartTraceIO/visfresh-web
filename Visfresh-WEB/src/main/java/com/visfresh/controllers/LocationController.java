@@ -23,6 +23,7 @@ import com.visfresh.constants.LocationConstants;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.ShortShipmentInfo;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.LocationSerializer;
@@ -59,12 +60,14 @@ public class LocationController extends AbstractController implements LocationCo
             final @RequestBody JsonObject profile) {
         try {
             final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.NormalUser);
+
             final LocationProfile lp = createSerializer(user).parseLocationProfile(profile);
-
-            security.checkCanSaveLocation(user);
-            checkCompanyAccess(user, lp);
-
             lp.setCompany(user.getCompany());
+
+            final LocationProfile old = dao.findOne(lp.getId());
+            checkCompanyAccess(user, old);
+
             final long id = dao.save(lp).getId();
             return createIdResponse("locationId", id);
         } catch (final Exception e) {
@@ -89,7 +92,7 @@ public class LocationController extends AbstractController implements LocationCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetLocations(user);
+            checkAccess(user, Role.BasicUser);
 
             final LocationSerializer ser = createSerializer(user);
 
@@ -129,7 +132,7 @@ public class LocationController extends AbstractController implements LocationCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetLocations(user);
+            checkAccess(user, Role.BasicUser);
 
             final LocationProfile p = dao.findOne(locationId);
             checkCompanyAccess(user, p);
@@ -151,7 +154,7 @@ public class LocationController extends AbstractController implements LocationCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveLocation(user);
+            checkAccess(user, Role.NormalUser);
 
             final LocationProfile p = dao.findOne(locationId);
             checkCompanyAccess(user, p);

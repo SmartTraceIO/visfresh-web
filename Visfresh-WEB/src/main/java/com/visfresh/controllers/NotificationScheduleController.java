@@ -27,6 +27,7 @@ import com.visfresh.dao.impl.ShipmentBaseDao;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.ReferenceInfo;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.NotificationScheduleSerializer;
@@ -69,12 +70,14 @@ public class NotificationScheduleController extends AbstractController implement
             final @RequestBody JsonObject schedule) {
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveNotificationSchedule(user);
+            checkAccess(user, Role.NormalUser);
 
             final NotificationSchedule s = createSerializer(user).parseNotificationSchedule(schedule);
-            checkCompanyAccess(user, s);
-
             s.setCompany(user.getCompany());
+
+            final NotificationSchedule old = dao.findOne(s.getId());
+            checkCompanyAccess(user, old);
+
             final Long id = dao.save(s).getId();
             return createIdResponse("notificationScheduleId", id);
         } catch (final Exception e) {
@@ -100,7 +103,7 @@ public class NotificationScheduleController extends AbstractController implement
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetNotificationSchedules(user);
+            checkAccess(user, Role.BasicUser);
 
             final List<NotificationSchedule> schedules = dao.findByCompany(
                     user.getCompany(),
@@ -156,10 +159,12 @@ public class NotificationScheduleController extends AbstractController implement
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveNotificationSchedule(user);
+            checkAccess(user, Role.NormalUser);
 
             //find schedule
             final NotificationSchedule s = dao.findOne(notificationScheduleId);
+            checkCompanyAccess(user, s);
+
             if (s != null && s.getCompany().getId().equals(user.getCompany().getId())) {
                 for (final PersonSchedule ps : s.getSchedules()) {
                     if (ps.getId().equals(personScheduleId)) {
@@ -188,7 +193,7 @@ public class NotificationScheduleController extends AbstractController implement
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetNotificationSchedules(user);
+            checkAccess(user, Role.NormalUser);
 
             final NotificationSchedule s = dao.findOne(notificationScheduleId);
             checkCompanyAccess(user, s);
@@ -210,7 +215,7 @@ public class NotificationScheduleController extends AbstractController implement
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveNotificationSchedule(user);
+            checkAccess(user, Role.NormalUser);
 
             final NotificationSchedule s = dao.findOne(notificationScheduleId);
             checkCompanyAccess(user, s);

@@ -22,6 +22,7 @@ import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.impl.ShipmentTemplateDaoImpl;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.io.ReferenceResolver;
@@ -63,12 +64,21 @@ public class ShipmentTemplateController extends AbstractController implements Sh
             final @RequestBody JsonObject tpl) {
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveShipmentTemplate(user);
+            checkAccess(user, Role.NormalUser);
 
             final ShipmentTemplate t = createSerializer(user).parseShipmentTemplate(tpl);
-            checkCompanyAccess(user, t);
-
             t.setCompany(user.getCompany());
+
+            //check company access to sub entiites
+            checkCompanyAccess(user, t.getAlertProfile());
+            checkCompanyAccess(user, t.getShippedFrom());
+            checkCompanyAccess(user, t.getShippedTo());
+            checkCompanyAccess(user, t.getAlertsNotificationSchedules());
+            checkCompanyAccess(user, t.getArrivalNotificationSchedules());
+
+            final ShipmentTemplate old = this.shipmentTemplateDao.findOne(t.getId());
+            checkCompanyAccess(user, old);
+
             final Long id = shipmentTemplateDao.save(t).getId();
             return createIdResponse("shipmentTemplateId", id);
         } catch (final Exception e) {
@@ -94,7 +104,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetShipmentTemplates(user);
+            checkAccess(user, Role.BasicUser);
 
             final Filter filter = new Filter();
             filter.addFilter(ShipmentTemplateDaoImpl.AUTOSTART_FIELD, false);
@@ -139,7 +149,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetShipmentTemplates(user);
+            checkAccess(user, Role.BasicUser);
 
             final ShipmentTemplate template = shipmentTemplateDao.findOne(shipmentTemplateId);
             checkCompanyAccess(user, template);
@@ -171,7 +181,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveShipmentTemplate(user);
+            checkAccess(user, Role.BasicUser);
 
             final ShipmentTemplate tpl = shipmentTemplateDao.findOne(shipmentTemplateId);
             checkCompanyAccess(user, tpl);

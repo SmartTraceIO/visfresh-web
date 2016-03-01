@@ -48,7 +48,6 @@ import com.visfresh.services.RestServiceException;
 public class UserControllerTest extends AbstractRestServiceTest {
     private User user;
     private UserDao dao;
-    private CompanyDao companyDao;
     private UserRestClient client;
 
     /**
@@ -61,7 +60,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
     @Before
     public void setUp() {
         dao = context.getBean(UserDao.class);
-        companyDao = context.getBean(CompanyDao.class);
         user = dao.findAll(null, null, null).get(0);
 
         client = new UserRestClient(UTC);
@@ -77,11 +75,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
      */
     @Test
     public void testGetUser() throws IOException, RestServiceException {
-        //create company
-        final Company c = new Company();
-        c.setDescription("JUnit test company");
-        c.setName("JUnit-C");
-        companyDao.save(c);
         final String firstName = "firstname";
         final String lastName = "LastName";
         final String email = "abra@cada.bra";
@@ -95,7 +88,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String title = "Mr";
 
         final User u = new User();
-        u.setCompany(c);
+        u.setCompany(getCompany());
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
@@ -109,10 +102,8 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternal(external);
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.ShipmentViewer);
-        u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.CompanyAdmin);
+        u.getRoles().add(Role.BasicUser);
+        u.getRoles().add(Role.Admin);
 
         final String password = "password";
 
@@ -121,7 +112,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         final User u2 = client.getUser(u.getId());
         assertNotNull(u2);
-        assertEquals(3, u2.getRoles().size());
+        assertEquals(2, u2.getRoles().size());
         assertEquals(firstName, u2.getFirstName());
         assertEquals(lastName, u2.getLastName());
         assertEquals(email, u2.getEmail());
@@ -143,10 +134,6 @@ public class UserControllerTest extends AbstractRestServiceTest {
     @Test
     public void testSaveUser() throws IOException, RestServiceException, AuthenticationException {
         //create company
-        final Company c = new Company();
-        c.setDescription("JUnit test company");
-        c.setName("JUnit-C");
-        companyDao.save(c);
         final String firstName = "firstname";
         final String lastName = "LastName";
         final String email = "abra@cada.bra";
@@ -160,7 +147,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String title = "Mrs";
 
         final User u = new User();
-        u.setCompany(c);
+        u.setCompany(getCompany());
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
@@ -174,10 +161,8 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternal(external);
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.ShipmentViewer);
-        u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.CompanyAdmin);
+        u.getRoles().add(Role.BasicUser);
+        u.getRoles().add(Role.NormalUser);
 
         final String password = "password";
 
@@ -186,7 +171,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertNotNull(id);
         User u2 = dao.findByEmail(u.getEmail());
         assertNotNull(u2);
-        assertEquals(3, u2.getRoles().size());
+        assertEquals(2, u2.getRoles().size());
         assertNotNull(u2.getCompany());
         assertEquals(firstName, u2.getFirstName());
         assertEquals(lastName, u2.getLastName());
@@ -211,8 +196,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final String newPassword = "newpassword";
 
         u.setPhone(newPhone);
-        u.setId(u2.getId());
-        u.setCompany(getCompany());
+        u.setId(id);
         client.saveUser(u, newPassword, true);
 
         u2 = dao.findByEmail(u.getEmail());
@@ -224,7 +208,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
     @Test
     public void testSaveWithoutCompany() throws IOException, RestServiceException, AuthenticationException {
         user.getRoles().clear();
-        user.getRoles().add(Role.CompanyAdmin);
+        user.getRoles().add(Role.Admin);
         dao.save(user);
 
         final AuthService auth = context.getBean(AuthService.class);
@@ -259,10 +243,8 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternal(external);
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.ShipmentViewer);
-        u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.CompanyAdmin);
+        u.getRoles().add(Role.BasicUser);
+        u.getRoles().add(Role.NormalUser);
 
         final String password = "password";
 
@@ -271,7 +253,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertNotNull(id);
         User u2 = dao.findByEmail(u.getEmail());
         assertNotNull(u2);
-        assertEquals(3, u2.getRoles().size());
+        assertEquals(2, u2.getRoles().size());
         assertNotNull(u2.getCompany());
         assertEquals(firstName, u2.getFirstName());
         assertEquals(lastName, u2.getLastName());
@@ -330,10 +312,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternal(external);
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.ShipmentViewer);
-        u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.CompanyAdmin);
+        u.getRoles().add(Role.BasicUser);
 
         final String password = "password";
         final Long id = client.saveUser(u, password, false);
@@ -346,7 +325,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         final User u2 = dao.findByEmail(u.getEmail());
         assertNotNull(u2);
-        assertEquals(3, u2.getRoles().size());
+        assertEquals(1, u2.getRoles().size());
         assertNotNull(u2.getCompany());
         assertEquals(firstName, u2.getFirstName());
         assertEquals(lastName, u2.getLastName());
@@ -521,7 +500,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setDeviceGroup("AuthorizedDeviceGroup");
         u.setTitle("Mr");
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.CompanyAdmin);
+        u.getRoles().add(Role.Admin);
         context.getBean(AuthService.class).saveUser(u, "", false);
         return u;
     }

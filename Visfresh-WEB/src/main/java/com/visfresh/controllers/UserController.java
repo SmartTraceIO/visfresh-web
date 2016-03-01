@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.io.json.UserSerializer;
 import com.visfresh.lists.ExpandedListUserItem;
 import com.visfresh.lists.ShortListUserItem;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.HashGenerator;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
@@ -82,11 +84,13 @@ public class UserController extends AbstractController implements UserConstants 
             final @RequestParam(required = false) Long userId) {
         try {
             final User user = getLoggedInUser(authToken);
-            if (userId != null) {
-                security.checkCanGetUserInfo(user, userId);
+            if (userId != null && !user.getId().equals(userId)) {
+                checkAccess(user, Role.NormalUser);
             }
 
             final User u = dao.findOne(userId == null ? user.getId() : userId);
+            checkCompanyAccess(user, u);
+
             return createSuccessResponse(u == null ? null : getUserSerializer(user).toJson(u));
         } catch (final Exception e) {
             log.error("Failed to get user info", e);
@@ -112,7 +116,7 @@ public class UserController extends AbstractController implements UserConstants 
 
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanListUsers(user);
+            checkAccess(user, Role.NormalUser);
 
             final int total = dao.getEntityCount(user.getCompany(), null);
             final UserSerializer ser = getUserSerializer(user);
@@ -152,7 +156,7 @@ public class UserController extends AbstractController implements UserConstants 
 
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanListUsers(user);
+            checkAccess(user, Role.NormalUser);
 
             final UserSerializer ser = getUserSerializer(user);
 
@@ -215,7 +219,7 @@ public class UserController extends AbstractController implements UserConstants 
         try {
             final User user = getLoggedInUser(authToken);
             final SaveUserRequest r = getUserSerializer(user).parseSaveUserRequest(req);
-            security.checkCanManageUsers(user, r.getUser().getCompany());
+            checkAccess(user, Role.Admin);
 
             User newUser = r.getUser();
             if (newUser.getId() != null) {
@@ -223,16 +227,17 @@ public class UserController extends AbstractController implements UserConstants 
                 checkCompanyAccess(user, newUser);
 
                 newUser = merteUsers(newUser, r.getUser());
-            } else {
-                if (newUser.getRoles() == null) {
-                    newUser.setRoles(new HashSet<Role>());
-                }
+            } else if (newUser.getRoles() == null) {
+                newUser.setRoles(new HashSet<Role>());
             }
 
             if (newUser.getCompany() == null) {
                 newUser.setCompany(user.getCompany());
+            } else {
+                checkCompanyAccess(user, newUser.getCompany());
             }
-            security.checkCanAssignRoles(user, newUser.getRoles());
+
+            checkCanAssignRoles(user, newUser.getRoles());
             authService.saveUser(newUser, r.getPassword(), Boolean.TRUE.equals(r.getResetOnLogin()));
 
             return createIdResponse("userId", newUser.getId());
@@ -241,6 +246,20 @@ public class UserController extends AbstractController implements UserConstants 
             return createErrorResponse(e);
         }
     }
+    /**
+     * @param user the user
+     * @param roles
+     * @throws RestServiceException
+     */
+    private void checkCanAssignRoles(final User user, final Set<Role> roles) throws RestServiceException {
+        for (final Role role : roles) {
+            if (!role.hasRole(user)) {
+                throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                        user.getEmail() + " can't assign role " + role);
+            }
+        }
+    }
+
     /**
      * @param oldUser old user.
      * @param newUser new user.
@@ -306,12 +325,12 @@ public class UserController extends AbstractController implements UserConstants 
             final @RequestParam Long userId) {
         try {
             final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.Admin);
 
             final User deletedUser = dao.findOne(userId);
-            security.checkCanManageUsers(user, deletedUser.getCompany());
+            checkCompanyAccess(user, deletedUser);
 
             dao.delete(userId);
-
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete user " + userId, e);
@@ -362,12 +381,18 @@ public class UserController extends AbstractController implements UserConstants 
             @RequestBody final JsonObject body) {
         try {
             final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.BasicUser);
+
             final UpdateUserDetailsRequest req = getUserSerializer(user).parseUpdateUserDetailsRequest(
                     body);
 
-            security.checkUpdateUserDetails(user, req.getUser());
-
             final User u = dao.findOne(req.getUser());
+            if (!Role.Admin.hasRole(user) && !u.getId().equals(user.getId())) {
+                throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                        user.getEmail() + " is not permitted to change user details for "
+                        + u.getEmail());
+            }
+
             if (req.getFirstName() != null) {
                 u.setFirstName(req.getFirstName());
             }

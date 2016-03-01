@@ -42,6 +42,7 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -132,7 +133,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final @RequestBody JsonObject jsonRequest) {
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveShipment(user);
+            checkAccess(user, Role.NormalUser);
 
             final ShipmentSerializer serializer = getSerializer(user);
 
@@ -157,7 +158,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
             final SaveShipmentRequest req = serializer.parseSaveShipmentRequest(jsonRequest);
             final Shipment newShipment = req.getShipment();
+
             checkCompanyAccess(user, newShipment);
+            checkCompanyAccess(user, newShipment.getAlertProfile());
+            checkCompanyAccess(user, newShipment.getShippedFrom());
+            checkCompanyAccess(user, newShipment.getShippedTo());
+            checkCompanyAccess(user, newShipment.getAlertsNotificationSchedules());
+            checkCompanyAccess(user, newShipment.getArrivalNotificationSchedules());
 
             newShipment.setCompany(user.getCompany());
             id = saveShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
@@ -240,7 +247,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetShipments(user);
+            checkAccess(user, Role.BasicUser);
 
             final ShipmentSerializer ser = getSerializer(user);
             final GetFilteredShipmentsRequest req = ser.parseGetFilteredShipmentsRequest(request);
@@ -434,7 +441,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetShipments(user);
+            checkAccess(user, Role.BasicUser);
 
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, shipment);
@@ -461,7 +468,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveShipment(user);
+            checkAccess(user, Role.NormalUser);
 
             final Shipment s = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, s);
@@ -480,7 +487,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetShipmentData(user);
+            checkAccess(user, Role.BasicUser);
 
             final ShipmentSerializer ser = getSerializer(user);
 

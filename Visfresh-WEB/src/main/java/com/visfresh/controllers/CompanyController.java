@@ -21,6 +21,7 @@ import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.CompanySerializer;
 
@@ -56,9 +57,7 @@ public class CompanyController extends AbstractController implements CompanyCons
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            if (companyId != null) {
-                security.checkCanGetCompany(user, companyId);
-            }
+            checkAccess(user, Role.NormalUser);
 
             final Company company;
             if (companyId == null || user.getCompany().getId().equals(companyId)) {
@@ -66,6 +65,8 @@ public class CompanyController extends AbstractController implements CompanyCons
             } else {
                 company = dao.findOne(companyId);
             }
+
+            checkCompanyAccess(user, company);
             return createSuccessResponse(getCompanySerializer(user).toJson(company));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
@@ -87,7 +88,7 @@ public class CompanyController extends AbstractController implements CompanyCons
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetCompanies(user);
+            checkAccess(user, Role.NormalUser);
 
             final List<Company> companies = dao.findAll(null, new Sorting(getDefaultSortOrder()), page);
             final int total = dao.getEntityCount(null);

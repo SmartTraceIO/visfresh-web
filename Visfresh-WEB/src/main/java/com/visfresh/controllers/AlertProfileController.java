@@ -22,6 +22,7 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
@@ -67,12 +68,15 @@ public class AlertProfileController extends AbstractController implements AlertP
             final @RequestBody JsonObject alert) {
         try {
             final User user = getLoggedInUser(authToken);
+
             final AlertProfile p = createSerializer(user).parseAlertProfile(alert);
-
-            security.checkCanSaveAlertProfile(user);
-            checkCompanyAccess(user, p);
-
             p.setCompany(user.getCompany());
+
+            checkAccess(user, Role.NormalUser);
+
+            final AlertProfile old = dao.findOne(p.getId());
+            checkCompanyAccess(user, old);
+
             final Long id = dao.save(p).getId();
             return createIdResponse("alertProfileId", id);
         } catch (final Exception e) {
@@ -91,7 +95,7 @@ public class AlertProfileController extends AbstractController implements AlertP
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetAlertProfiles(user);
+            checkAccess(user, Role.BasicUser);
 
             final AlertProfile alert = dao.findOne(alertProfileId);
             checkCompanyAccess(user, alert);
@@ -113,7 +117,7 @@ public class AlertProfileController extends AbstractController implements AlertP
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveAlertProfile(user);
+            checkAccess(user, Role.NormalUser);
 
             final AlertProfile p = dao.findOne(alertProfileId);
             checkCompanyAccess(user, p);
@@ -143,7 +147,8 @@ public class AlertProfileController extends AbstractController implements AlertP
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetAlertProfiles(user);
+            checkAccess(user, Role.BasicUser);
+
             final AlertProfileSerializer ser = createSerializer(user);
 
             final List<AlertProfile> alerts = dao.findByCompany(

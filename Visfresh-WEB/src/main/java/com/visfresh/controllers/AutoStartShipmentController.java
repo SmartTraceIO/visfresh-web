@@ -32,6 +32,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
 import com.visfresh.io.AutoStartShipmentDto;
@@ -85,7 +86,7 @@ public class AutoStartShipmentController extends AbstractController
             final AutoStartShipmentDto dto = createSerializer(user)
                     .parseAutoStartShipmentDto(defShipment);
 
-            security.checkCanSaveAutoStartShipment(user);
+            checkAccess(user, Role.NormalUser);
 
             AutoStartShipment cfg;
             ShipmentTemplate tpl;
@@ -95,6 +96,7 @@ public class AutoStartShipmentController extends AbstractController
 
                 checkCompanyAccess(user, cfg);
                 checkCompanyAccess(user, tpl);
+                checkCompanyAccess(user, dao.findOne(dto.getId()));
             } else {
                 cfg = new AutoStartShipment();
                 cfg.setCompany(user.getCompany());
@@ -215,7 +217,7 @@ public class AutoStartShipmentController extends AbstractController
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanViewAutoStartShipments(user);
+            checkAccess(user, Role.BasicUser);
 
             final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
             checkCompanyAccess(user, cfg);
@@ -238,7 +240,7 @@ public class AutoStartShipmentController extends AbstractController
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanSaveAutoStartShipment(user);
+            checkAccess(user, Role.NormalUser);
 
             final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
             checkCompanyAccess(user, cfg);
@@ -268,7 +270,8 @@ public class AutoStartShipmentController extends AbstractController
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetAlertProfiles(user);
+            checkAccess(user, Role.BasicUser);
+
             final AutoStartShipmentSerializer ser = createSerializer(user);
 
             final List<AutoStartShipment> configs = dao.findByCompany(

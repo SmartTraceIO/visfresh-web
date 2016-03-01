@@ -21,6 +21,7 @@ import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentNoteDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentNote;
 import com.visfresh.entities.User;
@@ -69,10 +70,12 @@ public class ShipmentNoteController extends AbstractController {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.BasicUser);
+
             final ShipmentNote note = shipmentNoteDao.findOne(noteId);
 
             if (note != null) {
-                security.checkCanViewShipmentNotes(user, note.getShipment(), note.getUser());
+                checkCompanyAccess(user, note.getShipment());
             }
             return createSuccessResponse(getSerializer(user).toJson(note));
         } catch (final Exception e) {
@@ -88,17 +91,19 @@ public class ShipmentNoteController extends AbstractController {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.BasicUser);
 
             //find user and shipment
             final User noteOwner = userDao.findOne(userId);
             final Shipment shipment = shipmentDao.findOne(shipmentId);
 
+            checkCompanyAccess(user, noteOwner);
+            checkCompanyAccess(user, shipment);
+
             final ShipmentNoteSerializer ser = getSerializer(user);
             final JsonArray array = new JsonArray();
 
             if (shipment != null && noteOwner != null) {
-                security.checkCanViewShipmentNotes(user, shipment, noteOwner);
-
                 final List<ShipmentNote> notes = shipmentNoteDao.findByUserAndShipment(shipment, noteOwner);
                 for (final ShipmentNote n : notes) {
                     array.add(ser.toJson(n));
@@ -117,6 +122,7 @@ public class ShipmentNoteController extends AbstractController {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.NormalUser);
 
             final ShipmentNoteSerializer ser = getSerializer(user);
             final SaveShipmentNoteRequest ssnr = ser.parseSaveShipmentNoteRequest(req);
@@ -142,6 +148,7 @@ public class ShipmentNoteController extends AbstractController {
                 note = shipmentNoteDao.findOne(ssnr.getNoteId());
 
                 if (note != null) {
+                    checkCompanyAccess(user, shipment);
                     checkOwner(note, noteOwner);
                     checkShipment(note, shipment);
                 }
@@ -156,7 +163,6 @@ public class ShipmentNoteController extends AbstractController {
 
             note.setText(ssnr.getNoteText());
 
-            security.checkCanEditShipmentNotes(user, shipment, noteOwner);
             final Long id = shipmentNoteDao.save(note).getId();
 
             return createIdResponse("shipmentNoteId", id);

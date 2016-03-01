@@ -79,8 +79,8 @@ public class UserSerializerTest extends AbstractSerializerTest {
         u.setMeasurementUnits(measurementUnits);
         u.setTitle(title);
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.ShipmentViewer);
+        u.getRoles().add(Role.BasicUser);
+        u.getRoles().add(Role.NormalUser);
 
         final JsonObject obj = serializer.toJson(u);
         u = serializer.parseUser(obj);
@@ -117,8 +117,8 @@ public class UserSerializerTest extends AbstractSerializerTest {
         u.setLastName(lastName);
         u.setEmail(email);
         u.setPosition(position);
-        u.getRoles().add(Role.Dispatcher);
-        u.getRoles().add(Role.ShipmentViewer);
+        u.getRoles().add(Role.BasicUser);
+        u.getRoles().add(Role.NormalUser);
         u.setCompanyName(companyName);
         u.setExternal(external);
 

@@ -24,6 +24,7 @@ import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.DeviceGroupSerializer;
 import com.visfresh.io.json.DeviceSerializer;
@@ -61,12 +62,14 @@ public class DeviceGroupController extends AbstractController implements DeviceG
             final @RequestBody JsonObject group) {
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanManageDeviceGroups(user);
+            checkAccess(user, Role.NormalUser);
 
             final DeviceGroup g = createSerializer(user).parseDeviceGroup(group);
-            checkCompanyAccess(user, g);
-
             g.setCompany(user.getCompany());
+
+            final DeviceGroup old = dao.findOne(g.getId());
+            checkCompanyAccess(user, old);
+
             dao.save(g);
             return createSuccessResponse(null);
         } catch (final Exception e) {
@@ -89,7 +92,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanViewDeviceGroups(user);
+            checkAccess(user, Role.BasicUser);
 
             final DeviceGroupSerializer ser = createSerializer(user);
 
@@ -121,7 +124,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetDevices(user);
+            checkAccess(user, Role.BasicUser);
 
             final DeviceGroup group = dao.findOne(groupName);
             checkCompanyAccess(user, group);
@@ -151,7 +154,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanViewDeviceGroups(user);
+            checkAccess(user, Role.BasicUser);
 
             final Device d = deviceDao.findOne(device);
             checkCompanyAccess(user, d);
@@ -183,7 +186,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
             final User user = getLoggedInUser(authToken);
 
             final DeviceGroup group = dao.findOne(name);
-            security.checkCanViewDeviceGroup(user, group);
+            checkAccess(user, Role.BasicUser);
             checkCompanyAccess(user, group);
 
             return createSuccessResponse(createSerializer(user).toJson(group));
@@ -203,7 +206,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanManageDeviceGroups(user);
+            checkAccess(user, Role.NormalUser);
 
             final DeviceGroup d = dao.findOne(name);
             checkCompanyAccess(user, d);
@@ -228,7 +231,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanManageDeviceGroups(user);
+            checkAccess(user, Role.NormalUser);
 
             final DeviceGroup g = dao.findOne(groupName);
             checkCompanyAccess(user, g);
@@ -257,7 +260,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanManageDeviceGroups(user);
+            checkAccess(user, Role.NormalUser);
 
             final DeviceGroup g = dao.findOne(groupName);
             checkCompanyAccess(user, g);

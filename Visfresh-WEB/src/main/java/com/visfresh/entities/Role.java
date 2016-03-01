@@ -8,20 +8,78 @@ package com.visfresh.entities;
  *
  */
 public enum Role {
-    GlobalAdmin(100),
-    CompanyAdmin(70),
-    Dispatcher(40),
-    ShipmentViewer(25),
-    Setup(24);
+//    GlobalAdmin(),
+//    CompanyAdmin(),
+//    Dispatcher(),
+//    ShipmentViewer(),
+//    Setup();
+    /**
+     * Add company, add initial users, add devices,
+     * This user not visible to other users
+     */
+    SmartTraceAdmin,
+    /**
+     * Company admin
+     */
+    Admin,
+    /**
+     * View Shipments,
+     * Shipment Detail (inc. Suppress Alerts/Shutdown device/AddNotes)
+     * NewShipment,
+     * (inc. Shutdown Device, Deactivate Device, Billing)
+     * Setup pages (inc. Users)
+     * Trackers,
+     * NewShipment,
+     * View Shipments,
+     * Shipment Detail (inc.Suppress Alerts/Shutdown device/AddNotes),
+     * Trackers (inc. Shutdown Device, but NOT Deactivate Device or Billing)
+     * Setup pages (but Users is View Only),
+     */
+    NormalUser,
+    /**
+     * NOT NewShipment
+     * View Shipments,
+     * Shipment Detail (NOT Suppress Alerts/Shutdown device/AddNotes),
+     * Trackers (NOT Shutdown Device, Deactivate Device or Billing)
+     * NOT Setup pages
+     */
+    BasicUser;
 
-    private int priority;
-    Role(final int priority) {
-        this.priority = priority;
+    static {
+        BasicUser.includedRoles = new Role[]{NormalUser};
+    }
+
+    private Role[] includedRoles = {};
+
+    /**
+     * @param r role.
+     * @return true if has given role.
+     */
+    private boolean hasRole(final Role r) {
+        if (this == r || this == SmartTraceAdmin || this == Admin && r != SmartTraceAdmin) {
+            return true;
+        }
+
+        for (final Role role : includedRoles) {
+            if (role.hasRole(r)) {
+                return true;
+            }
+        }
+
+        return false;
     }
     /**
-     * @return
+     * @param user the user.
+     * @return true if given user has given role.
      */
-    public boolean havePermissions(final Role r) {
-        return r == null || priority >= r.priority;
+    public boolean hasRole(final User user) {
+        if (user != null && user.getRoles() != null) {
+            for (final Role r : user.getRoles()) {
+                if (r.hasRole(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

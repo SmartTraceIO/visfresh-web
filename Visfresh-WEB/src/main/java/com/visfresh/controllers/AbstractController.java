@@ -3,6 +3,7 @@
  */
 package com.visfresh.controllers;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,11 +39,6 @@ public abstract class AbstractController {
      */
     @Autowired
     protected AuthService authService;
-    /**
-     * Access controller.
-     */
-    @Autowired
-    protected AccessController security;
     @Autowired
     private ReferenceResolver resolver;
     /**
@@ -61,9 +57,26 @@ public abstract class AbstractController {
     protected void checkCompanyAccess(final User user,
             final EntityWithCompany s) throws RestServiceException {
         if (s != null && s.getCompany() != null && !(
-                user.getRoles().contains(Role.GlobalAdmin)
+                Role.SmartTraceAdmin.hasRole(user)
                 || s.getCompany().getId().equals(user.getCompany().getId()))) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
+        }
+    }
+    protected <T extends EntityWithCompany> void checkCompanyAccess(final User user, final Collection<T> c)
+            throws RestServiceException {
+        for (final T t : c) {
+            checkCompanyAccess(user, t);
+        }
+    }
+    /**
+     * @param user user.
+     * @param role role.
+     * @throws RestServiceException
+     */
+    protected void checkAccess(final User user, final Role role) throws RestServiceException {
+        if (!role.hasRole(user)) {
+            throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                    user.getEmail() + " is not permitted for role " + role);
         }
     }
     /**

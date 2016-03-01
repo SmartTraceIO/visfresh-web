@@ -28,8 +28,9 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
-import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.json.DeviceSerializer;
@@ -75,12 +76,19 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final @RequestBody JsonObject device) {
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanManageDevices(user);
+            checkAccess(user, Role.NormalUser);
 
             final Device d = createSerializer(user).parseDevice(device);
-            checkCompanyAccess(user, d);
+
+            final Device old = dao.findByImei(d.getImei());
+            checkCompanyAccess(user, old);
 
             d.setCompany(user.getCompany());
+            if (!Role.Admin.hasRole(user)) {
+                //not admin can't change active state
+                d.setActive(old.isActive());
+            }
+
             dao.save(d);
             return createSuccessResponse(null);
         } catch (final Exception e) {
@@ -102,7 +110,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetDevices(user);
+            checkAccess(user, Role.BasicUser);
 
             final DeviceSerializer ser = createSerializer(user);
             final DateFormat isoFormat = DateTimeUtils.createDateFormat(user, "yyyy-MM-dd HH:mm");
@@ -180,7 +188,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanGetDevices(user);
+            checkAccess(user, Role.BasicUser);
 
             final Device device = dao.findByImei(imei);
             checkCompanyAccess(user, device);
@@ -202,7 +210,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            security.checkCanManageDevices(user);
+            checkAccess(user, Role.NormalUser);
 
             final Device d = dao.findOne(imei);
             checkCompanyAccess(user, d);
@@ -224,7 +232,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final @RequestBody JsonObject req) {
         try {
             final User user = getLoggedInUser(authToken);
-            security.checkCanSendCommandToDevice(user);
+            checkAccess(user, Role.NormalUser);
 
             final DeviceCommand cmd = createSerializer(user).parseDeviceCommand(req);
             commandService.sendCommand(cmd, new Date());

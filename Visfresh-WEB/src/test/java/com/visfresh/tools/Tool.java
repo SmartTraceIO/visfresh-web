@@ -99,7 +99,7 @@ public class Tool extends AbstractTool {
         u.setTitle("Mr.");
         u.setPosition("UI Developer");
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.CompanyAdmin);
+        u.getRoles().add(Role.Admin);
 
         userService.saveUser(u, password, false);
     }

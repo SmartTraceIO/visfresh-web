@@ -8,7 +8,7 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class Company implements EntityWithId<Long> {
+public class Company implements EntityWithId<Long>, EntityWithCompany {
     /**
      * Company ID.
      */
@@ -74,5 +74,18 @@ public class Company implements EntityWithId<Long> {
      */
     public void setDescription(final String description) {
         this.description = description;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.entities.EntityWithCompany#getCompany()
+     */
+    @Override
+    public Company getCompany() {
+        return this;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.entities.EntityWithCompany#setCompany(com.visfresh.entities.Company)
+     */
+    @Override
+    public void setCompany(final Company c) {
     }
 }
