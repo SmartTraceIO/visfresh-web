@@ -15,7 +15,7 @@ import com.google.gson.JsonNull;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.io.json.DeviceSerializer;
-import com.visfresh.lists.ListDeviceItem;
+import com.visfresh.lists.ListDeviceItemDto;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -39,21 +39,28 @@ public class DeviceRestClient extends RestClient {
                 serializer.toJson(tr));
     }
     /**
+     * @param sortColumn sort column.
+     * @param sortOrder sort order.
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return
      */
-    public List<ListDeviceItem> getDevices(final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
+    public List<ListDeviceItemDto> getDevices(final String sortColumn, final boolean sortOrder,
+            final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
         final HashMap<String, String> params = new HashMap<String, String>();
         if (pageIndex != null) {
             params.put("pageIndex", Integer.toString(pageIndex));
             params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
         }
+        if (sortColumn != null) {
+            params.put("sc", sortColumn);
+            params.put("so", sortOrder ? "asc" : "desc");
+        }
 
         final JsonArray response = sendGetRequest(getPathWithToken("getDevices"),
                 params).getAsJsonArray();
 
-        final List<ListDeviceItem> devices = new ArrayList<ListDeviceItem>(response.size());
+        final List<ListDeviceItemDto> devices = new ArrayList<ListDeviceItemDto>(response.size());
         for (int i = 0; i < response.size(); i++) {
             devices.add(serializer.parseListDeviceItem(response.get(i).getAsJsonObject()));
         }

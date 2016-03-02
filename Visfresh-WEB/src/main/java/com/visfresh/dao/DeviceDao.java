@@ -5,8 +5,10 @@ package com.visfresh.dao;
 
 import java.util.List;
 
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.rules.state.DeviceState;
 
 /**
@@ -36,4 +38,12 @@ public interface DeviceDao extends EntityWithCompanyDaoBase<Device, String> {
      * @return devices.
      */
     List<Device> findByGroup(DeviceGroup group);
+    /**
+     * @param company company.
+     * @param sorting sorting.
+     * @param page page.
+     * @return list of device items.
+     */
+    List<ListDeviceItem> getDevices(Company company, Sorting sorting,
+            Page page);
 }

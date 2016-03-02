@@ -9,7 +9,7 @@ import com.visfresh.entities.Device;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ListDeviceItem {
+public class ListDeviceItemDto {
     /**
      * Device IMEI code
      */
@@ -37,23 +37,24 @@ public class ListDeviceItem {
 
     //last reading data
     private String lastReadingTimeISO;
-    private Double lastReadingTemperature;
+    private String lastReadingTemperature;
     private Integer lastReadingBattery;
     private Double lastReadingLat;
     private Double lastReadingLong;
     private Long lastShipmentId;
     private String shipmentStatus;
+    private String shipmentNumber;
 
     /**
      * Default constructor.
      */
-    public ListDeviceItem() {
+    public ListDeviceItemDto() {
         super();
     }
     /**
      * @param d device.
      */
-    public ListDeviceItem(final Device d) {
+    public ListDeviceItemDto(final Device d) {
         super();
         setDescription(d.getDescription());
         setImei(d.getImei());
@@ -150,13 +151,13 @@ public class ListDeviceItem {
     /**
      * @return the lastReadingTemperature
      */
-    public Double getLastReadingTemperature() {
+    public String getLastReadingTemperature() {
         return lastReadingTemperature;
     }
     /**
      * @param lastReadingTemperature the lastReadingTemperature to set
      */
-    public void setLastReadingTemperature(final Double lastReadingTemperature) {
+    public void setLastReadingTemperature(final String lastReadingTemperature) {
         this.lastReadingTemperature = lastReadingTemperature;
     }
     /**
@@ -217,6 +218,12 @@ public class ListDeviceItem {
         this.shipmentStatus = s;
     }
     public String getShipmentNumber() {
-        return getSn() + "(" + getTripCount() + ")";
+        return shipmentNumber;
+    }
+    /**
+     * @param shipmentNumber the shipmentNumber to set
+     */
+    public void setShipmentNumber(final String shipmentNumber) {
+        this.shipmentNumber = shipmentNumber;
     }
 }

@@ -9,20 +9,24 @@ import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.constants.DeviceConstants;
 import com.visfresh.controllers.restclient.DeviceRestClient;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.lists.ListDeviceItem;
+import com.visfresh.lists.ListDeviceItemDto;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.utils.LocalizationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -88,13 +92,13 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         createTrackerEvent(d2, null, 11.);
         createTrackerEvent(d2, null, 11.);
 
-        assertEquals(4, client.getDevices(null, null).size());
-        assertEquals(1, client.getDevices(1, 1).size());
-        assertEquals(1, client.getDevices(2, 1).size());
-        assertEquals(0, client.getDevices(5, 1).size());
+        assertEquals(4, client.getDevices(null, true, null, null).size());
+        assertEquals(1, client.getDevices(null, true, 1, 1).size());
+        assertEquals(1, client.getDevices(null, true, 2, 1).size());
+        assertEquals(0, client.getDevices(null, true, 5, 1).size());
 
         //check data for d1
-        final ListDeviceItem item = client.getDevices(3, 1).get(0);
+        final ListDeviceItemDto item = client.getDevices(null, true, 3, 1).get(0);
         assertEquals(d1.getDescription(), item.getDescription());
         assertEquals(d1.getId(), item.getImei());
         assertEquals(d1.getImei(), item.getImei());
@@ -105,9 +109,28 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(e1.getBattery(), item.getLastReadingBattery().intValue());
         assertEquals(e1.getLatitude(), item.getLastReadingLat(), 0.0001);
         assertEquals(e1.getLongitude(), item.getLastReadingLong(), 0.0001);
-        assertEquals(23.46, item.getLastReadingTemperature(), 0.0001);
+        assertEquals(LocalizationUtils.getTemperatureString(23.46, TemperatureUnits.Celsius),
+                item.getLastReadingTemperature());
         assertNotNull(item.getLastReadingTimeISO());
         assertEquals(e1.getShipment().getId(), item.getLastShipmentId());
+    }
+    @Test
+    public void testGetDevicesSortByImei() throws RestServiceException, IOException {
+        final Device d1 = createDevice("3333333333333", true);
+        final Device d2 = createDevice("2222222222222", true);
+        final Device d3 = createDevice("1111111111111", true);
+
+        List<ListDeviceItemDto> dto;
+
+        dto = client.getDevices(DeviceConstants.PROPERTY_IMEI, true, null, null);
+        assertEquals(d3.getImei(), dto.get(0).getImei());
+        assertEquals(d2.getImei(), dto.get(1).getImei());
+        assertEquals(d1.getImei(), dto.get(2).getImei());
+
+        dto = client.getDevices(DeviceConstants.PROPERTY_IMEI, false, null, null);
+        assertEquals(d1.getImei(), dto.get(0).getImei());
+        assertEquals(d2.getImei(), dto.get(1).getImei());
+        assertEquals(d3.getImei(), dto.get(2).getImei());
     }
     @Test
     public void testSendCommandToDevice() throws RestServiceException, IOException {
@@ -123,6 +146,8 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
     private TrackerEvent createTrackerEvent(final Device device, final Shipment shipment, final double t) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(27);
+        e.setLatitude(12.34);
+        e.setLongitude(56.78);
         e.setDevice(device);
         e.setShipment(shipment);
         e.setTemperature(t);

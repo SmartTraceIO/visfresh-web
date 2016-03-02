@@ -3,6 +3,7 @@
  */
 package com.visfresh.dao.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,11 +14,16 @@ import org.springframework.stereotype.Component;
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Filter;
+import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.entities.ListDeviceItem;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.json.DeviceStateSerializer;
 import com.visfresh.rules.state.DeviceState;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -205,5 +211,103 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         } else {
             super.addFilterValue(property, value, params, filters);
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceDao#getListDeviceItems(com.visfresh.entities.Company, com.visfresh.dao.Sorting, com.visfresh.dao.Page)
+     */
+    @Override
+    public List<ListDeviceItem> getDevices(final Company company,
+            final Sorting sorting, final Page page) {
+        String sql = "select\n"
+                + "d." + IMEI_FIELD + " as " + DeviceConstants.PROPERTY_IMEI + ",\n"
+                + "d." + NAME_FIELD + " as " + DeviceConstants.PROPERTY_NAME + ",\n"
+                + "d." + DESCRIPTION_FIELD + " as " + DeviceConstants.PROPERTY_DESCRIPTION + ",\n"
+                + "d." + ACTIVE_FIELD + " as " + DeviceConstants.PROPERTY_ACTIVE + ",\n"
+                + "d." + TRIPCOUNT_FIELD + " as deviceTripCount,\n"
+                + "substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6) as "
+                + DeviceConstants.PROPERTY_SN + ",\n"
+                + "substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6) as "
+                + DeviceConstants.PROPERTY_SHIPMENT_NUMBER + ",\n"
+                + "lr.shipment as " + DeviceConstants.PROPERTY_LAST_SHIPMENT + ",\n"
+                + "lr.latitude as " + DeviceConstants.PROPERTY_LAST_READING_LAT + ",\n"
+                + "lr.longitude as " + DeviceConstants.PROPERTY_LAST_READING_LONG + ",\n"
+                + "lr.battery as " + DeviceConstants.PROPERTY_LAST_READING_BATTERY + ",\n"
+                + "lr.temperature as " + DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE + ",\n"
+                + "lr.time as " + DeviceConstants.PROPERTY_LAST_READING_TIME + ",\n"
+                + "lr.status as " + DeviceConstants.PROPERTY_SHIPMENT_STATUS + "\n"
+                + "from devices d\n"
+                + "left outer join (\n"
+                + "select\n"
+                + "s." + ShipmentDaoImpl.ID_FIELD + " as shipment,\n"
+                + "s." + ShipmentDaoImpl.STATUS_FIELD + " as status,\n"
+                + "te." + TrackerEventDaoImpl.TIME_FIELD + " as time,\n"
+                + "te." + TrackerEventDaoImpl.TEMPERATURE_FIELD + " as temperature,\n"
+                + "te." + TrackerEventDaoImpl.BATTERY_FIELD + " as battery,\n"
+                + "te." + TrackerEventDaoImpl.LATITUDE_FIELD + " as latitude,\n"
+                + "te." + TrackerEventDaoImpl.LONGITUDE_FIELD + " as longitude,\n"
+                + "te." + TrackerEventDaoImpl.DEVICE_FIELD + " as device\n"
+                + "from " + TrackerEventDaoImpl.TABLE + " te\n"
+                + "join (select max(" + TrackerEventDaoImpl.ID_FIELD + ") as id from "
+                + TrackerEventDaoImpl.TABLE + " group by " + TrackerEventDaoImpl.DEVICE_FIELD
+                + ") teid\n"
+                + "on teid.id = te." + TrackerEventDaoImpl.ID_FIELD + "\n"
+                + "left outer join " + ShipmentDaoImpl.TABLE + " s on te."
+                + TrackerEventDaoImpl.SHIPMENT_FIELD + " = s." + ShipmentDaoImpl.ID_FIELD + "\n"
+                + ") lr on lr.device = d." + IMEI_FIELD + "\n"
+                + "where d." + COMPANY_FIELD + " = :company\n";
+
+        if (sorting != null && sorting.getSortProperties().length > 0) {
+            sql += "order by ";
+            final String direction = sorting.isAscentDirection() ? " asc" : " desc";
+            sql += StringUtils.combine(sorting.getSortProperties(), direction + ",") + direction;
+        }
+        if (page != null) {
+            sql += " limit " + ((page.getPageNumber() - 1) * page.getPageSize()) + "," + page.getPageSize();
+        }
+
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("company", company.getId());
+
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+        final List<ListDeviceItem> items = new LinkedList<>();
+        for (final Map<String,Object> row : rows) {
+            final ListDeviceItem item = createListDeviceItem(row);
+            items.add(item);
+        }
+
+        return items;
+    }
+
+    /**
+     * @param row
+     * @return
+     */
+    private ListDeviceItem createListDeviceItem(final Map<String, Object> row) {
+        final ListDeviceItem item = new ListDeviceItem();
+
+        item.setActive(!Boolean.FALSE.equals(row.get(DeviceConstants.PROPERTY_ACTIVE)));
+        item.setDescription((String) row.get(DeviceConstants.PROPERTY_DESCRIPTION));
+        item.setImei((String) row.get(DeviceConstants.PROPERTY_IMEI));
+        item.setName((String) row.get(DeviceConstants.PROPERTY_NAME));
+        item.setTripCount(((Number) row.get("deviceTripCount")).intValue());
+
+        //if found the tracker event
+        final Number temperature = (Number) row.get(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE);
+        if (temperature != null) {
+            item.setTemperature(temperature.doubleValue());
+            item.setBattery(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_BATTERY)).intValue());
+            item.setLastReadingTime((Date) row.get(DeviceConstants.PROPERTY_LAST_READING_TIME));
+            item.setLatitude(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LAT)).doubleValue());
+            item.setLongitude(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LONG)).doubleValue());
+
+            //if shipment not null
+            final Number shipmentId = (Number) row.get(DeviceConstants.PROPERTY_LAST_SHIPMENT);
+            if (shipmentId != null) {
+                item.setShipmentId(shipmentId.longValue());
+                item.setShipmentStatus(
+                        ShipmentStatus.valueOf((String) row.get(DeviceConstants.PROPERTY_SHIPMENT_STATUS)));
+            }
+        }
+        return item;
     }
 }

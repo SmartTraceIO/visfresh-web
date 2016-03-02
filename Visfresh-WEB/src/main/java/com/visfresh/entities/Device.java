@@ -46,12 +46,18 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      */
     public String getSn() {
         final String im = getImei();
-        if (im == null) {
+        return getSerialNumber(im);
+    }
+    /**
+     * @param imei device IMEI.
+     * @return
+     */
+    public static String getSerialNumber(final String imei) {
+        if (imei == null) {
             return null;
         }
-
-        final int len = im.length();
-        return im.substring(len - 7, len - 1);
+        final int len = imei.length();
+        return imei.substring(len - 7, len - 1);
     }
     /**
      * @return the imei

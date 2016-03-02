@@ -5,9 +5,7 @@ package com.visfresh.controllers;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,17 +22,16 @@ import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Page;
-import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.Role;
-import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.json.DeviceSerializer;
-import com.visfresh.lists.ListDeviceItem;
+import com.visfresh.lists.ListDeviceItemDto;
 import com.visfresh.services.DeviceCommandService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
@@ -104,7 +101,10 @@ public class DeviceController extends AbstractController implements DeviceConsta
      */
     @RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
     public JsonObject getDevices(@PathVariable final String authToken,
-            @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize) {
+            @RequestParam(required = false) final Integer pageIndex,
+            @RequestParam(required = false) final Integer pageSize,
+            @RequestParam(required = false) final String sc,
+            @RequestParam(required = false) final String so) {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
@@ -115,30 +115,14 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final DeviceSerializer ser = createSerializer(user);
             final DateFormat isoFormat = DateTimeUtils.createDateFormat(user, "yyyy-MM-dd HH:mm");
 
-            final List<Device> devices = dao.findByCompany(user.getCompany(),
-                    new Sorting(getDefaultSortOrder()),
-                    page,
-                    null);
+            final List<ListDeviceItem> devices = dao.getDevices(user.getCompany(),
+                    createSorting(sc, so, getDefaultSortOrder(), 1),
+                    page);
             final int total = dao.getEntityCount(user.getCompany(), null);
 
-            final Map<String, ShortTrackerEvent> lastReadingsMap = getLastEvents(devices);
-
             final JsonArray array = new JsonArray();
-            for (final Device t : devices) {
-                final ListDeviceItem item = new ListDeviceItem(t);
-
-                final ShortTrackerEvent e = lastReadingsMap.get(t.getImei());
-                if (e != null) {
-                    item.setLastShipmentId(e.getShipmentId());
-                    item.setLastReadingBattery(e.getBattery());
-                    item.setLastReadingLat(e.getLatitude());
-                    item.setLastReadingLong(e.getLongitude());
-                    item.setLastReadingTemperature(formatTemperature(
-                            e.getTemperature(), user.getTemperatureUnits()));
-                    item.setLastReadingTimeISO(isoFormat.format(e.getTime()));
-                }
-
-                array.add(ser.toJson(item));
+            for (final ListDeviceItem item : devices) {
+                array.add(ser.toJson(createDto(item, isoFormat, user.getTemperatureUnits())));
             }
 
             return createListSuccessResponse(array, total);
@@ -148,33 +132,56 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
     }
     /**
-     * @param temperature
+     * @param item
+     * @param isoFormat
+     * @param temperatureUnits
      * @return
      */
-    private double formatTemperature(final double temperature, final TemperatureUnits units) {
-        final double t = LocalizationUtils.getTemperature(temperature, units);
-        return Math.round(t * 100) / 100.;
-    }
-    /**
-     * @param devices
-     * @return
-     */
-    private Map<String, ShortTrackerEvent> getLastEvents(final List<Device> devices) {
-        final List<ShortTrackerEvent> events = trackerEventDao.getLastEvents(devices);
+    private ListDeviceItemDto createDto(final ListDeviceItem item, final DateFormat isoFormat,
+            final TemperatureUnits temperatureUnits) {
+        final ListDeviceItemDto dto = new ListDeviceItemDto();
+        dto.setActive(item.isActive());
+        dto.setDescription(item.getDescription());
+        dto.setImei(item.getImei());
+        dto.setTripCount(item.getTripCount());
+        dto.setSn(Device.getSerialNumber(item.getImei()));
+        dto.setName(item.getName());
 
-        final Map<String, ShortTrackerEvent> map = new HashMap<>();
-        for (final ShortTrackerEvent e : events) {
-            map.put(e.getDeviceImei(), e);
+        if (item.getLastReadingTime() != null) {
+            dto.setLastReadingTimeISO(isoFormat.format(item.getLastReadingTime()));
+            dto.setLastReadingBattery(item.getBattery());
+            dto.setLastReadingLat(item.getLatitude());
+            dto.setLastReadingLong(item.getLongitude());
+            dto.setLastReadingTemperature(LocalizationUtils.getTemperatureString(
+                    item.getTemperature(), temperatureUnits));
+
+            if (item.getShipmentId() != null) {
+                dto.setLastShipmentId(item.getShipmentId());
+                dto.setShipmentNumber(dto.getSn() + "(" + dto.getTripCount() + ")");
+                dto.setShipmentStatus(item.getShipmentStatus().name());
+            }
         }
-        return map;
+
+        return dto;
     }
     /**
      * @return default sort order.
      */
     private String[] getDefaultSortOrder() {
         return new String[] {
-            PROPERTY_NAME,
-            PROPERTY_IMEI
+                PROPERTY_IMEI,
+                PROPERTY_NAME,
+                PROPERTY_DESCRIPTION,
+                PROPERTY_ACTIVE,
+                PROPERTY_SN,
+                PROPERTY_SHIPMENT_NUMBER,
+                PROPERTY_LAST_SHIPMENT,
+                PROPERTY_LAST_READING_LAT,
+                PROPERTY_LAST_READING_LONG,
+                PROPERTY_LAST_READING_BATTERY,
+                PROPERTY_LAST_READING_TEMPERATURE,
+                PROPERTY_LAST_READING_TIME,
+                PROPERTY_SHIPMENT_STATUS
         };
     }
     /**

@@ -35,20 +35,20 @@ import com.visfresh.utils.StringUtils;
  */
 @Component
 public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements ShipmentDao {
-    private static final String PONUM_FIELD = "ponum";
-    private static final String TRIPCOUNT_FIELD = "tripcount";
-    private static final String PALETTID_FIELD = "palletid";
-    private static final String ASSETNUM_FIELD = "assetnum";
-    private static final String SHIPMENTDATE_FIELD = "shipmentdate";
-    private static final String ARRIVALDATE_FIELD = "arrivaldate";
-    private static final String CUSTOMFIELDS_FIELD = "customfiels";
-    private static final String STATUS_FIELD = "status";
-    private static final String DEVICE_FIELD = "device";
-    private static final String SIBLINGGROUP_FIELD = "siblinggroup";
-    private static final String SIBLINGCOUNT_FIELD = "siblingcount";
-    private static final String ASSETTYPE_FIELD = "assettype";
-    private static final String LASTEVENT_FIELD = "lasteventdate";
-    private static final String DEVICESHUTDOWNDATE_FIELD = "deviceshutdowndate";
+    protected static final String PONUM_FIELD = "ponum";
+    protected static final String TRIPCOUNT_FIELD = "tripcount";
+    protected static final String PALETTID_FIELD = "palletid";
+    protected static final String ASSETNUM_FIELD = "assetnum";
+    protected static final String SHIPMENTDATE_FIELD = "shipmentdate";
+    protected static final String ARRIVALDATE_FIELD = "arrivaldate";
+    protected static final String CUSTOMFIELDS_FIELD = "customfiels";
+    protected static final String STATUS_FIELD = "status";
+    protected static final String DEVICE_FIELD = "device";
+    protected static final String SIBLINGGROUP_FIELD = "siblinggroup";
+    protected static final String SIBLINGCOUNT_FIELD = "siblingcount";
+    protected static final String ASSETTYPE_FIELD = "assettype";
+    protected static final String LASTEVENT_FIELD = "lasteventdate";
+    protected static final String DEVICESHUTDOWNDATE_FIELD = "deviceshutdowndate";
 
     @Autowired
     private DeviceDao deviceDao;
