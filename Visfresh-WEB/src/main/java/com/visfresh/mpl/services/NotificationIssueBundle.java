@@ -82,7 +82,9 @@ public class NotificationIssueBundle {
             //${shipmentDescription}  the shipment desc
             map.put("shipmentDescription", shipment.getShipmentDescription() == null
                     ? "" : shipment.getShipmentDescription());
+            map.put("shipmentId", shipment.getId().toString());
         } else {
+            map.put("shipmentId", "");
             map.put("tripCount", "");
             map.put("shippedFrom", "");
             map.put("shippedTo", "");

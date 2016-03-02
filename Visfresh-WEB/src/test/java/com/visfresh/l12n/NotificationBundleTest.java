@@ -24,7 +24,6 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
-import com.visfresh.l12n.NotificationBundle;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -198,7 +197,7 @@ public class NotificationBundleTest extends NotificationBundle {
      * @param msg message.
      */
     private void assertPlaceholdersResolved(final NotificationIssue issue, final String msg) {
-        if (msg.contains("${")) {
+        if (msg.contains("{")) {
             throw new AssertionFailedError("Not all placeholders resolved for message '"
                     + msg +"' of " + createBundleKey(issue));
         }
