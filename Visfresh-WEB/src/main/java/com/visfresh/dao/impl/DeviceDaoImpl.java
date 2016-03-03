@@ -57,6 +57,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
     public static final String TRIPCOUNT_FIELD = "tripcount";
     private static final String PROPERTY_DEVICE_GROUP = "deviceGroup";
     private static final String ACTIVE_FIELD = "active";
+    protected static final String AUTOSTART_TEMPLATE_FIELD = "autostart";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     private final DeviceStateSerializer stateSerializer = new DeviceStateSerializer();
@@ -84,6 +85,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         paramMap.put(COMPANY_FIELD, device.getCompany().getId());
         paramMap.put(TRIPCOUNT_FIELD, device.getTripCount());
         paramMap.put(ACTIVE_FIELD, device.isActive());
+        paramMap.put(AUTOSTART_TEMPLATE_FIELD, device.getAutostartTemplateId());
 
         final LinkedList<String> fields = new LinkedList<String>(paramMap.keySet());
 
@@ -132,6 +134,9 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         d.setImei((String) map.get(IMEI_FIELD));
         d.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         d.setActive(Boolean.TRUE.equals(map.get(ACTIVE_FIELD)));
+        if (map.get(AUTOSTART_TEMPLATE_FIELD) != null) {
+            d.setAutostartTemplateId(((Number) map.get(AUTOSTART_TEMPLATE_FIELD)).longValue());
+        }
         return d;
     }
     /* (non-Javadoc)
@@ -224,6 +229,10 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 + "d." + DESCRIPTION_FIELD + " as " + DeviceConstants.PROPERTY_DESCRIPTION + ",\n"
                 + "d." + ACTIVE_FIELD + " as " + DeviceConstants.PROPERTY_ACTIVE + ",\n"
                 + "d." + TRIPCOUNT_FIELD + " as deviceTripCount,\n"
+                + "aut." + AutoStartShipmentDaoImpl.ID_FIELD + " as "
+                + DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID + ",\n"
+                + "tpl." + ShipmentTemplateDaoImpl.NAME_FIELD + " as "
+                + DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME + ",\n"
                 + "substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6) as "
                 + DeviceConstants.PROPERTY_SN + ",\n"
                 + "substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6) as "
@@ -254,6 +263,10 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 + "left outer join " + ShipmentDaoImpl.TABLE + " s on te."
                 + TrackerEventDaoImpl.SHIPMENT_FIELD + " = s." + ShipmentDaoImpl.ID_FIELD + "\n"
                 + ") lr on lr.device = d." + IMEI_FIELD + "\n"
+                + "left outer join " + AutoStartShipmentDaoImpl.TABLE + " aut on aut."
+                + AutoStartShipmentDaoImpl.ID_FIELD + " = d." + AUTOSTART_TEMPLATE_FIELD + "\n"
+                + "left outer join " + ShipmentTemplateDaoImpl.TABLE + " tpl on tpl."
+                + ShipmentTemplateDaoImpl.ID_FIELD + " = aut." + AutoStartShipmentDaoImpl.TEMPLATE_FIELD + "\n"
                 + "where d." + COMPANY_FIELD + " = :company\n";
 
         if (sorting != null && sorting.getSortProperties().length > 0) {
@@ -290,6 +303,12 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         item.setImei((String) row.get(DeviceConstants.PROPERTY_IMEI));
         item.setName((String) row.get(DeviceConstants.PROPERTY_NAME));
         item.setTripCount(((Number) row.get("deviceTripCount")).intValue());
+
+        if (row.get(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID) != null) {
+            item.setAutostartTemplateId(((Number) row.get(
+                    DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID)).longValue());
+            item.setAutostartTemplateName((String) row.get(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME));
+        }
 
         //if found the tracker event
         final Number temperature = (Number) row.get(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE);

@@ -17,12 +17,16 @@ import org.junit.Test;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.controllers.restclient.DeviceRestClient;
+import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
@@ -92,6 +96,22 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final TrackerEvent e1 = createTrackerEvent(d1, s1, 23.456);
 
         final Device d2 = createDevice("4444444444444", true);
+
+        //create autostart shipment template
+        ShipmentTemplate tpl = new ShipmentTemplate();
+        tpl.setCompany(getCompany());
+        tpl.setName("TPL1");
+        tpl = getContext().getBean(ShipmentTemplateDao.class).save(tpl);
+
+        AutoStartShipment aut = new AutoStartShipment();
+        aut.setCompany(getCompany());
+        aut.setTemplate(tpl);
+        aut.setPriority(10);
+        aut = getContext().getBean(AutoStartShipmentDao.class).save(aut);
+
+        d1.setAutostartTemplateId(aut.getId());
+        dao.save(d1);
+
         //create readings without shipment
         createTrackerEvent(d2, null, 11.);
         createTrackerEvent(d2, null, 11.);
@@ -108,6 +128,8 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(d1.getImei(), item.getImei());
         assertEquals(d1.getName(), item.getName());
         assertEquals(d1.getSn(), item.getSn());
+        assertEquals(tpl.getName(), item.getAutostartTemplateName());
+        assertEquals(aut.getId(), item.getAutostartTemplateId());
 
         //last reading data
         assertEquals(e1.getBattery(), item.getLastReadingBattery().intValue());

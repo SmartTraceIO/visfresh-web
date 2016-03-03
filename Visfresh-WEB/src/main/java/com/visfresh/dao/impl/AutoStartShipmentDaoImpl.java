@@ -35,15 +35,15 @@ public class AutoStartShipmentDaoImpl
 
     public static final String TABLE = "autostartshipments";
 
-    private static final String ID_FIELD = "id";
-    private static final String COMPANY_FIELD = "company";
-    private static final String TEMPLATE_FIELD = "template";
-    private static final String PRIORITY_FIELD = "priority";
+    protected static final String ID_FIELD = "id";
+    protected static final String COMPANY_FIELD = "company";
+    protected static final String TEMPLATE_FIELD = "template";
+    protected static final String PRIORITY_FIELD = "priority";
 
-    private static final String LOCATION_REL_TABLE = "autostartlocations";
-    private static final String LOCATION_DIRECTION = "direction";
-    private static final String LOCATION_LOCATION = "location";
-    private static final String LOCATION_CONFIG = "config";
+    protected static final String LOCATION_REL_TABLE = "autostartlocations";
+    protected static final String LOCATION_DIRECTION = "direction";
+    protected static final String LOCATION_LOCATION = "location";
+    protected static final String LOCATION_CONFIG = "config";
 
     private Map<String, String> propertyToDbMap = new HashMap<>();
 

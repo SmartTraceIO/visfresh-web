@@ -33,6 +33,10 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      * Active flag.
      */
     private boolean active = true;
+    /**
+     * Autostart template ID.
+     */
+    private Long autostartTemplateId;
 
     /**
      * Default constructor.
@@ -139,6 +143,18 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      */
     public boolean isActive() {
         return active;
+    }
+    /**
+     * @return the autostartTemplateId
+     */
+    public Long getAutostartTemplateId() {
+        return autostartTemplateId;
+    }
+    /**
+     * @param autostartTemplateId the autostartTemplateId to set
+     */
+    public void setAutostartTemplateId(final Long autostartTemplateId) {
+        this.autostartTemplateId = autostartTemplateId;
     }
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

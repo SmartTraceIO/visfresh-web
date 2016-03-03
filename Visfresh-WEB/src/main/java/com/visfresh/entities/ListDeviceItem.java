@@ -39,6 +39,8 @@ public class ListDeviceItem {
     private Double longitude;
     private Long shipmentId;
     private ShipmentStatus shipmentStatus;
+    private Long autostartTemplateId;
+    private String autostartTemplateName;
 
     /**
      * Default constructor.
@@ -190,5 +192,29 @@ public class ListDeviceItem {
      */
     public void setShipmentStatus(final ShipmentStatus shipmentStatus) {
         this.shipmentStatus = shipmentStatus;
+    }
+    /**
+     * @return the autostartTemplateId
+     */
+    public Long getAutostartTemplateId() {
+        return autostartTemplateId;
+    }
+    /**
+     * @param id the autostartTemplateId to set
+     */
+    public void setAutostartTemplateId(final Long id) {
+        this.autostartTemplateId = id;
+    }
+    /**
+     * @return the autostartTemplateName
+     */
+    public String getAutostartTemplateName() {
+        return autostartTemplateName;
+    }
+    /**
+     * @param name the autostartTemplateName to set
+     */
+    public void setAutostartTemplateName(final String name) {
+        this.autostartTemplateName = name;
     }
 }

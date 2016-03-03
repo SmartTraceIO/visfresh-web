@@ -37,6 +37,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         tr.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
         tr.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));
         tr.setActive(!Boolean.FALSE.equals(asBoolean(json.get(DeviceConstants.PROPERTY_ACTIVE))));
+        tr.setAutostartTemplateId(asLong(json.get(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID)));
         return tr;
     }
     /**
@@ -54,6 +55,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
         obj.addProperty(DeviceConstants.PROPERTY_ACTIVE, d.isActive());
         obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
+        obj.addProperty(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID, d.getAutostartTemplateId());
         return obj;
     }
     public ListDeviceItemDto parseListDeviceItem(final JsonElement e) {
@@ -68,9 +70,15 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         d.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
         d.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));
         d.setSn(asString(json.get(DeviceConstants.PROPERTY_SN)));
-        d.setActive(!Boolean.FALSE.equals(json.get(DeviceConstants.PROPERTY_ACTIVE)));
+        d.setActive(!Boolean.FALSE.equals(asBoolean(json.get(DeviceConstants.PROPERTY_ACTIVE))));
+        d.setAutostartTemplateId(asLong(json.get(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID)));
+        d.setAutostartTemplateName(asString(json.get(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME)));
 
         d.setLastShipmentId(asLong(json.get(DeviceConstants.PROPERTY_LAST_SHIPMENT)));
+        final String status = asString(json.get(DeviceConstants.PROPERTY_SHIPMENT_STATUS));
+        if (status != null) {
+            d.setShipmentStatus(status);
+        }
         d.setShipmentNumber(asString(json.get(DeviceConstants.PROPERTY_SHIPMENT_NUMBER)));
         d.setLastReadingTimeISO(asString(json.get(DeviceConstants.PROPERTY_LAST_READING_TIME)));
         d.setLastReadingTemperature(asString(json.get(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE)));
@@ -95,6 +103,8 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
         obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
         obj.addProperty(DeviceConstants.PROPERTY_ACTIVE, d.isActive());
+        obj.addProperty(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID, d.getAutostartTemplateId());
+        obj.addProperty(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME, d.getAutostartTemplateName());
 
         obj.addProperty(DeviceConstants.PROPERTY_LAST_SHIPMENT, d.getLastShipmentId());
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TIME, d.getLastReadingTimeISO());

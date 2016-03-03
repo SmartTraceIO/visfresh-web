@@ -10,14 +10,17 @@ import static org.junit.Assert.assertNull;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.constants.DeviceConstants;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.state.DeviceState;
@@ -28,11 +31,18 @@ import com.visfresh.rules.state.DeviceState;
  */
 public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
     private int num;
+    private AutoStartShipment autoStart;
     /**
      * Default constructor.
      */
     public DeviceDaoTest() {
         super(DeviceDao.class);
+    }
+
+    @Before
+    public void setUp() {
+        final ShipmentTemplate tpl = createShipmentTemplate("Tpl1");
+        this.autoStart = createAutoStartTemplate(tpl);
     }
 
     /* (non-Javadoc)
@@ -44,16 +54,27 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
     }
 
     /**
-     * @param imei
+     * @param imei device IMEI..
      * @return
      */
-    protected Device createDevice(final String imei) {
+    private Device createDevice(final String imei) {
+        return createDevice(imei, autoStart);
+    }
+    /**
+     * @param imei
+     * @param au
+     * @return
+     */
+    private Device createDevice(final String imei, final AutoStartShipment au) {
         final Device d = new Device();
         d.setImei(imei);
         d.setName("Test Device");
         d.setCompany(sharedCompany);
         d.setDescription("Test device");
         d.setTripCount(5);
+        if (au != null) {
+            d.setAutostartTemplateId(au.getId());
+        }
         return d;
     }
     /* (non-Javadoc)
@@ -65,6 +86,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals("Test Device", d.getName());
         assertEquals("Test device", d.getDescription());
         assertEquals(5, d.getTripCount());
+        assertEquals(autoStart.getId(), d.getAutostartTemplateId());
 
         //test company
         final Company c = d.getCompany();
@@ -93,6 +115,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals(sharedCompany.getId(), c.getId());
         assertEquals(sharedCompany.getName(), c.getName());
         assertEquals(sharedCompany.getDescription(), c.getDescription());
+        assertEquals(autoStart.getId(), d.getAutostartTemplateId());
     }
     @Test
     public void testFindByCompany() {
@@ -130,13 +153,19 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         final int tripCount1 = 1;
         final int tripCount2 = 2;
 
-        final Device d1 = createDevice(imei1);
+        final ShipmentTemplate tpl1 = createShipmentTemplate(name1);
+        final ShipmentTemplate tpl2 = createShipmentTemplate(name2);
+
+        final AutoStartShipment aut2 = createAutoStartTemplate(tpl2);
+        final AutoStartShipment aut1 = createAutoStartTemplate(tpl1);
+
+        final Device d1 = createDevice(imei1, aut1);
         d1.setActive(active2);
         d1.setDescription(desc1);
         d1.setName(name2);
         d1.setTripCount(tripCount1);
 
-        final Device d2 = createDevice(imei2);
+        final Device d2 = createDevice(imei2, aut2);
         d2.setActive(active1);
         d2.setDescription(desc2);
         d2.setName(name1);
@@ -200,6 +229,23 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals(imei1, devices.get(0).getImei());
         assertEquals(imei2, devices.get(1).getImei());
 
+        //sort by autostart template ID
+        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID), null);
+        assertEquals(d2.getImei(), devices.get(0).getImei());
+        assertEquals(d1.getId(), devices.get(1).getImei());
+
+        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID), null);
+        assertEquals(d1.getImei(), devices.get(0).getImei());
+        assertEquals(d2.getId(), devices.get(1).getImei());
+
+        //sort by autostart template name
+        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME), null);
+        assertEquals(d1.getImei(), devices.get(0).getImei());
+        assertEquals(d2.getId(), devices.get(1).getImei());
+
+        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME), null);
+        assertEquals(d2.getImei(), devices.get(0).getImei());
+        assertEquals(d1.getId(), devices.get(1).getImei());
     }
     @Test
     public void testGetDevicesSortingByLastReadingFields() {
@@ -440,5 +486,26 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         e.setTime(date);
         e.setType(TrackerEventType.AUT);
         return getContext().getBean(TrackerEventDao.class).save(e);
+    }
+    /**
+     * @param name name.
+     * @return shipment template
+     */
+    private ShipmentTemplate createShipmentTemplate(final String name) {
+        final ShipmentTemplate s = new ShipmentTemplate();
+        s.setCompany(sharedCompany);
+        s.setName(name);
+        return getContext().getBean(ShipmentTemplateDao.class).save(s);
+    }
+    /**
+     * @param tpl
+     * @return
+     */
+    private AutoStartShipment createAutoStartTemplate(final ShipmentTemplate tpl) {
+        final AutoStartShipment aut = new AutoStartShipment();
+        aut.setCompany(sharedCompany);
+        aut.setTemplate(tpl);
+        aut.setPriority(10);
+        return getContext().getBean(AutoStartShipmentDao.class).save(aut);
     }
 }

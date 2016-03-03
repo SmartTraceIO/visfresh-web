@@ -143,9 +143,10 @@ public class DeviceController extends AbstractController implements DeviceConsta
         dto.setActive(item.isActive());
         dto.setDescription(item.getDescription());
         dto.setImei(item.getImei());
-        dto.setTripCount(item.getTripCount());
         dto.setSn(Device.getSerialNumber(item.getImei()));
         dto.setName(item.getName());
+        dto.setAutostartTemplateId(item.getAutostartTemplateId());
+        dto.setAutostartTemplateName(item.getAutostartTemplateName());
 
         if (item.getLastReadingTime() != null) {
             dto.setLastReadingTimeISO(isoFormat.format(item.getLastReadingTime()));
@@ -157,7 +158,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
             if (item.getShipmentId() != null) {
                 dto.setLastShipmentId(item.getShipmentId());
-                dto.setShipmentNumber(dto.getSn() + "(" + dto.getTripCount() + ")");
+                dto.setShipmentNumber(dto.getSn() + "(" + item.getTripCount() + ")");
                 dto.setShipmentStatus(item.getShipmentStatus().name());
             }
         }
@@ -174,6 +175,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
                 PROPERTY_DESCRIPTION,
                 PROPERTY_ACTIVE,
                 PROPERTY_SN,
+                PROPERTY_AUTOSTART_TEMPLATE_ID,
+                PROPERTY_AUTOSTART_TEMPLATE_NAME,
                 PROPERTY_SHIPMENT_NUMBER,
                 PROPERTY_LAST_SHIPMENT,
                 PROPERTY_LAST_READING_LAT,

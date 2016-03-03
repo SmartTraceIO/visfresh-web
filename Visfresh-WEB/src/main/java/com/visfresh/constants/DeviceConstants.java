@@ -13,6 +13,8 @@ public interface DeviceConstants {
     String PROPERTY_SN = "sn";
     String PROPERTY_IMEI = "imei";
     String PROPERTY_ACTIVE = "active";
+    String PROPERTY_AUTOSTART_TEMPLATE_ID = "autostartTemplateId";
+    String PROPERTY_AUTOSTART_TEMPLATE_NAME = "autostartTemplateName";
 
     String PROPERTY_LAST_READING_LONG = "lastReadingLong";
     String PROPERTY_LAST_READING_LAT = "lastReadingLat";

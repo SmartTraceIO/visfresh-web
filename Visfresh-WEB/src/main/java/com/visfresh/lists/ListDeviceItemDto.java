@@ -27,10 +27,6 @@ public class ListDeviceItemDto {
      */
     private String description;
     /**
-     * Current device trip count.
-     */
-    private int tripCount;
-    /**
      * Active flag.
      */
     private boolean active;
@@ -44,6 +40,8 @@ public class ListDeviceItemDto {
     private Long lastShipmentId;
     private String shipmentStatus;
     private String shipmentNumber;
+    private Long autostartTemplateId;
+    private String autostartTemplateName;
 
     /**
      * Default constructor.
@@ -60,7 +58,6 @@ public class ListDeviceItemDto {
         setImei(d.getImei());
         setName(d.getName());
         setSn(d.getSn());
-        setTripCount(d.getTripCount());
         setActive(d.isActive());
     }
 
@@ -123,18 +120,6 @@ public class ListDeviceItemDto {
      */
     public void setDescription(final String description) {
         this.description = description;
-    }
-    /**
-     * @return the tripCount
-     */
-    public int getTripCount() {
-        return tripCount;
-    }
-    /**
-     * @param tripCount the tripCount to set
-     */
-    public void setTripCount(final int tripCount) {
-        this.tripCount = tripCount;
     }
     /**
      * @return the lastReadingTimeISO
@@ -225,5 +210,29 @@ public class ListDeviceItemDto {
      */
     public void setShipmentNumber(final String shipmentNumber) {
         this.shipmentNumber = shipmentNumber;
+    }
+    /**
+     * @return the autostartTemplateId
+     */
+    public Long getAutostartTemplateId() {
+        return autostartTemplateId;
+    }
+    /**
+     * @param autostartTemplateId the autostartTemplateId to set
+     */
+    public void setAutostartTemplateId(final Long autostartTemplateId) {
+        this.autostartTemplateId = autostartTemplateId;
+    }
+    /**
+     * @return the autostartTemplateName
+     */
+    public String getAutostartTemplateName() {
+        return autostartTemplateName;
+    }
+    /**
+     * @param autostartTemplateName the autostartTemplateName to set
+     */
+    public void setAutostartTemplateName(final String autostartTemplateName) {
+        this.autostartTemplateName = autostartTemplateName;
     }
 }
