@@ -101,4 +101,14 @@ public class DeviceRestClient extends RestClient {
         params.put("imei", p.getId());
         sendGetRequest(getPathWithToken("deleteDevice"), params);
     }
+    /**
+     * @param imei device IMEI.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void shutdownDevice(final String imei) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("imei", imei);
+        sendGetRequest(getPathWithToken("shutdownDevice"), params);
+    }
 }

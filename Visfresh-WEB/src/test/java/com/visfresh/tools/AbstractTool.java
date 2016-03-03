@@ -5,6 +5,7 @@ package com.visfresh.tools;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -105,11 +106,12 @@ public class AbstractTool {
             u.setEmail(EMAIL);
             u.setFirstName("Java (JS)");
             u.setLastName("Developer");
+            u.setRoles(new HashSet<Role>());
             u.getRoles().add(Role.Admin);
             u.setCompany(c);
 
             userService.saveUser(u, newPassword, false);
-            token = userService.login(user.getEmail(), newPassword);
+            token = userService.login(u.getEmail(), newPassword);
         }
 
         setAuthToken(token);

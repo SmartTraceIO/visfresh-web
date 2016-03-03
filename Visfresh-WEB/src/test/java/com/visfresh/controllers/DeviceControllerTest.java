@@ -14,19 +14,23 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.controllers.restclient.DeviceRestClient;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.lists.ListDeviceItemDto;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.LocalizationUtils;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -138,6 +142,19 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         client.saveDevice(device);
 
         client.sendCommandToDevice(device, "shutdown");
+    }
+    @Test
+    public void testShutdownDevice() throws RestServiceException, IOException {
+        final Device device = createDevice("089723409857032498", true);
+        client.shutdownDevice(device.getImei());
+
+        //check result.
+        final List<SystemMessage> messages = context.getBean(SystemMessageDao.class).findAll(null, null, null);
+        assertEquals(1, messages.size());
+
+        final JsonObject json = SerializerUtils.parseJson(messages.get(0).getMessageInfo()).getAsJsonObject();
+        assertEquals("SHUTDOWN#", json.get("command").getAsString());
+        assertEquals(device.getImei(), json.get("imei").getAsString());
     }
     /**
      * @param device device.

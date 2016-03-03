@@ -6,6 +6,7 @@ package com.visfresh.controllers;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Type;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -89,32 +90,21 @@ public class WebConfig extends WebMvcConfigurerAdapter {
             private boolean restContent(final Class<?> clazz, final MediaType mediaType) {
                 return JsonElement.class.isAssignableFrom(clazz);
             }
-            /* (non-Javadoc)
-             * @see org.springframework.http.converter.json.GsonHttpMessageConverter#readInternal(java.lang.Class, org.springframework.http.HttpInputMessage)
-             */
             @Override
-            protected Object readInternal(final Class<?> clazz,
-                    final HttpInputMessage inputMessage) throws IOException,
-                    HttpMessageNotReadableException {
-                final Object obj;
-                if (log.isDebugEnabled()) {
-                    final TypeToken<?> token = getTypeToken(clazz);
-                    final Reader r = new InputStreamReader(inputMessage.getBody(), "UTF-8");
-                    try {
-                        final String json = StringUtils.getContent(r);
-                        log.debug("JSON request received:\n" + json);
+            public Object read(final Type type, final Class<?> contextClass, final HttpInputMessage inputMessage)
+                    throws IOException, HttpMessageNotReadableException {
 
-                        obj = gson.fromJson(json, token.getType());
-                    } catch (final JsonParseException ex) {
-                        throw new HttpMessageNotReadableException("Could not read JSON: " + ex.getMessage(), ex);
-                    } finally {
-                        r.close();
-                    }
-                } else {
-                    obj = super.readInternal(clazz, inputMessage);
+                final TypeToken<?> token = getTypeToken(type);
+                final Reader r = new InputStreamReader(inputMessage.getBody(), "UTF-8");
+                try {
+                    final String json = StringUtils.getContent(r);
+                    log.debug("JSON request received:\n" + json);
+
+                    return gson.fromJson(json, token.getType());
                 }
-
-                return obj;
+                catch (final JsonParseException ex) {
+                    throw new HttpMessageNotReadableException("Could not read JSON: " + ex.getMessage(), ex);
+                }
             }
         };
         gsonConverter.setGson(gson);

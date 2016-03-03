@@ -239,7 +239,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final @RequestBody JsonObject req) {
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.Admin);
 
             final DeviceCommand cmd = createSerializer(user).parseDeviceCommand(req);
             commandService.sendCommand(cmd, new Date());
@@ -247,6 +247,28 @@ public class DeviceController extends AbstractController implements DeviceConsta
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to send command to device", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param req shipment.
+     * @return status.
+     */
+    @RequestMapping(value = "/shutdownDevice/{authToken}", method = RequestMethod.GET)
+    public JsonObject shutdownDevice(@PathVariable final String authToken,
+            final @RequestParam String imei) {
+        try {
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.NormalUser);
+
+            final Device device = dao.findByImei(imei);
+            checkCompanyAccess(user, device);
+
+            commandService.shutdownDevice(device, new Date());
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to shutdown device", e);
             return createErrorResponse(e);
         }
     }
