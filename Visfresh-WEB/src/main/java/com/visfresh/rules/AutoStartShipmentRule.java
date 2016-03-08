@@ -113,7 +113,9 @@ public class AutoStartShipmentRule implements TrackerEventRule {
             log.debug("Create new shipment for device " + device.getImei());
             shipment = createNewDefaultShipment(device);
         }
+
         shipment.setShipmentDate(event.getTime());
+        shipmentDao.save(shipment);
 
         //close old shipment if need
         if (last != null && !last.hasFinalStatus()) {
@@ -139,16 +141,22 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     private Shipment createForStartLocation(final List<AutoStartShipment> autoStarts,
             final double latitude, final double longitude, final Device device) {
         Collections.sort(autoStarts);
+        final Long autostartId = device.getAutostartTemplateId();
+
         for (final AutoStartShipment auto : autoStarts) {
-            for (final LocationProfile loc : auto.getShippedFrom()) {
-                int distance = (int) LocationUtils.getDistanceMeters(
+            //if autostart not assigned to device or assigned to given device
+            if (autostartId == null || auto.getId().equals(autostartId)) {
+                for (final LocationProfile loc : auto.getShippedFrom()) {
+                    int distance = (int) LocationUtils.getDistanceMeters(
                         loc.getLocation().getLatitude(),
                         loc.getLocation().getLongitude(),
                         latitude,
                         longitude);
-                distance = Math.max(0, distance - loc.getRadius());
-                if (distance == 0) {
-                    return createNewShipment(auto.getTemplate(), loc, device);
+
+                    distance = Math.max(0, distance - loc.getRadius());
+                    if (distance == 0) {
+                        return createNewShipment(auto.getTemplate(), loc, device);
+                    }
                 }
             }
         }
@@ -176,7 +184,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         } else {
             s.setShipmentDescription("Created by autostart shipment rule");
         }
-        return shipmentDao.save(s);
+        return s;
     }
 
     /**
@@ -196,8 +204,6 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         s.setStatus(ShipmentStatus.Default);
         s.setDevice(device);
         s.setShipmentDescription("Created by autostart shipment rule");
-
-        shipmentDao.save(s);
         return s;
     }
 }

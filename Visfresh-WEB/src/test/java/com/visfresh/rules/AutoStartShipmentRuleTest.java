@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.dao.AutoStartShipmentDao;
+import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
@@ -182,7 +183,6 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertTrue(old.getTripCount() < shipment.getTripCount());
         assertEquals(e.getTime().getTime(), shipment.getShipmentDate().getTime(), 1000);
     }
-
     @Test
     public void testSelectAutoStartShipmentWithBadLocations() {
         // create locations
@@ -214,6 +214,42 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertNull(s.getShippedFrom());
         // check created from correct template
         assertEquals(t2.getShipmentDescription(), s.getShipmentDescription());
+    }
+    @Test
+    public void testAutostartAssignedToDevice() {
+        // create locations
+        final LocationProfile lok = createLocationProfile(17.14, 18.16, 1000);
+
+        // create shipment templates
+        final ShipmentTemplate tok = createTemplate("tok");
+
+        // create auto start shipments
+        createAutoStartShipment(tok, 2, lok);
+
+        TrackerEvent e = createEvent(17.14, 18.16, new Date());
+        RuleContext c = new RuleContext(e, new DeviceState());
+        rule.handle(c);
+
+        // check shipment created.
+        assertNotNull(e.getShipment());
+        final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
+
+        Shipment s = shipmentDao.findOne(e.getShipment().getId());
+        assertNotNull(s.getShippedFrom());
+
+        //assign autostart to device, but not set any locations to this
+        //template
+        final AutoStartShipment assigned = createAutoStartShipment(
+                createTemplate("Assigned"), 2);
+        e.getDevice().setAutostartTemplateId(assigned.getId());
+        context.getBean(DeviceDao.class).save(e.getDevice());
+
+        e = createEvent(17.14, 18.16, new Date());
+        c = new RuleContext(e, new DeviceState());
+        rule.handle(c);
+
+        s = shipmentDao.findOne(e.getShipment().getId());
+        assertNull(s.getShippedFrom());
     }
     // @Test test has temporary disabled according of comment the logics
     public void testNotReuseNotExpiredPreviousShipment() {
