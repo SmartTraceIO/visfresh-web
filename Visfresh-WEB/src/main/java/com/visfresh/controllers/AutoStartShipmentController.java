@@ -121,7 +121,7 @@ public class AutoStartShipmentController extends AbstractController
             final Long id = dao.save(cfg).getId();
             return createIdResponse("defaultShipmentId", id);
         } catch (final Exception e) {
-            log.error("Failed to save default shipment", e);
+            log.error("Failed to save autostart template", e);
             return createErrorResponse(e);
         }
     }
@@ -169,6 +169,7 @@ public class AutoStartShipmentController extends AbstractController
         final AlertProfile ap = alertProfileDao.findOne(dto.getAlertProfile());
         checkCompanyAccess(user, ap);
 
+        tpl.setAutostart(true);
         tpl.setAlertProfile(ap);
         tpl.setAlertSuppressionMinutes(dto.getAlertSuppressionMinutes());
         tpl.setArrivalNotificationWithinKm(dto.getArrivalNotificationWithinKm());
@@ -225,7 +226,7 @@ public class AutoStartShipmentController extends AbstractController
             return createSuccessResponse(createSerializer(user).toJson(
                     new AutoStartShipmentDto(cfg)));
         } catch (final Exception e) {
-            log.error("Failed to get default shipment", e);
+            log.error("Failed to get autostart template", e);
             return createErrorResponse(e);
         }
     }
@@ -248,7 +249,7 @@ public class AutoStartShipmentController extends AbstractController
 
             return createSuccessResponse(null);
         } catch (final Exception e) {
-            log.error("Failed to get default shipmemnt", e);
+            log.error("Failed to delete autostart shipmemnt", e);
             return createErrorResponse(e);
         }
     }
@@ -288,7 +289,7 @@ public class AutoStartShipmentController extends AbstractController
 
             return createListSuccessResponse(array, total);
         } catch (final Exception e) {
-            log.error("Failed to get default shipments", e);
+            log.error("Failed to get autostart templates", e);
             return createErrorResponse(e);
         }
     }

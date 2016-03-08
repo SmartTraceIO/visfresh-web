@@ -168,6 +168,7 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(name, tpl.getName());
         assertEquals(shipmentDescription, tpl.getShipmentDescription());
         assertEquals(addDateShipped, tpl.isAddDateShipped());
+        assertEquals(true, tpl.isAutostart());
     }
 
     @Test

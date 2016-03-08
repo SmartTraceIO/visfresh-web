@@ -306,7 +306,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
             no.setNoAlertsAfterArrivalMinutes(noalertAfterArrivalTimeOut.intValue());
         }
         final Number shutDownAfterStartMinutes = (Number) map.get(SHUTDOWN_AFTER_START_TIMOUT_FIELD);
-        if (noalertAfterArrivalTimeOut != null) {
+        if (shutDownAfterStartMinutes != null) {
             no.setShutDownAfterStartMinutes(shutDownAfterStartMinutes.intValue());
         }
 

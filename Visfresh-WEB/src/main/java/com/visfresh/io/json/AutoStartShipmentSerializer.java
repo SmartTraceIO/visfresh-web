@@ -3,6 +3,8 @@
  */
 package com.visfresh.io.json;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
@@ -15,6 +17,8 @@ import com.visfresh.constants.AutoStartShipmentConstants;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.controllers.ShipmentTemplateConstants;
 import com.visfresh.io.AutoStartShipmentDto;
+import com.visfresh.utils.SerializerUtils;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -136,5 +140,20 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
             result.add(e.getAsLong());
         }
         return result;
+    }
+    public static void main(final String[] args) throws IOException {
+        final AutoStartShipmentSerializer ser = new AutoStartShipmentSerializer(TimeZone.getDefault());
+        JsonObject json;
+
+        final InputStream in = ShipmentTemplateSerializer.class.getResourceAsStream("req.json");
+        try {
+            final String str = StringUtils.getContent(in, "UTF-8");
+            json = SerializerUtils.parseJson(str).getAsJsonObject();
+        } finally {
+            in.close();
+        }
+
+        final AutoStartShipmentDto aut = ser.parseAutoStartShipmentDto(json);
+        System.out.println("Success: " + aut);
     }
 }

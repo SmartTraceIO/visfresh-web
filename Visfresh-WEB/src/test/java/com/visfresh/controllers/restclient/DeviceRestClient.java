@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.Shipment;
 import com.visfresh.io.json.DeviceSerializer;
 import com.visfresh.lists.ListDeviceItemDto;
 import com.visfresh.services.RestServiceException;
@@ -103,12 +104,16 @@ public class DeviceRestClient extends RestClient {
     }
     /**
      * @param imei device IMEI.
+     * @param shipment shipment, can be null
      * @throws RestServiceException
      * @throws IOException
      */
-    public void shutdownDevice(final String imei) throws IOException, RestServiceException {
+    public void shutdownDevice(final String imei, final Shipment shipment) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("imei", imei);
+        if (shipment != null) {
+            params.put("shipmentId", shipment.getId().toString());
+        }
         sendGetRequest(getPathWithToken("shutdownDevice"), params);
     }
 }

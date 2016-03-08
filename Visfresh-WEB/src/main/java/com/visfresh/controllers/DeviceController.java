@@ -20,13 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Page;
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.Role;
+import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.DeviceResolver;
@@ -50,6 +54,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
     @Autowired
     private DeviceDao dao;
+    @Autowired
+    private ShipmentDao shipmentDao;
     @Autowired
     private TrackerEventDao trackerEventDao;
     @Autowired
@@ -260,19 +266,61 @@ public class DeviceController extends AbstractController implements DeviceConsta
      */
     @RequestMapping(value = "/shutdownDevice/{authToken}", method = RequestMethod.GET)
     public JsonObject shutdownDevice(@PathVariable final String authToken,
-            final @RequestParam String imei) {
+            final @RequestParam String imei,
+            final @RequestParam(required = false) Long shipmentId) {
         try {
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.NormalUser);
 
+            //get device to shutdown.
             final Device device = dao.findByImei(imei);
             checkCompanyAccess(user, device);
 
-            commandService.shutdownDevice(device, new Date());
+            Shipment shipment;
+            if (shipmentId != null) {
+                shipment = shipmentDao.findOne(shipmentId);
+                if (shipment != null && !shipment.getDevice().getImei().equals(imei)) {
+                    //check device is for given shipment.
+                    log.error("Shipment " + shipmentId + " device " + shipment.getDevice().getImei()
+                            + " not matches the shutting down device " + imei);
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Shipment " + shipmentId + " users another device than " + imei);
+                }
+            } else {
+                shipment = shipmentDao.findLastShipment(imei);
+            }
+
+            checkCompanyAccess(user, shipment);
+            stopShipmentAndShutdownDevice(shipment, device);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to shutdown device", e);
             return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param shipment
+     * @param device
+     */
+    private void stopShipmentAndShutdownDevice(final Shipment shipment, final Device device) {
+        commandService.shutdownDevice(device, new Date());
+
+        if (shipment != null) {
+            //stop shipment
+            final ShipmentStatus status = shipment.getStatus();
+            if (status == ShipmentStatus.Arrived) {
+                //if status = "Arrived" (shutdown) => status='arrived"
+                //[20:24:37] James Richardson: if stayts = 'Ended' (shutown) ==> status = 'Ended
+                //do nothing
+                log.debug("Shipment " + shipment.getId() + " is already in final status " + status);
+            } else {
+                //[20:23:46] James Richardson: if status = "InProgress" (shutdown) ==> status = 'ended'
+                //[20:24:21] James Richardson: if status = 'Default' (shutdown) ==> statsus- 'Ended'
+                shipment.setStatus(ShipmentStatus.Ended);
+                shipmentDao.save(shipment);
+                log.debug("Shipment " + shipment.getId() + " status has set to " + ShipmentStatus.Ended
+                        + " according device " + device.getImei() + " shutdown");
+            }
         }
     }
     /**
