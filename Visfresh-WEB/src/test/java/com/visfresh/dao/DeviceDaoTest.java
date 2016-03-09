@@ -325,11 +325,11 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals(s11.getId(), devices.get(1).getShipmentId());
 
         //sort by last reading time
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_LAST_READING_TIME), null);
+        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_LAST_READING_TIME_ISO), null);
         assertEquals(s22.getId(), devices.get(0).getShipmentId());
         assertEquals(s11.getId(), devices.get(1).getShipmentId());
 
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_TIME), null);
+        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_LAST_READING_TIME_ISO), null);
         assertEquals(s11.getId(), devices.get(0).getShipmentId());
         assertEquals(s22.getId(), devices.get(1).getShipmentId());
 

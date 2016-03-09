@@ -242,7 +242,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 + "lr.longitude as " + DeviceConstants.PROPERTY_LAST_READING_LONG + ",\n"
                 + "lr.battery as " + DeviceConstants.PROPERTY_LAST_READING_BATTERY + ",\n"
                 + "lr.temperature as " + DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE + ",\n"
-                + "lr.time as " + DeviceConstants.PROPERTY_LAST_READING_TIME + ",\n"
+                + "lr.time as " + DeviceConstants.PROPERTY_LAST_READING_TIME_ISO + ",\n"
                 + "lr.status as " + DeviceConstants.PROPERTY_SHIPMENT_STATUS + "\n"
                 + "from devices d\n"
                 + "left outer join (\n"
@@ -315,7 +315,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         if (temperature != null) {
             item.setTemperature(temperature.doubleValue());
             item.setBattery(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_BATTERY)).intValue());
-            item.setLastReadingTime((Date) row.get(DeviceConstants.PROPERTY_LAST_READING_TIME));
+            item.setLastReadingTime((Date) row.get(DeviceConstants.PROPERTY_LAST_READING_TIME_ISO));
             item.setLatitude(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LAT)).doubleValue());
             item.setLongitude(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LONG)).doubleValue());
 

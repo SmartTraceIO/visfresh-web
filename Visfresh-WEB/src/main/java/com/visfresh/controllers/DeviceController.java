@@ -123,7 +123,9 @@ public class DeviceController extends AbstractController implements DeviceConsta
             checkAccess(user, Role.BasicUser);
 
             final DeviceSerializer ser = createSerializer(user);
+
             final DateFormat isoFormat = DateTimeUtils.createDateFormat(user, "yyyy-MM-dd HH:mm");
+            final DateFormat prettyFormat = DateTimeUtils.createDateFormat(user, "h:mmaa d MMM yyyy");
 
             final List<ListDeviceItem> devices = dao.getDevices(user.getCompany(),
                     createSorting(sc, so, getDefaultSortOrder(), 1),
@@ -132,7 +134,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
             final JsonArray array = new JsonArray();
             for (final ListDeviceItem item : devices) {
-                array.add(ser.toJson(createDto(item, isoFormat, user.getTemperatureUnits())));
+                array.add(ser.toJson(createDto(item, isoFormat, prettyFormat, user.getTemperatureUnits())));
             }
 
             return createListSuccessResponse(array, total);
@@ -147,7 +149,9 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param temperatureUnits
      * @return
      */
-    private ListDeviceItemDto createDto(final ListDeviceItem item, final DateFormat isoFormat,
+    private ListDeviceItemDto createDto(final ListDeviceItem item,
+            final DateFormat isoFormat,
+            final DateFormat prettyFormat,
             final TemperatureUnits temperatureUnits) {
         final ListDeviceItemDto dto = new ListDeviceItemDto();
         dto.setActive(item.isActive());
@@ -160,6 +164,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
         if (item.getLastReadingTime() != null) {
             dto.setLastReadingTimeISO(isoFormat.format(item.getLastReadingTime()));
+            dto.setLastReadingTime(prettyFormat.format(item.getLastReadingTime()));
             dto.setLastReadingBattery(item.getBattery());
             dto.setLastReadingLat(item.getLatitude());
             dto.setLastReadingLong(item.getLongitude());
@@ -193,7 +198,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
                 PROPERTY_LAST_READING_LONG,
                 PROPERTY_LAST_READING_BATTERY,
                 PROPERTY_LAST_READING_TEMPERATURE,
-                PROPERTY_LAST_READING_TIME,
+                PROPERTY_LAST_READING_TIME_ISO,
                 PROPERTY_SHIPMENT_STATUS
         };
     }

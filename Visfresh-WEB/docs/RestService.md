@@ -1884,14 +1884,15 @@ Response:
   "response": [
     {
       "description": "Device description",
-      "imei": "3333333333333",
+      "imei": "1111111111111",
       "name": "Device Name",
-      "sn": "333333",
+      "sn": "111111",
       "active": true,
       "autostartTemplateId": null,
       "autostartTemplateName": null,
       "lastShipmentId": null,
       "lastReadingTimeISO": null,
+      "lastReadingTime": null,
       "lastReadingTemperature": null,
       "lastReadingBattery": null,
       "lastReadingLat": null,
@@ -1909,6 +1910,7 @@ Response:
       "autostartTemplateName": null,
       "lastShipmentId": null,
       "lastReadingTimeISO": null,
+      "lastReadingTime": null,
       "lastReadingTemperature": null,
       "lastReadingBattery": null,
       "lastReadingLat": null,
@@ -1918,23 +1920,42 @@ Response:
     },
     {
       "description": "Device description",
-      "imei": "1111111111111",
+      "imei": "3333333333333",
       "name": "Device Name",
-      "sn": "111111",
+      "sn": "333333",
+      "active": true,
+      "autostartTemplateId": 910,
+      "autostartTemplateName": "TPL1",
+      "lastShipmentId": 5711,
+      "lastReadingTimeISO": "2016-03-09 15:06",
+      "lastReadingTime": "3:06PM 9 Mar 2016",
+      "lastReadingTemperature": "23.5°C",
+      "lastReadingBattery": 27,
+      "lastReadingLat": 12.34,
+      "lastReadingLong": 56.78,
+      "shipmentNumber": "333333(0)",
+      "shipmentStatus": "InProgress"
+    },
+    {
+      "description": "Device description",
+      "imei": "4444444444444",
+      "name": "Device Name",
+      "sn": "444444",
       "active": true,
       "autostartTemplateId": null,
       "autostartTemplateName": null,
       "lastShipmentId": null,
-      "lastReadingTimeISO": null,
-      "lastReadingTemperature": null,
-      "lastReadingBattery": null,
-      "lastReadingLat": null,
-      "lastReadingLong": null,
+      "lastReadingTimeISO": "2016-03-09 15:06",
+      "lastReadingTime": "3:06PM 9 Mar 2016",
+      "lastReadingTemperature": "11.0°C",
+      "lastReadingBattery": 27,
+      "lastReadingLat": 12.34,
+      "lastReadingLong": 56.78,
       "shipmentNumber": null,
       "shipmentStatus": null
     }
   ],
-  "totalCount": 3
+  "totalCount": 4
 }
 ```
 ### Delete Device example ##

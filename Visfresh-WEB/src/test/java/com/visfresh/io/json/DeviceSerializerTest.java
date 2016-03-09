@@ -87,6 +87,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         final Double lastReadingLong = 12.34;
         final String lastReadingTemperature = "12.245";
         final String lastReadingTimeISO = "2016-03-03 11:11:11";
+        final String lastReadingTime = "11:33am 12 Mar 2016";
         final Long lastShipmentId = 9l;
         final String name = "JUnit Device";
         final String shipmentNumber = "12345(10)";
@@ -102,6 +103,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         dto.setLastReadingLong(lastReadingLong);
         dto.setLastReadingTemperature(lastReadingTemperature);
         dto.setLastReadingTimeISO(lastReadingTimeISO);
+        dto.setLastReadingTime(lastReadingTime);
         dto.setLastShipmentId(lastShipmentId);
         dto.setName(name);
         dto.setShipmentNumber(shipmentNumber);
@@ -119,6 +121,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         assertEquals(lastReadingLong, dto.getLastReadingLong());
         assertEquals(lastReadingTemperature, dto.getLastReadingTemperature());
         assertEquals(lastReadingTimeISO, dto.getLastReadingTimeISO());
+        assertEquals(lastReadingTime, dto.getLastReadingTime());
         assertEquals(lastShipmentId, dto.getLastShipmentId());
         assertEquals(name, dto.getName());
         assertEquals(shipmentNumber, dto.getShipmentNumber());

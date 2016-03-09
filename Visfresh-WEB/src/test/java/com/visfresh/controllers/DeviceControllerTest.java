@@ -141,6 +141,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(LocalizationUtils.getTemperatureString(23.46, TemperatureUnits.Celsius),
                 item.getLastReadingTemperature());
         assertNotNull(item.getLastReadingTimeISO());
+        assertNotNull(item.getLastReadingTime());
         assertEquals(e1.getShipment().getId(), item.getLastShipmentId());
     }
     @Test

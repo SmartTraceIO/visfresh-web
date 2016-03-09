@@ -80,7 +80,8 @@ public class DeviceSerializer extends AbstractJsonSerializer {
             d.setShipmentStatus(status);
         }
         d.setShipmentNumber(asString(json.get(DeviceConstants.PROPERTY_SHIPMENT_NUMBER)));
-        d.setLastReadingTimeISO(asString(json.get(DeviceConstants.PROPERTY_LAST_READING_TIME)));
+        d.setLastReadingTimeISO(asString(json.get(DeviceConstants.PROPERTY_LAST_READING_TIME_ISO)));
+        d.setLastReadingTime(asString(json.get(DeviceConstants.PROPERTY_LAST_READING_TIME)));
         d.setLastReadingTemperature(asString(json.get(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE)));
         d.setLastReadingBattery(asInteger(json.get(DeviceConstants.PROPERTY_LAST_READING_BATTERY)));
         d.setLastReadingLat(asDouble(json.get(DeviceConstants.PROPERTY_LAST_READING_LAT)));
@@ -107,7 +108,8 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME, d.getAutostartTemplateName());
 
         obj.addProperty(DeviceConstants.PROPERTY_LAST_SHIPMENT, d.getLastShipmentId());
-        obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TIME, d.getLastReadingTimeISO());
+        obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TIME_ISO, d.getLastReadingTimeISO());
+        obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TIME, d.getLastReadingTime());
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE, d.getLastReadingTemperature());
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_BATTERY, d.getLastReadingBattery());
         obj.addProperty(DeviceConstants.PROPERTY_LAST_READING_LAT, d.getLastReadingLat());

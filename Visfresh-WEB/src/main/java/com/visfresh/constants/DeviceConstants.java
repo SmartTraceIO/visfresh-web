@@ -20,7 +20,8 @@ public interface DeviceConstants {
     String PROPERTY_LAST_READING_LAT = "lastReadingLat";
     String PROPERTY_LAST_READING_BATTERY = "lastReadingBattery";
     String PROPERTY_LAST_READING_TEMPERATURE = "lastReadingTemperature";
-    String PROPERTY_LAST_READING_TIME = "lastReadingTimeISO";
+    String PROPERTY_LAST_READING_TIME_ISO = "lastReadingTimeISO";
+    String PROPERTY_LAST_READING_TIME = "lastReadingTime";
     String PROPERTY_LAST_SHIPMENT = "lastShipmentId";
     String PROPERTY_SHIPMENT_NUMBER = "shipmentNumber";
     String PROPERTY_SHIPMENT_STATUS = "shipmentStatus";

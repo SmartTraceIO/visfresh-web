@@ -33,6 +33,7 @@ public class ListDeviceItemDto {
 
     //last reading data
     private String lastReadingTimeISO;
+    private String lastReadingTime;
     private String lastReadingTemperature;
     private Integer lastReadingBattery;
     private Double lastReadingLat;
@@ -132,6 +133,18 @@ public class ListDeviceItemDto {
      */
     public void setLastReadingTimeISO(final String lastReadingTimeISO) {
         this.lastReadingTimeISO = lastReadingTimeISO;
+    }
+    /**
+     * @return the lastReadingTime
+     */
+    public String getLastReadingTime() {
+        return lastReadingTime;
+    }
+    /**
+     * @param time the lastReadingTime to set
+     */
+    public void setLastReadingTime(final String time) {
+        this.lastReadingTime = time;
     }
     /**
      * @return the lastReadingTemperature
