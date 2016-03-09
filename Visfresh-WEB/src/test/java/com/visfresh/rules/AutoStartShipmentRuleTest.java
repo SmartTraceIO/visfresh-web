@@ -102,6 +102,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
     @Test
     public void testHandle() {
         final TrackerEvent e = createEvent(17.14, 18.16, new Date());
+        e.setTime(new Date(System.currentTimeMillis() - 1000000l));
 
         final RuleContext c = new RuleContext(e, new DeviceState());
         rule.handle(c);

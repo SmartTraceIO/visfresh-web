@@ -4,6 +4,7 @@
 package com.visfresh.rules;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,8 +17,8 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.rules.state.DeviceState;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -51,13 +52,22 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      */
     private boolean isSuppressedAllerts(final RuleContext context) {
         final Shipment shipment = context.getEvent().getShipment();
+        final Date eventTime = context.getEvent().getTime();
 
-        if (shipment.getAlertSuppressionMinutes() > 0) {
-            final DeviceState state = context.getState();
-            final long allowed = state.getStartShipmentDate().getTime()
-                    + shipment.getAlertSuppressionMinutes() * 60 * 1000l;
+        //check not alerts after arrival
+        if (shipment.getStatus() == ShipmentStatus.Arrived && shipment.getNoAlertsAfterArrivalMinutes() != null) {
+            final Date arrivalDate = shipment.getArrivalDate();
+            if (arrivalDate != null && (eventTime.getTime() - arrivalDate.getTime()
+                    > shipment.getNoAlertsAfterArrivalMinutes() * 60 * 1000l)) {
+                return true;
+            }
+        }
 
-            return context.getEvent().getTime().getTime() < allowed;
+        //check not alert after start
+        if (shipment.getNoAlertsAfterStartMinutes() != null
+                && eventTime.getTime() - shipment.getShipmentDate().getTime()
+                > shipment.getNoAlertsAfterStartMinutes() * 60 * 1000l) {
+            return true;
         }
 
         return false;

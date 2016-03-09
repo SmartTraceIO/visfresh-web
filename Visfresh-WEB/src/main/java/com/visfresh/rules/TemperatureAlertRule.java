@@ -66,7 +66,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         for (final TemperatureRule rule : event.getShipment().getAlertProfile().getAlertRules()) {
 
             //if rule is not already processed. Each rule should be processed one time.
-            if (!AbstractRuleEngine.isTemperatureProcessedRule(context.getState(), rule)) {
+            if (!AbstractRuleEngine.isTemperatureRuleProcessed(context.getState(), rule)) {
                 final boolean isCumulative = rule.isCumulativeFlag();
                 if (isMatches(rule, t)) {
                     Alert a = null;
@@ -117,7 +117,9 @@ public class TemperatureAlertRule extends AbstractAlertRule {
 
         final TrackerEvent event = context.getEvent();
         final long total = (event.getTime().getTime() - firstIssue.getTime()) / MINUTE;
-        if (total >= rule.getTimeOutMinutes()) {
+        final int suppressionPeriod = event.getShipment().getAlertSuppressionMinutes();
+
+        if (total >= Math.max(rule.getTimeOutMinutes(), suppressionPeriod)) {
             final TemperatureAlert a = createAlert(rule, event);
             a.setMinutes((int) total);
             AbstractRuleEngine.setProcessedTemperatureRule(context.getState(), rule);
@@ -146,7 +148,8 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         long total = totalStr == null ? 0 : Long.parseLong(totalStr);
         total += Math.abs(event.getTime().getTime() - prev.getTime().getTime());
 
-        if (total >= rule.getTimeOutMinutes() * 60000L) {
+        final int suppressionPeriod = event.getShipment().getAlertSuppressionMinutes();
+        if (total >= Math.max(rule.getTimeOutMinutes(), suppressionPeriod) * 60000L) {
             final TemperatureAlert alert = createAlert(rule, event);
             alert.setMinutes((int) (total / 60000l));
             AbstractRuleEngine.setProcessedTemperatureRule(context.getState(), rule);

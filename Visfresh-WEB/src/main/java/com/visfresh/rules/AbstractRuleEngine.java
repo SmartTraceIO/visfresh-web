@@ -192,7 +192,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                 case CriticalCold:
                 case Hot:
                 case CriticalHot:
-                    if (state == null || !isTemperatureProcessedRule(state, rule)) {
+                    if (state == null || !isTemperatureRuleProcessed(state, rule)) {
                         alerts.add(rule);
                     }
                     break;
@@ -226,7 +226,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param rule alert rule.
      * @return
      */
-    protected static boolean isTemperatureProcessedRule(final DeviceState state,
+    protected static boolean isTemperatureRuleProcessed(final DeviceState state,
             final TemperatureRule rule) {
         return "true".equals(state.getTemperatureAlerts().getProperties().get(createProcessedKey(rule)));
     }

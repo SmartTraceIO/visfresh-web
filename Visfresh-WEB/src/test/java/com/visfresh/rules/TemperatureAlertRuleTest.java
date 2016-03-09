@@ -4,8 +4,6 @@
 package com.visfresh.rules;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
@@ -571,13 +569,46 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
     }
     @Test
     public void testSuppressionTimeOut() {
-        final double temperature = 10.;
-        final int timeOutMinutes = 30;
+        final double t = 10.;
+        final int timeOutMinutes = 8;
 
         //create alert rule
         final TemperatureRule r = new TemperatureRule(AlertType.CriticalCold);
-        r.setTemperature(temperature);
-        r.setTimeOutMinutes(timeOutMinutes);
+        r.setTemperature(t);
+        r.setTimeOutMinutes(timeOutMinutes + 1);
+        r.setCumulativeFlag(false);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        final DeviceState state = new DeviceState();
+        state.possibleNewShipment(shipment);
+
+        final long minutes9 = 9 * 60 * 1000l;
+        final long startTime = System.currentTimeMillis() - minutes9;
+
+        shipment.setAlertSuppressionMinutes(10);
+
+        //check without suppressed alert time
+        rule.handle(new RuleContext(createEvent(startTime, TrackerEventType.AUT, t), state));
+        rule.handle(new RuleContext(createEvent(startTime + minutes9, TrackerEventType.AUT, t), state));
+
+        assertEquals(0, alertDao.getAlerts(shipment).size());
+
+        shipment.setAlertSuppressionMinutes(0);
+        rule.handle(new RuleContext(createEvent(startTime + minutes9, TrackerEventType.AUT, t), state));
+
+        assertEquals(1, alertDao.getAlerts(shipment).size());
+    }
+    @Test
+    public void testSuppressionTimeOutCumulative() {
+        final double t = 10.;
+        final int timeOutMinutes = 8;
+
+        //create alert rule
+        final TemperatureRule r = new TemperatureRule(AlertType.CriticalCold);
+        r.setTemperature(t);
+        r.setTimeOutMinutes(timeOutMinutes + 1);
         r.setCumulativeFlag(true);
 
         alertProfile.getAlertRules().add(r);
@@ -586,21 +617,21 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final DeviceState state = new DeviceState();
         state.possibleNewShipment(shipment);
 
-        final TrackerEvent e = createEvent(System.currentTimeMillis(), TrackerEventType.AUT, temperature - 1);
+        final long minutes9 = 9 * 60 * 1000l;
+        final long startTime = System.currentTimeMillis() - minutes9;
+
+        shipment.setAlertSuppressionMinutes(10);
 
         //check without suppressed alert time
-        assertTrue(rule.accept(new RuleContext(e, state)));
+        rule.handle(new RuleContext(createEvent(startTime, TrackerEventType.AUT, t), state));
+        rule.handle(new RuleContext(createEvent(startTime + minutes9, TrackerEventType.AUT, t), state));
 
-        //check with suppressed alert time.
-        shipment.setAlertSuppressionMinutes(10);
-        context.getBean(ShipmentDao.class).save(shipment);
+        assertEquals(0, alertDao.getAlerts(shipment).size());
 
-        assertFalse(rule.accept(new RuleContext(e, state)));
+        shipment.setAlertSuppressionMinutes(0);
+        rule.handle(new RuleContext(createEvent(startTime + minutes9, TrackerEventType.AUT, t), state));
 
-        //shift the start shipment date.
-        state.setStartShipmentDate(new Date(e.getTime().getTime() - 10 * 60 * 1000l - 1l));
-
-        assertTrue(rule.accept(new RuleContext(e, state)));
+        assertEquals(1, alertDao.getAlerts(shipment).size());
     }
     /**
      * @param date date.
