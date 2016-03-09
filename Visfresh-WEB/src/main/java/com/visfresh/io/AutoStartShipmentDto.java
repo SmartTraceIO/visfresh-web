@@ -80,6 +80,7 @@ public class AutoStartShipmentDto {
      * Comments for receiver
      */
     private String commentsForReceiver;
+    private Integer noAlertsAfterStartMinutes;
 
     /**
      * Default constructor.
@@ -123,6 +124,7 @@ public class AutoStartShipmentDto {
         setExcludeNotificationsIfNoAlerts(tpl.isExcludeNotificationsIfNoAlerts());
         setShutdownDeviceAfterMinutes(tpl.getShutdownDeviceAfterMinutes());
         setNoAlertsAfterArrivalMinutes(tpl.getNoAlertsAfterArrivalMinutes());
+        setNoAlertsAfterStartMinutes(tpl.getNoAlertsAfterStartMinutes());
         setShutDownAfterStartMinutes(tpl.getShutDownAfterStartMinutes());
         setCommentsForReceiver(tpl.getCommentsForReceiver());
     }
@@ -270,6 +272,18 @@ public class AutoStartShipmentDto {
      */
     public void setNoAlertsAfterArrivalMinutes(final Integer noAlertsAfterArrivalMinutes) {
         this.noAlertsAfterArrivalMinutes = noAlertsAfterArrivalMinutes;
+    }
+    /**
+     * @param minutes
+     */
+    public void setNoAlertsAfterStartMinutes(final Integer minutes) {
+        this.noAlertsAfterStartMinutes = minutes;
+    }
+    /**
+     * @return the noAlertsAfterStartMinutes
+     */
+    public Integer getNoAlertsAfterStartMinutes() {
+        return noAlertsAfterStartMinutes;
     }
     /**
      * @return the shutDownAfterStartMinutes

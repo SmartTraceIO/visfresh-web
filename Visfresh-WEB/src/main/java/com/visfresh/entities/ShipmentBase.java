@@ -73,6 +73,7 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      * Comments for receiver
      */
     private String commentsForReceiver;
+    private Integer noAlertsAfterStartMinutes;
 
     /**
      * Default constructor.
@@ -273,6 +274,18 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      */
     public void setNoAlertsAfterArrivalMinutes(final Integer noAlertsAfterArrivalMinutes) {
         this.noAlertsAfterArrivalMinutes = noAlertsAfterArrivalMinutes;
+    }
+    /**
+     * @param minutes
+     */
+    public void setNoAlertsAfterStartMinutes(final Integer minutes) {
+        this.noAlertsAfterStartMinutes = minutes;
+    }
+    /**
+     * @return the noAlertsAfterStartMinutes
+     */
+    public Integer getNoAlertsAfterStartMinutes() {
+        return noAlertsAfterStartMinutes;
     }
     /**
      * @return the shutDownAfterStartMinutes

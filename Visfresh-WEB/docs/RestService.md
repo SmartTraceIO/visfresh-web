@@ -596,7 +596,8 @@ see [ResponseStatus](#markdown-header-response-status)
   "imei": "0239487043987",
   "name": "Device Name",
   "active": true,
-  "sn": "043987" // read only property
+  "sn": "043987", // read only property
+  "autostartTemplateId": null
 }
 ```
 ### Device Group ###
@@ -1857,8 +1858,9 @@ Response:
 {
   "description": "Device description",
   "imei": "0239487043987",
+  "name": "Device Name",
   "active": true,
-  "name": "Device Name"
+  "autostartTemplateId": null
 }
 ```  
 **Response:**  
@@ -1886,28 +1888,53 @@ Response:
       "name": "Device Name",
       "sn": "333333",
       "active": true,
-      "lastShipmentId": 1246,
-      "lastReadingTimeISO": "2016-02-26 18:57",
-      "lastReadingTemperature": 11.0,
-      "lastReadingBattery": 27,
-      "lastReadingLat": 0.0,
-      "lastReadingLong": 0.0
+      "autostartTemplateId": null,
+      "autostartTemplateName": null,
+      "lastShipmentId": null,
+      "lastReadingTimeISO": null,
+      "lastReadingTemperature": null,
+      "lastReadingBattery": null,
+      "lastReadingLat": null,
+      "lastReadingLong": null,
+      "shipmentNumber": null,
+      "shipmentStatus": null
     },
     {
       "description": "Device description",
-      "imei": "4444444444444",
+      "imei": "2222222222222",
       "name": "Device Name",
-      "sn": "444444",
+      "sn": "222222",
       "active": true,
-      "lastShipmentId": 1246,
-      "lastReadingTimeISO": "2016-02-26 18:57",
-      "lastReadingTemperature": 11.0,
-      "lastReadingBattery": 27,
-      "lastReadingLat": 0.0,
-      "lastReadingLong": 0.0
+      "autostartTemplateId": null,
+      "autostartTemplateName": null,
+      "lastShipmentId": null,
+      "lastReadingTimeISO": null,
+      "lastReadingTemperature": null,
+      "lastReadingBattery": null,
+      "lastReadingLat": null,
+      "lastReadingLong": null,
+      "shipmentNumber": null,
+      "shipmentStatus": null
+    },
+    {
+      "description": "Device description",
+      "imei": "1111111111111",
+      "name": "Device Name",
+      "sn": "111111",
+      "active": true,
+      "autostartTemplateId": null,
+      "autostartTemplateName": null,
+      "lastShipmentId": null,
+      "lastReadingTimeISO": null,
+      "lastReadingTemperature": null,
+      "lastReadingBattery": null,
+      "lastReadingLat": null,
+      "lastReadingLong": null,
+      "shipmentNumber": null,
+      "shipmentStatus": null
     }
   ],
-  "totalCount": 2
+  "totalCount": 3
 }
 ```
 ### Delete Device example ##

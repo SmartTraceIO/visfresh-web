@@ -42,6 +42,7 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -56,11 +57,11 @@ import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.shipment.SingleShipmentAlert;
 import com.visfresh.io.shipment.SingleShipmentDto;
-import com.visfresh.io.shipment.SingleShipmentDtoNew;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.io.shipment.SingleShipmentTimeItem;
 import com.visfresh.l12n.ChartBundle;
 import com.visfresh.l12n.RuleBundle;
+import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.lists.ListShipmentItem;
 import com.visfresh.services.ArrivalEstimation;
 import com.visfresh.services.ArrivalEstimationService;
@@ -280,10 +281,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private Sorting createSortingShipments(final String sc, final String so,
             final String[] defaultSortOrder, final int maxNumOfSortColumns) {
         String sortColumn;
-        if (PROPERTY_SHIPPED_FROM.equals(sc)) {
-            sortColumn = PROPERTY_SHIPPED_FROM_LOCATION_NAME;
-        } else if (PROPERTY_SHIPPED_TO.equals(sc)) {
-            sortColumn = PROPERTY_SHIPPED_TO_LOCATION_NAME;
+        if (SHIPPED_FROM.equals(sc)) {
+            sortColumn = SHIPPED_FROM_LOCATION_NAME;
+        } else if (SHIPPED_TO.equals(sc)) {
+            sortColumn = SHIPPED_TO_LOCATION_NAME;
         } else {
             sortColumn = sc;
         }
@@ -294,18 +295,18 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private String[] getDefaultListShipmentsSortingOrder() {
         return new String[] {
-            PROPERTY_SHIPMENT_ID,
-            PROPERTY_SHIPMENT_DATE,
-            PROPERTY_STATUS,
-            PROPERTY_SHIPPED_FROM_LOCATION_NAME,
-            PROPERTY_SHIPPED_TO_LOCATION_NAME,
-            PROPERTY_DEVICE_SN,
-            PROPERTY_ARRIVAL_DATE,
-            PROPERTY_COMMENTS_FOR_RECEIVER,
+            SHIPMENT_ID,
+            SHIPMENT_DATE,
+            STATUS,
+            SHIPPED_FROM_LOCATION_NAME,
+            SHIPPED_TO_LOCATION_NAME,
+            DEVICE_SN,
+            ARRIVAL_DATE,
+            COMMENTS_FOR_RECEIVER,
 //            PROPERTY_ETA,
-            PROPERTY_SHIPMENT_DESCRIPTION,
-            PROPERTY_ALERT_PROFILE_ID,
-            PROPERTY_ALERT_PROFILE
+            SHIPMENT_DESCRIPTION,
+            ALERT_PROFILE_ID,
+            ALERT_PROFILE
         };
     }
     private Filter createFilter(final GetFilteredShipmentsRequest req, final ShipmentSerializer ser) {
@@ -333,28 +334,28 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         final Filter f = new Filter();
         if (shippedFrom != null) {
-            f.addFilter(PROPERTY_SHIPPED_FROM_DATE, shippedFrom);
+            f.addFilter(SHIPPED_FROM_DATE, shippedFrom);
         }
         if (shippedTo != null) {
-            f.addFilter(PROPERTY_SHIPPED_TO_DATE, shippedTo);
+            f.addFilter(SHIPPED_TO_DATE, shippedTo);
         }
         if (req.getShipmentDescription() != null) {
-            f.addFilter(PROPERTY_SHIPMENT_DESCRIPTION, req.getShipmentDescription());
+            f.addFilter(SHIPMENT_DESCRIPTION, req.getShipmentDescription());
         }
         if (req.getDeviceImei() != null) {
-            f.addFilter(PROPERTY_DEVICE_IMEI, req.getDeviceImei());
+            f.addFilter(DEVICE_IMEI, req.getDeviceImei());
         }
         if (req.getStatus() != null) {
-            f.addFilter(PROPERTY_STATUS, req.getStatus());
+            f.addFilter(STATUS, req.getStatus());
         }
         if (req.getShippedFrom() != null && !req.getShippedFrom().isEmpty()) {
-            f.addFilter(PROPERTY_SHIPPED_FROM, req.getShippedFrom());
+            f.addFilter(SHIPPED_FROM, req.getShippedFrom());
         }
         if (req.getShippedTo() != null && !req.getShippedTo().isEmpty()) {
-            f.addFilter(PROPERTY_SHIPPED_TO, req.getShippedTo());
+            f.addFilter(SHIPPED_TO, req.getShippedTo());
         }
         if (req.isAlertsOnly()) {
-            f.addFilter(PROPERTY_ONLY_WITH_ALERTS, Boolean.TRUE);
+            f.addFilter(ONLY_WITH_ALERTS, Boolean.TRUE);
         }
         return f;
     }
@@ -497,7 +498,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 return createSuccessResponse(null);
             }
 
-            final SingleShipmentDtoNew dto = createDto(s, user);
+            final SingleShipmentDto dto = createDto(s, user);
 
             //add siblings
             final List<Shipment> siblings = siblingService.getSiblings(s);
@@ -517,9 +518,37 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @param addAllReadings
      * @return
      */
-    protected SingleShipmentDtoNew createDto(final Shipment s, final User user) {
-        final SingleShipmentDto dtoOld = getShipmentData(s);
-        final SingleShipmentDtoNew dto = createNewSingleShipmentData(s, dtoOld, user);
+    protected SingleShipmentDto createDto(final Shipment s, final User user) {
+        //create best tracker event candidate/alert map
+        final List<TrackerEvent> events = trackerEventDao.getEvents(s);
+
+        final List<SingleShipmentTimeItem> items = new LinkedList<>();
+        for (final TrackerEvent e : events) {
+            final SingleShipmentTimeItem item = new SingleShipmentTimeItem();
+            item.setEvent(e);
+            items.add(item);
+        }
+
+        final Map<AlertType, Integer> alertSummary = new HashMap<>();
+        if (events.size() > 0) {
+            //add alerts
+            final List<Alert> alerts = alertDao.getAlerts(s);
+            for (final Alert alert : alerts) {
+                final SingleShipmentTimeItem item = getBestCandidate(items, alert);
+                item.getAlerts().add(alert);
+            }
+
+            alertSummary.putAll(toSummaryMap(alerts));
+
+            //add arrivals
+            final List<Arrival> arrivals = arrivalDao.getArrivals(s);
+            for (final Arrival arrival : arrivals) {
+                final SingleShipmentTimeItem item = getBestCandidate(items, arrival);
+                item.getArrivals().add(arrival);
+            }
+        }
+
+        final SingleShipmentDto dto = createSingleShipmentData(s, user);
 
         double minTemp = 1000.;
         double maxTemp = -273.;
@@ -527,9 +556,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         long timeOfFirstReading = System.currentTimeMillis();
         long timeOfLastReading = 0;
 
-        for (final SingleShipmentTimeItem item : dtoOld.getItems()) {
-            final double t = item.getEvent().getTemperature();
-            final long time = item.getEvent().getTime().getTime();
+        for (final TrackerEvent e : events) {
+            final double t = e.getTemperature();
+            final long time = e.getTime().getTime();
 
             if (t < minTemp) {
                 minTemp = t;
@@ -561,10 +590,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             dto.setLastReadingTemperature(lastReadingTemperature.doubleValue());
         }
 
-        dto.getAlertSummary().addAll(dtoOld.getAlertSummary().keySet());
+        dto.getAlertSummary().addAll(alertSummary.keySet());
         dto.setAlertYetToFire(buildAlertYetToFire(ruleEngine.getAlertYetFoFire(s), user));
 
-        final Arrival arrival = getArrival(dtoOld);
+        final Arrival arrival = getArrival(items);
         if (arrival != null) {
             //"arrivalNotificationTimeISO": "2014-08-12 12:10",
             // NEW - ISO for actual time arrival notification sent out
@@ -573,21 +602,29 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         if (s.getArrivalDate() != null) {
             dto.setArrivalTimeIso(isoFmt.format(s.getArrivalDate()));
         }
-
-        final Date shutdownTime = s.getDeviceShutdownTime();
-        if (shutdownTime != null) {
-            dto.setShutdownTimeIso(isoFmt.format(shutdownTime));
+        if (s.getDeviceShutdownTime() != null) {
+            dto.setShutdownTimeIso(isoFmt.format(s.getDeviceShutdownTime()));
         }
+
+        int i = 0;
+        for (final SingleShipmentTimeItem item : items) {
+            dto.getLocations().addAll(createLocations(item, isoFmt,
+                    user, dto.getEta(), dto.getEndLocation(), i == items.size() - 1));
+            i++;
+        }
+        dto.setCurrentLocation(items.size() == 0 ? "Not determined"
+                : locationService.getLocationDescription(
+                    new Location(items.get(0).getEvent().getLatitude(), items.get(0).getEvent().getLongitude())));
 
         return dto;
     }
     /**
-     * @param dtoOld
+     * @param list
      * @return arrival if found
      */
-    private Arrival getArrival(final SingleShipmentDto dtoOld) {
+    private Arrival getArrival(final List<SingleShipmentTimeItem> list) {
         final LinkedList<SingleShipmentTimeItem> items = new LinkedList<SingleShipmentTimeItem>(
-                dtoOld.getItems());
+                list);
         Collections.reverse(items);
 
         for (final SingleShipmentTimeItem item : items) {
@@ -615,29 +652,28 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @param dtoOld
      * @return
      */
-    private SingleShipmentDtoNew createNewSingleShipmentData(final Shipment shipment,
-            final SingleShipmentDto dtoOld, final User user) {
+    private SingleShipmentDto createSingleShipmentData(final Shipment shipment, final User user) {
         //"startTimeISO": "2014-08-12 12:10",
         final DateFormat isoFmt = createDateFormat(user, ISO_FORMAT);
 
-        final SingleShipmentDtoNew dto = new SingleShipmentDtoNew();
-        dto.setAlertProfileId(dtoOld.getAlertProfileId());
-        dto.setAlertProfileName(dtoOld.getAlertProfileName());
+        final SingleShipmentDto dto = new SingleShipmentDto();
+        dto.setAlertProfileId(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());
+        dto.setAlertProfileName(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getName());
 
-        dto.setAlertSuppressionMinutes(dtoOld.getAlertSuppressionMinutes());
-        dto.setArrivalNotificationWithinKm(dtoOld.getArrivalNotificationWithInKm());
-        dto.setAssetNum(dtoOld.getAssetNum());
-        dto.setAssetType(dtoOld.getAssetType());
-        dto.setCommentsForReceiver(dtoOld.getCommentsForReceiver());
-        dto.setCurrentLocation(dtoOld.getCurrentLocation());
+        dto.setAlertSuppressionMinutes(shipment.getAlertSuppressionMinutes());
+        dto.setArrivalNotificationWithinKm(shipment.getArrivalNotificationWithinKm());
+        dto.setAssetNum(shipment.getAssetNum());
+        dto.setAssetType(shipment.getAssetType());
+        dto.setCommentsForReceiver(shipment.getCommentsForReceiver());
         dto.setNoAlertsAfterArrivalMinutes(shipment.getNoAlertsAfterArrivalMinutes());
+        dto.setNoAlertsAfterStartMinutes(shipment.getNoAlertsAfterStartMinutes());
         dto.setShutDownAfterStartMinutes(shipment.getShutDownAfterStartMinutes());
 
-        final List<SingleShipmentTimeItem> items = dtoOld.getItems();
         final Date startTime = shipment.getShipmentDate();
 
-        dto.setDeviceName(dtoOld.getDeviceName());
-        dto.setDeviceSN(dtoOld.getDeviceSn());
+        dto.setDeviceName(shipment.getDevice().getName());
+        dto.setDeviceSN(shipment.getDevice().getSn());
+
         if (shipment.getShippedTo() != null) {
             dto.setEndLocation(shipment.getShippedTo().getName());
             dto.setEndLocationForMap(shipment.getShippedTo().getLocation());
@@ -655,9 +691,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             }
         }
 
-        dto.setExcludeNotificationsIfNoAlerts(dtoOld.isExcludeNotificationsIfNoAlertsFired());
-        dto.setPalletId(dtoOld.getPalletId());
-        dto.setShipmentDescription(dtoOld.getShipmentDescription());
+        dto.setExcludeNotificationsIfNoAlerts(shipment.isExcludeNotificationsIfNoAlerts());
+        dto.setPalletId(shipment.getPalletId());
+        dto.setShipmentDescription(shipment.getShipmentDescription());
         dto.setShipmentId(shipment.getId());
         if (shipment.getAlertProfile() != null) {
             dto.setShutdownDeviceAfterMinutes(shipment.getShutdownDeviceAfterMinutes());
@@ -669,18 +705,22 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         dto.setStartTimeISO(isoFmt.format(startTime));
         dto.setStatus(shipment.getStatus());
-        dto.setTripCount(dtoOld.getTripCount());
+        dto.setTripCount(shipment.getTripCount());
 
-        int i = 0;
-        for (final SingleShipmentTimeItem item : items) {
-            dto.getLocations().addAll(createLocations(item, isoFmt,
-                    user, dto.getEta(), dto.getEndLocation(), i == items.size() - 1));
-            i++;
-        }
-
-        dto.getAlertsNotificationSchedules().addAll(dtoOld.getAlertsNotificationSchedules());
-        dto.getArrivalNotificationSchedules().addAll(dtoOld.getArrivalNotificationSchedules());
+        dto.getAlertsNotificationSchedules().addAll(toListItems(shipment.getAlertsNotificationSchedules()));
+        dto.getArrivalNotificationSchedules().addAll(toListItems(shipment.getArrivalNotificationSchedules()));
         return dto;
+    }
+    /**
+     * @param arrivalNotificationSchedules
+     * @return
+     */
+    private List<ListNotificationScheduleItem> toListItems(final List<NotificationSchedule> entities) {
+        final List<ListNotificationScheduleItem> items = new LinkedList<ListNotificationScheduleItem>();
+        for (final NotificationSchedule s : entities) {
+            items.add(new ListNotificationScheduleItem(s));
+        }
+        return items;
     }
     /**
      * @param item
@@ -774,42 +814,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             alert.getLines().add(lines[i]);
         }
         return alert;
-    }
-    /**
-     * @param s shipment.
-     * @param addAllReadings whether or not should include alerts.
-     * @return single shipment data.
-     */
-    private SingleShipmentDto getShipmentData(final Shipment s) {
-        final SingleShipmentDto dto = new SingleShipmentDto(s);
-
-        //create best tracker event candidate/alert map
-        final List<TrackerEvent> events = trackerEventDao.getEvents(s);
-        for (final TrackerEvent e : events) {
-            final SingleShipmentTimeItem item = new SingleShipmentTimeItem();
-            item.setEvent(e);
-            dto.getItems().add(item);
-        }
-
-        if (events.size() > 0) {
-            //add alerts
-            final List<Alert> alerts = alertDao.getAlerts(s);
-            for (final Alert alert : alerts) {
-                final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), alert);
-                item.getAlerts().add(alert);
-            }
-
-            dto.getAlertSummary().putAll(toSummaryMap(alerts));
-
-            //add arrivals
-            final List<Arrival> arrivals = arrivalDao.getArrivals(s);
-            for (final Arrival arrival : arrivals) {
-                final SingleShipmentTimeItem item = getBestCandidate(dto.getItems(), arrival);
-                item.getArrivals().add(arrival);
-            }
-        }
-
-        return dto;
     }
     /**
      * @param alerts

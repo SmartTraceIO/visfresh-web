@@ -202,6 +202,7 @@ create table shipments (
     nonotifsifnoalerts boolean not null,
     shutdownafterarrivalminutes int default null,
 	noalertsafterarrivalminutes int default null,
+	noalertsafterstartminutes int default null,
 	shutdownafterstartminutes int default null,
     shippedfrom bigint(20),
     shippedto bigint(20),

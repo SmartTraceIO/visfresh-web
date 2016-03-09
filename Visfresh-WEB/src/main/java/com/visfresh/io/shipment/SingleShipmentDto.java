@@ -3,15 +3,14 @@
  */
 package com.visfresh.io.shipment;
 
-import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.Shipment;
+import com.visfresh.entities.Location;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.lists.ListNotificationScheduleItem;
 
 /**
@@ -19,41 +18,50 @@ import com.visfresh.lists.ListNotificationScheduleItem;
  *
  */
 public class SingleShipmentDto {
-    private String shipmentDescription;
+    private long shipmentId;
+    private String deviceSN;
+    private String deviceName;
     private int tripCount;
+    private String shipmentDescription;
     private String palletId;
-    private int poNum;
-
-    private Long shippedFrom;
-    private Long shippedTo;
-    private Date shipmentDate;
-
     private String assetNum;
     private String assetType;
-
+    private ShipmentStatus status;
     private Long alertProfileId;
-    private final List<ListNotificationScheduleItem> alertsNotificationSchedules
-        = new LinkedList<ListNotificationScheduleItem>();
-
-    private Integer arrivalNotificationWithinKm;
-    private final List<ListNotificationScheduleItem> arrivalNotificationSchedules
-        = new LinkedList<ListNotificationScheduleItem>();
-    private boolean excludeNotificationsIfNoAlertsFired;
-
-    private String status;
-    private final List<SingleShipmentTimeItem> items = new LinkedList<SingleShipmentTimeItem>();
-    private String currentLocation;
-    private String deviceSn;
-    private String deviceName;
-    private Date estArrivalDate;
-    private Date actualArrivalDate;
-    private int percentageComplete;
-    private String alertProfileName;
-    private int maxTimesAlertFires;
-    private int alertSuppressionMinutes;
-    private final Map<AlertType, Integer> alertSummary = new HashMap<AlertType, Integer>();
-    private Long shipmentId;
+    private Integer alertSuppressionMinutes;
+    private final List<ListNotificationScheduleItem> alertsNotificationSchedules = new LinkedList<>();
     private String commentsForReceiver;
+    private Integer arrivalNotificationWithinKm;
+    boolean excludeNotificationsIfNoAlerts;
+    private final List<ListNotificationScheduleItem> arrivalNotificationSchedules = new LinkedList<>();
+    private Integer shutdownDeviceAfterMinutes;
+    private Integer noAlertsAfterArrivalMinutes;
+    private Integer shutDownAfterStartMinutes;
+    private String startLocation;
+    private String startTimeISO;
+    private String endLocation;
+    private String eta;
+    private String currentLocation;
+    private Location startLocationForMap;
+    private Location endLocationForMap;
+    private Location currentLocationForMap;
+    private int percentageComplete;
+
+    private double minTemp;
+    private double maxTemp;
+    private String timeOfFirstReading;
+
+    private final List<SingleShipmentLocation> locations = new LinkedList<>();
+    private final List<SingleShipmentDto> siblings = new LinkedList<>();
+    private String alertProfileName;
+    private final Set<AlertType> alertSummary = new HashSet<>();
+    private String alertYetToFire;
+    private String arrivalNotificationTimeIso;
+    private String shutdownTimeIso;
+    private String arrivalTimeIso;
+    private String lastReadingTimeIso;
+    private double lastReadingTemperature;
+    private Integer noAlertsAfterStartMinutes;
 
     /**
      * Default constructor.
@@ -63,50 +71,40 @@ public class SingleShipmentDto {
     }
 
     /**
-     * @param shipment
+     * @return the shipmentId
      */
-    public SingleShipmentDto(final Shipment shipment) {
-        super();
-        setAlertProfileId(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());
-        getAlertsNotificationSchedules().addAll(toListItems(shipment.getAlertsNotificationSchedules()));
-        getArrivalNotificationSchedules().addAll(toListItems(shipment.getArrivalNotificationSchedules()));
-        setArrivalNotificationWithInKm(shipment.getArrivalNotificationWithinKm());
-        setAssetNum(shipment.getAssetNum());
-        setAssetType(shipment.getAssetType());
-        setPalletId(shipment.getPalletId());
-        setPoNum(shipment.getPoNum());
-        setShipmentDescription(shipment.getShipmentDescription());
-        setShipmentId(shipment.getId());
-        setShippedFrom(shipment.getShippedFrom() == null ? null : shipment.getShippedFrom().getId());
-        setShippedTo(shipment.getShippedTo() == null ? null : shipment.getShippedTo().getId());
-        setStatus(shipment.getStatus().name());
-        setTripCount(shipment.getTripCount());
-        setCurrentLocation("Not determined");
-        setDeviceSn(shipment.getDevice().getSn());
-        setDeviceName(shipment.getDevice().getName());
-        //Mock arrival date.
-        //TODO replace it by calculated.
-        final Date arrivalDate = new Date(System.currentTimeMillis() + 2 * 24 * 60 * 60 * 1000L);
-        setEstArrivalDate(arrivalDate);
-        setActualArrivalDate(arrivalDate);
-        //TODO replace with autodetected
-        setPercentageComplete(0);
-        setAlertProfileName(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getName());
-        setAlertSuppressionMinutes(shipment.getAlertSuppressionMinutes());
-        setCommentsForReceiver(shipment.getCommentsForReceiver());
-    }
-
-    /**
-     * @return the shipmentDescription
-     */
-    public String getShipmentDescription() {
-        return shipmentDescription;
+    public long getShipmentId() {
+        return shipmentId;
     }
     /**
-     * @param shipmentDescription the shipmentDescription to set
+     * @param shipmentId the shipmentId to set
      */
-    public void setShipmentDescription(final String shipmentDescription) {
-        this.shipmentDescription = shipmentDescription;
+    public void setShipmentId(final long shipmentId) {
+        this.shipmentId = shipmentId;
+    }
+    /**
+     * @return the deviceSN
+     */
+    public String getDeviceSN() {
+        return deviceSN;
+    }
+    /**
+     * @param deviceSN the deviceSN to set
+     */
+    public void setDeviceSN(final String deviceSN) {
+        this.deviceSN = deviceSN;
+    }
+    /**
+     * @return the deviceName
+     */
+    public String getDeviceName() {
+        return deviceName;
+    }
+    /**
+     * @param deviceName the deviceName to set
+     */
+    public void setDeviceName(final String deviceName) {
+        this.deviceName = deviceName;
     }
     /**
      * @return the tripCount
@@ -121,6 +119,18 @@ public class SingleShipmentDto {
         this.tripCount = tripCount;
     }
     /**
+     * @return the shipmentDescription
+     */
+    public String getShipmentDescription() {
+        return shipmentDescription;
+    }
+    /**
+     * @param shipmentDescription the shipmentDescription to set
+     */
+    public void setShipmentDescription(final String shipmentDescription) {
+        this.shipmentDescription = shipmentDescription;
+    }
+    /**
      * @return the palletId
      */
     public String getPalletId() {
@@ -131,54 +141,6 @@ public class SingleShipmentDto {
      */
     public void setPalletId(final String palletId) {
         this.palletId = palletId;
-    }
-    /**
-     * @return the poNum
-     */
-    public int getPoNum() {
-        return poNum;
-    }
-    /**
-     * @param poNum the poNum to set
-     */
-    public void setPoNum(final int poNum) {
-        this.poNum = poNum;
-    }
-    /**
-     * @return the shippedFrom
-     */
-    public Long getShippedFrom() {
-        return shippedFrom;
-    }
-    /**
-     * @param shippedFrom the shippedFrom to set
-     */
-    public void setShippedFrom(final Long shippedFrom) {
-        this.shippedFrom = shippedFrom;
-    }
-    /**
-     * @return the shippedTo
-     */
-    public Long getShippedTo() {
-        return shippedTo;
-    }
-    /**
-     * @param shippedTo the shippedTo to set
-     */
-    public void setShippedTo(final Long shippedTo) {
-        this.shippedTo = shippedTo;
-    }
-    /**
-     * @return the shipmentDate
-     */
-    public Date getShipmentDate() {
-        return shipmentDate;
-    }
-    /**
-     * @param shipmentDate the shipmentDate to set
-     */
-    public void setShipmentDate(final Date shipmentDate) {
-        this.shipmentDate = shipmentDate;
     }
     /**
      * @return the assetNum
@@ -205,74 +167,149 @@ public class SingleShipmentDto {
         this.assetType = assetType;
     }
     /**
-     * @return the alertProfile
-     */
-    public Long getAlertProfileId() {
-        return alertProfileId;
-    }
-    /**
-     * @param alertProfile the alertProfile to set
-     */
-    public void setAlertProfileId(final Long alertProfile) {
-        this.alertProfileId = alertProfile;
-    }
-    /**
-     * @return the alertsNotificationSchedules
-     */
-    public List<ListNotificationScheduleItem> getAlertsNotificationSchedules() {
-        return alertsNotificationSchedules;
-    }
-    /**
-     * @return the arrivalNotificationWithIn
-     */
-    public Integer getArrivalNotificationWithInKm() {
-        return arrivalNotificationWithinKm;
-    }
-    /**
-     * @param arrivalNotificationWithIn the arrivalNotificationWithIn to set
-     */
-    public void setArrivalNotificationWithInKm(final Integer arrivalNotificationWithIn) {
-        this.arrivalNotificationWithinKm = arrivalNotificationWithIn;
-    }
-    /**
-     * @return the arrivalNotificationSchedules
-     */
-    public List<ListNotificationScheduleItem> getArrivalNotificationSchedules() {
-        return arrivalNotificationSchedules;
-    }
-    /**
-     * @return the excludeNotificationsIfNoAlertsFired
-     */
-    public boolean isExcludeNotificationsIfNoAlertsFired() {
-        return excludeNotificationsIfNoAlertsFired;
-    }
-    /**
-     * @param excludeNotificationsIfNoAlertsFired the excludeNotificationsIfNoAlertsFired to set
-     */
-    public void setExcludeNotificationsIfNoAlertsFired(
-            final boolean excludeNotificationsIfNoAlertsFired) {
-        this.excludeNotificationsIfNoAlertsFired = excludeNotificationsIfNoAlertsFired;
-    }
-    /**
      * @return the status
      */
-    public String getStatus() {
+    public ShipmentStatus getStatus() {
         return status;
     }
     /**
      * @param status the status to set
      */
-    public void setStatus(final String status) {
+    public void setStatus(final ShipmentStatus status) {
         this.status = status;
     }
     /**
-     * @return the items
+     * @return the alertProfileId
      */
-    public List<SingleShipmentTimeItem> getItems() {
-        return items;
+    public Long getAlertProfileId() {
+        return alertProfileId;
     }
     /**
-     * @return current location.
+     * @param alertProfileId the alertProfileId to set
+     */
+    public void setAlertProfileId(final Long alertProfileId) {
+        this.alertProfileId = alertProfileId;
+    }
+    public String getAlertProfileName() {
+        return alertProfileName;
+    }
+    /**
+     * @param alertProfileName the alertProfileName to set
+     */
+    public void setAlertProfileName(final String alertProfileName) {
+        this.alertProfileName = alertProfileName;
+    }
+    /**
+     * @return the alertSuppressionMinutes
+     */
+    public Integer getAlertSuppressionMinutes() {
+        return alertSuppressionMinutes;
+    }
+    /**
+     * @param alertSuppressionMinutes the alertSuppressionMinutes to set
+     */
+    public void setAlertSuppressionMinutes(final Integer alertSuppressionMinutes) {
+        this.alertSuppressionMinutes = alertSuppressionMinutes;
+    }
+    /**
+     * @return the commentsForReceiver
+     */
+    public String getCommentsForReceiver() {
+        return commentsForReceiver;
+    }
+    /**
+     * @param commentsForReceiver the commentsForReceiver to set
+     */
+    public void setCommentsForReceiver(final String commentsForReceiver) {
+        this.commentsForReceiver = commentsForReceiver;
+    }
+    /**
+     * @return the arrivalNotificationWithinKm
+     */
+    public Integer getArrivalNotificationWithinKm() {
+        return arrivalNotificationWithinKm;
+    }
+    /**
+     * @param arrivalNotificationWithinKm the arrivalNotificationWithinKm to set
+     */
+    public void setArrivalNotificationWithinKm(final Integer arrivalNotificationWithinKm) {
+        this.arrivalNotificationWithinKm = arrivalNotificationWithinKm;
+    }
+    /**
+     * @return the excludeNotificationsIfNoAlerts
+     */
+    public boolean isExcludeNotificationsIfNoAlerts() {
+        return excludeNotificationsIfNoAlerts;
+    }
+    /**
+     * @param excludeNotificationsIfNoAlerts the excludeNotificationsIfNoAlerts to set
+     */
+    public void setExcludeNotificationsIfNoAlerts(
+            final boolean excludeNotificationsIfNoAlerts) {
+        this.excludeNotificationsIfNoAlerts = excludeNotificationsIfNoAlerts;
+    }
+    /**
+     * @return the shutdownDeviceAfterMinutes
+     */
+    public Integer getShutdownDeviceAfterMinutes() {
+        return shutdownDeviceAfterMinutes;
+    }
+    /**
+     * @param shutdownDeviceAfterMinutes the shutdownDeviceAfterMinutes to set
+     */
+    public void setShutdownDeviceAfterMinutes(final Integer shutdownDeviceAfterMinutes) {
+        this.shutdownDeviceAfterMinutes = shutdownDeviceAfterMinutes;
+    }
+    /**
+     * @return the startLocation
+     */
+    public String getStartLocation() {
+        return startLocation;
+    }
+    /**
+     * @param startLocation the startLocation to set
+     */
+    public void setStartLocation(final String startLocation) {
+        this.startLocation = startLocation;
+    }
+    /**
+     * @return the startTimeISO
+     */
+    public String getStartTimeISO() {
+        return startTimeISO;
+    }
+    /**
+     * @param startTimeISO the startTimeISO to set
+     */
+    public void setStartTimeISO(final String startTimeISO) {
+        this.startTimeISO = startTimeISO;
+    }
+    /**
+     * @return the endLocation
+     */
+    public String getEndLocation() {
+        return endLocation;
+    }
+    /**
+     * @param endLocation the endLocation to set
+     */
+    public void setEndLocation(final String endLocation) {
+        this.endLocation = endLocation;
+    }
+    /**
+     * @return the eta
+     */
+    public String getEta() {
+        return eta;
+    }
+    /**
+     * @param eta the eta to set
+     */
+    public void setEta(final String eta) {
+        this.eta = eta;
+    }
+    /**
+     * @return the currentLocation
      */
     public String getCurrentLocation() {
         return currentLocation;
@@ -284,55 +321,104 @@ public class SingleShipmentDto {
         this.currentLocation = currentLocation;
     }
     /**
-     * @return device serial number.
+     * @return the startLocationForMap
      */
-    public String getDeviceSn() {
-        return deviceSn;
+    public Location getStartLocationForMap() {
+        return startLocationForMap;
     }
     /**
-     * @param deviceSn the deviceSn to set
+     * @param startLocationForMap the startLocationForMap to set
      */
-    public void setDeviceSn(final String deviceSn) {
-        this.deviceSn = deviceSn;
+    public void setStartLocationForMap(final Location startLocationForMap) {
+        this.startLocationForMap = startLocationForMap;
     }
     /**
-     * @return device name.
+     * @return the endLocationForMap
      */
-    public String getDeviceName() {
-        return deviceName;
+    public Location getEndLocationForMap() {
+        return endLocationForMap;
     }
     /**
-     * @param deviceName the deviceName to set
+     * @param endLocationForMap the endLocationForMap to set
      */
-    public void setDeviceName(final String deviceName) {
-        this.deviceName = deviceName;
+    public void setEndLocationForMap(final Location endLocationForMap) {
+        this.endLocationForMap = endLocationForMap;
     }
     /**
-     * @return estimated arrival date.
+     * @return the currentLocationForMap
      */
-    public Date getEstArrivalDate() {
-        return estArrivalDate;
+    public Location getCurrentLocationForMap() {
+        return currentLocationForMap;
     }
     /**
-     * @param estArrivalDate the estArrivalDate to set
+     * @param currentLocationForMap the currentLocationForMap to set
      */
-    public void setEstArrivalDate(final Date estArrivalDate) {
-        this.estArrivalDate = estArrivalDate;
+    public void setCurrentLocationForMap(final Location currentLocationForMap) {
+        this.currentLocationForMap = currentLocationForMap;
     }
     /**
-     * @return actual arrival date.
+     * @return the alertsNotificationSchedules
      */
-    public Date getActualArrivalDate() {
-        return actualArrivalDate;
+    public List<ListNotificationScheduleItem> getAlertsNotificationSchedules() {
+        return alertsNotificationSchedules;
     }
     /**
-     * @param actualArrivalDate the actualArrivalDate to set
+     * @return the arrivalNotificationSchedules
      */
-    public void setActualArrivalDate(final Date actualArrivalDate) {
-        this.actualArrivalDate = actualArrivalDate;
+    public List<ListNotificationScheduleItem> getArrivalNotificationSchedules() {
+        return arrivalNotificationSchedules;
     }
     /**
-     * @return percentage completed.
+     * @return the locations
+     */
+    public List<SingleShipmentLocation> getLocations() {
+        return locations;
+    }
+    /**
+     * @return the siblings
+     */
+    public List<SingleShipmentDto> getSiblings() {
+        return siblings;
+    }
+
+    /**
+     * @return the minTemp
+     */
+    public double getMinTemp() {
+        return minTemp;
+    }
+    /**
+     * @param minTemp the minTemp to set
+     */
+    public void setMinTemp(final double minTemp) {
+        this.minTemp = minTemp;
+    }
+    /**
+     * @return the maxTemp
+     */
+    public double getMaxTemp() {
+        return maxTemp;
+    }
+    /**
+     * @param maxTemp the maxTemp to set
+     */
+    public void setMaxTemp(final double maxTemp) {
+        this.maxTemp = maxTemp;
+    }
+    /**
+     * @return the timeOfFirstReading
+     */
+    public String getTimeOfFirstReading() {
+        return timeOfFirstReading;
+    }
+    /**
+     * @param timeOfFirstReading the timeOfFirstReading to set
+     */
+    public void setTimeOfFirstReading(final String timeOfFirstReading) {
+        this.timeOfFirstReading = timeOfFirstReading;
+    }
+    /**
+     * @return the percentageComplete
      */
     public int getPercentageComplete() {
         return percentageComplete;
@@ -343,82 +429,124 @@ public class SingleShipmentDto {
     public void setPercentageComplete(final int percentageComplete) {
         this.percentageComplete = percentageComplete;
     }
-    /**
-     * @return alert profile name.
-     */
-    public String getAlertProfileName() {
-        return alertProfileName;
+    public int getTrackerPositionFrontPercent() {
+        return getPercentageComplete();
+    }
+    public int getTrackerPositionLeftPercent() {
+        return Math.max(0, 100 - getTrackerPositionFrontPercent());
     }
     /**
-     * @param alertProfileName the alertProfileName to set
+     * @return the alertSummary
      */
-    public void setAlertProfileName(final String alertProfileName) {
-        this.alertProfileName = alertProfileName;
-    }
-    /**
-     * @return max times alert fires.
-     */
-    public int getMaxTimesAlertFires() {
-        return maxTimesAlertFires;
-    }
-    /**
-     * @param maxTimesAlertFires the maxTimesAlertFires to set
-     */
-    public void setMaxTimesAlertFires(final int maxTimesAlertFires) {
-        this.maxTimesAlertFires = maxTimesAlertFires;
-    }
-    /**
-     * @return alert suppression in minutes.
-     */
-    public int getAlertSuppressionMinutes() {
-        return alertSuppressionMinutes;
-    }
-    /**
-     * @param alertSuppressionMinutes the alertSuppressionMinutes to set
-     */
-    public void setAlertSuppressionMinutes(final int alertSuppressionMinutes) {
-        this.alertSuppressionMinutes = alertSuppressionMinutes;
-    }
-    /**
-     * @return alert summary map.
-     */
-    public Map<AlertType, Integer> getAlertSummary() {
+    public Set<AlertType> getAlertSummary() {
         return alertSummary;
     }
     /**
-     * @return shipment ID.
-     */
-    public Long getShipmentId() {
-        return shipmentId;
-    }
-    /**
-     * @param shipmentId the shipmentId to set
-     */
-    public void setShipmentId(final Long shipmentId) {
-        this.shipmentId = shipmentId;
-    }
-    /**
      * @return
      */
-    public String getCommentsForReceiver() {
-        return commentsForReceiver;
+    public String getAlertYetToFire() {
+        return alertYetToFire;
     }
     /**
-     * @param comments the commentsForReceiver to set
+     * @param alertYetToFire the alertYetToFire to set
      */
-    public void setCommentsForReceiver(final String comments) {
-        this.commentsForReceiver = comments;
+    public void setAlertYetToFire(final String alertYetToFire) {
+        this.alertYetToFire = alertYetToFire;
     }
-
     /**
-     * @param arrivalNotificationSchedules
-     * @return
+     * @return the arrivalNotificationTimeIso
      */
-    private List<ListNotificationScheduleItem> toListItems(final List<NotificationSchedule> entities) {
-        final List<ListNotificationScheduleItem> items = new LinkedList<ListNotificationScheduleItem>();
-        for (final NotificationSchedule s : entities) {
-            items.add(new ListNotificationScheduleItem(s));
-        }
-        return items;
+    public String getArrivalNotificationTimeIso() {
+        return arrivalNotificationTimeIso;
+    }
+    /**
+     * @param arrivalNotificationTimeIso the arrivalNotificationTimeIso to set
+     */
+    public void setArrivalNotificationTimeIso(final String arrivalNotificationTimeIso) {
+        this.arrivalNotificationTimeIso = arrivalNotificationTimeIso;
+    }
+    /**
+     * @return shutdown time ISO string.
+     */
+    public String getShutdownTimeIso() {
+        return shutdownTimeIso;
+    }
+    /**
+     * @param time shutdown time ISO string.
+     */
+    public void setShutdownTimeIso(final String time) {
+        this.shutdownTimeIso = time;
+    }
+    /**
+     * @return arrival time ISO string.
+     */
+    public String getArrivalTimeIso() {
+        return arrivalTimeIso;
+    }
+    /**
+     * @param time arrival time ISO string.
+     */
+    public void setArrivalTimeIso(final String time) {
+        this.arrivalTimeIso = time;
+    }
+    /**
+     * @return last event time in ISO format.
+     */
+    public String getLastReadingTimeIso() {
+        return lastReadingTimeIso;
+    }
+    /**
+     * @param time last event time in ISO format.
+     */
+    public void setLastReadingTimeIso(final String time) {
+        this.lastReadingTimeIso = time;
+    }
+    /**
+     * @return temperature of last event.
+     */
+    public double getLastReadingTemperature() {
+        return lastReadingTemperature;
+    }
+    /**
+     * @param temperature temperature of last event.
+     */
+    public void setLastReadingTemperature(final double temperature) {
+        this.lastReadingTemperature = temperature;
+    }
+    /**
+     * @return the noAlertsAfterArrivalMinutes
+     */
+    public Integer getNoAlertsAfterArrivalMinutes() {
+        return noAlertsAfterArrivalMinutes;
+    }
+    /**
+     * @param noAlertsAfterArrivalMinutes the noAlertsAfterArrivalMinutes to set
+     */
+    public void setNoAlertsAfterArrivalMinutes(final Integer noAlertsAfterArrivalMinutes) {
+        this.noAlertsAfterArrivalMinutes = noAlertsAfterArrivalMinutes;
+    }
+    /**
+     * @param noAlertsAfterStartMinutes
+     */
+    public void setNoAlertsAfterStartMinutes(final Integer noAlertsAfterStartMinutes) {
+        this.noAlertsAfterStartMinutes = noAlertsAfterStartMinutes;
+    }
+    /**
+     * @return the noAlertsAfterStartMinutes
+     */
+    public Integer getNoAlertsAfterStartMinutes() {
+        return noAlertsAfterStartMinutes;
+    }
+    /**
+     * @return the shutDownAfterStartMinutes
+     */
+    public Integer getShutDownAfterStartMinutes() {
+        return shutDownAfterStartMinutes;
+    }
+    /**
+     * @param shutDownAfterStartMinutes the shutDownAfterStartMinutes to set
+     */
+    public void setShutDownAfterStartMinutes(final Integer shutDownAfterStartMinutes) {
+        this.shutDownAfterStartMinutes = shutDownAfterStartMinutes;
     }
 }

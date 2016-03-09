@@ -196,6 +196,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setSiblingGroup(77l);
         s.setSiblingCount(11);
         s.setNoAlertsAfterArrivalMinutes(7);
+        s.setNoAlertsAfterStartMinutes(77);
         s.setShutDownAfterStartMinutes(9);
         return s;
     }
@@ -228,6 +229,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(77l, s.getSiblingGroup().longValue());
         assertEquals(11, s.getSiblingCount());
         assertEquals(new Integer(7), s.getNoAlertsAfterArrivalMinutes());
+        assertEquals(new Integer(77), s.getNoAlertsAfterStartMinutes());
         assertEquals(new Integer(9), s.getShutDownAfterStartMinutes());
     }
 
@@ -450,13 +452,13 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         dao.save(s2);
         dao.save(s3);
 
-        List<Shipment> result = dao.findAll(null, new Sorting(true, ShipmentConstants.PROPERTY_DEVICE_SN), null);
+        List<Shipment> result = dao.findAll(null, new Sorting(true, ShipmentConstants.DEVICE_SN), null);
 
         assertEquals(s3.getId(), result.get(0).getId());
         assertEquals(s2.getId(), result.get(1).getId());
         assertEquals(s1.getId(), result.get(2).getId());
 
-        result = dao.findAll(null, new Sorting(false, ShipmentConstants.PROPERTY_DEVICE_SN), null);
+        result = dao.findAll(null, new Sorting(false, ShipmentConstants.DEVICE_SN), null);
 
         assertEquals(s1.getId(), result.get(0).getId());
         assertEquals(s2.getId(), result.get(1).getId());
@@ -474,14 +476,14 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         //test shipped from.
         List<Shipment> result = dao.findAll(null, new Sorting(true,
-                ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME), null);
+                ShipmentConstants.SHIPPED_FROM_LOCATION_NAME), null);
 
         assertEquals(s1.getId(), result.get(0).getId());
         assertEquals(s2.getId(), result.get(1).getId());
         assertEquals(s3.getId(), result.get(2).getId());
 
         result = dao.findAll(null, new Sorting(false,
-                ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME), null);
+                ShipmentConstants.SHIPPED_FROM_LOCATION_NAME), null);
 
         assertEquals(s3.getId(), result.get(0).getId());
         assertEquals(s2.getId(), result.get(1).getId());
@@ -489,14 +491,14 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         //test shipped to.
         result = dao.findAll(null, new Sorting(true,
-                ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME), null);
+                ShipmentConstants.SHIPPED_TO_LOCATION_NAME), null);
 
         assertEquals(s3.getId(), result.get(0).getId());
         assertEquals(s2.getId(), result.get(1).getId());
         assertEquals(s1.getId(), result.get(2).getId());
 
         result = dao.findAll(null, new Sorting(false,
-                ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME), null);
+                ShipmentConstants.SHIPPED_TO_LOCATION_NAME), null);
 
         assertEquals(s1.getId(), result.get(0).getId());
         assertEquals(s2.getId(), result.get(1).getId());

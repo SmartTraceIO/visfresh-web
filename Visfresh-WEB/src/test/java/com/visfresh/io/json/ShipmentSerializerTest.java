@@ -79,6 +79,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final int tripCount = 11;
         final String commentsForReceiver = "commentsForReceiver";
         final Integer noAlertsAfterArrivalMinutes = 3;
+        final Integer noAlertsAfterStartMinutes = 33;
         final Integer shutDownAfterStartMinutes = 5;
 
         Shipment s = new Shipment();
@@ -104,6 +105,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         s.setTripCount(tripCount);
         s.setCommentsForReceiver(commentsForReceiver);
         s.setNoAlertsAfterArrivalMinutes(noAlertsAfterArrivalMinutes);
+        s.setNoAlertsAfterStartMinutes(noAlertsAfterStartMinutes);
         s.setShutDownAfterStartMinutes(shutDownAfterStartMinutes);
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
@@ -131,6 +133,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(tripCount, s.getTripCount());
         assertEquals(commentsForReceiver, s.getCommentsForReceiver());
         assertEquals(noAlertsAfterArrivalMinutes, s.getNoAlertsAfterArrivalMinutes());
+        assertEquals(noAlertsAfterStartMinutes, s.getNoAlertsAfterStartMinutes());
         assertEquals(shutDownAfterStartMinutes, s.getShutDownAfterStartMinutes());
     }
     @Test

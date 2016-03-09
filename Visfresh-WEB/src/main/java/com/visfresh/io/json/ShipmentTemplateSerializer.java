@@ -12,7 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ShipmentConstants;
-import com.visfresh.controllers.ShipmentTemplateConstants;
+import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.ShipmentTemplate;
@@ -43,23 +43,24 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
 
         final JsonObject obj = new JsonObject();
 
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_ID, tpl.getId());
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME, tpl.getName());
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION, tpl.getShipmentDescription());
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_ADD_DATE_SHIPPED, tpl.isAddDateShipped());
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPPED_FROM, getId(tpl.getShippedFrom()));
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPPED_TO, getId(tpl.getShippedTo()));
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM, tpl.isDetectLocationForShippedFrom());
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_ALERT_PROFILE_ID, getId(tpl.getAlertProfile()));
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES, tpl.getAlertSuppressionMinutes());
-        obj.add(ShipmentTemplateConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES, getIdList(tpl.getAlertsNotificationSchedules()));
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_COMMENTS_FOR_RECEIVER, tpl.getCommentsForReceiver());
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM, tpl.getArrivalNotificationWithinKm());
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS, tpl.isExcludeNotificationsIfNoAlerts());
-        obj.add(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES, getIdList(tpl.getArrivalNotificationSchedules()));
-        obj.addProperty(ShipmentTemplateConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES, tpl.getShutdownDeviceAfterMinutes());
-        obj.addProperty(ShipmentConstants.PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES, tpl.getNoAlertsAfterArrivalMinutes());
-        obj.addProperty(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES, tpl.getShutDownAfterStartMinutes());
+        obj.addProperty(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_ID, tpl.getId());
+        obj.addProperty(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME, tpl.getName());
+        obj.addProperty(ShipmentTemplateConstants.SHIPMENT_DESCRIPTION, tpl.getShipmentDescription());
+        obj.addProperty(ShipmentTemplateConstants.ADD_DATE_SHIPPED, tpl.isAddDateShipped());
+        obj.addProperty(ShipmentTemplateConstants.SHIPPED_FROM, getId(tpl.getShippedFrom()));
+        obj.addProperty(ShipmentTemplateConstants.SHIPPED_TO, getId(tpl.getShippedTo()));
+        obj.addProperty(ShipmentTemplateConstants.DETECT_LOCATION_FOR_SHIPPED_FROM, tpl.isDetectLocationForShippedFrom());
+        obj.addProperty(ShipmentTemplateConstants.ALERT_PROFILE_ID, getId(tpl.getAlertProfile()));
+        obj.addProperty(ShipmentTemplateConstants.ALERT_SUPPRESSION_MINUTES, tpl.getAlertSuppressionMinutes());
+        obj.add(ShipmentTemplateConstants.ALERTS_NOTIFICATION_SCHEDULES, getIdList(tpl.getAlertsNotificationSchedules()));
+        obj.addProperty(ShipmentTemplateConstants.COMMENTS_FOR_RECEIVER, tpl.getCommentsForReceiver());
+        obj.addProperty(ShipmentTemplateConstants.ARRIVAL_NOTIFICATION_WITHIN_KM, tpl.getArrivalNotificationWithinKm());
+        obj.addProperty(ShipmentTemplateConstants.EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS, tpl.isExcludeNotificationsIfNoAlerts());
+        obj.add(ShipmentTemplateConstants.ARRIVAL_NOTIFICATION_SCHEDULES, getIdList(tpl.getArrivalNotificationSchedules()));
+        obj.addProperty(ShipmentTemplateConstants.SHUTDOWN_DEVICE_AFTER_MINUTES, tpl.getShutdownDeviceAfterMinutes());
+        obj.addProperty(ShipmentConstants.NO_ALERTS_AFTER_ARRIVAL_MINUTES, tpl.getNoAlertsAfterArrivalMinutes());
+        obj.addProperty(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES, tpl.getNoAlertsAfterStartMinutes());
+        obj.addProperty(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES, tpl.getShutDownAfterStartMinutes());
 
         return obj;
     }
@@ -70,28 +71,29 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
     public ShipmentTemplate parseShipmentTemplate(final JsonObject obj) {
         final ShipmentTemplate shp = new ShipmentTemplate();
 
-        shp.setAlertSuppressionMinutes(asInt(obj.get(ShipmentConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES)));
-        shp.setAlertProfile(getReferenceResolver().getAlertProfile(asLong(obj.get(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID))));
+        shp.setAlertSuppressionMinutes(asInt(obj.get(ShipmentConstants.ALERT_SUPPRESSION_MINUTES)));
+        shp.setAlertProfile(getReferenceResolver().getAlertProfile(asLong(obj.get(ShipmentConstants.ALERT_PROFILE_ID))));
         shp.getAlertsNotificationSchedules().addAll(resolveNotificationSchedules(obj.get(
-                ShipmentConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES).getAsJsonArray()));
+                ShipmentConstants.ALERTS_NOTIFICATION_SCHEDULES).getAsJsonArray()));
         shp.setArrivalNotificationWithinKm(asInteger(obj.get(
-                ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM)));
+                ShipmentConstants.ARRIVAL_NOTIFICATION_WITHIN_KM)));
         shp.getArrivalNotificationSchedules().addAll(resolveNotificationSchedules(
-                obj.get(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES).getAsJsonArray()));
+                obj.get(ShipmentConstants.ARRIVAL_NOTIFICATION_SCHEDULES).getAsJsonArray()));
         shp.setExcludeNotificationsIfNoAlerts(asBoolean(obj.get(
-                ShipmentConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS)));
-        shp.setShippedFrom(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_FROM))));
-        shp.setShippedTo(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_TO))));
-        shp.setShutdownDeviceAfterMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES)));
-        shp.setNoAlertsAfterArrivalMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES)));
-        shp.setShutDownAfterStartMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES)));
-        shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER)));
+                ShipmentConstants.EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS)));
+        shp.setShippedFrom(resolveLocationProfile(asLong(obj.get(ShipmentConstants.SHIPPED_FROM))));
+        shp.setShippedTo(resolveLocationProfile(asLong(obj.get(ShipmentConstants.SHIPPED_TO))));
+        shp.setShutdownDeviceAfterMinutes(asInteger(obj.get(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_MINUTES)));
+        shp.setNoAlertsAfterArrivalMinutes(asInteger(obj.get(ShipmentConstants.NO_ALERTS_AFTER_ARRIVAL_MINUTES)));
+        shp.setNoAlertsAfterStartMinutes(asInteger(obj.get(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES)));
+        shp.setShutDownAfterStartMinutes(asInteger(obj.get(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES)));
+        shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.COMMENTS_FOR_RECEIVER)));
 
-        shp.setId(asLong(obj.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_ID)));
-        shp.setName(asString(obj.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME)));
-        shp.setShipmentDescription(asString(obj.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION)));
-        shp.setAddDateShipped(asBoolean(obj.get(ShipmentTemplateConstants.PROPERTY_ADD_DATE_SHIPPED)));
-        shp.setDetectLocationForShippedFrom(asBoolean(obj.get(ShipmentTemplateConstants.PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM)));
+        shp.setId(asLong(obj.get(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_ID)));
+        shp.setName(asString(obj.get(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME)));
+        shp.setShipmentDescription(asString(obj.get(ShipmentTemplateConstants.SHIPMENT_DESCRIPTION)));
+        shp.setAddDateShipped(asBoolean(obj.get(ShipmentTemplateConstants.ADD_DATE_SHIPPED)));
+        shp.setDetectLocationForShippedFrom(asBoolean(obj.get(ShipmentTemplateConstants.DETECT_LOCATION_FOR_SHIPPED_FROM)));
 
         return shp;
     }
@@ -105,19 +107,19 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject json = new JsonObject();
-        json.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_TEMPLATE_ID, item.getShipmentTemplateId());
+        json.addProperty(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_ID, item.getShipmentTemplateId());
 
-        json.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME, item.getShipmentTemplateName());
-        json.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION, item.getShipmentDescription());
+        json.addProperty(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME, item.getShipmentTemplateName());
+        json.addProperty(ShipmentTemplateConstants.SHIPMENT_DESCRIPTION, item.getShipmentDescription());
 
-        json.addProperty(ShipmentConstants.PROPERTY_SHIPPED_FROM, item.getShippedFrom());
-        json.addProperty(ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME, item.getShippedFromLocationName());
+        json.addProperty(ShipmentTemplateConstants.SHIPPED_FROM, item.getShippedFrom());
+        json.addProperty(ShipmentConstants.SHIPPED_FROM_LOCATION_NAME, item.getShippedFromLocationName());
 
-        json.addProperty(ShipmentConstants.PROPERTY_SHIPPED_TO, item.getShippedTo());
-        json.addProperty(ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME, item.getShippedToLocationName());
+        json.addProperty(ShipmentConstants.SHIPPED_TO, item.getShippedTo());
+        json.addProperty(ShipmentConstants.SHIPPED_TO_LOCATION_NAME, item.getShippedToLocationName());
 
-        json.addProperty(ShipmentConstants.PROPERTY_ALERT_PROFILE, item.getAlertProfile());
-        json.addProperty(ShipmentConstants.PROPERTY_ALERT_PROFILE_NAME, item.getAlertProfileName());
+        json.addProperty(ShipmentConstants.ALERT_PROFILE, item.getAlertProfile());
+        json.addProperty(ShipmentConstants.ALERT_PROFILE_NAME, item.getAlertProfileName());
         return json;
     }
     public ListShipmentTemplateItem parseListShipmentTemplateItem(final JsonElement el) {
@@ -127,19 +129,19 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         final JsonObject json = el.getAsJsonObject();
 
         final ListShipmentTemplateItem item = new ListShipmentTemplateItem();
-        item.setShipmentTemplateId(asLong(json.get(ShipmentConstants.PROPERTY_SHIPMENT_TEMPLATE_ID)));
+        item.setShipmentTemplateId(asLong(json.get(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_ID)));
 
-        item.setShipmentTemplateName(asString(json.get(ShipmentConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME)));
-        item.setShipmentDescription(asString(json.get(ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION)));
+        item.setShipmentTemplateName(asString(json.get(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME)));
+        item.setShipmentDescription(asString(json.get(ShipmentConstants.SHIPMENT_DESCRIPTION)));
 
-        item.setShippedFrom(asLong(json.get(ShipmentConstants.PROPERTY_SHIPPED_FROM)));
-        item.setShippedFromLocationName(asString(json.get(ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME)));
+        item.setShippedFrom(asLong(json.get(ShipmentConstants.SHIPPED_FROM)));
+        item.setShippedFromLocationName(asString(json.get(ShipmentConstants.SHIPPED_FROM_LOCATION_NAME)));
 
-        item.setShippedTo(asLong(json.get(ShipmentConstants.PROPERTY_SHIPPED_TO)));
-        item.setShippedToLocationName(asString(json.get(ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME)));
+        item.setShippedTo(asLong(json.get(ShipmentConstants.SHIPPED_TO)));
+        item.setShippedToLocationName(asString(json.get(ShipmentConstants.SHIPPED_TO_LOCATION_NAME)));
 
-        item.setAlertProfile(asLong(json.get(ShipmentConstants.PROPERTY_ALERT_PROFILE)));
-        item.setAlertProfileName(asString(json.get(ShipmentConstants.PROPERTY_ALERT_PROFILE_NAME)));
+        item.setAlertProfile(asLong(json.get(ShipmentConstants.ALERT_PROFILE)));
+        item.setAlertProfileName(asString(json.get(ShipmentConstants.ALERT_PROFILE_NAME)));
 
         return item;
     }

@@ -65,7 +65,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
     //        final @RequestBody String alert) {
     @Test
     public void testSaveDevice() throws RestServiceException, IOException {
-        final Device p = createDevice("0239487043987", false);
+        final Device p = createDevice("0239487043987", true);
         client.saveDevice(p);
         assertNotNull(dao.findOne(p.getImei()));
     }

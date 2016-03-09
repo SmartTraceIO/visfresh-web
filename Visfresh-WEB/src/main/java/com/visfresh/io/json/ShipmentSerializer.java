@@ -32,7 +32,7 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.shipment.SingleShipmentAlert;
-import com.visfresh.io.shipment.SingleShipmentDtoNew;
+import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.lists.ListShipmentItem;
@@ -64,39 +64,40 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param shp
      */
     private void parseShipmentBase(final JsonObject obj, final ShipmentBase shp) {
-        shp.setAlertSuppressionMinutes(asInt(obj.get(ShipmentConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES)));
-        shp.setAlertProfile(getReferenceResolver().getAlertProfile(asLong(obj.get(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID))));
+        shp.setAlertSuppressionMinutes(asInt(obj.get(ShipmentConstants.ALERT_SUPPRESSION_MINUTES)));
+        shp.setAlertProfile(getReferenceResolver().getAlertProfile(asLong(obj.get(ShipmentConstants.ALERT_PROFILE_ID))));
         shp.getAlertsNotificationSchedules().addAll(resolveNotificationSchedules(obj.get(
-                ShipmentConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES).getAsJsonArray()));
+                ShipmentConstants.ALERTS_NOTIFICATION_SCHEDULES).getAsJsonArray()));
         shp.setArrivalNotificationWithinKm(asInteger(obj.get(
-                ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM)));
+                ShipmentConstants.ARRIVAL_NOTIFICATION_WITHIN_KM)));
         shp.getArrivalNotificationSchedules().addAll(resolveNotificationSchedules(
-                obj.get(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES).getAsJsonArray()));
+                obj.get(ShipmentConstants.ARRIVAL_NOTIFICATION_SCHEDULES).getAsJsonArray()));
         shp.setExcludeNotificationsIfNoAlerts(asBoolean(obj.get(
-                ShipmentConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS)));
-        shp.setShippedFrom(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_FROM))));
-        shp.setShippedTo(resolveLocationProfile(asLong(obj.get(ShipmentConstants.PROPERTY_SHIPPED_TO))));
-        shp.setShutdownDeviceAfterMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES)));
-        shp.setNoAlertsAfterArrivalMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES)));
-        shp.setShutDownAfterStartMinutes(asInteger(obj.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES)));
-        shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER)));
+                ShipmentConstants.EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS)));
+        shp.setShippedFrom(resolveLocationProfile(asLong(obj.get(ShipmentConstants.SHIPPED_FROM))));
+        shp.setShippedTo(resolveLocationProfile(asLong(obj.get(ShipmentConstants.SHIPPED_TO))));
+        shp.setShutdownDeviceAfterMinutes(asInteger(obj.get(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_MINUTES)));
+        shp.setNoAlertsAfterArrivalMinutes(asInteger(obj.get(ShipmentConstants.NO_ALERTS_AFTER_ARRIVAL_MINUTES)));
+        shp.setNoAlertsAfterStartMinutes(asInteger(obj.get(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES)));
+        shp.setShutDownAfterStartMinutes(asInteger(obj.get(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES)));
+        shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.COMMENTS_FOR_RECEIVER)));
     }
     public Shipment parseShipment(final JsonObject json) {
         final Shipment s = new Shipment();
         parseShipmentBase(json, s);
 
-        s.setAssetType(asString(json.get(ShipmentConstants.PROPERTY_ASSET_TYPE)));
-        s.setId(asLong(json.get(ShipmentConstants.PROPERTY_SHIPMENT_ID)));
-        s.setShipmentDescription(asString(json.get(ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION)));
-        s.setPalletId(asString(json.get(ShipmentConstants.PROPERTY_PALLET_ID)));
-        s.setAssetNum(asString(json.get(ShipmentConstants.PROPERTY_ASSET_NUM)));
-        s.setTripCount(asInt(json.get(ShipmentConstants.PROPERTY_TRIP_COUNT)));
-        s.setPoNum(asInt(json.get(ShipmentConstants.PROPERTY_PO_NUM)));
-        s.setShipmentDate(asDate(json.get(ShipmentConstants.PROPERTY_SHIPMENT_DATE)));
-        s.setArrivalDate(asDate(json.get(ShipmentConstants.PROPERTY_ARRIVAL_DATE)));
-        s.getCustomFields().putAll(parseStringMap(json.get(ShipmentConstants.PROPERTY_CUSTOM_FIELDS)));
-        s.setStatus(ShipmentStatus.valueOf(json.get(ShipmentConstants.PROPERTY_STATUS).getAsString()));
-        s.setDevice(getReferenceResolver().getDevice(asString(json.get(ShipmentConstants.PROPERTY_DEVICE_IMEI))));
+        s.setAssetType(asString(json.get(ShipmentConstants.ASSET_TYPE)));
+        s.setId(asLong(json.get(ShipmentConstants.SHIPMENT_ID)));
+        s.setShipmentDescription(asString(json.get(ShipmentConstants.SHIPMENT_DESCRIPTION)));
+        s.setPalletId(asString(json.get(ShipmentConstants.PALLET_ID)));
+        s.setAssetNum(asString(json.get(ShipmentConstants.ASSET_NUM)));
+        s.setTripCount(asInt(json.get(ShipmentConstants.TRIP_COUNT)));
+        s.setPoNum(asInt(json.get(ShipmentConstants.PO_NUM)));
+        s.setShipmentDate(asDate(json.get(ShipmentConstants.SHIPMENT_DATE)));
+        s.setArrivalDate(asDate(json.get(ShipmentConstants.ARRIVAL_DATE)));
+        s.getCustomFields().putAll(parseStringMap(json.get(ShipmentConstants.CUSTOM_FIELDS)));
+        s.setStatus(ShipmentStatus.valueOf(json.get(ShipmentConstants.STATUS).getAsString()));
+        s.setDevice(getReferenceResolver().getDevice(asString(json.get(ShipmentConstants.DEVICE_IMEI))));
 
         return s;
     }
@@ -110,42 +111,43 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject obj = new JsonObject();
-        obj.addProperty(ShipmentConstants.PROPERTY_STATUS, s.getStatus().name());
+        obj.addProperty(ShipmentConstants.STATUS, s.getStatus().name());
 
         if (s.getDevice() != null) {
-            obj.addProperty(ShipmentConstants.PROPERTY_DEVICE_IMEI, s.getDevice().getImei());
+            obj.addProperty(ShipmentConstants.DEVICE_IMEI, s.getDevice().getImei());
             obj.addProperty("deviceSN", s.getDevice().getSn());
             obj.addProperty("deviceName", s.getDevice().getName());
         }
-        obj.addProperty(ShipmentConstants.PROPERTY_TRIP_COUNT, s.getTripCount());
+        obj.addProperty(ShipmentConstants.TRIP_COUNT, s.getTripCount());
 
-        obj.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_ID, s.getId());
-        obj.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION, s.getShipmentDescription());
+        obj.addProperty(ShipmentConstants.SHIPMENT_ID, s.getId());
+        obj.addProperty(ShipmentConstants.SHIPMENT_DESCRIPTION, s.getShipmentDescription());
 
-        obj.addProperty(ShipmentConstants.PROPERTY_PALLET_ID, s.getPalletId());
-        obj.addProperty(ShipmentConstants.PROPERTY_PO_NUM, s.getPoNum());
-        obj.addProperty(ShipmentConstants.PROPERTY_ASSET_NUM, s.getAssetNum());
-        obj.addProperty(ShipmentConstants.PROPERTY_ASSET_TYPE, s.getAssetType());
+        obj.addProperty(ShipmentConstants.PALLET_ID, s.getPalletId());
+        obj.addProperty(ShipmentConstants.PO_NUM, s.getPoNum());
+        obj.addProperty(ShipmentConstants.ASSET_NUM, s.getAssetNum());
+        obj.addProperty(ShipmentConstants.ASSET_TYPE, s.getAssetType());
 
-        obj.addProperty(ShipmentConstants.PROPERTY_SHIPPED_FROM, getId(s.getShippedFrom()));
-        obj.addProperty(ShipmentConstants.PROPERTY_SHIPPED_TO, getId(s.getShippedTo()));
-        obj.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_DATE, formatDate(s.getShipmentDate()));
-        obj.addProperty(ShipmentConstants.PROPERTY_ARRIVAL_DATE, formatDate(s.getArrivalDate()));
+        obj.addProperty(ShipmentConstants.SHIPPED_FROM, getId(s.getShippedFrom()));
+        obj.addProperty(ShipmentConstants.SHIPPED_TO, getId(s.getShippedTo()));
+        obj.addProperty(ShipmentConstants.SHIPMENT_DATE, formatDate(s.getShipmentDate()));
+        obj.addProperty(ShipmentConstants.ARRIVAL_DATE, formatDate(s.getArrivalDate()));
 
-        obj.addProperty(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID, getId(s.getAlertProfile()));
-        obj.addProperty(ShipmentConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES, s.getAlertSuppressionMinutes());
-        obj.add(ShipmentConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES, getIdList(s.getAlertsNotificationSchedules()));
+        obj.addProperty(ShipmentConstants.ALERT_PROFILE_ID, getId(s.getAlertProfile()));
+        obj.addProperty(ShipmentConstants.ALERT_SUPPRESSION_MINUTES, s.getAlertSuppressionMinutes());
+        obj.add(ShipmentConstants.ALERTS_NOTIFICATION_SCHEDULES, getIdList(s.getAlertsNotificationSchedules()));
 
-        obj.addProperty(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER, s.getCommentsForReceiver());
-        obj.addProperty(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM, s.getArrivalNotificationWithinKm());
-        obj.addProperty(ShipmentConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS, s.isExcludeNotificationsIfNoAlerts());
-        obj.add(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES, getIdList(s.getArrivalNotificationSchedules()));
+        obj.addProperty(ShipmentConstants.COMMENTS_FOR_RECEIVER, s.getCommentsForReceiver());
+        obj.addProperty(ShipmentConstants.ARRIVAL_NOTIFICATION_WITHIN_KM, s.getArrivalNotificationWithinKm());
+        obj.addProperty(ShipmentConstants.EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS, s.isExcludeNotificationsIfNoAlerts());
+        obj.add(ShipmentConstants.ARRIVAL_NOTIFICATION_SCHEDULES, getIdList(s.getArrivalNotificationSchedules()));
 
-        obj.addProperty(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES, s.getShutdownDeviceAfterMinutes());
-        obj.addProperty(ShipmentConstants.PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES, s.getNoAlertsAfterArrivalMinutes());
-        obj.addProperty(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES, s.getShutDownAfterStartMinutes());
+        obj.addProperty(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_MINUTES, s.getShutdownDeviceAfterMinutes());
+        obj.addProperty(ShipmentConstants.NO_ALERTS_AFTER_ARRIVAL_MINUTES, s.getNoAlertsAfterArrivalMinutes());
+        obj.addProperty(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES, s.getNoAlertsAfterStartMinutes());
+        obj.addProperty(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES, s.getShutDownAfterStartMinutes());
 
-        obj.add(ShipmentConstants.PROPERTY_CUSTOM_FIELDS, toJson(s.getCustomFields()));
+        obj.add(ShipmentConstants.CUSTOM_FIELDS, toJson(s.getCustomFields()));
         return obj;
     }
     /**
@@ -176,7 +178,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      */
     public Long getShipmentIdFromSaveRequest(final JsonObject json) {
         final JsonObject shipment = getShipmentFromRequest(json);
-        return asLong(shipment.get(ShipmentConstants.PROPERTY_SHIPMENT_ID));
+        return asLong(shipment.get(ShipmentConstants.SHIPMENT_ID));
     }
     /**
      * @param json JSON save shipment request.
@@ -195,7 +197,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
     public SaveShipmentResponse parseSaveShipmentResponse(final JsonObject json) {
         final SaveShipmentResponse resp = new SaveShipmentResponse();
-        resp.setShipmentId(asLong(json.get(ShipmentConstants.PROPERTY_SHIPMENT_ID)));
+        resp.setShipmentId(asLong(json.get(ShipmentConstants.SHIPMENT_ID)));
         resp.setTemplateId(asLong(json.get("templateId")));
         return resp;
     }
@@ -205,7 +207,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      */
     public JsonObject toJson(final SaveShipmentResponse resp) {
         final JsonObject obj = new JsonObject();
-        obj.addProperty(ShipmentConstants.PROPERTY_SHIPMENT_ID, resp.getShipmentId());
+        obj.addProperty(ShipmentConstants.SHIPMENT_ID, resp.getShipmentId());
         obj.addProperty("templateId", resp.getTemplateId());
         return obj;
     }
@@ -476,7 +478,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param dto
      * @return
      */
-    public JsonObject toJson(final SingleShipmentDtoNew dto) {
+    public JsonObject toJson(final SingleShipmentDto dto) {
         return toJson(dto, true);
     }
 
@@ -485,7 +487,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param isNotSibling
      * @return
      */
-    protected JsonObject toJson(final SingleShipmentDtoNew dto,
+    protected JsonObject toJson(final SingleShipmentDto dto,
             final boolean isNotSibling) {
         if (dto == null) {
             return  null;
@@ -585,7 +587,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.add("locations", locations);
 
             final JsonArray siblings = new JsonArray();
-            for (final SingleShipmentDtoNew sibling: dto.getSiblings()) {
+            for (final SingleShipmentDto sibling: dto.getSiblings()) {
                 siblings.add(toJson(sibling, false));
             }
 

@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.AutoStartShipmentConstants;
 import com.visfresh.constants.ShipmentConstants;
-import com.visfresh.controllers.ShipmentTemplateConstants;
+import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.io.AutoStartShipmentDto;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
@@ -60,24 +60,25 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
             dto.getEndLocations().add(el.getAsLong());
         }
 
-        dto.setAlertSuppressionMinutes(asInt(json.get(ShipmentConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES)));
-        dto.setAlertProfile(asLong(json.get(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID)));
+        dto.setAlertSuppressionMinutes(asInt(json.get(ShipmentConstants.ALERT_SUPPRESSION_MINUTES)));
+        dto.setAlertProfile(asLong(json.get(ShipmentConstants.ALERT_PROFILE_ID)));
         dto.getAlertsNotificationSchedules().addAll(toLongList(json.get(
-                ShipmentConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES).getAsJsonArray()));
+                ShipmentConstants.ALERTS_NOTIFICATION_SCHEDULES).getAsJsonArray()));
         dto.setArrivalNotificationWithinKm(asInteger(json.get(
-                ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM)));
+                ShipmentConstants.ARRIVAL_NOTIFICATION_WITHIN_KM)));
         dto.getArrivalNotificationSchedules().addAll(toLongList(
-                json.get(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES).getAsJsonArray()));
+                json.get(ShipmentConstants.ARRIVAL_NOTIFICATION_SCHEDULES).getAsJsonArray()));
         dto.setExcludeNotificationsIfNoAlerts(asBoolean(json.get(
-                ShipmentConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS)));
-        dto.setShutdownDeviceAfterMinutes(asInteger(json.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES)));
-        dto.setNoAlertsAfterArrivalMinutes(asInteger(json.get(ShipmentConstants.PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES)));
-        dto.setShutDownAfterStartMinutes(asInteger(json.get(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES)));
-        dto.setCommentsForReceiver(asString(json.get(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER)));
+                ShipmentConstants.EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS)));
+        dto.setShutdownDeviceAfterMinutes(asInteger(json.get(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_MINUTES)));
+        dto.setNoAlertsAfterArrivalMinutes(asInteger(json.get(ShipmentConstants.NO_ALERTS_AFTER_ARRIVAL_MINUTES)));
+        dto.setNoAlertsAfterStartMinutes(asInteger(json.get(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES)));
+        dto.setShutDownAfterStartMinutes(asInteger(json.get(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES)));
+        dto.setCommentsForReceiver(asString(json.get(ShipmentConstants.COMMENTS_FOR_RECEIVER)));
 
-        dto.setName(asString(json.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME)));
-        dto.setShipmentDescription(asString(json.get(ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION)));
-        dto.setAddDateShipped(asBoolean(json.get(ShipmentTemplateConstants.PROPERTY_ADD_DATE_SHIPPED)));
+        dto.setName(asString(json.get(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME)));
+        dto.setShipmentDescription(asString(json.get(ShipmentTemplateConstants.SHIPMENT_DESCRIPTION)));
+        dto.setAddDateShipped(asBoolean(json.get(ShipmentTemplateConstants.ADD_DATE_SHIPPED)));
 
         return dto;
     }
@@ -113,21 +114,22 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
         }
 
         //shipment template
-        json.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME, as.getName());
-        json.addProperty(ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION, as.getShipmentDescription());
-        json.addProperty(ShipmentTemplateConstants.PROPERTY_ADD_DATE_SHIPPED, as.isAddDateShipped());
-        json.addProperty(ShipmentTemplateConstants.PROPERTY_ALERT_PROFILE_ID, as.getAlertProfile());
-        json.addProperty(ShipmentTemplateConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES, as.getAlertSuppressionMinutes());
-        json.add(ShipmentTemplateConstants.PROPERTY_ALERTS_NOTIFICATION_SCHEDULES,
+        json.addProperty(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME, as.getName());
+        json.addProperty(ShipmentTemplateConstants.SHIPMENT_DESCRIPTION, as.getShipmentDescription());
+        json.addProperty(ShipmentTemplateConstants.ADD_DATE_SHIPPED, as.isAddDateShipped());
+        json.addProperty(ShipmentTemplateConstants.ALERT_PROFILE_ID, as.getAlertProfile());
+        json.addProperty(ShipmentTemplateConstants.ALERT_SUPPRESSION_MINUTES, as.getAlertSuppressionMinutes());
+        json.add(ShipmentTemplateConstants.ALERTS_NOTIFICATION_SCHEDULES,
                 toJsonArray(as.getAlertsNotificationSchedules()));
-        json.addProperty(ShipmentTemplateConstants.PROPERTY_COMMENTS_FOR_RECEIVER, as.getCommentsForReceiver());
-        json.addProperty(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM, as.getArrivalNotificationWithinKm());
-        json.addProperty(ShipmentTemplateConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS, as.isExcludeNotificationsIfNoAlerts());
-        json.add(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES,
+        json.addProperty(ShipmentTemplateConstants.COMMENTS_FOR_RECEIVER, as.getCommentsForReceiver());
+        json.addProperty(ShipmentTemplateConstants.ARRIVAL_NOTIFICATION_WITHIN_KM, as.getArrivalNotificationWithinKm());
+        json.addProperty(ShipmentTemplateConstants.EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS, as.isExcludeNotificationsIfNoAlerts());
+        json.add(ShipmentTemplateConstants.ARRIVAL_NOTIFICATION_SCHEDULES,
                 toJsonArray(as.getArrivalNotificationSchedules()));
-        json.addProperty(ShipmentTemplateConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES, as.getShutdownDeviceAfterMinutes());
-        json.addProperty(ShipmentConstants.PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES, as.getNoAlertsAfterArrivalMinutes());
-        json.addProperty(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES, as.getShutDownAfterStartMinutes());
+        json.addProperty(ShipmentTemplateConstants.SHUTDOWN_DEVICE_AFTER_MINUTES, as.getShutdownDeviceAfterMinutes());
+        json.addProperty(ShipmentConstants.NO_ALERTS_AFTER_ARRIVAL_MINUTES, as.getNoAlertsAfterArrivalMinutes());
+        json.addProperty(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES, as.getNoAlertsAfterStartMinutes());
+        json.addProperty(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES, as.getShutDownAfterStartMinutes());
         return json;
     }
     /**

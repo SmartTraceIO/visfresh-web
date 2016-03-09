@@ -1,0 +1,1 @@
+alter table shipments add column noalertsafterstartminutes int default null;

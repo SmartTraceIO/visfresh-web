@@ -60,32 +60,32 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      */
     public ShipmentDaoImpl() {
         super();
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_ALERT_PROFILE_ID, ALERT_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES, NOALERTIFCOODOWN_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM,
+        propertyToDbFields.put(ShipmentConstants.ALERT_PROFILE_ID, ALERT_FIELD);
+        propertyToDbFields.put(ShipmentConstants.ALERT_SUPPRESSION_MINUTES, NOALERTIFCOODOWN_FIELD);
+        propertyToDbFields.put(ShipmentConstants.ARRIVAL_NOTIFICATION_WITHIN_KM,
                 ARRIVALNOTIFWITHIN_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS,
+        propertyToDbFields.put(ShipmentConstants.EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS,
                 NONOTIFSIFNOALERTS_FIELD);
 //        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPPED_FROM, SHIPPEDFROM_FIELD);
 //        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPPED_TO, SHIPPEDTO_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES,
+        propertyToDbFields.put(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_MINUTES,
                 SHUTDOWNTIMEOUT_FIELD);
 //        propertyToDbFields.put(ShipmentConstants.PROPERTY_MAX_TIMES_ALERT_FIRES,
 //                );
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_COMMENTS_FOR_RECEIVER, COMMENTS_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION, DESCRIPTION_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_ALERT_PROFILE, ALERT_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_DEVICE_IMEI, DEVICE_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_STATUS, STATUS_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_CUSTOM_FIELDS, CUSTOMFIELDS_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPMENT_DATE, SHIPMENTDATE_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_ARRIVAL_DATE, ARRIVALDATE_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_PO_NUM, PONUM_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_TRIP_COUNT, TRIPCOUNT_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_ASSET_NUM, ASSETNUM_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_PALLET_ID, PALETTID_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_SHIPMENT_ID, ID_FIELD);
-        propertyToDbFields.put(ShipmentConstants.PROPERTY_ASSET_TYPE, ASSETTYPE_FIELD);
+        propertyToDbFields.put(ShipmentConstants.COMMENTS_FOR_RECEIVER, COMMENTS_FIELD);
+        propertyToDbFields.put(ShipmentConstants.SHIPMENT_DESCRIPTION, DESCRIPTION_FIELD);
+        propertyToDbFields.put(ShipmentConstants.ALERT_PROFILE, ALERT_FIELD);
+        propertyToDbFields.put(ShipmentConstants.DEVICE_IMEI, DEVICE_FIELD);
+        propertyToDbFields.put(ShipmentConstants.STATUS, STATUS_FIELD);
+        propertyToDbFields.put(ShipmentConstants.CUSTOM_FIELDS, CUSTOMFIELDS_FIELD);
+        propertyToDbFields.put(ShipmentConstants.SHIPMENT_DATE, SHIPMENTDATE_FIELD);
+        propertyToDbFields.put(ShipmentConstants.ARRIVAL_DATE, ARRIVALDATE_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PO_NUM, PONUM_FIELD);
+        propertyToDbFields.put(ShipmentConstants.TRIP_COUNT, TRIPCOUNT_FIELD);
+        propertyToDbFields.put(ShipmentConstants.ASSET_NUM, ASSETNUM_FIELD);
+        propertyToDbFields.put(ShipmentConstants.PALLET_ID, PALETTID_FIELD);
+        propertyToDbFields.put(ShipmentConstants.SHIPMENT_ID, ID_FIELD);
+        propertyToDbFields.put(ShipmentConstants.ASSET_TYPE, ASSETTYPE_FIELD);
 //        propertyToDbFields.put(ShipmentConstants.PROPERTY_ETA, )
     }
     /* (non-Javadoc)
@@ -155,10 +155,10 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     @Override
     public Shipment findLastShipment(final String imei) {
         //sorting
-        final Sorting sort = new Sorting(false, ShipmentConstants.PROPERTY_SHIPMENT_ID);
+        final Sorting sort = new Sorting(false, ShipmentConstants.SHIPMENT_ID);
         //filter
         final Filter filter = new Filter();
-        filter.addFilter(ShipmentConstants.PROPERTY_DEVICE_IMEI, imei);
+        filter.addFilter(ShipmentConstants.DEVICE_IMEI, imei);
         //page
         final List<Shipment> shipments = findAll(filter, sort, new Page(1, 1));
 
@@ -424,7 +424,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
 
         if (STATUS_FIELD.equals(property)) {
             super.addFilterValue(property, value == null ? null : value.toString(), params, filters);
-        } else if (ShipmentConstants.PROPERTY_SHIPPED_TO.equals(property)){
+        } else if (ShipmentConstants.SHIPPED_TO.equals(property)){
             //create placeholder for 'in' operator
             final List<String> in = new LinkedList<String>();
             int num = 0;
@@ -436,7 +436,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             }
 
             filters.add(TABLE + "." + SHIPPEDTO_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
-        } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM.equals(property)){
+        } else if (ShipmentConstants.SHIPPED_FROM.equals(property)){
             //create placeholder for 'in' operator
             final List<String> in = new LinkedList<String>();
             int num = 0;
@@ -448,19 +448,19 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             }
 
             filters.add(SHIPPEDFROM_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
-        } else if (ShipmentConstants.PROPERTY_SHIPPED_TO_DATE.equals(property)){
+        } else if (ShipmentConstants.SHIPPED_TO_DATE.equals(property)){
             //shipped to date
             params.put(defaultKey, value);
             filters.add(TABLE + "." + SHIPMENTDATE_FIELD + " <= :" + defaultKey);
-        } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM_DATE.equals(property)){
+        } else if (ShipmentConstants.SHIPPED_FROM_DATE.equals(property)){
             //shipped from date
             params.put(defaultKey, value);
             filters.add(TABLE + "." + LASTEVENT_FIELD + " >= :" + defaultKey);
-        } else if (ShipmentConstants.PROPERTY_SHIPMENT_DESCRIPTION.equals(property)){
+        } else if (ShipmentConstants.SHIPMENT_DESCRIPTION.equals(property)){
             params.put(defaultKey, "%" + value + "%");
             filters.add(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
-        } else if (ShipmentConstants.PROPERTY_DEVICE_SN.equals(property)){
-            filters.add(ShipmentConstants.PROPERTY_DEVICE_SN + " = :" + defaultKey);
+        } else if (ShipmentConstants.DEVICE_SN.equals(property)){
+            filters.add(ShipmentConstants.DEVICE_SN + " = :" + defaultKey);
         } else {
             super.addFilterValue(property, value, params, filters);
         }
@@ -471,9 +471,9 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     @Override
     protected void addFiltesForFindAll(final Filter filter, final Map<String, Object> params,
             final List<String> filters) {
-        final Object value = filter.getFilter(ShipmentConstants.PROPERTY_ONLY_WITH_ALERTS);
+        final Object value = filter.getFilter(ShipmentConstants.ONLY_WITH_ALERTS);
         if (value != null) {
-            filter.removeFilter(ShipmentConstants.PROPERTY_ONLY_WITH_ALERTS);
+            filter.removeFilter(ShipmentConstants.ONLY_WITH_ALERTS);
         }
 
         super.addFiltesForFindAll(filter, params, filters);
@@ -491,11 +491,11 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
                 + getTableName()
                 + ".*"
                 + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6)"
-                + " as " + ShipmentConstants.PROPERTY_DEVICE_SN
+                + " as " + ShipmentConstants.DEVICE_SN
                 + " , sfrom." + LocationProfileDaoImpl.NAME_FIELD
-                + " as " + ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME
+                + " as " + ShipmentConstants.SHIPPED_FROM_LOCATION_NAME
                 + " , sto." + LocationProfileDaoImpl.NAME_FIELD
-                + " as " + ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME
+                + " as " + ShipmentConstants.SHIPPED_TO_LOCATION_NAME
                 + " from " + getTableName()
                 + " left outer join " + DeviceDaoImpl.TABLE + " as d"
                 + " on " + getTableName() + "." + DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
@@ -511,13 +511,13 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     @Override
     protected void addSortForDbField(final String field, final List<String> sorts,
             final boolean isAscent) {
-        if (ShipmentConstants.PROPERTY_DEVICE_SN.equals(field)) {
+        if (ShipmentConstants.DEVICE_SN.equals(field)) {
             //also add the trip count to sort
             super.addSortForDbField(field, sorts, isAscent);
             super.addSortForDbField(TABLE + "." + TRIPCOUNT_FIELD, sorts, isAscent);
-        } else if (ShipmentConstants.PROPERTY_SHIPPED_FROM_LOCATION_NAME.equals(field)){
+        } else if (ShipmentConstants.SHIPPED_FROM_LOCATION_NAME.equals(field)){
             super.addSortForDbField(field, sorts, isAscent);
-        } else if (ShipmentConstants.PROPERTY_SHIPPED_TO_LOCATION_NAME.equals(field)){
+        } else if (ShipmentConstants.SHIPPED_TO_LOCATION_NAME.equals(field)){
             super.addSortForDbField(field, sorts, isAscent);
         } else {
             super.addSortForDbField(TABLE + "." + field, sorts, isAscent);

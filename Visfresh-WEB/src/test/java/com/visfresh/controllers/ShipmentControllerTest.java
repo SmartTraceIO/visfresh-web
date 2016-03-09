@@ -246,13 +246,13 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Shipment s3 = createShipment(true);
 
         //CreationDate ascent
-        List<Long> ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPMENT_ID, true);
+        List<Long> ids = getSortedShipmentId(ShipmentConstants.SHIPMENT_ID, true);
         assertEquals(s1.getId(), ids.get(0));
         assertEquals(s2.getId(), ids.get(1));
         assertEquals(s3.getId(), ids.get(2));
 
         //CreationDate descent
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPMENT_ID, false);
+        ids = getSortedShipmentId(ShipmentConstants.SHIPMENT_ID, false);
         assertEquals(s3.getId(), ids.get(0));
         assertEquals(s2.getId(), ids.get(1));
         assertEquals(s1.getId(), ids.get(2));
@@ -267,12 +267,12 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentDao.save(s2);
         shipmentDao.save(s3);
 
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPMENT_DATE, true);
+        ids = getSortedShipmentId(ShipmentConstants.SHIPMENT_DATE, true);
         assertEquals(s2.getId(), ids.get(0));
         assertEquals(s3.getId(), ids.get(1));
         assertEquals(s1.getId(), ids.get(2));
 
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPMENT_DATE, false);
+        ids = getSortedShipmentId(ShipmentConstants.SHIPMENT_DATE, false);
         assertEquals(s1.getId(), ids.get(0));
         assertEquals(s3.getId(), ids.get(1));
         assertEquals(s2.getId(), ids.get(2));
@@ -286,12 +286,12 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentDao.save(s2);
         shipmentDao.save(s3);
 
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_ARRIVAL_DATE, true);
+        ids = getSortedShipmentId(ShipmentConstants.ARRIVAL_DATE, true);
         assertEquals(s1.getId(), ids.get(0));
         assertEquals(s3.getId(), ids.get(1));
         assertEquals(s2.getId(), ids.get(2));
 
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_ARRIVAL_DATE, false);
+        ids = getSortedShipmentId(ShipmentConstants.ARRIVAL_DATE, false);
         assertEquals(s2.getId(), ids.get(0));
         assertEquals(s3.getId(), ids.get(1));
         assertEquals(s1.getId(), ids.get(2));
@@ -305,12 +305,12 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentDao.save(s2);
         shipmentDao.save(s3);
 
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_STATUS, true);
+        ids = getSortedShipmentId(ShipmentConstants.STATUS, true);
         assertEquals(s1.getId(), ids.get(0));
         assertEquals(s3.getId(), ids.get(1));
         assertEquals(s2.getId(), ids.get(2));
 
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_STATUS, false);
+        ids = getSortedShipmentId(ShipmentConstants.STATUS, false);
         assertEquals(s2.getId(), ids.get(0));
         assertEquals(s3.getId(), ids.get(1));
         assertEquals(s1.getId(), ids.get(2));
@@ -328,12 +328,12 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentDao.save(s2);
         shipmentDao.save(s3);
 
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPPED_FROM, true);
+        ids = getSortedShipmentId(ShipmentConstants.SHIPPED_FROM, true);
         assertEquals(s1.getId(), ids.get(0));
         assertEquals(s3.getId(), ids.get(1));
         assertEquals(s2.getId(), ids.get(2));
 
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPPED_FROM, false);
+        ids = getSortedShipmentId(ShipmentConstants.SHIPPED_FROM, false);
         assertEquals(s2.getId(), ids.get(0));
         assertEquals(s3.getId(), ids.get(1));
         assertEquals(s1.getId(), ids.get(2));
@@ -347,12 +347,12 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentDao.save(s2);
         shipmentDao.save(s3);
 
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPPED_TO, true);
+        ids = getSortedShipmentId(ShipmentConstants.SHIPPED_TO, true);
         assertEquals(s1.getId(), ids.get(0));
         assertEquals(s3.getId(), ids.get(1));
         assertEquals(s2.getId(), ids.get(2));
 
-        ids = getSortedShipmentId(ShipmentConstants.PROPERTY_SHIPPED_TO, false);
+        ids = getSortedShipmentId(ShipmentConstants.SHIPPED_TO, false);
         assertEquals(s2.getId(), ids.get(0));
         assertEquals(s3.getId(), ids.get(1));
         assertEquals(s1.getId(), ids.get(2));

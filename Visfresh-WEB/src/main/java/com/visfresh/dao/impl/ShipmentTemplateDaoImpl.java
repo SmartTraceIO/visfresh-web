@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.ShipmentTemplateConstants;
+import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.entities.ShipmentTemplate;
 
@@ -30,32 +30,32 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
      */
     public ShipmentTemplateDaoImpl() {
         super();
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES,
+        propertyToDbFields.put(ShipmentTemplateConstants.SHUTDOWN_DEVICE_AFTER_MINUTES,
                 SHUTDOWNTIMEOUT_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS,
+        propertyToDbFields.put(ShipmentTemplateConstants.EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS,
                 NONOTIFSIFNOALERTS_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM,
+        propertyToDbFields.put(ShipmentTemplateConstants.ARRIVAL_NOTIFICATION_WITHIN_KM,
                 ARRIVALNOTIFWITHIN_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_COMMENTS_FOR_RECEIVER,
+        propertyToDbFields.put(ShipmentTemplateConstants.COMMENTS_FOR_RECEIVER,
                 COMMENTS_FIELD);
 //        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_MAX_TIMES_ALERT_FIRES, );
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_ALERT_SUPPRESSION_MINUTES,
+        propertyToDbFields.put(ShipmentTemplateConstants.ALERT_SUPPRESSION_MINUTES,
                 NOALERTIFCOODOWN_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_DETECT_LOCATION_FOR_SHIPPED_FROM,
+        propertyToDbFields.put(ShipmentTemplateConstants.DETECT_LOCATION_FOR_SHIPPED_FROM,
                 DETECTLOCATION_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPPED_TO,
+        propertyToDbFields.put(ShipmentTemplateConstants.SHIPPED_TO,
                 SHIPPEDTO_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPPED_FROM,
+        propertyToDbFields.put(ShipmentTemplateConstants.SHIPPED_FROM,
                 SHIPPEDFROM_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_ADD_DATE_SHIPPED,
+        propertyToDbFields.put(ShipmentTemplateConstants.ADD_DATE_SHIPPED,
                 ADDDATASHIPPED_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION,
+        propertyToDbFields.put(ShipmentTemplateConstants.SHIPMENT_DESCRIPTION,
                 DESCRIPTION_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME,
+        propertyToDbFields.put(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME,
                 NAME_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_ID,
+        propertyToDbFields.put(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_ID,
                 ID_FIELD);
-        propertyToDbFields.put(ShipmentTemplateConstants.PROPERTY_ALERT_PROFILE_ID,
+        propertyToDbFields.put(ShipmentTemplateConstants.ALERT_PROFILE_ID,
                 ALERT_FIELD);
 
     }
@@ -99,9 +99,9 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
                 + getTableName()
                 + ".*"
                 + " , shipfrom." + LocationProfileDaoImpl.NAME_FIELD
-                + " as " + ShipmentTemplateConstants.PROPERTY_SHIPPEDFROM_NAME
+                + " as " + ShipmentTemplateConstants.SHIPPEDFROM_NAME
                 + " , shipto." + LocationProfileDaoImpl.NAME_FIELD
-                + " as " + ShipmentTemplateConstants.PROPERTY_SHIPPEDTO_NAME
+                + " as " + ShipmentTemplateConstants.SHIPPEDTO_NAME
                 + " from " + getTableName()
             //join alert profiles table
             + " left outer join " + AlertProfileDaoImpl.TABLE + " ap on ap."

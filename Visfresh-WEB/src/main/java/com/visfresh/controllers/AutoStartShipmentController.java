@@ -176,6 +176,8 @@ public class AutoStartShipmentController extends AbstractController
         tpl.setCommentsForReceiver(dto.getCommentsForReceiver());
         tpl.setName(dto.getName());
         tpl.setNoAlertsAfterArrivalMinutes(dto.getNoAlertsAfterArrivalMinutes());
+        tpl.setNoAlertsAfterStartMinutes(dto.getNoAlertsAfterStartMinutes());
+
         tpl.setShipmentDescription(dto.getShipmentDescription());
         tpl.setShutDownAfterStartMinutes(dto.getShutDownAfterStartMinutes());
         tpl.setShutdownDeviceAfterMinutes(dto.getShutdownDeviceAfterMinutes());

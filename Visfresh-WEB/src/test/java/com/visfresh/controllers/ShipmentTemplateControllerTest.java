@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.controllers.restclient.RestIoListener;
 import com.visfresh.controllers.restclient.ShipmentTemplateRestClient;
 import com.visfresh.dao.ShipmentTemplateDao;
@@ -158,33 +159,33 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
 
         //name
         assertEquals(sp1.getId(), client.getShipmentTemplates(1, 1000,
-                ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME, "asc").get(0).getId());
+                ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME, "asc").get(0).getId());
         assertEquals(sp1.getId(), client.getShipmentTemplates(1, 1000,
-                ShipmentTemplateConstants.PROPERTY_SHIPMENT_TEMPLATE_NAME, "desc").get(endIndex).getId());
+                ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME, "desc").get(endIndex).getId());
 
         //description
         assertEquals(sp2.getId(), client.getShipmentTemplates(1, 1000,
-                ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION, "asc").get(0).getId());
+                ShipmentTemplateConstants.SHIPMENT_DESCRIPTION, "asc").get(0).getId());
         assertEquals(sp2.getId(), client.getShipmentTemplates(1, 1000,
-                ShipmentTemplateConstants.PROPERTY_SHIPMENT_DESCRIPTION, "desc").get(endIndex).getId());
+                ShipmentTemplateConstants.SHIPMENT_DESCRIPTION, "desc").get(endIndex).getId());
 
         //location from
         assertEquals(sp3.getId(), client.getShipmentTemplates(1, 1000,
-                ShipmentTemplateConstants.PROPERTY_SHIPPED_FROM, "asc").get(0).getId());
+                ShipmentTemplateConstants.SHIPPED_FROM, "asc").get(0).getId());
         assertEquals(sp3.getId(), client.getShipmentTemplates(1, 1000,
-                ShipmentTemplateConstants.PROPERTY_SHIPPED_FROM, "desc").get(endIndex).getId());
+                ShipmentTemplateConstants.SHIPPED_FROM, "desc").get(endIndex).getId());
 
         //location to
         assertEquals(sp1.getId(), client.getShipmentTemplates(1, 1000,
-                ShipmentTemplateConstants.PROPERTY_SHIPPED_TO, "asc").get(0).getId());
+                ShipmentTemplateConstants.SHIPPED_TO, "asc").get(0).getId());
         assertEquals(sp1.getId(), client.getShipmentTemplates(1, 1000,
-                ShipmentTemplateConstants.PROPERTY_SHIPPED_TO, "desc").get(endIndex).getId());
+                ShipmentTemplateConstants.SHIPPED_TO, "desc").get(endIndex).getId());
 
         //alert profile
         assertEquals(sp2.getId(), client.getShipmentTemplates(1, 1000,
-                ShipmentTemplateConstants.PROPERTY_ALERT_PROFILE_ID, "asc").get(0).getId());
+                ShipmentTemplateConstants.ALERT_PROFILE_ID, "asc").get(0).getId());
         assertEquals(sp2.getId(), client.getShipmentTemplates(1, 1000,
-                ShipmentTemplateConstants.PROPERTY_ALERT_PROFILE_ID, "desc").get(endIndex).getId());
+                ShipmentTemplateConstants.ALERT_PROFILE_ID, "desc").get(endIndex).getId());
     }
     @Test
     public void testSaveEmpty() throws RestServiceException, IOException {

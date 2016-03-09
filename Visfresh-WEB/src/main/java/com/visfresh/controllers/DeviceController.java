@@ -84,6 +84,10 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final Device d = createSerializer(user).parseDevice(device);
 
             final Device old = dao.findByImei(d.getImei());
+            if (old == null) {
+                log.error("User " + user.getEmail() + " attempts to add new device " + d.getImei());
+                return createErrorResponse(ErrorCodes.SECURITY_ERROR, "Can't add new devices, only edit existing");
+            }
             checkCompanyAccess(user, old);
 
             d.setCompany(user.getCompany());

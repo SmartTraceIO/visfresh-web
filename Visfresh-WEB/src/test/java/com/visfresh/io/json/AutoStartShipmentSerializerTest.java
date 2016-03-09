@@ -48,6 +48,7 @@ public class AutoStartShipmentSerializerTest {
         final boolean excludeNotificationsIfNoAlerts = true;
         final Integer shutdownDeviceAfterMinutes = 99;
         final Integer noAlertsAfterArrivalMinutes = 43;
+        final Integer noAlertsAfterStartMinutes = 433;
         final Integer shutDownAfterStartMinutes = 47;
         final String commentsForReceiver = "Any comments for receiver";
         final String name = "JUnit name";
@@ -64,6 +65,7 @@ public class AutoStartShipmentSerializerTest {
         dto.setExcludeNotificationsIfNoAlerts(excludeNotificationsIfNoAlerts);
         dto.setShutdownDeviceAfterMinutes(shutdownDeviceAfterMinutes);
         dto.setNoAlertsAfterArrivalMinutes(noAlertsAfterArrivalMinutes);
+        dto.setNoAlertsAfterStartMinutes(noAlertsAfterStartMinutes);
         dto.setShutDownAfterStartMinutes(shutDownAfterStartMinutes);
         dto.setCommentsForReceiver(commentsForReceiver);
         dto.setName(name);
@@ -97,6 +99,7 @@ public class AutoStartShipmentSerializerTest {
         assertEquals(excludeNotificationsIfNoAlerts, dto.isExcludeNotificationsIfNoAlerts());
         assertEquals(shutdownDeviceAfterMinutes, dto.getShutdownDeviceAfterMinutes());
         assertEquals(noAlertsAfterArrivalMinutes, dto.getNoAlertsAfterArrivalMinutes());
+        assertEquals(noAlertsAfterStartMinutes, dto.getNoAlertsAfterStartMinutes());
         assertEquals(shutDownAfterStartMinutes, dto.getShutDownAfterStartMinutes());
         assertEquals(commentsForReceiver, dto.getCommentsForReceiver());
         assertEquals(name, dto.getName());

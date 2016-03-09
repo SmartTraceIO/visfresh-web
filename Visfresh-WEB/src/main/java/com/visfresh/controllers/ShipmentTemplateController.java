@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
@@ -130,11 +131,11 @@ public class ShipmentTemplateController extends AbstractController implements Sh
     }
     private String[] getDefaultSortOrder() {
         return new String[] {
-            PROPERTY_SHIPMENT_TEMPLATE_NAME,
-            PROPERTY_SHIPMENT_DESCRIPTION,
-            PROPERTY_SHIPPED_FROM,
-            PROPERTY_SHIPPED_TO,
-            PROPERTY_ALERT_PROFILE_ID
+            SHIPMENT_TEMPLATE_NAME,
+            SHIPMENT_DESCRIPTION,
+            SHIPPED_FROM,
+            SHIPPED_TO,
+            ALERT_PROFILE_ID
         };
     }
 

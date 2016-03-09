@@ -163,6 +163,8 @@ public class ShipmentTemplateDaoTest
         s.getArrivalNotificationSchedules().add(arrivalSched);
         s.setAddDateShipped(true);
         s.setDetectLocationForShippedFrom(true);
+        s.setNoAlertsAfterArrivalMinutes(7);
+        s.setNoAlertsAfterStartMinutes(77);
         return s;
     }
     /* (non-Javadoc)
@@ -185,6 +187,8 @@ public class ShipmentTemplateDaoTest
         assertTrue(tpl.isAddDateShipped());
         assertTrue(tpl.isDetectLocationForShippedFrom());
         assertFalse(tpl.isAutostart());
+        assertEquals(new Integer(7), tpl.getNoAlertsAfterArrivalMinutes());
+        assertEquals(new Integer(77), tpl.getNoAlertsAfterStartMinutes());
     }
     @Test
     public void testFindByCompany() {

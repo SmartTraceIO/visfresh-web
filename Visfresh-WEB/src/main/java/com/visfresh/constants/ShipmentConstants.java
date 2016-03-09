@@ -7,42 +7,28 @@ package com.visfresh.constants;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface ShipmentConstants {
-    String PROPERTY_ALERT_PROFILE_ID = "alertProfileId";
-    String PROPERTY_ARRIVAL_NOTIFICATION_SCHEDULES = "arrivalNotificationSchedules";
-    String PROPERTY_ALERT_PROFILE_NAME = "alertProfileName";
-    String PROPERTY_ALERT_SUPPRESSION_MINUTES = "alertSuppressionMinutes";
-    String PROPERTY_ALERTS_NOTIFICATION_SCHEDULES = "alertsNotificationSchedules";
-    String PROPERTY_ARRIVAL_NOTIFICATION_WITHIN_KM = "arrivalNotificationWithinKm";
-    String PROPERTY_EXCLUDE_NOTIFICATIONS_IF_NO_ALERTS = "excludeNotificationsIfNoAlerts";
-    String PROPERTY_SHIPPED_FROM = "shippedFrom";
-    String PROPERTY_SHIPPED_TO = "shippedTo";
-    String PROPERTY_SHUTDOWN_DEVICE_AFTER_MINUTES = "shutdownDeviceAfterMinutes";
-    String PROPERTY_NO_ALERTS_AFTER_ARRIVAL_MINUTES = "noAlertsAfterArrivalMinutes";
-    String PROPERTY_SHUTDOWN_DEVICE_AFTER_START_MINUTES = "shutDownAfterStartMinutes";
-    String PROPERTY_COMMENTS_FOR_RECEIVER = "commentsForReceiver";
-    String PROPERTY_SHIPMENT_DESCRIPTION = "shipmentDescription";
-    String PROPERTY_SHIPMENT_TEMPLATE_ID = "shipmentTemplateId";
-    String PROPERTY_SHIPMENT_TEMPLATE_NAME = "shipmentTemplateName";
-    String PROPERTY_ALERT_PROFILE = "alertProfile";
-    String PROPERTY_SHIPPED_TO_LOCATION_NAME = "shippedToLocationName";
-    String PROPERTY_SHIPPED_FROM_LOCATION_NAME = "shippedFromLocationName";
-    String PROPERTY_DEVICE_IMEI = "deviceImei";
-    String PROPERTY_DEVICE_SN = "deviceSN";
-    String PROPERTY_STATUS = "status";
-    String PROPERTY_CUSTOM_FIELDS = "customFields";
-    String PROPERTY_SHIPMENT_DATE = "shipmentDate";
-    String PROPERTY_PO_NUM = "poNum";
-    String PROPERTY_TRIP_COUNT = "tripCount";
-    String PROPERTY_ASSET_NUM = "assetNum";
-    String PROPERTY_PALLET_ID = "palletId";
-    String PROPERTY_SHIPMENT_ID = "shipmentId";
-    String PROPERTY_ASSET_TYPE = "assetType";
+public interface ShipmentConstants extends BaseShipmentConstants {
+    String CUSTOM_FIELDS = "customFields";
+    String SHIPMENT_DATE = "shipmentDate";
+    String PO_NUM = "poNum";
+    String TRIP_COUNT = "tripCount";
+    String ASSET_NUM = "assetNum";
+    String PALLET_ID = "palletId";
+    String SHIPMENT_ID = "shipmentId";
+    String ASSET_TYPE = "assetType";
 
     //search criterias
-    String PROPERTY_SHIPPED_FROM_DATE = "shippedFromDate";
-    String PROPERTY_SHIPPED_TO_DATE = "shippedToDate";
-    String PROPERTY_ONLY_WITH_ALERTS = "alertsOnly";
-    String PROPERTY_ARRIVAL_DATE = "actualArrivalDate";
-    String PROPERTY_ETA = "eta";
+    String SHIPPED_FROM_DATE = "shippedFromDate";
+    String SHIPPED_TO_DATE = "shippedToDate";
+    String ONLY_WITH_ALERTS = "alertsOnly";
+    String ARRIVAL_DATE = "actualArrivalDate";
+    String ETA = "eta";
+
+    String ALERT_PROFILE_NAME = "alertProfileName";
+    String ALERT_PROFILE = "alertProfile";
+    String SHIPPED_TO_LOCATION_NAME = "shippedToLocationName";
+    String SHIPPED_FROM_LOCATION_NAME = "shippedFromLocationName";
+    String DEVICE_IMEI = "deviceImei";
+    String DEVICE_SN = "deviceSN";
+    String STATUS = "status";
 }
