@@ -296,6 +296,21 @@ public class AutoStartShipmentController extends AbstractController
         }
     }
     /**
+     * @param authToken authentication token.
+     * @param pageIndex the page index.
+     * @param pageSize the page size.
+     * @return list of default shipments.
+     */
+    @RequestMapping(value = "/getAutoStartTemplates/{authToken}", method = RequestMethod.GET)
+    public JsonElement getAutoStartTemplates(@PathVariable final String authToken,
+            @RequestParam(required = false) final Integer pageIndex,
+            @RequestParam(required = false) final Integer pageSize,
+            @RequestParam(required = false) final String sc,
+            @RequestParam(required = false) final String so
+            ) {
+        return getAutoStartShipments(authToken, pageIndex, pageSize, sc, so);
+    }
+    /**
      * @param user
      * @return
      */

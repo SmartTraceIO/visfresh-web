@@ -211,9 +211,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             newShipment.setId(current.getId());
             newShipment.setStatus(ShipmentStatus.InProgress);
             newShipment.setTripCount(current.getTripCount());
-            if (current.getShipmentDate() != null) {
-                newShipment.setShipmentDate(current.getShipmentDate());
-            }
         }
 
         final Long resultId = shipmentDao.save(newShipment).getId();

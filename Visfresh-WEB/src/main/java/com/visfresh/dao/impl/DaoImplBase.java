@@ -98,7 +98,9 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      */
     @Override
     public void delete(final T entity) {
-        delete(entity.getId());
+        if (entity != null) {
+            delete(entity.getId());
+        }
     }
     /* (non-Javadoc)
      * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Iterable)

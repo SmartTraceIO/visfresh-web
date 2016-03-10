@@ -9,6 +9,9 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +50,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
     private Device device;
     private DeviceDao deviceDao;
     private ShipmentTemplateDao shipmentTemplateDao;
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
      * Default constructor.
@@ -174,6 +178,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
     protected Shipment createTestEntity() {
         final Shipment s = new Shipment();
         s.setDevice(device);
+        s.setShipmentDate(parseDate("1988-12-12T11:11:11"));
         s.setAlertProfile(alertProfile);
         s.setAlertSuppressionMinutes(5);
         s.setArrivalNotificationWithinKm(17);
@@ -185,7 +190,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setPoNum(329487);
         s.setTripCount(876);
         s.setShipmentDescription("Test Shipment");
-        s.setShipmentDate(new Date());
         s.setShippedFrom(shippedFrom);
         s.setShippedTo(shippedTo);
         s.setShutdownDeviceAfterMinutes(70);
@@ -199,6 +203,18 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setNoAlertsAfterStartMinutes(77);
         s.setShutDownAfterStartMinutes(9);
         return s;
+    }
+
+    /**
+     * @param source
+     * @return
+     */
+    private Date parseDate(final String source) {
+        try {
+            return dateFormat.parse(source);
+        } catch (final ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /* (non-Javadoc)
@@ -231,6 +247,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(new Integer(7), s.getNoAlertsAfterArrivalMinutes());
         assertEquals(new Integer(77), s.getNoAlertsAfterStartMinutes());
         assertEquals(new Integer(9), s.getShutDownAfterStartMinutes());
+        assertEquals("1988-12-12T11:11:11", dateFormat.format(s.getShipmentDate()));
     }
 
     @Test
