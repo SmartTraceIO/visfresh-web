@@ -89,9 +89,9 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final Device d = createSerializer(user).parseDevice(device);
 
             final Device old = dao.findByImei(d.getImei());
-            if (old == null) {
+            if (old == null && !Role.SmartTraceAdmin.hasRole(user)) {
                 log.error("User " + user.getEmail() + " attempts to add new device " + d.getImei());
-                return createErrorResponse(ErrorCodes.SECURITY_ERROR, "Can't add new devices, only edit existing");
+                return createErrorResponse(ErrorCodes.SECURITY_ERROR, "Only SmartTrace admin can add new device");
             }
             checkCompanyAccess(user, old);
 
@@ -273,29 +273,29 @@ public class DeviceController extends AbstractController implements DeviceConsta
             return createErrorResponse(e);
         }
     }
-    /**
-     * @param authToken authentication token.
-     * @param imei device ID.
-     * @return device.
-     */
-    @RequestMapping(value = "/deleteDevice/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteDevice(@PathVariable final String authToken,
-            @RequestParam final String imei) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
-            final Device d = dao.findOne(imei);
-            checkCompanyAccess(user, d);
-
-            dao.delete(d);
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to get devices", e);
-            return createErrorResponse(e);
-        }
-    }
+//    /**
+//     * @param authToken authentication token.
+//     * @param imei device ID.
+//     * @return device.
+//     */
+//    @RequestMapping(value = "/deleteDevice/{authToken}", method = RequestMethod.GET)
+//    public JsonObject deleteDevice(@PathVariable final String authToken,
+//            @RequestParam final String imei) {
+//        try {
+//            //check logged in.
+//            final User user = getLoggedInUser(authToken);
+//            checkAccess(user, Role.NormalUser);
+//
+//            final Device d = dao.findOne(imei);
+//            checkCompanyAccess(user, d);
+//
+//            dao.delete(d);
+//            return createSuccessResponse(null);
+//        } catch (final Exception e) {
+//            log.error("Failed to get devices", e);
+//            return createErrorResponse(e);
+//        }
+//    }
     /**
      * @param authToken authentication token.
      * @param req shipment.

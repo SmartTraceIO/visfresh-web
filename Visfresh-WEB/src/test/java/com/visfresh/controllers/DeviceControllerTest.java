@@ -5,7 +5,6 @@ package com.visfresh.controllers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.Date;
@@ -85,12 +84,12 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
 
         assertNotNull(client.getDevice(ap.getId()));
     }
-    @Test
-    public void testDeleteDevice() throws RestServiceException, IOException {
-        final Device p = createDevice("0239487043987", true);
-        client.deleteDevice(p);
-        assertNull(dao.findOne(p.getId()));
-    }
+//    @Test
+//    public void testDeleteDevice() throws RestServiceException, IOException {
+//        final Device p = createDevice("0239487043987", true);
+//        client.deleteDevice(p);
+//        assertNull(dao.findOne(p.getId()));
+//    }
     //@RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getDevices(@PathVariable final String authToken) {
     @Test

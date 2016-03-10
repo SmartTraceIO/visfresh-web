@@ -93,22 +93,21 @@ List items is short representations of base entities, like as [Alert Profile](#m
 32. [Save Device](#markdown-header-save-device)  
 33. [Get Device](#markdown-header-get-device)  
 34. [Get Devices](#markdown-header-get-devices)  
-35. [Delete Device](#markdown-header-delete-device)  
-36. [Save Device Group](#markdown-header-save-device-group)  
-37. [Get Device Group](#markdown-header-get-device-group)  
-38. [Get Device Groups](#markdown-header-get-device-groups)  
-39. [Delete Device Group](#markdown-header-delete-device-group)  
-40. [Add Device to Group](#markdown-header-add-device-to-group)  
-41. [Remove Device from Group](#markdown-header-remove-device-from-group)  
-42. [Get Devices of Group](#markdown-header-get-devices-of-group)    
-43. [Get Groups of Device](#markdown-header-get-groups-of-device)  
-44. [Get Notifications](#markdown-header-get-notifications)  
-45. [Send Command to Device](#markdown-header-send-command-to-device)  
-46. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
-47. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
-48. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
-49. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
-50. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
+35. [Save Device Group](#markdown-header-save-device-group)  
+36. [Get Device Group](#markdown-header-get-device-group)  
+37. [Get Device Groups](#markdown-header-get-device-groups)  
+38. [Delete Device Group](#markdown-header-delete-device-group)  
+39. [Add Device to Group](#markdown-header-add-device-to-group)  
+40. [Remove Device from Group](#markdown-header-remove-device-from-group)  
+41. [Get Devices of Group](#markdown-header-get-devices-of-group)    
+42. [Get Groups of Device](#markdown-header-get-groups-of-device)  
+43. [Get Notifications](#markdown-header-get-notifications)  
+44. [Send Command to Device](#markdown-header-send-command-to-device)  
+45. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
+46. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
+47. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
+48. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
+49. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -304,11 +303,6 @@ Method *GET*, method name *getDevice*. Request parameters:
 1. imei - device IMEI.  
 Returns expanded [Device Object](#markdown-header-device) with added last reading and auto start template info  
 [(example)](#markdown-header-get-device-example)
-
-### Delete Device ###
-Method *GET*, method name *deleteDevice*. Request parameters:
-1. imei - device IMEI.  
-[(example)](#markdown-header-delete-device-example)
 
 ### Save Device Group ###
 Method *POST*, method name *saveDeviceGroup*. Request body contains JSON serialized [Device Group Object](#markdown-header-device-group)  
@@ -1956,17 +1950,6 @@ Response:
     }
   ],
   "totalCount": 4
-}
-```
-### Delete Device example ##
-**GET /vf/rest/deleteDevice/${accessToken}?imei=0239487043987**  
-**Response:**  
-```json
-{
-  "status": {
-    "code": 0,
-    "message": "Success"
-  }
 }
 ```
 ### Save Device Group example ###
