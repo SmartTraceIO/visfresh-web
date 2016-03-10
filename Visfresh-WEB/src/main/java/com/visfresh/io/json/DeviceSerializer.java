@@ -12,7 +12,7 @@ import com.visfresh.constants.DeviceConstants;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.io.DeviceResolver;
-import com.visfresh.lists.ListDeviceItemDto;
+import com.visfresh.lists.DeviceDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -58,14 +58,14 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID, d.getAutostartTemplateId());
         return obj;
     }
-    public ListDeviceItemDto parseListDeviceItem(final JsonElement e) {
+    public DeviceDto parseListDeviceItem(final JsonElement e) {
         if (e == null || e.isJsonNull()) {
             return null;
         }
 
         final JsonObject json = e.getAsJsonObject();
 
-        final ListDeviceItemDto d = new ListDeviceItemDto();
+        final DeviceDto d = new DeviceDto();
         d.setImei(asString(json.get(DeviceConstants.PROPERTY_IMEI)));
         d.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
         d.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));
@@ -93,7 +93,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
      * @param d device.
      * @return device serialized to JSON format.
      */
-    public JsonElement toJson(final ListDeviceItemDto d) {
+    public JsonElement toJson(final DeviceDto d) {
         if (d == null) {
             return JsonNull.INSTANCE;
         }

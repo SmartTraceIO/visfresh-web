@@ -9,7 +9,7 @@ import com.visfresh.entities.Device;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ListDeviceItemDto {
+public class DeviceDto {
     /**
      * Device IMEI code
      */
@@ -47,13 +47,13 @@ public class ListDeviceItemDto {
     /**
      * Default constructor.
      */
-    public ListDeviceItemDto() {
+    public DeviceDto() {
         super();
     }
     /**
      * @param d device.
      */
-    public ListDeviceItemDto(final Device d) {
+    public DeviceDto(final Device d) {
         super();
         setDescription(d.getDescription());
         setImei(d.getImei());

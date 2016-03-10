@@ -302,7 +302,7 @@ Returns array of [Device Objects](#markdown-header-device) and total items count
 ### Get Device ###
 Method *GET*, method name *getDevice*. Request parameters:
 1. imei - device IMEI.  
-Returns [Device Object](#markdown-header-device)  
+Returns expanded [Device Object](#markdown-header-device) with added last reading and auto start template info  
 [(example)](#markdown-header-get-device-example)
 
 ### Delete Device ###
@@ -2266,7 +2266,7 @@ Response:
 }
 ```
 ### Get Device example ###
-**GET /vf/rest/getDevice/${accessToken}?id=923487509328**  
+**GET /vf/rest/getDevice/${accessToken}?id=0239487043987**  
 **Response:**  
 ```json
 {
@@ -2276,11 +2276,21 @@ Response:
   },
   "response": {
     "description": "Device description",
-    "id": "923487509328",
-    "imei": "923487509328",
+    "imei": "0239487043987",
     "name": "Device Name",
+    "sn": "704398",
     "active": true,
-    "sn": "1"
+    "autostartTemplateId": null,
+    "autostartTemplateName": null,
+    "lastShipmentId": 6532,
+    "lastReadingTimeISO": "2016-03-10 11:06",
+    "lastReadingTime": "11:06AM 10 Mar 2016",
+    "lastReadingTemperature": "23.5°C",
+    "lastReadingBattery": 27,
+    "lastReadingLat": 12.34,
+    "lastReadingLong": 56.78,
+    "shipmentNumber": "704398(0)",
+    "shipmentStatus": "InProgress"
   }
 }
 ```

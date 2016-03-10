@@ -4,6 +4,7 @@
 package com.visfresh.rules;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -140,24 +141,67 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      */
     private Shipment createForStartLocation(final List<AutoStartShipment> autoStarts,
             final double latitude, final double longitude, final Device device) {
-        Collections.sort(autoStarts);
+        //if autostart is assigned to device
         final Long autostartId = device.getAutostartTemplateId();
+        if (autostartId != null) {
+            //move autostart for given device to front.
+            AutoStartShipment auto = null;
+            for (final AutoStartShipment a : autoStarts) {
+                if (a.getId().equals(autostartId)) {
+                    auto = a;
+                    break;
+                }
+            }
 
+            //if found autostart with given ID.
+            if (auto != null) {
+                return createNewShipment(auto.getTemplate(),
+                        getBestLocation(auto, latitude, longitude),
+                        device);
+            }
+        }
+
+        //if autostart is not assigned to device.
+        //old schema
+        Collections.sort(autoStarts);
         for (final AutoStartShipment auto : autoStarts) {
             //if autostart not assigned to device or assigned to given device
-            if (autostartId == null || auto.getId().equals(autostartId)) {
-                for (final LocationProfile loc : auto.getShippedFrom()) {
-                    int distance = (int) LocationUtils.getDistanceMeters(
-                        loc.getLocation().getLatitude(),
-                        loc.getLocation().getLongitude(),
-                        latitude,
-                        longitude);
+            final LocationProfile best = getBestLocation(auto, latitude, longitude);
 
-                    distance = Math.max(0, distance - loc.getRadius());
-                    if (distance == 0) {
-                        return createNewShipment(auto.getTemplate(), loc, device);
-                    }
-                }
+            //if not any locations found
+            if (best != null) {
+                return createNewShipment(auto.getTemplate(), best, device);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param auto
+     * @return
+     */
+    private LocationProfile getBestLocation(final AutoStartShipment auto, final double latitude, final double longitude) {
+        //get all available location profiles.
+        final List<LocationProfile> profiles = new LinkedList<LocationProfile>();
+        profiles.addAll(auto.getShippedFrom());
+        if (auto.getTemplate().getShippedFrom() != null) {
+            profiles.add(auto.getTemplate().getShippedFrom());
+        }
+
+        //find best location
+        LocationProfile best = null;
+        for (final LocationProfile loc : profiles) {
+            int distance = (int) LocationUtils.getDistanceMeters(
+                loc.getLocation().getLatitude(),
+                loc.getLocation().getLongitude(),
+                latitude,
+                longitude);
+
+            distance = Math.max(0, distance - loc.getRadius());
+            if (distance == 0) {
+                best = loc;
+                return best;
             }
         }
 

@@ -16,7 +16,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.Shipment;
 import com.visfresh.io.json.DeviceSerializer;
-import com.visfresh.lists.ListDeviceItemDto;
+import com.visfresh.lists.DeviceDto;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -46,7 +46,7 @@ public class DeviceRestClient extends RestClient {
      * @param pageSize page size.
      * @return
      */
-    public List<ListDeviceItemDto> getDevices(final String sortColumn, final boolean sortOrder,
+    public List<DeviceDto> getDevices(final String sortColumn, final boolean sortOrder,
             final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
         final HashMap<String, String> params = new HashMap<String, String>();
         if (pageIndex != null) {
@@ -61,7 +61,7 @@ public class DeviceRestClient extends RestClient {
         final JsonArray response = sendGetRequest(getPathWithToken("getDevices"),
                 params).getAsJsonArray();
 
-        final List<ListDeviceItemDto> devices = new ArrayList<ListDeviceItemDto>(response.size());
+        final List<DeviceDto> devices = new ArrayList<DeviceDto>(response.size());
         for (int i = 0; i < response.size(); i++) {
             devices.add(serializer.parseListDeviceItem(response.get(i).getAsJsonObject()));
         }

@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.lists.ListDeviceItemDto;
+import com.visfresh.lists.DeviceDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -76,7 +76,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
     }
     @Test
     public void testListDeviceItemDto() {
-        ListDeviceItemDto dto = new ListDeviceItemDto();
+        DeviceDto dto = new DeviceDto();
 
         final boolean active = false;
         final Long autostartTemplateId = 754L;

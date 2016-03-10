@@ -25,9 +25,9 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -322,5 +322,23 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         }
 
         return result;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getLastEvent(com.visfresh.entities.Device)
+     */
+    @Override
+    public ShortTrackerEvent getLastEvent(final Device device) {
+        if (device == null) {
+            return null;
+        }
+
+        final List<Device> devices = new LinkedList<>();
+        devices.add(device);
+
+        final List<ShortTrackerEvent> lastEvents = getLastEvents(devices);
+        if (!lastEvents.isEmpty()) {
+            return lastEvents.get(0);
+        }
+        return null;
     }
 }

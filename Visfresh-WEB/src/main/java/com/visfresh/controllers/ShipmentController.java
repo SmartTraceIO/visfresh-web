@@ -307,8 +307,14 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             SHIPMENT_DESCRIPTION,
             ALERT_PROFILE_ID,
             ALERT_PROFILE
+//            ETA,
+//            ALERT_
+//            "alertSummary"
+//            "lastReadingTimeISO"
+//            "lastReadingTemperature"
         };
     }
+
     private Filter createFilter(final GetFilteredShipmentsRequest req, final ShipmentSerializer ser) {
         Date shippedFrom = req.getShipmentDateFrom();
         Date shippedTo = req.getShipmentDateTo();

@@ -7,8 +7,8 @@ import java.util.List;
 
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.TrackerEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -40,4 +40,9 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
      * @return list of tracker events.
      */
     List<ShortTrackerEvent> getLastEvents(List<Device> devices);
+    /**
+     * @param device device.
+     * @return short tracker event.
+     */
+    ShortTrackerEvent getLastEvent(Device device);
 }

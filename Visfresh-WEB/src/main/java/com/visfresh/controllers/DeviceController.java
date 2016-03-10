@@ -21,21 +21,24 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.constants.ErrorCodes;
+import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.json.DeviceSerializer;
-import com.visfresh.lists.ListDeviceItemDto;
+import com.visfresh.lists.DeviceDto;
 import com.visfresh.services.DeviceCommandService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
@@ -56,6 +59,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
     private DeviceDao dao;
     @Autowired
     private ShipmentDao shipmentDao;
+    @Autowired
+    private AutoStartShipmentDao autoStartShipmentDao;
     @Autowired
     private TrackerEventDao trackerEventDao;
     @Autowired
@@ -124,8 +129,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
             final DeviceSerializer ser = createSerializer(user);
 
-            final DateFormat isoFormat = DateTimeUtils.createDateFormat(user, "yyyy-MM-dd HH:mm");
-            final DateFormat prettyFormat = DateTimeUtils.createDateFormat(user, "h:mmaa d MMM yyyy");
+            final DateFormat isoFormat = createIsoFormat(user);
+            final DateFormat prettyFormat = createPrettyFormat(user);
 
             final List<ListDeviceItem> devices = dao.getDevices(user.getCompany(),
                     createSorting(sc, so, getDefaultSortOrder(), 1),
@@ -144,16 +149,30 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
     }
     /**
+     * @param user
+     * @return
+     */
+    protected DateFormat createPrettyFormat(final User user) {
+        return DateTimeUtils.createDateFormat(user, "h:mmaa d MMM yyyy");
+    }
+    /**
+     * @param user
+     * @return
+     */
+    protected DateFormat createIsoFormat(final User user) {
+        return DateTimeUtils.createDateFormat(user, "yyyy-MM-dd HH:mm");
+    }
+    /**
      * @param item
      * @param isoFormat
      * @param temperatureUnits
      * @return
      */
-    private ListDeviceItemDto createDto(final ListDeviceItem item,
+    private DeviceDto createDto(final ListDeviceItem item,
             final DateFormat isoFormat,
             final DateFormat prettyFormat,
             final TemperatureUnits temperatureUnits) {
-        final ListDeviceItemDto dto = new ListDeviceItemDto();
+        final DeviceDto dto = new DeviceDto();
         dto.setActive(item.isActive());
         dto.setDescription(item.getDescription());
         dto.setImei(item.getImei());
@@ -218,7 +237,37 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final Device device = dao.findByImei(imei);
             checkCompanyAccess(user, device);
 
-            return createSuccessResponse(createSerializer(user).toJson(device));
+            //create result
+            final ListDeviceItem item = new ListDeviceItem(device);
+            //add last reading date
+            final ShortTrackerEvent e = trackerEventDao.getLastEvent(device);
+            if (e != null) {
+                item.setLastReadingTime(e.getTime());
+                item.setBattery(e.getBattery());
+                item.setLatitude(e.getLatitude());
+                item.setLongitude(e.getLongitude());
+                item.setTemperature(e.getTemperature());
+
+                if (e.getShipmentId() != null) {
+                    item.setShipmentId(e.getShipmentId());
+                    final Shipment s = shipmentDao.findOne(e.getShipmentId());
+                    item.setShipmentStatus(s.getStatus());
+                }
+            }
+
+            //add autostart template data
+            if (device.getAutostartTemplateId() != null) {
+                final AutoStartShipment aut = autoStartShipmentDao.findOne(device.getAutostartTemplateId());
+                if (aut != null) {
+                    item.setAutostartTemplateName(aut.getTemplate().getName());
+                }
+            }
+
+            //format result
+            final DateFormat isoFormat = createIsoFormat(user);
+            final DateFormat prettyFormat = createPrettyFormat(user);
+            return createSuccessResponse(createSerializer(user).toJson(
+                    createDto(item, isoFormat, prettyFormat, user.getTemperatureUnits())));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);

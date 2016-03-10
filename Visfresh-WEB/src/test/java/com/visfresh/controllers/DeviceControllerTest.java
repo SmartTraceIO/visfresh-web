@@ -34,7 +34,7 @@ import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.lists.ListDeviceItemDto;
+import com.visfresh.lists.DeviceDto;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.SerializerUtils;
@@ -72,6 +72,17 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetDevice() throws IOException, RestServiceException {
         final Device ap = createDevice("0239487043987", true);
+
+        Shipment s1 = createShipment(true);
+        final Device toRemove = s1.getDevice();
+        s1.setDevice(ap);
+        s1 = context.getBean(ShipmentDao.class).save(s1);
+        context.getBean(DeviceDao.class).delete(toRemove);
+
+        //create readings with shipment
+        createTrackerEvent(ap, s1, 11.);
+        createTrackerEvent(ap, s1, 23.456);
+
         assertNotNull(client.getDevice(ap.getId()));
     }
     @Test
@@ -125,7 +136,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(0, client.getDevices(null, true, 5, 1).size());
 
         //check data for d1
-        final ListDeviceItemDto item = client.getDevices(null, true, 3, 1).get(0);
+        final DeviceDto item = client.getDevices(null, true, 3, 1).get(0);
         assertEquals(d1.getDescription(), item.getDescription());
         assertEquals(d1.getId(), item.getImei());
         assertEquals(d1.getImei(), item.getImei());
@@ -150,7 +161,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final Device d2 = createDevice("2222222222222", true);
         final Device d3 = createDevice("1111111111111", true);
 
-        List<ListDeviceItemDto> dto;
+        List<DeviceDto> dto;
 
         dto = client.getDevices(DeviceConstants.PROPERTY_IMEI, true, null, null);
         assertEquals(d3.getImei(), dto.get(0).getImei());

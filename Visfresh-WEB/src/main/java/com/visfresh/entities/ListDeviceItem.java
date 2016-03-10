@@ -48,6 +48,18 @@ public class ListDeviceItem {
     public ListDeviceItem() {
         super();
     }
+    /**
+     * @param d device.
+     */
+    public ListDeviceItem(final Device d) {
+        super();
+        setActive(d.isActive());
+        setAutostartTemplateId(d.getAutostartTemplateId());
+        setDescription(d.getDescription());
+        setImei(d.getImei());
+        setName(d.getName());
+        setTripCount(d.getTripCount());
+    }
 
     /**
      * @return the imei
