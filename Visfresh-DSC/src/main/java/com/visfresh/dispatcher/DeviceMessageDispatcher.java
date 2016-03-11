@@ -72,8 +72,24 @@ public class DeviceMessageDispatcher extends AbstractDispatcher {
     private void processMessage(final DeviceMessage m) throws RetryableException {
         final Location location = getLocationService().getLocation(
                 m.getImei(), m.getStations());
+        check00(location);
+
         log.debug("Location (" + location + ") has detected for message " + m);
         systemMessageDao.sendSystemMessageFor(m, location);
+    }
+
+    /**
+     * @param loc location.
+     * @throws RetryableException
+     */
+    private void check00(final Location loc) throws RetryableException {
+        if ((Math.abs(loc.getLatitude()) + Math.abs(loc.getLongitude())) < 0.000001) {
+            final RetryableException exc = new RetryableException("Invalid location has detected by UnwiredLabs: "
+                    + loc);
+            exc.setCanRetry(true);
+            exc.setNumberOfRetry(3);
+            throw exc;
+        }
     }
 
     /**
