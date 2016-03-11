@@ -3,6 +3,7 @@
  */
 package com.visfresh.service;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -46,8 +47,8 @@ public class DeviceMessageService {
      * @return
      */
     public DeviceCommand process(final List<DeviceMessage> msgs) {
-        DeviceCommand cmd = null;
         Device device = null;
+        boolean hasInitMessage = false;
 
         for (final DeviceMessage msg : msgs) {
             //attempt to load device
@@ -56,28 +57,45 @@ public class DeviceMessageService {
             }
 
             if (device != null) {
-                if (cmd == null) {
-                    final List<DeviceCommand> commands = getCommandsForDevice(device.getImei());
-                    if (!commands.isEmpty()) {
-                        if (msgs.size() != NUMBER_OF_MESSAGES_IN_CRITICAL_BATH) {
-                            cmd = commands.get(0);
-                            deleteCommand(cmd);
-                        } else {
-                            log.warn("Given message batch has " + NUMBER_OF_MESSAGES_IN_CRITICAL_BATH
-                                    + " messages, the device command" + commands.get(0) + " will postponed");
-                        }
-                    }
-                }
-
                 if (msg.getType() == DeviceMessageType.RSP) {
                     //process response to server command
                     log.debug("Device " + msg.getImei() + " has sent command response: " + msg.getMessage());
                 } else {
+                    if (msg.getType() == DeviceMessageType.INIT) {
+                        hasInitMessage = true;
+                    }
                     saveDeviceMessage(msg);
                 }
             } else {
                 log.warn("Not found registered device " + msg.getImei());
                 break;
+            }
+        }
+
+        DeviceCommand cmd = null;
+        if (device != null && msgs.size() != NUMBER_OF_MESSAGES_IN_CRITICAL_BATH) {
+            final List<DeviceCommand> commands = getCommandsForDevice(device.getImei());
+            if (hasInitMessage) {
+                //delete all shutdown commands
+                final Iterator<DeviceCommand> iter = commands.iterator();
+                while (iter.hasNext()) {
+                    final DeviceCommand next = iter.next();
+                    if (next.getCommand().toLowerCase().contains("shutdown")) {
+                        iter.remove();
+                        log.debug("shutdown command has ignored because init message");
+                        deleteCommand(next);
+                    }
+                }
+            }
+
+            if (!commands.isEmpty()) {
+                if (msgs.size() != NUMBER_OF_MESSAGES_IN_CRITICAL_BATH) {
+                    cmd = commands.get(0);
+                    deleteCommand(cmd);
+                } else {
+                    log.warn("Given message batch has " + NUMBER_OF_MESSAGES_IN_CRITICAL_BATH
+                            + " messages, the device command" + commands.get(0) + " will postponed");
+                }
             }
         }
 

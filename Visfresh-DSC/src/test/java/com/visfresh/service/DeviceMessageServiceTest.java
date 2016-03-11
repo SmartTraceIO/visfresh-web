@@ -129,6 +129,23 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
         assertEquals(cmd2.getCommand(), commands.get(m1.getImei()).get(0).getCommand());
     }
     @Test
+    public void testIgnoreShutdownIfInit() {
+        final Device d1 = addDevice("10982734098127304");
+
+        final DeviceMessage m1 = createDeviceMessage(d1.getImei(), DeviceMessageType.INIT);
+
+        commands.get(m1.getImei()).add(createCommand("SHUTDOWN#"));
+        commands.get(m1.getImei()).add(createCommand("anycommand"));
+        commands.get(m1.getImei()).add(createCommand("SHUTDOWN#"));
+
+        final List<DeviceMessage> msgs = new LinkedList<DeviceMessage>();
+        msgs.add(m1);
+        assertEquals("anycommand", process(msgs).getCommand());
+
+        //check deleted command
+        assertEquals(0, commands.get(m1.getImei()).size());
+    }
+    @Test
     public void testNotReturnCommandFor8Batch() {
         final List<DeviceMessage> msgs = new LinkedList<DeviceMessage>();
         for (int i = 0; i < 8; i++) {
@@ -149,7 +166,7 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
      */
     private DeviceCommand createCommand(final String command) {
         final DeviceCommand cmd = new DeviceCommand();
-        cmd.setCommand("anycommand");
+        cmd.setCommand(command);
         cmd.setId(++lastId);
         return cmd;
     }
