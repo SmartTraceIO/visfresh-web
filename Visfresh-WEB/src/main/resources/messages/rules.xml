@@ -6,19 +6,19 @@
 	<!-- CriticalCold chart -->
 	<entry key="CriticalCold"><![CDATA[<]]>${temperature} for ${ruleperiod} min</entry>
 	<!-- Cold Cumulative chart -->
-	<entry key="Cold.cumulative"><![CDATA[<]]>${temperature} for ${ruleperiod} min</entry>
+	<entry key="Cold.cumulative"><![CDATA[<]]>${temperature} for ${ruleperiod} min in total</entry>
 
 	<!-- CriticalCold Cumulative chart -->
-	<entry key="CriticalCold.cumulative"><![CDATA[<]]>${temperature} for ${ruleperiod} min</entry>
+	<entry key="CriticalCold.cumulative"><![CDATA[<]]>${temperature} for ${ruleperiod} min in total</entry>
 
 	<!-- //////////////////////////////////////////// Hot  //////////////////////////////////////////////////////////////////-->
 	<entry key="Hot"><![CDATA[>]]>${temperature} for ${ruleperiod} min</entry>
 	<!-- CriticalHot chart -->
 	<entry key="CriticalHot"><![CDATA[>]]>${temperature} for ${ruleperiod} min</entry>
 	<!-- Hot Cumulative chart -->
-	<entry key="Hot.cumulative"><![CDATA[>]]>${temperature} for ${ruleperiod} min</entry>
+	<entry key="Hot.cumulative"><![CDATA[>]]>${temperature} for ${ruleperiod} min in total</entry>
 	<!-- CriticalHot Cumulative chart -->
-	<entry key="CriticalHot.cumulative"><![CDATA[>]]>${temperature} for ${ruleperiod} min</entry>
+	<entry key="CriticalHot.cumulative"><![CDATA[>]]>${temperature} for ${ruleperiod} min in total</entry>
 	
 	<!-- Not temperature alerts -->
 	<entry key="MovementStart">Movement start</entry>
