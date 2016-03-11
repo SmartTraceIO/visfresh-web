@@ -63,10 +63,16 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
             }
         }
 
+        //alert suppression minutes
+        if (eventTime.getTime() < shipment.getShipmentDate().getTime()
+                + shipment.getAlertSuppressionMinutes() * 60 * 1000l) {
+            return true;
+        }
+
         //check not alert after start
         if (shipment.getNoAlertsAfterStartMinutes() != null
-                && eventTime.getTime() - shipment.getShipmentDate().getTime()
-                > shipment.getNoAlertsAfterStartMinutes() * 60 * 1000l) {
+                && eventTime.getTime() > shipment.getShipmentDate().getTime()
+                + shipment.getNoAlertsAfterStartMinutes() * 60 * 1000l) {
             return true;
         }
 

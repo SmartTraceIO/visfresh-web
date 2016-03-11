@@ -91,15 +91,24 @@ public class AbstractAlertRuleTest extends AbstractAlertRule {
     public void testNoAlertsAfterStartMinutes() {
         final Integer minutes = 10;
         shipment.setAlertProfile(new AlertProfile());
-        shipment.setShipmentDate(new Date(System.currentTimeMillis() - minutes * 60 * 1000L));
+        shipment.setNoAlertsAfterStartMinutes(minutes);
 
-        final DeviceState state = new DeviceState();
-        state.possibleNewShipment(shipment);
+        shipment.setShipmentDate(new Date(event.getTime().getTime() - minutes * 60 * 1000L - 1l));
+        assertFalse(accept(new RuleContext(event, new DeviceState())));
 
-        shipment.setNoAlertsAfterStartMinutes(minutes + 1);
-        assertTrue(accept(new RuleContext(event, state)));
+        shipment.setShipmentDate(new Date(event.getTime().getTime() - minutes * 60 * 1000L + 1l));
+        assertTrue(accept(new RuleContext(event, new DeviceState())));
+    }
+    @Test
+    public void testSuppressAlertsAfterStartMinutes() {
+        final int minutes = 10;
+        shipment.setAlertProfile(new AlertProfile());
+        shipment.setAlertSuppressionMinutes(minutes);
 
-        shipment.setNoAlertsAfterStartMinutes(minutes - 1);
-        assertFalse(accept(new RuleContext(event, state)));
+        shipment.setShipmentDate(new Date(event.getTime().getTime() - minutes * 60 * 1000L - 1l));
+        assertTrue(accept(new RuleContext(event, new DeviceState())));
+
+        shipment.setShipmentDate(new Date(event.getTime().getTime() - minutes * 60 * 1000L + 1l));
+        assertFalse(accept(new RuleContext(event, new DeviceState())));
     }
 }

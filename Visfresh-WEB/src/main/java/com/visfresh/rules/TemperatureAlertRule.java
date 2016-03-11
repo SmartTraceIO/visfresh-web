@@ -117,9 +117,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
 
         final TrackerEvent event = context.getEvent();
         final long total = (event.getTime().getTime() - firstIssue.getTime()) / MINUTE;
-        final int suppressionPeriod = event.getShipment().getAlertSuppressionMinutes();
-
-        if (total >= Math.max(rule.getTimeOutMinutes(), suppressionPeriod)) {
+        if (total >= rule.getTimeOutMinutes()) {
             final TemperatureAlert a = createAlert(rule, event);
             a.setMinutes((int) total);
             AbstractRuleEngine.setProcessedTemperatureRule(context.getState(), rule);
@@ -148,8 +146,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         long total = totalStr == null ? 0 : Long.parseLong(totalStr);
         total += Math.abs(event.getTime().getTime() - prev.getTime().getTime());
 
-        final int suppressionPeriod = event.getShipment().getAlertSuppressionMinutes();
-        if (total >= Math.max(rule.getTimeOutMinutes(), suppressionPeriod) * 60000L) {
+        if (total >= rule.getTimeOutMinutes() * 60000L) {
             final TemperatureAlert alert = createAlert(rule, event);
             alert.setMinutes((int) (total / 60000l));
             AbstractRuleEngine.setProcessedTemperatureRule(context.getState(), rule);
