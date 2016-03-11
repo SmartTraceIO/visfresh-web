@@ -46,7 +46,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}' >View chart</a>]]>
+		http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}
 	</entry>
 	<!-- Hot -->
 	<entry key="Email.Hot">
@@ -57,7 +57,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}' >View chart</a>]]>
+		http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}
 	</entry>
 	<!-- CriticalCold -->
 	<entry key="Email.CriticalCold">
@@ -68,7 +68,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}' >View chart</a>]]>
+		http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}
 	</entry>
 	<!-- CriticalHot -->
 	<entry key="Email.CriticalHot">
@@ -79,7 +79,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}' >View chart</a>]]>
+		http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}
 	</entry>
 	<!-- Cold cumulative-->
 	<entry key="Email.Cold.cumulative">
@@ -90,7 +90,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}' >View chart</a>]]>
+		http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}
 	</entry>
 	<!-- Hot cumulative -->
 	<entry key="Email.Hot.cumulative">
@@ -101,7 +101,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}' >View chart</a>]]>
+		http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}
 	</entry>
 	<!-- CriticalCold cumulative -->
 	<entry key="Email.CriticalCold.cumulative">
@@ -112,7 +112,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}' >View chart</a>]]>
+		http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}
 	</entry>
 	<!-- CriticalHot cumulative -->
 	<entry key="Email.CriticalHot.cumulative">
@@ -123,7 +123,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}' >View chart</a>]]>
+		http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}
 	</entry>	
 
 	<!-- Battery Email -->
@@ -134,7 +134,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}' > View chart</a>]]>
+		http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}
 	</entry>
 
 	<!-- Arrival Email -->
@@ -145,7 +145,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		<![CDATA[<a href='http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}' > View chart</a>]]>
+		http://stf.smarttrace.com.au/#/view-shipment-detail/${shipmentId}
 	</entry>
 
 	<!-- Subjects -->	
