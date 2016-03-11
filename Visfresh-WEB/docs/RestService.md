@@ -2803,7 +2803,7 @@ Request:
 }
 ```
 ### Get AutoStart Shipment example ###
-**GET /vf/rest/getAutoStartShipment/${accessToken}?autoStartShipmentId=237**  
+**GET /vf/rest/getAutoStartShipment/${accessToken}?autoStartShipmentId=1363**  
 **Response:**  
 ```json
 {
@@ -2813,17 +2813,24 @@ Request:
   },
   "response": {
     "priority": 77,
-    "id": 273,
+    "id": 1363,
     "startLocations": [
-      1253
+      7231
+    ],
+    "startLocationNames": [
+      "TO"
     ],
     "endLocations": [
-      1252
+      7230
+    ],
+    "endLocationNames": [
+      "From"
     ],
     "shipmentTemplateName": "JUnit template",
     "shipmentDescription": null,
     "addDateShipped": false,
-    "alertProfileId": 528,
+    "alertProfileId": 3569,
+    "alertProfileName": "AnyAlert",
     "alertSuppressionMinutes": 0,
     "alertsNotificationSchedules": [],
     "commentsForReceiver": null,
@@ -2832,6 +2839,7 @@ Request:
     "arrivalNotificationSchedules": [],
     "shutdownDeviceAfterMinutes": null,
     "noAlertsAfterArrivalMinutes": null,
+    "noAlertsAfterStartMinutes": null,
     "shutDownAfterStartMinutes": null
   }
 }
@@ -2848,17 +2856,24 @@ Request:
   "response": [
     {
       "priority": 77,
-      "id": 331,
+      "id": 1351,
       "startLocations": [
-        1663
+        7217
+      ],
+      "startLocationNames": [
+        "TO"
       ],
       "endLocations": [
-        1662
+        7216
+      ],
+      "endLocationNames": [
+        "From"
       ],
       "shipmentTemplateName": "JUnit template",
       "shipmentDescription": null,
       "addDateShipped": false,
       "alertProfileId": null,
+      "alertProfileName": null,
       "alertSuppressionMinutes": 0,
       "alertsNotificationSchedules": [],
       "commentsForReceiver": null,
@@ -2867,21 +2882,29 @@ Request:
       "arrivalNotificationSchedules": [],
       "shutdownDeviceAfterMinutes": null,
       "noAlertsAfterArrivalMinutes": null,
+      "noAlertsAfterStartMinutes": null,
       "shutDownAfterStartMinutes": null
     },
     {
       "priority": 77,
-      "id": 332,
+      "id": 1352,
       "startLocations": [
-        1663
+        7217
+      ],
+      "startLocationNames": [
+        "TO"
       ],
       "endLocations": [
-        1662
+        7216
+      ],
+      "endLocationNames": [
+        "From"
       ],
       "shipmentTemplateName": "JUnit template",
       "shipmentDescription": null,
       "addDateShipped": false,
       "alertProfileId": null,
+      "alertProfileName": null,
       "alertSuppressionMinutes": 0,
       "alertsNotificationSchedules": [],
       "commentsForReceiver": null,
@@ -2890,6 +2913,7 @@ Request:
       "arrivalNotificationSchedules": [],
       "shutdownDeviceAfterMinutes": null,
       "noAlertsAfterArrivalMinutes": null,
+      "noAlertsAfterStartMinutes": null,
       "shutDownAfterStartMinutes": null
     }
   ],

@@ -20,12 +20,15 @@ public class AutoStartShipmentDto {
      * The list of start location ID.
      */
     private final List<Long> startLocations = new LinkedList<>();
+    private final List<String> startLocationNames = new LinkedList<>();
     /**
      * The list of end location ID.
      */
     private final List<Long> endLocations = new LinkedList<>();
+    private final List<String> endLocationNames = new LinkedList<>();
     private int priority;
     private Long id;
+    private String alertProfileName;
 
     /**
      * Name.
@@ -100,10 +103,12 @@ public class AutoStartShipmentDto {
         //add start locations.
         for (final LocationProfile loc : cfg.getShippedFrom()) {
             startLocations.add(loc.getId());
+            startLocationNames.add(loc.getName());
         }
         //add end locations.
         for (final LocationProfile loc : cfg.getShippedTo()) {
             endLocations.add(loc.getId());
+            endLocationNames.add(loc.getName());
         }
 
         //shipment template fields.
@@ -112,7 +117,10 @@ public class AutoStartShipmentDto {
         setName(tpl.getName());
         setShipmentDescription(tpl.getShipmentDescription());
         setAddDateShipped(tpl.isAddDateShipped());
-        setAlertProfile(tpl.getAlertProfile() == null ? null : tpl.getAlertProfile().getId());
+        if (tpl.getAlertProfile() != null) {
+            setAlertProfile(tpl.getAlertProfile().getId());
+            setAlertProfileName(tpl.getAlertProfile().getName());
+        }
         for (final NotificationSchedule s : tpl.getAlertsNotificationSchedules()) {
             alertsNotificationSchedules.add(s.getId());
         }
@@ -320,5 +328,29 @@ public class AutoStartShipmentDto {
      */
     public List<Long> getArrivalNotificationSchedules() {
         return arrivalNotificationSchedules;
+    }
+    /**
+     * @return the alertProfileName
+     */
+    public String getAlertProfileName() {
+        return alertProfileName;
+    }
+    /**
+     * @param alertProfileName the alertProfileName to set
+     */
+    public void setAlertProfileName(final String alertProfileName) {
+        this.alertProfileName = alertProfileName;
+    }
+    /**
+     * @return the endLocationNames
+     */
+    public List<String> getEndLocationNames() {
+        return endLocationNames;
+    }
+    /**
+     * @return the startLocationNames
+     */
+    public List<String> getStartLocationNames() {
+        return startLocationNames;
     }
 }

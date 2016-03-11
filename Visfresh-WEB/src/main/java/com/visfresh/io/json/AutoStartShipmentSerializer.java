@@ -53,15 +53,30 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
         for (final JsonElement el : array) {
             dto.getStartLocations().add(el.getAsLong());
         }
+        //names is readonly therefore can be absent
+        if (json.has(START_LOCATION_NAMES)) {
+            array = json.get(START_LOCATION_NAMES).getAsJsonArray();
+            for (final JsonElement el : array) {
+                dto.getStartLocationNames().add(el.getAsString());
+            }
+        }
 
         //end locations.
         array = json.get(END_LOCATIONS).getAsJsonArray();
         for (final JsonElement el : array) {
             dto.getEndLocations().add(el.getAsLong());
         }
+        //names is readonly therefore can be absent
+        if (json.has(END_LOCATION_NAMES)) {
+            array = json.get(END_LOCATION_NAMES).getAsJsonArray();
+            for (final JsonElement el : array) {
+                dto.getEndLocationNames().add(el.getAsString());
+            }
+        }
 
         dto.setAlertSuppressionMinutes(asInt(json.get(ShipmentConstants.ALERT_SUPPRESSION_MINUTES)));
         dto.setAlertProfile(asLong(json.get(ShipmentConstants.ALERT_PROFILE_ID)));
+        dto.setAlertProfileName(asString(json.get(ALERT_PROFILE_NAME)));
         dto.getAlertsNotificationSchedules().addAll(toLongList(json.get(
                 ShipmentConstants.ALERTS_NOTIFICATION_SCHEDULES).getAsJsonArray()));
         dto.setArrivalNotificationWithinKm(asInteger(json.get(
@@ -98,19 +113,35 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
         json.addProperty(ID, as.getId());
 
         //start locations
-        JsonArray array = new JsonArray();
-        json.add(START_LOCATIONS, array);
+        JsonArray ids = new JsonArray();
+        json.add(START_LOCATIONS, ids);
 
         for (final Long id : as.getStartLocations()) {
-            array.add(new JsonPrimitive(id));
+            ids.add(new JsonPrimitive(id));
+        }
+
+        //names
+        JsonArray names = new JsonArray();
+        json.add(START_LOCATION_NAMES, names);
+
+        for (final String name : as.getStartLocationNames()) {
+            names.add(new JsonPrimitive(name));
         }
 
         //end locations
-        array = new JsonArray();
-        json.add(END_LOCATIONS, array);
+        ids = new JsonArray();
+        json.add(END_LOCATIONS, ids);
 
         for (final Long id : as.getEndLocations()) {
-            array.add(new JsonPrimitive(id));
+            ids.add(new JsonPrimitive(id));
+        }
+
+        //names
+        names = new JsonArray();
+        json.add(END_LOCATION_NAMES, names);
+
+        for (final String name : as.getEndLocationNames()) {
+            names.add(new JsonPrimitive(name));
         }
 
         //shipment template
@@ -118,6 +149,7 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
         json.addProperty(ShipmentTemplateConstants.SHIPMENT_DESCRIPTION, as.getShipmentDescription());
         json.addProperty(ShipmentTemplateConstants.ADD_DATE_SHIPPED, as.isAddDateShipped());
         json.addProperty(ShipmentTemplateConstants.ALERT_PROFILE_ID, as.getAlertProfile());
+        json.addProperty(ALERT_PROFILE_NAME, as.getAlertProfileName());
         json.addProperty(ShipmentTemplateConstants.ALERT_SUPPRESSION_MINUTES, as.getAlertSuppressionMinutes());
         json.add(ShipmentTemplateConstants.ALERTS_NOTIFICATION_SCHEDULES,
                 toJsonArray(as.getAlertsNotificationSchedules()));
