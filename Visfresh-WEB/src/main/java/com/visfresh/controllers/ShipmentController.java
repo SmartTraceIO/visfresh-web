@@ -297,7 +297,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             STATUS,
             SHIPPED_FROM_LOCATION_NAME,
             SHIPPED_TO_LOCATION_NAME,
-            DEVICE_SN,
+            DEVICE_SN, //should add trip count next
             ARRIVAL_DATE,
             COMMENTS_FOR_RECEIVER,
 //            PROPERTY_ETA,

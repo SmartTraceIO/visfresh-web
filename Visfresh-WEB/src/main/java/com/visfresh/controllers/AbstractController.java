@@ -92,9 +92,18 @@ public abstract class AbstractController {
      * @return
      */
     protected JsonObject createSuccessResponse(final JsonElement response) {
+        return createSuccessResponse("Success", response);
+    }
+    /**
+     * @param message
+     * @param response
+     * @return
+     */
+    protected JsonObject createSuccessResponse(final String message,
+            final JsonElement response) {
         final JsonObject obj = new JsonObject();
         //add status
-        obj.add("status", createStatus(0, "Success"));
+        obj.add("status", createStatus(0, message));
         //add response
         obj.add("response", response == null ? JsonNull.INSTANCE : response);
         return obj;

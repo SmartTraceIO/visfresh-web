@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -181,8 +179,11 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
     }
     @Test
     public void testShutdownDevice() throws RestServiceException, IOException {
-        final Device device = createDevice("089723409857032498", true);
-        client.shutdownDevice(device.getImei(), null);
+        final Shipment s = this.createShipment(true);
+        s.setStatus(ShipmentStatus.InProgress);
+        saveShipmentDirectly(s);
+
+        client.shutdownDevice(s);
 
         //check result.
         final List<SystemMessage> messages = context.getBean(SystemMessageDao.class).findAll(null, null, null);
@@ -190,37 +191,31 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
 
         final JsonObject json = SerializerUtils.parseJson(messages.get(0).getMessageInfo()).getAsJsonObject();
         assertEquals("SHUTDOWN#", json.get("command").getAsString());
-        assertEquals(device.getImei(), json.get("imei").getAsString());
+        assertEquals(s.getDevice().getImei(), json.get("imei").getAsString());
+
+        //check shipment state
+        assertEquals(ShipmentStatus.Ended, context.getBean(ShipmentDao.class).findOne(s.getId()).getStatus());
     }
     @Test
-    public void testShutdownDeviceEndsShipment() throws RestServiceException, IOException {
-        final Device device = createDevice("089723409857032498", true);
+    public void testShutdownNotLatestDevice() throws RestServiceException, IOException {
         Shipment s = this.createShipment(true);
-        s.setDevice(device);
         s.setStatus(ShipmentStatus.InProgress);
         saveShipmentDirectly(s);
 
-        client.shutdownDevice(device.getImei(), s);
+        final Shipment last = this.createShipment(true);
+        last.setDevice(s.getDevice());
+        last.setStatus(ShipmentStatus.InProgress);
+        saveShipmentDirectly(last);
 
+        client.shutdownDevice(s);
+
+        //check not shutdown message created.
+        final List<SystemMessage> messages = context.getBean(SystemMessageDao.class).findAll(null, null, null);
+        assertEquals(0, messages.size());
+
+        //but shipment stopped
         s = context.getBean(ShipmentDao.class).findOne(s.getId());
         assertEquals(ShipmentStatus.Ended, s.getStatus());
-    }
-    @Test
-    public void testShutdownDeviceErrorIfLeftShipment() throws RestServiceException, IOException {
-        final Device device = createDevice("089723409857032498", true);
-        Shipment s = this.createShipment(true);
-        s.setStatus(ShipmentStatus.InProgress);
-        saveShipmentDirectly(s);
-
-        try {
-            client.shutdownDevice(device.getImei(), s);
-            throw new AssertionFailedError("Exception should be thrown");
-        } catch (final Exception e) {
-            // correct behavior
-        }
-
-        s = context.getBean(ShipmentDao.class).findOne(s.getId());
-        assertEquals(ShipmentStatus.InProgress, s.getStatus());
     }
     /**
      * @param device device.

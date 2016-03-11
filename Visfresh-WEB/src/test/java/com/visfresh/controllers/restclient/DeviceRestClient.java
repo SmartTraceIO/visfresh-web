@@ -108,12 +108,9 @@ public class DeviceRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public void shutdownDevice(final String imei, final Shipment shipment) throws IOException, RestServiceException {
+    public void shutdownDevice(final Shipment shipment) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("imei", imei);
-        if (shipment != null) {
-            params.put("shipmentId", shipment.getId().toString());
-        }
+        params.put("shipmentId", shipment.getId().toString());
         sendGetRequest(getPathWithToken("shutdownDevice"), params);
     }
 }

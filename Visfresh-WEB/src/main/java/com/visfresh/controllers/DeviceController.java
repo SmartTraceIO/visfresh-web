@@ -96,9 +96,15 @@ public class DeviceController extends AbstractController implements DeviceConsta
             checkCompanyAccess(user, old);
 
             d.setCompany(user.getCompany());
-            if (!Role.Admin.hasRole(user)) {
-                //not admin can't change active state
-                d.setActive(old.isActive());
+
+            if (old != null) {
+                //not allow to overwrite trip count
+                d.setTripCount(old.getTripCount());
+
+                if (!Role.Admin.hasRole(user)) {
+                    //not admin can't change active state
+                    d.setActive(old.isActive());
+                }
             }
 
             dao.save(d);
@@ -324,35 +330,26 @@ public class DeviceController extends AbstractController implements DeviceConsta
      */
     @RequestMapping(value = "/shutdownDevice/{authToken}", method = RequestMethod.GET)
     public JsonObject shutdownDevice(@PathVariable final String authToken,
-            final @RequestParam String imei,
-            final @RequestParam(required = false) Long shipmentId) {
+            final @RequestParam Long shipmentId) {
         try {
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.NormalUser);
 
+            final Shipment shipment = shipmentDao.findOne(shipmentId);
+            checkCompanyAccess(user, shipment);
+
             //get device to shutdown.
-            final Device device = dao.findByImei(imei);
+            final Device device = shipment.getDevice();
+            if (device == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Shipment " + shipmentId + " has not assigned device");
+            }
             checkCompanyAccess(user, device);
 
-            Shipment shipment;
-            if (shipmentId != null) {
-                shipment = shipmentDao.findOne(shipmentId);
-                if (shipment != null && !shipment.getDevice().getImei().equals(imei)) {
-                    //check device is for given shipment.
-                    log.error("Shipment " + shipmentId + " device " + shipment.getDevice().getImei()
-                            + " not matches the shutting down device " + imei);
-                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                            "Shipment " + shipmentId + " users another device than " + imei);
-                }
-            } else {
-                shipment = shipmentDao.findLastShipment(imei);
-            }
-
-            checkCompanyAccess(user, shipment);
             stopShipmentAndShutdownDevice(shipment, device);
             return createSuccessResponse(null);
         } catch (final Exception e) {
-            log.error("Failed to shutdown device", e);
+            log.error("Failed to shutdown device for shipment " + shipmentId, e);
             return createErrorResponse(e);
         }
     }
@@ -361,24 +358,28 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param device
      */
     private void stopShipmentAndShutdownDevice(final Shipment shipment, final Device device) {
-        commandService.shutdownDevice(device, new Date());
+        final Shipment last = shipmentDao.findLastShipment(device.getImei());
+        if (last != null && last.getId().equals(shipment.getId())) {
+            commandService.shutdownDevice(device, new Date());
+        } else {
+            log.warn("The shipment " + shipment.getId() + " is not last sipment for device "
+                    + device.getImei() + ". Device shutdown will ignored");
+        }
 
-        if (shipment != null) {
-            //stop shipment
-            final ShipmentStatus status = shipment.getStatus();
-            if (status == ShipmentStatus.Arrived) {
-                //if status = "Arrived" (shutdown) => status='arrived"
-                //[20:24:37] James Richardson: if stayts = 'Ended' (shutown) ==> status = 'Ended
-                //do nothing
-                log.debug("Shipment " + shipment.getId() + " is already in final status " + status);
-            } else {
-                //[20:23:46] James Richardson: if status = "InProgress" (shutdown) ==> status = 'ended'
-                //[20:24:21] James Richardson: if status = 'Default' (shutdown) ==> statsus- 'Ended'
-                shipment.setStatus(ShipmentStatus.Ended);
-                shipmentDao.save(shipment);
-                log.debug("Shipment " + shipment.getId() + " status has set to " + ShipmentStatus.Ended
-                        + " according device " + device.getImei() + " shutdown");
-            }
+        //stop shipment
+        final ShipmentStatus status = shipment.getStatus();
+        if (shipment.hasFinalStatus()) {
+            //if status = "Arrived" (shutdown) => status='arrived"
+            //[20:24:37] James Richardson: if stayts = 'Ended' (shutown) ==> status = 'Ended
+            //do nothing
+            log.debug("Shipment " + shipment.getId() + " is already in final status " + status);
+        } else {
+            //[20:23:46] James Richardson: if status = "InProgress" (shutdown) ==> status = 'ended'
+            //[20:24:21] James Richardson: if status = 'Default' (shutdown) ==> statsus- 'Ended'
+            shipment.setStatus(ShipmentStatus.Ended);
+            shipmentDao.save(shipment);
+            log.debug("Shipment " + shipment.getId() + " status has set to " + ShipmentStatus.Ended
+                    + " according device " + device.getImei() + " shutdown");
         }
     }
     /**
