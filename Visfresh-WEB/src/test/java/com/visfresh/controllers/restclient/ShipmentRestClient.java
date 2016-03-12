@@ -41,6 +41,16 @@ public class ShipmentRestClient extends RestClient {
 
         return sendGetRequest(getPathWithToken("getSingleShipment"), params);
     }
+    public JsonElement getSingleShipment(final String sn, final int trip)
+            throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        if (sn != null) {
+            params.put("sn", sn);
+            params.put("trip", Integer.toString(trip));
+        }
+
+        return sendGetRequest(getPathWithToken("getSingleShipment"), params);
+    }
 
     /**
      * @param shipment

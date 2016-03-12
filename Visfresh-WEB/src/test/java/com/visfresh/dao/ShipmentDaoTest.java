@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
+import junit.framework.AssertionFailedError;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -480,6 +482,42 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(s1.getId(), result.get(0).getId());
         assertEquals(s2.getId(), result.get(1).getId());
         assertEquals(s3.getId(), result.get(2).getId());
+    }
+    @Test
+    public void testFindBySnTrip() {
+        final String sn = "001111";
+        final int trip = 1;
+
+        final Shipment s0 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+        final Device d0 = createDevice("11111130000013");
+        s0.setDevice(d0);
+        s0.setTripCount(trip);
+        dao.save(s0);
+
+        assertNull(dao.findBySnTrip(sn, trip));
+
+        final Shipment s1 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+        final Device d1 = createDevice("1111113" + sn + "3");
+        s1.setDevice(d1);
+        s1.setTripCount(trip);
+        dao.save(s1);
+
+        assertNotNull(dao.findBySnTrip(sn, trip));
+        assertNotNull(dao.findBySnTrip("1111", trip));
+
+        //create other device with same SN
+        final Shipment s2 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+        final Device d2 = createDevice("1111112" + sn + "2");
+        s2.setDevice(d2);
+        s2.setTripCount(trip);
+        dao.save(s2);
+
+        try {
+            dao.findBySnTrip(sn, trip);
+            throw new AssertionFailedError("Runtime exception should be thrown");
+        } catch (final RuntimeException e) {
+            //normal
+        }
     }
     @Test
     public void testOrderByLocation() {

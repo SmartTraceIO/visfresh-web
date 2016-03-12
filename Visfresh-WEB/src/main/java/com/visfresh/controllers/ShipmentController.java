@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
@@ -486,7 +487,15 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     }
     @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
     public JsonObject getSingleShipment(@PathVariable final String authToken,
-            @RequestParam final Long shipmentId) {
+            @RequestParam(required = false) final Long shipmentId,
+            @RequestParam(required = false) final String sn,
+            @RequestParam(required = false) final Integer trip
+            ) {
+        //check parameters
+        if (shipmentId == null && (sn == null || trip == null)) {
+            return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Should be specified shipmentId or (sn and trip) request parameters");
+        }
 
         try {
             //check logged in.
@@ -495,7 +504,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
             final ShipmentSerializer ser = getSerializer(user);
 
-            final Shipment s = shipmentDao.findOne(shipmentId);
+            final Shipment s;
+            if (shipmentId != null) {
+                s = shipmentDao.findOne(shipmentId);
+            } else {
+                s = shipmentDao.findBySnTrip(sn, trip);
+            }
+
             checkCompanyAccess(user, s);
             if (s == null) {
                 return createSuccessResponse(null);

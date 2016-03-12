@@ -70,7 +70,7 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
     @Test
     public void testAccept() {
         final TrackerEvent e = createEvent(TrackerEventType.DRK);
-        final Shipment s = createShipmentWithEnabledAlert(e.getDevice());
+        final Shipment s = createShipmentWithEnabledAlert(e.getDevice(), e.getTime());
         e.setShipment(s);
 
         //test accept event
@@ -97,7 +97,7 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
     @Test
     public void testHandle() {
         final TrackerEvent e = createEvent(TrackerEventType.DRK);
-        final Shipment s = createShipmentWithEnabledAlert(e.getDevice());
+        final Shipment s = createShipmentWithEnabledAlert(e.getDevice(), e.getTime());
         e.setShipment(s);
         context.getBean(TrackerEventDao.class).save(e);
 
@@ -119,8 +119,10 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
      * @param d device.
      * @return shipment by enabled bettery low alert.
      */
-    private Shipment createShipmentWithEnabledAlert(final Device d) {
+    private Shipment createShipmentWithEnabledAlert(final Device d, final Date shipmentDate) {
         final Shipment s = createDefaultShipment(ShipmentStatus.InProgress, d);
+        s.setShipmentDate(shipmentDate);
+
         //enable battery low alerts
         final AlertProfile p = new AlertProfile();
         p.setName("Enter dark environment alert rule");

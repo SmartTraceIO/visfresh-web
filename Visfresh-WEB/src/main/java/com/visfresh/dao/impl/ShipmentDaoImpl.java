@@ -466,6 +466,52 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         }
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#getBySnTrip(java.lang.String, java.lang.Integer)
+     */
+    @Override
+    public Shipment findBySnTrip(final String sn, final Integer trip) {
+        //create serial number filter
+        final String key = "snKey";
+
+        //build like clause
+        final StringBuilder serialNum = new StringBuilder(sn);
+        while (serialNum.length() < 6) {
+            serialNum.insert(0, '0');
+        }
+        //append
+        serialNum.insert(0, '%');
+        serialNum.append('_');
+
+        final Filter f = new Filter();
+        f.addFilter(DEVICE_FIELD, new SynteticFilter() {
+            @Override
+            public Object[] getValues() {
+                return new Object[]{serialNum.toString()};
+            }
+            @Override
+            public String[] getKeys() {
+                return new String[]{key};
+            }
+            @Override
+            public String getFilter() {
+                return DEVICE_FIELD + " like :" + key;
+            }
+        });
+
+        //add trip count filter
+        f.addFilter(TRIPCOUNT_FIELD, trip);
+
+        final List<Shipment> all = findAll(f, null, null);
+        if (all.size() > 1) {
+            throw new RuntimeException(all.size() + " shipments has selected for " + sn + "(" + trip + ")");
+        }
+        if (!all.isEmpty()) {
+            return all.get(0);
+        }
+
+        return null;
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#addFiltes(com.visfresh.dao.Filter, java.util.Map, java.util.List, java.util.Map)
      */
     @Override

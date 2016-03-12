@@ -53,15 +53,6 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
                 && shipment != null
                 && shipment.getStatus() != ShipmentStatus.Ended;
 
-        if (accept) {
-            final List<PersonSchedule> schedules = getAllPersonalSchedules(shipment);
-            for (final PersonSchedule s : schedules) {
-                if (matchesTimeFrame(s)) {
-                    return true;
-                }
-            }
-        }
-
         return accept;
     }
 

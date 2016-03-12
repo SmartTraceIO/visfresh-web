@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import junit.framework.AssertionFailedError;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +35,7 @@ import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -388,6 +391,34 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
         assertNotNull(sd);
+    }
+    @Test
+    public void testGetSingleShipmentBySnTrip() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+        final Device device = createDevice("1923087980000117", true);
+        s.setDevice(device);
+        saveShipmentDirectly(s);
+
+        //add tracker event.
+        createEvent(s, TrackerEventType.AUT);
+        createEvent(s, TrackerEventType.AUT);
+
+        //add alert
+        createAlert(s, AlertType.Battery);
+        createTemperatureAlert(s, AlertType.Hot);
+        createArrival(s);
+
+        final JsonObject sd = shipmentClient.getSingleShipment(
+                "11", s.getTripCount()).getAsJsonObject();
+        assertNotNull(sd);
+
+        //check null params
+        try {
+            shipmentClient.getSingleShipment(null, s.getTripCount()).getAsJsonObject();
+            throw new AssertionFailedError("Exception has trown associating of incorect parameters");
+        } catch (final Exception e) {
+            //ok
+        }
     }
     @Test
     public void testGetShipmentsFiltered() throws RestServiceException, IOException {

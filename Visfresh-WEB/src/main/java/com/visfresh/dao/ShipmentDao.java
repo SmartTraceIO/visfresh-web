@@ -57,4 +57,10 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
     void updateSiblingInfo(List<Shipment> shipments, Long siblingGroup, int siblingCount);
     @Override
     <S extends Shipment> S save(S s);
+    /**
+     * @param sn serial number.
+     * @param trip trip count.
+     * @return shipment
+     */
+    Shipment findBySnTrip(String sn, Integer trip);
 }
