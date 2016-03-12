@@ -4,8 +4,6 @@
 package com.visfresh.controllers;
 
 
-import static com.visfresh.utils.DateTimeUtils.createDateFormat;
-
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -69,6 +67,7 @@ import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.services.LocationService;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.ShipmentSiblingService;
+import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
@@ -84,7 +83,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * 2 hours by default.
      */
     private static final long MAX_DEFAULT_SHIPMENT_INACTIVE_TIME = 2 * 60 * 60 * 1000L;
-    private static final String ISO_FORMAT = "yyyy-MM-dd HH:mm";
     /**
      * Logger.
      */
@@ -376,7 +374,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
 
         final Date currentTime = new Date();
-        final DateFormat isoFmt = createDateFormat(user, ISO_FORMAT);
+        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user);
 
         //add alerts to each shipment.
         for (final Shipment s : shipments) {
@@ -597,7 +595,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setMinTemp(minTemp);
         dto.setMaxTemp(maxTemp);
 
-        final DateFormat isoFmt = createDateFormat(user, ISO_FORMAT);
+        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user);
 
         dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
 
@@ -672,7 +670,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private SingleShipmentDto createSingleShipmentData(final Shipment shipment, final User user) {
         //"startTimeISO": "2014-08-12 12:10",
-        final DateFormat isoFmt = createDateFormat(user, ISO_FORMAT);
+        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user);
 
         final SingleShipmentDto dto = new SingleShipmentDto();
         dto.setAlertProfileId(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());

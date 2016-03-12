@@ -4,6 +4,7 @@
 package com.visfresh.mpl.services;
 
 import static com.visfresh.utils.DateTimeUtils.createDateFormat;
+import static com.visfresh.utils.DateTimeUtils.createIsoFormat;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -19,7 +20,6 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
-import com.visfresh.io.json.AbstractJsonSerializer;
 import com.visfresh.utils.LocalizationUtils;
 
 /**
@@ -60,15 +60,14 @@ public class NotificationIssueBundle {
 
         //supported place holders:
         //${date} alert issue date include day and year
-        DateFormat sdf = createDateFormat(user, AbstractJsonSerializer.DATE_FORMAT);
-        map.put("date", sdf.format(issueDate));
+        map.put("date", createIsoFormat(user).format(issueDate));
         //${time} the time in scope of day.
-        sdf = createDateFormat(user, "HH:mm");
+        final DateFormat sdf = createDateFormat(user, "HH:mm");
         map.put("time", sdf.format(issueDate));
         //${device} device IMEI
         map.put("device", device.getImei());
         //${devicesn} device serial number
-        map.put("devicesn", device.getSn());
+        map.put("devicesn", normalizeSn(device.getSn()));
 
         if (shipment != null) {
             //${tripCount} trip count for given device of shipment.
@@ -141,6 +140,17 @@ public class NotificationIssueBundle {
         }
 
         return map;
+    }
+    /**
+     * @param sn serial number.
+     * @return normalized serial number.
+     */
+    private String normalizeSn(final String sn) {
+        final StringBuilder sb = new StringBuilder(sn);
+        while (sb.charAt(0) == '0' && sb.length() > 1) {
+            sb.deleteCharAt(0);
+        }
+        return sb.toString();
     }
     /**
      * @param ta temperature alert.

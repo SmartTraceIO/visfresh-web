@@ -30,4 +30,18 @@ public final class DateTimeUtils {
         fmt.setTimeZone(user.getTimeZone());
         return fmt;
     }
+    /**
+     * @param user user.
+     * @return date format.
+     */
+    public static DateFormat createPrettyFormat(final User user) {
+        return DateTimeUtils.createDateFormat(user, "h:mmaa d MMM yyyy");
+    }
+    /**
+     * @param user user.
+     * @return date format.
+     */
+    public static DateFormat createIsoFormat(final User user) {
+        return DateTimeUtils.createDateFormat(user, "yyyy-MM-dd HH:mm");
+    }
 }

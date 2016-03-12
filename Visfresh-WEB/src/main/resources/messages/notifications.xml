@@ -6,6 +6,7 @@
 	supported place holders:
 
 	${date} alert issue date include day and year
+	${prettyDate} date in pretty format.
 	${time} the time in scope of day.
 	${device} device IMEI
 	${devicesn} device serial number

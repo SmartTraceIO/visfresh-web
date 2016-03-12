@@ -4,7 +4,6 @@
 package com.visfresh.controllers;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +41,7 @@ import com.visfresh.io.NotificationItem;
 import com.visfresh.io.json.NotificationSerializer;
 import com.visfresh.l12n.ChartBundle;
 import com.visfresh.l12n.NotificationBundle;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -106,7 +106,7 @@ public class NotificationController extends AbstractController implements Notifi
 
             final int total = dao.getEntityCount(user, filter);
             final JsonArray array = new JsonArray();
-            final DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+            final DateFormat isoFormat = DateTimeUtils.createPrettyFormat(user);
             for (final Notification t : ns) {
                 array.add(ser.toJson(createNotificationItem(t, user, locations.get(t.getId()),
                         isoFormat, events)));
@@ -165,7 +165,7 @@ public class NotificationController extends AbstractController implements Notifi
      * @return notification item.
      */
     private NotificationItem createNotificationItem(final Notification n, final User user,
-            final Location location, final DateFormat isoFormatter,
+            final Location location, final DateFormat dateFormatter,
             final Map<Long, TrackerEvent> trackerEvents) {
         final NotificationItem item = new NotificationItem();
         item.setAlertId(n.getIssue().getId());
@@ -177,7 +177,7 @@ public class NotificationController extends AbstractController implements Notifi
         }
 
         item.setClosed(n.isRead());
-        item.setDate(isoFormatter.format(n.getIssue().getDate()));
+        item.setDate(dateFormatter.format(n.getIssue().getDate()));
         item.setNotificationId(n.getId());
 
         final Shipment shipment = n.getIssue().getShipment();

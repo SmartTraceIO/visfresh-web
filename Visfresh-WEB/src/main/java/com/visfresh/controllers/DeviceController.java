@@ -135,9 +135,6 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
             final DeviceSerializer ser = createSerializer(user);
 
-            final DateFormat isoFormat = createIsoFormat(user);
-            final DateFormat prettyFormat = createPrettyFormat(user);
-
             final List<ListDeviceItem> devices = dao.getDevices(user.getCompany(),
                     createSorting(sc, so, getDefaultSortOrder(), 1),
                     page);
@@ -145,7 +142,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
             final JsonArray array = new JsonArray();
             for (final ListDeviceItem item : devices) {
-                array.add(ser.toJson(createDto(item, isoFormat, prettyFormat, user.getTemperatureUnits())));
+                array.add(ser.toJson(createDto(item, user)));
             }
 
             return createListSuccessResponse(array, total);
@@ -155,29 +152,15 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
     }
     /**
-     * @param user
-     * @return
-     */
-    protected DateFormat createPrettyFormat(final User user) {
-        return DateTimeUtils.createDateFormat(user, "h:mmaa d MMM yyyy");
-    }
-    /**
-     * @param user
-     * @return
-     */
-    protected DateFormat createIsoFormat(final User user) {
-        return DateTimeUtils.createDateFormat(user, "yyyy-MM-dd HH:mm");
-    }
-    /**
      * @param item
-     * @param isoFormat
-     * @param temperatureUnits
+     * @param user
      * @return
      */
-    private DeviceDto createDto(final ListDeviceItem item,
-            final DateFormat isoFormat,
-            final DateFormat prettyFormat,
-            final TemperatureUnits temperatureUnits) {
+    private DeviceDto createDto(final ListDeviceItem item,final User user) {
+        final DateFormat isoFormat = DateTimeUtils.createIsoFormat(user);
+        final DateFormat prettyFormat = DateTimeUtils.createPrettyFormat(user);
+        final TemperatureUnits temperatureUnits = user.getTemperatureUnits();
+
         final DeviceDto dto = new DeviceDto();
         dto.setActive(item.isActive());
         dto.setDescription(item.getDescription());
@@ -270,10 +253,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
             }
 
             //format result
-            final DateFormat isoFormat = createIsoFormat(user);
-            final DateFormat prettyFormat = createPrettyFormat(user);
             return createSuccessResponse(createSerializer(user).toJson(
-                    createDto(item, isoFormat, prettyFormat, user.getTemperatureUnits())));
+                    createDto(item, user)));
         } catch (final Exception e) {
             log.error("Failed to get devices", e);
             return createErrorResponse(e);
