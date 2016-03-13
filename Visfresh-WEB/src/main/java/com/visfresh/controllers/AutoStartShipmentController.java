@@ -22,6 +22,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.AutoStartShipmentConstants;
+import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.LocationProfileDao;
@@ -323,7 +324,12 @@ public class AutoStartShipmentController extends AbstractController
      */
     private String[] getDefaultSortOrder() {
         return new String[] {
-            ID
+            ID,
+            ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME,
+            ShipmentTemplateConstants.SHIPMENT_DESCRIPTION,
+            START_LOCATIONS,
+            END_LOCATIONS,
+            ALERT_PROFILE_NAME
         };
     }
 }

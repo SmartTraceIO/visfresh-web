@@ -7,9 +7,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.constants.AutoStartShipmentConstants;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentTemplate;
@@ -74,14 +77,63 @@ public class AutoStartShipmentDaoTest extends
         dao.delete(cfg);
         assertNull(templateDao.findOne(cfg.getTemplate().getId()));
     }
+    @Test
+    public void testSortById() {
+        final AutoStartShipment a1 = dao.save(createTestEntity());
+        final AutoStartShipment a2 = dao.save(createTestEntity());
+        final AutoStartShipment a3 = dao.save(createTestEntity());
+
+        List<AutoStartShipment> all = dao.findAll(null, new Sorting(true, AutoStartShipmentConstants.ID), null);
+
+        assertEquals(a1.getId(), all.get(0));
+        assertEquals(a2.getId(), all.get(1));
+        assertEquals(a3.getId(), all.get(2));
+
+        //descent
+        all = dao.findAll(null, new Sorting(false, AutoStartShipmentConstants.ID), null);
+
+        assertEquals(a3.getId(), all.get(0));
+        assertEquals(a2.getId(), all.get(1));
+        assertEquals(a1.getId(), all.get(2));
+    }
+    @Test
+    public void testSortByTemplateName() {
+
+//        ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME,
+    }
+    @Test
+    public void testSortByTemplateDescription() {
+//        ShipmentTemplateConstants.SHIPMENT_DESCRIPTION,
+    }
+    @Test
+    public void testStartByStartLocations() {
+
+    }
+    @Test
+    public void testStartByEndLocations() {
+
+    }
+    @Test
+    public void testSortByAlertProfileName() {
+
+    }
 
     /**
      * @return shipment template.
      */
     private ShipmentTemplate createTemplate() {
+        return createTemplate("JUnit template", null);
+    }
+    /**
+     * @param name template name.
+     * @param description template description.
+     * @return shipment template.
+     */
+    private ShipmentTemplate createTemplate(final String name, final String description) {
         final ShipmentTemplate tpl = new ShipmentTemplate();
         tpl.setCompany(sharedCompany);
-        tpl.setName("JUnit template");
+        tpl.setName(name);
+        tpl.setShipmentDescription(description);
         return getContext().getBean(ShipmentTemplateDao.class).save(tpl);
     }
     /**
@@ -116,10 +168,18 @@ public class AutoStartShipmentDaoTest extends
      */
     @Override
     protected AutoStartShipment createTestEntity() {
+        final ShipmentTemplate template = createTemplate();
+        return createAutoStart(template);
+    }
+    /**
+     * @param template
+     * @return
+     */
+    private AutoStartShipment createAutoStart(final ShipmentTemplate template) {
         final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setCompany(sharedCompany);
         cfg.setPriority(10);
-        cfg.setTemplate(createTemplate());
+        cfg.setTemplate(template);
         cfg.getShippedFrom().add(locFrom);
         cfg.getShippedTo().add(locTo);
         return cfg;

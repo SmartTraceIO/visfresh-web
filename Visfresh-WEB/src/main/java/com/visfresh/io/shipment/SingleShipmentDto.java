@@ -3,6 +3,8 @@
  */
 package com.visfresh.io.shipment;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -548,5 +550,8 @@ public class SingleShipmentDto {
      */
     public void setShutDownAfterStartMinutes(final Integer shutDownAfterStartMinutes) {
         this.shutDownAfterStartMinutes = shutDownAfterStartMinutes;
+    }
+    public static void main(final String[] args) throws UnsupportedEncodingException {
+        System.out.println(URLEncoder.encode("12345(7)", "UTF-8"));
     }
 }

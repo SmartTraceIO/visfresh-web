@@ -16,6 +16,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.AutoStartShipmentConstants;
+import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentTemplateDao;
@@ -56,8 +57,6 @@ public class AutoStartShipmentDaoImpl
      */
     public AutoStartShipmentDaoImpl() {
         super();
-        propertyToDbMap.put(AutoStartShipmentConstants.ID, ID_FIELD);
-        propertyToDbMap.put(AutoStartShipmentConstants.PRIORITY, PRIORITY_FIELD);
     }
 
     /* (non-Javadoc)
@@ -258,7 +257,8 @@ public class AutoStartShipmentDaoImpl
 
         //get location ID's
         final List<Map<String, Object>> rows = jdbc.queryForList("select * from "
-                + LOCATION_REL_TABLE + " where " + LOCATION_CONFIG + " = :cfg", params);
+                + LOCATION_REL_TABLE + " where " + LOCATION_CONFIG
+                + " = :cfg order by " + LOCATION_LOCATION, params);
 
         for (final Map<String,Object> map : rows) {
             final String direction = (String) map.get(LOCATION_DIRECTION);
@@ -309,4 +309,56 @@ public class AutoStartShipmentDaoImpl
         //delete template, entity should be deleted by DB trigger
         shipmentTemplateDao.delete(entity.getTemplate().getId());
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
+     */
+    @Override
+    protected String buildSelectBlockForFindAll() {
+        return "select "
+                //first group for sorting
+                + "lfrom.locationName as " + AutoStartShipmentConstants.START_LOCATIONS + ","
+                + "lto.locationName as " + AutoStartShipmentConstants.END_LOCATIONS + ","
+                + "ap.alertProfileName as " + AutoStartShipmentConstants.ALERT_PROFILE_NAME + ",\n"
+                + "tpl.shipmentTemplateName as " + ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME + ",\n"
+                + "tpl.shipmentDescription as " + ShipmentTemplateConstants.SHIPMENT_DESCRIPTION + ",\n"
+                //for build entity
+                + getTableName() + ".*\n"
+                + "from " + getTableName() + "\n"
+                //shipment template name and description from shipments table
+                + "join (select "
+                + ShipmentTemplateDaoImpl.ALERT_FIELD + " as alertProfileId,\n"
+                + ShipmentTemplateDaoImpl.ID_FIELD + " as shipmentTemplateId,\n"
+                + ShipmentTemplateDaoImpl.NAME_FIELD + " as shipmentTemplateName,\n"
+                + ShipmentTemplateDaoImpl.DESCRIPTION_FIELD + " as shipmentDescription\n"
+                + "from " + ShipmentTemplateDaoImpl.TABLE
+                + ") tpl on tpl.shipmentTemplateId = " + TABLE + "." + TEMPLATE_FIELD + "\n"
+                //alert profile name from alert profiles table
+                + "left outer join (select "
+                + AlertProfileDaoImpl.ID_FIELD + " as alertProfileId,\n"
+                + AlertProfileDaoImpl.NAME_FIELD + " as alertProfileName\n"
+                + "from " + AlertProfileDaoImpl.TABLE
+                + ") ap on ap.alertProfileId = tpl.alertProfileId\n"
+                //location from
+                + "left outer join (select "
+                + "lr." + LOCATION_CONFIG + " as locationConfig,\n"
+                + "loc." + LocationProfileDaoImpl.NAME_FIELD + " as locationName\n"
+                + "from " + LOCATION_REL_TABLE + " lr\n"
+                + "join " + LocationProfileDaoImpl.TABLE + " loc\n"
+                + "on loc." + LocationProfileDaoImpl.ID_FIELD + "=lr." + LOCATION_LOCATION + "\n"
+                + "where lr." + LOCATION_DIRECTION  + " = 'from'\n"
+                + "order by loc." + LocationProfileDaoImpl.ID_FIELD + " limit 1"
+                + ") lfrom on lfrom.locationConfig = " + TABLE + "." + ID_FIELD + "\n"
+                //location to
+                + "left outer join (select "
+                + "lr." + LOCATION_CONFIG + " as locationConfig,\n"
+                + "loc." + LocationProfileDaoImpl.NAME_FIELD + " as locationName\n"
+                + "from " + LOCATION_REL_TABLE + " lr\n"
+                + "join " + LocationProfileDaoImpl.TABLE + " loc\n"
+                + "on loc." + LocationProfileDaoImpl.ID_FIELD + "=lr." + LOCATION_LOCATION + "\n"
+                + "where lr." + LOCATION_DIRECTION  + " = 'to'\n"
+                + "order by loc." + LocationProfileDaoImpl.ID_FIELD + " limit 1"
+                + ") lto on lto.locationConfig = " + TABLE + "." + ID_FIELD + "\n"
+                ;
+    }
 }
+
