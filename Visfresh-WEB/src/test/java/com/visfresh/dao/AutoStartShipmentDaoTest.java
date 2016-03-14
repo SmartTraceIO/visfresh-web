@@ -85,16 +85,16 @@ public class AutoStartShipmentDaoTest extends
 
         List<AutoStartShipment> all = dao.findAll(null, new Sorting(true, AutoStartShipmentConstants.ID), null);
 
-        assertEquals(a1.getId(), all.get(0));
-        assertEquals(a2.getId(), all.get(1));
-        assertEquals(a3.getId(), all.get(2));
+        assertEquals(a1.getId(), all.get(0).getId());
+        assertEquals(a2.getId(), all.get(1).getId());
+        assertEquals(a3.getId(), all.get(2).getId());
 
         //descent
         all = dao.findAll(null, new Sorting(false, AutoStartShipmentConstants.ID), null);
 
-        assertEquals(a3.getId(), all.get(0));
-        assertEquals(a2.getId(), all.get(1));
-        assertEquals(a1.getId(), all.get(2));
+        assertEquals(a3.getId(), all.get(0).getId());
+        assertEquals(a2.getId(), all.get(1).getId());
+        assertEquals(a1.getId(), all.get(2).getId());
     }
     @Test
     public void testSortByTemplateName() {

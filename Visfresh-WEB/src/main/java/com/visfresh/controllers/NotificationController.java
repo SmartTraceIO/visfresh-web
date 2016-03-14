@@ -106,7 +106,7 @@ public class NotificationController extends AbstractController implements Notifi
 
             final int total = dao.getEntityCount(user, filter);
             final JsonArray array = new JsonArray();
-            final DateFormat isoFormat = DateTimeUtils.createPrettyFormat(user);
+            final DateFormat isoFormat = DateTimeUtils.createIsoFormat(user);
             for (final Notification t : ns) {
                 array.add(ser.toJson(createNotificationItem(t, user, locations.get(t.getId()),
                         isoFormat, events)));
