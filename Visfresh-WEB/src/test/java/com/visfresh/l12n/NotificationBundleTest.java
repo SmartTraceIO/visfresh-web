@@ -192,6 +192,12 @@ public class NotificationBundleTest extends NotificationBundle {
         assertNotNull(msg);
         assertPlaceholdersResolved(arrival, msg);
     }
+    @Test
+    public void testGetLinkToShipment() {
+        final String link = getLinkToShipment(shipment);
+        assertNotNull(link);
+        assertPlaceholdersResolved(null, link);
+    }
     /**
      * @param issue notification issue.
      * @param msg message.

@@ -145,7 +145,7 @@ public class NotificationIssueBundle {
      * @param sn serial number.
      * @return normalized serial number.
      */
-    private String normalizeSn(final String sn) {
+    protected String normalizeSn(final String sn) {
         final StringBuilder sb = new StringBuilder(sn);
         while (sb.charAt(0) == '0' && sb.length() > 1) {
             sb.deleteCharAt(0);

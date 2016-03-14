@@ -42,6 +42,6 @@ public final class DateTimeUtils {
      * @return date format.
      */
     public static DateFormat createIsoFormat(final User user) {
-        return DateTimeUtils.createDateFormat(user, "yyyy-MM-dd HH:mm");
+        return DateTimeUtils.createDateFormat(user, "yyyy-MM-dd' 'HH:mm");
     }
 }

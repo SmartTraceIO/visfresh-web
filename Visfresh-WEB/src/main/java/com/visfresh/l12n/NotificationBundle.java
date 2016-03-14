@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.mpl.services.NotificationIssueBundle;
@@ -84,15 +85,18 @@ public class NotificationBundle extends NotificationIssueBundle {
         return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
     }
     /**
+     * @param shipment the shipment
      * @param user user.
      * @param issue notification issue.
      * @param trackerEvent tracker event.
      * @return message.
      */
-    public String getLinkToShipment(final Long sipmentId) {
+    public String getLinkToShipment(final Shipment shipment) {
         final String str = getBundle().getString("LinkToShipment");
         final Map<String, String> map = new HashMap<String, String>();
-        map.put("shipmentId", sipmentId.toString());
+        map.put("shipmentId", shipment.getId().toString());
+        map.put("devicesn", normalizeSn(shipment.getDevice().getSn()));
+        map.put("tripCount", Integer.toString(shipment.getTripCount()));
         return StringUtils.getMessage(str, map);
     }
     /**
