@@ -13,6 +13,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.constants.AutoStartShipmentConstants;
+import com.visfresh.constants.ShipmentTemplateConstants;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentTemplate;
@@ -98,24 +100,148 @@ public class AutoStartShipmentDaoTest extends
     }
     @Test
     public void testSortByTemplateName() {
+        final ShipmentTemplate tpl1 = createTemplate("A", null);
+        final ShipmentTemplate tpl2 = createTemplate("B", null);
 
-//        ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME,
+        final AutoStartShipment a1 = dao.save(createAutoStart(tpl2));
+        final AutoStartShipment a2 = dao.save(createAutoStart(tpl1));
+
+        List<AutoStartShipment> all = dao.findAll(null,
+                new Sorting(true, ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME), null);
+
+        assertEquals(a2.getId(), all.get(0).getId());
+        assertEquals(a1.getId(), all.get(1).getId());
+
+        //descent
+        all = dao.findAll(null,
+                new Sorting(false, ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME), null);
+
+        assertEquals(a1.getId(), all.get(0).getId());
+        assertEquals(a2.getId(), all.get(1).getId());
     }
     @Test
     public void testSortByTemplateDescription() {
-//        ShipmentTemplateConstants.SHIPMENT_DESCRIPTION,
+        final ShipmentTemplate tpl1 = createTemplate(null, "A");
+        final ShipmentTemplate tpl2 = createTemplate(null, "B");
+
+        final AutoStartShipment a1 = dao.save(createAutoStart(tpl2));
+        final AutoStartShipment a2 = dao.save(createAutoStart(tpl1));
+
+        List<AutoStartShipment> all = dao.findAll(null,
+                new Sorting(true, ShipmentTemplateConstants.SHIPMENT_DESCRIPTION), null);
+
+        assertEquals(a2.getId(), all.get(0).getId());
+        assertEquals(a1.getId(), all.get(1).getId());
+
+        //descent
+        all = dao.findAll(null,
+                new Sorting(false, ShipmentTemplateConstants.SHIPMENT_DESCRIPTION), null);
+
+        assertEquals(a1.getId(), all.get(0).getId());
+        assertEquals(a2.getId(), all.get(1).getId());
     }
     @Test
     public void testStartByStartLocations() {
+        final AutoStartShipment a1 = dao.save(createAutoStart(createTemplate()));
+        final AutoStartShipment a2 = dao.save(createAutoStart(createTemplate()));
 
+        //a1
+        a1.getShippedFrom().add(createLocation("A"));
+        a1.getShippedFrom().add(createLocation("A"));
+
+        a1.getShippedTo().add(createLocation("E"));
+        a1.getShippedTo().add(createLocation("B"));
+
+        dao.save(a1);
+
+        //a2
+        a2.getShippedFrom().add(createLocation("A"));
+        a2.getShippedFrom().add(createLocation("A"));
+
+        a2.getShippedTo().add(createLocation("C"));
+        a2.getShippedTo().add(createLocation("A"));
+
+        dao.save(a2);
+
+        //run test
+        List<AutoStartShipment> all = dao.findAll(null,
+                new Sorting(true, AutoStartShipmentConstants.END_LOCATIONS), null);
+
+        assertEquals(a2.getId(), all.get(0).getId());
+        assertEquals(a1.getId(), all.get(1).getId());
+
+        //descent
+        all = dao.findAll(null,
+                new Sorting(false, AutoStartShipmentConstants.END_LOCATIONS), null);
+
+        assertEquals(a1.getId(), all.get(0).getId());
+        assertEquals(a2.getId(), all.get(1).getId());
     }
     @Test
     public void testStartByEndLocations() {
+        final AutoStartShipment a1 = dao.save(createAutoStart(createTemplate()));
+        final AutoStartShipment a2 = dao.save(createAutoStart(createTemplate()));
 
+        //a1
+        a1.getShippedFrom().add(createLocation("E"));
+        a1.getShippedFrom().add(createLocation("B"));
+
+        a1.getShippedTo().add(createLocation("A"));
+        a1.getShippedTo().add(createLocation("A"));
+
+        dao.save(a1);
+
+        //a2
+        a2.getShippedFrom().add(createLocation("C"));
+        a2.getShippedFrom().add(createLocation("A"));
+
+        a2.getShippedTo().add(createLocation("A"));
+        a2.getShippedTo().add(createLocation("A"));
+
+        dao.save(a2);
+
+        //run test
+        List<AutoStartShipment> all = dao.findAll(null,
+                new Sorting(true, AutoStartShipmentConstants.START_LOCATIONS), null);
+
+        assertEquals(a2.getId(), all.get(0).getId());
+        assertEquals(a1.getId(), all.get(1).getId());
+
+        //descent
+        all = dao.findAll(null,
+                new Sorting(false, AutoStartShipmentConstants.START_LOCATIONS), null);
+
+        assertEquals(a1.getId(), all.get(0).getId());
+        assertEquals(a2.getId(), all.get(1).getId());
     }
     @Test
     public void testSortByAlertProfileName() {
+        final AlertProfile ap1 = createAlertProfile("A");
+        final AlertProfile ap2 = createAlertProfile("B");
 
+        final ShipmentTemplate tpl1 = createTemplate();
+        tpl1.setAlertProfile(ap1);
+        final ShipmentTemplate tpl2 = createTemplate();
+        tpl2.setAlertProfile(ap2);
+
+        getContext().getBean(ShipmentTemplateDao.class).save(tpl1);
+        getContext().getBean(ShipmentTemplateDao.class).save(tpl2);
+
+        final AutoStartShipment a1 = dao.save(createAutoStart(tpl2));
+        final AutoStartShipment a2 = dao.save(createAutoStart(tpl1));
+
+        List<AutoStartShipment> all = dao.findAll(null,
+                new Sorting(true, AutoStartShipmentConstants.ALERT_PROFILE_NAME), null);
+
+        assertEquals(a2.getId(), all.get(0).getId());
+        assertEquals(a1.getId(), all.get(1).getId());
+
+        //descent
+        all = dao.findAll(null,
+                new Sorting(false, AutoStartShipmentConstants.ALERT_PROFILE_NAME), null);
+
+        assertEquals(a1.getId(), all.get(0).getId());
+        assertEquals(a2.getId(), all.get(1).getId());
     }
 
     /**
@@ -147,6 +273,16 @@ public class AutoStartShipmentDaoTest extends
         l.setRadius(300);
         l.setAddress("adderss of " + name);
         return getContext().getBean(LocationProfileDao.class).save(l);
+    }
+    /**
+     * @param name alert profile name.
+     * @return alert profile.
+     */
+    private AlertProfile createAlertProfile(final String name) {
+        final AlertProfile a = new AlertProfile();
+        a.setCompany(sharedCompany);
+        a.setName(name);
+        return getContext().getBean(AlertProfileDao.class).save(a);
     }
 
     /* (non-Javadoc)
