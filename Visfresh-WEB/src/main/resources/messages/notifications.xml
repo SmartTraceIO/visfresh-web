@@ -47,7 +47,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+		https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 	<!-- Hot -->
 	<entry key="Email.Hot">
@@ -58,7 +58,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+		https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 	<!-- CriticalCold -->
 	<entry key="Email.CriticalCold">
@@ -69,7 +69,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+		https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 	<!-- CriticalHot -->
 	<entry key="Email.CriticalHot">
@@ -80,7 +80,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+		https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 	<!-- Cold cumulative-->
 	<entry key="Email.Cold.cumulative">
@@ -91,7 +91,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+		https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 	<!-- Hot cumulative -->
 	<entry key="Email.Hot.cumulative">
@@ -102,7 +102,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+		https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 	<!-- CriticalCold cumulative -->
 	<entry key="Email.CriticalCold.cumulative">
@@ -113,7 +113,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+		https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 	<!-- CriticalHot cumulative -->
 	<entry key="Email.CriticalHot.cumulative">
@@ -124,7 +124,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+		https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>	
 
 	<!-- Battery Email -->
@@ -135,7 +135,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+		https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 
 	<!-- Arrival Email -->
@@ -146,7 +146,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
-		https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+		https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 
 	<!-- Subjects -->	
@@ -218,7 +218,7 @@
 	<entry key="SMS.Arrival">Arrival Alert for Tracker ${devicesn}(${tripCount})</entry>
 
 	<!-- ***************************************************** App notifications *********************************************************** -->
-	<entry key="LinkToShipment">https://stf.smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}</entry>
+	<entry key="LinkToShipment">https://smarttrace.com.au/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}</entry>
 	<!-- Cold -->
 	<entry key="App.Cold">
 		Cold Alert for Tracker ${devicesn}(${tripCount})
