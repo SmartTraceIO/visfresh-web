@@ -123,10 +123,10 @@ public class AbstractJsonSerializer {
     }
 
     /**
-     * @param date
+     * @param date date to format.
      * @return
      */
-    public String formatDate(final Date date) {
+    protected String formatDate(final Date date) {
         if (date == null) {
             return null;
         }

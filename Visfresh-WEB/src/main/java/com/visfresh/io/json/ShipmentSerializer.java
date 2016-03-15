@@ -4,6 +4,7 @@
 package com.visfresh.io.json;
 
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.lists.ListShipmentItem;
+import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -49,6 +51,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     private ReferenceResolver referenceResolver;
     private NotificationScheduleSerializer notificationScheduleSerializer;
     private final User user;
+    private final DateFormat isoFormat;
+    private final DateFormat prettyFormat;
 
     /**
      * @param user user.
@@ -57,6 +61,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         super(user.getTimeZone());
         notificationScheduleSerializer = new NotificationScheduleSerializer(user.getTimeZone());
         this.user = user;
+        this.isoFormat = DateTimeUtils.createIsoFormat(user);
+        this.prettyFormat = DateTimeUtils.createPrettyFormat(user);
     }
 
     /**
@@ -132,6 +138,10 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.SHIPPED_TO, getId(s.getShippedTo()));
         obj.addProperty(ShipmentConstants.SHIPMENT_DATE, formatDate(s.getShipmentDate()));
         obj.addProperty(ShipmentConstants.ARRIVAL_DATE, formatDate(s.getArrivalDate()));
+        obj.addProperty(ShipmentConstants.DEVICE_SHUTDOWN_TIME_ISO,
+                s.getDeviceShutdownTime() == null ? null : isoFormat.format(s.getDeviceShutdownTime()));
+        obj.addProperty(ShipmentConstants.DEVICE_SHUTDOWN_TIME,
+                s.getDeviceShutdownTime() == null ? null : prettyFormat.format(s.getDeviceShutdownTime()));
 
         obj.addProperty(ShipmentConstants.ALERT_PROFILE_ID, getId(s.getAlertProfile()));
         obj.addProperty(ShipmentConstants.ALERT_SUPPRESSION_MINUTES, s.getAlertSuppressionMinutes());

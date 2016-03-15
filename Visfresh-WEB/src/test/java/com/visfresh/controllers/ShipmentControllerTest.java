@@ -363,6 +363,9 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetShipment() throws IOException, RestServiceException {
         final Shipment sp = createShipment(true);
+        sp.setDeviceShutdownTime(new Date(System.currentTimeMillis() - 10000000l));
+        saveShipmentDirectly(sp);
+
         assertNotNull(shipmentClient.getShipment(sp.getId()));
     }
     @Test
