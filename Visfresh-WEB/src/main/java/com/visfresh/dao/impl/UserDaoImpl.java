@@ -25,7 +25,6 @@ import com.visfresh.entities.ReferenceInfo;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
-import com.visfresh.io.json.AbstractJsonSerializer;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -145,7 +144,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         paramMap.put(TITLE_FIELD, user.getTitle());
         paramMap.put(ACTIVE_FIELD, !Boolean.FALSE.equals(user.getActive()));
         paramMap.put(EXTERNAL_FIELD, Boolean.TRUE.equals(user.getExternal()));
-        paramMap.put(SETTINGS_FIELD, AbstractJsonSerializer.toJson(user.getSettings()).toString());
+        paramMap.put(SETTINGS_FIELD, SerializerUtils.toJson(user.getSettings()).toString());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -233,7 +232,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         u.setTitle((String) row.get(TITLE_FIELD));
         u.setActive(!Boolean.FALSE.equals(row.get(ACTIVE_FIELD)));
         u.setExternal((Boolean) row.get(EXTERNAL_FIELD));
-        u.getSettings().putAll(AbstractJsonSerializer.parseStringMap(
+        u.getSettings().putAll(SerializerUtils.parseStringMap(
                 SerializerUtils.parseJson((String) row.get(SETTINGS_FIELD))));
         return u;
     }

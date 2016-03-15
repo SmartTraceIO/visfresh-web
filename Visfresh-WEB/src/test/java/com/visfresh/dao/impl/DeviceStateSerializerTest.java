@@ -12,10 +12,8 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.gson.JsonObject;
 import com.visfresh.io.json.DeviceStateSerializer;
 import com.visfresh.rules.state.DeviceState;
-import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -40,20 +38,16 @@ public class DeviceStateSerializerTest {
     }
     @Test
     public void testSerialize() {
-        final Long shipmentId = 77L;
-
         DeviceState s = new DeviceState();
-        final Date startShipment = new Date(System.currentTimeMillis() - 10000);
         final Date d1 = new Date(System.currentTimeMillis() - 100000);
         final Date d2 = new Date(System.currentTimeMillis() - 1000);
-        s.setShipmentId(shipmentId);
+        final String key = "shipmentPropertyKey";
+        final String value = "shipmentPropertyValue";
 
         s.getTemperatureAlerts().getDates().put("1", d1);
         s.getTemperatureAlerts().getDates().put("2", d2);
         s.getTemperatureAlerts().getProperties().put("key", "value");
-        s.setStartShipmentDate(startShipment);
-        s.setArrivalProcessed(true);
-        s.setOldShipmentsClean(true);
+        s.setShipmentProperty(key, value);
 
         final String str = serializer.toString(s);
         s = serializer.parseState(str);
@@ -62,28 +56,8 @@ public class DeviceStateSerializerTest {
 
         assertEquals(format(d1), format(s.getTemperatureAlerts().getDates().get("1")));
         assertEquals(format(d2), format(s.getTemperatureAlerts().getDates().get("2")));
-        assertEquals(format(startShipment), format(s.getStartShipmentDate()));
         assertEquals("value", s.getTemperatureAlerts().getProperties().get("key"));
-        assertEquals(shipmentId, s.getShipmentId());
-        assertEquals(true, s.isArrivalProcessed());
-        assertEquals(true, s.isOldShipmentsClean());
-    }
-    @Test
-    public void testSupportsNullArrivalProcessed() {
-        DeviceState s = new DeviceState();
-        s.setShipmentId(0l);
-
-        final String str = serializer.toString(s);
-        //remove arrival processed property
-        final JsonObject obj = SerializerUtils.parseJson(str).getAsJsonObject();
-
-        assertNotNull(obj.get("arrivalProcessed"));
-        obj.remove("arrivalProcessed");
-
-        s = serializer.parseState(obj.toString());
-
-        assertNotNull(s);
-        assertEquals(false, s.isArrivalProcessed());
+        assertEquals(value, s.getShipmentProperty(key));
     }
     /**
      * @param date the date to format.

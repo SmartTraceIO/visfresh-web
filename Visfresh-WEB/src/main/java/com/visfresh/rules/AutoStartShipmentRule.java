@@ -25,6 +25,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.rules.state.DeviceState;
 import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.utils.LocationUtils;
 
@@ -53,6 +54,56 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     @Autowired
     private ArrivalEstimationService estimationService;
 
+    private static class ShipmentInit {
+        private AutoStartShipment autoStart;
+        private LocationProfile from;
+        private LocationProfile to;
+
+        /**
+         * Default constructor.
+         */
+        public ShipmentInit() {
+            super();
+        }
+
+        /**
+         * @return the autoStart
+         */
+        public AutoStartShipment getAutoStart() {
+            return autoStart;
+        }
+
+        /**
+         * @param autoStart the autoStart to set
+         */
+        public void setAutoStart(final AutoStartShipment autoStart) {
+            this.autoStart = autoStart;
+        }
+        /**
+         * @return the from
+         */
+        public LocationProfile getFrom() {
+            return from;
+        }
+        /**
+         * @param from the from to set
+         */
+        public void setFrom(final LocationProfile from) {
+            this.from = from;
+        }
+        /**
+         * @return the to
+         */
+        public LocationProfile getTo() {
+            return to;
+        }
+        /**
+         * @param to the to to set
+         */
+        public void setTo(final LocationProfile to) {
+            this.to = to;
+        }
+    }
     /**
      * Default constructor.
      */
@@ -98,18 +149,22 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         final Device device = event.getDevice();
         final Shipment last = shipmentDao.findLastShipment(device.getImei());
 
-        Shipment shipment;
-
+        ShipmentInit init = null;
         //first of all attempt to select autostart shipment template
         final List<AutoStartShipment> autoStarts = autoStartShipmentDao.findByCompany(
                 device.getCompany(), null, null, null);
         if (!autoStarts.isEmpty()) {
-            shipment = createForStartLocation(
-                    autoStarts, event.getLatitude(), event.getLongitude(), device);
+            init = createForBestStartLocation(
+                    autoStarts, event.getLatitude(), event.getLongitude(), device, context.getState());
             //if not found, create new shipment from most priority template
-            if (shipment == null) {
-                shipment = createNewShipment(autoStarts.get(0).getTemplate(), null, device);
+            if (init == null) {
+                init = createShipmentFromTemplate(autoStarts.get(0), null, device, context.getState());
             }
+        }
+
+        Shipment shipment;
+        if (init != null) {
+            shipment = createShipment(init, device);
         } else {
             log.debug("Create new shipment for device " + device.getImei());
             shipment = createNewDefaultShipment(device);
@@ -117,6 +172,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
 
         shipment.setShipmentDate(event.getTime());
         shipmentDao.save(shipment);
+        event.setShipment(shipment);
+        context.getState().possibleNewShipment(shipment);
 
         //close old shipment if need
         if (last != null && !last.hasFinalStatus()) {
@@ -125,10 +182,11 @@ public class AutoStartShipmentRule implements TrackerEventRule {
             closeOldShipment(last);
         }
 
-        context.getState().possibleNewShipment(shipment);
-        event.setShipment(shipment);
-        trackerEventDao.save(event);
+        if (init != null) {
+            AutoDetectEndLocationRule.needAutodetect(init.getAutoStart(), context.getState());
+        }
 
+        trackerEventDao.save(event);
         return true;
     }
 
@@ -139,8 +197,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      * @param device device.
      * @return shipment.
      */
-    private Shipment createForStartLocation(final List<AutoStartShipment> autoStarts,
-            final double latitude, final double longitude, final Device device) {
+    private ShipmentInit createForBestStartLocation(final List<AutoStartShipment> autoStarts,
+            final double latitude, final double longitude, final Device device, final DeviceState state) {
         //if autostart is assigned to device
         final Long autostartId = device.getAutostartTemplateId();
         if (autostartId != null) {
@@ -155,9 +213,10 @@ public class AutoStartShipmentRule implements TrackerEventRule {
 
             //if found autostart with given ID.
             if (auto != null) {
-                return createNewShipment(auto.getTemplate(),
+                return createShipmentFromTemplate(auto,
                         getBestLocation(auto, latitude, longitude),
-                        device);
+                        device,
+                        state);
             }
         }
 
@@ -167,14 +226,61 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         for (final AutoStartShipment auto : autoStarts) {
             //if autostart not assigned to device or assigned to given device
             final LocationProfile best = getBestLocation(auto, latitude, longitude);
-
-            //if not any locations found
             if (best != null) {
-                return createNewShipment(auto.getTemplate(), best, device);
+                return createShipmentFromTemplate(auto, best, device, state);
             }
         }
 
         return null;
+    }
+
+    /**
+     * @param auto
+     * @param startLocation
+     * @param device
+     * @param deviceState
+     * @return
+     */
+    private ShipmentInit createShipmentFromTemplate(final AutoStartShipment auto,
+            final LocationProfile startLocation, final Device device, final DeviceState deviceState) {
+        final ShipmentInit init = new ShipmentInit();
+        init.setAutoStart(auto);
+        init.setFrom(startLocation);
+
+        //end location detection
+        if (auto.getShippedTo().size() == 1) {
+            init.setTo(auto.getShippedTo().get(0));
+        } else if (auto.getShippedTo().size() > 0) {
+            //TODO enable autodetect
+        }
+
+        return init;
+    }
+    /**
+     * @param auto
+     * @param startLocation
+     * @param device
+     * @param deviceState
+     * @return
+     */
+    private Shipment createShipment(final ShipmentInit init, final Device device) {
+        final ShipmentTemplate tpl = init.getAutoStart().getTemplate();
+
+        final Shipment s = shipmentDao.createNewFrom(tpl);
+        s.setStatus(ShipmentStatus.Default);
+        s.setDevice(device);
+        s.setShippedFrom(init.getFrom());
+        s.setShippedTo(init.getTo());
+
+        if (tpl.getShipmentDescription() != null) {
+            s.setShipmentDescription(tpl.getShipmentDescription());
+        } else if (tpl.getName() != null) {
+            s.setShipmentDescription("Auto created from '" + tpl.getName() + "'");
+        } else {
+            s.setShipmentDescription("Created by autostart shipment rule");
+        }
+
+        return s;
     }
 
     /**
@@ -206,29 +312,6 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         }
 
         return null;
-    }
-
-    /**
-     * @param tpl template
-     * @param startLocation start location.
-     * @param device device
-     * @return
-     */
-    private Shipment createNewShipment(final ShipmentTemplate tpl,
-            final LocationProfile startLocation, final Device device) {
-        final Shipment s = shipmentDao.createNewFrom(tpl);
-        s.setStatus(ShipmentStatus.Default);
-        s.setDevice(device);
-        s.setShippedFrom(startLocation);
-
-        if (tpl.getShipmentDescription() != null) {
-            s.setShipmentDescription(tpl.getShipmentDescription());
-        } else if (tpl.getName() != null) {
-            s.setShipmentDescription("Auto created from '" + tpl.getName() + "'");
-        } else {
-            s.setShipmentDescription("Created by autostart shipment rule");
-        }
-        return s;
     }
 
     /**

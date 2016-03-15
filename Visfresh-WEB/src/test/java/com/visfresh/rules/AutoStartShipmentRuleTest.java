@@ -74,14 +74,6 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         return context.getBean(TrackerEventDao.class).save(e);
     }
 
-    private TrackerEvent createEvent(final Shipment s, final double lat,
-            final double lon, final Date date) {
-        final TrackerEvent e = createEvent(lat, lon, date);
-        e.setShipment(s);
-        e.setDevice(s.getDevice());
-        return context.getBean(TrackerEventDao.class).save(e);
-    }
-
     @Test
     public void testAccept() {
         final TrackerEvent e = createEvent(13.14, 15.16, new Date());
@@ -167,6 +159,8 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertEquals(lok.getId(), shipment.getShippedFrom().getId());
         // check created from correct template
         assertEquals(tok.getShipmentDescription(), shipment.getShipmentDescription());
+        //first is shipment ID.
+        assertEquals(2, c.getState().getShipmentKeys().size());
 
         // check not duplicate handle
         assertFalse(rule.accept(c));
@@ -252,32 +246,37 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         s = shipmentDao.findOne(e.getShipment().getId());
         assertNull(s.getShippedFrom());
     }
-    // @Test test has temporary disabled according of comment the logics
-    public void testNotReuseNotExpiredPreviousShipment() {
-        // create in progress shipment
-        final Shipment s = createDefaultShipment(ShipmentStatus.InProgress,
-                device);
-        final LocationProfile l1 = createLocationProfile(17.14, 18.16, 0);
-        final LocationProfile l2 = createLocationProfile(18.14, 19.16, 0);
-        s.setShippedFrom(l1);
-        s.setShippedTo(l2);
-        context.getBean(ShipmentDao.class).save(s);
 
-        createEvent(s, 17.14, 18.16, new Date(
-                System.currentTimeMillis() - 10000000l));
-        createEvent(s, 17.1401, 18.1601, new Date(System.currentTimeMillis()));
+    @Test
+    public void testSelectEndLocationIfOne() {
+        // create locations
+        final LocationProfile l1 = createLocationProfile(17.14, 18.16, 1000);
+        final LocationProfile l2 = createLocationProfile(27.14, 28.16, 1000);
 
-        final TrackerEvent e = createEvent(18.14, 19.16, new Date());
-        final RuleContext c = new RuleContext(e, new DeviceState());
+        // create shipment templates
+        final ShipmentTemplate tok = createTemplate("tok");
 
-        rule.handle(c);
+        // create auto start shipments
+        final AutoStartShipmentDao dao = context.getBean(AutoStartShipmentDao.class);
+
+        final AutoStartShipment aut = createAutoStartShipment(tok, 2, l1);
+        aut.getShippedTo().add(l1);
+        aut.getShippedTo().add(l2);
+        dao.save(aut);
+
+        final TrackerEvent e = createEvent(17.14, 18.16, new Date());
+        final DeviceState state = new DeviceState();
+        rule.handle(new RuleContext(e, state));
+        assertEquals(2, state.getShipmentKeys().size());
 
         // check shipment created.
-        assertNotNull(e.getShipment());
+        assertNull(e.getShipment().getShippedTo());
 
-        // check not new shipments created
-        final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
-        assertEquals(2, shipmentDao.findAll(null, null, null).size());
+        aut.getShippedTo().remove(l1);
+        dao.save(aut);
+
+        rule.handle(new RuleContext(e, state));
+        assertEquals(l2.getId(), e.getShipment().getShippedTo().getId());
     }
 
     /**

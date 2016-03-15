@@ -151,7 +151,7 @@ public class ChartBundleTest extends ChartBundle {
     }
     @Test
     public void testRuleVariablesSupport() {
-        final int period = 15;
+        final int period = 1899875;
         final double temperature = 123.456;
 
         //Temperature alerts
@@ -174,7 +174,7 @@ public class ChartBundleTest extends ChartBundle {
 
         final Long ruleId = 125l;
         final double ruleTemperature = 654.321;
-        final int rulePeriod = 98;
+        final int rulePeriod = 987658;
 
         rule.setId(ruleId);
         rule.setTemperature(ruleTemperature);

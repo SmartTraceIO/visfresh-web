@@ -101,7 +101,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         s.setPoNum(asInt(json.get(ShipmentConstants.PO_NUM)));
         s.setShipmentDate(asDate(json.get(ShipmentConstants.SHIPMENT_DATE)));
         s.setArrivalDate(asDate(json.get(ShipmentConstants.ARRIVAL_DATE)));
-        s.getCustomFields().putAll(parseStringMap(json.get(ShipmentConstants.CUSTOM_FIELDS)));
+        s.getCustomFields().putAll(SerializerUtils.parseStringMap(json.get(ShipmentConstants.CUSTOM_FIELDS)));
         s.setStatus(ShipmentStatus.valueOf(json.get(ShipmentConstants.STATUS).getAsString()));
         s.setDevice(getReferenceResolver().getDevice(asString(json.get(ShipmentConstants.DEVICE_IMEI))));
 
@@ -157,7 +157,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES, s.getNoAlertsAfterStartMinutes());
         obj.addProperty(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES, s.getShutDownAfterStartMinutes());
 
-        obj.add(ShipmentConstants.CUSTOM_FIELDS, toJson(s.getCustomFields()));
+        obj.add(ShipmentConstants.CUSTOM_FIELDS, SerializerUtils.toJson(s.getCustomFields()));
         return obj;
     }
     /**
@@ -294,7 +294,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         json.addProperty("alertProfileId", dto.getAlertProfileId());
         json.addProperty("alertProfileName", dto.getAlertProfileName());
-        json.add("alertSummary", toJson(dto.getAlertSummary()));
+        json.add("alertSummary", SerializerUtils.toJson(dto.getAlertSummary()));
         json.addProperty("siblingCount", dto.getSiblingCount());
 
         //last reading data

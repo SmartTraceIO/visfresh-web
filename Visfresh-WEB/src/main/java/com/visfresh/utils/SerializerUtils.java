@@ -5,8 +5,10 @@ package com.visfresh.utils;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 
@@ -94,5 +96,35 @@ public final class SerializerUtils {
         }
 
         return result;
+    }
+
+    /**
+     * @param customFields
+     * @return
+     */
+    public static <K, V> JsonObject toJson(final Map<K, V> customFields) {
+        final JsonObject obj = new JsonObject();
+        for (final Map.Entry<K, V> e : customFields.entrySet()) {
+            if (e.getValue() != null) {
+                obj.addProperty(e.getKey().toString(), e.getValue().toString());
+            }
+        }
+        return obj;
+    }
+    /**
+     * @param je
+     * @return
+     */
+    public static Map<String, String> parseStringMap(final JsonElement je) {
+        if (je == null || je.isJsonNull()) {
+            return new HashMap<String, String>();
+        }
+
+        final JsonObject json = je.getAsJsonObject();
+        final Map<String, String> map = new HashMap<String, String>();
+        for (final Entry<String, JsonElement> e : json.entrySet()) {
+            map.put(e.getKey(), e.getValue().getAsString());
+        }
+        return map;
     }
 }

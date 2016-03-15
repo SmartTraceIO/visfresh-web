@@ -11,21 +11,11 @@ import com.visfresh.rules.MovementStartAlertRule;
 import com.visfresh.rules.MovementStopAlertRule;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.TemperatureAlertRule;
-import com.visfresh.rules.StartShipmentTimeCorrectRule;
 import com.visfresh.rules.CloseOldShipmentsRule;
 import com.visfresh.rules.SetShipmentArrivedRule;
+import com.visfresh.rules.AutoDetectEndLocationRule;
 
 global AbstractRuleEngine engine;
-
-rule "StartShipmentTimeCorrect"
-	salience 150
-    when
-        context : RuleContext(engine.getRule(StartShipmentTimeCorrectRule.NAME).accept(this));
-    then
-    	if(engine.getRule(StartShipmentTimeCorrectRule.NAME).handle(context)) {
-       		update(context);
-        }
-end
 
 rule "AssignShipment"
 	salience 100
@@ -43,6 +33,16 @@ rule "AutoStartShipment"
         context : RuleContext(engine.getRule(AutoStartShipmentRule.NAME).accept(this));
     then
     	if(engine.getRule(AutoStartShipmentRule.NAME).handle(context)) {
+       		update(context);
+        }
+end
+
+rule "AutoDetectEndLocation"
+	salience 49
+    when
+        context : RuleContext(engine.getRule(AutoDetectEndLocationRule.NAME).accept(this));
+    then
+    	if(engine.getRule(AutoDetectEndLocationRule.NAME).handle(context)) {
        		update(context);
         }
 end

@@ -7,15 +7,11 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.entities.EntityWithId;
 
@@ -36,36 +32,6 @@ public class AbstractJsonSerializer {
     public AbstractJsonSerializer(final TimeZone tz) {
         super();
         timeZone = tz;
-    }
-
-    /**
-     * @param customFields
-     * @return
-     */
-    public static <K, V> JsonObject toJson(final Map<K, V> customFields) {
-        final JsonObject obj = new JsonObject();
-        for (final Map.Entry<K, V> e : customFields.entrySet()) {
-            obj.addProperty(String.valueOf(e.getKey()),
-                    String.valueOf(e.getValue()));
-        }
-        return obj;
-    }
-
-    /**
-     * @param je
-     * @return
-     */
-    public static Map<String, String> parseStringMap(final JsonElement je) {
-        if (je == null || je.isJsonNull()) {
-            return new HashMap<String, String>();
-        }
-
-        final JsonObject json = je.getAsJsonObject();
-        final Map<String, String> map = new HashMap<String, String>();
-        for (final Entry<String, JsonElement> e : json.entrySet()) {
-            map.put(e.getKey(), e.getValue().getAsString());
-        }
-        return map;
     }
     /**
      * @param e

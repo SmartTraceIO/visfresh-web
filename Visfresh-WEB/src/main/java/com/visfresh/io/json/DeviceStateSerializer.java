@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
 
 import com.google.gson.JsonElement;
@@ -20,11 +22,11 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 public class DeviceStateSerializer extends AbstractJsonSerializer {
-    private static final String ARRIVAL_PROCESSED = "arrivalProcessed";
-    private static final String SHIPMENT_ID = "shipmentId";
-    private static final String SHIPMENT_START_DATE = "shipmentStart";
+    /**
+     *
+     */
+    private static final String SHIPMENT_PROPERTIES = "shipmentProperties";
     private static final String TEMPERATURE_ALERTS = "temperatureAlerts";
-    private static final String OLD_SHIPMENTS_CLEAN = "oldShipmentsClean";
 
     /**
      * Default constructor.
@@ -67,10 +69,15 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
 
         final JsonObject json = new JsonObject();
         json.add(TEMPERATURE_ALERTS, toJson(state.getTemperatureAlerts()));
-        json.addProperty(SHIPMENT_ID, state.getShipmentId());
-        json.addProperty(ARRIVAL_PROCESSED, state.isArrivalProcessed());
-        json.addProperty(SHIPMENT_START_DATE, formatDate(state.getStartShipmentDate()));
-        json.addProperty(OLD_SHIPMENTS_CLEAN, state.isOldShipmentsClean());
+
+        final JsonObject props = new JsonObject();
+        json.add(SHIPMENT_PROPERTIES, props);
+        for (final String key : state.getShipmentKeys()) {
+            final String value = state.getShipmentProperty(key);
+            if (value != null) {
+                props.addProperty(key, value);
+            }
+        }
         return json;
     }
     /**
@@ -79,22 +86,26 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
      */
     private DeviceState parseState(final JsonObject json) {
         final DeviceState s = new DeviceState();
-        s.setTemperatureAlerts(parseRulesState(json.get(TEMPERATURE_ALERTS)));
-        s.setShipmentId(asLong(json.get(SHIPMENT_ID)));
-        s.setArrivalProcessed(Boolean.TRUE.equals(asBoolean(json.get(ARRIVAL_PROCESSED))));
-        s.setStartShipmentDate(parseDate(asString(json.get(SHIPMENT_START_DATE))));
-        s.setOldShipmentsClean(Boolean.TRUE.equals(asBoolean(json.get(OLD_SHIPMENTS_CLEAN))));
+        parseRulesState(s.getTemperatureAlerts(), json.get(TEMPERATURE_ALERTS));
+
+        final JsonElement props = json.get(SHIPMENT_PROPERTIES);
+        if (props != null) {
+            final JsonObject obj = props.getAsJsonObject();
+            final Set<Entry<String, JsonElement>> entrySet = obj.entrySet();
+            for (final Entry<String, JsonElement> e : entrySet) {
+                s.setShipmentProperty(e.getKey(), e.getValue().getAsString());
+            }
+        }
         return s;
     }
     /**
      * @param e
      * @return
      */
-    private RulesState parseRulesState(final JsonElement e) {
+    private RulesState parseRulesState(final RulesState s, final JsonElement e) {
         final JsonObject json = e.getAsJsonObject();
-        final RulesState s = new RulesState();
         s.getDates().putAll(jsonToDates(json.get("dates").getAsJsonObject()));
-        s.getProperties().putAll(parseStringMap(json.get("properties")));
+        s.getProperties().putAll(SerializerUtils.parseStringMap(json.get("properties")));
         return s;
     }
     /**
@@ -104,7 +115,7 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
     private JsonObject toJson(final RulesState s) {
         final JsonObject obj = new JsonObject();
         obj.add("dates", datesToJson(s.getDates()));
-        obj.add("properties", toJson(s.getProperties()));
+        obj.add("properties", SerializerUtils.toJson(s.getProperties()));
         return obj;
     }
     /**

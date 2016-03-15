@@ -3,7 +3,10 @@
  */
 package com.visfresh.rules.state;
 
-import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import com.visfresh.entities.Shipment;
 
@@ -12,11 +15,13 @@ import com.visfresh.entities.Shipment;
  *
  */
 public class DeviceState {
-    private RulesState temperatureAlerts = new RulesState();
-    private volatile Long shipmentId;
-    private volatile boolean arrivalProcessed;
-    private volatile Date startShipmentDate;
-    private volatile boolean oldShipmentsClean;
+    private static final String PREFIX = "_DS_";
+    private static final String SHIPMENT_ID = PREFIX + "shipmentId";
+    private static final String ARRIVAL_RPOCESSED = PREFIX + "arrivalProcessed";
+    private static final String OLD_SHIPMENTS_CLEAN = PREFIX + "oldShipmentsClean";
+
+    private final RulesState temperatureAlerts = new RulesState();
+    private final Map<String, String> shipmentProperties = new HashMap<String, String>();
 
     /**
      * Default constructor.
@@ -32,67 +37,57 @@ public class DeviceState {
         return temperatureAlerts;
     }
     /**
-     * @param temperatureAlerts the temperatureAlerts to set
-     */
-    public void setTemperatureAlerts(final RulesState temperatureAlerts) {
-        this.temperatureAlerts = temperatureAlerts;
-    }
-    /**
      * Some operations if new shipment started. I.e. cleaning of alerts history.
      * @param s shipments.
      */
     public void possibleNewShipment(final Shipment s) {
+        final Long shipmentId = getShipmentId();
         if (shipmentId == null || !shipmentId.equals(s.getId())) {
-            shipmentId = s.getId();
-            startShipmentDate = new Date();
+            this.shipmentProperties.clear();
             temperatureAlerts.clear();
-            arrivalProcessed = false;
-            setOldShipmentsClean(false);
+
+            shipmentProperties.put(SHIPMENT_ID, s.getId().toString());
         }
     }
     /**
      * @return the shipmentId
      */
     public Long getShipmentId() {
-        return shipmentId;
-    }
-    /**
-     * @param shipmentId the shipmentId to set
-     */
-    public void setShipmentId(final Long shipmentId) {
-        this.shipmentId = shipmentId;
+        final String str = shipmentProperties.get(SHIPMENT_ID);
+        return str == null ? null : Long.valueOf(str);
     }
     public void setArrivalProcessed(final boolean p) {
-        arrivalProcessed = p;
+        shipmentProperties.put(ARRIVAL_RPOCESSED, p ? "true" : "false");
     }
     /**
      * @return the arrivalProcessed
      */
     public boolean isArrivalProcessed() {
-        return arrivalProcessed;
-    }
-    /**
-     * @return start shipment date.
-     */
-    public Date getStartShipmentDate() {
-        return startShipmentDate;
-    }
-    /**
-     * @param startShipmentDate the startShipmentDate to set
-     */
-    public void setStartShipmentDate(final Date startShipmentDate) {
-        this.startShipmentDate = startShipmentDate;
+        return "true".equals(shipmentProperties.get(ARRIVAL_RPOCESSED));
     }
     /**
      * @return true if old shipments alredy clean.
      */
     public boolean isOldShipmentsClean() {
-        return oldShipmentsClean;
+        return "true".equals(shipmentProperties.get(OLD_SHIPMENTS_CLEAN));
     }
     /**
      * @param clean the oldShipmentsClean to set
      */
     public void setOldShipmentsClean(final boolean clean) {
-        this.oldShipmentsClean = clean;
+        shipmentProperties.put(OLD_SHIPMENTS_CLEAN, clean ? "true" : "false");
+    }
+    public String getShipmentProperty(final String key) {
+        return shipmentProperties.get(key);
+    }
+    public void setShipmentProperty(final String key, final String value) {
+        if (key == null) {
+            shipmentProperties.remove(key);
+        } else {
+            shipmentProperties.put(key, value);
+        }
+    }
+    public Set<String> getShipmentKeys() {
+        return new HashSet<>(shipmentProperties.keySet());
     }
 }

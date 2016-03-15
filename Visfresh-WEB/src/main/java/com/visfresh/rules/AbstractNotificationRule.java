@@ -4,7 +4,6 @@
 package com.visfresh.rules;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -55,16 +54,6 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
 
         return accept;
     }
-
-    /**
-     * @param s personal schedule.
-     * @return true if the situation (time and other) matches the schedule.
-     */
-    private boolean matchesTimeFrame(final PersonSchedule s) {
-        final Calendar c = new GregorianCalendar();
-        return matchesTimeFrame(s, c);
-    }
-
     /**
      * This method is made as protected for unit test purposes.
      * @param s personal notification schedule.

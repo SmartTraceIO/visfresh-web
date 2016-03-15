@@ -253,7 +253,7 @@ create table autostartlocations (
     config bigint(20) not null,
     location bigint(20) not null,
     direction varchar(8) not null,
-    primary key (config, location),
+    primary key (config, location, direction),
     FOREIGN KEY (location)
         REFERENCES locationprofiles (id) ON DELETE CASCADE,
     FOREIGN KEY (config)
