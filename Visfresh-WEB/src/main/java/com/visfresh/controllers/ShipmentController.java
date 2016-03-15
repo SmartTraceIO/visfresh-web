@@ -601,7 +601,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         //last readings
         if (lastReadingTemperature != null) {
-            final Date lastReadingTime = new Date(timeOfFirstReading);
+            final Date lastReadingTime = new Date(timeOfLastReading);
             dto.setLastReadingTimeIso(isoFmt.format(lastReadingTime));
             dto.setLastReadingTemperature(lastReadingTemperature.doubleValue());
         }
