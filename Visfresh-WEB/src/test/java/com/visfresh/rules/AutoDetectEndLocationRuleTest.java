@@ -6,14 +6,15 @@ package com.visfresh.rules;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.gson.JsonArray;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
@@ -51,6 +52,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         final int radius = 15;
         final double lat = 1.11111;
         final double lon = 2.22222;
+        final int numReadings = 99;
 
         LocationProfile loc = new LocationProfile();
         loc.setId(id);
@@ -58,15 +60,44 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         loc.getLocation().setLatitude(lat);
         loc.getLocation().setLongitude(lon);
 
-        List<LocationProfile> list = new LinkedList<LocationProfile>();
-        list.add(loc);
+        AutodetectData data = new AutodetectData();
+        data.setNumReadings(numReadings);
+        data.getLocations().add(loc);
 
-        final String json = toJSon(list).toString();
-        list = parseLocations(SerializerUtils.parseJson(json).getAsJsonArray());
+        final String json = toJSon(data).toString();
+        data = parseAutodetectData(SerializerUtils.parseJson(json).getAsJsonObject());
 
-        assertEquals(1, list.size());
+        assertEquals(numReadings, data.getNumReadings());
+        assertEquals(1, data.getLocations().size());
 
-        loc = list.get(0);
+        loc = data.getLocations().get(0);
+        assertEquals(id, loc.getId());
+        assertEquals(radius, loc.getRadius());
+        assertEquals(lat, loc.getLocation().getLatitude(), 0.00000001);
+        assertEquals(lon, loc.getLocation().getLongitude(), 0.00000001);
+    }
+    @Test
+    public void testOldVersionSerializationCompatibility() {
+        final Long id = 7l;
+        final int radius = 15;
+        final double lat = 1.11111;
+        final double lon = 2.22222;
+
+        LocationProfile loc = new LocationProfile();
+        loc.setId(id);
+        loc.setRadius(radius);
+        loc.getLocation().setLatitude(lat);
+        loc.getLocation().setLongitude(lon);
+
+        final JsonArray array = new JsonArray();
+        array.add(toJson(loc));
+
+        final String json = array.toString();
+        final AutodetectData data = parseAutodetectData(SerializerUtils.parseJson(json));
+
+        assertEquals(1, data.getLocations().size());
+
+        loc = data.getLocations().get(0);
         assertEquals(id, loc.getId());
         assertEquals(radius, loc.getRadius());
         assertEquals(lat, loc.getLocation().getLatitude(), 0.00000001);
@@ -85,7 +116,10 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         final String prop = state.getShipmentProperty(getLocationsKey());
         assertNotNull(prop);
 
-        final List<LocationProfile> locs = parseLocations(SerializerUtils.parseJson(prop).getAsJsonArray());
+        final AutodetectData data = parseAutodetectData(SerializerUtils.parseJson(prop).getAsJsonObject());
+
+        assertEquals(0, data.getNumReadings());
+        final List<LocationProfile> locs = data.getLocations();
         assertEquals(loc1.getId(), locs.get(0).getId());
         assertEquals(loc2.getId(), locs.get(1).getId());
     }
@@ -107,10 +141,10 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         //test accept correct
         assertTrue(accept(new RuleContext(e, state)));
 
-        //check not accept if not matched location
+        //check accept if not matched location
         e.setLatitude(10.);
         e.setLongitude(11.);
-        assertFalse(accept(new RuleContext(e, state)));
+        assertTrue(accept(new RuleContext(e, state)));
 
         e.setLatitude(2.0);
         e.setLongitude(0.);
@@ -141,9 +175,13 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
 
         needAutodetect(autoStart, state);
 
+        //check ignores first reading
         assertFalse(handle(new RuleContext(e, state)));
+        assertTrue(accept(new RuleContext(e, state)));
+        assertNull(shipment.getShippedTo());
 
         //check not autodetect next
+        assertFalse(handle(new RuleContext(e, state)));
         assertFalse(accept(new RuleContext(e, state)));
 
         //test location assigned
