@@ -62,8 +62,6 @@ import com.visfresh.l12n.ChartBundle;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.lists.ListShipmentItem;
-import com.visfresh.services.ArrivalEstimation;
-import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.services.LocationService;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.ShipmentSiblingService;
@@ -104,8 +102,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private ReferenceResolver referenceResolver;
     @Autowired
     private UserResolver userResolver;
-    @Autowired
-    private ArrivalEstimationService arrivalEstimationService;
     @Autowired
     private ChartBundle chartBundle;
     @Autowired
@@ -392,17 +388,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             if (s.hasFinalStatus()) {
                 dto.setPercentageComplete(100);
             } else {
-                if (lastEvent != null) {
-                    final TrackerEvent firstEvent = trackerEventDao.getFirstEvent(s);
-                    final ArrivalEstimation est = arrivalEstimationService.estimateArrivalDate(s,
-                            new Location(lastEvent.getLatitude(), lastEvent.getLongitude()),
-                            firstEvent.getTime(),
-                            currentTime);
-
-                    dto.setPercentageComplete(est.getPercentageComplete());
-                    if (est.getArrivalDate() != null) {
-                        dto.setEstArrivalDate(isoFmt.format(est.getArrivalDate()));
-                    }
+                final Date eta = s.getEta();
+                if (eta != null) {
+                    dto.setEstArrivalDate(isoFmt.format(eta));
+                    dto.setPercentageComplete(getPercentageCompleted(s, currentTime, eta));
                 }
             }
 
@@ -431,6 +420,24 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
 
         return result;
+    }
+    /**
+     * @param s
+     * @param currentTime
+     * @param eta
+     * @return
+     */
+    protected int getPercentageCompleted(final Shipment s,
+            final Date currentTime, final Date eta) {
+        int percentage;
+        if (eta.before(currentTime)) {
+            percentage = 100;
+        } else {
+            double d = currentTime.getTime() - s.getShipmentDate().getTime();
+            d = Math.max(0., d / (eta.getTime() - s.getShipmentDate().getTime()));
+            percentage = (int) Math.round(d);
+        }
+        return percentage;
     }
 
     /**
@@ -699,18 +706,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         if (shipment.getShippedTo() != null) {
             dto.setEndLocation(shipment.getShippedTo().getName());
             dto.setEndLocationForMap(shipment.getShippedTo().getLocation());
-
-            if (shipment.getShippedFrom() != null
-                    && dto.getCurrentLocation() != null
-                    && dto.getCurrentLocationForMap() != null) {
-                //get last location
-                final ArrivalEstimation estimation = arrivalEstimationService.estimateArrivalDate(
-                        shipment, dto.getCurrentLocationForMap(), startTime, new Date());
-                if (estimation != null) {
-                    dto.setEtaIso(isoFmt.format(estimation.getArrivalDate()));
-                    dto.setEta(prettyFmt.format(estimation.getArrivalDate()));
-                    dto.setPercentageComplete(estimation.getPercentageComplete());
-                }
+        }
+        if (shipment.getEta() != null) {
+            final Date eta = shipment.getEta();
+            if (eta != null) {
+                dto.setPercentageComplete(getPercentageCompleted(shipment, new Date(), eta));
+                dto.setEtaIso(isoFmt.format(eta));
+                dto.setEta(prettyFmt.format(eta));
             }
         }
 

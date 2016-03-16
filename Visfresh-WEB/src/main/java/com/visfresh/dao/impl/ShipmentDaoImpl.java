@@ -40,6 +40,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     protected static final String ASSETNUM_FIELD = "assetnum";
     protected static final String SHIPMENTDATE_FIELD = "shipmentdate";
     protected static final String ARRIVALDATE_FIELD = "arrivaldate";
+    protected static final String ETA_FIELD = "eta";
     protected static final String CUSTOMFIELDS_FIELD = "customfiels";
     protected static final String STATUS_FIELD = "status";
     protected static final String DEVICE_FIELD = "device";
@@ -281,6 +282,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         e.setAssetNum((String) map.get(ASSETNUM_FIELD));
         e.setShipmentDate((Date) map.get(SHIPMENTDATE_FIELD));
         e.setArrivalDate((Date) map.get(ARRIVALDATE_FIELD));
+        e.setEta((Date) map.get(ETA_FIELD));
         e.setLastEventDate((Date) map.get(LASTEVENT_FIELD));
         e.setDeviceShutdownTime((Date) map.get(DEVICESHUTDOWNDATE_FIELD));
         e.getCustomFields().putAll(parseJsonMap((String) map.get(CUSTOMFIELDS_FIELD)));
@@ -317,6 +319,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(ASSETNUM_FIELD, s.getAssetNum());
         params.put(SHIPMENTDATE_FIELD, s.getShipmentDate());
         params.put(ARRIVALDATE_FIELD, s.getArrivalDate());
+        params.put(ETA_FIELD, s.getEta());
         params.put(LASTEVENT_FIELD, s.getLastEventDate());
         params.put(DEVICESHUTDOWNDATE_FIELD, s.getDeviceShutdownTime());
         params.put(CUSTOMFIELDS_FIELD, SerializerUtils.toJson(s.getCustomFields()).toString());
@@ -615,5 +618,22 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
                 + " set " + SIBLINGGROUP_FIELD + " = :group, "
                 + SIBLINGCOUNT_FIELD + " = :count where "
                 + ID_FIELD + " in (:" + StringUtils.combine(placeHolders, ",:") + ")", params);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#updateEta(com.visfresh.entities.Shipment, java.util.Date)
+     */
+    @Override
+    public void updateEta(final Shipment s, final Date eta) {
+        if (s == null) {
+            return;
+        }
+        s.setEta(eta);
+
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("s", s.getId());
+        params.put("eta", eta);
+
+        jdbc.update("update " + TABLE + " set " + ETA_FIELD + " = :eta where " + ID_FIELD + "=:s",
+                params);
     }
 }

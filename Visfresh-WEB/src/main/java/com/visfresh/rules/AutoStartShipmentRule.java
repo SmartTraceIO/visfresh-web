@@ -26,7 +26,6 @@ import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.state.DeviceState;
-import com.visfresh.services.ArrivalEstimationService;
 import com.visfresh.utils.LocationUtils;
 
 /**
@@ -51,8 +50,6 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     private TrackerEventDao trackerEventDao;
     @Autowired
     private AbstractRuleEngine engine;
-    @Autowired
-    private ArrivalEstimationService estimationService;
 
     private static class ShipmentInit {
         private AutoStartShipment autoStart;

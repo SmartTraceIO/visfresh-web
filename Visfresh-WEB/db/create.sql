@@ -226,6 +226,7 @@ create table shipments (
     shipmentdate timestamp NULL default NULL,
     lasteventdate timestamp NULL default NULL,
     arrivaldate timestamp NULL default NULL,
+    eta timestamp NULL default NULL,
     customfiels longtext,
     comments varchar(300),
     ponum int not null default 0,

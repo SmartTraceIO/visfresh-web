@@ -3,6 +3,7 @@
  */
 package com.visfresh.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import com.visfresh.entities.Company;
@@ -63,4 +64,9 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @return shipment
      */
     Shipment findBySnTrip(String sn, Integer trip);
+    /**
+     * @param s shipment.
+     * @param eta ETA.
+     */
+    void updateEta(Shipment s, Date eta);
 }

@@ -181,6 +181,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         final Shipment s = new Shipment();
         s.setDevice(device);
         s.setShipmentDate(parseDate("1988-12-12T11:11:11"));
+        s.setEta(parseDate("1988-12-15T11:11:11"));
         s.setAlertProfile(alertProfile);
         s.setAlertSuppressionMinutes(5);
         s.setArrivalNotificationWithinKm(17);
@@ -250,6 +251,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(new Integer(77), s.getNoAlertsAfterStartMinutes());
         assertEquals(new Integer(9), s.getShutDownAfterStartMinutes());
         assertEquals("1988-12-12T11:11:11", dateFormat.format(s.getShipmentDate()));
+        assertEquals("1988-12-15T11:11:11", dateFormat.format(s.getEta()));
     }
 
     @Test
@@ -595,6 +597,16 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         assertEquals(siblingGroup, s3.getSiblingGroup());
         assertEquals(siblingCount, s3.getSiblingCount());
+    }
+    @Test
+    public void testUpdateEta() {
+        Shipment s = createShipment(sharedCompany, ShipmentStatus.InProgress);
+        final Date eta = new Date(System.currentTimeMillis() - 10000000l);
+
+        dao.updateEta(s, eta);
+        s = dao.findOne(s.getId());
+
+        assertEquals(eta.getTime(), s.getEta().getTime(), 1001);
     }
     /**
      * @param siblingGroup sibling group.

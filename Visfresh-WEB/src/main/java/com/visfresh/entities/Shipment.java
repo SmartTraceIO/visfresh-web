@@ -58,6 +58,7 @@ public class Shipment extends ShipmentBase {
     private Long siblingGroup;
     private int siblingCount;
     private Date arrivalDate;
+    private Date eta;
 
     /**
      * Default constructor.
@@ -231,6 +232,18 @@ public class Shipment extends ShipmentBase {
      */
     public Date getArrivalDate() {
         return arrivalDate;
+    }
+    /**
+     * @param eta the eta to set
+     */
+    public void setEta(final Date eta) {
+        this.eta = eta;
+    }
+    /**
+     * @return the eta
+     */
+    public Date getEta() {
+        return eta;
     }
 
     /**
