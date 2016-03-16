@@ -596,13 +596,15 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setMaxTemp(maxTemp);
 
         final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user);
+        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user);
 
         dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
-
+        dto.setFirstReadingTime(prettyFmt.format(new Date(timeOfFirstReading)));
         //last readings
         if (lastReadingTemperature != null) {
             final Date lastReadingTime = new Date(timeOfLastReading);
             dto.setLastReadingTimeIso(isoFmt.format(lastReadingTime));
+            dto.setLastReadingTime(prettyFmt.format(lastReadingTime));
             dto.setLastReadingTemperature(lastReadingTemperature.doubleValue());
         }
 
@@ -614,18 +616,21 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             //"arrivalNotificationTimeISO": "2014-08-12 12:10",
             // NEW - ISO for actual time arrival notification sent out
             dto.setArrivalNotificationTimeIso(isoFmt.format(arrival.getDate()));
+            dto.setArrivalNotificationTime(prettyFmt.format(arrival.getDate()));
         }
         if (s.getArrivalDate() != null) {
             dto.setArrivalTimeIso(isoFmt.format(s.getArrivalDate()));
+            dto.setArrivalTime(prettyFmt.format(s.getArrivalDate()));
         }
         if (s.getDeviceShutdownTime() != null) {
             dto.setShutdownTimeIso(isoFmt.format(s.getDeviceShutdownTime()));
+            dto.setShutdownTime(prettyFmt.format(s.getDeviceShutdownTime()));
         }
 
         int i = 0;
         for (final SingleShipmentTimeItem item : items) {
             dto.getLocations().addAll(createLocations(item, isoFmt,
-                    user, dto.getEta(), dto.getEndLocation(), i == items.size() - 1));
+                    user, dto.getEtaIso(), dto.getEndLocation(), i == items.size() - 1));
             i++;
         }
         dto.setCurrentLocation(items.size() == 0 ? "Not determined"
@@ -671,6 +676,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private SingleShipmentDto createSingleShipmentData(final Shipment shipment, final User user) {
         //"startTimeISO": "2014-08-12 12:10",
         final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user);
+        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user);
 
         final SingleShipmentDto dto = new SingleShipmentDto();
         dto.setAlertProfileId(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());
@@ -701,7 +707,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 final ArrivalEstimation estimation = arrivalEstimationService.estimateArrivalDate(
                         shipment, dto.getCurrentLocationForMap(), startTime, new Date());
                 if (estimation != null) {
-                    dto.setEta(isoFmt.format(estimation.getArrivalDate()));
+                    dto.setEtaIso(isoFmt.format(estimation.getArrivalDate()));
+                    dto.setEta(prettyFmt.format(estimation.getArrivalDate()));
                     dto.setPercentageComplete(estimation.getPercentageComplete());
                 }
             }
@@ -720,6 +727,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
 
         dto.setStartTimeISO(isoFmt.format(startTime));
+        dto.setStartTime(prettyFmt.format(startTime));
         dto.setStatus(shipment.getStatus());
         dto.setTripCount(shipment.getTripCount());
 

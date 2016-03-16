@@ -3,8 +3,6 @@
  */
 package com.visfresh.io.shipment;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,7 +39,9 @@ public class SingleShipmentDto {
     private Integer shutDownAfterStartMinutes;
     private String startLocation;
     private String startTimeISO;
+    private String startTime;
     private String endLocation;
+    private String etaIso;
     private String eta;
     private String currentLocation;
     private Location startLocationForMap;
@@ -59,9 +59,14 @@ public class SingleShipmentDto {
     private final Set<AlertType> alertSummary = new HashSet<>();
     private String alertYetToFire;
     private String arrivalNotificationTimeIso;
+    private String arrivalNotificationTime;
     private String shutdownTimeIso;
+    private String shutdownTime;
     private String arrivalTimeIso;
+    private String arrivalTime;
+    private String firstReadingTime;
     private String lastReadingTimeIso;
+    private String lastReadingTime;
     private double lastReadingTemperature;
     private Integer noAlertsAfterStartMinutes;
 
@@ -301,14 +306,14 @@ public class SingleShipmentDto {
     /**
      * @return the eta
      */
-    public String getEta() {
-        return eta;
+    public String getEtaIso() {
+        return etaIso;
     }
     /**
      * @param eta the eta to set
      */
-    public void setEta(final String eta) {
-        this.eta = eta;
+    public void setEtaIso(final String eta) {
+        this.etaIso = eta;
     }
     /**
      * @return the currentLocation
@@ -551,7 +556,102 @@ public class SingleShipmentDto {
     public void setShutDownAfterStartMinutes(final Integer shutDownAfterStartMinutes) {
         this.shutDownAfterStartMinutes = shutDownAfterStartMinutes;
     }
-    public static void main(final String[] args) throws UnsupportedEncodingException {
-        System.out.println(URLEncoder.encode("12345(7)", "UTF-8"));
+
+    /**
+     * @return the startTime
+     */
+    public String getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * @param startTime the startTime to set
+     */
+    public void setStartTime(final String startTime) {
+        this.startTime = startTime;
+    }
+
+    /**
+     * @return the etaPretty
+     */
+    public String getEta() {
+        return eta;
+    }
+
+    /**
+     * @param etaPretty the etaPretty to set
+     */
+    public void setEta(final String etaPretty) {
+        this.eta = etaPretty;
+    }
+
+    /**
+     * @return the arrivalNotificationTime
+     */
+    public String getArrivalNotificationTime() {
+        return arrivalNotificationTime;
+    }
+
+    /**
+     * @param arrivalNotificationTime the arrivalNotificationTime to set
+     */
+    public void setArrivalNotificationTime(final String arrivalNotificationTime) {
+        this.arrivalNotificationTime = arrivalNotificationTime;
+    }
+
+    /**
+     * @return the shutdownTime
+     */
+    public String getShutdownTime() {
+        return shutdownTime;
+    }
+
+    /**
+     * @param shutdownTime the shutdownTime to set
+     */
+    public void setShutdownTime(final String shutdownTime) {
+        this.shutdownTime = shutdownTime;
+    }
+
+    /**
+     * @return the arrivalTime
+     */
+    public String getArrivalTime() {
+        return arrivalTime;
+    }
+
+    /**
+     * @param arrivalTime the arrivalTime to set
+     */
+    public void setArrivalTime(final String arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    /**
+     * @return the firstReadingTime
+     */
+    public String getFirstReadingTime() {
+        return firstReadingTime;
+    }
+
+    /**
+     * @param firstReadingTime the firstReadingTime to set
+     */
+    public void setFirstReadingTime(final String firstReadingTime) {
+        this.firstReadingTime = firstReadingTime;
+    }
+
+    /**
+     * @return the lastReadingTime
+     */
+    public String getLastReadingTime() {
+        return lastReadingTime;
+    }
+
+    /**
+     * @param lastReadingTime the lastReadingTime to set
+     */
+    public void setLastReadingTime(final String lastReadingTime) {
+        this.lastReadingTime = lastReadingTime;
     }
 }

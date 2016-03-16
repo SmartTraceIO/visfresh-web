@@ -138,7 +138,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.SHIPPED_TO, getId(s.getShippedTo()));
         obj.addProperty(ShipmentConstants.SHIPMENT_DATE, formatDate(s.getShipmentDate()));
         obj.addProperty(ShipmentConstants.ARRIVAL_DATE, formatDate(s.getArrivalDate()));
-        obj.addProperty(ShipmentConstants.DEVICE_SHUTDOWN_TIME_ISO,
+        obj.addProperty(ShipmentConstants.SHUTDOWN_TIME_ISO,
                 s.getDeviceShutdownTime() == null ? null : isoFormat.format(s.getDeviceShutdownTime()));
         obj.addProperty(ShipmentConstants.DEVICE_SHUTDOWN_TIME,
                 s.getDeviceShutdownTime() == null ? null : prettyFormat.format(s.getDeviceShutdownTime()));
@@ -546,6 +546,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             //"arrivalNotificationTimeISO": "2014-08-12 12:10",
             // NEW - ISO for actual time arrival notification sent out
             json.addProperty("arrivalNotificationTimeISO", dto.getArrivalNotificationTimeIso());
+            json.addProperty("arrivalNotificationTime", dto.getArrivalNotificationTime());
 
             json.addProperty("arrivalNotificationWithinKm", dto.getArrivalNotificationWithinKm());
             json.addProperty("excludeNotificationsIfNoAlerts", dto.isExcludeNotificationsIfNoAlerts());
@@ -567,19 +568,24 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("shutDownAfterStartMinutes", dto.getShutDownAfterStartMinutes());
 
             json.addProperty("shutdownTimeISO", dto.getShutdownTimeIso());
+            json.addProperty("shutdownTime", dto.getShutdownTime());
 
             json.addProperty("startLocation", dto.getStartLocation());
             json.addProperty("startTimeISO", dto.getStartTimeISO());
+            json.addProperty("startTime", dto.getStartTime());
             json.add("startLocationForMap", toJson(dto.getStartLocationForMap()));
 
             json.addProperty("endLocation", dto.getEndLocation());
-            json.addProperty("etaISO", dto.getEta());
+            json.addProperty("etaISO", dto.getEtaIso());
+            json.addProperty("eta", dto.getEta());
 
             json.addProperty("arrivalTimeISO", dto.getArrivalTimeIso());
+            json.addProperty("arrivalTime", dto.getArrivalTime());
             json.add("endLocationForMap", toJson(dto.getEndLocationForMap()));
 
             json.addProperty("lastReadingLocation", dto.getCurrentLocation());
             json.addProperty("lastReadingTimeISO", dto.getLastReadingTimeIso());
+            json.addProperty("lastReadingTime", dto.getLastReadingTime());
             json.addProperty("lastReadingTemperature", convertTemperature(dto.getLastReadingTemperature()));
 
             json.add("lastReadingForMap", toJson(dto.getCurrentLocationForMap()));
@@ -587,6 +593,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("minTemp", convertTemperature(dto.getMinTemp()));
             json.addProperty("maxTemp", convertTemperature(dto.getMaxTemp()));
             json.addProperty("firstReadingTimeISO", dto.getTimeOfFirstReading());
+            json.addProperty("firstReadingTime", dto.getFirstReadingTime());
         }
 
         if (isNotSibling) {

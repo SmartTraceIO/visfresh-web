@@ -10,7 +10,7 @@ package com.visfresh.constants;
 public interface ShipmentConstants extends BaseShipmentConstants {
     String CUSTOM_FIELDS = "customFields";
     String SHIPMENT_DATE = "shipmentDate";
-    String DEVICE_SHUTDOWN_TIME_ISO = "shutdownTimeISO";
+    String SHUTDOWN_TIME_ISO = "shutdownTimeISO";
     String DEVICE_SHUTDOWN_TIME = "shutdownTime";
     String PO_NUM = "poNum";
     String TRIP_COUNT = "tripCount";
