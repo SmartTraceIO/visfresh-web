@@ -141,7 +141,7 @@ public class AutoStartShipmentDaoTest extends
         assertEquals(a2.getId(), all.get(1).getId());
     }
     @Test
-    public void testStartByStartLocations() {
+    public void testStartByEndLocations() {
         final AutoStartShipment a1 = dao.save(createAutoStart(createTemplate()));
         final AutoStartShipment a2 = dao.save(createAutoStart(createTemplate()));
 
@@ -178,7 +178,7 @@ public class AutoStartShipmentDaoTest extends
         assertEquals(a2.getId(), all.get(1).getId());
     }
     @Test
-    public void testStartByEndLocations() {
+    public void testStartByStartLocations() {
         final AutoStartShipment a1 = dao.save(createAutoStart(createTemplate()));
         final AutoStartShipment a2 = dao.save(createAutoStart(createTemplate()));
 
@@ -186,17 +186,11 @@ public class AutoStartShipmentDaoTest extends
         a1.getShippedFrom().add(createLocation("E"));
         a1.getShippedFrom().add(createLocation("B"));
 
-        a1.getShippedTo().add(createLocation("A"));
-        a1.getShippedTo().add(createLocation("A"));
-
         dao.save(a1);
 
         //a2
         a2.getShippedFrom().add(createLocation("C"));
         a2.getShippedFrom().add(createLocation("A"));
-
-        a2.getShippedTo().add(createLocation("A"));
-        a2.getShippedTo().add(createLocation("A"));
 
         dao.save(a2);
 

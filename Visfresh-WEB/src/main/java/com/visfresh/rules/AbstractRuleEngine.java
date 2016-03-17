@@ -24,7 +24,6 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
-import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TemperatureRule;
@@ -199,17 +198,6 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                     default:
                         //nothing
             }
-        }
-
-        //add continuously rules
-        if (alertProfile.isWatchBatteryLow()) {
-            alerts.add(new AlertRule(AlertType.Battery));
-        }
-        if (alertProfile.isWatchEnterBrightEnvironment()) {
-            alerts.add(new AlertRule(AlertType.LightOn));
-        }
-        if (alertProfile.isWatchEnterBrightEnvironment()) {
-            alerts.add(new AlertRule(AlertType.LightOff));
         }
 
         return alerts;

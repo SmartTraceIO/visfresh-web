@@ -24,7 +24,7 @@ import com.visfresh.utils.LocationUtils;
  */
 @Component
 public class EtaCalculationRule implements TrackerEventRule {
-    private static final String NAME = "EtaCalculation";
+    public static final String NAME = "EtaCalculation";
     private static final Logger log = LoggerFactory.getLogger(EtaCalculationRule.class);
 
     /**
