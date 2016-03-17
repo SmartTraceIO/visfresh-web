@@ -33,4 +33,9 @@ public interface ShipmentConstants extends BaseShipmentConstants {
     String DEVICE_IMEI = "deviceImei";
     String DEVICE_SN = "deviceSN";
     String STATUS = "status";
+    String SIBLING_COUNT = "siblingCount";
+    String LAST_READING_TIME = "lastReadingTime";
+    String LAST_READING_TIME_ISO = "lastReadingTimeISO";
+    String LAST_READING_TEMPERATURE = "lastReadingTemperature";
+    String ALERT_SUMMARY = "alertSummary";
 }

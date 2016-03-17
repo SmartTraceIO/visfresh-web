@@ -294,12 +294,12 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         json.addProperty("alertProfileId", dto.getAlertProfileId());
         json.addProperty("alertProfileName", dto.getAlertProfileName());
-        json.add("alertSummary", SerializerUtils.toJson(dto.getAlertSummary()));
-        json.addProperty("siblingCount", dto.getSiblingCount());
+        json.add(ShipmentConstants.ALERT_SUMMARY, SerializerUtils.toJson(dto.getAlertSummary()));
+        json.addProperty(ShipmentConstants.SIBLING_COUNT, dto.getSiblingCount());
 
         //last reading data
-        json.addProperty("lastReadingTimeISO", dto.getLastReadingTimeISO());
-        json.addProperty("lastReadingTemperature", dto.getLastReadingTemperature());
+        json.addProperty(ShipmentConstants.LAST_READING_TIME_ISO, dto.getLastReadingTimeISO());
+        json.addProperty(ShipmentConstants.LAST_READING_TEMPERATURE, dto.getLastReadingTemperature());
         json.addProperty("lastReadingBattery", dto.getLastReadingBattery());
         json.addProperty("lastReadingLat", dto.getLastReadingLat());
         json.addProperty("lastReadingLong", dto.getLastReadingLong());
@@ -539,7 +539,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
 
         //alert summary
-        json.add("alertSummary", createAlertSummaryArray(dto.getAlertSummary())); /*+*/
+        json.add(ShipmentConstants.ALERT_SUMMARY, createAlertSummaryArray(dto.getAlertSummary())); /*+*/
         if (isNotSibling) {
             json.addProperty("alertYetToFire", dto.getAlertYetToFire());
 
@@ -584,9 +584,10 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.add("endLocationForMap", toJson(dto.getEndLocationForMap()));
 
             json.addProperty("lastReadingLocation", dto.getCurrentLocation());
-            json.addProperty("lastReadingTimeISO", dto.getLastReadingTimeIso());
-            json.addProperty("lastReadingTime", dto.getLastReadingTime());
-            json.addProperty("lastReadingTemperature", convertTemperature(dto.getLastReadingTemperature()));
+            json.addProperty(ShipmentConstants.LAST_READING_TIME_ISO, dto.getLastReadingTimeIso());
+            json.addProperty(ShipmentConstants.LAST_READING_TIME, dto.getLastReadingTime());
+            json.addProperty(ShipmentConstants.LAST_READING_TEMPERATURE,
+                    convertTemperature(dto.getLastReadingTemperature()));
 
             json.add("lastReadingForMap", toJson(dto.getCurrentLocationForMap()));
 

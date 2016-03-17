@@ -388,6 +388,114 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(s1.getId(), ids.get(2));
     }
     @Test
+    public void testSortingBySiblingCount() throws RestServiceException, IOException {
+        final Shipment s3 = createShipment(true);
+        s3.setSiblingCount(3);
+        final Shipment s1 = createShipment(true);
+        s1.setSiblingCount(1);
+        final Shipment s2 = createShipment(true);
+        s2.setSiblingCount(2);
+
+        saveShipmentDirectly(s1);
+        saveShipmentDirectly(s2);
+        saveShipmentDirectly(s3);
+
+        List<Long> ids;
+
+        ids = getSortedShipmentId(ShipmentConstants.SIBLING_COUNT, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s3.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.SIBLING_COUNT, false);
+        assertEquals(s3.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+    }
+    @Test
+    public void testSortingByLastReadingDate() throws RestServiceException, IOException {
+        final long currentTime = System.currentTimeMillis();
+
+        final Shipment s3 = createShipment(true);
+        s3.setLastEventDate(new Date(currentTime - 100000l));
+        final Shipment s1 = createShipment(true);
+        s1.setLastEventDate(new Date(currentTime - 3 * 100000l));
+        final Shipment s2 = createShipment(true);
+        s2.setLastEventDate(new Date(currentTime - 2 * 100000l));
+
+        saveShipmentDirectly(s1);
+        saveShipmentDirectly(s2);
+        saveShipmentDirectly(s3);
+
+        List<Long> ids;
+
+        ids = getSortedShipmentId(ShipmentConstants.LAST_READING_TIME, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s3.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.LAST_READING_TIME_ISO, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s3.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.LAST_READING_TIME, false);
+        assertEquals(s3.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.LAST_READING_TIME_ISO, false);
+        assertEquals(s3.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+    }
+    @Test
+    public void testSortingByLastReadingTemperature() throws RestServiceException, IOException {
+        final Shipment s3 = createShipment(true);
+        createTrackerEvent(s3, 3.);
+        final Shipment s1 = createShipment(true);
+        createTrackerEvent(s1, 1.);
+        final Shipment s2 = createShipment(true);
+        createTrackerEvent(s2, 2.);
+
+        List<Long> ids;
+
+        ids = getSortedShipmentId(ShipmentConstants.LAST_READING_TEMPERATURE, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s3.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.LAST_READING_TEMPERATURE, false);
+        assertEquals(s3.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+    }
+    @Test
+    public void testSortingByLastAlertSummary() throws RestServiceException, IOException {
+        final Shipment s3 = createShipment(true);
+        createAlert(s3, AlertType.Cold);
+        createAlert(s3, AlertType.Cold);
+        createAlert(s3, AlertType.Cold);
+        final Shipment s1 = createShipment(true);
+        createAlert(s1, AlertType.Cold);
+        final Shipment s2 = createShipment(true);
+        createAlert(s2, AlertType.Cold);
+        createAlert(s2, AlertType.Cold);
+
+        List<Long> ids;
+
+        ids = getSortedShipmentId(ShipmentConstants.ALERT_SUMMARY, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s3.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.ALERT_SUMMARY, false);
+        assertEquals(s3.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+    }
+
+    @Test
     public void testGetShipment() throws IOException, RestServiceException {
         final Shipment sp = createShipment(true);
         sp.setDeviceShutdownTime(new Date(System.currentTimeMillis() - 10000000l));
@@ -674,6 +782,19 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         alert.setType(type);
         alertDao.save(alert);
         return alert;
+    }
+    /**
+     * @param shipment
+     * @param temperature
+     */
+    private TrackerEvent createTrackerEvent(final Shipment shipment, final double temperature) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setType(TrackerEventType.AUT);
+        e.setShipment(shipment);
+        e.setDevice(shipment.getDevice());
+        e.setTime(new Date());
+        e.setTemperature(temperature);
+        return context.getBean(TrackerEventDao.class).save(e);
     }
     /**
      * @param name location name.

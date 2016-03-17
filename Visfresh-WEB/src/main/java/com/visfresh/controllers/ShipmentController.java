@@ -298,11 +298,12 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             ETA,
             SHIPMENT_DESCRIPTION,
             ALERT_PROFILE_ID,
-            ALERT_PROFILE
-//            ALERT_
-//            "alertSummary"
-//            "lastReadingTimeISO"
-//            "lastReadingTemperature"
+            ALERT_PROFILE,
+            SIBLING_COUNT,
+            LAST_READING_TIME,
+            LAST_READING_TIME_ISO,
+            LAST_READING_TEMPERATURE,
+            ALERT_SUMMARY
         };
     }
 

@@ -87,6 +87,9 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         propertyToDbFields.put(ShipmentConstants.SHIPMENT_ID, ID_FIELD);
         propertyToDbFields.put(ShipmentConstants.ASSET_TYPE, ASSETTYPE_FIELD);
         propertyToDbFields.put(ShipmentConstants.ETA, ETA_FIELD);
+        propertyToDbFields.put(ShipmentConstants.SIBLING_COUNT, SIBLINGCOUNT_FIELD);
+        propertyToDbFields.put(ShipmentConstants.LAST_READING_TIME, LASTEVENT_FIELD);
+        propertyToDbFields.put(ShipmentConstants.LAST_READING_TIME_ISO, LASTEVENT_FIELD);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#createEntity()
@@ -536,22 +539,35 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     @Override
     protected String buildSelectBlockForFindAll() {
         return "select "
-                + getTableName()
-                + ".*"
-                + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6)"
-                + " as " + ShipmentConstants.DEVICE_SN
-                + " , sfrom." + LocationProfileDaoImpl.NAME_FIELD
-                + " as " + ShipmentConstants.SHIPPED_FROM_LOCATION_NAME
-                + " , sto." + LocationProfileDaoImpl.NAME_FIELD
-                + " as " + ShipmentConstants.SHIPPED_TO_LOCATION_NAME
-                + " from " + getTableName()
-                + " left outer join " + DeviceDaoImpl.TABLE + " as d"
-                + " on " + getTableName() + "." + DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
-                + " left outer join " + LocationProfileDaoImpl.TABLE + " as sfrom"
-                + " on " + getTableName() + "." + SHIPPEDFROM_FIELD + " = sfrom." + LocationProfileDaoImpl.ID_FIELD
-                + " left outer join " + LocationProfileDaoImpl.TABLE + " as sto"
-                + " on " + getTableName() + "." + SHIPPEDTO_FIELD + " = sto." + LocationProfileDaoImpl.ID_FIELD
-                ;
+            + getTableName()
+            + ".*"
+            + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6)"
+            + " as " + ShipmentConstants.DEVICE_SN
+            + " , sfrom." + LocationProfileDaoImpl.NAME_FIELD
+            + " as " + ShipmentConstants.SHIPPED_FROM_LOCATION_NAME
+            + " , sto." + LocationProfileDaoImpl.NAME_FIELD
+            + " as " + ShipmentConstants.SHIPPED_TO_LOCATION_NAME
+            + " , te.temperature"
+            + " as " + ShipmentConstants.LAST_READING_TEMPERATURE
+            + " , (select count(*) from " + AlertDaoImpl.TABLE
+            + " al where al." + AlertDaoImpl.SHIPMENT_FIELD + " = " + TABLE + "." + ID_FIELD + ")"
+            + " as " + ShipmentConstants.ALERT_SUMMARY
+            + " from " + getTableName()
+            + " left outer join " + DeviceDaoImpl.TABLE + " as d"
+            + " on " + getTableName() + "." + DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
+            + " left outer join " + LocationProfileDaoImpl.TABLE + " as sfrom"
+            + " on " + getTableName() + "." + SHIPPEDFROM_FIELD + " = sfrom." + LocationProfileDaoImpl.ID_FIELD
+            + " left outer join " + LocationProfileDaoImpl.TABLE + " as sto"
+            + " on " + getTableName() + "." + SHIPPEDTO_FIELD + " = sto." + LocationProfileDaoImpl.ID_FIELD
+            + " left outer join (select"
+            + " t." + TrackerEventDaoImpl.TEMPERATURE_FIELD + " as temperature,"
+            + " t." + TrackerEventDaoImpl.SHIPMENT_FIELD + " as shipment"
+            + " from " + TrackerEventDaoImpl.TABLE + " t"
+            + " join (select max(id) as id from " + TrackerEventDaoImpl.TABLE
+            + " group by " + TrackerEventDaoImpl.SHIPMENT_FIELD + ") t1"
+            + " on t1.id = t.id) te\n"
+            + "on te.shipment = " + getTableName() + "." + ID_FIELD + "\n"
+            ;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#addSortForDbField(java.lang.String, java.util.List, boolean)
@@ -566,6 +582,10 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         } else if (ShipmentConstants.SHIPPED_FROM_LOCATION_NAME.equals(field)){
             super.addSortForDbField(field, sorts, isAscent);
         } else if (ShipmentConstants.SHIPPED_TO_LOCATION_NAME.equals(field)){
+            super.addSortForDbField(field, sorts, isAscent);
+        } else if (ShipmentConstants.LAST_READING_TEMPERATURE.equals(field)){
+            super.addSortForDbField(field, sorts, isAscent);
+        } else if (ShipmentConstants.ALERT_SUMMARY.equals(field)){
             super.addSortForDbField(field, sorts, isAscent);
         } else {
             super.addSortForDbField(TABLE + "." + field, sorts, isAscent);
