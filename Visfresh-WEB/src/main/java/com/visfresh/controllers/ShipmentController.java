@@ -295,11 +295,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             DEVICE_SN, //should add trip count next
             ARRIVAL_DATE,
             COMMENTS_FOR_RECEIVER,
-//            PROPERTY_ETA,
+            ETA,
             SHIPMENT_DESCRIPTION,
             ALERT_PROFILE_ID,
             ALERT_PROFILE
-//            ETA,
 //            ALERT_
 //            "alertSummary"
 //            "lastReadingTimeISO"

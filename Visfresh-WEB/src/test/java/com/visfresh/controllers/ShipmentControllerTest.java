@@ -361,6 +361,33 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(s1.getId(), ids.get(2));
     }
     @Test
+    public void testSortingByEta() throws RestServiceException, IOException {
+        final long currentTime = System.currentTimeMillis();
+
+        final Shipment s3 = createShipment(true);
+        s3.setEta(new Date(currentTime - 100000l));
+        final Shipment s1 = createShipment(true);
+        s1.setEta(new Date(currentTime - 3 * 100000l));
+        final Shipment s2 = createShipment(true);
+        s2.setEta(new Date(currentTime - 2 * 100000l));
+
+        saveShipmentDirectly(s1);
+        saveShipmentDirectly(s2);
+        saveShipmentDirectly(s3);
+
+        List<Long> ids;
+
+        ids = getSortedShipmentId(ShipmentConstants.ETA, true);
+        assertEquals(s1.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s3.getId(), ids.get(2));
+
+        ids = getSortedShipmentId(ShipmentConstants.ETA, false);
+        assertEquals(s3.getId(), ids.get(0));
+        assertEquals(s2.getId(), ids.get(1));
+        assertEquals(s1.getId(), ids.get(2));
+    }
+    @Test
     public void testGetShipment() throws IOException, RestServiceException {
         final Shipment sp = createShipment(true);
         sp.setDeviceShutdownTime(new Date(System.currentTimeMillis() - 10000000l));

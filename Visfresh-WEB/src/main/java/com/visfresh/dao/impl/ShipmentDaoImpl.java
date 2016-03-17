@@ -86,7 +86,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         propertyToDbFields.put(ShipmentConstants.PALLET_ID, PALETTID_FIELD);
         propertyToDbFields.put(ShipmentConstants.SHIPMENT_ID, ID_FIELD);
         propertyToDbFields.put(ShipmentConstants.ASSET_TYPE, ASSETTYPE_FIELD);
-//        propertyToDbFields.put(ShipmentConstants.PROPERTY_ETA, )
+        propertyToDbFields.put(ShipmentConstants.ETA, ETA_FIELD);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#createEntity()
