@@ -3,9 +3,13 @@
  */
 package com.visfresh.rules;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 
@@ -14,10 +18,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.UtilitiesController;
 import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AutoStartShipment;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
@@ -168,6 +174,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         }
 
         shipment.setShipmentDate(event.getTime());
+
         shipmentDao.save(shipment);
         event.setShipment(shipment);
         context.getState().possibleNewShipment(shipment);
@@ -277,7 +284,27 @@ public class AutoStartShipmentRule implements TrackerEventRule {
             s.setShipmentDescription("Created by autostart shipment rule");
         }
 
+        if (tpl.isAddDateShipped()) {
+            s.setShipmentDescription(s.getShipmentDescription()
+                    + " " + formatShipmentDate(tpl.getCompany(), new Date()));
+        }
+
         return s;
+    }
+    /**
+     * @param company
+     * @param date
+     * @return
+     */
+    private String formatShipmentDate(final Company company, final Date date) {
+        //TODO get time zone and locale from company
+        final TimeZone tz = TimeZone.getTimeZone("UTC");
+        final Locale locale = Locale.ENGLISH;
+
+        final SimpleDateFormat fmt = new SimpleDateFormat("h:mmaa d MMM yyyy ", locale);
+        fmt.setTimeZone(tz);
+
+        return fmt.format(date) + UtilitiesController.createOffsetString(tz.getRawOffset());
     }
 
     /**

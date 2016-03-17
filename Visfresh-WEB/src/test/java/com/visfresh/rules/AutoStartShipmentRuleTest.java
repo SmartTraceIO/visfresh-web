@@ -158,7 +158,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         // check correct start location selected.
         assertEquals(lok.getId(), shipment.getShippedFrom().getId());
         // check created from correct template
-        assertEquals(tok.getShipmentDescription(), shipment.getShipmentDescription());
+        assertTrue(shipment.getShipmentDescription().startsWith(tok.getShipmentDescription()));
         //first is shipment ID.
         assertEquals(2, c.getState().getShipmentKeys().size());
 
@@ -208,7 +208,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         // check correct start location selected.
         assertNull(s.getShippedFrom());
         // check created from correct template
-        assertEquals(t2.getShipmentDescription(), s.getShipmentDescription());
+        assertTrue(s.getShipmentDescription().startsWith(t2.getShipmentDescription()));
     }
     @Test
     public void testAutostartAssignedToDevice() {
@@ -328,6 +328,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         s.setShutdownDeviceAfterMinutes(70);
         s.setAddDateShipped(true);
         s.setDetectLocationForShippedFrom(true);
+        s.setAddDateShipped(true);
         return context.getBean(ShipmentTemplateDao.class).save(s);
     }
 }

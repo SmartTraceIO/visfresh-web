@@ -119,7 +119,7 @@ public class UtilitiesController extends AbstractController {
         obj.addProperty("offset", createOffsetString(tz.getRawOffset()));
         return obj;
     }
-    private static String createOffsetString(final int rawOffset) {
+    public static String createOffsetString(final int rawOffset) {
         final long hours = TimeUnit.MILLISECONDS.toHours(rawOffset);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(rawOffset)
                 - TimeUnit.HOURS.toMinutes(hours);
