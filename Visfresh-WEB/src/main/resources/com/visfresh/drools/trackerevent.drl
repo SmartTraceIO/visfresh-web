@@ -14,6 +14,7 @@ import com.visfresh.rules.TemperatureAlertRule;
 import com.visfresh.rules.CloseOldShipmentsRule;
 import com.visfresh.rules.SetShipmentArrivedRule;
 import com.visfresh.rules.AutoDetectEndLocationRule;
+import com.visfresh.rules.EtaCalculationRule;
 
 global AbstractRuleEngine engine;
 
@@ -124,6 +125,15 @@ rule "SetShipmentArrived"
         context : RuleContext(engine.getRule(SetShipmentArrivedRule.NAME).accept(this));
     then
     	if(engine.getRule(SetShipmentArrivedRule.NAME).handle(context)) {
+       		update(context);
+        }
+end
+
+rule "EtaCalculation"
+    when
+        context : RuleContext(engine.getRule(EtaCalculationRule.NAME).accept(this));
+    then
+    	if(engine.getRule(EtaCalculationRule.NAME).handle(context)) {
        		update(context);
         }
 end
