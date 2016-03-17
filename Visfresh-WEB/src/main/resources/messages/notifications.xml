@@ -106,7 +106,7 @@
 	</entry>
 	<!-- CriticalCold cumulative -->
 	<entry key="Email.CriticalCold.cumulative">
-		Cold Alert for Tracker ${devicesn}(${tripCount})
+		Critical Cold Alert for Tracker ${devicesn}(${tripCount})
 		Alert Rule: Below ${ruletemperature} for more than ${ruleperiod}min in total
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
@@ -117,7 +117,7 @@
 	</entry>
 	<!-- CriticalHot cumulative -->
 	<entry key="Email.CriticalHot.cumulative">
-		Hot Alert for Tracker ${devicesn}(${tripCount})
+		Critical Hot Alert for Tracker ${devicesn}(${tripCount})
 		Alert Rule: Above ${ruletemperature} for more than ${ruleperiod}min in total
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
@@ -202,7 +202,7 @@
 	<!-- CriticalCold -->
 	<entry key="SMS.CriticalCold">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) below ${temperature} for ${period}min</entry>
 	<!-- CriticalHot -->
-	<entry key="SMS.CriticalHot">Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min</entry>
+	<entry key="SMS.CriticalHot">Critical Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min</entry>
 	<!-- Cold Cumulative -->
 	<entry key="SMS.Cold.cumulative">Cold Alert. Tracker ${devicesn}(${tripCount}) below ${temperature} for ${period}min in total</entry>
 	<!-- Hot Cumulative-->
@@ -210,7 +210,7 @@
 	<!-- CriticalCold Cumulative -->
 	<entry key="SMS.CriticalCold.cumulative">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) below ${temperature} for ${period}min in total</entry>
 	<!-- CriticalHot Cumulative -->
-	<entry key="SMS.CriticalHot.cumulative">Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min in total</entry>
+	<entry key="SMS.CriticalHot.cumulative">Critical Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min in total</entry>
 
 	<!-- Battery -->
 	<entry key="SMS.Battery">Low Battery Alert for Tracker ${devicesn}(${tripCount})</entry>
