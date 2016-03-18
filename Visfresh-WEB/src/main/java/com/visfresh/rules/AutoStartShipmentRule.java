@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.UtilitiesController;
 import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
@@ -301,10 +301,44 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         final TimeZone tz = TimeZone.getTimeZone("UTC");
         final Locale locale = Locale.ENGLISH;
 
-        final SimpleDateFormat fmt = new SimpleDateFormat("h:mmaa d MMM yyyy ", locale);
+        return formatDate(date, tz, locale);
+    }
+
+    /**
+     * @param date
+     * @param tz
+     * @param locale
+     * @return
+     */
+    private static String formatDate(final Date date, final TimeZone tz,
+            final Locale locale) {
+        final int rawOffset = tz.getRawOffset();
+        final SimpleDateFormat fmt = new SimpleDateFormat("h:mmaa dMMMyyyy ", locale);
         fmt.setTimeZone(tz);
 
-        return fmt.format(date) + UtilitiesController.createOffsetString(tz.getRawOffset());
+        //time zone
+        final long hours = TimeUnit.MILLISECONDS.toHours(rawOffset);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(rawOffset)
+                - TimeUnit.HOURS.toMinutes(hours);
+        // avoid -4:-30 issue
+        minutes = Math.abs(minutes);
+
+        String tzString;
+        if (hours >= 0) {
+            if (minutes > 0) {
+                tzString = String.format("+%d:%d", hours, minutes);
+            } else {
+                tzString = String.format("+%d", hours, minutes);
+            }
+        } else {
+            if (minutes > 0) {
+                tzString = String.format("%d:%d", hours, minutes);
+            } else {
+                tzString = String.format("%d", hours, minutes);
+            }
+        }
+
+        return fmt.format(date) + tzString;
     }
 
     /**
@@ -356,5 +390,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         s.setDevice(device);
         s.setShipmentDescription("Created by autostart shipment rule");
         return s;
+    }
+    public static void main(final String[] args) {
+        System.out.println(formatDate(new Date(), TimeZone.getDefault(), Locale.getDefault()));
     }
 }
