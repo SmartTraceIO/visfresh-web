@@ -53,6 +53,7 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
         d.setImei(imei);
         d.setName("JUnit-" + imei);
         d.setDescription("Test device");
+        d.setActive(true);
 
         devices.put(d.getImei(), d);
         commands.put(imei, new LinkedList<DeviceCommand>());
@@ -73,6 +74,21 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
         assertEquals(2, messages.size());
         assertEquals(m1.getId(), messages.get(0).getId());
         assertEquals(m2.getId(), messages.get(1).getId());
+    }
+    @Test
+    public void testInactiveDevice() {
+        device.setActive(false);
+
+        final DeviceMessage m1 = createDeviceMessage(device.getImei(), DeviceMessageType.INIT);
+        final DeviceMessage m2 = createDeviceMessage(device.getImei(), DeviceMessageType.INIT);
+
+        final List<DeviceMessage> msgs = new LinkedList<DeviceMessage>();
+        msgs.add(m1);
+        msgs.add(m2);
+
+        process(msgs);
+
+        assertEquals(0, messages.size());
     }
     @Test
     public void testProcessRspMessage() {

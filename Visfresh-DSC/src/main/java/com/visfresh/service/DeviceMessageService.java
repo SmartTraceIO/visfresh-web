@@ -56,7 +56,13 @@ public class DeviceMessageService {
                 device = getDeviceByImei(msg.getImei());
             }
 
-            if (device != null) {
+            if (device == null) {
+                log.warn("Not found registered device " + msg.getImei());
+                break;
+            } else if (!device.isActive()) {
+                log.debug("Device " + device.getImei() + " is inactive, message(s) ignored");
+                break;
+            } else {
                 if (msg.getType() == DeviceMessageType.RSP) {
                     //process response to server command
                     log.debug("Device " + msg.getImei() + " has sent command response: " + msg.getMessage());
@@ -66,9 +72,6 @@ public class DeviceMessageService {
                     }
                     saveDeviceMessage(msg);
                 }
-            } else {
-                log.warn("Not found registered device " + msg.getImei());
-                break;
             }
         }
 

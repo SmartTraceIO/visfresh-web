@@ -20,6 +20,10 @@ public class Device {
      * Device description
      */
     private String description;
+    /**
+     * Is active flag.
+     */
+    private boolean isActive;
 
     /**
      * Default constructor.
@@ -63,5 +67,17 @@ public class Device {
      */
     public void setDescription(final String description) {
         this.description = description;
+    }
+    /**
+     * @return the isActive
+     */
+    public boolean isActive() {
+        return isActive;
+    }
+    /**
+     * @param isActive the isActive to set
+     */
+    public void setActive(final boolean isActive) {
+        this.isActive = isActive;
     }
 }
