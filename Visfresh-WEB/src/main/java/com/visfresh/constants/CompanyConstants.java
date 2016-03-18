@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.visfresh.constants;
 
@@ -8,9 +8,16 @@ package com.visfresh.constants;
  *
  */
 public interface CompanyConstants {
-
-    public static final String PROPERTY_DESCRIPTION = "description";
-    public static final String PROPERTY_NAME = "name";
-    public static final String PROPERTY_ID = "id";
-
+    String ID = "id";
+    String NAME = "name";
+    String DESCRIPTION = "description";
+    String ADDRESS = "address";
+    String CONTACT_PERSON = "contactPerson";
+    String EMAIL = "email";
+    String TIME_ZONE = "timeZone";
+    String START_DATE = "startDate";
+    String TRACKERS_EMAIL = "trackersEmail";
+    String PAYMENT_METHOD = "paymentMethod";
+    String BILLING_PERSON = "billingPerson";
+    String LANGUAGE = "language";
 }

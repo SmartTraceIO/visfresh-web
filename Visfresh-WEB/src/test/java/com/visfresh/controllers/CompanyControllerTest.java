@@ -6,6 +6,8 @@ package com.visfresh.controllers;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +15,8 @@ import org.junit.Test;
 import com.visfresh.controllers.restclient.CompanyRestClient;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Language;
+import com.visfresh.entities.PaymentMethod;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.SerializerUtils;
 
@@ -55,6 +59,16 @@ public class CompanyControllerTest extends AbstractRestServiceTest {
         Company c = new Company();
         c.setDescription("JUnit test company");
         c.setName("JUnit-C-1");
+
+        c.setAddress("RU, Odessa, Deribasovskaya st. 1");
+        c.setBillingPerson("Adam Smit");
+        c.setContactPerson("James Bond");
+        c.setEmail("junt@smarttrace.com.au");
+        c.setLanguage(Language.English);
+        c.setPaymentMethod(PaymentMethod.PayPal);
+        c.setStartDate(new Date(System.currentTimeMillis() - 100000L));
+        c.setTimeZone(TimeZone.getDefault());
+        c.setTrackersEmail("junit.trackers@smarttrace.com.au");
         dao.save(c);
 
         c = new Company();

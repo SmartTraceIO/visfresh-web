@@ -136,7 +136,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                         + " has updated to " + shipment.getLastEventDate());
             }
         } finally {
-            deviceDao.saveState(imei, state);
+            deviceDao.saveState(event.getImei(), state);
         }
     }
     /**

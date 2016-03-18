@@ -5,13 +5,22 @@ package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Language;
+import com.visfresh.entities.PaymentMethod;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class CompanyDaoTest extends BaseCrudTest<CompanyDao, Company, Long> {
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
     /**
      * Default constructor.
      */
@@ -35,6 +44,17 @@ public class CompanyDaoTest extends BaseCrudTest<CompanyDao, Company, Long> {
         final Company c = new Company();
         c.setName("JUnit company");
         c.setDescription("Any Description");
+
+        c.setAddress("Company address");
+        c.setContactPerson("contact person");
+        c.setEmail("a@b.c");
+        c.setTimeZone(TimeZone.getTimeZone("UTC"));
+        c.setStartDate(parseDate("2016-03-08"));
+        c.setTrackersEmail("Trackeres email");
+        c.setPaymentMethod(PaymentMethod.PayPal);
+        c.setBillingPerson("Billing person");
+        c.setLanguage(Language.English);
+
         return c;
     }
     /* (non-Javadoc)
@@ -44,5 +64,26 @@ public class CompanyDaoTest extends BaseCrudTest<CompanyDao, Company, Long> {
     protected void assertCreateTestEntityOk(final Company c) {
         assertEquals("JUnit company", c.getName());
         assertEquals("Any Description", c.getDescription());
+
+        assertEquals("Company address", c.getAddress());
+        assertEquals("contact person", c.getContactPerson());
+        assertEquals("a@b.c", c.getEmail());
+        assertEquals(TimeZone.getTimeZone("UTC"), c.getTimeZone());
+        assertEquals("2016-03-08", dateFormat.format(c.getStartDate()));
+        assertEquals("Trackeres email", c.getTrackersEmail());
+        assertEquals(PaymentMethod.PayPal, c.getPaymentMethod());
+        assertEquals("Billing person", c.getBillingPerson());
+        assertEquals(Language.English, c.getLanguage());
+    }
+    /**
+     * @param str
+     * @return
+     */
+    private Date parseDate(final String str) {
+        try {
+            return dateFormat.parse(str);
+        } catch (final ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

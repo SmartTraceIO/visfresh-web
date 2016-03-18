@@ -115,8 +115,17 @@ public class CompanyController extends AbstractController implements CompanyCons
      */
     private String[] getDefaultSortOrder() {
         return new String[] {
-            PROPERTY_NAME,
-            PROPERTY_ID
+            NAME,
+            ID,
+            ADDRESS,
+            CONTACT_PERSON,
+            EMAIL,
+            TIME_ZONE,
+            START_DATE,
+            TRACKERS_EMAIL,
+            PAYMENT_METHOD,
+            BILLING_PERSON,
+            LANGUAGE
         };
     }
 }

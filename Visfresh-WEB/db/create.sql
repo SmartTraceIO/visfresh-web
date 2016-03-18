@@ -30,6 +30,15 @@ create table companies (
     id bigint(20) auto_increment not null,
     `name` varchar(255) not null,
     description varchar(255) default null,
+    address varchar(255) default null,
+    contactperson varchar(50) default null,
+    email varchar(127) default null,
+    timezone varchar(31) null default 'UTC',
+    startdate timestamp NULL default NULL,
+    trackersemail varchar(127) default null,
+    paymentmethod varchar(127) default null,
+    billingperson varchar(50) default null,
+    `language` varchar(20) null default 'English',
     PRIMARY KEY (`id`)
 );
 
