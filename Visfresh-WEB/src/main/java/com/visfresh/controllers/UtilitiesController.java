@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
@@ -42,6 +43,8 @@ public class UtilitiesController extends AbstractController {
     private static final Logger log = LoggerFactory.getLogger(UtilitiesController.class);
     @Autowired
     private TimeZoneService timeZoneService;
+    @Autowired
+    private UserDao userDao;
 
     /**
      * Default constructor.
@@ -189,7 +192,9 @@ public class UtilitiesController extends AbstractController {
     @RequestMapping(value = "/getUserTime/{authToken}", method = RequestMethod.GET)
     public JsonObject getUserTime(@PathVariable final String authToken) {
         try {
-            final User user = getLoggedInUser(authToken);
+            final User u = getLoggedInUser(authToken);
+
+            final User user = userDao.findOne(u.getId());
             final TimeZone tz = user.getTimeZone();
             final Date date = new Date();
 

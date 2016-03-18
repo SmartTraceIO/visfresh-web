@@ -297,10 +297,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      * @return
      */
     private String formatShipmentDate(final Company company, final Date date) {
-        //TODO get time zone and locale from company
-        final TimeZone tz = TimeZone.getTimeZone("UTC");
-        final Locale locale = Locale.ENGLISH;
-
+        final TimeZone tz = company.getTimeZone() != null? company.getTimeZone() : TimeZone.getTimeZone("UTC");
+        final Locale locale = company.getLanguage() != null ? company.getLanguage().getLocale() : Locale.ENGLISH;
         return formatDate(date, tz, locale);
     }
 

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.NotificationScheduleConstants;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.Page;
@@ -224,11 +225,10 @@ public class NotificationScheduleController extends AbstractController implement
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete notification schedule " + notificationScheduleId, e);
-            //TODO uncomment
-//            final List<ReferenceInfo> refs = dao.getDbReferences(notificationScheduleId);
-//            if (!refs.isEmpty()) {
-//                return createErrorResponse(ErrorCodes.ENTITY_IN_USE, createEntityInUseMessage(refs));
-//            }
+            final List<ReferenceInfo> refs = dao.getDbReferences(notificationScheduleId);
+            if (!refs.isEmpty()) {
+                return createErrorResponse(ErrorCodes.ENTITY_IN_USE, createEntityInUseMessage(refs));
+            }
             return createErrorResponse(e);
         }
     }

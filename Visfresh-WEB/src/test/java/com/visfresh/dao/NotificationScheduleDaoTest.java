@@ -16,6 +16,7 @@ import org.junit.Test;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
+import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 
@@ -63,13 +64,7 @@ public class NotificationScheduleDaoTest
         s.setName("Schd-Test");
         s.setDescription("Test schedule");
 
-        final PersonSchedule ps = new PersonSchedule();
-        ps.setUser(user);
-        ps.setFromTime(45);
-        ps.setSendApp(true);
-        ps.setSendEmail(true);
-        ps.setSendSms(true);
-        ps.setToTime(150);
+        final PersonSchedule ps = createPersonalSchedule();
 
         s.getSchedules().add(ps);
         return s;
@@ -131,5 +126,48 @@ public class NotificationScheduleDaoTest
         left = companyDao.save(left);
 
         assertEquals(0, dao.findByCompany(left, null, null, null).size());
+    }
+    @Test
+    public void testGetDbReferences() {
+        final NotificationSchedule s = new NotificationSchedule();
+        s.setCompany(sharedCompany);
+        s.setName("Schd-Test");
+        s.setDescription("Test schedule");
+
+        s.getSchedules().add(createPersonalSchedule());
+        s.getSchedules().add(createPersonalSchedule());
+
+        dao.save(s);
+
+        createTemplate(s);
+        createTemplate(s);
+
+        assertEquals(4, dao.getDbReferences(s.getId()).size());
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    private ShipmentTemplate createTemplate(final NotificationSchedule s) {
+        final ShipmentTemplate tpl = new ShipmentTemplate();
+        tpl.setCompany(sharedCompany);
+        tpl.setShipmentDescription("Created by autostart shipment rule");
+        tpl.getAlertsNotificationSchedules().add(s);
+        tpl.getArrivalNotificationSchedules().add(s);
+        return getContext().getBean(ShipmentTemplateDao.class).save(tpl);
+    }
+    /**
+     * @return
+     */
+    private PersonSchedule createPersonalSchedule() {
+        final PersonSchedule ps = new PersonSchedule();
+        ps.setUser(user);
+        ps.setFromTime(45);
+        ps.setSendApp(true);
+        ps.setSendEmail(true);
+        ps.setSendSms(true);
+        ps.setToTime(150);
+        return ps;
     }
 }

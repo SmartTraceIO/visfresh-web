@@ -286,30 +286,27 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
             return new LinkedList<>();
         }
 
-//        final String sql = //notifications
-//                "(select " + ShipmentBaseDao.ID_FIELD + " as id, '"
-//                + ShipmentBaseDao.ALERTNOTIFSCHEDULES_TABLE
-//                + "' as type from " + ShipmentBaseDao.TABLE + " where "
-//                + ShipmentBaseDao.USER_FIELD + "=:user order by "
-//                + ShipmentBaseDao.ID_FIELD + ") UNION "
-//                //personal schedules
-//                + "(select " + ShipmentBaseDao.ID_FIELD + " as id, '"
-//                + ShipmentBaseDao.PERSONAL_SCHEDULE_TABLE
-//                + "' as type from " + ShipmentBaseDao.PERSONAL_SCHEDULE_TABLE + " where "
-//                + ShipmentBaseDao.USER_FIELD + "=:user order by "
-//                + ShipmentBaseDao.ID_FIELD + ")";
-//        final Map<String, Object> params = new HashMap<String, Object>();
-//        params.put("user", id);
+        final String sql =
+                "(select id as id, 'personalschedules' as type from personalschedules where "
+                + "schedule=:schedule order by id)"
+                + " UNION "
+                + "(select shipment as id, 'shipments' as type from alertnotifschedules where "
+                + "notification=:schedule order by id)"
+                + " UNION "
+                + "(select shipment as id, 'shipments' as type from arrivalnotifschedules where "
+                + "notification=:schedule order by id)";
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("schedule", id);
 
         final List<ReferenceInfo> refs = new LinkedList<>();
 
-//        for (final Map<String,Object> row : jdbc.queryForList(sql, params)) {
-//            final ReferenceInfo ref = new ReferenceInfo();
-//            ref.setType((String) row.get("type"));
-//            ref.setId(((Number) row.get("id")).longValue());
-//
-//            refs.add(ref);
-//        }
+        for (final Map<String,Object> row : jdbc.queryForList(sql, params)) {
+            final ReferenceInfo ref = new ReferenceInfo();
+            ref.setType((String) row.get("type"));
+            ref.setId(((Number) row.get("id")).longValue());
+
+            refs.add(ref);
+        }
         return refs;
     }
 }
