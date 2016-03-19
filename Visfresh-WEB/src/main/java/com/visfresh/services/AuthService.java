@@ -51,4 +51,9 @@ public interface AuthService {
      * @throws AuthenticationException
      */
     public void resetPassword(String email, String password, String token) throws AuthenticationException;
+    /**
+     * Closes all user sessions.
+     * @param u user.
+     */
+    public void forceLogout(User u);
 }

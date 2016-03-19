@@ -7,10 +7,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.TimeZone;
+
+import junit.framework.AssertionFailedError;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -62,11 +65,9 @@ public class UserControllerTest extends AbstractRestServiceTest {
         dao = context.getBean(UserDao.class);
         user = dao.findAll(null, null, null).get(0);
 
-        client = new UserRestClient(UTC);
-        client.setAuthToken(login());
-        client.setServiceUrl(getServiceUrl());
-        client.setCompanyResolver(context.getBean(CompanyResolver.class));
-        client.setShipmentResolver(context.getBean(ShipmentResolver.class));
+        final UserRestClient c = createClient();
+        c.setAuthToken(login());
+        this.client = c;
     }
     /**
      * Tests getUser method.
@@ -157,7 +158,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setLanguage(language);
         u.setMeasurementUnits(measurementUnits);
         u.setTitle(title);
-        u.setActive(false);
+        u.setActive(true);
         u.setExternal(external);
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
@@ -183,7 +184,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(language, u.getLanguage());
         assertEquals(measurementUnits, u.getMeasurementUnits());
         assertEquals(title, u.getTitle());
-        assertFalse(u.getActive());
+        assertTrue(u.getActive());
         assertEquals(external, u.getExternal());
 
         final AuthService auth = context.getBean(AuthService.class);
@@ -239,7 +240,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setLanguage(language);
         u.setMeasurementUnits(measurementUnits);
         u.setTitle(title);
-        u.setActive(false);
+        u.setActive(true);
         u.setExternal(external);
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
@@ -265,7 +266,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(language, u.getLanguage());
         assertEquals(measurementUnits, u.getMeasurementUnits());
         assertEquals(title, u.getTitle());
-        assertFalse(u.getActive());
+        assertTrue(u.getActive());
         assertEquals(external, u.getExternal());
 
         //check update user
@@ -282,6 +283,73 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         //check password
         assertNotNull(auth.login(u.getEmail(), newPassword));
+    }
+    @Test
+    public void testNotLoginInactiveUser() throws AuthenticationException {
+        final User u = createUser("abra@cada.bra", "James", "Bond", getCompany());
+
+        //check login
+        final AuthService auth = context.getBean(AuthService.class);
+        assertNotNull(auth.login(u.getEmail(), ""));
+
+        //set user to inactive
+        u.setActive(false);
+        dao.save(u);
+
+        try {
+            assertNotNull(auth.login(u.getEmail(), ""));
+            throw new AssertionFailedError("Auth exception should be thrown");
+        } catch (final AuthenticationException e) {
+            // ok
+        }
+    }
+    @Test
+    public void testLogout() throws AuthenticationException, IOException, RestServiceException {
+        final User u = createUser("abra@cada.bra", "James", "Bond", getCompany());
+
+        //check login
+        final AuthService auth = context.getBean(AuthService.class);
+
+        assertNotNull(auth.login(u.getEmail(), ""));
+        assertNotNull(client.getUser(null));
+
+        auth.logout(client.getAuthToken());
+        try {
+            client.getUser(null);
+            throw new AssertionFailedError("Auth exception should be thrown");
+        } catch (final Exception e) {
+            // ok
+        }
+    }
+    @Test
+    public void testForceLogout() throws AuthenticationException, IOException, RestServiceException {
+        final User u = createUser("abra@cada.bra", "James", "Bond", getCompany());
+
+        //check login
+        final AuthService auth = context.getBean(AuthService.class);
+
+        final UserRestClient c1 = createClient();
+        final UserRestClient c2 = createClient();
+
+        c1.setAuthToken(auth.login(u.getEmail(), "").getToken());
+        c2.setAuthToken(auth.login(u.getEmail(), "").getToken());
+
+        assertNotNull(c1.getUser(null));
+        assertNotNull(c2.getUser(null));
+
+        auth.forceLogout(u);
+        try {
+            c1.getUser(null);
+            throw new AssertionFailedError("Auth exception should be thrown");
+        } catch (final Exception e) {
+            // ok
+        }
+        try {
+            c2.getUser(null);
+            throw new AssertionFailedError("Auth exception should be thrown");
+        } catch (final Exception e) {
+            // ok
+        }
     }
     @Test
     public void testSaveWithNullValues() throws IOException, RestServiceException, AuthenticationException {
@@ -503,5 +571,15 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.getRoles().add(Role.Admin);
         context.getBean(AuthService.class).saveUser(u, "", false);
         return u;
+    }
+    /**
+     * @return
+     */
+    protected UserRestClient createClient() {
+        final UserRestClient c = new UserRestClient(UTC);
+        c.setServiceUrl(getServiceUrl());
+        c.setCompanyResolver(context.getBean(CompanyResolver.class));
+        c.setShipmentResolver(context.getBean(ShipmentResolver.class));
+        return c;
     }
 }

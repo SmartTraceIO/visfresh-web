@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -71,6 +72,9 @@ public class DefaultAuthService implements AuthService {
         final User user = userDao.findByEmail(email);
         if (user == null) {
             throw new AuthenticationException("Unknown user " + email);
+        }
+        if (!user.isActive()) {
+            throw new AuthenticationException("User is inactive " + email);
         }
 
         if (user.getPassword().equals(generateHash(password))) {
@@ -395,11 +399,33 @@ public class DefaultAuthService implements AuthService {
      */
     @Override
     public void logout(final String authToken) {
-        final User user = getUserForToken(authToken);
-        if (user != null) {
-            synchronized (users) {
-                users.remove(user.getEmail());
+        UserInfo userInfo;
+        synchronized (users) {
+            userInfo = users.remove(authToken);
+        }
+        if (userInfo != null) {
+            log.debug("User " + userInfo.getUser().getEmail() + "/" + authToken + " has logged out");
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.AuthService#forceLogout(com.visfresh.entities.User)
+     */
+    @Override
+    public void forceLogout(final User u) {
+        int count = 0;
+
+        final Long id = u.getId();
+        synchronized (users) {
+            final Iterator<Entry<String, UserInfo>> iter = users.entrySet().iterator();
+            while(iter.hasNext()) {
+                final Entry<String, UserInfo> entry = iter.next();
+                if (id.equals(entry.getValue().getUser().getId())) {
+                    iter.remove();
+                    count++;
+                }
             }
         }
+
+        log.debug(count + " user sessions have been closed for force logout of " + u.getEmail());
     }
 }

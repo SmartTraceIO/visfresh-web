@@ -428,6 +428,10 @@ public class UserController extends AbstractController implements UserConstants 
             }
 
             dao.save(u);
+
+            if (!u.isActive()) {
+                authService.forceLogout(u);
+            }
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to update user details", e);
