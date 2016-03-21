@@ -46,6 +46,14 @@ import com.visfresh.utils.StringUtils;
  *
  */
 public class ShipmentSerializer extends AbstractJsonSerializer {
+    /**
+     *
+     */
+    private static final String CREATED_BY = "createdBy";
+    /**
+     *
+     */
+    private static final String START_DATE = "startDate";
     private static final String JSON_SORT_COLUMN = "sc";
     private static final String JSON_SORT_ORDER = "so";
     private ReferenceResolver referenceResolver;
@@ -104,6 +112,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         s.getCustomFields().putAll(SerializerUtils.parseStringMap(json.get(ShipmentConstants.CUSTOM_FIELDS)));
         s.setStatus(ShipmentStatus.valueOf(json.get(ShipmentConstants.STATUS).getAsString()));
         s.setDevice(getReferenceResolver().getDevice(asString(json.get(ShipmentConstants.DEVICE_IMEI))));
+        s.setStartDate(asDate(json.get(START_DATE)));
+        s.setCreatedBy(asString(json.get(CREATED_BY)));
 
         return s;
     }
@@ -158,6 +168,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES, s.getShutDownAfterStartMinutes());
 
         obj.add(ShipmentConstants.CUSTOM_FIELDS, SerializerUtils.toJson(s.getCustomFields()));
+        obj.addProperty(START_DATE, formatDate(s.getStartDate()));
+        obj.addProperty(CREATED_BY, s.getCreatedBy());
         return obj;
     }
     /**

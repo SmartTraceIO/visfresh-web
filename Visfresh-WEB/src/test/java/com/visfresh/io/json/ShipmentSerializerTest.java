@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -35,6 +36,7 @@ import com.visfresh.io.SaveShipmentResponse;
  */
 public class ShipmentSerializerTest extends AbstractSerializerTest {
     private ShipmentSerializer serializer;
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     /**
      * Default constructor.
@@ -81,6 +83,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final Integer noAlertsAfterArrivalMinutes = 3;
         final Integer noAlertsAfterStartMinutes = 33;
         final Integer shutDownAfterStartMinutes = 5;
+        final String createdBy = "developer";
+        final Date startDate = new Date(10000l);
 
         Shipment s = new Shipment();
         s.setAlertProfile(alertProfile);
@@ -107,6 +111,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         s.setNoAlertsAfterArrivalMinutes(noAlertsAfterArrivalMinutes);
         s.setNoAlertsAfterStartMinutes(noAlertsAfterStartMinutes);
         s.setShutDownAfterStartMinutes(shutDownAfterStartMinutes);
+        s.setCreatedBy(createdBy);
+        s.setStartDate(startDate);
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
         s = serializer.parseShipment(obj);
@@ -135,6 +141,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(noAlertsAfterArrivalMinutes, s.getNoAlertsAfterArrivalMinutes());
         assertEquals(noAlertsAfterStartMinutes, s.getNoAlertsAfterStartMinutes());
         assertEquals(shutDownAfterStartMinutes, s.getShutDownAfterStartMinutes());
+        assertEquals(createdBy, s.getCreatedBy());
+        assertEquals(dateFormat.format(startDate), dateFormat.format(s.getStartDate()));
     }
     @Test
     public void testSaveShipmentResponse() {

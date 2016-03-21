@@ -205,6 +205,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setNoAlertsAfterArrivalMinutes(7);
         s.setNoAlertsAfterStartMinutes(77);
         s.setShutDownAfterStartMinutes(9);
+        s.setStartDate(parseDate("1988-12-15T12:12:12"));
+        s.setCreatedBy("developer");
         return s;
     }
 
@@ -252,6 +254,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(new Integer(9), s.getShutDownAfterStartMinutes());
         assertEquals("1988-12-12T11:11:11", dateFormat.format(s.getShipmentDate()));
         assertEquals("1988-12-15T11:11:11", dateFormat.format(s.getEta()));
+        assertEquals("1988-12-15T12:12:12", dateFormat.format(s.getStartDate()));
+        assertEquals("developer", s.getCreatedBy());
     }
 
     @Test

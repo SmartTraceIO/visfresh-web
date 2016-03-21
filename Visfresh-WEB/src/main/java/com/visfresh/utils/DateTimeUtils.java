@@ -5,7 +5,12 @@ package com.visfresh.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
+import com.visfresh.entities.Company;
 import com.visfresh.entities.User;
 
 /**
@@ -43,5 +48,52 @@ public final class DateTimeUtils {
      */
     public static DateFormat createIsoFormat(final User user) {
         return DateTimeUtils.createDateFormat(user, "yyyy-MM-dd' 'HH:mm");
+    }
+    /**
+     * @param company
+     * @param date
+     * @return
+     */
+    public static String formatShipmentDate(final Company company, final Date date) {
+        final TimeZone tz = company.getTimeZone() != null? company.getTimeZone() : TimeZone.getTimeZone("UTC");
+        final Locale locale = company.getLanguage() != null ? company.getLanguage().getLocale() : Locale.ENGLISH;
+        return formatDate(date, tz, locale);
+    }
+
+    /**
+     * @param date
+     * @param tz
+     * @param locale
+     * @return
+     */
+    private static String formatDate(final Date date, final TimeZone tz,
+            final Locale locale) {
+        final int rawOffset = tz.getRawOffset();
+        final SimpleDateFormat fmt = new SimpleDateFormat("h:mmaa dMMMyyyy ", locale);
+        fmt.setTimeZone(tz);
+
+        //time zone
+        final long hours = TimeUnit.MILLISECONDS.toHours(rawOffset);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(rawOffset)
+                - TimeUnit.HOURS.toMinutes(hours);
+        // avoid -4:-30 issue
+        minutes = Math.abs(minutes);
+
+        String tzString;
+        if (hours >= 0) {
+            if (minutes > 0) {
+                tzString = String.format("+%d:%d", hours, minutes);
+            } else {
+                tzString = String.format("+%d", hours, minutes);
+            }
+        } else {
+            if (minutes > 0) {
+                tzString = String.format("%d:%d", hours, minutes);
+            } else {
+                tzString = String.format("%d", hours, minutes);
+            }
+        }
+
+        return fmt.format(date) + tzString;
     }
 }

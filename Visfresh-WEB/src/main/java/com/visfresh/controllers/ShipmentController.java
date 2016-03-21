@@ -163,7 +163,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             checkCompanyAccess(user, newShipment.getArrivalNotificationSchedules());
 
             newShipment.setCompany(user.getCompany());
-            id = saveShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
+            id = saveShipment(newShipment,
+                    user,
+                    !Boolean.FALSE.equals(req.isIncludePreviousData()));
 
             final SaveShipmentResponse resp = new SaveShipmentResponse();
             resp.setShipmentId(id);
@@ -183,7 +185,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @param newShipment
      * @return
      */
-    private Long saveShipment(final Shipment newShipment, final boolean includePreviousData) {
+    private Long saveShipment(final Shipment newShipment, final User user, final boolean includePreviousData) {
         final String imei = newShipment.getDevice().getImei();
         final Shipment current = includePreviousData ? shipmentDao.findLastShipment(imei) : null;
 
@@ -206,6 +208,22 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             newShipment.setId(current.getId());
             newShipment.setStatus(ShipmentStatus.InProgress);
             newShipment.setTripCount(current.getTripCount());
+        }
+
+        //add date shipped
+        if (newShipment.getId() == null) {
+            final String dateShipped = DateTimeUtils.formatShipmentDate(
+                    newShipment.getCompany(), newShipment.getShipmentDate());
+            String desc = newShipment.getShipmentDescription();
+            if (desc == null) {
+                desc = dateShipped;
+            } else {
+                desc += " " + dateShipped;
+            }
+
+            newShipment.setShipmentDescription(desc);
+            newShipment.setStartDate(new Date());
+            newShipment.setCreatedBy(user.getEmail());
         }
 
         final Long resultId = shipmentDao.save(newShipment).getId();

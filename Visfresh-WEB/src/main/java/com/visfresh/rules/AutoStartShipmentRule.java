@@ -3,14 +3,10 @@
  */
 package com.visfresh.rules;
 
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -23,7 +19,6 @@ import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AutoStartShipment;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
@@ -32,6 +27,7 @@ import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.state.DeviceState;
+import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocationUtils;
 
 /**
@@ -161,7 +157,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
                     autoStarts, event.getLatitude(), event.getLongitude(), device, context.getState());
             //if not found, create new shipment from most priority template
             if (init == null) {
-                init = createShipmentFromTemplate(autoStarts.get(0), null, device, context.getState());
+                init = getFromTemplate(autoStarts.get(0), null, device, context.getState());
             }
         }
 
@@ -217,7 +213,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
 
             //if found autostart with given ID.
             if (auto != null) {
-                return createShipmentFromTemplate(auto,
+                return getFromTemplate(auto,
                         getBestLocation(auto, latitude, longitude),
                         device,
                         state);
@@ -231,7 +227,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
             //if autostart not assigned to device or assigned to given device
             final LocationProfile best = getBestLocation(auto, latitude, longitude);
             if (best != null) {
-                return createShipmentFromTemplate(auto, best, device, state);
+                return getFromTemplate(auto, best, device, state);
             }
         }
 
@@ -245,7 +241,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      * @param deviceState
      * @return
      */
-    private ShipmentInit createShipmentFromTemplate(final AutoStartShipment auto,
+    private ShipmentInit getFromTemplate(final AutoStartShipment auto,
             final LocationProfile startLocation, final Device device, final DeviceState deviceState) {
         final ShipmentInit init = new ShipmentInit();
         init.setAutoStart(auto);
@@ -275,6 +271,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         s.setDevice(device);
         s.setShippedFrom(init.getFrom());
         s.setShippedTo(init.getTo());
+        s.setStartDate(new Date());
+        s.setCreatedBy("AutoStart shipment rule");
 
         if (tpl.getShipmentDescription() != null) {
             s.setShipmentDescription(tpl.getShipmentDescription());
@@ -286,59 +284,11 @@ public class AutoStartShipmentRule implements TrackerEventRule {
 
         if (tpl.isAddDateShipped()) {
             s.setShipmentDescription(s.getShipmentDescription()
-                    + " " + formatShipmentDate(tpl.getCompany(), new Date()));
+                    + " " + DateTimeUtils.formatShipmentDate(tpl.getCompany(), new Date()));
         }
 
         return s;
     }
-    /**
-     * @param company
-     * @param date
-     * @return
-     */
-    private String formatShipmentDate(final Company company, final Date date) {
-        final TimeZone tz = company.getTimeZone() != null? company.getTimeZone() : TimeZone.getTimeZone("UTC");
-        final Locale locale = company.getLanguage() != null ? company.getLanguage().getLocale() : Locale.ENGLISH;
-        return formatDate(date, tz, locale);
-    }
-
-    /**
-     * @param date
-     * @param tz
-     * @param locale
-     * @return
-     */
-    private static String formatDate(final Date date, final TimeZone tz,
-            final Locale locale) {
-        final int rawOffset = tz.getRawOffset();
-        final SimpleDateFormat fmt = new SimpleDateFormat("h:mmaa dMMMyyyy ", locale);
-        fmt.setTimeZone(tz);
-
-        //time zone
-        final long hours = TimeUnit.MILLISECONDS.toHours(rawOffset);
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(rawOffset)
-                - TimeUnit.HOURS.toMinutes(hours);
-        // avoid -4:-30 issue
-        minutes = Math.abs(minutes);
-
-        String tzString;
-        if (hours >= 0) {
-            if (minutes > 0) {
-                tzString = String.format("+%d:%d", hours, minutes);
-            } else {
-                tzString = String.format("+%d", hours, minutes);
-            }
-        } else {
-            if (minutes > 0) {
-                tzString = String.format("%d:%d", hours, minutes);
-            } else {
-                tzString = String.format("%d", hours, minutes);
-            }
-        }
-
-        return fmt.format(date) + tzString;
-    }
-
     /**
      * @param auto
      * @return
@@ -388,8 +338,5 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         s.setDevice(device);
         s.setShipmentDescription("Created by autostart shipment rule");
         return s;
-    }
-    public static void main(final String[] args) {
-        System.out.println(formatDate(new Date(), TimeZone.getDefault(), Locale.getDefault()));
     }
 }

@@ -4,6 +4,7 @@
 package com.visfresh.controllers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -135,6 +136,32 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(tpl);
         assertNotNull(tpl.getName());
         assertEquals(comments, tpl.getCommentsForReceiver());
+    }
+    @Test
+    public void testSaveShipmentAddDateShipped() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+        s.setId(null);
+        final SaveShipmentResponse resp = shipmentClient.saveShipment(s, null, false);
+        assertNotNull(resp.getShipmentId());
+
+        //check new template is saved
+        final long id = resp.getShipmentId();
+        final Shipment shipment = context.getBean(ShipmentDao.class).findOne(id);
+
+        assertNotEquals(s.getShipmentDescription(), shipment.getShipmentDescription());
+    }
+    @Test
+    public void testCreatedBy() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+        s.setId(null);
+        final SaveShipmentResponse resp = shipmentClient.saveShipment(s, null, false);
+        assertNotNull(resp.getShipmentId());
+
+        //check new template is saved
+        final long id = resp.getShipmentId();
+        final Shipment shipment = context.getBean(ShipmentDao.class).findOne(id);
+
+        assertNotNull(shipment.getCreatedBy());
     }
     @Test
     public void testSaveShipmentOverDefault() throws RestServiceException, IOException {

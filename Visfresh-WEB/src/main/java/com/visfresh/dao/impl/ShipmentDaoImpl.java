@@ -39,6 +39,8 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     protected static final String PALETTID_FIELD = "palletid";
     protected static final String ASSETNUM_FIELD = "assetnum";
     protected static final String SHIPMENTDATE_FIELD = "shipmentdate";
+    protected static final String START_DATE = "startdate";
+    protected static final String CRETED_BY = "createdby";
     protected static final String ARRIVALDATE_FIELD = "arrivaldate";
     protected static final String ETA_FIELD = "eta";
     protected static final String CUSTOMFIELDS_FIELD = "customfiels";
@@ -284,6 +286,8 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         e.setPalletId((String) map.get(PALETTID_FIELD));
         e.setAssetNum((String) map.get(ASSETNUM_FIELD));
         e.setShipmentDate((Date) map.get(SHIPMENTDATE_FIELD));
+        e.setStartDate((Date) map.get(START_DATE));
+        e.setCreatedBy((String) map.get(CRETED_BY));
         e.setArrivalDate((Date) map.get(ARRIVALDATE_FIELD));
         e.setEta((Date) map.get(ETA_FIELD));
         e.setLastEventDate((Date) map.get(LASTEVENT_FIELD));
@@ -321,6 +325,8 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(PALETTID_FIELD, s.getPalletId());
         params.put(ASSETNUM_FIELD, s.getAssetNum());
         params.put(SHIPMENTDATE_FIELD, s.getShipmentDate());
+        params.put(START_DATE, s.getStartDate());
+        params.put(CRETED_BY, s.getCreatedBy());
         params.put(ARRIVALDATE_FIELD, s.getArrivalDate());
         params.put(ETA_FIELD, s.getEta());
         params.put(LASTEVENT_FIELD, s.getLastEventDate());

@@ -51,6 +51,14 @@ public class Shipment extends ShipmentBase {
      */
     private Date lastEventDate = new Date();
     /**
+     * The start date.
+     */
+    private Date startDate = new Date();
+    /**
+     * Email of author.
+     */
+    private String createdBy;
+    /**
      * Shipment status.
      */
     private ShipmentStatus status = ShipmentStatus.Default;
@@ -244,6 +252,32 @@ public class Shipment extends ShipmentBase {
      */
     public Date getEta() {
         return eta;
+    }
+    /**
+     * @return the startDate
+     */
+    public Date getStartDate() {
+        return startDate;
+    }
+    /**
+     * @param startDate the startDate to set
+     */
+    public void setStartDate(final Date startDate) {
+        this.startDate = startDate;
+    }
+
+    /**
+     * @return the createdBy
+     */
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    /**
+     * @param createdBy the createdBy to set
+     */
+    public void setCreatedBy(final String createdBy) {
+        this.createdBy = createdBy;
     }
 
     /**
