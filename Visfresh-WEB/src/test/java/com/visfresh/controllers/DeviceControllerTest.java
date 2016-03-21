@@ -13,7 +13,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.controllers.restclient.DeviceRestClient;
 import com.visfresh.dao.AutoStartShipmentDao;
@@ -32,9 +31,9 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.lists.DeviceDto;
+import com.visfresh.mock.MockShipmentShutdownService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.LocalizationUtils;
-import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -186,12 +185,8 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         client.shutdownDevice(s);
 
         //check result.
-        final List<SystemMessage> messages = context.getBean(SystemMessageDao.class).findAll(null, null, null);
-        assertEquals(1, messages.size());
-
-        final JsonObject json = SerializerUtils.parseJson(messages.get(0).getMessageInfo()).getAsJsonObject();
-        assertEquals("SHUTDOWN#", json.get("command").getAsString());
-        assertEquals(s.getDevice().getImei(), json.get("imei").getAsString());
+        final Date shutdownDate = context.getBean(MockShipmentShutdownService.class).getShutdownDate(s.getId());
+        assertNotNull(shutdownDate);
 
         //check shipment state
         assertEquals(ShipmentStatus.Ended, context.getBean(ShipmentDao.class).findOne(s.getId()).getStatus());

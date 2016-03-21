@@ -40,6 +40,7 @@ import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.json.DeviceSerializer;
 import com.visfresh.lists.DeviceDto;
 import com.visfresh.services.DeviceCommandService;
+import com.visfresh.services.ShipmentShutdownService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
 
@@ -67,6 +68,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
     private DeviceCommandService commandService;
     @Autowired
     private DeviceResolver deviceResolver;
+    @Autowired
+    private ShipmentShutdownService shutdownService;
 
     /**
      * Default constructor.
@@ -260,29 +263,6 @@ public class DeviceController extends AbstractController implements DeviceConsta
             return createErrorResponse(e);
         }
     }
-//    /**
-//     * @param authToken authentication token.
-//     * @param imei device ID.
-//     * @return device.
-//     */
-//    @RequestMapping(value = "/deleteDevice/{authToken}", method = RequestMethod.GET)
-//    public JsonObject deleteDevice(@PathVariable final String authToken,
-//            @RequestParam final String imei) {
-//        try {
-//            //check logged in.
-//            final User user = getLoggedInUser(authToken);
-//            checkAccess(user, Role.NormalUser);
-//
-//            final Device d = dao.findOne(imei);
-//            checkCompanyAccess(user, d);
-//
-//            dao.delete(d);
-//            return createSuccessResponse(null);
-//        } catch (final Exception e) {
-//            log.error("Failed to get devices", e);
-//            return createErrorResponse(e);
-//        }
-//    }
     /**
      * @param authToken authentication token.
      * @param req shipment.
@@ -339,13 +319,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param device
      */
     private void stopShipmentAndShutdownDevice(final Shipment shipment, final Device device) {
-        final Shipment last = shipmentDao.findLastShipment(device.getImei());
-        if (last != null && last.getId().equals(shipment.getId())) {
-            commandService.shutdownDevice(device, new Date());
-        } else {
-            log.warn("The shipment " + shipment.getId() + " is not last sipment for device "
-                    + device.getImei() + ". Device shutdown will ignored");
-        }
+        shutdownService.sendShipmentShutdown(shipment, new Date());
 
         //stop shipment
         final ShipmentStatus status = shipment.getStatus();
