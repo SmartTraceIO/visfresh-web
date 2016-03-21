@@ -87,7 +87,7 @@ public class AutoStartShipmentController extends AbstractController
             final AutoStartShipmentDto dto = createSerializer(user)
                     .parseAutoStartShipmentDto(defShipment);
 
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             AutoStartShipment cfg;
             ShipmentTemplate tpl;
@@ -221,7 +221,7 @@ public class AutoStartShipmentController extends AbstractController
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
             checkCompanyAccess(user, cfg);
@@ -244,7 +244,7 @@ public class AutoStartShipmentController extends AbstractController
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
             checkCompanyAccess(user, cfg);
@@ -274,7 +274,7 @@ public class AutoStartShipmentController extends AbstractController
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final AutoStartShipmentSerializer ser = createSerializer(user);
 

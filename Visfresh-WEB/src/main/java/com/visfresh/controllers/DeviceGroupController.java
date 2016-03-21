@@ -62,7 +62,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
             final @RequestBody JsonObject group) {
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final DeviceGroup g = createSerializer(user).parseDeviceGroup(group);
             g.setCompany(user.getCompany());
@@ -92,7 +92,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final DeviceGroupSerializer ser = createSerializer(user);
 
@@ -124,7 +124,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final DeviceGroup group = dao.findOne(groupName);
             checkCompanyAccess(user, group);
@@ -154,7 +154,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final Device d = deviceDao.findOne(device);
             checkCompanyAccess(user, d);
@@ -186,7 +186,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
             final User user = getLoggedInUser(authToken);
 
             final DeviceGroup group = dao.findOne(name);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
             checkCompanyAccess(user, group);
 
             return createSuccessResponse(createSerializer(user).toJson(group));
@@ -206,7 +206,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final DeviceGroup d = dao.findOne(name);
             checkCompanyAccess(user, d);
@@ -231,7 +231,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final DeviceGroup g = dao.findOne(groupName);
             checkCompanyAccess(user, g);
@@ -260,7 +260,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final DeviceGroup g = dao.findOne(groupName);
             checkCompanyAccess(user, g);

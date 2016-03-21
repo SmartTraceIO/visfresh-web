@@ -129,7 +129,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final @RequestBody JsonObject jsonRequest) {
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final ShipmentSerializer serializer = getSerializer(user);
 
@@ -240,7 +240,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final ShipmentSerializer ser = getSerializer(user);
             final GetFilteredShipmentsRequest req = ser.parseGetFilteredShipmentsRequest(request);
@@ -451,7 +451,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, shipment);
@@ -478,7 +478,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final Shipment s = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, s);
@@ -505,7 +505,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final ShipmentSerializer ser = getSerializer(user);
 

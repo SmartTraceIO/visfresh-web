@@ -70,7 +70,7 @@ public class ShipmentNoteController extends AbstractController {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final ShipmentNote note = shipmentNoteDao.findOne(noteId);
 
@@ -91,7 +91,7 @@ public class ShipmentNoteController extends AbstractController {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             //find user and shipment
             final User noteOwner = userDao.findOne(userId);
@@ -122,7 +122,7 @@ public class ShipmentNoteController extends AbstractController {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final ShipmentNoteSerializer ser = getSerializer(user);
             final SaveShipmentNoteRequest ssnr = ser.parseSaveShipmentNoteRequest(req);

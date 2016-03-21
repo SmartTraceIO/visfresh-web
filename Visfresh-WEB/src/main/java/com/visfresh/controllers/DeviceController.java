@@ -84,7 +84,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final @RequestBody JsonObject device) {
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final Device d = createSerializer(user).parseDevice(device);
 
@@ -131,7 +131,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final DeviceSerializer ser = createSerializer(user);
 
@@ -221,7 +221,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final Device device = dao.findByImei(imei);
             checkCompanyAccess(user, device);
@@ -314,7 +314,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final @RequestParam Long shipmentId) {
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, shipment);

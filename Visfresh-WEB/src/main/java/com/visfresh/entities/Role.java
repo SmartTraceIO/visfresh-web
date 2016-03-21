@@ -35,7 +35,7 @@ public enum Role {
      * Trackers (inc. Shutdown Device, but NOT Deactivate Device or Billing)
      * Setup pages (but Users is View Only),
      */
-    NormalUser,
+    BasicUser,
     /**
      * NOT NewShipment
      * View Shipments,
@@ -43,10 +43,10 @@ public enum Role {
      * Trackers (NOT Shutdown Device, Deactivate Device or Billing)
      * NOT Setup pages
      */
-    BasicUser;
+    NormalUser;
 
     static {
-        BasicUser.includedRoles = new Role[]{NormalUser};
+        NormalUser.includedRoles = new Role[]{BasicUser};
     }
 
     private Role[] includedRoles = {};

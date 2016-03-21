@@ -60,7 +60,7 @@ public class LocationController extends AbstractController implements LocationCo
             final @RequestBody JsonObject profile) {
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final LocationProfile lp = createSerializer(user).parseLocationProfile(profile);
             lp.setCompany(user.getCompany());
@@ -92,7 +92,7 @@ public class LocationController extends AbstractController implements LocationCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final LocationSerializer ser = createSerializer(user);
 
@@ -132,7 +132,7 @@ public class LocationController extends AbstractController implements LocationCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final LocationProfile p = dao.findOne(locationId);
             checkCompanyAccess(user, p);
@@ -154,7 +154,7 @@ public class LocationController extends AbstractController implements LocationCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final LocationProfile p = dao.findOne(locationId);
             checkCompanyAccess(user, p);

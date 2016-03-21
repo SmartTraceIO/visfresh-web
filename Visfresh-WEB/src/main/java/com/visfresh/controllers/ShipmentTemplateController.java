@@ -65,7 +65,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
             final @RequestBody JsonObject tpl) {
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final ShipmentTemplate t = createSerializer(user).parseShipmentTemplate(tpl);
             t.setCompany(user.getCompany());
@@ -105,7 +105,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final Filter filter = new Filter();
             filter.addFilter(ShipmentTemplateDaoImpl.AUTOSTART_FIELD, false);
@@ -150,7 +150,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final ShipmentTemplate template = shipmentTemplateDao.findOne(shipmentTemplateId);
             checkCompanyAccess(user, template);
@@ -182,7 +182,7 @@ public class ShipmentTemplateController extends AbstractController implements Sh
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final ShipmentTemplate tpl = shipmentTemplateDao.findOne(shipmentTemplateId);
             checkCompanyAccess(user, tpl);

@@ -57,7 +57,7 @@ public class CompanyController extends AbstractController implements CompanyCons
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final Company company;
             if (companyId == null || user.getCompany().getId().equals(companyId)) {
@@ -88,7 +88,7 @@ public class CompanyController extends AbstractController implements CompanyCons
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final List<Company> companies = dao.findAll(null, new Sorting(getDefaultSortOrder()), page);
             final int total = dao.getEntityCount(null);

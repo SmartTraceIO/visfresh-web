@@ -72,7 +72,7 @@ public class AlertProfileController extends AbstractController implements AlertP
             final AlertProfile p = createSerializer(user).parseAlertProfile(alert);
             p.setCompany(user.getCompany());
 
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final AlertProfile old = dao.findOne(p.getId());
             checkCompanyAccess(user, old);
@@ -95,7 +95,7 @@ public class AlertProfileController extends AbstractController implements AlertP
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final AlertProfile alert = dao.findOne(alertProfileId);
             checkCompanyAccess(user, alert);
@@ -117,7 +117,7 @@ public class AlertProfileController extends AbstractController implements AlertP
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final AlertProfile p = dao.findOne(alertProfileId);
             checkCompanyAccess(user, p);
@@ -147,7 +147,7 @@ public class AlertProfileController extends AbstractController implements AlertP
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final AlertProfileSerializer ser = createSerializer(user);
 

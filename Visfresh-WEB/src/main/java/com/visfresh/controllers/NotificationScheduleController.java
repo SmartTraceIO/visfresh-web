@@ -71,7 +71,7 @@ public class NotificationScheduleController extends AbstractController implement
             final @RequestBody JsonObject schedule) {
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final NotificationSchedule s = createSerializer(user).parseNotificationSchedule(schedule);
             s.setCompany(user.getCompany());
@@ -104,7 +104,7 @@ public class NotificationScheduleController extends AbstractController implement
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final List<NotificationSchedule> schedules = dao.findByCompany(
                     user.getCompany(),
@@ -160,7 +160,7 @@ public class NotificationScheduleController extends AbstractController implement
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             //find schedule
             final NotificationSchedule s = dao.findOne(notificationScheduleId);
@@ -194,7 +194,7 @@ public class NotificationScheduleController extends AbstractController implement
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final NotificationSchedule s = dao.findOne(notificationScheduleId);
             checkCompanyAccess(user, s);
@@ -216,7 +216,7 @@ public class NotificationScheduleController extends AbstractController implement
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final NotificationSchedule s = dao.findOne(notificationScheduleId);
             checkCompanyAccess(user, s);

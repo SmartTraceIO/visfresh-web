@@ -85,7 +85,7 @@ public class UserController extends AbstractController implements UserConstants 
         try {
             final User user = getLoggedInUser(authToken);
             if (userId != null && !user.getId().equals(userId)) {
-                checkAccess(user, Role.NormalUser);
+                checkAccess(user, Role.BasicUser);
             }
 
             final User u = dao.findOne(userId == null ? user.getId() : userId);
@@ -116,7 +116,7 @@ public class UserController extends AbstractController implements UserConstants 
 
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final int total = dao.getEntityCount(user.getCompany(), null);
             final UserSerializer ser = getUserSerializer(user);
@@ -156,7 +156,7 @@ public class UserController extends AbstractController implements UserConstants 
 
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final UserSerializer ser = getUserSerializer(user);
 
@@ -381,7 +381,7 @@ public class UserController extends AbstractController implements UserConstants 
             @RequestBody final JsonObject body) {
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final UpdateUserDetailsRequest req = getUserSerializer(user).parseUpdateUserDetailsRequest(
                     body);

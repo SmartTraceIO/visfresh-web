@@ -178,7 +178,7 @@ public class AutoStartShipmentDaoTest extends
         assertEquals(a2.getId(), all.get(1).getId());
     }
     @Test
-    public void testStartByStartLocations() {
+    public void testSortByStartLocations() {
         final AutoStartShipment a1 = dao.save(createAutoStart(createTemplate()));
         final AutoStartShipment a2 = dao.save(createAutoStart(createTemplate()));
 

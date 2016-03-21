@@ -103,7 +103,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternal(external);
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.BasicUser);
+        u.getRoles().add(Role.NormalUser);
         u.getRoles().add(Role.Admin);
 
         final String password = "password";
@@ -162,8 +162,8 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternal(external);
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.BasicUser);
         u.getRoles().add(Role.NormalUser);
+        u.getRoles().add(Role.BasicUser);
 
         final String password = "password";
 
@@ -244,8 +244,8 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternal(external);
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.BasicUser);
         u.getRoles().add(Role.NormalUser);
+        u.getRoles().add(Role.BasicUser);
 
         final String password = "password";
 
@@ -380,7 +380,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         u.setExternal(external);
         u.setExternalCompany(externalCompany);
         u.setRoles(new HashSet<Role>());
-        u.getRoles().add(Role.BasicUser);
+        u.getRoles().add(Role.NormalUser);
 
         final String password = "password";
         final Long id = client.saveUser(u, password, false);

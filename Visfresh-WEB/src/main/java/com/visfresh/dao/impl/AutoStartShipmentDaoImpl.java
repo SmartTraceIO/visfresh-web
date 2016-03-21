@@ -341,22 +341,22 @@ public class AutoStartShipmentDaoImpl
                 //location from
                 + "left outer join (select "
                 + "lr." + LOCATION_CONFIG + " as locationConfig,\n"
-                + "loc." + LocationProfileDaoImpl.NAME_FIELD + " as locationName\n"
+                + "min(loc." + LocationProfileDaoImpl.NAME_FIELD + ") as locationName\n"
                 + "from " + LOCATION_REL_TABLE + " lr\n"
                 + "join " + LocationProfileDaoImpl.TABLE + " loc\n"
                 + "on loc." + LocationProfileDaoImpl.ID_FIELD + "=lr." + LOCATION_LOCATION + "\n"
                 + "where lr." + LOCATION_DIRECTION  + " = 'from'\n"
-                + "order by loc." + LocationProfileDaoImpl.ID_FIELD + " limit 1"
+                + "group by lr." + LOCATION_CONFIG
                 + ") lfrom on lfrom.locationConfig = " + TABLE + "." + ID_FIELD + "\n"
                 //location to
                 + "left outer join (select "
                 + "lr." + LOCATION_CONFIG + " as locationConfig,\n"
-                + "loc." + LocationProfileDaoImpl.NAME_FIELD + " as locationName\n"
+                + "min(loc." + LocationProfileDaoImpl.NAME_FIELD + ") as locationName\n"
                 + "from " + LOCATION_REL_TABLE + " lr\n"
                 + "join " + LocationProfileDaoImpl.TABLE + " loc\n"
                 + "on loc." + LocationProfileDaoImpl.ID_FIELD + "=lr." + LOCATION_LOCATION + "\n"
                 + "where lr." + LOCATION_DIRECTION  + " = 'to'\n"
-                + "order by loc." + LocationProfileDaoImpl.ID_FIELD + " limit 1"
+                + "group by lr." + LOCATION_CONFIG
                 + ") lto on lto.locationConfig = " + TABLE + "." + ID_FIELD + "\n"
                 ;
     }
