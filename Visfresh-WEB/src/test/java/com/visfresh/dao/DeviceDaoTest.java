@@ -407,6 +407,24 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals(d.getTripCount(), item.getTripCount());
     }
     @Test
+    public void testGetDevicesCorrectShipment() {
+        final Device d1 = createAndSaveDevice(sharedCompany, "111111111111");
+        final Device d2 = createAndSaveDevice(sharedCompany, "111111111112");
+        dao.save(d1);
+        dao.save(d2);
+
+        final Shipment s1 = createShipment(d1, ShipmentStatus.Arrived);
+        final Shipment s2 = createShipment(d2, ShipmentStatus.Arrived);
+
+        createTrackerEvent(s2, 1.1, 2.2, 3, 4, new Date());
+        createTrackerEvent(d1, 1.1, 2.2, 3, 5, new Date());
+        final TrackerEvent e = createTrackerEvent(d1, 1.1, 2.2, 3, 6, new Date());
+
+        final ListDeviceItem item = dao.getDevices(sharedCompany, null, null).get(0);
+        assertEquals(s1.getId(), item.getShipmentId());
+        assertEquals(e.getTemperature(), item.getTemperature(), 0.0001);
+    }
+    @Test
     public void testGetByImei() {
         final String imei = "3984709382475";
         final Device d1 = createDevice(imei);
@@ -480,6 +498,26 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         e.setBattery(battery);
         e.setDevice(s.getDevice());
         e.setShipment(s);
+        e.setLatitude(lat);
+        e.setLongitude(lon);
+        e.setTemperature(t);
+        e.setTime(date);
+        e.setType(TrackerEventType.AUT);
+        return getContext().getBean(TrackerEventDao.class).save(e);
+    }
+    /**
+     * @param s shipment.
+     * @param lat latitude.
+     * @param lon longitude.
+     * @param battery battery.
+     * @param t temperature.
+     * @param date date.
+     */
+    private TrackerEvent createTrackerEvent(final Device d, final double lat, final double lon,
+            final int battery, final double t, final Date date) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setBattery(battery);
+        e.setDevice(d);
         e.setLatitude(lat);
         e.setLongitude(lon);
         e.setTemperature(t);

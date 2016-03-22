@@ -228,7 +228,6 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 + "d." + NAME_FIELD + " as " + DeviceConstants.PROPERTY_NAME + ",\n"
                 + "d." + DESCRIPTION_FIELD + " as " + DeviceConstants.PROPERTY_DESCRIPTION + ",\n"
                 + "d." + ACTIVE_FIELD + " as " + DeviceConstants.PROPERTY_ACTIVE + ",\n"
-                + "d." + TRIPCOUNT_FIELD + " as deviceTripCount,\n"
                 + "aut." + AutoStartShipmentDaoImpl.ID_FIELD + " as "
                 + DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID + ",\n"
                 + "tpl." + ShipmentTemplateDaoImpl.NAME_FIELD + " as "
@@ -237,18 +236,17 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 + DeviceConstants.PROPERTY_SN + ",\n"
                 + "substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6) as "
                 + DeviceConstants.PROPERTY_SHIPMENT_NUMBER + ",\n"
-                + "lr.shipment as " + DeviceConstants.PROPERTY_LAST_SHIPMENT + ",\n"
+                + "sp.id as " + DeviceConstants.PROPERTY_LAST_SHIPMENT + ",\n"
                 + "lr.latitude as " + DeviceConstants.PROPERTY_LAST_READING_LAT + ",\n"
                 + "lr.longitude as " + DeviceConstants.PROPERTY_LAST_READING_LONG + ",\n"
                 + "lr.battery as " + DeviceConstants.PROPERTY_LAST_READING_BATTERY + ",\n"
                 + "lr.temperature as " + DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE + ",\n"
                 + "lr.time as " + DeviceConstants.PROPERTY_LAST_READING_TIME_ISO + ",\n"
-                + "lr.status as " + DeviceConstants.PROPERTY_SHIPMENT_STATUS + "\n"
+                + "sp.status as " + DeviceConstants.PROPERTY_SHIPMENT_STATUS + ",\n"
+                + "sp.tripcount as deviceTripCount\n"
                 + "from devices d\n"
                 + "left outer join (\n"
                 + "select\n"
-                + "s." + ShipmentDaoImpl.ID_FIELD + " as shipment,\n"
-                + "s." + ShipmentDaoImpl.STATUS_FIELD + " as status,\n"
                 + "te." + TrackerEventDaoImpl.TIME_FIELD + " as time,\n"
                 + "te." + TrackerEventDaoImpl.TEMPERATURE_FIELD + " as temperature,\n"
                 + "te." + TrackerEventDaoImpl.BATTERY_FIELD + " as battery,\n"
@@ -260,9 +258,14 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 + TrackerEventDaoImpl.TABLE + " group by " + TrackerEventDaoImpl.DEVICE_FIELD
                 + ") teid\n"
                 + "on teid.id = te." + TrackerEventDaoImpl.ID_FIELD + "\n"
-                + "left outer join " + ShipmentDaoImpl.TABLE + " s on te."
-                + TrackerEventDaoImpl.SHIPMENT_FIELD + " = s." + ShipmentDaoImpl.ID_FIELD + "\n"
                 + ") lr on lr.device = d." + IMEI_FIELD + "\n"
+
+                + "left outer join (select s.* from "
+                + ShipmentDaoImpl.TABLE + " s "
+                + " join (select max(" + ShipmentDaoImpl.ID_FIELD+ ") as id from " + ShipmentDaoImpl.TABLE
+                + " group by " + ShipmentDaoImpl.DEVICE_FIELD + ") s1 on s1.id = s." + ShipmentDaoImpl.ID_FIELD
+                + ") sp on sp.device = d." + IMEI_FIELD + "\n"
+
                 + "left outer join " + AutoStartShipmentDaoImpl.TABLE + " aut on aut."
                 + AutoStartShipmentDaoImpl.ID_FIELD + " = d." + AUTOSTART_TEMPLATE_FIELD + "\n"
                 + "left outer join " + ShipmentTemplateDaoImpl.TABLE + " tpl on tpl."
@@ -302,7 +305,10 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         item.setDescription((String) row.get(DeviceConstants.PROPERTY_DESCRIPTION));
         item.setImei((String) row.get(DeviceConstants.PROPERTY_IMEI));
         item.setName((String) row.get(DeviceConstants.PROPERTY_NAME));
-        item.setTripCount(((Number) row.get("deviceTripCount")).intValue());
+        final Number deviceTripCount = (Number) row.get("deviceTripCount");
+        if (deviceTripCount != null) {
+            item.setTripCount(deviceTripCount.intValue());
+        }
 
         if (row.get(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID) != null) {
             item.setAutostartTemplateId(((Number) row.get(
