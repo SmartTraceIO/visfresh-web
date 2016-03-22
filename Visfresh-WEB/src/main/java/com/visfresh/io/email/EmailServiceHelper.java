@@ -10,9 +10,10 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
-import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import com.sun.mail.smtp.SMTPTransport;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -57,49 +58,44 @@ public class EmailServiceHelper {
             props.put("mail.smtp.auth", "false");
         }
 
-        if (!useSsl) {
-            props.put("mail.smtp.host", smtpHost);
-            props.put("mail.smtp.port", smtpPort);
+        props.put("mail.smtp.from", getSender());
+        props.put("mail.smtp.user", getUser());
+        props.put("mail.smtp.password", getPassword());
+        props.put("mail.smtp.host", smtpHost);
+        props.put("mail.smtp.port", smtpPort);
 
-            sendMessage(props, auth, email, sender, subject, message);
-            return;
-        } else {
-            props.put("mail.smtp.auth", "true");
+        if (useSsl) {
             props.put("mail.smtp.host", smtpHost);
             props.put("mail.smtp.socketFactory.port", smtpPort);
-            props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
             props.put("mail.smtp.socketFactory.fallback", "false");
-
-            sendMessage(props, auth, email, sender, subject, message);
         }
-    }
-
-    private void sendMessage(final Properties props,
-            final Authenticator auth,
-            final String[] to,
-            final String from,
-            final String subject,
-            final String textBody) throws MessagingException {
         // create some properties and get the default Session
+
         final Session session = Session.getInstance(props, auth);
         // create a message
         final Message msg = new MimeMessage(session);
 
         // set the from and to address
-        msg.setFrom(new InternetAddress(from));
+        msg.setFrom(new InternetAddress(sender));
 
         //add receipts
-        for (final String receipt : to) {
+        for (final String receipt : email) {
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(receipt));
         }
 
         // Setting the Subject and Content Type
         msg.setSubject(subject);
-        msg.setText(textBody);
+        msg.setText(message);
 
-        Transport.send(msg);
+        final SMTPTransport t = (SMTPTransport) session.getTransport(isUseSsl() ? "smtps" : "smtp");
+        t.connect(getSmtpHost(), getSmtpPort(), getUser(), getPassword());
+
+        try {
+            t.sendMessage(msg, msg.getAllRecipients());
+        } finally {
+            t.close();
+        }
     }
-
     /**
      * @return the useSsl
      */
@@ -171,5 +167,18 @@ public class EmailServiceHelper {
      */
     public void setPassword(final String password) {
         this.password = password;
+    }
+
+    public static void main(final String[] args) throws MessagingException {
+        final EmailServiceHelper h = new EmailServiceHelper();
+        h.setUseSsl(true);
+        h.setSender("smarttraceapi@yahoo.com");
+        h.setSmtpHost("smtp.mail.yahoo.com");
+        h.setSmtpPort(465);
+        h.setUser("smarttraceapi@yahoo.com");
+        h.setPassword("govisfresh20151217");
+
+        h.sendMessage(new String[] {"vyacheslav.soldatov@inbox.ru"},
+                "Test Message", "Test message for new email service");
     }
 }
