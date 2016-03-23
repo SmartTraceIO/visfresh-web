@@ -68,6 +68,8 @@ public class EmailServiceHelper {
             props.put("mail.smtp.host", smtpHost);
             props.put("mail.smtp.socketFactory.port", smtpPort);
             props.put("mail.smtp.socketFactory.fallback", "false");
+            props.put("mail.smtp.socketFactory.class", WorkaroundSslSocketFactory.class.getName());
+            props.put("mail.smtps.socketFactory.class", WorkaroundSslSocketFactory.class.getName());
         }
         // create some properties and get the default Session
 
@@ -172,11 +174,11 @@ public class EmailServiceHelper {
     public static void main(final String[] args) throws MessagingException {
         final EmailServiceHelper h = new EmailServiceHelper();
         h.setUseSsl(true);
-        h.setSender("smarttraceapi@yahoo.com");
-        h.setSmtpHost("smtp.mail.yahoo.com");
+        h.setSender("api@smarttrace.com.au");
+        h.setSmtpHost("mail.messagingengine.com");
         h.setSmtpPort(465);
-        h.setUser("smarttraceapi@yahoo.com");
-        h.setPassword("govisfresh20151217");
+        h.setUser("api@smarttrace.com.au");
+        h.setPassword("figspace");
 
         h.sendMessage(new String[] {"vyacheslav.soldatov@inbox.ru"},
                 "Test Message", "Test message for new email service");
