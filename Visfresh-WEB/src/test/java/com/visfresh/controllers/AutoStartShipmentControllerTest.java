@@ -108,12 +108,14 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
 
         final LocationProfile locTo = createLocation("From");
         final LocationProfile locFrom = createLocation("TO");
+        final LocationProfile locInterim = createLocation("Interim");
         final int priority = 99;
 
         final AutoStartShipmentDto dto = new AutoStartShipmentDto();
         dto.setPriority(priority);
         dto.getStartLocations().add(locFrom.getId());
         dto.getEndLocations().add(locTo.getId());
+        dto.getInterimStops().add(locInterim.getId());
 
         //add shipment template fields
         final AlertProfile alertProfile = createAlertProfile(true);
@@ -151,6 +153,7 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(priority, ds.getPriority());
         assertEquals(locFrom.getId(), ds.getShippedFrom().get(0).getId());
         assertEquals(locTo.getId(), ds.getShippedTo().get(0).getId());
+        assertEquals(locInterim.getId(), ds.getInterimStops().get(0).getId());
 
         //check shipment template fields.
         final ShipmentTemplate tpl = ds.getTemplate();

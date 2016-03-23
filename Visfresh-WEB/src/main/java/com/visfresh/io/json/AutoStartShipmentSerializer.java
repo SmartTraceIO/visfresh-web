@@ -74,6 +74,19 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
             }
         }
 
+        //end locations.
+        array = json.get(INTERIM_STOPS).getAsJsonArray();
+        for (final JsonElement el : array) {
+            dto.getInterimStops().add(el.getAsLong());
+        }
+        //names is readonly therefore can be absent
+        if (json.has(INTERIM_STOPS_NAMES)) {
+            array = json.get(INTERIM_STOPS_NAMES).getAsJsonArray();
+            for (final JsonElement el : array) {
+                dto.getInterimStopsNames().add(el.getAsString());
+            }
+        }
+
         dto.setAlertSuppressionMinutes(asInt(json.get(ShipmentConstants.ALERT_SUPPRESSION_MINUTES)));
         dto.setAlertProfile(asLong(json.get(ShipmentConstants.ALERT_PROFILE_ID)));
         dto.setAlertProfileName(asString(json.get(ALERT_PROFILE_NAME)));
@@ -141,6 +154,22 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
         json.add(END_LOCATION_NAMES, names);
 
         for (final String name : as.getEndLocationNames()) {
+            names.add(new JsonPrimitive(name));
+        }
+
+        //interim stops
+        ids = new JsonArray();
+        json.add(INTERIM_STOPS, ids);
+
+        for (final Long id : as.getInterimStops()) {
+            ids.add(new JsonPrimitive(id));
+        }
+
+        //names
+        names = new JsonArray();
+        json.add(INTERIM_STOPS_NAMES, names);
+
+        for (final String name : as.getInterimStopsNames()) {
             names.add(new JsonPrimitive(name));
         }
 

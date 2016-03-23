@@ -40,11 +40,15 @@ public class AutoStartShipmentSerializerTest {
         final Long loc2 = 2l;
         final Long loc3 = 3l;
         final Long loc4 = 4l;
+        final Long loc5 = 5l;
+        final Long loc6 = 6l;
 
         final String locName1 = "Location_1";
         final String locName2 = "Location_2";
         final String locName3 = "Location_3";
         final String locName4 = "Location_4";
+        final String locName5 = "Location_5";
+        final String locName6 = "Location_6";
 
         //template
         final int alertSuppressionMinutes = 25;
@@ -89,6 +93,10 @@ public class AutoStartShipmentSerializerTest {
         dto.getEndLocationNames().add(locName3);
         dto.getEndLocations().add(loc4);
         dto.getEndLocationNames().add(locName4);
+        dto.getInterimStops().add(loc5);
+        dto.getInterimStopsNames().add(locName5);
+        dto.getInterimStops().add(loc6);
+        dto.getInterimStopsNames().add(locName6);
 
         dto = serializer.parseAutoStartShipmentDto(serializer.toJson(dto));
 
@@ -98,11 +106,15 @@ public class AutoStartShipmentSerializerTest {
         assertEquals(loc2, dto.getStartLocations().get(1));
         assertEquals(loc3, dto.getEndLocations().get(0));
         assertEquals(loc4, dto.getEndLocations().get(1));
+        assertEquals(loc5, dto.getInterimStops().get(0));
+        assertEquals(loc6, dto.getInterimStops().get(1));
 
         assertEquals(locName1, dto.getStartLocationNames().get(0));
         assertEquals(locName2, dto.getStartLocationNames().get(1));
         assertEquals(locName3, dto.getEndLocationNames().get(0));
         assertEquals(locName4, dto.getEndLocationNames().get(1));
+        assertEquals(locName5, dto.getInterimStopsNames().get(0));
+        assertEquals(locName6, dto.getInterimStopsNames().get(1));
 
         //template
         assertEquals(alertSuppressionMinutes, dto.getAlertSuppressionMinutes());

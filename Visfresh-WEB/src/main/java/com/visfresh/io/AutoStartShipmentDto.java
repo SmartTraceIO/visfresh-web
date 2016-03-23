@@ -26,6 +26,10 @@ public class AutoStartShipmentDto {
      */
     private final List<Long> endLocations = new LinkedList<>();
     private final List<String> endLocationNames = new LinkedList<>();
+
+    private final List<Long> interimStops = new LinkedList<>();
+    private final List<String> interimStopsNames = new LinkedList<>();
+
     private int priority;
     private Long id;
     private String alertProfileName;
@@ -109,6 +113,11 @@ public class AutoStartShipmentDto {
         for (final LocationProfile loc : cfg.getShippedTo()) {
             endLocations.add(loc.getId());
             endLocationNames.add(loc.getName());
+        }
+        //add interim stops.
+        for (final LocationProfile loc : cfg.getInterimStops()) {
+            interimStops.add(loc.getId());
+            interimStopsNames.add(loc.getName());
         }
 
         //shipment template fields.
@@ -352,5 +361,17 @@ public class AutoStartShipmentDto {
      */
     public List<String> getStartLocationNames() {
         return startLocationNames;
+    }
+    /**
+     * @return
+     */
+    public List<Long> getInterimStops() {
+        return interimStops;
+    }
+    /**
+     * @return the startLocationNames
+     */
+    public List<String> getInterimStopsNames() {
+        return interimStopsNames;
     }
 }

@@ -137,10 +137,12 @@ public class AutoStartShipmentController extends AbstractController
         //get locations.
         final Set<Long> locFroms = new HashSet<>(dto.getStartLocations());
         final Set<Long> locTos = new HashSet<>(dto.getEndLocations());
+        final Set<Long> locInterims = new HashSet<>(dto.getInterimStops());
 
         final Set<Long> allLoctions = new HashSet<Long>();
         allLoctions.addAll(locFroms);
         allLoctions.addAll(locTos);
+        allLoctions.addAll(locInterims);
 
         final List<LocationProfile> loctions = locationProfileDao.findAll(allLoctions);
         //check company access
@@ -151,11 +153,14 @@ public class AutoStartShipmentController extends AbstractController
         //resolve locations
         cfg.getShippedFrom().clear();
         cfg.getShippedTo().clear();
+        cfg.getInterimStops().clear();
         for (final LocationProfile l : loctions) {
             if (locFroms.contains(l.getId())) {
                 cfg.getShippedFrom().add(l);
-            } else {
+            } else if (locTos.contains(l.getId())) {
                 cfg.getShippedTo().add(l);
+            } else {
+                cfg.getInterimStops().add(l);
             }
         }
     }
@@ -329,6 +334,7 @@ public class AutoStartShipmentController extends AbstractController
             ShipmentTemplateConstants.SHIPMENT_DESCRIPTION,
             START_LOCATIONS,
             END_LOCATIONS,
+            INTERIM_STOPS,
             ALERT_PROFILE_NAME
         };
     }

@@ -767,60 +767,39 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 ```
 ### AutoStart Shipment ###
 ```json
-Request:
 {
   "priority": 99,
   "id": null,
   "startLocations": [
-    1239
+    9514
   ],
+  "startLocationNames": [],
   "endLocations": [
-    1238
+    9513
   ],
+  "endLocationNames": [],
+  "interimStops": [
+    9515
+  ],
+  "interimStopsNames": [],
   "shipmentTemplateName": "JUnit name",
   "shipmentDescription": "JUnit shipment",
   "addDateShipped": true,
-  "alertProfileId": 525,
+  "alertProfileId": 4145,
+  "alertProfileName": null,
   "alertSuppressionMinutes": 25,
   "alertsNotificationSchedules": [
-    873
+    7008
   ],
   "commentsForReceiver": "Any comments for receiver",
   "arrivalNotificationWithinKm": 15,
   "excludeNotificationsIfNoAlerts": true,
   "arrivalNotificationSchedules": [
-    874
+    7009
   ],
   "shutdownDeviceAfterMinutes": 99,
   "noAlertsAfterArrivalMinutes": 43,
-  "shutDownAfterStartMinutes": 47
-}
-2016-02-26 21:05:55,801 DEBUG [WebConfig] JSON request received:
-{
-  "priority": 99,
-  "id": 77, // authostart shipment ID.
-  "startLocations": [ // array of ID of locations
-    1239
-  ],
-  "endLocations": [ // array of ID of locations
-    1238
-  ],
-  "shipmentTemplateName": "JUnit name",
-  "shipmentDescription": "JUnit shipment",
-  "addDateShipped": true,
-  "alertProfileId": 525,
-  "alertSuppressionMinutes": 25,
-  "alertsNotificationSchedules": [ //array of ID of notification schedules
-    873
-  ],
-  "commentsForReceiver": "Any comments for receiver",
-  "arrivalNotificationWithinKm": 15,
-  "excludeNotificationsIfNoAlerts": true,
-  "arrivalNotificationSchedules": [ //array of ID of notification schedules
-    874
-  ],
-  "shutdownDeviceAfterMinutes": 99,
-  "noAlertsAfterArrivalMinutes": 43,
+  "noAlertsAfterStartMinutes": null,
   "shutDownAfterStartMinutes": 47
 }
 ```
@@ -2586,60 +2565,39 @@ Response:
 **POST /rest/saveAutoStartShipment/${accessToken}**  
 **Request:**  
 ```json
-Request:
 {
   "priority": 99,
   "id": null,
   "startLocations": [
-    1239
+    9514
   ],
+  "startLocationNames": [],
   "endLocations": [
-    1238
+    9513
   ],
+  "endLocationNames": [],
+  "interimStops": [
+    9515
+  ],
+  "interimStopsNames": [],
   "shipmentTemplateName": "JUnit name",
   "shipmentDescription": "JUnit shipment",
   "addDateShipped": true,
-  "alertProfileId": 525,
+  "alertProfileId": 4145,
+  "alertProfileName": null,
   "alertSuppressionMinutes": 25,
   "alertsNotificationSchedules": [
-    873
+    7008
   ],
   "commentsForReceiver": "Any comments for receiver",
   "arrivalNotificationWithinKm": 15,
   "excludeNotificationsIfNoAlerts": true,
   "arrivalNotificationSchedules": [
-    874
+    7009
   ],
   "shutdownDeviceAfterMinutes": 99,
   "noAlertsAfterArrivalMinutes": 43,
-  "shutDownAfterStartMinutes": 47
-}
-2016-02-26 21:05:55,801 DEBUG [WebConfig] JSON request received:
-{
-  "priority": 99,
-  "id": null,
-  "startLocations": [
-    1239
-  ],
-  "endLocations": [
-    1238
-  ],
-  "shipmentTemplateName": "JUnit name",
-  "shipmentDescription": "JUnit shipment",
-  "addDateShipped": true,
-  "alertProfileId": 525,
-  "alertSuppressionMinutes": 25,
-  "alertsNotificationSchedules": [
-    873
-  ],
-  "commentsForReceiver": "Any comments for receiver",
-  "arrivalNotificationWithinKm": 15,
-  "excludeNotificationsIfNoAlerts": true,
-  "arrivalNotificationSchedules": [
-    874
-  ],
-  "shutdownDeviceAfterMinutes": 99,
-  "noAlertsAfterArrivalMinutes": 43,
+  "noAlertsAfterStartMinutes": null,
   "shutDownAfterStartMinutes": 47
 }
 ```  
@@ -2666,23 +2624,25 @@ Request:
   },
   "response": {
     "priority": 77,
-    "id": 1363,
+    "id": 2220,
     "startLocations": [
-      7231
+      9545
     ],
     "startLocationNames": [
       "TO"
     ],
     "endLocations": [
-      7230
+      9544
     ],
     "endLocationNames": [
       "From"
     ],
+    "interimStops": [],
+    "interimStopsNames": [],
     "shipmentTemplateName": "JUnit template",
     "shipmentDescription": null,
     "addDateShipped": false,
-    "alertProfileId": 3569,
+    "alertProfileId": 4150,
     "alertProfileName": "AnyAlert",
     "alertSuppressionMinutes": 0,
     "alertsNotificationSchedules": [],
@@ -2709,19 +2669,21 @@ Request:
   "response": [
     {
       "priority": 77,
-      "id": 1351,
+      "id": 2208,
       "startLocations": [
-        7217
+        9530
       ],
       "startLocationNames": [
         "TO"
       ],
       "endLocations": [
-        7216
+        9529
       ],
       "endLocationNames": [
         "From"
       ],
+      "interimStops": [],
+      "interimStopsNames": [],
       "shipmentTemplateName": "JUnit template",
       "shipmentDescription": null,
       "addDateShipped": false,
@@ -2740,19 +2702,21 @@ Request:
     },
     {
       "priority": 77,
-      "id": 1352,
+      "id": 2209,
       "startLocations": [
-        7217
+        9530
       ],
       "startLocationNames": [
         "TO"
       ],
       "endLocations": [
-        7216
+        9529
       ],
       "endLocationNames": [
         "From"
       ],
+      "interimStops": [],
+      "interimStopsNames": [],
       "shipmentTemplateName": "JUnit template",
       "shipmentDescription": null,
       "addDateShipped": false,
