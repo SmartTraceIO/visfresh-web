@@ -327,24 +327,24 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
     private Filter createFilter(final GetFilteredShipmentsRequest req, final ShipmentSerializer ser) {
         Date shippedFrom = req.getShipmentDateFrom();
-        Date shippedTo = req.getShipmentDateTo();
+        final Date shippedTo = req.getShipmentDateTo();
 
         //date ranges
         if (shippedFrom == null || shippedTo == null) {
-            shippedTo = new Date();
+            final Date d = new Date();
             final long oneDay = 24 * 60 * 60 * 1000l;
 
             if (Boolean.TRUE.equals(req.getLastDay())) {
-                shippedFrom = new Date(shippedTo.getTime() - oneDay);
+                shippedFrom = new Date(d.getTime() - oneDay);
             } else if (Boolean.TRUE.equals(req.getLast2Days())) {
-                shippedFrom = new Date(shippedTo.getTime() - 2 * oneDay);
+                shippedFrom = new Date(d.getTime() - 2 * oneDay);
             } else if (Boolean.TRUE.equals(req.getLastWeek())) {
-                shippedFrom = new Date(shippedTo.getTime() - 7 * oneDay);
+                shippedFrom = new Date(d.getTime() - 7 * oneDay);
             } else if (Boolean.TRUE.equals(req.getLastMonth())) {
-                shippedFrom = new Date(shippedTo.getTime() - 31 * oneDay);
+                shippedFrom = new Date(d.getTime() - 31 * oneDay);
             } else {
                 //two weeks by default
-                shippedFrom = new Date(shippedTo.getTime() - 14 * oneDay);
+                shippedFrom = new Date(d.getTime() - 14 * oneDay);
             }
         }
 

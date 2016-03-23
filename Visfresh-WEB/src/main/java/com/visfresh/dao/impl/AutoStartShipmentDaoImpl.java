@@ -96,16 +96,19 @@ public class AutoStartShipmentDaoImpl
     private void mergeLocations(final AutoStartShipment cfg) {
         final Set<Long> oldLocFrom = new HashSet<>();
         final Set<Long> oldLocTo = new HashSet<>();
+        final Set<Long> oldLocInterim = new HashSet<>();
 
-        getLocationIds(cfg, oldLocFrom, oldLocTo);
+        getLocationIds(cfg, oldLocFrom, oldLocTo, oldLocInterim);
 
         final Set<Long> newLocFrom = new HashSet<>();
         final Set<Long> newLocTo = new HashSet<>();
+        final Set<Long> newLocInterim = new HashSet<>();
 
         merge(cfg.getShippedFrom(), oldLocFrom, newLocFrom);
         merge(cfg.getShippedTo(), oldLocTo, newLocTo);
+        merge(cfg.getInterimStops(), oldLocInterim, newLocInterim);
 
-        if (!(oldLocFrom.isEmpty() && oldLocTo.isEmpty())) {
+        if (!(oldLocFrom.isEmpty() && oldLocTo.isEmpty() && oldLocInterim.isEmpty())) {
             //disconnect redundant locations
             final Map<String, Object> params = new HashMap<String, Object>();
             params.put("config", cfg.getId());
@@ -113,14 +116,17 @@ public class AutoStartShipmentDaoImpl
             for (final Long id : oldLocFrom) {
                 params.put("id_" + id, id);
             }
-
             for (final Long id : oldLocTo) {
+                params.put("id_" + id, id);
+            }
+            for (final Long id : oldLocInterim) {
                 params.put("id_" + id, id);
             }
 
             final Set<Long> ids = new HashSet<>();
             ids.addAll(oldLocFrom);
             ids.addAll(oldLocTo);
+            ids.addAll(oldLocInterim);
 
             final String sql = "delete from " + LOCATION_REL_TABLE
                     + " where " + LOCATION_CONFIG + "=:config and "
@@ -129,7 +135,7 @@ public class AutoStartShipmentDaoImpl
             jdbc.update(sql, params);
         }
 
-        if (!(newLocFrom.isEmpty() && newLocTo.isEmpty())) {
+        if (!(newLocFrom.isEmpty() && newLocTo.isEmpty() && newLocInterim.isEmpty())) {
             //connect new locations
             String sql = "insert into " + LOCATION_REL_TABLE
                 + "(" + LOCATION_CONFIG + ", " + LOCATION_LOCATION + ", " + LOCATION_DIRECTION
@@ -143,11 +149,15 @@ public class AutoStartShipmentDaoImpl
                 params.put("id_" + id, id);
                 inserts.add("(:config, :id_" + id + ", 'from')");
             }
-
             //to locations
             for (final Long id : newLocTo) {
                 params.put("id_" + id, id);
                 inserts.add("(:config, :id_" + id + ", 'to')");
+            }
+            //to locations
+            for (final Long id : newLocInterim) {
+                params.put("id_" + id, id);
+                inserts.add("(:config, :id_" + id + ", 'interim')");
             }
 
             sql += StringUtils.combine(inserts, ",");
@@ -231,27 +241,31 @@ public class AutoStartShipmentDaoImpl
             final Map<String, Object> row, final Map<String, Object> cache) {
         final Set<Long> locFrom = new HashSet<>();
         final Set<Long> locTo = new HashSet<>();
+        final Set<Long> locInterim = new HashSet<>();
 
-        getLocationIds(t, locFrom, locTo);
+        getLocationIds(t, locFrom, locTo, locInterim);
 
         //get locations
         final List<Long> locationIds = new LinkedList<>();
         locationIds.addAll(locFrom);
         locationIds.addAll(locTo);
+        locationIds.addAll(locInterim);
 
         final List<LocationProfile> locations = locationProfileDao.findAll(locationIds);
 
         addLocations(t.getShippedFrom(), locations, locFrom);
         addLocations(t.getShippedTo(), locations, locTo);
+        addLocations(t.getInterimStops(), locations, locInterim);
     }
 
     /**
      * @param t
      * @param locFrom
      * @param locTo
+     * @param locInterim TODO
      */
     protected void getLocationIds(final AutoStartShipment t,
-            final Set<Long> locFrom, final Set<Long> locTo) {
+            final Set<Long> locFrom, final Set<Long> locTo, final Set<Long> locInterim) {
         final Map<String, Object> params = new HashMap<>();
         params.put("cfg", t.getId());
 
@@ -267,6 +281,8 @@ public class AutoStartShipmentDaoImpl
                 locFrom.add(locationId);
             } else if ("to".equals(direction)) {
                 locTo.add(locationId);
+            } else if ("interim".equals(direction)) {
+                locInterim.add(locationId);
             } else {
                 throw new IllegalArgumentException("Undefined location direction " + direction);
             }
@@ -318,6 +334,8 @@ public class AutoStartShipmentDaoImpl
                 //first group for sorting
                 + "lfrom.locationName as " + AutoStartShipmentConstants.START_LOCATIONS + ","
                 + "lto.locationName as " + AutoStartShipmentConstants.END_LOCATIONS + ","
+                + "ins.locationName as " + AutoStartShipmentConstants.INTERIM_STOPS + ","
+                + "lto.locationName as " + AutoStartShipmentConstants.END_LOCATIONS + ","
                 + "ap.alertProfileName as " + AutoStartShipmentConstants.ALERT_PROFILE_NAME + ",\n"
                 + "tpl.shipmentTemplateName as " + ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME + ",\n"
                 + "tpl.shipmentDescription as " + ShipmentTemplateConstants.SHIPMENT_DESCRIPTION + ",\n"
@@ -358,6 +376,16 @@ public class AutoStartShipmentDaoImpl
                 + "where lr." + LOCATION_DIRECTION  + " = 'to'\n"
                 + "group by lr." + LOCATION_CONFIG
                 + ") lto on lto.locationConfig = " + TABLE + "." + ID_FIELD + "\n"
+                //location interim
+                + "left outer join (select "
+                + "lr." + LOCATION_CONFIG + " as locationConfig,\n"
+                + "min(loc." + LocationProfileDaoImpl.NAME_FIELD + ") as locationName\n"
+                + "from " + LOCATION_REL_TABLE + " lr\n"
+                + "join " + LocationProfileDaoImpl.TABLE + " loc\n"
+                + "on loc." + LocationProfileDaoImpl.ID_FIELD + "=lr." + LOCATION_LOCATION + "\n"
+                + "where lr." + LOCATION_DIRECTION  + " = 'interim'\n"
+                + "group by lr." + LOCATION_CONFIG
+                + ") ins on ins.locationConfig = " + TABLE + "." + ID_FIELD + "\n"
                 ;
     }
 }

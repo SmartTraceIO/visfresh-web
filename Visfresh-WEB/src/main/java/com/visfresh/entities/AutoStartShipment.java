@@ -18,6 +18,7 @@ public class AutoStartShipment implements EntityWithCompany,
     private ShipmentTemplate template;
     private final List<LocationProfile> shippedFrom = new LinkedList<>();
     private final List<LocationProfile> shippedTo = new LinkedList<>();
+    private final List<LocationProfile> interimStops = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -88,6 +89,12 @@ public class AutoStartShipment implements EntityWithCompany,
      */
     public List<LocationProfile> getShippedTo() {
         return shippedTo;
+    }
+    /**
+     * @return the interimStops
+     */
+    public List<LocationProfile> getInterimStops() {
+        return interimStops;
     }
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)

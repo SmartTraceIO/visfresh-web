@@ -12,6 +12,7 @@ public interface AutoStartShipmentConstants {
     String PRIORITY = "priority";
     String END_LOCATIONS = "endLocations";
     String START_LOCATIONS = "startLocations";
+    String INTERIM_STOPS = "interimStops";
     String START_LOCATION_NAMES = "startLocationNames";
     String END_LOCATION_NAMES = "endLocationNames";
     String ALERT_PROFILE_NAME = "alertProfileName";

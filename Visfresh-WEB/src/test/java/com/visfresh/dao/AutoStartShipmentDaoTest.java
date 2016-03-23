@@ -26,6 +26,7 @@ public class AutoStartShipmentDaoTest extends
         BaseCrudTest<AutoStartShipmentDao, AutoStartShipment, Long> {
     private LocationProfile locFrom;
     private LocationProfile locTo;
+    private LocationProfile locInterim;
 
     /**
      * @param clazz the DAO class.
@@ -38,6 +39,7 @@ public class AutoStartShipmentDaoTest extends
     public void setUp() {
         locFrom = createLocation("From");
         locTo = createLocation("To");
+        locInterim = createLocation("Interim");
     }
 
     @Test
@@ -48,9 +50,11 @@ public class AutoStartShipmentDaoTest extends
 
         final LocationProfile l1 = createLocation("l1");
         final LocationProfile l2 = createLocation("l2");
+        final LocationProfile l3 = createLocation("l3");
 
         cfg.getShippedFrom().add(l1);
         cfg.getShippedTo().add(l2);
+        cfg.getInterimStops().add(l3);
 
         dao.save(cfg);
 
@@ -58,6 +62,8 @@ public class AutoStartShipmentDaoTest extends
         cfg.getShippedFrom().add(l2);
         cfg.getShippedTo().clear();
         cfg.getShippedTo().add(l1);
+        cfg.getInterimStops().clear();
+        cfg.getInterimStops().add(l1);
 
         dao.save(cfg);
 
@@ -65,9 +71,11 @@ public class AutoStartShipmentDaoTest extends
 
         assertEquals(1, cfg.getShippedFrom().size());
         assertEquals(1, cfg.getShippedTo().size());
+        assertEquals(1, cfg.getInterimStops().size());
 
         assertEquals(l2.getId(), cfg.getShippedFrom().get(0).getId());
         assertEquals(l1.getId(), cfg.getShippedTo().get(0).getId());
+        assertEquals(l1.getId(), cfg.getInterimStops().get(0).getId());
     }
     @Test
     public void testTemplateDeleted() {
@@ -291,6 +299,8 @@ public class AutoStartShipmentDaoTest extends
         assertEquals(locFrom.getId(), cfg.getShippedFrom().get(0).getId());
         assertEquals(1, cfg.getShippedTo().size());
         assertEquals(locTo.getId(), cfg.getShippedTo().get(0).getId());
+        assertEquals(1, cfg.getInterimStops().size());
+        assertEquals(locInterim.getId(), cfg.getInterimStops().get(0).getId());
     }
 
     /* (non-Javadoc)
@@ -312,6 +322,7 @@ public class AutoStartShipmentDaoTest extends
         cfg.setTemplate(template);
         cfg.getShippedFrom().add(locFrom);
         cfg.getShippedTo().add(locTo);
+        cfg.getInterimStops().add(locInterim);
         return cfg;
     }
 }
