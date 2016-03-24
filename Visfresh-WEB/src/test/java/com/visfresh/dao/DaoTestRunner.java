@@ -18,7 +18,7 @@ import com.visfresh.junit.db.JUnitDbConfig;
  */
 public class DaoTestRunner extends BlockJUnit4ClassRunner {
     private AbstractApplicationContext context;
-    private BaseCrudTest<?, ?, ?> test;
+    private BaseDaoTest<?> test;
 
     /**
      * @param klass
@@ -34,8 +34,8 @@ public class DaoTestRunner extends BlockJUnit4ClassRunner {
     @Override
     protected Object createTest() throws Exception {
         final Object test = super.createTest();
-        if (test instanceof BaseCrudTest) {
-            this.test = ((BaseCrudTest<?, ?, ?>) test);
+        if (test instanceof BaseDaoTest<?>) {
+            this.test = ((BaseDaoTest<?>) test);
             this.test.initialize(context);
         }
         return test;

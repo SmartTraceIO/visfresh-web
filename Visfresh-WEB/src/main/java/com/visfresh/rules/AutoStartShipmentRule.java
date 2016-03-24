@@ -5,6 +5,7 @@ package com.visfresh.rules;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,9 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
@@ -51,11 +54,13 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     @Autowired
     private TrackerEventDao trackerEventDao;
     @Autowired
+    private AlternativeLocationsDao altLocDao;
+    @Autowired
     private AbstractRuleEngine engine;
 
     private static class ShipmentInit {
         private AutoStartShipment autoStart;
-        private LocationProfile from;
+        private final List<LocationProfile> from = new LinkedList<>();
         private LocationProfile to;
 
         /**
@@ -81,15 +86,10 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         /**
          * @return the from
          */
-        public LocationProfile getFrom() {
+        public List<LocationProfile> getFrom() {
             return from;
         }
         /**
-         * @param from the from to set
-         */
-        public void setFrom(final LocationProfile from) {
-            this.from = from;
-        }
         /**
          * @return the to
          */
@@ -152,6 +152,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         //first of all attempt to select autostart shipment template
         final List<AutoStartShipment> autoStarts = autoStartShipmentDao.findByCompany(
                 device.getCompany(), null, null, null);
+        Collections.sort(autoStarts);
+
         if (!autoStarts.isEmpty()) {
             init = createForBestStartLocation(
                     autoStarts, event.getLatitude(), event.getLongitude(), device, context.getState());
@@ -172,6 +174,18 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         shipment.setShipmentDate(event.getTime());
 
         shipmentDao.save(shipment);
+        //save start location variants
+        if (init != null && init.getFrom().size() > 0) {
+            final List<LocationProfile> variants = new LinkedList<>(init.getFrom());
+            variants.remove(0);
+
+            final AlternativeLocations v = new AlternativeLocations();
+            v.getFrom().addAll(variants);
+            v.getTo().addAll(init.getAutoStart().getShippedTo());
+            v.getInterim().addAll(init.getAutoStart().getInterimStops());
+            altLocDao.save(shipment, v);
+        }
+
         event.setShipment(shipment);
         context.getState().possibleNewShipment(shipment);
 
@@ -214,7 +228,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
             //if found autostart with given ID.
             if (auto != null) {
                 return getFromTemplate(auto,
-                        getBestLocation(auto, latitude, longitude),
+                        getSortedMatchedLocations(auto, latitude, longitude),
                         device,
                         state);
             }
@@ -222,11 +236,10 @@ public class AutoStartShipmentRule implements TrackerEventRule {
 
         //if autostart is not assigned to device.
         //old schema
-        Collections.sort(autoStarts);
         for (final AutoStartShipment auto : autoStarts) {
             //if autostart not assigned to device or assigned to given device
-            final LocationProfile best = getBestLocation(auto, latitude, longitude);
-            if (best != null) {
+            final List<LocationProfile> best = getSortedMatchedLocations(auto, latitude, longitude);
+            if (!best.isEmpty()) {
                 return getFromTemplate(auto, best, device, state);
             }
         }
@@ -242,10 +255,12 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      * @return
      */
     private ShipmentInit getFromTemplate(final AutoStartShipment auto,
-            final LocationProfile startLocation, final Device device, final DeviceState deviceState) {
+            final List<LocationProfile> startLocation, final Device device, final DeviceState deviceState) {
         final ShipmentInit init = new ShipmentInit();
         init.setAutoStart(auto);
-        init.setFrom(startLocation);
+        if (startLocation != null) {
+            init.getFrom().addAll(startLocation);
+        }
 
         //end location detection
         if (auto.getShippedTo().size() == 1) {
@@ -269,7 +284,9 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         final Shipment s = shipmentDao.createNewFrom(tpl);
         s.setStatus(ShipmentStatus.Default);
         s.setDevice(device);
-        s.setShippedFrom(init.getFrom());
+        if (!init.getFrom().isEmpty()) {
+            s.setShippedFrom(init.getFrom().get(0));
+        }
         s.setShippedTo(init.getTo());
         s.setStartDate(new Date());
         s.setCreatedBy("AutoStart shipment rule");
@@ -293,7 +310,9 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      * @param auto
      * @return
      */
-    private LocationProfile getBestLocation(final AutoStartShipment auto, final double latitude, final double longitude) {
+    private List<LocationProfile> getSortedMatchedLocations(final AutoStartShipment auto,
+            final double latitude,
+            final double longitude) {
         //get all available location profiles.
         final List<LocationProfile> profiles = new LinkedList<LocationProfile>();
         profiles.addAll(auto.getShippedFrom());
@@ -303,21 +322,38 @@ public class AutoStartShipmentRule implements TrackerEventRule {
 
         //find best location
         LocationProfile best = null;
+        int minDistance = Integer.MAX_VALUE;
+        final List<LocationProfile> matches = new LinkedList<>();
+
         for (final LocationProfile loc : profiles) {
-            int distance = (int) LocationUtils.getDistanceMeters(
+            final int distance = (int) LocationUtils.getDistanceMeters(
                 loc.getLocation().getLatitude(),
                 loc.getLocation().getLongitude(),
                 latitude,
                 longitude);
 
-            distance = Math.max(0, distance - loc.getRadius());
-            if (distance == 0) {
-                best = loc;
-                return best;
+            if (Math.max(0, distance - loc.getRadius()) == 0) {
+                matches.add(loc);
+
+                if (distance < minDistance) {
+                    best = loc;
+                    minDistance = distance;
+                }
             }
         }
 
-        return null;
+        //move best location to front
+        if (matches.size() > 1) {
+            final Iterator<LocationProfile> iter = matches.iterator();
+            while (iter.hasNext()) {
+                if (iter.next() == best) {
+                    iter.remove();
+                    matches.add(0, best);
+                }
+            }
+        }
+
+        return matches;
     }
 
     /**

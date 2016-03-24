@@ -10,46 +10,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.context.support.AbstractApplicationContext;
 
-import com.visfresh.entities.Company;
 import com.visfresh.entities.EntityWithId;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@RunWith(DaoTestRunner.class)
 public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWithId<ID>,
-        ID extends Serializable & Comparable<ID>> {
-    /**
-     * Spring context.
-     */
-    private AbstractApplicationContext context;
-    /**
-     * DAO class.
-     */
-    private Class<T> clazz;
-    /**
-     * DAO for test.
-     */
-    protected T dao;
-    /**
-     * Company DAO.
-     */
-    protected CompanyDao companyDao;
-    /**
-     * Shared company.
-     */
-    protected Company sharedCompany;
-
+        ID extends Serializable & Comparable<ID>> extends BaseDaoTest<T> {
     /**
      *
      */
     protected BaseCrudTest(final Class<T> clazz) {
-        super();
-        this.clazz = clazz;
+        super(clazz);
     }
 
     /**
@@ -123,32 +97,6 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
         dao.save(e1);
         dao.save(e1);
         assertCreateTestEntityOk(e1);
-    }
-
-    /**
-     * @param ctxt spring context.
-     */
-    protected void initialize(final AbstractApplicationContext ctxt) {
-        this.context = ctxt;
-        dao = ctxt.getBean(clazz);
-        companyDao = getContext().getBean(CompanyDao.class);
-
-        this.sharedCompany = createCompany("Unit Test LLC");
-    }
-
-    /**
-     * @return company.
-     */
-    protected Company createCompany(final String name) {
-        final Company company = new Company();
-        company.setName(name);
-        return companyDao.save(company);
-    }
-    /**
-     * @return the context
-     */
-    protected AbstractApplicationContext getContext() {
-        return context;
     }
 
     protected abstract E createTestEntity();

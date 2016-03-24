@@ -72,6 +72,18 @@ public final class DateTimeUtils {
         final SimpleDateFormat fmt = new SimpleDateFormat("h:mmaa dMMMyyyy ", locale);
         fmt.setTimeZone(tz);
 
+        return fmt.format(date) + getTimeZoneString(rawOffset);
+    }
+
+    /**
+     * @param rawOffset
+     * @return
+     */
+    protected static String getTimeZoneString(final int rawOffset) {
+        if (rawOffset == 0) {
+            return "";
+        }
+
         //time zone
         final long hours = TimeUnit.MILLISECONDS.toHours(rawOffset);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(rawOffset)
@@ -93,7 +105,6 @@ public final class DateTimeUtils {
                 tzString = String.format("%d", hours, minutes);
             }
         }
-
-        return fmt.format(date) + tzString;
+        return tzString;
     }
 }
