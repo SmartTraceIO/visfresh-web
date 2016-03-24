@@ -3,12 +3,13 @@
  */
 package com.visfresh.dao.impl;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -45,6 +46,7 @@ public class AutoStartShipmentDaoImpl
     protected static final String LOCATION_DIRECTION = "direction";
     protected static final String LOCATION_LOCATION = "location";
     protected static final String LOCATION_CONFIG = "config";
+    protected static final String LOCATION_ORDER = "sortorder";
 
     private Map<String, String> propertyToDbMap = new HashMap<>();
 
@@ -94,15 +96,15 @@ public class AutoStartShipmentDaoImpl
         return aut;
     }
     private void mergeLocations(final AutoStartShipment cfg) {
-        final Set<Long> oldLocFrom = new HashSet<>();
-        final Set<Long> oldLocTo = new HashSet<>();
-        final Set<Long> oldLocInterim = new HashSet<>();
+        final List<Long> oldLocFrom = new LinkedList<>();
+        final List<Long> oldLocTo = new LinkedList<>();
+        final List<Long> oldLocInterim = new LinkedList<>();
 
         getLocationIds(cfg, oldLocFrom, oldLocTo, oldLocInterim);
 
-        final Set<Long> newLocFrom = new HashSet<>();
-        final Set<Long> newLocTo = new HashSet<>();
-        final Set<Long> newLocInterim = new HashSet<>();
+        final List<Long> newLocFrom = new LinkedList<>();
+        final List<Long> newLocTo = new LinkedList<>();
+        final List<Long> newLocInterim = new LinkedList<>();
 
         merge(cfg.getShippedFrom(), oldLocFrom, newLocFrom);
         merge(cfg.getShippedTo(), oldLocTo, newLocTo);
@@ -113,70 +115,103 @@ public class AutoStartShipmentDaoImpl
             final Map<String, Object> params = new HashMap<String, Object>();
             params.put("config", cfg.getId());
 
-            for (final Long id : oldLocFrom) {
-                params.put("id_" + id, id);
-            }
-            for (final Long id : oldLocTo) {
-                params.put("id_" + id, id);
-            }
-            for (final Long id : oldLocInterim) {
-                params.put("id_" + id, id);
-            }
-
-            final Set<Long> ids = new HashSet<>();
-            ids.addAll(oldLocFrom);
-            ids.addAll(oldLocTo);
-            ids.addAll(oldLocInterim);
+            final List<String> conditions = new LinkedList<>();
+            addToCondition("from", oldLocFrom, conditions, params);
+            addToCondition("to", oldLocTo, conditions, params);
+            addToCondition("interim", oldLocInterim, conditions, params);
 
             final String sql = "delete from " + LOCATION_REL_TABLE
-                    + " where " + LOCATION_CONFIG + "=:config and "
-                    + LOCATION_LOCATION + " in (:id_"
-                    + StringUtils.combine(ids, ",:id_") + ")";
+                    + " where " + LOCATION_CONFIG + "=:config and ("
+                    + StringUtils.combine(conditions, " or ") + ")";
             jdbc.update(sql, params);
         }
 
         if (!(newLocFrom.isEmpty() && newLocTo.isEmpty() && newLocInterim.isEmpty())) {
             //connect new locations
             String sql = "insert into " + LOCATION_REL_TABLE
-                + "(" + LOCATION_CONFIG + ", " + LOCATION_LOCATION + ", " + LOCATION_DIRECTION
-                + ") values ";
+                + "\n(" + LOCATION_CONFIG + ", " + LOCATION_LOCATION + ", " + LOCATION_DIRECTION
+                + ", " + LOCATION_ORDER + ")\n values\n ";
             final Map<String, Object> params = new HashMap<String, Object>();
             params.put("config", cfg.getId());
 
-            //from locations
             final List<String> inserts = new LinkedList<>();
-            for (final Long id : newLocFrom) {
-                params.put("id_" + id, id);
-                inserts.add("(:config, :id_" + id + ", 'from')");
-            }
+            //from locations
+            addToSql("from", newLocFrom, params, inserts);
             //to locations
-            for (final Long id : newLocTo) {
-                params.put("id_" + id, id);
-                inserts.add("(:config, :id_" + id + ", 'to')");
-            }
-            //to locations
-            for (final Long id : newLocInterim) {
-                params.put("id_" + id, id);
-                inserts.add("(:config, :id_" + id + ", 'interim')");
-            }
+            addToSql("to", newLocTo, params, inserts);
+            //interim locations
+            addToSql("interim", newLocInterim, params, inserts);
 
             sql += StringUtils.combine(inserts, ",");
             jdbc.update(sql, params);
         }
     }
     /**
+     * @param type
+     * @param locations
+     * @param conditions
+     * @param params
+     */
+    private void addToCondition(final String type, final List<Long> locations,
+            final List<String> conditions, final Map<String, Object> params) {
+        int index = 0;
+        for (final Long id : locations) {
+            final String idKey = type + "_" + index;
+            params.put(idKey, id);
+
+            conditions.add("(" + LOCATION_LOCATION
+                    + "=:" + idKey + " and " + LOCATION_DIRECTION + "='"
+                    + type + "')");
+            index++;
+        }
+    }
+    /**
+     * @param type
+     * @param locations
+     * @param targetList
+     */
+    private void addToSql(final String type, final List<Long> locations,
+            final Map<String, Object> params, final List<String> targetList) {
+        int order = 0;
+        for (final Long id : locations) {
+            params.put("id_" + id, id);
+            final String orderKey = "order" + type + "_" + order;
+            targetList.add("(:config, :id_" + id + ", '" + type + "',:" + orderKey + ")\n");
+            //order
+            params.put(orderKey, order);
+            order++;
+        }
+    }
+
+    /**
      * @param locations full location list.
-     * @param oldLocTo old locations.
+     * @param oldLocations old locations.
      * @param newLocTo new locations.
      */
-    private void merge(final List<LocationProfile> locations, final Set<Long> oldLocTo,
-            final Set<Long> newLocTo) {
+    private void merge(final List<LocationProfile> locations, final List<Long> oldLocations,
+            final List<Long> newLocTo) {
         for (final LocationProfile locationProfile : locations) {
             final Long id = locationProfile.getId();
-            if (!oldLocTo.remove(id)) {
+            if (!removeFromList(oldLocations, id)) {
                 newLocTo.add(id);
             }
         }
+    }
+
+    /**
+     * @param oldLocations
+     * @param id
+     * @return
+     */
+    private boolean removeFromList(final List<Long> oldLocations, final Long id) {
+        final Iterator<Long> iter = oldLocations.iterator();
+        while (iter.hasNext()) {
+            if (iter.next().equals(id)) {
+                iter.remove();
+                return true;
+            }
+        }
+        return false;
     }
 
     /* (non-Javadoc)
@@ -239,9 +274,9 @@ public class AutoStartShipmentDaoImpl
      */
     private void resolveLocations(final AutoStartShipment t,
             final Map<String, Object> row, final Map<String, Object> cache) {
-        final Set<Long> locFrom = new HashSet<>();
-        final Set<Long> locTo = new HashSet<>();
-        final Set<Long> locInterim = new HashSet<>();
+        final List<Long> locFrom = new LinkedList<>();
+        final List<Long> locTo = new LinkedList<>();
+        final List<Long> locInterim = new LinkedList<>();
 
         getLocationIds(t, locFrom, locTo, locInterim);
 
@@ -265,28 +300,38 @@ public class AutoStartShipmentDaoImpl
      * @param locInterim TODO
      */
     protected void getLocationIds(final AutoStartShipment t,
-            final Set<Long> locFrom, final Set<Long> locTo, final Set<Long> locInterim) {
+            final List<Long> locFrom, final List<Long> locTo, final List<Long> locInterim) {
         final Map<String, Object> params = new HashMap<>();
         params.put("cfg", t.getId());
 
         //get location ID's
         final List<Map<String, Object>> rows = jdbc.queryForList("select * from "
-                + LOCATION_REL_TABLE + " where " + LOCATION_CONFIG
-                + " = :cfg order by " + LOCATION_LOCATION, params);
+                + LOCATION_REL_TABLE + " where " + LOCATION_CONFIG + " = :cfg", params);
+
+        final Map<Long, Integer> fromOrders = new HashMap<>();
+        final Map<Long, Integer> toOrders = new HashMap<>();
+        final Map<Long, Integer> interimOrders = new HashMap<>();
 
         for (final Map<String,Object> map : rows) {
             final String direction = (String) map.get(LOCATION_DIRECTION);
             final Long locationId = ((Number) map.get(LOCATION_LOCATION)).longValue();
             if ("from".equals(direction)) {
                 locFrom.add(locationId);
+                fromOrders.put(locationId, ((Number) map.get(LOCATION_ORDER)).intValue());
             } else if ("to".equals(direction)) {
                 locTo.add(locationId);
+                toOrders.put(locationId, ((Number) map.get(LOCATION_ORDER)).intValue());
             } else if ("interim".equals(direction)) {
                 locInterim.add(locationId);
+                interimOrders.put(locationId, ((Number) map.get(LOCATION_ORDER)).intValue());
             } else {
                 throw new IllegalArgumentException("Undefined location direction " + direction);
             }
         }
+
+        sortLocations(locFrom, fromOrders);
+        sortLocations(locTo, toOrders);
+        sortLocations(locInterim, interimOrders);
     }
     /**
      * @param target target list of location.
@@ -294,12 +339,45 @@ public class AutoStartShipmentDaoImpl
      * @param ids set of location ID to copy.
      */
     private void addLocations(final List<LocationProfile> target,
-            final List<LocationProfile> source, final Set<Long> ids) {
+            final List<LocationProfile> source, final List<Long> ids) {
+        final Map<Long, Integer> orders = new HashMap<>();
+        int order = 0;
+        for (final Long id : ids) {
+            orders.put(id, order);
+            order++;
+        }
+
         for (final LocationProfile l : source) {
-            if (ids.contains(l.getId())) {
+            if (orders.containsKey(l.getId())) {
                 target.add(l);
             }
         }
+
+        //sort target list
+        Collections.sort(target, new Comparator<LocationProfile>() {
+            /* (non-Javadoc)
+             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+             */
+            @Override
+            public int compare(final LocationProfile o1, final LocationProfile o2) {
+                return orders.get(o1.getId()).compareTo(orders.get(o2.getId()));
+            }
+        });
+    }
+    /**
+     * @param locs
+     * @param orders
+     */
+    private void sortLocations(final List<Long> locs, final Map<Long, Integer> orders) {
+        Collections.sort(locs, new Comparator<Long>() {
+            /* (non-Javadoc)
+             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+             */
+            @Override
+            public int compare(final Long o1, final Long o2) {
+                return orders.get(o1).compareTo(orders.get(o2));
+            }
+        });
     }
     /**
      * @param t

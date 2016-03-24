@@ -47,6 +47,7 @@ public class AutoStartShipmentDaoTest extends
         AutoStartShipment cfg = createTestEntity();
         cfg.getShippedFrom().clear();
         cfg.getShippedTo().clear();
+        cfg.getInterimStops().clear();
 
         final LocationProfile l1 = createLocation("l1");
         final LocationProfile l2 = createLocation("l2");
@@ -76,6 +77,37 @@ public class AutoStartShipmentDaoTest extends
         assertEquals(l2.getId(), cfg.getShippedFrom().get(0).getId());
         assertEquals(l1.getId(), cfg.getShippedTo().get(0).getId());
         assertEquals(l1.getId(), cfg.getInterimStops().get(0).getId());
+    }
+    @Test
+    public void testLocationsOrder() {
+        AutoStartShipment cfg = createTestEntity();
+        cfg.getShippedFrom().clear();
+        cfg.getShippedTo().clear();
+        cfg.getInterimStops().clear();
+
+        final LocationProfile l3 = createLocation("l3");
+        final LocationProfile l1 = createLocation("l1");
+        final LocationProfile l2 = createLocation("l2");
+
+        cfg.getShippedFrom().add(l1);
+        cfg.getShippedFrom().add(l2);
+        cfg.getShippedFrom().add(l3);
+
+        cfg.getShippedTo().add(l2);
+        cfg.getShippedTo().add(l1);
+        cfg.getShippedTo().add(l3);
+
+        cfg.getInterimStops().add(l3);
+        cfg.getInterimStops().add(l2);
+        cfg.getInterimStops().add(l1);
+
+        dao.save(cfg);
+
+        cfg = dao.findOne(cfg.getId());
+
+        assertEquals(l1.getId(), cfg.getShippedFrom().get(0).getId());
+        assertEquals(l2.getId(), cfg.getShippedTo().get(0).getId());
+        assertEquals(l3.getId(), cfg.getInterimStops().get(0).getId());
     }
     @Test
     public void testTemplateDeleted() {

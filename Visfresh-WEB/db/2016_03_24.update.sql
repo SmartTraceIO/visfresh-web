@@ -1,0 +1,1 @@
+alter table autostartlocations add column sortorder int not null default 0;

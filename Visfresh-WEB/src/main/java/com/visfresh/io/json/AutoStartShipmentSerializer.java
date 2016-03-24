@@ -75,15 +75,17 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
         }
 
         //end locations.
-        array = json.get(INTERIM_STOPS).getAsJsonArray();
-        for (final JsonElement el : array) {
-            dto.getInterimStops().add(el.getAsLong());
-        }
-        //names is readonly therefore can be absent
-        if (json.has(INTERIM_STOPS_NAMES)) {
-            array = json.get(INTERIM_STOPS_NAMES).getAsJsonArray();
+        if (json.has(INTERIM_STOPS)) { // this check is for support older versions of UI.
+            array = json.get(INTERIM_STOPS).getAsJsonArray();
             for (final JsonElement el : array) {
-                dto.getInterimStopsNames().add(el.getAsString());
+                dto.getInterimStops().add(el.getAsLong());
+            }
+            //names is readonly therefore can be absent
+            if (json.has(INTERIM_STOPS_NAMES)) {
+                array = json.get(INTERIM_STOPS_NAMES).getAsJsonArray();
+                for (final JsonElement el : array) {
+                    dto.getInterimStopsNames().add(el.getAsString());
+                }
             }
         }
 
