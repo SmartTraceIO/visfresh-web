@@ -284,6 +284,21 @@ create table alternativelocations (
         REFERENCES shipments (id) ON DELETE CASCADE
 );
 
+create table interimstops (
+    id bigint(20) auto_increment not null,
+    shipment bigint(20) not null,
+    location bigint(20) not null,
+    latitude double not null,
+    longitude double not null,
+    pause int not null default 0, -- stop time minutes
+    `date` timestamp null default null,
+    primary key (id),
+    FOREIGN KEY (location)
+        REFERENCES locationprofiles (id),
+    FOREIGN KEY (shipment)
+        REFERENCES shipments (id) ON DELETE CASCADE
+);
+
 create table alerts (
     id bigint(20) auto_increment not null,
     `type` varchar(50) not null,

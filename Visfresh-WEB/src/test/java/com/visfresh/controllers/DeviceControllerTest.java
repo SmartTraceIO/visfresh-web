@@ -170,6 +170,57 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(d3.getImei(), dto.get(2).getImei());
     }
     @Test
+    public void testSortByShipmentNumber() throws RestServiceException, IOException {
+        final Device d1 = createDevice("3333333333333", true);
+        final Device d2 = createDevice("2222222222222", true);
+        final Device d3 = createDevice("1111111111111", true);
+
+        createShipment(d1, true);
+        createShipment(d2, true);
+        createShipment(d3, true);
+
+        List<DeviceDto> dto;
+
+        dto = client.getDevices(DeviceConstants.PROPERTY_SHIPMENT_NUMBER, true, null, null);
+        assertEquals(d3.getImei(), dto.get(0).getImei());
+        assertEquals(d2.getImei(), dto.get(1).getImei());
+        assertEquals(d1.getImei(), dto.get(2).getImei());
+
+        dto = client.getDevices(DeviceConstants.PROPERTY_SHIPMENT_NUMBER, false, null, null);
+        assertEquals(d1.getImei(), dto.get(0).getImei());
+        assertEquals(d2.getImei(), dto.get(1).getImei());
+        assertEquals(d3.getImei(), dto.get(2).getImei());
+    }
+    @Test
+    public void testSortByShipmentStatus() throws RestServiceException, IOException {
+        final Device d1 = createDevice("3333333333333", true);
+        final Device d2 = createDevice("2222222222222", true);
+        final Device d3 = createDevice("1111111111111", true);
+
+        final Shipment s1 = createShipment(d1, true);
+        s1.setStatus(ShipmentStatus.Ended);
+        final Shipment s2 = createShipment(d2, true);
+        s2.setStatus(ShipmentStatus.Default);
+        final Shipment s3 = createShipment(d3, true);
+        s3.setStatus(ShipmentStatus.Arrived);
+
+        context.getBean(ShipmentDao.class).save(s1);
+        context.getBean(ShipmentDao.class).save(s2);
+        context.getBean(ShipmentDao.class).save(s3);
+
+        List<DeviceDto> dto;
+
+        dto = client.getDevices(DeviceConstants.PROPERTY_SHIPMENT_STATUS, true, null, null);
+        assertEquals(d3.getImei(), dto.get(0).getImei());
+        assertEquals(d2.getImei(), dto.get(1).getImei());
+        assertEquals(d1.getImei(), dto.get(2).getImei());
+
+        dto = client.getDevices(DeviceConstants.PROPERTY_SHIPMENT_STATUS, false, null, null);
+        assertEquals(d1.getImei(), dto.get(0).getImei());
+        assertEquals(d2.getImei(), dto.get(1).getImei());
+        assertEquals(d3.getImei(), dto.get(2).getImei());
+    }
+    @Test
     public void testSendCommandToDevice() throws RestServiceException, IOException {
         final Device device = createDevice("089723409857032498", true);
         client.saveDevice(device);

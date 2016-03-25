@@ -10,6 +10,7 @@ import java.util.Set;
 
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Location;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.lists.ListNotificationScheduleItem;
 
@@ -69,6 +70,11 @@ public class SingleShipmentDto {
     private String lastReadingTime;
     private double lastReadingTemperature;
     private Integer noAlertsAfterStartMinutes;
+
+    private final List<LocationProfile> startLocationAlternatives = new LinkedList<>();
+    private final List<LocationProfile> endLocationAlternatives = new LinkedList<>();
+    private final List<LocationProfile> interimLocationAlternatives = new LinkedList<>();
+    private final List<LocationProfile> interimStops = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -653,5 +659,29 @@ public class SingleShipmentDto {
      */
     public void setLastReadingTime(final String lastReadingTime) {
         this.lastReadingTime = lastReadingTime;
+    }
+    /**
+     * @return the startLocationAlternatives
+     */
+    public List<LocationProfile> getStartLocationAlternatives() {
+        return startLocationAlternatives;
+    }
+    /**
+     * @return the endLocationAlternatives
+     */
+    public List<LocationProfile> getEndLocationAlternatives() {
+        return endLocationAlternatives;
+    }
+    /**
+     * @return the interimLocationAlternatives
+     */
+    public List<LocationProfile> getInterimLocationAlternatives() {
+        return interimLocationAlternatives;
+    }
+    /**
+     * @return the interimStops
+     */
+    public List<LocationProfile> getInterimStops() {
+        return interimStops;
     }
 }

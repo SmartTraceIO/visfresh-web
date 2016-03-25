@@ -61,6 +61,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     private final User user;
     private final DateFormat isoFormat;
     private final DateFormat prettyFormat;
+    private final LocationSerializer locationSerializer;
 
     /**
      * @param user user.
@@ -68,6 +69,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     public ShipmentSerializer(final User user) {
         super(user.getTimeZone());
         notificationScheduleSerializer = new NotificationScheduleSerializer(user.getTimeZone());
+        locationSerializer = new LocationSerializer(user.getTimeZone());
         this.user = user;
         this.isoFormat = DateTimeUtils.createIsoFormat(user);
         this.prettyFormat = DateTimeUtils.createPrettyFormat(user);
@@ -622,9 +624,26 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             }
 
             json.add("siblings", siblings);
+
+            //alternatives
+            json.add("startLocationAlternatives", toJson(dto.getStartLocationAlternatives()));
+            json.add("endLocationAlternatives", toJson(dto.getEndLocationAlternatives()));
+            json.add("interimLocationAlternatives", toJson(dto.getInterimLocationAlternatives()));
+            json.add("interimStops", toJson(dto.getInterimStops()));
         }
 
         return json;
+    }
+    /**
+     * @param locs locations.
+     * @return JSON array of locations.
+     */
+    private JsonArray toJson(final List<LocationProfile> locs) {
+        final JsonArray array = new JsonArray();
+        for (final LocationProfile loc : locs) {
+            array.add(locationSerializer.toJson(loc));
+        }
+        return array;
     }
     /**
      * @param summary

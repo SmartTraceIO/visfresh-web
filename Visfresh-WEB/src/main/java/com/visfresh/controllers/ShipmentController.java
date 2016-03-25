@@ -27,6 +27,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
@@ -37,6 +38,7 @@ import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Location;
@@ -112,6 +114,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private RuleEngine ruleEngine;
     @Autowired
     private RuleBundle ruleBundle;
+    @Autowired
+    private AlternativeLocationsDao alternativeLocationsDao;
 
     /**
      * Default constructor.
@@ -540,6 +544,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             }
 
             final SingleShipmentDto dto = createDto(s, user);
+            addLocationAlternatives(dto, s);
 
             //add siblings
             final List<Shipment> siblings = siblingService.getSiblings(s);
@@ -551,6 +556,18 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         } catch (final Exception e) {
             log.error("Failed to get single shipment: " + shipmentId, e);
             return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param dto single shipment DTO.
+     * @param s shipment.
+     */
+    private void addLocationAlternatives(final SingleShipmentDto dto, final Shipment s) {
+        final AlternativeLocations alt = alternativeLocationsDao.getByShipment(s);
+        if (alt != null) {
+            dto.getStartLocationAlternatives().addAll(alt.getFrom());
+            dto.getEndLocationAlternatives().addAll(alt.getTo());
+            dto.getInterimLocationAlternatives().addAll(alt.getInterim());
         }
     }
     /**

@@ -19,7 +19,6 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -29,6 +28,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
@@ -267,6 +267,15 @@ public abstract class AbstractRestServiceTest {
         return s;
     }
     protected Shipment createShipment(final boolean save) {
+        final Device device = createDevice("234908720394857", save);
+        return createShipment(device, save);
+    }
+    /**
+     * @param device
+     * @param save
+     * @return
+     */
+    protected Shipment createShipment(final Device device, final boolean save) {
         final Shipment s = new Shipment();
         s.setAlertProfile(createAlertProfile(save));
         s.getAlertsNotificationSchedules().add(createNotificationSchedule(createUser1(), save));
@@ -278,7 +287,7 @@ public abstract class AbstractRestServiceTest {
         s.setShippedFrom(createLocationProfile(true));
         s.setShippedTo(createLocationProfile(true));
         s.setShutdownDeviceAfterMinutes(155);
-        s.setDevice(createDevice("234908720394857", save));
+        s.setDevice(device);
         s.setPalletId("palettid");
         s.setAssetNum("10515");
         s.setShipmentDate(new Date(System.currentTimeMillis() - 1000000000l));

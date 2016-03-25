@@ -2455,6 +2455,103 @@ Response:
         ]
       }
     ],
+    "startLocationAlternatives": [
+      {
+        "locationId": 11288,
+        "locationName": "L1",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      },
+      {
+        "locationId": 11289,
+        "locationName": "L2",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      }
+    ],
+    "endLocationAlternatives": [
+      {
+        "locationId": 11290,
+        "locationName": "L3",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      },
+      {
+        "locationId": 11291,
+        "locationName": "L4",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      }
+    ],
+    "interimLocationAlternatives": [
+      {
+        "locationId": 11292,
+        "locationName": "L5",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      },
+      {
+        "locationId": 11293,
+        "locationName": "L6",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      }
+    ],
+    "interimStops": [],
     "siblings": []
   }
 }

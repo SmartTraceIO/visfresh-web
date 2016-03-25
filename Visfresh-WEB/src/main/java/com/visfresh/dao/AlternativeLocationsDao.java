@@ -11,6 +11,6 @@ import com.visfresh.entities.Shipment;
  *
  */
 public interface AlternativeLocationsDao {
-    public AlternativeLocations getByShipment(Shipment s);
-    public void save(Shipment s, AlternativeLocations locs);
+    AlternativeLocations getByShipment(Shipment s);
+    void save(Shipment s, AlternativeLocations locs);
 }

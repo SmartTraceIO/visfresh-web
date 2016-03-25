@@ -51,7 +51,7 @@ public class AlternativeLocationsDaoImpl implements AlternativeLocationsDao {
         params.put("shipment", s.getId());
 
         final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select * from alternativelocations where shipment=:shipment", params);
+                "select * from alternativelocations where shipment=:shipment order by loctype, location", params);
 
         final AlternativeLocations a = new AlternativeLocations();
 

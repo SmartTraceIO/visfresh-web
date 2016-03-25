@@ -24,10 +24,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.visfresh.constants.LocationConstants;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.controllers.restclient.RestIoListener;
 import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentDao;
@@ -35,6 +37,7 @@ import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
@@ -555,6 +558,43 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         createArrival(s);
 
         final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
+        assertNotNull(sd);
+    }
+    @Test
+    public void testGetSingleShipmentAlternatives() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+        final LocationProfile l1 = createLocationProfile("L1");
+        final LocationProfile l2 = createLocationProfile("L2");
+        final LocationProfile l3 = createLocationProfile("L3");
+        final LocationProfile l4 = createLocationProfile("L4");
+        final LocationProfile l5 = createLocationProfile("L5");
+        final LocationProfile l6 = createLocationProfile("L6");
+
+        final AlternativeLocations alts = new AlternativeLocations();
+        alts.getFrom().add(l1);
+        alts.getFrom().add(l2);
+
+        alts.getTo().add(l3);
+        alts.getTo().add(l4);
+
+        alts.getInterim().add(l5);
+        alts.getInterim().add(l6);
+
+        context.getBean(AlternativeLocationsDao.class).save(s, alts);
+
+        final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
+
+        JsonArray array;
+        array = sd.get("startLocationAlternatives").getAsJsonArray();
+        assertEquals(2, array.size());
+        assertEquals("L1", array.get(0).getAsJsonObject().get(LocationConstants.PROPERTY_LOCATION_NAME).getAsString());
+        array = sd.get("endLocationAlternatives").getAsJsonArray();
+        assertEquals(2, array.size());
+        assertEquals("L3", array.get(0).getAsJsonObject().get(LocationConstants.PROPERTY_LOCATION_NAME).getAsString());
+        array = sd.get("interimLocationAlternatives").getAsJsonArray();
+        assertEquals(2, array.size());
+        assertEquals("L5", array.get(0).getAsJsonObject().get(LocationConstants.PROPERTY_LOCATION_NAME).getAsString());
+
         assertNotNull(sd);
     }
     @Test
