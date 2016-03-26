@@ -31,6 +31,7 @@ import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
@@ -40,6 +41,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -598,6 +600,18 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(sd);
     }
     @Test
+    public void testInterimStops() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        createInterimStop(s);
+        createInterimStop(s);
+        createInterimStop(s);
+
+        final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
+        final JsonArray array = sd.get("interimStops").getAsJsonArray();
+
+        assertEquals(3, array.size());
+    }
+    @Test
     public void testGetSingleShipmentBySnTrip() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
         final Device device = createDevice("1923087980000117", true);
@@ -888,6 +902,22 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
             ids.add(id);
         }
         return ids;
+    }
+    /**
+     * @param locationName
+     * @return
+     */
+    private InterimStop createInterimStop(final Shipment s) {
+        final LocationProfile loc = createLocationProfile(true);
+
+        final InterimStop stop = new InterimStop();
+        stop.setLocation(loc);
+        stop.setDate(new Date());
+        stop.setLatitude(1.0);
+        stop.setLongitude(2.0);
+        stop.setTime(15);
+        context.getBean(InterimStopDao.class).add(s, stop);
+        return stop;
     }
 
     @After

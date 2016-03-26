@@ -30,6 +30,7 @@ import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.Filter;
+import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
@@ -41,6 +42,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.NotificationSchedule;
@@ -116,6 +118,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private RuleBundle ruleBundle;
     @Autowired
     private AlternativeLocationsDao alternativeLocationsDao;
+    @Autowired
+    private InterimStopDao interimStopDao;
 
     /**
      * Default constructor.
@@ -545,6 +549,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
             final SingleShipmentDto dto = createDto(s, user);
             addLocationAlternatives(dto, s);
+            addInterimStops(dto, s);
 
             //add siblings
             final List<Shipment> siblings = siblingService.getSiblings(s);
@@ -557,6 +562,14 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             log.error("Failed to get single shipment: " + shipmentId, e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param dto DTO.
+     * @param s shipment.
+     */
+    private void addInterimStops(final SingleShipmentDto dto, final Shipment s) {
+        final List<InterimStop> stops = interimStopDao.getByShipment(s);
+        dto.getInterimStops().addAll(stops);
     }
     /**
      * @param dto single shipment DTO.

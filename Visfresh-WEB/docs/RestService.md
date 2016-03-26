@@ -2551,7 +2551,74 @@ Response:
         "endFlag": "Y"
       }
     ],
-    "interimStops": [],
+    "interimStops": [
+      {
+        "id": 16,
+        "latitude": 1.0,
+        "longitude": 2.0,
+        "time": 15,
+        "date": "2016-03-26T17:05",
+        "location": {
+          "locationId": 12220,
+          "locationName": "Loc-5",
+          "companyName": "Sun Microsystems",
+          "notes": "Any notes",
+          "address": "Bankstown Warehouse",
+          "location": {
+            "lat": 100.5,
+            "lon": 100.501
+          },
+          "radiusMeters": 1000,
+          "startFlag": "Y",
+          "interimFlag": "Y",
+          "endFlag": "Y"
+        }
+      },
+      {
+        "id": 17,
+        "latitude": 1.0,
+        "longitude": 2.0,
+        "time": 15,
+        "date": "2016-03-26T17:05",
+        "location": {
+          "locationId": 12221,
+          "locationName": "Loc-6",
+          "companyName": "Sun Microsystems",
+          "notes": "Any notes",
+          "address": "Bankstown Warehouse",
+          "location": {
+            "lat": 100.5,
+            "lon": 100.501
+          },
+          "radiusMeters": 1000,
+          "startFlag": "Y",
+          "interimFlag": "Y",
+          "endFlag": "Y"
+        }
+      },
+      {
+        "id": 18,
+        "latitude": 1.0,
+        "longitude": 2.0,
+        "time": 15,
+        "date": "2016-03-26T17:05",
+        "location": {
+          "locationId": 12222,
+          "locationName": "Loc-7",
+          "companyName": "Sun Microsystems",
+          "notes": "Any notes",
+          "address": "Bankstown Warehouse",
+          "location": {
+            "lat": 100.5,
+            "lon": 100.501
+          },
+          "radiusMeters": 1000,
+          "startFlag": "Y",
+          "interimFlag": "Y",
+          "endFlag": "Y"
+        }
+      }
+    ],
     "siblings": []
   }
 }

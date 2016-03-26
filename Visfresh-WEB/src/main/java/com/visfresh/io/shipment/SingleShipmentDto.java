@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
@@ -74,7 +75,7 @@ public class SingleShipmentDto {
     private final List<LocationProfile> startLocationAlternatives = new LinkedList<>();
     private final List<LocationProfile> endLocationAlternatives = new LinkedList<>();
     private final List<LocationProfile> interimLocationAlternatives = new LinkedList<>();
-    private final List<LocationProfile> interimStops = new LinkedList<>();
+    private final List<InterimStop> interimStops = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -681,7 +682,7 @@ public class SingleShipmentDto {
     /**
      * @return the interimStops
      */
-    public List<LocationProfile> getInterimStops() {
+    public List<InterimStop> getInterimStops() {
         return interimStops;
     }
 }

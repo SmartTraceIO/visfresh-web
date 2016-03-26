@@ -19,6 +19,7 @@ import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -609,9 +610,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("maxTemp", convertTemperature(dto.getMaxTemp()));
             json.addProperty("firstReadingTimeISO", dto.getTimeOfFirstReading());
             json.addProperty("firstReadingTime", dto.getFirstReadingTime());
-        }
 
-        if (isNotSibling) {
             final JsonArray locations = new JsonArray();
             for (final SingleShipmentLocation l : dto.getLocations()) {
                 locations.add(toJson(l));
@@ -626,24 +625,64 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.add("siblings", siblings);
 
             //alternatives
-            json.add("startLocationAlternatives", toJson(dto.getStartLocationAlternatives()));
-            json.add("endLocationAlternatives", toJson(dto.getEndLocationAlternatives()));
-            json.add("interimLocationAlternatives", toJson(dto.getInterimLocationAlternatives()));
-            json.add("interimStops", toJson(dto.getInterimStops()));
+            json.add("startLocationAlternatives", locationsToJson(dto.getStartLocationAlternatives()));
+            json.add("endLocationAlternatives", locationsToJson(dto.getEndLocationAlternatives()));
+            json.add("interimLocationAlternatives", locationsToJson(dto.getInterimLocationAlternatives()));
+
+            //interim stops
+            json.add("interimStops", interimStopsTJson(dto.getInterimStops()));
         }
 
         return json;
     }
     /**
+     * @param interimStops
+     * @return
+     */
+    private JsonArray interimStopsTJson(final List<InterimStop> interimStops) {
+        final JsonArray array = new JsonArray();
+        for (final InterimStop stop : interimStops) {
+            array.add(toJson(stop));
+        }
+        return array;
+    }
+    /**
+     * @param stop
+     * @return
+     */
+    private JsonObject toJson(final InterimStop stop) {
+        if (stop == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("id", stop.getId());
+        json.addProperty("latitude", stop.getLatitude());
+        json.addProperty("longitude", stop.getLongitude());
+        json.addProperty("time", stop.getTime());
+        json.addProperty("date", formatDate(stop.getDate()));
+        json.add("location", toJson(stop.getLocation()));
+        return json;
+    }
+
+    /**
      * @param locs locations.
      * @return JSON array of locations.
      */
-    private JsonArray toJson(final List<LocationProfile> locs) {
+    private JsonArray locationsToJson(final List<LocationProfile> locs) {
         final JsonArray array = new JsonArray();
         for (final LocationProfile loc : locs) {
-            array.add(locationSerializer.toJson(loc));
+            array.add(toJson(loc));
         }
         return array;
+    }
+
+    /**
+     * @param loc
+     * @return
+     */
+    protected JsonElement toJson(final LocationProfile loc) {
+        return locationSerializer.toJson(loc);
     }
     /**
      * @param summary
