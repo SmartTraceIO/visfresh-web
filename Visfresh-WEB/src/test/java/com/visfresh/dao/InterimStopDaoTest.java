@@ -68,6 +68,17 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
         assertEquals(stop1.getLocation().getId(), stop.getLocation().getId());
         assertEquals(stop1.getTime(), stop.getTime());
     }
+    @Test
+    public void testUpdateTime() {
+        final int minutes = 777737;
+        InterimStop stop = createStop("A");
+        dao.add(shipment, stop);
+
+        dao.updateTime(stop.getId(), minutes);
+
+        stop = dao.getByShipment(shipment).get(0);
+        assertEquals(minutes, stop.getTime());
+    }
     /**
      * @param locationName
      * @return

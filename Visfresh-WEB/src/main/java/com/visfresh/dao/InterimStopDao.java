@@ -15,4 +15,5 @@ import com.visfresh.entities.Shipment;
 public interface InterimStopDao {
     List<InterimStop> getByShipment(Shipment s);
     void add(Shipment s, InterimStop locs);
+    void updateTime(Long id, int minutes);
 }

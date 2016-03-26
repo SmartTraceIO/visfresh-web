@@ -111,4 +111,15 @@ public class InterimStopDaoImpl implements InterimStopDao {
             locs.setId(keyHolder.getKey().longValue());
         }
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.InterimStopDao#updateTime(java.lang.Long, int)
+     */
+    @Override
+    public void updateTime(final Long id, final int minutes) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        params.put("pause", minutes);
+
+        jdbc.update("update interimstops set pause = :pause where id = :id", params);
+    }
 }
