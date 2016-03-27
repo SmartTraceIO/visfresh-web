@@ -15,6 +15,7 @@ import com.visfresh.rules.CloseOldShipmentsRule;
 import com.visfresh.rules.SetShipmentArrivedRule;
 import com.visfresh.rules.AutoDetectEndLocationRule;
 import com.visfresh.rules.EtaCalculationRule;
+import com.visfresh.rules.InterimStopRule;
 
 global AbstractRuleEngine engine;
 
@@ -134,6 +135,15 @@ rule "EtaCalculation"
         context : RuleContext(engine.getRule(EtaCalculationRule.NAME).accept(this));
     then
     	if(engine.getRule(EtaCalculationRule.NAME).handle(context)) {
+       		update(context);
+        }
+end
+
+rule "InterimStop"
+    when
+        context : RuleContext(engine.getRule(InterimStopRule.NAME).accept(this));
+    then
+    	if(engine.getRule(InterimStopRule.NAME).handle(context)) {
        		update(context);
         }
 end
