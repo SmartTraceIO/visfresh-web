@@ -38,6 +38,8 @@ public class InterimStopRule implements TrackerEventRule {
 
     public static final String NAME = "InterimStop";
 
+    private static final long MINUTE = 60 * 1000l;
+
     @Autowired
     protected ArrivalDao arrivalDao;
     @Autowired
@@ -207,7 +209,10 @@ public class InterimStopRule implements TrackerEventRule {
                 shouldCreateStop = true;
             } else {
                 //update stop time in DB
-                updateStopTime(stop, (int) ((event.getTime().getTime() - stop.getStartTime()) / 60 * 1000));
+                final int minutes = (int) ((event.getTime().getTime() - stop.getStartTime()) / MINUTE);
+                updateStopTime(stop, minutes);
+                log.debug("Stop time for shipment " + event.getShipment().getId()
+                        + " has update to " + minutes + " min");
             }
 
             if (shouldCreateStop) {
@@ -217,7 +222,7 @@ public class InterimStopRule implements TrackerEventRule {
                 s.setLongitude(stop.getLongitude());
                 s.setLocation(getBestLocation(locs, event.getLatitude(), event.getLongitude()));
                 s.setDate(new Date(stop.getStartTime()));
-                s.setTime((int) ((event.getTime().getTime() - stop.getStartTime()) / 60 * 1000));
+                s.setTime((int) ((event.getTime().getTime() - stop.getStartTime()) / MINUTE));
 
                 log.debug("Interim stop detected near location " + s.getLocation().getId()
                         + " (" + s.getLocation().getName() + ")");
@@ -225,7 +230,7 @@ public class InterimStopRule implements TrackerEventRule {
                 stop.setId(id);
             }
 
-            state.setShipmentProperty(createInterimStopKey(), toJson(stop).toString());
+            setInterimStopState(state, stop);
         } else if (isInInterimStop(state)) {
             //remove interim stop
             log.debug("Interim stop of shipment " + event.getShipment().getId() + " has finished");
@@ -235,6 +240,13 @@ public class InterimStopRule implements TrackerEventRule {
         return false;
     }
 
+    /**
+     * @param state interim stop state.
+     * @param stop the interim stop info.
+     */
+    protected void setInterimStopState(final DeviceState state, final InterimStopInfo stop) {
+        state.setShipmentProperty(createInterimStopKey(), toJson(stop).toString());
+    }
     /**
      * @param shipment
      * @param stop
@@ -316,7 +328,7 @@ public class InterimStopRule implements TrackerEventRule {
      * @param state
      * @return
      */
-    private static InterimStopInfo getInterimStop(final DeviceState state) {
+    protected static InterimStopInfo getInterimStop(final DeviceState state) {
         final String key = createInterimStopKey();
         final String info = state.getShipmentProperty(key);
 
@@ -331,7 +343,10 @@ public class InterimStopRule implements TrackerEventRule {
      */
     protected static InterimStopInfo parseInterimStopInfo(final JsonObject json) {
         final InterimStopInfo info = new InterimStopInfo();
-        info.setId(json.get("id").getAsLong());
+        final JsonElement id = json.get("id");
+        if (id != null && !id.isJsonNull()) {
+            info.setId(id.getAsLong());
+        }
         info.setLatitude(json.get("latitude").getAsDouble());
         info.setLongitude(json.get("longitude").getAsDouble());
         info.setNumReadings(json.get("numReadings").getAsInt());
