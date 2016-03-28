@@ -12,6 +12,7 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.entities.Location;
 import com.visfresh.io.json.DeviceStateSerializer;
 import com.visfresh.rules.state.DeviceState;
 
@@ -43,11 +44,13 @@ public class DeviceStateSerializerTest {
         final Date d2 = new Date(System.currentTimeMillis() - 1000);
         final String key = "shipmentPropertyKey";
         final String value = "shipmentPropertyValue";
+        final Location loc = new Location(10., 20.);
 
         s.getTemperatureAlerts().getDates().put("1", d1);
         s.getTemperatureAlerts().getDates().put("2", d2);
         s.getTemperatureAlerts().getProperties().put("key", "value");
         s.setShipmentProperty(key, value);
+        s.setLastLocation(loc);
 
         final String str = serializer.toString(s);
         s = serializer.parseState(str);
@@ -58,6 +61,8 @@ public class DeviceStateSerializerTest {
         assertEquals(format(d2), format(s.getTemperatureAlerts().getDates().get("2")));
         assertEquals("value", s.getTemperatureAlerts().getProperties().get("key"));
         assertEquals(value, s.getShipmentProperty(key));
+        assertEquals(loc.getLatitude(), s.getLastLocation().getLatitude(), 0.00001);
+        assertEquals(loc.getLongitude(), s.getLastLocation().getLongitude(), 0.00001);
     }
     /**
      * @param date the date to format.

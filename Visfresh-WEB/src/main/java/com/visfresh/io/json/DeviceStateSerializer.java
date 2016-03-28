@@ -13,6 +13,7 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.visfresh.entities.Location;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.RulesState;
 import com.visfresh.utils.SerializerUtils;
@@ -78,6 +79,10 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
                 props.addProperty(key, value);
             }
         }
+
+        //last location
+        json.addProperty("lat", state.getLastLocation().getLatitude());
+        json.addProperty("lon", state.getLastLocation().getLongitude());
         return json;
     }
     /**
@@ -95,6 +100,14 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
             for (final Entry<String, JsonElement> e : entrySet) {
                 s.setShipmentProperty(e.getKey(), e.getValue().getAsString());
             }
+        }
+
+        //last location
+        if (json.has("lat")) {
+            final Location loc = new Location();
+            loc.setLatitude(json.get("lat").getAsDouble());
+            loc.setLongitude(json.get("lon").getAsDouble());
+            s.setLastLocation(loc);
         }
         return s;
     }

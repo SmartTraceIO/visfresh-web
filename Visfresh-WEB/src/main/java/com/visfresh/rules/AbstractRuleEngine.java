@@ -24,6 +24,7 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TemperatureRule;
@@ -36,6 +37,7 @@ import com.visfresh.rules.state.DeviceState;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.SystemMessageHandler;
+import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -121,7 +123,16 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         DeviceState state = deviceDao.getState(imei);
         if (state == null) {
             state = new DeviceState();
+        } else if (state.getLastLocation() != null) {
+            final Location loc = state.getLastLocation();
+            final int meters = (int) LocationUtils.getDistanceMeters(loc.getLatitude(), loc.getLongitude(),
+                    e.getLatitude(), e.getLongitude());
+            if (meters > 200000) {
+                log.warn("Incorrect device moving to " + meters + " meters has detected. Event has ignored");
+                return;
+            }
         }
+
         final RuleContext context = new RuleContext(e, state);
 
         try {
@@ -136,6 +147,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                         + " has updated to " + shipment.getLastEventDate());
             }
         } finally {
+            state.setLastLocation(new Location(e.getLatitude(), e.getLongitude()));
             deviceDao.saveState(event.getImei(), state);
         }
     }

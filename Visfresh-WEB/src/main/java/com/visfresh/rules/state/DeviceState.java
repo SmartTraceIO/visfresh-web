@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 
 /**
@@ -22,6 +23,7 @@ public class DeviceState {
 
     private final RulesState temperatureAlerts = new RulesState();
     private final Map<String, String> shipmentProperties = new HashMap<String, String>();
+    private Location lastLocation;
 
     /**
      * Default constructor.
@@ -89,5 +91,17 @@ public class DeviceState {
     }
     public Set<String> getShipmentKeys() {
         return new HashSet<>(shipmentProperties.keySet());
+    }
+    /**
+     * @return the lastLocation
+     */
+    public Location getLastLocation() {
+        return lastLocation;
+    }
+    /**
+     * @param loc the lastLocation to set
+     */
+    public void setLastLocation(final Location loc) {
+        this.lastLocation = loc;
     }
 }
