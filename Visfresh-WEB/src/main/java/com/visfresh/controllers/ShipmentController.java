@@ -140,7 +140,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             checkAccess(user, Role.BasicUser);
 
             final ShipmentSerializer serializer = getSerializer(user);
-
             Long id = serializer.getShipmentIdFromSaveRequest(jsonRequest);
             if (id != null) {
                 //merge the shipment from request by existing shipment
@@ -171,9 +170,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             checkCompanyAccess(user, newShipment.getArrivalNotificationSchedules());
 
             newShipment.setCompany(user.getCompany());
-            id = saveShipment(newShipment,
-                    user,
-                    !Boolean.FALSE.equals(req.isIncludePreviousData()));
+            newShipment.setCreatedBy(user.getEmail());
+
+            if (id != null) {
+                shipmentDao.save(newShipment);
+            } else {
+                id = saveNewShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
+            }
 
             final SaveShipmentResponse resp = new SaveShipmentResponse();
             resp.setShipmentId(id);
@@ -193,7 +196,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @param newShipment
      * @return
      */
-    private Long saveShipment(final Shipment newShipment, final User user, final boolean includePreviousData) {
+    private Long saveNewShipment(final Shipment newShipment, final boolean includePreviousData) {
         final String imei = newShipment.getDevice().getImei();
         final Shipment current = includePreviousData ? shipmentDao.findLastShipment(imei) : null;
 
@@ -219,20 +222,17 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
 
         //add date shipped
-        if (newShipment.getId() == null) {
-            final String dateShipped = DateTimeUtils.formatShipmentDate(
-                    newShipment.getCompany(), newShipment.getShipmentDate());
-            String desc = newShipment.getShipmentDescription();
-            if (desc == null) {
-                desc = dateShipped;
-            } else {
-                desc += " " + dateShipped;
-            }
-
-            newShipment.setShipmentDescription(desc);
-            newShipment.setStartDate(new Date());
-            newShipment.setCreatedBy(user.getEmail());
+        final String dateShipped = DateTimeUtils.formatShipmentDate(
+                newShipment.getCompany(), newShipment.getShipmentDate());
+        String desc = newShipment.getShipmentDescription();
+        if (desc == null) {
+            desc = dateShipped;
+        } else {
+            desc += " " + dateShipped;
         }
+
+        newShipment.setShipmentDescription(desc);
+        newShipment.setStartDate(new Date());
 
         final Long resultId = shipmentDao.save(newShipment).getId();
 
