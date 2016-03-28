@@ -1,4 +1,5 @@
 -- drops
+drop table if exists shipmentsessions;
 drop table if exists devicestates;
 drop table if exists alertnotifschedules;
 drop table if exists arrivalnotifschedules;
@@ -389,4 +390,12 @@ create table devicestates (
     primary key (device),
     foreign key (device)
         references devices (imei) on delete cascade
+);
+
+create table shipmentsessions (
+    shipment bigint(20) NOT NULL,
+    state longtext,
+    primary key (shipment),
+    foreign key (shipment)
+        references shipments (id) on delete cascade
 );
