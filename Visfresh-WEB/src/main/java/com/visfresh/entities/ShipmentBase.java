@@ -74,6 +74,10 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      */
     private String commentsForReceiver;
     private Integer noAlertsAfterStartMinutes;
+    /**
+     * Is autostart template flag.
+     */
+    private boolean isAutostart;
 
     /**
      * Default constructor.
@@ -298,5 +302,17 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      */
     public void setShutDownAfterStartMinutes(final Integer shutDownAfterStartMinutes) {
         this.shutDownAfterStartMinutes = shutDownAfterStartMinutes;
+    }
+    /**
+     * @return the isAutostart
+     */
+    public boolean isAutostart() {
+        return isAutostart;
+    }
+    /**
+     * @param isAutostart the isAutostart to set
+     */
+    public void setAutostart(final boolean isAutostart) {
+        this.isAutostart = isAutostart;
     }
 }

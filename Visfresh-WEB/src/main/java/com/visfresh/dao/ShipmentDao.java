@@ -69,4 +69,8 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @param eta ETA.
      */
     void updateEta(Shipment s, Date eta);
+    /**
+     * @param s shipment.
+     */
+    void markAsAutostarted(Shipment s);
 }

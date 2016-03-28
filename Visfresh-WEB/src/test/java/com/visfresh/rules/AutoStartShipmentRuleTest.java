@@ -153,6 +153,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
 
         Shipment shipment = shipmentDao.findOne(shipmentId);
+        assertTrue(shipment.isAutostart());
         assertNotNull(shipment);
         assertEquals(e.getTime().getTime(), shipment.getShipmentDate().getTime(), 1000);
         // check correct start location selected.

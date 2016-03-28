@@ -56,6 +56,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
     protected static final String SHIPPEDTO_FIELD = "shippedto";
     protected static final String SHIPPEDFROM_FIELD = "shippedfrom";
     protected static final String COMMENTS_FIELD = "comments";
+    public static final String AUTOSTART_FIELD = "isautostart";
 
     @Autowired
     private AlertProfileDao alertProfileDao;
@@ -318,6 +319,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
 
         no.getAlertsNotificationSchedules().addAll(findNotificationSchedules(no, ALERTNOTIFSCHEDULES_TABLE));
         no.getArrivalNotificationSchedules().addAll(findNotificationSchedules(no, ARRIVALNOTIFSCHEDULES_TABLE));
+        no.setAutostart(Boolean.TRUE.equals(map.get(AUTOSTART_FIELD)));
 
         return no;
     }

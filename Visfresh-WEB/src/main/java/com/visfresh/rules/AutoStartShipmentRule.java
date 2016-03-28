@@ -188,6 +188,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
             if (!init.getAutoStart().getInterimStops().isEmpty()) {
                 InterimStopRule.saveInterimLocations(context.getState(), init.getAutoStart().getInterimStops());
             }
+            shipmentDao.markAsAutostarted(shipment);
         }
 
         event.setShipment(shipment);

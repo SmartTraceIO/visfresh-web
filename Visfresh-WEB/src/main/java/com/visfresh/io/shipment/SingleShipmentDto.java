@@ -71,6 +71,7 @@ public class SingleShipmentDto {
     private String lastReadingTime;
     private double lastReadingTemperature;
     private Integer noAlertsAfterStartMinutes;
+    private String shipmentType;
 
     private final List<LocationProfile> startLocationAlternatives = new LinkedList<>();
     private final List<LocationProfile> endLocationAlternatives = new LinkedList<>();
@@ -684,5 +685,17 @@ public class SingleShipmentDto {
      */
     public List<InterimStop> getInterimStops() {
         return interimStops;
+    }
+    /**
+     * @return the sthipmentType
+     */
+    public String getShipmentType() {
+        return shipmentType;
+    }
+    /**
+     * @param shipmentType the shipmentType to set
+     */
+    public void setShipmentType(final String shipmentType) {
+        this.shipmentType = shipmentType;
     }
 }

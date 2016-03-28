@@ -750,6 +750,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         dto.setDeviceName(shipment.getDevice().getName());
         dto.setDeviceSN(shipment.getDevice().getSn());
+        dto.setShipmentType(shipment.isAutostart() ? "Autostart": "Manual");
 
         if (shipment.getShippedTo() != null) {
             dto.setEndLocation(shipment.getShippedTo().getName());

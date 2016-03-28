@@ -662,4 +662,16 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         jdbc.update("update " + TABLE + " set " + ETA_FIELD + " = :eta where " + ID_FIELD + "=:s",
                 params);
     }
+    @Override
+    public void markAsAutostarted(final Shipment s) {
+        if (s == null) {
+            return;
+        }
+
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("s", s.getId());
+
+        jdbc.update("update " + TABLE + " set isautostart = true where " + ID_FIELD + "=:s",
+                params);
+    }
 }
