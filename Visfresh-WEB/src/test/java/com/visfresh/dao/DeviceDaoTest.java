@@ -220,15 +220,6 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals(imei1, devices.get(0).getImei());
         assertEquals(imei2, devices.get(1).getImei());
 
-        //test by shipment number
-        devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_SHIPMENT_NUMBER), null);
-        assertEquals(imei2, devices.get(0).getImei());
-        assertEquals(imei1, devices.get(1).getImei());
-
-        devices = dao.getDevices(sharedCompany, new Sorting(false, DeviceConstants.PROPERTY_SHIPMENT_NUMBER), null);
-        assertEquals(imei1, devices.get(0).getImei());
-        assertEquals(imei2, devices.get(1).getImei());
-
         //sort by autostart template ID
         devices = dao.getDevices(sharedCompany, new Sorting(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID), null);
         assertEquals(d2.getImei(), devices.get(0).getImei());

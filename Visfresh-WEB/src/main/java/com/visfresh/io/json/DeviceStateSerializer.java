@@ -81,8 +81,10 @@ public class DeviceStateSerializer extends AbstractJsonSerializer {
         }
 
         //last location
-        json.addProperty("lat", state.getLastLocation().getLatitude());
-        json.addProperty("lon", state.getLastLocation().getLongitude());
+        if (state.getLastLocation() != null) {
+            json.addProperty("lat", state.getLastLocation().getLatitude());
+            json.addProperty("lon", state.getLastLocation().getLongitude());
+        }
         return json;
     }
     /**

@@ -234,7 +234,8 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 + DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME + ",\n"
                 + "substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6) as "
                 + DeviceConstants.PROPERTY_SN + ",\n"
-                + "substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6) as "
+                //please attention, the field shipment number is used only for sorting
+                + "COALESCE(substring(sp." + ShipmentDaoImpl.DEVICE_FIELD + ", -7, 6), '999999999999999999') as "
                 + DeviceConstants.PROPERTY_SHIPMENT_NUMBER + ",\n"
                 + "sp.id as " + DeviceConstants.PROPERTY_LAST_SHIPMENT + ",\n"
                 + "lr.latitude as " + DeviceConstants.PROPERTY_LAST_READING_LAT + ",\n"

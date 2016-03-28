@@ -173,23 +173,23 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
     public void testSortByShipmentNumber() throws RestServiceException, IOException {
         final Device d1 = createDevice("3333333333333", true);
         final Device d2 = createDevice("2222222222222", true);
-        final Device d3 = createDevice("1111111111111", true);
+        final Device d3 = createDevice("4444444444444", true);
 
         createShipment(d1, true);
         createShipment(d2, true);
-        createShipment(d3, true);
+        //d3 without shipment, and therefore without shipment number
 
         List<DeviceDto> dto;
 
         dto = client.getDevices(DeviceConstants.PROPERTY_SHIPMENT_NUMBER, true, null, null);
-        assertEquals(d3.getImei(), dto.get(0).getImei());
-        assertEquals(d2.getImei(), dto.get(1).getImei());
-        assertEquals(d1.getImei(), dto.get(2).getImei());
+        assertEquals(d2.getImei(), dto.get(0).getImei());
+        assertEquals(d1.getImei(), dto.get(1).getImei());
+        assertEquals(d3.getImei(), dto.get(2).getImei());
 
         dto = client.getDevices(DeviceConstants.PROPERTY_SHIPMENT_NUMBER, false, null, null);
-        assertEquals(d1.getImei(), dto.get(0).getImei());
-        assertEquals(d2.getImei(), dto.get(1).getImei());
-        assertEquals(d3.getImei(), dto.get(2).getImei());
+        assertEquals(d3.getImei(), dto.get(0).getImei());
+        assertEquals(d1.getImei(), dto.get(1).getImei());
+        assertEquals(d2.getImei(), dto.get(2).getImei());
     }
     @Test
     public void testSortByShipmentStatus() throws RestServiceException, IOException {
