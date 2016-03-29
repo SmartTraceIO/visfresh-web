@@ -517,6 +517,26 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             return createErrorResponse(e);
         }
     }
+    @RequestMapping(value = "/suppressAlerts/{authToken}", method = RequestMethod.GET)
+    public JsonObject suppressAlerts(@PathVariable final String authToken,
+            @RequestParam final Long shipmentId) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.BasicUser);
+
+            final Shipment s = shipmentDao.findOne(shipmentId);
+            checkCompanyAccess(user, s);
+
+            if (s != null) {
+                ruleEngine.supressNextAlerts(s);
+            }
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to delete shipment " + shipmentId, e);
+            return createErrorResponse(e);
+        }
+    }
     @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
     public JsonObject getSingleShipment(@PathVariable final String authToken,
             @RequestParam(required = false) final Long shipmentId,

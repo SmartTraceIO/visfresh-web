@@ -102,6 +102,16 @@ public class ShipmentRestClient extends RestClient {
         sendGetRequest(getPathWithToken("deleteShipment"), params);
     }
     /**
+     * @param id shipment ID.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void suppressAlerts(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("shipmentId", id.toString());
+        sendGetRequest(getPathWithToken("suppressAlerts"), params);
+    }
+    /**
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return

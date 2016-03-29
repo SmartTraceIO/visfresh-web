@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Date;
@@ -34,6 +35,7 @@ import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
@@ -54,6 +56,7 @@ import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UserResolver;
+import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
 
@@ -540,6 +543,14 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Shipment sp = createShipment(true);
         shipmentClient.deleteShipment(sp.getId());
         assertNull(shipmentDao.findOne(sp.getId()));
+    }
+    @Test
+    public void testSuppressAlerts() throws IOException, RestServiceException {
+        final Shipment sp = createShipment(true);
+        shipmentClient.suppressAlerts(sp.getId());
+
+        final ShipmentSession session = context.getBean(ShipmentSessionDao.class).getSession(sp);
+        assertTrue(session.isAlertsSuppressed());
     }
     //@RequestMapping(value = "/getShipmentData/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getShipmentData(@PathVariable final String authToken,
