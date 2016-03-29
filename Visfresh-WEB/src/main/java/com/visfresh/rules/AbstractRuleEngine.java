@@ -7,12 +7,14 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +68,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
     private final DeviceDcsNativeEventSerializer deviceEventParser = new DeviceDcsNativeEventSerializer();
     private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<>();
-    private final Map<Long, ShipmentSession> sessionCache = new ConcurrentHashMap<>();
+    protected final Map<Long, ShipmentSessionCacheEntry> sessionCache = new ConcurrentHashMap<>();
 
     private final TrackerEventRule emptyRule = new TrackerEventRule() {
         @Override
@@ -78,7 +80,12 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             return false;
         }
     };
+    private static final String ruleEngineCacheId = "ruleEngine";
 
+    private static class ShipmentSessionCacheEntry {
+        ShipmentSession session;
+        final Set<String> loaders = new ConcurrentHashSet<>();
+    }
     /**
      *
      */
@@ -154,7 +161,6 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             if (shipment != null) {
                 shipment.setLastEventDate(e.getTime());
                 saveShipment(shipment);
-                saveSession(shipment, getSession(shipment));
 
                 log.debug("Last shipment date of " + shipment.getShipmentDescription()
                         + " has updated to " + shipment.getLastEventDate());
@@ -162,6 +168,9 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         } finally {
             state.setLastLocation(new Location(e.getLatitude(), e.getLongitude()));
             saveDeviceState(event.getImei(), state);
+            if (e.getShipment() != null) {
+                unloadAndSaveSession(e.getShipment(), ruleEngineCacheId);
+            }
         }
     }
     /**
@@ -247,25 +256,87 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @see com.visfresh.rules.state.ShipmentSessionManager#getSession(com.visfresh.entities.Shipment)
      */
     @Override
-    public synchronized ShipmentSession getSession(final Shipment s) {
-        ShipmentSession ss = sessionCache.get(s.getId());
-        if (ss == null) {
-            ss = shipmentSessionDao.getSession(s);
+    public ShipmentSession getSession(final Shipment s) {
+        return loadSession(s, ruleEngineCacheId);
+    }
+    /**
+     * @param s shipment
+     * @param loaderId
+     * @return shipment session.
+     */
+    private ShipmentSession loadSession(final Shipment s, final String loaderId) {
+        //load cache entry
+        ShipmentSessionCacheEntry ss;
+        synchronized (sessionCache) {
+            ss = sessionCache.get(s.getId());
             if (ss == null) {
-                ss = new ShipmentSession();
+                ss = new ShipmentSessionCacheEntry();
+                sessionCache.put(s.getId(), ss);
+                ss.loaders.add(loaderId);
             }
-
-            sessionCache.put(s.getId(), ss);
         }
-        return ss;
+
+        //load session.
+        synchronized (ss) {
+            if (ss.session == null) {
+                ss.session = loadSession(s);
+                log.debug("Shipment session for " + s.getId() + " is load from DB");
+            }
+            if (ss.session == null) {
+                ss.session = new ShipmentSession();
+            }
+        }
+
+        return ss.session;
+    }
+    private void unloadAndSaveSession(final Shipment s, final String loaderId) {
+        ShipmentSessionCacheEntry ss;
+        synchronized (sessionCache) {
+            ss = sessionCache.get(s.getId());
+        }
+
+        if (ss != null) {
+            synchronized (ss) {
+                saveSession(s, ss.session);
+                ss.loaders.remove(loaderId);
+                log.debug("Shipment session for " + s.getId() + " has saved");
+
+                if (ss.loaders.isEmpty()) {
+                    synchronized (sessionCache) {
+                        sessionCache.remove(s.getId());
+                        log.debug("Shipment session cache for " + s.getId() + " has cleaned");
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param s
+     * @param ss
+     */
+    protected void saveSession(final Shipment s, final ShipmentSession ss) {
+        shipmentSessionDao.saveSession(s, ss);
+    }
+    /**
+     * @param s
+     * @return
+     */
+    protected ShipmentSession loadSession(final Shipment s) {
+        return shipmentSessionDao.getSession(s);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.rules.state.ShipmentSessionManager#saveSession(com.visfresh.entities.Shipment, com.visfresh.rules.state.ShipmentSession)
+     * @see com.visfresh.services.RuleEngine#supressNextAlerts(com.visfresh.entities.Shipment)
      */
     @Override
-    public synchronized void saveSession(final Shipment s, final ShipmentSession session) {
-        sessionCache.remove(s.getId());
-        shipmentSessionDao.saveSession(s, session);
+    public void supressNextAlerts(final Shipment s) {
+        final String loaderId = "suppressAlerts";
+        final ShipmentSession session = loadSession(s, loaderId);
+        try {
+            session.setAlertsSuppressed(true);
+        } finally {
+            unloadAndSaveSession(s, loaderId);
+        }
     }
     /**
      * @param imei device IMEI.

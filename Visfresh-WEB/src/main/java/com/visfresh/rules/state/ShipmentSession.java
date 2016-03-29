@@ -8,19 +8,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.visfresh.entities.Shipment;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class ShipmentSession {
     private static final String PREFIX = "_DS_";
-    private static final String SHIPMENT_ID = PREFIX + "shipmentId";
     private static final String ARRIVAL_RPOCESSED = PREFIX + "arrivalProcessed";
 
     private final RulesState temperatureAlerts = new RulesState();
     private final Map<String, String> shipmentProperties = new ConcurrentHashMap<String, String>();
+    private boolean alertsSuppressed;
 
     /**
      * Default constructor.
@@ -34,26 +32,6 @@ public class ShipmentSession {
      */
     public RulesState getTemperatureAlerts() {
         return temperatureAlerts;
-    }
-    /**
-     * Some operations if new shipment started. I.e. cleaning of alerts history.
-     * @param s shipments.
-     */
-    public void possibleNewShipment(final Shipment s) {
-        final Long shipmentId = getShipmentId();
-        if (shipmentId == null || !shipmentId.equals(s.getId())) {
-            this.shipmentProperties.clear();
-            temperatureAlerts.clear();
-
-            shipmentProperties.put(SHIPMENT_ID, s.getId().toString());
-        }
-    }
-    /**
-     * @return the shipmentId
-     */
-    public Long getShipmentId() {
-        final String str = shipmentProperties.get(SHIPMENT_ID);
-        return str == null ? null : Long.valueOf(str);
     }
     public void setArrivalProcessed(final boolean p) {
         shipmentProperties.put(ARRIVAL_RPOCESSED, p ? "true" : "false");
@@ -76,5 +54,17 @@ public class ShipmentSession {
     }
     public Set<String> getShipmentKeys() {
         return new HashSet<>(shipmentProperties.keySet());
+    }
+    /**
+     * @param suppressed
+     */
+    public void setAlertsSuppressed(final boolean suppressed) {
+        this.alertsSuppressed = suppressed;
+    }
+    /**
+     * @return the alertsSuppressed
+     */
+    public boolean isAlertsSuppressed() {
+        return alertsSuppressed;
     }
 }

@@ -25,6 +25,10 @@ public class ShipmentSessionSerializer extends AbstractJsonSerializer {
     /**
      *
      */
+    private static final String ALERTS_SUPPRESSED = "alertsSuppressed";
+    /**
+     *
+     */
     private static final String SHIPMENT_PROPERTIES = "shipmentProperties";
     private static final String TEMPERATURE_ALERTS = "temperatureAlerts";
 
@@ -69,6 +73,7 @@ public class ShipmentSessionSerializer extends AbstractJsonSerializer {
 
         final JsonObject json = new JsonObject();
         json.add(TEMPERATURE_ALERTS, toJson(state.getTemperatureAlerts()));
+        json.addProperty(ALERTS_SUPPRESSED, state.isAlertsSuppressed());
 
         final JsonObject props = new JsonObject();
         json.add(SHIPMENT_PROPERTIES, props);
@@ -95,6 +100,10 @@ public class ShipmentSessionSerializer extends AbstractJsonSerializer {
             for (final Entry<String, JsonElement> e : entrySet) {
                 s.setShipmentProperty(e.getKey(), e.getValue().getAsString());
             }
+        }
+        final JsonElement alertsSuppressed = json.get(ALERTS_SUPPRESSED);
+        if (alertsSuppressed != null) {
+            s.setAlertsSuppressed(Boolean.TRUE.equals(alertsSuppressed.getAsBoolean()));
         }
 
         return s;

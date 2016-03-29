@@ -29,4 +29,9 @@ public interface RuleEngine {
      * @return map of alert yet to fire.
      */
     List<AlertRule> getAlertYetFoFire(Shipment s);
+    /**
+     * Suppress next alerts for shipment.
+     * @param s the shipment.
+     */
+    void supressNextAlerts(Shipment s);
 }

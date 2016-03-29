@@ -130,6 +130,28 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         assertEquals(1, sessions.size());
     }
     @Test
+    public void testShipmentStateCache() throws RetryableException {
+        final Device device = createDevice("3249870239847908");
+        final Shipment s = new Shipment();
+        s.setId(77l);
+        s.setShipmentDescription("JUnit shipment");
+        detectedShipment = s;
+
+        //run
+        final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
+        e.setDate(new Date(System.currentTimeMillis() - 10000));
+        e.getLocation().setLatitude(11.12);
+        e.getLocation().setLongitude(13.14);
+        e.setType("AUT");
+        e.setImei(device.getImei());
+
+        supressNextAlerts(s);
+        processDcsEvent(e);
+
+        //check tracker event saved
+        assertEquals(0, this.sessionCache.size());
+    }
+    @Test
     public void testIgnoreBadData() throws RetryableException {
         final Device device = createDevice("3249870239847908");
         final Shipment s = new Shipment();
@@ -185,6 +207,9 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
     public void invokeRules(final RuleContext context) {
         numInvoked++;
         context.getEvent().setShipment(detectedShipment);
+        if (detectedShipment != null) {
+            context.getSessionManager().getSession(detectedShipment);
+        }
     }
 
     /* (non-Javadoc)
@@ -209,23 +234,18 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         deviceStates.put(imei, state);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.rules.AbstractRuleEngine#loadSession(com.visfresh.entities.Shipment)
+     */
+    @Override
+    protected ShipmentSession loadSession(final Shipment s) {
+        return sessions.get(s.getId());
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.rules.AbstractRuleEngine#saveSession(com.visfresh.entities.Shipment, com.visfresh.rules.state.ShipmentSession)
      */
     @Override
-    public void saveSession(final Shipment s, final ShipmentSession session) {
-        sessions.put(s.getId(), session);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.rules.AbstractRuleEngine#getSession(com.visfresh.entities.Shipment)
-     */
-    @Override
-    public ShipmentSession getSession(final Shipment s) {
-        ShipmentSession ss = sessions.get(s.getId());
-        if (ss == null) {
-            ss = new ShipmentSession();
-            saveSession(s, ss);
-        }
-        return ss;
+    protected void saveSession(final Shipment s, final ShipmentSession ss) {
+        sessions.put(s.getId(), ss);
     }
     /* (non-Javadoc)
      * @see com.visfresh.rules.AbstractRuleEngine#saveShipment(com.visfresh.entities.Shipment)

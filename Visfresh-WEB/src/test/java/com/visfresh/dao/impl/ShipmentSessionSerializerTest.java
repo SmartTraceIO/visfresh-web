@@ -5,6 +5,7 @@ package com.visfresh.dao.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -48,6 +49,7 @@ public class ShipmentSessionSerializerTest {
         s.getTemperatureAlerts().getDates().put("2", d2);
         s.getTemperatureAlerts().getProperties().put("key", "value");
         s.setShipmentProperty(key, value);
+        s.setAlertsSuppressed(true);
 
         final String str = serializer.toString(s);
         s = serializer.parseState(str);
@@ -58,6 +60,7 @@ public class ShipmentSessionSerializerTest {
         assertEquals(format(d2), format(s.getTemperatureAlerts().getDates().get("2")));
         assertEquals("value", s.getTemperatureAlerts().getProperties().get("key"));
         assertEquals(value, s.getShipmentProperty(key));
+        assertTrue(s.isAlertsSuppressed());
     }
     /**
      * @param date the date to format.

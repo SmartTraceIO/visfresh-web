@@ -52,15 +52,4 @@ public class SessionHolder implements ShipmentSessionManager {
         }
         return ss;
     }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * com.visfresh.rules.state.ShipmentSessionManager#saveSession(com.visfresh
-     * .entities.Shipment, com.visfresh.rules.state.ShipmentSession)
-     */
-    @Override
-    public void saveSession(final Shipment s, final ShipmentSession session) {
-    }
 }
