@@ -25,7 +25,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -64,7 +64,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testAccept() {
         //test success accept
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         //test not accept with not saved interim locations
         assertFalse(accept(new RuleContext(createTrackerEvent(shipment, 1, 2), state)));
@@ -93,7 +93,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testHandleFirstReading() {
         //test success accept
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
         saveInterimLocations(state, locations);
 
         final TrackerEvent e = createTrackerEvent(locations.get(0));
@@ -108,7 +108,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testHandleFirstReadingWithInit() {
         //test success accept
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
         saveInterimLocations(state, locations);
 
         final TrackerEvent e = createTrackerEvent(locations.get(0));
@@ -125,7 +125,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testHandleSecondReading() {
         //test success accept
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
         saveInterimLocations(state, locations);
 
         //simulate previous stop
@@ -140,7 +140,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testHandleEndOfStop() {
         //test success accept
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
         saveInterimLocations(state, locations);
 
         //simulate prevous stop
@@ -156,7 +156,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testUpdateStopTime() {
         //test success accept
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
         saveInterimLocations(state, locations);
 
         //simulate previous stop

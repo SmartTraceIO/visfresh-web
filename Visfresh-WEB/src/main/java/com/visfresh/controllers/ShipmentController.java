@@ -51,6 +51,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
@@ -818,6 +819,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         lo.setLongitude(event.getLongitude());
         lo.setTemperature(event.getTemperature());
         lo.setTimeIso(timeIsoFmt.format(event.getTime()));
+        lo.setType(eventTypeToString(event.getType()));
         list.add(lo);
 
         final String address = this.locationService.getLocationDescription(
@@ -838,6 +840,28 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
 
         return list;
+    }
+    /**
+     * @param type
+     * @return
+     */
+    private String eventTypeToString(final TrackerEventType type) {
+        switch(type) {
+            case INIT:
+                return "SwitchedOn";
+            case AUT:
+                return "Reading";
+            case VIB:
+                return "Moving";
+            case STP:
+                return "Stationary";
+            case BRT:
+                return "LightOn";
+            case DRK:
+                return "LightOff";
+                default:
+                    return null;
+        }
     }
     /**
      * @param event event.

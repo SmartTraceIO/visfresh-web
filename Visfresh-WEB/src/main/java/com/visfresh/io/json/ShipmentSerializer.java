@@ -728,6 +728,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("long", l.getLongitude());
         json.addProperty("temperature", convertTemperature(l.getTemperature()));
         json.addProperty("timeISO", l.getTimeIso());
+        json.addProperty("type", l.getType());
 
         final JsonArray alerts = new JsonArray();
         for (final SingleShipmentAlert alert : l.getAlerts()) {

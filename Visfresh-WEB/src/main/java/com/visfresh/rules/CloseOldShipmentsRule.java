@@ -53,7 +53,7 @@ public class CloseOldShipmentsRule implements TrackerEventRule {
     public boolean accept(final RuleContext context) {
         return context.getEvent().getShipment() != null
                 && !context.isProcessed(this)
-                && !context.getState().isOldShipmentsClean();
+                && !context.getSession().isOldShipmentsClean();
     }
     /* (non-Javadoc)
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
@@ -75,7 +75,7 @@ public class CloseOldShipmentsRule implements TrackerEventRule {
         }
 
         context.setProcessed(this);
-        context.getState().setOldShipmentsClean(true);
+        context.getSession().setOldShipmentsClean(true);
         return false;
     }
 

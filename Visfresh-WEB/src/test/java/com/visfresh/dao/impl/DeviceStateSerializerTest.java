@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.Location;
 import com.visfresh.io.json.DeviceStateSerializer;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -39,7 +39,7 @@ public class DeviceStateSerializerTest {
     }
     @Test
     public void testSerialize() {
-        DeviceState s = new DeviceState();
+        ShipmentSession s = new ShipmentSession();
         final Date d1 = new Date(System.currentTimeMillis() - 100000);
         final Date d2 = new Date(System.currentTimeMillis() - 1000);
         final String key = "shipmentPropertyKey";

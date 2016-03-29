@@ -24,7 +24,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.SerializerUtils;
 
@@ -139,14 +139,14 @@ public class InterimStopRule implements TrackerEventRule {
         final boolean accept = shipment != null
                 && !req.isProcessed(this)
                 && !shipment.hasFinalStatus()
-                && getInterimLocations(req.getState()) != null
-                && (isInInterimStop(req.getState())
-                || isNearInterimStop(req.getState(), event.getLatitude(), event.getLongitude()));
+                && getInterimLocations(req.getSession()) != null
+                && (isInInterimStop(req.getSession())
+                || isNearInterimStop(req.getSession(), event.getLatitude(), event.getLongitude()));
 
         return accept;
     }
 
-    public static boolean isNearInterimStop(final DeviceState state, final double latitude,
+    public static boolean isNearInterimStop(final ShipmentSession state, final double latitude,
             final double longitude) {
         final List<LocationProfile> locs = getInterimLocations(state);
         if (locs != null) {
@@ -188,7 +188,7 @@ public class InterimStopRule implements TrackerEventRule {
         context.setProcessed(this);
 
         final TrackerEvent event = context.getEvent();
-        final DeviceState state = context.getState();
+        final ShipmentSession state = context.getSession();
         if (isNearInterimStop(state, event.getLatitude(), event.getLongitude())) {
             InterimStopInfo stop = getInterimStop(state);
             final List<LocationProfile> locs = getInterimLocations(state);
@@ -244,7 +244,7 @@ public class InterimStopRule implements TrackerEventRule {
      * @param state interim stop state.
      * @param stop the interim stop info.
      */
-    protected void setInterimStopState(final DeviceState state, final InterimStopInfo stop) {
+    protected void setInterimStopState(final ShipmentSession state, final InterimStopInfo stop) {
         state.setShipmentProperty(createInterimStopKey(), toJson(stop).toString());
     }
     /**
@@ -268,7 +268,7 @@ public class InterimStopRule implements TrackerEventRule {
         return NAME;
     }
 
-    public static void saveInterimLocations(final DeviceState state, final List<LocationProfile> stops) {
+    public static void saveInterimLocations(final ShipmentSession state, final List<LocationProfile> stops) {
         final String key = createInterimLocationsKey();
         final JsonArray array = new JsonArray();
         for (final LocationProfile l : stops) {
@@ -277,7 +277,7 @@ public class InterimStopRule implements TrackerEventRule {
 
         state.setShipmentProperty(key, array.toString());
     }
-    protected static List<LocationProfile> getInterimLocations(final DeviceState state) {
+    protected static List<LocationProfile> getInterimLocations(final ShipmentSession state) {
         final String key = createInterimLocationsKey();
         final String str = state.getShipmentProperty(key);
         if (str != null) {
@@ -321,14 +321,14 @@ public class InterimStopRule implements TrackerEventRule {
      * @param state
      * @return
      */
-    private static boolean isInInterimStop(final DeviceState state) {
+    private static boolean isInInterimStop(final ShipmentSession state) {
         return getInterimStop(state) != null;
     }
     /**
      * @param state
      * @return
      */
-    protected static InterimStopInfo getInterimStop(final DeviceState state) {
+    protected static InterimStopInfo getInterimStop(final ShipmentSession state) {
         final String key = createInterimStopKey();
         final String info = state.getShipmentProperty(key);
 

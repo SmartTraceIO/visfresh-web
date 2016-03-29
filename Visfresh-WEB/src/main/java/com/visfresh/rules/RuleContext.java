@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -16,7 +16,7 @@ import com.visfresh.rules.state.DeviceState;
  */
 public class RuleContext {
     private final TrackerEvent event;
-    private final DeviceState state;
+    private final ShipmentSession state;
     private Map<Object, Object> clientProperties = new ConcurrentHashMap<Object, Object>();
     private Map<TrackerEventRule, Boolean> processedMap = new HashMap<TrackerEventRule, Boolean>();
 
@@ -24,7 +24,7 @@ public class RuleContext {
      * @param e tracker event.
      * @param state device rules state.
      */
-    public RuleContext(final TrackerEvent e, final DeviceState state) {
+    public RuleContext(final TrackerEvent e, final ShipmentSession state) {
         super();
         this.event = e;
         this.state = state;
@@ -69,7 +69,7 @@ public class RuleContext {
     /**
      * @return the session
      */
-    public DeviceState getState() {
+    public ShipmentSession getSession() {
         return state;
     }
 }

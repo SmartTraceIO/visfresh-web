@@ -17,7 +17,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -68,10 +68,10 @@ public class AbstractAlertRuleTest extends AbstractAlertRule {
         final AlertProfile ap = new AlertProfile();
         shipment.setAlertProfile(ap);
 
-        assertTrue(accept(new RuleContext(event, new DeviceState())));
+        assertTrue(accept(new RuleContext(event, new ShipmentSession())));
 
         shipment.setAlertProfile(null);
-        assertFalse(accept(new RuleContext(event, new DeviceState())));
+        assertFalse(accept(new RuleContext(event, new ShipmentSession())));
     }
     @Test
     public void testNoAlertsAfterArrivalMinutes() {
@@ -82,10 +82,10 @@ public class AbstractAlertRuleTest extends AbstractAlertRule {
         shipment.setNoAlertsAfterArrivalMinutes(minutes);
 
         shipment.setArrivalDate(new Date(event.getTime().getTime() - (minutes + 1) * 60 * 1000l));
-        assertTrue(accept(new RuleContext(event, new DeviceState())));
+        assertTrue(accept(new RuleContext(event, new ShipmentSession())));
 
         shipment.setStatus(ShipmentStatus.Arrived);
-        assertFalse(accept(new RuleContext(event, new DeviceState())));
+        assertFalse(accept(new RuleContext(event, new ShipmentSession())));
     }
     @Test
     public void testNoAlertsAfterStartMinutes() {
@@ -94,10 +94,10 @@ public class AbstractAlertRuleTest extends AbstractAlertRule {
         shipment.setNoAlertsAfterStartMinutes(minutes);
 
         shipment.setShipmentDate(new Date(event.getTime().getTime() - minutes * 60 * 1000L - 1l));
-        assertFalse(accept(new RuleContext(event, new DeviceState())));
+        assertFalse(accept(new RuleContext(event, new ShipmentSession())));
 
         shipment.setShipmentDate(new Date(event.getTime().getTime() - minutes * 60 * 1000L + 1l));
-        assertTrue(accept(new RuleContext(event, new DeviceState())));
+        assertTrue(accept(new RuleContext(event, new ShipmentSession())));
     }
     @Test
     public void testSuppressAlertsAfterStartMinutes() {
@@ -106,9 +106,9 @@ public class AbstractAlertRuleTest extends AbstractAlertRule {
         shipment.setAlertSuppressionMinutes(minutes);
 
         shipment.setShipmentDate(new Date(event.getTime().getTime() - minutes * 60 * 1000L - 1l));
-        assertTrue(accept(new RuleContext(event, new DeviceState())));
+        assertTrue(accept(new RuleContext(event, new ShipmentSession())));
 
         shipment.setShipmentDate(new Date(event.getTime().getTime() - minutes * 60 * 1000L + 1l));
-        assertFalse(accept(new RuleContext(event, new DeviceState())));
+        assertFalse(accept(new RuleContext(event, new ShipmentSession())));
     }
 }

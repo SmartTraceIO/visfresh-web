@@ -2421,22 +2421,23 @@ Response:
         "lat": 50.5,
         "long": 51.51,
         "temperature": 56.0,
-        "timeISO": "2016-03-12 18:27",
+        "timeISO": "2016-03-29 09:15",
+        "type": "Reading",
         "alerts": [
           {
-            "title": "Low Battery Alert for Tracker 000011(1)",
-            "Line1": "56.0°C  |  6:27PM 12 Mar 2016",
+            "title": "Low Battery Alert for Tracker 39485(1)",
+            "Line1": "56.0°C  |  9:15AM 29 Mar 2016",
             "type": "Battery"
           },
           {
-            "title": "Hot Alert for Tracker 000011(1)",
+            "title": "Hot Alert for Tracker 39485(1)",
             "Line1": "Above 5.0°C for more than 55 mins",
-            "Line2": "56.0°C  |  6:27PM 12 Mar 2016",
+            "Line2": "56.0°C  |  9:15AM 29 Mar 2016",
             "type": "Hot"
           },
           {
-            "title": "Arrival Alert for Tracker 000011(1)",
-            "Line1": "56.0°C  |  6:27PM 12 Mar 2016",
+            "title": "Arrival Alert for Tracker 39485(1)",
+            "Line1": "56.0°C  |  9:15AM 29 Mar 2016",
             "type": "ArrivalNotice"
           }
         ]
@@ -2445,11 +2446,12 @@ Response:
         "lat": 50.5,
         "long": 51.51,
         "temperature": 56.0,
-        "timeISO": "2016-03-12 18:27",
+        "timeISO": "2016-03-29 09:15",
+        "type": "Reading",
         "alerts": [
           {
-            "title": "Last reading for Tracker #000011(1)",
-            "Line1": "56.0°C  |  6:27PM 12 Mar 2016",
+            "title": "Last reading for Tracker #39485(1)",
+            "Line1": "56.0°C  |  9:15AM 29 Mar 2016",
             "type": "LastReading"
           }
         ]

@@ -20,7 +20,7 @@ import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.SerializerUtils;
 
@@ -86,7 +86,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
             return false;
         }
 
-        return getAutoDetectData(context.getState()) != null;
+        return getAutoDetectData(context.getSession()) != null;
     }
     /**
      * @param context
@@ -115,21 +115,21 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
     public boolean handle(final RuleContext context) {
         final TrackerEvent e = context.getEvent();
 
-        final AutodetectData data = getAutoDetectData(context.getState());
+        final AutodetectData data = getAutoDetectData(context.getSession());
         final LocationProfile loc = getMatchesLocation(data, e.getLatitude(), e.getLongitude());
         if (loc == null) {
             data.setNumReadings(0);
-            context.getState().setShipmentProperty(getLocationsKey(), toJSon(data).toString());
+            context.getSession().setShipmentProperty(getLocationsKey(), toJSon(data).toString());
         } else if (data.getNumReadings() == 0) {
             data.setNumReadings(1);
-            context.getState().setShipmentProperty(getLocationsKey(), toJSon(data).toString());
+            context.getSession().setShipmentProperty(getLocationsKey(), toJSon(data).toString());
         } else {
             final Shipment shipment = context.getEvent().getShipment();
             shipment.setShippedTo(loc);
             saveShipment(shipment);
 
             //stop check end location
-            context.getState().setShipmentProperty(getLocationsKey(), null);
+            context.getSession().setShipmentProperty(getLocationsKey(), null);
         }
 
         return false;
@@ -147,7 +147,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
      * @param state device state.
      */
     public static void needAutodetect(final AutoStartShipment autoStart,
-            final DeviceState state) {
+            final ShipmentSession state) {
         final AutodetectData data = new AutodetectData();
         data.getLocations().addAll(autoStart.getShippedTo());
 
@@ -219,7 +219,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
      * @param context
      * @return
      */
-    protected AutodetectData getAutoDetectData(final DeviceState state) {
+    protected AutodetectData getAutoDetectData(final ShipmentSession state) {
         final String str = state.getShipmentProperty(getLocationsKey());
         if (str == null) {
             return null;

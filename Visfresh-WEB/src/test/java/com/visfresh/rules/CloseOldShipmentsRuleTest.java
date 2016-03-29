@@ -20,7 +20,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -71,7 +71,7 @@ public class CloseOldShipmentsRuleTest extends CloseOldShipmentsRule {
 
     @Test
     public void testAccept() {
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
         final RuleContext context = new RuleContext(event, state);
 
         //check null shipment
@@ -106,7 +106,7 @@ public class CloseOldShipmentsRuleTest extends CloseOldShipmentsRule {
         activeShipments.put(shipment.getDevice().getImei(), active);
 
         //handle event
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
         final RuleContext context = new RuleContext(event, state);
         assertFalse(handle(context));
 

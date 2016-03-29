@@ -20,7 +20,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.SerializerUtils;
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -105,7 +105,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
     }
     @Test
     public void testNeedAutodetect() {
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         final LocationProfile loc1 = createLocation(1., 0.);
         final LocationProfile loc2 = createLocation(1., 0.);
@@ -125,7 +125,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
     }
     @Test
     public void testAccept() {
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         final TrackerEvent e = new TrackerEvent();
         e.setShipment(shipment);
@@ -158,11 +158,11 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         assertTrue(accept(new RuleContext(e, state)));
 
         //test not accept not need autodetect
-        assertFalse(accept(new RuleContext(e, new DeviceState())));
+        assertFalse(accept(new RuleContext(e, new ShipmentSession())));
     }
     @Test
     public void testHandle() {
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         final TrackerEvent e = new TrackerEvent();
         e.setShipment(shipment);

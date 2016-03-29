@@ -24,7 +24,7 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -83,7 +83,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        DeviceState state = new DeviceState();
+        ShipmentSession state = new ShipmentSession();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
         rule.handle(new RuleContext(e, state));
@@ -110,7 +110,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check not handles already handled
         alertDao.deleteAll();
-        state = new DeviceState();
+        state = new ShipmentSession();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
         rule.handle(new RuleContext(e, state));
@@ -146,7 +146,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
         rule.handle(new RuleContext(e, state));
@@ -180,7 +180,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
         rule.handle(new RuleContext(e, state));
@@ -214,7 +214,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
         rule.handle(new RuleContext(e, state));
@@ -262,7 +262,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        DeviceState state = new DeviceState();
+        ShipmentSession state = new ShipmentSession();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
         rule.handle(new RuleContext(e, state));
@@ -289,7 +289,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check not handles already handled
         alertDao.deleteAll();
-        state = new DeviceState();
+        state = new ShipmentSession();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
         rule.handle(new RuleContext(e, state));
@@ -325,7 +325,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
         rule.handle(new RuleContext(e, state));
@@ -372,7 +372,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
         rule.handle(new RuleContext(e, state));
@@ -426,7 +426,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
         rule.handle(new RuleContext(e, state));
@@ -474,7 +474,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        DeviceState state = new DeviceState();
+        ShipmentSession state = new ShipmentSession();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
         rule.handle(new RuleContext(e, state));
@@ -501,7 +501,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check not handles already handled
         alertDao.deleteAll();
-        state = new DeviceState();
+        state = new ShipmentSession();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
         rule.handle(new RuleContext(e, state));
@@ -537,7 +537,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final DeviceState state = new DeviceState();
+        final ShipmentSession state = new ShipmentSession();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
         rule.handle(new RuleContext(e, state));

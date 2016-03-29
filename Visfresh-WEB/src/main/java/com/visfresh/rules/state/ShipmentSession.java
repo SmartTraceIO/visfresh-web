@@ -3,10 +3,10 @@
  */
 package com.visfresh.rules.state;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
@@ -15,20 +15,20 @@ import com.visfresh.entities.Shipment;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DeviceState {
+public class ShipmentSession {
     private static final String PREFIX = "_DS_";
     private static final String SHIPMENT_ID = PREFIX + "shipmentId";
     private static final String ARRIVAL_RPOCESSED = PREFIX + "arrivalProcessed";
     private static final String OLD_SHIPMENTS_CLEAN = PREFIX + "oldShipmentsClean";
 
     private final RulesState temperatureAlerts = new RulesState();
-    private final Map<String, String> shipmentProperties = new HashMap<String, String>();
-    private Location lastLocation;
+    private final Map<String, String> shipmentProperties = new ConcurrentHashMap<String, String>();
+    private volatile Location lastLocation;
 
     /**
      * Default constructor.
      */
-    public DeviceState() {
+    public ShipmentSession() {
         super();
     }
 

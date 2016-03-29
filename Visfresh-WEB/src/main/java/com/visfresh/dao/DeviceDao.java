@@ -9,7 +9,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.ListDeviceItem;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -26,12 +26,12 @@ public interface DeviceDao extends EntityWithCompanyDaoBase<Device, String> {
      * @param imei device IMEI.
      * @return device state.
      */
-    DeviceState getState(String imei);
+    ShipmentSession getState(String imei);
     /**
      * @param imei device IMEI.
      * @param state device state.
      */
-    void saveState(String imei, DeviceState state);
+    void saveState(String imei, ShipmentSession state);
     /**
      * Get devices from given group.
      * @param group device group.

@@ -16,6 +16,7 @@ public class SingleShipmentLocation {
     private double temperature;
     private String timeIso;
     private final List<SingleShipmentAlert> alerts = new LinkedList<>();
+    private String type;
 
     /**
      * Default constructor.
@@ -77,5 +78,18 @@ public class SingleShipmentLocation {
      */
     public List<SingleShipmentAlert> getAlerts() {
         return alerts;
+    }
+
+    /**
+     * @param eventType
+     */
+    public void setType(final String eventType) {
+        this.type = eventType;
+    }
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
     }
 }

@@ -22,7 +22,7 @@ import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.json.DeviceStateSerializer;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -158,7 +158,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
      * @see com.visfresh.dao.DeviceDao#getState(java.lang.String)
      */
     @Override
-    public DeviceState getState(final String imei) {
+    public ShipmentSession getState(final String imei) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("device", imei);
 
@@ -175,7 +175,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
      * @see com.visfresh.dao.DeviceDao#save(java.lang.String, com.visfresh.rules.DeviceState)
      */
     @Override
-    public void saveState(final String imei, final DeviceState state) {
+    public void saveState(final String imei, final ShipmentSession state) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("state", stateSerializer.toString(state));
         params.put("device", imei);

@@ -33,7 +33,7 @@ import com.visfresh.entities.TrackerEventType;
 import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.mpl.services.TrackerMessageDispatcher;
-import com.visfresh.rules.state.DeviceState;
+import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.SystemMessageHandler;
@@ -120,9 +120,9 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         log.debug("Tracker event accepted: " + e);
 
         //process tracker event with rule engine.
-        DeviceState state = deviceDao.getState(imei);
+        ShipmentSession state = deviceDao.getState(imei);
         if (state == null) {
-            state = new DeviceState();
+            state = new ShipmentSession();
         } else if (state.getLastLocation() != null) {
             final Location loc = state.getLastLocation();
             final int meters = (int) LocationUtils.getDistanceMeters(loc.getLatitude(), loc.getLongitude(),
@@ -196,7 +196,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         }
 
         //check device state is set.
-        final DeviceState state = deviceDao.getState(imei);
+        final ShipmentSession state = deviceDao.getState(imei);
         for (final TemperatureRule rule: alertProfile.getAlertRules()) {
             switch (rule.getType()) {
                 case Cold:
@@ -226,7 +226,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param rule alert rule.
      * @return
      */
-    protected static boolean isTemperatureRuleProcessed(final DeviceState state,
+    protected static boolean isTemperatureRuleProcessed(final ShipmentSession state,
             final TemperatureRule rule) {
         return "true".equals(state.getTemperatureAlerts().getProperties().get(createProcessedKey(rule)));
     }
@@ -234,7 +234,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param deviceState
      * @param rule
      */
-    protected static void setProcessedTemperatureRule(final DeviceState deviceState, final TemperatureRule rule) {
+    protected static void setProcessedTemperatureRule(final ShipmentSession deviceState, final TemperatureRule rule) {
         deviceState.getTemperatureAlerts().getProperties().put(createProcessedKey(rule), "true");
     }
 }
