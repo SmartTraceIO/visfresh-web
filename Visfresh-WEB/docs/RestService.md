@@ -90,25 +90,26 @@ List items is short representations of base entities, like as [Alert Profile](#m
 29. [Get Shipment](#markdown-header-get-shipment)  
 30. [Get Single Shipment](#markdown-header-get-single-shipment)
 31. [Delete Shipment](#markdown-header-delete-shipment)  
-32. [Save Device](#markdown-header-save-device) 
-33. [Shutdown Device](#markdown-header-shutdown-device) 
-34. [Get Device](#markdown-header-get-device)  
-35. [Get Devices](#markdown-header-get-devices)  
-36. [Save Device Group](#markdown-header-save-device-group)  
-37. [Get Device Group](#markdown-header-get-device-group)  
-38. [Get Device Groups](#markdown-header-get-device-groups)  
-39. [Delete Device Group](#markdown-header-delete-device-group)  
-40. [Add Device to Group](#markdown-header-add-device-to-group)  
-41. [Remove Device from Group](#markdown-header-remove-device-from-group)  
-42. [Get Devices of Group](#markdown-header-get-devices-of-group)    
-43. [Get Groups of Device](#markdown-header-get-groups-of-device)  
-44. [Get Notifications](#markdown-header-get-notifications)  
-45. [Send Command to Device](#markdown-header-send-command-to-device)  
-46. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
-47. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
-48. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
-49. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
-50. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
+32. [Suppress alerts](#markdown-header-suppress-alerts)  
+33. [Save Device](#markdown-header-save-device) 
+34. [Shutdown Device](#markdown-header-shutdown-device) 
+35. [Get Device](#markdown-header-get-device)  
+36. [Get Devices](#markdown-header-get-devices)  
+37. [Save Device Group](#markdown-header-save-device-group)  
+38. [Get Device Group](#markdown-header-get-device-group)  
+39. [Get Device Groups](#markdown-header-get-device-groups)  
+40. [Delete Device Group](#markdown-header-delete-device-group)  
+41. [Add Device to Group](#markdown-header-add-device-to-group)  
+42. [Remove Device from Group](#markdown-header-remove-device-from-group)  
+43. [Get Devices of Group](#markdown-header-get-devices-of-group)    
+44. [Get Groups of Device](#markdown-header-get-groups-of-device)  
+45. [Get Notifications](#markdown-header-get-notifications)  
+46. [Send Command to Device](#markdown-header-send-command-to-device)  
+47. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
+48. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
+49. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
+50. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
+51. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -376,6 +377,11 @@ it is not same as [Shipment Object](#markdown-header-shipment).
 Method *GET*, method name deleteShipment, method parameters:  
 1. shipmentId - shipment ID  
 [(example)](#markdown-header-delete-shipment-example)
+
+### Suppress alerts ###
+Method *GET*, method name *suppressAlerts*, Request parameters:  
+1. shipmentId - ID of shipment to suppress alerts.  
+[(example)](#markdown-header-suppress-alerts-example)
 
 ### Get Single Shipment ###
 Method *GET*, method *getSingleShipment*. Request parameters:  
@@ -1831,6 +1837,18 @@ Response:
     "code": 0,
     "message": "Success"
   }
+}
+```
+### Suppress alerts example ###
+**GET /vf/rest/suppressAlerts/${accessToken}?shipmentId=15559**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
 }
 ```
 ### Save Device example ###
