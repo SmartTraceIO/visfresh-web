@@ -110,4 +110,13 @@ public class AbstractAlertRuleTest extends AbstractAlertRule {
         shipment.setShipmentDate(new Date(event.getTime().getTime() - minutes * 60 * 1000L + 1l));
         assertFalse(accept(new RuleContext(event, new SessionHolder(shipment))));
     }
+    @Test
+    public void testAlertsSuppressedBySession() {
+        shipment.setAlertProfile(new AlertProfile());
+
+        final SessionHolder mgr = new SessionHolder(shipment);
+        mgr.getSession(shipment).setAlertsSuppressed(true);
+
+        assertFalse(accept(new RuleContext(event, mgr)));
+    }
 }

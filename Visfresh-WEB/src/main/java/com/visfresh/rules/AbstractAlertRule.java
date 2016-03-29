@@ -19,6 +19,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -52,6 +53,11 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      */
     private boolean isSuppressedAllerts(final RuleContext context) {
         final Shipment shipment = context.getEvent().getShipment();
+        final ShipmentSession session = context.getSessionManager().getSession(shipment);
+        if (session.isAlertsSuppressed()) {
+            return true;
+        }
+
         final Date eventTime = context.getEvent().getTime();
 
         //check not alerts after arrival
