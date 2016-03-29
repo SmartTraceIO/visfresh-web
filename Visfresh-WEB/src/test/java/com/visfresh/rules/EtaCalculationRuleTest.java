@@ -22,7 +22,6 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -56,7 +55,7 @@ public class EtaCalculationRuleTest extends EtaCalculationRule {
         e.setLongitude(151.0);
         e.setTime(new Date());
 
-        final RuleContext c = new RuleContext(e, new ShipmentSession());
+        final RuleContext c = new RuleContext(e, new SessionHolder());
 
         //check accept ok
         assertTrue(accept(c));
@@ -104,7 +103,7 @@ public class EtaCalculationRuleTest extends EtaCalculationRule {
         e.setLongitude(151.0);
 
         //test ok
-        assertFalse(handle(new RuleContext(e, new ShipmentSession())));
+        assertFalse(handle(new RuleContext(e, new SessionHolder())));
         assertNotNull(shipment.getEta());
         assertNotNull(etas.get(shipment.getId()));
     }

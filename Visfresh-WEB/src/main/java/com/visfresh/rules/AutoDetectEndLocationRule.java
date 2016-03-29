@@ -86,7 +86,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
             return false;
         }
 
-        return getAutoDetectData(context.getSession()) != null;
+        return getAutoDetectData(context.getSessionManager().getSession(shipment)) != null;
     }
     /**
      * @param context
@@ -114,22 +114,23 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
     @Override
     public boolean handle(final RuleContext context) {
         final TrackerEvent e = context.getEvent();
+        final ShipmentSession session = context.getSessionManager().getSession(e.getShipment());
 
-        final AutodetectData data = getAutoDetectData(context.getSession());
+        final AutodetectData data = getAutoDetectData(session);
         final LocationProfile loc = getMatchesLocation(data, e.getLatitude(), e.getLongitude());
         if (loc == null) {
             data.setNumReadings(0);
-            context.getSession().setShipmentProperty(getLocationsKey(), toJSon(data).toString());
+            session.setShipmentProperty(getLocationsKey(), toJSon(data).toString());
         } else if (data.getNumReadings() == 0) {
             data.setNumReadings(1);
-            context.getSession().setShipmentProperty(getLocationsKey(), toJSon(data).toString());
+            session.setShipmentProperty(getLocationsKey(), toJSon(data).toString());
         } else {
             final Shipment shipment = context.getEvent().getShipment();
             shipment.setShippedTo(loc);
             saveShipment(shipment);
 
             //stop check end location
-            context.getSession().setShipmentProperty(getLocationsKey(), null);
+            session.setShipmentProperty(getLocationsKey(), null);
         }
 
         return false;

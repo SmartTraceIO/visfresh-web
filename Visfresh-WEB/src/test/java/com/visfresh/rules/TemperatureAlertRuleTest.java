@@ -24,7 +24,6 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.rules.state.ShipmentSession;
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -83,49 +82,49 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        ShipmentSession state = new ShipmentSession();
+        SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
-        state = new ShipmentSession();
+        mgr = new SessionHolder();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         //normal temperature occurence should flush state
         e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature - 3);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         assertEquals(0, alertDao.findAll(null, null, null).size());
     }
@@ -146,18 +145,18 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         final Alert alert = alertDao.findAll(null, null, null).get(0);
@@ -180,18 +179,18 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         final TemperatureAlert alert = (TemperatureAlert) alertDao.findAll(null, null, null).get(0);
@@ -214,35 +213,35 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 5);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         //normal temperature occurrence should flush state
         e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature - 3);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 5);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
     }
 
     @Test
@@ -262,49 +261,49 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        ShipmentSession state = new ShipmentSession();
+        SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
-        state = new ShipmentSession();
+        mgr = new SessionHolder();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         //normal temperature occurence should flush state
         e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature - 3);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         assertEquals(0, alertDao.findAll(null, null, null).size());
     }
@@ -325,35 +324,35 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 5);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         //normal temperature occurrence should flush state
         e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature - 3);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature + 5);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature + 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
     }
     @Test
     public void testColdTemperatureAlert() {
@@ -372,39 +371,39 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         alertDao.deleteAll();
 
         //normal temperature occurence should flush state
         e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature + 3);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         assertEquals(0, alertDao.findAll(null, null, null).size());
     }
@@ -426,35 +425,35 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 5);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         //normal temperature occurrence should flush state
         e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature + 3);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 5);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
     }
 
     @Test
@@ -474,49 +473,49 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        ShipmentSession state = new ShipmentSession();
+        SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
-        state = new ShipmentSession();
+        mgr = new SessionHolder();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         //normal temperature occurence should flush state
         e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature + 3);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         assertEquals(0, alertDao.findAll(null, null, null).size());
     }
@@ -537,35 +536,35 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         //check first iteration
         final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 5);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         //normal temperature occurrence should flush state
         e = createEvent(startTime + 12 * minute, TrackerEventType.AUT, temperature + 3);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 11 * minute, TrackerEventType.AUT, temperature - 5);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(0, alertDao.findAll(null, null, null).size());
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         //check not handles already handled
         alertDao.deleteAll();
 
         e = createEvent(startTime, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, mgr));
     }
     /**
      * @param date date.

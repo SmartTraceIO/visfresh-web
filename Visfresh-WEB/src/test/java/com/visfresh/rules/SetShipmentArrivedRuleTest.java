@@ -21,7 +21,6 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.mock.MockShipmentShutdownService;
-import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.RuleEngine;
 
 /**
@@ -55,7 +54,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         e.setTime(new Date());
         e.setType(TrackerEventType.AUT);
 
-        final RuleContext req = new RuleContext(e, new ShipmentSession());
+        final RuleContext req = new RuleContext(e, new SessionHolder());
         //final location not set
         assertFalse(rule.accept(req));
 
@@ -84,7 +83,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e, new ShipmentSession());
+        final RuleContext req = new RuleContext(e, new SessionHolder());
         rule.accept(req);
         rule.handle(req);
 
@@ -103,7 +102,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e, new ShipmentSession());
+        final RuleContext req = new RuleContext(e, new SessionHolder());
         assertTrue(rule.accept(req));
         rule.handle(req);
 
@@ -120,13 +119,13 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
 
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder mgr = new SessionHolder();
         //set nearest location
-        final RuleContext req = new RuleContext(e, state);
+        final RuleContext req = new RuleContext(e, mgr);
         assertTrue(rule.accept(req));
         rule.handle(req);
 
-        assertFalse(rule.accept(new RuleContext(e, state)));
+        assertFalse(rule.accept(new RuleContext(e, mgr)));
     }
 
     /**

@@ -37,7 +37,6 @@ import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.email.EmailMessage;
 import com.visfresh.mock.MockEmailService;
-import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -70,7 +69,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         e.setTime(new Date());
         e.setType(TrackerEventType.AUT);
 
-        final RuleContext req = new RuleContext(e, new ShipmentSession());
+        final RuleContext req = new RuleContext(e, new SessionHolder(shipment));
         //final location not set
         assertFalse(rule.accept(req));
 
@@ -98,7 +97,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e, new ShipmentSession());
+        final RuleContext req = new RuleContext(e, new SessionHolder(shipment));
         assertTrue(rule.accept(req));
         rule.handle(req);
 
@@ -125,7 +124,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e, new ShipmentSession());
+        final RuleContext req = new RuleContext(e, new SessionHolder(shipment));
         assertTrue(rule.accept(req));
         rule.handle(req);
 
@@ -154,7 +153,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e, new ShipmentSession());
+        final RuleContext req = new RuleContext(e, new SessionHolder(shipment));
         rule.handle(req);
 
         //check notification send
@@ -193,7 +192,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e, new ShipmentSession());
+        final RuleContext req = new RuleContext(e, new SessionHolder(shipment));
         assertTrue(rule.accept(req));
     }
     @Test
@@ -206,7 +205,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
 
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder state = new SessionHolder(shipment);
         //set nearest location
         final RuleContext req = new RuleContext(e, state);
         assertTrue(rule.accept(req));

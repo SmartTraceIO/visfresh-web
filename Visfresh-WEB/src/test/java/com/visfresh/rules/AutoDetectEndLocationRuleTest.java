@@ -125,7 +125,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
     }
     @Test
     public void testAccept() {
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder state = new SessionHolder();
 
         final TrackerEvent e = new TrackerEvent();
         e.setShipment(shipment);
@@ -136,7 +136,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         final LocationProfile loc2 = createLocation(2., 0.);
         final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
 
-        needAutodetect(autoStart, state);
+        needAutodetect(autoStart, state.getSession(shipment));
 
         //test accept correct
         assertTrue(accept(new RuleContext(e, state)));
@@ -158,11 +158,11 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         assertTrue(accept(new RuleContext(e, state)));
 
         //test not accept not need autodetect
-        assertFalse(accept(new RuleContext(e, new ShipmentSession())));
+        assertFalse(accept(new RuleContext(e, new SessionHolder())));
     }
     @Test
     public void testHandle() {
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder state = new SessionHolder();
 
         final TrackerEvent e = new TrackerEvent();
         e.setShipment(shipment);
@@ -173,7 +173,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         final LocationProfile loc2 = createLocation(2., 0.);
         final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
 
-        needAutodetect(autoStart, state);
+        needAutodetect(autoStart, state.getSession(shipment));
 
         //check ignores first reading
         assertFalse(handle(new RuleContext(e, state)));

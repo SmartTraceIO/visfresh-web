@@ -26,7 +26,6 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -74,25 +73,25 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
         e.setShipment(s);
 
         //test accept event
-        assertTrue(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
 
         //ignores without shipment
         e.setShipment(null);
-        assertFalse(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertFalse(rule.accept(new RuleContext(e, new SessionHolder())));
 
         //ignore with shipment not configured for given alert
         e.setShipment(createDefaultShipment(ShipmentStatus.InProgress, s.getDevice()));
-        assertFalse(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertFalse(rule.accept(new RuleContext(e, new SessionHolder())));
 
         //set alwais accepted even if handled
         e.setShipment(s);
-        final RuleContext c = new RuleContext(e, new ShipmentSession());
+        final RuleContext c = new RuleContext(e, new SessionHolder());
         rule.handle(c);
-        assertTrue(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
 
         //test ignore left event type
         e.setType(TrackerEventType.INIT);
-        assertFalse(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertFalse(rule.accept(new RuleContext(e, new SessionHolder())));
     }
     @Test
     public void testHandle() {
@@ -101,7 +100,7 @@ public class EnterDarkEnvironmentAlertRuleTest extends BaseRuleTest {
         e.setShipment(s);
         context.getBean(TrackerEventDao.class).save(e);
 
-        final RuleContext c = new RuleContext(e, new ShipmentSession());
+        final RuleContext c = new RuleContext(e, new SessionHolder());
         rule.handle(c);
 
         //check shipment created.

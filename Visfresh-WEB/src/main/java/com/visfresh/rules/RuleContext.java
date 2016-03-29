@@ -7,8 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.visfresh.entities.Location;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.rules.state.ShipmentSessionManager;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -16,15 +17,16 @@ import com.visfresh.rules.state.ShipmentSession;
  */
 public class RuleContext {
     private final TrackerEvent event;
-    private final ShipmentSession state;
+    private final ShipmentSessionManager state;
     private Map<Object, Object> clientProperties = new ConcurrentHashMap<Object, Object>();
     private Map<TrackerEventRule, Boolean> processedMap = new HashMap<TrackerEventRule, Boolean>();
+    private Location oldLocation;
 
     /**
      * @param e tracker event.
      * @param state device rules state.
      */
-    public RuleContext(final TrackerEvent e, final ShipmentSession state) {
+    public RuleContext(final TrackerEvent e, final ShipmentSessionManager state) {
         super();
         this.event = e;
         this.state = state;
@@ -69,7 +71,19 @@ public class RuleContext {
     /**
      * @return the session
      */
-    public ShipmentSession getSession() {
+    public ShipmentSessionManager getSessionManager() {
         return state;
+    }
+    /**
+     * @param oldLocation the oldLocation to set
+     */
+    public void setOldLocation(final Location oldLocation) {
+        this.oldLocation = oldLocation;
+    }
+    /**
+     * @return the oldLocation
+     */
+    public Location getOldLocation() {
+        return oldLocation;
     }
 }

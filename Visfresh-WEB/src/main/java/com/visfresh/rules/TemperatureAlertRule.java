@@ -16,6 +16,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -59,6 +60,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         final TrackerEvent event = context.getEvent();
         final TrackerEvent prev = trackerEventDao.getPreviousEvent(event);
         final double t = getAverageTemparature(prev, event);
+        final ShipmentSession session = context.getSessionManager().getSession(event.getShipment());
 
         final List<Alert> alerts = new LinkedList<Alert>();
 
@@ -66,7 +68,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         for (final TemperatureRule rule : event.getShipment().getAlertProfile().getAlertRules()) {
 
             //if rule is not already processed. Each rule should be processed one time.
-            if (!AbstractRuleEngine.isTemperatureRuleProcessed(context.getSession(), rule)) {
+            if (!AbstractRuleEngine.isTemperatureRuleProcessed(session, rule)) {
                 final boolean isCumulative = rule.isCumulativeFlag();
                 if (isMatches(rule, t)) {
                     Alert a = null;
@@ -87,7 +89,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
                 } else {
                     if (!isCumulative) {
                         //clear first issue date
-                        final Map<String, String> props = context.getSession().getTemperatureAlerts()
+                        final Map<String, String> props = session.getTemperatureAlerts()
                                 .getProperties();
                         props.remove(creaeStartIssueKey(rule));
                     }
@@ -104,7 +106,8 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @return alert.
      */
     private Alert processNormalRule(final TemperatureRule rule, final RuleContext context) {
-        final Map<String, Date> dateProps = context.getSession().getTemperatureAlerts()
+        final ShipmentSession session = context.getSessionManager().getSession(context.getEvent().getShipment());
+        final Map<String, Date> dateProps = session.getTemperatureAlerts()
                 .getDates();
 
         final String startIssueKey = creaeStartIssueKey(rule);
@@ -120,7 +123,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         if (total >= rule.getTimeOutMinutes()) {
             final TemperatureAlert a = createAlert(rule, event);
             a.setMinutes((int) total);
-            AbstractRuleEngine.setProcessedTemperatureRule(context.getSession(), rule);
+            AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
             return a;
         }
 
@@ -134,7 +137,8 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      */
     private Alert processComulativeRule(final TemperatureRule rule, final RuleContext context,
             final TrackerEvent prev) {
-        final Map<String, String> props = context.getSession().getTemperatureAlerts()
+        final ShipmentSession session = context.getSessionManager().getSession(context.getEvent().getShipment());
+        final Map<String, String> props = session.getTemperatureAlerts()
                 .getProperties();
 
         //process cumulative rule
@@ -149,7 +153,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         if (total >= rule.getTimeOutMinutes() * 60000L) {
             final TemperatureAlert alert = createAlert(rule, event);
             alert.setMinutes((int) (total / 60000l));
-            AbstractRuleEngine.setProcessedTemperatureRule(context.getSession(), rule);
+            AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
             return alert;
         } else {
             props.put(cumulativeTotalKey, Long.toString(total));

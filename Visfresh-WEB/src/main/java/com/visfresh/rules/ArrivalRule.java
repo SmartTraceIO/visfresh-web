@@ -57,14 +57,13 @@ public class ArrivalRule extends AbstractNotificationRule {
     @Override
     public boolean accept(final RuleContext req) {
         final TrackerEvent event = req.getEvent();
-        final boolean accept = !req.getSession().isArrivalProcessed()
-                && super.accept(req)
-                && isNearEndLocation(event.getShipment(), event.getLatitude(), event.getLongitude());
-        if (accept) {
-            log.debug("Arrival Rule matches for shipment "
-                    + event.getShipment().getShipmentDescription()
-                    + " tracker event. Notification will generated");
+        if (!super.accept(req)) {
+            return false;
         }
+
+        final Shipment shipment = event.getShipment();
+        final boolean accept = !req.getSessionManager().getSession(shipment).isArrivalProcessed()
+                && isNearEndLocation(shipment, event.getLatitude(), event.getLongitude());
         return accept;
     }
     /**
@@ -106,8 +105,9 @@ public class ArrivalRule extends AbstractNotificationRule {
         final TrackerEvent event = context.getEvent();
         final Shipment shipment = event.getShipment();
 
+        log.debug("Handle arrival for shipment " + shipment.getId());
         context.setProcessed(this);
-        context.getSession().setArrivalProcessed(true);
+        context.getSessionManager().getSession(shipment).setArrivalProcessed(true);
 
         arrival.setDate(event.getTime());
         arrival.setDevice(event.getDevice());

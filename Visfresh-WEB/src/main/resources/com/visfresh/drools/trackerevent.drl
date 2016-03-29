@@ -11,7 +11,6 @@ import com.visfresh.rules.MovementStartAlertRule;
 import com.visfresh.rules.MovementStopAlertRule;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.TemperatureAlertRule;
-import com.visfresh.rules.CloseOldShipmentsRule;
 import com.visfresh.rules.SetShipmentArrivedRule;
 import com.visfresh.rules.AutoDetectEndLocationRule;
 import com.visfresh.rules.EtaCalculationRule;
@@ -108,15 +107,6 @@ rule "MovementStopAlert"
         context : RuleContext(engine.getRule(MovementStopAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(MovementStopAlertRule.NAME).handle(context)) {
-       		update(context);
-        }
-end
-
-rule "CloseOldShipments"
-    when
-        context : RuleContext(engine.getRule(CloseOldShipmentsRule.NAME).accept(this));
-    then
-    	if(engine.getRule(CloseOldShipmentsRule.NAME).handle(context)) {
        		update(context);
         }
 end

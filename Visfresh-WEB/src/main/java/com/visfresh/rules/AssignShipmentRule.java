@@ -71,7 +71,6 @@ public class AssignShipmentRule implements TrackerEventRule {
 
         log.debug("Assign shipment " + shipment.getId() + " to event " + context.getEvent());
         context.getEvent().setShipment(shipment);
-        context.getSession().possibleNewShipment(shipment);
         trackerEventDao.save(context.getEvent());
         return true;
     }

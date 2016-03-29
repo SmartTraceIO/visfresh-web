@@ -21,9 +21,11 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonElement;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
@@ -33,7 +35,9 @@ import com.visfresh.entities.TrackerEventType;
 import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.mpl.services.TrackerMessageDispatcher;
+import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.rules.state.ShipmentSessionManager;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.SystemMessageHandler;
@@ -45,7 +49,7 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 @Component
-public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHandler {
+public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHandler, ShipmentSessionManager {
     private static final Logger log = LoggerFactory.getLogger(AbstractRuleEngine.class);
     private static final int TIME_ZONE_OFSET = TimeZone.getDefault().getRawOffset();
 
@@ -57,9 +61,12 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     private TrackerEventDao trackerEventDao;
     @Autowired
     private DeviceDao deviceDao;
+    @Autowired
+    private ShipmentSessionDao shipmentSessionDao;
 
     private final DeviceDcsNativeEventSerializer deviceEventParser = new DeviceDcsNativeEventSerializer();
-    private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<String, TrackerEventRule>();
+    private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<>();
+    private final Map<Long, ShipmentSession> sessionCache = new ConcurrentHashMap<>();
 
     private final TrackerEventRule emptyRule = new TrackerEventRule() {
         @Override
@@ -113,17 +120,18 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         e.setType(TrackerEventType.valueOf(event.getType()));
 
         final String imei = event.getImei();
-
         //set device
-        e.setDevice(deviceDao.findByImei(imei));
-        trackerEventDao.save(e);
-        log.debug("Tracker event accepted: " + e);
+        e.setDevice(findDevice(imei));
 
         //process tracker event with rule engine.
-        ShipmentSession state = deviceDao.getState(imei);
+        DeviceState state = getDeviceState(imei);
         if (state == null) {
-            state = new ShipmentSession();
-        } else if (state.getLastLocation() != null) {
+            state = new DeviceState();
+        }
+
+        final RuleContext context = new RuleContext(e, this);
+
+        if (state.getLastLocation() != null) {
             final Location loc = state.getLastLocation();
             final int meters = (int) LocationUtils.getDistanceMeters(loc.getLatitude(), loc.getLongitude(),
                     e.getLatitude(), e.getLongitude());
@@ -131,9 +139,12 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                 log.warn("Incorrect device moving to " + meters + " meters has detected. Event has ignored");
                 return;
             }
+
+            context.setOldLocation(loc);
         }
 
-        final RuleContext context = new RuleContext(e, state);
+        saveTrackerEvent(e);
+        log.debug("Tracker event accepted: " + e);
 
         try {
             invokeRules(context);
@@ -142,13 +153,15 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             final Shipment shipment = e.getShipment();
             if (shipment != null) {
                 shipment.setLastEventDate(e.getTime());
-                shipmentDao.save(shipment);
+                saveShipment(shipment);
+                saveSession(shipment, getSession(shipment));
+
                 log.debug("Last shipment date of " + shipment.getShipmentDescription()
                         + " has updated to " + shipment.getLastEventDate());
             }
         } finally {
             state.setLastLocation(new Location(e.getLatitude(), e.getLongitude()));
-            deviceDao.saveState(event.getImei(), state);
+            saveDeviceState(event.getImei(), state);
         }
     }
     /**
@@ -156,7 +169,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @return rule.
      */
     @Override
-    public TrackerEventRule getRule(final String name) {
+    public final TrackerEventRule getRule(final String name) {
         final TrackerEventRule rule = rules.get(name);
         if (name == null) {
             log.warn("Rule with name " + name + " is not found. Given drools expression will ignored");
@@ -180,7 +193,6 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     @Override
     public List<AlertRule> getAlertYetFoFire(final Shipment s) {
-        final String imei = s.getDevice().getImei();
         final List<AlertRule> alerts = new LinkedList<AlertRule>();
 
         //check alert profile exists
@@ -189,14 +201,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             return alerts;
         }
 
-        //check this shipment is active
-        final Shipment lastShipment = shipmentDao.findLastShipment(imei);
-        if (!lastShipment.getId().equals(s.getId())) {
-            return alerts;
-        }
-
         //check device state is set.
-        final ShipmentSession state = deviceDao.getState(imei);
+        final ShipmentSession state = getSession(s);
         for (final TemperatureRule rule: alertProfile.getAlertRules()) {
             switch (rule.getType()) {
                 case Cold:
@@ -236,5 +242,64 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     protected static void setProcessedTemperatureRule(final ShipmentSession deviceState, final TemperatureRule rule) {
         deviceState.getTemperatureAlerts().getProperties().put(createProcessedKey(rule), "true");
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.state.ShipmentSessionManager#getSession(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public synchronized ShipmentSession getSession(final Shipment s) {
+        ShipmentSession ss = sessionCache.get(s.getId());
+        if (ss == null) {
+            ss = shipmentSessionDao.getSession(s);
+            if (ss == null) {
+                ss = new ShipmentSession();
+            }
+
+            sessionCache.put(s.getId(), ss);
+        }
+        return ss;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.state.ShipmentSessionManager#saveSession(com.visfresh.entities.Shipment, com.visfresh.rules.state.ShipmentSession)
+     */
+    @Override
+    public synchronized void saveSession(final Shipment s, final ShipmentSession session) {
+        sessionCache.remove(s.getId());
+        shipmentSessionDao.saveSession(s, session);
+    }
+    /**
+     * @param imei device IMEI.
+     * @param state device state.
+     */
+    protected void saveDeviceState(final String imei, final DeviceState state) {
+        deviceDao.saveState(imei, state);
+    }
+    /**
+     * @param imei
+     * @return
+     */
+    protected DeviceState getDeviceState(final String imei) {
+        return deviceDao.getState(imei);
+    }
+    /**
+     * @param shipment shipment.
+     * @return saved shipment.
+     */
+    protected Shipment saveShipment(final Shipment shipment) {
+        return shipmentDao.save(shipment);
+    }
+    /**
+     * @param e tracker event.
+     * @return saved tracker event.
+     */
+    protected TrackerEvent saveTrackerEvent(final TrackerEvent e) {
+        return trackerEventDao.save(e);
+    }
+    /**
+     * @param imei device IMEI.
+     * @return device.
+     */
+    protected Device findDevice(final String imei) {
+        return deviceDao.findByImei(imei);
     }
 }

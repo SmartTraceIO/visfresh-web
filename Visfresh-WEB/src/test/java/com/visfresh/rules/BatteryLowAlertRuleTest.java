@@ -26,7 +26,6 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -75,7 +74,7 @@ public class BatteryLowAlertRuleTest extends BaseRuleTest {
         final TrackerEvent e = createEvent(batteryLow);
 
         //ignores without shipment
-        assertFalse(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertFalse(rule.accept(new RuleContext(e, new SessionHolder())));
 
         //ignore with battery ok.
         final Shipment s = createShipmentWithEnabledAlert(e.getDevice(), e.getTime());
@@ -83,16 +82,16 @@ public class BatteryLowAlertRuleTest extends BaseRuleTest {
         context.getBean(TrackerEventDao.class).save(e);
 
         e.setBattery(batteryOk);
-        assertFalse(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertFalse(rule.accept(new RuleContext(e, new SessionHolder())));
 
         //accept with battery low.
         e.setBattery(batteryLow);
-        assertTrue(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
 
         //set alwais accepted even if handled
-        final RuleContext c = new RuleContext(e, new ShipmentSession());
+        final RuleContext c = new RuleContext(e, new SessionHolder());
         rule.handle(c);
-        assertTrue(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
     }
     @Test
     public void testHandle() {
@@ -101,7 +100,7 @@ public class BatteryLowAlertRuleTest extends BaseRuleTest {
         e.setShipment(s);
         context.getBean(TrackerEventDao.class).save(e);
 
-        final RuleContext c = new RuleContext(e, new ShipmentSession());
+        final RuleContext c = new RuleContext(e, new SessionHolder());
         rule.handle(c);
 
         //check shipment created.

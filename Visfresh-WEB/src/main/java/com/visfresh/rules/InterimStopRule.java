@@ -135,13 +135,14 @@ public class InterimStopRule implements TrackerEventRule {
     public boolean accept(final RuleContext req) {
         final TrackerEvent event = req.getEvent();
         final Shipment shipment = event.getShipment();
+        final ShipmentSession session = shipment == null ? null : req.getSessionManager().getSession(shipment);
 
         final boolean accept = shipment != null
                 && !req.isProcessed(this)
                 && !shipment.hasFinalStatus()
-                && getInterimLocations(req.getSession()) != null
-                && (isInInterimStop(req.getSession())
-                || isNearInterimStop(req.getSession(), event.getLatitude(), event.getLongitude()));
+                && getInterimLocations(session) != null
+                && (isInInterimStop(session)
+                || isNearInterimStop(session, event.getLatitude(), event.getLongitude()));
 
         return accept;
     }
@@ -188,7 +189,7 @@ public class InterimStopRule implements TrackerEventRule {
         context.setProcessed(this);
 
         final TrackerEvent event = context.getEvent();
-        final ShipmentSession state = context.getSession();
+        final ShipmentSession state = context.getSessionManager().getSession(event.getShipment());
         if (isNearInterimStop(state, event.getLatitude(), event.getLongitude())) {
             InterimStopInfo stop = getInterimStop(state);
             final List<LocationProfile> locs = getInterimLocations(state);

@@ -28,7 +28,6 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -80,15 +79,15 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         e.setShipment(new Shipment());
 
         // ignores with shipment
-        assertFalse(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertFalse(rule.accept(new RuleContext(e, new SessionHolder())));
 
         // accept with shipment if INIT message
         e.setType(TrackerEventType.INIT);
-        assertTrue(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
 
         e.setShipment(null);
         e.setType(TrackerEventType.AUT);
-        assertTrue(rule.accept(new RuleContext(e, new ShipmentSession())));
+        assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
     }
 
     @Test
@@ -96,7 +95,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         final TrackerEvent e = createEvent(17.14, 18.16, new Date());
         e.setTime(new Date(System.currentTimeMillis() - 1000000l));
 
-        final RuleContext c = new RuleContext(e, new ShipmentSession());
+        final RuleContext c = new RuleContext(e, new SessionHolder());
         rule.handle(c);
 
         // check shipment created.
@@ -144,7 +143,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
 
         final TrackerEvent e = createEvent(17.14, 18.16, new Date());
 
-        final RuleContext c = new RuleContext(e, new ShipmentSession());
+        final RuleContext c = new RuleContext(e, new SessionHolder());
         rule.handle(c);
 
         // check shipment created.
@@ -160,8 +159,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertEquals(lok.getId(), shipment.getShippedFrom().getId());
         // check created from correct template
         assertTrue(shipment.getShipmentDescription().startsWith(tok.getShipmentDescription()));
-        //first is shipment ID.
-        assertEquals(2, c.getSession().getShipmentKeys().size());
+        assertEquals(1, c.getSessionManager().getSession(shipment).getShipmentKeys().size());
 
         // check not duplicate handle
         assertFalse(rule.accept(c));
@@ -195,7 +193,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
 
         final TrackerEvent e = createEvent(17.14, 18.16, new Date());
 
-        final RuleContext c = new RuleContext(e, new ShipmentSession());
+        final RuleContext c = new RuleContext(e, new SessionHolder());
         rule.handle(c);
 
         // check shipment created.
@@ -223,7 +221,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         createAutoStartShipment(tok, 2, lok);
 
         TrackerEvent e = createEvent(17.14, 18.16, new Date());
-        RuleContext c = new RuleContext(e, new ShipmentSession());
+        RuleContext c = new RuleContext(e, new SessionHolder());
         rule.handle(c);
 
         // check shipment created.
@@ -241,7 +239,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         context.getBean(DeviceDao.class).save(e.getDevice());
 
         e = createEvent(17.14, 18.16, new Date());
-        c = new RuleContext(e, new ShipmentSession());
+        c = new RuleContext(e, new SessionHolder());
         rule.handle(c);
 
         s = shipmentDao.findOne(e.getShipment().getId());
@@ -266,9 +264,9 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         dao.save(aut);
 
         final TrackerEvent e = createEvent(17.14, 18.16, new Date());
-        final ShipmentSession state = new ShipmentSession();
+        final SessionHolder state = new SessionHolder();
         rule.handle(new RuleContext(e, state));
-        assertEquals(2, state.getShipmentKeys().size());
+        assertEquals(1, state.getSession(e.getShipment()).getShipmentKeys().size());
 
         // check shipment created.
         assertNull(e.getShipment().getShippedTo());

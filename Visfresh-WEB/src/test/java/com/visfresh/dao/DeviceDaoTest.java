@@ -23,7 +23,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.rules.state.DeviceState;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -442,7 +442,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         final Device d = createDevice("3984709382475");
         dao.save(d);
 
-        final ShipmentSession s = new ShipmentSession();
+        final DeviceState s = new DeviceState();
 
         dao.saveState(d.getImei(), s);
         assertNotNull(dao.getState(d.getImei()));
