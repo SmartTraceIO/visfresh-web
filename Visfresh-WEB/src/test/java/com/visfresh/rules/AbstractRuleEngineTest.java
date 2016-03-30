@@ -237,14 +237,14 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
      * @see com.visfresh.rules.AbstractRuleEngine#loadSession(com.visfresh.entities.Shipment)
      */
     @Override
-    protected ShipmentSession loadSession(final Shipment s) {
+    protected ShipmentSession loadSessionFromDb(final Shipment s) {
         return sessions.get(s.getId());
     }
     /* (non-Javadoc)
      * @see com.visfresh.rules.AbstractRuleEngine#saveSession(com.visfresh.entities.Shipment, com.visfresh.rules.state.ShipmentSession)
      */
     @Override
-    protected void saveSession(final Shipment s, final ShipmentSession ss) {
+    protected void saveSessionToDb(final Shipment s, final ShipmentSession ss) {
         sessions.put(s.getId(), ss);
     }
     /* (non-Javadoc)

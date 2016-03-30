@@ -523,7 +523,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final Shipment s = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, s);

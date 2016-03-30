@@ -211,19 +211,21 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         }
 
         //check device state is set.
-        final ShipmentSession state = getSession(s);
-        for (final TemperatureRule rule: alertProfile.getAlertRules()) {
-            switch (rule.getType()) {
-                case Cold:
-                case CriticalCold:
-                case Hot:
-                case CriticalHot:
-                    if (state == null || !isTemperatureRuleProcessed(state, rule)) {
-                        alerts.add(rule);
-                    }
-                    break;
-                    default:
-                        //nothing
+        final ShipmentSession session = loadSessionFromDb(s);
+        if (session != null && !session.isAlertsSuppressed()) {
+            for (final TemperatureRule rule: alertProfile.getAlertRules()) {
+                switch (rule.getType()) {
+                    case Cold:
+                    case CriticalCold:
+                    case Hot:
+                    case CriticalHot:
+                        if (session == null || !isTemperatureRuleProcessed(session, rule)) {
+                            alerts.add(rule);
+                        }
+                        break;
+                        default:
+                            //nothing
+                }
             }
         }
 
@@ -279,7 +281,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         //load session.
         synchronized (ss) {
             if (ss.session == null) {
-                ss.session = loadSession(s);
+                ss.session = loadSessionFromDb(s);
                 log.debug("Shipment session for " + s.getId() + " is load from DB");
             }
             if (ss.session == null) {
@@ -297,7 +299,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         if (ss != null) {
             synchronized (ss) {
-                saveSession(s, ss.session);
+                saveSessionToDb(s, ss.session);
                 ss.loaders.remove(loaderId);
                 log.debug("Shipment session for " + s.getId() + " has saved");
 
@@ -315,14 +317,14 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param s
      * @param ss
      */
-    protected void saveSession(final Shipment s, final ShipmentSession ss) {
+    protected void saveSessionToDb(final Shipment s, final ShipmentSession ss) {
         shipmentSessionDao.saveSession(s, ss);
     }
     /**
      * @param s
      * @return
      */
-    protected ShipmentSession loadSession(final Shipment s) {
+    protected ShipmentSession loadSessionFromDb(final Shipment s) {
         return shipmentSessionDao.getSession(s);
     }
     /* (non-Javadoc)

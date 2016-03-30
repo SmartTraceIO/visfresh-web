@@ -294,7 +294,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final @RequestParam Long shipmentId) {
         try {
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, shipment);
