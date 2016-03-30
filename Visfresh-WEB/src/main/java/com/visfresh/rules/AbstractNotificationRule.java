@@ -18,6 +18,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.NotificationService;
 
 /**
@@ -54,9 +55,22 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
 
         final boolean accept = !e.isProcessed(this)
                 && shipment != null
-                && shipment.getStatus() != ShipmentStatus.Ended;
+                && shipment.getStatus() != ShipmentStatus.Ended
+                && !isSuppressedNotifications(e);
 
         return accept;
+    }
+    /**
+     * @param context rule context.
+     * @return
+     */
+    protected boolean isSuppressedNotifications(final RuleContext context) {
+        final Shipment shipment = context.getEvent().getShipment();
+        final ShipmentSession session = context.getSessionManager().getSession(shipment);
+        if (session.isAlertsSuppressed()) {
+            return true;
+        }
+        return false;
     }
     /**
      * This method is made as protected for unit test purposes.
