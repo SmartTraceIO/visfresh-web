@@ -7,14 +7,12 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +82,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
     private static class ShipmentSessionCacheEntry {
         ShipmentSession session;
-        final Set<String> loaders = new ConcurrentHashSet<>();
+        final Map<String, Object> loaders = new ConcurrentHashMap<>();
     }
     /**
      *
@@ -274,7 +272,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             if (ss == null) {
                 ss = new ShipmentSessionCacheEntry();
                 sessionCache.put(s.getId(), ss);
-                ss.loaders.add(loaderId);
+                ss.loaders.put(loaderId, this);
             }
         }
 
