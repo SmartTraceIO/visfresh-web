@@ -440,7 +440,7 @@ Method *GET*, method *getNotes*. Request parameters:
 1. shipmentId - shipment ID  
 2. sn - device serial number.  
 3. trip - shipment trip count  
-One is required on shipmentId or sn+trip pair  
+One is required or shipmentId or sn+trip pair  
 [(example)](#markdown-header-get-notes-example)
 
 ## Objects
@@ -2989,7 +2989,7 @@ Response:
   }
 }
 ```
-### Get Notes ###
+### Get Notes example ###
 **GET /vf/rest/getNotes/${tripCount}?sn=039485&trip=1**  
 **GET /vf/rest/getNotes/${tripCount}?shipmentId**    
 **Response:**  
