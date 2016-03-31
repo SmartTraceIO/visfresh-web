@@ -46,20 +46,30 @@ public class NoteDaoImpl implements NoteDao {
         params.put("shipment", s.getId());
 
         final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select * from notes where shipment=:shipment order by notenum", params);
+                "select * from notes where shipment=:shipment and active order by notenum", params);
         final List<Note> notes = new LinkedList<>();
         for (final Map<String,Object> row : rows) {
-            final Note n = new Note();
-            n.setCreatedBy((String) row.get("createdby"));
-            n.setCreationDate((Date) row.get("createdon"));
-            n.setNoteNum(((Number) row.get("notenum")).intValue());
-            n.setNoteText((String) row.get("notetext"));
-            n.setNoteType(NoteType.valueOf((String) row.get("notetype")));
-            n.setTimeOnChart((Date) row.get("timeonchart"));
-            notes.add(n);
+            notes.add(createNote(row));
         }
 
         return notes;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.NoteDao#findNote(com.visfresh.entities.Shipment, java.lang.Integer)
+     */
+    @Override
+    public Note getNote(final Shipment s, final Integer noteNum) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("shipment", s.getId());
+        params.put("notenum", noteNum);
+
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                "select * from notes where shipment=:shipment and notenum=:notenum", params);
+        if (rows.size() > 0) {
+            return createNote(rows.get(0));
+        }
+
+        return null;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.NoteDao#save(com.visfresh.entities.Shipment, com.visfresh.entities.Note)
@@ -78,12 +88,13 @@ public class NoteDaoImpl implements NoteDao {
         params.put("createdon", note.getCreationDate());
         params.put("notetype", note.getNoteType().name());
         params.put("timeonchart", note.getTimeOnChart());
+        params.put("active", note.isActive());
 
         if (note.getNoteNum() != null) {
             //update
             params.put("notenum", note.getNoteNum());
             final String sql = "update notes set notetext=:notetext,timeonchart=:timeonchart,"
-                    + "notetype=:notetype,createdon=:createdon,createdby=:createdby"
+                    + "notetype=:notetype,createdon=:createdon,createdby=:createdby,active=:active"
                     + " where shipment=:shipment and notenum=:notenum";
             jdbc.update(sql, params);
         } else {
@@ -97,12 +108,28 @@ public class NoteDaoImpl implements NoteDao {
                 note.setNoteNum(noteNum);
 
                 //insert
-                final String sql = "insert into notes(shipment,notenum,notetext,timeonchart,notetype,createdon,createdby)"
-                        + " values(:shipment,:notenum,:notetext,:timeonchart,:notetype,:createdon,:createdby)";
+                final String sql = "insert into notes"
+                        + "(shipment,notenum,notetext,timeonchart,notetype,createdon,createdby,active)"
+                        + " values(:shipment,:notenum,:notetext,:timeonchart,:notetype,:createdon,:createdby,:active)";
                 jdbc.update(sql, params);
             }
         }
 
         return note;
+    }
+    /**
+     * @param row
+     * @return
+     */
+    private Note createNote(final Map<String, Object> row) {
+        final Note n = new Note();
+        n.setCreatedBy((String) row.get("createdby"));
+        n.setCreationDate((Date) row.get("createdon"));
+        n.setNoteNum(((Number) row.get("notenum")).intValue());
+        n.setNoteText((String) row.get("notetext"));
+        n.setNoteType(NoteType.valueOf((String) row.get("notetype")));
+        n.setTimeOnChart((Date) row.get("timeonchart"));
+        n.setActive((Boolean) row.get("active"));
+        return n;
     }
 }

@@ -10,3 +10,5 @@ create table notes (
     foreign key (shipment)
         references shipments (id) on delete cascade
 );
+
+alter table notes add column active boolean not NULL default true;

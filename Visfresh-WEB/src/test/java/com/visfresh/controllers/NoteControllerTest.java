@@ -151,7 +151,20 @@ public class NoteControllerTest extends AbstractRestServiceTest {
 
         assertEquals("B", notes.get(0).getNoteText());
     }
+    @Test
+    public void testDeleteNote() throws IOException, RestServiceException {
+        final Note a = createNote("A");
+        final Note b = createNote("B");
+        createNote("C");
 
+        client.deleteNote(shipment.getId(), a.getNoteNum());
+        assertEquals(2, dao.findByShipment(shipment).size());
+
+        client.deleteNote(shipment.getDevice().getSn(), shipment.getTripCount(), b.getNoteNum());
+        assertEquals(1, dao.findByShipment(shipment).size());
+
+        assertEquals("C", dao.findByShipment(shipment).get(0).getNoteText());
+    }
     /**
      * @param text note text.
      */

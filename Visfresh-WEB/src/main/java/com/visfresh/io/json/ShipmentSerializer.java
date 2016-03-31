@@ -29,6 +29,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.NoteDto;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -63,6 +64,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     private final DateFormat isoFormat;
     private final DateFormat prettyFormat;
     private final LocationSerializer locationSerializer;
+    private final NoteSerializer noteSerializer;
 
     /**
      * @param user user.
@@ -71,6 +73,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         super(user.getTimeZone());
         notificationScheduleSerializer = new NotificationScheduleSerializer(user.getTimeZone());
         locationSerializer = new LocationSerializer(user.getTimeZone());
+        noteSerializer = new NoteSerializer(user.getTimeZone());
+
         this.user = user;
         this.isoFormat = DateTimeUtils.createIsoFormat(user);
         this.prettyFormat = DateTimeUtils.createPrettyFormat(user);
@@ -631,6 +635,13 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
             //interim stops
             json.add("interimStops", interimStopsTJson(dto.getInterimStops()));
+
+            //add notes
+            final JsonArray notes = new JsonArray();
+            for (final NoteDto n : dto.getNotes()) {
+                notes.add(noteSerializer.toJson(n));
+            }
+            json.add("notes", notes);
         }
 
         return json;

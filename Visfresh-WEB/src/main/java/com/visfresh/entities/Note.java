@@ -16,6 +16,7 @@ public class Note {
     private Integer noteNum;
     private Date creationDate = new Date();
     private String createdBy;
+    private boolean active = true;
 
     /**
      * Default constructor.
@@ -95,5 +96,17 @@ public class Note {
      */
     public void setCreatedBy(final String createdBy) {
         this.createdBy = createdBy;
+    }
+    /**
+     * @return the active
+     */
+    public boolean isActive() {
+        return active;
+    }
+    /**
+     * @param active the active to set
+     */
+    public void setActive(final boolean active) {
+        this.active = active;
     }
 }

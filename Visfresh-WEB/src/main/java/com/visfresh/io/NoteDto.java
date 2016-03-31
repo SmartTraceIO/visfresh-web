@@ -4,6 +4,7 @@
 package com.visfresh.io;
 
 
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -18,7 +19,7 @@ public class NoteDto {
     private Long shipmentId;
     private String sn;
     private Integer trip;
-    private boolean activeFlag;
+    private boolean activeFlag = true;
 
     /**
      * Default constructor.

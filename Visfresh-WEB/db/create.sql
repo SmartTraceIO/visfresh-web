@@ -403,6 +403,7 @@ create table shipmentsessions (
 
 create table notes (
     shipment bigint(20) NOT NULL,
+    active boolean not NULL default true,
     notenum int NOT NULL,
     notetext longtext NOT NULL,
     timeonchart timestamp NULL default NULL,

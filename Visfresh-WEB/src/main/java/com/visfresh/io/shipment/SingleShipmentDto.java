@@ -13,6 +13,7 @@ import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.io.NoteDto;
 import com.visfresh.lists.ListNotificationScheduleItem;
 
 /**
@@ -77,6 +78,7 @@ public class SingleShipmentDto {
     private final List<LocationProfile> endLocationAlternatives = new LinkedList<>();
     private final List<LocationProfile> interimLocationAlternatives = new LinkedList<>();
     private final List<InterimStop> interimStops = new LinkedList<>();
+    private final List<NoteDto> notes = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -697,5 +699,11 @@ public class SingleShipmentDto {
      */
     public void setShipmentType(final String shipmentType) {
         this.shipmentType = shipmentType;
+    }
+    /**
+     * @return
+     */
+    public List<NoteDto> getNotes() {
+        return notes;
     }
 }

@@ -71,4 +71,38 @@ public class NoteRestClient extends RestClient {
 
         return result;
     }
+    /**
+     * @param shipmentId
+     * @param noteNum
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deleteNote(final Long shipmentId, final Integer noteNum) throws IOException, RestServiceException {
+        final Map<String, String> params = new HashMap<String, String>();
+        params.put("shipmentId", shipmentId.toString());
+        params.put("noteNum", noteNum.toString());
+        deleteNote(params);
+    }
+    /**
+     * @param sn
+     * @param tripCount
+     * @param noteNum
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deleteNote(final String sn, final int tripCount, final Integer noteNum) throws IOException, RestServiceException {
+        final Map<String, String> params = new HashMap<String, String>();
+        params.put("sn", sn);
+        params.put("trip", Integer.toString(tripCount));
+        params.put("noteNum", noteNum.toString());
+        deleteNote(params);
+    }
+    /**
+     * @param params
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    private void deleteNote(final Map<String, String> params) throws IOException, RestServiceException {
+        sendGetRequest(getPathWithToken("deleteNote"), params);
+    }
 }

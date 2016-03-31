@@ -96,18 +96,7 @@ public class NoteController extends AbstractController implements DeviceConstant
 
             final JsonArray array = new JsonArray();
             for (final Note note : notes) {
-                final NoteDto dto = new NoteDto();
-                //populate note DTO
-                dto.setActiveFlag(s.getDevice().isActive());
-                dto.setCreatedBy(user.getEmail());
-                dto.setCreationDate(iso.format(note.getCreationDate()));
-                dto.setNoteNum(note.getNoteNum());
-                dto.setNoteText(note.getNoteText());
-                dto.setShipmentId(s.getId());
-                dto.setNoteType(note.getNoteType().name());
-                dto.setSn(s.getDevice().getSn());
-                dto.setTrip(s.getTripCount());
-                dto.setTimeOnChart(iso.format(note.getTimeOnChart()));
+                final NoteDto dto = creaetNoteDto(note, s, iso);
 
                 array.add(ser.toJson(dto));
             }
@@ -118,6 +107,73 @@ public class NoteController extends AbstractController implements DeviceConstant
             return createErrorResponse(e);
         }
     }
+    @RequestMapping(value = "/deleteNote/{authToken}", method = RequestMethod.GET)
+    public JsonObject deleteNote(@PathVariable final String authToken,
+            @RequestParam(required = false) final Long shipmentId,
+            @RequestParam(required = false) final String sn,
+            @RequestParam(required = false) final Integer trip,
+            @RequestParam final Integer noteNum
+            ) {
+        //check parameters
+        if (shipmentId == null && (sn == null || trip == null)) {
+            return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Should be specified shipmentId or (sn and trip) request parameters");
+        }
+
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.NormalUser);
+
+            final Shipment s;
+            if (shipmentId != null) {
+                s = shipmentDao.findOne(shipmentId);
+            } else {
+                s = shipmentDao.findBySnTrip(sn, trip);
+            }
+
+            checkCompanyAccess(user, s);
+            if (s == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "Shipment not found");
+            }
+
+            final Note note = noteDao.getNote(s, noteNum);
+            if (note == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Note with given number " + noteNum + " not found");
+            }
+
+            note.setActive(false);
+            noteDao.save(s, note);
+
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to delete note: " + shipmentId, e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param note
+     * @param s
+     * @param iso
+     * @return
+     */
+    protected static NoteDto creaetNoteDto(final Note note, final Shipment s,
+            final DateFormat iso) {
+        final NoteDto dto = new NoteDto();
+        //populate note DTO
+        dto.setActiveFlag(note.isActive());
+        dto.setCreatedBy(note.getCreatedBy());
+        dto.setCreationDate(iso.format(note.getCreationDate()));
+        dto.setNoteNum(note.getNoteNum());
+        dto.setNoteText(note.getNoteText());
+        dto.setShipmentId(s.getId());
+        dto.setNoteType(note.getNoteType().name());
+        dto.setSn(s.getDevice().getSn());
+        dto.setTrip(s.getTripCount());
+        dto.setTimeOnChart(iso.format(note.getTimeOnChart()));
+        return dto;
+    }
     @RequestMapping(value = "/saveNote/{authToken}", method = RequestMethod.POST)
     public JsonObject saveNote(@PathVariable final String authToken,
             final @RequestBody JsonObject jsonRequest) {
@@ -125,7 +181,7 @@ public class NoteController extends AbstractController implements DeviceConstant
 
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final NoteSerializer ser = getSerializer(user);
             final NoteDto dto = ser.parseNoteDto(jsonRequest);
@@ -157,6 +213,7 @@ public class NoteController extends AbstractController implements DeviceConstant
             note.setNoteText(dto.getNoteText());
             note.setNoteType(dto.getNoteType() == null ? NoteType.Simple : NoteType.valueOf(dto.getNoteType()));
             note.setTimeOnChart(iso.parse(dto.getTimeOnChart()));
+            note.setActive(dto.isActiveFlag());
 
             note = noteDao.save(s, note);
 

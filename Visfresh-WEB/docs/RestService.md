@@ -112,6 +112,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 51. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
 52. [Save Note](#markdown-header-save-note) 
 53. [Get Notes](#markdown-header-get-notes)  
+54. [Delete Note](#markdown-header-delete-note)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -442,6 +443,15 @@ Method *GET*, method *getNotes*. Request parameters:
 3. trip - shipment trip count  
 One is required or shipmentId or sn+trip pair  
 [(example)](#markdown-header-get-notes-example)
+
+### Delete Note ###
+Method *GET*, method *deleteNote*. Request parameters:  
+1. shipmentId - shipment ID  
+2. sn - device serial number.  
+3. trip - shipment trip count  
+4. noteNum - note number  
+One is required or shipmentId or sn+trip pair  
+[(example)](#markdown-header-delete-note-example)
 
 ## Objects
 ### Response message ###
@@ -2666,6 +2676,32 @@ Response:
         }
       }
     ],
+    "notes": [
+      {
+        "activeFlag": true,
+        "createdBy": "a@b.c",
+        "creationDate": "2016-03-31 16:16",
+        "noteNum": 1,
+        "noteText": "Note 1",
+        "shipmentId": 9088,
+        "noteType": "Simple",
+        "sn": "11",
+        "trip": 1,
+        "timeOnChart": "2016-03-31 16:16"
+      },
+      {
+        "activeFlag": true,
+        "createdBy": "a@b.c",
+        "creationDate": "2016-03-31 16:16",
+        "noteNum": 2,
+        "noteText": "Note 2",
+        "shipmentId": 9088,
+        "noteType": "Simple",
+        "sn": "11",
+        "trip": 1,
+        "timeOnChart": "2016-03-31 16:16"
+      }
+    ],
     "siblings": []
   }
 }
@@ -2990,8 +3026,8 @@ Response:
 }
 ```
 ### Get Notes example ###
-**GET /vf/rest/getNotes/${tripCount}?sn=039485&trip=1**  
-**GET /vf/rest/getNotes/${tripCount}?shipmentId=17137**    
+**GET /vf/rest/getNotes/${accessToken}?sn=039485&trip=1**  
+**GET /vf/rest/getNotes/${accessToken}?shipmentId=17137**    
 **Response:**  
 ```json
 {
@@ -3025,5 +3061,18 @@ Response:
       "timeOnChart": "2016-03-31 14:53"
     }
   ]
+}
+```
+### Delete Note example ###
+**GET /vf/rest/deleteNote/${accessToken}?noteNum=2&sn=039485&trip=1**  
+**GET /vf/rest/deleteNote/${accessToken}?noteNum=2&shipmentId=17137**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
 }
 ```

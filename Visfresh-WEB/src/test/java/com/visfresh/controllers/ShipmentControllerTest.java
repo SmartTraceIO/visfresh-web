@@ -34,6 +34,7 @@ import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.ShipmentTemplateDao;
@@ -45,6 +46,8 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.Note;
+import com.visfresh.entities.NoteType;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -81,6 +84,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
             currentJsonResponse = new JsonParser().parse(responseBody).getAsJsonObject();
         }
     };
+    private User user;
 
     /**
      * Default constructor.
@@ -97,7 +101,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         trackerEventDao = context.getBean(TrackerEventDao.class);
 
         final String token = login();
-        final User user = context.getBean(AuthService.class).getUserForToken(token);
+        this.user = context.getBean(AuthService.class).getUserForToken(token);
         shipmentClient = new ShipmentRestClient(user);
 
         shipmentClient.setServiceUrl(getServiceUrl());
@@ -570,6 +574,9 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         createTemperatureAlert(s, AlertType.Hot);
         createArrival(s);
 
+        createNote(s, "Note 1");
+        createNote(s, "Note 2");
+
         final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
         assertNotNull(sd);
     }
@@ -929,6 +936,19 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         stop.setTime(15);
         context.getBean(InterimStopDao.class).add(s, stop);
         return stop;
+    }
+
+    /**
+     * @param text note text.
+     */
+    private Note createNote(final Shipment shipment, final String text) {
+        final Note n = new Note();
+        n.setCreatedBy(user.getEmail());
+        n.setCreationDate(new Date());
+        n.setNoteText(text);
+        n.setNoteType(NoteType.Simple);
+        n.setTimeOnChart(new Date());
+        return context.getBean(NoteDao.class).save(shipment, n);
     }
 
     @After

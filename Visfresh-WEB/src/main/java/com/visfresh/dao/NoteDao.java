@@ -24,4 +24,10 @@ public interface NoteDao {
      * @return saved note.
      */
     Note save(Shipment s, Note note);
+    /**
+     * @param s shipment.
+     * @param noteNum note number.
+     * @return note.
+     */
+    Note getNote(Shipment s, Integer noteNum);
 }

@@ -31,6 +31,7 @@ import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.InterimStopDao;
+import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
@@ -44,6 +45,7 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
+import com.visfresh.entities.Note;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Role;
@@ -121,6 +123,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private AlternativeLocationsDao alternativeLocationsDao;
     @Autowired
     private InterimStopDao interimStopDao;
+    @Autowired
+    private NoteDao noteDao;
 
     /**
      * Default constructor.
@@ -712,6 +716,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setCurrentLocation(items.size() == 0 ? "Not determined"
                 : locationService.getLocationDescription(
                     new Location(items.get(0).getEvent().getLatitude(), items.get(0).getEvent().getLongitude())));
+
+        for (final Note n : noteDao.findByShipment(s)) {
+            dto.getNotes().add(NoteController.creaetNoteDto(n, s, isoFmt));
+        }
 
         return dto;
     }

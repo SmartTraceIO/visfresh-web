@@ -4,6 +4,8 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -135,7 +137,36 @@ public class NoteDaoTest extends BaseDaoTest<NoteDao> {
 
         assertEquals(0, dao.findByShipment(s).size());
     }
+    @Test
+    public void testGetNote() {
+        final int noteNum = dao.save(shipment, createNote("A")).getNoteNum();
 
+        final Note n = dao.getNote(shipment, noteNum);
+        assertNotNull(n);
+        assertEquals("A", n.getNoteText());
+
+        //test select by left shipment
+        Shipment s = new Shipment();
+        s.setDevice(shipment.getDevice());
+        s.setCompany(shipment.getCompany());
+        s.setStatus(ShipmentStatus.InProgress);
+        s = getContext().getBean(ShipmentDao.class).save(s);
+
+        assertNull(dao.getNote(s, noteNum));
+    }
+    @Test
+    public void testDeactivateNote() {
+        final Note a = dao.save(shipment, createNote("A"));
+        dao.save(shipment, createNote("B"));
+        dao.save(shipment, createNote("C"));
+
+        a.setActive(false);
+        dao.save(shipment, a);
+
+        final List<Note> notes = dao.findByShipment(shipment);
+        assertEquals(2, notes.size());
+        assertEquals("B", notes.get(0).getNoteText());
+    }
     /**
      * @param noteText
      * @return
