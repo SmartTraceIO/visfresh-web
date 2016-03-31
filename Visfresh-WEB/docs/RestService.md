@@ -110,6 +110,8 @@ List items is short representations of base entities, like as [Alert Profile](#m
 49. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
 50. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
 51. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
+52. [Save Note](#markdown-header-save-note) 
+53. [Get Notes](#markdown-header-get-notes)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -429,6 +431,17 @@ Method *GET*, method *deleteAutoStartShipment*. Request parameters:
 1. autoStartShipmentId autostart shipment ID  
 [(example)](#markdown-header-delete-autostart-shipment-example)
 
+### Save Note ###
+Method *POST*, method name *saveNote*. Request body contains [Save Note request](#markdown-header-save-note-request).  
+[(example)](#markdown-header-save-note-example)
+
+### Get Notes ###
+Method *GET*, method *getNotes*. Request parameters:  
+1. shipmentId - shipment ID  
+2. sn - device serial number.  
+3. trip - shipment trip count  
+One is required on shipmentId or sn+trip pair  
+[(example)](#markdown-header-get-notes-example)
 
 ## Objects
 ### Response message ###
@@ -888,6 +901,20 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "pageSize": 200,
   "sortOrder": "asc",
   "sortColumn": "anyColumn"
+}
+```
+### Save Note request ###
+```json
+{
+  "createdBy": null, //by default is the email of currently logged in user
+  "creationDate": null, //by default is current system time
+  "noteNum": null, //required for update operation, for create new note operation should be null
+  "noteText": "Note text",
+  "shipmentId": null, //one from shipmentId or sn/trip pair is required
+  "noteType": "Simple",
+  "sn": "039485", //one from shipmentId or sn/trip pair is required
+  "trip": 1, //one from shipmentId or sn/trip pair is required
+  "timeOnChart": "2016-03-31 14:27"
 }
 ```
 ## Examples ##
@@ -2931,5 +2958,72 @@ Response:
     "message": "Success"
   },
   "response": null
+}
+```
+### Save Note example ###
+**POST /vf/rest/saveNote/${accessToken}**  
+**Request:**  
+```json
+{
+  "activeFlag": false,
+  "createdBy": null,
+  "creationDate": null,
+  "noteNum": null,
+  "noteText": "Note text",
+  "shipmentId": null,
+  "noteType": "Simple",
+  "sn": "039485",
+  "trip": 1,
+  "timeOnChart": "2016-03-31 14:27"
+}
+```  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "noteNum": 1
+  }
+}
+```
+### Get Notes ###
+**GET /vf/rest/getNotes/${tripCount}?sn=039485&trip=1**  
+**GET /vf/rest/getNotes/${tripCount}?shipmentId**    
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "activeFlag": true,
+      "createdBy": "a@b.c",
+      "creationDate": "2016-03-31 14:53",
+      "noteNum": 1,
+      "noteText": "A",
+      "shipmentId": 17137,
+      "noteType": "Simple",
+      "sn": "039485",
+      "trip": 1,
+      "timeOnChart": "2016-03-31 14:53"
+    },
+    {
+      "activeFlag": true,
+      "createdBy": "a@b.c",
+      "creationDate": "2016-03-31 14:53",
+      "noteNum": 2,
+      "noteText": "B",
+      "shipmentId": 17137,
+      "noteType": "Simple",
+      "sn": "039485",
+      "trip": 1,
+      "timeOnChart": "2016-03-31 14:53"
+    }
+  ]
 }
 ```

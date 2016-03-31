@@ -1,4 +1,5 @@
 -- drops
+drop table if exists notes;
 drop table if exists shipmentsessions;
 drop table if exists devicestates;
 drop table if exists alertnotifschedules;
