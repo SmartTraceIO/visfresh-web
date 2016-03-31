@@ -2991,7 +2991,7 @@ Response:
 ```
 ### Get Notes example ###
 **GET /vf/rest/getNotes/${tripCount}?sn=039485&trip=1**  
-**GET /vf/rest/getNotes/${tripCount}?shipmentId**    
+**GET /vf/rest/getNotes/${tripCount}?shipmentId=17137**    
 **Response:**  
 ```json
 {
