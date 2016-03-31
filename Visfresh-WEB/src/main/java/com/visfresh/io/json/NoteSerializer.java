@@ -58,7 +58,7 @@ public class NoteSerializer extends AbstractJsonSerializer implements NoteConsta
         dto.setActiveFlag(!Boolean.FALSE.equals(asBoolean(json.get(ACTIVE_FLAG))));
         dto.setCreatedBy(asString(json.get(CREATED_BY)));
         dto.setCreationDate(asString(json.get(CREATION_DATE)));
-        dto.setNoteNum(asInt(json.get(NOTE_NUM)));
+        dto.setNoteNum(asInteger(json.get(NOTE_NUM)));
         dto.setNoteText(asString(json.get(NOTE_TEXT)));
         dto.setShipmentId(asLong(json.get(SHIPMENT_ID)));
         dto.setNoteType(asString(json.get(NOTE_TYPE)));

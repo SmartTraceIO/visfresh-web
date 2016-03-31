@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -35,8 +36,8 @@ import com.visfresh.utils.DateTimeUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-//@RestController("Note")
-//@RequestMapping("/rest")
+@RestController("Note")
+@RequestMapping("/rest")
 public class NoteController extends AbstractController implements DeviceConstants {
     /**
      * Logger.
@@ -99,7 +100,7 @@ public class NoteController extends AbstractController implements DeviceConstant
                 //populate note DTO
                 dto.setActiveFlag(s.getDevice().isActive());
                 dto.setCreatedBy(user.getEmail());
-                dto.setCreationDate(iso.format(dto.getCreationDate()));
+                dto.setCreationDate(iso.format(note.getCreationDate()));
                 dto.setNoteNum(note.getNoteNum());
                 dto.setNoteText(note.getNoteText());
                 dto.setShipmentId(s.getId());
