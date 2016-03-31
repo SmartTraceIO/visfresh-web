@@ -47,7 +47,6 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Note;
-import com.visfresh.entities.NoteType;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -946,7 +945,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         n.setCreatedBy(user.getEmail());
         n.setCreationDate(new Date());
         n.setNoteText(text);
-        n.setNoteType(NoteType.Simple);
+        n.setNoteType("Green");
         n.setTimeOnChart(new Date());
         return context.getBean(NoteDao.class).save(shipment, n);
     }

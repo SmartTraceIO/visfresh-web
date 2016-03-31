@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.NoteDao;
 import com.visfresh.entities.Note;
-import com.visfresh.entities.NoteType;
 import com.visfresh.entities.Shipment;
 
 /**
@@ -86,7 +85,7 @@ public class NoteDaoImpl implements NoteDao {
         params.put("notetext", note.getNoteText());
         params.put("createdby", note.getCreatedBy());
         params.put("createdon", note.getCreationDate());
-        params.put("notetype", note.getNoteType().name());
+        params.put("notetype", note.getNoteType());
         params.put("timeonchart", note.getTimeOnChart());
         params.put("active", note.isActive());
 
@@ -127,7 +126,7 @@ public class NoteDaoImpl implements NoteDao {
         n.setCreationDate((Date) row.get("createdon"));
         n.setNoteNum(((Number) row.get("notenum")).intValue());
         n.setNoteText((String) row.get("notetext"));
-        n.setNoteType(NoteType.valueOf((String) row.get("notetype")));
+        n.setNoteType((String) row.get("notetype"));
         n.setTimeOnChart((Date) row.get("timeonchart"));
         n.setActive((Boolean) row.get("active"));
         return n;

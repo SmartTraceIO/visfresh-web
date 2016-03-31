@@ -407,7 +407,7 @@ create table notes (
     notenum int NOT NULL,
     notetext longtext NOT NULL,
     timeonchart timestamp NULL default NULL,
-    notetype varchar(31) NOT NULL,
+    notetype varchar(31) default NULL,
     createdon timestamp NULL default NULL,
     createdby varchar(127) default null,
     primary key (shipment, notenum),

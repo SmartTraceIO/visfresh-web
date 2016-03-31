@@ -17,7 +17,6 @@ import org.junit.Test;
 import com.visfresh.controllers.restclient.NoteRestClient;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.entities.Note;
-import com.visfresh.entities.NoteType;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.io.NoteDto;
@@ -60,7 +59,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         final NoteDto dto = new NoteDto();
 
         final String noteText = "Note text";
-        final String noteType = NoteType.Simple.name();
+        final String noteType = "Red";
         final String timeOnChart = isoFormat.format(new Date(System.currentTimeMillis() - 1111111l));
 
         dto.setNoteText(noteText);
@@ -76,7 +75,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         assertEquals(user.getEmail(), note.getCreatedBy());
         assertNotNull(note.getCreationDate());
         assertEquals(noteText, note.getNoteText());
-        assertEquals(noteType, note.getNoteType().name());
+        assertEquals(noteType, note.getNoteType());
         assertEquals(timeOnChart, isoFormat.format(note.getTimeOnChart()));
     }
     @Test
@@ -84,7 +83,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         final NoteDto dto = new NoteDto();
 
         final String noteText = "Note text";
-        final String noteType = NoteType.Simple.name();
+        final String noteType = "Red";
         final String timeOnChart = isoFormat.format(new Date(System.currentTimeMillis() - 1111111l));
 
         dto.setNoteText(noteText);
@@ -101,7 +100,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         assertEquals(user.getEmail(), note.getCreatedBy());
         assertNotNull(note.getCreationDate());
         assertEquals(noteText, note.getNoteText());
-        assertEquals(noteType, note.getNoteType().name());
+        assertEquals(noteType, note.getNoteType());
         assertEquals(timeOnChart, isoFormat.format(note.getTimeOnChart()));
     }
     @Test
@@ -134,7 +133,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
 
         final NoteDto dto = new NoteDto();
         dto.setNoteText("B");
-        dto.setNoteType(n.getNoteType().name());
+        dto.setNoteType(n.getNoteType());
         dto.setNoteNum(n.getNoteNum());
         dto.setTimeOnChart(isoFormat.format(n.getTimeOnChart()));
         dto.setCreatedBy(n.getCreatedBy());
@@ -173,7 +172,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         n.setCreatedBy(user.getEmail());
         n.setCreationDate(new Date());
         n.setNoteText(text);
-        n.setNoteType(NoteType.Simple);
+        n.setNoteType("Red");
         n.setTimeOnChart(new Date());
         return dao.save(shipment, n);
     }

@@ -12,3 +12,4 @@ create table notes (
 );
 
 alter table notes add column active boolean not NULL default true;
+alter table notes modify column notetype varchar(31) default NULL;

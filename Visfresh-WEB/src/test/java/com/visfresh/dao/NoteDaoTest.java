@@ -17,7 +17,6 @@ import org.junit.Test;
 
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Note;
-import com.visfresh.entities.NoteType;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 
@@ -57,7 +56,7 @@ public class NoteDaoTest extends BaseDaoTest<NoteDao> {
         final String createdBy = "created by";
         final Date creationDate = new Date(System.currentTimeMillis() - 5555555l);
         final String noteText = "Note text";
-        final NoteType noteType = NoteType.Simple;
+        final String noteType = "Red";
         final Date timeOnChart = new Date(System.currentTimeMillis() - 4444444l);
 
         Note n = new Note();
@@ -97,7 +96,7 @@ public class NoteDaoTest extends BaseDaoTest<NoteDao> {
         final String createdBy = "created by new";
         final Date creationDate = new Date(System.currentTimeMillis() - 555l);
         final String noteText = "Note text new";
-        final NoteType noteType = NoteType.Simple;
+        final String noteType = "Red";
         final Date timeOnChart = new Date(System.currentTimeMillis() - 444l);
 
         n.setCreatedBy(createdBy);
@@ -176,7 +175,7 @@ public class NoteDaoTest extends BaseDaoTest<NoteDao> {
         n.setCreatedBy("created by");
         n.setCreationDate(new Date(System.currentTimeMillis() - 5555555l));
         n.setNoteText(noteText);
-        n.setNoteType(NoteType.Simple);
+        n.setNoteType("Green");
         n.setTimeOnChart(new Date(System.currentTimeMillis() - 4444444l));
         return n;
     }

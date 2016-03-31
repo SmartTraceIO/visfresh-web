@@ -12,7 +12,7 @@ import java.util.Date;
 public class Note {
     private String noteText;
     private Date timeOnChart;
-    private NoteType noteType;
+    private String noteType;
     private Integer noteNum;
     private Date creationDate = new Date();
     private String createdBy;
@@ -52,13 +52,13 @@ public class Note {
     /**
      * @return the notetype
      */
-    public NoteType getNoteType() {
+    public String getNoteType() {
         return noteType;
     }
     /**
      * @param notetype the notetype to set
      */
-    public void setNoteType(final NoteType notetype) {
+    public void setNoteType(final String notetype) {
         this.noteType = notetype;
     }
     /**

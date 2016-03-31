@@ -24,7 +24,6 @@ import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Note;
-import com.visfresh.entities.NoteType;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
@@ -168,7 +167,7 @@ public class NoteController extends AbstractController implements DeviceConstant
         dto.setNoteNum(note.getNoteNum());
         dto.setNoteText(note.getNoteText());
         dto.setShipmentId(s.getId());
-        dto.setNoteType(note.getNoteType().name());
+        dto.setNoteType(note.getNoteType());
         dto.setSn(s.getDevice().getSn());
         dto.setTrip(s.getTripCount());
         dto.setTimeOnChart(iso.format(note.getTimeOnChart()));
@@ -211,7 +210,7 @@ public class NoteController extends AbstractController implements DeviceConstant
             note.setCreatedBy(dto.getCreatedBy() == null ? user.getEmail() : dto.getCreatedBy());
             note.setNoteNum(dto.getNoteNum());
             note.setNoteText(dto.getNoteText());
-            note.setNoteType(dto.getNoteType() == null ? NoteType.Simple : NoteType.valueOf(dto.getNoteType()));
+            note.setNoteType(dto.getNoteType());
             note.setTimeOnChart(iso.parse(dto.getTimeOnChart()));
             note.setActive(dto.isActiveFlag());
 
