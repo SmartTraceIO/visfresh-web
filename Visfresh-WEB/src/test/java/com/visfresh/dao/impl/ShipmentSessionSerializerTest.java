@@ -50,9 +50,10 @@ public class ShipmentSessionSerializerTest {
         s.getTemperatureAlerts().getProperties().put("key", "value");
         s.setShipmentProperty(key, value);
         s.setAlertsSuppressed(true);
+        s.setBatteryLowProcessed(true);
 
         final String str = serializer.toString(s);
-        s = serializer.parseState(str);
+        s = serializer.parseSession(str);
 
         assertNotNull(s);
 
@@ -61,6 +62,12 @@ public class ShipmentSessionSerializerTest {
         assertEquals("value", s.getTemperatureAlerts().getProperties().get("key"));
         assertEquals(value, s.getShipmentProperty(key));
         assertTrue(s.isAlertsSuppressed());
+        assertTrue(s.isBatteryLowProcessed());
+    }
+    @Test
+    public void testEmptySession() {
+        final ShipmentSession s = serializer.parseSession("{}");
+        assertNotNull(s);
     }
     /**
      * @param date the date to format.

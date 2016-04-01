@@ -5,6 +5,7 @@ import com.visfresh.rules.RuleContext;
 import com.visfresh.rules.EnterBrightEnvironmentAlertRule;
 import com.visfresh.rules.EnterDarkEnvironmentAlertRule;
 import com.visfresh.rules.BatteryLowAlertRule;
+import com.visfresh.rules.BatteryRechargedRule;
 import com.visfresh.rules.ArrivalRule;
 import com.visfresh.rules.AutoStartShipmentRule;
 import com.visfresh.rules.MovementStartAlertRule;
@@ -80,6 +81,15 @@ rule "BatteryLowAlert"
         context : RuleContext(engine.getRule(BatteryLowAlertRule.NAME).accept(this));
     then
     	if(engine.getRule(BatteryLowAlertRule.NAME).handle(context)) {
+       		update(context);
+        }
+end
+
+rule "BatteryRecharged"
+    when
+        context : RuleContext(engine.getRule(BatteryRechargedRule.NAME).accept(this));
+    then
+    	if(engine.getRule(BatteryRechargedRule.NAME).handle(context)) {
        		update(context);
         }
 end

@@ -25,6 +25,10 @@ public class ShipmentSessionSerializer extends AbstractJsonSerializer {
     /**
      *
      */
+    private static final String BATTERY_LOW_PROCESSED = "batteryLowProcessed";
+    /**
+     *
+     */
     private static final String ALERTS_SUPPRESSED = "alertsSuppressed";
     /**
      *
@@ -51,7 +55,7 @@ public class ShipmentSessionSerializer extends AbstractJsonSerializer {
      * @param state
      * @return
      */
-    public ShipmentSession parseState(final String state) {
+    public ShipmentSession parseSession(final String state) {
         return parseState(SerializerUtils.parseJson(state).getAsJsonObject());
     }
 
@@ -74,6 +78,7 @@ public class ShipmentSessionSerializer extends AbstractJsonSerializer {
         final JsonObject json = new JsonObject();
         json.add(TEMPERATURE_ALERTS, toJson(state.getTemperatureAlerts()));
         json.addProperty(ALERTS_SUPPRESSED, state.isAlertsSuppressed());
+        json.addProperty(BATTERY_LOW_PROCESSED, state.isBatteryLowProcessed());
 
         final JsonObject props = new JsonObject();
         json.add(SHIPMENT_PROPERTIES, props);
@@ -91,7 +96,9 @@ public class ShipmentSessionSerializer extends AbstractJsonSerializer {
      */
     private ShipmentSession parseState(final JsonObject json) {
         final ShipmentSession s = new ShipmentSession();
-        parseRulesState(s.getTemperatureAlerts(), json.get(TEMPERATURE_ALERTS));
+        if (json.has(TEMPERATURE_ALERTS)) {
+            parseRulesState(s.getTemperatureAlerts(), json.get(TEMPERATURE_ALERTS));
+        }
 
         final JsonElement props = json.get(SHIPMENT_PROPERTIES);
         if (props != null) {
@@ -104,6 +111,10 @@ public class ShipmentSessionSerializer extends AbstractJsonSerializer {
         final JsonElement alertsSuppressed = json.get(ALERTS_SUPPRESSED);
         if (alertsSuppressed != null) {
             s.setAlertsSuppressed(Boolean.TRUE.equals(alertsSuppressed.getAsBoolean()));
+        }
+        final JsonElement batteryLowProcessed = json.get(BATTERY_LOW_PROCESSED);
+        if (batteryLowProcessed != null) {
+            s.setBatteryLowProcessed(json.get(BATTERY_LOW_PROCESSED).getAsBoolean());
         }
 
         return s;

@@ -55,7 +55,7 @@ public class ShipmentSessionDaoImpl implements ShipmentSessionDao {
         }
 
         final String state = (String) list.get(0).get("state");
-        return stateSerializer.parseState(state);
+        return stateSerializer.parseSession(state);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceDao#save(java.lang.String, com.visfresh.rules.DeviceState)

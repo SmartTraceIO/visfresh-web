@@ -114,6 +114,24 @@ public class BatteryLowAlertRuleTest extends BaseRuleTest {
         assertEquals(e.getId(), alert.getTrackerEventId());
     }
 
+    @Test
+    public void testHandleOnce() {
+        final TrackerEvent e = createEvent(batteryLow);
+        final Shipment s = createShipmentWithEnabledAlert(e.getDevice(), e.getTime());
+        e.setShipment(s);
+        context.getBean(TrackerEventDao.class).save(e);
+
+        final SessionHolder mgr = new SessionHolder();
+        rule.handle(new RuleContext(e, mgr));
+
+        //check shipment created.
+        assertTrue(mgr.getSession(s).isBatteryLowProcessed());
+        assertFalse(rule.accept(new RuleContext(e, mgr)));
+
+        mgr.getSession(s).setBatteryLowProcessed(false);
+        assertTrue(rule.accept(new RuleContext(e, mgr)));
+    }
+
     /**
      * @param d device.
      * @return shipment by enabled bettery low alert.

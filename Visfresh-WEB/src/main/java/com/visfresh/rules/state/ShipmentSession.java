@@ -19,6 +19,7 @@ public class ShipmentSession {
     private final RulesState temperatureAlerts = new RulesState();
     private final Map<String, String> shipmentProperties = new ConcurrentHashMap<String, String>();
     private boolean alertsSuppressed;
+    private boolean batteryLowProcessed;
 
     /**
      * Default constructor.
@@ -66,5 +67,14 @@ public class ShipmentSession {
      */
     public boolean isAlertsSuppressed() {
         return alertsSuppressed;
+    }
+    /**
+     * @return
+     */
+    public boolean isBatteryLowProcessed() {
+        return batteryLowProcessed;
+    }
+    public void setBatteryLowProcessed(final boolean processed) {
+        this.batteryLowProcessed = processed;
     }
 }
