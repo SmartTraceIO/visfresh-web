@@ -175,20 +175,26 @@ public class AutoStartShipmentRule implements TrackerEventRule {
 
         shipmentDao.save(shipment);
         //save start location variants
-        if (init != null && init.getFrom().size() > 0) {
-            final List<LocationProfile> variants = new LinkedList<>(init.getFrom());
-            variants.remove(0);
-
+        if (init != null) {
             final AlternativeLocations v = new AlternativeLocations();
-            v.getFrom().addAll(variants);
+            if(init.getFrom().size() > 0) {
+                final List<LocationProfile> variants = new LinkedList<>(init.getFrom());
+                variants.remove(0);
+                v.getFrom().addAll(variants);
+            }
+
             v.getTo().addAll(init.getAutoStart().getShippedTo());
             v.getInterim().addAll(init.getAutoStart().getInterimStops());
-            altLocDao.save(shipment, v);
+
+            if (!(v.getFrom().isEmpty() && v.getTo().isEmpty() && v.getInterim().isEmpty())) {
+                altLocDao.save(shipment, v);
+            }
 
             if (!init.getAutoStart().getInterimStops().isEmpty()) {
                 final ShipmentSession session = context.getSessionManager().getSession(shipment);
                 InterimStopRule.saveInterimLocations(session, init.getAutoStart().getInterimStops());
             }
+
             shipmentDao.markAsAutostarted(shipment);
         }
 
