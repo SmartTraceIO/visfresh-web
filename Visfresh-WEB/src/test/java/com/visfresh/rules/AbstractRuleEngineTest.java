@@ -16,10 +16,13 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.rules.state.DeviceState;
@@ -186,6 +189,76 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         final DeviceState st = getDeviceState(device.getImei());
         assertEquals(0.0, st.getLastLocation().getLatitude(), 0.0001);
         assertEquals(0.0, st.getLastLocation().getLongitude(), 0.0001);
+    }
+    @Test
+    public void testAlertYetToFire() {
+        final Device device = createDevice("3249870239847908");
+        final Shipment s = new Shipment();
+        s.setId(77l);
+        s.setDevice(device);
+        s.setShipmentDescription("JUnit shipment");
+
+        //test not alert profile
+        assertEquals(0, getAlertYetFoFire(s).size());
+
+        //test with alert profile, not session
+        final AlertProfile p = new AlertProfile();
+        s.setAlertProfile(p);
+
+        final TemperatureRule r1 = new TemperatureRule();
+        r1.setType(AlertType.CriticalHot);
+        r1.setId(1l);
+        final TemperatureRule r2 = new TemperatureRule();
+        r2.setId(2l);
+        r2.setType(AlertType.Hot);
+
+        p.getAlertRules().add(r1);
+        p.getAlertRules().add(r2);
+
+        assertEquals(2, getAlertYetFoFire(s).size());
+
+        //test with shipment session
+        final ShipmentSession session = new ShipmentSession();
+        this.sessions.put(s.getId(), session);
+
+        setProcessedTemperatureRule(session, r2);
+        assertEquals(1, getAlertYetFoFire(s).size());
+        assertEquals(r1.getId(), getAlertYetFoFire(s).get(0).getId());
+    }
+    @Test
+    public void testAlertFired() {
+        final Device device = createDevice("3249870239847908");
+        final Shipment s = new Shipment();
+        s.setId(77l);
+        s.setDevice(device);
+        s.setShipmentDescription("JUnit shipment");
+
+        //test not alert profile
+        assertEquals(0, getAlertYetFoFire(s).size());
+
+        //test with alert profile, not session
+        final AlertProfile p = new AlertProfile();
+        s.setAlertProfile(p);
+
+        final TemperatureRule r1 = new TemperatureRule();
+        r1.setType(AlertType.CriticalHot);
+        r1.setId(1l);
+        final TemperatureRule r2 = new TemperatureRule();
+        r2.setId(2l);
+        r2.setType(AlertType.Hot);
+
+        p.getAlertRules().add(r1);
+        p.getAlertRules().add(r2);
+
+        assertEquals(0, getAlertFired(s).size());
+
+        //test with shipment session
+        final ShipmentSession session = new ShipmentSession();
+        this.sessions.put(s.getId(), session);
+
+        setProcessedTemperatureRule(session, r2);
+        assertEquals(1, getAlertFired(s).size());
+        assertEquals(r2.getId(), getAlertFired(s).get(0).getId());
     }
     /**
      * @param imei
