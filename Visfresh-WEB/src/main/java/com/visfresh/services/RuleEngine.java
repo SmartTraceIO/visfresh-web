@@ -30,6 +30,11 @@ public interface RuleEngine {
      */
     List<AlertRule> getAlertYetFoFire(Shipment s);
     /**
+     * @param s shipment.
+     * @return alerts already fired for given shipment.
+     */
+    List<AlertRule> getAlertFired(Shipment s);
+    /**
      * Suppress next alerts for shipment.
      * @param s the shipment.
      */

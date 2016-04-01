@@ -689,7 +689,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
 
         dto.getAlertSummary().addAll(alertSummary.keySet());
-        dto.setAlertYetToFire(buildAlertYetToFire(ruleEngine.getAlertYetFoFire(s), user));
+        dto.setAlertYetToFire(alertsToOneString(ruleEngine.getAlertYetFoFire(s), user));
+        dto.setAlertFired(alertsToOneString(ruleEngine.getAlertFired(s), user));
 
         final Arrival arrival = getArrival(items);
         if (arrival != null) {
@@ -746,7 +747,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @param user current user.
      * @return temperature alerts yet to fire so user can suppress future notifications.
      */
-    private String buildAlertYetToFire(final List<AlertRule> rules, final User user) {
+    private String alertsToOneString(final List<AlertRule> rules, final User user) {
         final List<String> list = new LinkedList<>();
         for (final AlertRule rule: rules) {
             list.add(ruleBundle.buildDescription(rule, user.getTemperatureUnits()));

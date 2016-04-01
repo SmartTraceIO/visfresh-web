@@ -561,6 +561,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.add(ShipmentConstants.ALERT_SUMMARY, createAlertSummaryArray(dto.getAlertSummary())); /*+*/
         if (isNotSibling) {
             json.addProperty("alertYetToFire", dto.getAlertYetToFire());
+            json.addProperty("alertFired", dto.getAlertFired());
 
             //"arrivalNotificationTimeISO": "2014-08-12 12:10",
             // NEW - ISO for actual time arrival notification sent out

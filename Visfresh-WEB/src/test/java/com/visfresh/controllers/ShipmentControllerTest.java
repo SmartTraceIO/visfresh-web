@@ -51,6 +51,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
@@ -58,6 +59,7 @@ import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UserResolver;
+import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
@@ -563,6 +565,18 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetSingleShipment() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
+
+        //mark any rules as processed
+        final ShipmentSession session = new ShipmentSession();
+        int count = 0;
+        for(final TemperatureRule rule: s.getAlertProfile().getAlertRules()) {
+            if (count > 2) {
+                break;
+            }
+            AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
+            count++;
+        }
+        context.getBean(ShipmentSessionDao.class).saveSession(s, session);
 
         //add tracker event.
         createEvent(s, TrackerEventType.AUT);

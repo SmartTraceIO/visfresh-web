@@ -2435,7 +2435,8 @@ Response:
       "Hot",
       "Battery"
     ],
-    "alertYetToFire": ">18.0°C for 0 min in total, >17.0°C for 1 min in total, <-12.0°C for 0 min in total, <-11.0°C for 1 min in total, >6.0°C for 0 min in total, >7.0°C for 2 min in total, <-7.0°C for 40 min in total, <-5.0°C for 55 min in total, battery low, entering bright environment, entering dark environment",
+    "alertYetToFire": "<-11.0°C for 1 min in total, >6.0°C for 0 min in total, >7.0°C for 2 min in total, <-7.0°C for 40 min in total, <-5.0°C for 55 min in total",
+    "alertFired": ">18.0°C for 0 min in total, >17.0°C for 1 min in total, <-12.0°C for 0 min in total",
     "arrivalNotificationTimeISO": "2016-03-12 18:26",
     "arrivalNotificationWithinKm": 111,
     "excludeNotificationsIfNoAlerts": true,

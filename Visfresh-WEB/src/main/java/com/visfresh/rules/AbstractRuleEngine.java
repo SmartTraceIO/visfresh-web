@@ -200,6 +200,18 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     @Override
     public List<AlertRule> getAlertYetFoFire(final Shipment s) {
+        return getAlerts(s, false);
+    }
+    @Override
+    public List<AlertRule> getAlertFired(final Shipment s) {
+        return getAlerts(s, true);
+    }
+    /**
+     * @param s shipment.
+     * @param onlyProcessed only processed or only not processed flag.
+     * @return alerts.
+     */
+    private List<AlertRule> getAlerts(final Shipment s, final boolean onlyProcessed) {
         final List<AlertRule> alerts = new LinkedList<AlertRule>();
 
         //check alert profile exists
@@ -210,20 +222,21 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         //check device state is set.
         final ShipmentSession session = loadSessionFromDb(s);
-        if (session != null && !session.isAlertsSuppressed()) {
-            for (final TemperatureRule rule: alertProfile.getAlertRules()) {
-                switch (rule.getType()) {
-                    case Cold:
-                    case CriticalCold:
-                    case Hot:
-                    case CriticalHot:
-                        if (session == null || !isTemperatureRuleProcessed(session, rule)) {
-                            alerts.add(rule);
-                        }
-                        break;
-                        default:
-                            //nothing
-                }
+        for (final TemperatureRule rule: alertProfile.getAlertRules()) {
+            switch (rule.getType()) {
+                case Cold:
+                case CriticalCold:
+                case Hot:
+                case CriticalHot:
+                    final boolean isRuleProcessed = isTemperatureRuleProcessed(session, rule);
+                    if (!onlyProcessed && !isRuleProcessed && (session == null || !session.isAlertsSuppressed())) {
+                        alerts.add(rule);
+                    } else if (onlyProcessed && isRuleProcessed){
+                        alerts.add(rule);
+                    }
+                    break;
+                    default:
+                        //nothing
             }
         }
 
@@ -243,13 +256,16 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     protected static boolean isTemperatureRuleProcessed(final ShipmentSession state,
             final TemperatureRule rule) {
+        if (state == null) {
+            return false;
+        }
         return "true".equals(state.getTemperatureAlerts().getProperties().get(createProcessedKey(rule)));
     }
     /**
      * @param deviceState
      * @param rule
      */
-    protected static void setProcessedTemperatureRule(final ShipmentSession deviceState, final TemperatureRule rule) {
+    public static void setProcessedTemperatureRule(final ShipmentSession deviceState, final TemperatureRule rule) {
         deviceState.getTemperatureAlerts().getProperties().put(createProcessedKey(rule), "true");
     }
     /* (non-Javadoc)

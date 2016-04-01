@@ -61,6 +61,7 @@ public class SingleShipmentDto {
     private String alertProfileName;
     private final Set<AlertType> alertSummary = new HashSet<>();
     private String alertYetToFire;
+    private String alertFired;
     private String arrivalNotificationTimeIso;
     private String arrivalNotificationTime;
     private String shutdownTimeIso;
@@ -469,6 +470,15 @@ public class SingleShipmentDto {
      */
     public void setAlertYetToFire(final String alertYetToFire) {
         this.alertYetToFire = alertYetToFire;
+    }
+    /**
+     * @return the alertFired
+     */
+    public String getAlertFired() {
+        return alertFired;
+    }
+    public void setAlertFired(final String alertFired) {
+        this.alertFired = alertFired;
     }
     /**
      * @return the arrivalNotificationTimeIso
