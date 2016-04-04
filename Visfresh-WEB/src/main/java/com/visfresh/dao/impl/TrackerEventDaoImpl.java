@@ -300,23 +300,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         final List<Map<String, Object>> rows = jdbc.queryForList(StringUtils.combine(sqls, " UNION "), params);
 
         for (final Map<String, Object> row : rows) {
-            final TrackerEvent e = createEntity(row);
-
-            final ShortTrackerEvent ue = new ShortTrackerEvent();
-            ue.setBattery(e.getBattery());
-            ue.setId(e.getId());
-            ue.setLatitude(e.getLatitude());
-            ue.setLongitude(e.getLongitude());
-            ue.setTemperature(e.getTemperature());
-            ue.setTime(e.getTime());
-            ue.setType(e.getType());
-
-            final Object shipmentField = row.get(SHIPMENT_FIELD);
-            //possible null if not shipment assigned for given event. It is possible
-            if (shipmentField != null) {
-                ue.setShipmentId(((Number) shipmentField).longValue());
-            }
-            ue.setDeviceImei((String) row.get(DEVICE_FIELD));
+            final ShortTrackerEvent ue = createShortTrackerEvent(row);
 
             result.add(ue);
         }
@@ -340,5 +324,66 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
             return lastEvents.get(0);
         }
         return null;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#findBy(java.lang.String, java.util.Date, java.util.Date)
+     */
+    @Override
+    public List<ShortTrackerEvent> findBy(final String device, final Date startDate,
+            final Date endDate) {
+        //create set of device IMEI for avoid of duplicates.
+        final Map<String, Object> params = new HashMap<>();
+        params.put("device", device);
+        if (startDate != null) {
+            params.put("startDate", startDate);
+        }
+        if (endDate != null) {
+            params.put("endDate", endDate);
+        }
+
+        final StringBuilder sql = new StringBuilder(buildSelectBlockForFindAll());
+        sql.append(" where " + DEVICE_FIELD + "=:device");
+        if (startDate != null) {
+            sql.append(" and " + TIME_FIELD + " >= :startDate");
+        }
+        if (endDate != null) {
+            sql.append(" and " + TIME_FIELD + " <= :endDate");
+        }
+        sql.append(" order by " + ID_FIELD);
+
+        final List<ShortTrackerEvent> result = new LinkedList<>();
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql.toString(), params);
+
+        for (final Map<String, Object> row : rows) {
+            final ShortTrackerEvent ue = createShortTrackerEvent(row);
+            result.add(ue);
+        }
+
+        return result;
+    }
+    /**
+     * @param row
+     * @return
+     */
+    private ShortTrackerEvent createShortTrackerEvent(
+            final Map<String, Object> row) {
+        final TrackerEvent e = createEntity(row);
+
+        final ShortTrackerEvent ue = new ShortTrackerEvent();
+        ue.setBattery(e.getBattery());
+        ue.setId(e.getId());
+        ue.setLatitude(e.getLatitude());
+        ue.setLongitude(e.getLongitude());
+        ue.setTemperature(e.getTemperature());
+        ue.setTime(e.getTime());
+        ue.setType(e.getType());
+
+        final Object shipmentField = row.get(SHIPMENT_FIELD);
+        //possible null if not shipment assigned for given event. It is possible
+        if (shipmentField != null) {
+            ue.setShipmentId(((Number) shipmentField).longValue());
+        }
+        ue.setDeviceImei((String) row.get(DEVICE_FIELD));
+        return ue;
     }
 }

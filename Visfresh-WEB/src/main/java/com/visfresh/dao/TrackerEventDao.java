@@ -3,6 +3,7 @@
  */
 package com.visfresh.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import com.visfresh.entities.Device;
@@ -45,4 +46,11 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
      * @return short tracker event.
      */
     ShortTrackerEvent getLastEvent(Device device);
+    /**
+     * @param device device IMEI.
+     * @param startDate start date.
+     * @param endDate end date.
+     * @return list of tracker events for given device and time ranges.
+     */
+    List<ShortTrackerEvent> findBy(String device, Date startDate, Date endDate);
 }

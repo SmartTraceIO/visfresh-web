@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ErrorCodes;
@@ -34,8 +35,8 @@ import com.visfresh.utils.DateTimeUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-//@RestController("Simulator")
-//@RequestMapping("/rest")
+@RestController("Simulator")
+@RequestMapping("/rest")
 public class SimulatorController extends AbstractController {
     /**
      * Logger.
@@ -116,7 +117,7 @@ public class SimulatorController extends AbstractController {
             }
 
             JsonObject response = null;
-            final SimulatorDto dto = simulatorDao.findSimulatorDto(u.getId());
+            final SimulatorDto dto = simulatorDao.findSimulatorDto(u);
             if (dto == null) {
                 response = createSerializer(currentUser).toJson(dto);
             }
@@ -141,7 +142,7 @@ public class SimulatorController extends AbstractController {
                         + user + " not found");
             }
 
-            simulatorDao.delete(u.getId());
+            simulatorDao.delete(u);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete simulator", e);
@@ -164,6 +165,12 @@ public class SimulatorController extends AbstractController {
                     return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
                             "User not found " + req.getUser());
                 }
+            }
+
+            //check correct velosity
+            if (req.getVelosity() < 1) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Invalid velosity " + req.getVelosity() + " should start from 1");
             }
 
             final DateFormat fmt = DateTimeUtils.createIsoFormat(user);

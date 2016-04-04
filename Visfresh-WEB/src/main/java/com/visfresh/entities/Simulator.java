@@ -3,19 +3,15 @@
  */
 package com.visfresh.entities;
 
-import java.util.Date;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class Simulator implements EntityWithId<Long> {
+public class Simulator {
     private User user;
     private Device source;
     private Device target;
-    private Date startDate;
-    private Date endDate;
-    private int velosity;
 
     /**
      * Default constructor.
@@ -59,45 +55,5 @@ public class Simulator implements EntityWithId<Long> {
      */
     public Device getTarget() {
         return target;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.entities.EntityWithId#getId()
-     */
-    @Override
-    public Long getId() {
-        return getUser() == null ? null : getUser().getId();
-    }
-    /**
-     * @param date start date.
-     */
-    public void setStartDate(final Date date) {
-        this.startDate = date;
-    }
-    /**
-     * @return the startDate
-     */
-    public Date getStartDate() {
-        return startDate;
-    }
-    /**
-     * @param date start date.
-     */
-    public void setEndDate(final Date date) {
-        this.endDate = date;
-    }
-    /**
-     * @return the endDate
-     */
-    public Date getEndDate() {
-        return endDate;
-    }
-    public void setVelosity(final int v) {
-        this.velosity = v;
-    }
-    /**
-     * @return the velosity
-     */
-    public int getVelosity() {
-        return velosity;
     }
 }
