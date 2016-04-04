@@ -359,6 +359,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
                 if (iter.next() == best) {
                     iter.remove();
                     matches.add(0, best);
+                    break;
                 }
             }
         }

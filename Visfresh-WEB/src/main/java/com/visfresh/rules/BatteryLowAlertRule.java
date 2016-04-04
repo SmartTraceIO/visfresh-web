@@ -15,7 +15,7 @@ import com.visfresh.rules.state.ShipmentSession;
  */
 @Component
 public class BatteryLowAlertRule extends AbstractAlertRule {
-    public static final int LOW_BATTERY_LIMIT = 3200;
+    public static final int LOW_BATTERY_LIMIT = 3441;
     public static final String NAME = "BatteryLowAlert";
 
     /**
@@ -31,6 +31,7 @@ public class BatteryLowAlertRule extends AbstractAlertRule {
     @Override
     public boolean accept(final RuleContext e) {
         final boolean accept = e.getEvent().getBattery() < LOW_BATTERY_LIMIT && super.accept(e)
+                && !e.getEvent().getShipment().hasFinalStatus()
                 && e.getEvent().getShipment().getAlertProfile().isWatchBatteryLow();
         if (accept) {
             final ShipmentSession s = e.getSessionManager().getSession(e.getEvent().getShipment());

@@ -56,7 +56,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
         final boolean accept = !e.isProcessed(this)
                 && shipment != null
                 && shipment.getStatus() != ShipmentStatus.Ended
-                && !isSuppressedNotifications(e);
+                && !isNextAlertsSuppressed(e);
 
         return accept;
     }
@@ -64,7 +64,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
      * @param context rule context.
      * @return
      */
-    protected boolean isSuppressedNotifications(final RuleContext context) {
+    protected boolean isNextAlertsSuppressed(final RuleContext context) {
         final Shipment shipment = context.getEvent().getShipment();
         final ShipmentSession session = context.getSessionManager().getSession(shipment);
         if (session.isAlertsSuppressed()) {
