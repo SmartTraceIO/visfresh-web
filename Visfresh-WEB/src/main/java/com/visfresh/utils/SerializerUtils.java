@@ -63,6 +63,16 @@ public final class SerializerUtils {
         return obj;
     }
     /**
+     * @param idFieldName ID field name
+     * @param id entity ID.
+     * @return JSON object.
+     */
+    public static JsonObject idToJson(final String idFieldName, final String id) {
+        final JsonObject obj = new JsonObject();
+        obj.addProperty(idFieldName, id);
+        return obj;
+    }
+    /**
      * Warning!!! This feature does not support of merging of arrays.
      * @param from source object.
      * @param pattern pattern object.

@@ -88,6 +88,14 @@ public abstract class AbstractController {
         return createSuccessResponse(SerializerUtils.idToJson(idFieldName, id));
     }
     /**
+     * @param id the entity ID.
+     * @param idFieldName ID field name.
+     * @return JSON response.
+     */
+    protected JsonObject createIdResponse(final String idFieldName, final String id) {
+        return createSuccessResponse(SerializerUtils.idToJson(idFieldName, id));
+    }
+    /**
      * @param response
      * @return
      */
