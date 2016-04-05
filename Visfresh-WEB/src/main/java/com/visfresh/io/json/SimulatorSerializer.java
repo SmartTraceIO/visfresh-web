@@ -16,12 +16,13 @@ import com.visfresh.io.StartSimulatorRequest;
  *
  */
 public class SimulatorSerializer extends AbstractJsonSerializer {
-    private static final String START_DATE = "startDate";
-    private static final String END_DATE = "endDate";
-
     private static final String USER = "user";
     private static final String TARGET_DEVICE = "targetDevice";
     private static final String SOURCE_DEVICE = "sourceDevice";
+    private static final String STARTED = "started";
+
+    private static final String START_DATE = "startDate";
+    private static final String END_DATE = "endDate";
     private static final String VELOSITY = "velosity";
 
     /**
@@ -52,6 +53,7 @@ public class SimulatorSerializer extends AbstractJsonSerializer {
         dto.setSourceDevice(asString(json.get(SOURCE_DEVICE)));
         dto.setTargetDevice(asString(json.get(TARGET_DEVICE)));
         dto.setUser(asString(json.get(USER)));
+        dto.setStarted(Boolean.TRUE.equals(asBoolean(json.get(STARTED))));
 
         return dto;
     }
@@ -64,6 +66,7 @@ public class SimulatorSerializer extends AbstractJsonSerializer {
         json.addProperty(SOURCE_DEVICE, dto.getSourceDevice());
         json.addProperty(TARGET_DEVICE, dto.getTargetDevice());
         json.addProperty(USER, dto.getUser());
+        json.addProperty(STARTED, dto.isStarted());
         return json;
     }
 

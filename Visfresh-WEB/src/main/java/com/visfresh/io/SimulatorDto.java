@@ -11,6 +11,7 @@ public class SimulatorDto {
     private String sourceDevice;
     private String user;
     private String targetDevice;
+    private boolean isStarted;
 
     /**
      * default constructor.
@@ -54,5 +55,17 @@ public class SimulatorDto {
      */
     public void setTargetDevice(final String targetDevice) {
         this.targetDevice = targetDevice;
+    }
+    /**
+     * @return the started state.
+     */
+    public boolean isStarted() {
+        return isStarted;
+    }
+    /**
+     * @param b the started state.
+     */
+    public void setStarted(final boolean b) {
+        this.isStarted = b;
     }
 }

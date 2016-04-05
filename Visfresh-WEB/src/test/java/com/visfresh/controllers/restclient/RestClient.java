@@ -293,6 +293,18 @@ public class RestClient  {
         }
         return set.iterator().next().getValue().getAsLong();
     }
+    /**
+     * @param e JSON object.
+     * @return ID attribute.
+     */
+    protected String parseStringId(final JsonObject e) {
+        //according meeting can have name not only 'id'
+        final Set<Entry<String, JsonElement>> set = e.entrySet();
+        if (set.size() != 1) {
+            throw new RuntimeException("Unexpected ID format: " + e);
+        }
+        return set.iterator().next().getValue().getAsString();
+    }
     public void addRestIoListener(final RestIoListener l) {
         listeners.add(l);
     }

@@ -4,7 +4,9 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
@@ -104,6 +106,23 @@ public class SimulatorDaoTest extends BaseDaoTest<SimulatorDao> {
         assertEquals(0, context.getBean(TrackerEventDao.class).findAll(null, null, null).size());
         assertEquals(0, context.getBean(ShipmentDao.class).findAll(null, null, null).size());
         assertNull(context.getBean(DeviceDao.class).findByImei(s.getTarget().getImei()));
+    }
+    @Test
+    public void testSimulatorStarted() {
+        final User u = createUser("u1@b.c");
+        createSimulator(u);
+
+        //test start
+        dao.setSimulatorStarted(u, true);
+
+        SimulatorDto dto = dao.findSimulatorDto(u);
+        assertTrue(dto.isStarted());
+
+        //test stop
+        dao.setSimulatorStarted(u, false);
+
+        dto = dao.findSimulatorDto(u);
+        assertFalse(dto.isStarted());
     }
 
     /**

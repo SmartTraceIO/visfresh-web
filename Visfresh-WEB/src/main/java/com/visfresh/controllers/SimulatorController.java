@@ -47,7 +47,7 @@ public class SimulatorController extends AbstractController {
     @Autowired
     private DeviceDao deviceDao;
     @Autowired
-    private SimulatorDao simulatorDao;
+    private SimulatorDao dao;
     @Autowired
     private SimulatorService service;
 
@@ -94,7 +94,7 @@ public class SimulatorController extends AbstractController {
             sim.setSource(d);
             sim.setTarget(simulatorDevice);
 
-            simulatorDao.save(sim);
+            dao.save(sim);
 
             return createIdResponse("simulatorDevice", simulatorDevice.getImei());
         } catch (final Exception e) {
@@ -117,7 +117,7 @@ public class SimulatorController extends AbstractController {
             }
 
             JsonObject response = null;
-            final SimulatorDto dto = simulatorDao.findSimulatorDto(u);
+            final SimulatorDto dto = dao.findSimulatorDto(u);
             if (dto == null) {
                 response = createSerializer(currentUser).toJson(dto);
             }
@@ -142,7 +142,8 @@ public class SimulatorController extends AbstractController {
                         + user + " not found");
             }
 
-            simulatorDao.delete(u);
+            service.stopSimulator(u);
+            dao.delete(u);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete simulator", e);
@@ -165,6 +166,17 @@ public class SimulatorController extends AbstractController {
                     return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
                             "User not found " + req.getUser());
                 }
+            }
+
+            //check already started
+            final SimulatorDto sim = dao.findSimulatorDto(u);
+            if (sim == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Simulator not found for user " + u.getEmail());
+            }
+            if (sim.isStarted()) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Simulator already started for user " + u.getEmail());
             }
 
             //check correct velosity

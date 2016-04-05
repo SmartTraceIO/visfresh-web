@@ -47,7 +47,7 @@ public class SimulatorDaoImpl implements SimulatorDao {
         params.put("user", userId);
 
         final List<Map<String, Object>> rows = jdbc.queryForList("select"
-                + " s.source as source, u.email as user, s.target as target from simulators s"
+                + " s.source as source, u.email as user, s.target as target, s.started as started from simulators s"
                 + " join users u on u.id = s.user where s.user = :user", params);
         if (rows.size() > 0) {
             final Map<String, Object> row = rows.get(0);
@@ -55,6 +55,7 @@ public class SimulatorDaoImpl implements SimulatorDao {
             s.setSourceDevice((String) row.get("source"));
             s.setTargetDevice((String) row.get("target"));
             s.setUser((String) row.get("user"));
+            s.setStarted((Boolean) row.get("started"));
             return s;
         }
         return null;
@@ -77,6 +78,14 @@ public class SimulatorDaoImpl implements SimulatorDao {
             //insert
             jdbc.update("insert into simulators(source, target, user) values (:source, :target, :user)", params);
         }
+    }
+    @Override
+    public void setSimulatorStarted(final User user, final boolean started) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("started", started);
+        params.put("user", user.getId());
+
+        jdbc.update("update simulators set started = :started where user = :user", params);
     }
 
     /* (non-Javadoc)

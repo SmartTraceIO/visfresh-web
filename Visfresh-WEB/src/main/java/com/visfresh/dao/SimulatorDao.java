@@ -25,4 +25,9 @@ public interface SimulatorDao {
      * @param user user.
      */
     void delete(User user);
+    /**
+     * @param user user.
+     * @param started started flag.
+     */
+    void setSimulatorStarted(User user, boolean started);
 }

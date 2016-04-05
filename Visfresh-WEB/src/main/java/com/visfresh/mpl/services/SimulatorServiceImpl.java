@@ -72,6 +72,10 @@ public class SimulatorServiceImpl implements SimulatorService {
         if (dto == null) {
             throw new RuntimeException("Simulator for user " + user.getEmail() + " is not created");
         }
+        if (dto.isStarted()) {
+            log.debug("Simulator for user " + user.getEmail() + " already started");
+            return;
+        }
 
         log.debug("Start simulator for " + user.getEmail() + ", virtual device: " + dto.getTargetDevice());
         final DeviceDcsNativeEventSerializer ser = new DeviceDcsNativeEventSerializer();
@@ -102,6 +106,7 @@ public class SimulatorServiceImpl implements SimulatorService {
             }
         }
 
+        dao.setSimulatorStarted(user, true);
         log.debug(numEvents + " events have been simulated for user " + user.getEmail());
     }
 
@@ -133,6 +138,7 @@ public class SimulatorServiceImpl implements SimulatorService {
             }
         }
 
+        dao.setSimulatorStarted(user, false);
         log.debug("Finished of stoping simulator for user "
                 + user.getEmail() + ". " + count + " device events is removed");
     }
