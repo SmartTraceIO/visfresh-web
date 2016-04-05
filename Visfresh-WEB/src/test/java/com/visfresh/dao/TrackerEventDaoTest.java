@@ -18,9 +18,9 @@ import org.junit.Test;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.entities.ShortTrackerEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -292,11 +292,11 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         createEvent(d1, s1);
         final TrackerEvent e1 = createEvent(d1, s1);
 
-        createEvent(d2, null);
-        createEvent(d2, null);
-        createEvent(d2, null);
-        createEvent(d2, null);
-        final TrackerEvent e2 = createEvent(d2, null);
+        createEvent(d2, (Shipment) null);
+        createEvent(d2, (Shipment) null);
+        createEvent(d2, (Shipment) null);
+        createEvent(d2, (Shipment) null);
+        final TrackerEvent e2 = createEvent(d2, (Shipment) null);
 
         final List<Device> devices = new LinkedList<>();
         devices.add(d1);
@@ -326,6 +326,33 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(e1.getTime().getTime(), ute1.getTime().getTime(), 1000);
         assertEquals(e1.getType(), ute1.getType());
     }
+    @Test
+    public void testFindByDeviceDateRanges() {
+        final Device d1 = createDevice("234949838243985298");
+        final Device d2 = createDevice("232398340987908790");
+
+        final long dt = 100000l;
+        final long t0 = System.currentTimeMillis() - 20 * dt;
+
+        final TrackerEvent e1 = createEvent(d1, new Date(t0 + 1 * dt));
+        createEvent(d2, new Date(t0 + 2 * dt));
+        final TrackerEvent e2 = createEvent(d1, new Date(t0 + 3 * dt));
+        createEvent(d2, new Date(t0 + 4 * dt));
+        final TrackerEvent e3 = createEvent(d1, new Date(t0 + 5 * dt));
+        createEvent(d2, new Date(t0 + 6 * dt));
+        final TrackerEvent e4 = createEvent(d1, new Date(t0 + 7 * dt));
+        createEvent(d2, new Date(t0 + 8 * dt));
+
+        List<ShortTrackerEvent> events = dao.findBy(d1.getImei(), null, null);
+        assertEquals(4, events.size());
+        assertEquals(e1.getId(), events.get(0).getId());
+        assertEquals(e4.getId(), events.get(events.size() - 1).getId());
+
+        events = dao.findBy(d1.getImei(), new Date(t0 + 2 * dt), new Date(t0 + 6 * dt));
+        assertEquals(2, events.size());
+        assertEquals(e2.getId(), events.get(0).getId());
+        assertEquals(e3.getId(), events.get(events.size() - 1).getId());
+    }
     /**
      * @param device device.
      * @param shipment shipment.
@@ -337,7 +364,16 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         e.setShipment(shipment);
         return dao.save(e);
     }
-
+    /**
+     * @param device device.
+     * @param shipment shipment.
+     * @return tracker event.
+     */
+    private TrackerEvent createEvent(final Device device, final Date date) {
+        final TrackerEvent e = createEvent(date, 1.0);
+        e.setDevice(device);
+        return dao.save(e);
+    }
     /**
      * @param date
      * @param temperature temperature

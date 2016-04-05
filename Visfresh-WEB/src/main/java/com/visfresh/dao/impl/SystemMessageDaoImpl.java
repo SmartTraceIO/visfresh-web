@@ -14,6 +14,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.Filter;
+import com.visfresh.dao.Sorting;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
@@ -152,7 +154,16 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, Long> imple
         }
         return result;
     }
-
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.SystemMessageDao#findTrackerEvents(boolean)
+     */
+    @Override
+    public List<SystemMessage> findTrackerEvents(final boolean asc) {
+        final Filter filter = new Filter();
+        filter.addFilter(SystemMessageDaoImpl.TYPE_FIELD, SystemMessageType.Tracker.name());
+        final Sorting sorting = new Sorting(asc, SystemMessageDaoImpl.ID_FIELD);
+        return findAll(filter, sorting, null);
+    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()
      */

@@ -16,6 +16,9 @@ import org.junit.Test;
 
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
+import com.visfresh.entities.TrackerEventType;
+import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
+import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -23,6 +26,8 @@ import com.visfresh.entities.SystemMessageType;
  */
 public class SystemMessageDaoTest extends
         BaseCrudTest<SystemMessageDao, SystemMessage, Long> {
+    private final DeviceDcsNativeEventSerializer eventSerializer = new DeviceDcsNativeEventSerializer();
+
     /**
      * @param clazz
      */
@@ -66,7 +71,6 @@ public class SystemMessageDaoTest extends
         assertEquals(SystemMessageType.Tracker, msg.getType());
 
     }
-
     @Test
     public void testSelectMessagesForProcessing() {
         final SystemMessage m1 = createTestEntity(null);
@@ -105,5 +109,63 @@ public class SystemMessageDaoTest extends
         //test ordering
         assertEquals(m1.getId(), messages.get(0).getId());
         assertNull(dao.findOne(m3.getId()).getProcessor());
+    }
+    @Test
+    public void testFindTrackerEvents() {
+        final long dt = 100000;
+        final long t = System.currentTimeMillis() - 20 * dt;
+
+        final SystemMessage mStart = createTrackerEvent(new Date(t + 1 * dt));
+        createSystemMessage("any data", SystemMessageType.DeviceCommand, new Date(t + 1 * dt));
+
+        createTrackerEvent(new Date(t + 2 * dt));
+        createSystemMessage("any data", SystemMessageType.DeviceCommand, new Date(t + 2 * dt));
+
+        createTrackerEvent(new Date(t + 3 * dt));
+        createSystemMessage("any data", SystemMessageType.DeviceCommand, new Date(t + 3 * dt));
+
+        createTrackerEvent(new Date(t + 4 * dt));
+        createSystemMessage("any data", SystemMessageType.DeviceCommand, new Date(t + 4 * dt));
+
+        createTrackerEvent(new Date(t + 5 * dt));
+        createSystemMessage("any data", SystemMessageType.DeviceCommand, new Date(t + 5 * dt));
+
+        createTrackerEvent(new Date(t + 6 * dt));
+        createSystemMessage("any data", SystemMessageType.DeviceCommand, new Date(t + 6 * dt));
+
+        final SystemMessage mEnd = createTrackerEvent(new Date(t + 7 * dt));
+        createSystemMessage("any data", SystemMessageType.DeviceCommand, new Date(t + 7 * dt));
+
+        List<SystemMessage> msgs = dao.findTrackerEvents(true);
+        assertEquals(7, msgs.size());
+        assertEquals(mStart.getId(), msgs.get(0).getId());
+
+        msgs = dao.findTrackerEvents(false);
+        assertEquals(7, msgs.size());
+        assertEquals(mEnd.getId(), msgs.get(0).getId());
+    }
+
+    private SystemMessage createTrackerEvent(final Date date) {
+        final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
+        e.setDate(date);
+        e.setImei("10923870192873098");
+        e.setType(TrackerEventType.AUT.name());
+        return createSystemMessage(eventSerializer.toJson(e).toString(), SystemMessageType.Tracker, date);
+    }
+    /**
+     * @param data message data.
+     * @param type message type.
+     * @param date reading on date.
+     * @return system message.
+     */
+    protected SystemMessage createSystemMessage(final String data,
+            final SystemMessageType type, final Date date) {
+        final SystemMessage msg = new SystemMessage();
+        msg.setMessageInfo(data);
+        msg.setNumberOfRetry(99);
+        msg.setRetryOn(date);
+        msg.setTime(date);
+        msg.setType(type);
+        return dao.save(msg);
     }
 }

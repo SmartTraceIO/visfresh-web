@@ -6,20 +6,14 @@ package com.visfresh.mpl.services;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import com.visfresh.dao.Filter;
 import com.visfresh.dao.SimulatorDao;
-import com.visfresh.dao.Sorting;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.dao.TrackerEventDao;
-import com.visfresh.dao.impl.SystemMessageDaoImpl;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
@@ -53,22 +47,13 @@ public class SimulatorServiceImpl implements SimulatorService {
         super();
     }
 
-    @PostConstruct
-    public void setUp() {
-
-    }
-    @PreDestroy
-    public void shutDown() {
-
-    }
-
     /* (non-Javadoc)
      * @see com.visfresh.services.SimulatorService#startSimulator(com.visfresh.entities.User, java.util.Date, java.util.Date, int)
      */
     @Override
     public void startSimulator(final User user, final Date startDate, final Date endDate,
             final int velosity) {
-        final SimulatorDto dto = dao.findSimulatorDto(user);
+        final SimulatorDto dto = findSimulator(user);
         if (dto == null) {
             throw new RuntimeException("Simulator for user " + user.getEmail() + " is not created");
         }
@@ -81,7 +66,7 @@ public class SimulatorServiceImpl implements SimulatorService {
         final DeviceDcsNativeEventSerializer ser = new DeviceDcsNativeEventSerializer();
 
         int numEvents = 0;
-        final List<ShortTrackerEvent> events = eventDao.findBy(dto.getSourceDevice(), startDate, endDate);
+        final List<ShortTrackerEvent> events = getTrackerEvents(dto.getSourceDevice(), startDate, endDate);
         if (events.size() > 0) {
             final long oldStart = events.get(0).getTime().getTime();
             final long newStart = System.currentTimeMillis();
@@ -100,13 +85,12 @@ public class SimulatorServiceImpl implements SimulatorService {
                 e.setDate(new Date(newStart + dt));
 
                 //send as new native event from device.
-                this.dispatcher.sendSystemMessage(
-                        ser.toJson(e).toString(), SystemMessageType.Tracker, e.getTime());
+                sendSystemMessage(ser.toJson(e).toString(), SystemMessageType.Tracker, e.getTime());
                 numEvents++;
             }
         }
 
-        dao.setSimulatorStarted(user, true);
+        setSimulatorStarted(user, true);
         log.debug(numEvents + " events have been simulated for user " + user.getEmail());
     }
 
@@ -115,31 +99,72 @@ public class SimulatorServiceImpl implements SimulatorService {
      */
     @Override
     public void stopSimulator(final User user) {
-        final SimulatorDto dto = dao.findSimulatorDto(user);
+        final SimulatorDto dto = findSimulator(user);
         if (dto == null) {
             log.debug("Simulator for user " + user.getEmail() + " is not created");
         }
 
         //select tracker events
-        final Filter filter = new Filter();
-        filter.addFilter(SystemMessageDaoImpl.TYPE_FIELD, SystemMessageType.Tracker.name());
-        final Sorting sorting = new Sorting(false, SystemMessageDaoImpl.ID_FIELD);
-
         log.debug("Stopping simulator for user " + user.getEmail());
 
         int count = 0;
         final DeviceDcsNativeEventSerializer ser = new DeviceDcsNativeEventSerializer();
-        for (final SystemMessage msg : systemMessageDao.findAll(filter, sorting, null)) {
+        for (final SystemMessage msg : findTrackerEventMessages()) {
             final DeviceDcsNativeEvent m = ser.parseDeviceDcsNativeEvent(
                     SerializerUtils.parseJson(msg.getMessageInfo()));
             if (m.getImei().equals(dto.getTargetDevice())) {
-                systemMessageDao.delete(msg);
+                deleteSystemMessage(msg);
                 count++;
             }
         }
 
-        dao.setSimulatorStarted(user, false);
+        setSimulatorStarted(user, false);
         log.debug("Finished of stoping simulator for user "
                 + user.getEmail() + ". " + count + " device events is removed");
+    }
+
+    /**
+     * @param sourceDevice
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    protected List<ShortTrackerEvent> getTrackerEvents(final String sourceDevice,
+            final Date startDate, final Date endDate) {
+        return eventDao.findBy(sourceDevice, startDate, endDate);
+    }
+    /**
+     * @param user user.
+     * @param b started flag.
+     */
+    protected void setSimulatorStarted(final User user, final boolean b) {
+        dao.setSimulatorStarted(user, false);
+    }
+    /**
+     * @param msg
+     */
+    protected void deleteSystemMessage(final SystemMessage msg) {
+        systemMessageDao.delete(msg);
+    }
+    /**
+     * @return list of tracker system messages
+     */
+    protected List<SystemMessage> findTrackerEventMessages() {
+        return systemMessageDao.findTrackerEvents(false);
+    }
+    /**
+     * @param payload
+     * @param type
+     * @param time
+     */
+    protected void sendSystemMessage(final String payload, final SystemMessageType type, final Date time) {
+        this.dispatcher.sendSystemMessage(payload, type, time);
+    }
+    /**
+     * @param user
+     * @return
+     */
+    protected SimulatorDto findSimulator(final User user) {
+        return dao.findSimulatorDto(user);
     }
 }
