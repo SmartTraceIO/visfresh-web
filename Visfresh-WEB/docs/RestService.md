@@ -113,6 +113,10 @@ List items is short representations of base entities, like as [Alert Profile](#m
 52. [Save Note](#markdown-header-save-note) 
 53. [Get Notes](#markdown-header-get-notes)  
 54. [Delete Note](#markdown-header-delete-note)  
+55. [Create (save) Simulator](#markdown-header-save-simulator)  
+56. [Delete Simulator](#markdown-header-delete-simulator)  
+57. [Start Simulator](#markdown-header-start-simulator)  
+58. [Stop Simulator](#markdown-header-stop-simulator)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -452,6 +456,29 @@ Method *GET*, method *deleteNote*. Request parameters:
 4. noteNum - note number  
 One is required or shipmentId or sn+trip pair  
 [(example)](#markdown-header-delete-note-example)
+
+### Save Simulator ###
+Method *POST*, method *saveSimulator*. Request JSON body: save simulator request.  
+Response contains IMEI of created virtual device  
+Requires SmartTraceAdmin role  
+[(example)](#markdown-header-save-simulator-example)
+
+### Delete Simulator ###
+Method *GET*, method *deleteSimulator*. Request parameters:  
+1. user - email of simulator owner  
+One is required or shipmentId or sn+trip pair  
+Requires SmartTraceAdmin role  
+[(example)](#markdown-header-delete-simulator-example)
+
+### Start Simulator ###
+Method *POST*, method *startSimulator*. Request JSON body: start simulator request.  
+[(example)](#markdown-header-start-simulator-example)
+
+### Stop Simulator ###
+Method *GET*, method *stopSimulator*. Request parameters:  
+1. user - email of simulator owner. If null, currently logged in user will used by default  
+One is required or shipmentId or sn+trip pair  
+[(example)](#markdown-header-stop-simulator-example)
 
 ## Objects
 ### Response message ###
@@ -3067,6 +3094,73 @@ Response:
 ### Delete Note example ###
 **GET /vf/rest/deleteNote/${accessToken}?noteNum=2&sn=039485&trip=1**  
 **GET /vf/rest/deleteNote/${accessToken}?noteNum=2&shipmentId=17137**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
+}
+```
+### Save Simulator example ###
+**POST /vf/rest/saveSimulator/${accessToken}
+**Request:**  
+```json
+{
+  "sourceDevice": "098234790799284",
+  "targetDevice": null, //this is real only property. Will generated if need automatically for given user
+  "user": "mkutuzov-1@mail.ru"
+}
+```
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "simulatorDevice": "aaaaaaaaacebcgh"
+  }
+}
+```
+### Delete Simulator example ###
+**GET /vf/rest/deleteSimulator/${accessToken}?user=mkutuzov-1%40mail.ru**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
+}
+```
+### Start Simulator example ###
+**POST /vf/rest/startSimulator/${accessToken}**  
+**Request:**  
+```json
+{
+  "user": "mkutuzov-1@mail.ru", // if null, current logged it user will used.
+  "startDate": "2016-04-05 18:42", //start of time interval. can be null
+  "endDate": "2016-04-05 21:29",  //end of time interval. can be null
+  "velosity": 20 // t1new - tonew = (t1old - t0old) / velosity
+}
+```
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
+}
+```
+### Stop Simulator example ###
+**GET /vf/rest/stopSimulator/${accessToken}?user=mkutuzov-1%40mail.ru
 **Response:**  
 ```json
 {
