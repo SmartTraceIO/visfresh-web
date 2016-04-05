@@ -59,11 +59,12 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
     @Override
     <S extends Shipment> S save(S s);
     /**
+     * @param company TODO
      * @param sn serial number.
      * @param trip trip count.
      * @return shipment
      */
-    Shipment findBySnTrip(String sn, Integer trip);
+    Shipment findBySnTrip(Company company, String sn, Integer trip);
     /**
      * @param s shipment.
      * @param eta ETA.

@@ -564,7 +564,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             if (shipmentId != null) {
                 s = shipmentDao.findOne(shipmentId);
             } else {
-                s = shipmentDao.findBySnTrip(sn, trip);
+                s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
             }
 
             checkCompanyAccess(user, s);

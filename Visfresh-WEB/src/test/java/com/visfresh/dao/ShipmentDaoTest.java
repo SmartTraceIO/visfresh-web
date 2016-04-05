@@ -500,7 +500,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s0.setTripCount(trip);
         dao.save(s0);
 
-        assertNull(dao.findBySnTrip(sn, trip));
+        assertNull(dao.findBySnTrip(sharedCompany, sn, trip));
 
         final Shipment s1 = createShipment(sharedCompany, ShipmentStatus.Arrived);
         final Device d1 = createDevice("1111113" + sn + "3");
@@ -508,8 +508,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s1.setTripCount(trip);
         dao.save(s1);
 
-        assertNotNull(dao.findBySnTrip(sn, trip));
-        assertNotNull(dao.findBySnTrip("1111", trip));
+        assertNotNull(dao.findBySnTrip(sharedCompany, sn, trip));
+        assertNotNull(dao.findBySnTrip(sharedCompany, "1111", trip));
 
         //create other device with same SN
         final Shipment s2 = createShipment(sharedCompany, ShipmentStatus.Arrived);
@@ -519,11 +519,23 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         dao.save(s2);
 
         try {
-            dao.findBySnTrip(sn, trip);
+            dao.findBySnTrip(sharedCompany, sn, trip);
             throw new AssertionFailedError("Runtime exception should be thrown");
         } catch (final RuntimeException e) {
             //normal
         }
+
+        //create other company device with same SN
+        final Company left = createCompany("Left");
+
+        final Shipment s3 = createShipment(left, ShipmentStatus.Arrived);
+        final Device d3 = createDevice("1111112" + sn + "2");
+        d3.setCompany(left);
+        s3.setDevice(d3);
+        s3.setTripCount(trip);
+        dao.save(s3);
+
+        assertNotNull(dao.findBySnTrip(left, sn, trip));
     }
     @Test
     public void testOrderByLocation() {

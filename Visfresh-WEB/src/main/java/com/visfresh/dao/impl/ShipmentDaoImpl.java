@@ -480,7 +480,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      * @see com.visfresh.dao.ShipmentDao#getBySnTrip(java.lang.String, java.lang.Integer)
      */
     @Override
-    public Shipment findBySnTrip(final String sn, final Integer trip) {
+    public Shipment findBySnTrip(final Company company, final String sn, final Integer trip) {
         //create serial number filter
         final String key = "snKey";
 
@@ -494,6 +494,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         serialNum.append('_');
 
         final Filter f = new Filter();
+        f.addFilter(COMPANY_FIELD, company.getId());
         f.addFilter(DEVICE_FIELD, new SynteticFilter() {
             @Override
             public Object[] getValues() {
