@@ -950,7 +950,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "noteType": "Simple",
   "sn": "039485", //one from shipmentId or sn/trip pair is required
   "trip": 1, //one from shipmentId or sn/trip pair is required
-  "timeOnChart": "2016-03-31 14:27"
+  "timeOnChart": "2016-04-05 22:10",
+  "createdByName": "Yury G"
 }
 ```
 ## Examples ##
@@ -2714,7 +2715,8 @@ Response:
         "noteType": "Simple",
         "sn": "11",
         "trip": 1,
-        "timeOnChart": "2016-03-31 16:16"
+        "timeOnChart": "2016-03-31 16:16",
+        "createdByName": "Yury G"
       },
       {
         "activeFlag": true,
@@ -2726,7 +2728,8 @@ Response:
         "noteType": "Simple",
         "sn": "11",
         "trip": 1,
-        "timeOnChart": "2016-03-31 16:16"
+        "timeOnChart": "2016-03-31 16:16",
+        "createdByName": "Yury G"
       }
     ],
     "siblings": []

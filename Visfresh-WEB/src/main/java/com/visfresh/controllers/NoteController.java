@@ -171,6 +171,7 @@ public class NoteController extends AbstractController implements DeviceConstant
         dto.setSn(s.getDevice().getSn());
         dto.setTrip(s.getTripCount());
         dto.setTimeOnChart(iso.format(note.getTimeOnChart()));
+        dto.setCreatedByName(note.getCreateCreatedByName());
         return dto;
     }
     @RequestMapping(value = "/saveNote/{authToken}", method = RequestMethod.POST)

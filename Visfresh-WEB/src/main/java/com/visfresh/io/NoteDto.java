@@ -19,6 +19,7 @@ public class NoteDto {
     private Long shipmentId;
     private String sn;
     private Integer trip;
+    private String createdByName;
     private boolean activeFlag = true;
 
     /**
@@ -147,5 +148,17 @@ public class NoteDto {
      */
     public void setActiveFlag(final boolean activeflag) {
         this.activeFlag = activeflag;
+    }
+    /**
+     * @return the createdByName
+     */
+    public String getCreatedByName() {
+        return createdByName;
+    }
+    /**
+     * @param createdByName the createdByName to set
+     */
+    public void setCreatedByName(final String createdByName) {
+        this.createdByName = createdByName;
     }
 }

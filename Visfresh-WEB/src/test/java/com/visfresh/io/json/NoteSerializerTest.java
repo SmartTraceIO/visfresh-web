@@ -45,6 +45,7 @@ public class NoteSerializerTest {
         final String sn = "12345";
         final String timeOnChart = "2016-31-03 11:11";
         final Integer trip = 9;
+        final String createdByName = "createdByName";
 
         NoteDto n = new NoteDto();
         n.setActiveFlag(activeflag);
@@ -56,6 +57,7 @@ public class NoteSerializerTest {
         n.setSn(sn);
         n.setTimeOnChart(timeOnChart);
         n.setTrip(trip);
+        n.setCreatedByName(createdByName);
 
         n = serializer.parseNoteDto(serializer.toJson(n));
 
@@ -68,6 +70,7 @@ public class NoteSerializerTest {
         assertEquals(sn, n.getSn());
         assertEquals(timeOnChart, n.getTimeOnChart());
         assertEquals(trip, n.getTrip());
+        assertEquals(createdByName, n.getCreatedByName());
     }
     @Test
     public void testSerializeWithEmptyValues() {

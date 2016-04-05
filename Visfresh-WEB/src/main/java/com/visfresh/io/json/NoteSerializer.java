@@ -40,6 +40,7 @@ public class NoteSerializer extends AbstractJsonSerializer implements NoteConsta
         json.addProperty(SN, dto.getSn());
         json.addProperty(TRIP, dto.getTrip());
         json.addProperty(TIME_ON_CHART, dto.getTimeOnChart());
+        json.addProperty(CREATE_CREATED_BY_NAME, dto.getCreatedByName());
 
         return json;
     }
@@ -65,6 +66,7 @@ public class NoteSerializer extends AbstractJsonSerializer implements NoteConsta
         dto.setSn(asString(json.get(SN)));
         dto.setTrip(asInteger(json.get(TRIP)));
         dto.setTimeOnChart(asString(json.get(TIME_ON_CHART)));
+        dto.setCreatedByName(asString(json.get(CREATE_CREATED_BY_NAME)));
 
         return dto;
     }

@@ -18,4 +18,5 @@ public interface NoteConstants {
     String CREATION_DATE = "creationDate";
     String CREATED_BY = "createdBy";
     String ACTIVE_FLAG = "activeFlag";
+    String CREATE_CREATED_BY_NAME = "createdByName";
 }

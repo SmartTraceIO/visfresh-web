@@ -44,8 +44,11 @@ public class NoteDaoImpl implements NoteDao {
         final Map<String, Object> params = new HashMap<>();
         params.put("shipment", s.getId());
 
+        final String sql = "select n.*, u.firstname as firstName, u.lastname as lastName"
+            + " from notes n left outer join users u on n.createdby = u.email"
+            + " where n.shipment=:shipment and n.active order by n.notenum";
         final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select * from notes where shipment=:shipment and active order by notenum", params);
+                sql, params);
         final List<Note> notes = new LinkedList<>();
         for (final Map<String,Object> row : rows) {
             notes.add(createNote(row));
@@ -63,7 +66,9 @@ public class NoteDaoImpl implements NoteDao {
         params.put("notenum", noteNum);
 
         final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select * from notes where shipment=:shipment and notenum=:notenum", params);
+                "select n.*, u.firstname as firstName, u.lastname as lastName"
+                + " from notes n left outer join users u on n.createdby = u.email"
+                + " where n.shipment=:shipment and n.notenum=:notenum", params);
         if (rows.size() > 0) {
             return createNote(rows.get(0));
         }
@@ -129,6 +134,26 @@ public class NoteDaoImpl implements NoteDao {
         n.setNoteType((String) row.get("notetype"));
         n.setTimeOnChart((Date) row.get("timeonchart"));
         n.setActive((Boolean) row.get("active"));
+        n.setCreatedByName(createCreatedByName((String) row.get("firstName"), (String) row.get("lastName")));
         return n;
+    }
+
+    /**
+     * @param firstName
+     * @param lastName
+     * @return
+     */
+    private String createCreatedByName(final String firstName, final String lastName) {
+        final StringBuilder sb = new StringBuilder();
+        if (firstName != null) {
+            sb.append(firstName);
+        }
+        if (lastName != null && lastName.length() > 0) {
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
+            sb.append(lastName.charAt(0));
+        }
+        return sb.toString();
     }
 }

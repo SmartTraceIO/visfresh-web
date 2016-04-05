@@ -17,6 +17,7 @@ public class Note {
     private Date creationDate = new Date();
     private String createdBy;
     private boolean active = true;
+    private String createCreatedByName;
 
     /**
      * Default constructor.
@@ -108,5 +109,17 @@ public class Note {
      */
     public void setActive(final boolean active) {
         this.active = active;
+    }
+    /**
+     * @param createCreatedByName
+     */
+    public void setCreatedByName(final String createCreatedByName) {
+        this.createCreatedByName = createCreatedByName;
+    }
+    /**
+     * @return the createCreatedByName
+     */
+    public String getCreateCreatedByName() {
+        return createCreatedByName;
     }
 }
