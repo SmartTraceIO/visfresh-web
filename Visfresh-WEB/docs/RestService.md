@@ -477,7 +477,6 @@ Method *POST*, method *startSimulator*. Request JSON body: start simulator reque
 ### Stop Simulator ###
 Method *GET*, method *stopSimulator*. Request parameters:  
 1. user - email of simulator owner. If null, currently logged in user will used by default  
-One is required or shipmentId or sn+trip pair  
 [(example)](#markdown-header-stop-simulator-example)
 
 ## Objects
