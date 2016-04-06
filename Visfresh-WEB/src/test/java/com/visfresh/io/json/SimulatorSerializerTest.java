@@ -41,12 +41,14 @@ public class SimulatorSerializerTest {
         final String targetDevice = "targetDevice";
         final String user = "user";
         final boolean started = true;
+        final Long autoStart = 77l;
 
         SimulatorDto dto = new SimulatorDto();
         dto.setSourceDevice(sourceDevice);
         dto.setTargetDevice(targetDevice);
         dto.setUser(user);
         dto.setStarted(started);
+        dto.setAutoStart(autoStart);
 
         dto = ser.parseSimulator(ser.toJson(dto));
 
@@ -54,6 +56,7 @@ public class SimulatorSerializerTest {
         assertEquals(targetDevice, dto.getTargetDevice());
         assertEquals(user, dto.getUser());
         assertEquals(started, dto.isStarted());
+        assertEquals(autoStart, dto.getAutoStart());
     }
     @Test
     public void testSerializeStartRequest() {

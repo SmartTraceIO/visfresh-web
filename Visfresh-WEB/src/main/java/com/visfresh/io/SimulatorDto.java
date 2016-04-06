@@ -11,6 +11,7 @@ public class SimulatorDto {
     private String sourceDevice;
     private String user;
     private String targetDevice;
+    private Long autoStart;
     private boolean isStarted;
 
     /**
@@ -67,5 +68,17 @@ public class SimulatorDto {
      */
     public void setStarted(final boolean b) {
         this.isStarted = b;
+    }
+    /**
+     * @return the autostart
+     */
+    public Long getAutoStart() {
+        return autoStart;
+    }
+    /**
+     * @param autostart the autostart to set
+     */
+    public void setAutoStart(final Long autostart) {
+        this.autoStart = autostart;
     }
 }

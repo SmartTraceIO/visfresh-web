@@ -47,8 +47,11 @@ public class SimulatorDaoImpl implements SimulatorDao {
         params.put("user", userId);
 
         final List<Map<String, Object>> rows = jdbc.queryForList("select"
-                + " s.source as source, u.email as user, s.target as target, s.started as started from simulators s"
-                + " join users u on u.id = s.user where s.user = :user", params);
+                + " s.source as source, u.email as user, s.target as target,"
+                + " s.started as started, d.autostart as autostart from simulators s"
+                + " join users u on u.id = s.user"
+                + " join devices d on d.imei = s.target"
+                + " where s.user = :user", params);
         if (rows.size() > 0) {
             final Map<String, Object> row = rows.get(0);
             final SimulatorDto s = new SimulatorDto();
@@ -56,6 +59,10 @@ public class SimulatorDaoImpl implements SimulatorDao {
             s.setTargetDevice((String) row.get("target"));
             s.setUser((String) row.get("user"));
             s.setStarted((Boolean) row.get("started"));
+            final Number autostart = (Number) row.get("autostart");
+            if (autostart != null) {
+                s.setAutoStart(autostart.longValue());
+            }
             return s;
         }
         return null;
@@ -76,7 +83,8 @@ public class SimulatorDaoImpl implements SimulatorDao {
             jdbc.update("update simulators set source = :source where user = :user", params);
         } else {
             //insert
-            jdbc.update("insert into simulators(source, target, user) values (:source, :target, :user)", params);
+            jdbc.update("insert into simulators(source, target, user)"
+                    + " values (:source, :target, :user)", params);
         }
     }
     @Override

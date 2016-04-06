@@ -3120,7 +3120,8 @@ Response:
 {
   "sourceDevice": "098234790799284",
   "targetDevice": null, //this is real only property. Will generated if need automatically for given user
-  "user": "mkutuzov-1@mail.ru"
+  "user": "mkutuzov-1@mail.ru",
+  "autoStartTemplate": 22138
 }
 ```
 **Response:**  
@@ -3193,7 +3194,8 @@ Response:
     "sourceDevice": "098234790799284",
     "targetDevice": "aaaaaaaaacehaih",
     "user": "mkutuzov-1@mail.ru",
-    "started": false
+    "started": false,
+    "autoStartTemplate": 22138
   }
 }
 ```

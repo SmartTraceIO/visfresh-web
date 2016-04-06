@@ -59,16 +59,24 @@ public class SimulatorDaoTest extends BaseDaoTest<SimulatorDao> {
     }
     @Test
     public void testSave() {
+        final Long autostartTemplateId = 777l;
+
         final Simulator s = new Simulator();
         s.setSource(device);
         s.setUser(user);
-        s.setTarget(createDevice(SimulatorController.generateImei(user.getId())));
+
+        final Device d = createDevice(SimulatorController.generateImei(user.getId()));
+        d.setAutostartTemplateId(autostartTemplateId);
+        context.getBean(DeviceDao.class).save(d);
+
+        s.setTarget(d);
         dao.save(s);
 
         final SimulatorDto dto = dao.findSimulatorDto(user);
         assertEquals(s.getSource().getImei(), dto.getSourceDevice());
         assertEquals(s.getTarget().getImei(), dto.getTargetDevice());
         assertEquals(s.getUser().getEmail(), dto.getUser());
+        assertEquals(autostartTemplateId, dto.getAutoStart());
     }
     @Test
     public void testUpdate() {

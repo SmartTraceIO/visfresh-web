@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.SimulatorDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Role;
+import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.Simulator;
 import com.visfresh.entities.User;
 import com.visfresh.io.SimulatorDto;
@@ -50,6 +52,8 @@ public class SimulatorController extends AbstractController {
     private SimulatorDao dao;
     @Autowired
     private SimulatorService service;
+    @Autowired
+    private ShipmentTemplateDao shipmentTemplateDao;
 
     /**
      * Default constructor.
@@ -80,6 +84,11 @@ public class SimulatorController extends AbstractController {
                 return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "User "
                         + dto.getUser() + " not found");
             }
+            final ShipmentTemplate tpl = shipmentTemplateDao.findOne(dto.getAutoStart());
+            if (tpl != null && !u.getCompany().getId().equals(tpl.getCompany().getId())) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Shipment template should be from same company as user");
+            }
 
             final String simulatorImei = generateImei(u.getId());
             Device simulatorDevice = deviceDao.findByImei(simulatorImei);
@@ -96,12 +105,22 @@ public class SimulatorController extends AbstractController {
 
             dao.save(sim);
 
+            //set autostart template to virtual device.
+            final Long autoStart = tpl == null ? null : tpl.getId();
+            final Long oldAutoStart = simulatorDevice.getAutostartTemplateId();
+
+            if (!equals(autoStart, oldAutoStart)) {
+                simulatorDevice.setAutostartTemplateId(autoStart);
+                deviceDao.save(simulatorDevice);
+            }
+
             return createIdResponse("simulatorDevice", simulatorDevice.getImei());
         } catch (final Exception e) {
             log.error("Failed to save simulator", e);
             return createErrorResponse(e);
         }
     }
+
     @RequestMapping(value = "/getSimulator/{authToken}", method = RequestMethod.GET)
     public JsonObject getSimulator(@PathVariable final String authToken,
             final @RequestParam(required = false) String user) {
@@ -254,7 +273,14 @@ public class SimulatorController extends AbstractController {
 
         return sb.toString();
     }
-
+    /**
+     * @param o1
+     * @param o2
+     * @return
+     */
+    private boolean equals(final Object o1, final Object o2) {
+        return o1 == null && o2 == null || o1 != null && o1.equals(o2);
+    }
     /**
      * @param user user.
      * @return simulator parser.
