@@ -104,21 +104,29 @@ public class SimulatorController extends AbstractController {
     }
     @RequestMapping(value = "/getSimulator/{authToken}", method = RequestMethod.GET)
     public JsonObject getSimulator(@PathVariable final String authToken,
-            final @RequestParam String user) {
+            final @RequestParam(required = false) String user) {
         try {
             final User currentUser = getLoggedInUser(authToken);
-            checkAccess(currentUser, Role.SmartTraceAdmin);
 
             //find user
-            final User u = userDao.findByEmail(user);
-            if (u == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "User "
-                        + user + " not found");
+            final User u;
+            if (user != null) {
+                u = userDao.findByEmail(user);
+                if (u == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "User "
+                            + user + " not found");
+                }
+
+                if (!u.getId().equals(currentUser.getId())) {
+                    checkAccess(currentUser, Role.SmartTraceAdmin);
+                }
+            } else {
+                u = currentUser;
             }
 
             JsonObject response = null;
             final SimulatorDto dto = dao.findSimulatorDto(u);
-            if (dto == null) {
+            if (dto != null) {
                 response = createSerializer(currentUser).toJson(dto);
             }
 

@@ -189,6 +189,22 @@ public class SimulatorControllerTest extends AbstractRestServiceTest {
         assertEquals(0, service.getRequests().size());
     }
     @Test
+    public void testGetSimulator() throws IOException, RestServiceException {
+        final User u = createUser2();
+
+        createSimulator(u);
+
+        final SimulatorDto sim = client.getSimulator(u);
+        assertNotNull(sim);
+    }
+    @Test
+    public void testGetSimulatorDefaultUser() throws IOException, RestServiceException {
+        createSimulator(user);
+
+        final SimulatorDto sim = client.getSimulator(null);
+        assertNotNull(sim);
+    }
+    @Test
     public void testStopSimulatorDefaultUser() throws IOException, RestServiceException {
         createSimulator(user);
         dao.setSimulatorStarted(user, true);

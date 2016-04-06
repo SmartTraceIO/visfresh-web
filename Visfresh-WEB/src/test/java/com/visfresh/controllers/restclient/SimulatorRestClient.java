@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.JsonElement;
 import com.visfresh.entities.User;
 import com.visfresh.io.SimulatorDto;
 import com.visfresh.io.StartSimulatorRequest;
@@ -68,7 +69,20 @@ public class SimulatorRestClient extends RestClient {
         }
         sendGetRequest(getPathWithToken("stopSimulator"), params);
     }
-
+    /**
+     * @param user
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public SimulatorDto getSimulator(final User user) throws IOException, RestServiceException {
+        final Map<String, String> params = new HashMap<>();
+        if (user != null) {
+            params.put("user", user.getEmail());
+        }
+        final JsonElement el = sendGetRequest(getPathWithToken("getSimulator"), params);
+        return serializer.parseSimulator(el);
+    }
     /**
      * @param user user.
      * @param startDate start date.

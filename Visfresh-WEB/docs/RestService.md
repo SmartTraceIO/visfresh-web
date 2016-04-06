@@ -117,6 +117,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 56. [Delete Simulator](#markdown-header-delete-simulator)  
 57. [Start Simulator](#markdown-header-start-simulator)  
 58. [Stop Simulator](#markdown-header-stop-simulator)  
+58. [Get Simulator](#markdown-header-get-simulator)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -478,6 +479,12 @@ Method *POST*, method *startSimulator*. Request JSON body: start simulator reque
 Method *GET*, method *stopSimulator*. Request parameters:  
 1. user - email of simulator owner. If null, currently logged in user will used by default  
 [(example)](#markdown-header-stop-simulator-example)
+
+### Get Simulator ###
+Method *GET*, method *getSimulator*. Request parameters:  
+1. user - email of simulator owner. If null, currently logged in user will used by default.  
+If user specified and is not equals currently logged in user, the SmartTraceAdmin role is required.
+[(example)](#markdown-header-get-simulator-example)
 
 ## Objects
 ### Response message ###
@@ -3171,5 +3178,22 @@ Response:
     "message": "Success"
   },
   "response": null
+}
+```
+### Get Simulator example###
+**GET /vf/rest/getSimulator/${accessToken}?user=mkutuzov-1%40mail.ru
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "sourceDevice": "098234790799284",
+    "targetDevice": "aaaaaaaaacehaih",
+    "user": "mkutuzov-1@mail.ru",
+    "started": false
+  }
 }
 ```
