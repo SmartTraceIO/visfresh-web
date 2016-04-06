@@ -145,7 +145,8 @@ public class ChartBundleTest extends ChartBundle {
     }
     @Test
     public void testTrackerEventBundle() {
-        final String msg = buildTrackerEventDescription(user, trackerEvent);
+        final String msg = buildTrackerEventDescription(trackerEvent,
+                user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
         assertNotNull(msg);
         assertPlaceholdersResolved(null, msg);
     }
@@ -184,6 +185,17 @@ public class ChartBundleTest extends ChartBundle {
         msg = buildDescription(user, alert, trackerEvent);
         assertFalse(msg.indexOf(Integer.toString(period)) > 0);
         assertTrue(msg.indexOf(Integer.toString(rulePeriod)) > 0);
+    }
+
+    /**
+     * @param u
+     * @param issue
+     * @param e
+     * @return
+     */
+    private String buildDescription(final User u, final NotificationIssue issue,
+            final TrackerEvent e) {
+        return buildDescription(issue, e, user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
     }
 
     /**

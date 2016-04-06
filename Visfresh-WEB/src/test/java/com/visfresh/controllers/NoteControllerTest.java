@@ -51,7 +51,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         client.setAuthToken(login());
         user = context.getBean(AuthService.class).getUserForToken(client.getAuthToken());
 
-        isoFormat = DateTimeUtils.createIsoFormat(user);
+        isoFormat = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
     }
 
     @Test

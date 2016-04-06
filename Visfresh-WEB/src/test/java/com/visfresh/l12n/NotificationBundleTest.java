@@ -94,21 +94,25 @@ public class NotificationBundleTest extends NotificationBundle {
                 alert.setCumulative(false);
 
                 //mail
-                String msg = getEmailMessage(user, alert, trackerEvent);
+                String msg = getEmailMessage(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
-                msg = getEmailSubject(user, alert, trackerEvent);
+                msg = getEmailSubject(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
                 //SMS
-                msg = getSmsMessage(user, alert, trackerEvent);
+                msg = getSmsMessage(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
                 //App
-                msg = getAppMessage(user, alert, trackerEvent);
+                msg = getAppMessage(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
@@ -116,21 +120,25 @@ public class NotificationBundleTest extends NotificationBundle {
                 alert.setCumulative(true);
 
                 //mail
-                msg = getEmailMessage(user, alert, trackerEvent);
+                msg = getEmailMessage(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
-                msg = getEmailSubject(user, alert, trackerEvent);
+                msg = getEmailSubject(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
                 //SMS
-                msg = getSmsMessage(user, alert, trackerEvent);
+                msg = getSmsMessage(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
                 //App
-                msg = getAppMessage(user, alert, trackerEvent);
+                msg = getAppMessage(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
             }
@@ -147,21 +155,25 @@ public class NotificationBundleTest extends NotificationBundle {
                 alert.setType(type);
 
                 //mail
-                String msg = getEmailMessage(user, alert, trackerEvent);
+                String msg = getEmailMessage(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
-                msg = getEmailSubject(user, alert, trackerEvent);
+                msg = getEmailSubject(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
                 //SMS
-                msg = getSmsMessage(user, alert, trackerEvent);
+                msg = getSmsMessage(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
 
                 //App
-                msg = getAppMessage(user, alert, trackerEvent);
+                msg = getAppMessage(alert, trackerEvent, user.getLanguage(),
+                        user.getTimeZone(), user.getTemperatureUnits());
                 assertNotNull(msg);
                 assertPlaceholdersResolved(alert, msg);
             }
@@ -174,21 +186,25 @@ public class NotificationBundleTest extends NotificationBundle {
         arrival.setShipment(shipment);
 
         //mail
-        String msg = getEmailMessage(user, arrival, trackerEvent);
+        String msg = getEmailMessage(arrival, trackerEvent, user.getLanguage(),
+                user.getTimeZone(), user.getTemperatureUnits());
         assertNotNull(msg);
         assertPlaceholdersResolved(arrival, msg);
 
-        msg = getEmailSubject(user, arrival, trackerEvent);
+        msg = getEmailSubject(arrival, trackerEvent, user.getLanguage(),
+                user.getTimeZone(), user.getTemperatureUnits());
         assertNotNull(msg);
         assertPlaceholdersResolved(arrival, msg);
 
         //SMS
-        msg = getSmsMessage(user, arrival, trackerEvent);
+        msg = getSmsMessage(arrival, trackerEvent, user.getLanguage(),
+                user.getTimeZone(), user.getTemperatureUnits());
         assertNotNull(msg);
         assertPlaceholdersResolved(arrival, msg);
 
         //App
-        msg = getAppMessage(user, arrival, trackerEvent);
+        msg = getAppMessage(arrival, trackerEvent, user.getLanguage(),
+                user.getTimeZone(), user.getTemperatureUnits());
         assertNotNull(msg);
         assertPlaceholdersResolved(arrival, msg);
     }

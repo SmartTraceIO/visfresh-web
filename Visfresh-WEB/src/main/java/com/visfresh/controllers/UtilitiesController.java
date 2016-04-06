@@ -199,18 +199,24 @@ public class UtilitiesController extends AbstractController {
             final Date date = new Date();
 
             final JsonObject json = new JsonObject();
-            json.addProperty("dateTimeIso", createDateFormat(user, "yyyy-MM-dd'T'HH:mm").format(date));
+            json.addProperty("dateTimeIso", createDateFormat("yyyy-MM-dd'T'HH:mm",
+                    user.getLanguage(), user.getTimeZone()).format(date));
             // formattedDateTimeIso: "9-Dec-2015 1:16PM (UTC)"
             json.addProperty("formattedDateTimeIso",
-                    createDateFormat(user, "d-MMM-yyyy h:mmaa '('zzz')'").format(date));
+                    createDateFormat("d-MMM-yyyy h:mmaa '('zzz')'", user.getLanguage(),
+                            user.getTimeZone()).format(date));
             // dateTimeString: "24-Nov-15 9:42am"
-            json.addProperty("dateTimeString", createDateFormat(user, "d-MMM-yyyy h:mmaa").format(date));
+            json.addProperty("dateTimeString", createDateFormat(
+                    "d-MMM-yyyy h:mmaa", user.getLanguage(), user.getTimeZone()).format(date));
             // dateString: "24-Nov-15"
-            json.addProperty("dateString", createDateFormat(user, "d-MMM-yyyy").format(date));
+            json.addProperty("dateString", createDateFormat("d-MMM-yyyy"
+                    , user.getLanguage(), user.getTimeZone()).format(date));
             // timeString: "24-Nov-15"
-            json.addProperty("timeString", createDateFormat(user, "h:mmaa").format(date));
+            json.addProperty("timeString", createDateFormat(
+                    "h:mmaa", user.getLanguage(), user.getTimeZone()).format(date));
             // v24: "16:33"
-            json.addProperty("timeString24", createDateFormat(user, "HH:mm").format(date));
+            json.addProperty("timeString24", createDateFormat(
+                    "HH:mm", user.getLanguage(), user.getTimeZone()).format(date));
             json.addProperty("timeZoneId", tz.getID());
             json.addProperty("timeZoneString", tz.getDisplayName());
             return createSuccessResponse(json);

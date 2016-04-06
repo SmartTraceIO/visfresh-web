@@ -4,12 +4,14 @@
 package com.visfresh.l12n;
 
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 
 import org.springframework.stereotype.Component;
 
+import com.visfresh.entities.Language;
 import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.User;
 import com.visfresh.mpl.services.NotificationIssueBundle;
 import com.visfresh.utils.StringUtils;
 
@@ -45,20 +47,21 @@ public class ChartBundle extends NotificationIssueBundle {
      * @param trackerEvent tracker event.
      * @return description for given alert.
      */
-    public String buildDescription(final User user, final NotificationIssue issue,
-            final TrackerEvent trackerEvent) {
+    public String buildDescription(final NotificationIssue issue,
+            final TrackerEvent trackerEvent, final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME, XmlControl.INSTANCE);
         final String str = bundle.getString(createBundleKey(issue));
-        return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
+        return StringUtils.getMessage(str, createReplacementMap(issue, trackerEvent, lang, tz, tu));
     }
     /**
      * @param user user.
      * @param event event.
      * @return
      */
-    public String buildTrackerEventDescription(final User user, final TrackerEvent event) {
+    public String buildTrackerEventDescription(final TrackerEvent event,
+            final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME, XmlControl.INSTANCE);
         final String str = bundle.getString("TrackerEvent");
-        return StringUtils.getMessage(str, createReplacementMap(user, null, event));
+        return StringUtils.getMessage(str, createReplacementMap(null, event, lang, tz, tu));
     }
 }

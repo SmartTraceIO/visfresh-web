@@ -76,10 +76,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         noteSerializer = new NoteSerializer(user.getTimeZone());
 
         this.user = user;
-        this.isoFormat = DateTimeUtils.createIsoFormat(user);
-        this.prettyFormat = DateTimeUtils.createPrettyFormat(user);
+        this.isoFormat = createIsoFormat(user);
+        this.prettyFormat = createPrettyFormat(user);
     }
-
     /**
      * @param obj
      * @param shp
@@ -772,6 +771,22 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("type", alert.getType());
         return json;
     }
+
+    /**
+     * @param u
+     * @return
+     */
+    private DateFormat createPrettyFormat(final User u) {
+        return DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
+    }
+    /**
+     * @param u
+     * @return
+     */
+    private DateFormat createIsoFormat(final User u) {
+        return DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+    }
+
     public static void main(final String[] args) throws Exception {
         final ShipmentSerializer ser = new ShipmentSerializer(new User());
         ser.setReferenceResolver(new ReferenceResolver() {

@@ -90,7 +90,7 @@ public class NoteController extends AbstractController implements DeviceConstant
             }
 
             final NoteSerializer ser = getSerializer(user);
-            final DateFormat iso = DateTimeUtils.createIsoFormat(user);
+            final DateFormat iso = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
             final List<Note> notes = noteDao.findByShipment(s);
 
             final JsonArray array = new JsonArray();
@@ -204,7 +204,7 @@ public class NoteController extends AbstractController implements DeviceConstant
                 return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "Shipment not found");
             }
 
-            final DateFormat iso = DateTimeUtils.createIsoFormat(user);
+            final DateFormat iso = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
 
             Note note = new Note();
             note.setCreationDate(dto.getCreationDate() == null ? new Date() : iso.parse(dto.getCreationDate()));

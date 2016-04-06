@@ -11,7 +11,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import com.visfresh.entities.Company;
-import com.visfresh.entities.User;
+import com.visfresh.entities.Language;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -30,24 +30,24 @@ public final class DateTimeUtils {
      * @param format date format string.
      * @return date format.
      */
-    public static DateFormat createDateFormat(final User user, final String format) {
-        final DateFormat fmt = new SimpleDateFormat(format, user.getLanguage().getLocale());
-        fmt.setTimeZone(user.getTimeZone());
+    public static DateFormat createDateFormat(final String format, final Language lang, final TimeZone tz) {
+        final DateFormat fmt = new SimpleDateFormat(format, lang.getLocale());
+        fmt.setTimeZone(tz);
         return fmt;
     }
     /**
      * @param user user.
      * @return date format.
      */
-    public static DateFormat createPrettyFormat(final User user) {
-        return DateTimeUtils.createDateFormat(user, "h:mmaa d MMM yyyy");
+    public static DateFormat createPrettyFormat(final Language lang, final TimeZone tz) {
+        return DateTimeUtils.createDateFormat("h:mmaa d MMM yyyy", lang, tz);
     }
     /**
      * @param user user.
      * @return date format.
      */
-    public static DateFormat createIsoFormat(final User user) {
-        return DateTimeUtils.createDateFormat(user, "yyyy-MM-dd' 'HH:mm");
+    public static DateFormat createIsoFormat(final Language lang, final TimeZone tz) {
+        return DateTimeUtils.createDateFormat("yyyy-MM-dd' 'HH:mm", lang, tz);
     }
     /**
      * @param company

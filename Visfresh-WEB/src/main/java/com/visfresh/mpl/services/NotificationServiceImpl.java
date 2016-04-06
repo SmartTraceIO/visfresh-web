@@ -3,6 +3,8 @@
  */
 package com.visfresh.mpl.services;
 
+import java.util.TimeZone;
+
 import javax.mail.MessagingException;
 
 import org.slf4j.Logger;
@@ -12,10 +14,12 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.PersonSchedule;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.NotificationBundle;
@@ -54,27 +58,18 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendNotification(final PersonSchedule s, final NotificationIssue issue,
             final TrackerEvent trackerEvent) {
         final User user = s.getUser();
-        final String email = user.getEmail();
-        final String person = getPersonDescription(s);
+        final Language lang = user.getLanguage();
+        final TimeZone tz = user.getTimeZone();
+        final TemperatureUnits tu = user.getTemperatureUnits();
 
         //send email
         if (s.isSendEmail()) {
-            final String subject = bundle.getEmailSubject(user, issue, trackerEvent);
-            final String message = bundle.getEmailMessage(user, issue, trackerEvent);
-
-            if (email != null && email.length() > 0) {
-                try {
-                    emailService.sendMessage(new String[] {email}, subject, message);
-                } catch (final MessagingException e) {
-                    log.error("Failed to send email message to " + email, e);
-                }
-            } else {
-                log.warn("Email has not set for personal schedule for " + person + " , email can't be send");
-            }
+            sendEmailNotification(issue, user.getEmail(), trackerEvent, lang, tz, tu);
         }
 
+        final String person = getPersonDescription(s);
         if (s.isSendSms()) {
-            final String message = bundle.getSmsMessage(user, issue, trackerEvent);
+            final String message = bundle.getSmsMessage(issue, trackerEvent, lang, tz, tu);
 
             //send SMS
             final String phone = user.getPhone();
@@ -92,6 +87,32 @@ public class NotificationServiceImpl implements NotificationService {
             n.setUser(user);
 
             notificationDao.save(n);
+        }
+    }
+
+    /**
+     * @param issue
+     * @param email
+     * @param trackerEvent
+     * @param lang
+     * @param tz
+     * @param tu
+     */
+    @Override
+    public void sendEmailNotification(final NotificationIssue issue,
+            final String email, final TrackerEvent trackerEvent,
+            final Language lang, final TimeZone tz, final TemperatureUnits tu) {
+        final String subject = bundle.getEmailSubject(issue, trackerEvent, lang, tz, tu);
+        final String message = bundle.getEmailMessage(issue, trackerEvent, lang, tz, tu);
+
+        if (email != null && email.length() > 0) {
+            try {
+                emailService.sendMessage(new String[] {email}, subject, message);
+            } catch (final MessagingException e) {
+                log.error("Failed to send email message to " + email, e);
+            }
+        } else {
+            log.warn("Email has not set for personal schedule for " + email + " , email can't be send");
         }
     }
     /**

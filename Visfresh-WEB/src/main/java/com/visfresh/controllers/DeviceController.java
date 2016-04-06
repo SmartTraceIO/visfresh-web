@@ -160,8 +160,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return
      */
     private DeviceDto createDto(final ListDeviceItem item,final User user) {
-        final DateFormat isoFormat = DateTimeUtils.createIsoFormat(user);
-        final DateFormat prettyFormat = DateTimeUtils.createPrettyFormat(user);
+        final DateFormat isoFormat = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+        final DateFormat prettyFormat = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
         final TemperatureUnits temperatureUnits = user.getTemperatureUnits();
 
         final DeviceDto dto = new DeviceDto();

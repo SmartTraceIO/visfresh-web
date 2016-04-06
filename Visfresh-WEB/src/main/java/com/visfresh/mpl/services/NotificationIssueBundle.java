@@ -10,16 +10,18 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.User;
 import com.visfresh.utils.LocalizationUtils;
 
 /**
@@ -40,8 +42,9 @@ public class NotificationIssueBundle {
      * @param trackerEvent tracker event.
      * @return map of replacements.
      */
-    protected Map<String, String> createReplacementMap(final User user,
-            final NotificationIssue issue, final TrackerEvent trackerEvent) {
+    protected Map<String, String> createReplacementMap(
+            final NotificationIssue issue, final TrackerEvent trackerEvent,
+            final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final Shipment shipment;
         final Date issueDate;
         final Device device;
@@ -60,9 +63,9 @@ public class NotificationIssueBundle {
 
         //supported place holders:
         //${date} alert issue date include day and year
-        map.put("date", createIsoFormat(user).format(issueDate));
+        map.put("date", createIsoFormat(lang, tz).format(issueDate));
         //${time} the time in scope of day.
-        final DateFormat sdf = createDateFormat(user, "HH:mm");
+        final DateFormat sdf = createDateFormat("HH:mm", lang, tz);
         map.put("time", sdf.format(issueDate));
         //${device} device IMEI
         map.put("device", device.getImei());
@@ -92,13 +95,13 @@ public class NotificationIssueBundle {
 
         if (trackerEvent != null) {
             //${readingTime}      the time reading occured in user's timezone - eg. 4:34am
-            map.put("readingTime", createDateFormat(user, "K:mma").format(trackerEvent.getTime()));
+            map.put("readingTime", createDateFormat("K:mma", lang, tz).format(trackerEvent.getTime()));
             //${readingDate}      the date reading occured in user's timezone - eg. 12 Feb 2016
-            map.put("readingDate", createDateFormat(user, "dd MMM yyyy").format(trackerEvent.getTime()));
+            map.put("readingDate", createDateFormat("dd MMM yyyy", lang, tz).format(trackerEvent.getTime()));
             //${temperature}
             //${readingTemperature}  the temperature in user's temperature scale (C/F) at time of alert
             final String t = LocalizationUtils.getTemperatureString(
-                    trackerEvent.getTemperature(), user.getTemperatureUnits());
+                    trackerEvent.getTemperature(), tu);
             map.put("readingTemperature", t);
             map.put("temperature", t);
         } else {
@@ -126,12 +129,12 @@ public class NotificationIssueBundle {
                     map.put("ruleperiod", period);
                     //${ruletemperature}  the temperature in alert rule
                     map.put("ruletemperature", LocalizationUtils.getTemperatureString(
-                            ta.getTemperature(), user.getTemperatureUnits()));
+                            ta.getTemperature(), tu));
                 } else {//new version which supports the rule ID.
                     map.put("ruleperiod", Integer.toString(rule.getTimeOutMinutes()));
                     //${ruletemperature}  the temperature in alert rule
                     map.put("ruletemperature", LocalizationUtils.getTemperatureString(
-                            rule.getTemperature(), user.getTemperatureUnits()));
+                            rule.getTemperature(), tu));
                 }
             }
         } else if (issue instanceof Arrival) {

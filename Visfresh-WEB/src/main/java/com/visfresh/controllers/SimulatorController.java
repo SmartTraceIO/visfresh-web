@@ -212,7 +212,7 @@ public class SimulatorController extends AbstractController {
                         "Invalid velosity " + req.getVelosity() + " should start from 1");
             }
 
-            final DateFormat fmt = DateTimeUtils.createIsoFormat(user);
+            final DateFormat fmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
 
             final Date startDate = req.getStartDate() == null ? null : fmt.parse(req.getStartDate());
             final Date endDate = req.getEndDate() == null ? null : fmt.parse(req.getEndDate());

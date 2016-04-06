@@ -30,7 +30,7 @@ public class SimulatorRestClient extends RestClient {
      */
     public SimulatorRestClient(final User user) {
         serializer = new SimulatorSerializer(user);
-        fmt = DateTimeUtils.createIsoFormat(user);
+        fmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
     }
 
     /**

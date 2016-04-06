@@ -106,7 +106,8 @@ public class NotificationController extends AbstractController implements Notifi
 
             final int total = dao.getEntityCount(user, filter);
             final JsonArray array = new JsonArray();
-            final DateFormat isoFormat = DateTimeUtils.createDateFormat(user, "yyyy-MM-dd'T'HH:mm");
+            final DateFormat isoFormat = DateTimeUtils.createDateFormat(
+                    "yyyy-MM-dd'T'HH:mm", user.getLanguage(), user.getTimeZone());
             for (final Notification t : ns) {
                 array.add(ser.toJson(createNotificationItem(t, user, locations.get(t.getId()),
                         isoFormat, events)));
@@ -197,7 +198,9 @@ public class NotificationController extends AbstractController implements Notifi
         item.setType("Alert");
         item.setLink(notificationBundle.getLinkToShipment(shipment));
 
-        final String[] lines = notificationBundle.getAppMessage(user, n.getIssue(), trackerEvent).split("\n");
+        final String[] lines = notificationBundle.getAppMessage(
+                n.getIssue(), trackerEvent, user.getLanguage(),
+                user.getTimeZone(), user.getTemperatureUnits()).split("\n");
         for (final String line : lines) {
             item.getLines().add(line);
         }

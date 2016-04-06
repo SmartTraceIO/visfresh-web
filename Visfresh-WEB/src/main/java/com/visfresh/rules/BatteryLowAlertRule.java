@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Shipment;
 import com.visfresh.rules.state.ShipmentSession;
 
 /**
@@ -29,12 +30,14 @@ public class BatteryLowAlertRule extends AbstractAlertRule {
      * @see com.visfresh.drools.AbstractAlertRule#accept(com.visfresh.drools.TrackerEventRequest)
      */
     @Override
-    public boolean accept(final RuleContext e) {
-        final boolean accept = e.getEvent().getBattery() < LOW_BATTERY_LIMIT && super.accept(e)
-                && !e.getEvent().getShipment().hasFinalStatus()
-                && e.getEvent().getShipment().getAlertProfile().isWatchBatteryLow();
+    public boolean accept(final RuleContext context) {
+        final Shipment shipment = context.getEvent().getShipment();
+
+        final boolean accept = context.getEvent().getBattery() < LOW_BATTERY_LIMIT && super.accept(context)
+                && !shipment.hasFinalStatus()
+                && shipment.getAlertProfile().isWatchBatteryLow();
         if (accept) {
-            final ShipmentSession s = e.getSessionManager().getSession(e.getEvent().getShipment());
+            final ShipmentSession s = context.getSessionManager().getSession(shipment);
             if (s.isBatteryLowProcessed()) {
                 return false;
             }

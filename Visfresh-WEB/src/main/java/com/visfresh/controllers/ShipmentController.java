@@ -401,7 +401,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
 
         final Date currentTime = new Date();
-        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user);
+        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
 
         //add alerts to each shipment.
         for (final Shipment s : shipments) {
@@ -675,8 +675,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         dto.setMinTemp(minTemp);
         dto.setMaxTemp(maxTemp);
 
-        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user);
-        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user);
+        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
 
         dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
         dto.setFirstReadingTime(prettyFmt.format(new Date(timeOfFirstReading)));
@@ -760,8 +760,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private SingleShipmentDto createSingleShipmentData(final Shipment shipment, final User user) {
         //"startTimeISO": "2014-08-12 12:10",
-        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user);
-        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user);
+        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
 
         final SingleShipmentDto dto = new SingleShipmentDto();
         dto.setAlertProfileId(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());
@@ -901,7 +901,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private SingleShipmentAlert createLastReadingAlert(final TrackerEvent event,
             final User user, final String address, final String timeIso) {
-        final String text = chartBundle.buildTrackerEventDescription(user, event);
+        final String text = chartBundle.buildTrackerEventDescription(event,
+                user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
         return createSingleShipmentAlert("LastReading", text);
     }
     /**
@@ -911,7 +912,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private SingleShipmentAlert createSingleShipmentAlert(final Arrival a, final TrackerEvent trackerEvent,
             final User user) {
-        final String text = chartBundle.buildDescription(user, a, trackerEvent);
+        final String text = chartBundle.buildDescription(a, trackerEvent, user.getLanguage(),
+                user.getTimeZone(), user.getTemperatureUnits());
         return createSingleShipmentAlert("ArrivalNotice", text);
     }
     /**
@@ -921,7 +923,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private SingleShipmentAlert createSingleShipmentAlert(
             final Alert a, final TrackerEvent trackerEvent, final User user) {
-        final String text = chartBundle.buildDescription(user, a, trackerEvent);
+        final String text = chartBundle.buildDescription(a, trackerEvent,
+                user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
         return createSingleShipmentAlert(a.getType().name(), text);
     }
     /**

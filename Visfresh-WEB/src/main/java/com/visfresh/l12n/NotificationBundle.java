@@ -6,13 +6,15 @@ package com.visfresh.l12n;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 
 import org.springframework.stereotype.Component;
 
+import com.visfresh.entities.Language;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.User;
 import com.visfresh.mpl.services.NotificationIssueBundle;
 import com.visfresh.utils.StringUtils;
 
@@ -46,10 +48,10 @@ public class NotificationBundle extends NotificationIssueBundle {
      * @param trackerEvent tracker event
      * @return description for given alert.
      */
-    public String getEmailMessage(final User user, final NotificationIssue issue,
-            final TrackerEvent trackerEvent) {
+    public String getEmailMessage(final NotificationIssue issue,
+            final TrackerEvent trackerEvent, final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final String str = getBundle().getString("Email." + createBundleKey(issue));
-        return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
+        return StringUtils.getMessage(str, createReplacementMap(issue, trackerEvent, lang, tz, tu));
     }
     /**
      *  supported place holders:
@@ -68,10 +70,10 @@ public class NotificationBundle extends NotificationIssueBundle {
      * @param trackerEvent tracker event.
      * @return description for given alert.
      */
-    public String getSmsMessage(final User user, final NotificationIssue issue,
-            final TrackerEvent trackerEvent) {
+    public String getSmsMessage(final NotificationIssue issue,
+            final TrackerEvent trackerEvent, final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final String str = getBundle().getString("SMS." + createBundleKey(issue));
-        return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
+        return StringUtils.getMessage(str, createReplacementMap(issue, trackerEvent, lang, tz, tu));
     }
     /**
      * @param user user.
@@ -79,10 +81,10 @@ public class NotificationBundle extends NotificationIssueBundle {
      * @param trackerEvent tracker event.
      * @return message.
      */
-    public String getAppMessage(final User user, final NotificationIssue issue,
-            final TrackerEvent trackerEvent) {
+    public String getAppMessage(final NotificationIssue issue,
+            final TrackerEvent trackerEvent, final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final String str = getBundle().getString("App." + createBundleKey(issue));
-        return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
+        return StringUtils.getMessage(str, createReplacementMap(issue, trackerEvent, lang, tz, tu));
     }
     /**
      * @param shipment the shipment
@@ -105,9 +107,10 @@ public class NotificationBundle extends NotificationIssueBundle {
      * @param trackerEvent tracker event, can be NULL
      * @return
      */
-    public String getEmailSubject(final User user, final NotificationIssue issue, final TrackerEvent trackerEvent) {
+    public String getEmailSubject(final NotificationIssue issue, final TrackerEvent trackerEvent,
+            final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final String str = getBundle().getString("Email.Subject." + createBundleKey(issue));
-        return StringUtils.getMessage(str, createReplacementMap(user, issue, trackerEvent));
+        return StringUtils.getMessage(str, createReplacementMap(issue, trackerEvent, lang, tz, tu));
     }
     /**
      * @return resource bundle.
