@@ -483,7 +483,7 @@ Method *GET*, method *stopSimulator*. Request parameters:
 ### Get Simulator ###
 Method *GET*, method *getSimulator*. Request parameters:  
 1. user - email of simulator owner. If null, currently logged in user will used by default.  
-If user specified and is not equals currently logged in user, the SmartTraceAdmin role is required.
+If user specified and is not equals currently logged in user, the SmartTraceAdmin role is required.  
 [(example)](#markdown-header-get-simulator-example)
 
 ## Objects
@@ -3169,7 +3169,7 @@ Response:
 }
 ```
 ### Stop Simulator example ###
-**GET /vf/rest/stopSimulator/${accessToken}?user=mkutuzov-1%40mail.ru
+**GET /vf/rest/stopSimulator/${accessToken}?user=mkutuzov-1%40mail.ru**  
 **Response:**  
 ```json
 {
@@ -3181,7 +3181,7 @@ Response:
 }
 ```
 ### Get Simulator example###
-**GET /vf/rest/getSimulator/${accessToken}?user=mkutuzov-1%40mail.ru
+**GET /vf/rest/getSimulator/${accessToken}?user=mkutuzov-1%40mail.ru**  
 **Response:**  
 ```json
 {
