@@ -167,7 +167,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             state.setLastLocation(new Location(e.getLatitude(), e.getLongitude()));
             saveDeviceState(event.getImei(), state);
             if (e.getShipment() != null) {
-                unloadAndSaveSession(e.getShipment(), ruleEngineCacheId, true);
+                unloadSession(e.getShipment(), ruleEngineCacheId, true);
             }
         }
     }
@@ -280,7 +280,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param loaderId
      * @return shipment session.
      */
-    private ShipmentSession loadSession(final Shipment s, final String loaderId) {
+    public ShipmentSession loadSession(final Shipment s, final String loaderId) {
         //load cache entry
         ShipmentSessionCacheEntry ss;
         synchronized (sessionCache) {
@@ -305,7 +305,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         return ss.session;
     }
-    private void unloadAndSaveSession(final Shipment s, final String loaderId, final boolean saveSession) {
+    public void unloadSession(final Shipment s, final String loaderId, final boolean saveSession) {
         ShipmentSessionCacheEntry ss;
         synchronized (sessionCache) {
             ss = sessionCache.get(s.getId());
@@ -351,7 +351,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         try {
             session.setAlertsSuppressed(true);
         } finally {
-            unloadAndSaveSession(s, loaderId, true);
+            unloadSession(s, loaderId, true);
         }
     }
     /* (non-Javadoc)
@@ -364,7 +364,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         try {
             return session.getAlertsSuppressionDate();
         } finally {
-            unloadAndSaveSession(s, loaderId, false);
+            unloadSession(s, loaderId, false);
         }
     }
     /* (non-Javadoc)
@@ -377,7 +377,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         try {
             return session.isAlertsSuppressed();
         } finally {
-            unloadAndSaveSession(s, loaderId, false);
+            unloadSession(s, loaderId, false);
         }
     }
     /**

@@ -18,6 +18,7 @@ import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AutoStartShipment;
@@ -28,6 +29,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -159,7 +161,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertEquals(lok.getId(), shipment.getShippedFrom().getId());
         // check created from correct template
         assertTrue(shipment.getShipmentDescription().startsWith(tok.getShipmentDescription()));
-        assertEquals(1, c.getSessionManager().getSession(shipment).getShipmentKeys().size());
+        assertEquals(1, getSession(shipment).getShipmentKeys().size());
 
         // check not duplicate handle
         assertFalse(rule.accept(c));
@@ -264,9 +266,8 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         dao.save(aut);
 
         final TrackerEvent e = createEvent(17.14, 18.16, new Date());
-        final SessionHolder state = new SessionHolder();
-        rule.handle(new RuleContext(e, state));
-        assertEquals(1, state.getSession(e.getShipment()).getShipmentKeys().size());
+        rule.handle(new RuleContext(e, new SessionHolder()));
+        assertEquals(1, getSession(e.getShipment()).getShipmentKeys().size());
 
         // check shipment created.
         assertNull(e.getShipment().getShippedTo());
@@ -274,10 +275,16 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         aut.getShippedTo().remove(l1);
         dao.save(aut);
 
-        rule.handle(new RuleContext(e, state));
+        rule.handle(new RuleContext(e, new SessionHolder()));
         assertEquals(l2.getId(), e.getShipment().getShippedTo().getId());
     }
-
+    /**
+     * @param shipment shipment.
+     * @return
+     */
+    private ShipmentSession getSession(final Shipment shipment) {
+        return context.getBean(ShipmentSessionDao.class).getSession(shipment);
+    }
     /**
      * @param lat latitude.
      * @param lon longitude.
