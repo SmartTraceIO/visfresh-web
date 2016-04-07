@@ -825,6 +825,41 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNull(s.getShutdownDeviceAfterMinutes());
         assertNull(s.getArrivalNotificationWithinKm());
     }
+    @Test
+    public void autoStartShipment() throws IOException, RestServiceException {
+        final Device d = createDevice("123987230987", true);
+
+        //test not device found
+        try {
+            shipmentClient.autoStartShipment("1111111111111111");
+            throw new AssertionFailedError("Not device found exception should be thrown");
+        } catch (final Exception e) {
+            //ok
+        }
+
+        //test not last reading found
+        try {
+            shipmentClient.autoStartShipment(d.getImei());
+            throw new AssertionFailedError("Not last reading found exception should be thrown");
+        } catch (final Exception e) {
+            //ok
+        }
+
+        //create last event for device
+        final TrackerEvent e = new TrackerEvent();
+        e.setDevice(d);
+        e.setTime(new Date());
+        e.setType(TrackerEventType.AUT);
+        e.setLatitude(50.50);
+        e.setLongitude(51.51);
+
+        trackerEventDao.save(e);
+
+        final Long id = shipmentClient.autoStartShipment(d.getImei());
+        assertNotNull(id);
+        final Shipment s = shipmentDao.findOne(id);
+        assertNotNull(s);
+    }
     /**
      * @param s
      * @return

@@ -23,12 +23,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.NoteDao;
@@ -43,6 +45,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Note;
@@ -52,6 +55,7 @@ import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
@@ -69,6 +73,7 @@ import com.visfresh.l12n.ChartBundle;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.lists.ListShipmentItem;
+import com.visfresh.services.AutoStartShipmentService;
 import com.visfresh.services.LocationService;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.ShipmentSiblingService;
@@ -92,9 +97,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * Logger.
      */
     private static final Logger log = LoggerFactory.getLogger(ShipmentController.class);
-    /**
-     * Report service.
-     */
+
     @Autowired
     private ShipmentDao shipmentDao;
     @Autowired
@@ -125,6 +128,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private InterimStopDao interimStopDao;
     @Autowired
     private NoteDao noteDao;
+    @Autowired
+    private DeviceDao deviceDao;
+    @Autowired
+    private AutoStartShipmentService autoStartService;
 
     /**
      * Default constructor.
@@ -588,6 +595,39 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             return createErrorResponse(e);
         }
     }
+
+    @RequestMapping(value = "/autoStartNewShipment/{authToken}", method = RequestMethod.GET)
+    public JsonElement autoStartNewShipment(@PathVariable final String authToken,
+            @RequestParam final String device) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.NormalUser);
+
+            //get device
+            final Device d = deviceDao.findByImei(device);
+            checkCompanyAccess(user, d);
+
+            if (d == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Unable to found device with IMEI '" + device + "'");
+            }
+
+            //get last reading
+            final ShortTrackerEvent e = trackerEventDao.getLastEvent(d);
+            if (e == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Not last event found for device '" + device + "'");
+            }
+
+            final Shipment s = autoStartService.autoStartNewShipment(d, e.getLatitude(), e.getLongitude(), new Date());
+            return createIdResponse("shipmentId", s.getId());
+        } catch (final Exception e) {
+            log.error("Failed to get autostart templates", e);
+            return createErrorResponse(e);
+        }
+    }
+
     /**
      * @param dto DTO.
      * @param s shipment.

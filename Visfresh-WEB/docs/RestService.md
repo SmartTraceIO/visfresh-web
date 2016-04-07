@@ -117,7 +117,8 @@ List items is short representations of base entities, like as [Alert Profile](#m
 56. [Delete Simulator](#markdown-header-delete-simulator)  
 57. [Start Simulator](#markdown-header-start-simulator)  
 58. [Stop Simulator](#markdown-header-stop-simulator)  
-58. [Get Simulator](#markdown-header-get-simulator)  
+59. [Get Simulator](#markdown-header-get-simulator)  
+60. [AutoStartNewShipment](#markdown-header-autostart-new-shipment)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -485,6 +486,12 @@ Method *GET*, method *getSimulator*. Request parameters:
 1. user - email of simulator owner. If null, currently logged in user will used by default.  
 If user specified and is not equals currently logged in user, the SmartTraceAdmin role is required.  
 [(example)](#markdown-header-get-simulator-example)
+
+### AutoStart new Shipment ###
+Method *GET*, method *autoStartNewShipment*. Request parameters:  
+1. device - the device.  
+Last reading for given device is required.  
+[(example)](#markdown-header-autostart-new-shipment-example)
 
 ## Objects
 ### Response message ###
@@ -3201,6 +3208,20 @@ Response:
     "user": "mkutuzov-1@mail.ru",
     "started": false,
     "autoStartTemplate": 22138
+  }
+}
+```
+### AutoStart new Shipment example ###
+**GET /vf/rest/autoStartNewShipment/${accessToken}?device=123987230987**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "shipmentId": 23819 //ID of created shipment
   }
 }
 ```

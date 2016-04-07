@@ -5,6 +5,7 @@ package com.visfresh.controllers.restclient;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -153,6 +154,19 @@ public class ShipmentRestClient extends RestClient {
             throws IOException, RestServiceException {
         return sendPostRequest(getPathWithToken("getShipments"),
                 serializer.toJson(req)).getAsJsonArray();
+    }
+    /**
+     * @param device
+     * @throws RestServiceException
+     * @throws IOException
+     * @return ID of new autostarted shipment.
+     */
+    public Long autoStartShipment(final String device) throws IOException, RestServiceException {
+        final Map<String, String> params = new HashMap<>();
+        params.put("device", device);
+
+        final JsonElement el = sendGetRequest(getPathWithToken("autoStartNewShipment"), params);
+        return parseId(el.getAsJsonObject());
     }
 
     /**
