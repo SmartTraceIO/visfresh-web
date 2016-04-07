@@ -319,8 +319,6 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param device
      */
     private void stopShipmentAndShutdownDevice(final Shipment shipment, final Device device) {
-        shutdownService.sendShipmentShutdown(shipment, new Date());
-
         //stop shipment
         final ShipmentStatus status = shipment.getStatus();
         if (shipment.hasFinalStatus()) {
@@ -336,6 +334,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
             log.debug("Shipment " + shipment.getId() + " status has set to " + ShipmentStatus.Ended
                     + " according device " + device.getImei() + " shutdown");
         }
+
+        shutdownService.sendShipmentShutdown(shipment, new Date());
     }
     /**
      * @param user

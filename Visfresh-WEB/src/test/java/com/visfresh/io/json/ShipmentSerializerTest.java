@@ -85,6 +85,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final Integer shutDownAfterStartMinutes = 5;
         final String createdBy = "developer";
         final Date startDate = new Date(10000l);
+        final Date deviceShutdownTime = new Date(923847092834l);
 
         Shipment s = new Shipment();
         s.setAlertProfile(alertProfile);
@@ -113,6 +114,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         s.setShutDownAfterStartMinutes(shutDownAfterStartMinutes);
         s.setCreatedBy(createdBy);
         s.setStartDate(startDate);
+        s.setDeviceShutdownTime(deviceShutdownTime);
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
         s = serializer.parseShipment(obj);
@@ -143,6 +145,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(shutDownAfterStartMinutes, s.getShutDownAfterStartMinutes());
         assertEquals(createdBy, s.getCreatedBy());
         assertEquals(dateFormat.format(startDate), dateFormat.format(s.getStartDate()));
+        assertEquals(dateFormat.format(deviceShutdownTime), dateFormat.format(s.getDeviceShutdownTime()));
     }
     @Test
     public void testSaveShipmentResponse() {

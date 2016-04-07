@@ -5,7 +5,9 @@ package com.visfresh.io.json;
 
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -114,6 +116,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         s.setTripCount(asInt(json.get(ShipmentConstants.TRIP_COUNT)));
         s.setPoNum(asInt(json.get(ShipmentConstants.PO_NUM)));
         s.setShipmentDate(asDate(json.get(ShipmentConstants.SHIPMENT_DATE)));
+        s.setDeviceShutdownTime(parseIsoDate(json.get(ShipmentConstants.SHUTDOWN_TIME_ISO)));
         s.setArrivalDate(asDate(json.get(ShipmentConstants.ARRIVAL_DATE)));
         s.getCustomFields().putAll(SerializerUtils.parseStringMap(json.get(ShipmentConstants.CUSTOM_FIELDS)));
         s.setStatus(ShipmentStatus.valueOf(json.get(ShipmentConstants.STATUS).getAsString()));
@@ -279,7 +282,20 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         value = Math.round(value * 100) / 100.;
         return value;
     }
-
+    /**
+     * @param el
+     * @return
+     */
+    private Date parseIsoDate(final JsonElement el) {
+        if (el == null || el.isJsonNull()) {
+            return null;
+        }
+        try {
+            return isoFormat.parse(el.getAsString());
+        } catch (final ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
     /**
      * @param dto
      * @return
