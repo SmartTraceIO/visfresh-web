@@ -163,7 +163,6 @@ public class ArrivalRule extends AbstractNotificationRule {
      * @param shipment shipment.
      * @return
      */
-    @Override
     protected List<PersonSchedule> getAllPersonalSchedules(final Shipment shipment) {
         final List<PersonSchedule> all = new LinkedList<PersonSchedule>();
 

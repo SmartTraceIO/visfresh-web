@@ -41,9 +41,11 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      */
     @Override
     public boolean accept(final RuleContext context) {
-        return super.accept(context)
-                && context.getEvent().getShipment().getAlertProfile() != null
-                && !isSuppressedAllerts(context);
+        final Shipment shipment = context.getEvent().getShipment();
+        return shipment != null //please not remove even if is it handled in super.accept
+            && shipment.getAlertProfile() != null //please not remove even if is it handled in super.accept
+            && super.accept(context)
+            && (shouldIgnoreAlertSuppression() || !isSuppressedAllerts(context));
     }
     /**
      * @param context rule context.
@@ -126,7 +128,6 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      * @param shipment shipment.
      * @return
      */
-    @Override
     protected List<PersonSchedule> getAllPersonalSchedules(final Shipment shipment) {
         final List<PersonSchedule> all = new LinkedList<PersonSchedule>();
 

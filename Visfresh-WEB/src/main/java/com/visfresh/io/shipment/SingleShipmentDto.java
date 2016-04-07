@@ -72,6 +72,7 @@ public class SingleShipmentDto {
     private String lastReadingTimeIso;
     private String lastReadingTime;
     private double lastReadingTemperature;
+    private Integer batteryLevel;
     private Integer noAlertsAfterStartMinutes;
     private String shipmentType;
 
@@ -527,6 +528,18 @@ public class SingleShipmentDto {
      */
     public void setLastReadingTimeIso(final String time) {
         this.lastReadingTimeIso = time;
+    }
+    /**
+     * @return the batteryLevel
+     */
+    public Integer getBatteryLevel() {
+        return batteryLevel;
+    }
+    /**
+     * @param batteryLevel the batteryLevel to set
+     */
+    public void setBatteryLevel(final int batteryLevel) {
+        this.batteryLevel = batteryLevel;
     }
     /**
      * @return temperature of last event.

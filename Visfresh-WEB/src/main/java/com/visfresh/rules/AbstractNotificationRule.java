@@ -4,7 +4,6 @@
 package com.visfresh.rules;
 
 import java.util.Calendar;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -56,9 +55,12 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
         final boolean accept = !e.isProcessed(this)
                 && shipment != null
                 && shipment.getStatus() != ShipmentStatus.Ended
-                && !isNextAlertsSuppressed(e);
+                && (shouldIgnoreAlertSuppression() || !isNextAlertsSuppressed(e));
 
         return accept;
+    }
+    protected boolean shouldIgnoreAlertSuppression() {
+        return false;
     }
     /**
      * @param context rule context.
@@ -124,12 +126,6 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
 
         return matches;
     }
-
-    /**
-     * @param shipment shipment.
-     * @return
-     */
-    protected abstract List<PersonSchedule> getAllPersonalSchedules(final Shipment shipment);
 
     public abstract String getName();
 

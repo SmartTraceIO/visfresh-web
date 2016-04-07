@@ -607,6 +607,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty(ShipmentConstants.LAST_READING_TIME, dto.getLastReadingTime());
             json.addProperty(ShipmentConstants.LAST_READING_TEMPERATURE,
                     convertTemperature(dto.getLastReadingTemperature()));
+            json.addProperty("batteryLevel", dto.getBatteryLevel());
 
             json.add("lastReadingForMap", toJson(dto.getCurrentLocationForMap()));
 

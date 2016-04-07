@@ -625,8 +625,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             items.add(item);
         }
 
+        final SingleShipmentDto dto = createSingleShipmentData(s, user);
+
         final Map<AlertType, Integer> alertSummary = new HashMap<>();
         if (events.size() > 0) {
+            //add battery level.
+            dto.setBatteryLevel(events.get(events.size() - 1).getBattery());
+
             //add alerts
             final List<Alert> alerts = alertDao.getAlerts(s);
             for (final Alert alert : alerts) {
@@ -643,8 +648,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 item.getArrivals().add(arrival);
             }
         }
-
-        final SingleShipmentDto dto = createSingleShipmentData(s, user);
 
         double minTemp = 1000.;
         double maxTemp = -273.;

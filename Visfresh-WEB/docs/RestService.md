@@ -2502,6 +2502,7 @@ Response:
     "lastReadingLocation": "Bankstown Warehouse",
     "lastReadingTimeISO": "2016-03-12 18:27",
     "lastReadingTemperature": 56.0,
+    "batteryLevel": 1234,
     "lastReadingForMap": null,
     "minTemp": 56.0,
     "maxTemp": 56.0,
