@@ -596,8 +596,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         }
     }
 
-    @RequestMapping(value = "/autoStartNewShipment/{authToken}", method = RequestMethod.GET)
-    public JsonElement autoStartNewShipment(@PathVariable final String authToken,
+    @RequestMapping(value = "/createNewAutoSthipment/{authToken}", method = RequestMethod.GET)
+    public JsonElement createNewAutoSthipment(@PathVariable final String authToken,
             @RequestParam final String device) {
         try {
             //check logged in.

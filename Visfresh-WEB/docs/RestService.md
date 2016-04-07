@@ -3212,7 +3212,7 @@ Response:
 }
 ```
 ### AutoStart new Shipment example ###
-**GET /vf/rest/autoStartNewShipment/${accessToken}?device=123987230987**  
+**GET /vf/rest/createNewAutoSthipment/${accessToken}?device=123987230987**  
 **Response:**  
 ```json
 {

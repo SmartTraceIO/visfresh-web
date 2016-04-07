@@ -165,7 +165,7 @@ public class ShipmentRestClient extends RestClient {
         final Map<String, String> params = new HashMap<>();
         params.put("device", device);
 
-        final JsonElement el = sendGetRequest(getPathWithToken("autoStartNewShipment"), params);
+        final JsonElement el = sendGetRequest(getPathWithToken("createNewAutoSthipment"), params);
         return parseId(el.getAsJsonObject());
     }
 
