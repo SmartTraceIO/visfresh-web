@@ -537,7 +537,8 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         super.addFiltesForFindAll(filter, params, filters);
 
         if (Boolean.TRUE.equals(value)) {
-            filters.add("exists (select * from alerts where alerts.shipment = shipments.id)");
+            filters.add("exists (select * from alerts where"
+                    + " alerts.shipment = shipments.id and alerts.type <> 'LightOn' and alerts.type <> 'LightOff')");
         }
     }
     /* (non-Javadoc)

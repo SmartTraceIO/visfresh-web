@@ -796,8 +796,19 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         final long oneDay = 24 * 60 * 60 * 1000L;
 
+        //create light on alert
+        Alert alert = createAlert(s, AlertType.LightOn);
+        alert.setDate(new Date(System.currentTimeMillis() - oneDay));
+        alertDao.save(alert);
+
+        alert = createAlert(s, AlertType.LightOff);
+        alert.setDate(new Date(System.currentTimeMillis() - oneDay));
+        alertDao.save(alert);
+
+        assertEquals(0, shipmentClient.getShipments(req).size());
+
         //create alert
-        final Alert alert = createTemperatureAlert(s, AlertType.Hot);
+        alert = createTemperatureAlert(s, AlertType.Hot);
         alert.setDate(new Date(System.currentTimeMillis() - oneDay));
         alertDao.save(alert);
 
