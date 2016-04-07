@@ -167,7 +167,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             state.setLastLocation(new Location(e.getLatitude(), e.getLongitude()));
             saveDeviceState(event.getImei(), state);
             if (e.getShipment() != null) {
-                unloadAndSaveSession(e.getShipment(), ruleEngineCacheId);
+                unloadAndSaveSession(e.getShipment(), ruleEngineCacheId, true);
             }
         }
     }
@@ -305,7 +305,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         return ss.session;
     }
-    private void unloadAndSaveSession(final Shipment s, final String loaderId) {
+    private void unloadAndSaveSession(final Shipment s, final String loaderId, final boolean saveSession) {
         ShipmentSessionCacheEntry ss;
         synchronized (sessionCache) {
             ss = sessionCache.get(s.getId());
@@ -345,13 +345,39 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @see com.visfresh.services.RuleEngine#supressNextAlerts(com.visfresh.entities.Shipment)
      */
     @Override
-    public void supressNextAlerts(final Shipment s) {
+    public void suppressNextAlerts(final Shipment s) {
         final String loaderId = "suppressAlerts";
         final ShipmentSession session = loadSession(s, loaderId);
         try {
             session.setAlertsSuppressed(true);
         } finally {
-            unloadAndSaveSession(s, loaderId);
+            unloadAndSaveSession(s, loaderId, true);
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RuleEngine#getAlertsSuppressionDate(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public Date getAlertsSuppressionDate(final Shipment s) {
+        final String loaderId = "alertsSuppressionDate";
+        final ShipmentSession session = loadSession(s, loaderId);
+        try {
+            return session.getAlertsSuppressionDate();
+        } finally {
+            unloadAndSaveSession(s, loaderId, false);
+        }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RuleEngine#isAlertsSuppressed(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public boolean isAlertsSuppressed(final Shipment s) {
+        final String loaderId = "alertsSuppression";
+        final ShipmentSession session = loadSession(s, loaderId);
+        try {
+            return session.isAlertsSuppressed();
+        } finally {
+            unloadAndSaveSession(s, loaderId, false);
         }
     }
     /**

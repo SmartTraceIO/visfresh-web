@@ -2507,6 +2507,10 @@ Response:
     "minTemp": 56.0,
     "maxTemp": 56.0,
     "firstReadingTimeISO": "2016-03-12 18:27",
+    "firstReadingTime": "6:27PM 12 Mar 2016",
+    "alertsSuppressed": true,
+    "alertsSuppressionTime": "11:34AM 7 Apr 2016",
+    "alertsSuppressionTimeIso": "2016-04-07 11:34",
     "locations": [
       {
         "lat": 50.5,

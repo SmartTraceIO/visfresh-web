@@ -3,6 +3,7 @@
  */
 package com.visfresh.rules.state;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +20,7 @@ public class ShipmentSession {
     private final RulesState temperatureAlerts = new RulesState();
     private final Map<String, String> shipmentProperties = new ConcurrentHashMap<String, String>();
     private boolean alertsSuppressed;
+    private Date alertsSuppressionDate;
     private boolean batteryLowProcessed;
 
     /**
@@ -61,12 +63,29 @@ public class ShipmentSession {
      */
     public void setAlertsSuppressed(final boolean suppressed) {
         this.alertsSuppressed = suppressed;
+        if (suppressed) {
+            setAlertsSuppressionDate(new Date());
+        } else {
+            setAlertsSuppressionDate(null);
+        }
     }
     /**
      * @return the alertsSuppressed
      */
     public boolean isAlertsSuppressed() {
         return alertsSuppressed;
+    }
+    /**
+     * @param alertsSupressionDate the alertsSupressionDate to set
+     */
+    public void setAlertsSuppressionDate(final Date alertsSupressionDate) {
+        this.alertsSuppressionDate = alertsSupressionDate;
+    }
+    /**
+     * @return the alertsSupressionDate
+     */
+    public Date getAlertsSuppressionDate() {
+        return alertsSuppressionDate;
     }
     /**
      * @return

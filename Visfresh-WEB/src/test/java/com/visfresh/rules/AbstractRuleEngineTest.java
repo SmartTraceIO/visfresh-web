@@ -148,7 +148,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         e.setType("AUT");
         e.setImei(device.getImei());
 
-        supressNextAlerts(s);
+        suppressNextAlerts(s);
         processDcsEvent(e);
 
         //check tracker event saved

@@ -68,6 +68,9 @@ public class SingleShipmentDto {
     private String shutdownTime;
     private String arrivalTimeIso;
     private String arrivalTime;
+    private boolean alertsSuppressed;
+    private String alertsSuppressionTimeIso;
+    private String alertsSuppressionTime;
     private String firstReadingTime;
     private String lastReadingTimeIso;
     private String lastReadingTime;
@@ -728,5 +731,47 @@ public class SingleShipmentDto {
      */
     public List<NoteDto> getNotes() {
         return notes;
+    }
+
+    /**
+     * @return the alertsSuppressed
+     */
+    public boolean isAlertsSuppressed() {
+        return alertsSuppressed;
+    }
+
+    /**
+     * @param alertsSuppressed the alertsSuppressed to set
+     */
+    public void setAlertsSuppressed(final boolean alertsSuppressed) {
+        this.alertsSuppressed = alertsSuppressed;
+    }
+
+    /**
+     * @return the alertsSuppressionTimeIso
+     */
+    public String getAlertsSuppressionTimeIso() {
+        return alertsSuppressionTimeIso;
+    }
+
+    /**
+     * @param alertsSuppressionTimeIso the alertsSuppressionTimeIso to set
+     */
+    public void setAlertsSuppressionTimeIso(final String alertsSuppressionTimeIso) {
+        this.alertsSuppressionTimeIso = alertsSuppressionTimeIso;
+    }
+
+    /**
+     * @return the alertsSuppressionTime
+     */
+    public String getAlertsSuppressionTime() {
+        return alertsSuppressionTime;
+    }
+
+    /**
+     * @param alertsSuppressionTime the alertsSuppressionTime to set
+     */
+    public void setAlertsSuppressionTime(final String alertsSuppressionTime) {
+        this.alertsSuppressionTime = alertsSuppressionTime;
     }
 }

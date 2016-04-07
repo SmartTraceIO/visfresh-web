@@ -3,6 +3,7 @@
  */
 package com.visfresh.services;
 
+import java.util.Date;
 import java.util.List;
 
 import com.visfresh.entities.AlertRule;
@@ -38,5 +39,15 @@ public interface RuleEngine {
      * Suppress next alerts for shipment.
      * @param s the shipment.
      */
-    void supressNextAlerts(Shipment s);
+    void suppressNextAlerts(Shipment s);
+    /**
+     * @param s shipment.
+     * @return alerts suppressed state of shipment.
+     */
+    boolean isAlertsSuppressed(Shipment s);
+    /**
+     * @param s shipment.
+     * @return alerts suppression date.
+     */
+    Date getAlertsSuppressionDate(Shipment s);
 }

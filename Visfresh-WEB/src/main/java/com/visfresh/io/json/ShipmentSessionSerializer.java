@@ -22,17 +22,9 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 public class ShipmentSessionSerializer extends AbstractJsonSerializer {
-    /**
-     *
-     */
+    private static final String ALERTS_SUPPRESSION_DATE = "alertsSuppressionDate";
     private static final String BATTERY_LOW_PROCESSED = "batteryLowProcessed";
-    /**
-     *
-     */
     private static final String ALERTS_SUPPRESSED = "alertsSuppressed";
-    /**
-     *
-     */
     private static final String SHIPMENT_PROPERTIES = "shipmentProperties";
     private static final String TEMPERATURE_ALERTS = "temperatureAlerts";
 
@@ -78,6 +70,7 @@ public class ShipmentSessionSerializer extends AbstractJsonSerializer {
         final JsonObject json = new JsonObject();
         json.add(TEMPERATURE_ALERTS, toJson(state.getTemperatureAlerts()));
         json.addProperty(ALERTS_SUPPRESSED, state.isAlertsSuppressed());
+        json.addProperty(ALERTS_SUPPRESSION_DATE, formatDate(state.getAlertsSuppressionDate()));
         json.addProperty(BATTERY_LOW_PROCESSED, state.isBatteryLowProcessed());
 
         final JsonObject props = new JsonObject();
@@ -111,6 +104,10 @@ public class ShipmentSessionSerializer extends AbstractJsonSerializer {
         final JsonElement alertsSuppressed = json.get(ALERTS_SUPPRESSED);
         if (alertsSuppressed != null) {
             s.setAlertsSuppressed(Boolean.TRUE.equals(alertsSuppressed.getAsBoolean()));
+        }
+        final JsonElement alertsSuppressionDate = json.get(ALERTS_SUPPRESSION_DATE);
+        if (alertsSuppressionDate != null && !alertsSuppressionDate.isJsonNull()) {
+            s.setAlertsSuppressionDate(parseDate(alertsSuppressionDate.getAsString()));
         }
         final JsonElement batteryLowProcessed = json.get(BATTERY_LOW_PROCESSED);
         if (batteryLowProcessed != null) {

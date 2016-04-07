@@ -42,6 +42,7 @@ public class ShipmentSessionSerializerTest {
         ShipmentSession s = new ShipmentSession();
         final Date d1 = new Date(System.currentTimeMillis() - 100000);
         final Date d2 = new Date(System.currentTimeMillis() - 1000);
+        final Date alertsSupressionDate = new Date(System.currentTimeMillis() - 209832470932l);
         final String key = "shipmentPropertyKey";
         final String value = "shipmentPropertyValue";
 
@@ -50,6 +51,7 @@ public class ShipmentSessionSerializerTest {
         s.getTemperatureAlerts().getProperties().put("key", "value");
         s.setShipmentProperty(key, value);
         s.setAlertsSuppressed(true);
+        s.setAlertsSuppressionDate(alertsSupressionDate);
         s.setBatteryLowProcessed(true);
 
         final String str = serializer.toString(s);
@@ -63,6 +65,7 @@ public class ShipmentSessionSerializerTest {
         assertEquals(value, s.getShipmentProperty(key));
         assertTrue(s.isAlertsSuppressed());
         assertTrue(s.isBatteryLowProcessed());
+        assertEquals(format(alertsSupressionDate), format(s.getAlertsSuppressionDate()));
     }
     @Test
     public void testEmptySession() {

@@ -533,7 +533,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             checkCompanyAccess(user, s);
 
             if (s != null) {
-                ruleEngine.supressNextAlerts(s);
+                ruleEngine.suppressNextAlerts(s);
             }
             return createSuccessResponse(null);
         } catch (final Exception e) {
@@ -723,6 +723,18 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         for (final Note n : noteDao.findByShipment(s)) {
             dto.getNotes().add(NoteController.creaetNoteDto(n, s, isoFmt));
+        }
+
+        final Date alertsSuppressedTime = this.ruleEngine.getAlertsSuppressionDate(s);
+        boolean alertsSuppressed = true;
+        if (alertsSuppressedTime == null) {
+            alertsSuppressed = this.ruleEngine.isAlertsSuppressed(s);
+        }
+
+        if (alertsSuppressed) {
+            dto.setAlertsSuppressed(true);
+            dto.setAlertsSuppressionTime(prettyFmt.format(alertsSuppressedTime));
+            dto.setAlertsSuppressionTimeIso(isoFmt.format(alertsSuppressedTime));
         }
 
         return dto;

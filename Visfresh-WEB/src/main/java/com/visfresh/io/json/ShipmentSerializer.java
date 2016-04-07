@@ -616,6 +616,10 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("firstReadingTimeISO", dto.getTimeOfFirstReading());
             json.addProperty("firstReadingTime", dto.getFirstReadingTime());
 
+            json.addProperty("alertsSuppressed", dto.isAlertsSuppressed());
+            json.addProperty("alertsSuppressionTime", dto.getAlertsSuppressionTime());
+            json.addProperty("alertsSuppressionTimeIso", dto.getAlertsSuppressionTimeIso());
+
             final JsonArray locations = new JsonArray();
             for (final SingleShipmentLocation l : dto.getLocations()) {
                 locations.add(toJson(l));

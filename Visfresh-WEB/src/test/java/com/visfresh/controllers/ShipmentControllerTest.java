@@ -63,6 +63,7 @@ import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.services.RuleEngine;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -556,6 +557,15 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         final ShipmentSession session = context.getBean(ShipmentSessionDao.class).getSession(sp);
         assertTrue(session.isAlertsSuppressed());
+        assertNotNull(session.getAlertsSuppressionDate());
+    }
+    @Test
+    public void testGetSingleShipmentWithSuppressedAlerts() throws IOException, RestServiceException {
+        final Shipment sp = createShipment(true);
+        context.getBean(RuleEngine.class).suppressNextAlerts(sp);
+
+        //run client only for obtain the HTTP dump
+        shipmentClient.getSingleShipment(sp).getAsJsonObject();
     }
     //@RequestMapping(value = "/getShipmentData/{authToken}", method = RequestMethod.GET)
     //public @ResponseBody String getShipmentData(@PathVariable final String authToken,
