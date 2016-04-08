@@ -164,6 +164,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
 
         final DeviceState state = new DeviceState();
         state.setLastLocation(new Location(0., 0.));
+        state.setLastReadTime(new Date());
         saveDeviceState(device.getImei(), state);
 
         //run
@@ -189,6 +190,15 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         final DeviceState st = getDeviceState(device.getImei());
         assertEquals(0.0, st.getLastLocation().getLatitude(), 0.0001);
         assertEquals(0.0, st.getLastLocation().getLongitude(), 0.0001);
+
+        //check not ignored if last event is so far
+        state.setLastReadTime(new Date(System.currentTimeMillis() - 60 * 60 * 1000L));
+        processDcsEvent(e);
+
+        //check event ignored
+        assertEquals(1, numInvoked);
+        assertEquals(1, savedShipments.size());
+        assertEquals(1, savedTrackerEvents.size());
     }
     @Test
     public void testAlertYetToFire() {

@@ -3,6 +3,7 @@
  */
 package com.visfresh.rules.state;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,7 @@ import com.visfresh.entities.Location;
 public class DeviceState {
     private final Map<String, String> properties = new ConcurrentHashMap<String, String>();
     private volatile Location lastLocation;
+    private Date lastReadTime;
 
     /**
      * Default constructor.
@@ -49,5 +51,17 @@ public class DeviceState {
      */
     public void setLastLocation(final Location loc) {
         this.lastLocation = loc;
+    }
+    /**
+     * @param time last reading time.
+     */
+    public void setLastReadTime(final Date time) {
+        this.lastReadTime = time;
+    }
+    /**
+     * @return the lastReadTime
+     */
+    public Date getLastReadTime() {
+        return lastReadTime;
     }
 }

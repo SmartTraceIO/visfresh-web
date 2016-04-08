@@ -136,11 +136,14 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         final RuleContext context = new RuleContext(e, this);
 
-        if (state.getLastLocation() != null) {
+        //check correct moving
+        if (state.getLastLocation() != null && state.getLastReadTime() != null) {
             final Location loc = state.getLastLocation();
             final int meters = (int) LocationUtils.getDistanceMeters(loc.getLatitude(), loc.getLongitude(),
                     e.getLatitude(), e.getLongitude());
-            if (meters > 200000) {
+
+            final long dt = System.currentTimeMillis() - state.getLastReadTime().getTime();
+            if (meters > 200000 && dt < 30 * 60 * 1000l) {
                 log.warn("Incorrect device moving to " + meters + " meters has detected. Event has ignored");
                 return;
             }
@@ -164,6 +167,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                         + " has updated to " + shipment.getLastEventDate());
             }
         } finally {
+            state.setLastReadTime(e.getTime());
             state.setLastLocation(new Location(e.getLatitude(), e.getLongitude()));
             saveDeviceState(event.getImei(), state);
             if (e.getShipment() != null) {
