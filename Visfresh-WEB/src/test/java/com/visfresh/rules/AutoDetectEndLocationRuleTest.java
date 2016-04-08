@@ -181,7 +181,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         assertNull(shipment.getShippedTo());
 
         //check not autodetect next
-        assertFalse(handle(new RuleContext(e, state)));
+        assertTrue(handle(new RuleContext(e, state)));
         assertFalse(accept(new RuleContext(e, state)));
 
         //test location assigned

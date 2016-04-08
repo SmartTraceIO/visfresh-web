@@ -276,6 +276,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
             checkAccess(user, Role.Admin);
 
             final DeviceCommand cmd = createSerializer(user).parseDeviceCommand(req);
+            checkCompanyAccess(user, cmd.getDevice());
+
             commandService.sendCommand(cmd, new Date());
 
             return createSuccessResponse(null);

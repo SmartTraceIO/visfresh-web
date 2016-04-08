@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +32,8 @@ import com.visfresh.utils.SerializerUtils;
  */
 @Component
 public class AutoDetectEndLocationRule implements TrackerEventRule {
+    private static final Logger log = LoggerFactory.getLogger(AutoDetectEndLocationRule.class);
+
     public static final String NAME = "AutoDetectEndLocation";
 
     @Autowired
@@ -105,7 +109,6 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
             }
         }
 
-
         return null;
     }
     /* (non-Javadoc)
@@ -114,7 +117,8 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
     @Override
     public boolean handle(final RuleContext context) {
         final TrackerEvent e = context.getEvent();
-        final ShipmentSession session = context.getSessionManager().getSession(e.getShipment());
+        final Shipment shipment = e.getShipment();
+        final ShipmentSession session = context.getSessionManager().getSession(shipment);
 
         final AutodetectData data = getAutoDetectData(session);
         final LocationProfile loc = getMatchesLocation(data, e.getLatitude(), e.getLongitude());
@@ -124,13 +128,16 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
         } else if (data.getNumReadings() == 0) {
             data.setNumReadings(1);
             session.setShipmentProperty(getLocationsKey(), toJSon(data).toString());
+            log.debug("Found location candidate '" + loc.getName()
+                    + "' for shipment " + shipment.getId() + ". Waiting of next reading");
         } else {
-            final Shipment shipment = context.getEvent().getShipment();
+            log.debug("Location '" + loc.getName() + "' has detected and set to shipment " + shipment.getId());
             shipment.setShippedTo(loc);
             saveShipment(shipment);
 
             //stop check end location
             session.setShipmentProperty(getLocationsKey(), null);
+            return true;
         }
 
         return false;

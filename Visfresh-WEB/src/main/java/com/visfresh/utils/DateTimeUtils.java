@@ -4,6 +4,7 @@
 package com.visfresh.utils;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -40,7 +41,7 @@ public final class DateTimeUtils {
      * @return date format.
      */
     public static DateFormat createPrettyFormat(final Language lang, final TimeZone tz) {
-        return DateTimeUtils.createDateFormat("h:mmaa d MMM yyyy", lang, tz);
+        return DateTimeUtils.createDateFormat("H:mm d MMM yyyy", lang, tz);
     }
     /**
      * @param user user.
@@ -69,7 +70,7 @@ public final class DateTimeUtils {
     private static String formatDate(final Date date, final TimeZone tz,
             final Locale locale) {
         final int rawOffset = tz.getRawOffset();
-        final SimpleDateFormat fmt = new SimpleDateFormat("h:mmaa dMMMyyyy ", locale);
+        final SimpleDateFormat fmt = new SimpleDateFormat("H:mm dMMMyyyy ", locale);
         fmt.setTimeZone(tz);
 
         return fmt.format(date) + getTimeZoneString(rawOffset);
@@ -106,5 +107,15 @@ public final class DateTimeUtils {
             }
         }
         return tzString;
+    }
+    public static void main(final String[] args) throws ParseException {
+        String origin = "2016-04-07 12:30";
+        final SimpleDateFormat std = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Date d = std.parse(origin);
+        System.out.println(origin + " --> " + createPrettyFormat(Language.English, TimeZone.getDefault()).format(d));
+
+        origin = "2016-04-07 00:30";
+        d = std.parse(origin);
+        System.out.println(origin + " --> " + createPrettyFormat(Language.English, TimeZone.getDefault()).format(d));
     }
 }
