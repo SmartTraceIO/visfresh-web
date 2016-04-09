@@ -317,9 +317,11 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         if (ss != null) {
             synchronized (ss) {
-                saveSessionToDb(s, ss.session);
                 ss.loaders.remove(loaderId);
-                log.debug("Shipment session for " + s.getId() + " has saved");
+                if (saveSession) {
+                    saveSessionToDb(s, ss.session);
+                    log.debug("Shipment session for " + s.getId() + " has saved");
+                }
 
                 if (ss.loaders.isEmpty()) {
                     synchronized (sessionCache) {
