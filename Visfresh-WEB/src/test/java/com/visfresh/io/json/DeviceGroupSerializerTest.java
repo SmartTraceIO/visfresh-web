@@ -41,15 +41,18 @@ public class DeviceGroupSerializerTest {
     public void testDeviceGroup() {
         final String description = "Device group description";
         final String name = "Device Group Name";
+        final Long id = 777l;
 
         DeviceGroup group = new DeviceGroup();
         group.setDescription(description);
         group.setName(name);
+        group.setId(id);
 
         final JsonObject json = serializer.toJson(group);
         group = serializer.parseDeviceGroup(json);
 
         assertEquals(name, group.getName());
         assertEquals(description, group.getDescription());
+        assertEquals(id, group.getId());
     }
 }
