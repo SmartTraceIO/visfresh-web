@@ -181,11 +181,21 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     @Override
     public final TrackerEventRule getRule(final String name) {
-        final TrackerEventRule rule = rules.get(name);
-        if (name == null) {
-            log.warn("Rule with name " + name + " is not found. Given drools expression will ignored");
+        TrackerEventRule rule = rules.get(name);
+        if (rule == null) {
+            log.warn("Rule " + name + " is not loaded now. Waiting 3 seconds for load");
+            try {
+                Thread.sleep(3000);
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
+            }
+            rule = rules.get(name);
+        }
+        if (rule == null) {
+            log.error("Rule with name " + name + " is not found. Given drools expression will ignored");
             return emptyRule;
         }
+
         return rule;
     }
     /**

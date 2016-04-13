@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,6 +57,10 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         dao = context.getBean(DeviceDao.class);
         client.setServiceUrl(getServiceUrl());
         client.setAuthToken(login());
+    }
+    @After
+    public void tearDown() {
+        context.getBean(MockEmailService.class).getMessages().clear();
     }
     //@RequestMapping(value = "/saveDevice/{authToken}", method = RequestMethod.POST)
     //public @ResponseBody String saveDevice(@PathVariable final String authToken,
