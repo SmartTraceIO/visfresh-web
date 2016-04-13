@@ -2766,10 +2766,12 @@ Response:
     ],
     "deviceGroups": [
       {
+        "groupId": 299,
         "name": "GR1",
         "description": "Description of group GR1"
       },
       {
+        "groupId": 300,
         "name": "GR2",
         "description": "Description of group GR2"
       }
