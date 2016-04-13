@@ -44,8 +44,9 @@ public class DeviceGroupRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public void saveDeviceGroup(final DeviceGroup group) throws IOException, RestServiceException {
-        sendPostRequest(getPathWithToken("saveDeviceGroup"), serializer.toJson(group));
+    public Long saveDeviceGroup(final DeviceGroup group) throws IOException, RestServiceException {
+        final JsonElement result = sendPostRequest(getPathWithToken("saveDeviceGroup"), serializer.toJson(group));
+        return parseId(result.getAsJsonObject());
     }
     /**
      * @param pageIndex

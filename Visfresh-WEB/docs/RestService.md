@@ -2751,6 +2751,16 @@ Response:
         "createdByName": "Yury G"
       }
     ],
+    "deviceGroups": [
+      {
+        "name": "GR1",
+        "description": "Description of group GR1"
+      },
+      {
+        "name": "GR2",
+        "description": "Description of group GR2"
+      }
+    ],
     "siblings": []
   }
 }

@@ -309,10 +309,11 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
             addSortsForFindAll(sorts, params, sorting);
         }
 
+        String sql = selectAll + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")) + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ",")) + (page == null ? "" : " limit "
+                + ((page.getPageNumber() - 1) * page.getPageSize())
+                + "," + page.getPageSize());
         final List<Map<String, Object>> list = jdbc.queryForList(
-                selectAll + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")) + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ",")) + (page == null ? "" : " limit "
-                        + ((page.getPageNumber() - 1) * page.getPageSize())
-                        + "," + page.getPageSize()),
+                sql,
                 params);
 
         final Map<String, Object> cache = new HashMap<String, Object>();

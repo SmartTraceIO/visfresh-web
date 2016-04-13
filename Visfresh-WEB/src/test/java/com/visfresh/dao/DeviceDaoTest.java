@@ -409,11 +409,10 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
 
         createTrackerEvent(s2, 1.1, 2.2, 3, 4, new Date());
         createTrackerEvent(d1, 1.1, 2.2, 3, 5, new Date());
-        final TrackerEvent e = createTrackerEvent(d1, 1.1, 2.2, 3, 6, new Date());
 
         final ListDeviceItem item = dao.getDevices(sharedCompany, null, null).get(0);
         assertEquals(s1.getId(), item.getShipmentId());
-        assertEquals(e.getTemperature(), item.getTemperature(), 0.0001);
+        assertNull(item.getTemperature());
     }
     @Test
     public void testGetByImei() {

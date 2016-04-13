@@ -8,9 +8,11 @@ import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,7 @@ import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.NoteDao;
@@ -65,6 +68,7 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.ShipmentSerializer;
+import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
 import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
@@ -132,6 +136,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private DeviceDao deviceDao;
     @Autowired
     private AutoStartShipmentService autoStartService;
+    @Autowired
+    private DeviceGroupDao deviceGroupDao;
 
     /**
      * Default constructor.
@@ -589,10 +595,35 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 dto.getSiblings().add(createDto(sibling, user));
             }
 
+            addDeviceGroups(dto);
+
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get single shipment: " + shipmentId, e);
             return createErrorResponse(e);
+        }
+    }
+
+    /**
+     * @param dto
+     */
+    private void addDeviceGroups(final SingleShipmentDto dto) {
+        final Map<Long, SingleShipmentDto> shipments = new HashMap<>();
+
+        //get all shipment ID's include siblings
+        final Set<Long> ids = new HashSet<>();
+        ids.add(dto.getShipmentId());
+        shipments.put(dto.getShipmentId(), dto);
+
+        for (final SingleShipmentDto sibling : dto.getSiblings()) {
+            ids.add(sibling.getShipmentId());
+            shipments.put(sibling.getShipmentId(), sibling);
+        }
+
+        final Map<Long, List<DeviceGroupDto>> shipmentGroups = deviceGroupDao.getShipmentGroups(ids);
+        //assign device groups to shipments
+        for (final Map.Entry<Long, SingleShipmentDto> e: shipments.entrySet()) {
+            e.getValue().getDeviceGroups().addAll(shipmentGroups.get(e.getKey()));
         }
     }
 

@@ -4,45 +4,42 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.DeviceGroupConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.Filter;
+import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.io.shipment.DeviceGroupDto;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup, String> implements DeviceGroupDao {
-    /**
-     *
-     */
-    private static final String PROPERTY_DEVICE = "device";
+public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup, Long> implements DeviceGroupDao {
     /**
      * Table name.
      */
     public static final String TABLE = "devicegroups";
-    /**
-     * Description field.
-     */
+
+    private static final String PROPERTY_DEVICE = "device";
+    private static final String ID_FIELD = "id";
     public static final String DESCRIPTION_FIELD = "description";
-    /**
-     * Name field.
-     */
     public static final String NAME_FIELD = "name";
-    /**
-     * Company name.
-     */
     public static final String COMPANY_FIELD = "company";
 
     public static final String RELATIONS_TABLE = "devicegrouprelations";
@@ -72,7 +69,7 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
 
         String sql;
 
-        if (findOne(group.getId()) == null) {
+        if (group.getId() == null) {
             //insert
             sql = "insert into " + TABLE + " (" + combine(
                     NAME_FIELD,
@@ -84,12 +81,14 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
                     + ", :" + DESCRIPTION_FIELD
                     + ")";
         } else {
+            paramMap.put(ID_FIELD, group.getId());
+
             //update
             sql = "update " + TABLE + " set "
                 + NAME_FIELD + "=:" + NAME_FIELD + ","
                 + COMPANY_FIELD + "=:" + COMPANY_FIELD + ","
                 + DESCRIPTION_FIELD + "=:" + DESCRIPTION_FIELD
-                + " where name = :" + NAME_FIELD
+                + " where id = :" + ID_FIELD
             ;
         }
 
@@ -97,7 +96,13 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
         paramMap.put(DESCRIPTION_FIELD, group.getDescription());
         paramMap.put(COMPANY_FIELD, group.getCompany().getId());
 
-        jdbc.update(sql, paramMap);
+        if (group.getId() == null) {
+            final GeneratedKeyHolder kh = new GeneratedKeyHolder();
+            jdbc.update(sql, new MapSqlParameterSource(paramMap), kh);
+            group.setId(kh.getKey().longValue());
+        } else {
+            jdbc.update(sql, paramMap);
+        }
 
         return group;
     }
@@ -106,7 +111,7 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
      */
     @Override
     protected String getIdFieldName() {
-        return NAME_FIELD;
+        return ID_FIELD;
     }
 
     /* (non-Javadoc)
@@ -129,6 +134,7 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
     @Override
     protected DeviceGroup createEntity(final Map<String, Object> map) {
         final DeviceGroup g = new DeviceGroup();
+        g.setId(((Number) map.get(ID_FIELD)).longValue());
         g.setName((String) map.get(NAME_FIELD));
         g.setDescription((String) map.get(DESCRIPTION_FIELD));
         return g;
@@ -190,11 +196,50 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
             final String imei = value instanceof Device ? ((Device) value).getImei() : value.toString();
             final String key = DEFAULT_FILTER_KEY_PREFIX + "imei";
 
-            filters.add(NAME_FIELD + " in (select `" + RELATIONS_GROUP
+            filters.add(ID_FIELD + " in (select `" + RELATIONS_GROUP
                     + "` from " + RELATIONS_TABLE + " where " + RELATIONS_DEVICE + " = :" + key + ")");
             params.put(key, imei);
         } else {
             super.addFilterValue(property, value, params, filters);
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceGroupDao#getShipmentGroups(java.util.Set)
+     */
+    @Override
+    public Map<Long, List<DeviceGroupDto>> getShipmentGroups(final Set<Long> ids) {
+        final Map<Long, List<DeviceGroupDto>> map = new HashMap<>();
+        //prepare map
+        for (final Long id : ids) {
+            map.put(id, new LinkedList<DeviceGroupDto>());
+        }
+
+        //check map of ID is empty
+        if (ids.isEmpty()) {
+            return map;
+        }
+
+        final String sql = "select dg.*, s.id as shipment from " + TABLE + " dg"
+                + " join devicegrouprelations rel on rel.group = dg.id"
+                + " join devices d on rel.device = d.imei"
+                + " join shipments s on s.device = d.imei"
+                + " where s.id in(" + StringUtils.combine(ids, ",") + ") order by dg.name";
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql, new HashMap<String, Object>());
+        for (final Map<String, Object> row : rows) {
+            final Long shipment = ((Number) row.get("shipment")).longValue();
+            map.get(shipment).add(new DeviceGroupDto(createEntity(row)));
+        }
+        return map;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceGroupDao#findByName(java.lang.String)
+     */
+    @Override
+    public DeviceGroup findByName(final String groupName) {
+        final Filter f = new Filter();
+        f.addFilter(NAME_FIELD, groupName);
+
+        final List<DeviceGroup> groups = findAll(f, new Sorting(ID_FIELD), new Page(1, 1));
+        return groups.isEmpty() ? null : groups.get(0);
     }
 }

@@ -84,6 +84,7 @@ public class SingleShipmentDto {
     private final List<LocationProfile> interimLocationAlternatives = new LinkedList<>();
     private final List<InterimStop> interimStops = new LinkedList<>();
     private final List<NoteDto> notes = new LinkedList<>();
+    private final List<DeviceGroupDto> deviceGroups = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -773,5 +774,11 @@ public class SingleShipmentDto {
      */
     public void setAlertsSuppressionTime(final String alertsSuppressionTime) {
         this.alertsSuppressionTime = alertsSuppressionTime;
+    }
+    /**
+     * @return the deviceGroups
+     */
+    public List<DeviceGroupDto> getDeviceGroups() {
+        return deviceGroups;
     }
 }

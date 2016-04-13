@@ -58,23 +58,24 @@ create table devices (
 );
 
 create table devicegroups (
+    id bigint(20) auto_increment not null,
     name varchar(127) not null,
     description varchar(255),
     company bigint(20),
-    primary key (name),
+    primary key (id),
     FOREIGN KEY (company)
         REFERENCES companies (id)
 );
 
 create table devicegrouprelations (
     device varchar(30) not null,
-    `group` varchar(127) not null,
+    `group` bigint(20) auto_increment not null,
     primary key (device, `group`),
     FOREIGN KEY (`device`)
         REFERENCES devices (imei)
 		ON DELETE CASCADE,
     FOREIGN KEY (`group`)
-        REFERENCES devicegroups (name)
+        REFERENCES devicegroups (id)
 		ON DELETE CASCADE
 );
 
@@ -82,7 +83,7 @@ create table devicecommands (
     id bigint(20) auto_increment not null,
     command varchar(127) not null,
     device varchar(127) not null,
-    `date` timestamp default CURRENT_TIMESTAMP,
+    `date` timestamp NULL default NULL,
     primary key (id),
     FOREIGN KEY (device)
         REFERENCES devices (imei)
@@ -379,7 +380,7 @@ create table systemmessages (
     type varchar(128) NOT NULL,
     time datetime NOT NULL,
     processor varchar(32),
-    retryon timestamp NOT NULL default CURRENT_TIMESTAMP,
+    retryon timestamp NULL default NULL,
     numretry int not null default 0,
     message varchar(512) not null,
     PRIMARY KEY (id)

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceGroupConstants;
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.Page;
@@ -64,14 +65,14 @@ public class DeviceGroupController extends AbstractController implements DeviceG
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.BasicUser);
 
-            final DeviceGroup g = createSerializer(user).parseDeviceGroup(group);
+            DeviceGroup g = createSerializer(user).parseDeviceGroup(group);
             g.setCompany(user.getCompany());
 
             final DeviceGroup old = dao.findOne(g.getId());
             checkCompanyAccess(user, old);
 
-            dao.save(g);
-            return createSuccessResponse(null);
+            g = dao.save(g);
+            return createIdResponse("deviceGroupId", g.getId());
         } catch (final Exception e) {
             log.error("Failed to save device", e);
             return createErrorResponse(e);
@@ -120,13 +121,34 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      */
     @RequestMapping(value = "/getDevicesOfGroup/{authToken}", method = RequestMethod.GET)
     public JsonObject getDevicesOfGroup(@PathVariable final String authToken,
-            @RequestParam final String groupName) {
+            @RequestParam(required = false) final String groupName,
+            @RequestParam(required = false) final Long groupId
+            ) {
         try {
+            if (groupName == null && groupId == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "One from 'groupName' or 'groupId' should be specified");
+            }
+
             //check logged in.
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.NormalUser);
 
-            final DeviceGroup group = dao.findOne(groupName);
+            DeviceGroup group = null;
+            if (groupId != null) {
+                group = dao.findOne(groupId);
+                if (group == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Group '" + groupId + "' not found");
+                }
+            } else if (groupName != null){
+                group = dao.findByName(groupName);
+                if (group == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Group '" + groupName + "' not found");
+                }
+            }
+
             checkCompanyAccess(user, group);
 
             final List<Device> devices = deviceDao.findByGroup(group);
@@ -180,13 +202,28 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      */
     @RequestMapping(value = "/getDeviceGroup/{authToken}", method = RequestMethod.GET)
     public JsonObject getDeviceGroup(@PathVariable final String authToken,
-            @RequestParam final String name) {
+            @RequestParam(required = false) final String name,
+            @RequestParam(required = false) final Long id) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-
-            final DeviceGroup group = dao.findOne(name);
             checkAccess(user, Role.NormalUser);
+
+            DeviceGroup group = null;
+            if (id != null) {
+                group = dao.findOne(id);
+                if (group == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Group '" + id + "' not found");
+                }
+            } else if (name != null){
+                group = dao.findByName(name);
+                if (group == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Group '" + name + "' not found");
+                }
+            }
+
             checkCompanyAccess(user, group);
 
             return createSuccessResponse(createSerializer(user).toJson(group));
@@ -202,16 +239,30 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      */
     @RequestMapping(value = "/deleteDeviceGroup/{authToken}", method = RequestMethod.GET)
     public JsonObject deleteDeviceGroup(@PathVariable final String authToken,
-            @RequestParam final String name) {
+            @RequestParam(required = false) final String name,
+            @RequestParam(required = false) final Long id) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
-            final DeviceGroup d = dao.findOne(name);
-            checkCompanyAccess(user, d);
+            DeviceGroup group = null;
+            if (id != null) {
+                group = dao.findOne(id);
+                if (group == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Group '" + id + "' not found");
+                }
+            } else if (name != null){
+                group = dao.findByName(name);
+                if (group == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Group '" + name + "' not found");
+                }
+            }
 
-            dao.delete(d);
+            checkCompanyAccess(user, group);
+            dao.delete(group);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete device group", e);
@@ -226,20 +277,39 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      */
     @RequestMapping(value = "/addDeviceToGroup/{authToken}", method = RequestMethod.GET)
     public JsonObject addDeviceToGroup(@PathVariable final String authToken,
-            @RequestParam final String groupName,
+            @RequestParam(required = false) final String groupName,
+            @RequestParam(required = false) final Long groupId,
             @RequestParam final String device) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
-            final DeviceGroup g = dao.findOne(groupName);
-            checkCompanyAccess(user, g);
+            if (groupName == null && groupId == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "One from 'groupName' or 'groupId' should be specified");
+            }
+
+            DeviceGroup group = null;
+            if (groupId != null) {
+                group = dao.findOne(groupId);
+                if (group == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Group '" + groupId + "' not found");
+                }
+            } else if (groupName != null){
+                group = dao.findByName(groupName);
+                if (group == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Group '" + groupName + "' not found");
+                }
+            }
+            checkCompanyAccess(user, group);
 
             final Device d = deviceDao.findOne(device);
             checkCompanyAccess(user, d);
 
-            dao.addDevice(g, d);
+            dao.addDevice(group, d);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete device group", e);
@@ -255,20 +325,39 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      */
     @RequestMapping(value = "/removeDeviceFromGroup/{authToken}", method = RequestMethod.GET)
     public JsonObject removeDeviceFromGroup(@PathVariable final String authToken,
-            @RequestParam final String groupName,
+            @RequestParam(required = false) final String groupName,
+            @RequestParam(required = false) final Long groupId,
             @RequestParam final String device) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            checkAccess(user, Role.NormalUser);
 
-            final DeviceGroup g = dao.findOne(groupName);
-            checkCompanyAccess(user, g);
+            if (groupName == null && groupId == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "One from 'groupName' or 'groupId' should be specified");
+            }
+
+            DeviceGroup group = null;
+            if (groupId != null) {
+                group = dao.findOne(groupId);
+                if (group == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Group '" + groupId + "' not found");
+                }
+            } else if (groupName != null){
+                group = dao.findByName(groupName);
+                if (group == null) {
+                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                            "Group '" + groupName + "' not found");
+                }
+            }
+            checkCompanyAccess(user, group);
 
             final Device d = deviceDao.findOne(device);
             checkCompanyAccess(user, d);
 
-            dao.removeDevice(g, d);
+            dao.removeDevice(group, d);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete device group", e);

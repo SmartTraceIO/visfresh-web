@@ -36,6 +36,7 @@ import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UserResolver;
+import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
 import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
@@ -664,6 +665,28 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             }
             json.add("notes", notes);
         }
+
+        //add device groups
+        final JsonArray deviceGroups = new JsonArray();
+        json.add("deviceGroups", deviceGroups);
+        for (final DeviceGroupDto grp : dto.getDeviceGroups()) {
+            deviceGroups.add(toJson(grp));
+        }
+
+        return json;
+    }
+    /**
+     * @param grp
+     * @return
+     */
+    private JsonObject toJson(final DeviceGroupDto grp) {
+        if (grp == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("name", grp.getName());
+        json.addProperty("description", grp.getDescription());
 
         return json;
     }

@@ -32,6 +32,7 @@ import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NoteDao;
@@ -44,6 +45,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Note;
@@ -681,6 +683,37 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         }
     }
     @Test
+    public void testGetSingleShipmentByDeviceGroups() throws RestServiceException, IOException {
+        final Long siblingGroup = 1234567l;
+
+        final Device d1 = createDevice("1923087980000117", true);
+        final Shipment s1 = createShipment(d1, true);
+        s1.setSiblingGroup(siblingGroup);
+        shipmentDao.save(s1);
+
+        final Device d2 = createDevice("2304870870987087", true);
+        final Shipment s2 = createShipment(d2, true);
+        s2.setSiblingGroup(siblingGroup);
+        shipmentDao.save(s2);
+
+        //add to device groups
+        final DeviceGroupDao dgd = context.getBean(DeviceGroupDao.class);
+        final DeviceGroup dg1 = createDeviceGroup("GR1");
+        final DeviceGroup dg2 = createDeviceGroup("GR2");
+        final DeviceGroup dg3 = createDeviceGroup("GR2");
+        final DeviceGroup dg4 = createDeviceGroup("GR3");
+
+        dgd.addDevice(dg1, d1);
+        dgd.addDevice(dg2, d1);
+        dgd.addDevice(dg3, d2);
+        dgd.addDevice(dg4, d2);
+
+        final JsonObject sd = shipmentClient.getSingleShipment(
+                "11", s1.getTripCount()).getAsJsonObject();
+        assertNotNull(sd);
+    }
+
+    @Test
     public void testGetShipmentsFiltered() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
 
@@ -1019,7 +1052,17 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         n.setTimeOnChart(new Date());
         return context.getBean(NoteDao.class).save(shipment, n);
     }
-
+    /**
+     * @param name
+     * @return
+     */
+    private DeviceGroup createDeviceGroup(final String name) {
+        final DeviceGroup dg = new DeviceGroup();
+        dg.setCompany(getCompany());
+        dg.setName(name);
+        dg.setDescription("Description of group " + name);
+        return context.getBean(DeviceGroupDao.class).save(dg);
+    }
     @After
     public void tearDown() {
         shipmentClient.removeRestIoListener(l);

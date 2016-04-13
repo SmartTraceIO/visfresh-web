@@ -3,9 +3,13 @@
  */
 package com.visfresh.io.json;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
+
+import org.drools.core.util.IoUtils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -16,6 +20,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.lists.ListAlertProfileItem;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -78,15 +83,34 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
             p.getAlertRules().add(parseTemperatureIssue(issue.getAsJsonObject()));
         }
 
-        p.setWatchBatteryLow(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_BATTERY_LOW)));
-        p.setWatchEnterBrightEnvironment(asBoolean(alert.get(
-                AlertProfileConstants.PROPERTY_WATCH_ENTER_BRIGHT_ENVIRONMENT)));
-        p.setWatchEnterDarkEnvironment(asBoolean(alert.get(
-                AlertProfileConstants.PROPERTY_WATCH_ENTER_DARK_ENVIRONMENT)));
-        p.setWatchMovementStart(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_START)));
-        p.setWatchMovementStop(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_STOP)));
+        if (has(alert, AlertProfileConstants.PROPERTY_WATCH_BATTERY_LOW)) {
+            p.setWatchBatteryLow(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_BATTERY_LOW)));
+        }
+        if (has(alert, AlertProfileConstants.PROPERTY_WATCH_ENTER_BRIGHT_ENVIRONMENT)) {
+            p.setWatchEnterBrightEnvironment(asBoolean(alert.get(
+                    AlertProfileConstants.PROPERTY_WATCH_ENTER_BRIGHT_ENVIRONMENT)));
+        }
+        if (has(alert, AlertProfileConstants.PROPERTY_WATCH_ENTER_DARK_ENVIRONMENT)) {
+            p.setWatchEnterDarkEnvironment(asBoolean(alert.get(
+                    AlertProfileConstants.PROPERTY_WATCH_ENTER_DARK_ENVIRONMENT)));
+        }
+        if (has(alert, AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_START)) {
+            p.setWatchMovementStart(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_START)));
+        }
+        if (has(alert, AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_STOP)) {
+            p.setWatchMovementStop(asBoolean(alert.get(AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_STOP)));
+        }
 
         return p;
+    }
+    /**
+     * @param obj
+     * @param property
+     * @return
+     */
+    private boolean has(final JsonObject obj, final String property) {
+        final JsonElement child = obj.get(property);
+        return child != null && !child.isJsonNull();
     }
     /**
      * @param issue temperature issue.
@@ -160,5 +184,18 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
             array.add(new JsonPrimitive(str));
         }
         return array;
+    }
+    public static void main(final String[] args) throws IOException {
+        String data ;
+        final InputStream in = AlertProfileSerializer.class.getResourceAsStream("ap.json");
+        try {
+            data = new String(IoUtils.readBytesFromInputStream(in));
+        } finally {
+            in.close();
+        }
+
+        final AlertProfileSerializer ser = new AlertProfileSerializer(TimeZone.getDefault());
+        final AlertProfile ap = ser.parseAlertProfile(SerializerUtils.parseJson(data).getAsJsonObject());
+        System.out.println(ap);
     }
 }

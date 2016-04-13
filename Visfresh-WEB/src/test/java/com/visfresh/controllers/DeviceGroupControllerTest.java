@@ -65,9 +65,9 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
         group.setName("JUnit");
         group.setDescription("JUnit device group");
 
-        client.saveDeviceGroup(group);
+        final Long id = client.saveDeviceGroup(group);
 
-        final DeviceGroup saved = dao.findOne(group.getName());
+        final DeviceGroup saved = dao.findOne(id);
 
         assertNotNull(saved);
         assertEquals(group.getDescription(), saved.getDescription());
@@ -113,7 +113,7 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
         final DeviceGroup group = createGroup("G1", "JUnit device group");
         client.deleteDeviceGroup(group.getName());
 
-        assertNull(dao.findOne(group.getName()));
+        assertNull(dao.findOne(group.getId()));
     }
     /**
      * Tests adding device to device group.

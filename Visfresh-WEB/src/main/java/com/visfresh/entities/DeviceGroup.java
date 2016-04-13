@@ -7,12 +7,16 @@ package com.visfresh.entities;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DeviceGroup implements EntityWithId<String>, EntityWithCompany {
+public class DeviceGroup implements EntityWithId<Long>, EntityWithCompany {
     /**
      * Name of group which contains all devices.
      */
     public static final String ALL_DEVICES_GROUP_NAME = "AllDevices";
 
+    /**
+     * Group ID
+     */
+    private Long id;
     /**
      * Group Name
      */
@@ -51,8 +55,14 @@ public class DeviceGroup implements EntityWithId<String>, EntityWithCompany {
      * @see com.visfresh.entities.EntityWithId#getId()
      */
     @Override
-    public String getId() {
-        return getName();
+    public Long getId() {
+        return id;
+    }
+    /**
+     * @param id the id to set
+     */
+    public void setId(final Long id) {
+        this.id = id;
     }
     /**
      * @return the name

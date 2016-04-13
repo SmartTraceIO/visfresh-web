@@ -205,8 +205,8 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
     protected void addFilterValue(final String property, final Object value,
             final Map<String, Object> params, final List<String> filters) {
         if (PROPERTY_DEVICE_GROUP.equals(property)) {
-            final String group = value instanceof DeviceGroup
-                    ? ((DeviceGroup) value).getName() : value.toString();
+            final Long group = value instanceof DeviceGroup
+                    ? ((DeviceGroup) value).getId() : (Long) value;
             final String key = DEFAULT_FILTER_KEY_PREFIX + "group";
 
             filters.add(IMEI_FIELD + " in (select " + DeviceGroupDaoImpl.RELATIONS_DEVICE
@@ -246,6 +246,13 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 + "sp.status as " + DeviceConstants.PROPERTY_SHIPMENT_STATUS + ",\n"
                 + "sp.tripcount as deviceTripCount\n"
                 + "from devices d\n"
+
+                + "left outer join (select s.* from "
+                + ShipmentDaoImpl.TABLE + " s "
+                + " join (select max(" + ShipmentDaoImpl.ID_FIELD+ ") as id from " + ShipmentDaoImpl.TABLE
+                + " group by " + ShipmentDaoImpl.DEVICE_FIELD + ") s1 on s1.id = s." + ShipmentDaoImpl.ID_FIELD
+                + ") sp on sp.device = d." + IMEI_FIELD + "\n"
+
                 + "left outer join (\n"
                 + "select\n"
                 + "te." + TrackerEventDaoImpl.TIME_FIELD + " as time,\n"
@@ -253,19 +260,15 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 + "te." + TrackerEventDaoImpl.BATTERY_FIELD + " as battery,\n"
                 + "te." + TrackerEventDaoImpl.LATITUDE_FIELD + " as latitude,\n"
                 + "te." + TrackerEventDaoImpl.LONGITUDE_FIELD + " as longitude,\n"
-                + "te." + TrackerEventDaoImpl.DEVICE_FIELD + " as device\n"
+                + "te." + TrackerEventDaoImpl.DEVICE_FIELD + " as device,\n"
+                + "te." + TrackerEventDaoImpl.SHIPMENT_FIELD + " as shipment\n"
                 + "from " + TrackerEventDaoImpl.TABLE + " te\n"
                 + "join (select max(" + TrackerEventDaoImpl.ID_FIELD + ") as id from "
-                + TrackerEventDaoImpl.TABLE + " group by " + TrackerEventDaoImpl.DEVICE_FIELD
+                + TrackerEventDaoImpl.TABLE + " where not shipment is NULL"
+                + " group by " + TrackerEventDaoImpl.SHIPMENT_FIELD
                 + ") teid\n"
                 + "on teid.id = te." + TrackerEventDaoImpl.ID_FIELD + "\n"
-                + ") lr on lr.device = d." + IMEI_FIELD + "\n"
-
-                + "left outer join (select s.* from "
-                + ShipmentDaoImpl.TABLE + " s "
-                + " join (select max(" + ShipmentDaoImpl.ID_FIELD+ ") as id from " + ShipmentDaoImpl.TABLE
-                + " group by " + ShipmentDaoImpl.DEVICE_FIELD + ") s1 on s1.id = s." + ShipmentDaoImpl.ID_FIELD
-                + ") sp on sp.device = d." + IMEI_FIELD + "\n"
+                + ") lr on lr.shipment = sp.id\n"
 
                 + "left outer join " + AutoStartShipmentDaoImpl.TABLE + " aut on aut."
                 + AutoStartShipmentDaoImpl.ID_FIELD + " = d." + AUTOSTART_TEMPLATE_FIELD + "\n"
@@ -317,21 +320,21 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
             item.setAutostartTemplateName((String) row.get(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME));
         }
 
-        //if found the tracker event
-        final Number temperature = (Number) row.get(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE);
-        if (temperature != null) {
-            item.setTemperature(temperature.doubleValue());
-            item.setBattery(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_BATTERY)).intValue());
-            item.setLastReadingTime((Date) row.get(DeviceConstants.PROPERTY_LAST_READING_TIME_ISO));
-            item.setLatitude(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LAT)).doubleValue());
-            item.setLongitude(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LONG)).doubleValue());
+        //if shipment not null
+        final Number shipmentId = (Number) row.get(DeviceConstants.PROPERTY_LAST_SHIPMENT);
+        if (shipmentId != null) {
+            item.setShipmentId(shipmentId.longValue());
+            item.setShipmentStatus(
+                    ShipmentStatus.valueOf((String) row.get(DeviceConstants.PROPERTY_SHIPMENT_STATUS)));
 
-            //if shipment not null
-            final Number shipmentId = (Number) row.get(DeviceConstants.PROPERTY_LAST_SHIPMENT);
-            if (shipmentId != null) {
-                item.setShipmentId(shipmentId.longValue());
-                item.setShipmentStatus(
-                        ShipmentStatus.valueOf((String) row.get(DeviceConstants.PROPERTY_SHIPMENT_STATUS)));
+            //if found the tracker event
+            final Number temperature = (Number) row.get(DeviceConstants.PROPERTY_LAST_READING_TEMPERATURE);
+            if (temperature != null) {
+                item.setTemperature(temperature.doubleValue());
+                item.setBattery(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_BATTERY)).intValue());
+                item.setLastReadingTime((Date) row.get(DeviceConstants.PROPERTY_LAST_READING_TIME_ISO));
+                item.setLatitude(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LAT)).doubleValue());
+                item.setLongitude(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LONG)).doubleValue());
             }
         }
         return item;

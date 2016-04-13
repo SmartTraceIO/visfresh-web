@@ -4,15 +4,18 @@
 package com.visfresh.dao;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.io.shipment.DeviceGroupDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface DeviceGroupDao extends EntityWithCompanyDaoBase<DeviceGroup, String> {
+public interface DeviceGroupDao extends EntityWithCompanyDaoBase<DeviceGroup, Long> {
     /**
      * Adds device to group.
      * @param group group.
@@ -31,4 +34,14 @@ public interface DeviceGroupDao extends EntityWithCompanyDaoBase<DeviceGroup, St
      * @return list of groups for given device.
      */
     List<DeviceGroup> findByDevice(Device device);
+    /**
+     * @param ids set of shipment ID.
+     * @return map of shipment ID to list of device groups.
+     */
+    Map<Long, List<DeviceGroupDto>> getShipmentGroups(Set<Long> ids);
+    /**
+     * @param groupName group name.
+     * @return device group by given name.
+     */
+    DeviceGroup findByName(String groupName);
 }
