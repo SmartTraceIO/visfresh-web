@@ -327,6 +327,8 @@ Method *POST*, method name *saveDeviceGroup*. Request body contains JSON seriali
 ### Get Device Group ###
 Method *GET*, method name *getDeviceGroup*. Method parameters:  
 1. name - group name.  
+2. id - group ID. 
+One from 'name' or 'id' should be presented   
 Returns [Device Group object](#markdown-header-device-group)  
 [(example)](#markdown-header-get-device-group-example)
 
@@ -340,18 +342,24 @@ Returns list of [Device Group object](#markdown-header-device-group)
 ### Delete Device Group ###
 Method *GET*, method name *deleteDeviceGroup*. Method parameters:  
 1. name - group name  
+2. id - group ID  
+One from 'name' or 'id' should be presented  
 [(example)](#markdown-header-delete-device-group-example)
 
 ### Add Device to Group ###
 Method *GET*, method name *addDeviceToGroup*. Method parameters:  
 1. groupName - group name.  
-2. device - device IMEI.  
+2. groupId - group ID.  
+3. device - device IMEI.  
+One from 'groupName' or 'groupId' should be presented  
 [(example)](add-device-to-group-example)
 
 ### Remove Device from Group ###
 Method *GET*, method name *removeDeviceFromGroup*. Method parameters:  
 1. groupName - group name.  
-2. device - device IMEI.  
+2. groupId - group ID.  
+3. device - device IMEI.  
+One from 'groupName' or 'groupId' should be presented  
 [(example)](remove-device-from-group-example)
 
 ### Get Devices of Group ###
@@ -2068,6 +2076,7 @@ Response:
 ```
 ### Get Device Group example ###
 **GET /vf/rest/getDeviceGroup/${accessToken}?name=G1**  
+**GET /vf/rest/getDeviceGroup/${accessToken}?id=223**  
 **Response:**  
 ```json
 {
@@ -2105,6 +2114,7 @@ Response:
 ```
 ### Delete Device Group example ###
 **GET /vf/rest/deleteDeviceGroup/${accessToken}?name=G1**  
+**GET /vf/rest/deleteDeviceGroup/${accessToken}?id=267**  
 **Response:**  
 ```json
 {
@@ -2116,6 +2126,7 @@ Response:
 ```
 ### Add Device to Group example ###
 **GET /vf/rest/addDeviceToGroup/${accessToken}?groupName=JUnit&device=0238947023987**  
+**GET /vf/rest/addDeviceToGroup/${accessToken}?groupId=238&device=0238947023987**  
 **Response:**  
 ```json
 {
@@ -2127,6 +2138,7 @@ Response:
 ```
 ### Remove Device from Group example ###
 **GET /vf/rest/removeDeviceFromGroup/${accessToken}?groupName=JUnit&device=0238947023987**  
+**GET /vf/rest/removeDeviceFromGroup/${accessToken}?groupId=294&device=2938799889897**  
 **Response:**  
 ```json
 {
@@ -2138,6 +2150,7 @@ Response:
 ```
 ### Get Devices of Group example ###
 **GET /vf/rest/getDevicesOfGroup/${accessToken}?groupName=JUnit**  
+**GET /vf/rest/getDevicesOfGroup/${accessToken}?groupId=252**  
 **Response:**  
 ```json
 {

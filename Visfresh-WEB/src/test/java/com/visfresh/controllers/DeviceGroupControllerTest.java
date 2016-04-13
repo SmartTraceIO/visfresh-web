@@ -191,13 +191,20 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
      */
     @Test
     public void testRemoveDeviceFromGroup() throws IOException, RestServiceException {
-        final Device d = createDevice("0238947023987", true);
+        final Device d1 = createDevice("0238947023987", true);
+        final Device d2 = createDevice("2938799889897", true);
         final DeviceGroup group = createGroup("JUnit", "JUnit device group");
 
-        dao.addDevice(group, d);
-        client.removeDeviceFromGroup(d.getImei(), group.getName());
+        dao.addDevice(group, d1);
+        dao.addDevice(group, d2);
 
-        assertEquals(0, dao.findByDevice(d).size());
+        client.removeDeviceFromGroup(d1.getImei(), group.getName());
+        assertEquals(0, dao.findByDevice(d1).size());
+        assertEquals(1, deviceDao.findByGroup(group).size());
+
+
+        client.removeDeviceFromGroup(d2.getImei(), group.getId());
+        assertEquals(0, dao.findByDevice(d2).size());
         assertEquals(0, deviceDao.findByGroup(group).size());
     }
     /**

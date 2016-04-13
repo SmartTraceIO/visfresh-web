@@ -685,6 +685,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject json = new JsonObject();
+        json.addProperty("groupId", grp.getId());
         json.addProperty("name", grp.getName());
         json.addProperty("description", grp.getDescription());
 

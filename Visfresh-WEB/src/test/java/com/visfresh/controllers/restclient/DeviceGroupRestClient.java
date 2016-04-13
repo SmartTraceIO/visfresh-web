@@ -184,6 +184,29 @@ public class DeviceGroupRestClient extends RestClient {
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("groupName", groupName);
+        removeDeviceFromGroup(device, params);
+    }
+    /**
+     * @param device device IMEI.
+     * @param groupId device group ID.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void removeDeviceFromGroup(final String device, final Long groupId)
+            throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("groupId", groupId.toString());
+        removeDeviceFromGroup(device, params);
+    }
+    /**
+     * @param device
+     * @param params
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    protected void removeDeviceFromGroup(final String device,
+            final HashMap<String, String> params) throws IOException,
+            RestServiceException {
         params.put("device", device);
         sendGetRequest(getPathWithToken("removeDeviceFromGroup"), params);
     }

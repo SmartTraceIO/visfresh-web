@@ -11,6 +11,10 @@ import com.visfresh.entities.DeviceGroup;
  */
 public class DeviceGroupDto {
     /**
+     * Group ID
+     */
+    private Long id;
+    /**
      * Group Name
      */
     private String name;
@@ -30,10 +34,23 @@ public class DeviceGroupDto {
      */
     public DeviceGroupDto(final DeviceGroup g) {
         super();
+        setId(g.getId());
         setName(g.getName());
         setDescription(g.getDescription());
     }
 
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
+    /**
+     * @param id the id to set
+     */
+    public void setId(final Long id) {
+        this.id = id;
+    }
     /**
      * @return the name
      */
