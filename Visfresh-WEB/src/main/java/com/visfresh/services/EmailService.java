@@ -17,4 +17,10 @@ public interface EmailService {
      * @throws MessagingException
      */
     public void sendMessage(String[] emails, String subject, String message) throws MessagingException;
+    /**
+     * @param subject message subject.
+     * @param message message body.
+     * @throws MessagingException
+     */
+    void sendMessageToSupport(String subject, String message) throws MessagingException;
 }

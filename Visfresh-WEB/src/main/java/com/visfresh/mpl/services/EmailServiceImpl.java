@@ -39,6 +39,7 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
 
     @Autowired
     private EmailMessageDispatcher dispatcher;
+    private String supportAddress;
 
     /**
      * @param env spring environment.
@@ -65,6 +66,8 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
         helper.setSmtpPort(Integer.parseInt(env.getProperty("mail.smtp.port")));
         helper.setUser(env.getProperty("mail.smtp.user"));
         helper.setPassword(env.getProperty("mail.smtp.password"));
+
+        supportAddress = env.getProperty("mail.support.address", "support@smarttrace.com.au");
     }
 
     /* (non-Javadoc)
@@ -81,6 +84,11 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
         final String payload = serializer.toJson(msg).toString();
         dispatcher.sendSystemMessage(payload, SystemMessageType.Email);
     }
+    @Override
+    public void sendMessageToSupport(final String subject, final String message) throws MessagingException {
+        sendMessage(new String[]{supportAddress}, subject, message);
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.services.SystemMessageHandler#handle(com.visfresh.entities.SystemMessage)
      */

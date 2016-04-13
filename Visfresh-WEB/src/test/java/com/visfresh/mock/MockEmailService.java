@@ -44,6 +44,15 @@ public class MockEmailService implements EmailService {
 
         this.messages.add(msg);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.EmailService#sendMessageToSupport(java.lang.String, java.lang.String)
+     */
+    @Override
+    public void sendMessageToSupport(final String subject, final String message)
+            throws MessagingException {
+        sendMessage(new String[]{"support@smarttrace.com.au"}, subject, message);
+    }
+
     /**
      * @return the messages
      */

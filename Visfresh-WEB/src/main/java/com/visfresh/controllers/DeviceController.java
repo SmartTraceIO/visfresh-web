@@ -40,6 +40,7 @@ import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.json.DeviceSerializer;
 import com.visfresh.lists.DeviceDto;
 import com.visfresh.services.DeviceCommandService;
+import com.visfresh.services.EmailService;
 import com.visfresh.services.ShipmentShutdownService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
@@ -70,6 +71,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
     private DeviceResolver deviceResolver;
     @Autowired
     private ShipmentShutdownService shutdownService;
+    @Autowired
+    private EmailService emailService;
 
     /**
      * Default constructor.
@@ -104,9 +107,27 @@ public class DeviceController extends AbstractController implements DeviceConsta
                 //not allow to overwrite trip count
                 d.setTripCount(old.getTripCount());
 
+                final boolean oldActive = old.isActive();
                 if (!Role.Admin.hasRole(user)) {
                     //not admin can't change active state
                     d.setActive(old.isActive());
+                }
+
+                if (oldActive != d.isActive()) {
+                    final StringBuilder msg = new StringBuilder("User ");
+                    msg.append(user.getEmail());
+                    msg.append(" set device ");
+                    msg.append(d.getImei());
+                    msg.append(" to ");
+                    if (d.isActive()) {
+                        msg.append("active");
+                    } else {
+                        msg.append("inactive");
+                    }
+                    msg.append(" state");
+
+                    //notify support team.
+                    emailService.sendMessageToSupport("Device " + d.getImei() + " state changed", msg.toString());
                 }
             }
 

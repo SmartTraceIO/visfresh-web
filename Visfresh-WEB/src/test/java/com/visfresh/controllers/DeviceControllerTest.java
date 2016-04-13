@@ -31,6 +31,7 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.lists.DeviceDto;
+import com.visfresh.mock.MockEmailService;
 import com.visfresh.mock.MockShipmentShutdownService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.LocalizationUtils;
@@ -64,6 +65,19 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final Device p = createDevice("0239487043987", true);
         client.saveDevice(p);
         assertNotNull(dao.findOne(p.getImei()));
+    }
+    @Test
+    public void testDeviceStateChanged() throws RestServiceException, IOException {
+        final Device p = createDevice("0239487043987", true);
+
+        final boolean activeState = !p.isActive();
+        p.setActive(activeState);
+        client.saveDevice(p);
+
+        assertEquals(activeState, dao.findOne(p.getImei()).isActive());
+
+        //check email to support sent
+        assertEquals(1, context.getBean(MockEmailService.class).getMessages().size());
     }
     @Test
     public void testGetDevice() throws IOException, RestServiceException {
