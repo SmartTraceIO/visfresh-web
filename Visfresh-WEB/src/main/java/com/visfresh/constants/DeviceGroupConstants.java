@@ -10,4 +10,5 @@ package com.visfresh.constants;
 public interface DeviceGroupConstants {
     public static final String PROPERTY_DESCRIPTION = "description";
     public static final String PROPERTY_NAME = "name";
+    public static final String PROPERTY_ID = "id";
 }

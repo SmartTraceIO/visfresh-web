@@ -81,7 +81,27 @@ public class DeviceGroupRestClient extends RestClient {
     public DeviceGroup getDeviceGroup(final String groupName) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("name", groupName);
-
+        return getDeviceGroup(params);
+    }
+    /**
+     * @param groupName
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public DeviceGroup getDeviceGroup(final Long groupId) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", groupId.toString());
+        return getDeviceGroup(params);
+    }
+    /**
+     * @param params
+     * @return
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    protected DeviceGroup getDeviceGroup(final HashMap<String, String> params)
+            throws IOException, RestServiceException {
         final JsonElement response = sendGetRequest(getPathWithToken("getDeviceGroup"), params);
         return response == JsonNull.INSTANCE ? null : serializer.parseDeviceGroup(
                 response.getAsJsonObject());
@@ -94,6 +114,26 @@ public class DeviceGroupRestClient extends RestClient {
     public void deleteDeviceGroup(final String name) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("name", name);
+        deleteDeviceGroup(params);
+    }
+    /**
+     * @param name device group name.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void deleteDeviceGroup(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", id.toString());
+        deleteDeviceGroup(params);
+    }
+
+    /**
+     * @param params
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    protected void deleteDeviceGroup(final HashMap<String, String> params)
+            throws IOException, RestServiceException {
         sendGetRequest(getPathWithToken("deleteDeviceGroup"), params);
     }
 
@@ -107,6 +147,29 @@ public class DeviceGroupRestClient extends RestClient {
             throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("groupName", groupName);
+        addDeviceToGroup(device, params);
+    }
+    /**
+     * @param device device IMEI.
+     * @param groupName device group name.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void addDeviceToGroup(final String device, final Long groupId)
+            throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("groupId", groupId.toString());
+        addDeviceToGroup(device, params);
+    }
+    /**
+     * @param device
+     * @param params
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    protected void addDeviceToGroup(final String device,
+            final HashMap<String, String> params) throws IOException,
+            RestServiceException {
         params.put("device", device);
         sendGetRequest(getPathWithToken("addDeviceToGroup"), params);
     }
@@ -134,7 +197,28 @@ public class DeviceGroupRestClient extends RestClient {
     public List<Device> getDevicesOfGroup(final String groupName) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("groupName", groupName);
-
+        return getDevicesOfGroup(params);
+    }
+    /**
+     * @param groupName group name.
+     * @return list of devices for given group.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public List<Device> getDevicesOfGroup(final Long groupId) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("groupId", groupId.toString());
+        return getDevicesOfGroup(params);
+    }
+    /**
+     * @param params
+     * @return
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    protected List<Device> getDevicesOfGroup(
+            final HashMap<String, String> params) throws IOException,
+            RestServiceException {
         final JsonArray array = sendGetRequest(getPathWithToken("getDevicesOfGroup"), params).getAsJsonArray();
 
         final DeviceSerializer devSer = new DeviceSerializer(TimeZone.getTimeZone("UTC"));

@@ -75,6 +75,36 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
         assertNotNull(saved.getCompany());
     }
     /**
+     * Tests saving of device group.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    @Test
+    public void testUpdateDeviceGroup() throws IOException, RestServiceException {
+        final DeviceGroup group = new DeviceGroup();
+        group.setName("JUnit");
+        group.setDescription("JUnit device group");
+
+        final Long id = client.saveDeviceGroup(group);
+        DeviceGroup saved = dao.findOne(id);
+
+        //do update group
+        final String updatedName = "Updated Name";
+        final String updatedDescription = "Updated Group Description";
+
+        group.setId(id);
+        group.setName(updatedName);
+        group.setDescription(updatedDescription);
+        client.saveDeviceGroup(group);
+
+        saved = dao.findOne(id);
+
+        assertNotNull(saved);
+        assertEquals(updatedDescription, saved.getDescription());
+        assertEquals(updatedName, saved.getName());
+        assertNotNull(saved.getCompany());
+    }
+    /**
      * Tests get of device groups
      * @throws RestServiceException
      * @throws IOException
@@ -100,8 +130,17 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
      */
     @Test
     public void testGetDeviceGroup() throws IOException, RestServiceException {
-        createGroup("G1", "JUnit device group");
+        final DeviceGroup dg = createGroup("G1", "JUnit device group");
+
         assertNotNull(client.getDeviceGroup("G1"));
+
+        final DeviceGroup g = client.getDeviceGroup(dg.getId());
+        assertNotNull(g);
+
+        //check correct values
+        assertEquals(dg.getId(), g.getId());
+        assertEquals(dg.getName(), g.getName());
+        assertEquals(dg.getDescription(), g.getDescription());
     }
     /**
      * Tests deleting of device group.
@@ -110,9 +149,13 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
      */
     @Test
     public void testDeleteDeviceGroup() throws IOException, RestServiceException {
-        final DeviceGroup group = createGroup("G1", "JUnit device group");
+        DeviceGroup group = createGroup("G1", "JUnit device group");
         client.deleteDeviceGroup(group.getName());
+        assertNull(dao.findOne(group.getId()));
 
+        //delete by grou ID.
+        group = createGroup("G1", "JUnit device group");
+        client.deleteDeviceGroup(group.getId());
         assertNull(dao.findOne(group.getId()));
     }
     /**
@@ -123,17 +166,23 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
     @Test
     public void testAddDeviceToGroup() throws IOException, RestServiceException {
         final Device d = createDevice("0238947023987", true);
-        final DeviceGroup group = createGroup("JUnit", "JUnit device group");
+        final DeviceGroup gr1 = createGroup("JUnit-1", "JUnit device group");
+        final DeviceGroup gr2 = createGroup("JUnit-2", "JUnit device group");
 
-        client.addDeviceToGroup(d.getImei(), group.getName());
+        client.addDeviceToGroup(d.getImei(), gr1.getName());
+        client.addDeviceToGroup(d.getImei(), gr2.getId());
 
-        final List<DeviceGroup> devices = dao.findByDevice(d);
+        final List<DeviceGroup> groups = dao.findByDevice(d);
+        assertEquals(2, groups.size());
+        assertEquals(gr1.getName(), groups.get(0).getName());
+
+        List<Device> devices = deviceDao.findByGroup(gr1);
         assertEquals(1, devices.size());
-        assertEquals(group.getName(), devices.get(0).getName());
+        assertEquals(d.getImei(), devices.get(0).getImei());
 
-        final List<Device> groups = deviceDao.findByGroup(group);
-        assertEquals(1, groups.size());
-        assertEquals(d.getImei(), groups.get(0).getImei());
+        devices = deviceDao.findByGroup(gr2);
+        assertEquals(1, devices.size());
+        assertEquals(d.getImei(), devices.get(0).getImei());
     }
     /**
      * Tests removing device from device group.
@@ -166,6 +215,7 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
         dao.addDevice(group, d2);
 
         assertEquals(2, client.getDevicesOfGroup(group.getName()).size());
+        assertEquals(2, client.getDevicesOfGroup(group.getId()).size());
     }
     /**
      * Tests get group of given device.

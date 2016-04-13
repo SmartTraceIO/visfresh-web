@@ -29,6 +29,7 @@ public class DeviceGroupSerializer extends AbstractJsonSerializer {
      */
     public DeviceGroup parseDeviceGroup(final JsonObject json) {
         final DeviceGroup group = new DeviceGroup();
+        group.setId(asLong(json.get(DeviceGroupConstants.PROPERTY_ID)));
         group.setName(asString(json.get(DeviceGroupConstants.PROPERTY_NAME)));
         group.setDescription(asString(json.get(DeviceGroupConstants.PROPERTY_DESCRIPTION)));
         group.setCompany(user.getCompany());
@@ -39,7 +40,12 @@ public class DeviceGroupSerializer extends AbstractJsonSerializer {
      * @return JSON object.
      */
     public JsonObject toJson(final DeviceGroup group) {
+        if (group == null) {
+            return null;
+        }
+
         final JsonObject json = new JsonObject();
+        json.addProperty(DeviceGroupConstants.PROPERTY_ID, group.getId());
         json.addProperty(DeviceGroupConstants.PROPERTY_NAME, group.getName());
         json.addProperty(DeviceGroupConstants.PROPERTY_DESCRIPTION, group.getDescription());
         return json;
