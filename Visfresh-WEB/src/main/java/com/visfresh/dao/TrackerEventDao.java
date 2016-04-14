@@ -53,4 +53,9 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
      * @return list of tracker events for given device and time ranges.
      */
     List<ShortTrackerEvent> findBy(String device, Date startDate, Date endDate);
+    /**
+     * @param oldDevice old device.
+     * @param newDevice new device.
+     */
+    void moveToNewDevice(Device oldDevice, Device newDevice);
 }

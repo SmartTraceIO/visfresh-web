@@ -15,11 +15,13 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 
 /**
@@ -42,6 +44,8 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
 
     @Autowired
     private ShipmentDao shipmentDao;
+    @Autowired
+    private DeviceDao deviceDao;
 
     /**
      * Default constructor.
@@ -82,6 +86,18 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
         }
 
         return arrival;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ArrivalDao#moveToNewDevice(com.visfresh.entities.Device, com.visfresh.entities.Device)
+     */
+    @Override
+    public void moveToNewDevice(final Device oldDevice, final Device newDevice) {
+        final String sql = "update " + TABLE + " set device = :new where device = :old";
+        final Map<String, Object> params = new HashMap<>();
+        params.put("old", oldDevice.getImei());
+        params.put("new", newDevice.getImei());
+
+        jdbc.update(sql, params);
     }
 
     public List<String> getFields(final boolean addId) {
@@ -142,17 +158,31 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
      * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
      */
     @Override
-    protected void resolveReferences(final Arrival a, final Map<String, Object> map,
+    protected void resolveReferences(final Arrival a, final Map<String, Object> row,
             final Map<String, Object> cache) {
-        final String shipmentId = map.get(SHIPMENT_FIELD).toString();
-        Shipment shipment = (Shipment) cache.get(shipmentId);
-        if (shipment == null) {
-            shipment = shipmentDao.findOne(Long.valueOf(shipmentId));
-            cache.put(shipmentId, shipment);
+        //resolve shipment
+        final Number shipmentId = (Number) row.get(SHIPMENT_FIELD);
+        if (shipmentId != null) {
+            final String shipmentKey = "ship_" + shipmentId;
+
+            Shipment shipment = (Shipment) cache.get(shipmentKey);
+            if (shipment == null) {
+                shipment = shipmentDao.findOne(shipmentId.longValue());
+                cache.put(shipmentKey, shipment);
+            }
+            a.setShipment(shipment);
         }
 
-        a.setShipment(shipment);
-        a.setDevice(shipment.getDevice());
+        //resolve device
+        final String imei = (String) row.get(DEVICE_FIELD);
+        final String deviceKey = "dev_" + imei;
+
+        Device device = (Device) cache.get(deviceKey);
+        if (device == null) {
+            device = deviceDao.findOne(imei);
+            cache.put(deviceKey, device);
+        }
+        a.setDevice(device);
     }
 
     /* (non-Javadoc)

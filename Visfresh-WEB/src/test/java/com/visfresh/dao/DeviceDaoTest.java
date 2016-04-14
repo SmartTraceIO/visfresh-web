@@ -454,6 +454,16 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         dao.delete(d);
         assertNull(dao.getState(d.getImei()));
     }
+    @Test
+    public void testMoveToNewCompany() {
+        final Company c1 = createCompany("C1");
+        final Company c2 = createCompany("C2");
+
+        final Device d = createAndSaveDevice(c1, "239488932490874");
+        dao.moveToNewCompany(d, c2);
+
+        assertEquals(c2.getId(), dao.findByImei(d.getImei()).getCompany().getId());
+    }
     /**
      * @param d device.
      * @return shipment.

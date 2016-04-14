@@ -104,6 +104,17 @@ public class DeviceCommandDaoImpl extends DaoImplBase<DeviceCommand, Long> imple
         this.saveCommand(null, command, imei);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceCommandDao#deleteCommandsFor(com.visfresh.entities.Device)
+     */
+    @Override
+    public void deleteCommandsFor(final Device d) {
+        final String sql = "delete from " + TABLE + " where device = :device";
+        final Map<String, Object> params = new HashMap<>();
+        params.put("device", d.getImei());
+
+        jdbc.update(sql, params);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
      */
     @Override

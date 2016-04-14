@@ -8,22 +8,38 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+
+import junit.framework.AssertionFailedError;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.BeansException;
 
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.controllers.restclient.DeviceRestClient;
+import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.AutoStartShipmentDao;
+import com.visfresh.dao.CompanyDao;
+import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Arrival;
 import com.visfresh.entities.AutoStartShipment;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.DeviceGroup;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -31,9 +47,12 @@ import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.entities.User;
 import com.visfresh.lists.DeviceDto;
 import com.visfresh.mock.MockEmailService;
 import com.visfresh.mock.MockShipmentShutdownService;
+import com.visfresh.services.AuthService;
+import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.LocalizationUtils;
 
@@ -281,6 +300,129 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         //but shipment stopped
         s = context.getBean(ShipmentDao.class).findOne(s.getId());
         assertEquals(ShipmentStatus.Ended, s.getStatus());
+    }
+    @Test
+    public void testMoveDevice() throws IOException, RestServiceException, BeansException, AuthenticationException {
+        final Company c1 = createCompany("C1");
+        final Company c2 = createCompany("C2");
+
+        //create device
+        final Device d = createDevice("0239870932487", false);
+        d.setCompany(c1);
+        dao.save(d);
+
+        //create device group for device
+        final DeviceGroup dg = new DeviceGroup();
+        dg.setCompany(c1);
+        dg.setName("DG-1");
+
+        final DeviceGroupDao dgd = context.getBean(DeviceGroupDao.class);
+        dgd.save(dg);
+
+        //add device to group
+        dgd.addDevice(dg, d);
+
+        //create device command
+        final DeviceCommand cmd = new DeviceCommand();
+        cmd.setCommand("start");
+        cmd.setDevice(d);
+        context.getBean(DeviceCommandDao.class).save(cmd);
+
+        //create shipments
+        final Shipment s = createShipment(d, true);
+
+        //create tracker events
+        final TrackerEvent e = createTrackerEvent(d, s, 1.);
+
+        //create alerts
+        final Alert al = createAlert(d, s);
+
+        //create arrival
+        final Arrival ar = createArrival(d, s);
+
+        try {
+            client.moveDevice(d, c2);
+            throw new AssertionFailedError("Security exception should be thrown");
+        } catch (final Exception e1) {
+            //correct should not allow this operation for normal user
+        }
+
+        final User u = new User();
+        u.setRoles(new LinkedList<Role>());
+        u.getRoles().add(Role.SmartTraceAdmin);
+        u.setCompany(getCompany());
+        u.setEmail("admin@smartrace.com.au");
+        u.setFirstName("JUnit");
+        u.setLastName("Admin");
+        context.getBean(AuthService.class).saveUser(u, "", false);
+
+        //relogin by smarttrace admin
+        final String token = context.getBean(AuthService.class).login(u.getEmail(),"").getToken();
+        client.setAuthToken(token);
+
+        //do move
+        final String newImei = client.moveDevice(d, c2);
+
+        //check device really moved
+        assertEquals(c2.getId(), dao.findByImei(d.getImei()).getCompany().getId());
+
+        //check device with given IMEI
+        final Device newDevice = dao.findByImei(newImei);
+        assertNotNull(newDevice);
+
+        //check new device has some company
+
+        //check device group has updated device
+        assertEquals(dg.getId(), context.getBean(DeviceGroupDao.class).findByDevice(newDevice).get(0).getId());
+
+        //check device commands removed
+        assertEquals(0, context.getBean(DeviceCommandDao.class).findAll(null, null, null).size());
+
+        //check shipment moved
+        assertEquals(newImei, context.getBean(ShipmentDao.class).findOne(s.getId()).getDevice().getImei());
+
+        //check alert moved
+        assertEquals(newImei, context.getBean(AlertDao.class).findOne(al.getId()).getDevice().getImei());
+
+        //check arrival moved
+        assertEquals(newImei, context.getBean(ArrivalDao.class).findOne(ar.getId()).getDevice().getImei());
+
+        //check tracker event moved
+        assertEquals(newImei, context.getBean(TrackerEventDao.class).findOne(e.getId()).getDevice().getImei());
+    }
+    /**
+     * @param d device.
+     * @param s shipment.
+     * @return alert
+     */
+    private Alert createAlert(final Device d, final Shipment s) {
+        final Alert a = new Alert();
+        a.setDate(new Date());
+        a.setType(AlertType.Battery);
+        a.setDevice(d);
+        a.setShipment(s);
+        return context.getBean(AlertDao.class).save(a);
+    }
+    /**
+     * @param d device.
+     * @param s shipment.
+     * @return alert
+     */
+    private Arrival createArrival(final Device d, final Shipment s) {
+        final Arrival a = new Arrival();
+        a.setDate(new Date());
+        a.setDevice(d);
+        a.setShipment(s);
+        return context.getBean(ArrivalDao.class).save(a);
+    }
+    /**
+     * @param name company name.
+     * @return company.
+     */
+    private Company createCompany(final String name) {
+        final Company c = new Company();
+        c.setName(name);
+        return context.getBean(CompanyDao.class).save(c);
     }
     /**
      * @param device device.

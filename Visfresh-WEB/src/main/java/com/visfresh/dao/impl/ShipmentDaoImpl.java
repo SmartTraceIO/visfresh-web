@@ -218,6 +218,19 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         }
         return ((Number) rows.get(0).get("count")).intValue() + 1;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ArrivalDao#moveToNewDevice(com.visfresh.entities.Device, com.visfresh.entities.Device)
+     */
+    @Override
+    public void moveToNewDevice(final Device oldDevice, final Device newDevice) {
+        final String sql = "update " + TABLE + " set device = :new where device = :old";
+        final Map<String, Object> params = new HashMap<>();
+        params.put("old", oldDevice.getImei());
+        params.put("new", newDevice.getImei());
+
+        jdbc.update(sql, params);
+    }
+
     /**
      * @param params
      * @return

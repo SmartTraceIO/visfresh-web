@@ -199,6 +199,20 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         return findAll(filter, sorting, null);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceDao#moveToNewCompany(com.visfresh.entities.Device, com.visfresh.entities.Company)
+     */
+    @Override
+    public void moveToNewCompany(final Device device, final Company c) {
+        final String sql = "update devices set company=:company, "
+                + TRIPCOUNT_FIELD + "= 0,"
+                + AUTOSTART_TEMPLATE_FIELD + "= NULL where imei=:device";
+        final Map<String, Object> params = new HashMap<>();
+        params.put("device", device.getImei());
+        params.put("company", c.getId());
+
+        jdbc.update(sql, params);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)
      */
     @Override

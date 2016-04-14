@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
 
@@ -74,4 +75,9 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @param s shipment.
      */
     void markAsAutostarted(Shipment s);
+    /**
+     * @param oldDevice old device.
+     * @param newDevice new device.
+     */
+    void moveToNewDevice(Device oldDevice, Device newDevice);
 }

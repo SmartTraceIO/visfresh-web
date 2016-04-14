@@ -12,6 +12,7 @@ import java.util.TimeZone;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.Shipment;
@@ -112,5 +113,20 @@ public class DeviceRestClient extends RestClient {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("shipmentId", shipment.getId().toString());
         sendGetRequest(getPathWithToken("shutdownDevice"), params);
+    }
+    /**
+     * @param device
+     * @param company
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public String moveDevice(final Device device, final Company company) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("device", device.getImei());
+        params.put("company", company.getId().toString());
+
+        final JsonElement response = sendGetRequest(getPathWithToken("moveDevice"), params);
+        return parseStringId(response.getAsJsonObject());
     }
 }

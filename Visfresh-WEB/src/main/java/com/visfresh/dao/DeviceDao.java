@@ -46,4 +46,9 @@ public interface DeviceDao extends EntityWithCompanyDaoBase<Device, String> {
      */
     List<ListDeviceItem> getDevices(Company company, Sorting sorting,
             Page page);
+    /**
+     * @param device device.
+     * @param c company.
+     */
+    void moveToNewCompany(Device device, Company c);
 }

@@ -58,14 +58,28 @@ public class DeviceGroupDaoTest extends BaseCrudTest<DeviceGroupDao, DeviceGroup
         assertEquals(1, dao.getShipmentGroups(getIds(s3)).size());
         assertEquals(0, dao.getShipmentGroups(getIds(s3)).get(s3.getId()).size());
     }
+    @Test
     public void testFindByName() {
         final DeviceGroup g1 = createGroup("G");
-        final DeviceGroup g2 = createGroup("G");
-        createGroup("NotG");
+        createGroup("G");
+        final DeviceGroup g2 = createGroup("NotG");
 
-        assertEquals(g1.getId(), dao.findByName("NotG").getId());
-        assertEquals(g2.getId(), dao.findByName("G").getId());
+        assertEquals(g1.getId(), dao.findByName("G").getId());
+        assertEquals(g2.getId(), dao.findByName("NotG").getId());
         assertNull(dao.findByName("wqpoiu"));
+    }
+    @Test
+    public void testMoveToNewDevice() {
+        final Device d1 = createDevice("12938401823709238");
+        final Device d2 = createDevice("23049832094890204");
+
+        final DeviceGroup grp1 = dao.save(createTestEntity());
+        dao.addDevice(grp1, d1);
+
+        dao.moveToNewDevice(d1, d2);
+
+        assertEquals(0, dao.findByDevice(d1).size());
+        assertEquals(1, dao.findByDevice(d2).size());
     }
     /**
      * @param groupName group name.

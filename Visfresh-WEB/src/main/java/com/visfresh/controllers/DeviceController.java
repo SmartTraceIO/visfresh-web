@@ -21,12 +21,18 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.constants.ErrorCodes;
+import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.AutoStartShipmentDao;
+import com.visfresh.dao.CompanyDao;
+import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.DeviceDao;
+import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AutoStartShipment;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.ListDeviceItem;
@@ -68,11 +74,23 @@ public class DeviceController extends AbstractController implements DeviceConsta
     @Autowired
     private DeviceCommandService commandService;
     @Autowired
+    private DeviceGroupDao deviceGroupDao;
+    @Autowired
     private DeviceResolver deviceResolver;
     @Autowired
     private ShipmentShutdownService shutdownService;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private DeviceCommandDao deviceCommandDao;
+    @Autowired
+    private ArrivalDao arrivalDao;
+    @Autowired
+    private AlertDao alertDao;
+    @Autowired
+    private CompanyDao companyDao;
+    @Autowired
+    private DeviceDao deviceDao;
 
     /**
      * Default constructor.
@@ -137,6 +155,78 @@ public class DeviceController extends AbstractController implements DeviceConsta
             log.error("Failed to save device", e);
             return createErrorResponse(e);
         }
+    }
+    @RequestMapping(value = "/moveDevice/{authToken}", method = RequestMethod.GET)
+    public JsonObject moveDevice(@PathVariable final String authToken,
+            final @RequestParam String device,
+            final @RequestParam Long company) {
+        try {
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.SmartTraceAdmin);
+
+            //get device
+            final Device oldDevice = dao.findByImei(device);
+            if (oldDevice == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Not found device for moving to another company " + device);
+            } else if (isVirtualDevice(oldDevice)) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Can't move device beause is virtual " + device);
+            }
+
+            //get company
+            final Company c = companyDao.findOne(company);
+            if (c == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Target company for moving device is not found " + company);
+            }
+
+            //create new device
+            final Device newDevice = createVistualDevice(oldDevice);
+
+            //switch device to new company
+            dao.moveToNewCompany(oldDevice, c);
+
+            deviceCommandDao.deleteCommandsFor(oldDevice);
+            deviceGroupDao.moveToNewDevice(oldDevice, newDevice);
+            arrivalDao.moveToNewDevice(oldDevice, newDevice);
+            alertDao.moveToNewDevice(oldDevice, newDevice);
+            trackerEventDao.moveToNewDevice(oldDevice, newDevice);
+            shipmentDao.moveToNewDevice(oldDevice, newDevice);
+            return createIdResponse("deviceImei", newDevice.getImei());
+        } catch (final Exception e) {
+            log.error("Failed to move device", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param device device.
+     * @return true if the device is virtual.
+     */
+    private boolean isVirtualDevice(final Device device) {
+        return device.getImei().startsWith(createVirtualPrefix(device));
+    }
+    /**
+     * @param device
+     * @return
+     */
+    private Device createVistualDevice(final Device device) {
+        final Device d = new Device();
+        d.setActive(device.isActive());
+        d.setAutostartTemplateId(null);
+        d.setCompany(device.getCompany());
+        d.setDescription(device.getDescription());
+        d.setImei(createVirtualPrefix(device) + device.getImei());
+        d.setName(device.getName());
+        d.setTripCount(device.getTripCount());
+        return deviceDao.save(d);
+    }
+    /**
+     * @param device device.
+     * @return virtual prefix for given device.
+     */
+    private String createVirtualPrefix(final Device device) {
+        return device.getCompany().getId() + "_";
     }
     /**
      * @param authToken authentication token.

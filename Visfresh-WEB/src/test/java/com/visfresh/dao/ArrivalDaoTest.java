@@ -185,4 +185,28 @@ public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
 
         assertNotNull(a.getShipment());
     }
+    @Test
+    public void testMoveToNewDevice() {
+        final Device d1 = createDevice("390248703928740");
+        final Device d2 = createDevice("293087098709870");
+
+        final Arrival a = createArrival(new Date());
+        a.setDevice(d1);
+        dao.save(a);
+
+        dao.moveToNewDevice(d1, d2);
+        assertEquals(d2.getImei(), dao.findOne(a.getId()).getDevice().getImei());
+    }
+    /**
+     * @param imei
+     * @return
+     */
+    private Device createDevice(final String imei) {
+        final Device d = new Device();
+        d.setImei(imei);
+        d.setActive(true);
+        d.setName("JUnit-" + imei);
+        d.setCompany(sharedCompany);
+        return context.getBean(DeviceDao.class).save(d);
+    }
 }

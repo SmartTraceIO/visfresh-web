@@ -161,6 +161,18 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
         jdbc.update(sql, params);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceGroupDao#moveToNewDevice(com.visfresh.entities.Device, com.visfresh.entities.Device)
+     */
+    @Override
+    public void moveToNewDevice(final Device oldDevice, final Device newDevice) {
+        final String sql = "update " + RELATIONS_TABLE + " set device = :new where device = :old";
+        final Map<String, Object> params = new HashMap<>();
+        params.put("old", oldDevice.getImei());
+        params.put("new", newDevice.getImei());
+
+        jdbc.update(sql, params);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceGroupDao#removeDevice(com.visfresh.entities.DeviceGroup, com.visfresh.entities.Device)
      */
     @Override

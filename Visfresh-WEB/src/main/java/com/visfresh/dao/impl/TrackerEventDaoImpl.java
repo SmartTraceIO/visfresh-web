@@ -111,6 +111,19 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
 
         return event;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ArrivalDao#moveToNewDevice(com.visfresh.entities.Device, com.visfresh.entities.Device)
+     */
+    @Override
+    public void moveToNewDevice(final Device oldDevice, final Device newDevice) {
+        final String sql = "update " + TABLE + " set device = :new where device = :old";
+        final Map<String, Object> params = new HashMap<>();
+        params.put("old", oldDevice.getImei());
+        params.put("new", newDevice.getImei());
+
+        jdbc.update(sql, params);
+    }
+
     public static List<String> getFields(final boolean includeId) {
         final List<String> fields = new LinkedList<String>();
         fields.add(TYPE_FIELD);
@@ -221,21 +234,29 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     @Override
     protected void resolveReferences(final TrackerEvent e, final Map<String, Object> row,
             final Map<String, Object> cache) {
-        final Object tmp = row.get(SHIPMENT_FIELD);
-        if (tmp != null) {
-            final String shipmentId = tmp.toString();
-            Shipment shipment = (Shipment) cache.get(shipmentId);
-            if (shipment == null) {
-                shipment = shipmentDao.findOne(Long.valueOf(shipmentId));
-                cache.put(shipmentId, shipment);
-            }
+        //resolve shipment
+        final Number shipmentId = (Number) row.get(SHIPMENT_FIELD);
+        if (shipmentId != null) {
+            final String shipmentKey = "ship_" + shipmentId;
 
+            Shipment shipment = (Shipment) cache.get(shipmentKey);
+            if (shipment == null) {
+                shipment = shipmentDao.findOne(shipmentId.longValue());
+                cache.put(shipmentKey, shipment);
+            }
             e.setShipment(shipment);
-            e.setDevice(shipment.getDevice());
-        } else {
-            final String imei = (String) row.get(DEVICE_FIELD);
-            e.setDevice(deviceDao.findByImei(imei));
         }
+
+        //resolve device
+        final String imei = (String) row.get(DEVICE_FIELD);
+        final String deviceKey = "dev_" + imei;
+
+        Device device = (Device) cache.get(deviceKey);
+        if (device == null) {
+            device = deviceDao.findOne(imei);
+            cache.put(deviceKey, device);
+        }
+        e.setDevice(device);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)

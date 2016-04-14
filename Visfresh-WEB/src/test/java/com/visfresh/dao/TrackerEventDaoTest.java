@@ -353,6 +353,16 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(e2.getId(), events.get(0).getId());
         assertEquals(e3.getId(), events.get(events.size() - 1).getId());
     }
+    @Test
+    public void testMoveToNewDevice() {
+        final Device d1 = createDevice("390248703928740");
+        final Device d2 = createDevice("293087098709870");
+
+        final TrackerEvent e = createEvent(d1, (Shipment) null);
+
+        dao.moveToNewDevice(d1, d2);
+        assertEquals(d2.getImei(), dao.findOne(e.getId()).getDevice().getImei());
+    }
     /**
      * @param device device.
      * @param shipment shipment.

@@ -44,4 +44,9 @@ public interface DeviceGroupDao extends EntityWithCompanyDaoBase<DeviceGroup, Lo
      * @return device group by given name.
      */
     DeviceGroup findByName(String groupName);
+    /**
+     * @param oldDevice old device.
+     * @param newDevice new device.
+     */
+    void moveToNewDevice(Device oldDevice, Device newDevice);
 }
