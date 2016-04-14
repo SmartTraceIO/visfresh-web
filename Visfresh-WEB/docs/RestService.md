@@ -95,30 +95,31 @@ List items is short representations of base entities, like as [Alert Profile](#m
 34. [Shutdown Device](#markdown-header-shutdown-device) 
 35. [Get Device](#markdown-header-get-device)  
 36. [Get Devices](#markdown-header-get-devices)  
-37. [Save Device Group](#markdown-header-save-device-group)  
-38. [Get Device Group](#markdown-header-get-device-group)  
-39. [Get Device Groups](#markdown-header-get-device-groups)  
-40. [Delete Device Group](#markdown-header-delete-device-group)  
-41. [Add Device to Group](#markdown-header-add-device-to-group)  
-42. [Remove Device from Group](#markdown-header-remove-device-from-group)  
-43. [Get Devices of Group](#markdown-header-get-devices-of-group)    
-44. [Get Groups of Device](#markdown-header-get-groups-of-device)  
-45. [Get Notifications](#markdown-header-get-notifications)  
-46. [Send Command to Device](#markdown-header-send-command-to-device)  
-47. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
-48. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
-49. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
-50. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
-51. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
-52. [Save Note](#markdown-header-save-note) 
-53. [Get Notes](#markdown-header-get-notes)  
-54. [Delete Note](#markdown-header-delete-note)  
-55. [Create (save) Simulator](#markdown-header-save-simulator)  
-56. [Delete Simulator](#markdown-header-delete-simulator)  
-57. [Start Simulator](#markdown-header-start-simulator)  
-58. [Stop Simulator](#markdown-header-stop-simulator)  
-59. [Get Simulator](#markdown-header-get-simulator)  
-60. [AutoStartNewShipment](#markdown-header-autostart-new-shipment)  
+37. [Save Device Group](#markdown-header-save-device-group) 
+38. [Move Device](#markdown-header-move-device)  
+39. [Get Device Group](#markdown-header-get-device-group)  
+40. [Get Device Groups](#markdown-header-get-device-groups)  
+41. [Delete Device Group](#markdown-header-delete-device-group)  
+42. [Add Device to Group](#markdown-header-add-device-to-group)  
+43. [Remove Device from Group](#markdown-header-remove-device-from-group)  
+44. [Get Devices of Group](#markdown-header-get-devices-of-group)    
+45. [Get Groups of Device](#markdown-header-get-groups-of-device)  
+46. [Get Notifications](#markdown-header-get-notifications)  
+47. [Send Command to Device](#markdown-header-send-command-to-device)  
+48. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
+49. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
+50. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
+51. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
+52. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
+53. [Save Note](#markdown-header-save-note) 
+54. [Get Notes](#markdown-header-get-notes)  
+55. [Delete Note](#markdown-header-delete-note)  
+56. [Create (save) Simulator](#markdown-header-save-simulator)  
+57. [Delete Simulator](#markdown-header-delete-simulator)  
+58. [Start Simulator](#markdown-header-start-simulator)  
+59. [Stop Simulator](#markdown-header-stop-simulator)  
+60. [Get Simulator](#markdown-header-get-simulator)  
+61. [AutoStartNewShipment](#markdown-header-autostart-new-shipment)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -319,6 +320,15 @@ Method *GET*, method name *getDevice*. Request parameters:
 1. imei - device IMEI.  
 Returns expanded [Device Object](#markdown-header-device) with added last reading and auto start template info  
 [(example)](#markdown-header-get-device-example)
+
+### Move Device ###
+Method *GET*, method name *moveDevice*. Request parameters:  
+1. company - target company.  
+2. device - device to move.  
+Returns IMEI of saved previous device.  
+This method creates new virtual devices, moves shipments, device groups, alerts, arrivals, trackerevents from  
+origin device to self, and assign origin devices for given company  
+[(example)](#markdown-header-move-device-example)
 
 ### Save Device Group ###
 Method *POST*, method name *saveDeviceGroup*. Request body contains JSON serialized [Device Group Object](#markdown-header-device-group)  
@@ -2071,6 +2081,20 @@ Response:
   "status": {
     "code": 0,
     "message": "Success"
+  }
+}
+```
+### Move Device example ###
+**GET /vf/rest/moveDevice/${accessToken}?company=28453&device=0239870932487**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "deviceImei": "28452_0239870932487"
   }
 }
 ```
