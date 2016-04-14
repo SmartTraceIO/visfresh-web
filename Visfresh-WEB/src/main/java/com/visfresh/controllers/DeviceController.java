@@ -193,6 +193,16 @@ public class DeviceController extends AbstractController implements DeviceConsta
             alertDao.moveToNewDevice(oldDevice, newDevice);
             trackerEventDao.moveToNewDevice(oldDevice, newDevice);
             shipmentDao.moveToNewDevice(oldDevice, newDevice);
+
+            //close all active shipments
+            final List<Shipment> activeShipments = shipmentDao.findActiveShipments(newDevice.getImei());
+            for (final Shipment s : activeShipments) {
+                if (!s.hasFinalStatus()) {
+                    s.setStatus(ShipmentStatus.Ended);
+                    shipmentDao.save(s);
+                }
+            }
+
             return createIdResponse("deviceImei", newDevice.getImei());
         } catch (final Exception e) {
             log.error("Failed to move device", e);

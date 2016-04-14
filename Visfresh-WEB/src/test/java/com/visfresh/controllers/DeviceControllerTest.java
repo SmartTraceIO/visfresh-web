@@ -5,6 +5,7 @@ package com.visfresh.controllers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Date;
@@ -379,7 +380,9 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(0, context.getBean(DeviceCommandDao.class).findAll(null, null, null).size());
 
         //check shipment moved
-        assertEquals(newImei, context.getBean(ShipmentDao.class).findOne(s.getId()).getDevice().getImei());
+        final Shipment shipment = context.getBean(ShipmentDao.class).findOne(s.getId());
+        assertEquals(newImei, shipment.getDevice().getImei());
+        assertTrue(shipment.hasFinalStatus());
 
         //check alert moved
         assertEquals(newImei, context.getBean(AlertDao.class).findOne(al.getId()).getDevice().getImei());
