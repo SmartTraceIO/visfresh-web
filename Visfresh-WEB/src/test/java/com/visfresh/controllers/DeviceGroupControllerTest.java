@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.BeansException;
 
+import com.visfresh.constants.DeviceGroupConstants;
 import com.visfresh.controllers.restclient.DeviceGroupRestClient;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
@@ -122,6 +123,63 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
         assertEquals(1, client.getDeviceGroups(1, 1).size());
         assertEquals(1, client.getDeviceGroups(2, 1).size());
         assertEquals(0, client.getDeviceGroups(3, 1).size());
+    }
+    /**
+     * Tests get of device groups
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    @Test
+    public void testGetDeviceGroupsSortedById() throws IOException, RestServiceException {
+        final DeviceGroup g1 = createGroup("2", "2");
+        createGroup("1", "1");
+        final DeviceGroup g3 = createGroup("3", "3");
+
+        //test paging
+        List<DeviceGroup> groups;
+        groups = client.getDeviceGroups(1, 100, DeviceGroupConstants.PROPERTY_ID, "asc");
+        assertEquals(g1.getId(), groups.get(0).getId());
+
+        groups = client.getDeviceGroups(1, 100, DeviceGroupConstants.PROPERTY_ID, "desc");
+        assertEquals(g3.getId(), groups.get(0).getId());
+    }
+    /**
+     * Tests get of device groups
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    @Test
+    public void testGetDeviceGroupsSortedByName() throws IOException, RestServiceException {
+        final DeviceGroup g1 = createGroup("3", "1");
+        final DeviceGroup g2 = createGroup("1", "2");
+        createGroup("2", "3");
+
+        //test paging
+        List<DeviceGroup> groups;
+        groups = client.getDeviceGroups(1, 100, DeviceGroupConstants.PROPERTY_NAME, "asc");
+        assertEquals(g2.getId(), groups.get(0).getId());
+
+        groups = client.getDeviceGroups(1, 100, DeviceGroupConstants.PROPERTY_NAME, "desc");
+        assertEquals(g1.getId(), groups.get(0).getId());
+    }
+    /**
+     * Tests get of device groups
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    @Test
+    public void testGetDeviceGroupsSortedByDescription() throws IOException, RestServiceException {
+        final DeviceGroup g1 = createGroup("1", "3");
+        final DeviceGroup g2 = createGroup("2", "1");
+        createGroup("3", "2");
+
+        //test paging
+        List<DeviceGroup> groups;
+        groups = client.getDeviceGroups(1, 100, DeviceGroupConstants.PROPERTY_DESCRIPTION, "asc");
+        assertEquals(g2.getId(), groups.get(0).getId());
+
+        groups = client.getDeviceGroups(1, 100, DeviceGroupConstants.PROPERTY_DESCRIPTION, "desc");
+        assertEquals(g1.getId(), groups.get(0).getId());
     }
     /**
      * Tests get device group method

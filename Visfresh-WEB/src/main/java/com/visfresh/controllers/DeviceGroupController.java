@@ -22,7 +22,6 @@ import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.Page;
-import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.Role;
@@ -87,7 +86,9 @@ public class DeviceGroupController extends AbstractController implements DeviceG
     @RequestMapping(value = "/getDeviceGroups/{authToken}", method = RequestMethod.GET)
     public JsonObject getDeviceGroups(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex,
-            @RequestParam(required = false) final Integer pageSize) {
+            @RequestParam(required = false) final Integer pageSize,
+            @RequestParam(required = false) final String sc,
+            @RequestParam(required = false) final String so) {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
         try {
@@ -98,7 +99,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
             final DeviceGroupSerializer ser = createSerializer(user);
 
             final List<DeviceGroup> groups = dao.findByCompany(user.getCompany(),
-                    new Sorting(getDefaultSortOrder()),
+                    createSorting(sc, so, getDefaultSortOrder(), 1),
                     page,
                     null);
 
@@ -369,6 +370,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      */
     private String[] getDefaultSortOrder() {
         return new String[] {
+            PROPERTY_ID,
             PROPERTY_NAME,
             PROPERTY_DESCRIPTION
         };

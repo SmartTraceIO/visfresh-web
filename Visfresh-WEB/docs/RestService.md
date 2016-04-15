@@ -346,6 +346,8 @@ Returns [Device Group object](#markdown-header-device-group)
 Method *GET*, method name *getDeviceGroups*. Method parameters:  
 1. pageIndex - page index  
 2. pageSize - page size  
+3. sc - sort column  
+4. so - sort order  
 Returns list of [Device Group object](#markdown-header-device-group)  
 [(example)](#markdown-header-get-device-groups-example)  
 
@@ -2115,7 +2117,7 @@ Response:
 }
 ```
 ### Get Device Groups example ###
-**GET /vf/rest/getDeviceGroups/${accessTonek}**  
+**/vf/rest/getDeviceGroups/${accessToken}?so=desc&pageSize=100&sc=name&pageIndex=1**  
 **Response:**  
 ```json
 {
@@ -2125,15 +2127,22 @@ Response:
   },
   "response": [
     {
-      "name": "G1",
-      "description": "JUnit device group"
+      "id": 23,
+      "name": "3",
+      "description": "1"
     },
     {
-      "name": "G2",
-      "description": "JUnit device group"
+      "id": 25,
+      "name": "2",
+      "description": "3"
+    },
+    {
+      "id": 24,
+      "name": "1",
+      "description": "2"
     }
   ],
-  "totalCount": 2
+  "totalCount": 3
 }
 ```
 ### Delete Device Group example ###

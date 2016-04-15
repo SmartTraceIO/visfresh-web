@@ -323,7 +323,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(e1.getLatitude(), ute1.getLatitude(), 0.001);
         assertEquals(e1.getLongitude(), ute1.getLongitude(), 0.001);
         assertEquals(e1.getTemperature(), ute1.getTemperature(), 0.001);
-        assertEquals(e1.getTime().getTime(), ute1.getTime().getTime(), 1000);
+        assertEquals(e1.getTime().getTime(), ute1.getTime().getTime(), 2000);
         assertEquals(e1.getType(), ute1.getType());
     }
     @Test

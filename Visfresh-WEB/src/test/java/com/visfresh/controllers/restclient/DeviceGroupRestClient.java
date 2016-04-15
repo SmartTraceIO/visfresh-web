@@ -57,10 +57,30 @@ public class DeviceGroupRestClient extends RestClient {
      */
     public List<DeviceGroup> getDeviceGroups(final Integer pageIndex, final Integer pageSize)
             throws IOException, RestServiceException {
+        return getDeviceGroups(pageIndex, pageSize, null, null);
+    }
+    /**
+     * @param pageIndex page idex.
+     * @param pageSize page size.
+     * @param sc sort column.
+     * @param so sort order.
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public List<DeviceGroup> getDeviceGroups(final Integer pageIndex, final Integer pageSize,
+            final String sc, final String so)
+            throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         if (pageIndex != null) {
             params.put("pageIndex", Integer.toString(pageIndex));
             params.put("pageSize", Integer.toString(pageSize == null ? Integer.MAX_VALUE : pageSize));
+        }
+        if (sc != null) {
+            params.put("sc", sc);
+        }
+        if (so != null) {
+            params.put("so", so);
         }
 
         final JsonArray response = sendGetRequest(getPathWithToken("getDeviceGroups"),
