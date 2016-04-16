@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.rules.RuleContext;
 import com.visfresh.rules.TrackerEventRule;
@@ -50,4 +51,14 @@ public interface RuleEngine {
      * @return alerts suppression date.
      */
     Date getAlertsSuppressionDate(Shipment s);
+    /**
+     * @param s shipment.
+     * @param stops interim stop locations.
+     */
+    void setInterimLocations(Shipment s, List<LocationProfile> stops);
+    /**
+     * @param s shipment.
+     * @return interim locations.
+     */
+    List<LocationProfile> getInterimLocations(Shipment s);
 }

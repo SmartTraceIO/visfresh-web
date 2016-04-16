@@ -4,7 +4,6 @@
 package com.visfresh.rules;
 
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.dao.ArrivalDao;
@@ -140,16 +138,16 @@ public class InterimStopRule implements TrackerEventRule {
         final boolean accept = shipment != null
                 && !req.isProcessed(this)
                 && !shipment.hasFinalStatus()
-                && getInterimLocations(session) != null
+                && getInterimLocations(shipment) != null
                 && (isInInterimStop(session)
-                || isNearInterimStop(session, event.getLatitude(), event.getLongitude()));
+                || isNearInterimStop(shipment, session, event.getLatitude(), event.getLongitude()));
 
         return accept;
     }
 
-    public static boolean isNearInterimStop(final ShipmentSession state, final double latitude,
+    private boolean isNearInterimStop(final Shipment shipment, final ShipmentSession state, final double latitude,
             final double longitude) {
-        final List<LocationProfile> locs = getInterimLocations(state);
+        final List<LocationProfile> locs = getInterimLocations(shipment);
         if (locs != null) {
             final LocationProfile p = getBestLocation(locs, latitude, longitude);
             return p != null;
@@ -190,9 +188,9 @@ public class InterimStopRule implements TrackerEventRule {
 
         final TrackerEvent event = context.getEvent();
         final ShipmentSession state = context.getSessionManager().getSession(event.getShipment());
-        if (isNearInterimStop(state, event.getLatitude(), event.getLongitude())) {
+        if (isNearInterimStop(event.getShipment(), state, event.getLatitude(), event.getLongitude())) {
             InterimStopInfo stop = getInterimStop(state);
-            final List<LocationProfile> locs = getInterimLocations(state);
+            final List<LocationProfile> locs = getInterimLocations(event.getShipment());
             boolean shouldCreateStop = false;
 
             if (stop == null) {
@@ -242,6 +240,14 @@ public class InterimStopRule implements TrackerEventRule {
     }
 
     /**
+     * @param shipment
+     * @return
+     */
+    protected List<LocationProfile> getInterimLocations(final Shipment shipment) {
+        return engine.getInterimLocations(shipment);
+    }
+
+    /**
      * @param state interim stop state.
      * @param stop the interim stop info.
      */
@@ -267,55 +273,6 @@ public class InterimStopRule implements TrackerEventRule {
 
     public String getName() {
         return NAME;
-    }
-
-    public static void saveInterimLocations(final ShipmentSession state, final List<LocationProfile> stops) {
-        final String key = createInterimLocationsKey();
-        final JsonArray array = new JsonArray();
-        for (final LocationProfile l : stops) {
-            array.add(toJson(l));
-        }
-
-        state.setShipmentProperty(key, array.toString());
-    }
-    protected static List<LocationProfile> getInterimLocations(final ShipmentSession state) {
-        final String key = createInterimLocationsKey();
-        final String str = state.getShipmentProperty(key);
-        if (str != null) {
-            final List<LocationProfile> locs = new LinkedList<>();
-            final JsonArray array = SerializerUtils.parseJson(str).getAsJsonArray();
-            for (final JsonElement e : array) {
-                locs.add(parseLocation(e.getAsJsonObject()));
-            }
-            return locs;
-        }
-
-        return null;
-    }
-
-    /**
-     * @param l
-     * @return
-     */
-    protected static JsonObject toJson(final LocationProfile l) {
-        final JsonObject json = new JsonObject();
-        json.addProperty("id", l.getId());
-        json.addProperty("lat", l.getLocation().getLatitude());
-        json.addProperty("lon", l.getLocation().getLongitude());
-        json.addProperty("radius", l.getRadius());
-        return json;
-    }
-    protected static LocationProfile parseLocation(final JsonObject json) {
-        if (json == null) {
-            return null;
-        }
-
-        final LocationProfile loc = new LocationProfile();
-        loc.setId(json.get("id").getAsLong());
-        loc.getLocation().setLatitude(json.get("lat").getAsDouble());
-        loc.getLocation().setLongitude(json.get("lon").getAsDouble());
-        loc.setRadius(json.get("radius").getAsInt());
-        return loc;
     }
 
     /**
@@ -362,12 +319,6 @@ public class InterimStopRule implements TrackerEventRule {
         json.addProperty("numReadings", info.getNumReadings());
         json.addProperty("startTime", info.getStartTime());
         return json;
-    }
-    /**
-     * @return
-     */
-    private static String createInterimLocationsKey() {
-        return NAME + "-locations";
     }
     /**
      * @return

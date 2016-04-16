@@ -15,6 +15,7 @@ public class SingleShipmentLocation {
     private double longitude;
     private double temperature;
     private String timeIso;
+    private String time;
     private final List<SingleShipmentAlert> alerts = new LinkedList<>();
     private String type;
 
@@ -72,6 +73,18 @@ public class SingleShipmentLocation {
      */
     public void setTimeIso(final String timeIso) {
         this.timeIso = timeIso;
+    }
+    /**
+     * @return the time
+     */
+    public String getTime() {
+        return time;
+    }
+    /**
+     * @param time the time to set
+     */
+    public void setTime(final String time) {
+        this.time = time;
     }
     /**
      * @return the alerts

@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Set;
 
 import com.visfresh.entities.AlertType;
-import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.NoteDto;
 import com.visfresh.lists.ListNotificationScheduleItem;
 
@@ -82,7 +82,7 @@ public class SingleShipmentDto {
     private final List<LocationProfile> startLocationAlternatives = new LinkedList<>();
     private final List<LocationProfile> endLocationAlternatives = new LinkedList<>();
     private final List<LocationProfile> interimLocationAlternatives = new LinkedList<>();
-    private final List<InterimStop> interimStops = new LinkedList<>();
+    private final List<InterimStopDto> interimStops = new LinkedList<>();
     private final List<NoteDto> notes = new LinkedList<>();
     private final List<DeviceGroupDto> deviceGroups = new LinkedList<>();
 
@@ -712,7 +712,7 @@ public class SingleShipmentDto {
     /**
      * @return the interimStops
      */
-    public List<InterimStop> getInterimStops() {
+    public List<InterimStopDto> getInterimStops() {
         return interimStops;
     }
     /**

@@ -3,6 +3,9 @@
  */
 package com.visfresh.io;
 
+import java.util.List;
+
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 
 /**
@@ -23,6 +26,7 @@ public class SaveShipmentRequest {
      */
     private boolean saveAsNewTemplate;
     private Boolean includePreviousData;
+    private List<LocationProfile> interimLocations;
 
     /**
      * Default constructor.
@@ -80,5 +84,17 @@ public class SaveShipmentRequest {
      */
     public void setIncludePreviousData(final Boolean includePreviousData) {
         this.includePreviousData = includePreviousData;
+    }
+    /**
+     * @return the interimLocations
+     */
+    public List<LocationProfile> getInterimLocations() {
+        return interimLocations;
+    }
+    /**
+     * @param interimLocations the interimLocations to set
+     */
+    public void setInterimLocations(final List<LocationProfile> interimLocations) {
+        this.interimLocations = interimLocations;
     }
 }

@@ -29,7 +29,6 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.AutoDetectEndLocationRule;
-import com.visfresh.rules.InterimStopRule;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.rules.state.ShipmentSessionManager;
 import com.visfresh.services.AutoStartShipmentService;
@@ -189,15 +188,12 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
             }
 
             v.getTo().addAll(init.getAutoStart().getShippedTo());
-            v.getInterim().addAll(init.getAutoStart().getInterimStops());
 
-            if (!(v.getFrom().isEmpty() && v.getTo().isEmpty() && v.getInterim().isEmpty())) {
+            if (!(v.getFrom().isEmpty() && v.getTo().isEmpty())) {
                 altLocDao.save(shipment, v);
             }
-
             if (!init.getAutoStart().getInterimStops().isEmpty()) {
-                final ShipmentSession session = mgr.getSession(shipment);
-                InterimStopRule.saveInterimLocations(session, init.getAutoStart().getInterimStops());
+                ruleEngine.setInterimLocations(shipment, init.getAutoStart().getInterimStops());
             }
 
             shipmentDao.markAsAutostarted(shipment);

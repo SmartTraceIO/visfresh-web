@@ -705,6 +705,8 @@ see [ResponseStatus](#markdown-header-response-status)
   "saveAsNewTemplate": true,
   "includePreviousData": true, // can be blank, default is true
   "templateName": "NewTemplate.tpl", // template name in case of save also as new template
+  "interimLocations": [], //array of interim locations. If not presented then list of interim locations will
+                          //not updated for given shipment.
   "shipment": ${EmbeddedShipmentObject} //this shipment object to save
 }
 ```
@@ -1745,6 +1747,10 @@ Response:
   "saveAsNewTemplate": true,
   "includePreviousData": true,
   "templateName": "NewTemplate.tpl",
+  "interimLocations": [
+    1599,
+    1600
+  ],
   "shipment": {
     "status": "InProgress",
     "deviceImei": "234908720394857",
@@ -2570,6 +2576,7 @@ Response:
         "long": 51.51,
         "temperature": 56.0,
         "timeISO": "2016-03-29 09:15",
+        "time": "21:05 16 Apr 2016",
         "type": "Reading",
         "alerts": [
           {
@@ -2595,6 +2602,7 @@ Response:
         "long": 51.51,
         "temperature": 56.0,
         "timeISO": "2016-03-29 09:15",
+        "time": "21:05 16 Apr 2016",
         "type": "Reading",
         "alerts": [
           {
@@ -2707,7 +2715,8 @@ Response:
         "latitude": 1.0,
         "longitude": 2.0,
         "time": 15,
-        "date": "2016-03-26T17:05",
+        "stopDate": "21:41 16 Apr 2016",
+        "stopDateISO": "2016-04-16 21:41",
         "location": {
           "locationId": 12220,
           "locationName": "Loc-5",

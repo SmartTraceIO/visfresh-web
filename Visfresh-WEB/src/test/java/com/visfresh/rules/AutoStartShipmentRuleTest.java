@@ -107,7 +107,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
 
         Shipment shipment = shipmentDao.findOne(shipmentId);
         assertNotNull(shipment);
-        assertEquals(e.getTime().getTime(), shipment.getShipmentDate().getTime(), 1000);
+        assertEquals(e.getTime().getTime(), shipment.getShipmentDate().getTime(), 2000);
 
         // check not duplicate handle
         assertFalse(rule.accept(c));

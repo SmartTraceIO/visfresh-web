@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
@@ -44,6 +45,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
 
     private int numInvoked = 0;
     private Company company;
+    private Map<Long, AlternativeLocations> alternativeLocations = new HashMap<>();
     /**
      * Default constructor.
      */
@@ -346,4 +348,19 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         savedTrackerEvents.add(e);
         return e;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.AbstractRuleEngine#getAlternativeLocations(com.visfresh.entities.Shipment)
+     */
+    @Override
+    protected AlternativeLocations getAlternativeLocations(final Shipment s) {
+        return alternativeLocations.get(s.getId());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.AbstractRuleEngine#saveAlternativeLocations(com.visfresh.entities.Shipment, com.visfresh.entities.AlternativeLocations)
+     */
+    @Override
+    protected void saveAlternativeLocations(final Shipment s, final AlternativeLocations v) {
+        alternativeLocations.put(s.getId(), v);
+    }
 }
+

@@ -21,7 +21,6 @@ import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
-import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -31,6 +30,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.NoteDto;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
@@ -131,9 +131,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param s shipment.
      * @return shipment serialized to JSON format.
      */
-    public JsonElement toJson(final Shipment s) {
+    public JsonObject toJson(final Shipment s) {
         if (s == null) {
-            return JsonNull.INSTANCE;
+            return null;
         }
 
         final JsonObject obj = new JsonObject();
@@ -192,6 +192,21 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         req.setIncludePreviousData(asBoolean(json.get("includePreviousData")));
         req.setTemplateName(asString(json.get("templateName")));
         req.setShipment(parseShipment(getShipmentFromRequest(json)));
+
+        final JsonElement locs = json.get("interimLocations");
+        if (locs != null && !locs.isJsonNull()) {
+            final JsonArray array = locs.getAsJsonArray();
+
+            final List<LocationProfile> list = new LinkedList<>();
+            req.setInterimLocations(list);
+            for (final JsonElement e : array) {
+                final Long id = e.getAsLong();
+                final LocationProfile lp = getReferenceResolver().getLocationProfile(id);
+                if (lp != null) {
+                    list.add(lp);
+                }
+            }
+        }
         return req;
     }
     public JsonObject toJson(final SaveShipmentRequest req) {
@@ -200,6 +215,15 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty("includePreviousData", req.isIncludePreviousData());
         obj.addProperty("templateName", req.getTemplateName());
         obj.add("shipment", toJson(req.getShipment()));
+        if (req.getInterimLocations() != null) {
+            final JsonArray array = new JsonArray();
+            obj.add("interimLocations", array);
+
+            for (final LocationProfile l : req.getInterimLocations()) {
+                array.add(new JsonPrimitive(l.getId()));
+            }
+        }
+
         obj.remove("deviceSN");
         obj.remove("deviceName");
         return obj;
@@ -695,9 +719,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param interimStops
      * @return
      */
-    private JsonArray interimStopsTJson(final List<InterimStop> interimStops) {
+    private JsonArray interimStopsTJson(final List<InterimStopDto> interimStops) {
         final JsonArray array = new JsonArray();
-        for (final InterimStop stop : interimStops) {
+        for (final InterimStopDto stop : interimStops) {
             array.add(toJson(stop));
         }
         return array;
@@ -706,7 +730,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param stop
      * @return
      */
-    private JsonObject toJson(final InterimStop stop) {
+    private JsonObject toJson(final InterimStopDto stop) {
         if (stop == null) {
             return null;
         }
@@ -716,7 +740,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("latitude", stop.getLatitude());
         json.addProperty("longitude", stop.getLongitude());
         json.addProperty("time", stop.getTime());
-        json.addProperty("date", formatDate(stop.getDate()));
+        json.addProperty("stopDate", stop.getStopDate());
+        json.addProperty("stopDateISO", stop.getStopDateIso());
         json.add("location", toJson(stop.getLocation()));
         return json;
     }
@@ -784,6 +809,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("long", l.getLongitude());
         json.addProperty("temperature", convertTemperature(l.getTemperature()));
         json.addProperty("timeISO", l.getTimeIso());
+        json.addProperty("time", l.getTime());
         json.addProperty("type", l.getType());
 
         final JsonArray alerts = new JsonArray();

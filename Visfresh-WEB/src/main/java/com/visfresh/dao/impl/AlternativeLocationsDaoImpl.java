@@ -114,12 +114,15 @@ public class AlternativeLocationsDaoImpl implements AlternativeLocationsDao {
     @Override
     public void save(final Shipment s, final AlternativeLocations locs) {
         if (!(locs.getFrom().isEmpty() && locs.getTo().isEmpty() && locs.getInterim().isEmpty())) {
-            final StringBuilder sql = new StringBuilder();
-
-            sql.append("insert into alternativelocations (shipment, location, loctype) values ");
-
             final Map<String, Object> params = new HashMap<>();
             params.put("shipment", s.getId());
+
+            //clear old alternative locations
+            jdbc.update("delete from alternativelocations where shipment = :shipment", params);
+
+            //add new alternative locations
+            final StringBuilder sql = new StringBuilder();
+            sql.append("insert into alternativelocations (shipment, location, loctype) values ");
 
             final List<String> values = new LinkedList<>();
             addLocations("from", locs.getFrom(), values, params);

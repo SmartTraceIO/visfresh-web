@@ -51,6 +51,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Note;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.NotificationSchedule;
@@ -63,6 +64,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -178,6 +180,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             }
 
             final SaveShipmentRequest req = serializer.parseSaveShipmentRequest(jsonRequest);
+
+            //save shipment
             final Shipment newShipment = req.getShipment();
 
             checkCompanyAccess(user, newShipment);
@@ -196,6 +200,16 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 id = saveNewShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
             }
 
+            //save interim locations
+            final List<LocationProfile> interims = req.getInterimLocations();
+            if (interims != null) {
+                //check company access
+                checkCompanyAccess(user, interims);
+
+                ruleEngine.setInterimLocations(newShipment, interims);
+            }
+
+            //build response
             final SaveShipmentResponse resp = new SaveShipmentResponse();
             resp.setShipmentId(id);
 
@@ -500,7 +514,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, shipment);
 
-            return createSuccessResponse(getSerializer(user).toJson(shipment));
+            final JsonObject json = getSerializer(user).toJson(shipment);
+            return createSuccessResponse(json);
         } catch (final Exception e) {
             log.error("Failed to get shipment " + shipmentId, e);
             return createErrorResponse(e);
@@ -587,7 +602,12 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
             final SingleShipmentDto dto = createDto(s, user);
             addLocationAlternatives(dto, s);
-            addInterimStops(dto, s);
+
+            //add interim stops
+            final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+            final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
+
+            addInterimStops(dto, s, isoFmt, prettyFmt);
 
             //add siblings
             final List<Shipment> siblings = siblingService.getSiblings(s);
@@ -663,9 +683,21 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @param dto DTO.
      * @param s shipment.
      */
-    private void addInterimStops(final SingleShipmentDto dto, final Shipment s) {
+    private void addInterimStops(final SingleShipmentDto dto, final Shipment s,
+            final DateFormat isoFormat, final DateFormat prettyFormat) {
         final List<InterimStop> stops = interimStopDao.getByShipment(s);
-        dto.getInterimStops().addAll(stops);
+        for (final InterimStop stp : stops) {
+            final InterimStopDto in = new InterimStopDto();
+            in.setId(stp.getId());
+            in.setLatitude(stp.getLatitude());
+            in.setLongitude(stp.getLongitude());
+            in.setLocation(stp.getLocation());
+            in.setTime(stp.getTime());
+            in.setStopDate(prettyFormat.format(stp.getDate()));
+            in.setStopDateIso(isoFormat.format(stp.getDate()));
+
+            dto.getInterimStops().add(in);
+        }
     }
     /**
      * @param dto single shipment DTO.
@@ -784,8 +816,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
         int i = 0;
         for (final SingleShipmentTimeItem item : items) {
-            dto.getLocations().addAll(createLocations(item, isoFmt,
-                    user, dto.getEtaIso(), dto.getEndLocation(), i == items.size() - 1));
+            dto.getLocations().addAll(createLocations(item, isoFmt, prettyFmt,
+                    user, i == items.size() - 1));
             i++;
         }
         dto.setCurrentLocation(items.size() == 0 ? "Not determined"
@@ -920,9 +952,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     private List<SingleShipmentLocation> createLocations(
             final SingleShipmentTimeItem item,
             final DateFormat timeIsoFmt,
+            final DateFormat prettyFmt,
             final User user,
-            final String etaIso,
-            final String shippedTo,
             final boolean isLast) {
         final List<SingleShipmentLocation> list = new LinkedList<SingleShipmentLocation>();
 
@@ -934,15 +965,13 @@ public class ShipmentController extends AbstractController implements ShipmentCo
         lo.setLongitude(event.getLongitude());
         lo.setTemperature(event.getTemperature());
         lo.setTimeIso(timeIsoFmt.format(event.getTime()));
+        lo.setTime(prettyFmt.format(event.getTime()));
         lo.setType(eventTypeToString(event.getType()));
         list.add(lo);
 
-        final String address = this.locationService.getLocationDescription(
-                new Location(event.getLatitude(), event.getLongitude()));
-
         //add tracker event
         if (isLast) {
-            lo.getAlerts().add(createLastReadingAlert(event, user, address, lo.getTimeIso()));
+            lo.getAlerts().add(createLastReadingAlert(event, user));
         }
 
         //add alerts
@@ -981,12 +1010,10 @@ public class ShipmentController extends AbstractController implements ShipmentCo
     /**
      * @param event event.
      * @param user user
-     * @param address address.
-     * @param timeIso time in ISO format
      * @return
      */
     private SingleShipmentAlert createLastReadingAlert(final TrackerEvent event,
-            final User user, final String address, final String timeIso) {
+            final User user) {
         final String text = chartBundle.buildTrackerEventDescription(event,
                 user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
         return createSingleShipmentAlert("LastReading", text);

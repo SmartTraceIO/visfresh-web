@@ -18,21 +18,26 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
+import com.visfresh.io.json.InterimStopSerializer;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.mpl.services.TrackerMessageDispatcher;
 import com.visfresh.rules.state.DeviceState;
@@ -63,8 +68,11 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     private DeviceDao deviceDao;
     @Autowired
     private ShipmentSessionDao shipmentSessionDao;
+    @Autowired
+    private AlternativeLocationsDao altLocDao;
 
     private final DeviceDcsNativeEventSerializer deviceEventParser = new DeviceDcsNativeEventSerializer();
+    private final InterimStopSerializer interimSerializer = new InterimStopSerializer();
     private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<>();
     protected final Map<Long, ShipmentSessionCacheEntry> sessionCache = new ConcurrentHashMap<>();
 
@@ -343,6 +351,57 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         }
     }
 
+    @Override
+    public void setInterimLocations(final Shipment s, final List<LocationProfile> stops) {
+        final String key = createInterimLocationsKey();
+
+        //add interims to alternative locations
+        final AlternativeLocations v = getAlternativeLocations(s);
+        v.getInterim().clear();
+        v.getInterim().addAll(stops);
+        saveAlternativeLocations(s, v);
+
+        //save interim location
+        final JsonArray array = new JsonArray();
+        for (final LocationProfile l : stops) {
+            array.add(interimSerializer.toJson(l));
+        }
+
+        final ShipmentSession state = this.loadSession(s, key);
+        try {
+            state.setShipmentProperty(key, array.toString());
+        } finally {
+            unloadSession(s, key, true);
+        }
+    }
+    @Override
+    public List<LocationProfile> getInterimLocations(final Shipment s) {
+        final String key = createInterimLocationsKey();
+        final ShipmentSession state = this.loadSession(s, key);
+
+        try {
+            final String str = state.getShipmentProperty(key);
+            if (str != null) {
+                final List<LocationProfile> locs = new LinkedList<>();
+                final JsonArray array = SerializerUtils.parseJson(str).getAsJsonArray();
+                for (final JsonElement e : array) {
+                    locs.add(interimSerializer.parseLocation(e.getAsJsonObject()));
+                }
+                return locs;
+            }
+        } finally {
+            unloadSession(s, key, false);
+        }
+
+        return null;
+    }
+    /**
+     * @return
+     */
+    private static String createInterimLocationsKey() {
+        return "InterimStop-locations";
+    }
+
     /**
      * @param s
      * @param ss
@@ -356,6 +415,21 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     protected ShipmentSession loadSessionFromDb(final Shipment s) {
         return shipmentSessionDao.getSession(s);
+    }
+    /**
+     * @param s
+     * @param v
+     */
+    protected void saveAlternativeLocations(final Shipment s,
+            final AlternativeLocations v) {
+        altLocDao.save(s, v);
+    }
+    /**
+     * @param s
+     * @return
+     */
+    protected AlternativeLocations getAlternativeLocations(final Shipment s) {
+        return altLocDao.getByShipment(s);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RuleEngine#supressNextAlerts(com.visfresh.entities.Shipment)

@@ -59,6 +59,7 @@ import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.ReferenceResolver;
+import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.UserResolver;
 import com.visfresh.rules.AbstractRuleEngine;
@@ -217,6 +218,47 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         //check old shipment closed
         final Shipment old = context.getBean(ShipmentDao.class).findOne(oldId);
         assertEquals(ShipmentStatus.Ended, old.getStatus());
+    }
+    @Test
+    public void testSaveInterimLocations() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+
+        final LocationProfile l1 = createLocationProfile(true);
+        final LocationProfile l2 = createLocationProfile(true);
+
+        final List<LocationProfile> locs = new LinkedList<>();
+        locs.add(l1);
+        locs.add(l2);
+
+        final SaveShipmentRequest req = new SaveShipmentRequest();
+        req.setShipment(s);
+        req.setInterimLocations(locs);
+
+        shipmentClient.saveShipment(req);
+
+        //check alternative locations saved
+        final AlternativeLocationsDao alDao = context.getBean(AlternativeLocationsDao.class);
+        assertEquals(2, alDao.getByShipment(s).getInterim().size());
+
+        //check interim locations configured.
+        final RuleEngine eng = context.getBean(RuleEngine.class);
+        assertEquals(2, eng.getInterimLocations(s).size());
+
+        //check interim locations
+        locs.remove(locs.size() - 1);
+        shipmentClient.saveShipment(req);
+
+        //check locations
+        assertEquals(1, alDao.getByShipment(s).getInterim().size());
+        assertEquals(1, eng.getInterimLocations(s).size());
+
+        //check if interims not present in request, that not then changed
+        req.setInterimLocations(null);
+        shipmentClient.saveShipment(req);
+
+        //check locations
+        assertEquals(1, alDao.getByShipment(s).getInterim().size());
+        assertEquals(1, eng.getInterimLocations(s).size());
     }
     @Test
     public void testSaveShipmentOverDefaultWithExpiredEvent() throws RestServiceException, IOException {

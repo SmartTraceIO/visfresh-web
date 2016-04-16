@@ -36,6 +36,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     private final Map<Long, List<InterimStop>> stops = new HashMap<>();
     private List<LocationProfile> locations;
     private Shipment shipment;
+    private Map<Long, List<LocationProfile>> interimLocations = new HashMap<>();
 
     /**
      * Default constructor.
@@ -69,7 +70,7 @@ public class InterimStopRuleTest extends InterimStopRule {
         assertFalse(accept(new RuleContext(createTrackerEvent(shipment, 1, 2), mgr)));
 
         //test accept correct request
-        saveInterimLocations(mgr.getSession(shipment), locations);
+        saveInterimLocations(shipment, locations);
         assertTrue(accept(new RuleContext(createTrackerEvent(shipment, 1, 2), mgr)));
 
         //test not accept far location
@@ -93,7 +94,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     public void testHandleFirstReading() {
         //test success accept
         final SessionHolder mgr = new SessionHolder();
-        saveInterimLocations(mgr.getSession(shipment), locations);
+        saveInterimLocations(shipment, locations);
 
         final TrackerEvent e = createTrackerEvent(locations.get(0));
         assertFalse(handle(new RuleContext(e, mgr)));
@@ -108,7 +109,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     public void testHandleFirstReadingWithInit() {
         //test success accept
         final SessionHolder mgr = new SessionHolder();
-        saveInterimLocations(mgr.getSession(shipment), locations);
+        saveInterimLocations(shipment, locations);
 
         final TrackerEvent e = createTrackerEvent(locations.get(0));
         e.setType(TrackerEventType.STP);
@@ -125,7 +126,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     public void testHandleSecondReading() {
         //test success accept
         final SessionHolder state = new SessionHolder();
-        saveInterimLocations(state.getSession(shipment), locations);
+        saveInterimLocations(shipment, locations);
 
         //simulate previous stop
         setInterimStopState(state.getSession(shipment), new InterimStopInfo());
@@ -140,7 +141,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     public void testHandleEndOfStop() {
         //test success accept
         final SessionHolder mgr = new SessionHolder();
-        saveInterimLocations(mgr.getSession(shipment), locations);
+        saveInterimLocations(shipment, locations);
 
         //simulate prevous stop
         setInterimStopState(mgr.getSession(shipment), new InterimStopInfo());
@@ -156,7 +157,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     public void testUpdateStopTime() {
         //test success accept
         final SessionHolder mgr = new SessionHolder();
-        saveInterimLocations(mgr.getSession(shipment), locations);
+        saveInterimLocations(shipment, locations);
 
         //simulate previous stop
         setInterimStopState(mgr.getSession(shipment), new InterimStopInfo());
@@ -244,6 +245,21 @@ public class InterimStopRuleTest extends InterimStopRule {
     protected LocationProfile createLocation(final Location loc) {
         return createLocation(loc.getLatitude(), loc.getLongitude());
     }
+    /**
+     * @param s shipment.
+     * @param locs locations.
+     */
+    private void saveInterimLocations(final Shipment s, final List<LocationProfile> locs) {
+        interimLocations.put(s.getId(), locs);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.InterimStopRule#getInterimLocations(com.visfresh.entities.Shipment)
+     */
+    @Override
+    protected List<LocationProfile> getInterimLocations(final Shipment shipment) {
+        return interimLocations.get(shipment.getId());
+    }
+
     /**
      * @param lat latitude
      * @param lon longitude
