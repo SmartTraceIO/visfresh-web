@@ -34,9 +34,10 @@ public class EmailMessageDispatcher extends AbstractSystemMessageDispatcher {
         processorId = env.getProperty("email.dispatcher.baseProcessorId", "email");
 
         setBatchLimit(Integer.parseInt(env.getProperty("email.dispatcher.batchLimit", "10")));
-        setRetryLimit(Integer.parseInt(env.getProperty("email.dispatcher.retryLimit", "5")));
+        setRetryLimit(Integer.parseInt(env.getProperty("email.dispatcher.retryLimit", "3")));
         setNumThreads(Integer.parseInt(env.getProperty("email.dispatcher.numThreads", "1")));
-        setInactiveTimeOut(Long.parseLong(env.getProperty("email.dispatcher.retryLimit", "3000")));
+        setInactiveTimeOut(Long.parseLong(env.getProperty("sms.dispatcher.inactiveTimeOut", "3000")));
+        setRetryTimeOut(Long.parseLong(env.getProperty("sms.dispatcher.retryTimeOut", "300000")));
     }
 
     /**

@@ -34,9 +34,10 @@ public class SmsMessageDispatcher extends AbstractSystemMessageDispatcher {
         processorId = env.getProperty("sms.dispatcher.baseProcessorId", "sms");
 
         setBatchLimit(Integer.parseInt(env.getProperty("sms.dispatcher.batchLimit", "10")));
-        setRetryLimit(Integer.parseInt(env.getProperty("sms.dispatcher.retryLimit", "5")));
+        setRetryLimit(Integer.parseInt(env.getProperty("sms.dispatcher.retryLimit", "3")));
         setNumThreads(Integer.parseInt(env.getProperty("sms.dispatcher.numThreads", "1")));
-        setInactiveTimeOut(Long.parseLong(env.getProperty("sms.dispatcher.retryLimit", "3000")));
+        setInactiveTimeOut(Long.parseLong(env.getProperty("sms.dispatcher.inactiveTimeOut", "3000")));
+        setRetryTimeOut(Long.parseLong(env.getProperty("sms.dispatcher.retryTimeOut", "300000")));
     }
 
     /**
