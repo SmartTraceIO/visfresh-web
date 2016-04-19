@@ -30,25 +30,44 @@ import com.visfresh.utils.SerializerUtils;
 @Component
 public class EmailServiceImpl implements EmailService, SystemMessageHandler {
     /**
+     *
+     */
+    private static final String DEFAULT_SUPPORT_ADDRESS = "support@smarttrace.com.au";
+
+    /**
      * The logger.
      */
     private static final Logger log = LoggerFactory.getLogger(EmailServiceImpl.class);
 
-    private final EmailServiceHelper helper = new EmailServiceHelper();
+    private final EmailServiceHelper helper;
     private final EmailSerializer serializer = new EmailSerializer();
 
     @Autowired
     private EmailMessageDispatcher dispatcher;
-    private String supportAddress;
+    private String supportAddress = DEFAULT_SUPPORT_ADDRESS;
 
     /**
      * @param env spring environment.
      */
     @Autowired
     public EmailServiceImpl(final Environment env) {
+        this(createHelper(env));
+        supportAddress = env.getProperty("mail.support.address", DEFAULT_SUPPORT_ADDRESS);
+    }
+    /**
+     *
+     */
+    public EmailServiceImpl(final EmailServiceHelper helper) {
         super();
-
+        this.helper = helper;
+    }
+    /**
+     * @param env
+     * @return
+     */
+    private static EmailServiceHelper createHelper(final Environment env) {
         final boolean useSsl = "true".equalsIgnoreCase(env.getProperty("mail.smtp.useSsl", "false"));
+        final EmailServiceHelper helper = new EmailServiceHelper();
         helper.setUseSsl(useSsl);
 
         final String sender = env.getProperty("mail.smtp.sender");
@@ -67,7 +86,7 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
         helper.setUser(env.getProperty("mail.smtp.user"));
         helper.setPassword(env.getProperty("mail.smtp.password"));
 
-        supportAddress = env.getProperty("mail.support.address", "support@smarttrace.com.au");
+        return helper;
     }
 
     /* (non-Javadoc)
@@ -82,7 +101,7 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
         msg.setSubject(subject);
 
         final String payload = serializer.toJson(msg).toString();
-        dispatcher.sendSystemMessage(payload, SystemMessageType.Email);
+        sendSystemMessage(payload, SystemMessageType.Email);
     }
     @Override
     public void sendMessageToSupport(final String subject, final String message) throws MessagingException {
@@ -98,6 +117,13 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
                 SerializerUtils.parseJson(msg.getMessageInfo()));
         log.debug("Email message dequeued: " + msg.getMessageInfo());
         sendImediatelly(m.getEmails(), m.getSubject(), m.getMessage());
+    }
+    /**
+     * @param payload
+     * @param type
+     */
+    protected void sendSystemMessage(final String payload, final SystemMessageType type) {
+        dispatcher.sendSystemMessage(payload, type);
     }
     /**
      * @param emails

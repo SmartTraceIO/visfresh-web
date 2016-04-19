@@ -186,7 +186,6 @@
 
 	<!-- Battery -->
 	<entry key="Email.Subject.Battery">
-		${type}
 		Low Battery Alert for Tracker ${devicesn}(${tripCount}) 		
 	</entry>
 	<!-- Arrival -->

@@ -180,7 +180,7 @@ public class EmailServiceHelper {
         h.setUser("api@smarttrace.com.au");
         h.setPassword("figspace");
 
-        h.sendMessage(new String[] {"vyacheslav.soldatov@inbox.ru"},
+        h.sendMessage(new String[] {"james@smarttrace.com.au", "vyacheslav.soldatov@inbox.ru"},
                 "Test Message", "Test message for new email service");
     }
 }

@@ -38,7 +38,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private SmsService smsService;
     @Autowired
-    private EmailService emailService;
+    protected EmailService emailService;
     @Autowired
     private NotificationDao notificationDao;
     @Autowired
