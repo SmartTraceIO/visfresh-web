@@ -135,10 +135,10 @@ public class SimulatorServiceImpl implements SimulatorService {
     }
     /**
      * @param user user.
-     * @param b started flag.
+     * @param started started flag.
      */
-    protected void setSimulatorStarted(final User user, final boolean b) {
-        dao.setSimulatorStarted(user, false);
+    protected void setSimulatorStarted(final User user, final boolean started) {
+        dao.setSimulatorStarted(user, started);
     }
     /**
      * @param msg

@@ -20,12 +20,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.controllers.restclient.SimulatorRestClient;
+import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.SimulatorDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Role;
-import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.Simulator;
 import com.visfresh.entities.User;
 import com.visfresh.io.SimulatorDto;
@@ -84,13 +85,17 @@ public class SimulatorControllerTest extends AbstractRestServiceTest {
     @Test
     public void testSaveSimulator() throws IOException, RestServiceException {
         final User u = createUser2();
-        final ShipmentTemplate tpl = createShipmentTemplate(true);
+
+        AutoStartShipment auto = new AutoStartShipment();
+        auto.setTemplate(createShipmentTemplate(true));
+        auto.setCompany(auto.getTemplate().getCompany());
+        auto = context.getBean(AutoStartShipmentDao.class).save(auto);
 
         final SimulatorDto dto = new SimulatorDto();
         dto.setSourceDevice(device.getImei());
         dto.setTargetDevice(null);
         dto.setUser(u.getEmail());
-        dto.setAutoStart(tpl.getId());
+        dto.setAutoStart(auto.getId());
 
         final String virtualDevice = client.saveSimulator(dto);
         assertNotNull(context.getBean(DeviceDao.class).findByImei(virtualDevice));
@@ -99,7 +104,7 @@ public class SimulatorControllerTest extends AbstractRestServiceTest {
         assertEquals(dto.getSourceDevice(), sim.getSourceDevice());
         assertEquals(u.getEmail(), sim.getUser());
         assertEquals(virtualDevice, sim.getTargetDevice());
-        assertEquals(tpl.getId(), sim.getAutoStart());
+        assertEquals(auto.getId(), sim.getAutoStart());
     }
     @Test
     public void testUpdateSimulator() throws IOException, RestServiceException {
@@ -107,14 +112,18 @@ public class SimulatorControllerTest extends AbstractRestServiceTest {
 
         final Simulator sim = createSimulator(u);
         final Device d = createDevice("187623887979876", true);
-        final ShipmentTemplate tpl = createShipmentTemplate(true);
+
+        AutoStartShipment auto = new AutoStartShipment();
+        auto.setTemplate(createShipmentTemplate(true));
+        auto.setCompany(auto.getTemplate().getCompany());
+        auto = context.getBean(AutoStartShipmentDao.class).save(auto);
 
         //do update
         SimulatorDto dto = new SimulatorDto();
         dto.setSourceDevice(d.getImei());
         dto.setTargetDevice(sim.getTarget().getImei());
         dto.setUser(u.getEmail());
-        dto.setAutoStart(tpl.getId());
+        dto.setAutoStart(auto.getId());
 
         final String virtualDevice = client.saveSimulator(dto);
         dto = dao.findSimulatorDto(u);
@@ -125,7 +134,7 @@ public class SimulatorControllerTest extends AbstractRestServiceTest {
 
         //check source device is changed
         assertEquals(dto.getSourceDevice(), d.getImei());
-        assertEquals(tpl.getId(),
+        assertEquals(auto.getId(),
                 context.getBean(DeviceDao.class).findOne(dto.getTargetDevice()).getAutostartTemplateId());
     }
     @Test

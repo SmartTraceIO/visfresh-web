@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ErrorCodes;
+import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.DeviceDao;
-import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.SimulatorDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Role;
-import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.Simulator;
 import com.visfresh.entities.User;
 import com.visfresh.io.SimulatorDto;
@@ -53,7 +53,7 @@ public class SimulatorController extends AbstractController {
     @Autowired
     private SimulatorService service;
     @Autowired
-    private ShipmentTemplateDao shipmentTemplateDao;
+    private AutoStartShipmentDao autoStartShipmentDao;
 
     /**
      * Default constructor.
@@ -84,8 +84,8 @@ public class SimulatorController extends AbstractController {
                 return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "User "
                         + dto.getUser() + " not found");
             }
-            final ShipmentTemplate tpl = shipmentTemplateDao.findOne(dto.getAutoStart());
-            if (tpl != null && !u.getCompany().getId().equals(tpl.getCompany().getId())) {
+            final AutoStartShipment auto = autoStartShipmentDao.findOne(dto.getAutoStart());
+            if (auto != null && !u.getCompany().getId().equals(auto.getCompany().getId())) {
                 return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
                         "Shipment template should be from same company as user");
             }
@@ -106,7 +106,7 @@ public class SimulatorController extends AbstractController {
             dao.save(sim);
 
             //set autostart template to virtual device.
-            final Long autoStart = tpl == null ? null : tpl.getId();
+            final Long autoStart = auto == null ? null : auto.getId();
             final Long oldAutoStart = simulatorDevice.getAutostartTemplateId();
 
             if (!equals(autoStart, oldAutoStart)) {
