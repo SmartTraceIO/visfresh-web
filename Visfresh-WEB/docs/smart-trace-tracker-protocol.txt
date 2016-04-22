@@ -1,0 +1,154 @@
+Smart-Trace Tracker Protocol 
+
+
+1 Device ---> Server protocol:
+=================================
+
+This is an example sent by device:
+
+POST /data HTTP/1.1<CR><LF>
+Host: 183.17.213.153<CR><LF>
+Accept-Encoding: identity<CR><LF>
+Content-Length: 578<CR><LF>
+<CR><LF>
+352165050241780|AUT|2015/01/22 14:02:27|<LF>
+4065|27.04|<LF>
+505|1|354|27992|59|<LF>
+505|1|354|16901|55|<LF>
+505|1|354|27993|41|<LF>
+505|1|354|27991|38|<LF>
+505|1|354|8041|36|<LF>
+505|1|354|16903|22|<LF>
+<LF>
+358688000000158|AUT|2015/01/22 14:13:29|<LF>
+4020|-11.52|<LF>
+505|1|9533|16114|34|<LF>
+505|1|9533|16111|37|<LF>
+505|1|9533|16904|31|<LF>
+505|1|9533|16113|23|<LF>
+<LF>
+358688000000158|RSP|2015/01/22 14:28:29|<LF>
+SET SERVER OK<LF>
+<LF>
+358688000000158|AUT|2015/01/22 14:38:29|<LF>
+4016|-10.08|<LF>
+505|1|9533|16114|34|<LF>
+505|1|9533|16111|37|<LF>
+505|1|9533|16904|31|<LF>
+505|1|9533|16113|23|<LF>
+505|1|9533|16142|21|<LF>
+505|1|9533|16526|18|<LF>
+<LF>
+
+The detail explanation:
+A. First line is HTTP request line.
+B. Following 3 lines are HTTP header lines.
+C. Following 1 line is blank line that is the gap between header and body.
+D. The following lines are HTTP body which includes all data sent by device. Format:
+    <IMEI>|<DATA_TYPE>|<TIME>|
+    <BATTERY>|<TEMPERATURE>|
+    <MCC>|<MNC>|<LAC>|<CI>|<RXLEV>|    // This is primary base station
+    <MCC>|<MNC>|<LAC>|<CI>|<RXLEV>|    // Others are neighbor base stations
+
+NOTE: <DATA_TYPE> in current protocol:
+          "INIT" means auto-collected-data at device starting,
+          "AUT"  means auto-collected-data by timer,
+          "RSP"  means the RESPONSE that is replied to server,
+          "VIB"  means the device start to vibrating (maybe moving?),
+          "STP"  means the device is stable (maybe stopped?),
+          "BRT"  means the device enters bright environment,
+          "DRK"  means the device enters dark environment,
+          Others are undefined.
+
+NOTE: Normally, we will encapsulate <QUANTITY> data in one package if network is in full service.
+NOTE: If there are too many pending data in storage because of no network, we will encapsulate
+      up to 8 data in one package after network is recovered.
+NOTE: <RXLEV> means the signal rx-level. 0 is -110dB, 1 is -109dB, and so on. MAX is 63 which
+      means -47dB.
+
+
+2 Server ---> Device response:
+====================================
+
+This is an example responsed by server to indicate it is received:
+
+HTTP/1.1 200 OK<CR><LF>
+Content-Length: 0<CR><LF>
+<CR><LF>
+
+The detail explanation:
+A. First line is HTTP status line.
+B. Following 1 line or more are HTTP header lines.
+C. Following 1 line is blank line that is the gap between header and body.
+D. The following lines are HTTP body. The body data is the command sent by server.
+
+NOTE: If device receives a legal HTTP response package, it means data has received by server
+      successfully. The content of body is the command sent by server.
+NOTE: After device receives response successfully, it deletes this package from storage and
+      sends another one if existed.
+NOTE: If transfer is interrupted or timeout, device keeps this package in storage and retry it
+      after some time.
+NOTE: Device sends package only when GSM network is available.
+NOTE: All packages are sent in FIFO. If there are many pending packages in device, the RESPONSE
+      for GPRS COMMAND will be sent after all pending packages. So you should send GPRS COMMAND
+      after all pending packages.
+
+
+3 Device commands:
+==============================================================
+
+3.1 Description:
+
+All commands can be sent by SMS/UART/GPRS.
+
+Q: How to send command by SMS?
+A: You edit raw command as SMS content and send. The result will return by SMS.
+
+Q: How to send command by GPRS?
+A: See section 1 and 2.
+
+3.2 UPGRADE,<FILENAME>,<SERVER>,<PORT>#
+
+3.3 MODEL,<MODEL>#
+
+3.4 APN,<APN>[,<USER>,<PASSWORD>]#
+
+3.5 SERVER,<MODE>,<SERVER>,<PORT>#
+
+EXAMPLE: server,1,www.s400.com,32001#
+EXAMPLE: server,0,76.12.61.210,3924#
+
+NOTE: <MODE>=1: <SERVER> is domain name; <MODE>=0: <SERVER> is IP address.
+
+3.6 TIMER,<INTERVAL>,<QUANTITY>#
+
+Setup timers of normal mode.
+
+EXAMPLE: timer,300,3#
+NOTE: <INTERVAL> is sampling interval (seconds) between data.
+NOTE: <QUANTITY> is data amount per package.
+
+3.7 ALERT,<INTERVAL>,<QUANTITY>,<LIMIT>#
+
+3.8 GMT,<E/W>,<TZ>#
+
+3.9 IMEI,<IMEI>#
+
+3.10 ALARM,<ALARM>#
+
+3.11 MOTION,<SENSITIVITY>,<DELAY>#
+
+3.12 LIGHT,<SENSITIVITY>,<DELAY>#
+
+3.13 RESET#
+
+3.14 SHUTDOWN#
+
+3.15 VERSION#
+
+3.16 PARAM#
+
+3.17 STATUS#
+
+3.18 REPORT#
+
