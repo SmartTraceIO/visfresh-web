@@ -96,7 +96,7 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
         final E e1 = createTestEntity();
         dao.save(e1);
         dao.save(e1);
-        assertCreateTestEntityOk(e1);
+        assertCreateTestEntityOk(dao.findOne(e1.getId()));
     }
 
     protected abstract E createTestEntity();

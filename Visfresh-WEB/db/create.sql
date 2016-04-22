@@ -338,6 +338,7 @@ create table trackerevents (
     id bigint(20) auto_increment not null,
     `type` varchar(20) not null,
     `time` timestamp null default null,
+    createdon timestamp null default null,
     battery int not null,
     temperature double not null,
     latitude double not null,

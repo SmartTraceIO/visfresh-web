@@ -186,6 +186,7 @@ public class SimulatorServiceTest extends SimulatorServiceImpl {
         te.setDeviceImei(device.getImei());
         te.setType(TrackerEventType.AUT);
         te.setTime(date);
+        te.setCreatedOn(new Date());
         events.add(te);
         return te;
     }

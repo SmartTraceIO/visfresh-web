@@ -6,6 +6,7 @@ package com.visfresh.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.Date;
@@ -109,6 +110,7 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
     @Override
     protected void assertCreateTestEntityOk(final TrackerEvent e) {
         assertNotNull(e.getTime());
+        assertNotNull(e.getCreatedOn());
         assertEquals(27, e.getBattery());
         assertEquals(5.5, e.getTemperature(), 0.00001);
         assertEquals(TrackerEventType.INIT, e.getType());
@@ -199,6 +201,16 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         final TrackerEvent e = dao.getPreviousEvent(curr);
         assertEquals(prev.getId(), e.getId());
         assertNull(dao.getPreviousEvent(first));
+    }
+    @Test
+    public void createdOnNotUpdatable() {
+        final long time = System.currentTimeMillis() - 100000000l;
+        final TrackerEvent e = createAndSave(new Date((time)), 12);
+
+        e.setCreatedOn(new Date(time));
+        dao.save(e);
+
+        assertTrue(dao.findOne(e.getId()).getCreatedOn().after(new Date(time + 100000l)));
     }
     @Test
     public void testGetLastEvent() {

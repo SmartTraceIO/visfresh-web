@@ -46,6 +46,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     protected static final String ID_FIELD = "id";
     protected static final String TYPE_FIELD = "type";
     protected static final String TIME_FIELD = "time";
+    protected static final String CREATED_ON_FIELD = "createdon";
     protected static final String BATTERY_FIELD = "battery";
     protected static final String TEMPERATURE_FIELD = "temperature";
     protected static final String LATITUDE_FIELD = "latitude";
@@ -86,7 +87,11 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         String sql;
         final List<String> fields = getFields(false);
         if (event.getId() == null) {
-            //insert
+            //create on field is not updateable.
+            event.setCreatedOn(new Date());
+            fields.add(CREATED_ON_FIELD);
+            paramMap.put(CREATED_ON_FIELD, event.getCreatedOn());
+
             sql = createInsertScript(TABLE, fields);
         } else {
             //update
@@ -276,15 +281,16 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      */
     @Override
     protected TrackerEvent createEntity(final Map<String, Object> map) {
-        final TrackerEvent a = new TrackerEvent();
-        a.setId(((Number) map.get(ID_FIELD)).longValue());
-        a.setBattery(((Number) map.get(BATTERY_FIELD)).intValue());
-        a.setTemperature(((Number) map.get(TEMPERATURE_FIELD)).doubleValue());
-        a.setLatitude(((Number) map.get(LATITUDE_FIELD)).doubleValue());
-        a.setLongitude(((Number) map.get(LONGITUDE_FIELD)).doubleValue());
-        a.setTime((Date) map.get(TIME_FIELD));
-        a.setType(TrackerEventType.valueOf((String) map.get(TYPE_FIELD)));
-        return a;
+        final TrackerEvent e = new TrackerEvent();
+        e.setId(((Number) map.get(ID_FIELD)).longValue());
+        e.setBattery(((Number) map.get(BATTERY_FIELD)).intValue());
+        e.setTemperature(((Number) map.get(TEMPERATURE_FIELD)).doubleValue());
+        e.setLatitude(((Number) map.get(LATITUDE_FIELD)).doubleValue());
+        e.setLongitude(((Number) map.get(LONGITUDE_FIELD)).doubleValue());
+        e.setTime((Date) map.get(TIME_FIELD));
+        e.setCreatedOn((Date) map.get(CREATED_ON_FIELD));
+        e.setType(TrackerEventType.valueOf((String) map.get(TYPE_FIELD)));
+        return e;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.TrackerEventDao#getLastEvents(java.util.List)
@@ -398,6 +404,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         ue.setTemperature(e.getTemperature());
         ue.setTime(e.getTime());
         ue.setType(e.getType());
+        ue.setCreatedOn(e.getCreatedOn());
 
         final Object shipmentField = row.get(SHIPMENT_FIELD);
         //possible null if not shipment assigned for given event. It is possible

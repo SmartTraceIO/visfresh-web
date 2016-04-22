@@ -31,6 +31,7 @@ public class TrackerEventSerializer extends AbstractJsonSerializer {
         obj.addProperty(TrackerEventConstants.PROPERTY_ID, e.getId());
         obj.addProperty(TrackerEventConstants.PROPERTY_TEMPERATURE, e.getTemperature());
         obj.addProperty(TrackerEventConstants.PROPERTY_TIME, formatDate(e.getTime()));
+        obj.addProperty(TrackerEventConstants.PROPERTY_CREATEDON, formatDate(e.getCreatedOn()));
         obj.addProperty(TrackerEventConstants.PROPERTY_TYPE, e.getType().toString());
         obj.addProperty(TrackerEventConstants.PROPERTY_LATITUDE, e.getLatitude());
         obj.addProperty(TrackerEventConstants.PROPERTY_LONGITUDE, e.getLongitude());
@@ -42,6 +43,7 @@ public class TrackerEventSerializer extends AbstractJsonSerializer {
         e.setId(asLong(json.get(TrackerEventConstants.PROPERTY_ID)));
         e.setTemperature(asDouble(json.get(TrackerEventConstants.PROPERTY_TEMPERATURE)));
         e.setTime(asDate(json.get(TrackerEventConstants.PROPERTY_TIME)));
+        e.setCreatedOn(asDate(json.get(TrackerEventConstants.PROPERTY_CREATEDON)));
         e.setType(TrackerEventType.valueOf(asString(json.get(TrackerEventConstants.PROPERTY_TYPE))));
         e.setLatitude(asDouble(json.get(TrackerEventConstants.PROPERTY_LATITUDE)));
         e.setLongitude(asDouble(json.get(TrackerEventConstants.PROPERTY_LONGITUDE)));

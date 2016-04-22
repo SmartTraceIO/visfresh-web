@@ -33,6 +33,7 @@ public class TrackerEventSerializerTest extends AbstractSerializerTest {
         final Long id = 7l;
         final double temperature = 77.77;
         final Date time = new Date(System.currentTimeMillis() - 1000000000L);
+        final Date createdOn = new Date(System.currentTimeMillis() - 1000000777L);
         final TrackerEventType type = TrackerEventType.RSP;
         final double latitude = 10.10;
         final double longitude = 11.11;
@@ -45,6 +46,7 @@ public class TrackerEventSerializerTest extends AbstractSerializerTest {
         e.setType(type);
         e.setLatitude(latitude);
         e.setLongitude(longitude);
+        e.setCreatedOn(createdOn);
 
         final JsonObject obj= serializer.toJson(e);
         e = serializer.parseTrackerEvent(obj);
@@ -53,6 +55,7 @@ public class TrackerEventSerializerTest extends AbstractSerializerTest {
         assertEquals(id, e.getId());
         assertEquals(temperature, e.getTemperature(), 0.00001);
         assertEquals(format(time), format(e.getTime()));
+        assertEquals(format(createdOn), format(e.getCreatedOn()));
         assertEquals(type, e.getType());
         assertEquals(latitude, e.getLatitude(), 0.000001);
         assertEquals(longitude, e.getLongitude(), 0.00001);

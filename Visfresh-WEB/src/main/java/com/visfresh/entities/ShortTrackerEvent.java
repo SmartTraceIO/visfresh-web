@@ -37,6 +37,7 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
     private Long shipentId;
     private double latitude;
     private double longitude;
+    private Date createdOn;
 
     /**
      * Default constructor.
@@ -153,6 +154,19 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
      */
     public void setLongitude(final double longitude) {
         this.longitude = longitude;
+    }
+
+    /**
+     * @param createdOn
+     */
+    public void setCreatedOn(final Date createdOn) {
+        this.createdOn = createdOn;
+    }
+    /**
+     * @return the createdOn
+     */
+    public Date getCreatedOn() {
+        return createdOn;
     }
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)

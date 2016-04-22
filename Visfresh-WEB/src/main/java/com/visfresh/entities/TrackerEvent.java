@@ -19,6 +19,10 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
      */
     private TrackerEventType type;
     /**
+     * Creation date.
+     */
+    private Date createdOn;
+    /**
      * Time of creation.
      */
     private Date time;
@@ -43,6 +47,7 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
      */
     public TrackerEvent() {
         super();
+        setCreatedOn(new Date());
     }
 
     /* (non-Javadoc)
@@ -153,6 +158,18 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
      */
     public void setLongitude(final double longitude) {
         this.longitude = longitude;
+    }
+    /**
+     * @return the createdOn
+     */
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+    /**
+     * @param createdOn the createdOn to set
+     */
+    public void setCreatedOn(final Date createdOn) {
+        this.createdOn = createdOn;
     }
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)

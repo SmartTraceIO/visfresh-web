@@ -236,6 +236,7 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         e.setLatitude(latitude);
         e.setLongitude(longitude);
         e.setTime(new Date(time));
+        e.setCreatedOn(e.getTime());
         events.add(e);
         return e;
     }
