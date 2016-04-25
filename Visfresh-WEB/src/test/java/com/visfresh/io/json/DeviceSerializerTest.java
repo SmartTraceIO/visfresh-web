@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
+import com.visfresh.entities.Color;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.ShipmentStatus;
@@ -42,12 +43,14 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         final String name = "Device Name";
         final boolean active = !t.isActive();
         final Long autostartTemplateId = 777l;
+        final Color color = Color.Blue;
 
         t.setDescription(description);
         t.setImei(imei);
         t.setName(name);
         t.setActive(active);
         t.setAutostartTemplateId(autostartTemplateId);
+        t.setColor(color);
 
         final JsonObject json = serializer.toJson(t).getAsJsonObject();
         t= serializer.parseDevice(json);
@@ -58,6 +61,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         assertNotNull(t.getSn());
         assertEquals(active, t.isActive());
         assertEquals(autostartTemplateId, t.getAutostartTemplateId());
+        assertEquals(color, t.getColor());
     }
     @Test
     public void testDeviceCommand() {
@@ -93,6 +97,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         final String shipmentNumber = "12345(10)";
         final String status = ShipmentStatus.Arrived.name();
         final String sn = "12345";
+        final String color = "color";
 
         dto.setActive(active);
         dto.setAutostartTemplateId(autostartTemplateId);
@@ -109,6 +114,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         dto.setShipmentNumber(shipmentNumber);
         dto.setShipmentStatus(status);
         dto.setSn(sn);
+        dto.setColor(color);
 
         dto = serializer.parseListDeviceItem(serializer.toJson(dto));
 
@@ -127,5 +133,6 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         assertEquals(shipmentNumber, dto.getShipmentNumber());
         assertEquals(status, dto.getShipmentStatus());
         assertEquals(sn, dto.getSn());
+        assertEquals(color, dto.getColor());
     }
 }

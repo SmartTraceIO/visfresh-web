@@ -3,7 +3,6 @@
  */
 package com.visfresh.lists;
 
-import com.visfresh.entities.Device;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -43,23 +42,13 @@ public class DeviceDto {
     private String shipmentNumber;
     private Long autostartTemplateId;
     private String autostartTemplateName;
+    private String color;
 
     /**
      * Default constructor.
      */
     public DeviceDto() {
         super();
-    }
-    /**
-     * @param d device.
-     */
-    public DeviceDto(final Device d) {
-        super();
-        setDescription(d.getDescription());
-        setImei(d.getImei());
-        setName(d.getName());
-        setSn(d.getSn());
-        setActive(d.isActive());
     }
 
     /**
@@ -247,5 +236,17 @@ public class DeviceDto {
      */
     public void setAutostartTemplateName(final String autostartTemplateName) {
         this.autostartTemplateName = autostartTemplateName;
+    }
+    /**
+     * @param c color name.
+     */
+    public void setColor(final String c) {
+        this.color = c;
+    }
+    /**
+     * @return the color
+     */
+    public String getColor() {
+        return color;
     }
 }

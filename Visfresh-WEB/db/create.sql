@@ -47,6 +47,7 @@ create table companies (
 create table devices (
     description varchar(255),
     imei varchar(30) not null,
+    color varchar(30) default null,
     name varchar(127) not null,
     company bigint(20),
     autostart bigint(20) default null,

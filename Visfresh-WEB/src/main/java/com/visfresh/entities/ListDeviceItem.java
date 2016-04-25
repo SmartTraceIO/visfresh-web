@@ -30,6 +30,10 @@ public class ListDeviceItem {
      * Active flag.
      */
     private boolean active;
+    /**
+     * Color.
+     */
+    private Color color;
 
     //last reading data
     private Date lastReadingTime;
@@ -59,6 +63,7 @@ public class ListDeviceItem {
         setImei(d.getImei());
         setName(d.getName());
         setTripCount(d.getTripCount());
+        setColor(d.getColor());
     }
 
     /**
@@ -228,5 +233,17 @@ public class ListDeviceItem {
      */
     public void setAutostartTemplateName(final String name) {
         this.autostartTemplateName = name;
+    }
+    /**
+     * @param c device color.
+     */
+    public void setColor(final Color c) {
+        this.color = c;
+    }
+    /**
+     * @return the color
+     */
+    public Color getColor() {
+        return color;
     }
 }

@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.DeviceConstants;
@@ -16,6 +18,7 @@ import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
+import com.visfresh.entities.Color;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
@@ -31,6 +34,8 @@ import com.visfresh.utils.StringUtils;
  */
 @Component
 public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> implements DeviceDao {
+    private static final Logger log = LoggerFactory.getLogger(DeviceDaoImpl.class);
+
     /**
      * Table name.
      */
@@ -58,6 +63,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
     private static final String PROPERTY_DEVICE_GROUP = "deviceGroup";
     private static final String ACTIVE_FIELD = "active";
     protected static final String AUTOSTART_TEMPLATE_FIELD = "autostart";
+    private static final String COLOR_FIELD = "color";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     private final DeviceStateSerializer stateSerializer = new DeviceStateSerializer();
@@ -86,6 +92,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         paramMap.put(TRIPCOUNT_FIELD, device.getTripCount());
         paramMap.put(ACTIVE_FIELD, device.isActive());
         paramMap.put(AUTOSTART_TEMPLATE_FIELD, device.getAutostartTemplateId());
+        paramMap.put(COLOR_FIELD, device.getColor() == null ? null : device.getColor().name());
 
         final LinkedList<String> fields = new LinkedList<String>(paramMap.keySet());
 
@@ -134,11 +141,28 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         d.setImei((String) map.get(IMEI_FIELD));
         d.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
         d.setActive(Boolean.TRUE.equals(map.get(ACTIVE_FIELD)));
+        d.setColor(parseColor((String) map.get(COLOR_FIELD)));
         if (map.get(AUTOSTART_TEMPLATE_FIELD) != null) {
             d.setAutostartTemplateId(((Number) map.get(AUTOSTART_TEMPLATE_FIELD)).longValue());
         }
         return d;
     }
+    /**
+     * @param str
+     * @return
+     */
+    private Color parseColor(final String str) {
+        if (str == null) {
+            return null;
+        }
+        try {
+            return Color.valueOf(str);
+        } catch (final Exception e) {
+            log.error("Failed to parse color value '" + str + "'", e);
+            return null;
+        }
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceDao#findAllByImei(java.lang.String)
      */
@@ -242,6 +266,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 + "d." + NAME_FIELD + " as " + DeviceConstants.PROPERTY_NAME + ",\n"
                 + "d." + DESCRIPTION_FIELD + " as " + DeviceConstants.PROPERTY_DESCRIPTION + ",\n"
                 + "d." + ACTIVE_FIELD + " as " + DeviceConstants.PROPERTY_ACTIVE + ",\n"
+                + "d." + COLOR_FIELD + " as " + DeviceConstants.PROPERTY_COLOR + ",\n"
                 + "aut." + AutoStartShipmentDaoImpl.ID_FIELD + " as "
                 + DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID + ",\n"
                 + "tpl." + ShipmentTemplateDaoImpl.NAME_FIELD + " as "
@@ -323,6 +348,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         item.setDescription((String) row.get(DeviceConstants.PROPERTY_DESCRIPTION));
         item.setImei((String) row.get(DeviceConstants.PROPERTY_IMEI));
         item.setName((String) row.get(DeviceConstants.PROPERTY_NAME));
+        item.setColor(parseColor((String) row.get(DeviceConstants.PROPERTY_COLOR)));
         final Number deviceTripCount = (Number) row.get("deviceTripCount");
         if (deviceTripCount != null) {
             item.setTripCount(deviceTripCount.intValue());

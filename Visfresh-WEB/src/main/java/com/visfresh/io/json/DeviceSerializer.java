@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
+import com.visfresh.entities.Color;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.io.DeviceResolver;
@@ -35,6 +36,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         final Device tr = new Device();
         tr.setImei(asString(json.get(DeviceConstants.PROPERTY_IMEI)));
         tr.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
+        tr.setColor(parseColor(asString(json.get(DeviceConstants.PROPERTY_COLOR))));
         tr.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));
         tr.setActive(!Boolean.FALSE.equals(asBoolean(json.get(DeviceConstants.PROPERTY_ACTIVE))));
         tr.setAutostartTemplateId(asLong(json.get(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID)));
@@ -44,9 +46,9 @@ public class DeviceSerializer extends AbstractJsonSerializer {
      * @param d device.
      * @return device serialized to JSON format.
      */
-    public JsonElement toJson(final Device d) {
+    public JsonObject toJson(final Device d) {
         if (d == null) {
-            return JsonNull.INSTANCE;
+            return null;
         }
 
         final JsonObject obj = new JsonObject();
@@ -55,6 +57,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
         obj.addProperty(DeviceConstants.PROPERTY_ACTIVE, d.isActive());
         obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
+        obj.addProperty(DeviceConstants.PROPERTY_COLOR, d.getColor() != null ? d.getColor().name() : null);
         obj.addProperty(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID, d.getAutostartTemplateId());
         return obj;
     }
@@ -73,6 +76,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         d.setActive(!Boolean.FALSE.equals(asBoolean(json.get(DeviceConstants.PROPERTY_ACTIVE))));
         d.setAutostartTemplateId(asLong(json.get(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID)));
         d.setAutostartTemplateName(asString(json.get(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME)));
+        d.setColor(asString(json.get(DeviceConstants.PROPERTY_COLOR)));
 
         d.setLastShipmentId(asLong(json.get(DeviceConstants.PROPERTY_LAST_SHIPMENT)));
         final String status = asString(json.get(DeviceConstants.PROPERTY_SHIPMENT_STATUS));
@@ -103,6 +107,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         obj.addProperty(DeviceConstants.PROPERTY_IMEI, d.getImei());
         obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
         obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
+        obj.addProperty(DeviceConstants.PROPERTY_COLOR, d.getColor());
         obj.addProperty(DeviceConstants.PROPERTY_ACTIVE, d.isActive());
         obj.addProperty(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_ID, d.getAutostartTemplateId());
         obj.addProperty(DeviceConstants.PROPERTY_AUTOSTART_TEMPLATE_NAME, d.getAutostartTemplateName());
@@ -149,5 +154,15 @@ public class DeviceSerializer extends AbstractJsonSerializer {
      */
     public DeviceResolver getDeviceResolver() {
         return deviceResolver;
+    }
+    /**
+     * @param name color name.
+     * @return
+     */
+    private Color parseColor(final String name) {
+        if (name == null) {
+            return null;
+        }
+        return Color.valueOf(name);
     }
 }

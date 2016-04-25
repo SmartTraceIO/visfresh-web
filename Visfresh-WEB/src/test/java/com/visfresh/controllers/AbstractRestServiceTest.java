@@ -20,6 +20,7 @@ import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Color;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
@@ -334,6 +335,7 @@ public abstract class AbstractRestServiceTest {
         t.setDescription("Device description");
         t.setImei(imei);
         t.setName("Device Name");
+        t.setColor(Color.Crimson);
         if (save) {
             t.setCompany(getCompany());
             context.getBean(DeviceDao.class).save(t);

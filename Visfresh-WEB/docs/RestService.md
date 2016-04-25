@@ -689,6 +689,7 @@ see [ResponseStatus](#markdown-header-response-status)
   "name": "Device Name",
   "active": true,
   "sn": "043987", // read only property
+  "color": "Crimson",
   "autostartTemplateId": null
 }
 ```
@@ -1964,6 +1965,7 @@ Response:
   "imei": "0239487043987",
   "name": "Device Name",
   "active": true,
+  "color": "Crimson",
   "autostartTemplateId": null
 }
 ```  
@@ -2004,6 +2006,7 @@ Response:
       "name": "Device Name",
       "sn": "111111",
       "active": true,
+      "color": "Crimson",
       "autostartTemplateId": null,
       "autostartTemplateName": null,
       "lastShipmentId": null,
@@ -2410,6 +2413,7 @@ Response:
     "imei": "0239487043987",
     "name": "Device Name",
     "sn": "704398",
+    "color": "Crimson",
     "active": true,
     "autostartTemplateId": null,
     "autostartTemplateName": null,

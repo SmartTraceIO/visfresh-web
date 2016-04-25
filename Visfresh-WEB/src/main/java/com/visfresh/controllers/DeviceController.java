@@ -50,6 +50,7 @@ import com.visfresh.services.EmailService;
 import com.visfresh.services.ShipmentShutdownService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -110,7 +111,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.BasicUser);
 
-            final Device d = createSerializer(user).parseDevice(device);
+            final DeviceSerializer ser = createSerializer(user);
+            Device d = ser.parseDevice(device);
 
             final Device old = dao.findByImei(d.getImei());
             if (old == null && !Role.SmartTraceAdmin.hasRole(user)) {
@@ -119,9 +121,13 @@ public class DeviceController extends AbstractController implements DeviceConsta
             }
             checkCompanyAccess(user, old);
 
-            d.setCompany(user.getCompany());
-
             if (old != null) {
+                //first of all merge saved device with existing. It needs for
+                //avoid of rewriting to NULL values
+                final JsonObject mereged = SerializerUtils.merge(device, ser.toJson(old));
+                d = ser.parseDevice(mereged);
+                d.setCompany(old.getCompany());
+
                 //not allow to overwrite trip count
                 d.setTripCount(old.getTripCount());
 
@@ -147,6 +153,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
                     //notify support team.
                     emailService.sendMessageToSupport("Device " + d.getImei() + " state changed", msg.toString());
                 }
+            } else {
+                d.setCompany(user.getCompany());
             }
 
             dao.save(d);
@@ -229,6 +237,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         d.setImei(createVirtualPrefix(device) + device.getImei());
         d.setName(device.getName());
         d.setTripCount(device.getTripCount());
+        d.setColor(device.getColor());
         return deviceDao.save(d);
     }
     /**
@@ -293,6 +302,9 @@ public class DeviceController extends AbstractController implements DeviceConsta
         dto.setName(item.getName());
         dto.setAutostartTemplateId(item.getAutostartTemplateId());
         dto.setAutostartTemplateName(item.getAutostartTemplateName());
+        if (item.getColor() != null) {
+            dto.setColor(item.getColor().name());
+        }
 
         if (item.getLastReadingTime() != null) {
             dto.setLastReadingTimeISO(isoFormat.format(item.getLastReadingTime()));

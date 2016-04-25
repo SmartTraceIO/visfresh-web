@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.entities.AutoStartShipment;
+import com.visfresh.entities.Color;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.ListDeviceItem;
@@ -72,6 +73,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         d.setCompany(sharedCompany);
         d.setDescription("Test device");
         d.setTripCount(5);
+        d.setColor(choiseColor(imei));
         if (au != null) {
             d.setAutostartTemplateId(au.getId());
         }
@@ -87,6 +89,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         assertEquals("Test device", d.getDescription());
         assertEquals(5, d.getTripCount());
         assertEquals(autoStart.getId(), d.getAutostartTemplateId());
+        assertEquals(choiseColor(d.getImei()), d.getColor());
 
         //test company
         final Company c = d.getCompany();
@@ -545,5 +548,15 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         aut.setTemplate(tpl);
         aut.setPriority(10);
         return getContext().getBean(AutoStartShipmentDao.class).save(aut);
+    }
+    /**
+     * @param deviceImei
+     * @return the color for given imei.
+     */
+    private Color choiseColor(final String deviceImei) {
+        final Color[] values = Color.values();
+        final int max = values.length;
+        final int hashCode = Math.abs(deviceImei.hashCode());
+        return values[hashCode % max];
     }
 }
