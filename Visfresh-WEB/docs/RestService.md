@@ -2854,6 +2854,59 @@ Response:
   ]
 }
 ```
+### Get Colors ###
+**GET /vf/rest/getColors/${accessToken}**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    "Aqua",
+    "Black",
+    "Blue",
+    "BlueViolet",
+    "Brown",
+    "Crimson",
+    "Cyan",
+    "DarkBlue",
+    "DarkGreen",
+    "DarkOrange",
+    "Fuchsia",
+    "Gold",
+    "GoldenRod",
+    "Gray",
+    "Green",
+    "HotPink",
+    "IndianRed",
+    "Indigo",
+    "Lime",
+    "Magenta",
+    "Maroon",
+    "Navy",
+    "Olive",
+    "Orange",
+    "OrangeRed",
+    "PaleVioletRed",
+    "Purple",
+    "Red",
+    "RoyalBlue",
+    "SaddleBrown",
+    "Salmon",
+    "SandyBrown",
+    "SeaGreen",
+    "SlateBlue",
+    "Tan",
+    "Teal",
+    "Tomato",
+    "Turquoise",
+    "Violet",
+    "YellowGreen"
+  ]
+}
+```
 ### Get Time Zones ###
 **GET /vf/rest/getTimeZones/${accessToken}**  
 **Response:**  

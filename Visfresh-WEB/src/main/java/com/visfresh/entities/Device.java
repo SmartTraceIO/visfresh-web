@@ -37,6 +37,10 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      * Autostart template ID.
      */
     private Long autostartTemplateId;
+    /**
+     * Device color.
+     */
+    private Color color;
 
     /**
      * Default constructor.
@@ -155,6 +159,18 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      */
     public void setAutostartTemplateId(final Long autostartTemplateId) {
         this.autostartTemplateId = autostartTemplateId;
+    }
+    /**
+     * @return the color
+     */
+    public Color getColor() {
+        return color;
+    }
+    /**
+     * @param color the color to set
+     */
+    public void setColor(final Color color) {
+        this.color = color;
     }
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

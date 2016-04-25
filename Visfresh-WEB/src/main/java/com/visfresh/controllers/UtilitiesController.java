@@ -5,6 +5,7 @@ package com.visfresh.controllers;
 
 import static com.visfresh.utils.DateTimeUtils.createDateFormat;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -25,6 +26,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.Color;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.MeasurementUnits;
 import com.visfresh.entities.Role;
@@ -186,6 +188,34 @@ public class UtilitiesController extends AbstractController {
             return createSuccessResponse(array);
         } catch (final Exception e) {
             log.error("Failed to list roles", e);
+            return createErrorResponse(e);
+        }
+    }
+    @RequestMapping(value = "/getColors/{authToken}", method = RequestMethod.GET)
+    public JsonObject getColors(@PathVariable final String authToken) {
+        try {
+            getLoggedInUser(authToken);
+
+            //sort colors by name.
+            final Color[] values = Color.values();
+            Arrays.sort(values, new Comparator<Color>() {
+                /* (non-Javadoc)
+                 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+                 */
+                @Override
+                public int compare(final Color c1, final Color c2) {
+                    return c1.name().compareTo(c2.name());
+                }
+            });
+
+            final JsonArray array = new JsonArray();
+            for (final Color c : values) {
+                array.add(new JsonPrimitive(c.toString()));
+            }
+
+            return createSuccessResponse(array);
+        } catch (final Exception e) {
+            log.error("Failed to list colors", e);
             return createErrorResponse(e);
         }
     }

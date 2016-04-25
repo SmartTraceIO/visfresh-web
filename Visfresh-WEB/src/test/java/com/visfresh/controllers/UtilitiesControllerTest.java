@@ -62,6 +62,12 @@ public class UtilitiesControllerTest extends AbstractRestServiceTest {
         assertTrue(array.size() > 0);
     }
     @Test
+    public void testGetColors() throws IOException, RestServiceException {
+        final JsonArray array = client.sendGetRequest(
+                client.getPathWithToken("getColors"), new HashMap<String, String>()).getAsJsonArray();
+        assertTrue(array.size() > 0);
+    }
+    @Test
     public void testGetUserTime() throws IOException, RestServiceException {
         final JsonObject array = client.sendGetRequest(
                 client.getPathWithToken("getUserTime"), new HashMap<String, String>()).getAsJsonObject();
