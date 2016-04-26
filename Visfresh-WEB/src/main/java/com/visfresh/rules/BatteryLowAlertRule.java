@@ -16,7 +16,7 @@ import com.visfresh.rules.state.ShipmentSession;
  */
 @Component
 public class BatteryLowAlertRule extends AbstractAlertRule {
-    public static final int LOW_BATTERY_LIMIT = 3441;
+    public static final int LOW_BATTERY_LIMIT = 3620;
     public static final String NAME = "BatteryLowAlert";
 
     /**

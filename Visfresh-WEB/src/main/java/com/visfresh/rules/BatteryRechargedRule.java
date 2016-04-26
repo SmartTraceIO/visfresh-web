@@ -19,7 +19,7 @@ import com.visfresh.rules.state.ShipmentSession;
  */
 @Component
 public class BatteryRechargedRule implements TrackerEventRule {
-    public static final int LOW_RECHARGED_LIMIT = 3500;
+    public static final int LOW_RECHARGED_LIMIT = 4070;
 
     /**
      * Logger.
