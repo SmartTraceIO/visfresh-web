@@ -238,7 +238,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         //check alternative locations saved
         final AlternativeLocationsDao alDao = context.getBean(AlternativeLocationsDao.class);
-        assertEquals(2, alDao.getByShipment(s).getInterim().size());
+        assertEquals(2, alDao.getBy(s).getInterim().size());
 
         //check interim locations configured.
         final RuleEngine eng = context.getBean(RuleEngine.class);
@@ -249,7 +249,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentClient.saveShipment(req);
 
         //check locations
-        assertEquals(1, alDao.getByShipment(s).getInterim().size());
+        assertEquals(1, alDao.getBy(s).getInterim().size());
         assertEquals(1, eng.getInterimLocations(s).size());
 
         //check if interims not present in request, that not then changed
@@ -257,7 +257,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentClient.saveShipment(req);
 
         //check locations
-        assertEquals(1, alDao.getByShipment(s).getInterim().size());
+        assertEquals(1, alDao.getBy(s).getInterim().size());
         assertEquals(1, eng.getInterimLocations(s).size());
     }
     @Test

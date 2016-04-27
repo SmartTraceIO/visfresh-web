@@ -23,6 +23,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
@@ -352,14 +353,14 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
      * @see com.visfresh.rules.AbstractRuleEngine#getAlternativeLocations(com.visfresh.entities.Shipment)
      */
     @Override
-    protected AlternativeLocations getAlternativeLocations(final Shipment s) {
+    protected AlternativeLocations getAlternativeLocations(final ShipmentBase s) {
         return alternativeLocations.get(s.getId());
     }
     /* (non-Javadoc)
      * @see com.visfresh.rules.AbstractRuleEngine#saveAlternativeLocations(com.visfresh.entities.Shipment, com.visfresh.entities.AlternativeLocations)
      */
     @Override
-    protected void saveAlternativeLocations(final Shipment s, final AlternativeLocations v) {
+    protected void saveAlternativeLocations(final ShipmentBase s, final AlternativeLocations v) {
         alternativeLocations.put(s.getId(), v);
     }
 }

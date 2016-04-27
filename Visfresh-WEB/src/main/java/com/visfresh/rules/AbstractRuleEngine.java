@@ -32,6 +32,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
@@ -352,14 +353,14 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     }
 
     @Override
-    public void setInterimLocations(final Shipment s, final List<LocationProfile> stops) {
+    public void setInterimLocations(final ShipmentBase base, final List<LocationProfile> stops) {
         final String key = createInterimLocationsKey();
 
         //add interims to alternative locations
-        final AlternativeLocations v = getAlternativeLocations(s);
+        final AlternativeLocations v = getAlternativeLocations(base);
         v.getInterim().clear();
         v.getInterim().addAll(stops);
-        saveAlternativeLocations(s, v);
+        saveAlternativeLocations(base, v);
 
         //save interim location
         final JsonArray array = new JsonArray();
@@ -367,11 +368,14 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             array.add(interimSerializer.toJson(l));
         }
 
-        final ShipmentSession state = this.loadSession(s, key);
-        try {
-            state.setShipmentProperty(key, array.toString());
-        } finally {
-            unloadSession(s, key, true);
+        if (base instanceof Shipment) {
+            final Shipment s = (Shipment) base;
+            final ShipmentSession state = this.loadSession(s, key);
+            try {
+                state.setShipmentProperty(key, array.toString());
+            } finally {
+                unloadSession(s, key, true);
+            }
         }
     }
     @Override
@@ -420,7 +424,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param s
      * @param v
      */
-    protected void saveAlternativeLocations(final Shipment s,
+    protected void saveAlternativeLocations(final ShipmentBase s,
             final AlternativeLocations v) {
         altLocDao.save(s, v);
     }
@@ -428,8 +432,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param s
      * @return
      */
-    protected AlternativeLocations getAlternativeLocations(final Shipment s) {
-        return altLocDao.getByShipment(s);
+    protected AlternativeLocations getAlternativeLocations(final ShipmentBase s) {
+        return altLocDao.getBy(s);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RuleEngine#supressNextAlerts(com.visfresh.entities.Shipment)

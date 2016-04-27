@@ -18,7 +18,7 @@ import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentBase;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -46,7 +46,7 @@ public class AlternativeLocationsDaoImpl implements AlternativeLocationsDao {
      * @see com.visfresh.dao.AlternativeLocationsDao#getAlternativeLocations(com.visfresh.entities.Shipment)
      */
     @Override
-    public AlternativeLocations getByShipment(final Shipment s) {
+    public AlternativeLocations getBy(final ShipmentBase s) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("shipment", s.getId());
 
@@ -112,27 +112,25 @@ public class AlternativeLocationsDaoImpl implements AlternativeLocationsDao {
      * @see com.visfresh.dao.AlternativeLocationsDao#saveAlternativeLocations(com.visfresh.entities.Shipment, com.visfresh.entities.AlternativeLocations)
      */
     @Override
-    public void save(final Shipment s, final AlternativeLocations locs) {
-        if (!(locs.getFrom().isEmpty() && locs.getTo().isEmpty() && locs.getInterim().isEmpty())) {
-            final Map<String, Object> params = new HashMap<>();
-            params.put("shipment", s.getId());
+    public void save(final ShipmentBase s, final AlternativeLocations locs) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("shipment", s.getId());
 
-            //clear old alternative locations
-            jdbc.update("delete from alternativelocations where shipment = :shipment", params);
+        //clear old alternative locations
+        jdbc.update("delete from alternativelocations where shipment = :shipment", params);
 
-            //add new alternative locations
-            final StringBuilder sql = new StringBuilder();
-            sql.append("insert into alternativelocations (shipment, location, loctype) values ");
+        //add new alternative locations
+        final StringBuilder sql = new StringBuilder();
+        sql.append("insert into alternativelocations (shipment, location, loctype) values ");
 
-            final List<String> values = new LinkedList<>();
-            addLocations("from", locs.getFrom(), values, params);
-            addLocations("to", locs.getTo(), values, params);
-            addLocations("interim", locs.getInterim(), values, params);
+        final List<String> values = new LinkedList<>();
+        addLocations("from", locs.getFrom(), values, params);
+        addLocations("to", locs.getTo(), values, params);
+        addLocations("interim", locs.getInterim(), values, params);
 
-            sql.append(StringUtils.combine(values, ","));
+        sql.append(StringUtils.combine(values, ","));
 
-            jdbc.update(sql.toString(), params);
-        }
+        jdbc.update(sql.toString(), params);
     }
 
     /**

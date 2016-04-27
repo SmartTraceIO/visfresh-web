@@ -704,7 +704,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      * @param s shipment.
      */
     private void addLocationAlternatives(final SingleShipmentDto dto, final Shipment s) {
-        final AlternativeLocations alt = alternativeLocationsDao.getByShipment(s);
+        final AlternativeLocations alt = alternativeLocationsDao.getBy(s);
         if (alt != null) {
             dto.getStartLocationAlternatives().addAll(alt.getFrom());
             dto.getEndLocationAlternatives().addAll(alt.getTo());

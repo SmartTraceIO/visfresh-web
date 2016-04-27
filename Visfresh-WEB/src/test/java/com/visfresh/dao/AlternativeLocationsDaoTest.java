@@ -51,7 +51,7 @@ public class AlternativeLocationsDaoTest extends BaseDaoTest<AlternativeLocation
 
         dao.save(shipment, loc);
 
-        loc = dao.getByShipment(shipment);
+        loc = dao.getBy(shipment);
         assertEquals(1, loc.getFrom().size());
         assertEquals(1, loc.getTo().size());
         assertEquals(1, loc.getInterim().size());
