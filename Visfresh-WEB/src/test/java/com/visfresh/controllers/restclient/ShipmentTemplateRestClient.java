@@ -13,8 +13,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.visfresh.entities.ShipmentTemplate;
-import com.visfresh.io.ReferenceResolver;
+import com.visfresh.io.ShipmentTemplateDto;
 import com.visfresh.io.json.ShipmentTemplateSerializer;
 import com.visfresh.lists.ListShipmentTemplateItem;
 import com.visfresh.services.RestServiceException;
@@ -34,14 +33,14 @@ public class ShipmentTemplateRestClient extends RestClient {
         serializer = new ShipmentTemplateSerializer(tz);
     }
 
-    public Long saveShipmentTemplate(final ShipmentTemplate tpl)
+    public Long saveShipmentTemplate(final ShipmentTemplateDto tpl)
             throws RestServiceException, IOException {
         final JsonObject e = sendPostRequest(getPathWithToken("saveShipmentTemplate"),
                 serializer.toJson(tpl)).getAsJsonObject();
         return parseId(e);
     }
 
-    public List<ListShipmentTemplateItem> getShipmentTemplates(final Integer pageIndex, final Integer pageSize, String sortColumn, String sortOrder) throws RestServiceException, IOException {
+    public List<ListShipmentTemplateItem> getShipmentTemplates(final Integer pageIndex, final Integer pageSize, final String sortColumn, final String sortOrder) throws RestServiceException, IOException {
         final HashMap<String, String> params = new HashMap<String, String>();
         if (pageIndex != null) {
             params.put("pageIndex", Integer.toString(pageIndex));
@@ -69,7 +68,7 @@ public class ShipmentTemplateRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public ShipmentTemplate getShipmentTemplate(final Long id) throws IOException, RestServiceException {
+    public ShipmentTemplateDto getShipmentTemplate(final Long id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("shipmentTemplateId", id.toString());
 
@@ -86,11 +85,5 @@ public class ShipmentTemplateRestClient extends RestClient {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("shipmentTemplateId", id.toString());
         sendGetRequest(getPathWithToken("deleteShipmentTemplate"), params);
-    }
-    /**
-     * @param r reference resolver.
-     */
-    public void setReferenceResolver(final ReferenceResolver r) {
-        serializer.setReferenceResolver(r);
     }
 }

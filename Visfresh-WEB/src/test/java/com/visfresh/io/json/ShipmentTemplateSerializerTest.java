@@ -6,14 +6,10 @@ package com.visfresh.io.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
-import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.io.ShipmentTemplateDto;
 import com.visfresh.lists.ListShipmentTemplateItem;
 
 /**
@@ -30,10 +26,6 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         super();
     }
 
-    @Before
-    public void setUp() {
-        serializer.setReferenceResolver(resolver);
-    }
     @Test
     public void testListShipmentTemplateItem() {
         ListShipmentTemplateItem item = new ListShipmentTemplateItem();
@@ -75,17 +67,17 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
     @Test
     public void testShipmentTemplate() {
         final boolean addDateShipped = true;
-        final AlertProfile alertProfile = createAlertProfile();
-        final NotificationSchedule alertsNotificationSchedule = createNotificationSchedule();
+        final Long alertProfile = 1L;
+        final Long alertsNotificationSchedule = 2l;
         final int alertSuppressionDuringCoolDown = 55;
         final int arrivalNotification = 111;
-        final NotificationSchedule arrivalNotificationSchedule = createNotificationSchedule();
+        final Long arrivalNotificationSchedule = 3l;
         final boolean excludeNotificationsIfNoAlertsFired = true;
         final Long id = 77l;
         final String name = "JUnit-tpl";
         final String shipmentDescription = "Any Description";
-        final LocationProfile shippedFrom = createLocationProfile();
-        final LocationProfile shippedTo = createLocationProfile();
+        final long shippedFrom = 4l;
+        final long shippedTo = 5l;
         final int shutdownDeviceTimeOut = 155;
         final boolean useLocationNearestToDevice = true;
         final String commentsForReceiver = "commentsForReceiver";
@@ -93,7 +85,7 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         final Integer noAlertsAfterStartMinutes = 33;
         final Integer shutDownAfterStartMinutes = 5;
 
-        ShipmentTemplate t = new ShipmentTemplate();
+        ShipmentTemplateDto t = new ShipmentTemplateDto();
         t.setAddDateShipped(addDateShipped);
         t.setAlertProfile(alertProfile);
         t.getAlertsNotificationSchedules().add(alertsNotificationSchedule);

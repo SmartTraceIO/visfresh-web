@@ -3,7 +3,10 @@
  */
 package com.visfresh.controllers;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,17 +21,22 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ShipmentTemplateConstants;
-import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.Filter;
+import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.impl.ShipmentTemplateDaoImpl;
+import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.User;
-import com.visfresh.io.ReferenceResolver;
+import com.visfresh.io.ShipmentTemplateDto;
 import com.visfresh.io.json.ShipmentTemplateSerializer;
 import com.visfresh.lists.ListShipmentTemplateItem;
+import com.visfresh.utils.EntityUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -44,9 +52,11 @@ public class ShipmentTemplateController extends AbstractController implements Sh
     @Autowired
     private ShipmentTemplateDao shipmentTemplateDao;
     @Autowired
-    private AlertDao alertDao;
+    private AlertProfileDao alertProfileDao;
     @Autowired
-    private ReferenceResolver referenceResolver;
+    private LocationProfileDao locationProfileDao;
+    @Autowired
+    private NotificationScheduleDao notificationScheduleDao;
 
     /**
      * Default constructor.
@@ -67,13 +77,20 @@ public class ShipmentTemplateController extends AbstractController implements Sh
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.BasicUser);
 
-            final ShipmentTemplate t = createSerializer(user).parseShipmentTemplate(tpl);
+            final ShipmentTemplateDto dto = createSerializer(user).parseShipmentTemplate(tpl);
+
+            final ShipmentTemplate t = createTemplate(dto);
             t.setCompany(user.getCompany());
 
             //check company access to sub entiites
+            resolveAlertProfile(t, dto);
             checkCompanyAccess(user, t.getAlertProfile());
+
+            resolveShipped(t, dto);
             checkCompanyAccess(user, t.getShippedFrom());
             checkCompanyAccess(user, t.getShippedTo());
+
+            resolveNotificationSchedules(t, dto);
             checkCompanyAccess(user, t.getAlertsNotificationSchedules());
             checkCompanyAccess(user, t.getArrivalNotificationSchedules());
 
@@ -155,20 +172,11 @@ public class ShipmentTemplateController extends AbstractController implements Sh
             final ShipmentTemplate template = shipmentTemplateDao.findOne(shipmentTemplateId);
             checkCompanyAccess(user, template);
 
-            return createSuccessResponse(createSerializer(user).toJson(template));
+            return createSuccessResponse(createSerializer(user).toJson(new ShipmentTemplateDto(template)));
         } catch (final Exception e) {
             log.error("Failed to get shipment templates", e);
             return createErrorResponse(e);
         }
-    }
-    /**
-     * @param user
-     * @return
-     */
-    private ShipmentTemplateSerializer createSerializer(final User user) {
-        final ShipmentTemplateSerializer tpl = new ShipmentTemplateSerializer(user.getTimeZone());
-        tpl.setReferenceResolver(referenceResolver);
-        return tpl;
     }
 
     /**
@@ -192,6 +200,89 @@ public class ShipmentTemplateController extends AbstractController implements Sh
         } catch (final Exception e) {
             log.error("Failed to delete shipment templates", e);
             return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param user
+     * @return
+     */
+    private ShipmentTemplateSerializer createSerializer(final User user) {
+        return new ShipmentTemplateSerializer(user.getTimeZone());
+    }
+    /**
+     * @param dto
+     * @return
+     */
+    private ShipmentTemplate createTemplate(final ShipmentTemplateDto dto) {
+        final ShipmentTemplate tpl = new ShipmentTemplate();
+        tpl.setId(dto.getId());
+        tpl.setName(dto.getName());
+        tpl.setShipmentDescription(dto.getShipmentDescription());
+        tpl.setAddDateShipped(dto.isAddDateShipped());
+        tpl.setDetectLocationForShippedFrom(dto.isDetectLocationForShippedFrom());
+        tpl.setAlertSuppressionMinutes(dto.getAlertSuppressionMinutes());
+        tpl.setCommentsForReceiver(dto.getCommentsForReceiver());
+        tpl.setArrivalNotificationWithinKm(dto.getArrivalNotificationWithinKm());
+        tpl.setExcludeNotificationsIfNoAlerts(dto.isExcludeNotificationsIfNoAlerts());
+        tpl.setShutdownDeviceAfterMinutes(dto.getShutdownDeviceAfterMinutes());
+        tpl.setNoAlertsAfterArrivalMinutes(dto.getNoAlertsAfterArrivalMinutes());
+        tpl.setNoAlertsAfterStartMinutes(dto.getNoAlertsAfterStartMinutes());
+        tpl.setShutDownAfterStartMinutes(dto.getShutDownAfterStartMinutes());
+        return tpl;
+    }
+    /**
+     * @param t shipment template.
+     * @param dto shipment template DTO.
+     */
+    private void resolveAlertProfile(final ShipmentTemplate t, final ShipmentTemplateDto dto) {
+        if (dto.getAlertProfile() != null) {
+            t.setAlertProfile(alertProfileDao.findOne(dto.getAlertProfile()));
+        }
+    }
+    /**
+     * @param t shipment template.
+     * @param dto shipment template DTO.
+     */
+    private void resolveShipped(final ShipmentTemplate t, final ShipmentTemplateDto dto) {
+        final Set<Long> ids = new HashSet<>();
+        if (dto.getShippedFrom() != null) {
+            ids.add(dto.getShippedFrom());
+        }
+        if (dto.getShippedTo() != null) {
+            ids.add(dto.getShippedTo());
+        }
+
+        final Map<Long, LocationProfile> map = EntityUtils.resolveEntities(locationProfileDao, ids);
+
+        t.setShippedFrom(map.get(dto.getShippedFrom()));
+        t.setShippedTo(map.get(dto.getShippedTo()));
+    }
+    /**
+     * @param t shipment template.
+     * @param dto shipment template DTO.
+     */
+    private void resolveNotificationSchedules(final ShipmentTemplate t,
+            final ShipmentTemplateDto dto) {
+        final Set<Long> ids = new HashSet<>();
+        ids.addAll(dto.getAlertsNotificationSchedules());
+        ids.addAll(dto.getArrivalNotificationSchedules());
+
+        final Map<Long, NotificationSchedule> map = EntityUtils.resolveEntities(notificationScheduleDao, ids);
+        resolveSchedules(map, dto.getAlertsNotificationSchedules(), t.getAlertsNotificationSchedules());
+        resolveSchedules(map, dto.getArrivalNotificationSchedules(), t.getArrivalNotificationSchedules());
+    }
+    /**
+     * @param source source map ID to schedule.
+     * @param ids list of ID.
+     * @param schedules list of notification schedules.
+     */
+    private void resolveSchedules(final Map<Long, NotificationSchedule> source,
+            final List<Long> ids, final List<NotificationSchedule> schedules) {
+        for (final Long id : ids) {
+            final NotificationSchedule sched = source.get(id);
+            if (sched != null) {
+                schedules.add(sched);
+            }
         }
     }
 }

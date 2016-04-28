@@ -22,7 +22,7 @@ import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentTemplate;
-import com.visfresh.io.ReferenceResolver;
+import com.visfresh.io.ShipmentTemplateDto;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -59,7 +59,6 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
         final String token = login();
 
         client.setServiceUrl(getServiceUrl());
-        client.setReferenceResolver(context.getBean(ReferenceResolver.class));
         client.setAuthToken(token);
         client.addRestIoListener(l);
 
@@ -68,7 +67,7 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
 
     @Test
     public void testSaveShipmentTemplate() throws RestServiceException, IOException {
-        final ShipmentTemplate t = createShipmentTemplate(true);
+        final ShipmentTemplateDto t = new ShipmentTemplateDto(createShipmentTemplate(true));
         t.setId(null);
         final Long id = client.saveShipmentTemplate(t);
         assertNotNull(id);
@@ -189,7 +188,7 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
     }
     @Test
     public void testSaveEmpty() throws RestServiceException, IOException {
-        final ShipmentTemplate t = new ShipmentTemplate();
+        final ShipmentTemplateDto t = new ShipmentTemplateDto();
         final Long id = client.saveShipmentTemplate(t);
         assertNotNull(id);
 

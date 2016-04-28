@@ -90,8 +90,15 @@ public class ShipmentTemplateDto {
      * Name.
      */
     private String name;
+
     /**
      * Default constructor.
+     */
+    public ShipmentTemplateDto() {
+        super();
+    }
+    /**
+     * @param tpl template.
      */
     public ShipmentTemplateDto(final ShipmentTemplate tpl) {
         super();

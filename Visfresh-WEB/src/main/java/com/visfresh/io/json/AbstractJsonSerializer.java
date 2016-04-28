@@ -3,10 +3,10 @@
  */
 package com.visfresh.io.json;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -132,6 +132,17 @@ public class AbstractJsonSerializer {
         return array;
     }
     /**
+     * @param array
+     * @return
+     */
+    protected List<Long> asLongList(final JsonArray array) {
+        final List<Long> list = new LinkedList<Long>();
+        for (final JsonElement l : array) {
+            list.add(l.getAsLong());
+        }
+        return list;
+    }
+    /**
      * @param entities list of entity.
      * @return JSON array with entity IDs.
      */
@@ -147,13 +158,6 @@ public class AbstractJsonSerializer {
      */
     protected SimpleDateFormat createDateFormat() {
         return new SimpleDateFormat(DATE_FORMAT);
-    }
-    /**
-     * @param e
-     * @return
-     */
-    protected <IDD extends Serializable & Comparable<IDD>> IDD getId(final EntityWithId<IDD> e) {
-        return e == null ? null : (IDD) e.getId();
     }
     /**
      * @return the timeZone

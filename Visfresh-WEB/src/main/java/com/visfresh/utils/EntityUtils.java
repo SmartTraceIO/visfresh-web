@@ -5,9 +5,13 @@ package com.visfresh.utils;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import com.visfresh.dao.DaoBase;
 import com.visfresh.entities.EntityWithId;
 
 /**
@@ -39,5 +43,19 @@ public final class EntityUtils {
             list.add(getEntityId(e));
         }
         return list;
+    }
+    /**
+     * @param locationProfileDao
+     * @param ids
+     * @return
+     */
+    public static
+        <E extends EntityWithId<ID>,ID extends Serializable & Comparable<ID>>
+            Map<ID, E> resolveEntities(final DaoBase<E, ID> dao, final Set<ID> ids) {
+        final Map<ID, E> map = new HashMap<>();
+        for (final E e : dao.findAll(ids)) {
+            map.put(e.getId(), e);
+        }
+        return map;
     }
 }

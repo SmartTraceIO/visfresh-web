@@ -3,6 +3,8 @@
  */
 package com.visfresh.io.json;
 
+import static com.visfresh.utils.EntityUtils.getEntityId;
+
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -154,8 +156,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.ASSET_NUM, s.getAssetNum());
         obj.addProperty(ShipmentConstants.ASSET_TYPE, s.getAssetType());
 
-        obj.addProperty(ShipmentConstants.SHIPPED_FROM, getId(s.getShippedFrom()));
-        obj.addProperty(ShipmentConstants.SHIPPED_TO, getId(s.getShippedTo()));
+        obj.addProperty(ShipmentConstants.SHIPPED_FROM, getEntityId(s.getShippedFrom()));
+        obj.addProperty(ShipmentConstants.SHIPPED_TO, getEntityId(s.getShippedTo()));
         obj.addProperty(ShipmentConstants.SHIPMENT_DATE, formatDate(s.getShipmentDate()));
         obj.addProperty(ShipmentConstants.ARRIVAL_DATE, formatDate(s.getArrivalDate()));
         obj.addProperty(ShipmentConstants.SHUTDOWN_TIME_ISO,
@@ -163,7 +165,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.DEVICE_SHUTDOWN_TIME,
                 s.getDeviceShutdownTime() == null ? null : prettyFormat.format(s.getDeviceShutdownTime()));
 
-        obj.addProperty(ShipmentConstants.ALERT_PROFILE_ID, getId(s.getAlertProfile()));
+        obj.addProperty(ShipmentConstants.ALERT_PROFILE_ID, getEntityId(s.getAlertProfile()));
         obj.addProperty(ShipmentConstants.ALERT_SUPPRESSION_MINUTES, s.getAlertSuppressionMinutes());
         obj.add(ShipmentConstants.ALERTS_NOTIFICATION_SCHEDULES, getIdList(s.getAlertsNotificationSchedules()));
 
