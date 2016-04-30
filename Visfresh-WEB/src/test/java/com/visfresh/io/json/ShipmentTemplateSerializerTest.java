@@ -6,6 +6,9 @@ package com.visfresh.io.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
@@ -85,6 +88,10 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         final Integer noAlertsAfterStartMinutes = 33;
         final Integer shutDownAfterStartMinutes = 5;
 
+        final List<Long> interimLocations = new LinkedList<>();
+        interimLocations.add(5l);
+        interimLocations.add(6l);
+
         ShipmentTemplateDto t = new ShipmentTemplateDto();
         t.setAddDateShipped(addDateShipped);
         t.setAlertProfile(alertProfile);
@@ -104,6 +111,7 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         t.setNoAlertsAfterArrivalMinutes(noAlertsAfterArrivalMinutes);
         t.setNoAlertsAfterStartMinutes(noAlertsAfterStartMinutes);
         t.setShutDownAfterStartMinutes(shutDownAfterStartMinutes);
+        t.setInterimLocations(interimLocations);
 
         final JsonObject obj = serializer.toJson(t).getAsJsonObject();
 
@@ -127,5 +135,6 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         assertEquals(noAlertsAfterArrivalMinutes, t.getNoAlertsAfterArrivalMinutes());
         assertEquals(noAlertsAfterStartMinutes, t.getNoAlertsAfterStartMinutes());
         assertEquals(shutDownAfterStartMinutes, t.getShutDownAfterStartMinutes());
+        assertEquals(2, t.getInterimLocations().size());
     }
 }

@@ -51,7 +51,6 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         user.setTimeZone(UTC);
 
         serializer = new ShipmentSerializer(user);
-        serializer.setUserResolver(resolver);
     }
 
     @Test

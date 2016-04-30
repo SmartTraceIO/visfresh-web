@@ -8,6 +8,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,8 +20,10 @@ import com.google.gson.JsonParser;
 import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.controllers.restclient.RestIoListener;
 import com.visfresh.controllers.restclient.ShipmentTemplateRestClient;
+import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.io.ShipmentTemplateDto;
@@ -67,10 +71,19 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
 
     @Test
     public void testSaveShipmentTemplate() throws RestServiceException, IOException {
-        final ShipmentTemplateDto t = new ShipmentTemplateDto(createShipmentTemplate(true));
+        final ShipmentTemplate tpl = createShipmentTemplate(true);
+        final ShipmentTemplateDto t = new ShipmentTemplateDto(tpl);
         t.setId(null);
+        final List<Long> locs = new LinkedList<>();
+        locs.add(createLocationProfile(true).getId());
+        locs.add(createLocationProfile(true).getId());
+        t.setInterimLocations(locs);
+
         final Long id = client.saveShipmentTemplate(t);
         assertNotNull(id);
+
+        tpl.setId(id);
+        assertEquals(2, context.getBean(AlternativeLocationsDao.class).getBy(tpl).getInterim().size());
     }
     @Test
     public void testGetShipmentTemplates() throws RestServiceException, IOException {
@@ -100,7 +113,17 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetShipmentTemplate() throws IOException, RestServiceException {
         final ShipmentTemplate sp = createShipmentTemplate(true);
-        assertNotNull(client.getShipmentTemplate(sp.getId()));
+
+        //create interim locations.
+        final AlternativeLocations locs = new AlternativeLocations();
+        locs.getInterim().add(createLocationProfile(true));
+        locs.getInterim().add(createLocationProfile(true));
+
+        context.getBean(AlternativeLocationsDao.class).save(sp, locs);
+
+        final ShipmentTemplateDto dto = client.getShipmentTemplate(sp.getId());
+        assertNotNull(dto);
+        assertEquals(2, dto.getInterimLocations().size());
     }
     @Test
     public void testDeleteShipmentTemplate() throws IOException, RestServiceException {

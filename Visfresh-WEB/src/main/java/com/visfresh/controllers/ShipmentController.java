@@ -72,7 +72,6 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
-import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
@@ -121,8 +120,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     private TrackerEventDao trackerEventDao;
     @Autowired
     private ReferenceResolver referenceResolver;
-    @Autowired
-    private UserResolver userResolver;
     @Autowired
     private ChartBundle chartBundle;
     @Autowired
@@ -562,6 +559,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
             final ShipmentDto dto = new ShipmentDto(shipment);
             addInterimLocations(dto, shipment);
+
             final JsonObject json = getSerializer(user).toJson(dto);
             return createSuccessResponse(json);
         } catch (final Exception e) {
@@ -574,9 +572,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @return
      */
     private ShipmentSerializer getSerializer(final User user) {
-        final ShipmentSerializer s = new ShipmentSerializer(user);
-        s.setUserResolver(userResolver);
-        return s;
+        return new ShipmentSerializer(user);
     }
     @RequestMapping(value = "/deleteShipment/{authToken}", method = RequestMethod.GET)
     public JsonObject deleteShipment(@PathVariable final String authToken,

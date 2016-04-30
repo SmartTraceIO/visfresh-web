@@ -143,6 +143,16 @@ public class AbstractJsonSerializer {
         return list;
     }
     /**
+     * @param e JSON elmeent.
+     * @return
+     */
+    protected List<Long> asLongList(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+        return asLongList(e.getAsJsonArray());
+    }
+    /**
      * @param entities list of entity.
      * @return JSON array with entity IDs.
      */

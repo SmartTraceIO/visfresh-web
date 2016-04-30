@@ -17,7 +17,6 @@ import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
-import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.services.RestServiceException;
 
@@ -167,8 +166,5 @@ public class ShipmentRestClient extends RestClient {
 
         final JsonElement el = sendGetRequest(getPathWithToken("createNewAutoSthipment"), params);
         return parseId(el.getAsJsonObject());
-    }
-    public void setUserResolver(final UserResolver r) {
-        serializer.setUserResolver(r);
     }
 }

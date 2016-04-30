@@ -31,7 +31,6 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
-import com.visfresh.io.UserResolver;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
 import com.visfresh.io.shipment.SingleShipmentDto;
@@ -47,11 +46,11 @@ import com.visfresh.utils.StringUtils;
  *
  */
 public class ShipmentSerializer extends AbstractJsonSerializer {
+    private static final String INTERIM_LOCATIONS = "interimLocations";
     private static final String CREATED_BY = "createdBy";
     private static final String START_DATE = "startDate";
     private static final String JSON_SORT_COLUMN = "sc";
     private static final String JSON_SORT_ORDER = "so";
-    private NotificationScheduleSerializer notificationScheduleSerializer;
     private final User user;
     private final DateFormat isoFormat;
     private final DateFormat prettyFormat;
@@ -63,7 +62,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      */
     public ShipmentSerializer(final User user) {
         super(user.getTimeZone());
-        notificationScheduleSerializer = new NotificationScheduleSerializer(user.getTimeZone());
         locationSerializer = new LocationSerializer(user.getTimeZone());
         noteSerializer = new NoteSerializer(user.getTimeZone());
 
@@ -95,11 +93,10 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.COMMENTS_FOR_RECEIVER)));
 
         //TODO correct
-        final JsonElement locs = obj.get("interimLocations");
+        final JsonElement locs = obj.get(INTERIM_LOCATIONS);
         if (locs != null && !locs.isJsonNull()) {
             shp.setInterimLocations(asLongList(locs));
         }
-
     }
     public ShipmentDto parseShipment(final JsonObject json) {
         final ShipmentDto s = new ShipmentDto();
@@ -179,13 +176,13 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         if (s.getInterimLocations() != null) {
             final JsonArray array = new JsonArray();
-            obj.add("interimLocations", array);
+            obj.add(INTERIM_LOCATIONS, array);
 
             for (final Long l : s.getInterimLocations()) {
                 array.add(new JsonPrimitive(l));
             }
         } else {
-            obj.add("interimLocations", JsonNull.INSTANCE);
+            obj.add(INTERIM_LOCATIONS, JsonNull.INSTANCE);
         }
         return obj;
     }
@@ -476,26 +473,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
         return array;
     }
-
-    /**
-     * @param e JSON elmeent.
-     * @return
-     */
-    private List<Long> asLongList(final JsonElement e) {
-        if (e == null || e.isJsonNull()) {
-            return null;
-        }
-
-        final JsonArray array = e.getAsJsonArray();
-        final List<Long> list = new LinkedList<Long>();
-        for (final JsonElement id : array) {
-            list.add(id.getAsLong());
-        }
-        return list;
-    }
-    public void setUserResolver(final UserResolver r) {
-        notificationScheduleSerializer.setUserResolver(r);
-    }
     /**
      * @param dto
      * @return
@@ -630,7 +607,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             //alternatives
             json.add("startLocationAlternatives", locationsToJson(dto.getStartLocationAlternatives()));
             json.add("endLocationAlternatives", locationsToJson(dto.getEndLocationAlternatives()));
-            json.add("interimLocations", locationsToJson(dto.getInterimLocationAlternatives()));
+            json.add(INTERIM_LOCATIONS, locationsToJson(dto.getInterimLocationAlternatives()));
 
             //interim stops
             json.add("interimStops", interimStopsTJson(dto.getInterimStops()));

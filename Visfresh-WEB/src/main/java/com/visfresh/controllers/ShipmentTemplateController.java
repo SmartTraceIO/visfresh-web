@@ -73,6 +73,7 @@ public class ShipmentTemplateController extends AbstractShipmentBaseController i
             resolveReferences(user, dto, t);
 
             final Long id = shipmentTemplateDao.save(t).getId();
+            saveInterimLoations(user, t, dto.getInterimLocations());
             return createIdResponse("shipmentTemplateId", id);
         } catch (final Exception e) {
             log.error("Failed to save shipment template", e);
@@ -147,7 +148,10 @@ public class ShipmentTemplateController extends AbstractShipmentBaseController i
             final ShipmentTemplate template = shipmentTemplateDao.findOne(shipmentTemplateId);
             checkCompanyAccess(user, template);
 
-            return createSuccessResponse(createSerializer(user).toJson(new ShipmentTemplateDto(template)));
+            final ShipmentTemplateDto dto = new ShipmentTemplateDto(template);
+            addInterimLocations(dto, template);
+
+            return createSuccessResponse(createSerializer(user).toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get shipment templates", e);
             return createErrorResponse(e);

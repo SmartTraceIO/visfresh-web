@@ -5,9 +5,11 @@ package com.visfresh.io.json;
 
 import java.util.TimeZone;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.io.ShipmentTemplateDto;
@@ -18,6 +20,8 @@ import com.visfresh.lists.ListShipmentTemplateItem;
  *
  */
 public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
+    private static final String INTERIM_LOCATIONS = "interimLocations";
+
     /**
      * @param tz time zone.
      */
@@ -54,6 +58,17 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES, tpl.getNoAlertsAfterStartMinutes());
         obj.addProperty(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES, tpl.getShutDownAfterStartMinutes());
 
+        if (tpl.getInterimLocations() != null) {
+            final JsonArray array = new JsonArray();
+            obj.add(INTERIM_LOCATIONS, array);
+
+            for (final Long l : tpl.getInterimLocations()) {
+                array.add(new JsonPrimitive(l));
+            }
+        } else {
+            obj.add(INTERIM_LOCATIONS, JsonNull.INSTANCE);
+        }
+
         return obj;
     }
     /**
@@ -86,6 +101,11 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         shp.setShipmentDescription(asString(obj.get(ShipmentTemplateConstants.SHIPMENT_DESCRIPTION)));
         shp.setAddDateShipped(asBoolean(obj.get(ShipmentTemplateConstants.ADD_DATE_SHIPPED)));
         shp.setDetectLocationForShippedFrom(asBoolean(obj.get(ShipmentTemplateConstants.DETECT_LOCATION_FOR_SHIPPED_FROM)));
+
+        final JsonElement locs = obj.get(INTERIM_LOCATIONS);
+        if (locs != null && !locs.isJsonNull()) {
+            shp.setInterimLocations(asLongList(locs));
+        }
 
         return shp;
     }

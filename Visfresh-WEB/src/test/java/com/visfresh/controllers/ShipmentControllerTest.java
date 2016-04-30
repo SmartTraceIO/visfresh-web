@@ -61,7 +61,6 @@ import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
-import com.visfresh.io.UserResolver;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AuthService;
@@ -110,7 +109,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentClient = new ShipmentRestClient(user);
 
         shipmentClient.setServiceUrl(getServiceUrl());
-        shipmentClient.setUserResolver(context.getBean(UserResolver.class));
         shipmentClient.setAuthToken(token);
         shipmentClient.addRestIoListener(l);
 

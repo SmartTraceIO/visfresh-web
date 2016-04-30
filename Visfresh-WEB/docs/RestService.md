@@ -678,7 +678,11 @@ see [ResponseStatus](#markdown-header-response-status)
     "shutdownDeviceAfterMinutes": 155,
     "noAlertsAfterArrivalMinutes": null,
     "noAlertsAfterStartMinutes": null,
-    "shutDownAfterStartMinutes": null
+    "shutDownAfterStartMinutes": null,
+    "interimLocations": [
+      5296,
+      5297
+    ]
 }
 ```  
 ### Device ###
@@ -1680,7 +1684,11 @@ Response:
   ],
   "shutdownDeviceAfterMinutes": 155,
   "noAlertsAfterArrivalMinutes": null,
-  "shutDownAfterStartMinutes": null
+  "shutDownAfterStartMinutes": null,
+  "interimLocations": [
+    5296,
+    5297
+  ]
 }
 ```  
 **Response:**  
@@ -2401,7 +2409,11 @@ Response:
     ],
     "shutdownDeviceAfterMinutes": 155,
     "noAlertsAfterArrivalMinutes": null,
-    "shutDownAfterStartMinutes": null
+    "shutDownAfterStartMinutes": null,
+    "interimLocations": [
+      5296,
+      5297
+    ]
   }
 }
 ```
