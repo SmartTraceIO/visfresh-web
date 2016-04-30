@@ -19,16 +19,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
-import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Device;
-import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.io.ShipmentDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -54,22 +51,21 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         user.setTimeZone(UTC);
 
         serializer = new ShipmentSerializer(user);
-        serializer.setReferenceResolver(resolver);
         serializer.setUserResolver(resolver);
     }
 
     @Test
     public void testShipment() {
-        final AlertProfile alertProfile = createAlertProfile();
-        final NotificationSchedule alertsNotificationSchedule = createNotificationSchedule();
+        final Long alertProfile = 2l;
+        final Long alertsNotificationSchedule = 3l;
         final int alertSuppressionDuringCoolDown = 55;
         final int arrivalNotification = 111;
-        final NotificationSchedule arrivalNotificationSchedule = createNotificationSchedule();
+        final Long arrivalNotificationSchedule = 4l;
         final boolean excludeNotificationsIfNoAlertsFired = true;
         final Long id = 77l;
         final String shipmentDescription = "Any Description";
-        final LocationProfile shippedFrom = createLocationProfile();
-        final LocationProfile shippedTo = createLocationProfile();
+        final Long shippedFrom = 5l;
+        final Long shippedTo = 6l;
         final int shutdownDeviceTimeOut = 155;
         final Device device = createDevice("234908720394857");
         final String palletId = "palettid";
@@ -87,7 +83,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final Date startDate = new Date(10000l);
         final Date deviceShutdownTime = new Date(923847092834l);
 
-        Shipment s = new Shipment();
+        ShipmentDto s = new ShipmentDto();
         s.setAlertProfile(alertProfile);
         s.getAlertsNotificationSchedules().add(alertsNotificationSchedule);
         s.setAlertSuppressionMinutes(alertSuppressionDuringCoolDown);
@@ -99,7 +95,9 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         s.setShippedFrom(shippedFrom);
         s.setShippedTo(shippedTo);
         s.setShutdownDeviceAfterMinutes(shutdownDeviceTimeOut);
-        s.setDevice(device);
+        s.setDeviceImei(device.getImei());
+        s.setDeviceName(device.getName());
+        s.setDeviceSN(device.getSn());
         s.setPalletId(palletId);
         s.setShipmentDate(shipmentDate);
         s.getCustomFields().put("name", "value");
@@ -130,7 +128,9 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertNotNull(s.getShippedFrom());
         assertNotNull(s.getShippedTo());
         assertEquals(shutdownDeviceTimeOut, s.getShutdownDeviceAfterMinutes().intValue());
-        assertEquals(device.getId(), s.getDevice().getId());
+        assertEquals(device.getImei(), s.getDeviceImei());
+        assertEquals(device.getSn(), s.getDeviceSN());
+        assertEquals(device.getName(), s.getDeviceName());
         assertEquals(palletId, s.getPalletId());
         assertEquals(format(shipmentDate), format(s.getShipmentDate()));
         assertEquals("value", s.getCustomFields().get("name"));
@@ -165,7 +165,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
     @Test
     public void testSaveShipmentRequest() {
         final boolean saveAsNewTemplate = true;
-        final Shipment shipment = createShipment();
+        final ShipmentDto shipment = new ShipmentDto(createShipment());
         final String templateName = "JUnit Shipment Template";
         final Boolean includePreviousData = true;
 

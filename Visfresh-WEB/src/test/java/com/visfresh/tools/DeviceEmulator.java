@@ -29,12 +29,12 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
-import com.visfresh.lists.ListAlertProfileItem;
+import com.visfresh.io.ShipmentDto;
 import com.visfresh.lists.DeviceDto;
+import com.visfresh.lists.ListAlertProfileItem;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.SerializerUtils;
@@ -250,14 +250,14 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
      * @throws IOException
      * @throws RestServiceException
      */
-    private Shipment createShipmentIfNeed(final Device device) throws RestServiceException, IOException {
+    private ShipmentDto createShipmentIfNeed(final Device device) throws RestServiceException, IOException {
         final String description = "DevelopmentShipment";
 
         final JsonArray shipments = service.getShipments(1, 100000);
         for (final JsonElement e : shipments) {
             final JsonObject obj = e.getAsJsonObject();
             final Long id = obj.get("shipmentId").getAsLong();
-            final Shipment shipment = service.getShipment(id);
+            final ShipmentDto shipment = service.getShipment(id);
             if (description.equals(shipment.getShipmentDescription())
                     && shipment.getStatus() != ShipmentStatus.Ended) {
                 return shipment;
@@ -265,13 +265,12 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
         }
 
         //create shipment with default alert
-        final Shipment s = new Shipment();
+        final ShipmentDto s = new ShipmentDto();
 
-        s.setDevice(device);
+        s.setDeviceImei(device.getImei());
         s.setShipmentDescription(description);
-        s.setCompany(company);
-        s.setAlertProfile(createAlertProfileIfNeed());
-        s.getAlertsNotificationSchedules().add(createNotificationScheduleIfNeed());
+        s.setAlertProfile(createAlertProfileIfNeed().getId());
+        s.getAlertsNotificationSchedules().add(createNotificationScheduleIfNeed().getId());
 
         final Long id = service.saveShipment(s, null, false).getShipmentId();
         s.setId(id);

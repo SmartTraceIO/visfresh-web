@@ -5,6 +5,7 @@ package com.visfresh.controllers;
 
 
 import java.text.DateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -57,6 +58,7 @@ import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.ShortTrackerEvent;
@@ -68,6 +70,8 @@ import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.io.ShipmentBaseDto;
+import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.shipment.DeviceGroupDto;
@@ -81,6 +85,7 @@ import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.lists.ListShipmentItem;
 import com.visfresh.services.AutoStartShipmentService;
 import com.visfresh.services.LocationService;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.ShipmentSiblingService;
 import com.visfresh.utils.DateTimeUtils;
@@ -94,7 +99,7 @@ import com.visfresh.utils.StringUtils;
  */
 @RestController("Shipment")
 @RequestMapping("/rest")
-public class ShipmentController extends AbstractController implements ShipmentConstants {
+public class ShipmentController extends AbstractShipmentBaseController implements ShipmentConstants {
     /**
      * 2 hours by default.
      */
@@ -161,19 +166,21 @@ public class ShipmentController extends AbstractController implements ShipmentCo
 
             final ShipmentSerializer serializer = getSerializer(user);
             Long id = serializer.getShipmentIdFromSaveRequest(jsonRequest);
+            Shipment oldShipment = null;
+
             if (id != null) {
                 //merge the shipment from request by existing shipment
                 //it is required to avoid the set to null the fields
                 //which are absent in save request.
-                final Shipment s = shipmentDao.findOne(id);
-                if (s != null) {
-                    checkCompanyAccess(user, s);
+                oldShipment = shipmentDao.findOne(id);
+                if (oldShipment != null) {
+                    checkCompanyAccess(user, oldShipment);
 
                     final JsonObject shipmentFromReqest = serializer.getShipmentFromRequest(
                             jsonRequest);
                     final JsonObject merged = SerializerUtils.merge(
                             shipmentFromReqest,
-                            serializer.toJson(s).getAsJsonObject());
+                            serializer.toJson(new ShipmentDto(oldShipment)).getAsJsonObject());
                     //correct shipment to save in request
                     serializer.setShipmentToRequest(jsonRequest, merged);
                 }
@@ -182,14 +189,8 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final SaveShipmentRequest req = serializer.parseSaveShipmentRequest(jsonRequest);
 
             //save shipment
-            final Shipment newShipment = req.getShipment();
-
-            checkCompanyAccess(user, newShipment);
-            checkCompanyAccess(user, newShipment.getAlertProfile());
-            checkCompanyAccess(user, newShipment.getShippedFrom());
-            checkCompanyAccess(user, newShipment.getShippedTo());
-            checkCompanyAccess(user, newShipment.getAlertsNotificationSchedules());
-            checkCompanyAccess(user, newShipment.getArrivalNotificationSchedules());
+            final Shipment newShipment = createShipment(req.getShipment(), oldShipment);
+            resolveReferences(user, req.getShipment(), newShipment);
 
             newShipment.setCompany(user.getCompany());
             newShipment.setCreatedBy(user.getEmail());
@@ -200,14 +201,7 @@ public class ShipmentController extends AbstractController implements ShipmentCo
                 id = saveNewShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
             }
 
-            //save interim locations
-            final List<LocationProfile> interims = req.getInterimLocations();
-            if (interims != null) {
-                //check company access
-                checkCompanyAccess(user, interims);
-
-                ruleEngine.setInterimLocations(newShipment, interims);
-            }
+            saveInterimLoations(user, newShipment, req.getShipment().getInterimLocations());
 
             //build response
             final SaveShipmentResponse resp = new SaveShipmentResponse();
@@ -223,6 +217,58 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             log.error("Failed to save shipment by request: " + jsonRequest, e);
             return createErrorResponse(e);
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AbstractShipmentBaseController#saveInterimLoations(com.visfresh.entities.ShipmentBase, java.util.Collection)
+     */
+    @Override
+    protected void saveInterimLoations(final ShipmentBase s,
+            final Collection<LocationProfile> locs) {
+        super.saveInterimLoations(s, locs);
+        ruleEngine.setInterimLocations(s, new LinkedList<>(locs));
+    }
+    /**
+     * @param dto
+     * @param oldShipment
+     * @return
+     */
+    private Shipment createShipment(final ShipmentDto dto, final Shipment oldShipment) {
+        final Shipment s = oldShipment == null ? new Shipment() : oldShipment;
+        copyBaseData(dto, s);
+
+        s.setPalletId(dto.getPalletId());
+        s.setAssetNum(dto.getAssetNum());
+        s.setTripCount(dto.getTripCount());
+        s.setPoNum(dto.getPoNum());
+        s.setAssetType(dto.getAssetType());
+        s.getCustomFields().putAll(dto.getCustomFields());
+        s.setShipmentDate(dto.getShipmentDate());
+        s.setLastEventDate(dto.getLastEventDate());
+        s.setStartDate(dto.getStartDate());
+        s.setCreatedBy(dto.getCreatedBy());
+        s.setStatus(dto.getStatus());
+        s.setDeviceShutdownTime(dto.getDeviceShutdownTime());
+        s.setSiblingGroup(dto.getSiblingGroup());
+        s.setSiblingCount(dto.getSiblingCount());
+        s.setArrivalDate(dto.getArrivalDate());
+        s.setEta(dto.getEta());
+
+        return s;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.controllers.AbstractShipmentBaseController#resolveReferences(com.visfresh.entities.User, com.visfresh.io.ShipmentBaseDto, com.visfresh.entities.ShipmentBase)
+     */
+    @Override
+    protected void resolveReferences(final User user, final ShipmentBaseDto dto,
+            final ShipmentBase t) throws RestServiceException {
+        final ShipmentDto shipmentDto = (ShipmentDto) dto;
+        final Shipment s = (Shipment) t;
+
+        final Device d = deviceDao.findByImei(shipmentDto.getDeviceImei());
+        checkCompanyAccess(user, d);
+        s.setDevice(d);
+
+        super.resolveReferences(user, dto, t);
     }
     /**
      * @param newShipment
@@ -514,7 +560,9 @@ public class ShipmentController extends AbstractController implements ShipmentCo
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, shipment);
 
-            final JsonObject json = getSerializer(user).toJson(shipment);
+            final ShipmentDto dto = new ShipmentDto(shipment);
+            addInterimLocations(dto, shipment);
+            final JsonObject json = getSerializer(user).toJson(dto);
             return createSuccessResponse(json);
         } catch (final Exception e) {
             log.error("Failed to get shipment " + shipmentId, e);
@@ -527,7 +575,6 @@ public class ShipmentController extends AbstractController implements ShipmentCo
      */
     private ShipmentSerializer getSerializer(final User user) {
         final ShipmentSerializer s = new ShipmentSerializer(user);
-        s.setReferenceResolver(referenceResolver);
         s.setUserResolver(userResolver);
         return s;
     }

@@ -3,10 +3,6 @@
  */
 package com.visfresh.io;
 
-import java.util.List;
-
-import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.Shipment;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -20,13 +16,12 @@ public class SaveShipmentRequest {
     /**
      * Shipment.
      */
-    private Shipment shipment;
+    private ShipmentDto shipment;
     /**
      * Indicates whether or not should save the shipment as new template.
      */
     private boolean saveAsNewTemplate;
     private Boolean includePreviousData;
-    private List<LocationProfile> interimLocations;
 
     /**
      * Default constructor.
@@ -51,13 +46,13 @@ public class SaveShipmentRequest {
     /**
      * @return shipment.
      */
-    public Shipment getShipment() {
+    public ShipmentDto getShipment() {
         return shipment;
     }
     /**
      * @param shipment shipment.
      */
-    public void setShipment(final Shipment shipment) {
+    public void setShipment(final ShipmentDto shipment) {
         this.shipment = shipment;
     }
 
@@ -84,17 +79,5 @@ public class SaveShipmentRequest {
      */
     public void setIncludePreviousData(final Boolean includePreviousData) {
         this.includePreviousData = includePreviousData;
-    }
-    /**
-     * @return the interimLocations
-     */
-    public List<LocationProfile> getInterimLocations() {
-        return interimLocations;
-    }
-    /**
-     * @param interimLocations the interimLocations to set
-     */
-    public void setInterimLocations(final List<LocationProfile> interimLocations) {
-        this.interimLocations = interimLocations;
     }
 }

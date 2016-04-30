@@ -14,9 +14,9 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
-import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.services.RestServiceException;
@@ -58,7 +58,7 @@ public class ShipmentRestClient extends RestClient {
      * @param templateName
      * @param saveTemplate
      */
-    public SaveShipmentResponse saveShipment(final Shipment shipment, final String templateName,
+    public SaveShipmentResponse saveShipment(final ShipmentDto shipment, final String templateName,
             final boolean saveTemplate) throws RestServiceException, IOException {
         final SaveShipmentRequest req = new SaveShipmentRequest();
         req.setShipment(shipment);
@@ -83,7 +83,7 @@ public class ShipmentRestClient extends RestClient {
     /* (non-Javadoc)
      * @see com.visfresh.io.ReferenceResolver#getShipment(java.lang.Long)
      */
-    public Shipment getShipment(final Long id) throws IOException, RestServiceException {
+    public ShipmentDto getShipment(final Long id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("shipmentId", id.toString());
 
@@ -167,13 +167,6 @@ public class ShipmentRestClient extends RestClient {
 
         final JsonElement el = sendGetRequest(getPathWithToken("createNewAutoSthipment"), params);
         return parseId(el.getAsJsonObject());
-    }
-
-    /**
-     * @param r reference resolver.
-     */
-    public void setReferenceResolver(final ReferenceResolver r) {
-        serializer.setReferenceResolver(r);
     }
     public void setUserResolver(final UserResolver r) {
         serializer.setUserResolver(r);

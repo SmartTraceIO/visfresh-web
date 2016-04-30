@@ -706,8 +706,6 @@ see [ResponseStatus](#markdown-header-response-status)
   "saveAsNewTemplate": true,
   "includePreviousData": true, // can be blank, default is true
   "templateName": "NewTemplate.tpl", // template name in case of save also as new template
-  "interimLocations": [], //array of interim locations. If not presented then list of interim locations will
-                          //not updated for given shipment.
   "shipment": ${EmbeddedShipmentObject} //this shipment object to save
 }
 ```
@@ -746,7 +744,11 @@ see [Shipment Object](#markdown-header-shipment)
     "shutDownAfterStartMinutes": null,
 	"customFields": {
 	  "field1": "value1"
-	}
+	},
+    "interimLocations": [
+      4735,
+      4736
+    ]
 }
 ```
 ### Shipment List Item ###
@@ -1783,7 +1785,11 @@ Response:
     "shutDownAfterStartMinutes": null,
     "customFields": {
       "field1": "value1"
-    }
+    },
+    "interimLocations": [
+      4735,
+      4736
+    ]
   }
 }
 ```
@@ -2470,7 +2476,11 @@ Response:
     "shutDownAfterStartMinutes": null,
     "customFields": {
       "field1": "value1"
-    }
+    },
+    "interimLocations": [
+      4735,
+      4736
+    ]
   }
 }
 ```
@@ -2681,9 +2691,9 @@ Response:
         "endFlag": "Y"
       }
     ],
-    "interimLocationAlternatives": [
+    "interimLocations": [
       {
-        "locationId": 11292,
+        "locationId": 4617,
         "locationName": "L5",
         "companyName": "Sun Microsystems",
         "notes": "Any notes",
@@ -2698,7 +2708,7 @@ Response:
         "endFlag": "Y"
       },
       {
-        "locationId": 11293,
+        "locationId": 4618,
         "locationName": "L6",
         "companyName": "Sun Microsystems",
         "notes": "Any notes",

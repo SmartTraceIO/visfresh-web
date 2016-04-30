@@ -58,9 +58,9 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
-import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
+import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.UserResolver;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.state.ShipmentSession;
@@ -110,7 +110,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentClient = new ShipmentRestClient(user);
 
         shipmentClient.setServiceUrl(getServiceUrl());
-        shipmentClient.setReferenceResolver(context.getBean(ReferenceResolver.class));
         shipmentClient.setUserResolver(context.getBean(UserResolver.class));
         shipmentClient.setAuthToken(token);
         shipmentClient.addRestIoListener(l);
@@ -140,11 +139,21 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testSaveShipment() throws RestServiceException, IOException {
         final String comments = "Some comments for receiver saved for shipment";
 
-        final Shipment s = createShipment(true);
+        final Shipment shp = createShipment(true);
+        final ShipmentDto s = new ShipmentDto(shp);
         s.setCommentsForReceiver(comments);
+
+        //add interim locations
+        final List<Long> locs = new LinkedList<Long>();
+        locs.add(createLocationProfile(true).getId());
+        locs.add(createLocationProfile(true).getId());
+        s.setInterimLocations(locs);
+
         s.setId(null);
+
         final SaveShipmentResponse resp = shipmentClient.saveShipment(s, "NewTemplate.tpl", true);
         assertNotNull(resp.getShipmentId());
+        shp.setId(resp.getShipmentId());
 
         //check new template is saved
         final long id = resp.getTemplateId();
@@ -153,10 +162,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(tpl);
         assertNotNull(tpl.getName());
         assertEquals(comments, tpl.getCommentsForReceiver());
+        assertEquals(2, context.getBean(AlternativeLocationsDao.class).getBy(shp).getInterim().size());
     }
     @Test
     public void testSaveShipmentAddDateShipped() throws RestServiceException, IOException {
-        final Shipment s = createShipment(true);
+        final ShipmentDto s = new ShipmentDto(createShipment(true));
         s.setId(null);
         final SaveShipmentResponse resp = shipmentClient.saveShipment(s, null, false);
         assertNotNull(resp.getShipmentId());
@@ -169,7 +179,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     }
     @Test
     public void testCreatedBy() throws RestServiceException, IOException {
-        final Shipment s = createShipment(true);
+        final ShipmentDto s = new ShipmentDto(createShipment(true));
         s.setId(null);
         final SaveShipmentResponse resp = shipmentClient.saveShipment(s, null, false);
         assertNotNull(resp.getShipmentId());
@@ -192,7 +202,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         s.setCommentsForReceiver(comments);
         s.setId(null);
 
-        final SaveShipmentResponse resp = shipmentClient.saveShipment(s, null, false);
+        final SaveShipmentResponse resp = shipmentClient.saveShipment(new ShipmentDto(s), null, false);
         assertEquals(oldId, resp.getShipmentId().longValue());
 
         //check new template is saved
@@ -212,7 +222,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         s.setCommentsForReceiver(comments);
         s.setId(null);
 
-        final SaveShipmentResponse resp = shipmentClient.saveShipment(s, null, false);
+        final SaveShipmentResponse resp = shipmentClient.saveShipment(new ShipmentDto(s), null, false);
         assertNotSame(oldId, resp.getShipmentId().longValue());
 
         //check old shipment closed
@@ -226,13 +236,14 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final LocationProfile l1 = createLocationProfile(true);
         final LocationProfile l2 = createLocationProfile(true);
 
-        final List<LocationProfile> locs = new LinkedList<>();
-        locs.add(l1);
-        locs.add(l2);
+        final List<Long> locs = new LinkedList<>();
+        locs.add(l1.getId());
+        locs.add(l2.getId());
 
         final SaveShipmentRequest req = new SaveShipmentRequest();
-        req.setShipment(s);
-        req.setInterimLocations(locs);
+        final ShipmentDto dto = new ShipmentDto(s);
+        req.setShipment(dto);
+        dto.setInterimLocations(locs);
 
         shipmentClient.saveShipment(req);
 
@@ -253,7 +264,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(1, eng.getInterimLocations(s).size());
 
         //check if interims not present in request, that not then changed
-        req.setInterimLocations(null);
+        dto.setInterimLocations(null);
         shipmentClient.saveShipment(req);
 
         //check locations
@@ -280,7 +291,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         s.setCommentsForReceiver(comments);
         s.setId(null);
 
-        final SaveShipmentResponse resp = shipmentClient.saveShipment(s, null, false);
+        final SaveShipmentResponse resp = shipmentClient.saveShipment(new ShipmentDto(s), null, false);
         assertNotSame(oldId, resp.getShipmentId().longValue());
 
         //check old shipment closed
@@ -586,7 +597,16 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         sp.setDeviceShutdownTime(new Date(System.currentTimeMillis() - 10000000l));
         saveShipmentDirectly(sp);
 
-        assertNotNull(shipmentClient.getShipment(sp.getId()));
+        final AlternativeLocations loc = new AlternativeLocations();
+        loc.getInterim().add(createLocationProfile(true));
+        loc.getInterim().add(createLocationProfile(true));
+
+        final AlternativeLocationsDao altDao = context.getBean(AlternativeLocationsDao.class);
+        altDao.save(sp, loc);
+
+        final ShipmentDto dto = shipmentClient.getShipment(sp.getId());
+        assertNotNull(dto);
+        assertEquals(2, dto.getInterimLocations().size());
     }
     @Test
     public void testDeleteShipment() throws IOException, RestServiceException {
@@ -678,7 +698,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         array = sd.get("endLocationAlternatives").getAsJsonArray();
         assertEquals(2, array.size());
         assertEquals("L3", array.get(0).getAsJsonObject().get(LocationConstants.PROPERTY_LOCATION_NAME).getAsString());
-        array = sd.get("interimLocationAlternatives").getAsJsonArray();
+        array = sd.get("interimLocations").getAsJsonArray();
         assertEquals(2, array.size());
         assertEquals("L5", array.get(0).getAsJsonObject().get(LocationConstants.PROPERTY_LOCATION_NAME).getAsString());
 
@@ -893,7 +913,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testSaveEmpty() throws RestServiceException, IOException {
         final Shipment shipment = new Shipment();
         shipment.setDevice(createDevice("123987230987", true));
-        final Long id = shipmentClient.saveShipment(shipment, null, false).getShipmentId();
+        final Long id = shipmentClient.saveShipment(new ShipmentDto(shipment), null, false).getShipmentId();
         assertNotNull(id);
 
         final Shipment s = shipmentDao.findOne(id);
