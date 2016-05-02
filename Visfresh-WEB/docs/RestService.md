@@ -119,7 +119,8 @@ List items is short representations of base entities, like as [Alert Profile](#m
 58. [Start Simulator](#markdown-header-start-simulator)  
 59. [Stop Simulator](#markdown-header-stop-simulator)  
 60. [Get Simulator](#markdown-header-get-simulator)  
-61. [AutoStartNewShipment](#markdown-header-autostart-new-shipment)  
+61. [Autostart new Shipment](#markdown-header-autostart-new-shipment)  
+62. [Init Device colors](#markdown-header-init-device-colors)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -512,6 +513,13 @@ Method *GET*, method *autoStartNewShipment*. Request parameters:
 1. device - the device.  
 Last reading for given device is required.  
 [(example)](#markdown-header-autostart-new-shipment-example)
+
+### Init device colors ###
+Method *GET*, method name *initDeviceColors*. Request parameters:
+1. company - company ID. If null, the company ID of currently logged in user will used.  
+Company admin role is required if ID is null or equals of currently logged in user.  
+Or SmartTraceAdmin role otherwise.  
+[(example)](#markdown-header-init-device-colors-example)
 
 ## Objects
 ### Response message ###
@@ -3369,5 +3377,17 @@ Response:
   "response": {
     "shipmentId": 23819 //ID of created shipment
   }
+}
+```
+### Init device colors example ###
+**GET /vf/rest/initDeviceColors/${accessToken}?company=5148**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
 }
 ```

@@ -336,7 +336,22 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
 
         return items;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.DeviceDao#updateColor(com.visfresh.entities.Device, com.visfresh.entities.Color)
+     */
+    @Override
+    public void updateColor(final Device d, final Color color) {
+        if (d == null) {
+            return;
+        }
 
+
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("imei", d.getImei());
+        params.put("color", color == null ? null : color.name());
+
+        jdbc.update("update " + TABLE + " set " + COLOR_FIELD + "=:color where " + IMEI_FIELD + "=:imei", params);
+    }
     /**
      * @param row
      * @return

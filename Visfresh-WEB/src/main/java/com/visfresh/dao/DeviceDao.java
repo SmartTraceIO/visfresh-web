@@ -5,6 +5,7 @@ package com.visfresh.dao;
 
 import java.util.List;
 
+import com.visfresh.entities.Color;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
@@ -51,4 +52,9 @@ public interface DeviceDao extends EntityWithCompanyDaoBase<Device, String> {
      * @param c company.
      */
     void moveToNewCompany(Device device, Company c);
+    /**
+     * @param d device.
+     * @param color color.
+     */
+    void updateColor(Device d, Color color);
 }

@@ -129,4 +129,18 @@ public class DeviceRestClient extends RestClient {
         final JsonElement response = sendGetRequest(getPathWithToken("moveDevice"), params);
         return parseStringId(response.getAsJsonObject());
     }
+    /**
+     * @param company.
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void initDeviceColors(final Company company) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        if (company != null) {
+            params.put("company", company.getId().toString());
+        }
+
+        sendGetRequest(getPathWithToken("initDeviceColors"), params);
+    }
 }

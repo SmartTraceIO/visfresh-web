@@ -393,6 +393,30 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         //check tracker event moved
         assertEquals(newImei, context.getBean(TrackerEventDao.class).findOne(e.getId()).getDevice().getImei());
     }
+    @Test
+    public void testInitDeviceColors() throws IOException, RestServiceException {
+        final Device d1 = createDevice("0239870932487", true);
+        final Device d2 = createDevice("2934879823477", true);
+        final Device d3 = createDevice("2987943878487", true);
+
+        client.initDeviceColors(d1.getCompany());
+
+        assertNotNull(dao.findOne(d1.getImei()).getColor());
+        assertNotNull(dao.findOne(d2.getImei()).getColor());
+        assertNotNull(dao.findOne(d3.getImei()).getColor());
+    }
+    @Test
+    public void testInitDeviceColorsNullCompany() throws IOException, RestServiceException {
+        final Device d1 = createDevice("0239870932487", true);
+        final Device d2 = createDevice("2934879823477", true);
+        final Device d3 = createDevice("2987943878487", true);
+
+        client.initDeviceColors(null);
+
+        assertNotNull(dao.findOne(d1.getImei()).getColor());
+        assertNotNull(dao.findOne(d2.getImei()).getColor());
+        assertNotNull(dao.findOne(d3.getImei()).getColor());
+    }
     /**
      * @param d device.
      * @param s shipment.

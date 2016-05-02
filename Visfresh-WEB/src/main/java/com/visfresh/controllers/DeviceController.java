@@ -450,6 +450,42 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
     }
     /**
+     * @param authToken authentication token.
+     * @param req shipment.
+     * @return status.
+     */
+    @RequestMapping(value = "/initDeviceColors/{authToken}", method = RequestMethod.GET)
+    public JsonObject initDeviceColors(@PathVariable final String authToken,
+            final @RequestParam(required = false) Long company) {
+        try {
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.Admin);
+
+            final Company c;
+            if (company != null) {
+                c = companyDao.findOne(company);
+            } else {
+                c = user.getCompany();
+            }
+
+            checkCompanyAccess(user, c);
+            final List<Device> devices = deviceDao.findByCompany(c, null, null, null);
+
+            final ColorInitializeTool tool = new ColorInitializeTool();
+            tool.initColors(devices);
+
+            //save colors.
+            for (final Device d : devices) {
+                deviceDao.updateColor(d, d.getColor());
+                log.debug("Color " + d.getColor().name() + " has set for device " + d.getImei());
+            }
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to initialize device colors for company " + company, e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
      * @param shipment
      * @param device
      */
