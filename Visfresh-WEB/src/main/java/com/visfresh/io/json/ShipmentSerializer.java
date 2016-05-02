@@ -325,6 +325,18 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("lastReadingLat", dto.getLastReadingLat());
         json.addProperty("lastReadingLong", dto.getLastReadingLong());
 
+        //first reading
+        json.addProperty("firstReadingLat", dto.getFirstReadingLat());
+        json.addProperty("firstReadingLong", dto.getFirstReadingLong());
+
+        //start location
+        json.addProperty("shippedFromLat", dto.getShippedFromLat());
+        json.addProperty("shippedFromLong", dto.getShippedFromLong());
+
+        //end location
+        json.addProperty("shippedToLat", dto.getShippedToLat());
+        json.addProperty("shippedToLong", dto.getShippedToLong());
+
         return json;
     }
     /**

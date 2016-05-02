@@ -43,6 +43,13 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private Double lastReadingLat;
     private Double lastReadingLong;
 
+    private Double shippedFromLat;
+    private Double shippedFromLong;
+    private Double shippedToLat;
+    private Double shippedToLong;
+    private Double firstReadingLat;
+    private Double firstReadingLong;
+
     /**
      * Default constructor.
      */
@@ -355,5 +362,77 @@ public class ListShipmentItem implements EntityWithId<Long> {
     @Override
     public Long getId() {
         return getShipmentId();
+    }
+    /**
+     * @return the shippedFromLat
+     */
+    public Double getShippedFromLat() {
+        return shippedFromLat;
+    }
+    /**
+     * @param shippedFromLat the shippedFromLat to set
+     */
+    public void setShippedFromLat(final double shippedFromLat) {
+        this.shippedFromLat = shippedFromLat;
+    }
+    /**
+     * @return the shippedFromLong
+     */
+    public Double getShippedFromLong() {
+        return shippedFromLong;
+    }
+    /**
+     * @param shippedFromLong the shippedFromLong to set
+     */
+    public void setShippedFromLong(final double shippedFromLong) {
+        this.shippedFromLong = shippedFromLong;
+    }
+    /**
+     * @return the shippedToLat
+     */
+    public Double getShippedToLat() {
+        return shippedToLat;
+    }
+    /**
+     * @param shippedToLat the shippedToLat to set
+     */
+    public void setShippedToLat(final double shippedToLat) {
+        this.shippedToLat = shippedToLat;
+    }
+    /**
+     * @return the shippedToLong
+     */
+    public Double getShippedToLong() {
+        return shippedToLong;
+    }
+    /**
+     * @param shippedToLong the shippedToLong to set
+     */
+    public void setShippedToLong(final double shippedToLong) {
+        this.shippedToLong = shippedToLong;
+    }
+    /**
+     * @return the firstReadingLat
+     */
+    public Double getFirstReadingLat() {
+        return firstReadingLat;
+    }
+    /**
+     * @param firstReadingLat the firstReadingLat to set
+     */
+    public void setFirstReadingLat(final double firstReadingLat) {
+        this.firstReadingLat = firstReadingLat;
+    }
+    /**
+     * @return the firstReadingLong
+     */
+    public Double getFirstReadingLong() {
+        return firstReadingLong;
+    }
+    /**
+     * @param firstReadingLong the firstReadingLong to set
+     */
+    public void setFirstReadingLong(final double firstReadingLong) {
+        this.firstReadingLong = firstReadingLong;
     }
 }

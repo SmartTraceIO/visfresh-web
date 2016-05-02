@@ -485,7 +485,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             dto.getAlertSummary().putAll(toSummaryMap(alerts));
 
             //percentage complete.
-            final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
             if (s.hasFinalStatus()) {
                 dto.setPercentageComplete(100);
             } else {
@@ -496,6 +495,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 }
             }
 
+            //last event
+            final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
             if (lastEvent != null) {
                 //set last reading data
                 dto.setLastReadingTimeISO(isoFmt.format(lastEvent.getTime()));
@@ -504,6 +505,13 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 dto.setLastReadingBattery(lastEvent.getBattery());
                 dto.setLastReadingLat(lastEvent.getLatitude());
                 dto.setLastReadingLong(lastEvent.getLongitude());
+            }
+
+            //first event
+            final TrackerEvent firstEvent = trackerEventDao.getFirstEvent(s);
+            if (firstEvent != null) {
+                dto.setFirstReadingLat(firstEvent.getLatitude());
+                dto.setFirstReadingLong(firstEvent.getLongitude());
             }
 
             if (s.getStatus() == ShipmentStatus.Default || s.getStatus() == ShipmentStatus.Ended) {
@@ -518,6 +526,17 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             }
 
             dto.setShipmentDate(isoFmt.format(s.getShipmentDate()));
+
+            //start location
+            if (s.getShippedFrom() != null) {
+                dto.setShippedFromLat(s.getShippedFrom().getLocation().getLatitude());
+                dto.setShippedFromLong(s.getShippedFrom().getLocation().getLongitude());
+            }
+            //end location
+            if (s.getShippedTo() != null) {
+                dto.setShippedToLat(s.getShippedTo().getLocation().getLatitude());
+                dto.setShippedToLong(s.getShippedTo().getLocation().getLongitude());
+            }
         }
 
         return result;
