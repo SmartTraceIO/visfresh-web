@@ -65,7 +65,7 @@ public class NotificationIssueBundle {
         //${date} alert issue date include day and year
         map.put("date", createIsoFormat(lang, tz).format(issueDate));
         //${time} the time in scope of day.
-        final DateFormat sdf = createDateFormat("HH:mm", lang, tz);
+        final DateFormat sdf = createDateFormat("H:mm", lang, tz);
         map.put("time", sdf.format(issueDate));
         //${device} device IMEI
         map.put("device", device.getImei());
@@ -94,8 +94,8 @@ public class NotificationIssueBundle {
         }
 
         if (trackerEvent != null) {
-            //${readingTime}      the time reading occured in user's timezone - eg. 4:34am
-            map.put("readingTime", createDateFormat("K:mma", lang, tz).format(trackerEvent.getTime()));
+            //${readingTime}      the time reading occured in user's timezone - eg. 4:34
+            map.put("readingTime", createDateFormat("H:mm", lang, tz).format(trackerEvent.getTime()));
             //${readingDate}      the date reading occured in user's timezone - eg. 12 Feb 2016
             map.put("readingDate", createDateFormat("dd MMM yyyy", lang, tz).format(trackerEvent.getTime()));
             //${temperature}
