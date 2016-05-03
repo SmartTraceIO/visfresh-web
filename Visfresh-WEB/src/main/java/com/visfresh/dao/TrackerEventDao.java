@@ -58,4 +58,10 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
      * @param newDevice new device.
      */
     void moveToNewDevice(Device oldDevice, Device newDevice);
+    /**
+     * @param s shipment.
+     * @param date start date.
+     * @return list of tracker events for given shipment after given date.
+     */
+    List<TrackerEvent> getEventsAfterDate(Shipment s, Date date);
 }

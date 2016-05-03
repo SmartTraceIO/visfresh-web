@@ -358,6 +358,48 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     @Override
     public List<ShortTrackerEvent> findBy(final String device, final Date startDate,
             final Date endDate) {
+        final List<Map<String, Object>> rows = findByDeviceAndDateRanges(device, startDate, endDate);
+
+        final List<ShortTrackerEvent> result = new LinkedList<>();
+        for (final Map<String, Object> row : rows) {
+            final ShortTrackerEvent ue = createShortTrackerEvent(row);
+            result.add(ue);
+        }
+
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getEventsAfterDate(com.visfresh.entities.Shipment, java.util.Date)
+     */
+    @Override
+    public List<TrackerEvent> getEventsAfterDate(final Shipment s, final Date date) {
+        final List<TrackerEvent> result = new LinkedList<>();
+
+        if (s != null) {
+            final List<Map<String, Object>> rows = findByDeviceAndDateRanges(
+                    s.getDevice().getImei(), date, null);
+
+            for (final Map<String, Object> row : rows) {
+                if (row.get(SHIPMENT_FIELD) != null) {
+                    final TrackerEvent ue = createEntity(row);
+                    ue.setShipment(s);
+                    ue.setDevice(s.getDevice());
+                    result.add(ue);
+                }
+            }
+        }
+
+        return result;
+    }
+    /**
+     * @param device
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    private List<Map<String, Object>> findByDeviceAndDateRanges(final String device,
+            final Date startDate, final Date endDate) {
         //create set of device IMEI for avoid of duplicates.
         final Map<String, Object> params = new HashMap<>();
         params.put("device", device);
@@ -378,16 +420,9 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         }
         sql.append(" order by " + ID_FIELD);
 
-        final List<ShortTrackerEvent> result = new LinkedList<>();
-        final List<Map<String, Object>> rows = jdbc.queryForList(sql.toString(), params);
-
-        for (final Map<String, Object> row : rows) {
-            final ShortTrackerEvent ue = createShortTrackerEvent(row);
-            result.add(ue);
-        }
-
-        return result;
+        return jdbc.queryForList(sql.toString(), params);
     }
+
     /**
      * @param row
      * @return

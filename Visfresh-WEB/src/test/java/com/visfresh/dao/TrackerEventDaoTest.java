@@ -366,6 +366,37 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         assertEquals(e3.getId(), events.get(events.size() - 1).getId());
     }
     @Test
+    public void testGetEventsAfterDate() {
+        final Device d1 = createDevice("234949838243985298");
+        final Device d2 = createDevice("232398340987908790");
+        final Shipment s = createShipment(d1);
+
+        final long dt = 100000l;
+        final long t0 = System.currentTimeMillis() - 20 * dt;
+
+        final TrackerEvent e1 = createEvent(d1, new Date(t0 + 1 * dt));
+        createEvent(d2, new Date(t0 + 2 * dt));
+        final TrackerEvent e2 = createEvent(d1, new Date(t0 + 3 * dt));
+        createEvent(d2, new Date(t0 + 4 * dt));
+        createEvent(d2, new Date(t0 + 6 * dt));
+        final TrackerEvent e4 = createEvent(d1, new Date(t0 + 7 * dt));
+
+        List<TrackerEvent> events = dao.getEventsAfterDate(s, null);
+        assertEquals(3, events.size());
+        assertEquals(e1.getId(), events.get(0).getId());
+        assertEquals(e4.getId(), events.get(events.size() - 1).getId());
+
+        events = dao.getEventsAfterDate(s, new Date(t0 + 2 * dt));
+        assertEquals(2, events.size());
+        assertEquals(e2.getId(), events.get(0).getId());
+        assertEquals(e4.getId(), events.get(events.size() - 1).getId());
+
+        //check shipment and device resolved
+        final TrackerEvent one = events.get(0);
+        assertNotNull(one.getShipment());
+        assertNotNull(one.getDevice());
+    }
+    @Test
     public void testMoveToNewDevice() {
         final Device d1 = createDevice("390248703928740");
         final Device d2 = createDevice("293087098709870");

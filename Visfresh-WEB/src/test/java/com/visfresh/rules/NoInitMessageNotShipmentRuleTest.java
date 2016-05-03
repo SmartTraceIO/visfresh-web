@@ -25,7 +25,7 @@ import com.visfresh.rules.state.ShipmentSessionManager;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class NoInitMessageRuleTest extends NoInitMessageRule {
+public class NoInitMessageNotShipmentRuleTest extends NoInitMessageNotShipmentRule {
     private Shipment autoStartedShipment;
     private List<String> sentMessages = new LinkedList<>();
     private List<Shipment> savedShipments = new LinkedList<>();
@@ -36,7 +36,7 @@ public class NoInitMessageRuleTest extends NoInitMessageRule {
     /**
      * Default constructor.
      */
-    public NoInitMessageRuleTest() {
+    public NoInitMessageNotShipmentRuleTest() {
         super();
     }
 

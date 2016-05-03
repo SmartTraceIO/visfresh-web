@@ -16,7 +16,8 @@ import com.visfresh.rules.SetShipmentArrivedRule;
 import com.visfresh.rules.AutoDetectEndLocationRule;
 import com.visfresh.rules.EtaCalculationRule;
 import com.visfresh.rules.InterimStopRule;
-import com.visfresh.rules.NoInitMessageRule;
+import com.visfresh.rules.NoInitMessageNotShipmentRule;
+import com.visfresh.rules.NoInitMessageArrivedShipmentRule;
 
 global AbstractRuleEngine engine;
 
@@ -149,11 +150,20 @@ rule "InterimStop"
         }
 end
 
-rule "NoInitMessage"
+rule "NoInitMessageNotShipment"
     when
-        context : RuleContext(engine.getRule(NoInitMessageRule.NAME).accept(this));
+        context : RuleContext(engine.getRule(NoInitMessageNotShipmentRule.NAME).accept(this));
     then
-    	if(engine.getRule(NoInitMessageRule.NAME).handle(context)) {
+    	if(engine.getRule(NoInitMessageNotShipmentRule.NAME).handle(context)) {
+       		update(context);
+        }
+end
+
+rule "NoInitMessageArrivedShipment"
+    when
+        context : RuleContext(engine.getRule(NoInitMessageArrivedShipmentRule.NAME).accept(this));
+    then
+    	if(engine.getRule(NoInitMessageArrivedShipmentRule.NAME).handle(context)) {
        		update(context);
         }
 end
