@@ -128,11 +128,4 @@ public class NoInitMessageArrivedShipmentRule extends AbstractNoInitMessageRule 
             final Date date) {
         return trackerEventDao.getEventsAfterDate(s, date);
     }
-
-    /**
-     * @param evt
-     */
-    protected void saveEvent(final TrackerEvent evt) {
-        trackerEventDao.save(evt);
-    }
 }

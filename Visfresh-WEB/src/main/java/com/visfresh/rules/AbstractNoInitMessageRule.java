@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TrackerEvent;
 import com.visfresh.services.AutoStartShipmentService;
 import com.visfresh.services.EmailService;
 
@@ -33,6 +35,8 @@ public abstract class AbstractNoInitMessageRule implements TrackerEventRule {
     private EmailService emailService;
     @Autowired
     private ShipmentDao shipmentDao;
+    @Autowired
+    private TrackerEventDao trackerEventDao;
 
     /**
      * Default constructor.
@@ -59,17 +63,35 @@ public abstract class AbstractNoInitMessageRule implements TrackerEventRule {
      * @param time
      * @return
      */
-    protected Shipment autoStartNewShipment(final Device device, final double latitude,
+    protected final Shipment autoStartNewShipment(final Device device, final double latitude,
             final double longitude, final Date time) {
-        final Shipment s = autoStartService.autoStartNewShipment(device, latitude, longitude, time);
+        final Shipment s = autoStartShipmentByService(device, latitude, longitude, time);
         s.setShipmentDescription(DESCRIPTION_PREFIX + s.getShipmentDescription());
         saveShipment(s);
         return s;
+    }
+
+    /**
+     * @param device
+     * @param latitude
+     * @param longitude
+     * @param time
+     * @return
+     */
+    protected Shipment autoStartShipmentByService(final Device device,
+            final double latitude, final double longitude, final Date time) {
+        return autoStartService.autoStartNewShipment(device, latitude, longitude, time);
     }
     /**
      * @param s
      */
     protected void saveShipment(final Shipment s) {
         shipmentDao.save(s);
+    }
+    /**
+     * @param evt
+     */
+    protected void saveEvent(final TrackerEvent evt) {
+        trackerEventDao.save(evt);
     }
 }

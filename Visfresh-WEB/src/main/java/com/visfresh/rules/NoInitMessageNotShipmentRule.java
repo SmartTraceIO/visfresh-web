@@ -69,6 +69,7 @@ public class NoInitMessageNotShipmentRule extends AbstractNoInitMessageRule {
         final Shipment s = autoStartNewShipment(
                 device, e.getLatitude(), e.getLongitude(), e.getTime());
         e.setShipment(s);
+        saveEvent(e);
 
         final String msg = "Not INIT message found for device "
                 + device.getImei()

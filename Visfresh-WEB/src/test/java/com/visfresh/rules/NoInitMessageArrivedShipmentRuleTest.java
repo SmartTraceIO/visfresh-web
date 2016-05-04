@@ -112,6 +112,8 @@ public class NoInitMessageArrivedShipmentRuleTest extends
         assertEquals(1, savedEvents.size());
         assertEquals(e.getId(), savedEvents.get(0).getId());
         assertEquals(s.getId(), e.getShipment().getId());
+        assertEquals(1, this.sentMessages.size());
+        assertEquals(1, savedShipments.size());
     }
     @Test
     public void testSetNullShipmentToEventsAfterShutdownTimeOut() {
@@ -181,11 +183,11 @@ public class NoInitMessageArrivedShipmentRuleTest extends
         return e;
     }
     /* (non-Javadoc)
-     * @see com.visfresh.rules.NoInitMessageRule#autoStartNewShipment(com.visfresh.entities.Device, double, double, java.util.Date)
+     * @see com.visfresh.rules.AbstractNoInitMessageRule#autoStartShipmentByService(com.visfresh.entities.Device, double, double, java.util.Date)
      */
     @Override
-    protected Shipment autoStartNewShipment(final Device device, final double latitude,
-            final double longitude, final Date time) {
+    protected Shipment autoStartShipmentByService(final Device device,
+            final double latitude, final double longitude, final Date time) {
         return autoStartedShipment;
     }
     /* (non-Javadoc)
