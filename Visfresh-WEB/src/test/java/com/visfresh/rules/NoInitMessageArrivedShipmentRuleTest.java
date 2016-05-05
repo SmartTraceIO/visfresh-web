@@ -53,7 +53,6 @@ public class NoInitMessageArrivedShipmentRuleTest extends
         device.setName("JUnit");
         device.setImei("23490870239487203");
 
-
         manager = new SessionHolder();
     }
 

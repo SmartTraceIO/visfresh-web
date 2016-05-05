@@ -34,6 +34,7 @@ public abstract class BaseRuleTest {
         final Company c = new Company();
         c.setName("JUnit company");
         c.setDescription("Any Description");
+        c.setEmail("junit@mail.ru");
         context.getBean(CompanyDao.class).save(c);
         this.company = c;
     }
