@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,6 +64,10 @@ public class BatteryLowAlertRuleTest extends BaseRuleTest {
     public void setUp() {
         this.rule = engine.getRule(BatteryLowAlertRule.NAME);
         this.device = createDevice("90324870987");
+    }
+    @After
+    public void tearDown() {
+        context.getBean(MockEmailService.class).getMessages().clear();
     }
     /**
      * @param lat latitude.
