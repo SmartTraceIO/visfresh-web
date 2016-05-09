@@ -175,6 +175,39 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
     }
 
     @Test
+    public void testSaveNotificationScheudles() throws IOException, RestServiceException {
+        final User user = createUser2();
+        final NotificationSchedule n1 = createNotificationSchedule(user, true);
+        final NotificationSchedule n2 = createNotificationSchedule(user, true);
+
+        final AutoStartShipmentDto dto = new AutoStartShipmentDto();
+        dto.setPriority(7);
+
+        //add shipment template fields
+        final AlertProfile alertProfile = createAlertProfile(true);
+        final String name = "JUnit name";
+        final String shipmentDescription = "JUnit shipment";
+        final boolean addDateShipped = true;
+
+        dto.setAlertProfile(alertProfile.getId());
+        dto.getAlertsNotificationSchedules().add(n1.getId());
+        dto.getAlertsNotificationSchedules().add(n2.getId());
+        dto.getArrivalNotificationSchedules().add(n1.getId());
+        dto.getArrivalNotificationSchedules().add(n2.getId());
+        dto.setName(name);
+        dto.setShipmentDescription(shipmentDescription);
+        dto.setAddDateShipped(addDateShipped);
+
+        final Long id = client.saveAutoStartShipment(dto);
+
+        assertNotNull(id);
+
+        final ShipmentTemplate tpl = dao.findOne(id).getTemplate();
+        assertEquals(2, tpl.getAlertsNotificationSchedules().size());
+        assertEquals(2, tpl.getArrivalNotificationSchedules().size());
+    }
+
+    @Test
     public void testUpdateAutoStartShipment() throws IOException, RestServiceException {
         final ShipmentTemplate template = createTemplate();
 

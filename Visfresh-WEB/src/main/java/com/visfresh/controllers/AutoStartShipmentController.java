@@ -200,9 +200,7 @@ public class AutoStartShipmentController extends AbstractController
 
         final List<NotificationSchedule> schedules = notificationScheduleDao.findAll(allLoctions);
         //check company access
-        for (final NotificationSchedule n : schedules) {
-            checkCompanyAccess(user, n);
-        }
+        checkCompanyAccess(user, schedules);
 
         //resolve locations
         tpl.getAlertsNotificationSchedules().clear();
@@ -210,7 +208,8 @@ public class AutoStartShipmentController extends AbstractController
         for (final NotificationSchedule n : schedules) {
             if (alerts.contains(n.getId())) {
                 tpl.getAlertsNotificationSchedules().add(n);
-            } else {
+            }
+            if (arrivals.contains(n.getId())) {
                 tpl.getArrivalNotificationSchedules().add(n);
             }
         }
