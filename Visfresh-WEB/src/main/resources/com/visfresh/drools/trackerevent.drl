@@ -16,8 +16,8 @@ import com.visfresh.rules.SetShipmentArrivedRule;
 import com.visfresh.rules.AutoDetectEndLocationRule;
 import com.visfresh.rules.EtaCalculationRule;
 import com.visfresh.rules.InterimStopRule;
-import com.visfresh.rules.NoInitMessageNotShipmentRule;
-import com.visfresh.rules.NoInitMessageArrivedShipmentRule;
+import com.visfresh.rules.NoInitMessageAfterShutdownRule;
+import com.visfresh.rules.CleanShutdownRepeatStateRule;
 
 global AbstractRuleEngine engine;
 
@@ -150,20 +150,20 @@ rule "InterimStop"
         }
 end
 
-rule "NoInitMessageNotShipment"
+rule "NoInitMessageAfterShutdown"
     when
-        context : RuleContext(engine.getRule(NoInitMessageNotShipmentRule.NAME).accept(this));
+        context : RuleContext(engine.getRule(NoInitMessageAfterShutdownRule.NAME).accept(this));
     then
-    	if(engine.getRule(NoInitMessageNotShipmentRule.NAME).handle(context)) {
+    	if(engine.getRule(NoInitMessageAfterShutdownRule.NAME).handle(context)) {
        		update(context);
         }
 end
 
-rule "NoInitMessageArrivedShipment"
+rule "CleanShutdownRepeatState"
     when
-        context : RuleContext(engine.getRule(NoInitMessageArrivedShipmentRule.NAME).accept(this));
+        context : RuleContext(engine.getRule(CleanShutdownRepeatStateRule.NAME).accept(this));
     then
-    	if(engine.getRule(NoInitMessageArrivedShipmentRule.NAME).handle(context)) {
+    	if(engine.getRule(CleanShutdownRepeatStateRule.NAME).handle(context)) {
        		update(context);
         }
 end

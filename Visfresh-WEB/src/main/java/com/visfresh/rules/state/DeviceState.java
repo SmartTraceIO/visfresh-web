@@ -31,7 +31,7 @@ public class DeviceState {
         return properties.get(key);
     }
     public void setProperty(final String key, final String value) {
-        if (key == null) {
+        if (value == null) {
             properties.remove(key);
         } else {
             properties.put(key, value);

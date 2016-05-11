@@ -30,6 +30,7 @@ import com.visfresh.entities.User;
 import com.visfresh.io.SimulatorDto;
 import com.visfresh.io.StartSimulatorRequest;
 import com.visfresh.io.json.SimulatorSerializer;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.services.SimulatorService;
 import com.visfresh.utils.DateTimeUtils;
 
@@ -128,20 +129,7 @@ public class SimulatorController extends AbstractController {
             final User currentUser = getLoggedInUser(authToken);
 
             //find user
-            final User u;
-            if (user != null) {
-                u = userDao.findByEmail(user);
-                if (u == null) {
-                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "User "
-                            + user + " not found");
-                }
-
-                if (!u.getId().equals(currentUser.getId())) {
-                    checkAccess(currentUser, Role.SmartTraceAdmin);
-                }
-            } else {
-                u = currentUser;
-            }
+            final User u = getSimulatorOwner(user, currentUser);
 
             JsonObject response = null;
             final SimulatorDto dto = dao.findSimulatorDto(u);
@@ -185,15 +173,7 @@ public class SimulatorController extends AbstractController {
             final SimulatorSerializer ser = createSerializer(user);
 
             final StartSimulatorRequest req = ser.parseStartRequest(json);
-            User u = user;
-            if (req.getUser() != null && !req.getUser().equals(user.getEmail())) {
-                checkAccess(user, Role.SmartTraceAdmin);
-                u = userDao.findByEmail(req.getUser());
-                if (u == null) {
-                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                            "User not found " + req.getUser());
-                }
-            }
+            final User u = getSimulatorOwner(req.getUser(), user);
 
             //check already started
             final SimulatorDto sim = dao.findSimulatorDto(u);
@@ -225,15 +205,47 @@ public class SimulatorController extends AbstractController {
         }
     }
     @RequestMapping(value = "/stopSimulator/{authToken}", method = RequestMethod.GET)
-    public JsonObject stopSimulator(@PathVariable final String authToken) {
+    public JsonObject stopSimulator(@PathVariable final String authToken,
+            final @RequestParam(required = false) String user) {
         try {
-            final User user = getLoggedInUser(authToken);
-            service.stopSimulator(user);
+            final User currentUser = getLoggedInUser(authToken);
+            //find user
+            final User u = getSimulatorOwner(user, currentUser);
+
+            service.stopSimulator(u);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete simulator", e);
             return createErrorResponse(e);
         }
+    }
+
+    /**
+     * @param userEmail
+     * @param currentUser
+     * @return
+     * @throws RestServiceException
+     */
+    protected User getSimulatorOwner(final String userEmail,
+            final User currentUser) throws RestServiceException {
+        final User u;
+        if (userEmail != null) {
+            u = userDao.findByEmail(userEmail);
+            if (u == null) {
+                throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "User " + userEmail + " not found");
+            }
+
+            if (Role.Admin.hasRole(currentUser)) {
+                checkCompanyAccess(currentUser, u);
+            } else if (!currentUser.getId().equals(u.getId())) {
+                throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
+                        "Access to simulator of user " + userEmail + " is not permitted");
+            }
+        } else {
+            u = currentUser;
+        }
+        return u;
     }
     /**
      * @param imei device.

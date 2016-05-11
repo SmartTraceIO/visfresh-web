@@ -144,6 +144,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         }
 
         final RuleContext context = new RuleContext(e, this);
+        context.setDeviceState(state);
 
         //check correct moving
         if (state.getLastLocation() != null && state.getLastReadTime() != null) {
@@ -156,8 +157,6 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                 log.warn("Incorrect device moving to " + meters + " meters has detected. Event has ignored");
                 return;
             }
-
-            context.setOldLocation(loc);
         }
 
         saveTrackerEvent(e);
