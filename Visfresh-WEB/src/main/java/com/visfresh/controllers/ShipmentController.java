@@ -5,6 +5,7 @@ package com.visfresh.controllers;
 
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,7 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Note;
@@ -67,11 +70,13 @@ import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.InterimStopDto;
+import com.visfresh.io.KeyLocation;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
+import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
@@ -88,6 +93,7 @@ import com.visfresh.services.RestServiceException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.ShipmentSiblingService;
 import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
@@ -361,15 +367,237 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     page, user);
             final int total = shipmentDao.getEntityCount(user.getCompany(), filter);
 
+            //add interim stops
+            addInterimStops(shipments, user);
+
+            //add events data
+            addEventsData(shipments, user.getTimeZone());
+
             final JsonArray array = new JsonArray();
             for (final ListShipmentItem s : shipments) {
                 array.add(ser.toJson(s));
             }
+
             return createListSuccessResponse(array, total);
         } catch (final Exception e) {
             log.error("Failed to get shipments", e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param shipments
+     * @throws ParseException
+     */
+    private void addEventsData(final List<ListShipmentItem> shipments, final TimeZone tz) throws ParseException {
+        final Map<Long, List<TrackerEventDto>> eventMap = trackerEventDao.getEventsForShipmentIds(
+                EntityUtils.getIdList(shipments));
+        for (final ListShipmentItem s : shipments) {
+            final List<TrackerEventDto> events = eventMap.get(s.getId());
+
+            final List<KeyLocation> keyLocs = buildKeyLocations(s.getId(), events);
+            addInterimStopKeyLocations(keyLocs, s.getInterimStops(), tz);
+
+            if (events.size() > 0) {
+                //create reverse events
+                final List<TrackerEventDto> reverted = new LinkedList<TrackerEventDto>(events);
+                Collections.reverse(reverted);
+
+                //shipped from
+                if (s.getShippedFrom() != null) {
+                    final Double lat = s.getShippedFromLat();
+                    final Double lon = s.getShippedFromLong();
+
+                    final TrackerEventDto e = findNearestEvent(lat, lon, reverted);
+                    final KeyLocation loc = new KeyLocation();
+                    loc.setKey("shippedFrom");
+                    loc.setLatitude(lat);
+                    loc.setLongitude(lon);
+                    loc.setTime(e.getTime().getTime());
+
+                    insertKeyLocation(loc, keyLocs);
+                }
+
+                //shipped to
+                if (s.getShippedTo() != null) {
+                    final Double lat = s.getShippedToLat();
+                    final Double lon = s.getShippedToLong();
+
+                    final TrackerEventDto e = findNearestEvent(lat, lon, reverted);
+                    final KeyLocation loc = new KeyLocation();
+                    loc.setKey("shippedTo");
+                    loc.setLatitude(lat);
+                    loc.setLongitude(lon);
+                    loc.setTime(e.getTime().getTime());
+
+                    insertKeyLocation(loc, keyLocs);
+                }
+            }
+
+            s.setKeyLocations(keyLocs);
+        }
+    }
+    /**
+     * @param lat
+     * @param lon
+     * @param reverted
+     * @return
+     */
+    private TrackerEventDto findNearestEvent(final double lat, final double lon,
+            final List<TrackerEventDto> events) {
+        double dl = Double.MAX_VALUE;
+        TrackerEventDto e = null;
+
+        for (final TrackerEventDto dto: events) {
+            final double dlat = lat - dto.getLatitude();
+            final double dlon = lon - dto.getLongitude();
+
+            final double dist = Math.sqrt(dlat * dlat + dlon * dlon);
+            if (dist < dl) {
+                e = dto;
+                dl = dist;
+            }
+        }
+        return e;
+    }
+    /**
+     * @param keyLocs
+     * @param interimStops
+     * @throws ParseException
+     */
+    private void addInterimStopKeyLocations(final List<KeyLocation> keyLocs,
+            final List<InterimStopDto> interimStops, final TimeZone tz) throws ParseException {
+        final DateFormat fmt = DateTimeUtils.createIsoFormat(Language.English, tz);
+
+        for (final InterimStopDto stp : interimStops) {
+            final KeyLocation loc = createKeyLocation(stp);
+            loc.setTime(fmt.parse(stp.getStopDateIso()).getTime());
+            insertKeyLocation(loc, keyLocs);
+        }
+
+    }
+    /**
+     * @param loc location.
+     * @param keyLocs location list.
+     */
+    private void insertKeyLocation(final KeyLocation loc,
+            final List<KeyLocation> keyLocs) {
+        boolean inserted = false;
+
+        //insert to best position.
+        for (int i = 1; i < keyLocs.size() - 1; i++) {
+            if (keyLocs.get(i + 1).getTime() > loc.getTime()) {
+                inserted = true;
+                keyLocs.add(i, loc);
+                break;
+            }
+        }
+
+        //insert before end
+        if (!inserted) {
+            keyLocs.add(keyLocs.size() - 1, loc);
+        }
+    }
+    /**
+     * @param stp
+     * @return
+     */
+    private KeyLocation createKeyLocation(final InterimStopDto stp) {
+        final KeyLocation loc = new KeyLocation();
+        loc.setKey("interimStop");
+        loc.setLatitude(stp.getLatitude());
+        loc.setLongitude(stp.getLongitude());
+        return loc;
+    }
+    /**
+     * @param id
+     * @param events
+     * @return
+     */
+    private List<KeyLocation> buildKeyLocations(final Long id, final List<TrackerEventDto> events) {
+        if (events.size() == 0) {
+            return null;
+        }
+
+        final long start = events.get(0).getTime().getTime();
+        final long end = events.get(events.size() - 1).getTime().getTime();
+
+        final List<KeyLocation> locs = new LinkedList<>();
+        locs.add(createKeyLocation("firstReading", findNearestEvent(start, events)));
+
+        KeyLocation current = locs.get(0);
+        for (long persent = 10; persent < 100; persent+=10) {
+            final TrackerEventDto event = findNearestEvent(start + (end - start) * persent / 100, events);
+            if (event.getTime().getTime() > current.getTime()) {
+                final KeyLocation loc = createKeyLocation("reading", event);
+                locs.add(loc);
+                current = loc;
+            }
+        }
+
+        locs.add(createKeyLocation("lastReading", findNearestEvent(end, events)));
+        return locs;
+    }
+    /**
+     * @param e
+     * @return
+     */
+    private KeyLocation createKeyLocation(final String key, final TrackerEventDto e) {
+        final KeyLocation loc = new KeyLocation();
+        loc.setKey(key);
+        loc.setLatitude(e.getLatitude());
+        loc.setLongitude(e.getLongitude());
+        loc.setTime(e.getTime().getTime());
+        return loc;
+    }
+    /**
+     * @param time
+     * @param events
+     * @return
+     */
+    private TrackerEventDto findNearestEvent(final long time, final List<TrackerEventDto> events) {
+        long dt = Long.MAX_VALUE;
+
+        TrackerEventDto e = null;
+        for (final TrackerEventDto dto : events) {
+            final long dt0 = Math.abs(dto.getTime().getTime() - time);
+            if (dt0 < dt) {
+                dt = dt0;
+                e = dto;
+            }
+        }
+        return e;
+    }
+    /**
+     * @param shipments
+     */
+    private void addInterimStops(final List<ListShipmentItem> shipments, final User user) {
+        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
+
+        final Map<Long, List<InterimStop>> stopMap = interimStopDao.getByShipmentIds(EntityUtils.getIdList(shipments));
+        for (final ListShipmentItem s : shipments) {
+            for (final InterimStop stop : stopMap.get(s.getId())) {
+                final InterimStopDto dto = new InterimStopDto();
+                dto.setId(stop.getId());
+                dto.setLatitude(stop.getLatitude());
+                dto.setLongitude(stop.getLongitude());
+                dto.setLocation(stop.getLocation());
+                dto.setStopDate(prettyFmt.format(stop.getDate()));
+                dto.setStopDateIso(isoFmt.format(stop.getDate()));
+
+                s.getInterimStops().add(dto);
+            }
+        }
+//
+//"interimStop1": "ABC Warehouse",
+//"interimStop1Time": "14:33 02-May-2016",
+//"interimStop1TimeISO": "2016-05-02 02:32",
+//
+//"interimStop2": "XYZ Warehouse",
+//"interimStop2Time": "14:33 02-May-2016",
+//"interimStop2TimeISO": "2016-05-02 02:32",
+//
+
     }
     private Sorting createSortingShipments(final String sc, final String so,
             final String[] defaultSortOrder, final int maxNumOfSortColumns) {
@@ -472,6 +700,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         final Date currentTime = new Date();
         final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
 
         //add alerts to each shipment.
         for (final Shipment s : shipments) {
@@ -499,6 +728,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
             if (lastEvent != null) {
                 //set last reading data
+                dto.setLastReadingTime(prettyFmt.format(lastEvent.getTime()));
                 dto.setLastReadingTimeISO(isoFmt.format(lastEvent.getTime()));
                 dto.setLastReadingTemperature(LocalizationUtils.getTemperature(
                         lastEvent.getTemperature(), user.getTemperatureUnits()));
@@ -510,6 +740,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             //first event
             final TrackerEvent firstEvent = trackerEventDao.getFirstEvent(s);
             if (firstEvent != null) {
+                dto.setFirstReadingTime(prettyFmt.format(firstEvent.getTime()));
+                dto.setFirstReadingTimeISO(isoFmt.format(firstEvent.getTime()));
                 dto.setFirstReadingLat(firstEvent.getLatitude());
                 dto.setFirstReadingLong(firstEvent.getLongitude());
             }
@@ -522,10 +754,14 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 }
             } else if (s.getStatus() == ShipmentStatus.Arrived && s.getArrivalDate() != null) {
                 //arrival date.
-                dto.setActualArrivalDate(isoFmt.format(s.getArrivalDate()));
+                dto.setActualArrivalDate(prettyFmt.format(s.getArrivalDate()));
+                dto.setActualArrivalDateISO(isoFmt.format(s.getArrivalDate()));
             }
 
-            dto.setShipmentDate(isoFmt.format(s.getShipmentDate()));
+            if (s.getShipmentDate() != null) {
+                dto.setShipmentDate(prettyFmt.format(s.getShipmentDate()));
+                dto.setShipmentDateISO(isoFmt.format(s.getShipmentDate()));
+            }
 
             //start location
             if (s.getShippedFrom() != null) {

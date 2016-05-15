@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +23,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.io.TrackerEventDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -406,6 +408,31 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         dao.moveToNewDevice(d1, d2);
         assertEquals(d2.getImei(), dao.findOne(e.getId()).getDevice().getImei());
     }
+    @Test
+    public void testGetEventsForShipmentIds() {
+        final Shipment s1 = createShipment(device);
+        final Shipment s2 = createShipment(device);
+        final Shipment s3 = createShipment(device);
+
+        createEvent(s1.getDevice(), s1);
+        createEvent(s1.getDevice(), s1);
+
+        createEvent(s2.getDevice(), s2);
+        createEvent(s2.getDevice(), s2);
+
+        createEvent(s3.getDevice(), s3);
+        createEvent(s3.getDevice(), s3);
+
+        final List<Long> ids = new LinkedList<>();
+        ids.add(s1.getId());
+        ids.add(s2.getId());
+
+        final Map<Long, List<TrackerEventDto>> map = dao.getEventsForShipmentIds(ids);
+        assertEquals(2, map.size());
+        assertEquals(2, map.get(s1.getId()).size());
+        assertEquals(2, map.get(s2.getId()).size());
+    }
+
     /**
      * @param device device.
      * @param shipment shipment.

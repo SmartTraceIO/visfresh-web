@@ -3,13 +3,16 @@
  */
 package com.visfresh.dao;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.io.TrackerEventDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -64,4 +67,9 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
      * @return list of tracker events for given shipment after given date.
      */
     List<TrackerEvent> getEventsAfterDate(Shipment s, Date date);
+    /**
+     * @param ids shipment IDs.
+     * @return map of shipment ID to list of tracker event.
+     */
+    Map<Long, List<TrackerEventDto>> getEventsForShipmentIds(Collection<Long> ids);
 }

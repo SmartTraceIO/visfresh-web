@@ -1836,61 +1836,171 @@ Response:
       "deviceSN": "039485",
       "deviceName": "Device Name",
       "tripCount": 1,
-      "shipmentId": 541,
+      "shipmentId": 696,
       "shipmentDescription": "Any Description",
-      "shipmentDate": "2015-11-29T21:01",
+      "shipmentDate": "3:41 4 May 2016",
+      "shipmentDateISO": "2016-05-04 03:41",
       "palletId": "palettid",
       "assetNum": "10515",
       "assetType": "SeaContainer",
-      "shippedFrom": "Bankstown Warehouse",
-      "shippedTo": "Bankstown Warehouse",
-      "estArrivalDate": "2015-11-29T21:01",
+      "shippedFrom": "Loc-3",
+      "shippedTo": "Loc-4",
+      "estArrivalDate": null,
       "actualArrivalDate": null,
+      "actualArrivalDateISO": null,
       "percentageComplete": 0,
-      "alertProfileId": 384,
-      "alertProfileName": "AnyAlert",
-      "alertSummary": {
-        "CriticalCold": "3",
-        "MovementStart": "4",
-        "Hot": "2",
-        "CriticalHot": "1",
-        "LightOn": "1",
-        "LightOff": "1",
-        "Cold": "1",
-        "Battery": "2"
-      },
-      "siblingCount": 0,
-      "lastReadingTimeISO": "2016-02-22 12:45",
-      "lastReadingTemperature": 56.0,
-      "lastReadingBattery": 1234,
-      "lastReadingLat": 50.5,
-      "lastReadingLong": 51.51
-    },
-    {
-      "status": "InProgress",
-      "deviceSN": "039485",
-      "deviceName": "Device Name",
-      "tripCount": 1,
-      "shipmentId": 542,
-      "shipmentDescription": "Any Description",
-      "shipmentDate": "2015-11-29T21:01",
-      "palletId": "palettid",
-      "assetNum": "10515",
-      "assetType": "SeaContainer",
-      "shippedFrom": "Bankstown Warehouse",
-      "shippedTo": "Bankstown Warehouse",
-      "estArrivalDate": "2015-11-29T21:01",
-      "actualArrivalDate": "2016-02-16T20:29",
-      "percentageComplete": 0,
-      "alertProfileId": 385,
+      "alertProfileId": 382,
       "alertProfileName": "AnyAlert",
       "alertSummary": {},
       "siblingCount": 0,
-      "lastReadingTimeISO": null,
-      "lastReadingTemperature": null,
-      "lastReadingBattery": null,
-      "lastReadingLat": null,
-      "lastReadingLong": null
+      "lastReadingTime": "17:28 15 May 2016",
+      "lastReadingTimeISO": "2016-05-15 17:28",
+      "lastReadingTemperature": 56.0,
+      "lastReadingBattery": 1234,
+      "lastReadingLat": 50.5,
+      "lastReadingLong": 51.51,
+      "firstReadingLat": 50.5,
+      "firstReadingLong": 51.51,
+      "firstReadingTime": "17:28 15 May 2016",
+      "firstReadingTimeISO": "2016-05-15 17:28",
+      "keyLocations": [
+        {
+          "key": "firstReading",
+          "lat": 50.5,
+          "lon": 51.51
+        },
+        {
+          "key": "shippedFrom",
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        {
+          "key": "shippedTo",
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        {
+          "key": "lastReading",
+          "lat": 50.5,
+          "lon": 51.51
+        }
+      ],
+      "shippedFromLat": 100.5,
+      "shippedFromLong": 100.501,
+      "shippedToLat": 100.5,
+      "shippedToLong": 100.501
+    },
+    {
+      "status": "Arrived",
+      "deviceSN": "039485",
+      "deviceName": "Device Name",
+      "tripCount": 1,
+      "shipmentId": 697,
+      "shipmentDescription": "Any Description",
+      "shipmentDate": "3:41 4 May 2016",
+      "shipmentDateISO": "2016-05-04 03:41",
+      "palletId": "palettid",
+      "assetNum": "10515",
+      "assetType": "SeaContainer",
+      "shippedFrom": "Loc-7",
+      "shippedTo": "Loc-8",
+      "estArrivalDate": null,
+      "actualArrivalDate": "17:11 15 May 2016",
+      "actualArrivalDateISO": "2016-05-15 17:11",
+      "percentageComplete": 100,
+      "alertProfileId": 383,
+      "alertProfileName": "AnyAlert",
+      "alertSummary": {},
+      "siblingCount": 0,
+      "lastReadingTime": "4:27 4 May 2016",
+      "lastReadingTimeISO": "2016-05-04 04:27",
+      "lastReadingTemperature": 56.0,
+      "lastReadingBattery": 1234,
+      "lastReadingLat": 5.199999999999997,
+      "lastReadingLong": 5.199999999999997,
+      "firstReadingLat": 3.0,
+      "firstReadingLong": 3.0,
+      "firstReadingTime": "3:43 4 May 2016",
+      "firstReadingTimeISO": "2016-05-04 03:43",
+      "interimStop1": "Unexpected stop",
+      "interimStop1Time": "4:05 4 May 2016",
+      "interimStop1TimeISO": "2016-05-04 04:05",
+      "keyLocations": [
+        {
+          "key": "firstReading",
+          "lat": 3.0,
+          "lon": 3.0
+        },
+        {
+          "key": "shippedFrom",
+          "lat": 3.0,
+          "lon": 3.0
+        },
+        {
+          "key": "reading",
+          "lat": 3.2,
+          "lon": 3.2
+        },
+        {
+          "key": "reading",
+          "lat": 3.4000000000000004,
+          "lon": 3.4000000000000004
+        },
+        {
+          "key": "reading",
+          "lat": 3.7000000000000006,
+          "lon": 3.7000000000000006
+        },
+        {
+          "key": "interimStop",
+          "lat": 4.1000000000000005,
+          "lon": 4.1000000000000005
+        },
+        {
+          "key": "reading",
+          "lat": 3.900000000000001,
+          "lon": 3.900000000000001
+        },
+        {
+          "key": "reading",
+          "lat": 4.1000000000000005,
+          "lon": 4.1000000000000005
+        },
+        {
+          "key": "reading",
+          "lat": 4.3,
+          "lon": 4.3
+        },
+        {
+          "key": "reading",
+          "lat": 4.499999999999999,
+          "lon": 4.499999999999999
+        },
+        {
+          "key": "reading",
+          "lat": 4.799999999999998,
+          "lon": 4.799999999999998
+        },
+        {
+          "key": "shippedTo",
+          "lat": 5.0,
+          "lon": 5.0
+        },
+        {
+          "key": "reading",
+          "lat": 4.999999999999997,
+          "lon": 4.999999999999997
+        },
+        {
+          "key": "lastReading",
+          "lat": 5.199999999999997,
+          "lon": 5.199999999999997
+        }
+      ],
+      "shippedFromLat": 3.0,
+      "shippedFromLong": 3.0,
+      "shippedToLat": 5.0,
+      "shippedToLong": 5.0
     }
   ],
   "totalCount": 2

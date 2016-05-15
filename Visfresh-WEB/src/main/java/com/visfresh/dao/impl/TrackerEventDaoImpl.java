@@ -3,6 +3,7 @@
  */
 package com.visfresh.dao.impl;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.io.TrackerEventDto;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -207,6 +209,49 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         prev.setShipment(e.getShipment());
         prev.setDevice(e.getShipment().getDevice());
         return prev;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getEventsForShipmentIds(java.util.Collection)
+     */
+    @Override
+    public Map<Long, List<TrackerEventDto>> getEventsForShipmentIds(
+            final Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return new HashMap<>();
+        }
+
+        final Map<Long, List<TrackerEventDto>> events = new HashMap<>();
+        for (final Long id : ids) {
+            events.put(id, new LinkedList<TrackerEventDto>());
+        }
+
+        //find first previous normal temperature.
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                "select * from " + TABLE + " where "
+                + SHIPMENT_FIELD + " in (" + StringUtils.combine(ids, ",") + ") order by id",
+                new HashMap<String, Object>());
+
+        for (final Map<String, Object> row : rows) {
+            final TrackerEvent e = createEntity(row);
+
+            final TrackerEventDto dto = new TrackerEventDto();
+            dto.setBattery(e.getBattery());
+            dto.setCreatedOn(e.getCreatedOn());
+            dto.setId(e.getId());
+            dto.setLatitude(e.getLatitude());
+            dto.setLongitude(e.getLongitude());
+            dto.setTemperature(e.getTemperature());
+            dto.setTime(e.getTime());
+            dto.setType(e.getType());
+
+            dto.setShipmentId(((Number) row.get(SHIPMENT_FIELD)).longValue());
+            dto.setDeviceImei((String) row.get(DEVICE_FIELD));
+
+            events.get(dto.getShipmentId()).add(dto);
+        }
+
+        //create event.
+        return events;
     }
 
     /* (non-Javadoc)

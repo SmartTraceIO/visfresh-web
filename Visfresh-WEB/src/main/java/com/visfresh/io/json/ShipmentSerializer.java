@@ -26,6 +26,7 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.InterimStopDto;
+import com.visfresh.io.KeyLocation;
 import com.visfresh.io.NoteDto;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -302,6 +303,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("shipmentId", dto.getShipmentId());
         json.addProperty("shipmentDescription", dto.getShipmentDescription());
         json.addProperty("shipmentDate", dto.getShipmentDate());
+        json.addProperty("shipmentDateISO", dto.getShipmentDateISO());
 
         json.addProperty("palletId", dto.getPalettId());
         json.addProperty("assetNum", dto.getAssetNum());
@@ -311,6 +313,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("shippedTo", dto.getShippedTo());
         json.addProperty("estArrivalDate", dto.getEstArrivalDate());
         json.addProperty("actualArrivalDate", dto.getActualArrivalDate());
+        json.addProperty("actualArrivalDateISO", dto.getActualArrivalDateISO());
         json.addProperty("percentageComplete", dto.getPercentageComplete());
 
         json.addProperty("alertProfileId", dto.getAlertProfileId());
@@ -319,6 +322,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty(ShipmentConstants.SIBLING_COUNT, dto.getSiblingCount());
 
         //last reading data
+        json.addProperty(ShipmentConstants.LAST_READING_TIME, dto.getLastReadingTime());
         json.addProperty(ShipmentConstants.LAST_READING_TIME_ISO, dto.getLastReadingTimeISO());
         json.addProperty(ShipmentConstants.LAST_READING_TEMPERATURE, dto.getLastReadingTemperature());
         json.addProperty("lastReadingBattery", dto.getLastReadingBattery());
@@ -328,6 +332,29 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         //first reading
         json.addProperty("firstReadingLat", dto.getFirstReadingLat());
         json.addProperty("firstReadingLong", dto.getFirstReadingLong());
+        json.addProperty("firstReadingTime", dto.getFirstReadingTime());
+        json.addProperty("firstReadingTimeISO", dto.getFirstReadingTimeISO());
+
+        int i = 1;
+        for (final InterimStopDto stp : dto.getInterimStops()) {
+            final String prefix = "interimStop" + i;
+            json.addProperty(prefix, stp.getLocation().getName());
+            json.addProperty(prefix + "Time", stp.getStopDate());
+            json.addProperty(prefix + "TimeISO", stp.getStopDateIso());
+            i++;
+        }
+
+        //key locations
+        if (dto.getKeyLocations() != null) {
+            final JsonArray kls = new JsonArray();
+            json.add("keyLocations", kls);
+
+            for (final KeyLocation kl : dto.getKeyLocations()) {
+                kls.add(toJson(kl));
+            }
+        } else {
+            json.add("keyLocations", null);
+        }
 
         //start location
         json.addProperty("shippedFromLat", dto.getShippedFromLat());
@@ -337,6 +364,21 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("shippedToLat", dto.getShippedToLat());
         json.addProperty("shippedToLong", dto.getShippedToLong());
 
+        return json;
+    }
+    /**
+     * @param kl key location.
+     * @return
+     */
+    public JsonObject toJson(final KeyLocation kl) {
+        if (kl == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("key", kl.getKey());
+        json.addProperty("lat", kl.getLatitude());
+        json.addProperty("lon", kl.getLongitude());
         return json;
     }
     /**

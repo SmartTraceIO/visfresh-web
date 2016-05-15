@@ -4,12 +4,16 @@
 package com.visfresh.lists;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.io.InterimStopDto;
+import com.visfresh.io.KeyLocation;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -27,6 +31,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private String shipmentDate;
     private String estArrivalDate;
     private String actualArrivalDate;
+    private String actualArrivalDateISO;
     private int percentageComplete;
     private String assetNum;
     private String assetType;
@@ -37,6 +42,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private int siblingCount = 5;
 
     //last reading data
+    private String lastReadingTime;
     private String lastReadingTimeISO;
     private Double lastReadingTemperature;
     private Integer lastReadingBattery;
@@ -47,8 +53,15 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private Double shippedFromLong;
     private Double shippedToLat;
     private Double shippedToLong;
+
+    private String shipmentDateISO;
+
     private Double firstReadingLat;
     private Double firstReadingLong;
+    private String firstReadingTime;
+    private String firstReadingTimeISO;
+    private final List<InterimStopDto> interimStops = new LinkedList<>();
+    private List<KeyLocation> keyLocations;
 
     /**
      * Default constructor.
@@ -182,6 +195,19 @@ public class ListShipmentItem implements EntityWithId<Long> {
         this.shipmentDate = shipmentDate;
     }
     /**
+     * @param date
+     */
+    public void setShipmentDateISO(final String date) {
+        this.shipmentDateISO = date;
+    }
+    /**
+     * @return the shipmentDateISO
+     */
+    public String getShipmentDateISO() {
+        return shipmentDateISO;
+    }
+
+    /**
      * @return the estArrivalDate
      */
     public String getEstArrivalDate() {
@@ -204,6 +230,18 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public void setActualArrivalDate(final String actualArrivalDate) {
         this.actualArrivalDate = actualArrivalDate;
+    }
+    /**
+     * @param date
+     */
+    public void setActualArrivalDateISO(final String date) {
+        this.actualArrivalDateISO = date;
+    }
+    /**
+     * @return the actualArrivalDateISO
+     */
+    public String getActualArrivalDateISO() {
+        return actualArrivalDateISO;
     }
 
     /**
@@ -307,6 +345,18 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public void setLastReadingTimeISO(final String lastReadingTimeISO) {
         this.lastReadingTimeISO = lastReadingTimeISO;
+    }
+    /**
+     * @param time
+     */
+    public void setLastReadingTime(final String time) {
+        this.lastReadingTime = time;
+    }
+    /**
+     * @return the lastReadingTime
+     */
+    public String getLastReadingTime() {
+        return lastReadingTime;
     }
     /**
      * @return the lastReadingTemperature
@@ -434,5 +484,47 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public void setFirstReadingLong(final double firstReadingLong) {
         this.firstReadingLong = firstReadingLong;
+    }
+    /**
+     * @param date
+     */
+    public void setFirstReadingTime(final String date) {
+        this.firstReadingTime = date;
+    }
+    /**
+     * @return the firstReadingTime
+     */
+    public String getFirstReadingTime() {
+        return firstReadingTime;
+    }
+    /**
+     * @param date
+     */
+    public void setFirstReadingTimeISO(final String date) {
+        this.firstReadingTimeISO = date;
+    }
+    /**
+     * @return the firstReadingTimeISO
+     */
+    public String getFirstReadingTimeISO() {
+        return firstReadingTimeISO;
+    }
+    /**
+     * @return
+     */
+    public List<InterimStopDto> getInterimStops() {
+        return interimStops;
+    }
+    /**
+     * @return
+     */
+    public List<KeyLocation> getKeyLocations() {
+        return keyLocations;
+    }
+    /**
+     * @param keyLocations the keyLocations to set
+     */
+    public void setKeyLocations(final List<KeyLocation> keyLocations) {
+        this.keyLocations = keyLocations;
     }
 }

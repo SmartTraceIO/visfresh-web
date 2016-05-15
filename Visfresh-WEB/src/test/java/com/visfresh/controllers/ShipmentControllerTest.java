@@ -47,6 +47,7 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.InterimStop;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Note;
 import com.visfresh.entities.Shipment;
@@ -335,6 +336,68 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(1, shipmentClient.getShipments(1, 1).size());
         assertEquals(1, shipmentClient.getShipments(2, 1).size());
         assertEquals(0, shipmentClient.getShipments(3, 10000).size());
+    }
+    @Test
+    public void testGetShipmentsKeyLocations() throws RestServiceException, IOException {
+        //first shipment.
+        final Shipment s1 = createShipment(true);
+        s1.getShippedTo().setAddress("Coles Perth DC");
+        shipmentDao.save(s1);
+
+        createEvent(s1, TrackerEventType.AUT);
+
+        //second shipment.
+        final Shipment s2 = createShipment(true);
+        s2.getShippedTo().setAddress("Coles Perth DC");
+        s2.setStatus(ShipmentStatus.Arrived);
+        s2.setArrivalDate(new Date(System.currentTimeMillis() - 1000000));
+        shipmentDao.save(s2);
+
+        //correct locations
+        final Location l1 = new Location(3., 3.);
+        final Location l2 = new Location(5., 5.);
+
+        //correct shipped from and shipped to for second location.
+        s2.getShippedFrom().getLocation().setLatitude(l1.getLatitude());
+        s2.getShippedFrom().getLocation().setLongitude(l1.getLongitude());
+
+        s2.getShippedTo().getLocation().setLatitude(l2.getLatitude());
+        s2.getShippedTo().getLocation().setLongitude(l2.getLongitude());
+
+        context.getBean(LocationProfileDao.class).save(s2.getShippedFrom());
+        context.getBean(LocationProfileDao.class).save(s2.getShippedTo());
+
+        long time = System.currentTimeMillis() - 1000000000l;
+
+        final List<TrackerEvent> events = new LinkedList<TrackerEvent>();
+        //create events
+        for (double x = l1.getLatitude(), y = l1.getLongitude();
+                x < l2.getLatitude() + 0.2 && y < l2.getLongitude() + 0.2;
+                x += 0.1, y += 0.1) {
+            events.add(createEvent(s2, x, y, time += 120 * 1000l));
+        }
+
+        //create one interim stop
+        final TrackerEvent e = events.get(events.size() / 2);
+
+        //create interim stop location
+        final LocationProfile loc = new LocationProfile();
+        loc.setAddress("address");
+        loc.setCompany(getCompany());
+        loc.setInterim(true);
+        loc.setName("Unexpected stop");
+        loc.setRadius(10);
+        context.getBean(LocationProfileDao.class).save(loc);
+
+        //create interim stop
+        final InterimStop stp = new InterimStop();
+        stp.setDate(e.getTime());
+        stp.setLatitude(e.getLatitude());
+        stp.setLongitude(e.getLongitude());
+        stp.setLocation(loc);
+        context.getBean(InterimStopDao.class).add(s2, stp);
+
+        assertEquals(2, shipmentClient.getShipments(null, null).size());
     }
     @Test
     public void testGetShipmentsSorted() throws RestServiceException, IOException {
@@ -1004,15 +1067,37 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
      * @return tracker event.
      */
     private TrackerEvent createEvent(final Shipment shipment, final TrackerEventType type) {
+        return createEvent(shipment, 50.50, 51.51, type, System.currentTimeMillis());
+    }
+    /**
+     * @param shipment shipment.
+     * @param lat latitude.
+     * @param lon longitude.
+     * @param event time.
+     * @return tracker event.
+     */
+    private TrackerEvent createEvent(final Shipment shipment, final double lat, final double lon, final long time) {
+        return createEvent(shipment, lat, lon, TrackerEventType.AUT, time);
+    }
+
+    /**
+     * @param shipment
+     * @param lat
+     * @param lon
+     * @param type
+     * @return
+     */
+    private TrackerEvent createEvent(final Shipment shipment, final double lat,
+            final double lon, final TrackerEventType type, final long time) {
         final TrackerEvent e = new TrackerEvent();
         e.setShipment(shipment);
         e.setDevice(shipment.getDevice());
         e.setBattery(1234);
         e.setTemperature(56);
-        e.setTime(new Date());
+        e.setTime(new Date(time));
         e.setType(type);
-        e.setLatitude(50.50);
-        e.setLongitude(51.51);
+        e.setLatitude(lat);
+        e.setLongitude(lon);
 
         trackerEventDao.save(e);
         return e;

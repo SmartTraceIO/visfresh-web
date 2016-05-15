@@ -3,6 +3,7 @@
  */
 package com.visfresh.dao.impl;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -59,18 +61,56 @@ public class InterimStopDaoImpl implements InterimStopDao {
         final List<Map<String, Object>> rows = jdbc.queryForList(
                 "select * from interimstops where shipment = :shipment order by `date`, id", params);
         for (final Map<String, Object> row : rows) {
-            final InterimStop stop = new InterimStop();
-            stop.setId(((Number) row.get("id")).longValue());
-            stop.setDate((Date) row.get("date"));
-            stop.setLatitude(((Number) row.get("latitude")).doubleValue());
-            stop.setLongitude(((Number) row.get("longitude")).doubleValue());
+            final InterimStop stop = createInterimStop(row);
             stopToLocation.put(stop, ((Number) row.get("location")).longValue());
-            stop.setTime(((Number) row.get("pause")).intValue());
             stops.add(stop);
         }
 
         resolveLocations(stopToLocation);
         return stops;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.InterimStopDao#getByShipment(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public Map<Long, List<InterimStop>> getByShipmentIds(final Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return new HashMap<>();
+        }
+        final Map<Long, List<InterimStop>> stops = new HashMap<>();
+        for (final Long id : ids) {
+            stops.put(id, new LinkedList<InterimStop>());
+        }
+
+        final Map<InterimStop, Long> stopToLocation = new HashMap<>();
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                "select * from interimstops where shipment in ("
+                        + StringUtils.combine(ids, ",") + ") order by `date`, id", new HashMap<String, Object>());
+
+        for (final Map<String, Object> row : rows) {
+            final InterimStop stop = createInterimStop(row);
+            stopToLocation.put(stop, ((Number) row.get("location")).longValue());
+
+            final Long shipment = ((Number) row.get("shipment")).longValue();
+            stops.get(shipment).add(stop);
+        }
+
+        resolveLocations(stopToLocation);
+        return stops;
+    }
+
+    /**
+     * @param row
+     * @return
+     */
+    private InterimStop createInterimStop(final Map<String, Object> row) {
+        final InterimStop stop = new InterimStop();
+        stop.setId(((Number) row.get("id")).longValue());
+        stop.setDate((Date) row.get("date"));
+        stop.setLatitude(((Number) row.get("latitude")).doubleValue());
+        stop.setLongitude(((Number) row.get("longitude")).doubleValue());
+        stop.setTime(((Number) row.get("pause")).intValue());
+        return stop;
     }
 
     /**

@@ -8,7 +8,9 @@ import static org.junit.Assert.assertEquals;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -78,6 +80,40 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
 
         stop = dao.getByShipment(shipment).get(0);
         assertEquals(minutes, stop.getTime());
+    }
+    @Test
+    public void testGetByShipmentIds() {
+        final Shipment s1 = createShipment(shipment.getDevice());
+        final Shipment s2 = createShipment(shipment.getDevice());
+        final Shipment s3 = createShipment(shipment.getDevice());
+
+        dao.add(s1, createStop("A1"));
+        dao.add(s1, createStop("A2"));
+        dao.add(s2, createStop("B1"));
+        dao.add(s2, createStop("B2"));
+        dao.add(s3, createStop("C1"));
+        dao.add(s3, createStop("C3"));
+
+        final List<Long> ids = new LinkedList<>();
+        ids.add(s1.getId());
+        ids.add(s2.getId());
+
+        final Map<Long, List<InterimStop>> map = dao.getByShipmentIds(ids);
+        assertEquals(2, map.size());
+        assertEquals(2, map.get(s1.getId()).size());
+        assertEquals(2, map.get(s2.getId()).size());
+    }
+    /**
+     * @param device
+     * @return
+     */
+    private Shipment createShipment(final Device device) {
+        final Shipment s = new Shipment();
+        s.setCompany(device.getCompany());
+        s.setStatus(ShipmentStatus.Default);
+        s.setDevice(device);
+        s.setShipmentDescription("Created by autostart shipment rule");
+        return context.getBean(ShipmentDao.class).save(s);
     }
     /**
      * @param locationName
