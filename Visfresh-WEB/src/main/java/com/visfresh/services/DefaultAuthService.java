@@ -23,7 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.RestSessionDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
 import com.visfresh.utils.HashGenerator;
 import com.visfresh.utils.Messages;
@@ -42,6 +44,8 @@ public class DefaultAuthService implements AuthService {
     private UserDao userDao;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private RestSessionDao sessionDao;
 
     private static final Logger log = LoggerFactory.getLogger(DefaultAuthService.class);
 
@@ -63,13 +67,27 @@ public class DefaultAuthService implements AuthService {
         super();
     }
 
+    @PostConstruct
+    public void init() {
+        final List<RestSession> sessions = loadSessions();
+        final Date now = new Date();
+
+        synchronized (users) {
+            for (final RestSession s : sessions) {
+                if (s.getToken().getExpirationTime().after(now)) {
+                    addUser(s.getUser(), s.getToken());
+                }
+            }
+        }
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.services.AuthService#login(java.lang.String, java.lang.String)
      */
     @Override
     public AuthToken login(final String email, final String password)
             throws AuthenticationException {
-        final User user = userDao.findByEmail(email);
+        final User user = findUserByEmail(email);
         if (user == null) {
             throw new AuthenticationException("Unknown user " + email);
         }
@@ -82,14 +100,13 @@ public class DefaultAuthService implements AuthService {
             if ("true".equals(resetPasswordOnLogin)) {
                 //set any random password and save. It flushes the current user password
                 user.setPassword(generateRandomPassword());
-                userDao.save(user);
+                saveUser(user);
             }
 
+            final AuthToken authToken = generateNewToken(user);
             synchronized (users) {
-                final UserInfo u = new UserInfo();
-                u.setUser(user);
-                u.setToken(generateNewToken(user));
-                users.put(u.getToken().getToken(), u);
+                final UserInfo u = addUser(user, authToken);
+                saveSession(u.getUser(), u.getToken());
                 log.debug("Registering new token " + u);
 
                 removeExpiredUsers(email);
@@ -98,6 +115,19 @@ public class DefaultAuthService implements AuthService {
         }
 
         throw new AuthenticationException("Authentication failed");
+    }
+
+    /**
+     * @param user
+     * @param authToken
+     * @return
+     */
+    private UserInfo addUser(final User user, final AuthToken authToken) {
+        final UserInfo u = new UserInfo();
+        u.setUser(user);
+        u.setToken(authToken);
+        users.put(u.getToken().getToken(), u);
+        return u;
     }
 
     /**
@@ -118,6 +148,7 @@ public class DefaultAuthService implements AuthService {
             while (list.size() > USER_LOGIN_LIMIT) {
                 final UserInfo toRemove = list.remove(0);
                 users.remove(toRemove.getToken().getToken());
+                deleteSession(toRemove.getToken());
                 log.debug("Old auth token for " + toRemove.getUser().getEmail()
                         + " has removed according of max logged in users limit");
             }
@@ -150,7 +181,7 @@ public class DefaultAuthService implements AuthService {
             user.getSettings().put(RESET_ON_LOGIN, "true");
         }
 
-        userDao.save(user);
+        saveUser(user);
     }
     /**
      * @param user user.
@@ -236,6 +267,7 @@ public class DefaultAuthService implements AuthService {
                     log.debug("Access token for user " + ui.getUser().getEmail()
                             + " has expired and will removed");
                     userIterator.remove();
+                    deleteSession(ui.getToken());
                 }
             }
         }
@@ -267,7 +299,7 @@ public class DefaultAuthService implements AuthService {
         final Map<String, String> replacements = new HashMap<>();
         replacements.put("email", email);
 
-        final User user = userDao.findByEmail(email);
+        final User user = findUserByEmail(email);
         if (user == null) {
             throw new AuthenticationException(Messages.getMessage("passwordreset.userNotFound", replacements));
         }
@@ -288,9 +320,10 @@ public class DefaultAuthService implements AuthService {
         //send email to user
         replacements.put("url", baseUrl + "token=" + reset.getSecureString());
         try {
-            emailService.sendMessage(new String[]{email},
-                    Messages.getMessage("passwordreset.reset.subject", replacements),
-                    Messages.getMessage("passwordreset.reset.text", replacements));
+            final String subject = Messages.getMessage("passwordreset.reset.subject", replacements);
+            final String message = Messages.getMessage("passwordreset.reset.text", replacements);
+
+            sendEmail(email, subject, message);
             log.debug("Reset password URL has send to " + email + " and contains the token "
                     + reset.getSecureString());
         } catch (final MessagingException e) {
@@ -335,7 +368,7 @@ public class DefaultAuthService implements AuthService {
         }
 
         passwordResets.remove(email);
-        final User user = userDao.findByEmail(email);
+        final User user = findUserByEmail(email);
         if (user == null) {
             throw new AuthenticationException(Messages.getMessage("passwordreset.userNotFound", replacements));
         }
@@ -356,8 +389,10 @@ public class DefaultAuthService implements AuthService {
         }
 
         info.setToken(generateNewToken(info.getUser()));
+        updateSession(info.getUser(), oldToken, info.getToken());
         return info.getToken();
     }
+
     /**
      * @param authToken
      * @return
@@ -404,6 +439,7 @@ public class DefaultAuthService implements AuthService {
             userInfo = users.remove(authToken);
         }
         if (userInfo != null) {
+            deleteSession(userInfo.getToken());
             log.debug("User " + userInfo.getUser().getEmail() + "/" + authToken + " has logged out");
         }
     }
@@ -419,13 +455,93 @@ public class DefaultAuthService implements AuthService {
             final Iterator<Entry<String, UserInfo>> iter = users.entrySet().iterator();
             while(iter.hasNext()) {
                 final Entry<String, UserInfo> entry = iter.next();
-                if (id.equals(entry.getValue().getUser().getId())) {
+                final UserInfo info = entry.getValue();
+                if (id.equals(info.getUser().getId())) {
                     iter.remove();
+                    deleteSession(info.getToken());
                     count++;
                 }
             }
         }
 
         log.debug(count + " user sessions have been closed for force logout of " + u.getEmail());
+    }
+    /**
+     * @param token
+     */
+    private void deleteSession(final AuthToken token) {
+        final RestSession s = findSessionByToken(token.getToken());
+        deleteSession(s);
+    }
+    /**
+     * @param user
+     * @param oldToken
+     * @param token
+     */
+    private void updateSession(final User user, final String oldToken, final AuthToken token) {
+        final RestSession s = findSessionByToken(oldToken);
+        s.setToken(token);
+        saveSession(s);
+    }
+    /**
+     * @param user user.
+     * @param token token.
+     */
+    private void saveSession(final User user, final AuthToken token) {
+        final RestSession s = new RestSession();
+        s.setUser(user);
+        s.setToken(token);
+        saveSession(s);
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    protected RestSession saveSession(final RestSession s) {
+        return sessionDao.save(s);
+    }
+    /**
+     * @param user user.
+     * @return
+     */
+    protected User saveUser(final User user) {
+        return userDao.save(user);
+    }
+    /**
+     * @param s
+     */
+    protected void deleteSession(final RestSession s) {
+        sessionDao.delete(s);
+    }
+    /**
+     * @param token
+     * @return
+     */
+    protected RestSession findSessionByToken(final String token) {
+        return sessionDao.findByToken(token);
+    }
+    /**
+     * @param email email.
+     * @return
+     */
+    protected User findUserByEmail(final String email) {
+        return userDao.findByEmail(email);
+    }
+    /**
+     * @param email
+     * @param subject
+     * @param message
+     * @throws MessagingException
+     */
+    protected void sendEmail(final String email, final String subject, final String message)
+            throws MessagingException {
+        emailService.sendMessage(new String[]{email}, subject, message);
+    }
+    /**
+     * @return
+     */
+    protected List<RestSession> loadSessions() {
+        return sessionDao.findAll(null, null, null);
     }
 }

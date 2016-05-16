@@ -24,6 +24,7 @@ drop table if exists alertprofiles;
 drop table if exists devicegrouprelations;
 drop table if exists devices;
 drop table if exists devicegroups;
+drop table if exists restsessions;
 drop table if exists users;
 drop table if exists companies;
 
@@ -115,6 +116,18 @@ create table users (
     primary key (id),
     FOREIGN KEY (company)
         REFERENCES companies (id)
+);
+
+create table restsessions (
+    id bigint(20) auto_increment not null,
+    user bigint(20) not null,
+    token varchar(50) not null unique,
+    expiredon timestamp NULL default NULL,
+    createdon timestamp NULL default NULL,
+    primary key (id),
+    FOREIGN KEY (user)
+        REFERENCES users (id)
+		on delete cascade
 );
 
 create table notifications (
