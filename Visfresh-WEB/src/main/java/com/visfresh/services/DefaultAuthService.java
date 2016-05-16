@@ -492,6 +492,7 @@ public class DefaultAuthService implements AuthService {
         s.setUser(user);
         s.setToken(token);
         saveSession(s);
+        log.debug("Rest session for user " + user.getEmail() + " has saved parsisted");
     }
 
     /**
@@ -513,6 +514,8 @@ public class DefaultAuthService implements AuthService {
      */
     protected void deleteSession(final RestSession s) {
         sessionDao.delete(s);
+        log.debug("Rest session " + s.getToken().getToken()
+                + " for user " + s.getUser().getEmail() + " has deleted");
     }
     /**
      * @param token
