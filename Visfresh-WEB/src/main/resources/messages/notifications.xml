@@ -85,7 +85,7 @@
 	<!-- Cold cumulative-->
 	<entry key="Email.Cold.cumulative">
 		Cold Alert for Tracker ${devicesn}(${tripCount})
-		Alert Rule: Below ${ruletemperature} for more than ${ruleperiod}min in total
+		Alert Rule: Below ${ruletemperature} for more than ${ruleperiod} total min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
 		Shipped From: ${shippedFrom}
@@ -96,7 +96,7 @@
 	<!-- Hot cumulative -->
 	<entry key="Email.Hot.cumulative">
 		Hot Alert for Tracker ${devicesn}(${tripCount})
-		Alert Rule: Above ${ruletemperature} for more than ${ruleperiod}min in total
+		Alert Rule: Above ${ruletemperature} for more than ${ruleperiod} total min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
 		Shipped From: ${shippedFrom}
@@ -107,7 +107,7 @@
 	<!-- CriticalCold cumulative -->
 	<entry key="Email.CriticalCold.cumulative">
 		Critical Cold Alert for Tracker ${devicesn}(${tripCount})
-		Alert Rule: Below ${ruletemperature} for more than ${ruleperiod}min in total
+		Alert Rule: Below ${ruletemperature} for more than ${ruleperiod} total min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
 		Shipped From: ${shippedFrom}
@@ -118,7 +118,7 @@
 	<!-- CriticalHot cumulative -->
 	<entry key="Email.CriticalHot.cumulative">
 		Critical Hot Alert for Tracker ${devicesn}(${tripCount})
-		Alert Rule: Above ${ruletemperature} for more than ${ruleperiod}min in total
+		Alert Rule: Above ${ruletemperature} for more than ${ruleperiod} total min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
 		Shipped From: ${shippedFrom}
@@ -169,19 +169,19 @@
 	</entry>
 	<!-- Cold Cumulative -->
 	<entry key="Email.Subject.Cold.cumulative">
-		Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod}min in total 
+		Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod} total min 
 	</entry>
 	<!-- Hot Cumulative -->
 	<entry key="Email.Subject.Hot.cumulative">
-		Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod}min in total 
+		Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod} total min 
 	</entry>
 	<!-- CriticalCold Cumulative -->
 	<entry key="Email.Subject.CriticalCold.cumulative">
-		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod}min in total
+		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod} total min
 	</entry>
 	<!-- CriticalHot Cumulative -->
 	<entry key="Email.Subject.CriticalHot.cumulative">
-		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod}min in total 
+		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod} total min 
 	</entry>	
 
 	<!-- Battery -->
@@ -245,25 +245,25 @@
 	<!-- Cold Cumulative -->
 	<entry key="App.Cold.cumulative">
 		Cold Alert for Tracker ${devicesn}(${tripCount})
-		Below ${ruletemperature} for more than ${ruleperiod}min
+		Below ${ruletemperature} for more than ${ruleperiod} total min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- Hot Cumulative -->
 	<entry key="App.Hot.cumulative">
 		Hot Alert for Tracker ${devicesn}(${tripCount})
-		Above ${ruletemperature} for more than ${ruleperiod}min
+		Above ${ruletemperature} for more than ${ruleperiod} total min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- CriticalCold Cumulative -->
 	<entry key="App.CriticalCold.cumulative">
 		Critical Cold Alert for Tracker ${devicesn}(${tripCount})
-		Below ${ruletemperature} for more than ${ruleperiod}min
+		Below ${ruletemperature} for more than ${ruleperiod} total min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- CriticalHot Cumulative -->
 	<entry key="App.CriticalHot.cumulative">
 		Critical Hot Alert for Tracker ${devicesn}(${tripCount})
-		Above ${ruletemperature} for more than ${ruleperiod}min
+		Above ${ruletemperature} for more than ${ruleperiod} total min
 		Description: ${shipmentDescription}
 	</entry>
 

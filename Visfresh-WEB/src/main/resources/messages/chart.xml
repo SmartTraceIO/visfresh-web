@@ -43,14 +43,14 @@
 	<!-- Cold Cumulative chart -->
 	<entry key="Cold.cumulative">
 		Cold Alert for Tracker ${devicesn}(${tripCount}) 
-		Below ${ruletemperature} for more than ${ruleperiod} total minutes  
+		Below ${ruletemperature} for more than ${ruleperiod} continuous mins  
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- CriticalCold Cumulative chart -->
 	<entry key="CriticalCold.cumulative">
 		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) 
-		Below ${ruletemperature} for more than ${ruleperiod} total minutes  
+		Below ${ruletemperature} for more than ${ruleperiod} continuous mins  
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
@@ -71,14 +71,14 @@
 	<!-- Hot Cumulative chart -->
 	<entry key="Hot.cumulative">
 		Hot Alert for Tracker ${devicesn}(${tripCount}) 
-		Above ${ruletemperature} for more than ${ruleperiod} total minutes  
+		Above ${ruletemperature} for more than ${ruleperiod} continuous mins  
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- CriticalHot Cumulative chart -->
 	<entry key="CriticalHot.cumulative">
 		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) 
-		Above ${ruletemperature} for more than ${ruleperiod} total minutes  
+		Above ${ruletemperature} for more than ${ruleperiod} continuous mins  
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 	
