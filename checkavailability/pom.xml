@@ -7,6 +7,25 @@
 	<name>Check Service Availability</name>
 
 	<dependencies>
+		<!-- Email -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.12</version>
+		</dependency>
+
+		<!-- ClickSend SMS provider -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.1</version>
+		</dependency>
 		<!-- Tests -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -24,6 +43,71 @@
 					<source>1.7</source>
 					<target>1.7</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.1</version>
+				<executions>
+					<execution>
+						<id>copyJars</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/build/lib</outputDirectory>
+							<excludeArtifactIds>junit</excludeArtifactIds>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
+				<executions>
+					<execution>
+						<id>execjar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<finalName>livechecker</finalName>
+							<outputDirectory>${basedir}/build</outputDirectory>
+							<skip>true</skip>
+							<archive>
+								<manifest>
+									<addClasspath>true</addClasspath>
+									<!-- The main class is not exists now, but will created in future -->
+									<mainClass>com.visfresh.checkavailability.Main</mainClass>
+									<classpathPrefix>lib/</classpathPrefix>
+								</manifest>
+							</archive>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<finalName>install</finalName>
+							<outputDirectory>${basedir}</outputDirectory>
+							<skip>true</skip>
+							<classesDirectory>${basedir}/build</classesDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- Additional invocation of default packaging for fix the maven bug 
+							with remembering of last created jar file name for placing it at the repository. -->
+						<id>4</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
