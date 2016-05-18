@@ -45,7 +45,7 @@ public class RawDataExtractor extends AbstractVisfreshLogParser {
     @Override
     protected void handleNextLogUnit(final LogUnit u) {
         try {
-            if (containsDevice(u.getMessage())) {
+            if (acceptUnit(u)) {
                 output.write(u.getRawData());
                 output.flush();
             }
@@ -54,6 +54,13 @@ public class RawDataExtractor extends AbstractVisfreshLogParser {
         }
     }
 
+    /**
+     * @param u log unit.
+     * @return true if accept.
+     */
+    protected boolean acceptUnit(final LogUnit u) {
+        return containsDevice(u.getMessage()) && u.getLocation().contains("DeviceCommunicationServlet");
+    }
     /**
      * @param message
      * @return
@@ -68,10 +75,11 @@ public class RawDataExtractor extends AbstractVisfreshLogParser {
     }
 
     public static void main(final String[] args) throws IOException {
-        final String device = "354430070007613";
+        final String device = "354430070001426";
 
-        final File inFile = new File("/home/soldatov/tmp/visfresh-dcs.log");
-        final File outFile = new File(inFile.getParentFile(), device + ".log");
+        final File inFile = new File("/home/soldatov/tmp/logs/visfresh-dcs-root.log");
+//        final File inFile = new File("/home/soldatov/tmp/logs/visfresh-dcs.log");
+        final File outFile = new File(inFile.getParentFile(), device + "-" + inFile.getName());
 
         final InputStream in = new BufferedInputStream(new FileInputStream(inFile));
         try {
