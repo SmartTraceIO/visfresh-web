@@ -3,9 +3,14 @@
  */
 package com.visfresh.checkavailability;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.visfresh.cfg.Config;
+import com.visfresh.mail.EmailSender;
+import com.visfresh.sms.SmsSender;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -13,6 +18,9 @@ import com.visfresh.cfg.Config;
  */
 public class Checker {
     private final String url;
+    private long timeOut = 5 * 60 * 1000l;
+    private long waitForResponseTimeOut = 10000; // 10 secs
+
     /**
      * Default constructor.
      */
@@ -25,11 +33,49 @@ public class Checker {
         if (!checkImpl()) {
             //do pause and recheck
             try {
-                Thread.sleep(5 * 60 * 1000l);
+                final long t = getTimeOut();
+                if (t > 0) {
+                    Thread.sleep(t);
+                }
 
+                if (!checkImpl()) {
+                    sendNotification();
+                }
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * @return
+     */
+    private long getTimeOut() {
+        return timeOut;
+    }
+    /**
+     * @param timeOut the timeOut to set
+     */
+    public void setTimeOut(final long timeOut) {
+        this.timeOut = timeOut;
+    }
+
+    /**
+     * Sends service not available notification.
+     */
+    protected void sendNotification() {
+        final String subject = "Service Availability checker";
+        final String message = "Service not available during " + getTimeOut() + " ms";
+
+        try {
+            new SmsSender().sendSms(subject, message);
+        } catch (final Throwable e) {
+            e.printStackTrace();
+        }
+        try {
+            new EmailSender().sendMessage(subject, message);
+        } catch (final Throwable e) {
+            e.printStackTrace();
         }
     }
 
@@ -40,12 +86,13 @@ public class Checker {
             final Thread t = new Thread("Async Checker") {
                 @Override
                 public void run() {
+                    try {
+                        sendCheckRequest();
+                        isOk.set(true);
+                    } catch (final Exception e) {
+                    }
+
                     synchronized (isOk) {
-                        try {
-                            sendCheckRequest();
-                            isOk.set(true);
-                        } catch (final Exception e) {
-                        }
                         isOk.notify();
                     }
                 };
@@ -53,7 +100,7 @@ public class Checker {
             t.start();
 
             try {
-                isOk.wait(3000);
+                isOk.wait(getWaitForResponseTimeOut());
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
@@ -67,10 +114,32 @@ public class Checker {
     }
 
     /**
+     * @return wait for response time out.
+     */
+    private long getWaitForResponseTimeOut() {
+        return waitForResponseTimeOut;
+    }
+    /**
+     * @param timeOut the waitForResponseTimeOut to set
+     */
+    public void setWaitForResponseTimeOut(final long timeOut) {
+        this.waitForResponseTimeOut = timeOut;
+    }
+
+    /**
      *
      */
-    protected void sendCheckRequest() {
-        // TODO Auto-generated method stub
+    protected void sendCheckRequest() throws IOException {
+        final byte[] buff = new byte[128];
 
+        final InputStream in = new URL(url).openStream();
+        //read all from stream.
+        try {
+            while (in.read(buff) > -1) {
+                //nothing
+            }
+        } finally {
+            in.close();
+        }
     }
 }
