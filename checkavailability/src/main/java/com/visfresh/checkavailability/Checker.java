@@ -30,7 +30,11 @@ public class Checker {
     }
 
     public void check() {
+        System.out.println("Checker started");
+
         if (!checkImpl()) {
+            System.out.println("First availability check not passed. Will wait for "
+                    + getTimeOut() + " ms and check again");
             //do pause and recheck
             try {
                 final long t = getTimeOut();
@@ -39,12 +43,15 @@ public class Checker {
                 }
 
                 if (!checkImpl()) {
+                    System.out.println("Second availability check not passed. Alamr will send");
                     sendNotification();
+                    System.out.println("Not availability alarm has sent");
                 }
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("Checker finished");
     }
 
     /**

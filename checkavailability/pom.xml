@@ -5,6 +5,10 @@
 	<artifactId>checkavailability</artifactId>
 	<version>0.0.1</version>
 	<name>Check Service Availability</name>
+	
+	<properties>
+		<build.out>${project.build.directory}/build</build.out>
+	</properties>
 
 	<dependencies>
 		<!-- Email -->
@@ -55,7 +59,7 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/build/lib</outputDirectory>
+							<outputDirectory>${build.out}/lib</outputDirectory>
 							<excludeArtifactIds>junit</excludeArtifactIds>
 						</configuration>
 					</execution>
@@ -73,7 +77,7 @@
 						</goals>
 						<configuration>
 							<finalName>livechecker</finalName>
-							<outputDirectory>${basedir}/build</outputDirectory>
+							<outputDirectory>${build.out}</outputDirectory>
 							<skip>true</skip>
 							<archive>
 								<manifest>
@@ -93,9 +97,9 @@
 						</goals>
 						<configuration>
 							<finalName>install</finalName>
-							<outputDirectory>${basedir}</outputDirectory>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 							<skip>true</skip>
-							<classesDirectory>${basedir}/build</classesDirectory>
+							<classesDirectory>${build.out}</classesDirectory>
 						</configuration>
 					</execution>
 					<execution>
