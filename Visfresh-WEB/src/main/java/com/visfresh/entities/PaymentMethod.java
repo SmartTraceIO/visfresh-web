@@ -8,5 +8,6 @@ package com.visfresh.entities;
  *
  */
 public enum PaymentMethod {
-    PayPal
+    PayPal,
+    Invoice
 }
