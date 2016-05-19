@@ -3,6 +3,7 @@
  */
 package com.visfresh.dao.impl;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,6 +23,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -146,26 +148,59 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         //resolve shipment
         final Number shipmentId = (Number) row.get(SHIPMENT_FIELD);
         if (shipmentId != null) {
-            final String shipmentKey = "ship_" + shipmentId;
-
-            Shipment shipment = (Shipment) cache.get(shipmentKey);
+            Shipment shipment = getCachedShipment(shipmentId, cache);
             if (shipment == null) {
                 shipment = shipmentDao.findOne(shipmentId.longValue());
-                cache.put(shipmentKey, shipment);
+                cacheShipment(shipment, cache);
             }
             a.setShipment(shipment);
         }
 
         //resolve device
         final String imei = (String) row.get(DEVICE_FIELD);
-        final String deviceKey = "dev_" + imei;
 
-        Device device = (Device) cache.get(deviceKey);
+        Device device = getCachedDevice(imei, cache);
         if (device == null) {
             device = deviceDao.findOne(imei);
-            cache.put(deviceKey, device);
+            cacheDevice(device, cache);
         }
         a.setDevice(device);
+    }
+
+    /**
+     * @param shipment
+     * @param cache
+     * @return
+     */
+    private Object cacheShipment(final Shipment shipment,
+            final Map<String, Object> cache) {
+        return cache.put("ship_" + shipment.getId(), shipment);
+    }
+    /**
+     * @param shipmentId
+     * @param cache
+     * @return
+     */
+    private Shipment getCachedShipment(final Number shipmentId,
+            final Map<String, Object> cache) {
+        return (Shipment) cache.get("ship_" + shipmentId);
+    }
+    /**
+     * @param device
+     * @param cache
+     * @return
+     */
+    private void cacheDevice(final Device device, final Map<String, Object> cache) {
+        cache.put("dev_" + device.getImei(), device);
+    }
+    /**
+     * @param imei
+     * @param cache
+     * @return
+     */
+    private Device getCachedDevice(final String imei,
+            final Map<String, Object> cache) {
+        return (Device) cache.get("dev_" + imei);
     }
 
     /* (non-Javadoc)
@@ -189,11 +224,10 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
     public List<Alert> getAlerts(final Shipment shipment) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("shipment", shipment.getId());
-        final Map<String, String> fields = createSelectAsMapping();
 
         final List<Map<String, Object>> list = jdbc.queryForList(
                 "select "
-                + buildSelectAs(fields)
+                + buildSelectAs(createSelectAsMapping())
                 + " from "
                 + TABLE + " a"
                 + " where "
@@ -207,6 +241,44 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
             alerts.add(a);
         }
         return alerts;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.AlertDao#getAlertsForShipmentIds(java.util.Collection)
+     */
+    @Override
+    public Map<Long, List<Alert>> getAlertsForShipmentIds(
+            final Collection<Long> shipmentIds) {
+        final Map<Long, Shipment> shipments = new HashMap<>();
+        for(final Shipment s: shipmentDao.findAll(shipmentIds)) {
+            shipments.put(s.getId(), s);
+        }
+        final Map<Long, List<Alert>> map = new HashMap<>();
+        if (shipmentIds.isEmpty()) {
+            return map;
+        }
+        for (final Long id : shipmentIds) {
+            map.put(id, new LinkedList<Alert>());
+        }
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select "
+                + buildSelectAs(createSelectAsMapping())
+                + " from "
+                + TABLE + " a"
+                + " where "
+                + "a." + SHIPMENT_FIELD + " in ("
+                        + StringUtils.combine(shipmentIds, ",")
+                        + ") order by date, id",
+                new HashMap<String, Object>());
+        for (final Map<String,Object> row : list) {
+            final Alert a = createAlert(row);
+
+            final Shipment shipment = shipments.get(row.get(SHIPMENT_FIELD));
+            a.setShipment(shipment);
+            a.setDevice(shipment.getDevice());
+            map.get(shipment.getId()).add(a);
+        }
+        return map;
     }
     /**
      * @param fields

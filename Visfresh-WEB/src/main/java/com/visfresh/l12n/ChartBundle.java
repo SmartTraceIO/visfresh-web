@@ -8,10 +8,12 @@ import java.util.TimeZone;
 
 import org.springframework.stereotype.Component;
 
+import com.visfresh.entities.Alert;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.io.TrackerEventDto;
 import com.visfresh.mpl.services.NotificationIssueBundle;
 import com.visfresh.utils.StringUtils;
 
@@ -63,5 +65,30 @@ public class ChartBundle extends NotificationIssueBundle {
         final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME, XmlControl.INSTANCE);
         final String str = bundle.getString("TrackerEvent");
         return StringUtils.getMessage(str, createReplacementMap(null, event, lang, tz, tu));
+    }
+
+    /**
+     * @param alert alert.
+     * @param dto tracker event DTO.
+     * @param language language.
+     * @param timeZone time zone.
+     * @param temperatureUnits temperature units.
+     * @return
+     */
+    public String buildDescription(final Alert alert, final TrackerEventDto dto,
+            final Language language, final TimeZone timeZone,
+            final TemperatureUnits temperatureUnits) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setId(dto.getId());
+        e.setBattery(dto.getBattery());
+        e.setDevice(alert.getDevice());
+        e.setLatitude(dto.getLatitude());
+        e.setLongitude(dto.getLongitude());
+        e.setShipment(alert.getShipment());
+        e.setTemperature(dto.getTemperature());
+        e.setTime(dto.getTime());
+        e.setType(dto.getType());
+
+        return buildDescription(alert, e, language, timeZone, temperatureUnits);
     }
 }

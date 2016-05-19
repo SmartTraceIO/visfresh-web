@@ -371,7 +371,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             addInterimStops(shipments, user);
 
             //add events data
-            addEventsData(shipments, user.getTimeZone());
+            addEventsData(shipments, user);
 
             final JsonArray array = new JsonArray();
             for (final ListShipmentItem s : shipments) {
@@ -388,15 +388,22 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param shipments
      * @throws ParseException
      */
-    private void addEventsData(final List<ListShipmentItem> shipments, final TimeZone tz) throws ParseException {
+    private void addEventsData(final List<ListShipmentItem> shipments, final User user) throws ParseException {
+        final Collection<Long> shipmentIds = EntityUtils.getIdList(shipments);
         final Map<Long, List<TrackerEventDto>> eventMap = trackerEventDao.getEventsForShipmentIds(
-                EntityUtils.getIdList(shipments));
+                shipmentIds);
+        //alerts
+        final Map<Long, List<Alert>> alertMap = alertDao.getAlertsForShipmentIds(
+                shipmentIds);
+
+        //events
         for (final ListShipmentItem s : shipments) {
             final List<TrackerEventDto> events = eventMap.get(s.getId());
 
             final List<KeyLocation> keyLocs = buildKeyLocations(s.getId(), events);
-            addInterimStopKeyLocations(keyLocs, s.getInterimStops(), tz);
+            addInterimStopKeyLocations(keyLocs, s.getInterimStops(), user.getTimeZone());
 
+            //add events
             if (events.size() > 0) {
                 //create reverse events
                 final List<TrackerEventDto> reverted = new LinkedList<TrackerEventDto>(events);
@@ -431,10 +438,44 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
                     insertKeyLocation(loc, keyLocs);
                 }
+
+                //alerts
+                for (final Alert alert : alertMap.get(s.getId())) {
+                    final KeyLocation loc = buildKeyLocation(alert, events, user);
+                    if (loc != null) {
+                        insertKeyLocation(loc, keyLocs);
+                    }
+                }
             }
 
             s.setKeyLocations(keyLocs);
         }
+    }
+
+    /**
+     * @param alert
+     * @param events
+     * @return
+     */
+    private KeyLocation buildKeyLocation(final Alert alert,
+            final List<TrackerEventDto> events, final User user) {
+        final Long eventId = alert.getTrackerEventId();
+
+        if (eventId != null) {
+            for (final TrackerEventDto e : events) {
+                if (e.getId().equals(eventId)) {
+                    final KeyLocation loc = new KeyLocation();
+                    loc.setKey(alert.getType().name());
+                    loc.setLatitude(e.getLatitude());
+                    loc.setLongitude(e.getLongitude());
+                    loc.setTime(e.getTime().getTime());
+                    loc.setDescription(chartBundle.buildDescription(alert, e,
+                            user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits()));
+                    return loc;
+                }
+            }
+        }
+        return null;
     }
     /**
      * @param lat

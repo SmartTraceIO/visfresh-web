@@ -12,6 +12,7 @@ public class KeyLocation implements Comparable<KeyLocation> {
     private double latitude;
     private double longitude;
     private long time;
+    private String description;
 
     /**
      * Default constructor.
@@ -74,5 +75,17 @@ public class KeyLocation implements Comparable<KeyLocation> {
     @Override
     public int compareTo(final KeyLocation o) {
         return new Long(getTime()).compareTo(new Long(o.getTime()));
+    }
+    /**
+     * @param desc
+     */
+    public void setDescription(final String desc) {
+        this.description = desc;
+    }
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
     }
 }

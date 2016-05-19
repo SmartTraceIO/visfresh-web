@@ -3,7 +3,9 @@
  */
 package com.visfresh.dao;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Device;
@@ -24,4 +26,9 @@ public interface AlertDao extends DaoBase<Alert, Long> {
      * @param newDevice new device.
      */
     void moveToNewDevice(Device oldDevice, Device newDevice);
+    /**
+     * @param shipmentIds
+     * @return map of alerts for givent shipment ID's.
+     */
+    Map<Long, List<Alert>> getAlertsForShipmentIds(Collection<Long> shipmentIds);
 }

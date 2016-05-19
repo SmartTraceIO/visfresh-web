@@ -8,7 +8,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -196,6 +198,41 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
 
         dao.moveToNewDevice(d1, d2);
         assertEquals(d2.getImei(), dao.findOne(a.getId()).getDevice().getImei());
+    }
+    @Test
+    public void testGetAlertsForShipmentIds() {
+        final Device d1 = createDevice("02398470238472");
+        final Shipment s1 = createShipment(d1);
+        final Shipment s2 = createShipment(d1);
+        final Shipment s3 = createShipment(createDevice("390248032847093"));
+
+        createEvent(s1);
+        createEvent(s1);
+
+        createEvent(s2);
+        createEvent(s2);
+
+        createEvent(s3);
+        createEvent(s3);
+
+        final List<Long> ids = new LinkedList<>();
+        ids.add(s1.getId());
+        ids.add(s2.getId());
+
+        final Map<Long, List<Alert>> map = dao.getAlertsForShipmentIds(ids);
+        assertEquals(2, map.size());
+        assertEquals(2, map.get(s1.getId()).size());
+        assertEquals(2, map.get(s2.getId()).size());
+    }
+    /**
+     * @param s
+     * @return alert.
+     */
+    private Alert createEvent(final Shipment s) {
+        final Alert a = createTestEntity();
+        a.setDevice(s.getDevice());
+        a.setShipment(s);
+        return dao.save(a);
     }
     /**
      * @param imei
