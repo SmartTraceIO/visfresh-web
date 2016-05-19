@@ -1,0 +1,1 @@
+java -jar /home/kgh/cron/livechecker/livechecker.jar >> /home/kgh/cron/logs/livechecker.log

@@ -1,0 +1,3 @@
+# should be placed to /etc/cron.d/
+
+*/5 * * * * kgh /home/kgh/cron/livechecker.sh
