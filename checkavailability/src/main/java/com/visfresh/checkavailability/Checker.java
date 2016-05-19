@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.visfresh.cfg.Config;
 import com.visfresh.mail.EmailSender;
 import com.visfresh.sms.SmsSender;
@@ -17,6 +20,10 @@ import com.visfresh.sms.SmsSender;
  *
  */
 public class Checker {
+    private static final Logger log = LoggerFactory.getLogger(Checker.class);
+    private String subject = "Service Availability checker";
+    private String message = "Service not available during " + getTimeOut() + " ms";
+
     private final String url;
     private long timeOut = 5 * 60 * 1000l;
     private long waitForResponseTimeOut = 10000; // 10 secs
@@ -30,10 +37,10 @@ public class Checker {
     }
 
     public void check() {
-        System.out.println("Checker started");
+        log.debug("Checker started");
 
         if (!checkImpl()) {
-            System.out.println("First availability check not passed. Will wait for "
+            log.debug("First availability check not passed. Will wait for "
                     + getTimeOut() + " ms and check again");
             //do pause and recheck
             try {
@@ -43,15 +50,15 @@ public class Checker {
                 }
 
                 if (!checkImpl()) {
-                    System.out.println("Second availability check not passed. Alamr will send");
+                    log.debug("Second availability check not passed. Alamr will send");
                     sendNotification();
-                    System.out.println("Not availability alarm has sent");
+                    log.debug("Not availability alarm has sent");
                 }
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        System.out.println("Checker finished");
+        log.debug("Checker finished");
     }
 
     /**
@@ -71,9 +78,6 @@ public class Checker {
      * Sends service not available notification.
      */
     protected void sendNotification() {
-        final String subject = "Service Availability checker";
-        final String message = "Service not available during " + getTimeOut() + " ms";
-
         try {
             new SmsSender().sendSms(subject, message);
         } catch (final Throwable e) {
@@ -132,11 +136,37 @@ public class Checker {
     public void setWaitForResponseTimeOut(final long timeOut) {
         this.waitForResponseTimeOut = timeOut;
     }
+    /**
+     * @return the subject
+     */
+    public String getSubject() {
+        return subject;
+    }
+    /**
+     * @param subject the subject to set
+     */
+    public void setSubject(final String subject) {
+        this.subject = subject;
+    }
+    /**
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
+    /**
+     * @param message the message to set
+     */
+    public void setMessage(final String message) {
+        this.message = message;
+    }
 
     /**
      *
      */
     protected void sendCheckRequest() throws IOException {
+        log.debug("Sending check request");
+
         final byte[] buff = new byte[128];
 
         final InputStream in = new URL(url).openStream();
@@ -148,5 +178,7 @@ public class Checker {
         } finally {
             in.close();
         }
+
+        log.debug("Check request successfully has sent");
     }
 }
