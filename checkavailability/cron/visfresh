@@ -1,3 +1,5 @@
 # should be placed to /etc/cron.d/
 
 */5 * * * * kgh /home/kgh/cron/livechecker.sh
+# remove log one time per day
+7 0 * * * kgh rm -f /home/kgh/cron/logs/livechecker.log
