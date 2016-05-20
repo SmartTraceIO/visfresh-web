@@ -13,6 +13,7 @@ public class KeyLocation implements Comparable<KeyLocation> {
     private double longitude;
     private long time;
     private String description;
+    private String prettyTime;
 
     /**
      * Default constructor.
@@ -87,5 +88,17 @@ public class KeyLocation implements Comparable<KeyLocation> {
      */
     public String getDescription() {
         return description;
+    }
+    /**
+     * @return the prettyTime
+     */
+    public String getPrettyTime() {
+        return prettyTime;
+    }
+    /**
+     * @param prettyTime the prettyTime to set
+     */
+    public void setPrettyTime(final String prettyTime) {
+        this.prettyTime = prettyTime;
     }
 }

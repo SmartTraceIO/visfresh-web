@@ -371,7 +371,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             addInterimStops(shipments, user);
 
             //add events data
-            addEventsData(shipments, user);
+            addKeyLocations(shipments, user);
 
             final JsonArray array = new JsonArray();
             for (final ListShipmentItem s : shipments) {
@@ -388,13 +388,14 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param shipments
      * @throws ParseException
      */
-    private void addEventsData(final List<ListShipmentItem> shipments, final User user) throws ParseException {
+    private void addKeyLocations(final List<ListShipmentItem> shipments, final User user) throws ParseException {
         final Collection<Long> shipmentIds = EntityUtils.getIdList(shipments);
         final Map<Long, List<TrackerEventDto>> eventMap = trackerEventDao.getEventsForShipmentIds(
                 shipmentIds);
         //alerts
         final Map<Long, List<Alert>> alertMap = alertDao.getAlertsForShipmentIds(
                 shipmentIds);
+        final DateFormat format = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
 
         //events
         for (final ListShipmentItem s : shipments) {
@@ -417,6 +418,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     final TrackerEventDto e = findNearestEvent(lat, lon, reverted);
                     final KeyLocation loc = new KeyLocation();
                     loc.setKey("shippedFrom");
+                    loc.setDescription(s.getShippedFrom());
                     loc.setLatitude(lat);
                     loc.setLongitude(lon);
                     loc.setTime(e.getTime().getTime());
@@ -432,6 +434,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     final TrackerEventDto e = findNearestEvent(lat, lon, reverted);
                     final KeyLocation loc = new KeyLocation();
                     loc.setKey("shippedTo");
+                    loc.setDescription(s.getShippedTo());
                     loc.setLatitude(lat);
                     loc.setLongitude(lon);
                     loc.setTime(e.getTime().getTime());
@@ -445,6 +448,11 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     if (loc != null) {
                         insertKeyLocation(loc, keyLocs);
                     }
+                }
+
+                //set pretty time
+                for (final KeyLocation loc : keyLocs) {
+                    loc.setPrettyTime(format.format(new Date(loc.getTime())));
                 }
             }
 
@@ -465,7 +473,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             for (final TrackerEventDto e : events) {
                 if (e.getId().equals(eventId)) {
                     final KeyLocation loc = new KeyLocation();
-                    loc.setKey(alert.getType().name());
+                    loc.setKey(alert.getType().name() + "Alert");
                     loc.setLatitude(e.getLatitude());
                     loc.setLongitude(e.getLongitude());
                     loc.setTime(e.getTime().getTime());
@@ -545,6 +553,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     private KeyLocation createKeyLocation(final InterimStopDto stp) {
         final KeyLocation loc = new KeyLocation();
         loc.setKey("interimStop");
+        loc.setDescription(stp.getLocation().getName());
         loc.setLatitude(stp.getLatitude());
         loc.setLongitude(stp.getLongitude());
         return loc;

@@ -379,6 +379,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("key", kl.getKey());
         json.addProperty("lat", kl.getLatitude());
         json.addProperty("lon", kl.getLongitude());
+        json.addProperty("desc", kl.getDescription());
+        json.addProperty("time", kl.getPrettyTime());
         return json;
     }
     /**

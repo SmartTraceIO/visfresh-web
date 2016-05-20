@@ -344,8 +344,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         s1.getShippedTo().setAddress("Coles Perth DC");
         shipmentDao.save(s1);
 
-        createEvent(s1, TrackerEventType.AUT);
-
         //second shipment.
         final Shipment s2 = createShipment(true);
         s2.getShippedTo().setAddress("Coles Perth DC");
@@ -396,6 +394,15 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         stp.setLongitude(e.getLongitude());
         stp.setLocation(loc);
         context.getBean(InterimStopDao.class).add(s2, stp);
+
+        //add one alert
+        final Alert alert = new TemperatureAlert();
+        alert.setTrackerEventId(e.getId());
+        alert.setType(AlertType.Hot);
+        alert.setShipment(e.getShipment());
+        alert.setDate(e.getTime());
+        alert.setDevice(e.getShipment().getDevice());
+        alertDao.save(alert);
 
         assertEquals(2, shipmentClient.getShipments(null, null).size());
     }
