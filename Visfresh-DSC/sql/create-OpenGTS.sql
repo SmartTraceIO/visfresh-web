@@ -1,5 +1,0 @@
--- CREATE USER 'gts'@'localhost' IDENTIFIED BY 'opengts'
--- CREATE USER 'gts'@'127.0.0.1' IDENTIFIED BY 'opengts'
--- create database gts character set utf8 COLLATE utf8_general_ci;
--- grant all gts on *.* to gts@127.0.0.1
--- grant all gts on *.* to gts@localhost

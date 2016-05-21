@@ -1,22 +1,23 @@
 /**
  *
  */
-package com.visfresh.dispatcher;
+package com.visfresh.dispatcher.mock;
 
 import org.springframework.stereotype.Component;
 
 import com.visfresh.DeviceMessage;
+import com.visfresh.dispatcher.AbstractDispatcher;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class JunitDispatcher extends AbstractDispatcher {
+public class JUnitDispatcher extends AbstractDispatcher {
     /**
      * Default constructor.
      */
-    public JunitDispatcher() {
+    public JUnitDispatcher() {
         super();
     }
 

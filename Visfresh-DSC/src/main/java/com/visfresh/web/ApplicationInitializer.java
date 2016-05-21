@@ -10,9 +10,10 @@ import javax.servlet.ServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.visfresh.dispatcher.DeviceMessageDispatcher;
+import com.visfresh.spring.prod.Config;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -35,15 +36,15 @@ public class ApplicationInitializer implements ServletContextListener {
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
         //initialize spring config
-        final String springConfig = "application-context.xml";
-        final ConfigurableApplicationContext ctx
-            = new ClassPathXmlApplicationContext(springConfig);
+        final AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+        ctx.scan(Config.class.getPackage().getName());
+        ctx.refresh();
         sce.getServletContext().setAttribute(BEAN_FACTORY_PROPERTY, ctx);
 
         //initialize dispatcher
         ctx.getBean(DeviceMessageDispatcher.class).start();
 
-        log.debug("Application has initialized. Spring config: " + springConfig);
+        log.debug("Application has initialized.");
     }
 
     /* (non-Javadoc)

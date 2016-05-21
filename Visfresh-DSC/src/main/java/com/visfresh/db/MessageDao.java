@@ -41,7 +41,7 @@ public class MessageDao {
     public static final String PROCESSOR_FIELD = "processor";
 
     //tables
-    public static final String DEVICE_MESSAGES_TABLE = "devicemsg";
+    public static final String TABLE = "devicemsg";
 
     /**
      * JDBC template.
@@ -61,7 +61,7 @@ public class MessageDao {
     }
 
     public void markDeviceMessagesForProcess(final String processorId, final int limit) {
-        markMessagesToProcess(DEVICE_MESSAGES_TABLE, processorId, limit);
+        markMessagesToProcess(TABLE, processorId, limit);
     }
     /**
      * @param tableName table name.
@@ -105,7 +105,7 @@ public class MessageDao {
 
         //run query
         final List<Map<String, Object>> list = jdbcTemplate.queryForList(
-                "select * from " + DEVICE_MESSAGES_TABLE + " where "
+                "select * from " + TABLE + " where "
                         + PROCESSOR_FIELD + " = :processor order by " + TIME_FIELD, params);
 
         final List<DeviceMessage> messages = new LinkedList<DeviceMessage>();
@@ -158,7 +158,7 @@ public class MessageDao {
 
         final GeneratedKeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update("INSERT INTO "
-                + DEVICE_MESSAGES_TABLE
+                + TABLE
             + "(" + IMEI_FIELD
             + ", " + TYPE_FIELD
             + ", " + TIME_FIELD
@@ -203,7 +203,7 @@ public class MessageDao {
     public void delete(final DeviceMessage msg) {
         final HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("msgid", msg.getId());
-        jdbcTemplate.update("delete from " + DEVICE_MESSAGES_TABLE
+        jdbcTemplate.update("delete from " + TABLE
                 + " where id = :msgid", params);
     }
 
@@ -216,7 +216,7 @@ public class MessageDao {
         params.put("retryOn", msg.getRetryOn());
         params.put("numRetry", msg.getNumberOfRetry());
 
-        jdbcTemplate.update("update " + DEVICE_MESSAGES_TABLE + " set "
+        jdbcTemplate.update("update " + TABLE + " set "
                 + RETRYON_FIELD + " = :retryOn, "
                 + NUMRETRY_FIELD + " = :numRetry "
                 + "where " + ID_FIELD + " = :msgid", params);

@@ -20,6 +20,7 @@ import com.visfresh.Device;
 import com.visfresh.DeviceCommand;
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageType;
+import com.visfresh.mail.mock.MockEmailMessage;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -31,6 +32,7 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
     private final Map<String, Device> devices = new HashMap<String, Device>();
     private final Map<String, List<DeviceCommand>> commands = new HashMap<>();
     private final List<DeviceMessage> messages = new LinkedList<>();
+    private final List<MockEmailMessage> alerts =  new LinkedList<>();
     private Device device;
 
     /**
@@ -89,6 +91,7 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
         process(msgs);
 
         assertEquals(0, messages.size());
+        assertEquals(1, alerts.size());
     }
     @Test
     public void testProcessRspMessage() {
@@ -231,5 +234,24 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
     @Override
     protected Device getDeviceByImei(final String imei) {
         return devices.get(imei);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.service.DeviceMessageService#getCompanyEmail(java.lang.String)
+     */
+    @Override
+    protected String getCompanyEmail(final String imei) {
+        return null;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.service.DeviceMessageService#sendAlert(java.lang.String[], java.lang.String, java.lang.String)
+     */
+    @Override
+    protected void sendAlert(final String[] emails, final String subject, final String message) {
+        final MockEmailMessage m = new MockEmailMessage();
+        m.setAddresses(emails);
+        m.setSubject(subject);
+        m.setMessage(message);
+
+        alerts.add(m);
     }
 }

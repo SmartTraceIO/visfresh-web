@@ -77,4 +77,19 @@ public class DeviceDao {
         map.put(entityName + "." + ACTIVE_FIELD, ACTIVE_FIELD);
         return map ;
     }
+    /**
+     * @param imei
+     * @return
+     */
+    public String getCompanyEmail(final String imei) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("imei", imei);
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select email from companies"
+                + " join devices on devices.company = companies.id and devices.imei = :imei limit 1",
+                params);
+
+        return list.size() == 0 ? null : (String) list.get(0).get("email");
+    }
 }

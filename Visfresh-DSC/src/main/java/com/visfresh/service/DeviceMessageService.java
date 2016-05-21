@@ -34,6 +34,8 @@ public class DeviceMessageService {
     private DeviceDao deviceDao;
     @Autowired
     private DeviceCommandDao deviceCommandDao;
+    @Autowired
+    private InactiveDeviceAlertSender alerter;
 
     /**
      * Default constructor.
@@ -61,6 +63,11 @@ public class DeviceMessageService {
                 break;
             } else if (!device.isActive()) {
                 log.debug("Device " + device.getImei() + " is inactive, message(s) ignored");
+
+                final String companyEmail = getCompanyEmail(msg.getImei());
+                sendAlert(companyEmail == null ? new String[0] : new String[]{companyEmail},
+                        "Attempt to send message to inactive device " + msg.getImei(),
+                        "Message body:\n" + combineMessages(msgs));
                 break;
             } else {
                 if (msg.getType() == DeviceMessageType.RSP) {
@@ -103,6 +110,36 @@ public class DeviceMessageService {
         }
 
         return cmd;
+    }
+
+    /**
+     * @param imei
+     * @return
+     */
+    protected String getCompanyEmail(final String imei) {
+        return deviceDao.getCompanyEmail(imei);
+    }
+    /**
+     * @param emails
+     * @param subject
+     * @param message
+     */
+    protected void sendAlert(final String[] emails, final String subject, final String message) {
+        alerter.sendAlert(emails, subject, message);
+    }
+    /**
+     * @param msgs
+     * @return
+     */
+    private String combineMessages(final List<DeviceMessage> msgs) {
+        final StringBuilder sb = new StringBuilder();
+        for (final DeviceMessage m : msgs) {
+            if (sb.length() > 0) {
+                sb.append("\n");
+            }
+            sb.append(m.toString());
+        }
+        return sb.toString();
     }
 
     /**

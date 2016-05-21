@@ -11,13 +11,14 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageParser;
 import com.visfresh.DeviceMessageType;
 import com.visfresh.StationSignal;
+import com.visfresh.spring.mock.JUnitConfig;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -27,7 +28,7 @@ public class MessageDaoTest extends TestCase {
     /**
      * Spring context.
      */
-    private ClassPathXmlApplicationContext spring;
+    private AnnotationConfigApplicationContext spring;
     /**
      * DAO to test.
      */
@@ -55,7 +56,7 @@ public class MessageDaoTest extends TestCase {
      */
     @Override
     protected void setUp() throws Exception {
-        spring = new ClassPathXmlApplicationContext("application-context-junit.xml");
+        spring = JUnitConfig.createContext();
         dao = spring.getBean(MessageDao.class);
         jdbcTemplate = spring.getBean(NamedParameterJdbcTemplate.class);
     }
@@ -101,7 +102,7 @@ public class MessageDaoTest extends TestCase {
 
         //check result
         final List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from "
-                + MessageDao.DEVICE_MESSAGES_TABLE, new HashMap<String, Object>());
+                + MessageDao.TABLE, new HashMap<String, Object>());
 
         assertEquals(1, list.size());
 
@@ -154,13 +155,13 @@ public class MessageDaoTest extends TestCase {
 
         dao.markDeviceMessagesForProcess("p1", 1);
         assertEquals(1, jdbcTemplate.queryForList(
-                "select * from " + MessageDao.DEVICE_MESSAGES_TABLE
+                "select * from " + MessageDao.TABLE
                 + " where " + MessageDao.PROCESSOR_FIELD + "='p1'",
                 new HashMap<String, Object>()).size());
 
         dao.markDeviceMessagesForProcess("p2", 1000);
         assertEquals(1, jdbcTemplate.queryForList(
-                "select * from " + MessageDao.DEVICE_MESSAGES_TABLE
+                "select * from " + MessageDao.TABLE
                 + " where " + MessageDao.PROCESSOR_FIELD + "='p2'",
                 new HashMap<String, Object>()).size());
     }
@@ -229,7 +230,7 @@ public class MessageDaoTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         //clean up data base
-        jdbcTemplate.update("delete from " + MessageDao.DEVICE_MESSAGES_TABLE,
+        jdbcTemplate.update("delete from " + MessageDao.TABLE,
                 new HashMap<String, Object>());
         spring.close();
     }

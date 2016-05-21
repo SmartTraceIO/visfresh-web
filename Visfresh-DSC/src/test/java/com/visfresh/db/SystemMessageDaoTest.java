@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 import junit.framework.TestCase;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.google.gson.JsonElement;
@@ -19,13 +19,14 @@ import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageType;
 import com.visfresh.Location;
 import com.visfresh.SystemMessage;
+import com.visfresh.spring.mock.JUnitConfig;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class SystemMessageDaoTest extends TestCase {
-    private ClassPathXmlApplicationContext spring;
+    private AnnotationConfigApplicationContext spring;
     private SystemMessageDao dao;
     private NamedParameterJdbcTemplate jdbc;
 
@@ -47,7 +48,7 @@ public class SystemMessageDaoTest extends TestCase {
      */
     @Override
     protected void setUp() throws Exception {
-        spring = new ClassPathXmlApplicationContext("application-context-junit.xml");
+        spring = JUnitConfig.createContext();
         dao = spring.getBean(SystemMessageDao.class);
         jdbc = spring.getBean(NamedParameterJdbcTemplate.class);
     }

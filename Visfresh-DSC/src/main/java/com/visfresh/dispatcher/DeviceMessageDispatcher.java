@@ -8,12 +8,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.DeviceMessage;
 import com.visfresh.Location;
-import com.visfresh.config.DeviceConstants;
 import com.visfresh.db.SystemMessageDao;
 
 /**
@@ -30,16 +29,20 @@ public class DeviceMessageDispatcher extends AbstractDispatcher {
     @Autowired
     private LocationService locationService;
     @Autowired
-    private DeviceConstants deviceConstants;
-    @Autowired
     private SystemMessageDao systemMessageDao;
 
     /**
      * Default constructor..
      */
-    public DeviceMessageDispatcher() {
+    @Autowired
+    public DeviceMessageDispatcher(final Environment env) {
         super();
-        setProcessorId("devicemsg");
+
+        setBatchLimit(Integer.parseInt(env.getProperty("deviceMessages.batchLimit", "0")));
+        setInactiveTimeOut(Integer.parseInt(env.getProperty("deviceMessages.inactiveTimeOut", "15000")));
+        setProcessorId(env.getProperty("deviceMessages.processorId", "device-msg"));
+        setRetryLimit(Integer.parseInt(env.getProperty("deviceMessages.retryLimit", "7")));
+        setRetryTimeOut(Integer.parseInt(env.getProperty("deviceMessages.retryTimeOut", "300000")));
     }
 
     @Override
@@ -103,45 +106,5 @@ public class DeviceMessageDispatcher extends AbstractDispatcher {
      */
     public void setLocationService(final LocationService locationService) {
         this.locationService = locationService;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dispatcher.AbstractDispatcher#setBatchLimit(int)
-     */
-    @Override
-    @Value("${deviceMessages.batchLimit}")
-    public void setBatchLimit(final int limit) {
-        super.setBatchLimit(limit);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dispatcher.AbstractDispatcher#setInactiveTimeOut(long)
-     */
-    @Override
-    @Value("${deviceMessages.inactiveTimeOut}")
-    public void setInactiveTimeOut(final long inactiveTimeOut) {
-        super.setInactiveTimeOut(inactiveTimeOut);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dispatcher.AbstractDispatcher#setProcessorId(java.lang.String)
-     */
-    @Override
-    @Value("${deviceMessages.processorId}")
-    public String setProcessorId(final String id) {
-        return super.setProcessorId(id);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dispatcher.AbstractDispatcher#setRetryLimit(int)
-     */
-    @Override
-    @Value("${deviceMessages.retryLimit}")
-    public void setRetryLimit(final int retryLimit) {
-        super.setRetryLimit(retryLimit);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dispatcher.AbstractDispatcher#setRetryTimeOut(long)
-     */
-    @Override
-    @Value("${deviceMessages.retryTimeOut}")
-    public void setRetryTimeOut(final long retryTimeOut) {
-        super.setRetryTimeOut(retryTimeOut);
     }
 }

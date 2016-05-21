@@ -10,18 +10,19 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.visfresh.Device;
 import com.visfresh.DeviceCommand;
+import com.visfresh.spring.mock.JUnitConfig;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class DeviceCommandDaoTest extends TestCase {
-    private ClassPathXmlApplicationContext spring;
+    private AnnotationConfigApplicationContext spring;
     private DeviceCommandDao dao;
     private NamedParameterJdbcTemplate jdbc;
     private Device device;
@@ -44,7 +45,7 @@ public class DeviceCommandDaoTest extends TestCase {
      */
     @Override
     protected void setUp() throws Exception {
-        spring = new ClassPathXmlApplicationContext("application-context-junit.xml");
+        spring = JUnitConfig.createContext();
         dao = spring.getBean(DeviceCommandDao.class);
         jdbc = spring.getBean(NamedParameterJdbcTemplate.class);
 
@@ -64,7 +65,6 @@ public class DeviceCommandDaoTest extends TestCase {
         jdbc.update(sql, params);
         this.device = spring.getBean(DeviceDao.class).getByImei(imei);
     }
-
     public void testReadAndDelete() {
         //create device command
         final Map<String, Object> params = new HashMap<String, Object>();

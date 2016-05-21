@@ -10,12 +10,14 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageType;
 import com.visfresh.db.MessageDao;
+import com.visfresh.dispatcher.mock.JUnitDispatcher;
+import com.visfresh.spring.mock.JUnitConfig;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -23,8 +25,8 @@ import com.visfresh.db.MessageDao;
  */
 public class AbstractDispatcherTest extends TestCase {
 
-    private ClassPathXmlApplicationContext spring;
-    private JunitDispatcher dispatcher;
+    private AnnotationConfigApplicationContext spring;
+    private JUnitDispatcher dispatcher;
     private MessageDao dao;
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -47,8 +49,8 @@ public class AbstractDispatcherTest extends TestCase {
      */
     @Override
     protected void setUp() throws Exception {
-        spring = new ClassPathXmlApplicationContext("application-context-junit.xml");
-        dispatcher = spring.getBean(JunitDispatcher.class);
+        spring = JUnitConfig.createContext();
+        dispatcher = spring.getBean(JUnitDispatcher.class);
         dao = spring.getBean(MessageDao.class);
         jdbcTemplate = spring.getBean(NamedParameterJdbcTemplate.class);
     }
@@ -59,7 +61,7 @@ public class AbstractDispatcherTest extends TestCase {
 
         dispatcher.handleSuccess(msg);
         final List<Map<String, Object>> rows = jdbcTemplate.queryForList("select * from "
-                + MessageDao.DEVICE_MESSAGES_TABLE,
+                + MessageDao.TABLE,
                 new HashMap<String, Object>());
 
         assertEquals(0, rows.size());
@@ -72,12 +74,12 @@ public class AbstractDispatcherTest extends TestCase {
 
         dispatcher.handleError(msg, new RetryableException());
         assertEquals(1, jdbcTemplate.queryForList("select * from "
-                + MessageDao.DEVICE_MESSAGES_TABLE,
+                + MessageDao.TABLE,
                 new HashMap<String, Object>()).size());
 
         dispatcher.handleError(msg, new RetryableException());
         assertEquals(0, jdbcTemplate.queryForList("select * from "
-                + MessageDao.DEVICE_MESSAGES_TABLE,
+                + MessageDao.TABLE,
                 new HashMap<String, Object>()).size());
     }
     public void testHandleRetryableErrorWithSetRetryLimit() {
@@ -91,12 +93,12 @@ public class AbstractDispatcherTest extends TestCase {
 
         dispatcher.handleError(msg, exc);
         assertEquals(1, jdbcTemplate.queryForList("select * from "
-                + MessageDao.DEVICE_MESSAGES_TABLE,
+                + MessageDao.TABLE,
                 new HashMap<String, Object>()).size());
 
         dispatcher.handleError(msg, exc);
         assertEquals(1, jdbcTemplate.queryForList("select * from "
-                + MessageDao.DEVICE_MESSAGES_TABLE,
+                + MessageDao.TABLE,
                 new HashMap<String, Object>()).size());
     }
     public void testHandleNotRetryableError() {
@@ -107,7 +109,7 @@ public class AbstractDispatcherTest extends TestCase {
         dispatcher.handleError(msg, new Exception());
 
         assertEquals(0, jdbcTemplate.queryForList("select * from "
-                + MessageDao.DEVICE_MESSAGES_TABLE,
+                + MessageDao.TABLE,
                 new HashMap<String, Object>()).size());
     }
     /**
@@ -127,7 +129,7 @@ public class AbstractDispatcherTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         //clean up data base
-        jdbcTemplate.update("delete from " + MessageDao.DEVICE_MESSAGES_TABLE,
+        jdbcTemplate.update("delete from " + MessageDao.TABLE,
                 new HashMap<String, Object>());
         spring.close();
     }
