@@ -443,7 +443,20 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 }
 
                 //alerts
+                boolean lightOnProcessed = false;
                 for (final Alert alert : alertMap.get(s.getId())) {
+                    final AlertType type = alert.getType();
+                    if (type == AlertType.LightOff) {
+                        continue;
+                    }
+                    if (type == AlertType.LightOn) {
+                        if (lightOnProcessed) {
+                            continue;
+                        } else {
+                            lightOnProcessed = true;
+                        }
+                    }
+
                     final KeyLocation loc = buildKeyLocation(alert, events, user);
                     if (loc != null) {
                         insertKeyLocation(loc, keyLocs);

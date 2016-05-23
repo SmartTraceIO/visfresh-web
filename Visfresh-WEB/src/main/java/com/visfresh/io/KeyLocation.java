@@ -101,4 +101,22 @@ public class KeyLocation implements Comparable<KeyLocation> {
     public void setPrettyTime(final String prettyTime) {
         this.prettyTime = prettyTime;
     }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getKey())
+            .append('(')
+            .append(getLatitude())
+            .append(',')
+            .append(getLongitude())
+            .append(')')
+            .append(' ')
+            .append(getPrettyTime())
+            .append(": ")
+            .append(getDescription());
+        return sb.toString();
+    }
 }

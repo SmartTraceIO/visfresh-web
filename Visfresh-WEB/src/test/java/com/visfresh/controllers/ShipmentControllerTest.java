@@ -59,9 +59,11 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.KeyLocation;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
+import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AuthService;
@@ -80,7 +82,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     private ShipmentRestClient shipmentClient;
     private JsonObject currentJsonResponse;
     //response catcher
-    final RestIoListener l = new RestIoListener() {
+    final RestIoListener restIoListener = new RestIoListener() {
         @Override
         public void sendingRequest(final String url, final String body, final String methodName) {
         }
@@ -111,7 +113,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         shipmentClient.setServiceUrl(getServiceUrl());
         shipmentClient.setAuthToken(token);
-        shipmentClient.addRestIoListener(l);
+        shipmentClient.addRestIoListener(restIoListener);
 
         currentJsonResponse = null;
     }
@@ -405,6 +407,92 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         alertDao.save(alert);
 
         assertEquals(2, shipmentClient.getShipments(null, null).size());
+    }
+    @Test
+    public void testKeyLocationsIgnoreLightOff() throws RestServiceException, IOException {
+        //second shipment.
+        final Shipment s2 = createShipment(true);
+        s2.setShippedTo(null);
+        s2.setShippedFrom(null);
+        shipmentDao.save(s2);
+
+        //correct locations
+        final Location l1 = new Location(3., 3.);
+        final Location l2 = new Location(5., 5.);
+
+        long time = System.currentTimeMillis() - 1000000000l;
+
+        final List<TrackerEvent> events = new LinkedList<TrackerEvent>();
+        //create events
+        for (double x = l1.getLatitude(), y = l1.getLongitude();
+                x < l2.getLatitude() + 0.2 && y < l2.getLongitude() + 0.2;
+                x += 0.1, y += 0.1) {
+            events.add(createEvent(s2, x, y, time += 120 * 1000l));
+        }
+
+        //create one interim stop
+        final TrackerEvent e = events.get(events.size() / 2);
+
+        //add one alert
+        final Alert alert = new Alert();
+        alert.setTrackerEventId(e.getId());
+        alert.setType(AlertType.LightOff);
+        alert.setShipment(e.getShipment());
+        alert.setDate(e.getTime());
+        alert.setDevice(e.getShipment().getDevice());
+        alertDao.save(alert);
+
+        final JsonArray response = shipmentClient.getShipments(null, null);
+        assertEquals(1, response.size());
+
+        final List<KeyLocation> locs = getKeyLocations(response.get(0).getAsJsonObject());
+        final List<KeyLocation> offs = getAlerts(locs, AlertType.LightOff);
+        assertEquals(0, offs.size());
+    }
+    @Test
+    public void testKeyLocationsLightOn() throws RestServiceException, IOException {
+        //second shipment.
+        final Shipment s2 = createShipment(true);
+        s2.setShippedTo(null);
+        s2.setShippedFrom(null);
+        shipmentDao.save(s2);
+
+        //correct locations
+        final Location l1 = new Location(3., 3.);
+        final Location l2 = new Location(5., 5.);
+
+        long time = System.currentTimeMillis() - 1000000000l;
+
+        final List<TrackerEvent> events = new LinkedList<TrackerEvent>();
+        //create events
+        for (double x = l1.getLatitude(), y = l1.getLongitude();
+                x < l2.getLatitude() + 0.2 && y < l2.getLongitude() + 0.2;
+                x += 0.1, y += 0.1) {
+            events.add(createEvent(s2, x, y, time += 120 * 1000l));
+        }
+
+        //create one interim stop
+        final TrackerEvent e = events.get(events.size() / 2);
+
+        //add one alert
+        final Alert alert = new Alert();
+        alert.setTrackerEventId(e.getId());
+        alert.setType(AlertType.LightOn);
+        alert.setShipment(e.getShipment());
+        alert.setDate(e.getTime());
+        alert.setDevice(e.getShipment().getDevice());
+
+        alertDao.save(alert);
+        //save again as new alert
+        alert.setId(null);
+        alertDao.save(alert);
+
+        final JsonArray response = shipmentClient.getShipments(null, null);
+        assertEquals(1, response.size());
+
+        final List<KeyLocation> locs = getKeyLocations(response.get(0).getAsJsonObject());
+        final List<KeyLocation> offs = getAlerts(locs, AlertType.LightOn);
+        assertEquals(1, offs.size());
     }
     @Test
     public void testGetShipmentsSorted() throws RestServiceException, IOException {
@@ -1215,8 +1303,43 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         dg.setDescription("Description of group " + name);
         return context.getBean(DeviceGroupDao.class).save(dg);
     }
+    /**
+     * @param shipmentJson
+     * @return
+     */
+    private List<KeyLocation> getKeyLocations(final JsonObject shipmentJson) {
+        final ShipmentSerializer ser = new ShipmentSerializer(user);
+
+        final JsonElement el = shipmentJson.get("keyLocations");
+        if (el == null || el.isJsonNull()) {
+            return null;
+        }
+
+        final List<KeyLocation> locs = new LinkedList<>();
+        for (final JsonElement jsl : el.getAsJsonArray()) {
+            locs.add(ser.parseKeyLocation(jsl));
+        }
+        return locs;
+    }
+    /**
+     * @param locs list of locations.
+     * @param type alert type.
+     * @return
+     */
+    private List<KeyLocation> getAlerts(final List<KeyLocation> locs,
+            final AlertType type) {
+
+        final List<KeyLocation> list = new LinkedList<>();
+        for (final KeyLocation kl : locs) {
+            String key = kl.getKey();
+            if (key != null && key.startsWith(type.name())) {
+                list.add(kl);
+            }
+        }
+        return list;
+    }
     @After
     public void tearDown() {
-        shipmentClient.removeRestIoListener(l);
+        shipmentClient.removeRestIoListener(restIoListener);
     }
 }
