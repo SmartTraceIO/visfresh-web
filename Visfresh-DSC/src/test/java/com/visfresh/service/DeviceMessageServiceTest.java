@@ -236,19 +236,12 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
         return devices.get(imei);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.service.DeviceMessageService#getCompanyEmail(java.lang.String)
-     */
-    @Override
-    protected String getCompanyEmail(final String imei) {
-        return null;
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.service.DeviceMessageService#sendAlert(java.lang.String[], java.lang.String, java.lang.String)
      */
     @Override
-    protected void sendAlert(final String[] emails, final String subject, final String message) {
+    protected void sendAlert(final String subject, final String message) {
         final MockEmailMessage m = new MockEmailMessage();
-        m.setAddresses(emails);
+        m.setAddresses(new String[0]);
         m.setSubject(subject);
         m.setMessage(message);
 

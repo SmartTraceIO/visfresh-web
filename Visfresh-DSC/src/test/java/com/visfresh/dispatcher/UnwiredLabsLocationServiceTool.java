@@ -33,7 +33,7 @@ public class UnwiredLabsLocationServiceTool {
      * @return
      */
     protected static UnwiredLabsLocationService createClient() {
-        final UnwiredLabsLocationService svc = new UnwiredLabsLocationService();
+        final UnwiredLabsLocationService svc = new UnwiredLabsLocationService() {};
 //        unwiredlabs.url=https://ap1.unwiredlabs.com/v2/process.php
         svc.setUrl("https://ap1.unwiredlabs.com/v2/process.php");
 //        unwiredlabs.token=a93bb2c1f9699a

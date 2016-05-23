@@ -16,7 +16,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonArray;
@@ -32,15 +33,23 @@ import com.visfresh.StationSignal;
 @Component
 public class UnwiredLabsLocationService implements LocationService {
     private static final Logger log = LoggerFactory.getLogger(UnwiredLabsLocationService.class);
-    private static final int CRITICAL_BALANCE = 50;
-    private boolean criticalBalanceHasReported;
 
     private String url;
     private String token;
+
     /**
      * Default constructor.
      */
-    public UnwiredLabsLocationService() {
+    @Autowired
+    public UnwiredLabsLocationService(final Environment env) {
+        super();
+        setUrl(env.getProperty("unwiredlabs.url"));
+        setToken(env.getProperty("unwiredlabs.token"));
+    }
+    /**
+     * Default constructor.
+     */
+    protected UnwiredLabsLocationService() {
         super();
     }
 
@@ -110,18 +119,6 @@ public class UnwiredLabsLocationService implements LocationService {
         final Location loc = new Location();
         loc.setLatitude(json.get("lat").getAsDouble());
         loc.setLongitude(json.get("lon").getAsDouble());
-
-        //check balance
-        final int balance = json.get("balance").getAsInt();
-        if (balance < CRITICAL_BALANCE) {
-            if (!criticalBalanceHasReported) {
-                log.error("Critical balance for UnwiredLabs: " + balance);
-                criticalBalanceHasReported = true;
-            }
-        } else {
-            criticalBalanceHasReported = false;
-        }
-
         return loc;
     }
 
@@ -236,14 +233,12 @@ public class UnwiredLabsLocationService implements LocationService {
     /**
      * @param url the url to set
      */
-    @Value("${unwiredlabs.url}")
     public void setUrl(final String url) {
         this.url = url;
     }
     /**
      * @param t the token.
      */
-    @Value("${unwiredlabs.token}")
     public void setToken(final String t) {
         this.token = t;
     }
