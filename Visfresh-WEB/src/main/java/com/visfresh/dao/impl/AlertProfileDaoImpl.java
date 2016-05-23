@@ -19,8 +19,8 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.AlertProfile;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.TemperatureRule;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -211,7 +211,8 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
                 jdbc.update("update temperaturerules set"
                         + " type = :type,"
                         + " temp = :temperature,"
-                        + " timeout = :timeOut"
+                        + " timeout = :timeOut,"
+                        + " cumulative = :cumulative"
                         + " where id = :id", paramMap);
             } else {
                 final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();

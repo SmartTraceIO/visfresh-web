@@ -6,6 +6,7 @@ package com.visfresh.controllers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -16,6 +17,8 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.controllers.restclient.AlertProfileRestClient;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.lists.ListAlertProfileItem;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.SerializerUtils;
@@ -50,6 +53,30 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         final AlertProfile p = createAlertProfile(false);
         final Long id = client.saveAlertProfile(p);
         assertNotNull(id);
+    }
+    @Test
+    public void testChangeToCumulative() throws RestServiceException, IOException {
+        final AlertProfile ap = new AlertProfile();
+        ap.setName("AnyAlert");
+        ap.setDescription("Any description");
+
+        final int normalTemperature = 3;
+        final TemperatureRule criticalHot = new TemperatureRule(AlertType.CriticalHot);
+        criticalHot.setTemperature(normalTemperature + 15);
+        criticalHot.setTimeOutMinutes(0);
+        criticalHot.setCumulativeFlag(false);
+        ap.getAlertRules().add(criticalHot);
+
+        final Long id = client.saveAlertProfile(ap);
+
+        //change rule to cumulative
+        AlertProfile p = dao.findOne(id);
+        p.getAlertRules().get(0).setCumulativeFlag(true);
+        client.saveAlertProfile(p);
+
+        //check cumulative is really set
+        p = dao.findOne(id);
+        assertTrue(p.getAlertRules().get(0).isCumulativeFlag());
     }
     @Test
     public void testGetAlertProfile() throws IOException, RestServiceException {

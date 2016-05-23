@@ -183,4 +183,33 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertEquals(expected.getType(), actual.getType());
         assertEquals(expected.isCumulativeFlag(), actual.isCumulativeFlag());
     }
+    @Override
+    @Test
+    public void testUpdate() {
+        AlertProfile ap = new AlertProfile();
+        ap.setCompany(sharedCompany);
+        ap.setDescription("JUnit test alert pforile");
+        ap.setName("JUnit-Alert");
+
+        TemperatureRule expected = new TemperatureRule(AlertType.CriticalHot);
+        expected.setTemperature(15);
+        expected.setTimeOutMinutes(0);
+        expected.setCumulativeFlag(false);
+        ap.getAlertRules().add(expected);
+
+        dao.save(ap);
+
+        ap = dao.findOne(ap.getId());
+        expected = ap.getAlertRules().get(0);
+        expected.setCumulativeFlag(true);
+        dao.save(ap);
+
+        ap = dao.findOne(ap.getId());
+
+        final TemperatureRule actual = ap.getAlertRules().get(0);
+        assertEquals(expected.getTemperature(), actual.getTemperature(), 0.001);
+        assertEquals(expected.getTimeOutMinutes(), actual.getTimeOutMinutes());
+        assertEquals(expected.getType(), actual.getType());
+        assertEquals(expected.isCumulativeFlag(), actual.isCumulativeFlag());
+    }
 }
