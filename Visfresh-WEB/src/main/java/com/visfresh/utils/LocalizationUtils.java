@@ -27,7 +27,7 @@ public final class LocalizationUtils {
      * @param units
      * @return
      */
-    public static double getTemperature(final double tCelsium, final TemperatureUnits units) {
+    public static double convertToUnits(final double tCelsium, final TemperatureUnits units) {
         double temp;
         switch (units) {
             case Fahrenheit:
@@ -40,13 +40,26 @@ public final class LocalizationUtils {
         }
         return temp;
     }
+    public static double convertFromUnits(final double tInUnits, final TemperatureUnits units) {
+        double temp;
+        switch (units) {
+            case Fahrenheit:
+                temp = (tInUnits - 32) / 1.8;
+                break;
+                default:
+                    temp = tInUnits;
+                    //nothing
+                    break;
+        }
+        return temp;
+    }
     /**
      * @param t temperature.
      * @param units temperature units.
      * @return temperature string.
      */
     public static String getTemperatureString(final double t, final TemperatureUnits units) {
-        final double temp = getTemperature(t, units);
+        final double temp = convertToUnits(t, units);
         String degree;
         switch (units) {
             case Fahrenheit:

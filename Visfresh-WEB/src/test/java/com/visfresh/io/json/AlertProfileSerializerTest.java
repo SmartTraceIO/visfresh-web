@@ -13,7 +13,9 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureRule;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.lists.ListAlertProfileItem;
+import com.visfresh.utils.LocalizationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -33,7 +35,7 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
      */
     @Before
     public void setUp() {
-        serializer = new AlertProfileSerializer(UTC);
+        serializer = new AlertProfileSerializer(UTC, TemperatureUnits.Celsius);
     }
 
     @Test
@@ -95,6 +97,25 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         assertEquals(timeOutMinutes, issue.getTimeOutMinutes());
         assertEquals(id, issue.getId());
         assertTrue(issue.isCumulativeFlag());
+    }
+    @Test
+    public void testTemperatureUnits() {
+        final double temperature = 15.;
+
+        final TemperatureRule issue = new TemperatureRule();
+
+        issue.setId(77l);
+        issue.setTemperature(temperature);
+        issue.setType(AlertType.CriticalCold);
+
+        final TemperatureUnits units = TemperatureUnits.Fahrenheit;
+        final AlertProfileSerializer serializer = new AlertProfileSerializer(UTC, units);
+
+        final JsonObject obj = serializer.toJson(issue);
+
+        assertEquals(LocalizationUtils.convertToUnits(temperature, units),
+                obj.get("temperature").getAsDouble(), 0.00001);
+
     }
     @Test
     public void testListAlertProfileItem() {

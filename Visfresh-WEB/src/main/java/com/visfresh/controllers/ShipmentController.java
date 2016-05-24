@@ -794,7 +794,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 //set last reading data
                 dto.setLastReadingTime(prettyFmt.format(lastEvent.getTime()));
                 dto.setLastReadingTimeISO(isoFmt.format(lastEvent.getTime()));
-                dto.setLastReadingTemperature(LocalizationUtils.getTemperature(
+                dto.setLastReadingTemperature(LocalizationUtils.convertToUnits(
                         lastEvent.getTemperature(), user.getTemperatureUnits()));
                 dto.setLastReadingBattery(lastEvent.getBattery());
                 dto.setLastReadingLat(lastEvent.getLatitude());

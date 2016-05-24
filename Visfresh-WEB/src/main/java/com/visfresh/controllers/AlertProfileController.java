@@ -184,7 +184,7 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @return
      */
     private AlertProfileSerializer createSerializer(final User user) {
-        return new AlertProfileSerializer(user.getTimeZone());
+        return new AlertProfileSerializer(user.getTimeZone(), user.getTemperatureUnits());
     }
 
     /**

@@ -19,7 +19,9 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureRule;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.lists.ListAlertProfileItem;
+import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -27,11 +29,14 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 public class AlertProfileSerializer extends AbstractJsonSerializer {
+    private final TemperatureUnits tempUnits;
+
     /**
      * @param tz time zone.
      */
-    public AlertProfileSerializer(final TimeZone tz) {
+    public AlertProfileSerializer(final TimeZone tz, final TemperatureUnits tempUnits) {
         super(tz);
+        this.tempUnits = tempUnits;
     }
     /**
      * @param alert alert profile.
@@ -120,7 +125,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
         obj.addProperty("id", issue.getId());
         obj.addProperty("type", issue.getType().toString());
-        obj.addProperty("temperature", issue.getTemperature());
+        obj.addProperty("temperature", LocalizationUtils.convertToUnits(issue.getTemperature(), tempUnits));
         obj.addProperty("timeOutMinutes", issue.getTimeOutMinutes());
         obj.addProperty("cumulativeFlag", issue.isCumulativeFlag());
         return obj;
@@ -133,7 +138,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         final TemperatureRule issue = new TemperatureRule();
         issue.setId(asLong(json.get("id")));
         issue.setType(AlertType.valueOf(json.get("type").getAsString()));
-        issue.setTemperature(asDouble(json.get("temperature")));
+        issue.setTemperature(LocalizationUtils.convertFromUnits(asDouble(json.get("temperature")), tempUnits));
         issue.setTimeOutMinutes(asInt(json.get("timeOutMinutes")));
         issue.setCumulativeFlag(asBoolean(json.get("cumulativeFlag")));
         return issue;
@@ -194,7 +199,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
             in.close();
         }
 
-        final AlertProfileSerializer ser = new AlertProfileSerializer(TimeZone.getDefault());
+        final AlertProfileSerializer ser = new AlertProfileSerializer(TimeZone.getDefault(), TemperatureUnits.Celsius);
         final AlertProfile ap = ser.parseAlertProfile(SerializerUtils.parseJson(data).getAsJsonObject());
         System.out.println(ap);
     }

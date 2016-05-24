@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.io.json.AlertProfileSerializer;
 import com.visfresh.lists.ListAlertProfileItem;
 import com.visfresh.services.RestServiceException;
@@ -31,9 +32,9 @@ public class AlertProfileRestClient extends RestClient {
     /**
      * @param tz time zone.
      */
-    public AlertProfileRestClient(final TimeZone tz) {
+    public AlertProfileRestClient(final TimeZone tz, final TemperatureUnits units) {
         super();
-        serializer = new AlertProfileSerializer(tz);
+        serializer = new AlertProfileSerializer(tz, units);
     }
     /**
      * @param pageIndex

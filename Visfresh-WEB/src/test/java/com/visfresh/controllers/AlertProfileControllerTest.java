@@ -16,12 +16,16 @@ import org.junit.Test;
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.controllers.restclient.AlertProfileRestClient;
 import com.visfresh.dao.AlertProfileDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureRule;
+import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.User;
 import com.visfresh.lists.ListAlertProfileItem;
+import com.visfresh.services.AuthService;
+import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
-import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -40,9 +44,18 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
     @Before
     public void setUp() {
         dao = context.getBean(AlertProfileDao.class);
-        client = new AlertProfileRestClient(SerializerUtils.UTС);
+
+        final User user = context.getBean(UserDao.class).findAll(null, null, null).get(0);
+        String token;
+        try {
+            token = context.getBean(AuthService.class).login(user.getEmail(),"").getToken();
+        } catch (final AuthenticationException e) {
+            throw new RuntimeException(e);
+        }
+
+        client = new AlertProfileRestClient(user.getTimeZone(), user.getTemperatureUnits());
         client.setServiceUrl(getServiceUrl());
-        client.setAuthToken(login());
+        client.setAuthToken(token);
     }
 
     //@RequestMapping(value = "/saveAlertProfile/{authToken}", method = RequestMethod.POST)
@@ -77,6 +90,34 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         //check cumulative is really set
         p = dao.findOne(id);
         assertTrue(p.getAlertRules().get(0).isCumulativeFlag());
+    }
+    @Test
+    public void testSaveInFahrenheit() throws RestServiceException, IOException {
+        final String authToken = client.getAuthToken();
+
+        final User user = context.getBean(AuthService.class).getUserForToken(authToken);
+        user.setTemperatureUnits(TemperatureUnits.Fahrenheit);
+        context.getBean(UserDao.class).save(user);
+
+        //rebuild client
+        client = new AlertProfileRestClient(user.getTimeZone(), user.getTemperatureUnits());
+        client.setServiceUrl(getServiceUrl());
+        client.setAuthToken(authToken);
+
+        final AlertProfile ap = new AlertProfile();
+        ap.setName("AnyAlert");
+        ap.setDescription("Any description");
+
+        final int temp = 18;
+        final TemperatureRule criticalHot = new TemperatureRule(AlertType.CriticalHot);
+        criticalHot.setTemperature(temp);
+        ap.getAlertRules().add(criticalHot);
+
+        final Long id = client.saveAlertProfile(ap);
+
+        //change rule to cumulative
+        final AlertProfile p = dao.findOne(id);
+        assertEquals(18, p.getAlertRules().get(0).getTemperature(), 0.00001);
     }
     @Test
     public void testGetAlertProfile() throws IOException, RestServiceException {

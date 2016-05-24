@@ -31,6 +31,7 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureRule;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.lists.DeviceDto;
@@ -58,7 +59,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
     private Point2D.Double v = new Point2D.Double(0.005, 0.);
     private long startTime;
 
-    private AlertProfileRestClient alertProfileClient = new AlertProfileRestClient(UTС);
+    private AlertProfileRestClient alertProfileClient = new AlertProfileRestClient(UTС, TemperatureUnits.Celsius);
     private NotificationScheduleRestClient notificationScheduleClient = new NotificationScheduleRestClient(UTС);
     private ShipmentRestClient service;
 
