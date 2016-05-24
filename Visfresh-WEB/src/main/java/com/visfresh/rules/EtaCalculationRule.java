@@ -97,7 +97,7 @@ public class EtaCalculationRule implements TrackerEventRule {
      * @param currentTime current time.
      * @return ETA
      */
-    protected Date estimateArrivalDate(final Shipment s,
+    public Date estimateArrivalDate(final Shipment s,
             final Location currentLocation, final Date startDate, final Date currentTime) {
         final long dt = currentTime.getTime() - startDate.getTime();
         final Location from = s.getShippedFrom().getLocation();

@@ -30,6 +30,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private String shippedTo;
     private String shipmentDate;
     private String estArrivalDate;
+    private String estArrivalDateISO;
     private String actualArrivalDate;
     private String actualArrivalDateISO;
     private int percentageComplete;
@@ -218,6 +219,12 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public void setEstArrivalDate(final String estArrivalDate) {
         this.estArrivalDate = estArrivalDate;
+    }
+    public String getEstArrivalDateISO() {
+        return estArrivalDateISO;
+    }
+    public void setEstArrivalDateISO(final String date) {
+        this.estArrivalDateISO = date;
     }
     /**
      * @return the actualArrivalDate

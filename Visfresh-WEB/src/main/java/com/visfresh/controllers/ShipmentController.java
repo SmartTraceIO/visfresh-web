@@ -782,7 +782,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             } else {
                 final Date eta = s.getEta();
                 if (eta != null) {
-                    dto.setEstArrivalDate(isoFmt.format(eta));
+                    dto.setEstArrivalDate(prettyFmt.format(eta));
+                    dto.setEstArrivalDateISO(isoFmt.format(eta));
                     dto.setPercentageComplete(getPercentageCompleted(s, currentTime, eta));
                 }
             }
@@ -812,6 +813,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             if (s.getStatus() == ShipmentStatus.Default || s.getStatus() == ShipmentStatus.Ended) {
                 dto.setEstArrivalDate(null);
                 dto.setActualArrivalDate(null);
+                dto.setActualArrivalDateISO(null);
                 if (s.getStatus() == ShipmentStatus.Default) {
                     dto.setShippedTo(null);
                 }

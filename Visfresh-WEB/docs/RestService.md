@@ -779,6 +779,7 @@ see [Shipment Object](#markdown-header-shipment)
   "shippedFrom": "Bankstown Warehouse",
   "shippedTo": "Bankstown Warehouse",
   "estArrivalDate": "2015-11-12T22:24",
+  "estArrivalDateISO": "2015-11-12T22:24",
   "percentageComplete": 0,
   "alertProfileId": 293,
   "alertProfileName": "AnyAlert",
@@ -1836,53 +1837,71 @@ Response:
       "deviceSN": "039485",
       "deviceName": "Device Name",
       "tripCount": 1,
-      "shipmentId": 696,
+      "shipmentId": 4341,
       "shipmentDescription": "Any Description",
-      "shipmentDate": "3:41 4 May 2016",
-      "shipmentDateISO": "2016-05-04 03:41",
+      "shipmentDate": "22:06 12 May 2016",
+      "shipmentDateISO": "2016-05-12 22:06",
       "palletId": "palettid",
       "assetNum": "10515",
       "assetType": "SeaContainer",
       "shippedFrom": "Loc-3",
       "shippedTo": "Loc-4",
-      "estArrivalDate": null,
+      "estArrivalDate": "22:08 12 May 2016",
+      "estArrivalDateISO": "2016-05-12 22:08",
       "actualArrivalDate": null,
       "actualArrivalDateISO": null,
-      "percentageComplete": 0,
-      "alertProfileId": 382,
+      "percentageComplete": 100,
+      "alertProfileId": 2183,
       "alertProfileName": "AnyAlert",
-      "alertSummary": {},
+      "alertSummary": {
+        "MovementStart": "4",
+        "LightOff": "1",
+        "Cold": "1",
+        "CriticalCold": "3",
+        "LightOn": "1",
+        "CriticalHot": "1",
+        "Battery": "2",
+        "Hot": "2"
+      },
       "siblingCount": 0,
-      "lastReadingTime": "17:28 15 May 2016",
-      "lastReadingTimeISO": "2016-05-15 17:28",
+      "lastReadingTime": "11:53 24 May 2016",
+      "lastReadingTimeISO": "2016-05-24 11:53",
       "lastReadingTemperature": 56.0,
       "lastReadingBattery": 1234,
       "lastReadingLat": 50.5,
       "lastReadingLong": 51.51,
       "firstReadingLat": 50.5,
       "firstReadingLong": 51.51,
-      "firstReadingTime": "17:28 15 May 2016",
-      "firstReadingTimeISO": "2016-05-15 17:28",
+      "firstReadingTime": "11:53 24 May 2016",
+      "firstReadingTimeISO": "2016-05-24 11:53",
       "keyLocations": [
         {
           "key": "firstReading",
           "lat": 50.5,
-          "lon": 51.51
+          "lon": 51.51,
+          "desc": null,
+          "time": "11:53 24 May 2016"
         },
         {
           "key": "shippedFrom",
           "lat": 100.5,
-          "lon": 100.501
+          "lon": 100.501,
+          "desc": "Loc-3",
+          "time": "11:53 24 May 2016"
         },
         {
           "key": "shippedTo",
           "lat": 100.5,
-          "lon": 100.501
+          "lon": 100.501,
+          "desc": "Loc-4",
+          "time": "11:53 24 May 2016"
         },
         {
           "key": "lastReading",
           "lat": 50.5,
-          "lon": 51.51
+          "lon": 51.51,
+          "desc": null,
+          "time": "11:53 24 May 2016"
         }
       ],
       "shippedFromLat": 100.5,
@@ -1895,206 +1914,39 @@ Response:
       "deviceSN": "039485",
       "deviceName": "Device Name",
       "tripCount": 1,
-      "shipmentId": 697,
+      "shipmentId": 4342,
       "shipmentDescription": "Any Description",
-      "shipmentDate": "3:41 4 May 2016",
-      "shipmentDateISO": "2016-05-04 03:41",
+      "shipmentDate": "22:07 12 May 2016",
+      "shipmentDateISO": "2016-05-12 22:07",
       "palletId": "palettid",
       "assetNum": "10515",
       "assetType": "SeaContainer",
       "shippedFrom": "Loc-7",
       "shippedTo": "Loc-8",
       "estArrivalDate": null,
-      "actualArrivalDate": "17:11 15 May 2016",
-      "actualArrivalDateISO": "2016-05-15 17:11",
+      "estArrivalDateISO": null,
+      "actualArrivalDate": "11:37 24 May 2016",
+      "actualArrivalDateISO": "2016-05-24 11:37",
       "percentageComplete": 100,
-      "alertProfileId": 383,
+      "alertProfileId": 2184,
       "alertProfileName": "AnyAlert",
       "alertSummary": {},
       "siblingCount": 0,
-      "lastReadingTime": "4:27 4 May 2016",
-      "lastReadingTimeISO": "2016-05-04 04:27",
-      "lastReadingTemperature": 56.0,
-      "lastReadingBattery": 1234,
-      "lastReadingLat": 5.199999999999997,
-      "lastReadingLong": 5.199999999999997,
-      "firstReadingLat": 3.0,
-      "firstReadingLong": 3.0,
-      "firstReadingTime": "3:43 4 May 2016",
-      "firstReadingTimeISO": "2016-05-04 03:43",
-      "interimStop1": "Unexpected stop",
-      "interimStop1Time": "4:05 4 May 2016",
-      "interimStop1TimeISO": "2016-05-04 04:05",
-      "keyLocations": [
-        {
-          "key": "firstReading",
-          "lat": 3.0,
-          "lon": 3.0,
-          "desc": null,
-          "time": "23:28 8 May 2016"
-        },
-        {
-          "key": "shippedFrom",
-          "lat": 3.0,
-          "lon": 3.0,
-          "desc": "Loc-7",
-          "time": "23:28 8 May 2016"
-        },
-        {
-          "key": "reading",
-          "lat": 3.2,
-          "lon": 3.2,
-          "desc": null,
-          "time": "23:32 8 May 2016"
-        },
-        {
-          "key": "reading",
-          "lat": 3.4000000000000004,
-          "lon": 3.4000000000000004,
-          "desc": null,
-          "time": "23:36 8 May 2016"
-        },
-        {
-          "key": "reading",
-          "lat": 3.7000000000000006,
-          "lon": 3.7000000000000006,
-          "desc": null,
-          "time": "23:42 8 May 2016"
-        },
-        {
-          "key": "interimStop",
-          "lat": 4.1000000000000005,
-          "lon": 4.1000000000000005,
-          "desc": "Unexpected stop",
-          "time": "23:50 8 May 2016"
-        },
-        {
-          "key": "reading",
-          "lat": 3.900000000000001,
-          "lon": 3.900000000000001,
-          "desc": null,
-          "time": "23:46 8 May 2016"
-        },
-        {
-          "key": "HotAlert",
-          "lat": 4.1000000000000005,
-          "lon": 4.1000000000000005,
-          "desc": "Hot Alert for Tracker 39485(1)\nAbove 0.0°C for more than 0 mins\n56.0°C  |  23:50 08 May 2016",
-          "time": "23:50 8 May 2016"
-        },
-        {
-          "key": "reading",
-          "lat": 4.1000000000000005,
-          "lon": 4.1000000000000005,
-          "desc": null,
-          "time": "23:50 8 May 2016"
-        },
-        {
-          "key": "reading",
-          "lat": 4.3,
-          "lon": 4.3,
-          "desc": null,
-          "time": "23:54 8 May 2016"
-        },
-        {
-          "key": "reading",
-          "lat": 4.499999999999999,
-          "lon": 4.499999999999999,
-          "desc": null,
-          "time": "23:58 8 May 2016"
-        },
-        {
-          "key": "reading",
-          "lat": 4.799999999999998,
-          "lon": 4.799999999999998,
-          "desc": null,
-          "time": "0:04 9 May 2016"
-        },
-        {
-          "key": "shippedTo",
-          "lat": 5.0,
-          "lon": 5.0,
-          "desc": "Loc-8",
-          "time": "0:08 9 May 2016"
-        },
-        {
-          "key": "reading",
-          "lat": 4.999999999999997,
-          "lon": 4.999999999999997,
-          "desc": null,
-          "time": "0:08 9 May 2016"
-        },
-        {
-          "key": "lastReading",
-          "lat": 5.199999999999997,
-          "lon": 5.199999999999997,
-          "desc": null,
-          "time": "0:12 9 May 2016"
-        }
-      ],
-      "shippedFromLat": 3.0,
-      "shippedFromLong": 3.0,
-      "shippedToLat": 5.0,
-      "shippedToLong": 5.0
-    }
-  ],
-  "totalCount": 2
-}
-```
-**Response:**  
-```json
-{
-  "status": {
-    "code": 0,
-    "message": "Success"
-  },
-  "response": [
-    {
-      "status": "InProgress",
-      "deviceSN": "039485",
-      "deviceName": "Device Name",
-      "tripCount": 1,
-      "shipmentId": 390,
-      "shipmentDescription": "Any Description",
-      "shipmentDate": "2015-11-12T22:24",
-      "palletId": "palettid",
-      "assetNum": "10515",
-      "assetType": "SeaContainer",
-      "shippedFrom": "Bankstown Warehouse",
-      "shippedTo": "Bankstown Warehouse",
-      "estArrivalDate": "2015-11-12T22:24",
-      "percentageComplete": 0,
-      "alertProfileId": 293,
-      "alertProfileName": "AnyAlert",
-      "alertSummary": {
-        "MovementStart": "4",
-        "LightOn": "1",
-        "LightOff": "1",
-        "CriticalHot": "1",
-        "Hot": "2",
-        "CriticalCold": "3",
-        "Battery": "2",
-        "Cold": "1"
-      }
-    },
-    {
-      "status": "InProgress",
-      "deviceSN": "039485",
-      "deviceName": "Device Name",
-      "tripCount": 1,
-      "shipmentId": 391,
-      "shipmentDescription": "Any Description",
-      "shipmentDate": "2015-11-12T22:24",
-      "palletId": "palettid",
-      "assetNum": "10515",
-      "assetType": "SeaContainer",
-      "shippedFrom": "Bankstown Warehouse",
-      "shippedTo": "Bankstown Warehouse",
-      "estArrivalDate": "2015-11-12T22:24",
-      "percentageComplete": 0,
-      "alertProfileId": 294,
-      "alertProfileName": "AnyAlert",
-      "alertSummary": {}
+      "lastReadingTime": null,
+      "lastReadingTimeISO": null,
+      "lastReadingTemperature": null,
+      "lastReadingBattery": null,
+      "lastReadingLat": null,
+      "lastReadingLong": null,
+      "firstReadingLat": null,
+      "firstReadingLong": null,
+      "firstReadingTime": null,
+      "firstReadingTimeISO": null,
+      "keyLocations": null,
+      "shippedFromLat": 100.5,
+      "shippedFromLong": 100.501,
+      "shippedToLat": 100.5,
+      "shippedToLong": 100.501
     }
   ],
   "totalCount": 2

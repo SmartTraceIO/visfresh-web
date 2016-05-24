@@ -65,6 +65,7 @@ import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.rules.AbstractRuleEngine;
+import com.visfresh.rules.EtaCalculationRule;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
@@ -303,6 +304,12 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testGetShipments() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
         s.getShippedTo().setAddress("Coles Perth DC");
+        final Date eta = context.getBean(EtaCalculationRule.class).estimateArrivalDate(s,
+                s.getShippedFrom().getLocation(),
+                s.getShipmentDate(),
+                new Date(s.getShipmentDate().getTime() + 100000l));
+        s.setEta(eta);
+
         final Shipment s2 = createShipment(true);
         s2.getShippedTo().setAddress("Coles Perth DC");
         s2.setStatus(ShipmentStatus.Arrived);
@@ -1331,7 +1338,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         final List<KeyLocation> list = new LinkedList<>();
         for (final KeyLocation kl : locs) {
-            String key = kl.getKey();
+            final String key = kl.getKey();
             if (key != null && key.startsWith(type.name())) {
                 list.add(kl);
             }
