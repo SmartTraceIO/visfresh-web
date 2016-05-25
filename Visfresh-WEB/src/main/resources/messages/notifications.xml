@@ -40,7 +40,7 @@
 
 	<!-- Cold -->
 	<entry key="Email.Cold">
-		Cold Alert for Tracker ${devicesn}(${tripCount}) 
+		Cold Alert for Shipment ${devicesn}(${tripCount}) 
 		Alert Rule: Below ${ruletemperature} continuously for more than ${ruleperiod}min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
@@ -51,7 +51,7 @@
 	</entry>
 	<!-- Hot -->
 	<entry key="Email.Hot">
-		Hot Alert for Tracker ${devicesn}(${tripCount})
+		Hot Alert for Shipment ${devicesn}(${tripCount})
 		Alert Rule: Above ${ruletemperature} continuously for more than ${ruleperiod}min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
@@ -62,7 +62,7 @@
 	</entry>
 	<!-- CriticalCold -->
 	<entry key="Email.CriticalCold">
-		Critical Cold Alert for Tracker ${devicesn}(${tripCount})
+		Critical Cold Alert for Shipment ${devicesn}(${tripCount})
 		Alert Rule: Below ${ruletemperature} continuously for more than ${ruleperiod}min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
@@ -73,7 +73,7 @@
 	</entry>
 	<!-- CriticalHot -->
 	<entry key="Email.CriticalHot">
-		Critical Hot Alert for Tracker ${devicesn}(${tripCount})
+		Critical Hot Alert for Shipment ${devicesn}(${tripCount})
 		Alert Rule: Above ${ruletemperature} continuously for more than ${ruleperiod}min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
@@ -84,7 +84,7 @@
 	</entry>
 	<!-- Cold cumulative-->
 	<entry key="Email.Cold.cumulative">
-		Cold Alert for Tracker ${devicesn}(${tripCount})
+		Cold Alert for Shipment ${devicesn}(${tripCount})
 		Alert Rule: Below ${ruletemperature} for more than ${ruleperiod} total min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
@@ -95,7 +95,7 @@
 	</entry>
 	<!-- Hot cumulative -->
 	<entry key="Email.Hot.cumulative">
-		Hot Alert for Tracker ${devicesn}(${tripCount})
+		Hot Alert for Shipment ${devicesn}(${tripCount})
 		Alert Rule: Above ${ruletemperature} for more than ${ruleperiod} total min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
@@ -106,7 +106,7 @@
 	</entry>
 	<!-- CriticalCold cumulative -->
 	<entry key="Email.CriticalCold.cumulative">
-		Critical Cold Alert for Tracker ${devicesn}(${tripCount})
+		Critical Cold Alert for Shipment ${devicesn}(${tripCount})
 		Alert Rule: Below ${ruletemperature} for more than ${ruleperiod} total min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
@@ -117,7 +117,7 @@
 	</entry>
 	<!-- CriticalHot cumulative -->
 	<entry key="Email.CriticalHot.cumulative">
-		Critical Hot Alert for Tracker ${devicesn}(${tripCount})
+		Critical Hot Alert for Shipment ${devicesn}(${tripCount})
 		Alert Rule: Above ${ruletemperature} for more than ${ruleperiod} total min
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
@@ -129,7 +129,7 @@
 
 	<!-- Battery Email -->
 	<entry key="Email.Battery">
-		Low Battery Alert for Tracker ${devicesn}(${tripCount}) 
+		Low Battery Alert for Shipment ${devicesn}(${tripCount}) 
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
 		Shipped From: ${shippedFrom}
@@ -140,7 +140,7 @@
 
 	<!-- Arrival Email -->
 	<entry key="Email.Arrival">
-		Arrival Alert for Tracker ${devicesn}(${tripCount}) 
+		Arrival Alert for Shipment ${devicesn}(${tripCount}) 
 		Time of Alert: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
 		Shipped From: ${shippedFrom}
@@ -153,128 +153,128 @@
 
 	<!-- Cold -->
 	<entry key="Email.Subject.Cold">
-		Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod}min
+		Cold Alert for Shipment ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod}min
 	</entry>
 	<!-- Hot -->
 	<entry key="Email.Subject.Hot">
-		Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod}min
+		Hot Alert for Shipment ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod}min
 	</entry>
 	<!-- CriticalCold -->
 	<entry key="Email.Subject.CriticalCold">
-		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod}min
+		Critical Cold Alert for Shipment ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod}min
 	</entry>
 	<!-- CriticalHot -->
 	<entry key="Email.Subject.CriticalHot">
-		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod}min
+		Critical Hot Alert for Shipment ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod}min
 	</entry>
 	<!-- Cold Cumulative -->
 	<entry key="Email.Subject.Cold.cumulative">
-		Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod} total min 
+		Cold Alert for Shipment ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod} total min 
 	</entry>
 	<!-- Hot Cumulative -->
 	<entry key="Email.Subject.Hot.cumulative">
-		Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod} total min 
+		Hot Alert for Shipment ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod} total min 
 	</entry>
 	<!-- CriticalCold Cumulative -->
 	<entry key="Email.Subject.CriticalCold.cumulative">
-		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod} total min
+		Critical Cold Alert for Shipment ${devicesn}(${tripCount}) - Below ${ruletemperature} for ${ruleperiod} total min
 	</entry>
 	<!-- CriticalHot Cumulative -->
 	<entry key="Email.Subject.CriticalHot.cumulative">
-		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod} total min 
+		Critical Hot Alert for Shipment ${devicesn}(${tripCount}) - Above ${ruletemperature} for ${ruleperiod} total min 
 	</entry>	
 
 	<!-- Battery -->
 	<entry key="Email.Subject.Battery">
-		Low Battery Alert for Tracker ${devicesn}(${tripCount}) 		
+		Low Battery Alert for Shipment ${devicesn}(${tripCount}) 		
 	</entry>
 	<!-- Arrival -->
 	<entry key="Email.Subject.Arrival">
-		Arrival Notification for Tracker ${devicesn}(${tripCount}) 		
+		Arrival Notification for Shipment ${devicesn}(${tripCount}) 		
 	</entry>
 	
 	<!-- *********************************************************** SMS notifications *************************************************** -->
 	<!-- Cold -->
-	<entry key="SMS.Cold">Cold Alert. Tracker ${devicesn}(${tripCount}) below ${ruletemperature} for ${ruleperiod}min</entry>
+	<entry key="SMS.Cold">Cold Alert. Shipment ${devicesn}(${tripCount}) below ${ruletemperature} for ${ruleperiod}min</entry>
 	<!-- Hot -->
-	<entry key="SMS.Hot">Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min</entry>
+	<entry key="SMS.Hot">Hot Alert. Shipment ${devicesn}(${tripCount}) above ${temperature} for ${period}min</entry>
 	<!-- CriticalCold -->
-	<entry key="SMS.CriticalCold">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) below ${temperature} for ${period}min</entry>
+	<entry key="SMS.CriticalCold">Critical Cold Alert. Shipment ${devicesn}(${tripCount}) below ${temperature} for ${period}min</entry>
 	<!-- CriticalHot -->
-	<entry key="SMS.CriticalHot">Critical Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min</entry>
+	<entry key="SMS.CriticalHot">Critical Hot Alert. Shipment ${devicesn}(${tripCount}) above ${temperature} for ${period}min</entry>
 	<!-- Cold Cumulative -->
-	<entry key="SMS.Cold.cumulative">Cold Alert. Tracker ${devicesn}(${tripCount}) below ${temperature} for ${period}min in total</entry>
+	<entry key="SMS.Cold.cumulative">Cold Alert. Shipment ${devicesn}(${tripCount}) below ${temperature} for ${period}min in total</entry>
 	<!-- Hot Cumulative-->
-	<entry key="SMS.Hot.cumulative">Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min in total</entry>
+	<entry key="SMS.Hot.cumulative">Hot Alert. Shipment ${devicesn}(${tripCount}) above ${temperature} for ${period}min in total</entry>
 	<!-- CriticalCold Cumulative -->
-	<entry key="SMS.CriticalCold.cumulative">Critical Cold Alert. Tracker ${devicesn}(${tripCount}) below ${temperature} for ${period}min in total</entry>
+	<entry key="SMS.CriticalCold.cumulative">Critical Cold Alert. Shipment ${devicesn}(${tripCount}) below ${temperature} for ${period}min in total</entry>
 	<!-- CriticalHot Cumulative -->
-	<entry key="SMS.CriticalHot.cumulative">Critical Hot Alert. Tracker ${devicesn}(${tripCount}) above ${temperature} for ${period}min in total</entry>
+	<entry key="SMS.CriticalHot.cumulative">Critical Hot Alert. Shipment ${devicesn}(${tripCount}) above ${temperature} for ${period}min in total</entry>
 
 	<!-- Battery -->
-	<entry key="SMS.Battery">Low Battery Alert for Tracker ${devicesn}(${tripCount})</entry>
+	<entry key="SMS.Battery">Low Battery Alert for Shipment ${devicesn}(${tripCount})</entry>
 	<!-- Arrival -->
-	<entry key="SMS.Arrival">Arrival Alert for Tracker ${devicesn}(${tripCount})</entry>
+	<entry key="SMS.Arrival">Arrival Alert for Shipment ${devicesn}(${tripCount})</entry>
 
 	<!-- ***************************************************** App notifications *********************************************************** -->
 	<entry key="LinkToShipment">https://smarttrace.com.au/webapp/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}</entry>
 	<!-- Cold -->
 	<entry key="App.Cold">
-		Cold Alert for Tracker ${devicesn}(${tripCount})
+		Cold Alert for Shipment ${devicesn}(${tripCount})
 		Below ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- Hot -->	
 	<entry key="App.Hot">
-		Hot Alert for Tracker ${devicesn}(${tripCount})
+		Hot Alert for Shipment ${devicesn}(${tripCount})
 		Above ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- CriticalCold -->
 	<entry key="App.CriticalCold">
-		Critical Cold Alert for Tracker ${devicesn}(${tripCount})
+		Critical Cold Alert for Shipment ${devicesn}(${tripCount})
 		Below ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- CriticalHot -->
 	<entry key="App.CriticalHot">
-		Critical Hot Alert for Tracker ${devicesn}(${tripCount})
+		Critical Hot Alert for Shipment ${devicesn}(${tripCount})
 		Above ${ruletemperature} for more than ${ruleperiod}min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- Cold Cumulative -->
 	<entry key="App.Cold.cumulative">
-		Cold Alert for Tracker ${devicesn}(${tripCount})
+		Cold Alert for Shipment ${devicesn}(${tripCount})
 		Below ${ruletemperature} for more than ${ruleperiod} total min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- Hot Cumulative -->
 	<entry key="App.Hot.cumulative">
-		Hot Alert for Tracker ${devicesn}(${tripCount})
+		Hot Alert for Shipment ${devicesn}(${tripCount})
 		Above ${ruletemperature} for more than ${ruleperiod} total min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- CriticalCold Cumulative -->
 	<entry key="App.CriticalCold.cumulative">
-		Critical Cold Alert for Tracker ${devicesn}(${tripCount})
+		Critical Cold Alert for Shipment ${devicesn}(${tripCount})
 		Below ${ruletemperature} for more than ${ruleperiod} total min
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- CriticalHot Cumulative -->
 	<entry key="App.CriticalHot.cumulative">
-		Critical Hot Alert for Tracker ${devicesn}(${tripCount})
+		Critical Hot Alert for Shipment ${devicesn}(${tripCount})
 		Above ${ruletemperature} for more than ${ruleperiod} total min
 		Description: ${shipmentDescription}
 	</entry>
 
 	<!-- Battery -->
 	<entry key="App.Battery">
-		Low Battery Alert for Tracker ${devicesn}(${tripCount})
+		Low Battery Alert for Shipment ${devicesn}(${tripCount})
 		Description: ${shipmentDescription}
 	</entry>
 	<!-- Arrival -->
 	<entry key="App.Arrival">
-		Arrival Alert for Tracker ${devicesn}(${tripCount})
+		Arrival Alert for Shipment ${devicesn}(${tripCount})
 		Description: ${shipmentDescription}	
 	</entry>
 	<!-- MovementStart -->
@@ -288,21 +288,21 @@
 	
 	<!-- Light On -->
 	<entry key="Email.Subject.LightOn">Light Alert</entry>
-	<entry key="Email.LightOn">Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
+	<entry key="Email.LightOn">Shipment ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
 
 	<entry key="SMS.Subject.LightOn">Light Alert</entry>
-	<entry key="SMS.LightOn">Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
+	<entry key="SMS.LightOn">Shipment ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
 
 	<entry key="App.Subject.LightOn">Light Alert</entry>
-	<entry key="App.LightOn">Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
+	<entry key="App.LightOn">Shipment ${devicesn}(${tripCount}) entered bright environment at ${time}</entry>
 
 	<!-- Light off -->	
 	<entry key="Email.Subject.LightOff">Light Off Alert</entry>
-	<entry key="Email.LightOff">Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
+	<entry key="Email.LightOff">Shipment ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
 	
 	<entry key="SMS.Subject.LightOff">Light Off Alert</entry>
-	<entry key="SMS.LightOff">Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
+	<entry key="SMS.LightOff">Shipment ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
 	
 	<entry key="App.Subject.LightOff">Light Off Alert</entry>
-	<entry key="App.LightOff">Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
+	<entry key="App.LightOff">Shipment ${devicesn}(${tripCount}) entered dark environment at ${time}</entry>
 </properties>

@@ -28,56 +28,56 @@
 
 	<!-- //////////////////////////////////////////// Cold  //////////////////////////////////////////////////////////////////-->
 	<entry key="Cold">
-		Cold Alert for Tracker ${devicesn}(${tripCount}) 
+		Cold Alert for Shipment ${devicesn}(${tripCount}) 
 		Below ${ruletemperature} for more than ${ruleperiod} mins 
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- CriticalCold chart -->
 	<entry key="CriticalCold">
-		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) 
+		Critical Cold Alert for Shipment ${devicesn}(${tripCount}) 
 		Below ${ruletemperature} for more than ${ruleperiod} mins 
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- Cold Cumulative chart -->
 	<entry key="Cold.cumulative">
-		Cold Alert for Tracker ${devicesn}(${tripCount}) 
+		Cold Alert for Shipment ${devicesn}(${tripCount}) 
 		Below ${ruletemperature} for more than ${ruleperiod} continuous mins  
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- CriticalCold Cumulative chart -->
 	<entry key="CriticalCold.cumulative">
-		Critical Cold Alert for Tracker ${devicesn}(${tripCount}) 
+		Critical Cold Alert for Shipment ${devicesn}(${tripCount}) 
 		Below ${ruletemperature} for more than ${ruleperiod} continuous mins  
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- //////////////////////////////////////////// Hot  //////////////////////////////////////////////////////////////////-->
 	<entry key="Hot">
-		Hot Alert for Tracker ${devicesn}(${tripCount}) 
+		Hot Alert for Shipment ${devicesn}(${tripCount}) 
 		Above ${ruletemperature} for more than ${ruleperiod} mins 
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- CriticalHot chart -->
 	<entry key="CriticalHot">
-		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) 
+		Critical Hot Alert for Shipment ${devicesn}(${tripCount}) 
 		Above ${ruletemperature} for more than ${ruleperiod} mins 
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- Hot Cumulative chart -->
 	<entry key="Hot.cumulative">
-		Hot Alert for Tracker ${devicesn}(${tripCount}) 
+		Hot Alert for Shipment ${devicesn}(${tripCount}) 
 		Above ${ruletemperature} for more than ${ruleperiod} continuous mins  
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- CriticalHot Cumulative chart -->
 	<entry key="CriticalHot.cumulative">
-		Critical Hot Alert for Tracker ${devicesn}(${tripCount}) 
+		Critical Hot Alert for Shipment ${devicesn}(${tripCount}) 
 		Above ${ruletemperature} for more than ${ruleperiod} continuous mins  
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
@@ -88,31 +88,31 @@
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 	<entry key="LightOn">
-		Tracker ${devicesn}(${tripCount}) entered bright environment at ${time}
+		Shipment ${devicesn}(${tripCount}) entered bright environment at ${time}
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 	<entry key="LightOff">
-		Tracker ${devicesn}(${tripCount}) entered dark environment at ${time}
+		Shipment ${devicesn}(${tripCount}) entered dark environment at ${time}
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- //////////////////////////////////////////// Arrival  //////////////////////////////////////////////////////////////////-->
 	<!-- Arrival -->
 	<entry key="Arrival">
-		Arrival Alert for Tracker ${devicesn}(${tripCount}) 
+		Arrival Alert for Shipment ${devicesn}(${tripCount}) 
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 
 	<!-- //////////////////////////////////////////// Battery  //////////////////////////////////////////////////////////////////-->
 	<!-- Battery -->
 	<entry key="Battery">
-		Low Battery Alert for Tracker ${devicesn}(${tripCount}) 
+		Low Battery Alert for Shipment ${devicesn}(${tripCount}) 
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 	
 	<!-- Last reading -->
 	<entry key="TrackerEvent">
-		Last reading for Tracker #${devicesn}(${tripCount})
+		Last reading for Shipment #${devicesn}(${tripCount})
 		${readingTemperature}  |  ${readingTime} ${readingDate}
 	</entry>
 </properties>
