@@ -163,13 +163,6 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         sb.append(" where " + idField + " =:").append(idField);
         return sb.toString();
     }
-
-    /**
-     * @return
-     */
-    protected String buildSelectBlockForFindAll() {
-        return "select * from " + getTableName();
-    }
     /**
      * @param sorts
      * @param params
@@ -274,12 +267,19 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         }
 
         final List<Map<String, Object>> list = jdbc.queryForList(
-                "select count(*) as count from "
-                + getTableName()
+                buildSelectBlockForEntityCount()
                 + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")),
                 params);
         return ((Number) list.get(0).get("count")).intValue();
     }
+
+    /**
+     * @return
+     */
+    protected String buildSelectBlockForEntityCount() {
+        return "select count(*) as count from " + getTableName();
+    }
+
     /**
      * @return
      */
@@ -309,7 +309,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
             addSortsForFindAll(sorts, params, sorting);
         }
 
-        String sql = selectAll + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")) + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ",")) + (page == null ? "" : " limit "
+        final String sql = selectAll + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")) + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ",")) + (page == null ? "" : " limit "
                 + ((page.getPageNumber() - 1) * page.getPageSize())
                 + "," + page.getPageSize());
         final List<Map<String, Object>> list = jdbc.queryForList(
@@ -324,6 +324,12 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
             result.add(t);
         }
         return result;
+    }
+    /**
+     * @return
+     */
+    protected String buildSelectBlockForFindAll() {
+        return "select * from " + getTableName();
     }
 
     /**

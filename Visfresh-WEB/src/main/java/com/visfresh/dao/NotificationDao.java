@@ -18,12 +18,13 @@ public interface NotificationDao extends
 
     /**
      * @param user user
+     * @param excludeLight TODO
      * @param sorting sorting.
      * @param filter filtering
      * @param page page.
      * @return
      */
-    List<Notification> findForUser(User user, Sorting sorting, Filter filter, Page page);
+    List<Notification> findForUser(User user, boolean excludeLight, Sorting sorting, Filter filter, Page page);
     /**
      * @param user the user.
      * @param ids notification IDs.
@@ -31,9 +32,10 @@ public interface NotificationDao extends
     void markAsReadenByUserAndId(User user, Set<Long> ids);
     /**
      * @param user user.
+     * @param excludeLight TODO
      * @param filter filter.
      * @return count of user satisfying given filter.
      */
-    int getEntityCount(User user, Filter filter);
+    int getEntityCount(User user, boolean excludeLight, Filter filter);
 
 }

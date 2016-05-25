@@ -16,6 +16,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.constants.NotificationConstants;
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Notification;
@@ -122,10 +124,61 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         final Notification n2 = createNotification(u);
         dao.save(n2);
 
-        final List<Notification> list = dao.findForUser(u, null, null, null);
-        assertEquals(1, list.size());
+        //crete light on alert
+        final Notification n3 = new Notification();
+        n3.setType(NotificationType.Alert);
+        n3.setIssue(arrival);
+        n3.setUser(u);
+
+        final Alert lightOn = new Alert();
+        lightOn.setType(AlertType.LightOn);
+        lightOn.setDevice(arrival.getDevice());
+        lightOn.setShipment(arrival.getShipment());
+        context.getBean(AlertDao.class).save(lightOn);
+        n3.setIssue(lightOn);
+        dao.save(n3);
+
+        //check result
+        final List<Notification> list = dao.findForUser(u, false, null, null, null);
+        assertEquals(2, list.size());
         assertEquals(n2.getId(), list.get(0).getId());
+
+        assertEquals(1, dao.findForUser(u, true, null, null, null).size());
     }
+    @Test
+    public void testFindForUserEntityCount() {
+        User u = new User();
+        u.setCompany(sharedCompany);
+        u.setEmail("mkutuzov@google.com");
+        u.setFirstName("Michael");
+        u.setLastName("Kutuzov");
+        u.setPassword("alskdj");
+        u = userDao.save(u);
+
+        final Notification n1 = createNotification(user);
+        dao.save(n1);
+        final Notification n2 = createNotification(u);
+        dao.save(n2);
+
+        //crete light on alert
+        final Notification n3 = new Notification();
+        n3.setType(NotificationType.Alert);
+        n3.setIssue(arrival);
+        n3.setUser(u);
+
+        final Alert lightOn = new Alert();
+        lightOn.setType(AlertType.LightOn);
+        lightOn.setDevice(arrival.getDevice());
+        lightOn.setShipment(arrival.getShipment());
+        context.getBean(AlertDao.class).save(lightOn);
+        n3.setIssue(lightOn);
+        dao.save(n3);
+
+        //check result
+        assertEquals(2, dao.getEntityCount(u, false, null));
+        assertEquals(1, dao.getEntityCount(u, true, null));
+    }
+
     @Test
     public void testMarkAsReadenByUserAndId() {
         User u = new User();
@@ -158,7 +211,6 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         filter.addFilter(NotificationConstants.PROPERTY_CLOSED, Boolean.FALSE);
         assertEquals(2, dao.findAll(filter, null, null).size());
     }
-
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()
      */

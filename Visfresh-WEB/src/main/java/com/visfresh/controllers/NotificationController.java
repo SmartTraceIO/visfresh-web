@@ -97,17 +97,20 @@ public class NotificationController extends AbstractController implements Notifi
             }
 
             final List<Notification> ns = dao.findForUser(user,
+                    true,
                     new Sorting(false, getDefaultSortOrder()),
                     filter,
                     page);
+
             //create notification to location map
             final Map<Long, Location> locations = createLocationMap(ns);
             final Map<Long, TrackerEvent> events = getTrackerEvents(ns);
 
-            final int total = dao.getEntityCount(user, filter);
+            final int total = dao.getEntityCount(user, true, filter);
             final JsonArray array = new JsonArray();
             final DateFormat isoFormat = DateTimeUtils.createDateFormat(
                     "yyyy-MM-dd'T'HH:mm", user.getLanguage(), user.getTimeZone());
+
             for (final Notification t : ns) {
                 array.add(ser.toJson(createNotificationItem(t, user, locations.get(t.getId()),
                         isoFormat, events)));

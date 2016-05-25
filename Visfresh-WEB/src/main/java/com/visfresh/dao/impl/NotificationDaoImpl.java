@@ -22,6 +22,7 @@ import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.User;
@@ -88,10 +89,15 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * @see com.visfresh.dao.NotificationDao#findByShipment(java.lang.Long)
      */
     @Override
-    public List<Notification> findForUser(final User user, final Sorting sorting, final Filter filter, final Page page) {
-        final Filter f = new Filter(filter);
-        f.addFilter(USER_FIELD, user.getId());
-        return findAll(f, sorting, page);
+    public List<Notification> findForUser(final User user, final boolean excludeLight, final Sorting sorting, final Filter filter, final Page page) {
+        return findAll(createByUserFilter(user, excludeLight, filter), sorting, page);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.NotificationDao#getEntityCount(com.visfresh.entities.User, com.visfresh.dao.Filter)
+     */
+    @Override
+    public int getEntityCount(final User user, final boolean excludeLight, final Filter filter) {
+        return getEntityCount(createByUserFilter(user, excludeLight, filter));
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.NotificationDao#deleteByUserAndId(com.visfresh.entities.User, java.util.List)
@@ -118,6 +124,67 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         jdbc.update("update " + TABLE + " set "
                 + ISREAD_FIELD + " = true where user = :user and (" + idPart + ")", paramMap);
     }
+//    select notifications.*,
+//    alerts.type as alertType
+//    from notifications
+//    left outer join alerts on notifications.type='Alert' and alerts.id=notifications.issue
+//    where not alerts.type in ('LightOff' , 'LightOn')
+//   ;
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
+     */
+    @Override
+    protected String buildSelectBlockForFindAll() {
+        final String table = getTableName();
+        return "select "
+                + table
+                + ".*"
+                + " from " + table
+                + " left outer join alerts"
+                + " on " + table + "." + TYPE_FIELD + "='" + NotificationType.Alert.name() + "'"
+                + " and alerts.id=" + table + "." + ISSUE_FIELD;
+    }
+    /**
+     * @return
+     */
+    @Override
+    protected String buildSelectBlockForEntityCount() {
+        final String table = getTableName();
+        return "select count(*) as count"
+                + " from " + table
+                + " left outer join alerts"
+                + " on " + table + "." + TYPE_FIELD + "='" + NotificationType.Alert.name() + "'"
+                + " and alerts.id=" + table + "." + ISSUE_FIELD;
+    }
+    /**
+     * @param user
+     * @param excludeLight
+     * @param originFilter origin filter.
+     * @return
+     */
+    private Filter createByUserFilter(final User user, final boolean excludeLight, final Filter originFilter) {
+        final Filter f = new Filter(originFilter);
+        f.addFilter(USER_FIELD, user.getId());
+        if (excludeLight) {
+            f.addFilter("ExcludeLights", new SynteticFilter() {
+                @Override
+                public Object[] getValues() {
+                    return new Object[0];
+                }
+                @Override
+                public String[] getKeys() {
+                    return new String[0];
+                }
+                @Override
+                public String getFilter() {
+                    return "(alerts.type is NULL or not alerts.type in ('"
+                            + AlertType.LightOff + "', '" + AlertType.LightOn + "'))";
+                }
+            });
+        }
+        return f;
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
@@ -182,15 +249,6 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
     @Override
     protected Map<String, String> getPropertyToDbMap() {
         return propertyToDbMap;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.NotificationDao#getEntityCount(com.visfresh.entities.User, com.visfresh.dao.Filter)
-     */
-    @Override
-    public int getEntityCount(final User user, final Filter filter) {
-        final Filter f = new Filter(filter);
-        f.addFilter(USER_FIELD, user.getId());
-        return getEntityCount(f);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
