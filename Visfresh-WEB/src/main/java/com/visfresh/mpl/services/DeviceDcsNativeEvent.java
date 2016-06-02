@@ -13,7 +13,7 @@ import com.visfresh.entities.Location;
  */
 public class DeviceDcsNativeEvent {
     private String imei;
-    private final Location location = new Location();
+    private Location location;
     private String type;
     private Date date;
     private double temperature;
@@ -54,6 +54,19 @@ public class DeviceDcsNativeEvent {
      */
     public Location getLocation() {
         return location;
+    }
+    /**
+     * @param location the location to set
+     */
+    public void setLocation(final Location location) {
+        this.location = location;
+    }
+    /**
+     * @param lat latitude.
+     * @param lon longitude.
+     */
+    public void setLocation(final double lat, final double lon) {
+        setLocation(new Location(lat, lon));
     }
     /**
      * @return IMEI code.

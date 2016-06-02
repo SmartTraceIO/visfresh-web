@@ -393,8 +393,14 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         final KeyLocation loc = new KeyLocation();
         loc.setKey(asString(json.get("key")));
-        loc.setLatitude(asDouble(json.get("lat")));
-        loc.setLongitude(asDouble(json.get("lon")));
+        final JsonElement lat = json.get("lat");
+        if (lat != null && !lat.isJsonNull()) {
+            loc.setLatitude(asDouble(lat));
+        }
+        final JsonElement lon = json.get("lon");
+        if (lon != null && !lon.isJsonNull()) {
+            loc.setLongitude(asDouble(lon));
+        }
         loc.setDescription(asString(json.get("desc")));
         loc.setPrettyTime(asString(json.get("time")));
         return loc;

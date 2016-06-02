@@ -398,7 +398,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @param lastReadingLat the lastReadingLat to set
      */
-    public void setLastReadingLat(final double lastReadingLat) {
+    public void setLastReadingLat(final Double lastReadingLat) {
         this.lastReadingLat = lastReadingLat;
     }
     /**
@@ -410,7 +410,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @param lastReadingLong the lastReadingLong to set
      */
-    public void setLastReadingLong(final double lastReadingLong) {
+    public void setLastReadingLong(final Double lastReadingLong) {
         this.lastReadingLong = lastReadingLong;
     }
     /* (non-Javadoc)
@@ -429,7 +429,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @param shippedFromLat the shippedFromLat to set
      */
-    public void setShippedFromLat(final double shippedFromLat) {
+    public void setShippedFromLat(final Double shippedFromLat) {
         this.shippedFromLat = shippedFromLat;
     }
     /**
@@ -441,7 +441,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @param shippedFromLong the shippedFromLong to set
      */
-    public void setShippedFromLong(final double shippedFromLong) {
+    public void setShippedFromLong(final Double shippedFromLong) {
         this.shippedFromLong = shippedFromLong;
     }
     /**
@@ -453,7 +453,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @param shippedToLat the shippedToLat to set
      */
-    public void setShippedToLat(final double shippedToLat) {
+    public void setShippedToLat(final Double shippedToLat) {
         this.shippedToLat = shippedToLat;
     }
     /**
@@ -465,7 +465,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @param shippedToLong the shippedToLong to set
      */
-    public void setShippedToLong(final double shippedToLong) {
+    public void setShippedToLong(final Double shippedToLong) {
         this.shippedToLong = shippedToLong;
     }
     /**
@@ -477,7 +477,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @param firstReadingLat the firstReadingLat to set
      */
-    public void setFirstReadingLat(final double firstReadingLat) {
+    public void setFirstReadingLat(final Double firstReadingLat) {
         this.firstReadingLat = firstReadingLat;
     }
     /**
@@ -489,7 +489,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @param firstReadingLong the firstReadingLong to set
      */
-    public void setFirstReadingLong(final double firstReadingLong) {
+    public void setFirstReadingLong(final Double firstReadingLong) {
         this.firstReadingLong = firstReadingLong;
     }
     /**

@@ -1242,6 +1242,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         e.setDevice(shipment.getDevice());
         e.setTime(new Date());
         e.setTemperature(temperature);
+        e.setLatitude(0.);
+        e.setLongitude(0.);
         return context.getBean(TrackerEventDao.class).save(e);
     }
     /**

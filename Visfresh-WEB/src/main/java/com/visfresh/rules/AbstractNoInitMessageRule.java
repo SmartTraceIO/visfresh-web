@@ -63,8 +63,8 @@ public abstract class AbstractNoInitMessageRule implements TrackerEventRule {
      * @param time
      * @return
      */
-    protected final Shipment autoStartNewShipment(final Device device, final double latitude,
-            final double longitude, final Date time) {
+    protected final Shipment autoStartNewShipment(final Device device, final Double latitude,
+            final Double longitude, final Date time) {
         final Shipment s = autoStartShipmentByService(device, latitude, longitude, time);
         s.setShipmentDescription(DESCRIPTION_PREFIX + s.getShipmentDescription());
         saveShipment(s);
@@ -79,7 +79,7 @@ public abstract class AbstractNoInitMessageRule implements TrackerEventRule {
      * @return
      */
     protected Shipment autoStartShipmentByService(final Device device,
-            final double latitude, final double longitude, final Date time) {
+            final Double latitude, final Double longitude, final Date time) {
         return autoStartService.autoStartNewShipment(device, latitude, longitude, time);
     }
     /**

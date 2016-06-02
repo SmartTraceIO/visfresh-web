@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import com.visfresh.dao.SimulatorDao;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
@@ -76,8 +77,10 @@ public class SimulatorServiceImpl implements SimulatorService {
                 e.setBattery(te.getBattery());
                 e.setImei(dto.getTargetDevice());
                 e.setTemperature(te.getTemperature());
-                e.getLocation().setLatitude(te.getLatitude());
-                e.getLocation().setLongitude(te.getLongitude());
+                if (te.getLatitude() != null && te.getLongitude() != null) {
+                    final Location loc = new Location(te.getLatitude(), te.getLongitude());
+                    e.setLocation(loc);
+                }
                 e.setType(te.getType().name());
 
                 //calculate new date

@@ -104,6 +104,8 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         e.setTemperature(temperature);
         e.setTime(time);
         e.setType(TrackerEventType.INIT);
+        e.setLatitude(0.);
+        e.setLongitude(0.);
         return e;
     }
     /* (non-Javadoc)

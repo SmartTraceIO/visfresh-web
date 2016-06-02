@@ -128,9 +128,10 @@ public class AlternativeLocationsDaoImpl implements AlternativeLocationsDao {
         addLocations("to", locs.getTo(), values, params);
         addLocations("interim", locs.getInterim(), values, params);
 
-        sql.append(StringUtils.combine(values, ","));
-
-        jdbc.update(sql.toString(), params);
+        if (values.size() > 0) {
+            sql.append(StringUtils.combine(values, ","));
+            jdbc.update(sql.toString(), params);
+        }
     }
 
     /**

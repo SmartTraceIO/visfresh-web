@@ -41,8 +41,8 @@ public class TrackerEventDto {
      */
     private String deviceImei;
     private Long shipmentId;
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
 
     /**
      * Default constructor.
@@ -150,25 +150,25 @@ public class TrackerEventDto {
     /**
      * @return the latitude
      */
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
     /**
      * @param latitude the latitude to set
      */
-    public void setLatitude(final double latitude) {
+    public void setLatitude(final Double latitude) {
         this.latitude = latitude;
     }
     /**
      * @return the longitude
      */
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
     /**
      * @param longitude the longitude to set
      */
-    public void setLongitude(final double longitude) {
+    public void setLongitude(final Double longitude) {
         this.longitude = longitude;
     }
 }

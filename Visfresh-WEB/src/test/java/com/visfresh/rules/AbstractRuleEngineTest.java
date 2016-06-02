@@ -93,8 +93,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         //run
         final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
         e.setDate(new Date(System.currentTimeMillis() - 10000));
-        e.getLocation().setLatitude(11.12);
-        e.getLocation().setLongitude(13.14);
+        e.setLocation(11.12, 13.14);
         e.setType("AUT");
         e.setImei(device.getImei());
         processDcsEvent(e);
@@ -122,8 +121,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         //run
         final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
         e.setDate(new Date(System.currentTimeMillis() - 10000));
-        e.getLocation().setLatitude(11.12);
-        e.getLocation().setLongitude(13.14);
+        e.setLocation(11.12, 13.14);
         e.setType("AUT");
         e.setImei(device.getImei());
 
@@ -146,8 +144,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         //run
         final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
         e.setDate(new Date(System.currentTimeMillis() - 10000));
-        e.getLocation().setLatitude(11.12);
-        e.getLocation().setLongitude(13.14);
+        e.setLocation(11.12, 13.14);
         e.setType("AUT");
         e.setImei(device.getImei());
 
@@ -173,8 +170,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         //run
         final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
         e.setDate(new Date(System.currentTimeMillis() - 10000));
-        e.getLocation().setLatitude(11.12);
-        e.getLocation().setLongitude(13.14);
+        e.setLocation(11.12, 13.14);
         e.setType("AUT");
         e.setImei(device.getImei());
         e.getLocation().setLatitude(100.);

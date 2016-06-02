@@ -416,14 +416,16 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     final Double lon = s.getShippedFromLong();
 
                     final TrackerEventDto e = findNearestEvent(lat, lon, reverted);
-                    final KeyLocation loc = new KeyLocation();
-                    loc.setKey("shippedFrom");
-                    loc.setDescription(s.getShippedFrom());
-                    loc.setLatitude(lat);
-                    loc.setLongitude(lon);
-                    loc.setTime(e.getTime().getTime());
+                    if (e != null) {
+                        final KeyLocation loc = new KeyLocation();
+                        loc.setKey("shippedFrom");
+                        loc.setDescription(s.getShippedFrom());
+                        loc.setLatitude(lat);
+                        loc.setLongitude(lon);
+                        loc.setTime(e.getTime().getTime());
 
-                    insertKeyLocation(loc, keyLocs);
+                        insertKeyLocation(loc, keyLocs);
+                    }
                 }
 
                 //shipped to
@@ -432,14 +434,16 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     final Double lon = s.getShippedToLong();
 
                     final TrackerEventDto e = findNearestEvent(lat, lon, reverted);
-                    final KeyLocation loc = new KeyLocation();
-                    loc.setKey("shippedTo");
-                    loc.setDescription(s.getShippedTo());
-                    loc.setLatitude(lat);
-                    loc.setLongitude(lon);
-                    loc.setTime(e.getTime().getTime());
+                    if (e != null) {
+                        final KeyLocation loc = new KeyLocation();
+                        loc.setKey("shippedTo");
+                        loc.setDescription(s.getShippedTo());
+                        loc.setLatitude(lat);
+                        loc.setLongitude(lon);
+                        loc.setTime(e.getTime().getTime());
 
-                    insertKeyLocation(loc, keyLocs);
+                        insertKeyLocation(loc, keyLocs);
+                    }
                 }
 
                 //alerts
@@ -504,19 +508,25 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param reverted
      * @return
      */
-    private TrackerEventDto findNearestEvent(final double lat, final double lon,
+    private TrackerEventDto findNearestEvent(final Double lat, final Double lon,
             final List<TrackerEventDto> events) {
+        if (lat == null || lon == null) {
+            return null;
+        }
+
         double dl = Double.MAX_VALUE;
         TrackerEventDto e = null;
 
         for (final TrackerEventDto dto: events) {
-            final double dlat = lat - dto.getLatitude();
-            final double dlon = lon - dto.getLongitude();
+            if (dto.getLatitude() != null && dto.getLongitude() != null) {
+                final double dlat = lat - dto.getLatitude();
+                final double dlon = lon - dto.getLongitude();
 
-            final double dist = Math.sqrt(dlat * dlat + dlon * dlon);
-            if (dist < dl) {
-                e = dto;
-                dl = dist;
+                final double dist = Math.sqrt(dlat * dlat + dlon * dlon);
+                if (dist < dl) {
+                    e = dto;
+                    dl = dist;
+                }
             }
         }
         return e;

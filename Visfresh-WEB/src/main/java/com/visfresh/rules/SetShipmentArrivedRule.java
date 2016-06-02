@@ -67,8 +67,12 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
      * @param longitude longitude of device location.
      * @return
      */
-    public static boolean isNearEndLocation(final Shipment shipment, final double latitude,
-            final double longitude) {
+    public static boolean isNearEndLocation(final Shipment shipment, final Double latitude,
+            final Double longitude) {
+        if (latitude == null || longitude == null) {
+            return false;
+        }
+
         final LocationProfile endLocation = shipment.getShippedTo();
         if (endLocation != null) {
             final double distance = getNumberOfMetersForArrival(latitude, longitude, endLocation);

@@ -241,7 +241,7 @@ public class NoInitMessageAfterShutdownRuleTest extends
      */
     @Override
     protected Shipment autoStartShipmentByService(final Device device,
-            final double latitude, final double longitude, final Date time) {
+            final Double latitude, final Double longitude, final Date time) {
         return autoStartedShipment;
     }
     /* (non-Javadoc)

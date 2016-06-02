@@ -35,8 +35,8 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
      */
     private String device;
     private Long shipentId;
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
     private Date createdOn;
 
     /**
@@ -134,25 +134,25 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
     /**
      * @return the latitude
      */
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
     /**
      * @return the longitude
      */
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
     /**
      * @param latitude the latitude to set
      */
-    public void setLatitude(final double latitude) {
+    public void setLatitude(final Double latitude) {
         this.latitude = latitude;
     }
     /**
      * @param longitude the longitude to set
      */
-    public void setLongitude(final double longitude) {
+    public void setLongitude(final Double longitude) {
         this.longitude = longitude;
     }
 

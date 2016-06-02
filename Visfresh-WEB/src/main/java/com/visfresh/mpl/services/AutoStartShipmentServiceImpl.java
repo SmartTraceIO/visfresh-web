@@ -138,8 +138,8 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
     }
 
     @Override
-    public Shipment autoStartNewShipment(final Device device, final double latitude,
-            final double longitude, final Date shipmentDate) {
+    public Shipment autoStartNewShipment(final Device device, final Double latitude,
+            final Double longitude, final Date shipmentDate) {
         final ShipmentSessionManagerImpl mgr = new ShipmentSessionManagerImpl();
         try {
             return autoStartNewShipmentImpl(device, latitude, longitude, shipmentDate, mgr);
@@ -148,8 +148,8 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
         }
     }
 
-    private Shipment autoStartNewShipmentImpl(final Device device, final double latitude,
-            final double longitude, final Date shipmentDate, final ShipmentSessionManager mgr) {
+    private Shipment autoStartNewShipmentImpl(final Device device, final Double latitude,
+            final Double longitude, final Date shipmentDate, final ShipmentSessionManager mgr) {
 
         final Shipment last = shipmentDao.findLastShipment(device.getImei());
 
@@ -222,7 +222,7 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
      * @return shipment.
      */
     private ShipmentInit createForBestStartLocation(final List<AutoStartShipment> autoStarts,
-            final double latitude, final double longitude, final Device device) {
+            final Double latitude, final Double longitude, final Device device) {
         //if autostart is assigned to device
         final Long autostartId = device.getAutostartTemplateId();
         if (autostartId != null) {
@@ -319,8 +319,12 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
      * @return
      */
     private List<LocationProfile> getSortedMatchedLocations(final AutoStartShipment auto,
-            final double latitude,
-            final double longitude) {
+            final Double latitude,
+            final Double longitude) {
+        if (latitude == null || longitude == null) {
+            return new LinkedList<>();
+        }
+
         //get all available location profiles.
         final List<LocationProfile> profiles = new LinkedList<LocationProfile>();
         profiles.addAll(auto.getShippedFrom());

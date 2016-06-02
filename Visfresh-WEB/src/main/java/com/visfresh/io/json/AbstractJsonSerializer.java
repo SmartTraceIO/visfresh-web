@@ -164,6 +164,19 @@ public class AbstractJsonSerializer {
         return array;
     }
     /**
+     * @param els
+     * @return
+     */
+    public boolean isNull(final JsonElement... els) {
+        for (final JsonElement e : els) {
+            if (e == null || e.isJsonNull()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @return date format.
      */
     protected SimpleDateFormat createDateFormat() {

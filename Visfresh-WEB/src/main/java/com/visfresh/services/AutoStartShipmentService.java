@@ -20,6 +20,6 @@ public interface AutoStartShipmentService {
      * @param shipmentDate shipment date.
      * @return
      */
-    Shipment autoStartNewShipment(Device device, double latitude,
-            double longitude, Date shipmentDate);
+    Shipment autoStartNewShipment(Device device, Double latitude,
+            Double longitude, Date shipmentDate);
 }

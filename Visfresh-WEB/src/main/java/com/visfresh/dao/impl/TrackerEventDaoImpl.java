@@ -330,8 +330,14 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         e.setId(((Number) map.get(ID_FIELD)).longValue());
         e.setBattery(((Number) map.get(BATTERY_FIELD)).intValue());
         e.setTemperature(((Number) map.get(TEMPERATURE_FIELD)).doubleValue());
-        e.setLatitude(((Number) map.get(LATITUDE_FIELD)).doubleValue());
-        e.setLongitude(((Number) map.get(LONGITUDE_FIELD)).doubleValue());
+        final Number lat = (Number) map.get(LATITUDE_FIELD);
+        if (lat != null) {
+            e.setLatitude(lat.doubleValue());
+        }
+        final Number lon = (Number) map.get(LONGITUDE_FIELD);
+        if (lon != null) {
+            e.setLongitude(lon.doubleValue());
+        }
         e.setTime((Date) map.get(TIME_FIELD));
         e.setCreatedOn((Date) map.get(CREATED_ON_FIELD));
         e.setType(TrackerEventType.valueOf((String) map.get(TYPE_FIELD)));

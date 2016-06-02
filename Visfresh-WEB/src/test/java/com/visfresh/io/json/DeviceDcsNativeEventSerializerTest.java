@@ -10,6 +10,7 @@ import java.util.Date;
 import org.junit.Test;
 
 import com.google.gson.JsonElement;
+import com.visfresh.entities.Location;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 
 /**
@@ -40,8 +41,7 @@ public class DeviceDcsNativeEventSerializerTest extends AbstractSerializerTest {
         e.setBattery(battery);
         e.setDate(date);
         e.setImei(imei);
-        e.getLocation().setLatitude(lat);
-        e.getLocation().setLongitude(lon);
+        e.setLocation(new Location(lat, lon));
         e.setType(type);
 
         final JsonElement json = serializer.toJson(e);

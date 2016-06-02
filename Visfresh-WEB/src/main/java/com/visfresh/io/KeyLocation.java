@@ -9,8 +9,8 @@ package com.visfresh.io;
  */
 public class KeyLocation implements Comparable<KeyLocation> {
     private String key;
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
     private long time;
     private String description;
     private String prettyTime;
@@ -37,25 +37,25 @@ public class KeyLocation implements Comparable<KeyLocation> {
     /**
      * @return latitude.
      */
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
     /**
      * @param latitude the latitude to set
      */
-    public void setLatitude(final double latitude) {
+    public void setLatitude(final Double latitude) {
         this.latitude = latitude;
     }
     /**
      * @return longitude.
      */
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
     /**
      * @param longitude the longitude to set
      */
-    public void setLongitude(final double longitude) {
+    public void setLongitude(final Double longitude) {
         this.longitude = longitude;
     }
     /**

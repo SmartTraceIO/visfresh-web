@@ -40,8 +40,13 @@ public class DeviceDcsNativeEventSerializer extends AbstractJsonSerializer {
             e1.printStackTrace();
         }
         e.setType(asString(obj.get("type")));
-        e.getLocation().setLatitude(asDouble(obj.get(TrackerEventConstants.PROPERTY_LATITUDE)));
-        e.getLocation().setLongitude(asDouble(obj.get(TrackerEventConstants.PROPERTY_LONGITUDE)));
+
+        final JsonElement lat = obj.get(TrackerEventConstants.PROPERTY_LATITUDE);
+        final JsonElement lon = obj.get(TrackerEventConstants.PROPERTY_LONGITUDE);
+        if (!isNull(lat, lon)) {
+            e.setLocation(asDouble(lat), asDouble(lon));
+        }
+
         e.setImei(asString(obj.get("imei")));
 
         return e;
@@ -58,8 +63,13 @@ public class DeviceDcsNativeEventSerializer extends AbstractJsonSerializer {
         obj.addProperty(TrackerEventConstants.PROPERTY_TEMPERATURE, e.getTemperature());
         obj.addProperty("time", sdf.format(e.getTime()));
         obj.addProperty("type", e.getType());
-        obj.addProperty(TrackerEventConstants.PROPERTY_LATITUDE, e.getLocation().getLatitude());
-        obj.addProperty(TrackerEventConstants.PROPERTY_LONGITUDE, e.getLocation().getLongitude());
+        if (e.getLocation() != null) {
+            obj.addProperty(TrackerEventConstants.PROPERTY_LATITUDE, e.getLocation().getLatitude());
+            obj.addProperty(TrackerEventConstants.PROPERTY_LONGITUDE, e.getLocation().getLongitude());
+        } else {
+            obj.add(TrackerEventConstants.PROPERTY_LATITUDE, JsonNull.INSTANCE);
+            obj.add(TrackerEventConstants.PROPERTY_LONGITUDE, JsonNull.INSTANCE);
+        }
         obj.addProperty("imei", e.getImei());
         return obj;
     }

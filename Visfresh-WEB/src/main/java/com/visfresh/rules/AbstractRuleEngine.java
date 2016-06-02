@@ -127,8 +127,10 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     public void processDcsEvent(final DeviceDcsNativeEvent event) throws RetryableException {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(event.getBattery());
-        e.setLatitude(event.getLocation().getLatitude());
-        e.setLongitude(event.getLocation().getLongitude());
+        if (event.getLocation() != null) {
+            e.setLatitude(event.getLocation().getLatitude());
+            e.setLongitude(event.getLocation().getLongitude());
+        }
         e.setTemperature(event.getTemperature());
         e.setTime(event.getTime());
         e.setType(TrackerEventType.valueOf(event.getType()));
@@ -176,7 +178,9 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             }
         } finally {
             state.setLastReadTime(e.getTime());
-            state.setLastLocation(new Location(e.getLatitude(), e.getLongitude()));
+            if (e.getLatitude() != null && e.getLongitude() != null) {
+                state.setLastLocation(new Location(e.getLatitude(), e.getLongitude()));
+            }
             saveDeviceState(event.getImei(), state);
             if (e.getShipment() != null) {
                 unloadSession(e.getShipment(), ruleEngineCacheId, true);
