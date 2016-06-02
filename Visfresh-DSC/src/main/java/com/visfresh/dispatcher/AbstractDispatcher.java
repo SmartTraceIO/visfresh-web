@@ -173,15 +173,30 @@ public abstract class AbstractDispatcher {
                 log.error("Retryable exception has occured for message " + msg + ", will retry later", e);
                 msg.setRetryOn(new Date(msg.getRetryOn().getTime() + getRetryTimeOut()));
                 msg.setNumberOfRetry(msg.getNumberOfRetry() + 1);
-                dao.saveForRetry(msg);
+                saveForRetry(msg);
             } else {
                 log.error("Retry limit has exceed for message " + msg + ", will deleted", e);
-                dao.delete(msg);
+                stopProcessingByError(msg, e);
             }
         } else {
             log.error("Not retryable exception has occured for message " + msg.getId() + ", will deleted", e);
-            dao.delete(msg);
+            stopProcessingByError(msg, e);
         }
+    }
+
+    /**
+     * @param msg
+     */
+    protected void saveForRetry(final DeviceMessage msg) {
+        dao.saveForRetry(msg);
+    }
+
+    /**
+     * @param msg message.
+     * @param error error
+     */
+    protected void stopProcessingByError(final DeviceMessage msg, final Throwable error) {
+        dao.delete(msg);
     }
     /**
      * @param msg the message.

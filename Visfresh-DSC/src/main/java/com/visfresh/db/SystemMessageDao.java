@@ -103,8 +103,10 @@ public class SystemMessageDao {
         obj.addProperty("temperature", e.getTemperature());
         obj.addProperty("time", sdf.format(e.getTime()));
         obj.addProperty("type", e.getType().name());
-        obj.addProperty("latitude", loc.getLatitude());
-        obj.addProperty("longitude", loc.getLongitude());
+        if (loc != null) {
+            obj.addProperty("latitude", loc.getLatitude());
+            obj.addProperty("longitude", loc.getLongitude());
+        }
         obj.addProperty("imei", e.getImei());
 
         final SystemMessage sm = new SystemMessage();

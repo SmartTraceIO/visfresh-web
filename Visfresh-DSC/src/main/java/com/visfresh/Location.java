@@ -17,6 +17,15 @@ public class Location {
     public Location() {
         super();
     }
+    /**
+     * @param lat latitude.
+     * @param lon longitude.
+     */
+    public Location(final double lat, final double lon) {
+        super();
+        this.latitude = lat;
+        this.longitude = lon;
+    }
 
     /**
      * @return the latitude

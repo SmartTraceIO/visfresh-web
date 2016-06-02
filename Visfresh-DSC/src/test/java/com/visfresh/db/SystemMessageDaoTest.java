@@ -80,6 +80,30 @@ public class SystemMessageDaoTest extends TestCase {
         final JsonElement e = new JsonParser().parse(in);
         assertNotNull(e);
     }
+    public void testSupportsNullLocations() {
+        final int battery = 90;
+        final String imei = "09098098";
+        final int numberOfRetry = 4;
+        final Date retryOn = new Date(System.currentTimeMillis() + 10000000l);
+        final double temperature = 36.6;
+
+        //create device command
+        final DeviceMessage m = new DeviceMessage();
+        m.setBattery(battery);
+        m.setImei(imei);
+        m.setNumberOfRetry(numberOfRetry);
+        m.setRetryOn(retryOn);
+        m.setTemperature(temperature);
+        m.setTime(new Date());
+        m.setType(DeviceMessageType.AUT);
+
+        SystemMessage sm = dao.sendSystemMessageFor(m, null);
+        sm = dao.findOne(sm.getId());
+
+        final Reader in = new StringReader(sm.getMessageInfo());
+        final JsonElement e = new JsonParser().parse(in);
+        assertNotNull(e);
+    }
 
     /* (non-Javadoc)
      * @see junit.framework.TestCase#tearDown()

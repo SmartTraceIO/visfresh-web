@@ -3,6 +3,7 @@
  */
 package com.visfresh.dispatcher;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -44,18 +45,17 @@ public class DeviceMessageDispatcher extends AbstractDispatcher {
         setRetryLimit(Integer.parseInt(env.getProperty("deviceMessages.retryLimit", "7")));
         setRetryTimeOut(Integer.parseInt(env.getProperty("deviceMessages.retryTimeOut", "300000")));
     }
+    /**
+     * Default constructor. for unit tests.
+     */
+    protected DeviceMessageDispatcher() {
+        super();
+    }
 
     @Override
     public int processMessages() {
-        try {
-            //mark messages for processing
-            dao.markDeviceMessagesForProcess(getProcessorId(), getBatchLimit());
-        } catch (final Throwable e) {
-            log.error("Failed to mark messages for process", e);
-            return 0;
-        }
+        final List<DeviceMessage> msgs = getDeviceMessagesForProcess();
 
-        final List<DeviceMessage> msgs = dao.getDeviceMessagesForProcess(getProcessorId());
         for (final DeviceMessage m : msgs) {
             try {
                 processMessage(m);
@@ -67,17 +67,54 @@ public class DeviceMessageDispatcher extends AbstractDispatcher {
 
         return msgs.size();
     }
-
     /**
      * @param m device message.
      * @throws RetryableException exception.
      */
     private void processMessage(final DeviceMessage m) throws RetryableException {
-        final Location location = getLocationService().getLocation(
-                m.getImei(), m.getStations());
+        final Location location = getLocationService().getLocation(m.getImei(), m.getStations());
         check00(location);
 
         log.debug("Location (" + location + ") has detected for message " + m);
+        sendSystemMessageFor(m, location);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dispatcher.AbstractDispatcher#stopProcessingByError(com.visfresh.DeviceMessage, java.lang.Throwable)
+     */
+    @Override
+    protected final void stopProcessingByError(final DeviceMessage msg, final Throwable error) {
+        superStopProcessingByError(msg, error);
+        sendSystemMessageFor(msg, null);
+    }
+
+    /**
+     * @param msg
+     * @param error
+     */
+    protected void superStopProcessingByError(final DeviceMessage msg,
+            final Throwable error) {
+        super.stopProcessingByError(msg, error);
+    }
+
+    /**
+     * @return
+     */
+    protected List<DeviceMessage> getDeviceMessagesForProcess() {
+        try {
+            //mark messages for processing
+            dao.markDeviceMessagesForProcess(getProcessorId(), getBatchLimit());
+        } catch (final Throwable e) {
+            log.error("Failed to mark messages for process", e);
+            return new LinkedList<>();
+        }
+
+        return dao.getDeviceMessagesForProcess(getProcessorId());
+    }
+    /**
+     * @param m
+     * @param location
+     */
+    protected void sendSystemMessageFor(final DeviceMessage m, final Location location) {
         systemMessageDao.sendSystemMessageFor(m, location);
     }
 
