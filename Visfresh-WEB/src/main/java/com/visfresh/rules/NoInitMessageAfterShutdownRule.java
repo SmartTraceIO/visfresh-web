@@ -88,10 +88,10 @@ public class NoInitMessageAfterShutdownRule extends AbstractNoInitMessageRule {
         if (accepted) {
             if (e.getShipment() == null) {
                 log.debug("Not Init message rule has triggered for event "
-                        + e.getId() + ". Old shipment is " + s.getId());
+                        + e.getId() + ". Old shipment is " + (s == null ? null : s.getId()));
             } else {
                 log.debug("Not Init message rule has triggered for event "
-                        + e.getId() + ". Shipment is " + s.getId());
+                        + e.getId() + ". Shipment is " + e.getShipment().getId());
             }
         }
 

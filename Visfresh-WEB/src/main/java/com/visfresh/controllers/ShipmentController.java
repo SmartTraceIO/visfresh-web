@@ -1430,13 +1430,17 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             final List<Alert> alerts) {
         final Map<AlertType, Integer> map = new HashMap<AlertType, Integer>();
         for (final Alert alert : alerts) {
-            Integer numAlerts = map.get(alert.getType());
-            if (numAlerts == null) {
-                numAlerts = 0;
+            final AlertType type = alert.getType();
+            if (type != AlertType.LightOff && type != AlertType.LightOn) {
+                Integer numAlerts = map.get(alert.getType());
+                if (numAlerts == null) {
+                    numAlerts = 0;
+                }
+                numAlerts = numAlerts + 1;
+                map.put(alert.getType(), numAlerts);
             }
-            numAlerts = numAlerts + 1;
-            map.put(alert.getType(), numAlerts);
         }
+
         return map;
     }
     /**
