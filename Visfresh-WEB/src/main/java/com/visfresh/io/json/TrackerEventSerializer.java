@@ -5,6 +5,7 @@ package com.visfresh.io.json;
 
 import java.util.TimeZone;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.TrackerEventConstants;
 import com.visfresh.entities.TrackerEvent;
@@ -45,8 +46,15 @@ public class TrackerEventSerializer extends AbstractJsonSerializer {
         e.setTime(asDate(json.get(TrackerEventConstants.PROPERTY_TIME)));
         e.setCreatedOn(asDate(json.get(TrackerEventConstants.PROPERTY_CREATEDON)));
         e.setType(TrackerEventType.valueOf(asString(json.get(TrackerEventConstants.PROPERTY_TYPE))));
-        e.setLatitude(asDouble(json.get(TrackerEventConstants.PROPERTY_LATITUDE)));
-        e.setLongitude(asDouble(json.get(TrackerEventConstants.PROPERTY_LONGITUDE)));
+
+        final JsonElement lat = json.get(TrackerEventConstants.PROPERTY_LATITUDE);
+        final JsonElement lon = json.get(TrackerEventConstants.PROPERTY_LONGITUDE);
+
+        if (lat != null && lon != null) {
+            e.setLatitude(asDouble(lat));
+            e.setLongitude(asDouble(lon));
+        }
+
         return e;
     }
 }

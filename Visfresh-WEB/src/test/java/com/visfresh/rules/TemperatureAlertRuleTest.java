@@ -586,8 +586,8 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
             final TrackerEventType type, final double temperature) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(100);
-        e.setLatitude(10);
-        e.setLongitude(10);
+        e.setLatitude(10.);
+        e.setLongitude(10.);
         e.setTemperature(20.4);
         e.setType(type);
         e.setShipment(shipment);

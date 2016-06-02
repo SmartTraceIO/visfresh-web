@@ -61,7 +61,9 @@ public class EtaCalculationRule implements TrackerEventRule {
             && !s.hasFinalStatus()
             && s.getShippedFrom() != null
             && s.getShippedTo() != null
-            && e.getTime().after(s.getShipmentDate());
+            && e.getTime().after(s.getShipmentDate())
+            && e.getLatitude() != null
+            && e.getLongitude() != null;
     }
 
     /* (non-Javadoc)

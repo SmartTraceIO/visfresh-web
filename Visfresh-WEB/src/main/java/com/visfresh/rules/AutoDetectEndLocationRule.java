@@ -85,8 +85,10 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
      */
     @Override
     public boolean accept(final RuleContext context) {
-        final Shipment shipment = context.getEvent().getShipment();
-        if (shipment == null || shipment.getShippedTo() != null) {
+        final TrackerEvent e = context.getEvent();
+        final Shipment shipment = e.getShipment();
+        if (shipment == null || shipment.getShippedTo() != null
+                || e.getLatitude() == null || e.getLongitude() == null) {
             return false;
         }
 

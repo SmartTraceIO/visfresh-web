@@ -4,6 +4,7 @@
 package com.visfresh.io.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
 
@@ -59,5 +60,13 @@ public class TrackerEventSerializerTest extends AbstractSerializerTest {
         assertEquals(type, e.getType());
         assertEquals(latitude, e.getLatitude(), 0.000001);
         assertEquals(longitude, e.getLongitude(), 0.00001);
+    }
+    @Test
+    public void testSerializeDefaultEvent() {
+        final TrackerEvent e = new TrackerEvent();
+        e.setType(TrackerEventType.AUT);
+
+        final JsonObject obj= serializer.toJson(e);
+        assertNotNull(serializer.parseTrackerEvent(obj));
     }
 }

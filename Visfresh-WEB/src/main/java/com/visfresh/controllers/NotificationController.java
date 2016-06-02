@@ -4,7 +4,6 @@
 package com.visfresh.controllers;
 
 import java.text.DateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +30,6 @@ import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.Location;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.Shipment;
@@ -103,7 +101,6 @@ public class NotificationController extends AbstractController implements Notifi
                     page);
 
             //create notification to location map
-            final Map<Long, Location> locations = createLocationMap(ns);
             final Map<Long, TrackerEvent> events = getTrackerEvents(ns);
 
             final int total = dao.getEntityCount(user, true, filter);
@@ -112,7 +109,7 @@ public class NotificationController extends AbstractController implements Notifi
                     "yyyy-MM-dd'T'HH:mm", user.getLanguage(), user.getTimeZone());
 
             for (final Notification t : ns) {
-                array.add(ser.toJson(createNotificationItem(t, user, locations.get(t.getId()),
+                array.add(ser.toJson(createNotificationItem(t, user,
                         isoFormat, events)));
             }
 
@@ -169,7 +166,7 @@ public class NotificationController extends AbstractController implements Notifi
      * @return notification item.
      */
     private NotificationItem createNotificationItem(final Notification n, final User user,
-            final Location location, final DateFormat dateFormatter,
+            final DateFormat dateFormatter,
             final Map<Long, TrackerEvent> trackerEvents) {
         final NotificationItem item = new NotificationItem();
         item.setAlertId(n.getIssue().getId());
@@ -224,56 +221,5 @@ public class NotificationController extends AbstractController implements Notifi
             PROPERTY_NOTIFICATION_ID,
             PROPERTY_TYPE
         };
-    }
-    /**
-     * @param ns list of notifications.
-     * @return map of notification to location.
-     */
-    private Map<Long, Location> createLocationMap(final List<Notification> ns) {
-        final Map<Long, List<TrackerEvent>> eventsCache = new HashMap<>();
-        final Map<Long, Location> map = new HashMap<>();
-
-        for (final Notification n : ns) {
-            //get events for given shipment.
-            final Shipment shipment = n.getIssue().getShipment();
-            List<TrackerEvent> events = eventsCache.get(shipment.getId());
-            if (events == null) {
-                events = trackerEventDao.getEvents(shipment);
-                eventsCache.put(shipment.getId(), events);
-            }
-
-            //find nearest event for given shipment.
-            final TrackerEvent e = getNearestEvent(events, n.getIssue().getDate());
-            if (e != null) {
-                map.put(n.getId(), new Location(e.getLatitude(), e.getLongitude()));
-            }
-        }
-
-        return map;
-    }
-    /**
-     * @param items list of tracker events.
-     * @param date date.
-     * @return nearest event for given date.
-     */
-    private TrackerEvent getNearestEvent(final List<TrackerEvent> items, final Date date) {
-        if (items.isEmpty()) {
-            return null;
-        }
-
-        for (final TrackerEvent i : items) {
-            if (near(i.getTime(), date) || i.getTime().after(date)) {
-                return i;
-            }
-        }
-        return items.get(items.size() - 1);
-    }
-    /**
-     * @param d1 first date.
-     * @param d2 second date.
-     * @return true if the difference between two dates is less then one second.
-     */
-    private boolean near(final Date d1, final Date d2) {
-        return Math.abs(d1.getTime() - d2.getTime()) < 1000l;
     }
 }

@@ -149,7 +149,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         context.setDeviceState(state);
 
         //check correct moving
-        if (state.getLastLocation() != null && state.getLastReadTime() != null) {
+        if (state.getLastLocation() != null && state.getLastReadTime() != null
+                && e.getLatitude() != null && e.getLongitude() != null) {
             final Location loc = state.getLastLocation();
             final int meters = (int) LocationUtils.getDistanceMeters(loc.getLatitude(), loc.getLongitude(),
                     e.getLatitude(), e.getLongitude());

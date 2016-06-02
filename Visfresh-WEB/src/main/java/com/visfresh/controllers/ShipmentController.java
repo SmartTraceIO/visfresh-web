@@ -1193,9 +1193,19 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     user, i == items.size() - 1));
             i++;
         }
-        dto.setCurrentLocation(items.size() == 0 ? "Not determined"
-                : locationService.getLocationDescription(
-                    new Location(items.get(0).getEvent().getLatitude(), items.get(0).getEvent().getLongitude())));
+
+
+        if (items.size() != 0) {
+            final TrackerEvent currentEvent = items.get(0).getEvent();
+            if (currentEvent.getLatitude() != null && currentEvent.getLongitude() != null) {
+                dto.setCurrentLocation(locationService.getLocationDescription(
+                        new Location(currentEvent.getLatitude(), currentEvent.getLongitude())));
+            }
+        }
+
+        if (dto.getCurrentLocation() == null) {
+            dto.setCurrentLocation("Not determined");
+        }
 
         for (final Note n : noteDao.findByShipment(s)) {
             dto.getNotes().add(NoteController.creaetNoteDto(n, s, isoFmt));

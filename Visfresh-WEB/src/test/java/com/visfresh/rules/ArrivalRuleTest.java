@@ -82,8 +82,8 @@ public class ArrivalRuleTest extends BaseRuleTest {
         assertFalse(rule.accept(req));
 
         //set nearest location
-        e.setLatitude(10);
-        e.setLongitude(10);
+        e.setLatitude(10.);
+        e.setLongitude(10.);
         assertTrue(rule.accept(req));
     }
     @Test

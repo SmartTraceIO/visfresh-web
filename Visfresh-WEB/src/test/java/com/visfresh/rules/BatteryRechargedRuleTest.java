@@ -115,8 +115,8 @@ public class BatteryRechargedRuleTest extends BatteryRechargedRule {
     private TrackerEvent createEvent(final int battery) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(battery);
-        e.setLatitude(25);
-        e.setLongitude(25);
+        e.setLatitude(25.);
+        e.setLongitude(25.);
         e.setTemperature(20.4);
         e.setType(TrackerEventType.AUT);
         e.setShipment(shipment);

@@ -58,8 +58,8 @@ public class EnterBrightEnvironmentAlertRuleTest extends BaseRuleTest {
     private TrackerEvent createEvent(final TrackerEventType type) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(100);
-        e.setLatitude(25);
-        e.setLongitude(25);
+        e.setLatitude(25.);
+        e.setLongitude(25.);
         e.setTemperature(20.4);
         e.setType(type);
         e.setDevice(device);

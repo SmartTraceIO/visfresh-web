@@ -150,13 +150,13 @@ public class TrackerEvent implements EntityWithId<Long>, Comparable<TrackerEvent
     /**
      * @param latitude the latitude to set
      */
-    public void setLatitude(final double latitude) {
+    public void setLatitude(final Double latitude) {
         this.latitude = latitude;
     }
     /**
      * @param longitude the longitude to set
      */
-    public void setLongitude(final double longitude) {
+    public void setLongitude(final Double longitude) {
         this.longitude = longitude;
     }
     /**

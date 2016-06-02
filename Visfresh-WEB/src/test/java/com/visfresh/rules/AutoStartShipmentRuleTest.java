@@ -61,7 +61,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
      *            date.
      * @return event.
      */
-    private TrackerEvent createEvent(final double lat, final double lon,
+    private TrackerEvent createEvent(final Double lat, final Double lon,
             final Date date) {
         final Device d = device;
         final TrackerEvent e = new TrackerEvent();
@@ -93,8 +93,58 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
     }
 
     @Test
+    public void testAcceptNullLocation() {
+        final TrackerEvent e = createEvent(null, null, new Date());
+        e.setShipment(new Shipment());
+
+        // ignores with shipment
+        assertFalse(rule.accept(new RuleContext(e, new SessionHolder())));
+
+        // accept with shipment if INIT message
+        e.setType(TrackerEventType.INIT);
+        assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
+
+        e.setShipment(null);
+        e.setType(TrackerEventType.AUT);
+        assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
+    }
+
+    @Test
     public void testHandle() {
         final TrackerEvent e = createEvent(17.14, 18.16, new Date());
+        e.setTime(new Date(System.currentTimeMillis() - 1000000l));
+
+        final RuleContext c = new RuleContext(e, new SessionHolder());
+        rule.handle(c);
+
+        // check shipment created.
+        assertNotNull(e.getShipment());
+        final Long shipmentId = e.getShipment().getId();
+        final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
+
+        Shipment shipment = shipmentDao.findOne(shipmentId);
+        assertNotNull(shipment);
+        assertEquals(e.getTime().getTime(), shipment.getShipmentDate().getTime(), 2000);
+
+        // check not duplicate handle
+        assertFalse(rule.accept(c));
+
+        // check old shipment closed
+        rule.handle(c);
+
+        // check old shipment closed
+        final Shipment old = shipmentDao.findOne(shipmentId);
+        assertEquals(ShipmentStatus.Ended, old.getStatus());
+
+        // check new shipment created.
+        shipment = shipmentDao.findOne(e.getShipment().getId());
+        assertTrue(!shipmentId.equals(shipment.getId()));
+        assertTrue(old.getTripCount() < shipment.getTripCount());
+        assertEquals(e.getTime().getTime(), shipment.getShipmentDate().getTime(), 1000);
+    }
+    @Test
+    public void testHandleNullLocation() {
+        final TrackerEvent e = createEvent(null, null, new Date());
         e.setTime(new Date(System.currentTimeMillis() - 1000000l));
 
         final RuleContext c = new RuleContext(e, new SessionHolder());

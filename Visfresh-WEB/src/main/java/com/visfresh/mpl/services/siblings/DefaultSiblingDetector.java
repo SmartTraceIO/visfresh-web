@@ -385,11 +385,16 @@ public class DefaultSiblingDetector implements SiblingDetector {
      * @param me2 second master event.
      * @return distance between given event and the sub path
      */
-    private double getDistance(final TrackerEvent e, final TrackerEvent me1,
+    private Double getDistance(final TrackerEvent e, final TrackerEvent me1,
             final TrackerEvent me2) {
+        if (oneHasNullLocation(e, me1, me2)) {
+            return null;
+        }
+
         //not ordinary situations
         final Date mt1 = me1.getTime();
         final Date mt2 = me2.getTime();
+
         if (mt1.equals(mt2)) {
             return getDistance(e, me1);
         }
@@ -412,11 +417,28 @@ public class DefaultSiblingDetector implements SiblingDetector {
     }
 
     /**
+     * @param events
+     * @return
+     */
+    private boolean oneHasNullLocation(final TrackerEvent... events) {
+        for (final TrackerEvent e : events) {
+            if (e.getLatitude() == null || e.getLongitude() == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @param e1 first tracker event.
      * @param e2 second tracker event.
      * @return distance between two event in meters.
      */
-    private double getDistance(final TrackerEvent e1, final TrackerEvent e2) {
+    private Double getDistance(final TrackerEvent e1, final TrackerEvent e2) {
+        if (oneHasNullLocation(e1, e2)) {
+            return null;
+        }
+
         return LocationUtils.getDistanceMeters(e1.getLatitude(), e1.getLongitude(),
                 e2.getLatitude(), e2.getLongitude());
     }

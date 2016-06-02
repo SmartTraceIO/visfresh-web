@@ -145,8 +145,12 @@ public class InterimStopRule implements TrackerEventRule {
         return accept;
     }
 
-    private boolean isNearInterimStop(final Shipment shipment, final ShipmentSession state, final double latitude,
-            final double longitude) {
+    private boolean isNearInterimStop(final Shipment shipment, final ShipmentSession state, final Double latitude,
+            final Double longitude) {
+        if (latitude == null || longitude == null) {
+            return false;
+        }
+
         final List<LocationProfile> locs = getInterimLocations(shipment);
         if (locs != null) {
             final LocationProfile p = getBestLocation(locs, latitude, longitude);
