@@ -4,8 +4,10 @@
 package com.visfresh.rules;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.ShipmentSession;
@@ -47,11 +50,33 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
     private int numInvoked = 0;
     private Company company;
     private Map<Long, AlternativeLocations> alternativeLocations = new HashMap<>();
+    protected Map<Long, ?> sessionCache;
+
     /**
      * Default constructor.
      */
     public AbstractRuleEngineTest() {
         super();
+
+        sessionManager = new EngineShipmentSessionManager(){
+            {
+                AbstractRuleEngineTest.this.sessionCache = this.sessionCache;
+            }
+            /* (non-Javadoc)
+             * @see com.visfresh.rules.AbstractRuleEngine#loadSession(com.visfresh.entities.Shipment)
+             */
+            @Override
+            protected ShipmentSession loadSessionFromDb(final Shipment s) {
+                return sessions.get(s.getId());
+            }
+            /* (non-Javadoc)
+             * @see com.visfresh.rules.AbstractRuleEngine#saveSession(com.visfresh.entities.Shipment, com.visfresh.rules.state.ShipmentSession)
+             */
+            @Override
+            protected void saveSessionToDb(final Shipment s, final ShipmentSession ss) {
+                sessions.put(s.getId(), ss);
+            }
+        };
     }
 
     @Before
@@ -269,6 +294,33 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         assertEquals(1, getAlertFired(s).size());
         assertEquals(r2.getId(), getAlertFired(s).get(0).getId());
     }
+    @Test
+    public void testNotProcessConsumedEvents() {
+        final TrackerEventRule rule = new TrackerEventRule() {
+            @Override
+            public boolean handle(final RuleContext context) {
+                return false;
+            }
+            @Override
+            public boolean accept(final RuleContext context) {
+                return true;
+            }
+        };
+
+        final String ruleName = "JUnitRule-testNotProcessConsumedEvents";
+        setRule(ruleName, rule);
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setDevice(createDevice("0329487093287"));
+        e.setType(TrackerEventType.AUT);
+
+        final RuleContext context = new RuleContext(e, this.sessionManager);
+
+        assertTrue(getRule(ruleName).accept(context));
+
+        context.setEventConsumed();
+        assertFalse(getRule(ruleName).accept(context));
+    }
     /**
      * @param imei
      */
@@ -314,20 +366,6 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
     @Override
     protected void saveDeviceState(final String imei, final DeviceState state) {
         deviceStates.put(imei, state);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.rules.AbstractRuleEngine#loadSession(com.visfresh.entities.Shipment)
-     */
-    @Override
-    protected ShipmentSession loadSessionFromDb(final Shipment s) {
-        return sessions.get(s.getId());
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.rules.AbstractRuleEngine#saveSession(com.visfresh.entities.Shipment, com.visfresh.rules.state.ShipmentSession)
-     */
-    @Override
-    protected void saveSessionToDb(final Shipment s, final ShipmentSession ss) {
-        sessions.put(s.getId(), ss);
     }
     /* (non-Javadoc)
      * @see com.visfresh.rules.AbstractRuleEngine#saveShipment(com.visfresh.entities.Shipment)

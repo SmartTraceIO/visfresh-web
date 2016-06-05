@@ -56,17 +56,24 @@ public class AssignShipmentRuleTest extends BaseRuleTest {
         final RuleContext req = new RuleContext(event, new SessionHolder());
         assertFalse(rule.accept(req));
 
+        final ShipmentDao shipmentDao = context.getBean(ShipmentDao.class);
+
         //create shipment but in final state
         final Shipment s = createDefaultShipment(ShipmentStatus.Ended, event.getDevice());
         assertFalse(rule.accept(req));
 
         s.setStatus(ShipmentStatus.Arrived);
-        context.getBean(ShipmentDao.class).save(s);
+        shipmentDao.save(s);
         assertTrue(rule.accept(req));
 
         s.setStatus(ShipmentStatus.InProgress);
-        context.getBean(ShipmentDao.class).save(s);
+        shipmentDao.save(s);
         assertTrue(rule.accept(req));
+
+        //test not accept shipments with set device shutdown time
+        s.setDeviceShutdownTime(new Date());
+        shipmentDao.save(s);
+        assertFalse(rule.accept(req));
     }
     @Test
     public void testHandle() {

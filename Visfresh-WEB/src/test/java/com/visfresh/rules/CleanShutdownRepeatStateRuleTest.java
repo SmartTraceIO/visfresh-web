@@ -36,15 +36,15 @@ public class CleanShutdownRepeatStateRuleTest extends
 
         final RuleContext context = new RuleContext(e, new SessionHolder());
         context.setDeviceState(new DeviceState());
-        NoInitMessageAfterShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date());
+        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date());
 
         assertTrue(accept(context));
 
         //test with not shutdown repeat time
-        NoInitMessageAfterShutdownRule.setShutDownRepeatTime(context.getDeviceState(), null);
+        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), null);
         assertFalse(accept(context));
 
-        NoInitMessageAfterShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date());
+        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date());
         assertTrue(accept(context));
 
         //test with shutdown device time set
@@ -63,9 +63,9 @@ public class CleanShutdownRepeatStateRuleTest extends
         final TrackerEvent e = new TrackerEvent();
         final RuleContext context = new RuleContext(e, new SessionHolder());
         context.setDeviceState(new DeviceState());
-        NoInitMessageAfterShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date());
+        RepeatShutdownRule.setShutDownRepeatTime(context.getDeviceState(), new Date());
 
         assertFalse(handle(context));
-        assertNull(NoInitMessageAfterShutdownRule.getShutDownRepeatTime(context.getDeviceState()));
+        assertNull(RepeatShutdownRule.getShutDownRepeatTime(context.getDeviceState()));
     }
 }

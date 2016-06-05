@@ -29,6 +29,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.AutoDetectEndLocationRule;
+import com.visfresh.rules.EngineShipmentSessionManager;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.rules.state.ShipmentSessionManager;
 import com.visfresh.services.AutoStartShipmentService;
@@ -54,6 +55,8 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
     private TrackerEventDao trackerEventDao;
     @Autowired
     private AlternativeLocationsDao altLocDao;
+    @Autowired
+    private EngineShipmentSessionManager sessionManager;
     @Autowired
     private AbstractRuleEngine ruleEngine;
 
@@ -115,7 +118,7 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
         public ShipmentSession getSession(final Shipment s) {
             ShipmentSession session = sessions.get(s.getId());
             if (session == null) {
-                session = ruleEngine.loadSession(s, loaderId);
+                session = sessionManager.loadSession(s, loaderId);
                 shipments.put(s.getId(), s);
                 sessions.put(s.getId(), session);
             }
@@ -126,7 +129,7 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
             final Iterator<Shipment> iter = shipments.values().iterator();
             while (iter.hasNext()) {
                 final Shipment s = iter.next();
-                ruleEngine.unloadSession(s, loaderId, true);
+                sessionManager.unloadSession(s, loaderId, true);
             }
         }
     }

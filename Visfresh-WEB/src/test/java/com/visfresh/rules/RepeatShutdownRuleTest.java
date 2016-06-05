@@ -6,7 +6,6 @@ package com.visfresh.rules;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
@@ -30,9 +29,8 @@ import com.visfresh.rules.state.ShipmentSessionManager;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class NoInitMessageAfterShutdownRuleTest extends
-        NoInitMessageAfterShutdownRule {
-    private Shipment autoStartedShipment;
+public class RepeatShutdownRuleTest extends
+        RepeatShutdownRule {
     private List<String> sentMessages = new LinkedList<>();
     private List<Shipment> savedShipments = new LinkedList<>();
     private List<TrackerEvent> savedEvents = new LinkedList<>();
@@ -46,7 +44,7 @@ public class NoInitMessageAfterShutdownRuleTest extends
     /**
      * Default constructor.
      */
-    public NoInitMessageAfterShutdownRuleTest() {
+    public RepeatShutdownRuleTest() {
         super();
     }
 
@@ -135,57 +133,8 @@ public class NoInitMessageAfterShutdownRuleTest extends
         assertTrue(accept(createRuleContext(e)));
     }
     @Test
-    public void testAutostartAfterShutdownRepeat() {
-        final TrackerEvent e = createCorrectEventWithShipment();
-
-        final Shipment s = new Shipment();
-        s.setStatus(ShipmentStatus.Default);
-        s.setAutostart(true);
-        s.setId(id++);
-        autoStartedShipment = s;
-
-        final RuleContext context = createRuleContext(e);
-        setShutDownRepeatTime(context.getDeviceState(), e.getShipment().getDeviceShutdownTime());
-
-        assertTrue(handle(context));
-        assertEquals(1, savedEvents.size());
-        assertEquals(e.getId(), savedEvents.get(0).getId());
-        assertEquals(s.getId(), e.getShipment().getId());
-        assertEquals(1, this.sentMessages.size());
-        assertEquals(1, savedShipments.size());
-        assertNull(getShutDownRepeatTime(context.getDeviceState()));
-    }
-    @Test
-    public void testAutostartAfterShutdownExpired() {
-        final TrackerEvent e = createCorrectEventWithShipment();
-
-        final Shipment s = new Shipment();
-        s.setStatus(ShipmentStatus.Default);
-        s.setAutostart(true);
-        s.setId(id++);
-        autoStartedShipment = s;
-
-        final RuleContext context = createRuleContext(e);
-        e.getShipment().setDeviceShutdownTime(new Date(e.getTime().getTime() - 2 * CHECK_SHUTDOWN_TIMEOUT - 100));
-
-        assertTrue(handle(context));
-        assertEquals(1, savedEvents.size());
-        assertEquals(e.getId(), savedEvents.get(0).getId());
-        assertEquals(s.getId(), e.getShipment().getId());
-        assertEquals(1, this.sentMessages.size());
-        assertEquals(1, savedShipments.size());
-        assertNull(getShutDownRepeatTime(context.getDeviceState()));
-    }
-    @Test
     public void testSendShutdownRepeat() {
         final TrackerEvent e = createCorrectEventWithShipment();
-
-        final Shipment s = new Shipment();
-        s.setStatus(ShipmentStatus.Default);
-        s.setAutostart(true);
-        s.setId(id++);
-        autoStartedShipment = s;
-
         final RuleContext context = createRuleContext(e);
 
         assertFalse(handle(context));
@@ -237,33 +186,11 @@ public class NoInitMessageAfterShutdownRuleTest extends
         return e;
     }
     /* (non-Javadoc)
-     * @see com.visfresh.rules.AbstractNoInitMessageRule#autoStartShipmentByService(com.visfresh.entities.Device, double, double, java.util.Date)
-     */
-    @Override
-    protected Shipment autoStartShipmentByService(final Device device,
-            final Double latitude, final Double longitude, final Date time) {
-        return autoStartedShipment;
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.rules.NoInitMessageRule#saveShipment(com.visfresh.entities.Shipment)
      */
     @Override
     protected void saveShipment(final Shipment s) {
         savedShipments.add(s);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.rules.NoInitMessageArrivedShipmentRule#saveEvent(com.visfresh.entities.TrackerEvent)
-     */
-    @Override
-    protected void saveEvent(final TrackerEvent evt) {
-        savedEvents.add(evt);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.rules.NoInitMessageRule#sendMessageToSupport(java.lang.String, java.lang.String)
-     */
-    @Override
-    protected void sendMessageToSupport(final String subject, final String msg) {
-        sentMessages.add(msg);
     }
     /* (non-Javadoc)
      * @see com.visfresh.rules.NoInitMessageAfterShutdownRule#findLastShipment(java.lang.String)

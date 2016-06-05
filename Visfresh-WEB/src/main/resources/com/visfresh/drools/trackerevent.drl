@@ -16,10 +16,21 @@ import com.visfresh.rules.SetShipmentArrivedRule;
 import com.visfresh.rules.AutoDetectEndLocationRule;
 import com.visfresh.rules.EtaCalculationRule;
 import com.visfresh.rules.InterimStopRule;
-import com.visfresh.rules.NoInitMessageAfterShutdownRule;
+import com.visfresh.rules.RepeatShutdownRule;
 import com.visfresh.rules.CleanShutdownRepeatStateRule;
+import com.visfresh.rules.VeryOldEventRule;
 
 global AbstractRuleEngine engine;
+
+rule "VeryOldEvent"
+	salience 150
+    when
+        context : RuleContext(engine.getRule(VeryOldEventRule.NAME).accept(this));
+    then
+    	if(engine.getRule(VeryOldEventRule.NAME).handle(context)) {
+       		update(context);
+        }
+end
 
 rule "AssignShipment"
 	salience 100
@@ -150,11 +161,11 @@ rule "InterimStop"
         }
 end
 
-rule "NoInitMessageAfterShutdown"
+rule "RepeatShutdown"
     when
-        context : RuleContext(engine.getRule(NoInitMessageAfterShutdownRule.NAME).accept(this));
+        context : RuleContext(engine.getRule(RepeatShutdownRule.NAME).accept(this));
     then
-    	if(engine.getRule(NoInitMessageAfterShutdownRule.NAME).handle(context)) {
+    	if(engine.getRule(RepeatShutdownRule.NAME).handle(context)) {
        		update(context);
         }
 end

@@ -23,7 +23,6 @@ import com.google.gson.JsonElement;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
@@ -43,7 +42,6 @@ import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.mpl.services.TrackerMessageDispatcher;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.ShipmentSession;
-import com.visfresh.rules.state.ShipmentSessionManager;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.SystemMessageHandler;
@@ -55,7 +53,7 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 @Component
-public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHandler, ShipmentSessionManager {
+public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHandler {
     private static final Logger log = LoggerFactory.getLogger(AbstractRuleEngine.class);
     private static final int TIME_ZONE_OFSET = TimeZone.getDefault().getRawOffset();
 
@@ -68,31 +66,14 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     @Autowired
     private DeviceDao deviceDao;
     @Autowired
-    private ShipmentSessionDao shipmentSessionDao;
-    @Autowired
     private AlternativeLocationsDao altLocDao;
+    @Autowired
+    protected EngineShipmentSessionManager sessionManager;
 
     private final DeviceDcsNativeEventSerializer deviceEventParser = new DeviceDcsNativeEventSerializer();
     private final InterimStopSerializer interimSerializer = new InterimStopSerializer();
     private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<>();
-    protected final Map<Long, ShipmentSessionCacheEntry> sessionCache = new ConcurrentHashMap<>();
 
-    private final TrackerEventRule emptyRule = new TrackerEventRule() {
-        @Override
-        public boolean handle(final RuleContext e) {
-            return false;
-        }
-        @Override
-        public boolean accept(final RuleContext e) {
-            return false;
-        }
-    };
-    private static final String ruleEngineCacheId = "ruleEngine";
-
-    private static class ShipmentSessionCacheEntry {
-        ShipmentSession session;
-        final Map<String, Object> loaders = new ConcurrentHashMap<>();
-    }
     /**
      *
      */
@@ -145,7 +126,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             state = new DeviceState();
         }
 
-        final RuleContext context = new RuleContext(e, this);
+        final RuleContext context = new RuleContext(e, sessionManager);
         context.setDeviceState(state);
 
         //check correct moving
@@ -184,7 +165,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             }
             saveDeviceState(event.getImei(), state);
             if (e.getShipment() != null) {
-                unloadSession(e.getShipment(), ruleEngineCacheId, true);
+                sessionManager.unloadSession(e.getShipment(), true);
             }
         }
     }
@@ -194,6 +175,29 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     @Override
     public final TrackerEventRule getRule(final String name) {
+        final TrackerEventRule rule = getRuleImpl(name);
+
+        //create rule wrapper.
+        return new TrackerEventRule() {
+            @Override
+            public boolean handle(final RuleContext context) {
+                return rule.handle(context);
+            }
+            @Override
+            public boolean accept(final RuleContext context) {
+                if (rule == null || context.isEventConsumed()) {
+                    return false;
+                }
+                return rule.accept(context);
+            }
+        };
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    private TrackerEventRule getRuleImpl(final String name) {
         TrackerEventRule rule = rules.get(name);
         if (rule == null) {
             log.warn("Rule " + name + " is not loaded now. Waiting 3 seconds for load");
@@ -206,9 +210,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         }
         if (rule == null) {
             log.error("Rule with name " + name + " is not found. Given drools expression will ignored");
-            return emptyRule;
+            return null;
         }
-
         return rule;
     }
     /**
@@ -248,7 +251,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         }
 
         //check device state is set.
-        final ShipmentSession session = loadSessionFromDb(s);
+        final ShipmentSession session = sessionManager.loadSessionFromDb(s);
         for (final TemperatureRule rule: alertProfile.getAlertRules()) {
             switch (rule.getType()) {
                 case Cold:
@@ -295,67 +298,6 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     public static void setProcessedTemperatureRule(final ShipmentSession deviceState, final TemperatureRule rule) {
         deviceState.getTemperatureAlerts().getProperties().put(createProcessedKey(rule), "true");
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.rules.state.ShipmentSessionManager#getSession(com.visfresh.entities.Shipment)
-     */
-    @Override
-    public ShipmentSession getSession(final Shipment s) {
-        return loadSession(s, ruleEngineCacheId);
-    }
-    /**
-     * @param s shipment
-     * @param loaderId
-     * @return shipment session.
-     */
-    public ShipmentSession loadSession(final Shipment s, final String loaderId) {
-        //load cache entry
-        ShipmentSessionCacheEntry ss;
-        synchronized (sessionCache) {
-            ss = sessionCache.get(s.getId());
-            if (ss == null) {
-                ss = new ShipmentSessionCacheEntry();
-                sessionCache.put(s.getId(), ss);
-                ss.loaders.put(loaderId, this);
-            }
-        }
-
-        //load session.
-        synchronized (ss) {
-            if (ss.session == null) {
-                ss.session = loadSessionFromDb(s);
-                log.debug("Shipment session for " + s.getId() + " is load from DB");
-            }
-            if (ss.session == null) {
-                ss.session = new ShipmentSession();
-            }
-        }
-
-        return ss.session;
-    }
-    public void unloadSession(final Shipment s, final String loaderId, final boolean saveSession) {
-        ShipmentSessionCacheEntry ss;
-        synchronized (sessionCache) {
-            ss = sessionCache.get(s.getId());
-        }
-
-        if (ss != null) {
-            synchronized (ss) {
-                ss.loaders.remove(loaderId);
-                if (saveSession) {
-                    saveSessionToDb(s, ss.session);
-                    log.debug("Shipment session for " + s.getId() + " has saved");
-                }
-
-                if (ss.loaders.isEmpty()) {
-                    synchronized (sessionCache) {
-                        sessionCache.remove(s.getId());
-                        log.debug("Shipment session cache for " + s.getId() + " has cleaned");
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public void setInterimLocations(final ShipmentBase base, final List<LocationProfile> stops) {
         final String key = createInterimLocationsKey();
@@ -374,18 +316,18 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         if (base instanceof Shipment) {
             final Shipment s = (Shipment) base;
-            final ShipmentSession state = this.loadSession(s, key);
+            final ShipmentSession state = sessionManager.loadSession(s, key);
             try {
                 state.setShipmentProperty(key, array.toString());
             } finally {
-                unloadSession(s, key, true);
+                sessionManager.unloadSession(s, key, true);
             }
         }
     }
     @Override
     public List<LocationProfile> getInterimLocations(final Shipment s) {
         final String key = createInterimLocationsKey();
-        final ShipmentSession state = this.loadSession(s, key);
+        final ShipmentSession state = sessionManager.loadSession(s, key);
 
         try {
             final String str = state.getShipmentProperty(key);
@@ -398,7 +340,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                 return locs;
             }
         } finally {
-            unloadSession(s, key, false);
+            sessionManager.unloadSession(s, key, false);
         }
 
         return null;
@@ -408,21 +350,6 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     private static String createInterimLocationsKey() {
         return "InterimStop-locations";
-    }
-
-    /**
-     * @param s
-     * @param ss
-     */
-    protected void saveSessionToDb(final Shipment s, final ShipmentSession ss) {
-        shipmentSessionDao.saveSession(s, ss);
-    }
-    /**
-     * @param s
-     * @return
-     */
-    protected ShipmentSession loadSessionFromDb(final Shipment s) {
-        return shipmentSessionDao.getSession(s);
     }
     /**
      * @param s
@@ -445,11 +372,11 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     @Override
     public void suppressNextAlerts(final Shipment s) {
         final String loaderId = "suppressAlerts";
-        final ShipmentSession session = loadSession(s, loaderId);
+        final ShipmentSession session = sessionManager.loadSession(s, loaderId);
         try {
             session.setAlertsSuppressed(true);
         } finally {
-            unloadSession(s, loaderId, true);
+            sessionManager.unloadSession(s, loaderId, true);
         }
     }
     /* (non-Javadoc)
@@ -458,11 +385,11 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     @Override
     public Date getAlertsSuppressionDate(final Shipment s) {
         final String loaderId = "alertsSuppressionDate";
-        final ShipmentSession session = loadSession(s, loaderId);
+        final ShipmentSession session = sessionManager.loadSession(s, loaderId);
         try {
             return session.getAlertsSuppressionDate();
         } finally {
-            unloadSession(s, loaderId, false);
+            sessionManager.unloadSession(s, loaderId, false);
         }
     }
     /* (non-Javadoc)
@@ -471,11 +398,11 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     @Override
     public boolean isAlertsSuppressed(final Shipment s) {
         final String loaderId = "alertsSuppression";
-        final ShipmentSession session = loadSession(s, loaderId);
+        final ShipmentSession session = sessionManager.loadSession(s, loaderId);
         try {
             return session.isAlertsSuppressed();
         } finally {
-            unloadSession(s, loaderId, false);
+            sessionManager.unloadSession(s, loaderId, false);
         }
     }
     /**

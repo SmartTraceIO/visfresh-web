@@ -388,8 +388,15 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
                 item.setTemperature(temperature.doubleValue());
                 item.setBattery(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_BATTERY)).intValue());
                 item.setLastReadingTime((Date) row.get(DeviceConstants.PROPERTY_LAST_READING_TIME_ISO));
-                item.setLatitude(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LAT)).doubleValue());
-                item.setLongitude(((Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LONG)).doubleValue());
+
+                final Number lat = (Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LAT);
+                if (lat != null) {
+                    item.setLatitude(lat.doubleValue());
+                }
+                final Number lon = (Number) row.get(DeviceConstants.PROPERTY_LAST_READING_LONG);
+                if (lon != null) {
+                    item.setLongitude(lon.doubleValue());
+                }
             }
         }
         return item;

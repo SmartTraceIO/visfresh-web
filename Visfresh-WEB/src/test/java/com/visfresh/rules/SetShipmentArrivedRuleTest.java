@@ -28,7 +28,7 @@ import com.visfresh.services.RuleEngine;
  *
  */
 public class SetShipmentArrivedRuleTest extends BaseRuleTest {
-    private SetShipmentArrivedRule rule;
+    private TrackerEventRule rule;
     private Shipment shipment;
 
     /**
@@ -40,7 +40,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
 
     @Before
     public void setUp() {
-        rule = (SetShipmentArrivedRule) context.getBean(RuleEngine.class).getRule(SetShipmentArrivedRule.NAME);
+        rule = context.getBean(RuleEngine.class).getRule(SetShipmentArrivedRule.NAME);
         shipment = createDefaultShipment(ShipmentStatus.InProgress, createDevice("9283470987"));
     }
 

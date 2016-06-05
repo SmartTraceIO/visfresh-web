@@ -21,6 +21,7 @@ public class RuleContext {
     private Map<Object, Object> clientProperties = new ConcurrentHashMap<Object, Object>();
     private Map<TrackerEventRule, Boolean> processedMap = new HashMap<TrackerEventRule, Boolean>();
     private DeviceState deviceState;
+    private boolean isEventConsumed;
 
     /**
      * @param e tracker event.
@@ -85,5 +86,17 @@ public class RuleContext {
      */
     public DeviceState getDeviceState() {
         return deviceState;
+    }
+    /**
+     * @return true if the event is consumed.
+     */
+    public boolean isEventConsumed() {
+        return isEventConsumed;
+    }
+    /**
+     * @param isEventConsumed the isEventConsumed to set
+     */
+    public void setEventConsumed() {
+        this.isEventConsumed = true;
     }
 }

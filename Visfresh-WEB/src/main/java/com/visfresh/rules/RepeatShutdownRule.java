@@ -30,10 +30,10 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 @Component
-public class NoInitMessageAfterShutdownRule extends AbstractNoInitMessageRule {
+public class RepeatShutdownRule implements TrackerEventRule {
     protected static final long CHECK_SHUTDOWN_TIMEOUT = 60 * 60 * 1000L;
-    public static final String NAME = "NoInitMessageAfterShutdown";
-    private static final Logger log = LoggerFactory.getLogger(NoInitMessageAfterShutdownRule.class);
+    public static final String NAME = "RepeatShutdown";
+    private static final Logger log = LoggerFactory.getLogger(RepeatShutdownRule.class);
 
     @Autowired
     private AbstractRuleEngine engine;
@@ -47,7 +47,7 @@ public class NoInitMessageAfterShutdownRule extends AbstractNoInitMessageRule {
     /**
      * Default constructor.
      */
-    public NoInitMessageAfterShutdownRule() {
+    public RepeatShutdownRule() {
         super();
     }
 
@@ -72,8 +72,9 @@ public class NoInitMessageAfterShutdownRule extends AbstractNoInitMessageRule {
         final DeviceState deviceState = context.getDeviceState();
         final Date shutdownRepeatTime = getShutDownRepeatTime(deviceState);
 
+        //if already sent shutdown
         if (shutdownRepeatTime != null) {
-            return time - shutdownRepeatTime.getTime() > CHECK_SHUTDOWN_TIMEOUT;
+            return false;
         }
 
         //check is not in processing, but should be accepted
@@ -82,17 +83,6 @@ public class NoInitMessageAfterShutdownRule extends AbstractNoInitMessageRule {
         boolean accepted = false;
         if (s != null && time - s.getDeviceShutdownTime().getTime() > CHECK_SHUTDOWN_TIMEOUT) {
             accepted = true;
-        }
-
-        //log
-        if (accepted) {
-            if (e.getShipment() == null) {
-                log.debug("Not Init message rule has triggered for event "
-                        + e.getId() + ". Old shipment is " + (s == null ? null : s.getId()));
-            } else {
-                log.debug("Not Init message rule has triggered for event "
-                        + e.getId() + ". Shipment is " + e.getShipment().getId());
-            }
         }
 
         return accepted;
@@ -113,23 +103,9 @@ public class NoInitMessageAfterShutdownRule extends AbstractNoInitMessageRule {
             final Date date = new Date();
             setShutDownRepeatTime(context.getDeviceState(), date);
             shutDownDevice(device, date);
-
-            return false;
-        } else {
-            final Shipment s = autoStartNewShipment(
-                    device, e.getLatitude(), e.getLongitude(), e.getTime());
-            e.setShipment(s);
-            saveEvent(e);
-            setShutDownRepeatTime(context.getDeviceState(), null);
-
-            final String msg = "Not INIT message found for device "
-                    + device.getImei()
-                    + ". New shipment " + s.getId() + " has autostarted";
-            log.debug(msg);
-            sendMessageToSupport("Unusual start", msg);
-
-            return true;
         }
+
+        return false;
     }
 
     /**
@@ -210,7 +186,6 @@ public class NoInitMessageAfterShutdownRule extends AbstractNoInitMessageRule {
     /**
      * @param s
      */
-    @Override
     protected void saveShipment(final Shipment s) {
         shipmentDao.save(s);
     }
