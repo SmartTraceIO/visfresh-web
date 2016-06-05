@@ -91,7 +91,6 @@ public abstract class AbstractVisfreshLogParser {
         u.setLocation(split[3].substring(1, split[3].length() - 1));
         return u;
     }
-
     /**
      * @param str the string date representation.
      * @return the date.

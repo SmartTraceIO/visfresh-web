@@ -13,6 +13,8 @@ drop table if exists alerts;
 drop table if exists notifications;
 drop table if exists userprofiles;
 drop table if exists shipmentdevices;
+drop table if exists interimstops;
+drop table if exists alternativelocations;
 drop table if exists autostartlocations;
 drop table if exists autostartshipments;
 drop table if exists shipments;
@@ -226,12 +228,13 @@ create table shipments (
     createdby varchar(127) default null,
     alert bigint(20),
     noalertsifcooldown int not null,
-    arrivalnotifwithIn int not null,
+    arrivalnotifwithIn int(11),
     nonotifsifnoalerts boolean not null,
     shutdownafterarrivalminutes int default null,
 	noalertsafterarrivalminutes int default null,
 	noalertsafterstartminutes int default null,
 	shutdownafterstartminutes int default null,
+    deviceshutdowndate timestamp NULL default NULL,
     shippedfrom bigint(20),
     shippedto bigint(20),
     assettype varchar(127),
