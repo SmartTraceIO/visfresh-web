@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -20,6 +21,7 @@ public class DeviceMessageParserTest extends TestCase {
      * Parser to test.
      */
     private DeviceMessageParser parser;
+    private SimpleDateFormat utcFormat;
 
     /**
      * Default constructor.
@@ -41,6 +43,8 @@ public class DeviceMessageParserTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         parser = new DeviceMessageParser();
+        utcFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     /**
@@ -72,7 +76,7 @@ public class DeviceMessageParserTest extends TestCase {
         final DeviceMessage msg = msgs.get(2);
         assertEquals("358688000000158", msg.getImei());
         assertEquals(DeviceMessageType.AUT, msg.getType());
-        assertEquals("2013/10/18 13:28:29", new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(msg.getTime()));
+        assertEquals("2013/10/18 13:28:29", utcFormat.format(msg.getTime()));
         assertEquals(4023, msg.getBattery());
         assertEquals("-10.24", Double.toString(msg.getTemperature()));
 

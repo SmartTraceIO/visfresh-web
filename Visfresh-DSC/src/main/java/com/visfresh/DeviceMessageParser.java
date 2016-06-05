@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 /**
@@ -19,6 +20,8 @@ import java.util.regex.Pattern;
  *
  */
 public class DeviceMessageParser {
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+
     /**
      * Default constructor.
      */
@@ -131,6 +134,7 @@ public class DeviceMessageParser {
     private Date parseDate(final String dateString) {
         // 2013/10/18 13:28:29
         final DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        format.setTimeZone(UTC);
         try {
             return format.parse(dateString);
         } catch (final ParseException e) {
