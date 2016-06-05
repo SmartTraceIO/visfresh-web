@@ -183,7 +183,7 @@ public abstract class AbstractSystemMessageDispatcher {
      * @return
      */
     protected int processMessages(final String processorId) {
-        final int count = 0;
+        int count = 0;
 
         if (!messageHandlers.isEmpty()) {
             final List<SystemMessage> messages = messageDao.selectMessagesForProcessing(
@@ -197,6 +197,8 @@ public abstract class AbstractSystemMessageDispatcher {
                     handleError(msg, e);
                 }
             }
+
+            count += messages.size();
         }
 
         return count;
