@@ -22,6 +22,7 @@ drop table if exists notificationschedules;
 drop table if exists temperaturerules;
 drop table if exists alertprofiles;
 drop table if exists devicegrouprelations;
+drop table if exists simulators;
 drop table if exists devices;
 drop table if exists devicegroups;
 drop table if exists restsessions;

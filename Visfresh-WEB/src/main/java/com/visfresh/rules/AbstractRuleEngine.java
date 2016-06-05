@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
@@ -55,7 +54,6 @@ import com.visfresh.utils.SerializerUtils;
 @Component
 public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHandler {
     private static final Logger log = LoggerFactory.getLogger(AbstractRuleEngine.class);
-    private static final int TIME_ZONE_OFSET = TimeZone.getDefault().getRawOffset();
 
     @Autowired
     private TrackerMessageDispatcher dispatcher;
@@ -97,8 +95,6 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         final DeviceDcsNativeEvent event = deviceEventParser.parseDeviceDcsNativeEvent(
                 e.getAsJsonObject());
-        //convert the UTC time to local
-        event.setDate(new Date(event.getTime().getTime() + TIME_ZONE_OFSET));
 
         processDcsEvent(event);
     }
@@ -113,7 +109,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             e.setLongitude(event.getLocation().getLongitude());
         }
         e.setTemperature(event.getTemperature());
-        e.setTime(event.getTime());
+        e.setTime(event.getDate());
+        e.setCreatedOn(event.getCreatedOn());
         e.setType(TrackerEventType.valueOf(event.getType()));
 
         final String imei = event.getImei();

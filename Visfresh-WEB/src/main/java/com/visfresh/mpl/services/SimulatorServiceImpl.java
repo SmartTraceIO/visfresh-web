@@ -88,7 +88,7 @@ public class SimulatorServiceImpl implements SimulatorService {
                 e.setDate(new Date(newStart + dt));
 
                 //send as new native event from device.
-                sendSystemMessage(ser.toJson(e).toString(), SystemMessageType.Tracker, e.getTime());
+                sendSystemMessage(ser.toJson(e).toString(), SystemMessageType.Tracker, e.getDate());
                 numEvents++;
             }
         }

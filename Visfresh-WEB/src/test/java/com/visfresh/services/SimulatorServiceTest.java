@@ -105,7 +105,7 @@ public class SimulatorServiceTest extends SimulatorServiceImpl {
         final DeviceDcsNativeEvent dne = serializer.parseDeviceDcsNativeEvent(
                 SerializerUtils.parseJson(lastMsg.getMessageInfo()));
         assertEquals(findSimulator(u2).getTargetDevice(), dne.getImei());
-        assertEquals(lastMsg.getTime().getTime(), dne.getTime().getTime(), 1000);
+        assertEquals(lastMsg.getTime().getTime(), dne.getDate().getTime(), 1000);
 
         //check simulator started
         assertTrue(this.findSimulator(u2).isStarted());

@@ -16,6 +16,7 @@ public class DeviceDcsNativeEvent {
     private Location location;
     private String type;
     private Date date;
+    private Date createdOn = new Date();
     private double temperature;
     private int battery;
     /**
@@ -40,7 +41,7 @@ public class DeviceDcsNativeEvent {
     /**
      * @return
      */
-    public Date getTime() {
+    public Date getDate() {
         return date;
     }
     /**
@@ -103,5 +104,17 @@ public class DeviceDcsNativeEvent {
      */
     public void setType(final String type) {
         this.type = type;
+    }
+    /**
+     * @return the createdOn
+     */
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+    /**
+     * @param createdOn the createdOn to set
+     */
+    public void setCreatedOn(final Date createdOn) {
+        this.createdOn = createdOn;
     }
 }
