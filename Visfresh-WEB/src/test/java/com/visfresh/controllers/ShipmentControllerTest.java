@@ -347,6 +347,43 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(0, shipmentClient.getShipments(3, 10000).size());
     }
     @Test
+    public void testGetShipmentsFilterLightOnOffAlertSummary() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+        s.getShippedTo().setAddress("Coles Perth DC");
+        final Date eta = context.getBean(EtaCalculationRule.class).estimateArrivalDate(s,
+                s.getShippedFrom().getLocation(),
+                s.getShipmentDate(),
+                new Date(s.getShipmentDate().getTime() + 100000l));
+        s.setEta(eta);
+
+        shipmentDao.save(s);
+
+        //create last reading
+        createEvent(s, TrackerEventType.AUT);
+
+        //add alert
+        createAlert(s, AlertType.Battery);
+        createAlert(s, AlertType.LightOff);
+        createAlert(s, AlertType.LightOn);
+
+        final JsonObject json = shipmentClient.getShipments(null, null).get(0).getAsJsonObject();
+        //check alert summary
+        //"alertSummary": {
+        //    "MovementStart": "4",
+        //    "LightOff": "1",
+        //    "Cold": "1",
+        //    "CriticalCold": "3",
+        //    "LightOn": "1",
+        //    "CriticalHot": "1",
+        //    "Battery": "2",
+        //    "Hot": "2"
+        //},
+        final JsonObject alertSummary = json.get("alertSummary").getAsJsonObject();
+        assertEquals(1, alertSummary.get("Battery").getAsInt());
+        assertNull(alertSummary.get("LightOn"));
+        assertNull(alertSummary.get("LightOff"));
+    }
+    @Test
     public void testGetShipmentsKeyLocations() throws RestServiceException, IOException {
         //first shipment.
         final Shipment s1 = createShipment(true);
