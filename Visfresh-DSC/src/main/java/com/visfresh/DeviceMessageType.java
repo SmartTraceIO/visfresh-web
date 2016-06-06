@@ -35,5 +35,12 @@ public enum DeviceMessageType {
     /**
      * means the device enters dark environment
      */
-    DRK
+    DRK,
+    //unexpected types
+    BAT0,
+    BAT1,
+    BAT2,
+    CRG0,
+    CRG1,
+    UNDEF
 }

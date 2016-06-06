@@ -80,7 +80,7 @@ public class DeviceMessageParser {
         try {
             return DeviceMessageType.valueOf(typeString);
         } catch (final Exception e) {
-            return DeviceMessageType.AUT;
+            return DeviceMessageType.UNDEF;
         }
     }
 
