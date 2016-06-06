@@ -24,9 +24,14 @@ public interface RuleEngine {
     void invokeRules(RuleContext context);
     /**
      * @param name rule name.
-     * @return rule.
+     * @return rule if has rule or default rule otherwise. Can't be null
      */
     TrackerEventRule getRule(String name);
+    /**
+     * @param name rule name.
+     * @return true if has rule with given name.
+     */
+    boolean hasRule(String name);
     /**
      * @param s shipment
      * @return map of alert yet to fire.

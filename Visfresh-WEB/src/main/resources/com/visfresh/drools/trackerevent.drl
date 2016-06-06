@@ -19,6 +19,7 @@ import com.visfresh.rules.InterimStopRule;
 import com.visfresh.rules.RepeatShutdownRule;
 import com.visfresh.rules.CleanShutdownRepeatStateRule;
 import com.visfresh.rules.VeryOldEventRule;
+import com.visfresh.rules.CorrectMovingControllRule;
 
 global AbstractRuleEngine engine;
 
@@ -28,6 +29,16 @@ rule "VeryOldEvent"
         context : RuleContext(engine.getRule(VeryOldEventRule.NAME).accept(this));
     then
     	if(engine.getRule(VeryOldEventRule.NAME).handle(context)) {
+       		update(context);
+        }
+end
+
+rule "CorrectMovingControll"
+	salience 150
+    when
+        context : RuleContext(engine.getRule(CorrectMovingControllRule.NAME).accept(this));
+    then
+    	if(engine.getRule(CorrectMovingControllRule.NAME).handle(context)) {
        		update(context);
         }
 end

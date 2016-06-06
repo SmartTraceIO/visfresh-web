@@ -677,6 +677,23 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         jdbc.update("update " + TABLE + " set " + ETA_FIELD + " = :eta where " + ID_FIELD + "=:s",
                 params);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#updateLastEventDate(com.visfresh.entities.Shipment, java.util.Date)
+     */
+    @Override
+    public void updateLastEventDate(final Shipment s, final Date lev) {
+        if (s == null) {
+            return;
+        }
+        s.setEta(lev);
+
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("s", s.getId());
+        params.put("lev", lev);
+
+        jdbc.update("update " + TABLE + " set " + LASTEVENT_FIELD + " = :lev where " + ID_FIELD + "=:s",
+                params);
+    }
     @Override
     public void markAsAutostarted(final Shipment s) {
         if (s == null) {

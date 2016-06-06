@@ -625,6 +625,16 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(eta.getTime(), s.getEta().getTime(), 1001);
     }
     @Test
+    public void testUpdateLastEventDate() {
+        Shipment s = createShipment(sharedCompany, ShipmentStatus.InProgress);
+        final Date date = new Date(System.currentTimeMillis() - 10000000l);
+
+        dao.updateLastEventDate(s, date);
+        s = dao.findOne(s.getId());
+
+        assertEquals(date.getTime(), s.getLastEventDate().getTime(), 1001);
+    }
+    @Test
     public void testMoveToNewDevice() {
         final Device d1 = createDevice("390248703928740");
         final Device d2 = createDevice("293087098709870");

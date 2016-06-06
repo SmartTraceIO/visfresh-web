@@ -3,18 +3,12 @@
  */
 package com.visfresh.io.json;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TimeZone;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.visfresh.entities.Language;
-import com.visfresh.entities.Location;
 import com.visfresh.rules.state.DeviceState;
-import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -23,8 +17,6 @@ import com.visfresh.utils.SerializerUtils;
  */
 public class DeviceStateSerializer {
     private static final String PROPERTIES = "properties";
-    private final DateFormat dateFormat = DateTimeUtils.createDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss", Language.English, TimeZone.getTimeZone("UTC"));
 
     /**
      * Default constructor.
@@ -66,15 +58,6 @@ public class DeviceStateSerializer {
                 props.addProperty(key, value);
             }
         }
-
-        //last location
-        if (state.getLastLocation() != null) {
-            json.addProperty("lat", state.getLastLocation().getLatitude());
-            json.addProperty("lon", state.getLastLocation().getLongitude());
-        }
-        if (state.getLastReadTime() != null) {
-            json.addProperty("lastReadTime", dateFormat.format(state.getLastReadTime()));
-        }
         return json;
     }
     /**
@@ -90,21 +73,6 @@ public class DeviceStateSerializer {
             final Set<Entry<String, JsonElement>> entrySet = obj.entrySet();
             for (final Entry<String, JsonElement> e : entrySet) {
                 s.setProperty(e.getKey(), e.getValue().getAsString());
-            }
-        }
-
-        //last location
-        if (json.has("lat")) {
-            final Location loc = new Location();
-            loc.setLatitude(json.get("lat").getAsDouble());
-            loc.setLongitude(json.get("lon").getAsDouble());
-            s.setLastLocation(loc);
-        }
-        if (json.has("lastReadTime")) {
-            try {
-                s.setLastReadTime(dateFormat.parse(json.get("lastReadTime").getAsString()));
-            } catch (final ParseException e) {
-                e.printStackTrace();
             }
         }
         return s;

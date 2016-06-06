@@ -5,7 +5,6 @@ package com.visfresh.rules;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -23,7 +22,6 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
-import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.TemperatureRule;
@@ -129,11 +127,6 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
 
         //check tracker event saved
         assertEquals(1, savedTrackerEvents.size());
-
-        //check last location
-        assertNotNull(state.getLastLocation());
-        assertEquals(e.getLocation().getLatitude(), state.getLastLocation().getLatitude(), 0.00001);
-        assertEquals(e.getLocation().getLongitude(), state.getLastLocation().getLongitude(), 0.00001);
     }
     @Test
     public void testShipmentState() throws RetryableException {
@@ -178,51 +171,6 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
 
         //check tracker event saved
         assertEquals(0, this.sessionCache.size());
-    }
-    @Test
-    public void testIgnoreBadData() throws RetryableException {
-        final Device device = createDevice("3249870239847908");
-        final Shipment s = new Shipment();
-        s.setId(77l);
-        s.setShipmentDescription("JUnit shipment");
-        detectedShipment = s;
-
-        final DeviceState state = new DeviceState();
-        state.setLastLocation(new Location(0., 0.));
-        state.setLastReadTime(new Date());
-        saveDeviceState(device.getImei(), state);
-
-        //run
-        final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
-        e.setDate(new Date(System.currentTimeMillis() - 10000));
-        e.setLocation(11.12, 13.14);
-        e.setType("AUT");
-        e.setImei(device.getImei());
-        e.getLocation().setLatitude(100.);
-        e.getLocation().setLongitude(100.);
-
-        processDcsEvent(e);
-
-        //check event ignored
-        assertEquals(0, numInvoked);
-
-        //test shipment is not saved
-        assertEquals(0, savedShipments.size());
-        assertEquals(0, savedTrackerEvents.size());
-
-        //test last location is not updated
-        final DeviceState st = getDeviceState(device.getImei());
-        assertEquals(0.0, st.getLastLocation().getLatitude(), 0.0001);
-        assertEquals(0.0, st.getLastLocation().getLongitude(), 0.0001);
-
-        //check not ignored if last event is so far
-        state.setLastReadTime(new Date(System.currentTimeMillis() - 60 * 60 * 1000L));
-        processDcsEvent(e);
-
-        //check event ignored
-        assertEquals(1, numInvoked);
-        assertEquals(1, savedShipments.size());
-        assertEquals(1, savedTrackerEvents.size());
     }
     @Test
     public void testAlertYetToFire() {
@@ -371,9 +319,9 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
      * @see com.visfresh.rules.AbstractRuleEngine#saveShipment(com.visfresh.entities.Shipment)
      */
     @Override
-    protected Shipment saveShipment(final Shipment shipment) {
+    protected void updateLastEventDate(final Shipment shipment, final Date date) {
+        shipment.setLastEventDate(date);
         savedShipments.add(shipment);
-        return shipment;
     }
     /* (non-Javadoc)
      * @see com.visfresh.rules.AbstractRuleEngine#saveTrackerEvent(com.visfresh.entities.TrackerEvent)

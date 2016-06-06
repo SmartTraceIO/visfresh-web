@@ -27,7 +27,6 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Device;
-import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentBase;
@@ -44,7 +43,6 @@ import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.SystemMessageHandler;
-import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -102,6 +100,44 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param event
      */
     public void processDcsEvent(final DeviceDcsNativeEvent event) throws RetryableException {
+        final TrackerEvent e = createTrackerEvent(event);
+
+        //process tracker event with rule engine.
+        DeviceState state = getDeviceState(event.getImei());
+        if (state == null) {
+            state = new DeviceState();
+        }
+
+        final RuleContext context = new RuleContext(e, sessionManager);
+        context.setDeviceState(state);
+
+        saveTrackerEvent(e);
+        log.debug("Tracker event accepted: " + e);
+
+        try {
+            invokeRules(context);
+
+            //update last shipment date.
+            final Shipment shipment = e.getShipment();
+            if (shipment != null) {
+                updateLastEventDate(shipment, e.getTime());
+
+                log.debug("Last shipment date of " + shipment.getShipmentDescription()
+                        + " has updated to " + shipment.getLastEventDate());
+            }
+        } finally {
+            saveDeviceState(event.getImei(), state);
+            if (e.getShipment() != null) {
+                sessionManager.unloadSession(e.getShipment(), true);
+            }
+        }
+    }
+
+    /**
+     * @param event
+     * @return
+     */
+    private TrackerEvent createTrackerEvent(final DeviceDcsNativeEvent event) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(event.getBattery());
         if (event.getLocation() != null) {
@@ -113,58 +149,9 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         e.setCreatedOn(event.getCreatedOn());
         e.setType(TrackerEventType.valueOf(event.getType()));
 
-        final String imei = event.getImei();
         //set device
-        e.setDevice(findDevice(imei));
-
-        //process tracker event with rule engine.
-        DeviceState state = getDeviceState(imei);
-        if (state == null) {
-            state = new DeviceState();
-        }
-
-        final RuleContext context = new RuleContext(e, sessionManager);
-        context.setDeviceState(state);
-
-        //check correct moving
-        if (state.getLastLocation() != null && state.getLastReadTime() != null
-                && e.getLatitude() != null && e.getLongitude() != null) {
-            final Location loc = state.getLastLocation();
-            final int meters = (int) LocationUtils.getDistanceMeters(loc.getLatitude(), loc.getLongitude(),
-                    e.getLatitude(), e.getLongitude());
-
-            final long dt = System.currentTimeMillis() - state.getLastReadTime().getTime();
-            if (meters > 200000 && dt < 30 * 60 * 1000l) {
-                log.warn("Incorrect device moving to " + meters + " meters has detected. Event has ignored");
-                return;
-            }
-        }
-
-        saveTrackerEvent(e);
-        log.debug("Tracker event accepted: " + e);
-
-        try {
-            invokeRules(context);
-
-            //update last shipment date.
-            final Shipment shipment = e.getShipment();
-            if (shipment != null) {
-                shipment.setLastEventDate(e.getTime());
-                saveShipment(shipment);
-
-                log.debug("Last shipment date of " + shipment.getShipmentDescription()
-                        + " has updated to " + shipment.getLastEventDate());
-            }
-        } finally {
-            state.setLastReadTime(e.getTime());
-            if (e.getLatitude() != null && e.getLongitude() != null) {
-                state.setLastLocation(new Location(e.getLatitude(), e.getLongitude()));
-            }
-            saveDeviceState(event.getImei(), state);
-            if (e.getShipment() != null) {
-                sessionManager.unloadSession(e.getShipment(), true);
-            }
-        }
+        e.setDevice(findDevice(event.getImei()));
+        return e;
     }
     /**
      * @param name rule name.
@@ -221,6 +208,13 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         } else {
             rules.put(name, rule);
         }
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.RuleEngine#hasRule(java.lang.String)
+     */
+    @Override
+    public boolean hasRule(final String name) {
+        return name == null ? false : rules.containsKey(name);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RuleEngine#getAlertYetFoFire(com.visfresh.entities.Shipment)
@@ -418,10 +412,12 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     }
     /**
      * @param shipment shipment.
+     * @param date last event date.
      * @return saved shipment.
      */
-    protected Shipment saveShipment(final Shipment shipment) {
-        return shipmentDao.save(shipment);
+    protected void updateLastEventDate(final Shipment shipment, final Date date) {
+        shipment.setLastEventDate(date);
+        shipmentDao.updateLastEventDate(shipment, date);
     }
     /**
      * @param e tracker event.

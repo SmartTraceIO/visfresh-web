@@ -80,4 +80,10 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @param newDevice new device.
      */
     void moveToNewDevice(Device oldDevice, Device newDevice);
+    /**
+     * @param shipment shipment.
+     * @param date new last event date.
+     * @return shipoment.
+     */
+    void updateLastEventDate(Shipment shipment, Date date);
 }
