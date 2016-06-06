@@ -3,6 +3,7 @@
  */
 package com.visfresh.tools;
 
+import com.visfresh.logs.LogUnit;
 import com.visfresh.tracker.DeviceMessage;
 
 /**
@@ -10,5 +11,5 @@ import com.visfresh.tracker.DeviceMessage;
  *
  */
 public interface ExtractedMessageHandler {
-    void handle(DeviceMessage m);
+    void handle(LogUnit u, DeviceMessage m);
 }

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
 import com.visfresh.jdbc.JdbcConfig;
+import com.visfresh.logs.LogUnit;
 import com.visfresh.tools.ExtractedMessageHandler;
 import com.visfresh.tools.LocationProviderBuilder;
 import com.visfresh.tools.MessageExtractor;
@@ -77,7 +78,7 @@ public class NativeDcsMessageInjector implements ExtractedMessageHandler {
      * @see com.visfresh.tools.ExtractedMessageHandler#handle(com.visfresh.tracker.DeviceMessage)
      */
     @Override
-    public void handle(final DeviceMessage m) {
+    public void handle(LogUnit u, final DeviceMessage m) {
         if (types.contains(m.getType())) {
             final String payload = buildSystemMessagePayload(m);
             saveSystemMessage(payload);

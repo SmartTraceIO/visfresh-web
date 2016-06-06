@@ -87,16 +87,17 @@ public class MessageExtractor extends AbstractVisfreshLogParser {
                     m.setLocation(getLocationProvider().getLocation(m.getStations()));
                 }
 
-                fireMessageExtracted(m);
+                fireMessageExtracted(u, m);
             }
         }
     }
     /**
+     * @param u log unit.
      * @param m message.
      */
-    private void fireMessageExtracted(final DeviceMessage m) {
+    private void fireMessageExtracted(final LogUnit u, final DeviceMessage m) {
         for (final ExtractedMessageHandler h : this.handlers) {
-            h.handle(m);
+            h.handle(u, m);
         }
     }
     /**
