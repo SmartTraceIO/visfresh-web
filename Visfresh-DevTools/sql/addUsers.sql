@@ -1,0 +1,21 @@
+INSERT INTO `users`
+(
+`password`,
+`firstname`,
+`lastname`,
+`email`,
+`phone`,
+`roles`,
+`company`,
+`active`)
+VALUES
+(
+'9d70bea0ac268c4d33683f3c1da67bf4',
+'Vyacheslav',
+'Soldatov',
+'vyacheslav.soldatov@inbox.ru',
+'+380662133219',
+'Admin',
+2,
+true
+);
