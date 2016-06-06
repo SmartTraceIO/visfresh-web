@@ -24,7 +24,7 @@ import com.visfresh.tracker.LocationProvider;
  *
  */
 public class MessageExtractor extends AbstractVisfreshLogParser {
-    private final Set<String> devices = new HashSet<>();
+    protected final Set<String> devices = new HashSet<>();
     private final List<ExtractedMessageHandler> handlers = new LinkedList<>();
     private DeviceMessageParser parser = new DeviceMessageParser();
     private LocationProvider locationProvider;
@@ -83,7 +83,7 @@ public class MessageExtractor extends AbstractVisfreshLogParser {
             //add logging time
             for (final DeviceMessage m: ms) {
                 m.setLoggTime(u.getDate());
-                if (m.getStations().size() > 0) {
+                if (getLocationProvider() != null && m.getStations().size() > 0) {
                     m.setLocation(getLocationProvider().getLocation(m.getStations()));
                 }
 
@@ -103,7 +103,7 @@ public class MessageExtractor extends AbstractVisfreshLogParser {
      * @param message
      * @return
      */
-    private boolean containsDevice(final String message) {
+    protected boolean containsDevice(final String message) {
         for (final String imei : devices) {
             if (message.contains(imei)) {
                 return true;

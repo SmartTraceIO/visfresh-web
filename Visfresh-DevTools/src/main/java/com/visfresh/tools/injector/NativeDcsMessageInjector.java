@@ -64,6 +64,11 @@ public class NativeDcsMessageInjector implements ExtractedMessageHandler {
         types.add("STP");
         types.add("BRT");
         types.add("DRK");
+        types.add("BAT0");
+        types.add("BAT1");
+        types.add("BAT2");
+        types.add("CRG0");
+        types.add("CRG1");
 
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
