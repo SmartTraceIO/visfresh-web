@@ -33,6 +33,7 @@ public interface ShipmentConstants extends BaseShipmentConstants {
     String DEVICE_IMEI = "deviceImei";
     String DEVICE_SN = "deviceSN";
     String DEVICE_NAME = "deviceName";
+    String DEVICE_COLOR = "deviceColor";
     String STATUS = "status";
     String SIBLING_COUNT = "siblingCount";
     String LAST_READING_TIME = "lastReadingTime";

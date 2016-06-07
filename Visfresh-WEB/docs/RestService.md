@@ -2536,6 +2536,7 @@ Response:
   "response": {
     "shipmentId": 9088,
     "deviceSN": "000011",
+    "deviceColor": "Crimson",
     "deviceName": "Device Name",
     "tripCount": 1,
     "shipmentDescription": "Any Description",
@@ -2543,6 +2544,7 @@ Response:
     "assetNum": "10515",
     "assetType": "SeaContainer",
     "status": "InProgress",
+    "isLatestShipment": true,
     "trackerPositionFrontPercent": 0,
     "trackerPositionLeftPercent": 100,
     "alertProfileId": 3985,

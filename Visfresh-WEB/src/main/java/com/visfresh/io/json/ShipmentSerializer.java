@@ -574,6 +574,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         json.addProperty("shipmentId", dto.getShipmentId()); /*+*/
         json.addProperty(ShipmentConstants.DEVICE_SN, dto.getDeviceSN()); /*+*/
+        json.addProperty(ShipmentConstants.DEVICE_COLOR, dto.getDeviceColor());
         if (isNotSibling) {
             json.addProperty(ShipmentConstants.DEVICE_NAME, dto.getDeviceName());
         }
@@ -586,6 +587,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("assetType", dto.getAssetType());
             json.addProperty("status", dto.getStatus().name());
         }
+        json.addProperty("isLatestShipment", dto.isLatestShipment());
         json.addProperty("trackerPositionFrontPercent", dto.getTrackerPositionFrontPercent()); /*+*/
         json.addProperty("trackerPositionLeftPercent", dto.getTrackerPositionLeftPercent()); /*+*/
 

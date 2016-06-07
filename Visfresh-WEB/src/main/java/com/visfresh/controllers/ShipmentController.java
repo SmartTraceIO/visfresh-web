@@ -996,7 +996,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return createErrorResponse(e);
         }
     }
-
     /**
      * @param dto
      */
@@ -1276,12 +1275,15 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         dto.setNoAlertsAfterArrivalMinutes(shipment.getNoAlertsAfterArrivalMinutes());
         dto.setNoAlertsAfterStartMinutes(shipment.getNoAlertsAfterStartMinutes());
         dto.setShutDownAfterStartMinutes(shipment.getShutDownAfterStartMinutes());
+        dto.setDeviceColor(shipment.getDevice().getColor() == null ? null : shipment.getDevice().getColor().name());
 
         final Date startTime = shipment.getShipmentDate();
 
         dto.setDeviceName(shipment.getDevice().getName());
         dto.setDeviceSN(shipment.getDevice().getSn());
         dto.setShipmentType(shipment.isAutostart() ? "Autostart": "Manual");
+        dto.setLatestShipment(shipment.getTripCount() == shipment.getDevice().getTripCount()
+                && shipment.getStatus() != ShipmentStatus.Ended);
 
         if (shipment.getShippedTo() != null) {
             dto.setEndLocation(shipment.getShippedTo().getName());

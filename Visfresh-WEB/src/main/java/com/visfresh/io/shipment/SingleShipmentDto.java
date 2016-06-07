@@ -85,6 +85,8 @@ public class SingleShipmentDto {
     private final List<InterimStopDto> interimStops = new LinkedList<>();
     private final List<NoteDto> notes = new LinkedList<>();
     private final List<DeviceGroupDto> deviceGroups = new LinkedList<>();
+    private String deviceColor;
+    private boolean isLatestShipment;
 
     /**
      * Default constructor.
@@ -128,6 +130,18 @@ public class SingleShipmentDto {
      */
     public void setDeviceName(final String deviceName) {
         this.deviceName = deviceName;
+    }
+    /**
+     * @param c device color.
+     */
+    public void setDeviceColor(final String c) {
+        this.deviceColor = c;
+    }
+    /**
+     * @return the deviceColor
+     */
+    public String getDeviceColor() {
+        return deviceColor;
     }
     /**
      * @return the tripCount
@@ -780,5 +794,17 @@ public class SingleShipmentDto {
      */
     public List<DeviceGroupDto> getDeviceGroups() {
         return deviceGroups;
+    }
+    /**
+     * @param latest
+     */
+    public void setLatestShipment(final boolean latest) {
+        isLatestShipment = latest;
+    }
+    /**
+     * @return the isLatestShipment
+     */
+    public boolean isLatestShipment() {
+        return isLatestShipment;
     }
 }

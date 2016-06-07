@@ -36,11 +36,28 @@ public enum TrackerEventType {
      * means the device enters dark environment
      */
     DRK,
-    //unexpected types
+    /**
+     * the charger is not inserted and average battery voltage is less than 3400mV
+     */
     BAT0,
+    /**
+     * the charger is not inserted and average battery voltage is less than 3500mV
+     */
     BAT1,
+    /**
+     * the charger is not inserted and average battery voltage is more than 3500mV,
+     */
     BAT2,
+    /**
+     * the charger is inserted and battery is charging
+     */
     CRG0,
+    /**
+     * the charger is inserted and battery is full
+     */
     CRG1,
+    /**
+     * Undefined message type.
+     */
     UNDEF
 }
