@@ -469,6 +469,10 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         if (json.has("goods")) {
             req.setGoods(asString(json.get("goods")));
         }
+        if (json.has("excludePriorShipments")) {
+            req.setExcludePriorShipments(asBoolean(json.get("excludePriorShipments")));
+        }
+
         if (json.has("pageIndex")) {
             req.setPageIndex(asInt(json.get("pageIndex")));
         }
@@ -530,6 +534,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
         if (r.getGoods() != null) {
             obj.addProperty("goods", r.getGoods());
+        }
+        if (r.getExcludePriorShipments() != null) {
+            obj.addProperty("excludePriorShipments", r.getExcludePriorShipments());
         }
         if (r.getPageIndex() != null) {
             obj.addProperty("pageIndex", r.getPageIndex());

@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.ShipmentTemplateConstants;
+import com.visfresh.dao.Filter;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.entities.ShipmentTemplate;
 
@@ -92,7 +93,7 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
      * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
      */
     @Override
-    protected String buildSelectBlockForFindAll() {
+    protected String buildSelectBlockForFindAll(Filter filter) {
         return "select "
                 + getTableName()
                 + ".*"

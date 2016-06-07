@@ -134,7 +134,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
      */
     @Override
-    protected String buildSelectBlockForFindAll() {
+    protected String buildSelectBlockForFindAll(Filter filter) {
         final String table = getTableName();
         return "select "
                 + table
@@ -148,7 +148,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * @return
      */
     @Override
-    protected String buildSelectBlockForEntityCount() {
+    protected String buildSelectBlockForEntityCount(Filter filter) {
         final String table = getTableName();
         return "select count(*) as count"
                 + " from " + table

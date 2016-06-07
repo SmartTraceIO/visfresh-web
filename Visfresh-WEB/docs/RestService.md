@@ -985,7 +985,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "shippedFrom": [], //array of ID of shipped from locations
   "shippedTo": [], //array of ID of shipped to locations
   "status": "InProgress",
-  "goods": "JUnit"
+  "goods": "JUnit",
+  "excludePriorShipments": true,
   "pageIndex": 10,
   "pageSize": 200,
   "sortOrder": "asc",

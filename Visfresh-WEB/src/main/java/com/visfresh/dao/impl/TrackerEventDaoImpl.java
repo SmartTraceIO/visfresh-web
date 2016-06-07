@@ -365,7 +365,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         for (final String imei : imeis) {
             final String key = "imei_" + index;
 
-            final String sql = "(" + buildSelectBlockForFindAll()
+            final String sql = "(" + buildSelectBlockForFindAll(null)
                     + " where " + DEVICE_FIELD + "=:" + key
                     + " order by " + ID_FIELD + " desc limit 1"
                     + ")";
@@ -461,7 +461,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
             params.put("endDate", endDate);
         }
 
-        final StringBuilder sql = new StringBuilder(buildSelectBlockForFindAll());
+        final StringBuilder sql = new StringBuilder(buildSelectBlockForFindAll(null));
         sql.append(" where " + DEVICE_FIELD + "=:device");
         if (startDate != null) {
             sql.append(" and " + TIME_FIELD + " >= :startDate");

@@ -26,6 +26,7 @@ public interface ShipmentConstants extends BaseShipmentConstants {
     String ARRIVAL_DATE = "actualArrivalDate";
     String ETA = "eta";
     String GOODS = "goods";
+    String EXCLUDE_PRIOR_SHIPMENTS = "excludePriorShipments";
 
     String ALERT_PROFILE_NAME = "alertProfileName";
     String ALERT_PROFILE = "alertProfile";

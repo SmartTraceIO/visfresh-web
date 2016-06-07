@@ -267,16 +267,17 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         }
 
         final List<Map<String, Object>> list = jdbc.queryForList(
-                buildSelectBlockForEntityCount()
+                buildSelectBlockForEntityCount(filter)
                 + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")),
                 params);
         return ((Number) list.get(0).get("count")).intValue();
     }
 
     /**
+     * @param filter the filter.
      * @return
      */
-    protected String buildSelectBlockForEntityCount() {
+    protected String buildSelectBlockForEntityCount(final Filter filter) {
         return "select count(*) as count from " + getTableName();
     }
 
@@ -301,7 +302,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         final List<String> filters = new LinkedList<String>();
         final List<String> sorts = new LinkedList<String>();
 
-        final String selectAll = buildSelectBlockForFindAll();
+        final String selectAll = buildSelectBlockForFindAll(filter);
         if (filter != null) {
             addFiltesForFindAll(filter, params, filters);
         }
@@ -326,12 +327,12 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         return result;
     }
     /**
-     * @return
+     * @param filter the filter.
+     * @return select all string depending of filter.
      */
-    protected String buildSelectBlockForFindAll() {
+    protected String buildSelectBlockForFindAll(final Filter filter) {
         return "select * from " + getTableName();
     }
-
     /**
      * @param t
      * @param map

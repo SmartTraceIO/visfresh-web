@@ -26,6 +26,7 @@ public class GetFilteredShipmentsRequest {
     private String deviceImei;
     private ShipmentStatus status;
     private String goods;
+    private Boolean excludePriorShipments;
     private Integer pageIndex;
     private Integer pageSize;
     private String sortOrder;
@@ -241,5 +242,17 @@ public class GetFilteredShipmentsRequest {
      */
     public void setGoods(final String goods) {
         this.goods = goods;
+    }
+    /**
+     * @return the excludePriorShipments
+     */
+    public Boolean getExcludePriorShipments() {
+        return excludePriorShipments;
+    }
+    /**
+     * @param excludePriorShipments the excludePriorShipments to set
+     */
+    public void setExcludePriorShipments(final Boolean excludePriorShipments) {
+        this.excludePriorShipments = excludePriorShipments;
     }
 }

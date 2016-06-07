@@ -760,6 +760,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         if (req.getGoods() != null) {
             f.addFilter(GOODS, req.getGoods());
         }
+        if (Boolean.TRUE.equals(req.getExcludePriorShipments())) {
+            f.addFilter(EXCLUDE_PRIOR_SHIPMENTS, true);
+        }
         return f;
     }
     /**

@@ -496,6 +496,8 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             sb.append(TABLE + "." + ASSETNUM_FIELD + " like :" + defaultKey);
             sb.append(')');
             filters.add(sb.toString());
+        } else if (ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS.equals(property)){
+            //nothing in where clause
         } else {
             super.addFilterValue(property, value, params, filters);
         }
@@ -569,8 +571,8 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
      */
     @Override
-    protected String buildSelectBlockForFindAll() {
-        return "select "
+    protected String buildSelectBlockForFindAll(final Filter filter) {
+        String selectAll = "select "
             + getTableName()
             + ".*"
             + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6)"
@@ -598,8 +600,27 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             + " join (select max(id) as id from " + TrackerEventDaoImpl.TABLE
             + " group by " + TrackerEventDaoImpl.SHIPMENT_FIELD + ") t1"
             + " on t1.id = t.id) te\n"
-            + "on te.shipment = " + getTableName() + "." + ID_FIELD + "\n"
-            ;
+            + "on te.shipment = " + getTableName() + "." + ID_FIELD + "\n";
+        if (filter != null && Boolean.TRUE.equals(filter.getFilter(ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS))) {
+            selectAll += "join (select max(id) as id from shipments group by device) newest on "
+                    + TABLE
+                    + ".id = newest.id\n";
+        }
+
+        return selectAll;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForEntityCount(com.visfresh.dao.Filter)
+     */
+    @Override
+    protected String buildSelectBlockForEntityCount(final Filter filter) {
+        String selectAll = super.buildSelectBlockForEntityCount(filter);
+        if (filter != null && Boolean.TRUE.equals(filter.getFilter(ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS))) {
+            selectAll += "\njoin (select max(id) as id from shipments group by device) newest on "
+                    + TABLE
+                    + ".id = newest.id\n";
+        }
+        return selectAll;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#addSortForDbField(java.lang.String, java.util.List, boolean)

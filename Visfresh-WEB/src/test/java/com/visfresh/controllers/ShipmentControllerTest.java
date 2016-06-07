@@ -1145,6 +1145,26 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(1, shipments.size());
         assertEquals(s3.getId().longValue(),
                 shipments.get(0).getAsJsonObject().get(ShipmentConstants.SHIPMENT_ID).getAsLong());
+        assertEquals(1, currentJsonResponse.get("totalCount").getAsInt());
+   }
+    @Test
+    public void testExcludePriorShipments() throws RestServiceException, IOException {
+        createShipment(true);
+        createShipment(true);
+        final Shipment s3 = createShipment(true);
+
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        JsonArray shipments;
+        shipments = shipmentClient.getShipments(req);
+        assertEquals(3, shipments.size());
+        assertEquals(3, currentJsonResponse.get("totalCount").getAsInt());
+
+        req.setExcludePriorShipments(true);
+        shipments = shipmentClient.getShipments(req);
+        assertEquals(1, shipments.size());
+        assertEquals(s3.getId().longValue(),
+                shipments.get(0).getAsJsonObject().get(ShipmentConstants.SHIPMENT_ID).getAsLong());
+        assertEquals(1, currentJsonResponse.get("totalCount").getAsInt());
     }
     @Test
     public void testSaveEmpty() throws RestServiceException, IOException {

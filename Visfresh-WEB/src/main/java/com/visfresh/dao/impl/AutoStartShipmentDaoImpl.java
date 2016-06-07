@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.constants.AutoStartShipmentConstants;
 import com.visfresh.constants.ShipmentTemplateConstants;
 import com.visfresh.dao.AutoStartShipmentDao;
+import com.visfresh.dao.Filter;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.entities.AutoStartShipment;
@@ -407,7 +408,7 @@ public class AutoStartShipmentDaoImpl
      * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
      */
     @Override
-    protected String buildSelectBlockForFindAll() {
+    protected String buildSelectBlockForFindAll(Filter filter) {
         return "select "
                 //first group for sorting
                 + "lfrom.locationName as " + AutoStartShipmentConstants.START_LOCATIONS + ","
