@@ -485,6 +485,17 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             filters.add(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
         } else if (ShipmentConstants.DEVICE_SN.equals(property)){
             filters.add(ShipmentConstants.DEVICE_SN + " = :" + defaultKey);
+        } else if (ShipmentConstants.GOODS.equals(property)){
+            params.put(defaultKey, "%" + value + "%");
+            final StringBuilder sb = new StringBuilder();
+            sb.append('(');
+            sb.append(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
+            sb.append(" or ");
+            sb.append(TABLE + "." + PALETTID_FIELD + " like :" + defaultKey);
+            sb.append(" or ");
+            sb.append(TABLE + "." + ASSETNUM_FIELD + " like :" + defaultKey);
+            sb.append(')');
+            filters.add(sb.toString());
         } else {
             super.addFilterValue(property, value, params, filters);
         }

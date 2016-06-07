@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -1108,6 +1109,42 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         alertDao.save(alert);
 
         assertEquals(1, shipmentClient.getShipments(req).size());
+    }
+    @Test
+    public void testFilteredByGoods() throws RestServiceException, IOException {
+        final String s1Goods = "s1Goods";
+        final String s2Goods = "s2Goods";
+        final String s3Goods = "s3Goods";
+
+        final Shipment s1 = createShipment(true);
+        s1.setShipmentDescription(s1Goods);
+        final Shipment s2 = createShipment(true);
+        s2.setPalletId(s2Goods);
+        final Shipment s3 = createShipment(true);
+        s3.setAssetNum(s3Goods);
+
+        shipmentDao.save(Arrays.asList(s1, s2, s3));
+
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        JsonArray shipments;
+
+        req.setGoods(s1Goods);
+        shipments = shipmentClient.getShipments(req);
+        assertEquals(1, shipments.size());
+        assertEquals(s1.getId().longValue(),
+                shipments.get(0).getAsJsonObject().get(ShipmentConstants.SHIPMENT_ID).getAsLong());
+
+        req.setGoods(s2Goods);
+        shipments = shipmentClient.getShipments(req);
+        assertEquals(1, shipments.size());
+        assertEquals(s2.getId().longValue(),
+                shipments.get(0).getAsJsonObject().get(ShipmentConstants.SHIPMENT_ID).getAsLong());
+
+        req.setGoods(s3Goods);
+        shipments = shipmentClient.getShipments(req);
+        assertEquals(1, shipments.size());
+        assertEquals(s3.getId().longValue(),
+                shipments.get(0).getAsJsonObject().get(ShipmentConstants.SHIPMENT_ID).getAsLong());
     }
     @Test
     public void testSaveEmpty() throws RestServiceException, IOException {

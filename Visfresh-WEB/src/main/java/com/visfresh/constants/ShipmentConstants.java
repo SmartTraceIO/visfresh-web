@@ -25,6 +25,7 @@ public interface ShipmentConstants extends BaseShipmentConstants {
     String ONLY_WITH_ALERTS = "alertsOnly";
     String ARRIVAL_DATE = "actualArrivalDate";
     String ETA = "eta";
+    String GOODS = "goods";
 
     String ALERT_PROFILE_NAME = "alertProfileName";
     String ALERT_PROFILE = "alertProfile";

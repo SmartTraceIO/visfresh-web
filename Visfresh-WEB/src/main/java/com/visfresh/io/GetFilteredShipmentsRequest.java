@@ -25,6 +25,7 @@ public class GetFilteredShipmentsRequest {
     private String shipmentDescription;
     private String deviceImei;
     private ShipmentStatus status;
+    private String goods;
     private Integer pageIndex;
     private Integer pageSize;
     private String sortOrder;
@@ -228,5 +229,17 @@ public class GetFilteredShipmentsRequest {
      */
     public void setSortColumn(final String sortColumn) {
         this.sortColumn = sortColumn;
+    }
+    /**
+     * @return the goods
+     */
+    public String getGoods() {
+        return goods;
+    }
+    /**
+     * @param goods the goods to set
+     */
+    public void setGoods(final String goods) {
+        this.goods = goods;
     }
 }

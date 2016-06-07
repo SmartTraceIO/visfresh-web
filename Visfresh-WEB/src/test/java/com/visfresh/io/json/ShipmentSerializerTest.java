@@ -202,6 +202,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertNull(req.getShippedFrom());
         assertNull(req.getShippedTo());
         assertNull(req.getStatus());
+        assertNull(req.getGoods());
 
         //test not null values
         req = new GetFilteredShipmentsRequest();
@@ -222,6 +223,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         shippedTo.add(2l);
         shippedTo.add(3l);
         final ShipmentStatus status = ShipmentStatus.InProgress;
+        final String goods = "ABC";
         final Integer pageIndex = 10;
         final Integer pageSize = 200;
         final String sortColumn = "anyColumn";
@@ -239,6 +241,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         req.setShippedFrom(shippedFrom);
         req.setShippedTo(shippedTo);
         req.setStatus(status);
+        req.setGoods(goods);
         req.setPageIndex(pageIndex);
         req.setPageSize(pageSize);
         req.setSortColumn(sortColumn);
@@ -259,6 +262,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(2, req.getShippedFrom().size());
         assertEquals(3, req.getShippedTo().size());
         assertEquals(status, req.getStatus());
+        assertEquals(goods, req.getGoods());
         assertEquals(pageIndex, req.getPageIndex());
         assertEquals(pageSize, req.getPageSize());
         assertEquals(sortColumn, req.getSortColumn());

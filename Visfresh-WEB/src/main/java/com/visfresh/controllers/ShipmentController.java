@@ -757,6 +757,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         if (req.isAlertsOnly()) {
             f.addFilter(ONLY_WITH_ALERTS, Boolean.TRUE);
         }
+        if (req.getGoods() != null) {
+            f.addFilter(GOODS, req.getGoods());
+        }
         return f;
     }
     /**

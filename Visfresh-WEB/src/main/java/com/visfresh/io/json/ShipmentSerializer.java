@@ -466,6 +466,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             final String statusString = asString(json.get("status"));
             req.setStatus(statusString == null ? null : ShipmentStatus.valueOf(statusString));
         }
+        if (json.has("goods")) {
+            req.setGoods(asString(json.get("goods")));
+        }
         if (json.has("pageIndex")) {
             req.setPageIndex(asInt(json.get("pageIndex")));
         }
@@ -524,6 +527,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
         if (r.getStatus() != null) {
             obj.addProperty("status", r.getStatus().toString());
+        }
+        if (r.getGoods() != null) {
+            obj.addProperty("goods", r.getGoods());
         }
         if (r.getPageIndex() != null) {
             obj.addProperty("pageIndex", r.getPageIndex());
