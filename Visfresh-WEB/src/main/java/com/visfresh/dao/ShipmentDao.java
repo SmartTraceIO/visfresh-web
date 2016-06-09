@@ -32,16 +32,6 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      */
     List<Shipment> findActiveShipments(Company company);
     /**
-     * @param siblingGroup sibling group.
-     * @return list of siblings in given group
-     */
-    List<Shipment> getSiblingGroup(Long siblingGroup);
-    /**
-     * @param siblingGroup sibling group.
-     * @return count of siblings on given group.
-     */
-    int getGroupSize(Long siblingGroup);
-    /**
      * @param s the shipment.
      * @return next shipment for given.
      */
@@ -51,16 +41,10 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @return new shipment from given template.
      */
     Shipment createNewFrom(ShipmentTemplate tpl);
-    /**
-     * @param shipments shipment.
-     * @param siblingGroup sibling group.
-     * @param siblingCount sibling count.
-     */
-    void updateSiblingInfo(List<Shipment> shipments, Long siblingGroup, int siblingCount);
     @Override
     <S extends Shipment> S save(S s);
     /**
-     * @param company TODO
+     * @param company company
      * @param sn serial number.
      * @param trip trip count.
      * @return shipment
@@ -86,4 +70,8 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @return shipoment.
      */
     void updateLastEventDate(Shipment shipment, Date date);
+    /**
+     * @param s shipment.
+     */
+    void updateSiblingInfo(Shipment s);
 }

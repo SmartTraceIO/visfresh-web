@@ -947,16 +947,18 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     }
     @Test
     public void testGetSingleShipmentByDeviceGroups() throws RestServiceException, IOException {
-        final Long siblingGroup = 1234567l;
-
         final Device d1 = createDevice("1923087980000117", true);
         final Shipment s1 = createShipment(d1, true);
-        s1.setSiblingGroup(siblingGroup);
+        s1.getSiblings().add(11l);
+        s1.getSiblings().add(12l);
+        s1.getSiblings().add(13l);
         shipmentDao.save(s1);
 
         final Device d2 = createDevice("2304870870987087", true);
         final Shipment s2 = createShipment(d2, true);
-        s2.setSiblingGroup(siblingGroup);
+        s1.getSiblings().add(11l);
+        s1.getSiblings().add(12l);
+        s1.getSiblings().add(13l);
         shipmentDao.save(s2);
 
         //add to device groups

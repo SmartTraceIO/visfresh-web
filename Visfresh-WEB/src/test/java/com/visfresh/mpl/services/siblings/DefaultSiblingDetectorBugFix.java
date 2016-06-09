@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -30,7 +31,6 @@ import com.visfresh.utils.CollectionUtils;
 public class DefaultSiblingDetectorBugFix extends DefaultSiblingDetector {
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final Map<Long, Shipment> activeShipments = new HashMap<>();
-    private final Map<Long, Shipment> savedShipments = new HashMap<>();
     private final Map<Long, List<TrackerEvent>> trackerEvents = new HashMap<>();
 
     private Company company;
@@ -122,34 +122,15 @@ public class DefaultSiblingDetectorBugFix extends DefaultSiblingDetector {
         CollectionUtils.sortById(list);
         return list;
     }
+
     /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#saveShipment(com.visfresh.entities.Shipment)
+     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#updateSiblingInfo(com.visfresh.entities.Shipment, java.util.Set)
      */
     @Override
-    protected void updateSiblingInfo(final List<Shipment> shipments, final Long siblingGroup, final int siblingCount) {
-        for (final Shipment shipment : shipments) {
-            shipment.setSiblingGroup(siblingGroup);
-            shipment.setSiblingCount(siblingCount);
-            savedShipments.put(shipment.getId(), shipment);
-        }
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#getInactiveSiblings(java.lang.Long)
-     */
-    @Override
-    protected List<Shipment> getInactiveSiblings(final Long groupId) {
-        return new LinkedList<Shipment>();
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#getTrackeEvents(com.visfresh.entities.Shipment)
-     */
-    @Override
-    protected TrackerEvent[] getTrackeEvents(final Shipment shipment) {
-        final List<TrackerEvent> events = trackerEvents.get(shipment.getId());
-        if (events == null) {
-            return new TrackerEvent[0];
-        }
-        return events.toArray(new TrackerEvent[events.size()]);
+    protected void updateSiblingInfo(final Shipment master, final Set<Long> set) {
+        master.getSiblings().clear();
+        master.getSiblings().addAll(set);
+        master.setSiblingCount(set.size());
     }
 
     public static void main(final String[] args) throws Exception {

@@ -251,8 +251,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         s.setCreatedBy(dto.getCreatedBy());
         s.setStatus(dto.getStatus());
         s.setDeviceShutdownTime(dto.getDeviceShutdownTime());
-        s.setSiblingGroup(dto.getSiblingGroup());
-        s.setSiblingCount(dto.getSiblingCount());
         s.setArrivalDate(dto.getArrivalDate());
         s.setEta(dto.getEta());
 

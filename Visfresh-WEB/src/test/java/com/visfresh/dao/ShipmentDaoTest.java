@@ -13,7 +13,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -200,8 +199,9 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.getAlertsNotificationSchedules().add(alertNotifSched);
         s.getArrivalNotificationSchedules().add(arrivalSched);
         s.setCommentsForReceiver("commentsForReceiver");
-        s.setSiblingGroup(77l);
         s.setSiblingCount(11);
+        s.getSiblings().add(7l);
+        s.getSiblings().add(8l);
         s.setNoAlertsAfterArrivalMinutes(7);
         s.setNoAlertsAfterStartMinutes(77);
         s.setShutDownAfterStartMinutes(9);
@@ -247,7 +247,9 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(1, s.getAlertsNotificationSchedules().size());
         assertEquals(1, s.getArrivalNotificationSchedules().size());
         assertEquals("commentsForReceiver", s.getCommentsForReceiver());
-        assertEquals(77l, s.getSiblingGroup().longValue());
+        assertEquals(2, s.getSiblings().size());
+        assertTrue(s.getSiblings().contains(7l));
+        assertTrue(s.getSiblings().contains(8l));
         assertEquals(11, s.getSiblingCount());
         assertEquals(new Integer(7), s.getNoAlertsAfterArrivalMinutes());
         assertEquals(new Integer(77), s.getNoAlertsAfterStartMinutes());
@@ -438,20 +440,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(2, dao.findActiveShipments(c1.getImei()).size());
     }
     @Test
-    public void testGetSiblingGroup() {
-        //create companies
-        final long g1 = 7l;
-        final long g2 = 8l;
-
-        //create shipments
-        createShipmentByGroup(sharedCompany, g1);
-        createShipmentByGroup(sharedCompany, g1);
-        createShipmentByGroup(sharedCompany, g2);
-
-        assertEquals(2, dao.getSiblingGroup(g1).size());
-        assertEquals(0, dao.getSiblingGroup(1l).size());
-    }
-    @Test
     public void testSelectIfNullDevice() {
         final Shipment s = createShipment(sharedCompany, ShipmentStatus.Arrived);
         s.setDevice(null);
@@ -588,31 +576,30 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
     }
     @Test
     public void testUpdateSiblingInfo() {
-        Shipment s1 = createShipment(null, 0);
-        Shipment s2 = createShipment(null, 0);
-        Shipment s3 = createShipment(null, 0);
+        Shipment s = createTestEntity();
+        s.getSiblings().clear();
+        s.setSiblingCount(0);
+        s = dao.save(s);
 
-        final List<Shipment> list = new LinkedList<Shipment>();
-        list.add(s1);
-        list.add(s3);
-
-        final Long siblingGroup = 777l;
-        final int siblingCount = 3;
-        dao.updateSiblingInfo(list, siblingGroup, siblingCount);
+        dao.updateSiblingInfo(s);
 
         //check sibling group and sibling count updated
-        s1 = dao.findOne(s1.getId());
-        s2 = dao.findOne(s2.getId());
-        s3 = dao.findOne(s3.getId());
+        s = dao.findOne(s.getId());
+        assertEquals(0, s.getSiblingCount());
+        assertEquals(0, s.getSiblings().size());
 
-        assertEquals(siblingGroup, s1.getSiblingGroup());
-        assertEquals(siblingCount, s1.getSiblingCount());
+        //add siblings
+        s.getSiblings().add(1l);
+        s.getSiblings().add(2l);
 
-        assertEquals(null, s2.getSiblingGroup());
-        assertEquals(0, s2.getSiblingCount());
+        dao.updateSiblingInfo(s);
 
-        assertEquals(siblingGroup, s3.getSiblingGroup());
-        assertEquals(siblingCount, s3.getSiblingCount());
+        //check sibling group and sibling count updated
+        s = dao.findOne(s.getId());
+        assertEquals(2, s.getSiblingCount());
+        assertEquals(2, s.getSiblings().size());
+        assertTrue(s.getSiblings().contains(1l));
+        assertTrue(s.getSiblings().contains(2l));
     }
     @Test
     public void testUpdateEta() {
@@ -643,27 +630,6 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         dao.moveToNewDevice(d1, d2);
         assertEquals(d2.getImei(), dao.findOne(a.getId()).getDevice().getImei());
-    }
-    /**
-     * @param siblingGroup sibling group.
-     * @param siblingCount sibling count.
-     * @return shipment.
-     */
-    private Shipment createShipment(final Long siblingGroup, final int siblingCount) {
-        final Shipment s = createTestEntity();
-        s.setSiblingGroup(siblingGroup);
-        s.setSiblingCount(siblingCount);
-        return dao.save(s);
-    }
-    /**
-     * @param c company.
-     * @param group sibling group.
-     */
-    private Shipment createShipmentByGroup(final Company c, final long group) {
-        final Shipment s = createTestEntity();
-        s.setCompany(c);
-        s.setSiblingGroup(group);
-        return dao.save(s);
     }
     /**
      * @param c company.

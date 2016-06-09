@@ -65,7 +65,6 @@ public class ShipmentDto extends ShipmentBaseDto {
      */
     private ShipmentStatus status = ShipmentStatus.Default;
     private Date deviceShutdownTime;
-    private Long siblingGroup;
     private int siblingCount;
     private Date arrivalDate;
     private Date eta;
@@ -100,8 +99,7 @@ public class ShipmentDto extends ShipmentBaseDto {
         setCreatedBy(s.getCreatedBy());
         setStatus(s.getStatus());
         setDeviceShutdownTime(s.getDeviceShutdownTime());
-        setSiblingGroup(s.getSiblingGroup());
-        setSiblingCount(s.getSiblingCount());
+        setSiblingCount(s.getSiblings().size());
         setArrivalDate(s.getArrivalDate());
         setEta(s.getEta());
     }
@@ -273,18 +271,6 @@ public class ShipmentDto extends ShipmentBaseDto {
      */
     public void setDeviceShutdownTime(final Date deviceShutdownTime) {
         this.deviceShutdownTime = deviceShutdownTime;
-    }
-    /**
-     * @return the siblingGroup
-     */
-    public Long getSiblingGroup() {
-        return siblingGroup;
-    }
-    /**
-     * @param siblingGroup the siblingGroup to set
-     */
-    public void setSiblingGroup(final Long siblingGroup) {
-        this.siblingGroup = siblingGroup;
     }
     /**
      * @return the siblingCount

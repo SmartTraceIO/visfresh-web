@@ -5,7 +5,9 @@ package com.visfresh.entities;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -63,8 +65,8 @@ public class Shipment extends ShipmentBase {
      */
     private ShipmentStatus status = ShipmentStatus.Default;
     private Date deviceShutdownTime;
-    private Long siblingGroup;
     private int siblingCount;
+    private final Set<Long> siblings = new HashSet<>();
     private Date arrivalDate;
     private Date eta;
 
@@ -206,16 +208,10 @@ public class Shipment extends ShipmentBase {
         this.deviceShutdownTime = deviceShutdownTime;
     }
     /**
-     * @return sibling group.
+     * @return the siblings
      */
-    public Long getSiblingGroup() {
-        return siblingGroup;
-    }
-    /**
-     * @param siblingGroup the siblingGroup to set
-     */
-    public void setSiblingGroup(final Long siblingGroup) {
-        this.siblingGroup = siblingGroup;
+    public Set<Long> getSiblings() {
+        return siblings;
     }
     /**
      * @param count sibling count.

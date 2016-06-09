@@ -46,7 +46,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     protected static final String CUSTOMFIELDS_FIELD = "customfiels";
     protected static final String STATUS_FIELD = "status";
     protected static final String DEVICE_FIELD = "device";
-    protected static final String SIBLINGGROUP_FIELD = "siblinggroup";
+    protected static final String SIBLINGS_FIELD = "siblings";
     protected static final String SIBLINGCOUNT_FIELD = "siblingcount";
     protected static final String ASSETTYPE_FIELD = "assettype";
     protected static final String LASTEVENT_FIELD = "lasteventdate";
@@ -174,51 +174,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         }
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.ShipmentDao#getSiblingGroup(java.lang.Long)
-     */
-    @Override
-    public List<Shipment> getSiblingGroup(final Long siblingGroup) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("siblings", siblingGroup);
-
-        final String sql = "select * from " + TABLE + " s"
-                + " where s." + ISTEMPLATE_FIELD + " = false"
-                + " and s." + SIBLINGGROUP_FIELD + " = :siblings"
-                + " order by s." + ID_FIELD + " desc";
-        final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
-
-        final Map<String, Object> cache = new HashMap<String, Object>();
-        final List<Shipment> result = new LinkedList<Shipment>();
-
-        for (final Map<String, Object> row : rows) {
-            final Shipment s = createEntity(row);
-            result.add(s);
-            resolveReferences(s, row, cache);
-        }
-
-        return result;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.ShipmentDao#getSiblingCount(java.lang.Long)
-     */
-    @Override
-    public int getGroupSize(final Long siblingGroup) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("siblings", siblingGroup);
-
-        final String sql = "select s."
-                + SIBLINGCOUNT_FIELD
-                + " as count from " + TABLE + " s"
-                + " where"
-                + " s." + SIBLINGGROUP_FIELD + " = :siblings"
-                + " limit 1";
-        final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
-        if (rows.isEmpty()) {
-            return 0;
-        }
-        return ((Number) rows.get(0).get("count")).intValue() + 1;
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.ArrivalDao#moveToNewDevice(com.visfresh.entities.Device, com.visfresh.entities.Device)
      */
     @Override
@@ -311,9 +266,11 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             e.setStatus(ShipmentStatus.valueOf((String) statusObject));
         }
         e.setDevice(deviceDao.findOne((String) map.get(DEVICE_FIELD)));
-        final Number num = (Number) map.get(SIBLINGGROUP_FIELD);
-        if (num != null) {
-            e.setSiblingGroup(num.longValue());
+        final String siblings = (String) map.get(SIBLINGS_FIELD);
+        if (siblings != null) {
+            for (final String sibling : siblings.split(",")) {
+                e.getSiblings().add(Long.parseLong(sibling));
+            }
         }
         e.setSiblingCount(((Number) map.get(SIBLINGCOUNT_FIELD)).intValue());
         e.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
@@ -349,7 +306,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put(PONUM_FIELD, s.getPoNum());
         params.put(TRIPCOUNT_FIELD, s.getTripCount());
         params.put(DEVICE_FIELD, s.getDevice() == null ? null : s.getDevice().getId());
-        params.put(SIBLINGGROUP_FIELD, s.getSiblingGroup());
+        params.put(SIBLINGS_FIELD, s.getSiblings().isEmpty() ? null : StringUtils.combine(s.getSiblings(), ","));
         params.put(SIBLINGCOUNT_FIELD, s.getSiblingCount());
         params.put(ASSETTYPE_FIELD, s.getAssetType());
         return params;
@@ -665,33 +622,33 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         }
         return null;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.ShipmentDao#updateSiblingInfo(com.visfresh.entities.Shipment, java.lang.Long, int)
-     */
-    @Override
-    public void updateSiblingInfo(final List<Shipment> shipments, final Long siblingGroup,
-            final int siblingCount) {
-        if (shipments.isEmpty()) {
-            return;
-        }
-
-        final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("group", siblingGroup);
-        params.put("count", siblingCount);
-
-        final List<String> placeHolders = new LinkedList<String>();
-        for (final Shipment s : shipments) {
-            final String key = "id_" + s.getId();
-            placeHolders.add(key);
-            params.put(key, s.getId());
-        }
-
-        jdbc.update("update "
-                + TABLE
-                + " set " + SIBLINGGROUP_FIELD + " = :group, "
-                + SIBLINGCOUNT_FIELD + " = :count where "
-                + ID_FIELD + " in (:" + StringUtils.combine(placeHolders, ",:") + ")", params);
-    }
+//    /* (non-Javadoc)
+//     * @see com.visfresh.dao.ShipmentDao#updateSiblingInfo(com.visfresh.entities.Shipment, java.lang.Long, int)
+//     */
+//    @Override
+//    public void updateSiblingInfo(final List<Shipment> shipments, final Long siblingGroup,
+//            final int siblingCount) {
+//        if (shipments.isEmpty()) {
+//            return;
+//        }
+//
+//        final Map<String, Object> params = new HashMap<String, Object>();
+//        params.put("group", siblingGroup);
+//        params.put("count", siblingCount);
+//
+//        final List<String> placeHolders = new LinkedList<String>();
+//        for (final Shipment s : shipments) {
+//            final String key = "id_" + s.getId();
+//            placeHolders.add(key);
+//            params.put(key, s.getId());
+//        }
+//
+//        jdbc.update("update "
+//                + TABLE
+//                + " set " + SIBLINGGROUP_FIELD + " = :group, "
+//                + SIBLINGCOUNT_FIELD + " = :count where "
+//                + ID_FIELD + " in (:" + StringUtils.combine(placeHolders, ",:") + ")", params);
+//    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#updateEta(com.visfresh.entities.Shipment, java.util.Date)
      */
@@ -707,6 +664,24 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         params.put("eta", eta);
 
         jdbc.update("update " + TABLE + " set " + ETA_FIELD + " = :eta where " + ID_FIELD + "=:s",
+                params);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#updateSiblingInfo(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public void updateSiblingInfo(final Shipment s) {
+        s.setSiblingCount(s.getSiblings().size());
+
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("s", s.getId());
+        params.put("siblings", s.getSiblingCount() == 0 ? null : StringUtils.combine(s.getSiblings(), ","));
+        params.put("siblingCount", s.getSiblingCount());
+
+        jdbc.update("update " + TABLE
+                + " set " + SIBLINGCOUNT_FIELD + " = :siblingCount"
+                + "," + SIBLINGS_FIELD + " = :siblings"
+                + " where " + ID_FIELD + "=:s",
                 params);
     }
     /* (non-Javadoc)

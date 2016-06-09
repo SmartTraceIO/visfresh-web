@@ -22,3 +22,4 @@ update shipments set siblings =
 where not siblinggroup is NULL and id <> -1;
 
 drop table tmpsiblings;
+alter table shipments drop column siblinggroup;

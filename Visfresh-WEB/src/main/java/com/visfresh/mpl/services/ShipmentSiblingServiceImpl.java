@@ -129,6 +129,6 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
      */
     @Override
     public int getSiblingCount(final Shipment s) {
-        return s.getSiblingCount();
+        return s.getSiblings().size();
     }
 }
