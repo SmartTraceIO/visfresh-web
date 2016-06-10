@@ -1151,22 +1151,27 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
    }
     @Test
     public void testExcludePriorShipments() throws RestServiceException, IOException {
-        createShipment(true);
-        createShipment(true);
-        final Shipment s3 = createShipment(true);
+        final Device d1 = createDevice("329487092384570", true);
+        final Device d2 = createDevice("392879384787838", true);
+        createShipment(d1, true);
+        final Shipment s2 = createShipment(d1, true);
+        createShipment(d2, true);
+        final Shipment s4 = createShipment(d2, true);
 
         final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
         JsonArray shipments;
         shipments = shipmentClient.getShipments(req);
-        assertEquals(3, shipments.size());
-        assertEquals(3, currentJsonResponse.get("totalCount").getAsInt());
+        assertEquals(4, shipments.size());
+        assertEquals(4, currentJsonResponse.get("totalCount").getAsInt());
 
         req.setExcludePriorShipments(true);
         shipments = shipmentClient.getShipments(req);
-        assertEquals(1, shipments.size());
-        assertEquals(s3.getId().longValue(),
+        assertEquals(2, shipments.size());
+        assertEquals(s2.getId().longValue(),
                 shipments.get(0).getAsJsonObject().get(ShipmentConstants.SHIPMENT_ID).getAsLong());
-        assertEquals(1, currentJsonResponse.get("totalCount").getAsInt());
+        assertEquals(s4.getId().longValue(),
+                shipments.get(1).getAsJsonObject().get(ShipmentConstants.SHIPMENT_ID).getAsLong());
+        assertEquals(2, currentJsonResponse.get("totalCount").getAsInt());
     }
     @Test
     public void testSaveEmpty() throws RestServiceException, IOException {

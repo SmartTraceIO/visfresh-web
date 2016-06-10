@@ -70,30 +70,13 @@
 			<version>2.2.4</version>
 		</dependency>
 		
-		<!-- Rules Engine -->
-		<dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-core</artifactId>
-			<version>${drools.varsion}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.drools</groupId>
-			<artifactId>drools-compiler</artifactId>
-			<version>${drools.varsion}</version>
-		</dependency>
-		
 		<!-- Email -->
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4.7</version>
 		</dependency>
-<!-- 		<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>smtp</artifactId>
-			<version>1.5.4</version>
-		</dependency>
- -->
+
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

@@ -9,9 +9,9 @@ import org.springframework.context.annotation.PropertySource;
 
 import com.visfresh.controllers.AbstractController;
 import com.visfresh.dao.impl.DaoImplBase;
-import com.visfresh.drools.DroolsRuleEngine;
 import com.visfresh.init.jdbc.JdbcConfig;
 import com.visfresh.l12n.XmlResourceBundle;
+import com.visfresh.mpl.ruleengine.VisfreshRuleEngine;
 import com.visfresh.mpl.services.TrackerMessageDispatcher;
 import com.visfresh.services.DefaultAuthService;
 
@@ -22,7 +22,7 @@ import com.visfresh.services.DefaultAuthService;
 @Configuration
 @ComponentScan(basePackageClasses = {
         AbstractController.class,
-        DroolsRuleEngine.class,
+        VisfreshRuleEngine.class,
         JdbcConfig.class,
         DefaultAuthService.class,
         DaoImplBase.class,

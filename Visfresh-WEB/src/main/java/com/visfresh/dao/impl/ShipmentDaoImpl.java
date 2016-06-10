@@ -559,9 +559,9 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             + " on t1.id = t.id) te\n"
             + "on te.shipment = " + getTableName() + "." + ID_FIELD + "\n";
         if (filter != null && Boolean.TRUE.equals(filter.getFilter(ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS))) {
-            selectAll += "join (select max(id) as id from shipments group by device) newest on "
-                    + TABLE
-                    + ".id = newest.id\n";
+            selectAll += "\njoin (select max(id) as id, device as device from shipments group by device) newest on "
+                    + TABLE + ".id = newest.id and "
+                    + TABLE + ".device = newest.device\n";
         }
 
         return selectAll;
@@ -573,9 +573,9 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     protected String buildSelectBlockForEntityCount(final Filter filter) {
         String selectAll = super.buildSelectBlockForEntityCount(filter);
         if (filter != null && Boolean.TRUE.equals(filter.getFilter(ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS))) {
-            selectAll += "\njoin (select max(id) as id from shipments group by device) newest on "
-                    + TABLE
-                    + ".id = newest.id\n";
+            selectAll += "\njoin (select max(id) as id, device as device from shipments group by device) newest on "
+                    + TABLE + ".id = newest.id and "
+                    + TABLE + ".device = newest.device\n";
         }
         return selectAll;
     }

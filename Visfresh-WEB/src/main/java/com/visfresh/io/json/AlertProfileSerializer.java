@@ -3,13 +3,9 @@
  */
 package com.visfresh.io.json;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
-
-import org.drools.core.util.IoUtils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -22,7 +18,6 @@ import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.lists.ListAlertProfileItem;
 import com.visfresh.utils.LocalizationUtils;
-import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -189,18 +184,5 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
             array.add(new JsonPrimitive(str));
         }
         return array;
-    }
-    public static void main(final String[] args) throws IOException {
-        String data ;
-        final InputStream in = AlertProfileSerializer.class.getResourceAsStream("ap.json");
-        try {
-            data = new String(IoUtils.readBytesFromInputStream(in));
-        } finally {
-            in.close();
-        }
-
-        final AlertProfileSerializer ser = new AlertProfileSerializer(TimeZone.getDefault(), TemperatureUnits.Celsius);
-        final AlertProfile ap = ser.parseAlertProfile(SerializerUtils.parseJson(data).getAsJsonObject());
-        System.out.println(ap);
     }
 }

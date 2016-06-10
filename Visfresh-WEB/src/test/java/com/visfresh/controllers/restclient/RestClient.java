@@ -17,14 +17,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.drools.core.util.IoUtils;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -242,8 +241,7 @@ public class RestClient  {
      * @return content of stream as string.
      */
     private String getContent(final InputStream in) throws IOException {
-        final byte[] bytes = IoUtils.readBytesFromInputStream(in);
-        return new String(bytes, "UTF-8");
+        return StringUtils.getContent(in, "UTF-8");
     }
 
     /**

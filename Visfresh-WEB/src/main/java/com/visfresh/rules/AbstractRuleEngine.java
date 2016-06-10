@@ -4,10 +4,12 @@
 package com.visfresh.rules;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -68,7 +70,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
     private final DeviceDcsNativeEventSerializer deviceEventParser = new DeviceDcsNativeEventSerializer();
     private final InterimStopSerializer interimSerializer = new InterimStopSerializer();
-    private final Map<String, TrackerEventRule> rules = new ConcurrentHashMap<>();
+    private final Map<String, TrackerEventRule> rules = new HashMap<>();
 
     /**
      *
@@ -174,6 +176,13 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                 }
                 return rule.accept(context);
             }
+            /* (non-Javadoc)
+             * @see java.lang.Object#toString()
+             */
+            @Override
+            public String toString() {
+                return rule == null ? "null" : rule.toString();
+            }
         };
     }
 
@@ -181,32 +190,22 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @param name
      * @return
      */
-    private TrackerEventRule getRuleImpl(final String name) {
-        TrackerEventRule rule = rules.get(name);
-        if (rule == null) {
-            log.warn("Rule " + name + " is not loaded now. Waiting 3 seconds for load");
-            try {
-                Thread.sleep(3000);
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
-            }
-            rule = rules.get(name);
+    protected TrackerEventRule getRuleImpl(final String name) {
+        synchronized(rules) {
+            return rules.get(name);
         }
-        if (rule == null) {
-            log.error("Rule with name " + name + " is not found. Given drools expression will ignored");
-            return null;
-        }
-        return rule;
     }
     /**
      * @param name rule name.
      * @param rule rule.
      */
     protected void setRule(final String name, final TrackerEventRule rule) {
-        if (rule == null) {
-            rules.remove(name);
-        } else {
-            rules.put(name, rule);
+        synchronized (rules) {
+            if (rule == null) {
+                rules.remove(name);
+            } else {
+                rules.put(name, rule);
+            }
         }
     }
     /* (non-Javadoc)
@@ -214,7 +213,15 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     @Override
     public boolean hasRule(final String name) {
-        return name == null ? false : rules.containsKey(name);
+        synchronized (rules) {
+            return name == null ? false : rules.containsKey(name);
+        }
+    }
+    @Override
+    public Set<String> getRules() {
+        synchronized (rules) {
+            return new HashSet<>(rules.keySet());
+        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RuleEngine#getAlertYetFoFire(com.visfresh.entities.Shipment)

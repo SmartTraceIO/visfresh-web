@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.Map;
@@ -110,5 +111,15 @@ public final class StringUtils {
         }
         hex.insert(0, '#');
         return hex.toString();
+    }
+
+    /**
+     * @param e
+     * @return
+     */
+    public static String getSteackTrace(final Throwable e) {
+        final StringWriter wr = new StringWriter();
+        e.printStackTrace(new PrintWriter(wr));
+        return wr.toString();
     }
 }

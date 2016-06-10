@@ -1,0 +1,7 @@
+{
+	VeryOldEvent: 150,
+	CorrectMovingControll: 150,
+	AssignShipment: 100,
+	AutoStartShipment: 50,
+	AutoDetectEndLocation: 49
+}

@@ -5,6 +5,7 @@ package com.visfresh.services;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.LocationProfile;
@@ -67,4 +68,8 @@ public interface RuleEngine {
      * @return interim locations.
      */
     List<LocationProfile> getInterimLocations(Shipment s);
+    /**
+     * @return
+     */
+    Set<String> getRules();
 }
