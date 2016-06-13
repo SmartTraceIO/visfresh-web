@@ -335,7 +335,7 @@ public abstract class AbstractRestServiceTest {
         t.setDescription("Device description");
         t.setImei(imei);
         t.setName("Device Name");
-        t.setColor(Color.Crimson);
+        t.setColor(Color.DarkCyan);
         if (save) {
             t.setCompany(getCompany());
             context.getBean(DeviceDao.class).save(t);
