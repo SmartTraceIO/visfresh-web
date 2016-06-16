@@ -185,8 +185,12 @@ public class DefaultSiblingDetector implements SiblingDetector {
             if (isSiblings(masterEvents, events)) {
                 siblingMap.get(master.getId()).add(s.getId());
             }
-            if (!s.hasFinalStatus() && isSiblings(events, masterEvents)) {
+            boolean siblingIsSiblingTo = isSiblings(events, masterEvents);
+            if (!s.hasFinalStatus() && siblingIsSiblingTo) {
                 siblingMap.get(s.getId()).add(master.getId());
+            }
+            if (s.hasFinalStatus() && !siblingIsSiblingTo) {
+                siblingMap.get(s.getId()).remove(master.getId());
             }
         }
     }
