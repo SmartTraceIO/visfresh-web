@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -134,54 +133,42 @@ public class DefaultSiblingDetectorSiblingIssueBugFix extends DefaultSiblingDete
                 DefaultSiblingDetectorSiblingIssueBugFix.class.getResourceAsStream(resource),
                 "UTF-8");
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetectorBugFix#updateSiblingInfo(com.visfresh.entities.Shipment, java.util.Set)
-     */
-    @Override
-    protected void updateSiblingInfo(final Shipment master, final Set<Long> set) {
-        super.updateSiblingInfo(master, set);
-        System.out.println("Siblings for " + master + " have been updated to " + set);
-    }
-//    public void runTest() {
-//        while (!events.isEmpty()) {
-//            final TrackerEvent e = events.remove(0);
-//            //add event
-//            final List<TrackerEvent> es = this.trackerEvents.get(e.getShipment().getId());
-//            es.add(e);
-//        }
-//
-//        //run sibling detection
-//        updateShipmentSiblingsForCompany(company);
-//    }
     public void runTest() {
-        while (!checkSiblings() && !events.isEmpty()) {
+        while (!events.isEmpty()) {
             final TrackerEvent e = events.remove(0);
             //add event
-            List<TrackerEvent> es = this.trackerEvents.get(e.getShipment().getId());
-            if (es == null) {
-                es = new LinkedList<>();
-                trackerEvents.put(e.getShipment().getId(), es);
-            }
-
+            final List<TrackerEvent> es = this.trackerEvents.get(e.getShipment().getId());
             es.add(e);
-
-            //run sibling detection
-            updateShipmentSiblingsForCompany(company);
         }
-    }
 
-    /**
-     * @return
-     */
-    private boolean checkSiblings() {
-        for (final Shipment s : this.activeShipments.values()) {
-            if (s.getId().longValue() == 1496l && s.getSiblings().size() > 4) {
-                System.out.println("Shipment " + s + " have siblings: " + s.getSiblings());
-                return true;
-            }
-        }
-        return false;
+        //run sibling detection
+        updateShipmentSiblingsForCompany(company);
     }
+//    public void runTest() {
+//        final Iterator<TrackerEvent> iter = events.iterator();
+//        while (iter.hasNext()) {
+//            final TrackerEvent e = iter.next();
+//
+//            final List<TrackerEvent> es = this.trackerEvents.get(e.getShipment().getId());
+//            es.add(e);
+//
+//            if (e.getId().longValue() == 225420L) {
+//                break;
+//            }
+//        }
+//
+//        final Shipment s = activeShipments.get(1496L);
+//        final List<Shipment> shipments = new LinkedList<>(activeShipments.values());
+//        shipments.remove(s);
+//
+//        final Map<Long, Set<Long>> siblingMap = new HashMap<>();
+//        for (final Shipment shipment : activeShipments.values()) {
+//            siblingMap.put(shipment.getId(), new HashSet<Long>());
+//        }
+//        findSiblings(s, shipments, siblingMap);
+//        System.out.println(siblingMap.get(s.getId()));
+//    }
+
     public static void main(final String[] args)throws Exception {
         final DefaultSiblingDetectorSiblingIssueBugFix bugFix = new DefaultSiblingDetectorSiblingIssueBugFix();
         bugFix.runTest();;

@@ -153,7 +153,7 @@ public class DefaultSiblingDetector implements SiblingDetector {
      * @param originShipments
      * @param siblingMap
      */
-    private void findSiblings(final Shipment master, final List<Shipment> originShipments,
+    protected void findSiblings(final Shipment master, final List<Shipment> originShipments,
             final Map<Long, Set<Long>> siblingMap) {
         final List<Shipment> shipments = new LinkedList<>(originShipments);
 
@@ -267,44 +267,74 @@ public class DefaultSiblingDetector implements SiblingDetector {
      * @return true if siblings.
      */
     protected boolean isSiblings(final List<TrackerEvent> originE1, final List<TrackerEvent> originE2) {
-        if (originE1.isEmpty() || originE2.isEmpty()) {
+        if (originE1.isEmpty()) {
             return false;
         }
 
         final List<TrackerEvent> e1 = new LinkedList<>(originE1);
         final List<TrackerEvent> e2 = new LinkedList<>(originE2);
 
+        //1. ignore events before first
+        removeEventsBeforeDate(e2, e1.get(0).getTime());
+        if (e2.isEmpty()) {
+            return false;
+        }
+
+        //get events of given tracker after the intersecting time
+        final List<TrackerEvent> reminder = cutEventsAfterDate(e1, e2.get(e2.size() - 1).getTime());
+
+        final double summ = getAvgDistance(e1, e2);
+        final boolean isSiblings = summ < MAX_DISTANCE_AVERAGE;
+        //check given tracker lives the sibling area
+        if (isSiblings && reminder.size() > 0) {
+            double ss = 0;
+            final double norma = reminder.size();
+            final TrackerEvent last = originE2.get(originE2.size() - 1);
+
+            for (final TrackerEvent e : reminder) {
+                ss += getDistance(e, last) / norma;
+                if (ss >= MAX_DISTANCE_AVERAGE) {
+                    return false;
+                }
+            }
+        }
+
+        return isSiblings;
+    }
+
+    /**
+     * @param e1
+     * @param e2
+     * @return
+     */
+    private double getAvgDistance(final List<TrackerEvent> e1, final List<TrackerEvent> e2) {
+        //calculate the distance in intersected time
         final List<Double> distances = new LinkedList<>();
 
-        TrackerEvent before = e2.remove(0);
         final Iterator<TrackerEvent> iter1 = e1.iterator();
+        final Iterator<TrackerEvent> iter2 = e2.iterator();
+
+        TrackerEvent before = iter2.next();
         while (iter1.hasNext()) {
             final TrackerEvent e = iter1.next();
-            Double distance = null;
 
             if (!e.getTime().before(before.getTime())) {
-                final Iterator<TrackerEvent> iter2 = e2.iterator();
                 while (iter2.hasNext()) {
                     final TrackerEvent after = iter2.next();
-                    if (!before.getTime().after(e.getTime()) && !after.getTime().before(e.getTime())) {
-                        distance = getDistance(e, before, after);
+                    if (!after.getTime().before(e.getTime())) {
+                        distances.add(getDistance(e, before, after));
+                        before = after;
                         break;
                     }
-
-                    before = after;
-                    iter2.remove();
+                    if (!after.getTime().before(e.getTime())) {
+                        before = after;
+                    }
                 }
-
-                if (distance == null) {
-                    distance = getDistance(e, before);
-                }
-
-                distances.add(distance);
             }
         }
 
         if (distances.isEmpty()) {
-            return false;
+            return Double.MAX_VALUE;
         }
 
         double summ = 0;
@@ -312,9 +342,45 @@ public class DefaultSiblingDetector implements SiblingDetector {
         for (final Double d : distances) {
             summ += d / norma;
         }
-
-        return summ < MAX_DISTANCE_AVERAGE;
+        return summ;
     }
+
+    /**
+     * @param e
+     * @param startDate
+     */
+    private void removeEventsBeforeDate(final List<TrackerEvent> e,
+            final Date startDate) {
+        final Iterator<TrackerEvent> iter = e.iterator();
+        while (iter.hasNext()) {
+            if (iter.next().getTime().before(startDate)) {
+                iter.remove();
+            } else {
+                break;
+            }
+        }
+    }
+
+    /**
+     * @param events
+     * @param time
+     * @return
+     */
+    private List<TrackerEvent> cutEventsAfterDate(final List<TrackerEvent> events,
+            final Date time) {
+        final List<TrackerEvent> list = new LinkedList<>();
+        final Iterator<TrackerEvent> iter = events.iterator();
+        while (iter.hasNext()) {
+            final TrackerEvent e = iter.next();
+            if (e.getTime().after(time)) {
+                iter.remove();
+                list.add(e);
+            }
+        }
+
+        return list;
+    }
+
     /**
      * @param e event.
      * @param me1 first master event.

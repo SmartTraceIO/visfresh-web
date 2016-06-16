@@ -79,6 +79,32 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         assertFalse(isSiblings(getTrackeEvents(notSibling), masterEvents));
     }
     @Test
+    public void testNotIntersectingByTime() {
+        final Shipment s1 = creaeShipment(1l);
+        final Shipment s2 = creaeShipment(2l);
+
+        //crete master event list
+        final List<TrackerEvent> e2 = new LinkedList<TrackerEvent>();
+        final List<TrackerEvent> e1 = new LinkedList<TrackerEvent>();
+        final double x0 = 10.;
+        final double y0 = 10.;
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        final long dt = 10 * 60 * 1000l;
+
+        //add tracker events for master shipment
+        addEvent(e1, s1, x0, y0, t0);
+        addEvent(e1, s1, x0, y0, t0);
+        addEvent(e1, s1, x0, y0, t0);
+
+        //add tracker events for given shipment
+        addEvent(e2, s2, x0, y0, t0 + dt);
+        addEvent(e2, s2, x0, y0, t0 + dt);
+        addEvent(e2, s2, x0, y0, t0 + dt);
+
+        assertFalse(isSiblings(e1, e2));
+        assertFalse(isSiblings(e2, e1));
+    }
+    @Test
     public void testIsTimeNotIntersecting() {
         final double lat = 60;
         final double dlon = getLongitudeDiff(lat, MAX_DISTANCE_AVERAGE) / 2.;
