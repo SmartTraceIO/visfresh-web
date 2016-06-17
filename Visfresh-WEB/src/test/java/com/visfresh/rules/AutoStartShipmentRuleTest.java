@@ -86,10 +86,6 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         // accept with shipment if INIT message
         e.setType(TrackerEventType.INIT);
         assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
-
-        e.setShipment(null);
-        e.setType(TrackerEventType.AUT);
-        assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
     }
 
     @Test
@@ -102,10 +98,6 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
 
         // accept with shipment if INIT message
         e.setType(TrackerEventType.INIT);
-        assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
-
-        e.setShipment(null);
-        e.setType(TrackerEventType.AUT);
         assertTrue(rule.accept(new RuleContext(e, new SessionHolder())));
     }
 

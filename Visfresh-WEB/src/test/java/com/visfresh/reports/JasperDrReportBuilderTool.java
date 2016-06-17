@@ -89,7 +89,7 @@ public class JasperDrReportBuilderTool {
         ap.setStandardDeviation(0.001 + random.nextDouble() / 0.5);
         ap.setTotalMonitoringTime((1 + random.nextInt(3 * 30 * 24)) * oneHour);
 
-        final int numRules = random.nextInt(7);
+        final int numRules = 3 + random.nextInt(7);
         for (int i = 0; i < numRules; i++) {
             final TemperatureRuleStats rule = new TemperatureRuleStats();
             rule.setTotalTime((3 + random.nextInt(15)) * oneHour);

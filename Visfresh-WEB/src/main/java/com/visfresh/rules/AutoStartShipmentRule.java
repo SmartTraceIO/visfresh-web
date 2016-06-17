@@ -69,7 +69,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
 
         //check init message.
         final TrackerEvent e = context.getEvent();
-        if(e.getShipment() == null || e.getType() == TrackerEventType.INIT) {
+        if(e.getType() == TrackerEventType.INIT) {
             return true;
         }
 
