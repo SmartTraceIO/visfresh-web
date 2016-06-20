@@ -1,59 +1,108 @@
 /**
  *
  */
-package com.visfresh.reports;
+package com.visfresh.controllers;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.Random;
 
-import net.sf.dynamicreports.report.exception.DRException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Company;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
+import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.reports.performance.AlertProfileStats;
 import com.visfresh.reports.performance.BiggestTemperatureException;
 import com.visfresh.reports.performance.PerformanceReportBean;
-import com.visfresh.reports.performance.PerformanceReportBuilder;
 import com.visfresh.reports.performance.TemperatureRuleStats;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class JasperDrReportBuilderTool {
+@Component
+@RestController("Reports")
+@RequestMapping("/rest")
+public class ReportsController extends AbstractController {
+    /**
+     * Logger.
+     */
+    private static final Logger log = LoggerFactory.getLogger(ReportsController.class);
+    private static MediaType OCTET_STREAM = MediaType.parseMediaType("application/octet-stream");
+
+    @Autowired
+    private PdfReportBuilder reportBuilder;
+
     /**
      * Default constructor.
      */
-    public JasperDrReportBuilderTool() {
+    public ReportsController() {
         super();
     }
 
     /**
-     * @param bean
-     * @param user
-     * @throws DRException
-     * @throws IOException
+     * @param authToken authentication token.
+     * @param defShipment alert profile.
+     * @return ID of saved alert profile.
      */
-    public static void showPerformanceReport(final PerformanceReportBean bean, final User user)
-            throws DRException, IOException {
-        final PerformanceReportBuilder builder = new PerformanceReportBuilder();
-        builder.createPerformanceReport(bean, user).show();
-    }
+    @RequestMapping(value = "/getPerformanceReport/{authToken}",
+            method = RequestMethod.GET, produces = "application/pdf")
+    public ResponseEntity<InputStream> saveAutoStartShipment(@PathVariable final String authToken)
+            throws Exception {
+        final User user = getLoggedInUser(authToken);
 
-    public static void main(final String[] args) throws Exception {
-        showPerformanceReport(createPerformanceBean(), createUser());
+        checkAccess(user, Role.BasicUser);
+
+        //create report bean.
+        final PerformanceReportBean bean = createPerformanceReport(user.getCompany());
+
+        //create tmp file with report PDF content.
+        final File file = createTmpFile("performanceReport");
+
+        try {
+            final OutputStream out = new FileOutputStream(file);
+            try {
+                reportBuilder.createPerformanceReport(bean, user, out);
+            } finally {
+                out.close();
+            }
+        } catch (final Throwable e) {
+            log.error("Failed to create pefromance report", e);
+            file.delete();
+            throw new IOException("Failed to create performance report", e);
+        }
+
+        final InputStream in = new TmpFileInputStream(file);
+        return ResponseEntity
+                .ok()
+                .contentType(OCTET_STREAM)
+                .contentLength(file.length())
+                .body(in);
     }
 
     /**
-     * @return the user.
+     * @param company
+     * @return
      */
-    private static User createUser() {
-        final User user = new User();
-        user.setId(7l);
-        user.setEmail("dev@smarttrace.com.au");
-        return user;
+    private PerformanceReportBean createPerformanceReport(final Company company) {
+        return createPerformanceBean();
     }
     /**
      * @return the bean to visualize.
@@ -117,5 +166,14 @@ public class JasperDrReportBuilderTool {
         }
 
         return ap;
+    }
+
+    /**
+     * @param name resource name.
+     * @return temporary file.
+     * @throws IOException
+     */
+    private File createTmpFile(final String name) throws IOException {
+        return File.createTempFile("visfreshtmp-", "-" + name);
     }
 }
