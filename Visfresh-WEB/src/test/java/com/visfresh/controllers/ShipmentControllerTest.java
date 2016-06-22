@@ -349,10 +349,18 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     }
     @Test
     public void testGetShipmentsWithoutTrackerEvents() throws RestServiceException, IOException {
-        createShipment(true);
+        final GetFilteredShipmentsRequest req = new GetFilteredShipmentsRequest();
+        req.setShipmentDateFrom(new Date(System.currentTimeMillis() - 100000000l));
+
+        final Shipment s1 = createShipment(true);
+        s1.setLastEventDate(null);
+        s1.setShipmentDate(req.getShipmentDateFrom());
+        shipmentDao.save(s1);
+
         createShipment(true);
 
-        assertEquals(2, shipmentClient.getShipments(null, null).size());
+        req.setShipmentDateTo(new Date());
+        assertEquals(2, shipmentClient.getShipments(req).size());
     }
     @Test
     public void testGetShipmentsFilterLightOnOffAlertSummary() throws RestServiceException, IOException {

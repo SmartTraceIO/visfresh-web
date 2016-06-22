@@ -436,7 +436,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         } else if (ShipmentConstants.SHIPPED_FROM_DATE.equals(property)){
             //shipped from date
             params.put(defaultKey, value);
-            filters.add(TABLE + "." + LASTEVENT_FIELD + " >= :" + defaultKey);
+            filters.add("COALESCE(" + TABLE + "." + LASTEVENT_FIELD + "," + TABLE + "." + SHIPMENTDATE_FIELD + ") >= :" + defaultKey);
         } else if (ShipmentConstants.SHIPMENT_DESCRIPTION.equals(property)){
             params.put(defaultKey, "%" + value + "%");
             filters.add(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
@@ -597,6 +597,10 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
             super.addSortForDbField(field, sorts, isAscent);
         } else if (ShipmentConstants.ALERT_SUMMARY.equals(field)){
             super.addSortForDbField(field, sorts, isAscent);
+        } else if (ShipmentConstants.SHIPPED_FROM_DATE.equals(field)){
+            //shipped from date
+            super.addSortForDbField("COALESCE(" + field
+                    + "," + SHIPMENTDATE_FIELD + ")", sorts, isAscent);
         } else {
             super.addSortForDbField(TABLE + "." + field, sorts, isAscent);
         }
