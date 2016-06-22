@@ -278,23 +278,23 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         return TemperatureAlertRule.NAME + "_" + rule.getType() + "_" + rule.getId() + "_processed";
     }
     /**
-     * @param state device state.
+     * @param session device state.
      * @param rule alert rule.
      * @return
      */
-    protected static boolean isTemperatureRuleProcessed(final ShipmentSession state,
+    protected static boolean isTemperatureRuleProcessed(final ShipmentSession session,
             final TemperatureRule rule) {
-        if (state == null) {
+        if (session == null) {
             return false;
         }
-        return "true".equals(state.getTemperatureAlerts().getProperties().get(createProcessedKey(rule)));
+        return "true".equals(session.getTemperatureAlerts().getProperties().get(createProcessedKey(rule)));
     }
     /**
-     * @param deviceState
+     * @param session
      * @param rule
      */
-    public static void setProcessedTemperatureRule(final ShipmentSession deviceState, final TemperatureRule rule) {
-        deviceState.getTemperatureAlerts().getProperties().put(createProcessedKey(rule), "true");
+    public static void setProcessedTemperatureRule(final ShipmentSession session, final TemperatureRule rule) {
+        session.getTemperatureAlerts().getProperties().put(createProcessedKey(rule), "true");
     }
     @Override
     public void setInterimLocations(final ShipmentBase base, final List<LocationProfile> stops) {

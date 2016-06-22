@@ -348,6 +348,13 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(0, shipmentClient.getShipments(3, 10000).size());
     }
     @Test
+    public void testGetShipmentsWithoutTrackerEvents() throws RestServiceException, IOException {
+        createShipment(true);
+        createShipment(true);
+
+        assertEquals(2, shipmentClient.getShipments(null, null).size());
+    }
+    @Test
     public void testGetShipmentsFilterLightOnOffAlertSummary() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
         s.getShippedTo().setAddress("Coles Perth DC");

@@ -354,7 +354,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             final Integer pageSize = req.getPageSize();
             final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-            final Filter filter = createFilter(req, ser);
+            final Filter filter = createFilter(req);
             final List<ListShipmentItem> shipments = getShipments(
                     user.getCompany(),
                     createSortingShipments(
@@ -707,7 +707,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         };
     }
 
-    private Filter createFilter(final GetFilteredShipmentsRequest req, final ShipmentSerializer ser) {
+    private Filter createFilter(final GetFilteredShipmentsRequest req) {
         Date shippedFrom = req.getShipmentDateFrom();
         final Date shippedTo = req.getShipmentDateTo();
 

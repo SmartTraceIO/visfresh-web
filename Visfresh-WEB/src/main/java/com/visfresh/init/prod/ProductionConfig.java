@@ -13,6 +13,7 @@ import com.visfresh.init.jdbc.JdbcConfig;
 import com.visfresh.l12n.XmlResourceBundle;
 import com.visfresh.mpl.ruleengine.VisfreshRuleEngine;
 import com.visfresh.mpl.services.TrackerMessageDispatcher;
+import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.services.DefaultAuthService;
 
 /**
@@ -27,6 +28,7 @@ import com.visfresh.services.DefaultAuthService;
         DefaultAuthService.class,
         DaoImplBase.class,
         XmlResourceBundle.class,
+        PdfReportBuilder.class,
         TrackerMessageDispatcher.class})
 @PropertySource("classpath:/app.properties")
 public class ProductionConfig {

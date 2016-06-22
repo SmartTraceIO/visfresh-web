@@ -91,7 +91,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
                         //clear first issue date
                         final Map<String, String> props = session.getTemperatureAlerts()
                                 .getProperties();
-                        props.remove(creaeStartIssueKey(rule));
+                        props.remove(createStartIssueKey(rule));
                     }
                 }
             }
@@ -110,7 +110,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         final Map<String, Date> dateProps = session.getTemperatureAlerts()
                 .getDates();
 
-        final String startIssueKey = creaeStartIssueKey(rule);
+        final String startIssueKey = createStartIssueKey(rule);
         final Date firstIssue = dateProps.get(startIssueKey);
         if (firstIssue == null) {
             //if first issue, return immediately
@@ -166,7 +166,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param rule
      * @return
      */
-    protected String creaeStartIssueKey(final TemperatureRule rule) {
+    protected String createStartIssueKey(final TemperatureRule rule) {
         final String ruleKey = createBaseRuleKey(rule);
         return ruleKey + "_start";
     }
