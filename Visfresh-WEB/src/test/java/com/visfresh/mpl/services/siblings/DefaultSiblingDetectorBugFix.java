@@ -12,45 +12,36 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.utils.CollectionUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DefaultSiblingDetectorBugFix extends DefaultSiblingDetector {
+public class DefaultSiblingDetectorBugFix extends AbstractSiblingDetectorTool {
     private final Map<String, Device> devices = new HashMap<>();
-    protected final Map<Long, Shipment> activeShipments = new LinkedHashMap<>();
+    protected final Map<Long, Shipment> shipments = new LinkedHashMap<>();
     protected final Map<Long, List<TrackerEvent>> trackerEvents = new HashMap<>();
 
-    protected Company company;
     /**
      * Default constructor.
      */
     public DefaultSiblingDetectorBugFix() throws Exception {
-        super(0);
-        company = new Company();
-        company.setId(1l);
-        company.setName("JUnit Company");
-
-        parseData();
+        super();
     }
 
     /**
      *
      */
-    protected void parseData() throws Exception {
+    private void parseData() throws Exception {
         final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         final Reader r = new InputStreamReader(
@@ -62,10 +53,10 @@ public class DefaultSiblingDetectorBugFix extends DefaultSiblingDetector {
             //"shipment" : 366
             //create shipment.
             final Long shipmentId = json.get("shipment").getAsLong();
-            Shipment s = this.activeShipments.get(shipmentId);
+            Shipment s = this.shipments.get(shipmentId);
             if (s == null) {
-                s = creaeShipment(shipmentId);
-                activeShipments.put(shipmentId, s);
+                s = createShipment(shipmentId);
+                shipments.put(shipmentId, s);
                 trackerEvents.put(shipmentId, new LinkedList<TrackerEvent>());
             }
 
@@ -108,22 +99,12 @@ public class DefaultSiblingDetectorBugFix extends DefaultSiblingDetector {
      * @param id shipment ID.
      * @return
      */
-    protected Shipment creaeShipment(final long id) {
+    protected Shipment createShipment(final long id) {
         final Shipment s = new Shipment();
         s.setId(id);
         s.setCompany(company);
         s.setShipmentDescription("Test_" + id);
         return s;
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#findActiveShipments(com.visfresh.entities.Company)
-     */
-    @Override
-    protected List<Shipment> findActiveShipments(final Company company) {
-        final List<Shipment> list = new LinkedList<>(activeShipments.values());
-        CollectionUtils.sortById(list);
-        return list;
     }
     /* (non-Javadoc)
      * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#getEventsFromDb(com.visfresh.entities.Shipment)
@@ -132,28 +113,6 @@ public class DefaultSiblingDetectorBugFix extends DefaultSiblingDetector {
     protected List<TrackerEvent> getEventsFromDb(final Shipment shipment) {
         final List<TrackerEvent> events = trackerEvents.get(shipment.getId());
         return events == null ? new LinkedList<TrackerEvent>() : events;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#getShipments(java.util.Set)
-     */
-    @Override
-    protected List<Shipment> getShipments(final Set<Long> ids) {
-        final List<Shipment> list = new LinkedList<>();
-        for (final Shipment shipment : this.activeShipments.values()) {
-            if (ids.contains(shipment.getId())) {
-                list.add(shipment);
-            }
-        }
-        return list;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#updateSiblingInfo(com.visfresh.entities.Shipment, java.util.Set)
-     */
-    @Override
-    protected void updateSiblingInfo(final Shipment master, final Set<Long> set) {
-        master.getSiblings().clear();
-        master.getSiblings().addAll(set);
-        master.setSiblingCount(set.size());
     }
     /**
      * @param imei device IMEI.
@@ -178,6 +137,15 @@ public class DefaultSiblingDetectorBugFix extends DefaultSiblingDetector {
 
     public static void main(final String[] args) throws Exception {
         final DefaultSiblingDetectorBugFix bugFix = new DefaultSiblingDetectorBugFix();
+        bugFix.parseData();
         bugFix.updateShipmentSiblingsForCompany(bugFix.company);
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.mpl.services.siblings.AbstractSiblingDetectorTool#getAllShipments()
+     */
+    @Override
+    protected List<Shipment> getAllShipments() {
+        return new LinkedList<>(shipments.values());
     }
 }
