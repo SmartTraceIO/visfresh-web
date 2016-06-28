@@ -32,6 +32,7 @@ import com.visfresh.reports.performance.AlertProfileStats;
 import com.visfresh.reports.performance.BiggestTemperatureException;
 import com.visfresh.reports.performance.PerformanceReportBean;
 import com.visfresh.reports.performance.TemperatureRuleStats;
+import com.visfresh.reports.shipment.ShipmentReportBean;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -64,7 +65,7 @@ public class ReportsController extends AbstractController {
      */
     @RequestMapping(value = "/getPerformanceReport/{authToken}",
             method = RequestMethod.GET, produces = "application/pdf")
-    public ResponseEntity<InputStream> saveAutoStartShipment(@PathVariable final String authToken)
+    public ResponseEntity<InputStream> getPerformanceReport(@PathVariable final String authToken)
             throws Exception {
         final User user = getLoggedInUser(authToken);
 
@@ -96,13 +97,67 @@ public class ReportsController extends AbstractController {
                 .contentLength(file.length())
                 .body(in);
     }
+    /**
+     * @param authToken authentication token.
+     * @param defShipment alert profile.
+     * @return ID of saved alert profile.
+     */
+    @RequestMapping(value = "/getShipmentReport/{authToken}",
+            method = RequestMethod.GET, produces = "application/pdf")
+    public ResponseEntity<InputStream> getShipmentReport(@PathVariable final String authToken)
+            throws Exception {
+        final User user = getLoggedInUser(authToken);
 
+        checkAccess(user, Role.BasicUser);
+
+        //create report bean.
+        final ShipmentReportBean bean = createShipmentReport(user.getCompany());
+
+        //create tmp file with report PDF content.
+        final File file = createTmpFile("performanceReport");
+
+        try {
+            final OutputStream out = new FileOutputStream(file);
+            try {
+                reportBuilder.createShipmentReport(bean, user, out);
+            } finally {
+                out.close();
+            }
+        } catch (final Throwable e) {
+            log.error("Failed to create pefromance report", e);
+            file.delete();
+            throw new IOException("Failed to create performance report", e);
+        }
+
+        final InputStream in = new TmpFileInputStream(file);
+        return ResponseEntity
+                .ok()
+                .contentType(OCTET_STREAM)
+                .contentLength(file.length())
+                .body(in);
+    }
+
+    /**
+     * @param company
+     * @return
+     */
+    private ShipmentReportBean createShipmentReport(final Company company) {
+        return createShipmentReportBean();
+    }
     /**
      * @param company
      * @return
      */
     private PerformanceReportBean createPerformanceReport(final Company company) {
         return createPerformanceBean();
+    }
+
+    /**
+     * @return
+     */
+    private ShipmentReportBean createShipmentReportBean() {
+        final ShipmentReportBean bean = new ShipmentReportBean();
+        return bean;
     }
     /**
      * @return the bean to visualize.

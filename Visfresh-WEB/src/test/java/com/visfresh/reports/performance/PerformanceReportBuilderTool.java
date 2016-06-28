@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.reports;
+package com.visfresh.reports.performance;
 
 import java.io.IOException;
 import java.util.Date;
@@ -12,21 +12,17 @@ import net.sf.dynamicreports.report.exception.DRException;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
-import com.visfresh.reports.performance.AlertProfileStats;
-import com.visfresh.reports.performance.BiggestTemperatureException;
-import com.visfresh.reports.performance.PerformanceReportBean;
-import com.visfresh.reports.performance.PerformanceReportBuilder;
-import com.visfresh.reports.performance.TemperatureRuleStats;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class JasperDrReportBuilderTool {
+public final class PerformanceReportBuilderTool {
+
     /**
      * Default constructor.
      */
-    public JasperDrReportBuilderTool() {
+    private PerformanceReportBuilderTool() {
         super();
     }
 
