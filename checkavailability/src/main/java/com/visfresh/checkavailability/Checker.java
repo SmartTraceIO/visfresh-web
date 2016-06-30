@@ -22,7 +22,7 @@ import com.visfresh.sms.SmsSender;
 public class Checker {
     private static final Logger log = LoggerFactory.getLogger(Checker.class);
     private String subject = "Service Availability checker";
-    private String message = "Service not available during " + getTimeOut() + " ms";
+    private String message;
 
     private final String url;
     private long timeOut = 5 * 60 * 1000l;
@@ -50,7 +50,7 @@ public class Checker {
                 }
 
                 if (!checkImpl()) {
-                    log.debug("Second availability check not passed. Alamr will send");
+                    log.debug("Second availability check not passed. Alarm will send");
                     sendNotification();
                     log.debug("Not availability alarm has sent");
                 }
@@ -78,6 +78,9 @@ public class Checker {
      * Sends service not available notification.
      */
     protected void sendNotification() {
+        final String message = getMessage() == null
+                ? "Service not available during " + getTimeOut() + " ms"
+                : getMessage();
         try {
             new SmsSender().sendSms(subject, message);
         } catch (final Throwable e) {
