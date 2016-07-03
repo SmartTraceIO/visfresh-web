@@ -2,6 +2,7 @@
 	VeryOldEvent: 150,
 	CorrectMovingControll: 150,
 	AssignShipment: 100,
+	LeaveStartLocation: 90,
 	AutoStartShipment: 50,
 	AutoDetectEndLocation: 49
 }
