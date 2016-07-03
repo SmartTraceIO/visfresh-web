@@ -236,7 +236,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @return
      */
     private Shipment createShipment(final ShipmentDto dto, final Shipment oldShipment) {
-        final Shipment s = oldShipment == null ? new Shipment() : oldShipment;
+        final boolean isNew = oldShipment == null;
+        final Shipment s = isNew ? new Shipment() : oldShipment;
         copyBaseData(dto, s);
 
         s.setPalletId(dto.getPalletId());
@@ -245,14 +246,22 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         s.setPoNum(dto.getPoNum());
         s.setAssetType(dto.getAssetType());
         s.getCustomFields().putAll(dto.getCustomFields());
-        s.setShipmentDate(dto.getShipmentDate());
-        s.setLastEventDate(dto.getLastEventDate());
-        s.setStartDate(dto.getStartDate());
+
+        s.setShipmentDate(isNew || dto.getShipmentDate() == null
+                ? new Date() : dto.getShipmentDate());
+        if (!isNew && dto.getLastEventDate() != null) {
+            s.setLastEventDate(dto.getLastEventDate());
+        }
+        s.setStartDate(isNew || dto.getStartDate() == null
+                ? new Date() : dto.getStartDate());
+
         s.setCreatedBy(dto.getCreatedBy());
         s.setStatus(dto.getStatus());
-        s.setDeviceShutdownTime(dto.getDeviceShutdownTime());
-        s.setArrivalDate(dto.getArrivalDate());
-        s.setEta(dto.getEta());
+        if (!isNew) {
+            s.setDeviceShutdownTime(dto.getDeviceShutdownTime());
+            s.setArrivalDate(dto.getArrivalDate());
+            s.setEta(dto.getEta());
+        }
 
         return s;
     }
@@ -802,12 +811,16 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 }
             }
 
+            //last reading
+            if (s.getLastEventDate() != null) {
+                dto.setLastReadingTime(prettyFmt.format(s.getLastEventDate()));
+                dto.setLastReadingTimeISO(isoFmt.format(s.getLastEventDate()));
+            }
+
             //last event
             final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
             if (lastEvent != null) {
                 //set last reading data
-                dto.setLastReadingTime(prettyFmt.format(lastEvent.getTime()));
-                dto.setLastReadingTimeISO(isoFmt.format(lastEvent.getTime()));
                 dto.setLastReadingTemperature(LocalizationUtils.convertToUnits(
                         lastEvent.getTemperature(), user.getTemperatureUnits()));
                 dto.setLastReadingBattery(lastEvent.getBattery());
