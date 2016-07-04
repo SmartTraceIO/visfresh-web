@@ -57,6 +57,7 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
         final boolean accept = !req.isProcessed(this)
                 && shipment != null
                 && !shipment.hasFinalStatus()
+                && LeaveStartLocationRule.isSetLeaving(req.getSessionManager().getSession(shipment))
                 && isNearEndLocation(shipment, event.getLatitude(), event.getLongitude());
 
         return accept;

@@ -22,7 +22,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.utils.LocationUtils;
+import com.visfresh.utils.LocationTestUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -107,7 +107,8 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
     @Test
     public void testIsTimeNotIntersecting() {
         final double lat = 60;
-        final double dlon = getLongitudeDiff(lat, MAX_DISTANCE_AVERAGE) / 2.;
+        final double dlon = LocationTestUtils.getLongitudeDiff(
+                lat, MAX_DISTANCE_AVERAGE) / 2.;
         final long min10 = 10 * 60 * 1000l;
 
         long t = 100 * min10;
@@ -131,7 +132,8 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
     @Test
     public void testIsTimeIntersecting() {
         final double lat = 60;
-        final double dlon = getLongitudeDiff(lat, MAX_DISTANCE_AVERAGE) / 5.;
+        final double dlon = LocationTestUtils.getLongitudeDiff(
+                lat, MAX_DISTANCE_AVERAGE) / 5.;
         final long min10 = 10 * 60 * 1000l;
 
         long t = 100 * min10;
@@ -394,27 +396,5 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
             }
         }
         return list;
-    }
-    private static double getLongitudeDiff(final double lat, final double distance) {
-        double min = 0;
-        double max = 360;
-        double lon = 25.;
-
-        while (true) {
-            final double d = LocationUtils.getDistanceMeters(lat, 0., lat, lon) - distance;
-            if (Math.abs(d - distance) < 0.0000001) {
-                break;
-            }
-
-            if (d > distance) {
-                max = lon;
-            }
-            if (d < distance) {
-                min = lon;
-            }
-            lon = (max + min) / 2.;
-        }
-
-        return lon;
     }
 }

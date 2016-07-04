@@ -64,7 +64,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testAccept() {
         //test success accept
-        final SessionHolder mgr = new SessionHolder();
+        final SessionHolder mgr = createSessionHolder(true);
 
         //test not accept with not saved interim locations
         assertFalse(accept(new RuleContext(createTrackerEvent(shipment, 1, 2), mgr)));
@@ -89,11 +89,19 @@ public class InterimStopRuleTest extends InterimStopRule {
         setInterimStopState(mgr.getSession(shipment), new InterimStopInfo());
         assertTrue(accept(new RuleContext(createTrackerEvent(shipment, 7, 8), mgr)));
     }
+    @Test
+    public void testNotAcceptNotLeavingStartLocation() {
+        //test success accept
+        final SessionHolder mgr = createSessionHolder(false);
 
+        //test accept correct request
+        saveInterimLocations(shipment, locations);
+        assertFalse(accept(new RuleContext(createTrackerEvent(shipment, 1, 2), mgr)));
+    }
     @Test
     public void testHandleFirstReading() {
         //test success accept
-        final SessionHolder mgr = new SessionHolder();
+        final SessionHolder mgr = createSessionHolder(true);
         saveInterimLocations(shipment, locations);
 
         final TrackerEvent e = createTrackerEvent(locations.get(0));
@@ -108,7 +116,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testHandleFirstReadingWithInit() {
         //test success accept
-        final SessionHolder mgr = new SessionHolder();
+        final SessionHolder mgr = createSessionHolder(true);
         saveInterimLocations(shipment, locations);
 
         final TrackerEvent e = createTrackerEvent(locations.get(0));
@@ -125,7 +133,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testHandleSecondReading() {
         //test success accept
-        final SessionHolder state = new SessionHolder();
+        final SessionHolder state = createSessionHolder(true);
         saveInterimLocations(shipment, locations);
 
         //simulate previous stop
@@ -140,7 +148,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testHandleEndOfStop() {
         //test success accept
-        final SessionHolder mgr = new SessionHolder();
+        final SessionHolder mgr = createSessionHolder(true);
         saveInterimLocations(shipment, locations);
 
         //simulate prevous stop
@@ -156,7 +164,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Test
     public void testUpdateStopTime() {
         //test success accept
-        final SessionHolder mgr = new SessionHolder();
+        final SessionHolder mgr = createSessionHolder(true);
         saveInterimLocations(shipment, locations);
 
         //simulate previous stop
@@ -258,6 +266,17 @@ public class InterimStopRuleTest extends InterimStopRule {
     @Override
     protected List<LocationProfile> getInterimLocations(final Shipment shipment) {
         return interimLocations.get(shipment.getId());
+    }
+    /**
+     * @param setLeaveStart whether or not should set the leving the start flag.
+     * @return session holder.
+     */
+    private SessionHolder createSessionHolder(final boolean setLeaveStart) {
+        final SessionHolder s = new SessionHolder(shipment);
+        if (setLeaveStart) {
+            LeaveStartLocationRule.setLeavingStartLocation(s.getSession(shipment));
+        }
+        return s;
     }
 
     /**

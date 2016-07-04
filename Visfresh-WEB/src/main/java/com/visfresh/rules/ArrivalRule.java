@@ -25,6 +25,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.LocationUtils;
 
 /**
@@ -62,8 +63,12 @@ public class ArrivalRule extends AbstractNotificationRule {
         }
 
         final Shipment shipment = event.getShipment();
-        final boolean accept = !req.getSessionManager().getSession(shipment).isArrivalProcessed()
-                && isNearEndLocation(shipment, event.getLatitude(), event.getLongitude());
+        final ShipmentSession session = req.getSessionManager().getSession(shipment);
+
+        final boolean accept = !session.isArrivalProcessed()
+                && LeaveStartLocationRule.isSetLeaving(session)
+                && isNearEndLocation(shipment,
+                        event.getLatitude(), event.getLongitude());
         return accept;
     }
     /**

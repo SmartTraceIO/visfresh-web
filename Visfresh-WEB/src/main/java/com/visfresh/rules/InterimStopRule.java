@@ -138,6 +138,7 @@ public class InterimStopRule implements TrackerEventRule {
         final boolean accept = shipment != null
                 && !req.isProcessed(this)
                 && !shipment.hasFinalStatus()
+                && LeaveStartLocationRule.isSetLeaving(session)
                 && getInterimLocations(shipment) != null
                 && (isInInterimStop(session)
                 || isNearInterimStop(shipment, session, event.getLatitude(), event.getLongitude()));
