@@ -88,6 +88,7 @@ public class AutoStartShipmentDto {
      */
     private String commentsForReceiver;
     private Integer noAlertsAfterStartMinutes;
+    private boolean startOnLeaveLocation;
 
     /**
      * Default constructor.
@@ -103,6 +104,7 @@ public class AutoStartShipmentDto {
 
         setId(cfg.getId());
         setPriority(cfg.getPriority());
+        setStartOnLeaveLocation(cfg.isStartOnLeaveLocation());
 
         //add start locations.
         for (final LocationProfile loc : cfg.getShippedFrom()) {
@@ -373,5 +375,17 @@ public class AutoStartShipmentDto {
      */
     public List<String> getInterimStopsNames() {
         return interimStopsNames;
+    }
+    /**
+     * @return the startOnLeaveLocation
+     */
+    public boolean isStartOnLeaveLocation() {
+        return startOnLeaveLocation;
+    }
+    /**
+     * @param startOnLeaveLocation the startOnLeaveLocation to set
+     */
+    public void setStartOnLeaveLocation(final boolean startOnLeaveLocation) {
+        this.startOnLeaveLocation = startOnLeaveLocation;
     }
 }

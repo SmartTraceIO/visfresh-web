@@ -64,6 +64,7 @@ public class AutoStartShipmentSerializerTest {
         final String name = "JUnit name";
         final String shipmentDescription = "JUnit shipment";
         final boolean addDateShipped = true;
+        final boolean startOnLeaveLocation = true;
 
         dto.setAlertSuppressionMinutes(alertSuppressionMinutes);
         dto.setAlertProfile(alertProfile);
@@ -97,6 +98,7 @@ public class AutoStartShipmentSerializerTest {
         dto.getInterimStopsNames().add(locName5);
         dto.getInterimStops().add(loc6);
         dto.getInterimStopsNames().add(locName6);
+        dto.setStartOnLeaveLocation(startOnLeaveLocation);
 
         dto = serializer.parseAutoStartShipmentDto(serializer.toJson(dto));
 
@@ -115,6 +117,8 @@ public class AutoStartShipmentSerializerTest {
         assertEquals(locName4, dto.getEndLocationNames().get(1));
         assertEquals(locName5, dto.getInterimStopsNames().get(0));
         assertEquals(locName6, dto.getInterimStopsNames().get(1));
+
+        assertEquals(startOnLeaveLocation, dto.isStartOnLeaveLocation());
 
         //template
         assertEquals(alertSuppressionMinutes, dto.getAlertSuppressionMinutes());

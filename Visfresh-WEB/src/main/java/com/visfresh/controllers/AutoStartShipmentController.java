@@ -114,6 +114,7 @@ public class AutoStartShipmentController extends AbstractController
             cfg.setPriority(dto.getPriority());
             cfg.setTemplate(tpl);
             cfg.setId(dto.getId());
+            cfg.setStartOnLeaveLocation(dto.isStartOnLeaveLocation());
 
             //set template fields
             fillTemplate(dto, tpl, user);

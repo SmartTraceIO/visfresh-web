@@ -6,6 +6,7 @@ package com.visfresh.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -333,6 +334,7 @@ public class AutoStartShipmentDaoTest extends
         assertEquals(locTo.getId(), cfg.getShippedTo().get(0).getId());
         assertEquals(1, cfg.getInterimStops().size());
         assertEquals(locInterim.getId(), cfg.getInterimStops().get(0).getId());
+        assertTrue(cfg.isStartOnLeaveLocation());
     }
 
     /* (non-Javadoc)
@@ -350,6 +352,7 @@ public class AutoStartShipmentDaoTest extends
     private AutoStartShipment createAutoStart(final ShipmentTemplate template) {
         final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setCompany(sharedCompany);
+        cfg.setStartOnLeaveLocation(true);
         cfg.setPriority(10);
         cfg.setTemplate(template);
         cfg.getShippedFrom().add(locFrom);

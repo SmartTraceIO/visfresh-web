@@ -17,4 +17,5 @@ public interface AutoStartShipmentConstants {
     String START_LOCATION_NAMES = "startLocationNames";
     String END_LOCATION_NAMES = "endLocationNames";
     String ALERT_PROFILE_NAME = "alertProfileName";
+    String START_ON_LEAVING_LOCATION = "startOnLeavingLocation";
 }

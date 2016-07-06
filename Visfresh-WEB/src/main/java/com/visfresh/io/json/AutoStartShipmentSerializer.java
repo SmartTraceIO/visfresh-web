@@ -73,6 +73,11 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
                 dto.getEndLocationNames().add(el.getAsString());
             }
         }
+        //start on leaving location
+        if (json.has(START_ON_LEAVING_LOCATION)) {
+            dto.setStartOnLeaveLocation(
+                    json.get(START_ON_LEAVING_LOCATION).getAsBoolean());
+        }
 
         //end locations.
         if (json.has(INTERIM_STOPS)) { // this check is for support older versions of UI.
@@ -174,6 +179,9 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
         for (final String name : as.getInterimStopsNames()) {
             names.add(new JsonPrimitive(name));
         }
+
+        //start on leaving location
+        json.addProperty(START_ON_LEAVING_LOCATION, as.isStartOnLeaveLocation());
 
         //shipment template
         json.addProperty(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_NAME, as.getName());

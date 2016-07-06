@@ -19,6 +19,7 @@ public class AutoStartShipment implements EntityWithCompany,
     private final List<LocationProfile> shippedFrom = new LinkedList<>();
     private final List<LocationProfile> shippedTo = new LinkedList<>();
     private final List<LocationProfile> interimStops = new LinkedList<>();
+    private boolean startOnLeaveLocation;
 
     /**
      * Default constructor.
@@ -95,6 +96,18 @@ public class AutoStartShipment implements EntityWithCompany,
      */
     public List<LocationProfile> getInterimStops() {
         return interimStops;
+    }
+    /**
+     * @return the startOnLeaveLocation
+     */
+    public boolean isStartOnLeaveLocation() {
+        return startOnLeaveLocation;
+    }
+    /**
+     * @param startOnLeaveLocation the startOnLeaveLocation to set
+     */
+    public void setStartOnLeaveLocation(final boolean startOnLeaveLocation) {
+        this.startOnLeaveLocation = startOnLeaveLocation;
     }
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)

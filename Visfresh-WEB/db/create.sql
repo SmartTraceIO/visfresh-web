@@ -276,6 +276,7 @@ create table autostartshipments (
     company bigint(20) not null,
     template bigint(20) not null,
     priority int not null default 0,
+    startonmoving boolean not null default false,
     primary key (id),
     FOREIGN KEY (company)
         REFERENCES companies (id),

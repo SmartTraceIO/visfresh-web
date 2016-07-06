@@ -48,6 +48,7 @@ public class AutoStartShipmentDaoImpl
     protected static final String LOCATION_LOCATION = "location";
     protected static final String LOCATION_CONFIG = "config";
     protected static final String LOCATION_ORDER = "sortorder";
+    protected static final String START_ON_MOVING_FIELD = "startonmoving";
 
     private Map<String, String> propertyToDbMap = new HashMap<>();
 
@@ -72,6 +73,7 @@ public class AutoStartShipmentDaoImpl
         paramMap.put(ID_FIELD, aut.getId());
         paramMap.put(COMPANY_FIELD, aut.getCompany().getId());
         paramMap.put(PRIORITY_FIELD, aut.getPriority());
+        paramMap.put(START_ON_MOVING_FIELD, aut.isStartOnLeaveLocation());
         if (aut.getId() == null) {
             paramMap.put(TEMPLATE_FIELD, aut.getTemplate().getId());
         }
@@ -255,6 +257,7 @@ public class AutoStartShipmentDaoImpl
         final AutoStartShipment cfg = new AutoStartShipment();
         cfg.setId(((Number) map.get(ID_FIELD)).longValue());
         cfg.setPriority(((Number) map.get(PRIORITY_FIELD)).intValue());
+        cfg.setStartOnLeaveLocation((Boolean) map.get(START_ON_MOVING_FIELD));
         return cfg;
     }
     /* (non-Javadoc)
@@ -408,7 +411,7 @@ public class AutoStartShipmentDaoImpl
      * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
      */
     @Override
-    protected String buildSelectBlockForFindAll(Filter filter) {
+    protected String buildSelectBlockForFindAll(final Filter filter) {
         return "select "
                 //first group for sorting
                 + "lfrom.locationName as " + AutoStartShipmentConstants.START_LOCATIONS + ","
