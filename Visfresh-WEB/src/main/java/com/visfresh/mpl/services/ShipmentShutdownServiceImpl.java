@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
+import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
@@ -43,6 +45,8 @@ public class ShipmentShutdownServiceImpl implements ShipmentShutdownService, Sys
     private DeviceCommandService commandService;
     @Autowired
     private MainSystemMessageDispatcher systemMessageDispatcher;
+    @Autowired
+    private AutoStartShipmentDao autoStartDao;
 
     /**
      * Default constructor.
@@ -62,11 +66,29 @@ public class ShipmentShutdownServiceImpl implements ShipmentShutdownService, Sys
         final String imei = s.getDevice().getImei();
 
         if (getNextShipment(s) == null) {
-            log.debug("Shutdown device " + imei + " for shipment " + s.getId());
+            //Check autostart template not have autostart on moving flag.
+            //in this case the device should never be shutdown.
+            final Long autoStartId = s.getDevice().getAutostartTemplateId();
+            boolean ignoreShutdown = false;
 
-            //send device shutdown command
-            shutdownDevice(s.getDevice(), new Date());
-            s.setDeviceShutdownTime(new Date());
+            if (autoStartId != null) {
+                final AutoStartShipment auto = getAutoStartTemplate(autoStartId);
+                if (auto != null && auto.isStartOnLeaveLocation()) {
+                    ignoreShutdown = true;
+                    log.debug("Shutdown of device " + imei
+                            + " for shipment " + s.getId()
+                            + " has ignored according of start of leaving start"
+                            + " location option set");
+                }
+            }
+
+            if (!ignoreShutdown) {
+                log.debug("Shutdown device " + imei + " for shipment " + s.getId());
+
+                //send device shutdown command
+                shutdownDevice(s.getDevice(), new Date());
+                s.setDeviceShutdownTime(new Date());
+            }
         } else {
             log.warn("Shutting down shipment " + s.getId()
                     + " is not latest shipment for given device " + imei
@@ -81,6 +103,14 @@ public class ShipmentShutdownServiceImpl implements ShipmentShutdownService, Sys
         }
 
         saveShipment(s);
+    }
+
+    /**
+     * @param tplId
+     * @return
+     */
+    protected AutoStartShipment getAutoStartTemplate(final Long tplId) {
+        return autoStartDao.findOne(tplId);
     }
 
     /**

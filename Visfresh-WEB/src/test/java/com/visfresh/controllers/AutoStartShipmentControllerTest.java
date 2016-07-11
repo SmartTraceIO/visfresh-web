@@ -173,6 +173,48 @@ public class AutoStartShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(addDateShipped, tpl.isAddDateShipped());
         assertEquals(true, tpl.isAutostart());
     }
+    @Test
+    public void testSaveWithSameLocation() throws IOException, RestServiceException {
+        final User user = createUser2();
+        final NotificationSchedule n1 = createNotificationSchedule(user, true);
+        final NotificationSchedule n2 = createNotificationSchedule(user, true);
+
+        final LocationProfile loc = createLocation("One Location for All");
+        final int priority = 99;
+
+        final AutoStartShipmentDto dto = new AutoStartShipmentDto();
+        dto.setPriority(priority);
+        dto.getStartLocations().add(loc.getId());
+        dto.getEndLocations().add(loc.getId());
+        dto.getInterimStops().add(loc.getId());
+
+        //add shipment template fields
+        final AlertProfile alertProfile = createAlertProfile(true);
+
+        dto.setAlertSuppressionMinutes(25);
+        dto.setAlertProfile(alertProfile.getId());
+        dto.getAlertsNotificationSchedules().add(n1.getId());
+        dto.setArrivalNotificationWithinKm(15);
+        dto.getArrivalNotificationSchedules().add(n2.getId());
+        dto.setExcludeNotificationsIfNoAlerts(true);
+        dto.setShutdownDeviceAfterMinutes(99);
+        dto.setNoAlertsAfterArrivalMinutes(43);
+        dto.setShutDownAfterStartMinutes(1000);
+        dto.setCommentsForReceiver("Any comments for receiver");
+        dto.setName("JUnit name");
+        dto.setShipmentDescription("JUnit shipment");
+
+        final Long id = client.saveAutoStartShipment(dto);
+
+        assertNotNull(id);
+
+        final AutoStartShipment ds = dao.findOne(id);
+        assertEquals(id, ds.getId());
+        assertEquals(priority, ds.getPriority());
+        assertEquals(loc.getId(), ds.getShippedFrom().get(0).getId());
+        assertEquals(loc.getId(), ds.getShippedTo().get(0).getId());
+        assertEquals(loc.getId(), ds.getInterimStops().get(0).getId());
+    }
 
     @Test
     public void testSaveNotificationScheudles() throws IOException, RestServiceException {

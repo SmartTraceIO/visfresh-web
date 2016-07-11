@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
+import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -36,6 +37,7 @@ public class ShipmentShutdownServiceTest extends ShipmentShutdownServiceImpl {
     private final Map<String, Date> shutdowns = new HashMap<>();
     private final List<TrackerEvent> events = new LinkedList<>();
     private final List<Shipment> savedShipments = new LinkedList<>();
+    private final Map<Long, AutoStartShipment> autoStarts = new HashMap<>();
 
     /**
      * Default constructor.
@@ -60,18 +62,25 @@ public class ShipmentShutdownServiceTest extends ShipmentShutdownServiceImpl {
     @Test
     public void testAcceptShipmentShutdown() throws RetryableException {
         //create shutdown shipment message
-        final JsonObject json = new JsonObject();
-        json.addProperty("shipment", shipment.getId());
+        handle(createSutdownMessage(shipment));
+        assertEquals(1, shutdowns.size());
+    }
+    @Test
+    public void testIgnoreWithStartOnMoveAutoStart() throws RetryableException {
+        final AutoStartShipment auto = new AutoStartShipment();
+        auto.setId(77l);
+        auto.setStartOnLeaveLocation(true);
+        autoStarts.put(auto.getId(), auto);
 
-        final SystemMessage msg = new SystemMessage();
-        msg.setId(1l);
-        msg.setMessageInfo(json.toString());
-        msg.setRetryOn(new Date());
-        msg.setTime(new Date());
-        msg.setType(SystemMessageType.ShutdownShipment);
+        shipment.getDevice().setAutostartTemplateId(auto.getId());
 
-        handle(msg);
+        //check ignores with set start on move
+        handle(createSutdownMessage(shipment));
+        assertEquals(0, shutdowns.size());
 
+        //check not ignores with not set
+        auto.setStartOnLeaveLocation(false);
+        handle(createSutdownMessage(shipment));
         assertEquals(1, shutdowns.size());
     }
     /**
@@ -121,5 +130,28 @@ public class ShipmentShutdownServiceTest extends ShipmentShutdownServiceImpl {
             }
         }
         return null;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.mpl.services.ShipmentShutdownServiceImpl#getAutoStartTemplate(java.lang.Long)
+     */
+    @Override
+    protected AutoStartShipment getAutoStartTemplate(final Long tplId) {
+        return autoStarts.get(tplId);
+    }
+    /**
+     * @param s shipment.
+     * @return shipment shutdown message.
+     */
+    private SystemMessage createSutdownMessage(final Shipment s) {
+        final JsonObject json = new JsonObject();
+        json.addProperty("shipment", s.getId());
+
+        final SystemMessage msg = new SystemMessage();
+        msg.setId(1l);
+        msg.setMessageInfo(json.toString());
+        msg.setRetryOn(new Date());
+        msg.setTime(new Date());
+        msg.setType(SystemMessageType.ShutdownShipment);
+        return msg;
     }
 }

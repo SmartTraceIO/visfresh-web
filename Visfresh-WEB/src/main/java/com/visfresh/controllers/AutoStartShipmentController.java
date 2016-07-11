@@ -158,9 +158,11 @@ public class AutoStartShipmentController extends AbstractController
         for (final LocationProfile l : loctions) {
             if (locFroms.contains(l.getId())) {
                 cfg.getShippedFrom().add(l);
-            } else if (locTos.contains(l.getId())) {
+            }
+            if (locTos.contains(l.getId())) {
                 cfg.getShippedTo().add(l);
-            } else {
+            }
+            if (locInterims.contains(l.getId())) {
                 cfg.getInterimStops().add(l);
             }
         }
