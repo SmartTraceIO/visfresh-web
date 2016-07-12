@@ -49,9 +49,9 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
 
     @Test
     public void testIsSiblings() {
-        final Shipment master = creaeShipment(1l);
-        final Shipment sibling = creaeShipment(2l);
-        final Shipment notSibling = creaeShipment(3l);
+        final Shipment master = createShipment(1l);
+        final Shipment sibling = createShipment(2l);
+        final Shipment notSibling = createShipment(3l);
 
         //crete master event list
         final List<TrackerEvent> masterEvents = new LinkedList<TrackerEvent>();
@@ -59,29 +59,54 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
+        final double minPath = LocationTestUtils.getLongitudeDiff(y0, MIN_PATH);
 
-        //add tracker events for master shipment
-        addEvent(masterEvents, master, x0, y0, t0);
-        addEvent(masterEvents, master, x0 + 0.01, y0 + 0.01, t0 + dt);
-        addEvent(masterEvents, master, x0 + 0.02, y0 + 0.02, t0 + 2 * dt);
-
-        //add tracker events for given shipment
-        addEvent(trackerEvents, sibling, x0, y0, t0);
-        addEvent(trackerEvents, sibling, x0 + 0.015, y0 + 0.015, t0 + dt + 60 * 1000l);
-        addEvent(trackerEvents, sibling, x0 + 0.025, y0 + 0.025, t0 + 2 * dt + 60 * 1000l);
-
-        //add tracker events for given shipment
-        addEvent(trackerEvents, notSibling, x0, y0, t0);
-        addEvent(trackerEvents, notSibling, x0 - 0.15, y0 - 0.15, t0 + dt + 60 * 1000l);
-        addEvent(trackerEvents, notSibling, x0 - 0.25, y0 - 0.25, t0 + 2 * dt + 60 * 1000l);
+        //intersected time
+        final int count = (int) Math.round(minPath / 0.01) + 1;
+        for (int i = 0; i < count; i++) {
+            addEvent(masterEvents, master, x0 + 0.01 * i, y0 + 0.01 * i, t0 + i * dt);
+            addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
+                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
+            addEvent(trackerEvents, notSibling,
+                    x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
+                    t0 + dt * i + 60 * 1000l);
+        }
 
         assertTrue(isSiblings(getTrackeEvents(sibling), masterEvents));
         assertFalse(isSiblings(getTrackeEvents(notSibling), masterEvents));
     }
     @Test
+    public void testExcludeWithSmallPath() {
+        final Shipment master = createShipment(1l);
+        final Shipment sibling = createShipment(2l);
+        final Shipment notSibling = createShipment(3l);
+
+        //crete master event list
+        final List<TrackerEvent> masterEvents = new LinkedList<TrackerEvent>();
+        final double x0 = 10.;
+        final double y0 = 10.;
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        final long dt = 10 * 60 * 1000l;
+        final double minPath = LocationTestUtils.getLongitudeDiff(y0, MIN_PATH / 10);
+
+        //intersected time
+        final int count = (int) Math.round(minPath / 0.01);
+        for (int i = 0; i < count; i++) {
+            addEvent(masterEvents, master, x0 + 0.01 * i, y0 + 0.01 * i, t0 + i * dt);
+            addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
+                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
+            addEvent(trackerEvents, notSibling,
+                    x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
+                    t0 + dt * i + 60 * 1000l);
+        }
+
+        assertFalse(isSiblings(getTrackeEvents(sibling), masterEvents));
+        assertFalse(isSiblings(getTrackeEvents(notSibling), masterEvents));
+    }
+    @Test
     public void testNotIntersectingByTime() {
-        final Shipment s1 = creaeShipment(1l);
-        final Shipment s2 = creaeShipment(2l);
+        final Shipment s1 = createShipment(1l);
+        final Shipment s2 = createShipment(2l);
 
         //crete master event list
         final List<TrackerEvent> e2 = new LinkedList<TrackerEvent>();
@@ -134,6 +159,7 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         final double lat = 60;
         final double dlon = LocationTestUtils.getLongitudeDiff(
                 lat, MAX_DISTANCE_AVERAGE) / 5.;
+        final double minPath = LocationTestUtils.getLongitudeDiff(lat, MIN_PATH);
         final long min10 = 10 * 60 * 1000l;
 
         long t = 100 * min10;
@@ -147,26 +173,12 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
 
-//        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-//        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-//
-//        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-//        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-//
-//        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-//        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-
-//        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-//        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-
-        l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
-        l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
+        //intersected time
+        final int count = (int) Math.round(minPath / dlon) + 1;
+        for (int i = 0; i < count; i++) {
+            l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
+            l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
+        }
 
         //l1 stopped l2 continued
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
@@ -183,14 +195,13 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
 
         assertTrue(isSiblings(l1, l2));
-        assertFalse(isSiblings(l2, l1));
     }
 
     @Test
     public void testIncludeOldSiblings() {
-        final Shipment master = creaeShipment(11l);
-        final Shipment sibling = creaeShipment(12l);
-        final Shipment oldSibling = creaeShipment(3l);
+        final Shipment master = createShipment(11l);
+        final Shipment sibling = createShipment(12l);
+        final Shipment oldSibling = createShipment(3l);
         oldSibling.setStatus(ShipmentStatus.Arrived);
         master.getSiblings().add(oldSibling.getId());
 
@@ -199,21 +210,18 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
+        final double minPath = LocationTestUtils.getLongitudeDiff(y0, MIN_PATH);
 
-        //add tracker events for master shipment
-        addEvent(trackerEvents, master, x0, y0, t0);
-        addEvent(trackerEvents, master, x0 + 0.01, y0 + 0.01, t0 + dt);
-        addEvent(trackerEvents, master, x0 + 0.02, y0 + 0.02, t0 + 2 * dt);
-
-        //add tracker events for given shipment
-        addEvent(trackerEvents, sibling, x0, y0, t0);
-        addEvent(trackerEvents, sibling, x0 + 0.015, y0 + 0.015, t0 + dt + 60 * 1000l);
-        addEvent(trackerEvents, sibling, x0 + 0.025, y0 + 0.025, t0 + 2 * dt + 60 * 1000l);
-
-        //add tracker events for given shipment
-        addEvent(trackerEvents, oldSibling, x0, y0, t0);
-        addEvent(trackerEvents, oldSibling, x0 + 0.015, y0 + 0.015, t0 + dt + 60 * 1000l);
-        addEvent(trackerEvents, oldSibling, x0 + 0.025, y0 + 0.025, t0 + 2 * dt + 60 * 1000l);
+        //intersected time
+        final int count = (int) Math.round(minPath / 0.01) + 1;
+        for (int i = 0; i < count; i++) {
+            addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
+                    t0 + i * dt);
+            addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
+                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
+            addEvent(trackerEvents, oldSibling, x0 + 0.01 * i + 0.005,
+                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
+        }
 
         this.updateShipmentSiblingsForCompany(company);
 
@@ -229,30 +237,28 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
 
     @Test
     public void testUpdateShipmentSiblingsForCompany() {
-        final Shipment master = creaeShipment(1l);
-        final Shipment sibling = creaeShipment(2l);
-        final Shipment notSibling = creaeShipment(3l);
+        final Shipment master = createShipment(1l);
+        final Shipment sibling = createShipment(2l);
+        final Shipment notSibling = createShipment(3l);
 
         //crete master event list
         final double x0 = 10.;
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
+        final double minPath = LocationTestUtils.getLongitudeDiff(y0, MIN_PATH);
 
-        //add tracker events for master shipment
-        addEvent(trackerEvents, master, x0, y0, t0);
-        addEvent(trackerEvents, master, x0 + 0.01, y0 + 0.01, t0 + dt);
-        addEvent(trackerEvents, master, x0 + 0.02, y0 + 0.02, t0 + 2 * dt);
-
-        //add tracker events for given shipment
-        addEvent(trackerEvents, sibling, x0, y0, t0);
-        addEvent(trackerEvents, sibling, x0 + 0.015, y0 + 0.015, t0 + dt + 60 * 1000l);
-        addEvent(trackerEvents, sibling, x0 + 0.025, y0 + 0.025, t0 + 2 * dt + 60 * 1000l);
-
-        //add tracker events for given shipment
-        addEvent(trackerEvents, notSibling, x0, y0, t0);
-        addEvent(trackerEvents, notSibling, x0 - 0.15, y0 - 0.15, t0 + dt + 60 * 1000l);
-        addEvent(trackerEvents, notSibling, x0 - 0.25, y0 - 0.25, t0 + 2 * dt + 60 * 1000l);
+        //intersected time
+        final int count = (int) Math.round(minPath / 0.01) + 1;
+        for (int i = 0; i < count; i++) {
+            addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
+                    t0 + i * dt);
+            addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
+                    y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
+            addEvent(trackerEvents, notSibling,
+                    x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
+                    t0 + dt * i + 60 * 1000l);
+        }
 
         this.updateShipmentSiblingsForCompany(company);
 
@@ -274,7 +280,7 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
      * @param id shipment ID.
      * @return
      */
-    protected Shipment creaeShipment(final long id) {
+    protected Shipment createShipment(final long id) {
         final Shipment s = new Shipment();
         s.setId(id);
         s.setCompany(company);

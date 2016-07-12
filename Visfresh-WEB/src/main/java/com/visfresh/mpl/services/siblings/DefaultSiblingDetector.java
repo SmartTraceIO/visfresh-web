@@ -37,6 +37,10 @@ import com.visfresh.utils.StringUtils;
 @Component
 public class DefaultSiblingDetector implements SiblingDetector {
     /**
+     * Minimal path for siblings.
+     */
+    protected static final int MIN_PATH = 25000; // meters
+    /**
      * The logger.
      */
     private static final Logger log = LoggerFactory.getLogger(DefaultSiblingDetector.class);
@@ -281,25 +285,41 @@ public class DefaultSiblingDetector implements SiblingDetector {
         }
 
         //get events of given tracker after the intersecting time
-        final List<TrackerEvent> reminder = cutEventsAfterDate(e1, e2.get(e2.size() - 1).getTime());
+        cutEventsAfterDate(e1, e2.get(e2.size() - 1).getTime());
 
         final double summ = getAvgDistance(e1, e2);
         final boolean isSiblings = summ < MAX_DISTANCE_AVERAGE;
-        //check given tracker lives the sibling area
-        if (isSiblings && reminder.size() > 0) {
-            double ss = 0;
-            final double norma = reminder.size();
-            final TrackerEvent last = originE2.get(originE2.size() - 1);
 
-            for (final TrackerEvent e : reminder) {
-                ss += getDistance(e, last) / norma;
-                if (ss >= MAX_DISTANCE_AVERAGE) {
-                    return false;
+        //check given tracker lives the sibling area
+        return isSiblings
+                && isPathNotLessThen(e1, MIN_PATH)
+                && isPathNotLessThen(e2, MIN_PATH);
+    }
+
+    /**
+     * @param events
+     * @param minPath
+     * @return
+     */
+    protected boolean isPathNotLessThen(final List<TrackerEvent> events, final int minPath) {
+        if (events.size() == 0) {
+            return false;
+        }
+
+        final LinkedList<TrackerEvent> list = new LinkedList<>(events);
+        TrackerEvent e;
+        while (list.size() > 0) {
+            e = list.remove(0);
+
+            final Iterator<TrackerEvent> iter = list.descendingIterator();
+            while (iter.hasNext()) {
+                if (getDistance(e, iter.next()) >= minPath) {
+                    return true;
                 }
             }
         }
 
-        return isSiblings;
+        return false;
     }
 
     /**
