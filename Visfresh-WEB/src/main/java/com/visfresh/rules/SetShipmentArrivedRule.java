@@ -15,12 +15,12 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Location;
-import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.services.ArrivalService;
 import com.visfresh.services.ShipmentShutdownService;
-import com.visfresh.utils.LocationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -38,6 +38,8 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
     protected ShipmentDao shipmentDao;
     @Autowired
     protected ShipmentShutdownService shutdownService;
+    @Autowired
+    private ArrivalService arrivalService;
 
     /**
      * Default constructor.
@@ -54,46 +56,18 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
         final TrackerEvent event = req.getEvent();
         final Shipment shipment = event.getShipment();
 
+        final ShipmentSession session = req.getSessionManager().getSession(shipment);
         final boolean accept = !req.isProcessed(this)
                 && shipment != null
+                && event.getLatitude() != null
+                && event.getLongitude() != null
+                && shipment.getShippedTo() != null
                 && !shipment.hasFinalStatus()
-                && LeaveStartLocationRule.isSetLeaving(req.getSessionManager().getSession(shipment))
-                && isNearEndLocation(shipment, event.getLatitude(), event.getLongitude());
+                && LeaveStartLocationRule.isSetLeaving(session)
+                && arrivalService.isNearLocation(shipment.getShippedTo(),
+                        new Location(event.getLatitude(), event.getLongitude()));
 
         return accept;
-    }
-    /**
-     * @param shipment shipment.
-     * @param latitude latitude of device location.
-     * @param longitude longitude of device location.
-     * @return
-     */
-    public static boolean isNearEndLocation(final Shipment shipment, final Double latitude,
-            final Double longitude) {
-        if (latitude == null || longitude == null) {
-            return false;
-        }
-
-        final LocationProfile endLocation = shipment.getShippedTo();
-        if (endLocation != null) {
-            final double distance = getNumberOfMetersForArrival(latitude, longitude, endLocation);
-            return distance < 1.0;
-        }
-        return false;
-    }
-
-    /**
-     * @param latitude
-     * @param longitude
-     * @param endLocation
-     * @return
-     */
-    protected static int getNumberOfMetersForArrival(final double latitude,
-            final double longitude, final LocationProfile endLocation) {
-        final Location end = endLocation.getLocation();
-        double distance = LocationUtils.getDistanceMeters(latitude, longitude, end.getLatitude(), end.getLongitude());
-        distance = Math.max(0., distance - endLocation.getRadius());
-        return (int) Math.round(distance);
     }
 
     /* (non-Javadoc)
@@ -106,15 +80,22 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
 
         context.setProcessed(this);
 
-        shipment.setStatus(ShipmentStatus.Arrived);
-        shipment.setArrivalDate(new Date());
-        shipmentDao.save(shipment);
-        log.debug("Shipment status for " + shipment.getId() + " has set to "+ ShipmentStatus.Arrived);
+        if (arrivalService.handleNearLocation(
+                shipment.getShippedFrom(),
+                new Location(event.getLatitude(), event.getLongitude()),
+                context.getSessionManager().getSession(shipment))) {
 
-        if (shipment.getShutdownDeviceAfterMinutes() != null) {
-            final long date = System.currentTimeMillis()
-                    + shipment.getShutdownDeviceAfterMinutes() * 60 * 1000l;
-            shutdownService.sendShipmentShutdown(shipment, new Date(date));
+            shipment.setStatus(ShipmentStatus.Arrived);
+            shipment.setArrivalDate(event.getTime());
+            shipmentDao.save(shipment);
+            log.debug("Shipment status for " + shipment.getId()
+                    + " has set to "+ ShipmentStatus.Arrived);
+
+            if (shipment.getShutdownDeviceAfterMinutes() != null) {
+                final long date = System.currentTimeMillis()
+                        + shipment.getShutdownDeviceAfterMinutes() * 60 * 1000l;
+                shutdownService.sendShipmentShutdown(shipment, new Date(date));
+            }
         }
 
         return false;
