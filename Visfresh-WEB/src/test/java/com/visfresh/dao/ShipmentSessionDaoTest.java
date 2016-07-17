@@ -49,7 +49,7 @@ public class ShipmentSessionDaoTest extends BaseDaoTest<ShipmentSessionDao> {
         assertNull(dao.getSession(shipment));
 
         //check save
-        final ShipmentSession s = new ShipmentSession();
+        final ShipmentSession s = new ShipmentSession(shipment.getId());
         s.setShipmentProperty("key1", "value1");
 
         dao.saveSession(shipment, s);

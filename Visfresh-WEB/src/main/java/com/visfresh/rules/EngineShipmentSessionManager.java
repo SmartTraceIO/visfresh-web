@@ -54,28 +54,28 @@ public class EngineShipmentSessionManager implements ShipmentSessionManager {
      */
     public ShipmentSession loadSession(final Shipment s, final String loaderId) {
         //load cache entry
-        ShipmentSessionCacheEntry ss;
+        ShipmentSessionCacheEntry entry;
         synchronized (sessionCache) {
-            ss = sessionCache.get(s.getId());
-            if (ss == null) {
-                ss = new ShipmentSessionCacheEntry();
-                sessionCache.put(s.getId(), ss);
-                ss.loaders.put(loaderId, this);
+            entry = sessionCache.get(s.getId());
+            if (entry == null) {
+                entry = new ShipmentSessionCacheEntry();
+                sessionCache.put(s.getId(), entry);
+                entry.loaders.put(loaderId, this);
             }
         }
 
         //load session.
-        synchronized (ss) {
-            if (ss.session == null) {
-                ss.session = loadSessionFromDb(s);
+        synchronized (entry) {
+            if (entry.session == null) {
+                entry.session = loadSessionFromDb(s);
                 log.debug("Shipment session for " + s.getId() + " is load from DB");
             }
-            if (ss.session == null) {
-                ss.session = new ShipmentSession();
+            if (entry.session == null) {
+                entry.session = new ShipmentSession(s.getId());
             }
         }
 
-        return ss.session;
+        return entry.session;
     }
 
     public void unloadSession(final Shipment s, final boolean saveSession) {

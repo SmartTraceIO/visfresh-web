@@ -857,7 +857,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Shipment s = createShipment(true);
 
         //mark any rules as processed
-        final ShipmentSession session = new ShipmentSession();
+        final ShipmentSession session = new ShipmentSession(s.getId());
         int count = 0;
         for(final TemperatureRule rule: s.getAlertProfile().getAlertRules()) {
             if (count > 2) {

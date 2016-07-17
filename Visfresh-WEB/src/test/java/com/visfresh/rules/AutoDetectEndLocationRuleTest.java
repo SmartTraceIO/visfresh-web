@@ -105,7 +105,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
     }
     @Test
     public void testNeedAutodetect() {
-        final ShipmentSession state = new ShipmentSession();
+        final ShipmentSession state = new ShipmentSession(shipment.getId());
 
         final LocationProfile loc1 = createLocation(1., 0.);
         final LocationProfile loc2 = createLocation(1., 0.);

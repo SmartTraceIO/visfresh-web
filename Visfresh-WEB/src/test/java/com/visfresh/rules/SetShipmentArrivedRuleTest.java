@@ -21,6 +21,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.mock.MockShipmentShutdownService;
+import com.visfresh.services.ArrivalService;
 import com.visfresh.services.RuleEngine;
 
 /**
@@ -30,6 +31,7 @@ import com.visfresh.services.RuleEngine;
 public class SetShipmentArrivedRuleTest extends BaseRuleTest {
     private TrackerEventRule rule;
     private Shipment shipment;
+    private ArrivalService service;
 
     /**
      * Default constructor.
@@ -41,6 +43,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
     @Before
     public void setUp() {
         rule = context.getBean(RuleEngine.class).getRule(SetShipmentArrivedRule.NAME);
+        service = context.getBean(ArrivalService.class);
         shipment = createDefaultShipment(ShipmentStatus.InProgress, createDevice("9283470987"));
     }
 
@@ -102,8 +105,14 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
 
+        final SessionHolder h = createSessionHolder(true);
+
+        final TrackerEvent e1 = createEventNearLocation(loc);
+        e1.setTime(new Date(e.getTime().getTime() - 30 * 60 * 1000l));
+        service.handleNearLocation(loc, e1, h.getSession(shipment));
+
         //set nearest location
-        final RuleContext req = new RuleContext(e, createSessionHolder(true));
+        final RuleContext req = new RuleContext(e, h);
         rule.accept(req);
         rule.handle(req);
 
@@ -117,12 +126,17 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
 
         final LocationProfile loc = createLocation();
         final TrackerEvent e = createEventNearLocation(loc);
+        final SessionHolder h = createSessionHolder(true);
+
+        final TrackerEvent e1 = createEventNearLocation(loc);
+        e1.setTime(new Date(e.getTime().getTime() - 30 * 60 * 1000l));
+        service.handleNearLocation(loc, e1, h.getSession(shipment));
 
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e, createSessionHolder(true));
+        final RuleContext req = new RuleContext(e, h);
         assertTrue(rule.accept(req));
         rule.handle(req);
 
@@ -145,7 +159,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         assertTrue(rule.accept(req));
         rule.handle(req);
 
-        assertFalse(rule.accept(new RuleContext(e, mgr)));
+        assertFalse(rule.accept(req));
     }
     /**
      * @param loc location.

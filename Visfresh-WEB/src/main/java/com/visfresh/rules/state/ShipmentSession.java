@@ -22,12 +22,21 @@ public class ShipmentSession {
     private boolean alertsSuppressed;
     private Date alertsSuppressionDate;
     private boolean batteryLowProcessed;
+    private Long shipmentId;
 
     /**
      * Default constructor.
      */
     public ShipmentSession() {
+        this(null);
+    }
+
+    /**
+     * @param id shipment ID.
+     */
+    public ShipmentSession(final Long id) {
         super();
+        this.setShipmentId(id);
     }
 
     /**
@@ -95,5 +104,17 @@ public class ShipmentSession {
     }
     public void setBatteryLowProcessed(final boolean processed) {
         this.batteryLowProcessed = processed;
+    }
+    /**
+     * @param id the shipment ID.
+     */
+    public void setShipmentId(final Long id) {
+        this.shipmentId = id;
+    }
+    /**
+     * @return the shipmentId
+     */
+    public Long getShipmentId() {
+        return shipmentId;
     }
 }

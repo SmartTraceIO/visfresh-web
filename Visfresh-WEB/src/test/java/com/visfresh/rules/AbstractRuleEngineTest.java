@@ -200,7 +200,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         assertEquals(2, getAlertYetFoFire(s).size());
 
         //test with shipment session
-        final ShipmentSession session = new ShipmentSession();
+        final ShipmentSession session = new ShipmentSession(s.getId());
         this.sessions.put(s.getId(), session);
 
         setProcessedTemperatureRule(session, r2);
@@ -235,7 +235,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         assertEquals(0, getAlertFired(s).size());
 
         //test with shipment session
-        final ShipmentSession session = new ShipmentSession();
+        final ShipmentSession session = new ShipmentSession(s.getId());
         this.sessions.put(s.getId(), session);
 
         setProcessedTemperatureRule(session, r2);

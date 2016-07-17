@@ -22,6 +22,7 @@ public class SessionHolder implements ShipmentSessionManager {
      */
     public SessionHolder(final Shipment s, final ShipmentSession session) {
         super();
+        session.setShipmentId(s.getId());
         sessions.put(s.getId(), session);
     }
     /**
@@ -47,7 +48,7 @@ public class SessionHolder implements ShipmentSessionManager {
     public ShipmentSession getSession(final Shipment s) {
         ShipmentSession ss = sessions.get(s.getId());
         if (ss == null) {
-            ss = new ShipmentSession();
+            ss = new ShipmentSession(s.getId());
             sessions.put(s.getId(), ss);
         }
         return ss;
