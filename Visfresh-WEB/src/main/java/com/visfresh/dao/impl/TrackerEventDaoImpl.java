@@ -500,4 +500,17 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         ue.setDeviceImei((String) row.get(DEVICE_FIELD));
         return ue;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#assignShipment(java.lang.Long, com.visfresh.entities.Shipment)
+     */
+    @Override
+    public void assignShipment(final Long id, final Shipment s) {
+        final String sql = "update " + TABLE + " set " + SHIPMENT_FIELD + "=:shipment where " + ID_FIELD + "=:id";
+
+        final Map<String, Object> map = new HashMap<>();
+        map.put("shipment", s.getId());
+        map.put("id", id);
+
+        jdbc.update(sql, map);
+    }
 }

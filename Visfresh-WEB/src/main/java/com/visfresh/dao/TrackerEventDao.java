@@ -72,4 +72,9 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
      * @return map of shipment ID to list of tracker event.
      */
     Map<Long, List<TrackerEventDto>> getEventsForShipmentIds(Collection<Long> ids);
+    /**
+     * @param id tracker event ID.
+     * @param s shipment.
+     */
+    void assignShipment(Long id, Shipment s);
 }

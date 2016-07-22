@@ -8,8 +8,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
+import java.util.GregorianCalendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,19 +22,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.visfresh.entities.AlertType;
+import com.visfresh.dao.PerformanceReportDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.reports.PdfReportBuilder;
-import com.visfresh.reports.performance.AlertProfileStats;
-import com.visfresh.reports.performance.BiggestTemperatureException;
 import com.visfresh.reports.performance.PerformanceReportBean;
-import com.visfresh.reports.performance.TemperatureRuleStats;
 import com.visfresh.reports.shipment.ShipmentReportBean;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -50,6 +50,8 @@ public class ReportsController extends AbstractController {
 
     @Autowired
     private PdfReportBuilder reportBuilder;
+    @Autowired
+    private PerformanceReportDao performanceReportDao;
 
     /**
      * Default constructor.
@@ -65,14 +67,49 @@ public class ReportsController extends AbstractController {
      */
     @RequestMapping(value = "/getPerformanceReport/{authToken}",
             method = RequestMethod.GET, produces = "application/pdf")
-    public ResponseEntity<InputStream> getPerformanceReport(@PathVariable final String authToken)
+    public ResponseEntity<InputStream> getPerformanceReport(
+            @PathVariable final String authToken,
+            @RequestParam(required = false) final String startDate,
+            @RequestParam(required = false) final String endDate)
             throws Exception {
         final User user = getLoggedInUser(authToken);
 
         checkAccess(user, Role.BasicUser);
 
+        Date d1 = null;
+        Date d2 = null;
+
+        if (startDate != null || endDate != null) {
+            final DateFormat df = DateTimeUtils.createDateFormat(
+                    "yyyy-MM-dd", user.getLanguage(), user.getTimeZone());
+            //start date
+            if (startDate != null) {
+                d1 = df.parse(startDate);
+            }
+            //end date
+            if (endDate != null) {
+                d2 = df.parse(endDate);
+
+                //correct end date to end of day
+                final Calendar calendar = new GregorianCalendar();
+                calendar.setTime(d2);
+                calendar.set(Calendar.HOUR_OF_DAY, 23);
+                calendar.set(Calendar.MINUTE, 59);
+                d2 = calendar.getTime();
+            }
+        }
+
+        //correct null date ranges
+        if (d2 == null) {
+            d2 = new Date();
+        }
+        if (d1 == null) {
+            d1 = new Date(d2.getTime() - 30 * 24 * 60 * 60 * 1000l);
+        }
+
         //create report bean.
-        final PerformanceReportBean bean = createPerformanceReport(user.getCompany());
+        final PerformanceReportBean bean = performanceReportDao.createReport(
+                user.getCompany(), d1, d2);
 
         //create tmp file with report PDF content.
         final File file = createTmpFile("performanceReport");
@@ -145,82 +182,11 @@ public class ReportsController extends AbstractController {
         return createShipmentReportBean();
     }
     /**
-     * @param company
-     * @return
-     */
-    private PerformanceReportBean createPerformanceReport(final Company company) {
-        return createPerformanceBean();
-    }
-
-    /**
      * @return
      */
     private ShipmentReportBean createShipmentReportBean() {
         final ShipmentReportBean bean = new ShipmentReportBean();
         return bean;
-    }
-    /**
-     * @return the bean to visualize.
-     */
-    private static PerformanceReportBean createPerformanceBean() {
-        final PerformanceReportBean bean = new PerformanceReportBean();
-
-        bean.setStartDate(new Date(System.currentTimeMillis() - 10000000000l));
-        bean.setEndDate(new Date());
-        bean.setNumberOfShipments(212);
-        bean.setNumberOfTrackers(122);
-        bean.setAvgShipmentsPerTracker(2.2);
-        bean.setAvgTrackersPerShipment(1.4);
-
-        bean.getAlertProfiles().add(createAlertProfile("Chilled Beef"));
-        bean.getAlertProfiles().add(createAlertProfile("Chilled Wine"));
-        return bean;
-    }
-
-    /**
-     * @param name alert profile name.
-     * @return random generated alert profile stats.
-     */
-    private static AlertProfileStats createAlertProfile(final String name) {
-        final AlertType[] types = {AlertType.Hot, AlertType.CriticalHot, AlertType.Cold, AlertType.CriticalCold};
-        final String[] serialNums = {"123", "324", "673", "257"};
-
-        final Random random = new Random();
-        final long oneHour = 60 * 60 * 1000l;
-
-        final AlertProfileStats ap = new AlertProfileStats();
-        ap.setAvgTemperature((random.nextDouble() - 0.5) * 20.);
-        ap.setName(name);
-        ap.setStandardDeviation(0.001 + random.nextDouble() / 0.5);
-        ap.setTotalMonitoringTime((1 + random.nextInt(3 * 30 * 24)) * oneHour);
-
-        final int numRules = 3 + random.nextInt(7);
-        for (int i = 0; i < numRules; i++) {
-            final TemperatureRuleStats rule = new TemperatureRuleStats();
-            rule.setTotalTime((3 + random.nextInt(15)) * oneHour);
-
-            //create temperature rule
-            final TemperatureRule tr = new TemperatureRule();
-            tr.setType(types[random.nextInt(types.length)]);
-            tr.setTemperature((random.nextDouble() - 0.5) * 20.);
-            tr.setCumulativeFlag(random.nextBoolean());
-            tr.setTimeOutMinutes((3 + random.nextInt(15)) * 60);
-            rule.setRule(tr);
-
-            //add biggest exceptions
-            final int numBidgest = random.nextInt(5);
-            for (int j = 0; j < numBidgest; j++) {
-                final BiggestTemperatureException b = new BiggestTemperatureException();
-                b.setSerialNumber(serialNums[random.nextInt(serialNums.length)]);
-                b.setTripCount(1 + random.nextInt(4));
-                b.setTime((3 + random.nextInt(5)) * oneHour);
-                rule.getBiggestExceptions().add(b);
-            }
-
-            ap.getTemperatureRules().add(rule);
-        }
-
-        return ap;
     }
 
     /**

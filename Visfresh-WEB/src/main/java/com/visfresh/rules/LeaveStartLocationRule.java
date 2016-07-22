@@ -28,7 +28,7 @@ public class LeaveStartLocationRule implements TrackerEventRule {
     private static final String IS_STARTED_WATCH_LIVING_START_LOCATION = "isStartedWatchLivingStartLocation";
     private static final String IS_SET_LEAVING_START_LOCATION = "isSetLeavingStartLocation";
 
-    protected static final long CHECK_SHUTDOWN_TIMEOUT = 60 * 60 * 1000L;
+    protected static final long CHECK_LEAVING_TIMEOUT = 60 * 60 * 1000L;
     public static final String NAME = "LeaveStartLocation";
     private static final Logger log = LoggerFactory.getLogger(LeaveStartLocationRule.class);
     protected static final int CONTROL_DISTANCE = 5000; //meters
@@ -152,7 +152,7 @@ public class LeaveStartLocationRule implements TrackerEventRule {
      */
     protected boolean isOutsideStartLocation(final TrackerEvent e) {
         final LocationProfile start = e.getShipment().getShippedFrom();
-        if (start == null || e.getLatitude() == null || e.getLongitude() == 0) {
+        if (start == null || e.getLatitude() == null || e.getLongitude() == null) {
             return false;
         }
 
