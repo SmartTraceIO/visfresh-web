@@ -4,7 +4,9 @@
 package com.visfresh.controllers.restclient;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -15,10 +17,12 @@ import com.google.gson.JsonNull;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.Shipment;
 import com.visfresh.io.json.DeviceSerializer;
 import com.visfresh.lists.DeviceDto;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -142,5 +146,29 @@ public class DeviceRestClient extends RestClient {
         }
 
         sendGetRequest(getPathWithToken("initDeviceColors"), params);
+    }
+
+    /**
+     * @param device
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public String getReadings(final Device device, final Date startDate, final Date endDate) throws IOException, RestServiceException {
+        final DateFormat fmt = DateTimeUtils.createDateFormat(
+                "yyyy-MM-dd'T'HH-mm-ss", Language.English, this.serializer.getTimeZone());
+
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("device", device.getImei());
+        if (startDate != null) {
+            params.put("startDate", fmt.format(startDate));
+        }
+        if (endDate != null) {
+            params.put("endDate", fmt.format(endDate));
+        }
+
+        return doSendGetRequest(getPathWithToken("getReadings"), params);
     }
 }

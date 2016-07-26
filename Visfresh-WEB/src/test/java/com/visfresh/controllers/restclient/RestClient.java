@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -134,6 +135,19 @@ public class RestClient  {
      */
     public final JsonElement sendGetRequest(final String path, final Map<String, String> params)
             throws IOException, RestServiceException {
+        final String response = doSendGetRequest(path, params);
+        return parseResponse(response);
+    }
+    /**
+     * @param path
+     * @param params
+     * @return
+     * @throws IOException
+     * @throws MalformedURLException
+     */
+    public String doSendGetRequest(final String path,
+            final Map<String, String> params) throws IOException,
+            MalformedURLException {
         final StringBuilder sb = new StringBuilder(
                 getServiceUrl().toExternalForm() + path);
 
@@ -161,7 +175,10 @@ public class RestClient  {
         con.setDoOutput(false);
         con.setDoInput(true);
 
-        return parseResponse(con);
+        final String response = getContent(con.getInputStream());
+        //notify listeners
+        fireResponseReceived(response);
+        return response;
     }
 
     /**
@@ -171,6 +188,18 @@ public class RestClient  {
      * @throws RestServiceException
      */
     public final JsonElement sendPostRequest(final String path, final JsonElement json) throws IOException, RestServiceException {
+        final String response = doSendPostRequest(path, json);
+        return parseResponse(response);
+    }
+    /**
+     * @param path
+     * @param json
+     * @return
+     * @throws IOException
+     * @throws MalformedURLException
+     */
+    public String doSendPostRequest(final String path, final JsonElement json)
+            throws IOException, MalformedURLException {
         final StringBuilder sb = new StringBuilder(
                 getServiceUrl().toExternalForm() + path);
 
@@ -192,7 +221,10 @@ public class RestClient  {
             wr.close();
         }
 
-        return parseResponse(con);
+        final String response = getContent(con.getInputStream());
+        //notify listeners
+        fireResponseReceived(response);
+        return response;
     }
     /**
      * @return
@@ -212,12 +244,8 @@ public class RestClient  {
      * @throws IOException
      * @throws RestServiceException
      */
-    public final JsonElement parseResponse(final URLConnection con)
+    protected JsonElement parseResponse(final String response)
             throws IOException, RestServiceException {
-        final String response = getContent(con.getInputStream());
-        //notify listeners
-        fireResponseReceived(response);
-
         final JsonObject e = new JsonParser().parse(response).getAsJsonObject();
         checkError(e);
         return e.get("response");

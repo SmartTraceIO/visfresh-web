@@ -16,6 +16,7 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -49,7 +50,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Override
     public void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
         converters.add(createGsonHttpMessageConverter());
-        super.configureMessageConverters(converters);
+        converters.add(new ResourceHttpMessageConverter());
     }
     /**
      * @return GSON converter.

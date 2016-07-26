@@ -3,13 +3,24 @@
  */
 package com.visfresh.controllers;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +70,7 @@ import com.visfresh.utils.SerializerUtils;
 @RestController("Device")
 @RequestMapping("/rest")
 public class DeviceController extends AbstractController implements DeviceConstants {
+    private static MediaType TEXT_PLAIN = MediaType.parseMediaType("text/plain");
     /**
      * Logger.
      */
@@ -484,6 +496,164 @@ public class DeviceController extends AbstractController implements DeviceConsta
             log.error("Failed to initialize device colors for company " + company, e);
             return createErrorResponse(e);
         }
+    }
+    @RequestMapping(value = "/getReadings/{authToken}",
+            method = RequestMethod.GET, produces = "text/plain")
+    public ResponseEntity<?> getTrackerEvents(
+            @PathVariable final String authToken,
+            @RequestParam(value = "startDate", required = false) final String startDateArg,
+            @RequestParam(value = "endDate", required = false) final String endDateArg,
+            @RequestParam(value = "device", required = false) final String deviceImei
+            ) throws Exception {
+
+        //check logged in.
+        final User user = getLoggedInUser(authToken);
+        checkAccess(user, Role.BasicUser);
+
+        final Device device = deviceDao.findByImei(deviceImei);
+
+        checkCompanyAccess(user, device);
+        if (device == null) {
+            return badRequest("Device " + deviceImei + " not found");
+        }
+
+        //create date format
+        final DateFormat df = DateTimeUtils.createDateFormat(
+                "yyyy-MM-dd'T'HH-mm-ss", user.getLanguage(), user.getTimeZone());
+
+        Date startDate = null;
+        Date endDate = null;
+
+        if (startDateArg != null || endDateArg != null) {
+            //start date
+            if (startDateArg != null) {
+                startDate = df.parse(startDateArg);
+            }
+            //end date
+            if (endDateArg != null) {
+                endDate = df.parse(endDateArg);
+            }
+        }
+
+        //correct null date ranges
+        if (endDate == null) {
+            endDate = new Date();
+        }
+        if (startDate == null) {
+            startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000l);
+        }
+
+        final List<ShortTrackerEvent> events = trackerEventDao.findBy(device.getImei(), startDate, endDate);
+
+        //create tmp file with report PDF content.
+        final File file = createTmpFile("readings");
+
+        try {
+            final OutputStream out = new FileOutputStream(file);
+            try {
+                readingsToCsv(events, out, df);
+            } finally {
+                out.close();
+            }
+        } catch (final Throwable e) {
+            log.error("Failed to create pefromance report", e);
+            file.delete();
+            throw new IOException("Failed to create performance report", e);
+        }
+
+        final InputStream in = new TmpFileInputStream(file);
+        return ResponseEntity
+                .ok()
+                .contentType(TEXT_PLAIN)
+                .contentLength(file.length())
+                .body(new InputStreamResource(in, file.getName()));
+    }
+
+    /**
+     * @param events tracker events.
+     * @param out CSV output stream.
+     * @throws IOException
+     */
+    public static void readingsToCsv(final List<ShortTrackerEvent> events, final OutputStream out, final DateFormat fmt)
+            throws IOException {
+        //+-------------+--------------+------+-----+---------+----------------+
+        //| Field       | Type         | Null | Key | Default | Extra          |
+        //+-------------+--------------+------+-----+---------+----------------+
+        //| id          | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+        //| type        | varchar(20)  | NO   |     | NULL    |                |
+        //| time        | timestamp    | YES  |     | NULL    |                |
+        //| battery     | int(11)      | NO   |     | NULL    |                |
+        //| temperature | double       | NO   |     | NULL    |                |
+        //| latitude    | double       | YES  |     | NULL    |                |
+        //| longitude   | double       | YES  |     | NULL    |                |
+        //| device      | varchar(127) | NO   | MUL | NULL    |                |
+        //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
+        //| createdon   | timestamp    | YES  |     | NULL    |                |
+        //+-------------+--------------+------+-----+---------+----------------+
+
+        out.write("id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon".getBytes());
+        out.write((byte) '\n');
+
+        //print headers
+        for (final ShortTrackerEvent e : events) {
+            final StringBuilder sb = new StringBuilder();
+            out.write(sb.toString().getBytes());
+
+            //| id          | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+            out.write(Long.toString(e.getId()).getBytes());
+            out.write((byte) ',');
+            //| type        | varchar(20)  | NO   |     | NULL    |                |
+            out.write(e.getType().name().getBytes());
+            out.write((byte) ',');
+            //| time        | timestamp    | YES  |     | NULL    |                |
+            out.write(fmt.format(e.getTime()).getBytes());
+            out.write((byte) ',');
+            //| battery     | int(11)      | NO   |     | NULL    |                |
+            out.write(Integer.toString(e.getBattery()).getBytes());
+            out.write((byte) ',');
+            //| temperature | double       | NO   |     | NULL    |                |
+            out.write(Double.toString(e.getTemperature()).getBytes());
+            out.write((byte) ',');
+            //| latitude    | double       | YES  |     | NULL    |                |
+            out.write(Double.toString(e.getLatitude()).getBytes());
+            out.write((byte) ',');
+            //| longitude   | double       | YES  |     | NULL    |                |
+            out.write(Double.toString(e.getLongitude()).getBytes());
+            out.write((byte) ',');
+            //| device      | varchar(127) | NO   | MUL | NULL    |                |
+            out.write(e.getDeviceImei().getBytes());
+            out.write((byte) ',');
+            //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
+            if (e.getShipmentId() != null) {
+                out.write(Long.toString(e.getShipmentId()).getBytes());
+            }
+            out.write((byte) ',');
+            //| createdon   | timestamp    | YES  |     | NULL    |                |
+            out.write(fmt.format(e.getCreatedOn()).getBytes());
+            //+-------------+--------------+------+-----+---------+----------------+
+            out.write((byte) '\n');
+        }
+
+        out.flush();
+    }
+    /**
+     * @param name resource name.
+     * @return temporary file.
+     * @throws IOException
+     */
+    private File createTmpFile(final String name) throws IOException {
+        return File.createTempFile("visfreshtmp-", "-" + name);
+    }
+    /**
+     * @param logMessage log message.
+     * @return empty response body.
+     */
+    protected ResponseEntity<ByteArrayInputStream> badRequest(final String logMessage) {
+        log.error(logMessage);
+        return ResponseEntity
+                .status(HttpServletResponse.SC_BAD_REQUEST)
+                .contentLength(0)
+                .body(new ByteArrayInputStream(new byte[0]));
     }
     /**
      * @param shipment

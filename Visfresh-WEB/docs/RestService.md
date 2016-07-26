@@ -121,6 +121,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 60. [Get Simulator](#markdown-header-get-simulator)  
 61. [Autostart new Shipment](#markdown-header-autostart-new-shipment)  
 62. [Init Device colors](#markdown-header-init-device-colors)  
+63. [Get Readings](#markdown-header-get-readings)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -520,6 +521,15 @@ Method *GET*, method name *initDeviceColors*. Request parameters:
 Company admin role is required if ID is null or equals of currently logged in user.  
 Or SmartTraceAdmin role otherwise.  
 [(example)](#markdown-header-init-device-colors-example)
+
+### Get Readings ###
+Method *GET*, method name *getReadings*. Request parameters:
+1. device - full device IMEI  
+2. startDate - start date range (not mandatory)  
+3. endDate - end date range (not mandatory)  
+The dates have yyyy-MM-dd'T'HH-mm-ss format (ie. 2016-07-26T08-17-58).  
+This format is used for avoid of URL encoding of dates  
+[(example)](#markdown-header-init-get-readings-example)
 
 ## Objects
 ### Response message ###
@@ -3391,4 +3401,13 @@ Response:
   },
   "response": null
 }
+```
+```
+### Init device colors example ###
+**GET vf/rest/getReadings/${accessToken}?startDate=2016-07-26T08-17-58&endDate=2016-07-26T09-18-18&device=1234987039487**  
+**CSV text response:**  
+```
+id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon
+5854,INIT,2016-07-26T07-18-08,27,11.0,12.34,56.78,1234987039487,,2016-07-26T11-18-08
+5855,INIT,2016-07-26T08-18-08,27,11.0,12.34,56.78,1234987039487,,2016-07-26T11-18-08
 ```
