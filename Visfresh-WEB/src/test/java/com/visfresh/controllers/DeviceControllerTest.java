@@ -432,11 +432,16 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final ShortTrackerEvent e = createShortTrackerEvent(10.10, 11.11, 7l);
         events.add(e);
         events.add(createShortTrackerEvent(9.10, 10.11, null));
+        //create event without lat/lon
+        final ShortTrackerEvent e1 = createShortTrackerEvent(10.10, 11.11, 7l);
+        e1.setLatitude(null);
+        e1.setLongitude(null);
+        events.add(e1);
 
         DeviceController.readingsToCsv(events, out, fmt);
 
         final String[] text = new String(out.toByteArray()).split("\r?\n");
-        assertEquals(3, text.length);
+        assertEquals(4, text.length);
 
         //check first reading
         final String[] str = text[1].split(",");

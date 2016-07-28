@@ -3,24 +3,20 @@
  */
 package com.visfresh.controllers;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,7 +66,10 @@ import com.visfresh.utils.SerializerUtils;
 @RestController("Device")
 @RequestMapping("/rest")
 public class DeviceController extends AbstractController implements DeviceConstants {
-    private static MediaType TEXT_PLAIN = MediaType.parseMediaType("text/plain");
+    /**
+     *
+     */
+    private static final String GET_READINGS = "getReadings";
     /**
      * Logger.
      */
@@ -104,6 +103,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
     private CompanyDao companyDao;
     @Autowired
     private DeviceDao deviceDao;
+    @Autowired
+    private FileDownload fileDownload;
 
     /**
      * Default constructor.
@@ -497,13 +498,15 @@ public class DeviceController extends AbstractController implements DeviceConsta
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/getReadings/{authToken}",
+    @RequestMapping(value = "/" + GET_READINGS + "/{authToken}",
             method = RequestMethod.GET, produces = "text/plain")
-    public ResponseEntity<?> getTrackerEvents(
+    public void getTrackerEvents(
             @PathVariable final String authToken,
             @RequestParam(value = "startDate", required = false) final String startDateArg,
             @RequestParam(value = "endDate", required = false) final String endDateArg,
-            @RequestParam(value = "device", required = false) final String deviceImei
+            @RequestParam(value = "device", required = false) final String deviceImei,
+            final HttpServletRequest request,
+            final HttpServletResponse response
             ) throws Exception {
 
         //check logged in.
@@ -514,7 +517,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
         checkCompanyAccess(user, device);
         if (device == null) {
-            return badRequest("Device " + deviceImei + " not found");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
 
         //create date format
@@ -546,7 +550,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         final List<ShortTrackerEvent> events = trackerEventDao.findBy(device.getImei(), startDate, endDate);
 
         //create tmp file with report PDF content.
-        final File file = createTmpFile("readings");
+        final File file = fileDownload.createTmpFile(createFileName(device, startDateArg, endDateArg) + ".csv");
 
         try {
             final OutputStream out = new FileOutputStream(file);
@@ -556,19 +560,34 @@ public class DeviceController extends AbstractController implements DeviceConsta
                 out.close();
             }
         } catch (final Throwable e) {
-            log.error("Failed to create pefromance report", e);
+            log.error("Failed to get readings for " + deviceImei, e);
             file.delete();
-            throw new IOException("Failed to create performance report", e);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
 
-        final InputStream in = new TmpFileInputStream(file);
-        return ResponseEntity
-                .ok()
-                .contentType(TEXT_PLAIN)
-                .contentLength(file.length())
-                .body(new InputStreamResource(in, file.getName()));
+        final int index = request.getRequestURL().indexOf("/" + GET_READINGS);
+        response.sendRedirect(FileDownload.createDownloadUrl(request.getRequestURL().substring(0, index),
+                authToken, file.getName()));
     }
-
+    /**
+     * @param device
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    private String createFileName(final Device device, final String startDate, final String endDate) {
+        final StringBuilder sb = new StringBuilder(device.getImei());
+        if (startDate != null) {
+            sb.append('-');
+            sb.append(startDate);
+        }
+        if (endDate != null) {
+            sb.append('-');
+            sb.append(endDate);
+        }
+        return sb.toString();
+    }
     /**
      * @param events tracker events.
      * @param out CSV output stream.
@@ -615,10 +634,14 @@ public class DeviceController extends AbstractController implements DeviceConsta
             out.write(Double.toString(e.getTemperature()).getBytes());
             out.write((byte) ',');
             //| latitude    | double       | YES  |     | NULL    |                |
-            out.write(Double.toString(e.getLatitude()).getBytes());
+            if (e.getLatitude() != null) {
+                out.write(Double.toString(e.getLatitude()).getBytes());
+            }
             out.write((byte) ',');
             //| longitude   | double       | YES  |     | NULL    |                |
-            out.write(Double.toString(e.getLongitude()).getBytes());
+            if (e.getLongitude() != null) {
+                out.write(Double.toString(e.getLongitude()).getBytes());
+            }
             out.write((byte) ',');
             //| device      | varchar(127) | NO   | MUL | NULL    |                |
             out.write(e.getDeviceImei().getBytes());
@@ -635,25 +658,6 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
 
         out.flush();
-    }
-    /**
-     * @param name resource name.
-     * @return temporary file.
-     * @throws IOException
-     */
-    private File createTmpFile(final String name) throws IOException {
-        return File.createTempFile("visfreshtmp-", "-" + name);
-    }
-    /**
-     * @param logMessage log message.
-     * @return empty response body.
-     */
-    protected ResponseEntity<ByteArrayInputStream> badRequest(final String logMessage) {
-        log.error(logMessage);
-        return ResponseEntity
-                .status(HttpServletResponse.SC_BAD_REQUEST)
-                .contentLength(0)
-                .body(new ByteArrayInputStream(new byte[0]));
     }
     /**
      * @param shipment

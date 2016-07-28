@@ -16,6 +16,7 @@ import java.util.GregorianCalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -26,8 +27,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.visfresh.dao.PerformanceReportDao;
-import com.visfresh.entities.Company;
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Role;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.reports.performance.PerformanceReportBean;
@@ -52,6 +54,8 @@ public class ReportsController extends AbstractController {
     private PdfReportBuilder reportBuilder;
     @Autowired
     private PerformanceReportDao performanceReportDao;
+    @Autowired
+    private ShipmentDao shipmentDao;
 
     /**
      * Default constructor.
@@ -67,7 +71,7 @@ public class ReportsController extends AbstractController {
      */
     @RequestMapping(value = "/getPerformanceReport/{authToken}",
             method = RequestMethod.GET, produces = "application/pdf")
-    public ResponseEntity<InputStream> getPerformanceReport(
+    public ResponseEntity<?> getPerformanceReport(
             @PathVariable final String authToken,
             @RequestParam(required = false) final String startDate,
             @RequestParam(required = false) final String endDate)
@@ -132,7 +136,7 @@ public class ReportsController extends AbstractController {
                 .ok()
                 .contentType(OCTET_STREAM)
                 .contentLength(file.length())
-                .body(in);
+                .body(new InputStreamResource(in));
     }
     /**
      * @param authToken authentication token.
@@ -141,14 +145,39 @@ public class ReportsController extends AbstractController {
      */
     @RequestMapping(value = "/getShipmentReport/{authToken}",
             method = RequestMethod.GET, produces = "application/pdf")
-    public ResponseEntity<InputStream> getShipmentReport(@PathVariable final String authToken)
-            throws Exception {
+    public ResponseEntity<?> getShipmentReport(
+            @PathVariable final String authToken,
+            @RequestParam(required = false) final Long shipmentId,
+            @RequestParam(required = false) final String sn,
+            @RequestParam(required = false) final Integer trip
+            ) throws Exception {
+        //check parameters
+        if (shipmentId == null && (sn == null || trip == null)) {
+            log.error("Incorrect shipment request parameters. Shipment ID: " + shipmentId
+                    + ", SN: " + sn + ", trip count: " + trip);
+            throw new IOException("Should be specified shipmentId or (sn and trip) request parameters");
+        }
+
         final User user = getLoggedInUser(authToken);
 
         checkAccess(user, Role.BasicUser);
 
+        final Shipment s;
+        if (shipmentId != null) {
+            s = shipmentDao.findOne(shipmentId);
+        } else {
+            s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
+        }
+
+        checkCompanyAccess(user, s);
+        if (s == null) {
+            log.error("Shipment not found. Shipment ID: " + shipmentId
+                    + ", SN: " + sn + ", trip count: " + trip);
+            throw new IOException("Shipment not found");
+        }
+
         //create report bean.
-        final ShipmentReportBean bean = createShipmentReport(user.getCompany());
+        final ShipmentReportBean bean = createShipmentReport(s);
 
         //create tmp file with report PDF content.
         final File file = createTmpFile("performanceReport");
@@ -171,21 +200,16 @@ public class ReportsController extends AbstractController {
                 .ok()
                 .contentType(OCTET_STREAM)
                 .contentLength(file.length())
-                .body(in);
+                .body(new InputStreamResource(in));
     }
 
     /**
-     * @param company
-     * @return
+     * @param shipment shipment.
+     * @return shipment report bean.
      */
-    private ShipmentReportBean createShipmentReport(final Company company) {
-        return createShipmentReportBean();
-    }
-    /**
-     * @return
-     */
-    private ShipmentReportBean createShipmentReportBean() {
+    private ShipmentReportBean createShipmentReport(final Shipment shipment) {
         final ShipmentReportBean bean = new ShipmentReportBean();
+//      bean.set
         return bean;
     }
 
