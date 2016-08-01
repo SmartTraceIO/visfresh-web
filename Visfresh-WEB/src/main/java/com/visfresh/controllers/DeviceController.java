@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +50,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.io.json.DeviceSerializer;
@@ -555,7 +558,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         try {
             final OutputStream out = new FileOutputStream(file);
             try {
-                readingsToCsv(events, out, df);
+                readingsToCsv(events, out, user);
             } finally {
                 out.close();
             }
@@ -593,7 +596,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param out CSV output stream.
      * @throws IOException
      */
-    public static void readingsToCsv(final List<ShortTrackerEvent> events, final OutputStream out, final DateFormat fmt)
+    private void readingsToCsv(final List<ShortTrackerEvent> events,
+            final OutputStream out, final User user)
             throws IOException {
         //+-------------+--------------+------+-----+---------+----------------+
         //| Field       | Type         | Null | Key | Default | Extra          |
@@ -609,6 +613,9 @@ public class DeviceController extends AbstractController implements DeviceConsta
         //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
         //| createdon   | timestamp    | YES  |     | NULL    |                |
         //+-------------+--------------+------+-----+---------+----------------+
+        final Map<Long, Integer> tripCounts = new HashMap<Long, Integer>();
+        final DateFormat fmt = DateTimeUtils.createDateFormat(
+                "yyyy-MM-dd HH:mm", user.getLanguage(), user.getTimeZone());
 
         out.write("id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon".getBytes());
         out.write((byte) '\n');
@@ -622,7 +629,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             out.write(Long.toString(e.getId()).getBytes());
             out.write((byte) ',');
             //| type        | varchar(20)  | NO   |     | NULL    |                |
-            out.write(e.getType().name().getBytes());
+            out.write(getType(e.getType()).getBytes());
             out.write((byte) ',');
             //| time        | timestamp    | YES  |     | NULL    |                |
             out.write(fmt.format(e.getTime()).getBytes());
@@ -631,7 +638,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
             out.write(Integer.toString(e.getBattery()).getBytes());
             out.write((byte) ',');
             //| temperature | double       | NO   |     | NULL    |                |
-            out.write(Double.toString(e.getTemperature()).getBytes());
+            out.write(LocalizationUtils.getTemperatureString(e.getTemperature(),
+                    user.getTemperatureUnits()).getBytes());
             out.write((byte) ',');
             //| latitude    | double       | YES  |     | NULL    |                |
             if (e.getLatitude() != null) {
@@ -644,11 +652,18 @@ public class DeviceController extends AbstractController implements DeviceConsta
             }
             out.write((byte) ',');
             //| device      | varchar(127) | NO   | MUL | NULL    |                |
-            out.write(e.getDeviceImei().getBytes());
+            out.write(("-" + e.getDeviceImei()).getBytes());
             out.write((byte) ',');
             //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
-            if (e.getShipmentId() != null) {
-                out.write(Long.toString(e.getShipmentId()).getBytes());
+            final Long shipmentId = e.getShipmentId();
+            if (shipmentId != null) {
+                Integer tripCount = tripCounts.get(shipmentId);
+                if (tripCount == null) {
+                    tripCount = shipmentDao.getTripCount(shipmentId);
+                    tripCounts.put(shipmentId, tripCount);
+                }
+                //TODO
+                out.write(getShipmentNumber(e.getDeviceImei(), tripCount).getBytes());
             }
             out.write((byte) ',');
             //| createdon   | timestamp    | YES  |     | NULL    |                |
@@ -658,6 +673,46 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
 
         out.flush();
+    }
+    /**
+     * @param deviceImei
+     * @param tripCount
+     * @return
+     */
+    private String getShipmentNumber(final String deviceImei, final Integer tripCount) {
+        //normalize device serial number
+        final StringBuilder sb = new StringBuilder(Device.getSerialNumber(deviceImei));
+        while (sb.charAt(0) == '0' && sb.length() > 1) {
+            sb.deleteCharAt(0);
+        }
+
+        //add shipment trip count
+        sb.append('(');
+        sb.append(tripCount);
+        sb.append(')');
+        return sb.toString();
+    }
+    /**
+     * @param type
+     * @return
+     */
+    private String getType(final TrackerEventType type) {
+        switch (type) {
+            case DRK:
+            return "LightOff";
+            case BRT:
+            return "LightOn";
+            case INIT:
+            return "SwitchedOn";
+            case VIB:
+            return "Moving";
+            case AUT:
+            return "Reading";
+            case STP:
+            return "Stop";
+            default:
+            return type.name();
+        }
     }
     /**
      * @param shipment

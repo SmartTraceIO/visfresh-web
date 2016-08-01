@@ -74,4 +74,9 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @param s shipment.
      */
     void updateSiblingInfo(Shipment s);
+    /**
+     * @param shipmentId
+     * @return
+     */
+    Integer getTripCount(Long shipmentId);
 }

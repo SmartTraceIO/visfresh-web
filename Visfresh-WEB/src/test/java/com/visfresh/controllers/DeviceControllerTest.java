@@ -7,10 +7,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,11 +41,11 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
-import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
@@ -59,6 +57,7 @@ import com.visfresh.mock.MockShipmentShutdownService;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
 
 /**
@@ -68,7 +67,6 @@ import com.visfresh.utils.LocalizationUtils;
 public class DeviceControllerTest extends AbstractRestServiceTest {
     private DeviceDao dao;
     private DeviceRestClient client = new DeviceRestClient(UTC);
-    private long id;
 
     /**
      * Default constructor.
@@ -423,52 +421,6 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertNotNull(dao.findOne(d3.getImei()).getColor());
     }
     @Test
-    public void testReadingsToCsv() throws IOException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        final DateFormat fmt= new SimpleDateFormat("yyyy-MM-dd'T'mm");
-
-        //create event list
-        final List<ShortTrackerEvent> events = new LinkedList<>();
-        final ShortTrackerEvent e = createShortTrackerEvent(10.10, 11.11, 7l);
-        events.add(e);
-        events.add(createShortTrackerEvent(9.10, 10.11, null));
-        //create event without lat/lon
-        final ShortTrackerEvent e1 = createShortTrackerEvent(10.10, 11.11, 7l);
-        e1.setLatitude(null);
-        e1.setLongitude(null);
-        events.add(e1);
-
-        DeviceController.readingsToCsv(events, out, fmt);
-
-        final String[] text = new String(out.toByteArray()).split("\r?\n");
-        assertEquals(4, text.length);
-
-        //check first reading
-        final String[] str = text[1].split(",");
-
-        assertEquals(10, str.length);
-        //| id          | bigint(20)   | NO   | PRI | NULL    | auto_increment |
-        assertEquals(Long.toString(e.getId()), str[0]);
-        //| type        | varchar(20)  | NO   |     | NULL    |                |
-        assertEquals(e.getType().name(), str[1]);
-        //| time        | timestamp    | YES  |     | NULL    |                |
-        assertEquals(fmt.format(e.getTime()), str[2]);
-        //| battery     | int(11)      | NO   |     | NULL    |                |
-        assertEquals(Integer.toString(e.getBattery()), str[3]);
-        //| temperature | double       | NO   |     | NULL    |                |
-        assertEquals(Double.toString(e.getTemperature()), str[4]);
-        //| latitude    | double       | YES  |     | NULL    |                |
-        assertEquals(Double.toString(e.getLatitude()), str[5]);
-        //| longitude   | double       | YES  |     | NULL    |                |
-        assertEquals(Double.toString(e.getLongitude()), str[6]);
-        //| device      | varchar(127) | NO   | MUL | NULL    |                |
-        assertEquals(e.getDeviceImei(), str[7]);
-        //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
-        assertEquals(e.getShipmentId() == null ? null : e.getShipmentId().toString(), str[8]);
-        //| createdon   | timestamp    | YES  |     | NULL    |                |
-        assertEquals(fmt.format(e.getCreatedOn()), str[9]);
-    }
-    @Test
     public void testGetReadings() throws IOException, RestServiceException {
         final Device d1 = createDevice("1234987039487", true);
         final Device d2 = createDevice("9324790898877", true);
@@ -478,7 +430,11 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         createTrackerEvent(d1, new Date(t0 + 1 * dt));
         createTrackerEvent(d1, new Date(t0 + 2 * dt));
         createTrackerEvent(d2, new Date(t0 + 3 * dt));
-        createTrackerEvent(d1, new Date(t0 + 4 * dt));
+
+        final Shipment s = createShipment(d1, true);
+        final TrackerEvent e = createTrackerEvent(d1, new Date(t0 + 4 * dt));
+        e.setShipment(s);
+        context.getBean(TrackerEventDao.class).save(e);
 
         String data =  client.getReadings(d1, new Date(t0 + 2 * dt - 10000), new Date(t0 + 3 * dt + 10000));
         assertEquals(2, data.split("\n").length);
@@ -494,6 +450,32 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         //test without date ranges
         data =  client.getReadings(d1, null, null);
         assertEquals(4, data.split("\n").length);
+
+        //check latest reading:
+        final DateFormat fmt = DateTimeUtils.createDateFormat(
+                "yyyy-MM-dd HH:mm", Language.English, UTC);
+
+        final String[] str = data.split("\n")[3].split(",");
+        //| id          | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+        assertEquals(Long.toString(e.getId()), str[0]);
+        //| type        | varchar(20)  | NO   |     | NULL    |                |
+        assertEquals("SwitchedOn", str[1]);
+        //| time        | timestamp    | YES  |     | NULL    |                |
+        assertEquals(fmt.format(e.getTime()), str[2]);
+        //| battery     | int(11)      | NO   |     | NULL    |                |
+        assertEquals(Integer.toString(e.getBattery()), str[3]);
+        //| temperature | double       | NO   |     | NULL    |                |
+        assertEquals(LocalizationUtils.getTemperatureString(e.getTemperature(), TemperatureUnits.Celsius), str[4]);
+        //| latitude    | double       | YES  |     | NULL    |                |
+        assertEquals(Double.toString(e.getLatitude()), str[5]);
+        //| longitude   | double       | YES  |     | NULL    |                |
+        assertEquals(Double.toString(e.getLongitude()), str[6]);
+        //| device      | varchar(127) | NO   | MUL | NULL    |                |
+        assertEquals("-" + e.getDevice().getImei(), str[7]);
+        //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
+        assertEquals("703948(1)", str[8]);
+        //| createdon   | timestamp    | YES  |     | NULL    |                |
+        assertEquals(fmt.format(e.getCreatedOn()), str[9]);
     }
     /**
      * @param d device.
@@ -562,26 +544,5 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         e.setCreatedOn(date);
         e.setType(TrackerEventType.INIT);
         return context.getBean(TrackerEventDao.class).save(e);
-    }
-
-    /**
-     * @param lat latitude.
-     * @param lon longitude.
-     * @param shipmentId shipment ID.
-     * @return short tracker event.
-     */
-    private ShortTrackerEvent createShortTrackerEvent(final double lat, final double lon, final Long shipmentId) {
-        final ShortTrackerEvent e = new ShortTrackerEvent();
-        e.setId(id++);
-        e.setBattery(3500);
-        e.setLatitude(lat);
-        e.setLongitude(lon);
-        e.setDeviceImei("923847082374087");
-        e.setShipmentId(shipmentId);
-        e.setTemperature(11);
-        e.setTime(new Date());
-        e.setType(TrackerEventType.INIT);
-        e.setCreatedOn(new Date());
-        return e;
     }
 }

@@ -626,33 +626,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         }
         return null;
     }
-//    /* (non-Javadoc)
-//     * @see com.visfresh.dao.ShipmentDao#updateSiblingInfo(com.visfresh.entities.Shipment, java.lang.Long, int)
-//     */
-//    @Override
-//    public void updateSiblingInfo(final List<Shipment> shipments, final Long siblingGroup,
-//            final int siblingCount) {
-//        if (shipments.isEmpty()) {
-//            return;
-//        }
-//
-//        final Map<String, Object> params = new HashMap<String, Object>();
-//        params.put("group", siblingGroup);
-//        params.put("count", siblingCount);
-//
-//        final List<String> placeHolders = new LinkedList<String>();
-//        for (final Shipment s : shipments) {
-//            final String key = "id_" + s.getId();
-//            placeHolders.add(key);
-//            params.put(key, s.getId());
-//        }
-//
-//        jdbc.update("update "
-//                + TABLE
-//                + " set " + SIBLINGGROUP_FIELD + " = :group, "
-//                + SIBLINGCOUNT_FIELD + " = :count where "
-//                + ID_FIELD + " in (:" + StringUtils.combine(placeHolders, ",:") + ")", params);
-//    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#updateEta(com.visfresh.entities.Shipment, java.util.Date)
      */
@@ -716,5 +689,21 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
 
         jdbc.update("update " + TABLE + " set isautostart = true where " + ID_FIELD + "=:s",
                 params);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#getTripCount(java.lang.Long)
+     */
+    @Override
+    public Integer getTripCount(final Long shipmentId) {
+        if (shipmentId == null) {
+            return null;
+        }
+
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("s", shipmentId);
+
+        final List<Map<String, Object>> rows = jdbc.queryForList("select s." + TRIPCOUNT_FIELD + " as tripcount from "
+                + TABLE + " s where s." + ID_FIELD + "=:s", params);
+        return rows.size() == 0 ? null : (((Number) rows.get(0).get("tripcount")).intValue());
     }
 }
