@@ -38,11 +38,11 @@ import com.visfresh.services.RestServiceException;
  */
 @RestController("FileDownload")
 @RequestMapping("/rest")
-public class FileDownload extends AbstractController {
+public class FileDownloadController extends AbstractController {
     /**
      * Logger.
      */
-    private static final Logger log = LoggerFactory.getLogger(FileDownload.class);
+    private static final Logger log = LoggerFactory.getLogger(FileDownloadController.class);
     private static final long ALIVE_TIME_OUT = 5 * 60 * 1000l;
     private File tmpRoot;
     private Timer timer = new Timer(true);
@@ -51,7 +51,7 @@ public class FileDownload extends AbstractController {
     /**
      * Default constructor.
      */
-    public FileDownload() {
+    public FileDownloadController() {
         super();
     }
 
@@ -173,7 +173,7 @@ public class FileDownload extends AbstractController {
      * @param file file.
      * @return media type for given file.
      */
-    protected MediaType getContentType(final File file) {
+    protected static MediaType getContentType(final File file) {
         try {
             return MediaType.parseMediaType(FileTypeMap.getDefaultFileTypeMap().getContentType(file));
         } catch (final Exception e) {

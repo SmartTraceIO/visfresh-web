@@ -107,7 +107,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
     @Autowired
     private DeviceDao deviceDao;
     @Autowired
-    private FileDownload fileDownload;
+    private FileDownloadController fileDownload;
 
     /**
      * Default constructor.
@@ -570,7 +570,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
 
         final int index = request.getRequestURL().indexOf("/" + GET_READINGS);
-        response.sendRedirect(FileDownload.createDownloadUrl(request.getRequestURL().substring(0, index),
+        response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
                 authToken, file.getName()));
     }
     /**

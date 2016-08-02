@@ -126,9 +126,13 @@ public class NotificationController extends AbstractController implements Notifi
     private Map<Long, TrackerEvent> getTrackerEvents(final List<Notification> ns) {
         final Set<Long> ids = new HashSet<Long>();
         for (final Notification n : ns) {
-            final Long trackerEventId = n.getIssue().getTrackerEventId();
-            if (trackerEventId != null) {
-                ids.add(trackerEventId);
+            if (n.getIssue() == null) {
+                log.warn("Issue for " + n.getId() + " notification possible deleted directly from DB");
+            } else {
+                final Long trackerEventId = n.getIssue().getTrackerEventId();
+                if (trackerEventId != null) {
+                    ids.add(trackerEventId);
+                }
             }
         }
 
