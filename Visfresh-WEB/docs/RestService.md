@@ -531,6 +531,15 @@ The dates have yyyy-MM-dd'T'HH-mm-ss format (ie. 2016-07-26T08-17-58).
 This format is used for avoid of URL encoding of dates  
 [(example)](#markdown-header-init-get-readings-example)
 
+### Get Shipment Report ###
+Method *GET*, method name *getReadings*. Request parameters:
+1. shipmentId shipment ID  
+or  
+1. sn device serial number  
+2. trip shipment trip count  
+Returns PDF file as byte stream  
+[(example)](#markdown-header-get-shipment-report-example)
+
 ## Objects
 ### Response message ###
 ```json
@@ -3403,7 +3412,7 @@ Response:
 }
 ```
 ```
-### Init device colors example ###
+### Get readings example ###
 **GET vf/rest/getReadings/${accessToken}?startDate=2016-07-26T08-17-58&endDate=2016-07-26T09-18-18&device=1234987039487**  
 **CSV text response:**  
 ```
@@ -3412,3 +3421,9 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon
 871,SwitchedOn,2016-08-01 17:45,27,11.0°C,12.34,56.78,-1234987039487,,2016-08-01 20:45
 873,SwitchedOn,2016-08-01 19:45,27,11.0°C,12.34,56.78,-1234987039487,703948(1),2016-08-01 20:45
 ```
+
+### Get Shipment Report ###
+**GET vf/rest/getShipmentReport/${accessToken}?shipmentId=2714**  
+**GET vf/rest/getShipmentReport/${accessToken}?sn=3456&trip=1**  
+
+**Returns PDF file as byte stream**  
