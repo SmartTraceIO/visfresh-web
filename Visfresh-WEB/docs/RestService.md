@@ -122,7 +122,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 61. [Autostart new Shipment](#markdown-header-autostart-new-shipment)  
 62. [Init Device colors](#markdown-header-init-device-colors)  
 63. [Get Readings](#markdown-header-get-readings)  
-64. [Get Readings](#markdown-header-get-shipment-report)  
+64. [Get Shipment Report](#markdown-header-get-shipment-report)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
