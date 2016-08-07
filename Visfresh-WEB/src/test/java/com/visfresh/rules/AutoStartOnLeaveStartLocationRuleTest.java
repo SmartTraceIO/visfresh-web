@@ -272,18 +272,7 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
             final Date date = e.getTime();
             if ((startDate == null || !startDate.after(date))
                     && (endDate == null || !endDate.before(date))) {
-                final ShortTrackerEvent se = new ShortTrackerEvent();
-                se.setBattery(e.getBattery());
-                se.setCreatedOn(e.getCreatedOn());
-                se.setDeviceImei(e.getDevice().getImei());
-                se.setId(e.getId());
-                se.setLatitude(e.getLatitude());
-                se.setLongitude(e.getLongitude());
-                se.setShipmentId(e.getShipment() == null ? null : e.getShipment().getId());
-                se.setTemperature(e.getTemperature());
-                se.setTime(e.getTime());
-                se.setType(e.getType());
-                result.add(se);
+                result.add(new ShortTrackerEvent(e));
             }
         }
         return result;

@@ -3,6 +3,7 @@
  */
 package com.visfresh.dao;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -37,5 +38,9 @@ public interface NotificationDao extends
      * @return count of user satisfying given filter.
      */
     int getEntityCount(User user, boolean excludeLight, Filter filter);
-
+    /**
+     * @param ids collection of ID.
+     * @return list of notifications for given ID collection.
+     */
+    List<Notification> getForIssues(Collection<Long> ids);
 }

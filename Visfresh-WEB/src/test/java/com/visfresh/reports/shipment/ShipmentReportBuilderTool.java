@@ -101,48 +101,36 @@ public final class ShipmentReportBuilderTool {
             bean.getReadings().add(e);
         }
 
-        bean.getTemperatureHistory().add(createHistoryItem("Chilled Beef"));
-        bean.getTemperatureHistory().add(createHistoryItem("Chilled Wine"));
-        return bean;
-    }
-
-    /**
-     * @param name alert profile name.
-     * @return random generated alert profile stats.
-     */
-    private static TemperatureHistoryBean createHistoryItem(final String name) {
-        final Random random = new Random();
         final long oneHour = 60 * 60 * 1000l;
 
-        final TemperatureHistoryBean ap = new TemperatureHistoryBean();
-        ap.setAlertProfile(name);
-        ap.setStandardDevitation(0.001 + random.nextDouble() / 0.5);
-        ap.setTotalTime((1 + random.nextInt(3 * 30 * 24)) * oneHour);
-        ap.setAvgTemperature(7.);
-        ap.getWhoWasNotified().add("user1@smarttrace.com.au");
-        ap.getWhoWasNotified().add("user2@smarttrace.com.au");
-        ap.getSchedules().add("Schedule 1");
-        ap.getSchedules().add("Schedule 2");
+        bean.setAlertProfile("Chilled Beef");
+        bean.setStandardDevitation(0.001 + random.nextDouble() / 0.5);
+        bean.setTotalTime((1 + random.nextInt(3 * 30 * 24)) * oneHour);
+        bean.setAvgTemperature(7.);
+        bean.getWhoWasNotified().add("user1@smarttrace.com.au");
+        bean.getWhoWasNotified().add("user2@smarttrace.com.au");
+        bean.getSchedules().add("Schedule 1");
+        bean.getSchedules().add("Schedule 2");
 
-        ap.getAlertsFired().add("<0.0°C for 60 min");
-        ap.getAlertsFired().add(">0.0°C for 30 min");
+        bean.getAlertsFired().add("<0.0°C for 60 min");
+        bean.getAlertsFired().add(">0.0°C for 30 min");
 
-        ap.getAlerts().add(createTimeWithLabel(
+        bean.getAlerts().add(createTimeWithLabel(
                 "Total time above high temp (5°C)", 72 * 60 * 1000l));
         //Total time above high temp (5°C): 2hrs 12min
-        ap.getAlerts().add(createTimeWithLabel(
+        bean.getAlerts().add(createTimeWithLabel(
                 "Total time above critical high temp (8°C)", 42 * 60 * 1000l));
         //Total time above critical high temp (8°C): 1hrs 12min
-        ap.getAlerts().add(createTimeWithLabel(
+        bean.getAlerts().add(createTimeWithLabel(
                 "Total time below low temp (0°C)", 22 * 60 * 1000l));
         //Total time below low temp (0°C): 22min
-        ap.getAlerts().add(createTimeWithLabel(
+        bean.getAlerts().add(createTimeWithLabel(
                 "Total time below low temp (0°C)", 72 * 60 * 1000l));
         //Total time below critical low temp (-2C): nil
-        ap.getAlerts().add(createTimeWithLabel(
+        bean.getAlerts().add(createTimeWithLabel(
                 "Total time below critical low temp (-2C)", 0l));
 
-        return ap;
+        return bean;
     }
 
     /**

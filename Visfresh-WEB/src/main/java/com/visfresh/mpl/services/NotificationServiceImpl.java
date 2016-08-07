@@ -80,14 +80,13 @@ public class NotificationServiceImpl implements NotificationService {
             }
         }
 
-        if (s.isSendApp()) {
-            final Notification n = new Notification();
-            n.setIssue(issue);
-            n.setType(issue instanceof Arrival? NotificationType.Arrival : NotificationType.Alert);
-            n.setUser(user);
+        final Notification n = new Notification();
+        n.setIssue(issue);
+        n.setType(issue instanceof Arrival? NotificationType.Arrival : NotificationType.Alert);
+        n.setUser(user);
+        n.setHidden(s.isSendApp());
 
-            notificationDao.save(n);
-        }
+        notificationDao.save(n);
     }
 
     /**

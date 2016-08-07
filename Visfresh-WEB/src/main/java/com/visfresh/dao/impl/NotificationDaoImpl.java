@@ -3,6 +3,7 @@
  */
 package com.visfresh.dao.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.User;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -57,6 +59,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * Is read flag.
      */
     public static final String ISREAD_FIELD = "isread";
+    public static final String HIDDEN_FIELD = "hidden";
 
     /**
      * User DAO.
@@ -124,17 +127,11 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         jdbc.update("update " + TABLE + " set "
                 + ISREAD_FIELD + " = true where user = :user and (" + idPart + ")", paramMap);
     }
-//    select notifications.*,
-//    alerts.type as alertType
-//    from notifications
-//    left outer join alerts on notifications.type='Alert' and alerts.id=notifications.issue
-//    where not alerts.type in ('LightOff' , 'LightOn')
-//   ;
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
      */
     @Override
-    protected String buildSelectBlockForFindAll(Filter filter) {
+    protected String buildSelectBlockForFindAll(final Filter filter) {
         final String table = getTableName();
         return "select "
                 + table
@@ -148,7 +145,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * @return
      */
     @Override
-    protected String buildSelectBlockForEntityCount(Filter filter) {
+    protected String buildSelectBlockForEntityCount(final Filter filter) {
         final String table = getTableName();
         return "select count(*) as count"
                 + " from " + table
@@ -208,6 +205,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         paramMap.put(ISSUE_FIELD, no.getIssue().getId());
         paramMap.put(USER_FIELD, no.getUser().getId());
         paramMap.put(ISREAD_FIELD, no.isRead());
+        paramMap.put(HIDDEN_FIELD, no.isHidden());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -227,7 +225,33 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         fields.add(ISSUE_FIELD);
         fields.add(USER_FIELD);
         fields.add(ISREAD_FIELD);
+        fields.add(HIDDEN_FIELD);
         return fields;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.NotificationDao#getForIssue(java.util.Collection)
+     */
+    @Override
+    public List<Notification> getForIssues(final Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return new LinkedList<>();
+        }
+
+        final String sql = "select * from " + getTableName() + " where "
+            +  ISSUE_FIELD + " in (" + StringUtils.combine(ids, ",") + ")";
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                sql, new HashMap<String, Object>());
+
+        final Map<String, Object> cache = new HashMap<String, Object>();
+        final List<Notification> result = new LinkedList<Notification>();
+        for (final Map<String,Object> map : list) {
+            final Notification t = createEntity(map);
+            resolveReferences(t, map, cache);
+            result.add(t);
+        }
+
+        return result;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#getIdFieldName()
@@ -284,6 +308,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         } else if (type == NotificationType.Arrival) {
             no.setIssue(arrivalDao.findOne(issueId));
         }
+        no.setHidden((Boolean) row.get(HIDDEN_FIELD));
 
         return no;
     }

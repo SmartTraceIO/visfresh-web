@@ -80,7 +80,7 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
         return false;
     }
 
-    protected void defaultAssign(final TrackerEvent e, final Alert a) {
+    protected static void defaultAssign(final TrackerEvent e, final Alert a) {
         a.setDate(e.getTime());
         a.setDevice(e.getDevice());
         a.setShipment(e.getShipment());

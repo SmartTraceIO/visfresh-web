@@ -30,6 +30,10 @@ public class Notification implements EntityWithId<Long> {
      * Notification issue.
      */
     private NotificationIssue issue;
+    /**
+     * Whether or not notification should be visible for user.
+     */
+    private boolean isHidden;
 
     /**
      * Default constructor.
@@ -98,5 +102,17 @@ public class Notification implements EntityWithId<Long> {
      */
     public void setRead(final boolean isRead) {
         this.isRead = isRead;
+    }
+    /**
+     * @return the isHidden
+     */
+    public boolean isHidden() {
+        return isHidden;
+    }
+    /**
+     * @param isHidden the isHidden to set
+     */
+    public void setHidden(final boolean isHidden) {
+        this.isHidden = isHidden;
     }
 }

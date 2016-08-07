@@ -49,7 +49,6 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
         super();
     }
 
-
     /* (non-Javadoc)
      * @see junit.framework.TestCase#setUp()
      */
@@ -122,6 +121,32 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
         assertEquals(1, client.getNotifications(false, 1, 1).size());
         assertEquals(1, client.getNotifications(false, 2, 1).size());
         assertEquals(0, client.getNotifications(false, 3, 10000).size());
+    }
+    @Test
+    public void testGetNotificationsNotShowHidden() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        //get server device
+        final Device d = deviceDao.findOne(s.getDevice().getId());
+
+        //create temperature alert notification
+        final TemperatureAlert tempAlert = new TemperatureAlert();
+        tempAlert.setDate(new Date());
+        tempAlert.setType(AlertType.Hot);
+        tempAlert.setTemperature(5);
+        tempAlert.setMinutes(55);
+        tempAlert.setDevice(d);
+        tempAlert.setShipment(s);
+        alertDao.save(tempAlert);
+
+        final Notification n = new Notification();
+        n.setIssue(tempAlert);
+        n.setType(NotificationType.Alert);
+        n.setUser(user);
+        n.setHidden(true);
+        notificationDao.save(n);
+
+        //get notifications
+        assertEquals(0, client.getNotifications(true, 1, 10000).size());
     }
     @Test
     public void testIncludeRead() throws IOException, RestServiceException {

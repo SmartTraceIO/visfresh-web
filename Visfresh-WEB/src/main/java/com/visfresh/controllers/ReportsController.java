@@ -13,6 +13,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.visfresh.dao.PerformanceReportDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentReportDao;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
@@ -44,11 +49,11 @@ import com.visfresh.utils.DateTimeUtils;
 @RestController("Reports")
 @RequestMapping("/rest")
 public class ReportsController extends AbstractController {
+    public static final String GET_SHIPMENT_REPORT = "getShipmentReport";
     /**
      * Logger.
      */
     private static final Logger log = LoggerFactory.getLogger(ReportsController.class);
-    private static MediaType OCTET_STREAM = MediaType.parseMediaType("application/octet-stream");
 
     @Autowired
     private PdfReportBuilder reportBuilder;
@@ -56,6 +61,10 @@ public class ReportsController extends AbstractController {
     private PerformanceReportDao performanceReportDao;
     @Autowired
     private ShipmentDao shipmentDao;
+    @Autowired
+    private ShipmentReportDao shipmentReportDao;
+    @Autowired
+    private FileDownloadController fileDownload;
 
     /**
      * Default constructor.
@@ -69,8 +78,7 @@ public class ReportsController extends AbstractController {
      * @param defShipment alert profile.
      * @return ID of saved alert profile.
      */
-    @RequestMapping(value = "/getPerformanceReport/{authToken}",
-            method = RequestMethod.GET, produces = "application/pdf")
+    @RequestMapping(value = "/getPerformanceReport/{authToken}", method = RequestMethod.GET)
     public ResponseEntity<?> getPerformanceReport(
             @PathVariable final String authToken,
             @RequestParam(required = false) final String startDate,
@@ -116,7 +124,7 @@ public class ReportsController extends AbstractController {
                 user.getCompany(), d1, d2);
 
         //create tmp file with report PDF content.
-        final File file = createTmpFile("performanceReport");
+        final File file = fileDownload.createTmpFile("performanceReport.pdf");
 
         try {
             final OutputStream out = new FileOutputStream(file);
@@ -134,7 +142,7 @@ public class ReportsController extends AbstractController {
         final InputStream in = new TmpFileInputStream(file);
         return ResponseEntity
                 .ok()
-                .contentType(OCTET_STREAM)
+                .contentType(MediaType.parseMediaType("application/pdf"))
                 .contentLength(file.length())
                 .body(new InputStreamResource(in));
     }
@@ -143,13 +151,14 @@ public class ReportsController extends AbstractController {
      * @param defShipment alert profile.
      * @return ID of saved alert profile.
      */
-    @RequestMapping(value = "/getShipmentReport/{authToken}",
-            method = RequestMethod.GET, produces = "application/pdf")
-    public ResponseEntity<?> getShipmentReport(
+    @RequestMapping(value = "/" + GET_SHIPMENT_REPORT + "/{authToken}", method = RequestMethod.GET)
+    public void getShipmentReport(
             @PathVariable final String authToken,
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
-            @RequestParam(required = false) final Integer trip
+            @RequestParam(required = false) final Integer trip,
+            final HttpServletRequest request,
+            final HttpServletResponse response
             ) throws Exception {
         //check parameters
         if (shipmentId == null && (sn == null || trip == null)) {
@@ -177,10 +186,10 @@ public class ReportsController extends AbstractController {
         }
 
         //create report bean.
-        final ShipmentReportBean bean = createShipmentReport(s);
+        final ShipmentReportBean bean = shipmentReportDao.createReport(s, user);
 
         //create tmp file with report PDF content.
-        final File file = createTmpFile("performanceReport");
+        final File file = fileDownload.createTmpFile(createFileName(s));
 
         try {
             final OutputStream out = new FileOutputStream(file);
@@ -190,35 +199,35 @@ public class ReportsController extends AbstractController {
                 out.close();
             }
         } catch (final Throwable e) {
-            log.error("Failed to create pefromance report", e);
+            log.error("Failed to create shipment report for " + s.getId(), e);
             file.delete();
-            throw new IOException("Failed to create performance report", e);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
 
-        final InputStream in = new TmpFileInputStream(file);
-        return ResponseEntity
-                .ok()
-                .contentType(OCTET_STREAM)
-                .contentLength(file.length())
-                .body(new InputStreamResource(in));
+        final int index = request.getRequestURL().indexOf("/" + GET_SHIPMENT_REPORT);
+        response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
+                authToken, file.getName()));
     }
-
     /**
-     * @param shipment shipment.
-     * @return shipment report bean.
+     * @param device
+     * @param startDate
+     * @param endDate
+     * @return
      */
-    private ShipmentReportBean createShipmentReport(final Shipment shipment) {
-        final ShipmentReportBean bean = new ShipmentReportBean();
-//      bean.set
-        return bean;
-    }
+    private String createFileName(final Shipment s) {
+        //normalize device serial number
+        final StringBuilder sb = new StringBuilder(Device.getSerialNumber(s.getDevice().getImei()));
+        while (sb.charAt(0) == '0' && sb.length() > 1) {
+            sb.deleteCharAt(0);
+        }
 
-    /**
-     * @param name resource name.
-     * @return temporary file.
-     * @throws IOException
-     */
-    private File createTmpFile(final String name) throws IOException {
-        return File.createTempFile("visfreshtmp-", "-" + name);
+        //add shipment trip count
+        sb.append('(');
+        sb.append(s.getTripCount());
+        sb.append(')');
+        sb.insert(0, "shipment-");
+        sb.append(".pdf");
+        return sb.toString();
     }
 }

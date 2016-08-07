@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,6 +40,10 @@ import com.visfresh.services.RestServiceException;
 @RestController("FileDownload")
 @RequestMapping("/rest")
 public class FileDownloadController extends AbstractController {
+    /**
+     * 
+     */
+    private static final String URL_ENCODING = "UTF-8";
     /**
      * Logger.
      */
@@ -94,21 +99,23 @@ public class FileDownloadController extends AbstractController {
      * @return ID of saved device.
      * @throws AuthenticationException
      * @throws RestServiceException
-     * @throws FileNotFoundException
+     * @throws IOException
      */
     @RequestMapping(value = "/" + DOWNLOAD_FILE + "/{authToken}/{fileNamePart}", method = RequestMethod.GET)
     public ResponseEntity<?> downloadFile(@PathVariable final String authToken,
             @PathVariable final String fileNamePart,
             final HttpServletRequest req)
-            throws AuthenticationException, RestServiceException, FileNotFoundException {
+            throws AuthenticationException, RestServiceException, IOException {
 
         //check logged in.
         final User user = getLoggedInUser(authToken);
         checkAccess(user, Role.BasicUser);
 
         //extract file name
-        final String fileName = req.getRequestURI().substring(req.getRequestURI().indexOf(authToken)
+        String fileName = req.getRequestURI().substring(req.getRequestURI().indexOf(authToken)
                 + authToken.length() + 1);
+        fileName = URLDecoder.decode(fileName, URL_ENCODING);
+
         final File file = getFile(fileName);
         if (!file.exists()) {
             log.error("File not found " + fileName);
@@ -141,7 +148,7 @@ public class FileDownloadController extends AbstractController {
         sb.append('/');
         sb.append(accessToken);
         sb.append('/');
-        sb.append(URLEncoder.encode(fileName, "UTF-8"));
+        sb.append(URLEncoder.encode(fileName, URL_ENCODING));
 
         return sb.toString();
     }
@@ -153,13 +160,14 @@ public class FileDownloadController extends AbstractController {
     public synchronized File createTmpFile(final String suffix) throws IOException {
         final char separator = '-';
 
-        final long id = 0;
+        long id = 0;
         while (true) {
             final File file = new File(tmpRoot, id + separator + suffix);
             if (!file.exists()) {
                 file.createNewFile();
                 return file;
             }
+            id++;
         }
     }
     /**

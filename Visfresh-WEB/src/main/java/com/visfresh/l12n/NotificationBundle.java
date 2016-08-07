@@ -24,6 +24,8 @@ import com.visfresh.utils.StringUtils;
  */
 @Component
 public class NotificationBundle extends NotificationIssueBundle {
+    private static final String BUNDLE_NAME = "notifications";
+
     /**
      * Default constructor.
      */
@@ -116,6 +118,6 @@ public class NotificationBundle extends NotificationIssueBundle {
      * @return resource bundle.
      */
     private ResourceBundle getBundle() {
-        return ResourceBundle.getBundle("notifications", XmlControl.INSTANCE);
+        return ResourceBundle.getBundle(BUNDLE_NAME, XmlControl.INSTANCE);
     }
 }

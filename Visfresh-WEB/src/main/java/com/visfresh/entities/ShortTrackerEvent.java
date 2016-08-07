@@ -45,6 +45,22 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
     public ShortTrackerEvent() {
         super();
     }
+    /**
+     * @param e tracker event.
+     */
+    public ShortTrackerEvent(final TrackerEvent e) {
+        super();
+        this.setBattery(e.getBattery());
+        this.setCreatedOn(e.getCreatedOn());
+        this.setDeviceImei(e.getDevice().getImei());
+        this.setId(e.getId());
+        this.setLatitude(e.getLatitude());
+        this.setLongitude(e.getLongitude());
+        this.setShipmentId(e.getShipment() == null ? null : e.getShipment().getId());
+        this.setTemperature(e.getTemperature());
+        this.setTime(e.getTime());
+        this.setType(e.getType());
+    }
 
     /* (non-Javadoc)
      * @see com.visfresh.entities.EntityWithId#getId()

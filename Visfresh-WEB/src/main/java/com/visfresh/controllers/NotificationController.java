@@ -29,6 +29,7 @@ import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.dao.impl.NotificationDaoImpl;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
@@ -86,11 +87,9 @@ public class NotificationController extends AbstractController implements Notifi
             final User user = getLoggedInUser(authToken);
             final NotificationSerializer ser = createSerializer(user);
 
-            Filter filter;
-            if (Boolean.TRUE.equals(includeRead)) {
-                filter = null;
-            } else {
-                filter = new Filter();
+            final Filter filter = new Filter();
+            filter.addFilter(NotificationDaoImpl.HIDDEN_FIELD, false);
+            if (!Boolean.TRUE.equals(includeRead)) {
                 filter.addFilter(PROPERTY_CLOSED, Boolean.FALSE);
             }
 

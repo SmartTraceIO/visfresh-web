@@ -184,7 +184,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param event event.
      * @return temperature alert.
      */
-    private TemperatureAlert createAlert(final TemperatureRule rule, final TrackerEvent event) {
+    public static TemperatureAlert createAlert(final TemperatureRule rule, final TrackerEvent event) {
         final TemperatureAlert alert = new TemperatureAlert();
         defaultAssign(event, alert);
         alert.setMinutes(rule.getTimeOutMinutes());
@@ -210,7 +210,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param t
      * @return
      */
-    private boolean isMatches(final TemperatureRule rule, final double t) {
+    public static boolean isMatches(final TemperatureRule rule, final double t) {
         switch (rule.getType()) {
             case Cold:
             case CriticalCold:

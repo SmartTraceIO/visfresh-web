@@ -1,0 +1,191 @@
+/**
+ *
+ */
+package com.visfresh.controllers;
+
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.visfresh.controllers.restclient.RestClient;
+import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.ShipmentSessionDao;
+import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
+import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
+import com.visfresh.rules.AbstractRuleEngine;
+import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.services.RestServiceException;
+
+/**
+ * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
+ *
+ */
+public class ReportsControllerTest extends AbstractRestServiceTest {
+    private RestClient client;
+    private TrackerEventDao trackerEventDao;
+    private AlertDao alertDao;
+    private ArrivalDao arrivalDao;
+
+    /**
+     * Default constructor.
+     */
+    public ReportsControllerTest() {
+        super();
+    }
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Before
+    public void setUp() throws Exception {
+        trackerEventDao = context.getBean(TrackerEventDao.class);
+        alertDao = context.getBean(AlertDao.class);
+        arrivalDao = context.getBean(ArrivalDao.class);
+
+        client = new RestClient();
+        client.setServiceUrl(getServiceUrl());
+        client.setAuthToken(login());
+    }
+
+    @Test
+    public void testGetShipmentReportById() throws IOException, RestServiceException {
+        final Shipment s = createShipment();
+
+        final Map<String, String> params = new HashMap<>();
+        params.put("shipmentId", s.getId().toString());
+
+        final String result = client.doSendGetRequest(client.getPathWithToken(
+                ReportsController.GET_SHIPMENT_REPORT), params);
+        assertTrue(result.length() > 0);
+    }
+    @Test
+    public void testGetShipmentReportBySnTripCount() throws IOException, RestServiceException {
+        final Shipment s = createShipment();
+
+        final Map<String, String> params = new HashMap<>();
+        params.put("sn", s.getDevice().getSn());
+        params.put("trip", Integer.toString(s.getTripCount()));
+
+        final String result = client.doSendGetRequest(client.getPathWithToken(
+                ReportsController.GET_SHIPMENT_REPORT), params);
+        assertTrue(result.length() > 0);
+    }
+    /**
+     * @return
+     */
+    private Shipment createShipment() {
+        final Shipment s = createShipment(true);
+
+        //mark any rules as processed
+        final ShipmentSession session = new ShipmentSession(s.getId());
+        int count = 0;
+        for(final TemperatureRule rule: s.getAlertProfile().getAlertRules()) {
+            if (count > 2) {
+                break;
+            }
+            AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
+            count++;
+        }
+        context.getBean(ShipmentSessionDao.class).saveSession(s, session);
+
+        //add tracker event.
+        final List<TrackerEvent> events = new LinkedList<>();
+        final long dt = 100000l;
+        final long startTime = 1000 * dt;
+
+        for (int i = 0; i < 20; i++) {
+            events.add(createEvent(s, TrackerEventType.AUT, startTime + dt * i));
+        }
+
+        //add alert
+        createAlert(s, AlertType.Battery, events.get(18));
+        createTemperatureAlert(s, AlertType.Hot, events.get(10));
+        createTemperatureAlert(s, AlertType.Hot, events.get(11));
+        createTemperatureAlert(s, AlertType.Hot, events.get(12));
+        createTemperatureAlert(s, AlertType.Hot, events.get(13));
+        createTemperatureAlert(s, AlertType.Hot, events.get(14));
+        createArrival(s, events.get(events.size() - 1));
+
+        return s;
+    }
+    /**
+     * @param s shipment.
+     * @return
+     */
+    private Arrival createArrival(final Shipment s, final TrackerEvent e) {
+        final Arrival arrival = new Arrival();
+        arrival.setDevice(s.getDevice());
+        arrival.setShipment(s);
+        arrival.setNumberOfMettersOfArrival(400);
+        arrival.setTrackerEventId(e.getId());
+        arrival.setDate(e.getTime());
+        arrivalDao.save(arrival);
+        return arrival;
+    }
+    /**
+     * @param s
+     * @param type
+     * @return
+     */
+    private TemperatureAlert createTemperatureAlert(final Shipment s, final AlertType type,
+            final TrackerEvent e) {
+        final TemperatureAlert alert = new TemperatureAlert();
+        alert.setTrackerEventId(e.getId());
+        alert.setDate(e.getTime());
+        alert.setType(type);
+        alert.setTemperature(5);
+        alert.setMinutes(55);
+        alert.setDevice(s.getDevice());
+        alert.setShipment(s);
+        alertDao.save(alert);
+        return alert;
+    }
+    /**
+     * @param s shipment
+     * @param type alert type.
+     * @return alert.
+     */
+    private Alert createAlert(final Shipment s, final AlertType type, final TrackerEvent e) {
+        final Alert alert = new Alert();
+        alert.setShipment(s);
+        alert.setTrackerEventId(e.getId());
+        alert.setDate(e.getTime());
+        alert.setDevice(s.getDevice());
+        alert.setType(type);
+        alertDao.save(alert);
+        return alert;
+    }
+    /**
+     * @param shipment shipment.
+     * @return tracker event.
+     */
+    private TrackerEvent createEvent(final Shipment shipment, final TrackerEventType type, final long time) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setShipment(shipment);
+        e.setDevice(shipment.getDevice());
+        e.setBattery(1234);
+        e.setTemperature(56);
+        e.setTime(new Date(time));
+        e.setType(type);
+        e.setLatitude(50.50);
+        e.setLongitude(51.51);
+
+        trackerEventDao.save(e);
+        return e;
+    }
+}

@@ -18,6 +18,7 @@ import java.util.Map;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.column.ColumnBuilder;
 import net.sf.dynamicreports.report.builder.column.Columns;
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
 import net.sf.dynamicreports.report.builder.component.Components;
@@ -95,12 +96,10 @@ public class ShipmentReportBuilder {
 
         //temperature history
         body.add(Components.text("Temperature History").setStyle(defaultStyleBold));
-        if (bean.getTemperatureHistory().size() == 0) {
+        if (bean.getAlertProfile() == null) {
             body.add(Components.gap(1, gap));
-        }
-
-        for (final TemperatureHistoryBean t : bean.getTemperatureHistory()) {
-            body.add(createTemperatureHistory(t, user));
+        } else {
+            body.add(createTemperatureHistory(bean, user));
             body.add(Components.gap(1, gap));
         }
 
@@ -138,7 +137,7 @@ public class ShipmentReportBuilder {
      * @return
      */
     private VerticalListBuilder createTemperatureHistory(
-            final TemperatureHistoryBean t, final User user) {
+            final ShipmentReportBean t, final User user) {
         final int gap = 5;
         final VerticalListBuilder list = Components.verticalList();
 
@@ -158,7 +157,7 @@ public class ShipmentReportBuilder {
      * @param user
      * @return
      */
-    private List<Map<String, ?>> alertsToMap(final TemperatureHistoryBean bean, final User user) {
+    private List<Map<String, ?>> alertsToMap(final ShipmentReportBean bean, final User user) {
         //Total time above high temp (5°C): 2hrs 12min
         //Total time above critical high temp (8°C): 1hrs 12min
         //Total time below low temp (0°C): 22min
@@ -191,7 +190,7 @@ public class ShipmentReportBuilder {
      * @param user
      * @return
      */
-    private List<Map<String, ?>> temperaturesToMap(final TemperatureHistoryBean t,
+    private List<Map<String, ?>> temperaturesToMap(final ShipmentReportBean t,
             final User user) {
         final List<Map<String, ?>> rows = new LinkedList<>();
         rows.add(createRow("Total time of monitoring:",
@@ -212,7 +211,7 @@ public class ShipmentReportBuilder {
      * @return
      */
     private List<Map<String, ?>> alertProfileSummaryToMap(
-            final TemperatureHistoryBean t, final User user) {
+            final ShipmentReportBean t, final User user) {
         final List<Map<String, ?>> rows = new LinkedList<>();
         rows.add(createRow("Alert Profile:", t.getAlertProfile()));
         rows.add(createRow("Alerts fired:",
@@ -389,14 +388,25 @@ public class ShipmentReportBuilder {
     private SubreportBuilder createTable(final List<String> columns,
             final List<Map<String, ?>> rows) {
         final JasperReportBuilder report = new JasperReportBuilder();
+
+        final ColumnBuilder<?, ?>[] cols = new ColumnBuilder<?, ?>[columns.size()];
+        int index = 0;
+
         for (final String column : columns) {
             final TextColumnBuilder<String> columnBuilder = Columns.column
                     (column, String.class);
             columnBuilder.setStyle(defaultStyle);
             columnBuilder.setStretchWithOverflow(true);
-            report.columns(columnBuilder);
+            if (index == 0) {
+                columnBuilder.setColumns(1);
+            } else {
+                columnBuilder.setColumns(2);
+            }
+            cols[index] = columnBuilder;
+            index++;
         }
 
+        report.columns(cols);
         report.setDataSource(new JRMapCollectionDataSource(rows));
         return Components.subreport(report);
     }

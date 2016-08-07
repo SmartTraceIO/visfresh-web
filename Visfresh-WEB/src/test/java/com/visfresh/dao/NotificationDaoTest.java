@@ -93,6 +93,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         assertTrue(n.getIssue() instanceof Arrival);
         assertNotNull(n.getUser());
         assertEquals(NotificationType.Arrival, n.getType());
+        assertTrue(n.isHidden());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)
@@ -107,6 +108,7 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         assertTrue(n.getIssue() instanceof Arrival);
         assertNotNull(n.getUser());
         assertEquals(NotificationType.Arrival, n.getType());
+        assertTrue(n.isHidden());
     }
 
     @Test
@@ -211,12 +213,39 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         filter.addFilter(NotificationConstants.PROPERTY_CLOSED, Boolean.FALSE);
         assertEquals(2, dao.findAll(filter, null, null).size());
     }
+    @Test
+    public void testGetForIssues() {
+        //craete user
+        User u = new User();
+        u.setCompany(sharedCompany);
+        u.setEmail("mkutuzov@google.com");
+        u.setFirstName("Michael");
+        u.setLastName("Kutuzov");
+        u.setPassword("alskdj");
+        u = userDao.save(u);
+
+        final Alert a1 = createAlert();
+        final Alert a2 = createAlert();
+        final Alert a3 = createAlert();
+
+        createNotification(user, a1);
+        createNotification(user, a2);
+        createNotification(user, a3);
+
+        final Set<Long> ids = new HashSet<Long>();
+        ids.add(a1.getId());
+        ids.add(a3.getId());
+
+        assertEquals(2, dao.getForIssues(ids).size());
+    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()
      */
     @Override
     protected Notification createTestEntity() {
-        return createNotification(user);
+        final Notification n = createNotification(user);
+        n.setHidden(true);
+        return n;
     }
 
     /**
@@ -229,5 +258,23 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         n.setIssue(arrival);
         n.setUser(u);
         return n;
+    }
+    /**
+     * @param u user.
+     * @return notification.
+     */
+    private Notification createNotification(final User u, final Alert a) {
+        final Notification n = new Notification();
+        n.setType(NotificationType.Alert);
+        n.setIssue(a);
+        n.setUser(u);
+        return dao.save(n);
+    }
+    private Alert createAlert() {
+        final Alert alert = new Alert();
+        alert.setType(AlertType.LightOn);
+        alert.setDevice(arrival.getDevice());
+        alert.setShipment(arrival.getShipment());
+        return context.getBean(AlertDao.class).save(alert);
     }
 }

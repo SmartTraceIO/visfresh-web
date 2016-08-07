@@ -139,6 +139,7 @@ create table notifications (
     issue bigint(20) not null,
     user bigint(20) not null,
     isread boolean not null default false,
+    hidden boolean not null default false,
     primary key (id),
     FOREIGN KEY (user)
         REFERENCES users (id)
