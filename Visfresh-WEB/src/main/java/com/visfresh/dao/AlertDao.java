@@ -4,6 +4,7 @@
 package com.visfresh.dao;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,14 @@ public interface AlertDao extends DaoBase<Alert, Long> {
     void moveToNewDevice(Device oldDevice, Device newDevice);
     /**
      * @param shipmentIds
-     * @return map of alerts for givent shipment ID's.
+     * @return map of alerts for given shipment ID's.
      */
     Map<Long, List<Alert>> getAlertsForShipmentIds(Collection<Long> shipmentIds);
+    /**
+     * @param device device.
+     * @param startDate start date.
+     * @param endDate end date.
+     * @return the list of alerts for given device and date ranges.
+     */
+    List<Alert> getAlerts(String device, Date startDate, Date endDate);
 }

@@ -4,12 +4,15 @@
 package com.visfresh.controllers;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +43,7 @@ import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Alert;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -49,7 +53,9 @@ import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.ShortTrackerEventWithAlerts;
 import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.DeviceResolver;
@@ -57,10 +63,13 @@ import com.visfresh.io.json.DeviceSerializer;
 import com.visfresh.lists.DeviceDto;
 import com.visfresh.services.DeviceCommandService;
 import com.visfresh.services.EmailService;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.services.ShipmentShutdownService;
 import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.SerializerUtils;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -507,7 +516,9 @@ public class DeviceController extends AbstractController implements DeviceConsta
             @PathVariable final String authToken,
             @RequestParam(value = "startDate", required = false) final String startDateArg,
             @RequestParam(value = "endDate", required = false) final String endDateArg,
-            @RequestParam(value = "device", required = false) final String deviceImei,
+            @RequestParam(value = "device", required = false) final String device,
+            @RequestParam(value = "sn", required = false) final String sn,
+            @RequestParam(value = "trip", required = false) final Integer trip,
             final HttpServletRequest request,
             final HttpServletResponse response
             ) throws Exception {
@@ -516,12 +527,83 @@ public class DeviceController extends AbstractController implements DeviceConsta
         final User user = getLoggedInUser(authToken);
         checkAccess(user, Role.BasicUser);
 
+        final List<ShortTrackerEventWithAlerts> events;
+        File file;
+
+        if (device != null) {
+            events = getTrackerEventByDeviceDateRanges(device, startDateArg, endDateArg, user);
+            file = fileDownload.createTmpFile("readings-" + createFileName(device, startDateArg, endDateArg) + ".csv");
+        } else if (sn != null && trip != null) {
+            events = getTrackerEventByShipment(user.getCompany(), sn, trip);
+            file = fileDownload.createTmpFile("readings-" + sn + "(" + trip + ").csv");
+        } else {
+            throw new IOException("One from device IMEI or SN and trip count should be presented in arguments");
+        }
+
+        //create temporary file with report PDF content.
+
+        try {
+            final OutputStream out = new FileOutputStream(file);
+            try {
+                readingsToCsv(events, out, user);
+            } finally {
+                out.close();
+            }
+        } catch (final Throwable e) {
+            log.error("Failed to get readings for " + device, e);
+            file.delete();
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        final int index = request.getRequestURL().indexOf("/" + GET_READINGS);
+        response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
+                authToken, file.getName()));
+    }
+    /**
+     * @param company company.
+     * @param sn device serial number.
+     * @param trip shipment trip count.
+     * @return list of events.
+     * @throws FileNotFoundException
+     */
+    private List<ShortTrackerEventWithAlerts> getTrackerEventByShipment(final Company company,
+            final String sn, final int trip) throws FileNotFoundException {
+        final Shipment s = shipmentDao.findBySnTrip(company, sn, trip);
+        if (s == null) {
+            throw new FileNotFoundException("Shipment " + sn + "(" + trip + ") not found");
+        }
+
+        final List<TrackerEvent> trackerEvents = trackerEventDao.getEvents(s);
+
+        final List<ShortTrackerEventWithAlerts> events = new LinkedList<>();
+        for (final TrackerEvent e : trackerEvents) {
+            events.add(new ShortTrackerEventWithAlerts(e));
+        }
+
+        //add alerts
+        final List<Alert> alerts = alertDao.getAlerts(s);
+        addAlerts(events, alerts);
+        return events;
+    }
+    /**
+     * @param deviceImei
+     * @param startDateArg
+     * @param endDateArg
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     * @throws ParseException
+     */
+    private List<ShortTrackerEventWithAlerts> getTrackerEventByDeviceDateRanges(
+            final String deviceImei, final String startDateArg, final String endDateArg, final User user)
+                    throws RestServiceException, IOException, ParseException {
+
         final Device device = deviceDao.findByImei(deviceImei);
 
         checkCompanyAccess(user, device);
         if (device == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+            throw new IOException("Device " + deviceImei + " not found");
         }
 
         //create date format
@@ -550,28 +632,30 @@ public class DeviceController extends AbstractController implements DeviceConsta
             startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000l);
         }
 
-        final List<ShortTrackerEvent> events = trackerEventDao.findBy(device.getImei(), startDate, endDate);
+        final List<ShortTrackerEvent> trackerEvents = trackerEventDao.findBy(device.getImei(), startDate, endDate);
 
-        //create tmp file with report PDF content.
-        final File file = fileDownload.createTmpFile(createFileName(device, startDateArg, endDateArg) + ".csv");
-
-        try {
-            final OutputStream out = new FileOutputStream(file);
-            try {
-                readingsToCsv(events, out, user);
-            } finally {
-                out.close();
-            }
-        } catch (final Throwable e) {
-            log.error("Failed to get readings for " + deviceImei, e);
-            file.delete();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+        final List<ShortTrackerEventWithAlerts> events = new LinkedList<>();
+        for (final ShortTrackerEvent e : trackerEvents) {
+            events.add(new ShortTrackerEventWithAlerts(e));
         }
 
-        final int index = request.getRequestURL().indexOf("/" + GET_READINGS);
-        response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
-                authToken, file.getName()));
+        //add alerts
+        final List<Alert> alerts = alertDao.getAlerts(device.getImei(), startDate, endDate);
+        addAlerts(events, alerts);
+        return events;
+    }
+    /**
+     * @param events
+     * @param alerts
+     */
+    protected void addAlerts(final List<ShortTrackerEventWithAlerts> events,
+            final List<Alert> alerts) {
+        for(final Alert a: alerts) {
+            final ShortTrackerEventWithAlerts e = EntityUtils.getEntity(events, a.getTrackerEventId());
+            if (e != null) {
+                e.getAlerts().add(a.getType());
+            }
+        }
     }
     /**
      * @param device
@@ -579,8 +663,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param endDate
      * @return
      */
-    private String createFileName(final Device device, final String startDate, final String endDate) {
-        final StringBuilder sb = new StringBuilder(device.getImei());
+    private String createFileName(final String device, final String startDate, final String endDate) {
+        final StringBuilder sb = new StringBuilder(device);
         if (startDate != null) {
             sb.append('-');
             sb.append(startDate);
@@ -596,7 +680,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param out CSV output stream.
      * @throws IOException
      */
-    private void readingsToCsv(final List<ShortTrackerEvent> events,
+    private void readingsToCsv(final List<ShortTrackerEventWithAlerts> events,
             final OutputStream out, final User user)
             throws IOException {
         //+-------------+--------------+------+-----+---------+----------------+
@@ -617,11 +701,11 @@ public class DeviceController extends AbstractController implements DeviceConsta
         final DateFormat fmt = DateTimeUtils.createDateFormat(
                 "yyyy-MM-dd HH:mm", user.getLanguage(), user.getTimeZone());
 
-        out.write("id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon".getBytes());
+        out.write("id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,alerts".getBytes());
         out.write((byte) '\n');
 
         //print headers
-        for (final ShortTrackerEvent e : events) {
+        for (final ShortTrackerEventWithAlerts e : events) {
             final StringBuilder sb = new StringBuilder();
             out.write(sb.toString().getBytes());
 
@@ -668,6 +752,12 @@ public class DeviceController extends AbstractController implements DeviceConsta
             out.write((byte) ',');
             //| createdon   | timestamp    | YES  |     | NULL    |                |
             out.write(fmt.format(e.getCreatedOn()).getBytes());
+            out.write((byte) ',');
+            if (!e.getAlerts().isEmpty()) {
+                out.write((byte) '"');
+                out.write(StringUtils.combine(e.getAlerts(), ",").getBytes());
+                out.write((byte) '"');
+            }
             //+-------------+--------------+------+-----+---------+----------------+
             out.write((byte) '\n');
         }

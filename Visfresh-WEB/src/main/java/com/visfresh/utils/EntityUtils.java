@@ -58,4 +58,18 @@ public final class EntityUtils {
         }
         return map;
     }
+    /**
+     * @param entities collection of entities.
+     * @param id entity ID.
+     * @return entity from collection for given ID.
+     */
+    public static <E extends EntityWithId<ID>,ID extends Serializable & Comparable<ID>>
+            E getEntity(final Collection<E> entities, final ID id) {
+        for (final E e : entities) {
+            if (e.getId().equals(id)) {
+                return e;
+            }
+        }
+        return null;
+    }
 }

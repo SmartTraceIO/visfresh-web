@@ -171,4 +171,17 @@ public class DeviceRestClient extends RestClient {
 
         return doSendGetRequest(getPathWithToken("getReadings"), params);
     }
+    /**
+     * @param s shipment.
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public String getReadings(final Shipment s) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("sn", Device.getSerialNumber(s.getDevice().getImei()));
+        params.put("trip", Integer.toString(s.getTripCount()));
+
+        return doSendGetRequest(getPathWithToken("getReadings"), params);
+    }
 }

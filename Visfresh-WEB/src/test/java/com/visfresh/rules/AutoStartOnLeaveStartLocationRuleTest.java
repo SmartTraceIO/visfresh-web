@@ -21,6 +21,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.ShortTrackerEventWithAlerts;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.state.DeviceState;
@@ -272,7 +273,7 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
             final Date date = e.getTime();
             if ((startDate == null || !startDate.after(date))
                     && (endDate == null || !endDate.before(date))) {
-                result.add(new ShortTrackerEvent(e));
+                result.add(new ShortTrackerEventWithAlerts(e));
             }
         }
         return result;

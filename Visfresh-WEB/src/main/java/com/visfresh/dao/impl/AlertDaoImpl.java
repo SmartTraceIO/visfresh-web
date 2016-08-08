@@ -243,6 +243,38 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         return alerts;
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.AlertDao#getAlerts(java.lang.String, java.util.Date, java.util.Date)
+     */
+    @Override
+    public List<Alert> getAlerts(final String device, final Date startDate, final Date endDate) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("device", device);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select "
+                + buildSelectAs(createSelectAsMapping())
+                + " from "
+                + TABLE + " a"
+                + " where "
+                + "a." + DEVICE_FIELD + " =:device"
+                + (startDate == null ? "" : " and a." + DATE_FIELD + " >= :startDate")
+                + (endDate == null ? "" : " and a." + DATE_FIELD + " <= :endDate")
+                + " order by a.date, a.id",
+                params);
+        final Map<String, Object> cache = new HashMap<>();
+
+        final List<Alert> alerts = new LinkedList<>();
+        for (final Map<String,Object> row : list) {
+            final Alert a = createAlert(row);
+            resolveReferences(a, row, cache);
+            alerts.add(a);
+        }
+
+        return alerts;
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.AlertDao#getAlertsForShipmentIds(java.util.Collection)
      */
     @Override

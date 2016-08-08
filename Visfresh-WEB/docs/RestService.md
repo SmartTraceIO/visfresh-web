@@ -3414,12 +3414,13 @@ Response:
 ```
 ### Get readings example ###
 **GET vf/rest/getReadings/${accessToken}?startDate=2016-07-26T08-17-58&endDate=2016-07-26T09-18-18&device=1234987039487**  
+**GET vf/rest/getReadings/${accessToken}?sn=703948&trip=1**  
 **CSV text response:**  
 ```
-id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon
-870,SwitchedOn,2016-08-01 16:45,27,11.0°C,12.34,56.78,-1234987039487,,2016-08-01 20:45
-871,SwitchedOn,2016-08-01 17:45,27,11.0°C,12.34,56.78,-1234987039487,,2016-08-01 20:45
-873,SwitchedOn,2016-08-01 19:45,27,11.0°C,12.34,56.78,-1234987039487,703948(1),2016-08-01 20:45
+id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,alerts
+870,SwitchedOn,2016-08-01 16:45,27,11.0°C,12.34,56.78,-1234987039487,,2016-08-01 20:45,
+871,SwitchedOn,2016-08-01 17:45,27,11.0°C,12.34,56.78,-1234987039487,,2016-08-01 20:45,"Battery,Hot,Cold"
+873,SwitchedOn,2016-08-01 19:45,27,11.0°C,12.34,56.78,-1234987039487,703948(1),2016-08-01 20:45,
 ```
 
 ### Get Shipment Report example ###

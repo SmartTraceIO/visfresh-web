@@ -477,6 +477,101 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         //| createdon   | timestamp    | YES  |     | NULL    |                |
         assertEquals(fmt.format(e.getCreatedOn()), str[9]);
     }
+    @Test
+    public void testGetReadingsBySnTrip() throws IOException, RestServiceException {
+        final Device d1 = createDevice("1234987039487", true);
+        final Device d2 = createDevice("9324790898877", true);
+
+        final long dt = 60 * 60 * 1000l; //one hour
+        final long t0 = System.currentTimeMillis() - 5 * dt;
+        createTrackerEvent(d1, new Date(t0 + 1 * dt));
+        createTrackerEvent(d1, new Date(t0 + 2 * dt));
+        createTrackerEvent(d2, new Date(t0 + 3 * dt));
+
+        final Shipment s = createShipment(d1, true);
+        final TrackerEvent e = createTrackerEvent(d1, new Date(t0 + 4 * dt));
+        e.setShipment(s);
+        context.getBean(TrackerEventDao.class).save(e);
+
+        final String data =  client.getReadings(s);
+        assertEquals(2, data.split("\n").length);
+
+        //check latest reading:
+        final DateFormat fmt = DateTimeUtils.createDateFormat(
+                "yyyy-MM-dd HH:mm", Language.English, UTC);
+
+        final String[] str = data.split("\n")[1].split(",");
+        //| id          | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+        assertEquals(Long.toString(e.getId()), str[0]);
+        //| type        | varchar(20)  | NO   |     | NULL    |                |
+        assertEquals("SwitchedOn", str[1]);
+        //| time        | timestamp    | YES  |     | NULL    |                |
+        assertEquals(fmt.format(e.getTime()), str[2]);
+        //| battery     | int(11)      | NO   |     | NULL    |                |
+        assertEquals(Integer.toString(e.getBattery()), str[3]);
+        //| temperature | double       | NO   |     | NULL    |                |
+        assertEquals(LocalizationUtils.getTemperatureString(e.getTemperature(), TemperatureUnits.Celsius), str[4]);
+        //| latitude    | double       | YES  |     | NULL    |                |
+        assertEquals(Double.toString(e.getLatitude()), str[5]);
+        //| longitude   | double       | YES  |     | NULL    |                |
+        assertEquals(Double.toString(e.getLongitude()), str[6]);
+        //| device      | varchar(127) | NO   | MUL | NULL    |                |
+        assertEquals("-" + e.getDevice().getImei(), str[7]);
+        //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
+        assertEquals("703948(1)", str[8]);
+        //| createdon   | timestamp    | YES  |     | NULL    |                |
+        assertEquals(fmt.format(e.getCreatedOn()), str[9]);
+    }
+    @Test
+    public void testGetReadingsAlerts() throws IOException, RestServiceException {
+        final Device d1 = createDevice("1234987039487", true);
+
+        final long dt = 60 * 60 * 1000l; //one hour
+        final long t0 = System.currentTimeMillis() - 5 * dt;
+
+        final Shipment s = createShipment(d1, true);
+        final TrackerEvent e = createTrackerEvent(d1, new Date(t0 + 4 * dt));
+        e.setShipment(s);
+        context.getBean(TrackerEventDao.class).save(e);
+
+        //create alert
+        createAlert(e, AlertType.Battery);
+        createAlert(e, AlertType.Hot);
+        createAlert(e, AlertType.Cold);
+
+        final String data =  client.getReadings(s);
+        final String[] lines = data.split("\n");
+        assertEquals(2, lines.length);
+
+        final String line = lines[1];
+        int index = 0;
+        for (int i = 0; i < 10; i++) {
+            index = line.indexOf(',', index + 1);
+        }
+
+        final String events = line.substring(index + 1);
+        assertTrue(events.startsWith("\""));
+        assertTrue(events.endsWith("\""));
+
+        final String[] split = events.substring(1, events.length() - 1).split(",");
+        //check is alert types
+        for (final String at : split) {
+            final AlertType type = AlertType.valueOf(at);
+            assertNotNull(type);
+        }
+    }
+    /**
+     * @param e
+     */
+    private Alert createAlert(final TrackerEvent e, final AlertType type) {
+        final Alert a = new Alert();
+        a.setDate(new Date());
+        a.setType(type);
+        a.setDevice(e.getDevice());
+        a.setShipment(e.getShipment());
+        a.setTrackerEventId(e.getId());
+        return context.getBean(AlertDao.class).save(a);
+    }
     /**
      * @param d device.
      * @param s shipment.

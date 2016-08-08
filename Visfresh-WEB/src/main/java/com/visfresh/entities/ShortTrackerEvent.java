@@ -45,8 +45,9 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
     public ShortTrackerEvent() {
         super();
     }
+
     /**
-     * @param e tracker event.
+     * @param e
      */
     public ShortTrackerEvent(final TrackerEvent e) {
         super();

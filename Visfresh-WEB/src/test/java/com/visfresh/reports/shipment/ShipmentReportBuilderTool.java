@@ -10,7 +10,7 @@ import java.util.Random;
 import net.sf.dynamicreports.report.exception.DRException;
 
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.ShortTrackerEventWithAlerts;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 
@@ -91,7 +91,7 @@ public final class ShipmentReportBuilderTool {
 
         final Random random = new Random();
         for (int i = 0; i < numReadings; i++) {
-            final ShortTrackerEvent e = new ShortTrackerEvent();
+            final ShortTrackerEventWithAlerts e = new ShortTrackerEventWithAlerts();
             e.setLatitude(lat0 + i * dlat);
             e.setLongitude(lon0 + i * dlon);
             e.setTemperature(11. + random.nextDouble() * 3.);
