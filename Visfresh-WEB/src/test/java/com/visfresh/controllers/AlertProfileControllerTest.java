@@ -163,29 +163,29 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
 
         //test sort by ID
         ListAlertProfileItem first = client.getAlertProfiles(1, 10000,
-                AlertProfileConstants.PROPERTY_ALERT_PROFILE_ID, "asc").get(0);
+                AlertProfileConstants.ALERT_PROFILE_ID, "asc").get(0);
         assertEquals((long) p1.getId(), first.getAlertProfileId());
 
         first = client.getAlertProfiles(1, 10000,
-                AlertProfileConstants.PROPERTY_ALERT_PROFILE_ID, "desc").get(maxIndex);
+                AlertProfileConstants.ALERT_PROFILE_ID, "desc").get(maxIndex);
         assertEquals((long) p1.getId(), first.getAlertProfileId());
 
         //test sort by name
         first = client.getAlertProfiles(1, 10000,
-                AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME, "asc").get(0);
+                AlertProfileConstants.ALERT_PROFILE_NAME, "asc").get(0);
         assertEquals((long) p2.getId(), first.getAlertProfileId());
 
         first = client.getAlertProfiles(1, 10000,
-                AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME, "desc").get(maxIndex);
+                AlertProfileConstants.ALERT_PROFILE_NAME, "desc").get(maxIndex);
         assertEquals((long) p2.getId(), first.getAlertProfileId());
 
         //test sort by description
         first = client.getAlertProfiles(1, 10000,
-                AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION, "asc").get(0);
+                AlertProfileConstants.ALERT_PROFILE_DESCRIPTION, "asc").get(0);
         assertEquals((long) p3.getId(), first.getAlertProfileId());
 
         first = client.getAlertProfiles(1, 10000,
-                AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION, "desc").get(maxIndex);
+                AlertProfileConstants.ALERT_PROFILE_DESCRIPTION, "desc").get(maxIndex);
         assertEquals((long) p3.getId(), first.getAlertProfileId());
     }
 }

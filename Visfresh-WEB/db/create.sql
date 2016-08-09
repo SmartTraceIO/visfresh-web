@@ -173,6 +173,8 @@ create table alertprofiles (
     onmovementstop boolean not null,
     onbatterylow boolean not null,
     company bigint(20) not null,
+	lowertemplimit int not null default 0,
+	uppertemplimit int not null default 5,
     primary key (id),
     FOREIGN KEY (company)
         REFERENCES companies (id)

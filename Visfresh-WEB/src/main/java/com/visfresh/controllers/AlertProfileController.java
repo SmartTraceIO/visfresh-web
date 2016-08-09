@@ -192,9 +192,9 @@ public class AlertProfileController extends AbstractController implements AlertP
      */
     private String[] getDefaultSortOrder() {
         return new String[] {
-            PROPERTY_ALERT_PROFILE_ID,
-            PROPERTY_ALERT_PROFILE_NAME,
-            PROPERTY_ALERT_PROFILE_DESCRIPTION
+            ALERT_PROFILE_ID,
+            ALERT_PROFILE_NAME,
+            ALERT_PROFILE_DESCRIPTION
         };
     }
 }

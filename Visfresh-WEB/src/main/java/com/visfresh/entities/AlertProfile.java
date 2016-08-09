@@ -47,6 +47,9 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     private boolean watchMovementStart;
     private boolean watchMovementStop;
 
+    private double lowerTemperatureLimit = 0.;
+    private double upperTemperatureLimit = 5.;
+
     /**
      * Default constructor.
      */
@@ -171,5 +174,29 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
      */
     public List<TemperatureRule> getAlertRules() {
         return temperatureIssues;
+    }
+    /**
+     * @return the loverTemperatureLimit
+     */
+    public double getLowerTemperatureLimit() {
+        return lowerTemperatureLimit;
+    }
+    /**
+     * @param lowerTemperatureLimit the loverTemperatureLimit to set
+     */
+    public void setLowerTemperatureLimit(final double lowerTemperatureLimit) {
+        this.lowerTemperatureLimit = lowerTemperatureLimit;
+    }
+    /**
+     * @return the upperTemperatureLimit
+     */
+    public double getUpperTemperatureLimit() {
+        return upperTemperatureLimit;
+    }
+    /**
+     * @param upperTemperatureLimit the upperTemperatureLimit to set
+     */
+    public void setUpperTemperatureLimit(final double upperTemperatureLimit) {
+        this.upperTemperatureLimit = upperTemperatureLimit;
     }
 }

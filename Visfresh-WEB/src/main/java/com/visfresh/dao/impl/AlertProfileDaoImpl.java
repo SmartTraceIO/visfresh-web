@@ -32,34 +32,16 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
 
     public static final String ID_FIELD = "id";
     public static final String NAME_FIELD = "name";
-    public static final String DESCRIPTION_FIELD = "description";
+    private static final String DESCRIPTION_FIELD = "description";
 
-    public static final String LOWTEMP_FIELD = "lowtemp";
-    public static final String LOWTEMPFORMORETHEN_FIELD = "lowtempformorethen";
-    public static final String LOWTEMP_FIELD_2 = "lowtemp2";
-    public static final String LOWTEMPFORMORETHEN_FIELD_2 = "lowtempformorethen2";
-
-    public static final String CRITICALLOWTEMP_FIELD = "criticallowtem";
-    public static final String CRITICALLOWTEMPFORMORETHEN_FIELD = "criticallowtempformorethen";
-    public static final String CRITICALLOWTEMP_FIELD_2 = "criticallowtem2";
-    public static final String CRITICALLOWTEMPFORMORETHEN_FIELD_2 = "criticallowtempformorethen2";
-
-    public static final String HIGHTEMP_FIELD = "hightemp";
-    public static final String HIGHTEMPFORMORETHEN_FIELD = "hightempformorethen";
-    public static final String HIGHTEMP_FIELD_2 = "hightemp2";
-    public static final String HIGHTEMPFORMORETHEN_FIELD_2 = "hightempformorethen2";
-
-    public static final String CRITICALHIGHTEMP_FIELD = "criticalhightemp";
-    public static final String CRITICALHIGHTEMPFORMORETHEN_FIELD = "criticalhightempformorethen";
-    public static final String CRITICALHIGHTEMP_FIELD_2 = "criticalhightemp2";
-    public static final String CRITICALHIGHTEMPFORMORETHEN_FIELD_2 = "criticalhightempformorethen2";
-
-    public static final String ONENTERBRIGHT_FIELD = "onenterbright";
-    public static final String ONENTERDARK_FIELD = "onenterdark";
-    public static final String ONMOVEMENTSTART_FIELD = "onmovementstart";
-    public static final String ONMOVEMENTSTOP_FIELD = "onmovementstop";
-    public static final String ONBATTERYLOW_FIELD = "onbatterylow";
-    public static final String COMPANY_FIELD = "company";
+    private static final String ONENTERBRIGHT_FIELD = "onenterbright";
+    private static final String ONENTERDARK_FIELD = "onenterdark";
+    private static final String ONMOVEMENTSTART_FIELD = "onmovementstart";
+    private static final String ONMOVEMENTSTOP_FIELD = "onmovementstop";
+    private static final String ONBATTERYLOW_FIELD = "onbatterylow";
+    private static final String UPPERTEMPLIMIT_FIELD = "uppertemplimit";
+    private static final String LOWERTEMPLIMIT_FIELD = "lowertemplimit";
+    private static final String COMPANY_FIELD = "company";
 
     @Autowired
     private CompanyDao companyDao;
@@ -72,72 +54,16 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         super();
 
         //build property to field map
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_STOP, ONMOVEMENTSTOP_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_WATCH_MOVEMENT_START, ONMOVEMENTSTART_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_WATCH_ENTER_DARK_ENVIRONMENT, ONENTERDARK_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_WATCH_ENTER_BRIGHT_ENVIRONMENT, ONENTERBRIGHT_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_WATCH_BATTERY_LOW, ONBATTERYLOW_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES2,
-                CRITICALHIGHTEMPFORMORETHEN_FIELD_2);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE2, CRITICALLOWTEMP_FIELD_2);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE_MINUTES,
-                CRITICALLOWTEMPFORMORETHEN_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_CRITICAL_LOW_TEMPERATURE,
-                CRITICALLOWTEMP_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES2,
-                LOWTEMPFORMORETHEN_FIELD_2);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_LOW_TEMPERATURE2,
-                LOWTEMP_FIELD_2);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_LOW_TEMPERATURE_MINUTES,
-                LOWTEMPFORMORETHEN_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_LOW_TEMPERATURE,
-                LOWTEMP_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES2,
-                CRITICALHIGHTEMPFORMORETHEN_FIELD_2);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE2,
-                CRITICALHIGHTEMP_FIELD_2);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE_MINUTES,
-            CRITICALHIGHTEMPFORMORETHEN_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_CRITICAL_HIGH_TEMPERATURE,
-                CRITICALHIGHTEMP_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES2,
-                HIGHTEMPFORMORETHEN_FIELD_2);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE2,
-                HIGHTEMP_FIELD_2);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE_MINUTES,
-                HIGHTEMPFORMORETHEN_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_HIGH_TEMPERATURE,
-                HIGHTEMP_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_ALERT_PROFILE_DESCRIPTION,
-                DESCRIPTION_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_ALERT_PROFILE_NAME,
-                NAME_FIELD);
-        propertyToDbFields.put(
-                AlertProfileConstants.PROPERTY_ALERT_PROFILE_ID,
-                ID_FIELD);
+        propertyToDbFields.put(AlertProfileConstants.WATCH_MOVEMENT_STOP, ONMOVEMENTSTOP_FIELD);
+        propertyToDbFields.put(AlertProfileConstants.WATCH_MOVEMENT_START, ONMOVEMENTSTART_FIELD);
+        propertyToDbFields.put(AlertProfileConstants.WATCH_ENTER_DARK_ENVIRONMENT, ONENTERDARK_FIELD);
+        propertyToDbFields.put(AlertProfileConstants.WATCH_ENTER_BRIGHT_ENVIRONMENT, ONENTERBRIGHT_FIELD);
+        propertyToDbFields.put(AlertProfileConstants.WATCH_BATTERY_LOW, ONBATTERYLOW_FIELD);
+        propertyToDbFields.put(AlertProfileConstants.ALERT_PROFILE_DESCRIPTION, DESCRIPTION_FIELD);
+        propertyToDbFields.put(AlertProfileConstants.ALERT_PROFILE_NAME, NAME_FIELD);
+        propertyToDbFields.put(AlertProfileConstants.ALERT_PROFILE_ID, ID_FIELD);
+        propertyToDbFields.put(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT, LOWERTEMPLIMIT_FIELD);
+        propertyToDbFields.put(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT, UPPERTEMPLIMIT_FIELD);
     }
 
     /* (non-Javadoc)
@@ -168,6 +94,8 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         paramMap.put(ONMOVEMENTSTOP_FIELD, ap.isWatchMovementStop());
         paramMap.put(ONBATTERYLOW_FIELD, ap.isWatchBatteryLow());
         paramMap.put(COMPANY_FIELD, ap.getCompany().getId());
+        paramMap.put(LOWERTEMPLIMIT_FIELD, ap.getLowerTemperatureLimit());
+        paramMap.put(UPPERTEMPLIMIT_FIELD, ap.getUpperTemperatureLimit());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -275,6 +203,9 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         fields.add(ONMOVEMENTSTOP_FIELD);
         fields.add(ONBATTERYLOW_FIELD);
         fields.add(COMPANY_FIELD);
+        fields.add(LOWERTEMPLIMIT_FIELD);
+        fields.add(UPPERTEMPLIMIT_FIELD);
+
         if (includeId) {
             fields.add(ID_FIELD);
         }
@@ -315,20 +246,22 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
      */
     @Override
     protected AlertProfile createEntity(final Map<String, Object> map) {
-        final AlertProfile no = new AlertProfile();
+        final AlertProfile ap = new AlertProfile();
 
-        no.setId(((Number) map.get(ID_FIELD)).longValue());
+        ap.setId(((Number) map.get(ID_FIELD)).longValue());
 
-        no.setName((String) map.get(NAME_FIELD));
-        no.setDescription((String) map.get(DESCRIPTION_FIELD));
+        ap.setName((String) map.get(NAME_FIELD));
+        ap.setDescription((String) map.get(DESCRIPTION_FIELD));
 
-        no.getAlertRules().addAll(loadTemperatureIssues(no.getId()));
+        ap.getAlertRules().addAll(loadTemperatureIssues(ap.getId()));
 
-        no.setWatchEnterBrightEnvironment((Boolean) map.get(ONENTERBRIGHT_FIELD));
-        no.setWatchEnterDarkEnvironment((Boolean) map.get(ONENTERDARK_FIELD));
-        no.setWatchMovementStart((Boolean) map.get(ONMOVEMENTSTART_FIELD));
-        no.setWatchMovementStop((Boolean) map.get(ONMOVEMENTSTOP_FIELD));
-        no.setWatchBatteryLow((Boolean) map.get(ONBATTERYLOW_FIELD));
-        return no;
+        ap.setWatchEnterBrightEnvironment((Boolean) map.get(ONENTERBRIGHT_FIELD));
+        ap.setWatchEnterDarkEnvironment((Boolean) map.get(ONENTERDARK_FIELD));
+        ap.setWatchMovementStart((Boolean) map.get(ONMOVEMENTSTART_FIELD));
+        ap.setWatchMovementStop((Boolean) map.get(ONMOVEMENTSTOP_FIELD));
+        ap.setWatchBatteryLow((Boolean) map.get(ONBATTERYLOW_FIELD));
+        ap.setLowerTemperatureLimit(((Number) map.get(LOWERTEMPLIMIT_FIELD)).intValue());
+        ap.setUpperTemperatureLimit(((Number) map.get(UPPERTEMPLIMIT_FIELD)).intValue());
+        return ap;
     }
 }

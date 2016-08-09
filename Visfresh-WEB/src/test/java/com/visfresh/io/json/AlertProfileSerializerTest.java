@@ -48,6 +48,8 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         final boolean watchEnterDarkEnvironment = false;
         final boolean watchMovementStart = true;
         final boolean watchMovementStop = true;
+        final double loverTemperatureLimit = -10.;
+        final double upperTemperatureLimit = 20.;
 
         AlertProfile p = new AlertProfile();
         p.setDescription(description);
@@ -60,6 +62,8 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         p.setWatchMovementStop(watchMovementStop);
         p.getAlertRules().add(new TemperatureRule(AlertType.Hot));
         p.getAlertRules().add(new TemperatureRule(AlertType.CriticalHot));
+        p.setLowerTemperatureLimit(loverTemperatureLimit);
+        p.setUpperTemperatureLimit(upperTemperatureLimit);
 
         final JsonObject json = serializer.toJson(p).getAsJsonObject();
         p = serializer.parseAlertProfile(json);
@@ -73,6 +77,8 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         assertEquals(watchMovementStart, p.isWatchMovementStart());
         assertEquals(watchMovementStop, p.isWatchMovementStop());
         assertEquals(2, p.getAlertRules().size());
+        assertEquals(loverTemperatureLimit, p.getLowerTemperatureLimit(), 0.001);
+        assertEquals(upperTemperatureLimit, p.getUpperTemperatureLimit(), 0.001);
     }
     @Test
     public void testTemperatureIssues() {
