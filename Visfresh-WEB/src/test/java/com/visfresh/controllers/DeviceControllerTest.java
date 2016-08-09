@@ -456,26 +456,26 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
                 "yyyy-MM-dd HH:mm", Language.English, UTC);
 
         final String[] str = data.split("\n")[3].split(",");
-        //| id          | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+        //id
         assertEquals(Long.toString(e.getId()), str[0]);
-        //| type        | varchar(20)  | NO   |     | NULL    |                |
-        assertEquals("SwitchedOn", str[1]);
-        //| time        | timestamp    | YES  |     | NULL    |                |
+        //shipment
+        assertEquals("703948(1)", str[1]);
+        //time
         assertEquals(fmt.format(e.getTime()), str[2]);
-        //| battery     | int(11)      | NO   |     | NULL    |                |
-        assertEquals(Integer.toString(e.getBattery()), str[3]);
-        //| temperature | double       | NO   |     | NULL    |                |
-        assertEquals(LocalizationUtils.getTemperatureString(e.getTemperature(), TemperatureUnits.Celsius), str[4]);
-        //| latitude    | double       | YES  |     | NULL    |                |
+        //temperature
+        assertEquals(LocalizationUtils.convertToUnitsString(e.getTemperature(), TemperatureUnits.Celsius), str[3]);
+        //battery
+        assertEquals(Integer.toString(e.getBattery()), str[4]);
+        //latitude
         assertEquals(Double.toString(e.getLatitude()), str[5]);
-        //| longitude   | double       | YES  |     | NULL    |                |
+        //longitude
         assertEquals(Double.toString(e.getLongitude()), str[6]);
-        //| device      | varchar(127) | NO   | MUL | NULL    |                |
-        assertEquals("-" + e.getDevice().getImei(), str[7]);
-        //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
-        assertEquals("703948(1)", str[8]);
-        //| createdon   | timestamp    | YES  |     | NULL    |                |
-        assertEquals(fmt.format(e.getCreatedOn()), str[9]);
+        //device
+        assertEquals("\"" + e.getDevice().getImei() + "\"", str[7]);
+        //createdon
+        assertEquals(fmt.format(e.getCreatedOn()), str[8]);
+        //type
+        assertEquals("SwitchedOn", str[9]);
     }
     @Test
     public void testGetReadingsBySnTrip() throws IOException, RestServiceException {
@@ -501,26 +501,26 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
                 "yyyy-MM-dd HH:mm", Language.English, UTC);
 
         final String[] str = data.split("\n")[1].split(",");
-        //| id          | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+        //id
         assertEquals(Long.toString(e.getId()), str[0]);
-        //| type        | varchar(20)  | NO   |     | NULL    |                |
-        assertEquals("SwitchedOn", str[1]);
-        //| time        | timestamp    | YES  |     | NULL    |                |
+        //shipment
+        assertEquals("703948(1)", str[1]);
+        //time
         assertEquals(fmt.format(e.getTime()), str[2]);
-        //| battery     | int(11)      | NO   |     | NULL    |                |
-        assertEquals(Integer.toString(e.getBattery()), str[3]);
-        //| temperature | double       | NO   |     | NULL    |                |
-        assertEquals(LocalizationUtils.getTemperatureString(e.getTemperature(), TemperatureUnits.Celsius), str[4]);
-        //| latitude    | double       | YES  |     | NULL    |                |
+        //temperature
+        assertEquals(LocalizationUtils.convertToUnitsString(e.getTemperature(), TemperatureUnits.Celsius), str[3]);
+        //battery
+        assertEquals(Integer.toString(e.getBattery()), str[4]);
+        //latitude
         assertEquals(Double.toString(e.getLatitude()), str[5]);
-        //| longitude   | double       | YES  |     | NULL    |                |
+        //longitude
         assertEquals(Double.toString(e.getLongitude()), str[6]);
-        //| device      | varchar(127) | NO   | MUL | NULL    |                |
-        assertEquals("-" + e.getDevice().getImei(), str[7]);
-        //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
-        assertEquals("703948(1)", str[8]);
-        //| createdon   | timestamp    | YES  |     | NULL    |                |
-        assertEquals(fmt.format(e.getCreatedOn()), str[9]);
+        //device
+        assertEquals("\"" + e.getDevice().getImei() + "\"", str[7]);
+        //createdon
+        assertEquals(fmt.format(e.getCreatedOn()), str[8]);
+        //type
+        assertEquals("SwitchedOn", str[9]);
     }
     @Test
     public void testGetReadingsAlerts() throws IOException, RestServiceException {

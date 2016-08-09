@@ -59,7 +59,31 @@ public final class LocalizationUtils {
      * @return temperature string.
      */
     public static String getTemperatureString(final double t, final TemperatureUnits units) {
+        final String unitsString = convertToUnitsString(t, units);
+        return unitsString + getDegreeSymbol(units);
+    }
+    /**
+     * @param t
+     * @param units
+     * @return
+     */
+    public static String convertToUnitsString(final double t,
+            final TemperatureUnits units) {
         final double temp = convertToUnits(t, units);
+
+        //create US locale decimal format
+        final DecimalFormat fmt = new DecimalFormat("#0.0");
+        final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
+        fmt.setDecimalFormatSymbols(decimalFormatSymbols);
+
+        //format temperature string
+        return fmt.format(temp);
+    }
+    /**
+     * @param units
+     * @return
+     */
+    public static String getDegreeSymbol(final TemperatureUnits units) {
         String degree;
         switch (units) {
             case Fahrenheit:
@@ -70,14 +94,7 @@ public final class LocalizationUtils {
                     //nothing
                     break;
         }
-
-        //create US locale decimal format
-        final DecimalFormat fmt = new DecimalFormat("#0.0");
-        final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
-        fmt.setDecimalFormatSymbols(decimalFormatSymbols);
-
-        //format temperature string
-        return fmt.format(temp) + degree;
+        return degree;
     }
     /**
      * @param distance distance in meters.

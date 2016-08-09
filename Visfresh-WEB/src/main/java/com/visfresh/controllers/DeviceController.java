@@ -683,62 +683,22 @@ public class DeviceController extends AbstractController implements DeviceConsta
     private void readingsToCsv(final List<ShortTrackerEventWithAlerts> events,
             final OutputStream out, final User user)
             throws IOException {
-        //+-------------+--------------+------+-----+---------+----------------+
-        //| Field       | Type         | Null | Key | Default | Extra          |
-        //+-------------+--------------+------+-----+---------+----------------+
-        //| id          | bigint(20)   | NO   | PRI | NULL    | auto_increment |
-        //| type        | varchar(20)  | NO   |     | NULL    |                |
-        //| time        | timestamp    | YES  |     | NULL    |                |
-        //| battery     | int(11)      | NO   |     | NULL    |                |
-        //| temperature | double       | NO   |     | NULL    |                |
-        //| latitude    | double       | YES  |     | NULL    |                |
-        //| longitude   | double       | YES  |     | NULL    |                |
-        //| device      | varchar(127) | NO   | MUL | NULL    |                |
-        //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
-        //| createdon   | timestamp    | YES  |     | NULL    |                |
-        //+-------------+--------------+------+-----+---------+----------------+
         final Map<Long, Integer> tripCounts = new HashMap<Long, Integer>();
         final DateFormat fmt = DateTimeUtils.createDateFormat(
+//                2016-11-23 18:33
                 "yyyy-MM-dd HH:mm", user.getLanguage(), user.getTimeZone());
 
-        out.write("id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,alerts".getBytes());
+        out.write(("id,shipment,time,temperature ("
+                + LocalizationUtils.getDegreeSymbol(user.getTemperatureUnits())
+                + "),battery,latitude,longitude,device,createdon,type,alerts").getBytes());
         out.write((byte) '\n');
 
         //print headers
         for (final ShortTrackerEventWithAlerts e : events) {
-            final StringBuilder sb = new StringBuilder();
-            out.write(sb.toString().getBytes());
-
-            //| id          | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+            //id
             out.write(Long.toString(e.getId()).getBytes());
             out.write((byte) ',');
-            //| type        | varchar(20)  | NO   |     | NULL    |                |
-            out.write(getType(e.getType()).getBytes());
-            out.write((byte) ',');
-            //| time        | timestamp    | YES  |     | NULL    |                |
-            out.write(fmt.format(e.getTime()).getBytes());
-            out.write((byte) ',');
-            //| battery     | int(11)      | NO   |     | NULL    |                |
-            out.write(Integer.toString(e.getBattery()).getBytes());
-            out.write((byte) ',');
-            //| temperature | double       | NO   |     | NULL    |                |
-            out.write(LocalizationUtils.getTemperatureString(e.getTemperature(),
-                    user.getTemperatureUnits()).getBytes());
-            out.write((byte) ',');
-            //| latitude    | double       | YES  |     | NULL    |                |
-            if (e.getLatitude() != null) {
-                out.write(Double.toString(e.getLatitude()).getBytes());
-            }
-            out.write((byte) ',');
-            //| longitude   | double       | YES  |     | NULL    |                |
-            if (e.getLongitude() != null) {
-                out.write(Double.toString(e.getLongitude()).getBytes());
-            }
-            out.write((byte) ',');
-            //| device      | varchar(127) | NO   | MUL | NULL    |                |
-            out.write(("-" + e.getDeviceImei()).getBytes());
-            out.write((byte) ',');
-            //| shipment    | bigint(20)   | YES  | MUL | NULL    |                |
+            //shipment
             final Long shipmentId = e.getShipmentId();
             if (shipmentId != null) {
                 Integer tripCount = tripCounts.get(shipmentId);
@@ -746,19 +706,46 @@ public class DeviceController extends AbstractController implements DeviceConsta
                     tripCount = shipmentDao.getTripCount(shipmentId);
                     tripCounts.put(shipmentId, tripCount);
                 }
-                //TODO
+
                 out.write(getShipmentNumber(e.getDeviceImei(), tripCount).getBytes());
             }
             out.write((byte) ',');
-            //| createdon   | timestamp    | YES  |     | NULL    |                |
+            //time
+            out.write(fmt.format(e.getTime()).getBytes());
+            out.write((byte) ',');
+            //temperature
+            out.write(LocalizationUtils.convertToUnitsString(e.getTemperature(),
+                    user.getTemperatureUnits()).getBytes());
+            out.write((byte) ',');
+            //battery
+            out.write(Integer.toString(e.getBattery()).getBytes());
+            out.write((byte) ',');
+            //latitude
+            if (e.getLatitude() != null) {
+                out.write(Double.toString(e.getLatitude()).getBytes());
+            }
+            out.write((byte) ',');
+            //longitude
+            if (e.getLongitude() != null) {
+                out.write(Double.toString(e.getLongitude()).getBytes());
+            }
+            out.write((byte) ',');
+            //device
+            out.write(("\"" + e.getDeviceImei() + "\"").getBytes());
+            out.write((byte) ',');
+            //createdon
             out.write(fmt.format(e.getCreatedOn()).getBytes());
             out.write((byte) ',');
+            //type
+            out.write(getType(e.getType()).getBytes());
+            out.write((byte) ',');
+            //alerts
             if (!e.getAlerts().isEmpty()) {
                 out.write((byte) '"');
                 out.write(StringUtils.combine(e.getAlerts(), ",").getBytes());
                 out.write((byte) '"');
             }
-            //+-------------+--------------+------+-----+---------+----------------+
+
             out.write((byte) '\n');
         }
 
