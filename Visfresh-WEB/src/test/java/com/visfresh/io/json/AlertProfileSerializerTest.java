@@ -48,8 +48,8 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         final boolean watchEnterDarkEnvironment = false;
         final boolean watchMovementStart = true;
         final boolean watchMovementStop = true;
-        final double loverTemperatureLimit = -10.;
-        final double upperTemperatureLimit = 20.;
+        final double loverTemperatureLimit = -11.11;
+        final double upperTemperatureLimit = 22.22;
 
         AlertProfile p = new AlertProfile();
         p.setDescription(description);

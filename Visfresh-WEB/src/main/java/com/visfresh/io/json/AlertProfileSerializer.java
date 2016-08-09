@@ -58,8 +58,10 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
                 alert.isWatchMovementStart());
         obj.addProperty(AlertProfileConstants.WATCH_MOVEMENT_STOP,
                 alert.isWatchMovementStop());
-        obj.addProperty(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT, alert.getLowerTemperatureLimit());
-        obj.addProperty(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT, alert.getUpperTemperatureLimit());
+        obj.addProperty(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT,
+                LocalizationUtils.convertToUnits(alert.getLowerTemperatureLimit(), tempUnits));
+        obj.addProperty(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT,
+                LocalizationUtils.convertToUnits(alert.getUpperTemperatureLimit(), tempUnits));
 
         final JsonArray tempIssues = new JsonArray();
         obj.add("temperatureIssues", tempIssues);
@@ -103,10 +105,12 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
             p.setWatchMovementStop(asBoolean(alert.get(AlertProfileConstants.WATCH_MOVEMENT_STOP)));
         }
         if (has(alert, AlertProfileConstants.LOWER_TEMPERATURE_LIMIT)) {
-            p.setLowerTemperatureLimit(asInt(alert.get(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT)));
+            p.setLowerTemperatureLimit(LocalizationUtils.convertFromUnits(
+                    asDouble(alert.get(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT)), tempUnits));
         }
         if (has(alert, AlertProfileConstants.UPPER_TEMPERATURE_LIMIT)) {
-            p.setUpperTemperatureLimit(asInt(alert.get(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT)));
+            p.setUpperTemperatureLimit(LocalizationUtils.convertFromUnits(
+                    asDouble(alert.get(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT)), tempUnits));
         }
 
         return p;

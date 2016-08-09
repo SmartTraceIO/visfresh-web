@@ -582,6 +582,8 @@ see [ResponseStatus](#markdown-header-response-status)
 	"watchEnterDarkEnvironment": true,
 	"watchMovementStart": true,
 	"watchMovementStop": true,
+	"lowerTemperatureLimit": -1.0, // if absent, default is 0C
+	"upperTemperatureLimit": 7.0,  // if absent, default is 5C
 	"temperatureIssues": [/* Array of temperature rules */]
 }
 ```
@@ -1280,6 +1282,8 @@ Response:
   "watchEnterDarkEnvironment": true,
   "watchMovementStart": true,
   "watchMovementStop": true,
+  "lowerTemperatureLimit": -1.0, // if absent, default is 0C
+  "upperTemperatureLimit": 7.0,  // if absent, default is 5C
   "temperatureIssues": [
     {
       "type": "CriticalHot",
@@ -1362,6 +1366,8 @@ Response:
     "watchEnterDarkEnvironment": true,
     "watchMovementStart": true,
     "watchMovementStop": true,
+    "lowerTemperatureLimit": -1.0, // if absent, default is 0C
+    "upperTemperatureLimit": 7.0,  // if absent, default is 5C
     "temperatureIssues": [
       {
         "id": 982,

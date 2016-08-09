@@ -45,8 +45,8 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         ap.setCompany(c);
         ap.setDescription("JUnit test alert pforile");
         ap.setName("JUnit-Alert");
-        ap.setLowerTemperatureLimit(-2.);
-        ap.setUpperTemperatureLimit(8.);
+        ap.setLowerTemperatureLimit(-2.5);
+        ap.setUpperTemperatureLimit(8.5);
 
         final int normalTemperature = 3;
         TemperatureRule criticalHot = new TemperatureRule(AlertType.CriticalHot);
@@ -116,8 +116,8 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertTrue(p.isWatchMovementStart());
         assertTrue(p.isWatchMovementStop());
         assertTrue(p.isWatchEnterDarkEnvironment());
-        assertEquals(-2, p.getLowerTemperatureLimit(), 0.00001);
-        assertEquals(8, p.getUpperTemperatureLimit(), 0.00001);
+        assertEquals(-2.5, p.getLowerTemperatureLimit(), 0.00001);
+        assertEquals(8.5, p.getUpperTemperatureLimit(), 0.00001);
 
         assertEquals(8, p.getAlertRules().size());
     }

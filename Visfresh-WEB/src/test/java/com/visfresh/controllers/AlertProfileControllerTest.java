@@ -104,11 +104,16 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         client.setServiceUrl(getServiceUrl());
         client.setAuthToken(authToken);
 
+        final double lowerTemperatureLimit = -11.11;
+        final double upperTemperatureLimit = 12.12;
+        final int temp = 18;
+
         final AlertProfile ap = new AlertProfile();
         ap.setName("AnyAlert");
         ap.setDescription("Any description");
+        ap.setLowerTemperatureLimit(lowerTemperatureLimit);
+        ap.setUpperTemperatureLimit(upperTemperatureLimit);
 
-        final int temp = 18;
         final TemperatureRule criticalHot = new TemperatureRule(AlertType.CriticalHot);
         criticalHot.setTemperature(temp);
         ap.getAlertRules().add(criticalHot);
@@ -117,7 +122,9 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
 
         //change rule to cumulative
         final AlertProfile p = dao.findOne(id);
-        assertEquals(18, p.getAlertRules().get(0).getTemperature(), 0.00001);
+        assertEquals(temp, p.getAlertRules().get(0).getTemperature(), 0.00001);
+        assertEquals(lowerTemperatureLimit, p.getLowerTemperatureLimit(), 0.00001);
+        assertEquals(upperTemperatureLimit, p.getUpperTemperatureLimit(), 0.00001);
     }
     @Test
     public void testGetAlertProfile() throws IOException, RestServiceException {

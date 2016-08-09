@@ -260,8 +260,8 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         ap.setWatchMovementStart((Boolean) map.get(ONMOVEMENTSTART_FIELD));
         ap.setWatchMovementStop((Boolean) map.get(ONMOVEMENTSTOP_FIELD));
         ap.setWatchBatteryLow((Boolean) map.get(ONBATTERYLOW_FIELD));
-        ap.setLowerTemperatureLimit(((Number) map.get(LOWERTEMPLIMIT_FIELD)).intValue());
-        ap.setUpperTemperatureLimit(((Number) map.get(UPPERTEMPLIMIT_FIELD)).intValue());
+        ap.setLowerTemperatureLimit(((Number) map.get(LOWERTEMPLIMIT_FIELD)).doubleValue());
+        ap.setUpperTemperatureLimit(((Number) map.get(UPPERTEMPLIMIT_FIELD)).doubleValue());
         return ap;
     }
 }
