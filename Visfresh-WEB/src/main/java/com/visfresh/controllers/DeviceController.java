@@ -688,9 +688,9 @@ public class DeviceController extends AbstractController implements DeviceConsta
 //                2016-11-23 18:33
                 "yyyy-MM-dd HH:mm", user.getLanguage(), user.getTimeZone());
 
-        out.write(("id,shipment,time,temperature ("
+        out.write(("id,shipment,time,temperature "
                 + LocalizationUtils.getDegreeSymbol(user.getTemperatureUnits())
-                + "),battery,latitude,longitude,device,createdon,type,alerts").getBytes());
+                + ",battery,latitude,longitude,device,createdon,type,alerts").getBytes());
         out.write((byte) '\n');
 
         //print headers

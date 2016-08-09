@@ -41,7 +41,7 @@ import com.visfresh.services.RestServiceException;
 @RequestMapping("/rest")
 public class FileDownloadController extends AbstractController {
     /**
-     * 
+     *
      */
     private static final String URL_ENCODING = "UTF-8";
     /**
@@ -162,7 +162,7 @@ public class FileDownloadController extends AbstractController {
 
         long id = 0;
         while (true) {
-            final File file = new File(tmpRoot, id + separator + suffix);
+            final File file = new File(tmpRoot, Long.toString(id) + separator + suffix);
             if (!file.exists()) {
                 file.createNewFile();
                 return file;
