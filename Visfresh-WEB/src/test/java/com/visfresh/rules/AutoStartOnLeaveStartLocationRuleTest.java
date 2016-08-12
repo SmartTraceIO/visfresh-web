@@ -3,6 +3,7 @@
  */
 package com.visfresh.rules;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -26,6 +27,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.LeaveLocationState;
+import com.visfresh.utils.EntityUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -35,6 +37,7 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         AutoStartOnLeaveStartLocationRule {
     private final List<AutoStartShipment> autoStarts = new LinkedList<>();
     private final List<Shipment> shipmentsToAutostart = new LinkedList<>();
+    private final List<Shipment> shipments = new LinkedList<>();
     private final List<TrackerEvent> events = new LinkedList<>();
     private long id;
     private Device device;
@@ -205,6 +208,7 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         final Shipment shipment = new Shipment();
         shipment.setId(id++);
         this.shipmentsToAutostart.add(shipment);
+        shipments.add(shipment);
 
         TrackerEvent e = createEvent(location.getLocation().getLatitude(), location.getLocation().getLongitude());
         e.setTime(new Date(e.getTime().getTime() - CHECK_TIMEOUT - 1000));
@@ -228,10 +232,27 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         context = createContext(e);
         context.setDeviceState(state);
 
+        //add event with shipment in status arrived
+        final Shipment arrived = new Shipment();
+        arrived.setId(id++);
+        arrived.setStatus(ShipmentStatus.Arrived);
+
+        e = createEvent(location.getLocation().getLatitude() + 10, location.getLocation().getLongitude() + 10);
+        e.setShipment(arrived);
+
+        //register all existing shipments
+        for (final TrackerEvent evt : events) {
+            if (evt.getShipment() != null
+                    && EntityUtils.getEntity(shipments, evt.getShipment().getId()) == null) {
+                shipments.add(evt.getShipment());
+            }
+        }
+
         assertTrue(handle(context));
         assertNull(events.get(0).getShipment());
         assertNotNull(events.get(1).getShipment());
         assertNotNull(events.get(2).getShipment());
+        assertEquals(context.getEvent().getShipment().getId(), events.get(3).getShipment().getId());
         assertNull(getLeaveLocationState(state));
     }
 
@@ -328,5 +349,12 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         final RuleContext c = new RuleContext(e, new SessionHolder());
         c.setDeviceState(new DeviceState());
         return c;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.AutoStartOnLeaveStartLocationRule#getShipment(java.lang.Long)
+     */
+    @Override
+    protected Shipment getShipment(final Long id) {
+        return EntityUtils.getEntity(shipments, id);
     }
 }

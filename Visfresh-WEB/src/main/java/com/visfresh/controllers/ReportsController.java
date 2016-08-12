@@ -216,12 +216,7 @@ public class ReportsController extends AbstractController {
      * @return
      */
     private String createFileName(final Shipment s) {
-        //normalize device serial number
         final StringBuilder sb = new StringBuilder(Device.getSerialNumber(s.getDevice().getImei()));
-        while (sb.charAt(0) == '0' && sb.length() > 1) {
-            sb.deleteCharAt(0);
-        }
-
         //add shipment trip count
         sb.append('(');
         sb.append(s.getTripCount());

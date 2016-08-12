@@ -3,11 +3,14 @@
  */
 package com.visfresh.reports.shipment;
 
+import java.awt.Color;
+import java.awt.Image;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,31 +19,42 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.base.expression.AbstractSimpleExpression;
 import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.builder.column.ColumnBuilder;
 import net.sf.dynamicreports.report.builder.column.Columns;
+import net.sf.dynamicreports.report.builder.column.ComponentColumnBuilder;
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
+import net.sf.dynamicreports.report.builder.component.ComponentBuilder;
 import net.sf.dynamicreports.report.builder.component.Components;
-import net.sf.dynamicreports.report.builder.component.SubreportBuilder;
+import net.sf.dynamicreports.report.builder.component.HorizontalListBuilder;
+import net.sf.dynamicreports.report.builder.component.ImageBuilder;
 import net.sf.dynamicreports.report.builder.component.TextFieldBuilder;
 import net.sf.dynamicreports.report.builder.component.VerticalListBuilder;
+import net.sf.dynamicreports.report.builder.style.BorderBuilder;
 import net.sf.dynamicreports.report.builder.style.FontBuilder;
-import net.sf.dynamicreports.report.builder.style.ReportStyleBuilder;
+import net.sf.dynamicreports.report.builder.style.PenBuilder;
+import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.builder.style.Styles;
+import net.sf.dynamicreports.report.constant.ComponentPositionType;
+import net.sf.dynamicreports.report.constant.HorizontalImageAlignment;
 import net.sf.dynamicreports.report.constant.HorizontalTextAlignment;
+import net.sf.dynamicreports.report.constant.ImageScale;
 import net.sf.dynamicreports.report.constant.SplitType;
+import net.sf.dynamicreports.report.constant.StretchType;
+import net.sf.dynamicreports.report.definition.ReportParameters;
 import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Device;
-import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.reports.TableSupport;
 import com.visfresh.utils.DateTimeUtils;
-import com.visfresh.utils.LocalizationUtils;
-import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -49,17 +63,14 @@ import com.visfresh.utils.StringUtils;
 @Component
 public class ShipmentReportBuilder {
     private static final int DEFAULT_FONT_SIZE = 10;
-    private final ReportStyleBuilder defaultStyle = createStyleByFont(DEFAULT_FONT_SIZE, false);
-    private final ReportStyleBuilder defaultStyleBold = createStyleByFont(DEFAULT_FONT_SIZE, true);
-    final List<String> twoColumns = new ArrayList<>(2);
+    private static final int DEFAULT_PADDING = 4;
+    private Color defaultGreen = Color.GREEN.brighter();
 
     /**
      * Default constructor.
      */
     public ShipmentReportBuilder() {
         super();
-        twoColumns.add("name");
-        twoColumns.add("value");
     }
 
 
@@ -78,77 +89,275 @@ public class ShipmentReportBuilder {
 
         final JasperReportBuilder report = DynamicReports.report();
         report.setTitleSplitType(SplitType.IMMEDIATE);
+        report.setShowColumnTitle(false);
 
-        report.title(createTitle(bean));
+        report.title(createTitle(bean, user));
 
         final VerticalListBuilder body = Components.verticalList();
         final int gap = 15;
 
-        //add shipment details
-        List<Map<String, ?>> rows = shipmentDetailsToRows(bean, user);
-        body.add(createTableWithTitle("Shipment Details", rows));
+        //first gap
         body.add(Components.gap(1, gap));
 
-        //create goods
-        rows = goodsAsRows(bean, user);
-        body.add(createTableWithTitle("Goods", rows));
+        //Goods
+        body.add(createGoodsTable(bean));
         body.add(Components.gap(1, gap));
 
-        //temperature history
-        body.add(Components.text("Temperature History").setStyle(defaultStyleBold));
-        if (bean.getAlertProfile() == null) {
-            body.add(Components.gap(1, gap));
-        } else {
-            body.add(createTemperatureHistory(bean, user));
-            body.add(Components.gap(1, gap));
-        }
+        //Shipment description and map
+        final HorizontalListBuilder shipmentDescAndMap = Components.horizontalFlowList();
+        shipmentDescAndMap.add(createShipmentDescription(bean, user));
+        shipmentDescAndMap.add(Components.gap(gap, 1));
+        shipmentDescAndMap.add(createMap(bean));
+        body.add(shipmentDescAndMap);
 
-        //arrival
-        if (bean.getArrival() != null) {
-            rows = arrivalToRows(bean.getArrival(), user);
-            body.add(createTableWithTitle("Arrival", rows));
-            body.add(Components.gap(1, gap));
-        }
-
-        //last reading
-        final int numReadings = bean.getReadings().size();
-        if (numReadings > 0) {
-            rows = lastReadingToRows(
-                    bean.getReadings().get(numReadings - 1),
-                    bean.isSuppressFurtherAlerts(),
-                    user);
-            body.add(createTableWithTitle("Last Reading", rows));
-            body.add(Components.gap(1, gap));
-
-            //TODO add maps
-        }
+        body.add(Components.gap(1, gap));
 
         //add body to report
         report.detail(body);
+
+        //add page footer
+        report.addPageFooter(createPageFooter());
+
         //this data source is not used, but required for
         //show the content
         report.setDataSource(Arrays.asList(bean));
         return report;
     }
+    /**
+     * @param bean
+     * @return
+     */
+    private ComponentBuilder<?, ?> createMap(final ShipmentReportBean bean) {
+        return Components.text("There will be Map");
+    }
+
 
     /**
-     * @param t
+     * @param bean
      * @param user
      * @return
      */
-    private VerticalListBuilder createTemperatureHistory(
-            final ShipmentReportBean t, final User user) {
-        final int gap = 5;
+    private ComponentBuilder<?, ?> createShipmentDescription(
+            final ShipmentReportBean bean, final User user) {
+        final JasperReportBuilder report = new JasperReportBuilder();
+
+        //column names
+        final String images = "images";
+        final String key = "key";
+        final String value = "value";
+
+        //creat rows
+        final List<Map<String, ?>> rows = new LinkedList<>();
+
+        //shipped from
+        final Map<String, Object> shippedFrom = new HashMap<>();
+        shippedFrom.put(images, createImage("reports/images/shipment/shippedFrom.png"));
+        shippedFrom.put(key, "Shipped From");
+        shippedFrom.put(value, bean.getShippedFrom() == null ? "" : bean.getShippedFrom());
+        rows.add(shippedFrom);
+
+        //date shipped
+        final Map<String, Object> dateShipped = new HashMap<>();
+        dateShipped.put(key, "Date Shipped");
+        dateShipped.put(value, bean.getDateShipped() == null ? "" : format(user, bean.getDateShipped()));
+        rows.add(dateShipped);
+
+        //shipped to
+        final Map<String, Object> shippedTo = new HashMap<>();
+        shippedTo.put(images, createImage("reports/images/shipment/shippedTo.png"));
+        shippedTo.put(key, "Shipped To");
+        shippedTo.put(value, bean.getShippedTo() == null ? "" : bean.getShippedTo());
+        rows.add(shippedTo);
+
+        //arrival date
+        final Map<String, Object> arrivalDate = new HashMap<>();
+        arrivalDate.put(key, "Arrival Date");
+        arrivalDate.put(value, bean.getDateArrived() == null ? "" : format(user, bean.getDateArrived()));
+        rows.add(arrivalDate);
+
+        final ColumnBuilder<?, ?>[] cols = new ColumnBuilder<?, ?>[3];
+        final StyleBuilder[] styles = new StyleBuilder[cols.length];
+
+        //image column
+        styles[0] = Styles.style();
+
+        @SuppressWarnings("serial")
+        final
+        ImageBuilder imageBuilder = Components.image(new AbstractSimpleExpression<Image>() {
+            /* (non-Javadoc)
+             * @see net.sf.dynamicreports.report.definition.expression.DRISimpleExpression#evaluate(net.sf.dynamicreports.report.definition.ReportParameters)
+             */
+            @Override
+            public Image evaluate(final ReportParameters reportParameters) {
+                final int row = reportParameters.getColumnRowNumber();
+                return (Image) rows.get(row - 1).get(images);
+            }
+        });
+        imageBuilder.setStretchType(StretchType.RELATIVE_TO_BAND_HEIGHT);
+        imageBuilder.setHorizontalImageAlignment(HorizontalImageAlignment.CENTER);
+        imageBuilder.setStyle(Styles.style().setPadding(DEFAULT_PADDING));
+
+        //add image wrapped to list
+        final ComponentColumnBuilder imageColumnBuilder = Columns.componentColumn(images,
+                Components.verticalList(imageBuilder));
+        imageColumnBuilder.setWidth(24);
+        imageColumnBuilder.setHeight(24);
+
+        cols[0] = imageColumnBuilder;
+
+        //key column
+        final StyleBuilder keyColumnStyle = Styles.style();
+        keyColumnStyle.setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold());
+        keyColumnStyle.setPadding(DEFAULT_PADDING);
+        styles[1] = keyColumnStyle;
+
+        TextColumnBuilder<String> columnBuilder = Columns.column(key, String.class);
+        columnBuilder.setStretchWithOverflow(true);
+        cols[1] = columnBuilder;
+
+        //value column
+        final StyleBuilder valueColumnStyle = Styles.style();
+        valueColumnStyle.setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE));
+        valueColumnStyle.setPadding(DEFAULT_PADDING);
+        styles[2] = valueColumnStyle;
+
+        columnBuilder = Columns.column(value, String.class);
+        columnBuilder.setStretchWithOverflow(true);
+        cols[2] = columnBuilder;
+
+        //apply styles
+        TableSupport.customizeTableStyles(styles);
+        for (int i = 0; i < styles.length; i++) {
+            cols[i].setStyle(styles[i]);
+        }
+
+        report.columns(cols);
+        report.setDataSource(new JRMapCollectionDataSource(rows));
+        report.setHighlightDetailOddRows(true);
+        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(TableSupport.CELL_BG));
+
+        //create subreport with border
+        report.setShowColumnTitle(false);
+
+        final VerticalListBuilder list = Components.verticalList(Components.subreport(report));
+        final BorderBuilder border = Styles.border(Styles.pen1Point().setLineColor(defaultGreen));
+        list.setStyle(Styles.style().setBorder(border));
+        return list;
+    }
+
+
+    /**
+     * @param resource
+     * @return
+     */
+    private Image createImage(final String resource) {
+        final URL url = ShipmentReportBuilder.class.getClassLoader().getResource(resource);
+        if (url == null) {
+            return null;
+        }
+
+        try {
+            return ImageIO.read(url);
+        } catch (final IOException e) {
+            throw new RuntimeException("Failed to load image", e);
+        }
+    }
+
+
+    /**
+     * @param bean
+     * @return
+     */
+    private ComponentBuilder<?, ?> createGoodsTable(final ShipmentReportBean bean) {
         final VerticalListBuilder list = Components.verticalList();
 
-        list.add(createTable(twoColumns, alertProfileSummaryToMap(t, user)));
-        list.add(Components.gap(1, gap));
+        //add table border
+        final PenBuilder pen = Styles.pen1Point().setLineColor(defaultGreen);
+        final BorderBuilder border = Styles.border(pen);
+        list.setStyle(Styles.style().setBorder(border));
 
-        list.add(createTable(twoColumns, temperaturesToMap(t, user)));
-        list.add(Components.gap(1, gap));
+        //add table title
+        final StyleBuilder titleStyle = createStyleByFont(DEFAULT_FONT_SIZE, true);
+        titleStyle.setBackgroundColor(defaultGreen);
+        titleStyle.setHorizontalTextAlignment(HorizontalTextAlignment.LEFT);
+        titleStyle.setPadding(Styles.padding(DEFAULT_PADDING));
 
-        list.add(createTable(twoColumns, alertsToMap(t, user)));
+        final BorderBuilder titleBorder = Styles.border(Styles.pen().setLineColor(defaultGreen));
+        titleBorder.setBottomPen(Styles.pen1Point().setLineColor(Color.BLACK));
+        titleStyle.setBorder(titleBorder);
 
+        final TextFieldBuilder<String> title = Components.text("GOODS").setStyle(titleStyle);
+        list.add(title);
+
+        //add table
+        final JasperReportBuilder report = new JasperReportBuilder();
+
+        final ColumnBuilder<?, ?>[] cols = new ColumnBuilder<?, ?>[2];
+        final StyleBuilder[] styles = new StyleBuilder[cols.length];
+
+        //key column
+        final StyleBuilder keyColumnStyle = Styles.style();
+        keyColumnStyle.setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold());
+        keyColumnStyle.setPadding(DEFAULT_PADDING);
+        styles[0] = keyColumnStyle;
+
+        final String key = "key";
+        TextColumnBuilder<String> columnBuilder = Columns.column(key, String.class);
+        columnBuilder.setStretchWithOverflow(true);
+        columnBuilder.setColumns(0);
+        cols[0] = columnBuilder;
+
+        //value column
+        final StyleBuilder valueColumnStyle = Styles.style();
+        valueColumnStyle.setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE));
+        valueColumnStyle.setPadding(DEFAULT_PADDING);
+        styles[1] = valueColumnStyle;
+
+        final String value = "value";
+        columnBuilder = Columns.column(value, String.class);
+        columnBuilder.setStretchWithOverflow(true);
+        columnBuilder.setColumns(1);
+        cols[1] = columnBuilder;
+
+        //apply styles
+        TableSupport.customizeTableStyles(styles);
+        for (int i = 0; i < styles.length; i++) {
+            cols[i].setStyle(styles[i]);
+        }
+
+        report.columns(cols);
+
+        //add data
+        final List<Map<String, ?>> rows = new LinkedList<>();
+
+        //tracker
+        final Map<String, Object> tracker = new HashMap<>();
+        tracker.put(key, "Tracker (TripNum)");
+        tracker.put(value, getShipmentNumber(bean));
+        rows.add(tracker);
+
+        //tracker
+        final Map<String, Object> description = new HashMap<>();
+        description.put(key, "Description");
+        description.put(value, bean.getDescription() == null ? "" : bean.getDescription());
+        rows.add(description);
+
+        //pallet ID
+        final Map<String, Object> palletId = new HashMap<>();
+        palletId.put(key, "Pallet ID");
+        palletId.put(value, bean.getPalletId() == null ? "" : bean.getPalletId());
+        rows.add(palletId);
+
+        //comments
+        final Map<String, Object> comments = new HashMap<>();
+        comments.put(key, "Comments");
+        comments.put(value, bean.getComment() == null ? "" : bean.getComment());
+        rows.add(comments);
+
+        report.setHighlightDetailOddRows(true);
+        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(TableSupport.CELL_BG));
+        report.setDataSource(new JRMapCollectionDataSource(rows));
+        list.add(Components.subreport(report));
         return list;
     }
 
@@ -181,72 +390,8 @@ public class ShipmentReportBuilder {
                     sb.append("min");
                 }
             }
-            rows.add(createRow(t.getLabel() + ":", sb.toString()));
+//            rows.add(createRow(t.getLabel() + ":", sb.toString()));
         }
-        return rows;
-    }
-    /**
-     * @param t
-     * @param user
-     * @return
-     */
-    private List<Map<String, ?>> temperaturesToMap(final ShipmentReportBean t,
-            final User user) {
-        final List<Map<String, ?>> rows = new LinkedList<>();
-        rows.add(createRow("Total time of monitoring:",
-                (t.getTotalTime() / (1000l * 60 * 60)) + "hrs"));
-        rows.add(createRow("Average temperature:",
-                LocalizationUtils.getTemperatureString(
-                        t.getAvgTemperature(), user.getTemperatureUnits())));
-
-        final DecimalFormat fmt = new DecimalFormat("#0.0");
-        fmt.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-        rows.add(createRow("Standard deviation:",
-                fmt.format(t.getStandardDevitation())));
-        return rows;
-    }
-    /**
-     * @param t
-     * @param user
-     * @return
-     */
-    private List<Map<String, ?>> alertProfileSummaryToMap(
-            final ShipmentReportBean t, final User user) {
-        final List<Map<String, ?>> rows = new LinkedList<>();
-        rows.add(createRow("Alert Profile:", t.getAlertProfile()));
-        rows.add(createRow("Alerts fired:",
-                StringUtils.combine(t.getAlertsFired(), ", ")));
-        rows.add(createRow("Who was notified:",
-                StringUtils.combine(t.getWhoWasNotified(), ", ")));
-        rows.add(createRow("Schedule(s):",
-                StringUtils.combine(t.getSchedules(), ", ")));
-        return rows;
-    }
-    /**
-     * @param e
-     * @param user
-     * @return
-     */
-    private List<Map<String, ?>> lastReadingToRows(
-            final ShortTrackerEvent e, final boolean suppressFurtherAlerts, final User user) {
-        final List<Map<String, ?>> rows = new LinkedList<>();
-        rows.add(createRow("Time of last reading:", format(user, e.getTime())));
-        rows.add(createRow("Temperature:", LocalizationUtils.getTemperatureString(
-                e.getTemperature(), user.getTemperatureUnits())));
-
-        final StringBuilder sb = new StringBuilder();
-        final int persents = (int) Math.round(Math.min(4150, e.getBattery()) * 100 / 4150.);
-        sb.append(persents);
-
-        sb.append("% (");
-        sb.append(toFormattedVolts(e.getBattery()));
-        sb.append("V)");
-
-        if (suppressFurtherAlerts) {
-            sb.append(". Suppress further alerts");
-        }
-
-        rows.add(createRow("Battery Level:", sb.toString()));
         return rows;
     }
     /**
@@ -260,89 +405,58 @@ public class ShipmentReportBuilder {
         fmt.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
         return fmt.format(d);
     }
-
-    /**
-     * @param a arrival.
-     * @return arrival properties as map.
-     */
-    private List<Map<String, ?>> arrivalToRows(final ArrivalBean a, final User user) {
-        final List<Map<String, ?>> rows = new LinkedList<>();
-        rows.add(createRow("Time of arrival:", format(user, a.getTime())));
-        rows.add(createRow("Notified when", a.getNotifiedWhenKm() == null
-                ? "" : a.getNotifiedWhenKm() + " km away"));
-        rows.add(createRow("Notified at", format(user, a.getNotifiedAt())));
-        rows.add(createRow("Who was notified", StringUtils.combine(
-                a.getWhoIsNotified(), ", ")));
-        rows.add(createRow("Schedule(s):",
-                StringUtils.combine(a.getSchedules(), ", ")));
-        rows.add(createRow("Time of shutdown", format(user, a.getShutdownTime())));
-        return rows;
-    }
     /**
      * @param bean
+     * @param user TODO
      * @param user
      * @return
      */
-    private List<Map<String, ?>> goodsAsRows(final ShipmentReportBean bean, final User user) {
-        final List<Map<String, ?>> rows = new LinkedList<>();
-        //Goods
-        //Description: some desc
-        rows.add(createRow("Description:", bean.getDescription()));
-        //Pallet ID: nil
-        rows.add(createRow("Pallet ID:", bean.getPalletId()));
-        //Asset Num: nil
-        rows.add(createRow("Asset Num:", bean.getAssetNum()));
-        //Comment:
-        rows.add(createRow("Comment:", bean.getComment()));
-        //Number of siblings
-        rows.add(createRow("Number of siblings", Integer.toString(
-                bean.getNumberOfSiblings())));
-        return rows;
-    }
-
-    /**
-     * @param bean
-     * @return
-     */
-    private List<Map<String, ?>> shipmentDetailsToRows(
-            final ShipmentReportBean bean, final User user) {
-        final List<Map<String, ?>> rows = new LinkedList<>();
-        //Shipment Num: 122(5)
-        rows.add(createRow("Shipment Num:", getShipmentNumber(bean)));
-        //Shipped From: Primo Head Office
-        rows.add(createRow("Shipped From:", bean.getShippedFrom()));
-        //Date shipped: 12 Jun 2016 13:45
-        rows.add(createRow("Date shipped:", format(user, bean.getDateShipped())));
-        //Shipped To: Coles DC Perth
-        rows.add(createRow("Shipped To:", bean.getShippedTo()));
-        //Date Arrived: 13 Jun 2016 22:44
-        rows.add(createRow("Date Arrived:", format(user, bean.getDateArrived())));
-        //Shipment Status: Arrived
-        rows.add(createRow("Shipment Status:", bean.getStatus().toString()));
-        return rows;
-    }
-
-    /**
-     * @param bean
-     * @param user
-     * @return
-     */
-    private VerticalListBuilder createTitle(final ShipmentReportBean bean) {
+    private VerticalListBuilder createTitle(final ShipmentReportBean bean, final User user) {
         //title
         final VerticalListBuilder titles = Components.verticalList();
 
-        TextFieldBuilder<String> f = Components.text("Shipment Report");
+//      SHIPMENT REPORT
+        TextFieldBuilder<String> f = Components.text("SHIPMENT REPORT");
+        f.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
+        f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 5, true));
+
+        titles.add(f);
+//      Primo Moraitis Fresh
+        f = Components.text(bean.getCompanyName());
+        f.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
+        f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 4, true));
+
+        titles.add(f);
+//      Tracker 122(4) - as of 6:45 13 Aug 2016 (EST)
+        final DateFormat fmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
+        f = Components.text("Tracker " + getShipmentNumber(bean) + " - as of "
+                + fmt.format(new Date()) + " (" + user.getTimeZone().getID() + ")");
         f.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
         f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 3, true));
-
         titles.add(f);
-
-        f = Components.text(getShipmentNumber(bean));
-        f.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
-        f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE, true));
-        titles.add(f);
-        titles.add(Components.gap(0, 20));
         return titles;
+    }
+    /**
+     * @return
+     */
+    private ComponentBuilder<?, ?> createPageFooter() {
+        final HorizontalListBuilder list = Components.horizontalList();
+        final TextFieldBuilder<String> text = Components.text("For assistance, contact SmartTrace Pty Ltd P: 612 9939 3233 E: contact@smartTrace.com.au");
+        text.setStretchWithOverflow(false);
+        text.setStretchType(StretchType.NO_STRETCH);
+        text.setPositionType(ComponentPositionType.FLOAT);
+
+        text.setStyle(Styles.style().setPadding(Styles.padding().setTop(12))
+                .setForegroundColor(TableSupport.CELL_BORDER));
+
+        list.add(text);
+
+        final ImageBuilder image = Components.image(createImage("reports/images/shipment/logo.jpg"));
+        image.setFixedWidth(110);
+        image.setFixedHeight(40);
+        image.setImageScale(ImageScale.RETAIN_SHAPE);
+        list.add(image);
+        return list;
     }
 
     /**
@@ -358,71 +472,13 @@ public class ShipmentReportBuilder {
      * @param isBold
      * @return
      */
-    private ReportStyleBuilder createStyleByFont(final int size, final boolean isBold) {
+    private StyleBuilder createStyleByFont(final int size, final boolean isBold) {
         FontBuilder font = Styles.font().setFontSize(size);
         if (isBold) {
             font = font.bold();
         }
 
-        final ReportStyleBuilder style = Styles.style().setFont(font);
-        return style;
-    }
-
-    /**
-     * @param title
-     * @param rows
-     * @return
-     */
-    private VerticalListBuilder createTableWithTitle(final String title,
-            final List<Map<String, ?>> rows) {
-        final VerticalListBuilder list = Components.verticalList();
-        list.add(Components.text(title).setStyle(defaultStyleBold));
-        list.add(createTable(twoColumns, rows));
-        return list;
-    }
-    /**
-     * @param columns
-     * @param rows
-     * @return
-     */
-    private SubreportBuilder createTable(final List<String> columns,
-            final List<Map<String, ?>> rows) {
-        final JasperReportBuilder report = new JasperReportBuilder();
-
-        final ColumnBuilder<?, ?>[] cols = new ColumnBuilder<?, ?>[columns.size()];
-        int index = 0;
-
-        for (final String column : columns) {
-            final TextColumnBuilder<String> columnBuilder = Columns.column
-                    (column, String.class);
-            columnBuilder.setStyle(defaultStyle);
-            columnBuilder.setStretchWithOverflow(true);
-            if (index == 0) {
-                columnBuilder.setColumns(1);
-            } else {
-                columnBuilder.setColumns(2);
-            }
-            cols[index] = columnBuilder;
-            index++;
-        }
-
-        report.columns(cols);
-        report.setDataSource(new JRMapCollectionDataSource(rows));
-        return Components.subreport(report);
-    }
-    /**
-     * @param key
-     * @param value
-     * @return
-     */
-    private Map<String, ?> createRow(final String... values) {
-        final Map<String, String> row = new HashMap<String, String>();
-        int i = 0;
-        for (final String value : values) {
-            row.put(twoColumns.get(i), value == null ? "" : value);
-            i++;
-        }
-        return row;
+        return Styles.style().setFont(font);
     }
     /**
      * @param date

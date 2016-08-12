@@ -15,6 +15,7 @@ import com.visfresh.entities.ShortTrackerEvent;
  */
 public class ShipmentReportBean {
     private String device;
+    private String companyName;
     private int tripCount;
     private String shippedFrom;
     private String shippedTo;
@@ -303,5 +304,17 @@ public class ShipmentReportBean {
      */
     public List<TimeWithLabel> getAlerts() {
         return alerts;
+    }
+    /**
+     * @return the companyName
+     */
+    public String getCompanyName() {
+        return companyName;
+    }
+    /**
+     * @param companyName the companyName to set
+     */
+    public void setCompanyName(final String companyName) {
+        this.companyName = companyName;
     }
 }

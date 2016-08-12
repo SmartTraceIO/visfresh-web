@@ -42,6 +42,7 @@ public final class ShipmentReportBuilderTool {
     private static ShipmentReportBean createPerformanceBean() {
         final ShipmentReportBean bean = new ShipmentReportBean();
 
+        bean.setCompanyName("Test Company");
         bean.setAssetNum("Test Asset");
         bean.setComment("Test bean for development");
         bean.setDateArrived(new Date(System.currentTimeMillis() - 100000000));

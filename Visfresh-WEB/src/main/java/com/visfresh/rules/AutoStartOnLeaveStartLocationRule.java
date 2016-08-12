@@ -6,7 +6,10 @@ package com.visfresh.rules;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.dao.AutoStartShipmentDao;
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
@@ -26,6 +30,7 @@ import com.visfresh.entities.Language;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.rules.state.DeviceState;
@@ -54,6 +59,8 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
     private AutoStartShipmentDao autoStartDao;
     @Autowired
     private AutoStartShipmentService autoStartService;
+    @Autowired
+    private ShipmentDao shipmentDao;
 
     /**
      * Default constructor.
@@ -150,9 +157,31 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
             //possible assign given shipment to old events.
             final List<ShortTrackerEvent> oldEvents = findTrackerEvents(
                     e.getDevice().getImei(), state.getLeaveOn(), e.getTime());
+
+            final Map<Long, List<ShortTrackerEvent>> assignedEvents = new HashMap<>();
+            //process not assigned shipments
+            //and collect assigned
             for (final ShortTrackerEvent ev : oldEvents) {
                 if (ev.getShipmentId() == null) {
                     assignShipment(ev.getId(), s);
+                } else if (!ev.getShipmentId().equals(s.getId())){
+                    List<ShortTrackerEvent> events = assignedEvents.get(ev.getShipmentId());
+                    if (events == null) {
+                        events = new LinkedList<>();
+                        assignedEvents.put(ev.getShipmentId(), events);
+                    }
+
+                    events.add(ev);
+                }
+            }
+
+            //process assigned events
+            for (final Map.Entry<Long, List<ShortTrackerEvent>> entry : assignedEvents.entrySet()) {
+                final Shipment oldShipment = getShipment(entry.getKey());
+                if (oldShipment.getStatus() == ShipmentStatus.Arrived) {
+                    for (final ShortTrackerEvent ev : entry.getValue()) {
+                        assignShipment(ev.getId(), s);
+                    }
                 }
             }
 
@@ -161,6 +190,14 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
 
         return false;
     }
+    /**
+     * @param id shipment ID.
+     * @return
+     */
+    protected Shipment getShipment(final Long id) {
+        return shipmentDao.findOne(id);
+    }
+
     /**
      * @param autoStart autostart configuration.
      * @param e tracker event.

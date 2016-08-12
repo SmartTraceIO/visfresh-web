@@ -71,6 +71,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             bean.setDateArrived(s.getArrivalDate());
         }
 
+        bean.setCompanyName(user.getCompany().getName());
         bean.setAssetNum(s.getAssetNum());
         bean.setComment(s.getCommentsForReceiver());
         bean.setDateShipped(s.getShipmentDate());

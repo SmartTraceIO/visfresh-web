@@ -53,8 +53,7 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      * @return the sn
      */
     public String getSn() {
-        final String im = getImei();
-        return getSerialNumber(im);
+        return getSerialNumber(getImei());
     }
     /**
      * @param imei device IMEI.
@@ -64,8 +63,15 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
         if (imei == null) {
             return null;
         }
+
+        //normalize device serial number
         final int len = imei.length();
-        return imei.substring(len - 7, len - 1);
+        final StringBuilder sb = new StringBuilder(imei.substring(len - 7, len - 1));
+        while (sb.charAt(0) == '0' && sb.length() > 1) {
+            sb.deleteCharAt(0);
+        }
+
+        return sb.toString();
     }
     /**
      * @return the imei

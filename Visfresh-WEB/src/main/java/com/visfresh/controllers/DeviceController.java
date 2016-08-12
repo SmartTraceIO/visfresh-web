@@ -757,12 +757,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @return
      */
     private String getShipmentNumber(final String deviceImei, final Integer tripCount) {
-        //normalize device serial number
         final StringBuilder sb = new StringBuilder(Device.getSerialNumber(deviceImei));
-        while (sb.charAt(0) == '0' && sb.length() > 1) {
-            sb.deleteCharAt(0);
-        }
-
         //add shipment trip count
         sb.append('(');
         sb.append(tripCount);
