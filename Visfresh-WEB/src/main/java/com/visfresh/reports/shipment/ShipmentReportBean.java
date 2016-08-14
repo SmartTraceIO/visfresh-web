@@ -33,7 +33,7 @@ public class ShipmentReportBean {
 
     //temperature history
     private String alertProfile;
-    private final List<String> alertsFired = new LinkedList<>();
+    private final List<AlertBean> alertsFired = new LinkedList<>();
     private final List<String> whoWasNotified = new LinkedList<>();
     private final List<String> schedules = new LinkedList<>();
     /**
@@ -48,7 +48,12 @@ public class ShipmentReportBean {
      * Standard deviation: 0.4
      */
     private double standardDevitation;
-    private final List<TimeWithLabel> alerts = new LinkedList<>();
+    private double minimumTemperature;
+    private double maximumTemperature;
+    private double lowerTemperatureLimit;
+    private double upperTemperatureLimit;
+    private long timeBelowLowerLimit;
+    private long timeAboveUpperLimit;
 
     /**
      * Default constructor.
@@ -248,7 +253,7 @@ public class ShipmentReportBean {
     /**
      * @return the alertsFired
      */
-    public List<String> getAlertsFired() {
+    public List<AlertBean> getAlertsFired() {
         return alertsFired;
     }
     /**
@@ -300,10 +305,28 @@ public class ShipmentReportBean {
         this.standardDevitation = standardDevitation;
     }
     /**
-     * @return the alerts
+     * @return minimum temperature.
      */
-    public List<TimeWithLabel> getAlerts() {
-        return alerts;
+    public double getMinimumTemperature() {
+        return minimumTemperature;
+    }
+    /**
+     * @param minimumTemperature the minimumTemperature to set
+     */
+    public void setMinimumTemperature(final double minimumTemperature) {
+        this.minimumTemperature = minimumTemperature;
+    }
+    /**
+     * @return minimum temperature.
+     */
+    public double getMaximumTemperature() {
+        return maximumTemperature;
+    }
+    /**
+     * @param maximumTemperature the maximumTemperature to set
+     */
+    public void setMaximumTemperature(final double maximumTemperature) {
+        this.maximumTemperature = maximumTemperature;
     }
     /**
      * @return the companyName
@@ -316,5 +339,53 @@ public class ShipmentReportBean {
      */
     public void setCompanyName(final String companyName) {
         this.companyName = companyName;
+    }
+    /**
+     * @return lower temperature limit.
+     */
+    public double getLowerTemperatureLimit() {
+        return lowerTemperatureLimit;
+    }
+    /**
+     * @param lowerTemperatureLimit the lowerTemperatureLimit to set
+     */
+    public void setLowerTemperatureLimit(final double lowerTemperatureLimit) {
+        this.lowerTemperatureLimit = lowerTemperatureLimit;
+    }
+    /**
+     * @return upper temperature limit.
+     */
+    public double getUpperTemperatureLimit() {
+        return upperTemperatureLimit;
+    }
+    /**
+     * @param upperTemperatureLimit the upperTemperatureLimit to set
+     */
+    public void setUpperTemperatureLimit(final double upperTemperatureLimit) {
+        this.upperTemperatureLimit = upperTemperatureLimit;
+    }
+    /**
+     * @return time below lower limit.
+     */
+    public long getTimeBelowLowerLimit() {
+        return timeBelowLowerLimit;
+    }
+    /**
+     * @param timeBelowLowerLimit the timeBelowLowerLimit to set
+     */
+    public void setTimeBelowLowerLimit(final long timeBelowLowerLimit) {
+        this.timeBelowLowerLimit = timeBelowLowerLimit;
+    }
+    /**
+     * @return time above upper limit.
+     */
+    public long getTimeAboveUpperLimit() {
+        return timeAboveUpperLimit;
+    }
+    /**
+     * @param timeAboveUpperLimit the timeAboveUpperLimit to set
+     */
+    public void setTimeAboveUpperLimit(final long timeAboveUpperLimit) {
+        this.timeAboveUpperLimit = timeAboveUpperLimit;
     }
 }

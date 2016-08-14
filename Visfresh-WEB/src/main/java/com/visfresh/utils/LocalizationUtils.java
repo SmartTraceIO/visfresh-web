@@ -70,14 +70,20 @@ public final class LocalizationUtils {
     public static String convertToUnitsString(final double t,
             final TemperatureUnits units) {
         final double temp = convertToUnits(t, units);
-
+        return formatByOneDecimal(temp);
+    }
+    /**
+     * @param value double value to format.
+     * @return formatted value.
+     */
+    public static String formatByOneDecimal(final double value) {
         //create US locale decimal format
         final DecimalFormat fmt = new DecimalFormat("#0.0");
         final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
         fmt.setDecimalFormatSymbols(decimalFormatSymbols);
 
         //format temperature string
-        return fmt.format(temp);
+        return fmt.format(value);
     }
     /**
      * @param units

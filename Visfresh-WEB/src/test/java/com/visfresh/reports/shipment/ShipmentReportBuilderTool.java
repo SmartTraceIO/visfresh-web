@@ -9,6 +9,7 @@ import java.util.Random;
 
 import net.sf.dynamicreports.report.exception.DRException;
 
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEventWithAlerts;
 import com.visfresh.entities.TrackerEventType;
@@ -65,14 +66,6 @@ public final class ShipmentReportBuilderTool {
         arrival.setNotifiedWhenKm(40);
         bean.setArrival(arrival);
 
-        //notified by arrival
-        arrival.getSchedules().add("High Temp en route COLES DC adelaide");
-        arrival.getSchedules().add("Low Temp en route COLES DC adelaide");
-
-        arrival.getWhoIsNotified().add("James");
-        arrival.getWhoIsNotified().add("Vu");
-        arrival.getWhoIsNotified().add("Vyacheslav");
-
         //generate events
         //Sidnay -33°52′10″ 151°12′30″
         final double lat0 = -33. + 52 / 60.;
@@ -107,45 +100,23 @@ public final class ShipmentReportBuilderTool {
         bean.setAlertProfile("Chilled Beef");
         bean.setStandardDevitation(0.001 + random.nextDouble() / 0.5);
         bean.setTotalTime((1 + random.nextInt(3 * 30 * 24)) * oneHour);
+        bean.setMinimumTemperature(-2);
+        bean.setLowerTemperatureLimit(0);
+        bean.setTimeAboveUpperLimit(10 * 61 * 60 * 1000L);
+        bean.setTimeBelowLowerLimit(2 * 61 * 60 * 1000L);
+        bean.setMaximumTemperature(11);
+        bean.setUpperTemperatureLimit(9);
         bean.setAvgTemperature(7.);
         bean.getWhoWasNotified().add("user1@smarttrace.com.au");
         bean.getWhoWasNotified().add("user2@smarttrace.com.au");
         bean.getSchedules().add("Schedule 1");
         bean.getSchedules().add("Schedule 2");
 
-        bean.getAlertsFired().add("<0.0°C for 60 min");
-        bean.getAlertsFired().add(">0.0°C for 30 min");
-
-        bean.getAlerts().add(createTimeWithLabel(
-                "Total time above high temp (5°C)", 72 * 60 * 1000l));
-        //Total time above high temp (5°C): 2hrs 12min
-        bean.getAlerts().add(createTimeWithLabel(
-                "Total time above critical high temp (8°C)", 42 * 60 * 1000l));
-        //Total time above critical high temp (8°C): 1hrs 12min
-        bean.getAlerts().add(createTimeWithLabel(
-                "Total time below low temp (0°C)", 22 * 60 * 1000l));
-        //Total time below low temp (0°C): 22min
-        bean.getAlerts().add(createTimeWithLabel(
-                "Total time below low temp (0°C)", 72 * 60 * 1000l));
-        //Total time below critical low temp (-2C): nil
-        bean.getAlerts().add(createTimeWithLabel(
-                "Total time below critical low temp (-2C)", 0l));
+        bean.getAlertsFired().add(new AlertBean(AlertType.Cold, "<0.0°C for 60 min"));
+        bean.getAlertsFired().add(new AlertBean(AlertType.Hot, ">0.0°C for 30 min"));
 
         return bean;
     }
-
-    /**
-     * @param label
-     * @param time
-     * @return
-     */
-    private static TimeWithLabel createTimeWithLabel(final String label, final long time) {
-        final TimeWithLabel tl = new TimeWithLabel();
-        tl.setLabel(label);
-        tl.setTotalTime(time);
-        return tl;
-    }
-
     /**
      * @param bean
      * @param user

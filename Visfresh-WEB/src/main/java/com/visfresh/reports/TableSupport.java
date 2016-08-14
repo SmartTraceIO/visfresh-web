@@ -24,6 +24,7 @@ public final class TableSupport {
 
     public static TableSupportCondition firstRowCondition = createFirstRowCondition();
     public static TableSupportCondition notFirstRowCondition = createNotFirstRowCondition();
+    public static TableSupportCondition firstColumnCondition = createFirstColumnCondition();
 
     /**
      * Default constructor.
@@ -41,6 +42,18 @@ public final class TableSupport {
             public Boolean evaluate(final List<?> values, final ReportParameters reportParameters) {
                 final Integer row = reportParameters.getColumnRowNumber();
                 return row != null && row > 1;
+            }
+        };
+    }
+    /**
+     * @return
+     */
+    private static TableSupportCondition createFirstColumnCondition() {
+        return new TableSupportCondition("firstColumnCondition") {
+            @Override
+            public Boolean evaluate(final List<?> values, final ReportParameters reportParameters) {
+                final Integer column = reportParameters.getColumnNumber();
+                return column != null && column == 1;
             }
         };
     }

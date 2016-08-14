@@ -24,15 +24,12 @@ import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.ChartBundle;
-import com.visfresh.l12n.RuleBundle;
+import com.visfresh.reports.shipment.AlertBean;
 import com.visfresh.reports.shipment.ArrivalBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
-import com.visfresh.reports.shipment.TimeWithLabel;
-import com.visfresh.rules.TemperatureAlertRule;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.EntityUtils;
 
@@ -42,6 +39,10 @@ import com.visfresh.utils.EntityUtils;
  */
 @Component
 public class ShipmentReportDaoImpl implements ShipmentReportDao {
+    public interface TemperatureIncedentDetector {
+        boolean haveIncedent(double temperature);
+    }
+
     @Autowired
     private ArrivalDao arrivalDao;
     @Autowired
@@ -113,28 +114,19 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
 
         bean.setAlertProfile(ap.getName());
+        bean.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
+        bean.setUpperTemperatureLimit(bean.getUpperTemperatureLimit());
 
         //add fired alerts
         final ChartBundle chartBundle = new ChartBundle();
         final List<Alert> alerts = alertDao.getAlerts(s);
         for (final Alert a : alerts) {
-            bean.getAlertsFired().add(chartBundle.buildDescription(
+            bean.getAlertsFired().add(new AlertBean(a.getType(), chartBundle.buildDescription(
                     a, getTrackerEvent(events, a.getTrackerEventId()),
-                    user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits()));
+                    user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits())));
         }
 
         //create alert map
-        final RuleBundle ruleBundle = new RuleBundle();
-        final Map<TemperatureRule, Long> ruleMap = createRuleIncedentMap(s, events);
-
-        for (final Map.Entry<TemperatureRule, Long> e : ruleMap.entrySet()) {
-            if (e.getValue() > 0) {
-                final TimeWithLabel tl = new TimeWithLabel();
-                tl.setLabel(ruleBundle.buildDescription(e.getKey(), user.getTemperatureUnits()));
-                tl.setTotalTime(e.getValue());
-            }
-        }
-
         final Map<Long, User> notifiedPersons = new HashMap<>();
 
         //add notified persons
@@ -156,10 +148,16 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         long startTime = Long.MAX_VALUE;
         long endTime = Long.MIN_VALUE;
 
-        //average temperature
+        //min/max/average temperature
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
         double avg = 0.;
+
         for (final TrackerEvent e : events) {
-            avg += e.getTemperature() / n;
+            final double t = e.getTemperature();
+            min = Math.min(min, t);
+            max = Math.max(max, t);
+            avg += t / n;
         }
 
         //standard deviation
@@ -178,50 +176,49 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
 
         if (endTime > startTime) {
             bean.setTotalTime(endTime - startTime);
+            bean.setMinimumTemperature(min);
+            bean.setMaximumTemperature(max);
             bean.setAvgTemperature(avg);
             bean.setStandardDevitation(sd);
         }
+
+        bean.setTimeAboveUpperLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
+            @Override
+            public boolean haveIncedent(final double temperature) {
+                return temperature > ap.getUpperTemperatureLimit();
+            }
+        }));
+        bean.setTimeBelowLowerLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
+            @Override
+            public boolean haveIncedent(final double temperature) {
+                return temperature < ap.getLowerTemperatureLimit();
+            }
+        }));
     }
-    /**
-     * @param s
-     * @param events
-     * @return
-     */
-    private Map<TemperatureRule, Long> createRuleIncedentMap(final Shipment s,
-            final List<TrackerEvent> events) {
-        final Map<TemperatureRule, Long> result = new HashMap<>();
-        //initially populate map
-        final List<TemperatureRule> rules = s.getAlertProfile().getAlertRules();
-        for (final TemperatureRule r : rules) {
-            result.put(r, 0l);
-        }
 
-        final Map<TemperatureRule, List<TrackerEvent>> incidents = new HashMap<>();
+    private long getInsedentTime(final List<TrackerEvent> events, final TemperatureIncedentDetector d) {
+        long totalTime = 0;
+        List<TrackerEvent> tre = null;
+
         for (final TrackerEvent e : events) {
-            for (final TemperatureRule r : rules) {
-                //process rule
-                List<TrackerEvent> tre = incidents.get(r);
-                if (TemperatureAlertRule.isMatches(r, e.getTemperature())) {
-                    if (tre == null) {
-                        //add matched event to incidents.
-                        tre = new LinkedList<>();
-                        incidents.put(r, tre);
-
-                        tre.add(e);
-                    }
-                } else if (tre != null){
-                    incidents.remove(r);
-
-                    //add incident time
-                    if (tre.size() > 0) {
-                        final long dt = tre.get(tre.size() - 1).getTime().getTime() - tre.get(0).getTime().getTime();
-                        result.put(r, result.get(r) + dt);
-                    }
+            if (d.haveIncedent(e.getTemperature())) {
+                if (tre == null) {
+                    //add matched event to incidents.
+                    tre = new LinkedList<>();
+                    tre.add(e);
                 }
+            } else if (tre != null){
+                //add incident time
+                if (tre.size() > 0) {
+                    final long dt = tre.get(tre.size() - 1).getTime().getTime()
+                            - tre.get(0).getTime().getTime();
+                    totalTime += dt;
+                }
+                tre = null;
             }
         }
 
-        return result;
+        return totalTime;
     }
 
     /**
