@@ -4,7 +4,6 @@
 package com.visfresh.dao.impl;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,13 +14,11 @@ import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.ShipmentReportDao;
-import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Notification;
-import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
@@ -30,7 +27,6 @@ import com.visfresh.l12n.ChartBundle;
 import com.visfresh.reports.shipment.AlertBean;
 import com.visfresh.reports.shipment.ArrivalBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
-import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.EntityUtils;
 
 /**
@@ -49,8 +45,6 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
     private AlertDao alertDao;
     @Autowired
     private TrackerEventDao trackerEventDao;
-    @Autowired
-    private ShipmentSessionDao shipmentSessionDao;
     @Autowired
     private NotificationDao notificationDao;
 
@@ -87,9 +81,6 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             bean.setShippedTo(s.getShippedTo().getName());
         }
         bean.setStatus(s.getStatus());
-        //add alert suppression
-        final ShipmentSession session = shipmentSessionDao.getSession(s);
-        bean.setSuppressFurtherAlerts(session == null ? false : session.isAlertsSuppressed());
         bean.setTripCount(s.getTripCount());
 
         //add readings
@@ -115,14 +106,14 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
 
         bean.setAlertProfile(ap.getName());
         bean.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
-        bean.setUpperTemperatureLimit(bean.getUpperTemperatureLimit());
+        bean.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
 
         //add fired alerts
         final ChartBundle chartBundle = new ChartBundle();
         final List<Alert> alerts = alertDao.getAlerts(s);
         for (final Alert a : alerts) {
             bean.getAlertsFired().add(new AlertBean(a.getType(), chartBundle.buildDescription(
-                    a, getTrackerEvent(events, a.getTrackerEventId()),
+                    a, EntityUtils.getEntity(events, a.getTrackerEventId()),
                     user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits())));
         }
 
@@ -137,11 +128,6 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
 
         for (final User u: notifiedPersons.values()) {
             bean.getWhoWasNotified().add(u.getEmail());
-        }
-
-        //alert schedules
-        for(final NotificationSchedule sched: s.getAlertsNotificationSchedules()) {
-            bean.getSchedules().add(sched.getName());
         }
 
         final int n = events.size();
@@ -168,7 +154,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
                 sd += (t - avg) * (t - avg) / (n - 1);
 
                 startTime = Math.min(startTime, e.getTime().getTime());
-                endTime = Math.max(startTime, e.getTime().getTime());
+                endTime = Math.max(endTime, e.getTime().getTime());
             }
 
             sd = Math.sqrt(sd);
@@ -196,43 +182,25 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }));
     }
 
-    private long getInsedentTime(final List<TrackerEvent> events, final TemperatureIncedentDetector d) {
+    protected long getInsedentTime(final List<TrackerEvent> events, final TemperatureIncedentDetector d) {
         long totalTime = 0;
-        List<TrackerEvent> tre = null;
+        TrackerEvent tre = null;
 
         for (final TrackerEvent e : events) {
-            if (d.haveIncedent(e.getTemperature())) {
-                if (tre == null) {
-                    //add matched event to incidents.
-                    tre = new LinkedList<>();
-                    tre.add(e);
-                }
-            } else if (tre != null){
+            if (tre != null){
                 //add incident time
-                if (tre.size() > 0) {
-                    final long dt = tre.get(tre.size() - 1).getTime().getTime()
-                            - tre.get(0).getTime().getTime();
-                    totalTime += dt;
-                }
+                totalTime += e.getTime().getTime() - tre.getTime().getTime();
+            }
+
+            if (d.haveIncedent(e.getTemperature())) {
+                //add matched event to incidents.
+                tre = e;
+            } else {
                 tre = null;
             }
         }
 
         return totalTime;
-    }
-
-    /**
-     * @param events
-     * @param id
-     * @return
-     */
-    private TrackerEvent getTrackerEvent(final List<TrackerEvent> events, final Long id) {
-        for (final TrackerEvent e : events) {
-            if (e.getId().equals(id)) {
-                return e;
-            }
-        }
-        return null;
     }
     /**
      * @param s shipment.

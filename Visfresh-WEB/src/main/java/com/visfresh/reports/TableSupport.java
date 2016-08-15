@@ -3,7 +3,6 @@
  */
 package com.visfresh.reports;
 
-import java.awt.Color;
 import java.util.List;
 
 import net.sf.dynamicreports.report.builder.style.BorderBuilder;
@@ -19,9 +18,6 @@ import net.sf.dynamicreports.report.definition.ReportParameters;
  */
 @SuppressWarnings("serial")
 public final class TableSupport {
-    public static Color CELL_BORDER = parseColor("#7D959D");
-    public static Color CELL_BG = parseColor("#B6FCFB");
-
     public static TableSupportCondition firstRowCondition = createFirstRowCondition();
     public static TableSupportCondition notFirstRowCondition = createNotFirstRowCondition();
     public static TableSupportCondition firstColumnCondition = createFirstColumnCondition();
@@ -69,18 +65,6 @@ public final class TableSupport {
             }
         };
     }
-    /**
-     * @param hex
-     * @return
-     */
-    private static Color parseColor(final String hex) {
-        // #7D959D
-        final int r = Integer.parseInt(hex.substring(1, 3), 16);
-        final int g = Integer.parseInt(hex.substring(3, 5), 16);
-        final int b = Integer.parseInt(hex.substring(5, 7), 16);
-        return new Color(r, g, b, 255);
-    }
-
     public static void customizeTableStyles(final StyleBuilder[] columnStyles) {
         for (int i = 0; i < columnStyles.length; i++) {
             final StyleBuilder style = columnStyles[i];
@@ -90,7 +74,7 @@ public final class TableSupport {
 
             //create normal border
             final ConditionalStyleBuilder normalCellStyle = Styles.conditionalStyle(notFirstRowCondition);
-            final BorderBuilder normalBorder = Styles.border(Styles.pen1Point().setLineColor(CELL_BORDER));
+            final BorderBuilder normalBorder = Styles.border(Styles.pen1Point().setLineColor(Colors.CELL_BORDER));
             normalBorder.setRightPen(emptyPen);
             normalBorder.setBottomPen(emptyPen);
             if (i == 0) {
@@ -102,7 +86,7 @@ public final class TableSupport {
             //first line border
             final ConditionalStyleBuilder firstLineCellStyle = Styles.conditionalStyle(firstRowCondition);
 
-            final BorderBuilder firstLineBorder = Styles.border(Styles.pen1Point().setLineColor(CELL_BORDER));
+            final BorderBuilder firstLineBorder = Styles.border(Styles.pen1Point().setLineColor(Colors.CELL_BORDER));
             firstLineBorder.setRightPen(emptyPen);
             firstLineBorder.setBottomPen(emptyPen);
             if (i == 0) {

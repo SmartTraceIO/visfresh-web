@@ -29,13 +29,11 @@ public class ShipmentReportBean {
     private int numberOfSiblings;
     private ArrivalBean arrival;
     private final List<ShortTrackerEvent> readings = new LinkedList<>();
-    private boolean suppressFurtherAlerts;
 
     //temperature history
     private String alertProfile;
     private final List<AlertBean> alertsFired = new LinkedList<>();
     private final List<String> whoWasNotified = new LinkedList<>();
-    private final List<String> schedules = new LinkedList<>();
     /**
      * Total time of monitoring: 234hrs
      */
@@ -223,19 +221,6 @@ public class ShipmentReportBean {
     public List<ShortTrackerEvent> getReadings() {
         return readings;
     }
-    /**
-     * @return
-     */
-    public boolean isSuppressFurtherAlerts() {
-        return suppressFurtherAlerts;
-    }
-    /**
-     * @param suppressFurtherAlerts the suppressFurtherAlerts to set
-     */
-    public void setSuppressFurtherAlerts(final boolean suppressFurtherAlerts) {
-        this.suppressFurtherAlerts = suppressFurtherAlerts;
-    }
-
     //temperature history
 
     /**
@@ -261,12 +246,6 @@ public class ShipmentReportBean {
      */
     public List<String> getWhoWasNotified() {
         return whoWasNotified;
-    }
-    /**
-     * @return the schedules
-     */
-    public List<String> getSchedules() {
-        return schedules;
     }
     /**
      * @return the totalTime

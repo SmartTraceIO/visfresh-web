@@ -48,6 +48,7 @@ import net.sf.dynamicreports.report.constant.ImageScale;
 import net.sf.dynamicreports.report.constant.LineStyle;
 import net.sf.dynamicreports.report.constant.SplitType;
 import net.sf.dynamicreports.report.constant.StretchType;
+import net.sf.dynamicreports.report.constant.TimePeriod;
 import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.dynamicreports.report.definition.ReportParameters;
 import net.sf.dynamicreports.report.definition.chart.DRIChartCustomizer;
@@ -60,10 +61,12 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.UtilitiesController;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.reports.Colors;
 import com.visfresh.reports.TableSupport;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
@@ -75,13 +78,9 @@ import com.visfresh.utils.StringUtils;
  */
 @Component
 public class ShipmentReportBuilder {
-    /**
-     *
-     */
     private static final int MIDDLE_PAGE = 295;
     private static final int DEFAULT_FONT_SIZE = 10;
-    private static final int DEFAULT_PADDING = 4;
-    private Color defaultGreen = Color.GREEN.brighter();
+    private static final int DEFAULT_PADDING = 6;
 
     /**
      * Default constructor.
@@ -159,7 +158,8 @@ public class ShipmentReportBuilder {
     @SuppressWarnings("serial")
     private ComponentBuilder<?, ?> createTemperatureChart(
             final ShipmentReportBean bean, final User user) {
-        final DateFormat fmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
+        final DateFormat fmt = DateTimeUtils.createPrettyFormat(
+                user.getLanguage(), user.getTimeZone());
 
         final String time = "time";
         final String temperature = "temperature";
@@ -167,11 +167,18 @@ public class ShipmentReportBuilder {
         final TimeSeriesChartBuilder chart = Charts.timeSeriesChart();
         chart
             .setTimePeriod(Columns.column(time, Date.class))
+            .setTimeAxisFormat(Charts.axisFormat().setLabel(
+                    "Time ("
+                    + user.getTimeZone().getID()
+                    + " "
+                    + UtilitiesController.createOffsetString(user.getTimeZone().getRawOffset())
+                    + ")"))
+            .setTimePeriodType(TimePeriod.MINUTE)
             .series(
                 Charts.serie(Columns.column(temperature, Double.class))
                 .setLabel("Temperature "
                         + LocalizationUtils.getDegreeSymbol(user.getTemperatureUnits())))
-            .seriesColors(this.defaultGreen);
+            .seriesColors(Colors.DEFAULT_GREEN);
 
         //add data
         final DRDataSource ds = new DRDataSource(new String[]{time, temperature});
@@ -210,7 +217,7 @@ public class ShipmentReportBuilder {
 
         //header
         final BorderBuilder separator = Styles.border(Styles.pen(0f, LineStyle.SOLID));
-        separator.setLeftPen(Styles.pen1Point().setLineColor(TableSupport.CELL_BORDER));
+        separator.setLeftPen(Styles.pen1Point().setLineColor(Colors.CELL_BORDER));
 
         //first column
         final VerticalListBuilder alertListView = buildAlertViewList(bean);
@@ -242,13 +249,13 @@ public class ShipmentReportBuilder {
         report.setHighlightDetailEvenRows(true);
 
         final SimpleStyleBuilder rowStyle = Styles.simpleStyle();
-        rowStyle.setBackgroundColor(TableSupport.CELL_BG);
-        rowStyle.setTopBorder(Styles.pen1Point().setLineColor(TableSupport.CELL_BORDER));
+        rowStyle.setBackgroundColor(Colors.CELL_BG);
+        rowStyle.setTopBorder(Styles.pen1Point().setLineColor(Colors.CELL_BORDER));
         report.setDetailEvenRowStyle(rowStyle);
 
         //create subreport with border
         final VerticalListBuilder sub = Components.verticalList(Components.subreport(report));
-        final BorderBuilder border = Styles.border(Styles.pen1Point().setLineColor(defaultGreen));
+        final BorderBuilder border = Styles.border(Styles.pen1Point().setLineColor(Colors.DEFAULT_GREEN));
         sub.setStyle(Styles.style().setBorder(border));
         return sub;
     }
@@ -276,8 +283,9 @@ public class ShipmentReportBuilder {
                 final ImageBuilder image = Components.image(alertImageMap.get(alert.getType()));
                 image.setFixedDimension(16, 16);
                 image.setImageScale(ImageScale.RETAIN_SHAPE);
+                image.setStretchType(StretchType.RELATIVE_TO_BAND_HEIGHT);
 
-                alertView.add(Components.hListCell(image).widthFixed().heightFixedOnMiddle());
+                alertView.add(Components.hListCell(image).heightFixedOnMiddle());
 
                 //text
                 alertView.add(Components.text(alert.getText())
@@ -390,12 +398,12 @@ public class ShipmentReportBuilder {
         report.columns(cols);
         report.setDataSource(ds);
         report.setHighlightDetailOddRows(true);
-        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(TableSupport.CELL_BG));
+        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(Colors.CELL_BG));
         report.setShowColumnTitle(false);
 
         //create subreport with border
         final VerticalListBuilder sub = Components.verticalList(Components.subreport(report));
-        final BorderBuilder border = Styles.border(Styles.pen1Point().setLineColor(defaultGreen));
+        final BorderBuilder border = Styles.border(Styles.pen1Point().setLineColor(Colors.DEFAULT_GREEN));
         list.setStyle(Styles.style().setBorder(border));
         list.add(sub);
 
@@ -410,17 +418,17 @@ public class ShipmentReportBuilder {
         final VerticalListBuilder list = Components.verticalList();
 
         //add table border
-        final PenBuilder pen = Styles.pen1Point().setLineColor(defaultGreen);
+        final PenBuilder pen = Styles.pen1Point().setLineColor(Colors.DEFAULT_GREEN);
         final BorderBuilder border = Styles.border(pen);
         list.setStyle(Styles.style().setBorder(border));
 
         //add table title
         final StyleBuilder titleStyle = createStyleByFont(DEFAULT_FONT_SIZE, true);
-        titleStyle.setBackgroundColor(defaultGreen);
+        titleStyle.setBackgroundColor(Colors.DEFAULT_GREEN);
         titleStyle.setHorizontalTextAlignment(HorizontalTextAlignment.LEFT);
         titleStyle.setPadding(Styles.padding(DEFAULT_PADDING));
 
-        final BorderBuilder titleBorder = Styles.border(Styles.pen().setLineColor(defaultGreen));
+        final BorderBuilder titleBorder = Styles.border(Styles.pen().setLineColor(Colors.DEFAULT_GREEN));
         titleBorder.setBottomPen(Styles.pen1Point().setLineColor(Color.BLACK).setLineWidth(2f)
                 .setLineStyle(LineStyle.SOLID));
         titleStyle.setBorder(titleBorder);
@@ -509,8 +517,8 @@ public class ShipmentReportBuilder {
         //add image wrapped to list
         final ComponentColumnBuilder imageColumnBuilder = Columns.componentColumn(images,
                 Components.verticalList(imageBuilder));
-        imageColumnBuilder.setWidth(24);
-        imageColumnBuilder.setHeight(24);
+        imageColumnBuilder.setWidth(17);
+        imageColumnBuilder.setHeight(17);
 
         cols[0] = imageColumnBuilder;
 
@@ -543,12 +551,12 @@ public class ShipmentReportBuilder {
         report.columns(cols);
         report.setDataSource(new JRMapCollectionDataSource(rows));
         report.setHighlightDetailOddRows(true);
-        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(TableSupport.CELL_BG));
+        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(Colors.CELL_BG));
         report.setShowColumnTitle(false);
 
         //create subreport with border
         final VerticalListBuilder list = Components.verticalList(Components.subreport(report));
-        final BorderBuilder border = Styles.border(Styles.pen1Point().setLineColor(defaultGreen));
+        final BorderBuilder border = Styles.border(Styles.pen1Point().setLineColor(Colors.DEFAULT_GREEN));
         list.setStyle(Styles.style().setBorder(border));
         return list;
     }
@@ -645,7 +653,7 @@ public class ShipmentReportBuilder {
         rows.add(comments);
 
         report.setHighlightDetailOddRows(true);
-        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(TableSupport.CELL_BG));
+        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(Colors.CELL_BG));
         report.setDataSource(new JRMapCollectionDataSource(rows));
         list.add(Components.subreport(report));
         return list;
@@ -691,7 +699,7 @@ public class ShipmentReportBuilder {
         text.setPositionType(ComponentPositionType.FLOAT);
 
         text.setStyle(Styles.style().setPadding(Styles.padding().setTop(12))
-                .setForegroundColor(TableSupport.CELL_BORDER));
+                .setForegroundColor(Colors.CELL_BORDER));
 
         list.add(text);
 

@@ -51,7 +51,6 @@ public final class ShipmentReportBuilderTool {
         bean.setDescription("Autostarted by rule");
         bean.setDevice("1920387091287439");
         bean.setNumberOfSiblings(3);
-        bean.setSuppressFurtherAlerts(true);
         bean.setPalletId("pallet-007");
         bean.setShippedFrom("Sidney");
         bean.setShippedTo("Canberra");
@@ -75,7 +74,7 @@ public final class ShipmentReportBuilderTool {
         final double lat1 = 24. + 52 / 60.;
         final double lon1 = 113. + 39 / 60.;
 
-        final int numReadings = 15;
+        final int numReadings = 150;
         final double dlat = (lat1 - lat0) / numReadings;
         final double dlon = (lon1 - lon0) / numReadings;
 
@@ -109,8 +108,6 @@ public final class ShipmentReportBuilderTool {
         bean.setAvgTemperature(7.);
         bean.getWhoWasNotified().add("user1@smarttrace.com.au");
         bean.getWhoWasNotified().add("user2@smarttrace.com.au");
-        bean.getSchedules().add("Schedule 1");
-        bean.getSchedules().add("Schedule 2");
 
         bean.getAlertsFired().add(new AlertBean(AlertType.Cold, "<0.0°C for 60 min"));
         bean.getAlertsFired().add(new AlertBean(AlertType.Hot, ">0.0°C for 30 min"));
