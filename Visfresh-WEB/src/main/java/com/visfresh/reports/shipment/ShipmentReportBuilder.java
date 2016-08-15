@@ -65,6 +65,7 @@ import com.visfresh.controllers.UtilitiesController;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.reports.Colors;
 import com.visfresh.reports.TableSupport;
@@ -367,20 +368,24 @@ public class ShipmentReportBuilder {
 //      Avg Temp SD Min Temp Max Temp Time below 0C Time above 5C Time monitored
 //      3.3°C 0.6 0.2°C 5.3°C 1.1hrs 0.2hrs 23.3hrs
         final DRDataSource ds = new DRDataSource(columns);
+        final TemperatureUnits units = user.getTemperatureUnits();
         ds.add("Avg Temp",
                 "SD",
                 "Min Temp",
                 "Max Temp",
                 "Time below " + LocalizationUtils.getTemperatureString(
-                        bean.getLowerTemperatureLimit(), user.getTemperatureUnits()),
+                        bean.getLowerTemperatureLimit(), units),
                 "Time above " + LocalizationUtils.getTemperatureString(
-                        bean.getUpperTemperatureLimit(), user.getTemperatureUnits()),
+                        bean.getUpperTemperatureLimit(), units),
                 "Time monitored");
         ds.add(
                 getTemperatureString(bean.getAvgTemperature(), user),
-                LocalizationUtils.formatByOneDecimal(bean.getStandardDevitation()),
-                LocalizationUtils.formatByOneDecimal(bean.getMinimumTemperature()),
-                LocalizationUtils.formatByOneDecimal(bean.getMaximumTemperature()),
+                LocalizationUtils.formatByOneDecimal(
+                        LocalizationUtils.convertSdToUnits(bean.getStandardDevitation(), units)),
+                LocalizationUtils.formatByOneDecimal(
+                        LocalizationUtils.convertToUnits(bean.getMinimumTemperature(), units)),
+                LocalizationUtils.formatByOneDecimal(
+                        LocalizationUtils.convertToUnits(bean.getMaximumTemperature(), units)),
                 LocalizationUtils.formatByOneDecimal(
                         bean.getTimeBelowLowerLimit() / (60 * 60 * 1000l)) + "hrs",
                 LocalizationUtils.formatByOneDecimal(
@@ -513,12 +518,13 @@ public class ShipmentReportBuilder {
         imageBuilder.setStretchType(StretchType.RELATIVE_TO_BAND_HEIGHT);
         imageBuilder.setHorizontalImageAlignment(HorizontalImageAlignment.CENTER);
         imageBuilder.setStyle(Styles.style().setPadding(DEFAULT_PADDING));
+        imageBuilder.setImageScale(ImageScale.RETAIN_SHAPE);
 
         //add image wrapped to list
         final ComponentColumnBuilder imageColumnBuilder = Columns.componentColumn(images,
                 Components.verticalList(imageBuilder));
-        imageColumnBuilder.setWidth(17);
-        imageColumnBuilder.setHeight(17);
+        imageColumnBuilder.setWidth(20);
+        imageColumnBuilder.setHeight(20);
 
         cols[0] = imageColumnBuilder;
 

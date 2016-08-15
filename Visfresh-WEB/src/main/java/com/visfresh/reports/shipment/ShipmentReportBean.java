@@ -48,8 +48,8 @@ public class ShipmentReportBean {
     private double standardDevitation;
     private double minimumTemperature;
     private double maximumTemperature;
-    private double lowerTemperatureLimit;
-    private double upperTemperatureLimit;
+    private double lowerTemperatureLimit = 0;
+    private double upperTemperatureLimit = 5;
     private long timeBelowLowerLimit;
     private long timeAboveUpperLimit;
 

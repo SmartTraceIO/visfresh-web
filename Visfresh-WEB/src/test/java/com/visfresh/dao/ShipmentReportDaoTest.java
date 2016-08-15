@@ -4,8 +4,8 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -14,15 +14,21 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.l12n.NotificationBundle;
+import com.visfresh.mpl.services.NotificationServiceImpl;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.utils.DateTimeUtils;
 
@@ -64,18 +70,26 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         s.setStatus(ShipmentStatus.Arrived);
         this.shipment = getContext().getBean(ShipmentDao.class).save(s);
 
-        user = new User();
+        user = createUser("Vasily", "Chapaev");
+    }
+    /**
+     * @param firstName
+     * @param lastName
+     * @return
+     */
+    private User createUser(final String firstName, final String lastName) {
+        final User user = new User();
         user.setActive(true);
         user.setCompany(sharedCompany);
-        user.setEmail("chapaev@mail.ru");
-        user.setFirstName("Vasily");
-        user.setLastName("Chapaev");
-        user.setTitle("VCh");
+        user.setEmail(firstName + "." + lastName + "@mail.ru");
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         user.setTemperatureUnits(TemperatureUnits.Fahrenheit);
         user.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        context.getBean(UserDao.class).save(user);
+        return context.getBean(UserDao.class).save(user);
     }
+
     @Test
     public void testGoods() {
         final int tripCount = 12;
@@ -144,8 +158,11 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         final double upperTemperatureLimit = 15.3;
         final double lowerTemperatureLimit = -11.2;
 
+        ap.setName("JUnit Alerts");
         ap.setUpperTemperatureLimit(upperTemperatureLimit);
         ap.setLowerTemperatureLimit(lowerTemperatureLimit);
+        ap.setCompany(sharedCompany);
+
         context.getBean(AlertProfileDao.class).save(ap);
 
         shipment.setAlertProfile(ap);
@@ -160,8 +177,9 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         createTrackerEvent(startTime + 4 * dt, 8);
         createTrackerEvent(startTime + 5 * dt, 6);
         createTrackerEvent(startTime + 6 * dt, 0);
-        createTrackerEvent(startTime + 6 * dt, -11.5);
-        createTrackerEvent(startTime + 7 * dt, -20.3);
+        createTrackerEvent(startTime + 7 * dt, -11.5);
+        createTrackerEvent(startTime + 8 * dt, -20.3);
+        createTrackerEvent(startTime + 9 * dt, 0);
 
         final ShipmentReportBean report = dao.createReport(shipment, user);
 
@@ -173,7 +191,6 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         }
 
         assertEquals(summ / events.size(), report.getAvgTemperature(), 0.0001);
-        assertTrue(report.getStandardDevitation() < 1.);
         assertEquals(-20.3, report.getMinimumTemperature(), 0.0001);
         assertEquals(20.7, report.getMaximumTemperature(), 0.0001);
         assertEquals(2 * dt, report.getTimeAboveUpperLimit());
@@ -183,9 +200,95 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
     @Test
     public void testAlertFired() {
+        final TrackerEvent e = createTrackerEvent(System.currentTimeMillis(), -10);
 
+        final Alert alert = createAlert(e);
+        createAlert(e);
+
+        final ShipmentReportBean report = dao.createReport(shipment, user);
+        assertEquals(2, report.getAlertsFired().size());
+        assertEquals(alert.getType(), report.getAlertsFired().get(0).getType());
+    }
+    @Test
+    public void testWhoNotified() throws Exception {
+        final TrackerEvent e = createTrackerEvent(System.currentTimeMillis(), -10);
+
+        final Alert a1 = createAlert(e);
+        final Alert a2 = createAlert(e);
+
+        final User u1 = createUser("U", "1");
+        final User u2 = createUser("U", "2");
+        createUser("U", "3");
+
+        //create personal schedule for user.
+        final PersonSchedule s1 = createSchedule(u1);
+        final PersonSchedule s2 = createSchedule(u2);
+
+        final NotificationSchedule ns = new NotificationSchedule();
+        ns.setCompany(sharedCompany);
+        ns.setName("JUnit NS");
+        ns.getSchedules().add(s1);
+        ns.getSchedules().add(s2);
+        context.getBean(NotificationScheduleDao.class).save(ns);
+
+        shipment.getAlertsNotificationSchedules().add(ns);
+        shipmentDao.save(shipment);
+
+        final NotificationServiceImpl notificator = new NotificationServiceImpl();
+        injectDependency(notificator, context.getBean(NotificationDao.class));
+        injectDependency(notificator, new NotificationBundle());
+
+        notificator.sendNotification(s1, a1, e);
+        notificator.sendNotification(s2, a2, e);
+
+        final ShipmentReportBean report = dao.createReport(shipment, user);
+        assertEquals(2, report.getWhoWasNotified().size());
     }
 
+    /**
+     * @param target
+     * @param depenency
+     */
+    private void injectDependency(final Object target, final Object depenency) throws Exception {
+        final Class<?> clazz = depenency.getClass();
+
+        final Field[] fields = target.getClass().getDeclaredFields();
+        for (final Field field : fields) {
+            if (field.getType().isAssignableFrom(clazz)) {
+                field.setAccessible(true);
+                if (field.get(target) == null) {
+                    field.set(target, depenency);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param user
+     * @return
+     */
+    private PersonSchedule createSchedule(final User user) {
+        final PersonSchedule s = new PersonSchedule();
+        s.setFromTime(0);
+        s.setToTime(24 * 60 - 1);
+        s.setUser(user);
+        s.setAllWeek();
+        return s;
+    }
+
+    /**
+     * @param e
+     * @return
+     */
+    protected Alert createAlert(final TrackerEvent e) {
+        final Alert alert = new Alert();
+        alert.setDate(e.getTime());
+        alert.setType(AlertType.CriticalCold);
+        alert.setDevice(shipment.getDevice());
+        alert.setShipment(shipment);
+        alert.setTrackerEventId(e.getId());
+        return context.getBean(AlertDao.class).save(alert);
+    }
     /**
      * @param time reading time.
      * @param temperature temperature.

@@ -99,14 +99,13 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      */
     private void addTemperatureHistory(final Shipment s,
             final List<TrackerEvent> events, final ShipmentReportBean bean, final User user) {
-        final AlertProfile ap = s.getAlertProfile();
-        if (ap == null) {
-            return;
+        if (s.getAlertProfile() != null) {
+            final AlertProfile ap = s.getAlertProfile();
+            bean.setAlertProfile(ap.getName());
+            bean.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
+            bean.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
         }
 
-        bean.setAlertProfile(ap.getName());
-        bean.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
-        bean.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
 
         //add fired alerts
         final ChartBundle chartBundle = new ChartBundle();
@@ -146,38 +145,40 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             avg += t / n;
         }
 
+        bean.setAvgTemperature(avg);
+        bean.setMinimumTemperature(min);
+        bean.setMaximumTemperature(max);
+
         //standard deviation
         double sd = 0.;
+        for (final TrackerEvent e : events) {
+            final double t = e.getTemperature();
+            final double dt = (t - avg);
+            sd += dt * dt;
+
+            startTime = Math.min(startTime, e.getTime().getTime());
+            endTime = Math.max(endTime, e.getTime().getTime());
+        }
+
         if (n > 1) {
-            for (final TrackerEvent e : events) {
-                final double t = e.getTemperature();
-                sd += (t - avg) * (t - avg) / (n - 1);
-
-                startTime = Math.min(startTime, e.getTime().getTime());
-                endTime = Math.max(endTime, e.getTime().getTime());
-            }
-
-            sd = Math.sqrt(sd);
+            sd = Math.sqrt(sd / (n - 1));
+        } else {
+            sd = 0;
         }
 
-        if (endTime > startTime) {
-            bean.setTotalTime(endTime - startTime);
-            bean.setMinimumTemperature(min);
-            bean.setMaximumTemperature(max);
-            bean.setAvgTemperature(avg);
-            bean.setStandardDevitation(sd);
-        }
+        bean.setTotalTime(endTime - startTime);
+        bean.setStandardDevitation(sd);
 
         bean.setTimeAboveUpperLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
             @Override
             public boolean haveIncedent(final double temperature) {
-                return temperature > ap.getUpperTemperatureLimit();
+                return temperature > bean.getUpperTemperatureLimit();
             }
         }));
         bean.setTimeBelowLowerLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
             @Override
             public boolean haveIncedent(final double temperature) {
-                return temperature < ap.getLowerTemperatureLimit();
+                return temperature < bean.getLowerTemperatureLimit();
             }
         }));
     }

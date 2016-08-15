@@ -54,6 +54,25 @@ public final class LocalizationUtils {
         return temp;
     }
     /**
+     * @param sd
+     * @param units
+     * @return
+     */
+    public static double convertSdToUnits(final double sd,
+            final TemperatureUnits units) {
+        double temp;
+        switch (units) {
+            case Fahrenheit:
+                temp = sd * 1.8;
+                break;
+                default:
+                    temp = sd;
+                    //nothing
+                    break;
+        }
+        return temp;
+    }
+    /**
      * @param t temperature.
      * @param units temperature units.
      * @return temperature string.

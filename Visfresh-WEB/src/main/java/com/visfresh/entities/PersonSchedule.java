@@ -144,4 +144,13 @@ public class PersonSchedule implements EntityWithId<Long> {
     public void setSendSms(final boolean sendSms) {
         this.sendSms = sendSms;
     }
+
+    /**
+     *
+     */
+    public void setAllWeek() {
+        for (int i = 0; i < weekDays.length; i++) {
+            weekDays[i] = true;
+        }
+    }
 }

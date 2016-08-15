@@ -6,12 +6,14 @@ package com.visfresh.reports.shipment;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Random;
+import java.util.TimeZone;
 
 import net.sf.dynamicreports.report.exception.DRException;
 
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEventWithAlerts;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 
@@ -35,6 +37,8 @@ public final class ShipmentReportBuilderTool {
         final User user = new User();
         user.setId(7l);
         user.setEmail("dev@smarttrace.com.au");
+        user.setTemperatureUnits(TemperatureUnits.Fahrenheit);
+        user.setTimeZone(TimeZone.getTimeZone("UTC"));
         return user;
     }
     /**
