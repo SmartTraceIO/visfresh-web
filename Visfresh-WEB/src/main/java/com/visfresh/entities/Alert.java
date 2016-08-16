@@ -19,6 +19,13 @@ public class Alert extends NotificationIssue {
     public Alert() {
         super();
     }
+    /**
+     * @param type alert type.
+     */
+    public Alert(final AlertType type) {
+        super();
+        this.type = type;
+    }
 
     /**
      * @return the type

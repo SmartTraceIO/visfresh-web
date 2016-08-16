@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 /**
@@ -32,7 +34,8 @@ public class ShipmentReportBean {
 
     //temperature history
     private String alertProfile;
-    private final List<AlertBean> alertsFired = new LinkedList<>();
+    private final List<AlertRule> firedAlertRules = new LinkedList<>();
+    private final List<Alert> alerts = new LinkedList<>();
     private final List<String> whoWasNotified = new LinkedList<>();
     /**
      * Total time of monitoring: 234hrs
@@ -238,8 +241,14 @@ public class ShipmentReportBean {
     /**
      * @return the alertsFired
      */
-    public List<AlertBean> getAlertsFired() {
-        return alertsFired;
+    public List<AlertRule> getFiredAlertRules() {
+        return firedAlertRules;
+    }
+    /**
+     * @return the alerts
+     */
+    public List<Alert> getAlerts() {
+        return alerts;
     }
     /**
      * @return the whoWasNotified

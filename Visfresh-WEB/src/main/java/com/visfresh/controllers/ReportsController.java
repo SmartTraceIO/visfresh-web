@@ -186,7 +186,7 @@ public class ReportsController extends AbstractController {
         }
 
         //create report bean.
-        final ShipmentReportBean bean = shipmentReportDao.createReport(s, user);
+        final ShipmentReportBean bean = shipmentReportDao.createReport(s);
 
         //create tmp file with report PDF content.
         final File file = fileDownload.createTmpFile(createFileName(s));

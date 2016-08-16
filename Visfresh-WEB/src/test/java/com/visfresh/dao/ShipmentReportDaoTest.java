@@ -5,7 +5,6 @@ package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
 
-import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -23,13 +22,15 @@ import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
-import com.visfresh.l12n.NotificationBundle;
-import com.visfresh.mpl.services.NotificationServiceImpl;
 import com.visfresh.reports.shipment.ShipmentReportBean;
+import com.visfresh.rules.AbstractRuleEngine;
+import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.services.NotificationService;
 import com.visfresh.utils.DateTimeUtils;
 
 /**
@@ -104,7 +105,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment, user);
+        final ShipmentReportBean report = dao.createReport(shipment);
 
         assertEquals(shipment.getDevice().getImei(), report.getDevice());
         assertEquals(tripCount, report.getTripCount());
@@ -141,7 +142,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment, user);
+        final ShipmentReportBean report = dao.createReport(shipment);
 
         final DateFormat fmt = DateTimeUtils.createPrettyFormat(
                 user.getLanguage(), user.getTimeZone());
@@ -153,17 +154,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
     }
     @Test
     public void testTemperature() {
-        final AlertProfile ap = new AlertProfile();
-
-        final double upperTemperatureLimit = 15.3;
-        final double lowerTemperatureLimit = -11.2;
-
-        ap.setName("JUnit Alerts");
-        ap.setUpperTemperatureLimit(upperTemperatureLimit);
-        ap.setLowerTemperatureLimit(lowerTemperatureLimit);
-        ap.setCompany(sharedCompany);
-
-        context.getBean(AlertProfileDao.class).save(ap);
+        final AlertProfile ap = createAlertProfile();
 
         shipment.setAlertProfile(ap);
         shipmentDao.save(shipment);
@@ -181,7 +172,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         createTrackerEvent(startTime + 8 * dt, -20.3);
         createTrackerEvent(startTime + 9 * dt, 0);
 
-        final ShipmentReportBean report = dao.createReport(shipment, user);
+        final ShipmentReportBean report = dao.createReport(shipment);
 
         final List<TrackerEvent> events = context.getBean(TrackerEventDao.class).findAll(
                 null, null, null);
@@ -198,16 +189,58 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         assertEquals(8 * dt, report.getTotalTime());
     }
 
+    /**
+     * @return
+     */
+    protected AlertProfile createAlertProfile() {
+        final AlertProfile ap = new AlertProfile();
+
+        ap.setName("JUnit Alerts");
+        ap.setUpperTemperatureLimit(15.3);
+        ap.setLowerTemperatureLimit(-11.2);
+        ap.setCompany(sharedCompany);
+
+        context.getBean(AlertProfileDao.class).save(ap);
+        return ap;
+    }
+
     @Test
-    public void testAlertFired() {
+    public void testFiredAlertRules() {
         final TrackerEvent e = createTrackerEvent(System.currentTimeMillis(), -10);
 
-        final Alert alert = createAlert(e);
+        final Alert a1 = createAlert(e);
         createAlert(e);
 
-        final ShipmentReportBean report = dao.createReport(shipment, user);
-        assertEquals(2, report.getAlertsFired().size());
-        assertEquals(alert.getType(), report.getAlertsFired().get(0).getType());
+        final TemperatureRule rule = new TemperatureRule();
+        rule.setType(a1.getType());
+        rule.setTemperature(e.getTemperature());
+
+        final AlertProfile ap = createAlertProfile();
+        ap.getAlertRules().add(rule);
+
+        shipment.setAlertProfile(ap);
+        shipmentDao.save(shipment);
+
+        final ShipmentSession session = new ShipmentSession();
+        AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
+        AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
+        context.getBean(ShipmentSessionDao.class).saveSession(shipment, session);
+
+        final ShipmentReportBean report = dao.createReport(shipment);
+        assertEquals(1, report.getFiredAlertRules().size());
+        assertEquals(a1.getType(), report.getFiredAlertRules().get(0).getType());
+    }
+    @Test
+    public void testAlerts() {
+        final TrackerEvent e = createTrackerEvent(System.currentTimeMillis(), -10);
+
+        final Alert a1 = createAlert(e);
+        createAlert(e);
+        shipmentDao.save(shipment);
+
+        final ShipmentReportBean report = dao.createReport(shipment);
+        assertEquals(2, report.getAlerts().size());
+        assertEquals(a1.getType(), report.getAlerts().get(0).getType());
     }
     @Test
     public void testWhoNotified() throws Exception {
@@ -234,33 +267,13 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         shipment.getAlertsNotificationSchedules().add(ns);
         shipmentDao.save(shipment);
 
-        final NotificationServiceImpl notificator = new NotificationServiceImpl();
-        injectDependency(notificator, context.getBean(NotificationDao.class));
-        injectDependency(notificator, new NotificationBundle());
+        final NotificationService notificator = context.getBean(NotificationService.class);
 
         notificator.sendNotification(s1, a1, e);
         notificator.sendNotification(s2, a2, e);
 
-        final ShipmentReportBean report = dao.createReport(shipment, user);
+        final ShipmentReportBean report = dao.createReport(shipment);
         assertEquals(2, report.getWhoWasNotified().size());
-    }
-
-    /**
-     * @param target
-     * @param depenency
-     */
-    private void injectDependency(final Object target, final Object depenency) throws Exception {
-        final Class<?> clazz = depenency.getClass();
-
-        final Field[] fields = target.getClass().getDeclaredFields();
-        for (final Field field : fields) {
-            if (field.getType().isAssignableFrom(clazz)) {
-                field.setAccessible(true);
-                if (field.get(target) == null) {
-                    field.set(target, depenency);
-                }
-            }
-        }
     }
 
     /**

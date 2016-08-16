@@ -32,13 +32,13 @@ import net.sf.dynamicreports.report.builder.component.ComponentBuilder;
 import net.sf.dynamicreports.report.builder.component.Components;
 import net.sf.dynamicreports.report.builder.component.HorizontalListBuilder;
 import net.sf.dynamicreports.report.builder.component.ImageBuilder;
+import net.sf.dynamicreports.report.builder.component.MultiPageListBuilder;
 import net.sf.dynamicreports.report.builder.component.TextFieldBuilder;
 import net.sf.dynamicreports.report.builder.component.VerticalListBuilder;
 import net.sf.dynamicreports.report.builder.style.BorderBuilder;
 import net.sf.dynamicreports.report.builder.style.ConditionalStyleBuilder;
 import net.sf.dynamicreports.report.builder.style.FontBuilder;
 import net.sf.dynamicreports.report.builder.style.PenBuilder;
-import net.sf.dynamicreports.report.builder.style.SimpleStyleBuilder;
 import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.builder.style.Styles;
 import net.sf.dynamicreports.report.constant.ComponentPositionType;
@@ -49,6 +49,7 @@ import net.sf.dynamicreports.report.constant.LineStyle;
 import net.sf.dynamicreports.report.constant.SplitType;
 import net.sf.dynamicreports.report.constant.StretchType;
 import net.sf.dynamicreports.report.constant.TimePeriod;
+import net.sf.dynamicreports.report.constant.VerticalTextAlignment;
 import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.dynamicreports.report.definition.ReportParameters;
 import net.sf.dynamicreports.report.definition.chart.DRIChartCustomizer;
@@ -58,15 +59,18 @@ import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.controllers.UtilitiesController;
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
+import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.Colors;
 import com.visfresh.reports.TableSupport;
 import com.visfresh.utils.DateTimeUtils;
@@ -82,6 +86,9 @@ public class ShipmentReportBuilder {
     private static final int MIDDLE_PAGE = 295;
     private static final int DEFAULT_FONT_SIZE = 10;
     private static final int DEFAULT_PADDING = 6;
+
+    @Autowired
+    protected RuleBundle ruleBundle;
 
     /**
      * Default constructor.
@@ -105,7 +112,7 @@ public class ShipmentReportBuilder {
             final ShipmentReportBean bean, final User user) throws IOException {
 
         final JasperReportBuilder report = DynamicReports.report();
-        report.setTitleSplitType(SplitType.IMMEDIATE);
+        report.setDetailSplitType(SplitType.IMMEDIATE);
         report.setShowColumnTitle(false);
 
         report.title(createTitle(bean, user));
@@ -137,7 +144,7 @@ public class ShipmentReportBuilder {
         body.add(Components.gap(1, gap));
 
         //add alerts table
-        body.add(createAlertsTable(bean));
+        body.add(createAlertsTable(bean, user));
         body.add(Components.gap(1, gap));
 
         //add temperature chart
@@ -198,8 +205,11 @@ public class ShipmentReportBuilder {
                 final DateAxis axis = (DateAxis) plot.getDomainAxis();
                 axis.setDateFormatOverride(fmt);
 
-                final XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer(0);
+                final TemperatureChartRenderer renderer = new TemperatureChartRenderer();
+                addFiredAlerts(renderer, bean);
+                plot.setRenderer(0, renderer);
                 renderer.setSeriesShape(0, new Rectangle(0, 0));
+                renderer.setLegendShape(0, new Rectangle(-1, -1, 2, 2));
             }
         });
 
@@ -207,37 +217,72 @@ public class ShipmentReportBuilder {
     }
 
     /**
+     * @param renderer
+     * @param bean
+     */
+    protected void addFiredAlerts(final TemperatureChartRenderer renderer,
+            final ShipmentReportBean bean) {
+        for (final Alert a : bean.getAlerts()) {
+            final int index = indexOf(bean.getReadings(), a.getTrackerEventId());
+            if (index > -1) {
+                renderer.addFiredAlerts(index, a.getType());
+            }
+        }
+    }
+
+    /**
+     * @param readings
+     * @param trackerEventId
+     * @return
+     */
+    private int indexOf(final List<ShortTrackerEvent> readings, final Long trackerEventId) {
+        int index = 0;
+        for (final ShortTrackerEvent e : readings) {
+            if (e.getId().equals(trackerEventId)) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+
+    /**
      * @param bean
      * @return
      */
-    private ComponentBuilder<?, ?> createAlertsTable(final ShipmentReportBean bean) {
+    private ComponentBuilder<?, ?> createAlertsTable(final ShipmentReportBean bean, final User user) {
 
         final JasperReportBuilder report = new JasperReportBuilder();
 
         final String[] columns = {"key", "value"};
-
-        //header
-        final BorderBuilder separator = Styles.border(Styles.pen(0f, LineStyle.SOLID));
-        separator.setLeftPen(Styles.pen1Point().setLineColor(Colors.CELL_BORDER));
+        final PenBuilder borderPen = Styles.pen1Point().setLineColor(Colors.CELL_BORDER);
 
         //first column
-        final VerticalListBuilder alertListView = buildAlertViewList(bean);
+        final ComponentBuilder<?, ?> alertListView = buildAlertViewList(bean, user.getTemperatureUnits());
+        alertListView.setStyle(Styles.style()
+                .setRightBorder(borderPen));
 
         final ComponentColumnBuilder alertsColumn = Columns.componentColumn(columns[0], alertListView);
+        alertsColumn.setStyle(Styles.style()
+                .setRightBorder(borderPen));
         alertsColumn.setTitle("Alert Fired");
         alertsColumn.setTitleStyle(Styles.style(createStyleByFont(DEFAULT_FONT_SIZE, true)
-                .setPadding(DEFAULT_PADDING)));
+                .setPadding(DEFAULT_PADDING)
+                .setBottomBorder(borderPen)));
         alertsColumn.setFixedWidth(MIDDLE_PAGE);
 
         //second column
         final TextColumnBuilder<String> whoNotifiedView = Columns.column(columns[1], String.class);
         whoNotifiedView.setStretchWithOverflow(true);
         whoNotifiedView.setStyle(Styles.style(createStyleByFont(DEFAULT_FONT_SIZE, false)
-                    .setPadding(DEFAULT_PADDING).setBorder(separator)));
-
+                .setPadding(DEFAULT_PADDING)
+                .setLeftBorder(borderPen)));
         whoNotifiedView.setTitle("Sent To");
         whoNotifiedView.setTitleStyle(Styles.style(createStyleByFont(DEFAULT_FONT_SIZE, true)
-                .setPadding(DEFAULT_PADDING)).setBorder(separator));
+                .setPadding(DEFAULT_PADDING))
+                .setBottomBorder(borderPen)
+                .setLeftBorder(borderPen));
 
         report.columns(alertsColumn, whoNotifiedView);
 
@@ -247,12 +292,7 @@ public class ShipmentReportBuilder {
 
         report.setDataSource(ds);
         report.setShowColumnTitle(true);
-        report.setHighlightDetailEvenRows(true);
-
-        final SimpleStyleBuilder rowStyle = Styles.simpleStyle();
-        rowStyle.setBackgroundColor(Colors.CELL_BG);
-        rowStyle.setTopBorder(Styles.pen1Point().setLineColor(Colors.CELL_BORDER));
-        report.setDetailEvenRowStyle(rowStyle);
+        report.setDetailStyle(Styles.style().setBackgroundColor(Colors.CELL_BG));
 
         //create subreport with border
         final VerticalListBuilder sub = Components.verticalList(Components.subreport(report));
@@ -265,20 +305,22 @@ public class ShipmentReportBuilder {
      * @param bean
      * @return
      */
-    private VerticalListBuilder buildAlertViewList(final ShipmentReportBean bean) {
-        final VerticalListBuilder list = Components.verticalList();
+    private ComponentBuilder<?, ?> buildAlertViewList(final ShipmentReportBean bean, final TemperatureUnits units) {
+        final MultiPageListBuilder list = Components.multiPageList();
         list.setStretchType(StretchType.RELATIVE_TO_TALLEST_OBJECT);
+        list.setPositionType(ComponentPositionType.FIX_RELATIVE_TO_TOP);
         list.setWidth(150);
 
-        if (bean.getAlertsFired().isEmpty()) {
+        if (bean.getFiredAlertRules().isEmpty()) {
             //build one component for avoid of confuse the cell
             list.add(Components.text("        "));
         } else {
             final Map<AlertType, Image> alertImageMap = loadAlertImages();
 
-            for (final AlertBean alert: bean.getAlertsFired()) {
+            for (final AlertRule alert: bean.getFiredAlertRules()) {
                 //create alert component
                 final HorizontalListBuilder alertView = Components.horizontalList();
+                alertView.setStyle(Styles.style().setLeftPadding(DEFAULT_PADDING));
 
                 //image
                 final ImageBuilder image = Components.image(alertImageMap.get(alert.getType()));
@@ -289,9 +331,10 @@ public class ShipmentReportBuilder {
                 alertView.add(Components.hListCell(image).heightFixedOnMiddle());
 
                 //text
-                alertView.add(Components.text(alert.getText())
+                alertView.add(Components.text(ruleBundle.buildDescription(alert, units))
                         .setStyle(createStyleByFont(DEFAULT_FONT_SIZE, true)
-                            .setPadding(DEFAULT_PADDING)));
+                            .setPadding(DEFAULT_PADDING)
+                            .setVerticalTextAlignment(VerticalTextAlignment.TOP)));
 
                 list.add(alertView);
             }
@@ -304,21 +347,9 @@ public class ShipmentReportBuilder {
      * @return
      */
     public static Map<AlertType, Image> loadAlertImages() {
-        final String resourcePath = "reports/images/shipment/alert";
-
         final Map<AlertType, Image> map = new HashMap<>();
         for (final AlertType type : AlertType.values()) {
-            final URL url = ShipmentReportBuilder.class.getClassLoader().getResource(
-                    resourcePath + type.name() + ".png");
-            if (url == null) {
-                throw new RuntimeException("Image not found for alert " + type);
-            }
-
-            try {
-                map.put(type, ImageIO.read(url));
-            } catch (final IOException e) {
-                throw new RuntimeException("Unable to load image", e);
-            }
+            map.put(type, TemperatureChartRenderer.loadAlertImage(type));
         }
         return map;
     }

@@ -23,10 +23,9 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
-import com.visfresh.l12n.ChartBundle;
-import com.visfresh.reports.shipment.AlertBean;
 import com.visfresh.reports.shipment.ArrivalBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
+import com.visfresh.services.RuleEngine;
 import com.visfresh.utils.EntityUtils;
 
 /**
@@ -47,6 +46,8 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
     private TrackerEventDao trackerEventDao;
     @Autowired
     private NotificationDao notificationDao;
+    @Autowired
+    private RuleEngine ruleEngine;
 
     /**
      * Default constructor.
@@ -59,14 +60,14 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @see com.visfresh.dao.ShipmentReportDao#createReport(com.visfresh.entities.Shipment)
      */
     @Override
-    public ShipmentReportBean createReport(final Shipment s, final User user) {
+    public ShipmentReportBean createReport(final Shipment s) {
         final ShipmentReportBean bean = new ShipmentReportBean();
         if (s.getArrivalDate() != null) {
             addArrival(s, bean);
             bean.setDateArrived(s.getArrivalDate());
         }
 
-        bean.setCompanyName(user.getCompany().getName());
+        bean.setCompanyName(s.getCompany().getName());
         bean.setAssetNum(s.getAssetNum());
         bean.setComment(s.getCommentsForReceiver());
         bean.setDateShipped(s.getShipmentDate());
@@ -90,7 +91,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
 
         //add temperature history
-        addTemperatureHistory(s, events, bean, user);
+        addTemperatureHistory(s, events, bean);
         return bean;
     }
     /**
@@ -98,7 +99,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @param bean shipment report bean
      */
     private void addTemperatureHistory(final Shipment s,
-            final List<TrackerEvent> events, final ShipmentReportBean bean, final User user) {
+            final List<TrackerEvent> events, final ShipmentReportBean bean) {
         if (s.getAlertProfile() != null) {
             final AlertProfile ap = s.getAlertProfile();
             bean.setAlertProfile(ap.getName());
@@ -106,20 +107,16 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             bean.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
         }
 
-
         //add fired alerts
-        final ChartBundle chartBundle = new ChartBundle();
-        final List<Alert> alerts = alertDao.getAlerts(s);
-        for (final Alert a : alerts) {
-            bean.getAlertsFired().add(new AlertBean(a.getType(), chartBundle.buildDescription(
-                    a, EntityUtils.getEntity(events, a.getTrackerEventId()),
-                    user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits())));
-        }
+        bean.getFiredAlertRules().addAll(ruleEngine.getAlertFired(s));
 
         //create alert map
         final Map<Long, User> notifiedPersons = new HashMap<>();
 
         //add notified persons
+        final List<Alert> alerts = alertDao.getAlerts(s);
+        bean.getAlerts().addAll(alerts);
+
         final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(alerts));
         for (final Notification n : notifs) {
             notifiedPersons.put(n.getUser().getId(), n.getUser());

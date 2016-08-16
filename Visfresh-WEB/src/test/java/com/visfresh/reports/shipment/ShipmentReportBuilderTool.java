@@ -10,24 +10,43 @@ import java.util.TimeZone;
 
 import net.sf.dynamicreports.report.exception.DRException;
 
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.ShortTrackerEventWithAlerts;
+import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.l12n.RuleBundle;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public final class ShipmentReportBuilderTool {
+    private static Device device = createDevice();
+    private static Random random = new Random();
+    private static long lastId;
 
     /**
      * Default constructor.
      */
     public ShipmentReportBuilderTool() {
         super();
+    }
+
+    /**
+     * @return
+     */
+    private static Device createDevice() {
+        final Device d = new Device();
+        d.setImei("1920387091287439");
+        return d;
     }
 
     /**
@@ -42,9 +61,10 @@ public final class ShipmentReportBuilderTool {
         return user;
     }
     /**
+     * @param user TODO
      * @return the bean to visualize.
      */
-    private static ShipmentReportBean createPerformanceBean() {
+    private static ShipmentReportBean createPerformanceBean(final User user) {
         final ShipmentReportBean bean = new ShipmentReportBean();
 
         bean.setCompanyName("Test Company");
@@ -53,7 +73,7 @@ public final class ShipmentReportBuilderTool {
         bean.setDateArrived(new Date(System.currentTimeMillis() - 100000000));
         bean.setDateShipped(new Date(System.currentTimeMillis() - 1000000000));
         bean.setDescription("Autostarted by rule");
-        bean.setDevice("1920387091287439");
+        bean.setDevice(device.getImei());
         bean.setNumberOfSiblings(3);
         bean.setPalletId("pallet-007");
         bean.setShippedFrom("Sidney");
@@ -89,6 +109,7 @@ public final class ShipmentReportBuilderTool {
         final Random random = new Random();
         for (int i = 0; i < numReadings; i++) {
             final ShortTrackerEventWithAlerts e = new ShortTrackerEventWithAlerts();
+            e.setId(++lastId);
             e.setLatitude(lat0 + i * dlat);
             e.setLongitude(lon0 + i * dlon);
             e.setTemperature(11. + random.nextDouble() * 3.);
@@ -113,10 +134,71 @@ public final class ShipmentReportBuilderTool {
         bean.getWhoWasNotified().add("user1@smarttrace.com.au");
         bean.getWhoWasNotified().add("user2@smarttrace.com.au");
 
-        bean.getAlertsFired().add(new AlertBean(AlertType.Cold, "<0.0°C for 60 min"));
-        bean.getAlertsFired().add(new AlertBean(AlertType.Hot, ">0.0°C for 30 min"));
+        addFiredAlert(bean, new AlertRule(AlertType.MovementStart));
+        addFiredAlert(bean, AlertType.Cold, 0., 60 * 1000l);
+        addFiredAlert(bean, AlertType.Hot, 10., 30 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalHot, 40., 10 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalHot, 50., 30 * 1000l);
+        addFiredAlert(bean, new AlertRule(AlertType.LightOn));
+        addFiredAlert(bean, new AlertRule(AlertType.LightOff));
+        addFiredAlert(bean, AlertType.Cold, 0., 60 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalCold, -5., 30 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalCold, -10.5, 10 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalHot, 60., 30 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalHot, 70., 30 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalHot, 50., 30 * 1000l);
+        addFiredAlert(bean, new AlertRule(AlertType.LightOn));
+        addFiredAlert(bean, new AlertRule(AlertType.LightOff));
+        addFiredAlert(bean, AlertType.Cold, 0., 60 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalCold, -5., 30 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalCold, -10.5, 10 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalHot, 60., 30 * 1000l);
+        addFiredAlert(bean, AlertType.CriticalHot, 70., 30 * 1000l);
 
         return bean;
+    }
+    /**
+     * @param bean TODO
+     * @param type
+     * @param temperature
+     * @param time
+     */
+    private static void addFiredAlert(final ShipmentReportBean bean, final AlertType type,
+            final double temperature, final long time) {
+        final TemperatureRule rule = new TemperatureRule();
+        rule.setType(type);
+        rule.setTemperature(temperature);
+        rule.setTimeOutMinutes((int) (time / (60 * 1000l)));
+        addFiredAlert(bean, rule);
+    }
+    /**
+     * @param bean
+     * @param rule
+     */
+    private static void addFiredAlert(final ShipmentReportBean bean,
+            final AlertRule rule) {
+        final ShortTrackerEvent e = bean.getReadings().get(random.nextInt(bean.getReadings().size()));
+        Alert alert;
+        if (rule instanceof TemperatureRule) {
+            final TemperatureRule tr = (TemperatureRule) rule;
+
+            final TemperatureAlert ta = new TemperatureAlert();
+            ta.setType(rule.getType());
+            ta.setTemperature(e.getTemperature());
+            ta.setCumulative(tr.isCumulativeFlag());
+            ta.setMinutes(tr.getTimeOutMinutes());
+
+            alert = ta;
+        } else {
+            alert = new Alert(rule.getType());
+        }
+
+        alert.setDate(e.getTime());
+        alert.setDevice(device);
+        alert.setTrackerEventId(e.getId());
+
+        bean.getAlerts().add(alert);
+        bean.getFiredAlertRules().add(rule);
     }
     /**
      * @param bean
@@ -126,11 +208,16 @@ public final class ShipmentReportBuilderTool {
      */
     public static void showShipmentReport(final ShipmentReportBean bean, final User user)
             throws DRException, IOException {
-        final ShipmentReportBuilder builder = new ShipmentReportBuilder();
+        final ShipmentReportBuilder builder = new ShipmentReportBuilder() {
+            {
+                this.ruleBundle = new RuleBundle();
+            }
+        };
         builder.createReport(bean, user).show();
     }
 
     public static void main(final String[] args) throws Exception {
-        showShipmentReport(createPerformanceBean(), createUser());
+        final User user = createUser();
+        showShipmentReport(createPerformanceBean(user), user);
     }
 }

@@ -4,7 +4,6 @@
 package com.visfresh.dao;
 
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.User;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 
 /**
@@ -14,8 +13,7 @@ import com.visfresh.reports.shipment.ShipmentReportBean;
 public interface ShipmentReportDao {
     /**
      * @param s shipment.
-     * @param user user.
      * @return shipment report bean.
      */
-    ShipmentReportBean createReport(Shipment s, User user);
+    ShipmentReportBean createReport(Shipment s);
 }
