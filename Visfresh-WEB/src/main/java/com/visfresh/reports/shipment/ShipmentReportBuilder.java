@@ -3,9 +3,18 @@
  */
 package com.visfresh.reports.shipment;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
@@ -59,6 +68,8 @@ import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.XYPlot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -73,6 +84,8 @@ import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.Colors;
 import com.visfresh.reports.TableSupport;
+import com.visfresh.reports.geomap.MapImageBuilder;
+import com.visfresh.reports.geomap.RenderedMap;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.StringUtils;
@@ -83,12 +96,15 @@ import com.visfresh.utils.StringUtils;
  */
 @Component
 public class ShipmentReportBuilder {
+    private static final Logger log = LoggerFactory.getLogger(ShipmentReportBuilder.class);
+
     private static final int MIDDLE_PAGE = 295;
     private static final int DEFAULT_FONT_SIZE = 10;
     private static final int DEFAULT_PADDING = 6;
 
     @Autowired
     protected RuleBundle ruleBundle;
+    private MapImageBuilder mapBuilder = new MapImageBuilder();
 
     /**
      * Default constructor.
@@ -134,6 +150,7 @@ public class ShipmentReportBuilder {
         shipmentDescAndMap.add(createShipmentDescription(bean, user));
         shipmentDescAndMap.add(Components.gap(gap, 1));
         final ComponentBuilder<?, ?> map = createMap(bean);
+//        map.setFixedWidth(MIDDLE_PAGE);
         shipmentDescAndMap.add(map);
 
         body.add(shipmentDescAndMap);
@@ -183,7 +200,7 @@ public class ShipmentReportBuilder {
                     + ")"))
             .setTimePeriodType(TimePeriod.MINUTE)
             .series(
-                Charts.serie(Columns.column(temperature, Double.class))
+                Charts.serie(Columns.column(temperature, java.lang.Double.class))
                 .setLabel("Temperature "
                         + LocalizationUtils.getDegreeSymbol(user.getTemperatureUnits())))
             .seriesColors(Colors.DEFAULT_GREEN);
@@ -307,7 +324,7 @@ public class ShipmentReportBuilder {
      */
     private ComponentBuilder<?, ?> buildAlertViewList(final ShipmentReportBean bean, final TemperatureUnits units) {
         final MultiPageListBuilder list = Components.multiPageList();
-        list.setStretchType(StretchType.RELATIVE_TO_TALLEST_OBJECT);
+        list.setStretchType(StretchType.CONTAINER_HEIGHT);
         list.setPositionType(ComponentPositionType.FIX_RELATIVE_TO_TOP);
         list.setWidth(150);
 
@@ -326,7 +343,7 @@ public class ShipmentReportBuilder {
                 final ImageBuilder image = Components.image(alertImageMap.get(alert.getType()));
                 image.setFixedDimension(16, 16);
                 image.setImageScale(ImageScale.RETAIN_SHAPE);
-                image.setStretchType(StretchType.RELATIVE_TO_BAND_HEIGHT);
+                image.setStretchType(StretchType.CONTAINER_HEIGHT);
 
                 alertView.add(Components.hListCell(image).heightFixedOnMiddle());
 
@@ -481,9 +498,82 @@ public class ShipmentReportBuilder {
      * @return
      */
     private ComponentBuilder<?, ?> createMap(final ShipmentReportBean bean) {
-        return Components.text("There will be Map").setFixedWidth(MIDDLE_PAGE);
+        if (bean.getReadings().size() != 0) {
+            final int w = 300;
+            final int h = 96;
+
+            final List<Point2D> coords = new LinkedList<>();
+
+            for (final ShortTrackerEvent e : bean.getReadings()) {
+                coords.add(new Point2D.Double(e.getLongitude(), e.getLatitude()));
+            }
+
+            try {
+                final Dimension size = new Dimension(w, h);
+                final RenderedMap rim = mapBuilder.createMapImage(coords, size);
+                final BufferedImage image = scaleMapAndAddPath(rim, coords, size);
+
+                final ImageBuilder builder = Components.image(image);
+                builder.setFixedDimension(w, h);
+                builder.setImageScale(ImageScale.RETAIN_SHAPE);
+                return builder;
+            } catch (final IOException exc) {
+                log.error("Faile to load tiles from openstreet map", exc);
+            }
+        }
+
+        return Components.text("openstreetmap service is unavailable now");
     }
 
+
+    /**
+     * @param rim
+     * @param coords
+     */
+    private BufferedImage scaleMapAndAddPath(final RenderedMap rim, final List<Point2D> coords, final Dimension size) {
+        double scale = 1.;
+        final boolean scaleChanged = rim.getMap().getWidth() != size.width || rim.getMap().getHeight() != size.height;
+        if (scaleChanged) {
+            scale = (double) size.width / rim.getMap().getWidth();
+            //scale image
+        }
+
+        final BufferedImage image = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g = image.createGraphics();
+        try {
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+            if (scaleChanged) {
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                g.drawImage(rim.getMap(), AffineTransform.getScaleInstance(scale, scale), null);
+            } else {
+                g.drawImage(rim.getMap(), 0, 0, null);
+            }
+
+            //create path shape
+            final Point loc = rim.getMapLocation();
+            final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+            final int zoom = rim.getZoom();
+
+            for (final Point2D p : coords) {
+                final int x = (int) Math.round(scale * (MapImageBuilder.lon2position(p.getX(), zoom) - loc.x));
+                final int y = (int) Math.round(scale * (MapImageBuilder.lat2position(p.getY(), zoom) - loc.y));
+                if (path.getCurrentPoint() == null) {
+                    path.moveTo(x, y);
+                } else {
+                    path.lineTo(x, y);
+                }
+            }
+
+            g.setStroke(new BasicStroke(2.f));
+            g.setColor(Color.GREEN.darker());
+            g.draw(path);
+        } finally {
+            g.dispose();
+        }
+
+        return image;
+    }
 
     /**
      * @param bean
@@ -546,7 +636,7 @@ public class ShipmentReportBuilder {
                 return (Image) rows.get(row - 1).get(images);
             }
         });
-        imageBuilder.setStretchType(StretchType.RELATIVE_TO_BAND_HEIGHT);
+        imageBuilder.setStretchType(StretchType.CONTAINER_HEIGHT);
         imageBuilder.setHorizontalImageAlignment(HorizontalImageAlignment.CENTER);
         imageBuilder.setStyle(Styles.style().setPadding(DEFAULT_PADDING));
         imageBuilder.setImageScale(ImageScale.RETAIN_SHAPE);

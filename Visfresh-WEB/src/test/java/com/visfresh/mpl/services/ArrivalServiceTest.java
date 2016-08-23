@@ -27,7 +27,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.SessionHolder;
 import com.visfresh.rules.state.ShipmentSession;
-import com.visfresh.utils.LocationTestUtils;
+import com.visfresh.utils.LocationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -60,7 +60,7 @@ public class ArrivalServiceTest extends ArrivalServiceImpl {
         loc.setRadius(radius);
 
         final Location l = new Location(loc.getLocation().getLatitude(), 0);
-        final double distance = LocationTestUtils.getLongitudeDiff(l.getLatitude(), radius);
+        final double distance = LocationUtils.getLongitudeDiff(l.getLatitude(), radius);
 
         l.setLongitude(loc.getLocation().getLongitude() + distance + 100);
         assertFalse(isNearLocation(loc, l));
@@ -74,7 +74,7 @@ public class ArrivalServiceTest extends ArrivalServiceImpl {
         final LocationProfile loc = createLocation();
         loc.setRadius(1500);
 
-        final double distance = LocationTestUtils.getLongitudeDiff(
+        final double distance = LocationUtils.getLongitudeDiff(
                 loc.getLocation().getLatitude(), loc.getRadius());
 
         final Location l = new Location(
@@ -107,7 +107,7 @@ public class ArrivalServiceTest extends ArrivalServiceImpl {
         final LocationProfile loc = createLocation();
         loc.setRadius(1500);
 
-        final double distance = LocationTestUtils.getLongitudeDiff(
+        final double distance = LocationUtils.getLongitudeDiff(
                 loc.getLocation().getLatitude(), loc.getRadius());
 
         final Location l = new Location(
@@ -142,7 +142,7 @@ public class ArrivalServiceTest extends ArrivalServiceImpl {
         final LocationProfile loc = createLocation();
         loc.setRadius(1500);
 
-        final double distance = LocationTestUtils.getLongitudeDiff(
+        final double distance = LocationUtils.getLongitudeDiff(
                 loc.getLocation().getLatitude(), loc.getRadius());
 
         final Location l = new Location(
@@ -177,7 +177,7 @@ public class ArrivalServiceTest extends ArrivalServiceImpl {
         final LocationProfile loc = createLocation();
         loc.setRadius(1500);
 
-        final double distance = LocationTestUtils.getLongitudeDiff(
+        final double distance = LocationUtils.getLongitudeDiff(
                 loc.getLocation().getLatitude(), loc.getRadius());
 
         final Location l = new Location(
@@ -212,7 +212,7 @@ public class ArrivalServiceTest extends ArrivalServiceImpl {
         final LocationProfile loc = createLocation();
         loc.setRadius(1500);
 
-        final double distance = LocationTestUtils.getLongitudeDiff(
+        final double distance = LocationUtils.getLongitudeDiff(
                 loc.getLocation().getLatitude(), loc.getRadius());
 
         final Location l = new Location(
@@ -247,7 +247,7 @@ public class ArrivalServiceTest extends ArrivalServiceImpl {
         final LocationProfile loc = createLocation();
         loc.setRadius(1500);
 
-        final double distance = LocationTestUtils.getLongitudeDiff(
+        final double distance = LocationUtils.getLongitudeDiff(
                 loc.getLocation().getLatitude(), loc.getRadius());
 
         final Location l = new Location(
@@ -281,7 +281,7 @@ public class ArrivalServiceTest extends ArrivalServiceImpl {
         final LocationProfile loc = createLocation();
         loc.setRadius(1500);
 
-        final double distance = LocationTestUtils.getLongitudeDiff(
+        final double distance = LocationUtils.getLongitudeDiff(
                 loc.getLocation().getLatitude(), loc.getRadius());
 
         final Location l = new Location(

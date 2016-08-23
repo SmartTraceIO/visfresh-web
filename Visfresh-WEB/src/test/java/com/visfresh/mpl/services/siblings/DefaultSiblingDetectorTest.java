@@ -22,7 +22,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.utils.LocationTestUtils;
+import com.visfresh.utils.LocationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -59,7 +59,7 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationTestUtils.getLongitudeDiff(y0, MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
@@ -87,7 +87,7 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationTestUtils.getLongitudeDiff(y0, MIN_PATH / 10);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH / 10);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01);
@@ -132,7 +132,7 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
     @Test
     public void testIsTimeNotIntersecting() {
         final double lat = 60;
-        final double dlon = LocationTestUtils.getLongitudeDiff(
+        final double dlon = LocationUtils.getLongitudeDiff(
                 lat, MAX_DISTANCE_AVERAGE) / 2.;
         final long min10 = 10 * 60 * 1000l;
 
@@ -157,9 +157,9 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
     @Test
     public void testIsTimeIntersecting() {
         final double lat = 60;
-        final double dlon = LocationTestUtils.getLongitudeDiff(
+        final double dlon = LocationUtils.getLongitudeDiff(
                 lat, MAX_DISTANCE_AVERAGE) / 5.;
-        final double minPath = LocationTestUtils.getLongitudeDiff(lat, MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(lat, MIN_PATH);
         final long min10 = 10 * 60 * 1000l;
 
         long t = 100 * min10;
@@ -210,7 +210,7 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationTestUtils.getLongitudeDiff(y0, MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
@@ -246,7 +246,7 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
         final long dt = 10 * 60 * 1000l;
-        final double minPath = LocationTestUtils.getLongitudeDiff(y0, MIN_PATH);
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;

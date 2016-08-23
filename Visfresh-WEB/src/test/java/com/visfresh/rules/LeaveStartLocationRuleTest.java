@@ -19,7 +19,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.utils.LocationTestUtils;
+import com.visfresh.utils.LocationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -216,7 +216,7 @@ public class LeaveStartLocationRuleTest extends LeaveStartLocationRule {
         final double lon = loc.getLocation().getLongitude();
 
         final TrackerEvent e = createTrackerEvent(s, lat, lon
-                + LocationTestUtils.getLongitudeDiff(lat, lon
+                + LocationUtils.getLongitudeDiff(lat, lon
                 + loc.getRadius() + CONTROL_DISTANCE + 10));
 
         return e;

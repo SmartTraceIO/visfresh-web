@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +49,7 @@ import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
@@ -684,9 +686,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             final OutputStream out, final User user)
             throws IOException {
         final Map<Long, Integer> tripCounts = new HashMap<Long, Integer>();
-        final DateFormat fmt = DateTimeUtils.createDateFormat(
-//                2016-11-23 18:33
-                "yyyy-MM-dd HH:mm", user.getLanguage(), user.getTimeZone());
+        final DateFormat fmt = createCsvDateFormat(user.getLanguage(), user.getTimeZone());
 
         out.write(("id,shipment,time,temperature "
                 + LocalizationUtils.getDegreeSymbol(user.getTemperatureUnits())
@@ -750,6 +750,16 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
 
         out.flush();
+    }
+    /**
+     * @param language
+     * @param timeZone
+     * @return
+     */
+    public static DateFormat createCsvDateFormat(final Language language, final TimeZone timeZone) {
+        return DateTimeUtils.createDateFormat(
+//              2016-11-23 18:33
+              "yyyy-MM-dd HH:mm", language, timeZone);
     }
     /**
      * @param deviceImei

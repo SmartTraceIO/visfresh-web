@@ -24,7 +24,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.mpl.services.ArrivalServiceImpl;
-import com.visfresh.utils.LocationTestUtils;
+import com.visfresh.utils.LocationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -143,7 +143,7 @@ public class ClearShipmentArrivedStateRuleTest extends
         assertTrue(arrivalService.hasEnteredLocations(h.getSession(shipment)));
 
         //test out of location
-        final double distance = LocationTestUtils.getLongitudeDiff(
+        final double distance = LocationUtils.getLongitudeDiff(
                 loc.getLocation().getLongitude(), loc.getRadius() + 300);
         e.setLatitude(e.getLatitude() + distance);
 

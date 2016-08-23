@@ -4,6 +4,8 @@
 package com.visfresh.reports.shipment;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Random;
 import java.util.TimeZone;
@@ -16,13 +18,12 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
-import com.visfresh.entities.ShortTrackerEventWithAlerts;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
-import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -63,8 +64,10 @@ public final class ShipmentReportBuilderTool {
     /**
      * @param user TODO
      * @return the bean to visualize.
+     * @throws ParseException
+     * @throws IOException
      */
-    private static ShipmentReportBean createPerformanceBean(final User user) {
+    private static ShipmentReportBean createPerformanceBean(final User user) throws IOException, ParseException {
         final ShipmentReportBean bean = new ShipmentReportBean();
 
         bean.setCompanyName("Test Company");
@@ -89,35 +92,7 @@ public final class ShipmentReportBuilderTool {
         arrival.setNotifiedWhenKm(40);
         bean.setArrival(arrival);
 
-        //generate events
-        //Sidnay -33°52′10″ 151°12′30″
-        final double lat0 = -33. + 52 / 60.;
-        final double lon0 = 151. + 12 / 60.;
-
-        //Carnarvon 24°52′02″ 113°39′40″
-        final double lat1 = 24. + 52 / 60.;
-        final double lon1 = 113. + 39 / 60.;
-
-        final int numReadings = 150;
-        final double dlat = (lat1 - lat0) / numReadings;
-        final double dlon = (lon1 - lon0) / numReadings;
-
-        //time
-        final long t0 = bean.getDateShipped().getTime();
-        final long dt = (bean.getDateArrived().getTime() - t0) / numReadings;
-
-        final Random random = new Random();
-        for (int i = 0; i < numReadings; i++) {
-            final ShortTrackerEventWithAlerts e = new ShortTrackerEventWithAlerts();
-            e.setId(++lastId);
-            e.setLatitude(lat0 + i * dlat);
-            e.setLongitude(lon0 + i * dlon);
-            e.setTemperature(11. + random.nextDouble() * 3.);
-            e.setBattery(3000 + random.nextInt(15));
-            e.setType(TrackerEventType.AUT);
-            e.setTime(new Date(t0 + i * dt));
-            bean.getReadings().add(e);
-        }
+        addReadings(bean);
 
         final long oneHour = 60 * 60 * 1000l;
 
@@ -157,6 +132,29 @@ public final class ShipmentReportBuilderTool {
 
         return bean;
     }
+    /**
+     * @param bean
+     * @throws ParseException
+     * @throws IOException
+     */
+    private static void addReadings(final ShipmentReportBean bean) throws IOException, ParseException {
+        final String readings = StringUtils.getContent(ShipmentReportBuilderTool.class.getResource("readings.csv"), "UTF-8");
+        final ReadingsParser p = new ReadingsParser();
+        p.setHandler(new ReadingsHandler() {
+            @Override
+            public void handleEvent(final ShortTrackerEvent e, final AlertType[] alerts) {
+                e.setDeviceImei(bean.getDevice());
+                bean.getReadings().add(e);
+            }
+
+            @Override
+            public Long getShipmentId(final String sn, final int tripCount) {
+                return 1l;
+            }
+        });
+        p.parse(new StringReader(readings));
+    }
+
     /**
      * @param bean TODO
      * @param type

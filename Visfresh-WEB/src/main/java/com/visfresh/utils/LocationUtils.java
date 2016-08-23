@@ -26,6 +26,40 @@ public final class LocationUtils {
         final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return earthRadius * c;
     }
+    /**
+     * @param lat the latitude.
+     * @param meters the distance.
+     * @return the longitude delta for given latitude.
+     */
+    public static double getLongitudeDiff(final double lat, final double meters) {
+        final int maxIterations = 100000;
+        int i = 0;
+        double min = 0;
+        double max = 360;
+        double lon = 25.;
+
+        while (true) {
+            final double d = LocationUtils.getDistanceMeters(lat, 0., lat, lon) - meters;
+            if (Math.abs(d - meters) < 0.0000001) {
+                break;
+            }
+
+            if (d > meters) {
+                max = lon;
+            }
+            if (d < meters) {
+                min = lon;
+            }
+            lon = (max + min) / 2.;
+
+            i++;
+            if (i > maxIterations) {
+                throw new RuntimeException("Max iterations " + maxIterations + " exceed");
+            }
+        }
+
+        return lon;
+    }
 
     public static void main(final String[] args) {
 //        | 356689 | 2016-08-09 18:05:54 | AUT  | -33.858152 | 151.052989 |

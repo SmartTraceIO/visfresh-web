@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -82,6 +83,20 @@ public final class StringUtils {
     public static String getContent(final InputStream in, final String encoding) throws IOException {
         final Reader r = new InputStreamReader(in, encoding);
         return getContent(r);
+    }
+    /**
+     * @param in input.
+     * @param encoding character encoding.
+     * @return stream content as string.
+     * @throws IOException
+     */
+    public static String getContent(final URL in, final String encoding) throws IOException {
+        final Reader r = new InputStreamReader(in.openStream(), encoding);
+        try {
+            return getContent(r);
+        } finally {
+            r.close();
+        }
     }
     /**
      * @param r reader.
