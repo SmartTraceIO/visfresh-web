@@ -98,7 +98,6 @@ import com.visfresh.utils.StringUtils;
 public class ShipmentReportBuilder {
     private static final Logger log = LoggerFactory.getLogger(ShipmentReportBuilder.class);
 
-    private static final int MIDDLE_PAGE = 295;
     private static final int DEFAULT_FONT_SIZE = 10;
     private static final int DEFAULT_PADDING = 6;
 
@@ -112,7 +111,6 @@ public class ShipmentReportBuilder {
     public ShipmentReportBuilder() {
         super();
     }
-
 
     public void createReport(final ShipmentReportBean bean,
             final User user, final OutputStream out)
@@ -149,9 +147,7 @@ public class ShipmentReportBuilder {
         final HorizontalListBuilder shipmentDescAndMap = Components.horizontalFlowList();
         shipmentDescAndMap.add(createShipmentDescription(bean, user));
         shipmentDescAndMap.add(Components.gap(gap, 1));
-        final ComponentBuilder<?, ?> map = createMap(bean);
-//        map.setFixedWidth(MIDDLE_PAGE);
-        shipmentDescAndMap.add(map);
+        shipmentDescAndMap.add(createMap(bean));
 
         body.add(shipmentDescAndMap);
         body.add(Components.gap(1, gap));
@@ -272,7 +268,7 @@ public class ShipmentReportBuilder {
 
         final JasperReportBuilder report = new JasperReportBuilder();
 
-        final String[] columns = {"key", "value"};
+        final String[] columns = {"key", "ap", "value"};
         final PenBuilder borderPen = Styles.pen1Point().setLineColor(Colors.CELL_BORDER);
 
         //first column
@@ -287,10 +283,22 @@ public class ShipmentReportBuilder {
         alertsColumn.setTitleStyle(Styles.style(createStyleByFont(DEFAULT_FONT_SIZE, true)
                 .setPadding(DEFAULT_PADDING)
                 .setBottomBorder(borderPen)));
-        alertsColumn.setFixedWidth(MIDDLE_PAGE);
+        alertsColumn.setFixedWidth(200);
 
         //second column
-        final TextColumnBuilder<String> whoNotifiedView = Columns.column(columns[1], String.class);
+        final TextColumnBuilder<String> alertProfile = Columns.column(columns[1], String.class);
+        alertProfile.setStretchWithOverflow(true);
+        alertProfile.setStyle(Styles.style(createStyleByFont(DEFAULT_FONT_SIZE, false)
+                .setPadding(DEFAULT_PADDING)
+                .setLeftBorder(borderPen)));
+        alertProfile.setTitle("Alert Profile");
+        alertProfile.setTitleStyle(Styles.style(createStyleByFont(DEFAULT_FONT_SIZE, true)
+                .setPadding(DEFAULT_PADDING))
+                .setBottomBorder(borderPen)
+                .setLeftBorder(borderPen));
+
+        //second column
+        final TextColumnBuilder<String> whoNotifiedView = Columns.column(columns[2], String.class);
         whoNotifiedView.setStretchWithOverflow(true);
         whoNotifiedView.setStyle(Styles.style(createStyleByFont(DEFAULT_FONT_SIZE, false)
                 .setPadding(DEFAULT_PADDING)
@@ -301,11 +309,11 @@ public class ShipmentReportBuilder {
                 .setBottomBorder(borderPen)
                 .setLeftBorder(borderPen));
 
-        report.columns(alertsColumn, whoNotifiedView);
+        report.columns(alertsColumn, alertProfile, whoNotifiedView);
 
         //add data
         final DRDataSource ds = new DRDataSource(columns);
-        ds.add("xxxxxxxxxxx", StringUtils.combine(bean.getWhoWasNotified(), ", "));
+        ds.add("xxxxxxxxxxx", bean.getAlertProfile(), StringUtils.combine(bean.getWhoWasNotified(), ", "));
 
         report.setDataSource(ds);
         report.setShowColumnTitle(true);
@@ -379,7 +387,13 @@ public class ShipmentReportBuilder {
      */
     private ComponentBuilder<?, ?> createTemperatureTable(
             final ShipmentReportBean bean, final User user) {
-        final String titleText = "TEMPERATURE";
+        String titleText = "TEMPERATURE";
+        if (bean.getAlertSuppressionMinutes() > 0) {
+            titleText += " (excluding "
+                    + LocalizationUtils.formatByOneDecimal(bean.getAlertSuppressionMinutes() / 60l) + "hrs"
+                    + " cooldown period)";
+        }
+
         final VerticalListBuilder list = createStyledVerticalListWithTitle(titleText);
 
         final JasperReportBuilder report = new JasperReportBuilder();
@@ -500,7 +514,7 @@ public class ShipmentReportBuilder {
     private ComponentBuilder<?, ?> createMap(final ShipmentReportBean bean) {
         if (bean.getReadings().size() != 0) {
             final int w = 300;
-            final int h = 96;
+            final int h = 119;
 
             final List<Point2D> coords = new LinkedList<>();
 
@@ -511,13 +525,28 @@ public class ShipmentReportBuilder {
             try {
                 final Dimension size = new Dimension(w, h);
                 final RenderedMap rim = mapBuilder.createMapImage(coords, size);
-                final BufferedImage image = scaleMapAndAddPath(rim, coords, size);
 
-                final ImageBuilder builder = Components.image(image);
-                builder.setFixedDimension(w, h);
-                builder.setImageScale(ImageScale.RETAIN_SHAPE);
-                return builder;
-            } catch (final IOException exc) {
+//                final RenderedMap rim = new RenderedMap();
+//                final BufferedImage bim = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+//                final Graphics g2 = bim.getGraphics();
+//                g2.setColor(Color.BLUE);
+//                g2.fillRect(0, 0, w, h);
+//                g2.dispose();
+//                rim.setMap(bim);
+//                rim.setMapLocation(new Point());
+//                rim.setZoom(14);
+
+                final BufferedImage image = scaleMapAndAddPath(rim, coords, size, bean.getDeviceColor());
+
+                final ImageBuilder ib = Components.image(image);
+                ib.setHorizontalImageAlignment(HorizontalImageAlignment.CENTER);
+                ib.setImageScale(ImageScale.RETAIN_SHAPE);
+                ib.setStretchType(StretchType.CONTAINER_HEIGHT);
+
+                final VerticalListBuilder centerVertical = Components.centerVertical(ib);
+                centerVertical.setFixedDimension(w, h);
+                return centerVertical;
+            } catch (final Exception exc) {
                 log.error("Faile to load tiles from openstreet map", exc);
             }
         }
@@ -530,7 +559,8 @@ public class ShipmentReportBuilder {
      * @param rim
      * @param coords
      */
-    private BufferedImage scaleMapAndAddPath(final RenderedMap rim, final List<Point2D> coords, final Dimension size) {
+    private BufferedImage scaleMapAndAddPath(final RenderedMap rim,
+            final List<Point2D> coords, final Dimension size, final Color color) {
         double scale = 1.;
         final boolean scaleChanged = rim.getMap().getWidth() != size.width || rim.getMap().getHeight() != size.height;
         if (scaleChanged) {
@@ -566,7 +596,7 @@ public class ShipmentReportBuilder {
             }
 
             g.setStroke(new BasicStroke(2.f));
-            g.setColor(Color.GREEN.darker());
+            g.setColor(color);
             g.draw(path);
         } finally {
             g.dispose();
@@ -617,6 +647,12 @@ public class ShipmentReportBuilder {
         arrivalDate.put(key, "Arrival Date");
         arrivalDate.put(value, bean.getDateArrived() == null ? "" : format(user, bean.getDateArrived()));
         rows.add(arrivalDate);
+
+        //shipment status
+        final Map<String, Object> status = new HashMap<>();
+        status.put(key, "Shipment Status");
+        status.put(value, bean.getStatus().name());
+        rows.add(status);
 
         final ColumnBuilder<?, ?>[] cols = new ColumnBuilder<?, ?>[3];
         final StyleBuilder[] styles = new StyleBuilder[cols.length];
@@ -721,10 +757,9 @@ public class ShipmentReportBuilder {
         final StyleBuilder[] styles = new StyleBuilder[cols.length];
 
         //key column
-        final StyleBuilder keyColumnStyle = Styles.style();
-        keyColumnStyle.setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold());
-        keyColumnStyle.setPadding(DEFAULT_PADDING);
-        styles[0] = keyColumnStyle;
+        styles[0] = Styles.style()
+            .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold())
+            .setPadding(DEFAULT_PADDING);
 
         final String key = "key";
         TextColumnBuilder<String> columnBuilder = Columns.column(key, String.class);
@@ -733,10 +768,9 @@ public class ShipmentReportBuilder {
         cols[0] = columnBuilder;
 
         //value column
-        final StyleBuilder valueColumnStyle = Styles.style();
-        valueColumnStyle.setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE));
-        valueColumnStyle.setPadding(DEFAULT_PADDING);
-        styles[1] = valueColumnStyle;
+        styles[1] = Styles.style()
+            .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE))
+            .setPadding(DEFAULT_PADDING);
 
         final String value = "value";
         columnBuilder = Columns.column(value, String.class);
@@ -756,12 +790,16 @@ public class ShipmentReportBuilder {
         final List<Map<String, ?>> rows = new LinkedList<>();
 
         //tracker
-        final Map<String, Object> tracker = new HashMap<>();
+        final Map<String, String> tracker = new HashMap<>();
         tracker.put(key, "Tracker (TripNum)");
         tracker.put(value, getShipmentNumber(bean));
+
+//        final TextFieldBuilder<String> trackerField = Components.text("There will be tracker num");
+//        report.addField(FieldBuilder<.>);
+//        tracker.put(value, trackerField);
         rows.add(tracker);
 
-        //tracker
+        //description
         final Map<String, Object> description = new HashMap<>();
         description.put(key, "Description");
         description.put(value, bean.getDescription() == null ? "" : bean.getDescription());
@@ -778,6 +816,12 @@ public class ShipmentReportBuilder {
         comments.put(key, "Comments");
         comments.put(value, bean.getComment() == null ? "" : bean.getComment());
         rows.add(comments);
+
+        //number of siblings
+        final Map<String, Object> siblings = new HashMap<>();
+        siblings.put(key, "Number of siblings");
+        siblings.put(value, Integer.toString(bean.getNumberOfSiblings()));
+        rows.add(siblings);
 
         report.setHighlightDetailOddRows(true);
         report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(Colors.CELL_BG));

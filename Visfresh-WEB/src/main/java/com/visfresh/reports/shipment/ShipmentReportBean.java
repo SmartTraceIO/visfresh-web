@@ -3,6 +3,7 @@
  */
 package com.visfresh.reports.shipment;
 
+import java.awt.Color;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,6 +56,8 @@ public class ShipmentReportBean {
     private double upperTemperatureLimit = 5;
     private long timeBelowLowerLimit;
     private long timeAboveUpperLimit;
+    private Color deviceColor = Color.GREEN.darker();
+    private int alertSuppressionMinutes;
 
     /**
      * Default constructor.
@@ -375,5 +378,29 @@ public class ShipmentReportBean {
      */
     public void setTimeAboveUpperLimit(final long timeAboveUpperLimit) {
         this.timeAboveUpperLimit = timeAboveUpperLimit;
+    }
+    /**
+     * @return the deviceColor
+     */
+    public Color getDeviceColor() {
+        return deviceColor;
+    }
+    /**
+     * @param deviceColor the deviceColor to set
+     */
+    public void setDeviceColor(final Color deviceColor) {
+        this.deviceColor = deviceColor;
+    }
+    /**
+     * @param alertSuppressionMinutes
+     */
+    public void setAlertSuppressionMinutes(final int alertSuppressionMinutes) {
+        this.alertSuppressionMinutes = alertSuppressionMinutes;
+    }
+    /**
+     * @return the alertSuppressionMinutes
+     */
+    public int getAlertSuppressionMinutes() {
+        return alertSuppressionMinutes;
     }
 }

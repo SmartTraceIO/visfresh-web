@@ -32,7 +32,6 @@ import com.visfresh.utils.StringUtils;
 public final class ShipmentReportBuilderTool {
     private static Device device = createDevice();
     private static Random random = new Random();
-    private static long lastId;
 
     /**
      * Default constructor.
@@ -83,6 +82,7 @@ public final class ShipmentReportBuilderTool {
         bean.setShippedTo("Canberra");
         bean.setStatus(ShipmentStatus.Arrived);
         bean.setTripCount(14);
+        bean.setAlertSuppressionMinutes(110);
 
         //set arrival
         final ArrivalBean arrival = new ArrivalBean();

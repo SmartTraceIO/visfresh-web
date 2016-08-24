@@ -167,47 +167,46 @@ public class ReportsController extends AbstractController {
             throw new IOException("Should be specified shipmentId or (sn and trip) request parameters");
         }
 
-        final User user = getLoggedInUser(authToken);
-
-        checkAccess(user, Role.BasicUser);
-
-        final Shipment s;
-        if (shipmentId != null) {
-            s = shipmentDao.findOne(shipmentId);
-        } else {
-            s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
-        }
-
-        checkCompanyAccess(user, s);
-        if (s == null) {
-            log.error("Shipment not found. Shipment ID: " + shipmentId
-                    + ", SN: " + sn + ", trip count: " + trip);
-            throw new IOException("Shipment not found");
-        }
-
-        //create report bean.
-        final ShipmentReportBean bean = shipmentReportDao.createReport(s);
-
-        //create tmp file with report PDF content.
-        final File file = fileDownload.createTmpFile(createFileName(s));
-
         try {
+            final User user = getLoggedInUser(authToken);
+
+            checkAccess(user, Role.BasicUser);
+
+            final Shipment s;
+            if (shipmentId != null) {
+                s = shipmentDao.findOne(shipmentId);
+            } else {
+                s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
+            }
+
+            checkCompanyAccess(user, s);
+            if (s == null) {
+                log.error("Shipment not found. Shipment ID: " + shipmentId
+                        + ", SN: " + sn + ", trip count: " + trip);
+                throw new IOException("Shipment not found");
+            }
+
+            //create report bean.
+            final ShipmentReportBean bean = shipmentReportDao.createReport(s);
+
+            //create tmp file with report PDF content.
+            final File file = fileDownload.createTmpFile(createFileName(s));
+
             final OutputStream out = new FileOutputStream(file);
             try {
                 reportBuilder.createShipmentReport(bean, user, out);
             } finally {
                 out.close();
             }
-        } catch (final Throwable e) {
-            log.error("Failed to create shipment report for " + s.getId(), e);
-            file.delete();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
 
-        final int index = request.getRequestURL().indexOf("/" + GET_SHIPMENT_REPORT);
-        response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
-                authToken, file.getName()));
+            final int index = request.getRequestURL().indexOf("/" + GET_SHIPMENT_REPORT);
+            response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
+                    authToken, file.getName()));
+
+        } catch (final Exception e) {
+            log.error("Failed to create shipment report", e);
+            throw e;
+        }
     }
     /**
      * @param device
@@ -224,5 +223,17 @@ public class ReportsController extends AbstractController {
         sb.insert(0, "shipment-");
         sb.append(".pdf");
         return sb.toString();
+    }
+    /**
+     * @param reportBuilder the reportBuilder to set
+     */
+    public void setReportBuilder(final PdfReportBuilder reportBuilder) {
+        this.reportBuilder = reportBuilder;
+    }
+    /**
+     * @return the reportBuilder
+     */
+    public PdfReportBuilder getReportBuilder() {
+        return reportBuilder;
     }
 }

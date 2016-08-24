@@ -3,7 +3,9 @@
  */
 package com.visfresh.dao.impl;
 
+import java.awt.Color;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -75,6 +77,12 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         bean.setDevice(s.getDevice().getImei());
         bean.setNumberOfSiblings(s.getSiblingCount());
         bean.setPalletId(s.getPalletId());
+//        excluding 2hr cooldown period
+        bean.setAlertSuppressionMinutes(s.getAlertSuppressionMinutes());
+
+        if (s.getDevice().getColor() != null) {
+            bean.setDeviceColor(parseColor(s.getDevice().getColor()));
+        }
         if (s.getShippedFrom() != null) {
             bean.setShippedFrom(s.getShippedFrom().getName());
         }
@@ -95,11 +103,19 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         return bean;
     }
     /**
+     * @param color
+     * @return
+     */
+    private Color parseColor(final com.visfresh.entities.Color color) {
+        return Color.decode(color.getHtmlValue());
+    }
+
+    /**
      * @param s shipment.
      * @param bean shipment report bean
      */
     private void addTemperatureHistory(final Shipment s,
-            final List<TrackerEvent> events, final ShipmentReportBean bean) {
+            final List<TrackerEvent> originEvents, final ShipmentReportBean bean) {
         if (s.getAlertProfile() != null) {
             final AlertProfile ap = s.getAlertProfile();
             bean.setAlertProfile(ap.getName());
@@ -124,6 +140,21 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
 
         for (final User u: notifiedPersons.values()) {
             bean.getWhoWasNotified().add(u.getEmail());
+        }
+
+
+        final List<TrackerEvent> events = new LinkedList<>(originEvents);
+        if (bean.getAlertSuppressionMinutes() > 0) {
+            //exclude events when alerts suppressed
+            final long t0 = bean.getAlertSuppressionMinutes() * 60 * 1000l + bean.getDateShipped().getTime();
+            while (events.size() > 0) {
+                final TrackerEvent e = events.get(0);
+                if (e.getTime().getTime() < t0) {
+                    events.remove(0);
+                } else {
+                    break;
+                }
+            }
         }
 
         final int n = events.size();

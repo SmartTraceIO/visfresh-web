@@ -4,6 +4,7 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -16,6 +17,7 @@ import org.junit.Test;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Color;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -189,6 +191,45 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         assertEquals(8 * dt, report.getTotalTime());
     }
 
+    @Test
+    public void testTemperatureWithAlertSuppression() {
+        final AlertProfile ap = createAlertProfile();
+
+        final long dt = 10 * 60 * 1000l;
+        final long startTime = System.currentTimeMillis() - dt * 1000;
+
+        shipment.setShipmentDate(new Date(startTime));
+        shipment.setAlertProfile(ap);
+        shipment.setAlertSuppressionMinutes((int) (5 * dt / (60 * 1000l)));
+        shipmentDao.save(shipment);
+
+        createTrackerEvent(startTime + 1 * dt, 20.7);
+        createTrackerEvent(startTime + 2 * dt, 15.7);
+        createTrackerEvent(startTime + 3 * dt, 10);
+        createTrackerEvent(startTime + 4 * dt, 8);
+        createTrackerEvent(startTime + 5 * dt, 6);
+        createTrackerEvent(startTime + 6 * dt, 0);
+        createTrackerEvent(startTime + 7 * dt, -11.5);
+        createTrackerEvent(startTime + 8 * dt, -20.3);
+        createTrackerEvent(startTime + 9 * dt, 0);
+
+        final ShipmentReportBean report = dao.createReport(shipment);
+
+        final List<TrackerEvent> events = context.getBean(TrackerEventDao.class).findAll(
+                null, null, null).subList(5, 9);
+        double summ = 0;
+        for (final TrackerEvent e : events) {
+            summ += e.getTemperature();
+        }
+
+        assertEquals(summ / events.size(), report.getAvgTemperature(), 0.0001);
+        assertEquals(-20.3, report.getMinimumTemperature(), 0.0001);
+        assertEquals(0, report.getMaximumTemperature(), 0.0001);
+        assertEquals(0, report.getTimeAboveUpperLimit());
+        assertEquals(2 * dt, report.getTimeBelowLowerLimit());
+        assertEquals(3 * dt, report.getTotalTime());
+    }
+
     /**
      * @return
      */
@@ -241,6 +282,14 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         final ShipmentReportBean report = dao.createReport(shipment);
         assertEquals(2, report.getAlerts().size());
         assertEquals(a1.getType(), report.getAlerts().get(0).getType());
+    }
+    @Test
+    public void testDeviceColor() {
+        shipment.getDevice().setColor(Color.DarkGoldenrod);
+        shipmentDao.save(shipment);
+
+        final ShipmentReportBean report = dao.createReport(shipment);
+        assertNotNull(report.getDeviceColor());
     }
     @Test
     public void testWhoNotified() throws Exception {
