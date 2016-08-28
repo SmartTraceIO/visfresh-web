@@ -3,13 +3,16 @@
  */
 package com.visfresh.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTrackerEvent> {
+public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTrackerEvent>,
+        Serializable {
+    private static final long serialVersionUID = 5009822165362091286L;
     /**
      * Event ID.
      */
@@ -58,6 +61,23 @@ public class ShortTrackerEvent implements EntityWithId<Long>, Comparable<ShortTr
         this.setLatitude(e.getLatitude());
         this.setLongitude(e.getLongitude());
         this.setShipmentId(e.getShipment() == null ? null : e.getShipment().getId());
+        this.setTemperature(e.getTemperature());
+        this.setTime(e.getTime());
+        this.setType(e.getType());
+    }
+
+    /**
+     * @param e
+     */
+    public ShortTrackerEvent(final ShortTrackerEvent e) {
+        super();
+        this.setBattery(e.getBattery());
+        this.setCreatedOn(e.getCreatedOn());
+        this.setDeviceImei(e.getDeviceImei());
+        this.setId(e.getId());
+        this.setLatitude(e.getLatitude());
+        this.setLongitude(e.getLongitude());
+        this.setShipmentId(e.getShipmentId());
         this.setTemperature(e.getTemperature());
         this.setTime(e.getTime());
         this.setType(e.getType());

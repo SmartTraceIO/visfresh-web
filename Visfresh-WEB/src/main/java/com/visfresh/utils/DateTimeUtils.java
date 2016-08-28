@@ -109,13 +109,18 @@ public final class DateTimeUtils {
         return tzString;
     }
     public static void main(final String[] args) throws ParseException {
-        String origin = "2016-04-07 12:30";
-        final SimpleDateFormat std = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Date d = std.parse(origin);
-        System.out.println(origin + " --> " + createPrettyFormat(Language.English, TimeZone.getDefault()).format(d));
+        final Date d = new Date();
+        System.out.println("Current time zone: " + d);
+        System.out.println("UTC time zone: " + convertToTimeZone(d, TimeZone.getTimeZone("Europe/Oslo")));
+    }
 
-        origin = "2016-04-07 00:30";
-        d = std.parse(origin);
-        System.out.println(origin + " --> " + createPrettyFormat(Language.English, TimeZone.getDefault()).format(d));
+    /**
+     * @param time
+     * @param timeZone
+     * @return
+     */
+    public static Date convertToTimeZone(final Date time, final TimeZone timeZone) {
+        final long t = time.getTime();
+        return new Date(t - (TimeZone.getDefault().getOffset(t) - timeZone.getOffset(t)));
     }
 }

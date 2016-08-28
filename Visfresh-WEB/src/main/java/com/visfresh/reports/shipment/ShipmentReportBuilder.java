@@ -6,7 +6,6 @@ package com.visfresh.reports.shipment;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -20,6 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -88,6 +88,7 @@ import com.visfresh.reports.TableSupport;
 import com.visfresh.reports.geomap.MapImageBuilder;
 import com.visfresh.reports.geomap.RenderedMap;
 import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -195,7 +196,7 @@ public class ShipmentReportBuilder {
                     + " "
                     + UtilitiesController.createOffsetString(user.getTimeZone().getRawOffset())
                     + ")"))
-            .setTimePeriodType(TimePeriod.MINUTE)
+            .setTimePeriodType(TimePeriod.MILLISECOND)
             .series(
                 Charts.serie(Columns.column(temperature, java.lang.Double.class))
                 .setLabel("Temperature "
@@ -204,9 +205,9 @@ public class ShipmentReportBuilder {
 
         //add data
         final DRDataSource ds = new DRDataSource(new String[]{time, temperature});
-        for (final ShortTrackerEvent e : bean.getReadings()) {
+        for (final ShortTrackerEvent e : getNormalizedReadings(bean)) {
             ds.add(
-                e.getTime(),
+                DateTimeUtils.convertToTimeZone(e.getTime(), user.getTimeZone()),
                 LocalizationUtils.convertToUnits(
                         e.getTemperature(), user.getTemperatureUnits()));
         }
@@ -218,12 +219,15 @@ public class ShipmentReportBuilder {
                 final XYPlot plot = chart.getXYPlot();
                 final DateAxis axis = (DateAxis) plot.getDomainAxis();
                 axis.setDateFormatOverride(fmt);
+                axis.setAutoRange(true);
 
                 final TemperatureChartRenderer renderer = new TemperatureChartRenderer();
-                addFiredAlerts(renderer, bean);
-                plot.setRenderer(0, renderer);
+                renderer.addAlertsData(bean.getReadings(), bean.getAlerts(), bean.getArrival(),
+                        user.getTimeZone());
                 renderer.setSeriesShape(0, new Rectangle(0, 0));
                 renderer.setLegendShape(0, new Rectangle(-1, -1, 2, 2));
+
+                plot.setRenderer(0, renderer);
             }
         });
 
@@ -231,35 +235,27 @@ public class ShipmentReportBuilder {
     }
 
     /**
-     * @param renderer
      * @param bean
-     */
-    protected void addFiredAlerts(final TemperatureChartRenderer renderer,
-            final ShipmentReportBean bean) {
-        for (final Alert a : bean.getAlerts()) {
-            final int index = indexOf(bean.getReadings(), a.getTrackerEventId());
-            if (index > -1) {
-                renderer.addFiredAlerts(index, a.getType());
-            }
-        }
-    }
-
-    /**
-     * @param readings
-     * @param trackerEventId
      * @return
      */
-    private int indexOf(final List<ShortTrackerEvent> readings, final Long trackerEventId) {
-        int index = 0;
-        for (final ShortTrackerEvent e : readings) {
-            if (e.getId().equals(trackerEventId)) {
-                return index;
-            }
-            index++;
-        }
-        return -1;
-    }
+    private List<ShortTrackerEvent> getNormalizedReadings(final ShipmentReportBean bean) {
+        final Map<String, ShortTrackerEvent> map = new HashMap<>();
+        final List<ShortTrackerEvent> readings = new LinkedList<>();
+        final DateFormat df = new SimpleDateFormat("yyyy:MM:dd:HH:mm");
 
+        for (final ShortTrackerEvent e : bean.getReadings()) {
+            final String key = df.format(e.getTime());
+
+            final ShortTrackerEvent existing = map.get(key);
+            if (existing == null) {
+                map.put(key, e);
+                readings.add(e);
+            } else {
+                existing.setTemperature((existing.getTemperature() + e.getTemperature()) / 2.);
+            }
+        }
+        return readings;
+    }
 
     /**
      * @param bean
@@ -376,7 +372,7 @@ public class ShipmentReportBuilder {
     public static Map<AlertType, BufferedImage> loadAlertImages() {
         final Map<AlertType, BufferedImage> map = new HashMap<>();
         for (final AlertType type : AlertType.values()) {
-            map.put(type, TemperatureChartRenderer.loadAlertImage(type));
+            map.put(type, AlertPaintingSupport.loadAlertImage(type));
         }
         return map;
     }
@@ -527,19 +523,20 @@ public class ShipmentReportBuilder {
 
             try {
                 final Dimension size = new Dimension(w, h);
-//                final RenderedMap rim = mapBuilder.createMapImage(coords, size);
+                final RenderedMap rim = mapBuilder.createMapImage(coords, size);
 
-                final RenderedMap rim = new RenderedMap();
-                final BufferedImage bim = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-                final Graphics g2 = bim.getGraphics();
-                g2.setColor(Color.BLUE);
-                g2.fillRect(0, 0, w, h);
-                g2.dispose();
-                rim.setMap(bim);
-                rim.setMapLocation(new Point());
-                rim.setZoom(14);
+//                final RenderedMap rim = new RenderedMap();
+//                final BufferedImage bim = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+//                final Graphics g2 = bim.getGraphics();
+//                g2.setColor(Color.BLUE);
+//                g2.fillRect(0, 0, w, h);
+//                g2.dispose();
+//                rim.setMap(bim);
+//                rim.setMapLocation(new Point());
+//                rim.setZoom(14);
 
-                final BufferedImage image = scaleMapAndAddPath(rim, coords, size, bean.getDeviceColor());
+                final BufferedImage image = scaleMapAndAddReadingData(
+                        rim, bean, size);
 
                 final ImageBuilder ib = Components.image(image);
                 ib.setHorizontalImageAlignment(HorizontalImageAlignment.CENTER);
@@ -560,10 +557,12 @@ public class ShipmentReportBuilder {
 
     /**
      * @param rim
-     * @param coords
+     * @param bean
+     * @param size
+     * @return
      */
-    private BufferedImage scaleMapAndAddPath(final RenderedMap rim,
-            final List<Point2D> coords, final Dimension size, final Color color) {
+    private BufferedImage scaleMapAndAddReadingData(final RenderedMap rim,
+            final ShipmentReportBean bean, final Dimension size) {
         double scale = 1.;
         final boolean scaleChanged = rim.getMap().getWidth() != size.width || rim.getMap().getHeight() != size.height;
         if (scaleChanged) {
@@ -588,9 +587,11 @@ public class ShipmentReportBuilder {
             final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
             final int zoom = rim.getZoom();
 
-            for (final Point2D p : coords) {
-                final int x = (int) Math.round(scale * (MapImageBuilder.lon2position(p.getX(), zoom) - loc.x));
-                final int y = (int) Math.round(scale * (MapImageBuilder.lat2position(p.getY(), zoom) - loc.y));
+            for (final ShortTrackerEvent p : bean.getReadings()) {
+                final int x = (int) Math.round(scale * (MapImageBuilder.lon2position(
+                        p.getLongitude(), zoom) - loc.x));
+                final int y = (int) Math.round(scale * (MapImageBuilder.lat2position(
+                        p.getLatitude(), zoom) - loc.y));
                 if (path.getCurrentPoint() == null) {
                     path.moveTo(x, y);
                 } else {
@@ -599,8 +600,40 @@ public class ShipmentReportBuilder {
             }
 
             g.setStroke(new BasicStroke(2.f));
-            g.setColor(color);
+            g.setColor(bean.getDeviceColor());
             g.draw(path);
+
+            //draw alerts
+            final AlertPaintingSupport support = new AlertPaintingSupport();
+            for (final Alert a : bean.getAlerts()) {
+                final ShortTrackerEvent e = EntityUtils.getEntity(bean.getReadings(), a.getTrackerEventId());
+                if (e != null) {
+                    support.addFiredAlerts(e.getTime(), a.getType());
+                }
+            }
+
+            final int readingsCount = bean.getReadings().size();
+            if (readingsCount > 0) {
+                support.addLastReading(bean.getReadings().get(readingsCount - 1).getTime());
+            }
+            if (bean.getArrival() != null) {
+                support.addArrival(bean.getArrival().getTime());
+            }
+
+            for (final ShortTrackerEvent p : bean.getReadings()) {
+                final List<BufferedImage> images = support.getAlertImages(p.getTime());
+
+                final int offset = AlertPaintingSupport.ICON_SIZE / 2;
+                if (images != null && !images.isEmpty()) {
+                    final int x = (int) Math.round(scale * (MapImageBuilder.lon2position(
+                            p.getLongitude(), zoom) - loc.x));
+                    final int y = (int) Math.round(scale * (MapImageBuilder.lat2position(
+                            p.getLatitude(), zoom) - loc.y));
+                    for (final BufferedImage im : images) {
+                        g.drawImage(im, x - offset, y - offset, null);
+                    }
+                }
+            }
         } finally {
             g.dispose();
         }

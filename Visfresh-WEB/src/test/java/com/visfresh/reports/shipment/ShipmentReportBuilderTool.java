@@ -57,7 +57,7 @@ public final class ShipmentReportBuilderTool {
         user.setId(7l);
         user.setEmail("dev@smarttrace.com.au");
         user.setTemperatureUnits(TemperatureUnits.Fahrenheit);
-        user.setTimeZone(TimeZone.getTimeZone("UTC"));
+        user.setTimeZone(TimeZone.getDefault());
         return user;
     }
     /**
@@ -84,15 +84,15 @@ public final class ShipmentReportBuilderTool {
         bean.setTripCount(14);
         bean.setAlertSuppressionMinutes(110);
 
+        addReadings(bean);
+
         //set arrival
         final ArrivalBean arrival = new ArrivalBean();
+        arrival.setTime(bean.getReadings().get(random.nextInt(bean.getReadings().size())).getTime());
         arrival.setNotifiedAt(bean.getDateArrived());
         arrival.setShutdownTime(new Date(System.currentTimeMillis() - 10000000));
-        arrival.setTime(bean.getDateArrived());
         arrival.setNotifiedWhenKm(40);
         bean.setArrival(arrival);
-
-        addReadings(bean);
 
         final long oneHour = 60 * 60 * 1000l;
 
