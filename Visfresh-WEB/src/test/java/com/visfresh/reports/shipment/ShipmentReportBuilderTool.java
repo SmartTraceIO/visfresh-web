@@ -78,8 +78,8 @@ public final class ShipmentReportBuilderTool {
         bean.setDevice(device.getImei());
         bean.setNumberOfSiblings(3);
         bean.setPalletId("pallet-007");
-        bean.setShippedFrom("Sidney");
-        bean.setShippedTo("Canberra");
+        bean.setShippedFrom("De Costi Office Lidcombe");
+        bean.setShippedTo("De Costi Office Lidcombe");
         bean.setStatus(ShipmentStatus.Arrived);
         bean.setTripCount(14);
         bean.setAlertSuppressionMinutes(110);

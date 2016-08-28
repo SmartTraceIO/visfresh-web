@@ -6,6 +6,7 @@ package com.visfresh.reports.shipment;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -340,7 +341,7 @@ public class ShipmentReportBuilder {
             //build one component for avoid of confuse the cell
             list.add(Components.text("        "));
         } else {
-            final Map<AlertType, Image> alertImageMap = loadAlertImages();
+            final Map<AlertType, BufferedImage> alertImageMap = loadAlertImages();
 
             for (final AlertRule alert: bean.getFiredAlertRules()) {
                 //create alert component
@@ -348,9 +349,10 @@ public class ShipmentReportBuilder {
                 alertView.setStyle(Styles.style().setLeftPadding(DEFAULT_PADDING));
 
                 //image
-                final ImageBuilder image = Components.image(alertImageMap.get(alert.getType()));
-                image.setFixedDimension(16, 16);
-                image.setImageScale(ImageScale.RETAIN_SHAPE);
+                final BufferedImage im = alertImageMap.get(alert.getType());
+                final ImageBuilder image = Components.image(im);
+                image.setFixedDimension(im.getWidth(), im.getHeight());
+                image.setImageScale(ImageScale.CLIP);
                 image.setStretchType(StretchType.CONTAINER_HEIGHT);
 
                 alertView.add(Components.hListCell(image).heightFixedOnMiddle());
@@ -371,8 +373,8 @@ public class ShipmentReportBuilder {
     /**
      * @return
      */
-    public static Map<AlertType, Image> loadAlertImages() {
-        final Map<AlertType, Image> map = new HashMap<>();
+    public static Map<AlertType, BufferedImage> loadAlertImages() {
+        final Map<AlertType, BufferedImage> map = new HashMap<>();
         for (final AlertType type : AlertType.values()) {
             map.put(type, TemperatureChartRenderer.loadAlertImage(type));
         }
@@ -395,6 +397,7 @@ public class ShipmentReportBuilder {
         }
 
         final VerticalListBuilder list = createStyledVerticalListWithTitle(titleText);
+        list.add(Components.gap(1, 1));
 
         final JasperReportBuilder report = new JasperReportBuilder();
 
@@ -524,17 +527,17 @@ public class ShipmentReportBuilder {
 
             try {
                 final Dimension size = new Dimension(w, h);
-                final RenderedMap rim = mapBuilder.createMapImage(coords, size);
+//                final RenderedMap rim = mapBuilder.createMapImage(coords, size);
 
-//                final RenderedMap rim = new RenderedMap();
-//                final BufferedImage bim = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-//                final Graphics g2 = bim.getGraphics();
-//                g2.setColor(Color.BLUE);
-//                g2.fillRect(0, 0, w, h);
-//                g2.dispose();
-//                rim.setMap(bim);
-//                rim.setMapLocation(new Point());
-//                rim.setZoom(14);
+                final RenderedMap rim = new RenderedMap();
+                final BufferedImage bim = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+                final Graphics g2 = bim.getGraphics();
+                g2.setColor(Color.BLUE);
+                g2.fillRect(0, 0, w, h);
+                g2.dispose();
+                rim.setMap(bim);
+                rim.setMapLocation(new Point());
+                rim.setZoom(14);
 
                 final BufferedImage image = scaleMapAndAddPath(rim, coords, size, bean.getDeviceColor());
 
@@ -749,6 +752,7 @@ public class ShipmentReportBuilder {
      */
     private ComponentBuilder<?, ?> createGoodsTable(final ShipmentReportBean bean) {
         final VerticalListBuilder list = createStyledVerticalListWithTitle("GOODS");
+        list.add(Components.gap(1, 1));
 
         //add table
         final JasperReportBuilder report = new JasperReportBuilder();
@@ -757,47 +761,50 @@ public class ShipmentReportBuilder {
         final StyleBuilder[] styles = new StyleBuilder[cols.length];
 
         //key column
+        final PenBuilder borderLine = Styles.pen1Point().setLineColor(Colors.CELL_BORDER);
         styles[0] = Styles.style()
             .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold())
-            .setPadding(DEFAULT_PADDING);
+            .setRightBorder(borderLine);
 
         final String key = "key";
         TextColumnBuilder<String> columnBuilder = Columns.column(key, String.class);
         columnBuilder.setStretchWithOverflow(true);
         columnBuilder.setColumns(0);
+        columnBuilder.setTitle("Tracker (TripNum)");
+        columnBuilder.setTitleStyle(Styles.style()
+                .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold())
+                .setPadding(DEFAULT_PADDING)
+                .setRightBorder(borderLine)
+                .setBottomBorder(borderLine));
         cols[0] = columnBuilder;
 
         //value column
         styles[1] = Styles.style()
-            .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE))
-            .setPadding(DEFAULT_PADDING);
+            .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE));
 
         final String value = "value";
         columnBuilder = Columns.column(value, String.class);
         columnBuilder.setStretchWithOverflow(true);
         columnBuilder.setColumns(1);
+        columnBuilder.setTitle("      " + getShipmentNumber(bean));
+        columnBuilder.setTitleStyle(Styles.style()
+                .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE))
+                .setPadding(DEFAULT_PADDING)
+                .setBottomBorder(borderLine));
         cols[1] = columnBuilder;
 
         //apply styles
-        TableSupport.customizeTableStyles(styles);
         for (int i = 0; i < styles.length; i++) {
-            cols[i].setStyle(styles[i]);
+            final StyleBuilder style = styles[i];
+            style.setPadding(DEFAULT_PADDING);
+            cols[i].setStyle(style);
         }
+        TableSupport.customizeTableStyles(styles);
 
         report.columns(cols);
 
         //add data
         final List<Map<String, ?>> rows = new LinkedList<>();
-
-        //tracker
-        final Map<String, String> tracker = new HashMap<>();
-        tracker.put(key, "Tracker (TripNum)");
-        tracker.put(value, getShipmentNumber(bean));
-
-//        final TextFieldBuilder<String> trackerField = Components.text("There will be tracker num");
-//        report.addField(FieldBuilder<.>);
-//        tracker.put(value, trackerField);
-        rows.add(tracker);
 
         //description
         final Map<String, Object> description = new HashMap<>();
@@ -823,12 +830,46 @@ public class ShipmentReportBuilder {
         siblings.put(value, Integer.toString(bean.getNumberOfSiblings()));
         rows.add(siblings);
 
-        report.setHighlightDetailOddRows(true);
-        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(Colors.CELL_BG));
+        report.setHighlightDetailEvenRows(true);
+        report.setShowColumnTitle(true);
+        report.setColumnHeaderBackgroundComponent(createGoodsBackgroundComponent(bean.getDeviceColor()));
+        report.setDetailEvenRowStyle(Styles.simpleStyle()
+                .setBackgroundColor(Colors.CELL_BG));
         report.setDataSource(new JRMapCollectionDataSource(rows));
         list.add(Components.subreport(report));
         return list;
     }
+    /**
+     * @return
+     */
+    private ComponentBuilder<?, ?> createGoodsBackgroundComponent(final Color c) {
+        //create background image.
+        final int gap = 135;
+        final int size = 12;
+        final int padding = DEFAULT_PADDING;
+
+        final BufferedImage bim = new BufferedImage(gap + size + 10, padding + size + 10,
+                BufferedImage.TYPE_INT_ARGB_PRE);
+        final Graphics2D g = bim.createGraphics();
+        try {
+            g.setColor(c);
+            g.fillRect(gap, padding, size, size);
+
+            g.setColor(Color.BLACK);
+            g.setStroke(new BasicStroke(2f));
+            g.drawRect(gap, padding, size, size);
+        } finally {
+            g.dispose();
+        }
+
+        final ImageBuilder image = Components.image(bim);
+        image.setFixedDimension(bim.getWidth(), bim.getHeight());
+        image.setImageScale(ImageScale.CLIP);
+        image.setHorizontalImageAlignment(HorizontalImageAlignment.LEFT);
+
+        return image;
+    }
+
     /**
      * @param bean report bean.
      * @param user user.
