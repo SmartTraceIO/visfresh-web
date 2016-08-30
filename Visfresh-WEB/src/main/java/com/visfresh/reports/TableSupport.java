@@ -21,6 +21,8 @@ public final class TableSupport {
     public static TableSupportCondition notFirstRowCondition = createNotFirstRowCondition();
     public static TableSupportCondition firstColumnCondition = createFirstColumnCondition();
 
+    private static long lastConditionId = 1;
+
     /**
      * Default constructor.
      */
@@ -64,6 +66,19 @@ public final class TableSupport {
             }
         };
     }
+    /**
+     * @return
+     */
+    public static TableSupportCondition createRowEqualsCondition(final int row) {
+        return new TableSupportCondition("rowCondition_" + (lastConditionId++)) {
+            @Override
+            public Boolean evaluate(final List<?> values, final ReportParameters reportParameters) {
+                final Integer columnRow = reportParameters.getColumnRowNumber();
+                return columnRow != null && columnRow == row;
+            }
+        };
+    }
+
     public static void customizeTableStyles(final StyleBuilder[] columnStyles, final boolean disableFirstTopBorder) {
         for (int i = 0; i < columnStyles.length; i++) {
             final StyleBuilder style = columnStyles[i];

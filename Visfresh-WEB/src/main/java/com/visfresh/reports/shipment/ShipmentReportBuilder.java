@@ -86,6 +86,7 @@ import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.Colors;
 import com.visfresh.reports.TableSupport;
+import com.visfresh.reports.TableSupportCondition;
 import com.visfresh.reports.geomap.MapImageBuilder;
 import com.visfresh.reports.geomap.RenderedMap;
 import com.visfresh.utils.DateTimeUtils;
@@ -171,6 +172,10 @@ public class ShipmentReportBuilder {
         //this data source is not used, but required for
         //show the content
         report.setDataSource(Arrays.asList(bean));
+        report.setHighlightDetailOddRows(true);
+        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(Colors.CELL_BG));
+        report.setShowColumnTitle(false);
+
         return report;
     }
     /**
@@ -870,37 +875,50 @@ public class ShipmentReportBuilder {
         final StyleBuilder[] styles = new StyleBuilder[cols.length];
 
         //key column
-        final PenBuilder borderLine = Styles.pen1Point().setLineColor(Colors.CELL_BORDER);
         styles[0] = Styles.style()
-            .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold())
-            .setRightBorder(borderLine);
+            .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold());
 
-        final String key = "key";
-        TextColumnBuilder<String> columnBuilder = Columns.column(key, String.class);
+        final TextColumnBuilder<String> columnBuilder = Columns.column("key", String.class);
         columnBuilder.setStretchWithOverflow(true);
-        columnBuilder.setColumns(0);
-        columnBuilder.setTitle("Tracker (TripNum)");
-        columnBuilder.setTitleStyle(Styles.style()
-                .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold())
-                .setPadding(DEFAULT_PADDING)
-                .setRightBorder(borderLine)
-                .setBottomBorder(borderLine));
+        columnBuilder.setFixedColumns(16);
         cols[0] = columnBuilder;
 
         //value column
-        styles[1] = Styles.style()
-            .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE));
+        styles[1] = Styles.style();
 
-        final String value = "value";
-        columnBuilder = Columns.column(value, String.class);
-        columnBuilder.setStretchWithOverflow(true);
-        columnBuilder.setColumns(1);
-        columnBuilder.setTitle("      " + getShipmentNumber(bean));
-        columnBuilder.setTitleStyle(Styles.style()
-                .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE))
-                .setPadding(DEFAULT_PADDING)
-                .setBottomBorder(borderLine));
-        cols[1] = columnBuilder;
+        final HorizontalListBuilder valueColumn = Components.horizontalList();
+
+        final TableSupportCondition firstRowExp = TableSupport.createRowEqualsCondition(1);
+        final ImageBuilder deviceRect = createDeviceRect(bean.getDeviceColor());
+        deviceRect.setPrintWhenExpression(firstRowExp);
+        valueColumn.setBackgroundComponent(deviceRect);
+
+        //add data
+        final List<Map<String, ?>> rows = new LinkedList<>();
+        @SuppressWarnings("serial")
+        final TextFieldBuilder<String> valueText = Components.text(
+            new AbstractSimpleExpression<String>("goodsVariable") {
+                /* (non-Javadoc)
+                 * @see net.sf.dynamicreports.report.definition.expression.DRISimpleExpression#evaluate(net.sf.dynamicreports.report.definition.ReportParameters)
+                 */
+                @Override
+                public String evaluate(final ReportParameters reportParameters) {
+                    final int row = reportParameters.getColumnRowNumber() - 1;
+                    String str = (String) rows.get(row).get("value");
+                    if (row == 0) {
+                        str = "     " + str;
+                    }
+                    return str;
+                }
+            });
+        valueText.setStyle(Styles.style()
+            .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE))
+            .setPadding(DEFAULT_PADDING));
+
+        valueColumn.add(valueText);
+//        valueColumn.setStyle(styles[1]);
+        final ComponentColumnBuilder valueColumnBuilder = Columns.componentColumn(valueColumn);
+        cols[1] = valueColumnBuilder;
 
         //apply styles
         for (int i = 0; i < styles.length; i++) {
@@ -908,77 +926,74 @@ public class ShipmentReportBuilder {
             style.setPadding(DEFAULT_PADDING);
             cols[i].setStyle(style);
         }
-        TableSupport.customizeTableStyles(styles, false);
+        TableSupport.customizeTableStyles(styles, true);
 
         report.columns(cols);
 
-        //add data
-        final List<Map<String, ?>> rows = new LinkedList<>();
+        //shipment
+        addGoodsRow(rows, "Tracker (TripNum)", getShipmentNumber(bean));
 
         //description
-        final Map<String, Object> description = new HashMap<>();
-        description.put(key, "Description");
-        description.put(value, bean.getDescription() == null ? "" : bean.getDescription());
-        rows.add(description);
+        addGoodsRow(rows, "Description", bean.getDescription() == null ? "" : bean.getDescription());
 
         //pallet ID
         if (bean.getPalletId() != null) {
-            final Map<String, Object> palletId = new HashMap<>();
-            palletId.put(key, "Pallet ID");
-            palletId.put(value, bean.getPalletId());
-            rows.add(palletId);
+            addGoodsRow(rows, "Pallet ID", bean.getPalletId());
         }
 
         //comments
-        final Map<String, Object> comments = new HashMap<>();
-        comments.put(key, "Comments");
-        comments.put(value, bean.getComment() == null ? "" : bean.getComment());
-        rows.add(comments);
+        addGoodsRow(rows, "Comments", bean.getComment() == null ? "" : bean.getComment());
 
         //number of siblings
         if (bean.getNumberOfSiblings() > 0) {
-            final Map<String, Object> siblings = new HashMap<>();
-            siblings.put(key, "Number of siblings");
-            siblings.put(value, Integer.toString(bean.getNumberOfSiblings()));
-            rows.add(siblings);
+            addGoodsRow(rows, "Number of siblings", Integer.toString(bean.getNumberOfSiblings()));
         }
 
-        report.setHighlightDetailEvenRows(true);
-        report.setShowColumnTitle(true);
-        report.setColumnHeaderBackgroundComponent(createGoodsBackgroundComponent(bean.getDeviceColor()));
-        report.setDetailEvenRowStyle(Styles.simpleStyle()
-                .setBackgroundColor(Colors.CELL_BG));
+        report.setShowColumnTitle(false);
         report.setDataSource(new JRMapCollectionDataSource(rows));
+        report.setHighlightDetailOddRows(true);
+        report.setDetailOddRowStyle(Styles.simpleStyle().setBackgroundColor(Colors.CELL_BG));
         list.add(Components.subreport(report));
         return list;
     }
     /**
+     * @param rows
+     * @param key
+     * @param value
+     */
+    private void addGoodsRow(final List<Map<String, ?>> rows, final String key, final String value) {
+        final Map<String, Object> row = new HashMap<>();
+        row.put("key", key);
+        row.put("value", value);
+        rows.add(row);
+    }
+
+    /**
      * @return
      */
-    private ComponentBuilder<?, ?> createGoodsBackgroundComponent(final Color c) {
+    private ImageBuilder createDeviceRect(final Color c) {
         //create background image.
-        final int gap = 135;
-        final int size = 12;
-        final int padding = DEFAULT_PADDING;
+        final int size = 10;
 
-        final BufferedImage bim = new BufferedImage(gap + size + 10, padding + size + 10,
-                BufferedImage.TYPE_INT_ARGB_PRE);
+        final BufferedImage bim = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB_PRE);
         final Graphics2D g = bim.createGraphics();
         try {
             g.setColor(c);
-            g.fillRect(gap, padding, size, size);
+            g.fillRect(0, 0, size, size);
 
             g.setColor(Color.BLACK);
-            g.setStroke(new BasicStroke(2f));
-            g.drawRect(gap, padding, size, size);
+            g.setStroke(new BasicStroke(1f));
+            g.drawRect(0, 0, size - 1, size - 1);
         } finally {
             g.dispose();
         }
 
         final ImageBuilder image = Components.image(bim);
         image.setFixedDimension(bim.getWidth(), bim.getHeight());
-        image.setImageScale(ImageScale.CLIP);
+        image.setImageScale(ImageScale.RETAIN_SHAPE);
         image.setHorizontalImageAlignment(HorizontalImageAlignment.LEFT);
+        image.setStretchType(StretchType.CONTAINER_HEIGHT);
+        image.setStyle(Styles.style().setPadding(DEFAULT_PADDING));
 
         return image;
     }
