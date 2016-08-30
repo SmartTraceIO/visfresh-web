@@ -11,6 +11,8 @@ import java.util.Set;
  *
  */
 public class ShortTrackerEventWithAlerts extends ShortTrackerEvent {
+    private static final long serialVersionUID = -38149942157383743L;
+
     private final Set<AlertType> alerts = new HashSet<>();
 
     /**

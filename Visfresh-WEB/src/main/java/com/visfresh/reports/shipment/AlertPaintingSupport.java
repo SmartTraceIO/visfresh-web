@@ -96,6 +96,8 @@ public class AlertPaintingSupport {
                     g.setTransform(AffineTransform.getScaleInstance(scale, scale));
                     g.setRenderingHint(RenderingHints.KEY_RENDERING,
                             RenderingHints.VALUE_RENDER_QUALITY);
+                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
                     g.drawImage(image, 0, 0, null);
                 } finally {

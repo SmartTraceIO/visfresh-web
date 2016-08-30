@@ -4,6 +4,7 @@
 package com.visfresh.reports.shipment;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Date;
@@ -51,11 +52,11 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
      * @see org.jfree.chart.renderer.xy.XYLineAndShapeRenderer#drawSecondaryPass(java.awt.Graphics2D, org.jfree.chart.plot.XYPlot, org.jfree.data.xy.XYDataset, int, int, int, org.jfree.chart.axis.ValueAxis, java.awt.geom.Rectangle2D, org.jfree.chart.axis.ValueAxis, org.jfree.chart.plot.CrosshairState, org.jfree.chart.entity.EntityCollection)
      */
     @Override
-    protected void drawSecondaryPass(final Graphics2D g2, final XYPlot plot,
+    protected void drawSecondaryPass(final Graphics2D g, final XYPlot plot,
             final XYDataset dataset, final int pass, final int series, final int item,
             final ValueAxis domainAxis, final Rectangle2D dataArea, final ValueAxis rangeAxis,
             final CrosshairState crosshairState, final EntityCollection entities) {
-        super.drawSecondaryPass(g2, plot, dataset, pass, series, item, domainAxis,
+        super.drawSecondaryPass(g, plot, dataset, pass, series, item, domainAxis,
                 dataArea, rangeAxis, crosshairState, entities);
         // get the data point...
         final double x1 = dataset.getXValue(series, item);
@@ -76,10 +77,18 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 final int w = im.getWidth();
                 final int h = im.getHeight();
 
-                g2.drawImage(im,
-                    (int) Math.round(transX1 - w/2.),
-                    (int) Math.round(transY1 - h/2.),
-                    null);
+                final RenderingHints hints = g.getRenderingHints();
+                try {
+                    g.setRenderingHint(RenderingHints.KEY_RENDERING,
+                            RenderingHints.VALUE_RENDER_QUALITY);
+
+                    g.drawImage(im,
+                        (int) Math.round(transX1 - w/2.),
+                        (int) Math.round(transY1 - h/2.),
+                        null);
+                } finally {
+                    g.setRenderingHints(hints);
+                }
             }
         }
     }

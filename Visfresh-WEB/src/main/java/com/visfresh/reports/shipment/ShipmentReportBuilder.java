@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -126,7 +127,6 @@ public class ShipmentReportBuilder {
     }
     public JasperReportBuilder createReport(
             final ShipmentReportBean bean, final User user) throws IOException {
-
         final JasperReportBuilder report = DynamicReports.report();
         report.setDetailSplitType(SplitType.IMMEDIATE);
         report.setShowColumnTitle(false);
@@ -222,7 +222,8 @@ public class ShipmentReportBuilder {
                 axis.setAutoRange(true);
 
                 final TemperatureChartRenderer renderer = new TemperatureChartRenderer();
-                renderer.addAlertsData(bean.getReadings(), bean.getAlerts(), bean.getArrival(),
+                renderer.addAlertsData(bean.getReadings(),
+                        filterAlerts(bean.getAlerts()), bean.getArrival(),
                         user.getTimeZone());
                 renderer.setSeriesShape(0, new Rectangle(0, 0));
                 renderer.setLegendShape(0, new Rectangle(-1, -1, 2, 2));
@@ -232,6 +233,20 @@ public class ShipmentReportBuilder {
         });
 
         return chart;
+    }
+
+    /**
+     * @param alerts
+     * @return
+     */
+    protected List<Alert> filterAlerts(final List<Alert> alerts) {
+        final List<Alert> result = new LinkedList<Alert>();
+        for (final Alert a : alerts) {
+            if (a.getType() != AlertType.LightOff && a.getType() != AlertType.LightOn) {
+                result.add(a);
+            }
+        }
+        return result;
     }
 
     /**
@@ -511,13 +526,16 @@ public class ShipmentReportBuilder {
      * @return
      */
     private ComponentBuilder<?, ?> createMap(final ShipmentReportBean bean) {
-        if (bean.getReadings().size() != 0) {
+        final List<ShortTrackerEvent> readings = bean.getReadings();
+        correctReadingsLocation(readings);
+
+        if (hasReadingsWithLocation(readings)) {
             final int w = 300;
             final int h = 119;
 
             final List<Point2D> coords = new LinkedList<>();
 
-            for (final ShortTrackerEvent e : bean.getReadings()) {
+            for (final ShortTrackerEvent e : readings) {
                 coords.add(new Point2D.Double(e.getLongitude(), e.getLatitude()));
             }
 
@@ -554,6 +572,64 @@ public class ShipmentReportBuilder {
         return Components.text("openstreetmap service is unavailable now");
     }
 
+
+    /**
+     * @param readings
+     * @return
+     */
+    private boolean hasReadingsWithLocation(final List<ShortTrackerEvent> readings) {
+        for (final ShortTrackerEvent e : readings) {
+            if (e.getLatitude() != null && e.getLongitude() != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param readings
+     */
+    protected void correctReadingsLocation(final List<ShortTrackerEvent> readings) {
+        List<ShortTrackerEvent> toRelocate = null;
+        ListIterator<ShortTrackerEvent> iter = readings.listIterator();
+
+        while (iter.hasNext()) {
+            final ShortTrackerEvent e = iter.next();
+            if (e.getLatitude() == null || e.getLongitude() == null) {
+                if (toRelocate == null) {
+                    toRelocate = new LinkedList<ShortTrackerEvent>();
+                }
+                toRelocate.add(e);
+            } else if (toRelocate != null) {
+                for (final ShortTrackerEvent relocating : toRelocate) {
+                    relocating.setLatitude(e.getLatitude());
+                    relocating.setLongitude(e.getLongitude());
+                }
+                toRelocate = null;
+            }
+        }
+
+        //if not relocate last part
+        if (toRelocate != null) {
+            ShortTrackerEvent lastRelocationTarget = null;
+
+            //find first located
+            iter = readings.listIterator(readings.size());
+            while (iter.hasPrevious() && lastRelocationTarget == null) {
+                final ShortTrackerEvent e = iter.previous();
+                if (e.getLatitude() != null && e.getLongitude() != null) {
+                    lastRelocationTarget = e;
+                }
+            }
+
+            if (lastRelocationTarget != null) {
+                for (final ShortTrackerEvent relocating : toRelocate) {
+                    relocating.setLatitude(lastRelocationTarget.getLatitude());
+                    relocating.setLongitude(lastRelocationTarget.getLongitude());
+                }
+            }
+        }
+    }
 
     /**
      * @param rim
@@ -605,7 +681,7 @@ public class ShipmentReportBuilder {
 
             //draw alerts
             final AlertPaintingSupport support = new AlertPaintingSupport();
-            for (final Alert a : bean.getAlerts()) {
+            for (final Alert a : filterAlerts(bean.getAlerts())) {
                 final ShortTrackerEvent e = EntityUtils.getEntity(bean.getReadings(), a.getTrackerEventId());
                 if (e != null) {
                     support.addFiredAlerts(e.getTime(), a.getType());
