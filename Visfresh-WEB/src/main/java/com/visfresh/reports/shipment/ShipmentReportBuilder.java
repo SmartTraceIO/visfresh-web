@@ -362,8 +362,8 @@ public class ShipmentReportBuilder {
                 //image
                 final BufferedImage im = alertImageMap.get(alert.getType());
                 final ImageBuilder image = Components.image(im);
-                image.setFixedDimension(im.getWidth(), im.getHeight());
-                image.setImageScale(ImageScale.CLIP);
+                image.setFixedDimension(17, 17);
+                image.setImageScale(ImageScale.RETAIN_SHAPE);
                 image.setStretchType(StretchType.CONTAINER_HEIGHT);
 
                 alertView.add(Components.hListCell(image).heightFixedOnMiddle());
@@ -403,7 +403,7 @@ public class ShipmentReportBuilder {
         String titleText = "TEMPERATURE";
         if (bean.getAlertSuppressionMinutes() > 0) {
             titleText += " (excluding "
-                    + LocalizationUtils.formatByOneDecimal(bean.getAlertSuppressionMinutes() / 60l) + "hrs"
+                    + LocalizationUtils.formatByOneDecimal(bean.getAlertSuppressionMinutes() / 60.) + "hrs"
                     + " cooldown period)";
         }
 
@@ -463,15 +463,15 @@ public class ShipmentReportBuilder {
                 LocalizationUtils.formatByOneDecimal(
                         LocalizationUtils.convertToUnits(bean.getMaximumTemperature(), units)),
                 LocalizationUtils.formatByOneDecimal(
-                        bean.getTimeBelowLowerLimit() / (60 * 60 * 1000l)) + "hrs",
+                        bean.getTimeBelowLowerLimit() / (60 * 60 * 1000.)) + "hrs",
                 LocalizationUtils.formatByOneDecimal(
-                        bean.getTimeAboveUpperLimit() / (60 * 60 * 1000l)) + "hrs",
+                        bean.getTimeAboveUpperLimit() / (60 * 60 * 1000.)) + "hrs",
                 LocalizationUtils.formatByOneDecimal(
-                        bean.getTotalTime() / (60 * 60 * 1000l)) + "hrs"
+                        bean.getTotalTime() / (60 * 60 * 1000.)) + "hrs"
                 );
 
         //apply styles
-        TableSupport.customizeTableStyles(styles);
+        TableSupport.customizeTableStyles(styles, true);
         for (int i = 0; i < styles.length; i++) {
             cols[i].setStyle(styles[i]);
         }
@@ -818,7 +818,7 @@ public class ShipmentReportBuilder {
         cols[2] = columnBuilder;
 
         //apply styles
-        TableSupport.customizeTableStyles(styles);
+        TableSupport.customizeTableStyles(styles, true);
         for (int i = 0; i < styles.length; i++) {
             cols[i].setStyle(styles[i]);
         }
@@ -908,7 +908,7 @@ public class ShipmentReportBuilder {
             style.setPadding(DEFAULT_PADDING);
             cols[i].setStyle(style);
         }
-        TableSupport.customizeTableStyles(styles);
+        TableSupport.customizeTableStyles(styles, false);
 
         report.columns(cols);
 
@@ -922,10 +922,12 @@ public class ShipmentReportBuilder {
         rows.add(description);
 
         //pallet ID
-        final Map<String, Object> palletId = new HashMap<>();
-        palletId.put(key, "Pallet ID");
-        palletId.put(value, bean.getPalletId() == null ? "" : bean.getPalletId());
-        rows.add(palletId);
+        if (bean.getPalletId() != null) {
+            final Map<String, Object> palletId = new HashMap<>();
+            palletId.put(key, "Pallet ID");
+            palletId.put(value, bean.getPalletId());
+            rows.add(palletId);
+        }
 
         //comments
         final Map<String, Object> comments = new HashMap<>();
@@ -934,10 +936,12 @@ public class ShipmentReportBuilder {
         rows.add(comments);
 
         //number of siblings
-        final Map<String, Object> siblings = new HashMap<>();
-        siblings.put(key, "Number of siblings");
-        siblings.put(value, Integer.toString(bean.getNumberOfSiblings()));
-        rows.add(siblings);
+        if (bean.getNumberOfSiblings() > 0) {
+            final Map<String, Object> siblings = new HashMap<>();
+            siblings.put(key, "Number of siblings");
+            siblings.put(value, Integer.toString(bean.getNumberOfSiblings()));
+            rows.add(siblings);
+        }
 
         report.setHighlightDetailEvenRows(true);
         report.setShowColumnTitle(true);

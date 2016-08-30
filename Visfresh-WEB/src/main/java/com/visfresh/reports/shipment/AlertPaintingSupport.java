@@ -3,9 +3,6 @@
  */
 package com.visfresh.reports.shipment;
 
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -86,26 +83,26 @@ public class AlertPaintingSupport {
         }
 
         try {
-            BufferedImage image = ImageIO.read(url);
-            if (image != null && image.getWidth() != 17 && image.getHeight() != 17) {
-                final BufferedImage im = new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_INT_ARGB_PRE);
-
-                final Graphics2D g = im.createGraphics();
-                try {
-                    final double scale = (double) ICON_SIZE/ image.getWidth();
-                    g.setTransform(AffineTransform.getScaleInstance(scale, scale));
-                    g.setRenderingHint(RenderingHints.KEY_RENDERING,
-                            RenderingHints.VALUE_RENDER_QUALITY);
-                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-
-                    g.drawImage(image, 0, 0, null);
-                } finally {
-                    g.dispose();
-                }
-
-                image = im;
-            }
+            final BufferedImage image = ImageIO.read(url);
+//            if (image != null && image.getWidth() != 17 && image.getHeight() != 17) {
+//                final BufferedImage im = new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_INT_ARGB_PRE);
+//
+//                final Graphics2D g = im.createGraphics();
+//                try {
+//                    final double scale = (double) ICON_SIZE/ image.getWidth();
+//                    g.setTransform(AffineTransform.getScaleInstance(scale, scale));
+//                    g.setRenderingHint(RenderingHints.KEY_RENDERING,
+//                            RenderingHints.VALUE_RENDER_QUALITY);
+//                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+//                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+//
+//                    g.drawImage(image, 0, 0, null);
+//                } finally {
+//                    g.dispose();
+//                }
+//
+//                image = im;
+//            }
             return image;
         } catch (final IOException e) {
             throw new RuntimeException("Unable to load image", e);

@@ -76,8 +76,8 @@ public final class ShipmentReportBuilderTool {
         bean.setDateShipped(new Date(System.currentTimeMillis() - 1000000000));
         bean.setDescription("Autostarted by rule");
         bean.setDevice(device.getImei());
-        bean.setNumberOfSiblings(3);
-        bean.setPalletId("pallet-007");
+        bean.setNumberOfSiblings(0);
+        bean.setPalletId(null);
         bean.setShippedFrom("De Costi Office Lidcombe");
         bean.setShippedTo("De Costi Office Lidcombe");
         bean.setStatus(ShipmentStatus.Arrived);
