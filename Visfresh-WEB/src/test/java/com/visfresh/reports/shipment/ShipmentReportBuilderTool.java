@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 
@@ -79,8 +81,16 @@ public final class ShipmentReportBuilderTool {
         bean.setNumberOfSiblings(0);
         bean.setPalletId(null);
         bean.setShippedFrom("De Costi Office Lidcombe");
-        bean.setShippedTo("De Costi Office Lidcombe");
-        bean.setStatus(ShipmentStatus.Arrived);
+//        bean.setShippedTo("De Costi Office Lidcombe");
+        final List<String> altLocs = new LinkedList<>();
+        altLocs.add("De Costi Office Lidcombe");
+        altLocs.add("Odessa deribasovskaya");
+        altLocs.add("WW DC Sydney");
+        altLocs.add("WW DC Brisbane");
+
+        bean.setPossibleShippedTo(altLocs);
+
+        bean.setStatus(ShipmentStatus.Default);
         bean.setTripCount(14);
         bean.setAlertSuppressionMinutes(110);
 

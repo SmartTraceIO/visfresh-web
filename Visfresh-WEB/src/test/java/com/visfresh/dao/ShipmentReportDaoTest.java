@@ -17,6 +17,7 @@ import org.junit.Test;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Color;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
@@ -323,6 +324,37 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         final ShipmentReportBean report = dao.createReport(shipment);
         assertEquals(2, report.getWhoWasNotified().size());
+    }
+    @Test
+    public void testPossibleShippedTo() {
+        final LocationProfile loc1 = craeteLocation("Loc 1");
+        final LocationProfile loc2 = craeteLocation("Loc 2");
+
+        final AlternativeLocations alts = new AlternativeLocations();
+        alts.getTo().add(loc1);
+        alts.getTo().add(loc2);
+
+        context.getBean(AlternativeLocationsDao.class).save(shipment, alts);
+
+        final ShipmentReportBean bean = dao.createReport(shipment);
+        assertEquals(2, bean.getPossibleShippedTo().size());
+        assertEquals(loc1.getName(), bean.getPossibleShippedTo().get(0));
+        assertEquals(loc2.getName(), bean.getPossibleShippedTo().get(1));
+    }
+
+    /**
+     * @param name location name.
+     * @return location profile.
+     */
+    private LocationProfile craeteLocation(final String name) {
+        final LocationProfile loc = new LocationProfile();
+        loc.setCompany(sharedCompany);
+        loc.setName(name);
+        loc.setAddress(name + " address");
+        loc.setRadius(500);
+        loc.getLocation().setLatitude(10);
+        loc.getLocation().setLongitude(10);
+        return context.getBean(LocationProfileDao.class).save(loc);
     }
 
     /**

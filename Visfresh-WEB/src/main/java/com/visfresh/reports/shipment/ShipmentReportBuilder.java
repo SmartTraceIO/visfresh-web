@@ -6,7 +6,6 @@ package com.visfresh.reports.shipment;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -81,6 +80,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
@@ -544,17 +544,17 @@ public class ShipmentReportBuilder {
 
             try {
                 final Dimension size = new Dimension(w, h);
-//                final RenderedMap rim = mapBuilder.createMapImage(coords, size);
+                final RenderedMap rim = mapBuilder.createMapImage(coords, size);
 
-                final RenderedMap rim = new RenderedMap();
-                final BufferedImage bim = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-                final Graphics g2 = bim.getGraphics();
-                g2.setColor(Color.BLUE);
-                g2.fillRect(0, 0, w, h);
-                g2.dispose();
-                rim.setMap(bim);
-                rim.setMapLocation(new Point());
-                rim.setZoom(14);
+//                final RenderedMap rim = new RenderedMap();
+//                final BufferedImage bim = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+//                final Graphics g2 = bim.getGraphics();
+//                g2.setColor(Color.BLUE);
+//                g2.fillRect(0, 0, w, h);
+//                g2.dispose();
+//                rim.setMap(bim);
+//                rim.setMapLocation(new Point());
+//                rim.setZoom(14);
 
                 final BufferedImage image = scaleMapAndAddReadingData(
                         rim, bean, size);
@@ -751,9 +751,46 @@ public class ShipmentReportBuilder {
 
         //shipped to
         final Map<String, Object> shippedTo = new HashMap<>();
-        shippedTo.put(images, createImage("reports/images/shipment/shippedTo.png"));
+        final List<String> possibleShippedTo = bean.getPossibleShippedTo();
+        if (bean.getShippedTo() == null
+                && possibleShippedTo != null && !possibleShippedTo.isEmpty()) {
+            shippedTo.put(images, createImage("reports/images/shipment/shippedToToBeDetermined.png"));
+
+            //cut two locations
+            final List<String> otherLocs = new LinkedList<>(possibleShippedTo);
+            final List<String> locs = new LinkedList<>();
+            while (!otherLocs.isEmpty()) {
+                locs.add(otherLocs.remove(0));
+                if (locs.size() == 2) {
+                    break;
+                }
+            }
+
+            //show two alternative locations.
+            final StringBuilder locations = new StringBuilder(StringUtils.combine(locs, ", "));
+
+            //add number of other alternative locations.
+            if (otherLocs.size() > 0) {
+                locations.append(" and ");
+                locations.append(Integer.toString(otherLocs.size()));
+                locations.append(" others");
+            }
+
+            //wrap by braces
+            locations.insert(0, '(').append(')');
+
+            if (!Shipment.isFinalStatus(bean.getStatus())) {
+                locations.insert(0, "To be determined ");
+            } else {
+                locations.insert(0, "Not determined ");
+            }
+
+            shippedTo.put(value, locations.toString());
+        } else {
+            shippedTo.put(images, createImage("reports/images/shipment/shippedTo.png"));
+            shippedTo.put(value, bean.getShippedTo() == null ? "" : bean.getShippedTo());
+        }
         shippedTo.put(key, "Shipped To");
-        shippedTo.put(value, bean.getShippedTo() == null ? "" : bean.getShippedTo());
         rows.add(shippedTo);
 
         //arrival date

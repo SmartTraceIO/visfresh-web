@@ -13,13 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
@@ -48,6 +51,8 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
     private TrackerEventDao trackerEventDao;
     @Autowired
     private NotificationDao notificationDao;
+    @Autowired
+    private AlternativeLocationsDao alternativeLocationsDao;
     @Autowired
     private RuleEngine ruleEngine;
 
@@ -88,6 +93,16 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
         if (s.getShippedTo() != null) {
             bean.setShippedTo(s.getShippedTo().getName());
+        } else {
+            final AlternativeLocations alts = alternativeLocationsDao.getBy(s);
+            if (alts != null && !alts.getTo().isEmpty()) {
+                final List<String> altNames = new LinkedList<>();
+                for (final LocationProfile altLoc : alts.getTo()) {
+                    altNames.add(altLoc.getName());
+                }
+
+                bean.setPossibleShippedTo(altNames);
+            }
         }
         bean.setStatus(s.getStatus());
         bean.setTripCount(s.getTripCount());

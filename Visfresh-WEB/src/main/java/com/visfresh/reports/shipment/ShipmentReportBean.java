@@ -58,6 +58,7 @@ public class ShipmentReportBean {
     private long timeAboveUpperLimit;
     private Color deviceColor = Color.GREEN.darker();
     private int alertSuppressionMinutes;
+    private List<String> possibleShippedTo;
 
     /**
      * Default constructor.
@@ -402,5 +403,17 @@ public class ShipmentReportBean {
      */
     public int getAlertSuppressionMinutes() {
         return alertSuppressionMinutes;
+    }
+    /**
+     * @param locNames
+     */
+    public void setPossibleShippedTo(final List<String> locNames) {
+        possibleShippedTo = locNames;
+    }
+    /**
+     * @return the possibleShippedTo
+     */
+    public List<String> getPossibleShippedTo() {
+        return possibleShippedTo;
     }
 }
