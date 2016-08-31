@@ -6,6 +6,7 @@ package com.visfresh.reports.shipment;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -546,17 +547,17 @@ public class ShipmentReportBuilder {
 
             try {
                 final Dimension size = new Dimension(w, h);
-                final RenderedMap rim = mapBuilder.createMapImage(coords, size);
+//                final RenderedMap rim = mapBuilder.createMapImage(coords, size);
 
-//                final RenderedMap rim = new RenderedMap();
-//                final BufferedImage bim = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-//                final Graphics g2 = bim.getGraphics();
-//                g2.setColor(Color.BLUE);
-//                g2.fillRect(0, 0, w, h);
-//                g2.dispose();
-//                rim.setMap(bim);
-//                rim.setMapLocation(new Point());
-//                rim.setZoom(14);
+                final RenderedMap rim = new RenderedMap();
+                final BufferedImage bim = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+                final Graphics g2 = bim.getGraphics();
+                g2.setColor(Color.BLUE);
+                g2.fillRect(0, 0, w, h);
+                g2.dispose();
+                rim.setMap(bim);
+                rim.setMapLocation(new Point());
+                rim.setZoom(14);
 
                 final BufferedImage image = scaleMapAndAddReadingData(
                         rim, bean, size);
@@ -702,17 +703,16 @@ public class ShipmentReportBuilder {
             }
 
             for (final ShortTrackerEvent p : bean.getReadings()) {
-                final List<BufferedImage> images = support.getAlertImages(p.getTime());
+                final int iconSize = 16;
+                final BufferedImage im = support.getRenderedImage(p.getTime(), iconSize);
 
-                final int offset = AlertPaintingSupport.ICON_SIZE / 2;
-                if (images != null && !images.isEmpty()) {
+                if (im != null) {
+                    final int offset = iconSize / 2;
                     final int x = (int) Math.round(scale * (MapImageBuilder.lon2position(
                             p.getLongitude(), zoom) - loc.x));
                     final int y = (int) Math.round(scale * (MapImageBuilder.lat2position(
                             p.getLatitude(), zoom) - loc.y));
-                    for (final BufferedImage im : images) {
-                        g.drawImage(im, x - offset, y - offset, null);
-                    }
+                    g.drawImage(im, x - offset, y - offset, null);
                 }
             }
         } finally {

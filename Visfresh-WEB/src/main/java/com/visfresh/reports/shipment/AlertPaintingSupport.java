@@ -3,6 +3,8 @@
  */
 package com.visfresh.reports.shipment;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -21,12 +23,12 @@ import com.visfresh.entities.AlertType;
  *
  */
 public class AlertPaintingSupport {
+    private Map<Date, BufferedImage> renderedImages = new HashMap<>();
     private static final String LAST_READING = "LastReading";
     private static final String ARRIVAL = "Arrival";
 
     private Map<Date, List<BufferedImage>> alertsFired = new HashMap<>();
     private Map<String, BufferedImage> imageCache = new HashMap<>();
-    public static final int ICON_SIZE = 17;
 
     /**
      * Default constructor.
@@ -134,5 +136,45 @@ public class AlertPaintingSupport {
      */
     public static BufferedImage loadAlertImage(final AlertType type) {
         return loadAlertImage(type.name());
+    }
+    /**
+     * @param date
+     * @return
+     */
+    public BufferedImage getRenderedImage(final Date date, final int size) {
+        final BufferedImage bim = this.renderedImages.get(date);
+        if (bim != null) {
+            return bim;
+        }
+
+        final List<BufferedImage> images = getAlertImages(date);
+        if (images != null) {
+            //calculate image width
+            final int w = size + images.size() - 1;
+            final int h = w;
+
+            //render complex image
+            final BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+
+            final Graphics2D g = result.createGraphics();
+            try {
+                int i = 0;
+                for (final BufferedImage a : images) {
+                    Image im = a;
+                    if (a.getWidth() != size || a.getHeight() != size) {
+                        im = a.getScaledInstance(size, size, Image.SCALE_AREA_AVERAGING);
+                    }
+
+                    g.drawImage(im, i, 0, null);
+                    i++;
+                }
+            } finally {
+                g.dispose();
+            }
+
+            renderedImages.put(date, result);
+            return result;
+        }
+        return null;
     }
 }

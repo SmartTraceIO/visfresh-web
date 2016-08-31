@@ -8,9 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.jfree.chart.axis.ValueAxis;
@@ -32,7 +30,7 @@ import com.visfresh.utils.EntityUtils;
  */
 @SuppressWarnings("serial")
 public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
-    private Map<Date, BufferedImage> complexImages = new HashMap<>();
+    private static final int ICON_SIZE = 20;
     private final AlertPaintingSupport support = new AlertPaintingSupport();
     /**
      * Default constructor.
@@ -72,7 +70,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
 
         if (getItemShapeVisible(series, item)) {
             final Long d = (Long) dataset.getX(series, item);
-            final BufferedImage im = getRenderedImage(new Date(d));
+            final BufferedImage im = support.getRenderedImage(new Date(d), ICON_SIZE);
             if (im != null) {
                 final int w = im.getWidth();
                 final int h = im.getHeight();
@@ -91,58 +89,6 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 }
             }
         }
-    }
-    /**
-     * @param date
-     * @return
-     */
-    private BufferedImage getRenderedImage(final Date date) {
-        final BufferedImage im = this.complexImages.get(date);
-        if (im != null) {
-            return im;
-        }
-
-        final List<BufferedImage> images = support.getAlertImages(date);
-        if (images != null) {
-            if (images.size() == 1) {
-                return images.get(0);
-            }
-
-            //calculate image width
-            int w = 0;
-            int h = 0;
-
-            int i = 0;
-            for (final BufferedImage image : images) {
-                h = Math.max(image.getHeight(), h);
-                w = Math.max(i + image.getWidth(), w);
-
-                i++;
-            }
-
-            //check empty images
-            if (w == 0 || h == 0) {
-                return null;
-            }
-
-            //render complex image
-            final BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-
-            final Graphics2D g = result.createGraphics();
-            try {
-                i = 0;
-                for (final BufferedImage a : images) {
-                    g.drawImage(a, i, 0, null);
-                    i++;
-                }
-            } finally {
-                g.dispose();
-            }
-
-            complexImages.put(date, result);
-            return result;
-        }
-        return null;
     }
     /**
      * @param readings
