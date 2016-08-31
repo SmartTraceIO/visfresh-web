@@ -54,6 +54,15 @@ public final class LocalizationUtils {
         return temp;
     }
     /**
+     * @param t temperature.
+     * @param units temperature units.
+     * @return temperature string.
+     */
+    public static String getTemperatureString(final double t, final TemperatureUnits units) {
+        final String unitsString = convertToUnitsString(t, units);
+        return unitsString + getDegreeSymbol(units);
+    }
+    /**
      * @param sd
      * @param units
      * @return
@@ -73,12 +82,13 @@ public final class LocalizationUtils {
         return temp;
     }
     /**
-     * @param t temperature.
-     * @param units temperature units.
-     * @return temperature string.
+     * @param sd
+     * @param units
+     * @return
      */
-    public static String getTemperatureString(final double t, final TemperatureUnits units) {
-        final String unitsString = convertToUnitsString(t, units);
+    public static String getSdString(final double sd,
+            final TemperatureUnits units) {
+        final String unitsString = formatByOneDecimal(convertSdToUnits(sd, units));
         return unitsString + getDegreeSymbol(units);
     }
     /**

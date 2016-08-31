@@ -462,12 +462,9 @@ public class ShipmentReportBuilder {
                 "Time monitored");
         ds.add(
                 getTemperatureString(bean.getAvgTemperature(), user),
-                LocalizationUtils.formatByOneDecimal(
-                        LocalizationUtils.convertSdToUnits(bean.getStandardDevitation(), units)),
-                LocalizationUtils.formatByOneDecimal(
-                        LocalizationUtils.convertToUnits(bean.getMinimumTemperature(), units)),
-                LocalizationUtils.formatByOneDecimal(
-                        LocalizationUtils.convertToUnits(bean.getMaximumTemperature(), units)),
+                LocalizationUtils.getSdString(bean.getStandardDevitation(), units),
+                LocalizationUtils.getTemperatureString(bean.getMinimumTemperature(), units),
+                LocalizationUtils.getTemperatureString(bean.getMaximumTemperature(), units),
                 LocalizationUtils.formatByOneDecimal(
                         bean.getTimeBelowLowerLimit() / (60 * 60 * 1000.)) + "hrs",
                 LocalizationUtils.formatByOneDecimal(
