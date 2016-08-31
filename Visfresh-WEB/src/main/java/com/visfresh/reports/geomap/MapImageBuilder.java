@@ -148,76 +148,24 @@ public class MapImageBuilder {
             g.dispose();
         }
     }
-
-    /**
-     * @param center
-     * @param w
-     * @param h
-     * @param targetSize
-     * @return
-     * @throws IOException
-     */
-    public RenderedMap createMapImage(final List<Point2D> points, final Dimension targetSize) throws IOException {
-        final int zoom = calculateZoom(points, targetSize);
-        final Rectangle r = getMapBounds(points, zoom);
-        expandMap(r);
-
-        final double k = Math.max(r.width / targetSize.getWidth(), r.height / targetSize.getHeight());
-        final int neww = (int) Math.floor(targetSize.width * k);
-        final int newh = (int) Math.floor(targetSize.height * k);
-
-        r.x = r.x + (r.width - neww) / 2;
-        r.y = r.y + (r.height - newh) / 2;
-        r.width = neww;
-        r.height = newh;
-
-        final BufferedImage image = new BufferedImage(r.width, r.height, BufferedImage.TYPE_INT_ARGB);
-
-
-        final Graphics2D g = image.createGraphics();
-        try {
-            paint(g, new Point(r.x, r.y),
-                    zoom, image.getWidth(), image.getHeight());
-        } finally {
-            g.dispose();
-        }
-
-        final RenderedMap map = new RenderedMap();
-        map.setMap(image);
-        map.setZoom(zoom);
-        map.setMapLocation(new Point(r.x, r.y));
-        return map;
-    }
-    /**
-     * @param r
-     */
-    private void expandMap(final Rectangle r) {
-        final int dx = (int) Math.floor(r.width / 8.0);
-        final int dy = (int) Math.floor(r.height / 8.0);
-
-        r.translate(-dx, -dy);
-        r.width += 2 * dx;
-        r.height += 2 * dx;
-    }
     /**
      * @param area
      * @param targetSize
      * @return
      */
-    private int calculateZoom(final List<Point2D> points, final Dimension targetSize) {
+    public int calculateZoom(final List<Point2D> points, final Dimension targetSize) {
         int bestZoom = maxZoom;
 
         int zoom = maxZoom;
         while (zoom > 1) {
+            bestZoom = zoom;
+
             //calculate area for given zoom
             final Rectangle r = getMapBounds(points, zoom);
-
-            if (r.width >= targetSize.width && r.height >= targetSize.height) {
-                bestZoom = zoom;
-                zoom--;
-            } else {
+            if (r.width <= targetSize.width && r.height <= targetSize.height) {
                 break;
             }
+            zoom--;
         }
 
         return bestZoom;
@@ -228,7 +176,7 @@ public class MapImageBuilder {
      * @param zoom
      * @return
      */
-    private Rectangle getMapBounds(final List<Point2D> points, final int zoom) {
+    public Rectangle getMapBounds(final List<Point2D> points, final int zoom) {
         int minx = Integer.MAX_VALUE;
         int miny = Integer.MAX_VALUE;
         int maxx = Integer.MIN_VALUE;

@@ -81,7 +81,7 @@ public final class ShipmentReportBuilderTool {
         bean.setNumberOfSiblings(0);
         bean.setPalletId(null);
         bean.setShippedFrom("De Costi Office Lidcombe");
-//        bean.setShippedTo("De Costi Office Lidcombe");
+        bean.setShippedTo("De Costi Office Lidcombe");
         final List<String> altLocs = new LinkedList<>();
         altLocs.add("De Costi Office Lidcombe");
         altLocs.add("Odessa deribasovskaya");

@@ -5,15 +5,9 @@ package com.visfresh.reports.shipment;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -88,10 +82,8 @@ import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.Colors;
 import com.visfresh.reports.TableSupport;
 import com.visfresh.reports.TableSupportCondition;
-import com.visfresh.reports.geomap.MapImageBuilder;
-import com.visfresh.reports.geomap.RenderedMap;
+import com.visfresh.reports.geomap.MapRendererImpl;
 import com.visfresh.utils.DateTimeUtils;
-import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -108,7 +100,6 @@ public class ShipmentReportBuilder {
 
     @Autowired
     protected RuleBundle ruleBundle;
-    private MapImageBuilder mapBuilder = new MapImageBuilder();
 
     /**
      * Default constructor.
@@ -245,7 +236,7 @@ public class ShipmentReportBuilder {
      * @param alerts
      * @return
      */
-    protected List<Alert> filterAlerts(final List<Alert> alerts) {
+    public static List<Alert> filterAlerts(final List<Alert> alerts) {
         final List<Alert> result = new LinkedList<Alert>();
         for (final Alert a : alerts) {
             if (a.getType() != AlertType.LightOff && a.getType() != AlertType.LightOn) {
@@ -534,38 +525,15 @@ public class ShipmentReportBuilder {
 
         if (hasReadingsWithLocation(readings)) {
             final int w = 300;
-            final int h = 119;
-
-            final List<Point2D> coords = new LinkedList<>();
-
-            for (final ShortTrackerEvent e : readings) {
-                coords.add(new Point2D.Double(e.getLongitude(), e.getLatitude()));
-            }
 
             try {
-                final Dimension size = new Dimension(w, h);
-                final RenderedMap rim = mapBuilder.createMapImage(coords, size);
-
-//                final RenderedMap rim = new RenderedMap();
-//                final BufferedImage bim = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-//                final Graphics g2 = bim.getGraphics();
-//                g2.setColor(Color.BLUE);
-//                g2.fillRect(0, 0, w, h);
-//                g2.dispose();
-//                rim.setMap(bim);
-//                rim.setMapLocation(new Point());
-//                rim.setZoom(14);
-
-                final BufferedImage image = scaleMapAndAddReadingData(
-                        rim, bean, size);
-
-                final ImageBuilder ib = Components.image(image);
+                final ImageBuilder ib = Components.image(new MapRendererImpl(bean));
                 ib.setHorizontalImageAlignment(HorizontalImageAlignment.CENTER);
                 ib.setImageScale(ImageScale.RETAIN_SHAPE);
                 ib.setStretchType(StretchType.CONTAINER_HEIGHT);
 
                 final VerticalListBuilder centerVertical = Components.centerVertical(ib);
-                centerVertical.setFixedDimension(w, h);
+                centerVertical.setFixedWidth(w);
                 return centerVertical;
             } catch (final Exception exc) {
                 log.error("Faile to load tiles from openstreet map", exc);
@@ -632,91 +600,6 @@ public class ShipmentReportBuilder {
                 }
             }
         }
-    }
-
-    /**
-     * @param rim
-     * @param bean
-     * @param size
-     * @return
-     */
-    private BufferedImage scaleMapAndAddReadingData(final RenderedMap rim,
-            final ShipmentReportBean bean, final Dimension size) {
-        double scale = 1.;
-        final boolean scaleChanged = rim.getMap().getWidth() != size.width || rim.getMap().getHeight() != size.height;
-        if (scaleChanged) {
-            scale = (double) size.width / rim.getMap().getWidth();
-            //scale image
-        }
-
-        final BufferedImage image = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-        final Graphics2D g = image.createGraphics();
-        try {
-            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-            if (scaleChanged) {
-                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-                g.drawImage(rim.getMap(), AffineTransform.getScaleInstance(scale, scale), null);
-            } else {
-                g.drawImage(rim.getMap(), 0, 0, null);
-            }
-
-            //create path shape
-            final Point loc = rim.getMapLocation();
-            final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-            final int zoom = rim.getZoom();
-
-            for (final ShortTrackerEvent p : bean.getReadings()) {
-                final int x = (int) Math.round(scale * (MapImageBuilder.lon2position(
-                        p.getLongitude(), zoom) - loc.x));
-                final int y = (int) Math.round(scale * (MapImageBuilder.lat2position(
-                        p.getLatitude(), zoom) - loc.y));
-                if (path.getCurrentPoint() == null) {
-                    path.moveTo(x, y);
-                } else {
-                    path.lineTo(x, y);
-                }
-            }
-
-            g.setStroke(new BasicStroke(2.f));
-            g.setColor(bean.getDeviceColor());
-            g.draw(path);
-
-            //draw alerts
-            final AlertPaintingSupport support = new AlertPaintingSupport();
-            for (final Alert a : filterAlerts(bean.getAlerts())) {
-                final ShortTrackerEvent e = EntityUtils.getEntity(bean.getReadings(), a.getTrackerEventId());
-                if (e != null) {
-                    support.addFiredAlerts(e.getTime(), a.getType());
-                }
-            }
-
-            final int readingsCount = bean.getReadings().size();
-            if (readingsCount > 0) {
-                support.addLastReading(bean.getReadings().get(readingsCount - 1).getTime());
-            }
-            if (bean.getArrival() != null) {
-                support.addArrival(bean.getArrival().getTime());
-            }
-
-            for (final ShortTrackerEvent p : bean.getReadings()) {
-                final int iconSize = 16;
-                final BufferedImage im = support.getRenderedImage(p.getTime(), iconSize);
-
-                if (im != null) {
-                    final int offset = iconSize / 2;
-                    final int x = (int) Math.round(scale * (MapImageBuilder.lon2position(
-                            p.getLongitude(), zoom) - loc.x));
-                    final int y = (int) Math.round(scale * (MapImageBuilder.lat2position(
-                            p.getLatitude(), zoom) - loc.y));
-                    g.drawImage(im, x - offset, y - offset, null);
-                }
-            }
-        } finally {
-            g.dispose();
-        }
-
-        return image;
     }
 
     /**
