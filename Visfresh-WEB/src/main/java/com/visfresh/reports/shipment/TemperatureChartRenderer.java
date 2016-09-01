@@ -3,24 +3,51 @@
  */
 package com.visfresh.reports.shipment;
 
+import static com.visfresh.utils.DateTimeUtils.convertToTimeZone;
+import static com.visfresh.utils.LocalizationUtils.convertToUnits;
+import static com.visfresh.utils.LocalizationUtils.getDegreeSymbol;
+
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
+import net.sf.dynamicreports.report.builder.chart.Charts;
+import net.sf.dynamicreports.report.builder.chart.TimeSeriesChartBuilder;
+import net.sf.dynamicreports.report.builder.column.Columns;
+import net.sf.dynamicreports.report.constant.TimePeriod;
+import net.sf.dynamicreports.report.datasource.DRDataSource;
+import net.sf.dynamicreports.report.definition.ReportParameters;
+import net.sf.dynamicreports.report.definition.chart.DRIChartCustomizer;
+
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.plot.CrosshairState;
+import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
+import org.jfree.ui.Layer;
 import org.jfree.ui.RectangleEdge;
 
+import com.visfresh.controllers.UtilitiesController;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.User;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
 
@@ -90,6 +117,15 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
             }
         }
     }
+    /* (non-Javadoc)
+     * @see org.jfree.chart.renderer.xy.AbstractXYItemRenderer#drawAnnotations(java.awt.Graphics2D, java.awt.geom.Rectangle2D, org.jfree.chart.axis.ValueAxis, org.jfree.chart.axis.ValueAxis, org.jfree.ui.Layer, org.jfree.chart.plot.PlotRenderingInfo)
+     */
+    @Override
+    public void drawAnnotations(final Graphics2D g2, final Rectangle2D dataArea,
+            final ValueAxis domainAxis, final ValueAxis rangeAxis, final Layer layer,
+            final PlotRenderingInfo info) {
+        super.drawAnnotations(g2, dataArea, domainAxis, rangeAxis, layer, info);
+    }
     /**
      * @param readings
      * @param alerts
@@ -101,7 +137,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
         for (final Alert a : alerts) {
             final ShortTrackerEvent e = EntityUtils.getEntity(readings, a.getTrackerEventId());
             if (e != null) {
-                support.addFiredAlerts(DateTimeUtils.convertToTimeZone(e.getTime(), timeZone),
+                support.addFiredAlerts(convertToTimeZone(e.getTime(), timeZone),
                         a.getType());
             }
         }
@@ -109,10 +145,107 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
         final int size = readings.size();
         if (size > 0) {
             support.addLastReading(
-                    DateTimeUtils.convertToTimeZone(readings.get(size - 1).getTime(), timeZone));
+                    convertToTimeZone(readings.get(size - 1).getTime(), timeZone));
         }
         if (arrival != null) {
-            support.addArrival(DateTimeUtils.convertToTimeZone(arrival.getTime(), timeZone));
+            support.addArrival(convertToTimeZone(arrival.getTime(), timeZone));
         }
+    }
+    /**
+     * @param bean
+     * @return
+     */
+    private static DRIChartCustomizer createCustomizer(final ShipmentReportBean bean, final User user) {
+        return new DRIChartCustomizer() {
+            @Override
+            public void customize(final JFreeChart chart, final ReportParameters reportParameters) {
+                //set date format to date axis
+                final DateAxis dateAxis = (DateAxis) chart.getXYPlot().getDomainAxis();
+                dateAxis.setDateFormatOverride(DateTimeUtils.createPrettyFormat(
+                        user.getLanguage(), user.getTimeZone()));
+                dateAxis.setAutoRange(true);
+
+                //install TemperatureChartRenderer to chart
+                final TemperatureChartRenderer renderer = new TemperatureChartRenderer();
+                renderer.addAlertsData(bean.getReadings(),
+                        ShipmentReportBuilder.filterAlerts(bean.getAlerts()), bean.getArrival(),
+                        user.getTimeZone());
+                renderer.setSeriesShape(0, new Rectangle(0, 0));
+                renderer.setLegendShape(0, new Rectangle(-1, -1, 2, 2));
+
+                chart.getXYPlot().setRenderer(0, renderer);
+
+                //add green line
+                final IntervalMarker greenLine = new IntervalMarker(
+                        convertToUnits(bean.getLowerTemperatureLimit(), user.getTemperatureUnits()),
+                        convertToUnits(bean.getUpperTemperatureLimit(), user.getTemperatureUnits()),
+                        new Color(202, 255, 181, 150));
+                chart.getXYPlot().addRangeMarker(greenLine, Layer.BACKGROUND);
+            }
+        };
+    }
+    /**
+     * @param bean
+     * @param user
+     * @return
+     */
+    public static TimeSeriesChartBuilder createCompatibleChart(
+            final ShipmentReportBean bean, final User user) {
+        final TemperatureUnits units = user.getTemperatureUnits();
+        final TimeZone timeZone = user.getTimeZone();
+
+        final String time = "time";
+        final String temperature = "temperature";
+
+        final TimeSeriesChartBuilder chart = Charts.timeSeriesChart();
+        chart
+            .setTimePeriod(Columns.column(time, Date.class))
+            .setTimeAxisFormat(Charts.axisFormat().setLabel(
+                    "Time (" + timeZone.getID() + " "
+                    + UtilitiesController.createOffsetString(timeZone.getRawOffset()) + ")"))
+            .setTimePeriodType(TimePeriod.MILLISECOND)
+            .series(Charts.serie(Columns.column(temperature, java.lang.Double.class))
+                .setLabel("Temperature " + getDegreeSymbol(units)))
+            .seriesColors(bean.getDeviceColor());
+
+        //add data
+        final DRDataSource ds = new DRDataSource(new String[]{time, temperature});
+        for (final ShortTrackerEvent e : getNormalizedReadings(bean)) {
+            ds.add(convertToTimeZone(e.getTime(), timeZone),
+                convertToUnits(e.getTemperature(), units));
+        }
+
+        chart.setDataSource(ds);
+        chart.addCustomizer(createCustomizer(bean, user));
+
+        return chart;
+    }
+    /**
+     * @param bean
+     * @return
+     */
+    private static List<ShortTrackerEvent> getNormalizedReadings(final ShipmentReportBean bean) {
+        final Map<String, ShortTrackerEvent> map = new HashMap<>();
+        final List<ShortTrackerEvent> readings = new LinkedList<>();
+        final DateFormat df = new SimpleDateFormat("yyyy:MM:dd:HH:mm");
+
+        for (final ShortTrackerEvent e : bean.getReadings()) {
+            final String key = df.format(e.getTime());
+
+            final ShortTrackerEvent existing = map.get(key);
+            if (existing == null) {
+                //add reading
+                readings.add(e);
+                //register existing reading for given time
+                map.put(key, e);
+            } else {
+                //use average temperature if more then one event associated
+                //to one time point and ignore given event for avoid of summarizing
+                //the value by chart builder.
+                existing.setTemperature((existing.getTemperature() + e.getTemperature()) / 2.);
+            }
+        }
+
+        return readings;
     }
 }

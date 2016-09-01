@@ -7,13 +7,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,8 +25,6 @@ import javax.imageio.ImageIO;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.base.expression.AbstractSimpleExpression;
 import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.dynamicreports.report.builder.chart.Charts;
-import net.sf.dynamicreports.report.builder.chart.TimeSeriesChartBuilder;
 import net.sf.dynamicreports.report.builder.column.ColumnBuilder;
 import net.sf.dynamicreports.report.builder.column.Columns;
 import net.sf.dynamicreports.report.builder.column.ComponentColumnBuilder;
@@ -53,23 +49,17 @@ import net.sf.dynamicreports.report.constant.ImageScale;
 import net.sf.dynamicreports.report.constant.LineStyle;
 import net.sf.dynamicreports.report.constant.SplitType;
 import net.sf.dynamicreports.report.constant.StretchType;
-import net.sf.dynamicreports.report.constant.TimePeriod;
 import net.sf.dynamicreports.report.constant.VerticalTextAlignment;
 import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.dynamicreports.report.definition.ReportParameters;
-import net.sf.dynamicreports.report.definition.chart.DRIChartCustomizer;
 import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.XYPlot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.UtilitiesController;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
@@ -156,7 +146,7 @@ public class ShipmentReportBuilder {
         body.add(Components.gap(1, gap));
 
         //add temperature chart
-        body.add(createTemperatureChart(bean, user));
+        body.add(TemperatureChartRenderer.createCompatibleChart(bean, user));
 
         //add page footer
         report.addPageFooter(createPageFooter());
@@ -169,67 +159,6 @@ public class ShipmentReportBuilder {
         report.setShowColumnTitle(false);
 
         return report;
-    }
-    /**
-     * @param bean
-     * @param user
-     * @return
-     */
-    @SuppressWarnings("serial")
-    private ComponentBuilder<?, ?> createTemperatureChart(
-            final ShipmentReportBean bean, final User user) {
-        final DateFormat fmt = DateTimeUtils.createPrettyFormat(
-                user.getLanguage(), user.getTimeZone());
-
-        final String time = "time";
-        final String temperature = "temperature";
-
-        final TimeSeriesChartBuilder chart = Charts.timeSeriesChart();
-        chart
-            .setTimePeriod(Columns.column(time, Date.class))
-            .setTimeAxisFormat(Charts.axisFormat().setLabel(
-                    "Time ("
-                    + user.getTimeZone().getID()
-                    + " "
-                    + UtilitiesController.createOffsetString(user.getTimeZone().getRawOffset())
-                    + ")"))
-            .setTimePeriodType(TimePeriod.MILLISECOND)
-            .series(
-                Charts.serie(Columns.column(temperature, java.lang.Double.class))
-                .setLabel("Temperature "
-                        + LocalizationUtils.getDegreeSymbol(user.getTemperatureUnits())))
-            .seriesColors(bean.getDeviceColor());
-
-        //add data
-        final DRDataSource ds = new DRDataSource(new String[]{time, temperature});
-        for (final ShortTrackerEvent e : getNormalizedReadings(bean)) {
-            ds.add(
-                DateTimeUtils.convertToTimeZone(e.getTime(), user.getTimeZone()),
-                LocalizationUtils.convertToUnits(
-                        e.getTemperature(), user.getTemperatureUnits()));
-        }
-
-        chart.setDataSource(ds);
-        chart.addCustomizer(new DRIChartCustomizer() {
-            @Override
-            public void customize(final JFreeChart chart, final ReportParameters reportParameters) {
-                final XYPlot plot = chart.getXYPlot();
-                final DateAxis axis = (DateAxis) plot.getDomainAxis();
-                axis.setDateFormatOverride(fmt);
-                axis.setAutoRange(true);
-
-                final TemperatureChartRenderer renderer = new TemperatureChartRenderer();
-                renderer.addAlertsData(bean.getReadings(),
-                        filterAlerts(bean.getAlerts()), bean.getArrival(),
-                        user.getTimeZone());
-                renderer.setSeriesShape(0, new Rectangle(0, 0));
-                renderer.setLegendShape(0, new Rectangle(-1, -1, 2, 2));
-
-                plot.setRenderer(0, renderer);
-            }
-        });
-
-        return chart;
     }
 
     /**
@@ -246,28 +175,6 @@ public class ShipmentReportBuilder {
         return result;
     }
 
-    /**
-     * @param bean
-     * @return
-     */
-    private List<ShortTrackerEvent> getNormalizedReadings(final ShipmentReportBean bean) {
-        final Map<String, ShortTrackerEvent> map = new HashMap<>();
-        final List<ShortTrackerEvent> readings = new LinkedList<>();
-        final DateFormat df = new SimpleDateFormat("yyyy:MM:dd:HH:mm");
-
-        for (final ShortTrackerEvent e : bean.getReadings()) {
-            final String key = df.format(e.getTime());
-
-            final ShortTrackerEvent existing = map.get(key);
-            if (existing == null) {
-                map.put(key, e);
-                readings.add(e);
-            } else {
-                existing.setTemperature((existing.getTemperature() + e.getTemperature()) / 2.);
-            }
-        }
-        return readings;
-    }
 
     /**
      * @param bean
