@@ -10,7 +10,6 @@ import static com.visfresh.utils.LocalizationUtils.getDegreeSymbol;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.DateFormat;
@@ -103,21 +102,10 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
             final Long d = (Long) dataset.getX(series, item);
             final BufferedImage im = support.getRenderedImage(new Date(d), ICON_SIZE);
             if (im != null) {
-                final int w = im.getWidth();
-                final int h = im.getHeight();
-
-                final RenderingHints hints = g.getRenderingHints();
-                try {
-                    g.setRenderingHint(RenderingHints.KEY_RENDERING,
-                            RenderingHints.VALUE_RENDER_QUALITY);
-
-                    g.drawImage(im,
-                        (int) Math.round(transX1 - w/2.),
-                        (int) Math.round(transY1 - h/2.),
-                        null);
-                } finally {
-                    g.setRenderingHints(hints);
-                }
+                g.drawImage(im,
+                    (int) Math.round(transX1 - im.getWidth() / 2.),
+                    (int) Math.round(transY1 - im.getHeight() / 2.),
+                    null);
             }
         }
     }

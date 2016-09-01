@@ -4,7 +4,8 @@
 package com.visfresh.reports.shipment;
 
 import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -160,12 +161,24 @@ public class AlertPaintingSupport {
             try {
                 int i = 0;
                 for (final BufferedImage a : images) {
-                    Image im = a;
                     if (a.getWidth() != size || a.getHeight() != size) {
-                        im = a.getScaledInstance(size, size, Image.SCALE_AREA_AVERAGING);
+                        final Graphics2D g1 = (Graphics2D) g.create(i, i, size, size);
+                        try {
+                            g1.setRenderingHint(RenderingHints.KEY_RENDERING,
+                                    RenderingHints.VALUE_RENDER_QUALITY);
+                            g1.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                            g1.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+                                    RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+                            final double scale = (double) size / a.getWidth();
+                            g1.drawImage(a, AffineTransform.getScaleInstance(scale, scale), null);
+                        } finally {
+                            g1.dispose();
+                        }
+                    } else {
+                        g.drawImage(a, i, i, null);
                     }
 
-                    g.drawImage(im, i, 0, null);
                     i++;
                 }
             } finally {
