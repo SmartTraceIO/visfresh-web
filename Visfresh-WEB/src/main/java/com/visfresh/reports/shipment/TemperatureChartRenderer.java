@@ -14,6 +14,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,11 +28,14 @@ import net.sf.dynamicreports.report.builder.chart.TimeSeriesChartBuilder;
 import net.sf.dynamicreports.report.builder.column.Columns;
 import net.sf.dynamicreports.report.constant.TimePeriod;
 import net.sf.dynamicreports.report.datasource.DRDataSource;
+import net.sf.dynamicreports.report.defaults.Defaults;
 import net.sf.dynamicreports.report.definition.ReportParameters;
 import net.sf.dynamicreports.report.definition.chart.DRIChartCustomizer;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.NumberTickUnit;
+import org.jfree.chart.axis.TickUnits;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.plot.CrosshairState;
@@ -181,6 +185,13 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                         convertToUnits(bean.getUpperTemperatureLimit(), user.getTemperatureUnits()),
                         new Color(202, 255, 181, 150));
                 chart.getXYPlot().addRangeMarker(greenLine, Layer.BACKGROUND);
+
+                //correct tick count for temperature axis
+                final ValueAxis rangeAxis = chart.getXYPlot().getRangeAxis(0);
+
+                final TickUnits tu = new TickUnits();
+                tu.add(new NumberTickUnit(1., NumberFormat.getNumberInstance(), 5));
+                rangeAxis.setStandardTickUnits(tu);
             }
         };
     }
@@ -217,6 +228,8 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
 
         chart.setDataSource(ds);
         chart.addCustomizer(createCustomizer(bean, user));
+        //set chart height
+        chart.setHeight(Defaults.getDefaults().getChartHeight() * 5 / 2);
 
         return chart;
     }

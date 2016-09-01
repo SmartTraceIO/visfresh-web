@@ -22,7 +22,6 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
-import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.utils.StringUtils;
@@ -58,7 +57,7 @@ public final class ShipmentReportBuilderTool {
         final User user = new User();
         user.setId(7l);
         user.setEmail("dev@smarttrace.com.au");
-        user.setTemperatureUnits(TemperatureUnits.Fahrenheit);
+//        user.setTemperatureUnits(TemperatureUnits.Fahrenheit);
         user.setTimeZone(TimeZone.getDefault());
         return user;
     }
