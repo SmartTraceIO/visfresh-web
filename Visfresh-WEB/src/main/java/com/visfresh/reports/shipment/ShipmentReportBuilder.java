@@ -198,7 +198,7 @@ public class ShipmentReportBuilder {
                 Charts.serie(Columns.column(temperature, java.lang.Double.class))
                 .setLabel("Temperature "
                         + LocalizationUtils.getDegreeSymbol(user.getTemperatureUnits())))
-            .seriesColors(Colors.DEFAULT_GREEN);
+            .seriesColors(bean.getDeviceColor());
 
         //add data
         final DRDataSource ds = new DRDataSource(new String[]{time, temperature});
@@ -421,7 +421,7 @@ public class ShipmentReportBuilder {
         final StyleBuilder[] styles = new StyleBuilder[columns.length];
         final ColumnBuilder<?, ?>[] cols = new ColumnBuilder<?, ?>[styles.length];
 
-        final ConditionalStyleBuilder font = Styles.conditionalStyle(TableSupport.firstColumnCondition)
+        final ConditionalStyleBuilder font = Styles.conditionalStyle(TableSupport.firstRowCondition)
                 .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold());
 
         for (int i = 0; i < columns.length; i++) {
