@@ -4,7 +4,6 @@
 package com.visfresh.utils;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -108,19 +107,14 @@ public final class DateTimeUtils {
         }
         return tzString;
     }
-    public static void main(final String[] args) throws ParseException {
-        final Date d = new Date();
-        System.out.println("Current time zone: " + d);
-        System.out.println("UTC time zone: " + convertToTimeZone(d, TimeZone.getTimeZone("Europe/Oslo")));
-    }
-
-    /**
-     * @param time
-     * @param timeZone
-     * @return
-     */
-    public static Date convertToTimeZone(final Date time, final TimeZone timeZone) {
-        final long t = time.getTime();
-        return new Date(t - (TimeZone.getDefault().getOffset(t) - timeZone.getOffset(t)));
-    }
+//
+//    /**
+//     * @param time
+//     * @param timeZone
+//     * @return
+//     */
+//    public static Date convertToTimeZone(final Date time, final TimeZone timeZone) {
+//        final long t = time.getTime();
+//        return new Date(t - (TimeZone.getDefault().getOffset(t) - timeZone.getOffset(t)));
+//    }
 }

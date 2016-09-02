@@ -87,6 +87,7 @@ import com.visfresh.utils.StringUtils;
 public class ShipmentReportBuilder {
     private static final Logger log = LoggerFactory.getLogger(ShipmentReportBuilder.class);
 
+    public static final int LOCATION_IMAGE_SIZE = 14;
     private static final int DEFAULT_FONT_SIZE = 8;
     private static final int DEFAULT_PADDING = 3;
 
@@ -547,7 +548,7 @@ public class ShipmentReportBuilder {
 
         //shipped from
         final Map<String, Object> shippedFrom = new HashMap<>();
-        shippedFrom.put(images, createImage("reports/images/shipment/shippedFrom.png"));
+        shippedFrom.put(images, createShippedFromImage());
         shippedFrom.put(key, "Shipped From");
         shippedFrom.put(value, bean.getShippedFrom() == null ? "" : bean.getShippedFrom());
         rows.add(shippedFrom);
@@ -596,7 +597,7 @@ public class ShipmentReportBuilder {
 
             shippedTo.put(value, locations.toString());
         } else {
-            shippedTo.put(images, createImage("reports/images/shipment/shippedTo.png"));
+            shippedTo.put(images, createShippedToImage());
             shippedTo.put(value, bean.getShippedTo() == null ? "" : bean.getShippedTo());
         }
         shippedTo.put(key, "Shipped To");
@@ -640,8 +641,8 @@ public class ShipmentReportBuilder {
         //add image wrapped to list
         final ComponentColumnBuilder imageColumnBuilder = Columns.componentColumn(images,
                 Components.verticalList(imageBuilder));
-        imageColumnBuilder.setWidth(14);
-        imageColumnBuilder.setHeight(14);
+        imageColumnBuilder.setWidth(LOCATION_IMAGE_SIZE);
+        imageColumnBuilder.setHeight(LOCATION_IMAGE_SIZE);
 
         cols[0] = imageColumnBuilder;
 
@@ -684,12 +685,23 @@ public class ShipmentReportBuilder {
         return list;
     }
 
-
+    /**
+     * @return
+     */
+    public static BufferedImage createShippedToImage() {
+        return createImage("reports/images/shipment/shippedTo.png");
+    }
+    /**
+     * @return
+     */
+    public static BufferedImage createShippedFromImage() {
+        return createImage("reports/images/shipment/shippedFrom.png");
+    }
     /**
      * @param resource
      * @return
      */
-    private Image createImage(final String resource) {
+    private static BufferedImage createImage(final String resource) {
         final URL url = ShipmentReportBuilder.class.getClassLoader().getResource(resource);
         if (url == null) {
             return null;

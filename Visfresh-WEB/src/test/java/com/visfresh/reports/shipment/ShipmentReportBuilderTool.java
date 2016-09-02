@@ -95,10 +95,15 @@ public final class ShipmentReportBuilderTool {
         bean.setAlertSuppressionMinutes(110);
 
         addReadings(bean);
+        final List<ShortTrackerEvent> readings = bean.getReadings();
+        if (readings.size() > 0) {
+            bean.setDateArrived(readings.get(readings.size() - Math.min(readings.size(), 10)).getTime());
+            bean.setDateShipped(readings.get(0).getTime());
+        }
 
         //set arrival
         final ArrivalBean arrival = new ArrivalBean();
-        arrival.setTime(bean.getReadings().get(random.nextInt(bean.getReadings().size())).getTime());
+        arrival.setTime(readings.get(random.nextInt(readings.size())).getTime());
         arrival.setNotifiedAt(bean.getDateArrived());
         arrival.setShutdownTime(new Date(System.currentTimeMillis() - 10000000));
         arrival.setNotifiedWhenKm(40);

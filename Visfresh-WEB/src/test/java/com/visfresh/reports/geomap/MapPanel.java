@@ -705,18 +705,6 @@ public class MapPanel extends JPanel {
             add(moves, BorderLayout.NORTH);
             add(zooms, BorderLayout.SOUTH);
         }
-
-        @Override
-        public void paint(final Graphics gOrig) {
-            final Graphics2D g = (Graphics2D) gOrig.create();
-            try {
-                final int w = getWidth(), h = getHeight();
-                drawBackground(g, w, h);
-            } finally {
-                g.dispose();
-            }
-            super.paint(gOrig);
-        }
     }
 
 

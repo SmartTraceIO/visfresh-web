@@ -3,14 +3,18 @@
  */
 package com.visfresh.reports.shipment;
 
-import static com.visfresh.utils.DateTimeUtils.convertToTimeZone;
 import static com.visfresh.utils.LocalizationUtils.convertToUnits;
 import static com.visfresh.utils.LocalizationUtils.getDegreeSymbol;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.DateFormat;
@@ -43,11 +47,12 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.Layer;
-import org.jfree.ui.RectangleEdge;
+import org.jfree.ui.RectangleInsets;
 
 import com.visfresh.controllers.UtilitiesController;
 import com.visfresh.entities.Alert;
@@ -65,6 +70,8 @@ import com.visfresh.utils.EntityUtils;
 public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
     private static final int ICON_SIZE = 20;
     private final AlertPaintingSupport support = new AlertPaintingSupport();
+    private Map<Long, BufferedImage> topMarkers = new HashMap<>();
+
     /**
      * Default constructor.
      */
@@ -96,10 +103,8 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
             return;
         }
 
-        final RectangleEdge xAxisLocation = plot.getDomainAxisEdge();
-        final RectangleEdge yAxisLocation = plot.getRangeAxisEdge();
-        final double transX1 = domainAxis.valueToJava2D(x1, dataArea, xAxisLocation);
-        final double transY1 = rangeAxis.valueToJava2D(y1, dataArea, yAxisLocation);
+        final double transX1 = domainAxis.valueToJava2D(x1, dataArea, plot.getDomainAxisEdge());
+        final double transY1 = rangeAxis.valueToJava2D(y1, dataArea, plot.getRangeAxisEdge());
 
         if (getItemShapeVisible(series, item)) {
             final Long d = (Long) dataset.getX(series, item);
@@ -131,18 +136,16 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
         for (final Alert a : alerts) {
             final ShortTrackerEvent e = EntityUtils.getEntity(readings, a.getTrackerEventId());
             if (e != null) {
-                support.addFiredAlerts(convertToTimeZone(e.getTime(), timeZone),
-                        a.getType());
+                support.addFiredAlerts(e.getTime(), a.getType());
             }
         }
 
         final int size = readings.size();
         if (size > 0) {
-            support.addLastReading(
-                    convertToTimeZone(readings.get(size - 1).getTime(), timeZone));
+            support.addLastReading(readings.get(size - 1).getTime());
         }
         if (arrival != null) {
-            support.addArrival(convertToTimeZone(arrival.getTime(), timeZone));
+            support.addArrival(arrival.getTime());
         }
     }
     /**
@@ -189,8 +192,58 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 tu.add(new NumberTickUnit(0.1, format));
                 tu.add(new NumberTickUnit(0.01, format));
                 rangeAxis.setStandardTickUnits(tu);
+
+                //expand range Axis for draw start and end location icons
+                rangeAxis.getPlot().setInsets(new RectangleInsets(
+                        ShipmentReportBuilder.LOCATION_IMAGE_SIZE + 2, 0, 0, 0));
+
+                if (bean.getDateShipped() != null) {
+                    final long value = bean.getDateShipped().getTime();
+                    chart.getXYPlot().addDomainMarker(new ValueMarker(
+                            value, Color.BLACK, new BasicStroke(2f)), Layer.FOREGROUND);
+                    renderer.topMarkers.put(value, ShipmentReportBuilder.createShippedFromImage());
+                }
+                if (bean.getDateArrived() != null) {
+                    final long value = bean.getDateArrived().getTime();
+                    chart.getXYPlot().addDomainMarker(new ValueMarker(
+                            value, Color.BLACK, new BasicStroke(2f)), Layer.FOREGROUND);
+                    renderer.topMarkers.put(value, ShipmentReportBuilder.createShippedToImage());
+                }
             }
         };
+    }
+    /* (non-Javadoc)
+     * @see org.jfree.chart.renderer.xy.AbstractXYItemRenderer#drawDomainLine(java.awt.Graphics2D, org.jfree.chart.plot.XYPlot, org.jfree.chart.axis.ValueAxis, java.awt.geom.Rectangle2D, double, java.awt.Paint, java.awt.Stroke)
+     */
+    @Override
+    public void drawDomainLine(final Graphics2D g2, final XYPlot plot, final ValueAxis axis,
+            final Rectangle2D dataArea, final double value, final Paint paint, final Stroke stroke) {
+        super.drawDomainLine(g2, plot, axis, dataArea, value, paint, stroke);
+
+        //draw top level markers
+        final Shape clip = g2.getClip();
+        try {
+            g2.setClip(null);
+
+            final ValueAxis rangeAxis = plot.getRangeAxis();
+            final int y = (int) rangeAxis.valueToJava2D(rangeAxis.getUpperBound(),
+                    dataArea, plot.getRangeAxisEdge());
+
+            for (final Map.Entry<Long, BufferedImage> e : topMarkers.entrySet()) {
+                final int x = (int) plot.getDomainAxis().valueToJava2D(
+                        e.getKey(), dataArea, plot.getDomainAxisEdge());
+
+                Image im = e.getValue();
+                final int iconSize = ShipmentReportBuilder.LOCATION_IMAGE_SIZE;
+                if (e.getValue().getWidth() != iconSize || e.getValue().getHeight() != iconSize) {
+                    im = e.getValue().getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH);
+                }
+
+                g2.drawImage(im, x - iconSize / 2, y - iconSize - 2, null);
+            }
+        } finally {
+            g2.setClip(clip);
+        }
     }
     /**
      * @return
@@ -229,8 +282,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
         //add data
         final DRDataSource ds = new DRDataSource(new String[]{time, temperature});
         for (final ShortTrackerEvent e : getNormalizedReadings(bean)) {
-            ds.add(convertToTimeZone(e.getTime(), timeZone),
-                convertToUnits(e.getTemperature(), units));
+            ds.add(e.getTime(), convertToUnits(e.getTemperature(), units));
         }
 
         chart.setDataSource(ds);
