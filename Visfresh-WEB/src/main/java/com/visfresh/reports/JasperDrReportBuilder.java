@@ -6,6 +6,8 @@ package com.visfresh.reports;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import net.sf.jasperreports.engine.JRException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
@@ -51,6 +53,10 @@ public class JasperDrReportBuilder implements PdfReportBuilder {
     @Override
     public void createShipmentReport(final ShipmentReportBean bean, final User user,
             final OutputStream out) throws IOException {
-        shipmentBuilder.createReport(bean, user, out);
+        try {
+            shipmentBuilder.createReport(bean, user, out);
+        } catch (final JRException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

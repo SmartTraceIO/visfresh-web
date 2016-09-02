@@ -82,7 +82,7 @@ public class MapRendererImpl extends AbstractRenderer implements
         try {
             final Composite comp = g.getComposite();
 
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.8f));
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.6f));
             builder.paint(g, p, zoom, width, height);
 
             g.setComposite(comp);
@@ -102,8 +102,6 @@ public class MapRendererImpl extends AbstractRenderer implements
      */
     private void paintMarkers(final ShipmentReportBean bean,
             final Graphics2D g, final Point loc, final int zoom) {
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
         //create path shape
         final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
@@ -112,14 +110,17 @@ public class MapRendererImpl extends AbstractRenderer implements
                     p.getLongitude(), zoom) - loc.x);
             final int y = Math.round(OpenStreetMapBuilder.lat2position(
                     p.getLatitude(), zoom) - loc.y);
-            if (path.getCurrentPoint() == null) {
+            final Point2D cp = path.getCurrentPoint();
+            if (cp == null) {
                 path.moveTo(x, y);
-            } else {
+            } else if (Math.round(cp.getX()) != x || Math.round(cp.getY()) != y) {
                 path.lineTo(x, y);
             }
         }
 
-        g.setStroke(new BasicStroke(2.f));
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        g.setStroke(new BasicStroke(2.f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.setColor(bean.getDeviceColor());
         g.draw(path);
 

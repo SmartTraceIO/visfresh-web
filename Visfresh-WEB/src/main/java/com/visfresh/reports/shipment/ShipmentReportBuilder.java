@@ -53,7 +53,9 @@ import net.sf.dynamicreports.report.constant.VerticalTextAlignment;
 import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.dynamicreports.report.definition.ReportParameters;
 import net.sf.dynamicreports.report.exception.DRException;
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
+import net.sf.jasperreports.engine.design.JRDesignField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +102,7 @@ public class ShipmentReportBuilder {
 
     public void createReport(final ShipmentReportBean bean,
             final User user, final OutputStream out)
-            throws IOException {
+            throws IOException, JRException {
         final JasperReportBuilder report = createReport(bean, user);
         try {
             report.toPdf(out);
@@ -109,10 +111,11 @@ public class ShipmentReportBuilder {
         }
     }
     public JasperReportBuilder createReport(
-            final ShipmentReportBean bean, final User user) throws IOException {
+            final ShipmentReportBean bean, final User user) throws IOException, JRException {
         final JasperReportBuilder report = DynamicReports.report();
         report.setDetailSplitType(SplitType.IMMEDIATE);
         report.setShowColumnTitle(false);
+        report.setPageMargin(DynamicReports.margin(10).setBottom(0));
 
         report.title(createTitle(bean, user));
 
@@ -303,9 +306,10 @@ public class ShipmentReportBuilder {
      * @param bean
      * @param user
      * @return
+     * @throws JRException
      */
     private ComponentBuilder<?, ?> createTemperatureTable(
-            final ShipmentReportBean bean, final User user) {
+            final ShipmentReportBean bean, final User user) throws JRException {
         String titleText = "TEMPERATURE";
         if (bean.getAlertSuppressionMinutes() > 0) {
             titleText += " (excluding "
@@ -328,7 +332,8 @@ public class ShipmentReportBuilder {
                 "totalTime"
         };
         final StyleBuilder[] styles = new StyleBuilder[columns.length];
-        final ColumnBuilder<?, ?>[] cols = new ColumnBuilder<?, ?>[styles.length];
+        @SuppressWarnings("unchecked")
+        final TextColumnBuilder<String>[] cols = new TextColumnBuilder[styles.length];
 
         final ConditionalStyleBuilder font = Styles.conditionalStyle(TableSupport.firstRowCondition)
                 .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold());
@@ -370,6 +375,22 @@ public class ShipmentReportBuilder {
                 LocalizationUtils.formatByOneDecimal(
                         bean.getTotalTime() / (60 * 60 * 1000.)) + "hrs"
                 );
+
+        //init column sizes from first row labels
+        //first row is in fact the table header
+        ds.next();
+        final JRDesignField field = new JRDesignField();
+        field.setValueClass(String.class);
+        field.setDescription("Temporaty field for access the data source");
+
+        for (int i = 0; i < cols.length; i++) {
+            final TextColumnBuilder<String> c = cols[i];
+            field.setName(columns[i]);
+            final String value = (String) ds.getFieldValue(field);
+            c.setColumns(Math.max(8, value.length() + 2));
+        }
+
+        ds.moveFirst();
 
         //apply styles
         TableSupport.customizeTableStyles(styles, true);

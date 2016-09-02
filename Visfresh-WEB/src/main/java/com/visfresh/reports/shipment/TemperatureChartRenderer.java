@@ -10,6 +10,7 @@ import static com.visfresh.utils.LocalizationUtils.getDegreeSymbol;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.DateFormat;
@@ -42,7 +43,6 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.IntervalMarker;
-import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
@@ -83,11 +83,11 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
      * @see org.jfree.chart.renderer.xy.XYLineAndShapeRenderer#drawSecondaryPass(java.awt.Graphics2D, org.jfree.chart.plot.XYPlot, org.jfree.data.xy.XYDataset, int, int, int, org.jfree.chart.axis.ValueAxis, java.awt.geom.Rectangle2D, org.jfree.chart.axis.ValueAxis, org.jfree.chart.plot.CrosshairState, org.jfree.chart.entity.EntityCollection)
      */
     @Override
-    protected void drawSecondaryPass(final Graphics2D g, final XYPlot plot,
+    protected void drawSecondaryPass(final Graphics2D gOrigin, final XYPlot plot,
             final XYDataset dataset, final int pass, final int series, final int item,
             final ValueAxis domainAxis, final Rectangle2D dataArea, final ValueAxis rangeAxis,
             final CrosshairState crosshairState, final EntityCollection entities) {
-        super.drawSecondaryPass(g, plot, dataset, pass, series, item, domainAxis,
+        super.drawSecondaryPass(gOrigin, plot, dataset, pass, series, item, domainAxis,
                 dataArea, rangeAxis, crosshairState, entities);
         // get the data point...
         final double x1 = dataset.getXValue(series, item);
@@ -105,21 +105,20 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
             final Long d = (Long) dataset.getX(series, item);
             final BufferedImage im = support.getRenderedImage(new Date(d), ICON_SIZE);
             if (im != null) {
-                g.drawImage(im,
-                    (int) Math.round(transX1 - im.getWidth() / 2.),
-                    (int) Math.round(transY1 - im.getHeight() / 2.),
-                    null);
+                final Graphics2D g = (Graphics2D) gOrigin.create();
+                try {
+                    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+
+                    g.drawImage(im,
+                        (int) Math.round(transX1 - im.getWidth() / 2.),
+                        (int) Math.round(transY1 - im.getHeight() / 2.),
+                        null);
+                } finally {
+                    g.dispose();
+                }
             }
         }
-    }
-    /* (non-Javadoc)
-     * @see org.jfree.chart.renderer.xy.AbstractXYItemRenderer#drawAnnotations(java.awt.Graphics2D, java.awt.geom.Rectangle2D, org.jfree.chart.axis.ValueAxis, org.jfree.chart.axis.ValueAxis, org.jfree.ui.Layer, org.jfree.chart.plot.PlotRenderingInfo)
-     */
-    @Override
-    public void drawAnnotations(final Graphics2D g2, final Rectangle2D dataArea,
-            final ValueAxis domainAxis, final ValueAxis rangeAxis, final Layer layer,
-            final PlotRenderingInfo info) {
-        super.drawAnnotations(g2, dataArea, domainAxis, rangeAxis, layer, info);
     }
     /**
      * @param readings
@@ -170,10 +169,11 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
 
                 chart.getXYPlot().setRenderer(0, renderer);
 
+                final TemperatureUnits tunits = user.getTemperatureUnits();
                 //add green line
                 final IntervalMarker greenLine = new IntervalMarker(
-                        convertToUnits(bean.getLowerTemperatureLimit(), user.getTemperatureUnits()),
-                        convertToUnits(bean.getUpperTemperatureLimit(), user.getTemperatureUnits()),
+                        convertToUnits(bean.getLowerTemperatureLimit(), tunits),
+                        convertToUnits(bean.getUpperTemperatureLimit(), tunits),
                         new Color(202, 255, 181, 150));
                 chart.getXYPlot().addRangeMarker(greenLine, Layer.BACKGROUND);
 
@@ -202,14 +202,6 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
         fmt.setDecimalFormatSymbols(decimalFormatSymbols);
         return fmt;
     }
-//    /**
-//     * @param number
-//     * @return
-//     */
-//    protected static boolean shouldIgnore(final Number number) {
-//        final int value = (int) Math.round(number.doubleValue());
-//        return value % 5 != 0;
-//    }
     /**
      * @param bean
      * @param user

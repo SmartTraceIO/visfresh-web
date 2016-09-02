@@ -13,6 +13,7 @@ import java.util.Random;
 import java.util.TimeZone;
 
 import net.sf.dynamicreports.report.exception.DRException;
+import net.sf.jasperreports.engine.JRException;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
@@ -212,9 +213,10 @@ public final class ShipmentReportBuilderTool {
      * @param user
      * @throws DRException
      * @throws IOException
+     * @throws JRException
      */
     public static void showShipmentReport(final ShipmentReportBean bean, final User user)
-            throws DRException, IOException {
+            throws DRException, IOException, JRException {
         final ShipmentReportBuilder builder = new ShipmentReportBuilder() {
             {
                 this.ruleBundle = new RuleBundle();

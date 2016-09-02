@@ -16,12 +16,11 @@ import javax.imageio.ImageIO;
  *
  */
 public class GoogleGeoMapBuiler extends AbstractGeoMapBuiler {
-
     /**
-     *
+     * Default constructor.
      */
     public GoogleGeoMapBuiler() {
-        // TODO Auto-generated constructor stub
+        super();
     }
     /* (non-Javadoc)
      * @see com.visfresh.reports.geomap.AbstractGeoMapBuiler#getMaxZoom()
