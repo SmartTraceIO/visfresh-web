@@ -39,7 +39,7 @@ public class MapRendererImpl extends AbstractRenderer implements
         Graphics2DRenderable {
     private static final long serialVersionUID = 3416741245999507093L;
     private final ShipmentReportBean bean;
-    private final MapImageBuilder builder;
+    private final AbstractGeoMapBuiler builder;
 
     /**
      * Default constructor.
@@ -47,7 +47,8 @@ public class MapRendererImpl extends AbstractRenderer implements
     public MapRendererImpl(final ShipmentReportBean bean) {
         super();
         this.bean = bean;
-        builder = new MapImageBuilder();
+//        builder = new OpenStreetMapBuilder();
+        builder = new GoogleGeoMapBuiler();
     }
 
     /* (non-Javadoc)
@@ -65,7 +66,7 @@ public class MapRendererImpl extends AbstractRenderer implements
         final int width = (int) Math.floor(viewArea.getWidth());
         final int height = (int) Math.floor(viewArea.getHeight());
 
-        final int zoom = builder.calculateZoom(coords, new Dimension(width, height));
+        final int zoom = builder.calculateZoom(coords, new Dimension(width, height), 9);
 
         final Rectangle r = builder.getMapBounds(coords, zoom);
 
@@ -107,9 +108,9 @@ public class MapRendererImpl extends AbstractRenderer implements
         final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
         for (final ShortTrackerEvent p : bean.getReadings()) {
-            final int x = Math.round(MapImageBuilder.lon2position(
+            final int x = Math.round(OpenStreetMapBuilder.lon2position(
                     p.getLongitude(), zoom) - loc.x);
-            final int y = Math.round(MapImageBuilder.lat2position(
+            final int y = Math.round(OpenStreetMapBuilder.lat2position(
                     p.getLatitude(), zoom) - loc.y);
             if (path.getCurrentPoint() == null) {
                 path.moveTo(x, y);
@@ -145,9 +146,9 @@ public class MapRendererImpl extends AbstractRenderer implements
 
             if (im != null) {
                 final int offset = iconSize / 2;
-                final int x = Math.round(MapImageBuilder.lon2position(
+                final int x = Math.round(OpenStreetMapBuilder.lon2position(
                         p.getLongitude(), zoom) - loc.x);
-                final int y = Math.round(MapImageBuilder.lat2position(
+                final int y = Math.round(OpenStreetMapBuilder.lat2position(
                         p.getLatitude(), zoom) - loc.y);
                 g.drawImage(im, x - offset, y - offset, null);
             }

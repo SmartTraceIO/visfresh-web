@@ -173,57 +173,59 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
 
         final int n = events.size();
-        long startTime = Long.MAX_VALUE;
-        long endTime = Long.MIN_VALUE;
+        if (n > 0) {
+            long startTime = Long.MAX_VALUE;
+            long endTime = Long.MIN_VALUE;
 
-        //min/max/average temperature
-        double min = Double.MAX_VALUE;
-        double max = Double.MIN_VALUE;
-        double avg = 0.;
+            //min/max/average temperature
+            double min = Double.MAX_VALUE;
+            double max = Double.MIN_VALUE;
+            double avg = 0.;
 
-        for (final TrackerEvent e : events) {
-            final double t = e.getTemperature();
-            min = Math.min(min, t);
-            max = Math.max(max, t);
-            avg += t / n;
-        }
-
-        bean.setAvgTemperature(avg);
-        bean.setMinimumTemperature(min);
-        bean.setMaximumTemperature(max);
-
-        //standard deviation
-        double sd = 0.;
-        for (final TrackerEvent e : events) {
-            final double t = e.getTemperature();
-            final double dt = (t - avg);
-            sd += dt * dt;
-
-            startTime = Math.min(startTime, e.getTime().getTime());
-            endTime = Math.max(endTime, e.getTime().getTime());
-        }
-
-        if (n > 1) {
-            sd = Math.sqrt(sd / (n - 1));
-        } else {
-            sd = 0;
-        }
-
-        bean.setTotalTime(endTime - startTime);
-        bean.setStandardDevitation(sd);
-
-        bean.setTimeAboveUpperLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
-            @Override
-            public boolean haveIncedent(final double temperature) {
-                return temperature > bean.getUpperTemperatureLimit();
+            for (final TrackerEvent e : events) {
+                final double t = e.getTemperature();
+                min = Math.min(min, t);
+                max = Math.max(max, t);
+                avg += t / n;
             }
-        }));
-        bean.setTimeBelowLowerLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
-            @Override
-            public boolean haveIncedent(final double temperature) {
-                return temperature < bean.getLowerTemperatureLimit();
+
+            bean.setAvgTemperature(avg);
+            bean.setMinimumTemperature(min);
+            bean.setMaximumTemperature(max);
+
+            //standard deviation
+            double sd = 0.;
+            for (final TrackerEvent e : events) {
+                final double t = e.getTemperature();
+                final double dt = (t - avg);
+                sd += dt * dt;
+
+                startTime = Math.min(startTime, e.getTime().getTime());
+                endTime = Math.max(endTime, e.getTime().getTime());
             }
-        }));
+
+            if (n > 1) {
+                sd = Math.sqrt(sd / (n - 1));
+            } else {
+                sd = 0;
+            }
+
+            bean.setTotalTime(endTime - startTime);
+            bean.setStandardDevitation(sd);
+
+            bean.setTimeAboveUpperLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
+                @Override
+                public boolean haveIncedent(final double temperature) {
+                    return temperature > bean.getUpperTemperatureLimit();
+                }
+            }));
+            bean.setTimeBelowLowerLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
+                @Override
+                public boolean haveIncedent(final double temperature) {
+                    return temperature < bean.getLowerTemperatureLimit();
+                }
+            }));
+        }
     }
 
     protected long getInsedentTime(final List<TrackerEvent> events, final TemperatureIncedentDetector d) {

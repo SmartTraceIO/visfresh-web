@@ -85,8 +85,8 @@ import com.visfresh.utils.StringUtils;
 public class ShipmentReportBuilder {
     private static final Logger log = LoggerFactory.getLogger(ShipmentReportBuilder.class);
 
-    private static final int DEFAULT_FONT_SIZE = 10;
-    private static final int DEFAULT_PADDING = 6;
+    private static final int DEFAULT_FONT_SIZE = 8;
+    private static final int DEFAULT_PADDING = 3;
 
     @Autowired
     protected RuleBundle ruleBundle;
@@ -119,7 +119,7 @@ public class ShipmentReportBuilder {
         final VerticalListBuilder body = Components.verticalList();
         report.detail(body);
 
-        final int gap = 15;
+        final int gap = 8;
 
         //first gap
         body.add(Components.gap(1, gap));
@@ -129,7 +129,7 @@ public class ShipmentReportBuilder {
         body.add(Components.gap(1, gap));
 
         //Shipment description and map
-        final HorizontalListBuilder shipmentDescAndMap = Components.horizontalFlowList();
+        final HorizontalListBuilder shipmentDescAndMap = Components.horizontalList();
         shipmentDescAndMap.add(createShipmentDescription(bean, user));
         shipmentDescAndMap.add(Components.gap(gap, 1));
         shipmentDescAndMap.add(createMap(bean));
@@ -258,6 +258,7 @@ public class ShipmentReportBuilder {
         } else {
             final Map<AlertType, BufferedImage> alertImageMap = loadAlertImages();
 
+            list.add(Components.gap(1, DEFAULT_PADDING));
             for (final AlertRule alert: bean.getFiredAlertRules()) {
                 //create alert component
                 final HorizontalListBuilder alertView = Components.horizontalList();
@@ -266,17 +267,18 @@ public class ShipmentReportBuilder {
                 //image
                 final BufferedImage im = alertImageMap.get(alert.getType());
                 final ImageBuilder image = Components.image(im);
-                image.setFixedDimension(17, 17);
+                image.setFixedDimension(14, 14);
                 image.setImageScale(ImageScale.RETAIN_SHAPE);
                 image.setStretchType(StretchType.CONTAINER_HEIGHT);
 
                 alertView.add(Components.hListCell(image).heightFixedOnMiddle());
+                alertView.add(Components.gap(2, 1));
 
                 //text
-                alertView.add(Components.text(ruleBundle.buildDescription(alert, units))
-                        .setStyle(createStyleByFont(DEFAULT_FONT_SIZE, true)
-                            .setPadding(DEFAULT_PADDING)
-                            .setVerticalTextAlignment(VerticalTextAlignment.TOP)));
+                final TextFieldBuilder<String> text = Components.text(ruleBundle.buildDescription(alert, units))
+                        .setStyle(createStyleByFont(DEFAULT_FONT_SIZE, false)
+                            .setVerticalTextAlignment(VerticalTextAlignment.MIDDLE));
+                alertView.add(text);
 
                 list.add(alertView);
             }
@@ -353,16 +355,14 @@ public class ShipmentReportBuilder {
                 "SD",
                 "Min Temp",
                 "Max Temp",
-                "Time below " + LocalizationUtils.getTemperatureString(
-                        bean.getLowerTemperatureLimit(), units),
-                "Time above " + LocalizationUtils.getTemperatureString(
-                        bean.getUpperTemperatureLimit(), units),
+                "Time below " + getTemperatureString(bean.getLowerTemperatureLimit(), units, ""),
+                "Time above " + getTemperatureString(bean.getUpperTemperatureLimit(), units, ""),
                 "Time monitored");
         ds.add(
-                getTemperatureString(bean.getAvgTemperature(), user),
-                LocalizationUtils.getSdString(bean.getStandardDevitation(), units),
-                LocalizationUtils.getTemperatureString(bean.getMinimumTemperature(), units),
-                LocalizationUtils.getTemperatureString(bean.getMaximumTemperature(), units),
+                getTemperatureString(bean.getAvgTemperature(), units, "No Readings"),
+                getSdString(bean.getStandardDevitation(), units, "No Readings"),
+                getTemperatureString(bean.getMinimumTemperature(), units, "No Readings"),
+                getTemperatureString(bean.getMaximumTemperature(), units, "No Readings"),
                 LocalizationUtils.formatByOneDecimal(
                         bean.getTimeBelowLowerLimit() / (60 * 60 * 1000.)) + "hrs",
                 LocalizationUtils.formatByOneDecimal(
@@ -391,7 +391,6 @@ public class ShipmentReportBuilder {
 
         return list;
     }
-
 
     /**
      * @param titleText
@@ -431,16 +430,14 @@ public class ShipmentReportBuilder {
         correctReadingsLocation(readings);
 
         if (hasReadingsWithLocation(readings)) {
-            final int w = 300;
-
             try {
                 final ImageBuilder ib = Components.image(new MapRendererImpl(bean));
-                ib.setHorizontalImageAlignment(HorizontalImageAlignment.CENTER);
-                ib.setImageScale(ImageScale.RETAIN_SHAPE);
+                ib.setImageScale(ImageScale.FILL_FRAME);
                 ib.setStretchType(StretchType.CONTAINER_HEIGHT);
 
                 final VerticalListBuilder centerVertical = Components.centerVertical(ib);
-                centerVertical.setFixedWidth(w);
+                centerVertical.setFixedWidth(300);
+                centerVertical.setHeight(10);
                 return centerVertical;
             } catch (final Exception exc) {
                 log.error("Faile to load tiles from openstreet map", exc);
@@ -621,8 +618,8 @@ public class ShipmentReportBuilder {
         //add image wrapped to list
         final ComponentColumnBuilder imageColumnBuilder = Columns.componentColumn(images,
                 Components.verticalList(imageBuilder));
-        imageColumnBuilder.setWidth(20);
-        imageColumnBuilder.setHeight(20);
+        imageColumnBuilder.setWidth(14);
+        imageColumnBuilder.setHeight(14);
 
         cols[0] = imageColumnBuilder;
 
@@ -766,7 +763,9 @@ public class ShipmentReportBuilder {
         }
 
         //comments
-        addGoodsRow(rows, "Comments", bean.getComment() == null ? "" : bean.getComment());
+        if (bean.getComment() != null) {
+            addGoodsRow(rows, "Comments", bean.getComment() == null ? "" : bean.getComment());
+        }
 
         //number of siblings
         if (bean.getNumberOfSiblings() > 0) {
@@ -834,13 +833,13 @@ public class ShipmentReportBuilder {
 //      SHIPMENT REPORT
         TextFieldBuilder<String> f = Components.text("SHIPMENT REPORT");
         f.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
-        f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 5, true));
+        f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 3, true));
 
         titles.add(f);
 //      Primo Moraitis Fresh
         f = Components.text(bean.getCompanyName());
         f.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
-        f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 4, true));
+        f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 2, true));
 
         titles.add(f);
 //      Tracker 122(4) - as of 6:45 13 Aug 2016 (EST)
@@ -848,7 +847,7 @@ public class ShipmentReportBuilder {
         f = Components.text("Tracker " + getShipmentNumber(bean) + " - as of "
                 + fmt.format(new Date()) + " (" + user.getTimeZone().getID() + ")");
         f.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
-        f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 3, true));
+        f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 1, true));
         titles.add(f);
         return titles;
     }
@@ -909,10 +908,25 @@ public class ShipmentReportBuilder {
     }
     /**
      * @param t
-     * @param user
+     * @param units
      * @return
      */
-    private String getTemperatureString(final double t, final User user) {
-        return LocalizationUtils.getTemperatureString(t, user.getTemperatureUnits());
+    private String getTemperatureString(final Double t, final TemperatureUnits units, final String defValue) {
+        if (t == null) {
+            return defValue;
+        }
+        return LocalizationUtils.getTemperatureString(t, units);
+    }
+    /**
+     * @param t
+     * @param units
+     * @param defValue
+     * @return
+     */
+    private String getSdString(final Double t, final TemperatureUnits units, final String defValue) {
+        if (t == null) {
+            return defValue;
+        }
+        return LocalizationUtils.getTemperatureString(t, units);
     }
 }

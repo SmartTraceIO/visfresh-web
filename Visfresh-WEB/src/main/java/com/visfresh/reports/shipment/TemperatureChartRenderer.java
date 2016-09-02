@@ -13,12 +13,15 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -178,11 +181,35 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 final ValueAxis rangeAxis = chart.getXYPlot().getRangeAxis(0);
 
                 final TickUnits tu = new TickUnits();
-                tu.add(new NumberTickUnit(1., NumberFormat.getNumberInstance(), 5));
+                final NumberFormat format = createTemperatureAxisUnitFromat(
+                        rangeAxis.getUpperBound(), rangeAxis.getLowerBound());
+
+                tu.add(new NumberTickUnit(5., format));
+                tu.add(new NumberTickUnit(1., format));
+                tu.add(new NumberTickUnit(0.1, format));
+                tu.add(new NumberTickUnit(0.01, format));
                 rangeAxis.setStandardTickUnits(tu);
             }
         };
     }
+    /**
+     * @return
+     */
+    protected static NumberFormat createTemperatureAxisUnitFromat(
+            final double upperBound, final double lowerBound) {
+        final DecimalFormat fmt = new DecimalFormat("#0.0");
+        final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
+        fmt.setDecimalFormatSymbols(decimalFormatSymbols);
+        return fmt;
+    }
+//    /**
+//     * @param number
+//     * @return
+//     */
+//    protected static boolean shouldIgnore(final Number number) {
+//        final int value = (int) Math.round(number.doubleValue());
+//        return value % 5 != 0;
+//    }
     /**
      * @param bean
      * @param user
@@ -217,7 +244,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
         chart.setDataSource(ds);
         chart.addCustomizer(createCustomizer(bean, user));
         //set chart height
-        chart.setHeight(Defaults.getDefaults().getChartHeight() * 5 / 2);
+        chart.setHeight(Defaults.getDefaults().getChartHeight() * 16 / 10);
 
         return chart;
     }

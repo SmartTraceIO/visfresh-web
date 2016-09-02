@@ -5,6 +5,7 @@ package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -244,6 +245,20 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         context.getBean(AlertProfileDao.class).save(ap);
         return ap;
+    }
+    /**
+     * @return
+     */
+    @Test
+    public void testNoReadings() {
+        final ShipmentReportBean report = dao.createReport(shipment);
+        assertEquals(0., report.getLowerTemperatureLimit(), 0.001);
+        assertEquals(5., report.getUpperTemperatureLimit(), 0.001);
+
+        assertNull(report.getAvgTemperature());
+        assertNull(report.getMaximumTemperature());
+        assertNull(report.getMinimumTemperature());
+        assertNull(report.getStandardDevitation());
     }
 
     @Test

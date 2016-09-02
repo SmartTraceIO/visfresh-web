@@ -45,13 +45,13 @@ public class ShipmentReportBean {
     /**
      * Average temperature: 4.5°C
      */
-    private double avgTemperature;
+    private Double avgTemperature;
     /**
      * Standard deviation: 0.4
      */
-    private double standardDevitation;
-    private double minimumTemperature;
-    private double maximumTemperature;
+    private Double standardDevitation;
+    private Double minimumTemperature;
+    private Double maximumTemperature;
     private double lowerTemperatureLimit = 0;
     private double upperTemperatureLimit = 5;
     private long timeBelowLowerLimit;
@@ -275,49 +275,49 @@ public class ShipmentReportBean {
     /**
      * @return the avgTemperature
      */
-    public double getAvgTemperature() {
+    public Double getAvgTemperature() {
         return avgTemperature;
     }
     /**
      * @param avgTemperature the avgTemperature to set
      */
-    public void setAvgTemperature(final double avgTemperature) {
+    public void setAvgTemperature(final Double avgTemperature) {
         this.avgTemperature = avgTemperature;
     }
     /**
      * @return the standardDevitation
      */
-    public double getStandardDevitation() {
+    public Double getStandardDevitation() {
         return standardDevitation;
     }
     /**
      * @param standardDevitation the standardDevitation to set
      */
-    public void setStandardDevitation(final double standardDevitation) {
+    public void setStandardDevitation(final Double standardDevitation) {
         this.standardDevitation = standardDevitation;
     }
     /**
      * @return minimum temperature.
      */
-    public double getMinimumTemperature() {
+    public Double getMinimumTemperature() {
         return minimumTemperature;
     }
     /**
      * @param minimumTemperature the minimumTemperature to set
      */
-    public void setMinimumTemperature(final double minimumTemperature) {
+    public void setMinimumTemperature(final Double minimumTemperature) {
         this.minimumTemperature = minimumTemperature;
     }
     /**
      * @return minimum temperature.
      */
-    public double getMaximumTemperature() {
+    public Double getMaximumTemperature() {
         return maximumTemperature;
     }
     /**
      * @param maximumTemperature the maximumTemperature to set
      */
-    public void setMaximumTemperature(final double maximumTemperature) {
+    public void setMaximumTemperature(final Double maximumTemperature) {
         this.maximumTemperature = maximumTemperature;
     }
     /**

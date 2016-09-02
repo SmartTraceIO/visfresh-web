@@ -77,8 +77,8 @@ public final class ShipmentReportBuilderTool {
         bean.setDateShipped(new Date(System.currentTimeMillis() - 1000000000));
         bean.setDescription("Autostarted by rule");
         bean.setDevice(device.getImei());
-        bean.setNumberOfSiblings(0);
-        bean.setPalletId(null);
+        bean.setNumberOfSiblings(7);
+        bean.setPalletId("12345");
         bean.setShippedFrom("De Costi Office Lidcombe");
         bean.setShippedTo("De Costi Office Lidcombe");
         final List<String> altLocs = new LinkedList<>();
@@ -108,11 +108,11 @@ public final class ShipmentReportBuilderTool {
         bean.setAlertProfile("Chilled Beef");
         bean.setStandardDevitation(0.001 + random.nextDouble() / 0.5);
         bean.setTotalTime((1 + random.nextInt(3 * 30 * 24)) * oneHour);
-        bean.setMinimumTemperature(-2);
+        bean.setMinimumTemperature(-2.);
         bean.setLowerTemperatureLimit(0);
         bean.setTimeAboveUpperLimit(10 * 61 * 60 * 1000L);
         bean.setTimeBelowLowerLimit(2 * 61 * 60 * 1000L);
-        bean.setMaximumTemperature(11);
+        bean.setMaximumTemperature(11.);
         bean.setUpperTemperatureLimit(9);
         bean.setAvgTemperature(7.);
         bean.getWhoWasNotified().add("user1@smarttrace.com.au");
