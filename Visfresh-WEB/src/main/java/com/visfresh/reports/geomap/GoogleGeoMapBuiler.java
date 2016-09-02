@@ -33,25 +33,33 @@ public class GoogleGeoMapBuiler extends AbstractGeoMapBuiler {
      * @see com.visfresh.reports.geomap.AbstractGeoMapBuiler#paint(java.awt.Graphics2D, java.awt.Point, int, int, int)
      */
     @Override
-    public void paint(final Graphics2D gOrig, final Point mapPosition, final int zoom, final int width,
+    public void paint(final Graphics2D gOrig, final Point pos, final int zoom, final int width,
             final int height) throws IOException {
-        final int cx = mapPosition.x + width / 2;
-        final int cy = mapPosition.y + height / 2;
+        final int w = Math.min(width, 612);
+        final int cx = pos.x + w / 2;
+        final int h = Math.min(height, 612);
+        final int cy = pos.y + h / 2;
 
-        final String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center="
-                + position2lat(cy, zoom)
-                + ","
-                + position2lon(cx, zoom)
-                + "&zoom="
-                + zoom
-                + "&size="
-                + width
-                + "x"
-                + height
-                + "&maptype=roadmap";
+        BufferedImage img = cache.get(pos.x, pos.y, w, h, zoom);
+        if (img == null) {
 
-        final BufferedImage bim = ImageIO.read(new URL(imageUrl));
-        gOrig.drawImage(bim, 0, 0, null);
+            final String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center="
+                    + position2lat(cy, zoom)
+                    + ","
+                    + position2lon(cx, zoom)
+                    + "&zoom="
+                    + zoom
+                    + "&size="
+                    + w
+                    + "x"
+                    + h
+                    + "&maptype=roadmap";
+
+            img = ImageIO.read(new URL(imageUrl));
+            cache.put(pos.x, pos.y, w, h, zoom, img);
+        }
+
+        gOrig.drawImage(img, 0, 0, null);
 //
 //        for a Map of a specific Geographic point(latitude and longitude)
 //

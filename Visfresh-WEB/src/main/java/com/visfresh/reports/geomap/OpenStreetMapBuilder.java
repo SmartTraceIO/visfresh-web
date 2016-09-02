@@ -8,7 +8,6 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.LinkedHashMap;
 
 import javax.imageio.ImageIO;
 
@@ -20,61 +19,6 @@ import javax.imageio.ImageIO;
 public class OpenStreetMapBuilder extends AbstractGeoMapBuiler {
     public static int MAX_ZOOM = 18;
     private String serviceUrl = "http://tile.openstreetmap.org/";
-    private final TileCache cache = new TileCache();
-
-    private static class Tile {
-        public final int x, y, z;
-        public Tile(final int x, final int y, final int z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + x;
-            result = prime * result + y;
-            result = prime * result + z;
-            return result;
-        }
-        @Override
-        public boolean equals(final Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            final Tile other = (Tile) obj;
-            if (x != other.x)
-                return false;
-            if (y != other.y)
-                return false;
-            if (z != other.z)
-                return false;
-            return true;
-        }
-
-    }
-
-    private static class TileCache {
-        private static final int CACHE_SIZE = 256;
-
-        @SuppressWarnings("serial")
-        private LinkedHashMap<Tile,BufferedImage> map = new LinkedHashMap<Tile,BufferedImage>(CACHE_SIZE, 0.75f, true) {
-            @Override
-            protected boolean removeEldestEntry(final java.util.Map.Entry<Tile,BufferedImage> eldest) {
-                return size() > CACHE_SIZE;
-            }
-        };
-        public void put(final int x, final int y, final int z, final BufferedImage image) {
-            map.put(new Tile(x, y, z), image);
-        }
-        public BufferedImage get(final int x, final int y, final int z) {
-            return map.get(new Tile(x, y, z));
-        }
-    }
 
     /**
      * Default constructor.

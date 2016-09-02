@@ -8,7 +8,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -17,6 +19,78 @@ import java.util.List;
  */
 public abstract class AbstractGeoMapBuiler {
     protected static final int TILE_SIZE = 256;
+    protected final TileCache cache = new TileCache();
+
+    protected static class Tile {
+        public final int x, y, z, w, h;
+        public Tile(final int x, final int y, final int z) {
+            this(x, y, z, TILE_SIZE, TILE_SIZE);
+        }
+        public Tile(final int x, final int y, final int z, final int w, final int h) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.w = w;
+            this.h = h;
+        }
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + x;
+            result = prime * result + y;
+            result = prime * result + z;
+            result = prime * result + w;
+            result = prime * result + h;
+            return result;
+        }
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            final Tile other = (Tile) obj;
+            if (x != other.x)
+                return false;
+            if (y != other.y)
+                return false;
+            if (z != other.z)
+                return false;
+            if (w != other.w)
+                return false;
+            if (h != other.h)
+                return false;
+            return true;
+        }
+
+    }
+
+    protected static class TileCache {
+        private static final int CACHE_SIZE = 256;
+
+        @SuppressWarnings("serial")
+        private LinkedHashMap<Tile,BufferedImage> map = new LinkedHashMap<Tile,BufferedImage>(CACHE_SIZE, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(final java.util.Map.Entry<Tile,BufferedImage> eldest) {
+                return size() > CACHE_SIZE;
+            }
+        };
+        public void put(final int x, final int y, final int w, final int h, final int z, final BufferedImage image) {
+            map.put(new Tile(x, y, z), image);
+        }
+        public void put(final int x, final int y, final int z, final BufferedImage image) {
+            put(x, y, TILE_SIZE, TILE_SIZE, z, image);
+        }
+        public BufferedImage get(final int x, final int y, final int w, final int h, final int z) {
+            return map.get(new Tile(x, y, z));
+        }
+        public BufferedImage get(final int x, final int y, final int z) {
+            return get(x, y, TILE_SIZE, TILE_SIZE, z);
+        }
+    }
 
     /**
      * @param area

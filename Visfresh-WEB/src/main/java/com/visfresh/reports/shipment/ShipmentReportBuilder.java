@@ -285,6 +285,7 @@ public class ShipmentReportBuilder {
 
                 list.add(alertView);
             }
+            list.add(Components.gap(1, DEFAULT_PADDING));
         }
 
         return list;
