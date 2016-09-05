@@ -146,7 +146,8 @@ public class MapRendererImpl extends AbstractRenderer implements
 
         final int readingsCount = bean.getReadings().size();
         if (readingsCount > 0) {
-            support.addLastReading(bean.getReadings().get(readingsCount - 1).getTime());
+            support.addLastReading(bean.getReadings().get(readingsCount - 1).getTime(),
+                    bean.getDeviceColor());
         }
         if (bean.getArrival() != null) {
             support.addArrival(bean.getArrival().getTime());

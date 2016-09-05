@@ -559,13 +559,19 @@ public class ShipmentReportBuilder {
         dateShipped.put(value, bean.getDateShipped() == null ? "" : format(user, bean.getDateShipped()));
         rows.add(dateShipped);
 
-        //shipped to
         final Map<String, Object> shippedTo = new HashMap<>();
         final List<String> possibleShippedTo = bean.getPossibleShippedTo();
+
+        //shipped to image
+        if (Shipment.isFinalStatus(bean.getStatus())) {
+            shippedTo.put(images, createShippedToImage());
+        } else {
+            shippedTo.put(images, createImage("reports/images/shipment/shippedToToBeDetermined.png"));
+        }
+
+        //shipped to text
         if (bean.getShippedTo() == null
                 && possibleShippedTo != null && !possibleShippedTo.isEmpty()) {
-            shippedTo.put(images, createImage("reports/images/shipment/shippedToToBeDetermined.png"));
-
             //cut two locations
             final List<String> otherLocs = new LinkedList<>(possibleShippedTo);
             final List<String> locs = new LinkedList<>();
@@ -597,9 +603,9 @@ public class ShipmentReportBuilder {
 
             shippedTo.put(value, locations.toString());
         } else {
-            shippedTo.put(images, createShippedToImage());
             shippedTo.put(value, bean.getShippedTo() == null ? "" : bean.getShippedTo());
         }
+
         shippedTo.put(key, "Shipped To");
         rows.add(shippedTo);
 

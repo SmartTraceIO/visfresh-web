@@ -3,6 +3,7 @@
  */
 package com.visfresh.reports.shipment;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
@@ -29,7 +30,7 @@ public class AlertPaintingSupport {
     private static final String ARRIVAL = "Arrival";
 
     private Map<Date, List<BufferedImage>> alertsFired = new HashMap<>();
-    private Map<String, BufferedImage> imageCache = new HashMap<>();
+    private Map<String, BufferedImage> alertImages = new HashMap<>();
 
     /**
      * Default constructor.
@@ -50,24 +51,31 @@ public class AlertPaintingSupport {
      * @param alertNames
      */
     protected void addFiredAlerts(final Date date, final String... alertNames) {
+        for (final String name: alertNames) {
+            addFiredAlertImage(date, possibleLoadImage(name));
+        }
+    }
+    /**
+     * @param date
+     * @param image
+     */
+    protected void addFiredAlertImage(final Date date, final BufferedImage image) {
         List<BufferedImage> list = getAlertImages(date);
         if (list == null) {
             list = new LinkedList<>();
             alertsFired.put(date, list);
         }
-        for (final String name: alertNames) {
-            list.add(possibleLoadImage(name));
-        }
+        list.add(image);
     }
     /**
      * @param type
      */
     private BufferedImage possibleLoadImage(final String name) {
-        BufferedImage image = imageCache.get(name);
+        BufferedImage image = alertImages.get(name);
         if (image == null) {
             image = loadAlertImage(name);
         }
-        imageCache.put(name, image);
+        alertImages.put(name, image);
         return image;
     }
     public static BufferedImage loadLastReaing() {
@@ -86,27 +94,7 @@ public class AlertPaintingSupport {
         }
 
         try {
-            final BufferedImage image = ImageIO.read(url);
-//            if (image != null && image.getWidth() != 17 && image.getHeight() != 17) {
-//                final BufferedImage im = new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_INT_ARGB_PRE);
-//
-//                final Graphics2D g = im.createGraphics();
-//                try {
-//                    final double scale = (double) ICON_SIZE/ image.getWidth();
-//                    g.setTransform(AffineTransform.getScaleInstance(scale, scale));
-//                    g.setRenderingHint(RenderingHints.KEY_RENDERING,
-//                            RenderingHints.VALUE_RENDER_QUALITY);
-//                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-//                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-//
-//                    g.drawImage(image, 0, 0, null);
-//                } finally {
-//                    g.dispose();
-//                }
-//
-//                image = im;
-//            }
-            return image;
+            return ImageIO.read(url);
         } catch (final IOException e) {
             throw new RuntimeException("Unable to load image", e);
         }
@@ -122,8 +110,27 @@ public class AlertPaintingSupport {
     /**
      * @param date
      */
-    public void addLastReading(final Date date) {
-        addFiredAlerts(date, LAST_READING);
+    public void addLastReading(final Date date, final Color color) {
+        //create last reading image.
+        final int size = 16;
+        final int margins = 3;
+        final int internalSize = size - 2 * margins;
+
+        final BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB_PRE);
+
+        final Graphics2D g = image.createGraphics();
+        try {
+            g.setColor(color);
+            g.fillRect(margins, margins, internalSize, internalSize);
+
+            //draw border
+            g.setColor(Color.WHITE);
+            g.drawRect(margins, margins, internalSize, internalSize);
+        } finally {
+            g.dispose();
+        }
+
+        addFiredAlertImage(date, image);
     }
     /**
      * @param date

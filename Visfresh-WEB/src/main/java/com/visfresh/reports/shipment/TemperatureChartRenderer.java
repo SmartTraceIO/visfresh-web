@@ -131,7 +131,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
      * @param renderer
      */
     public void addAlertsData(final List<ShortTrackerEvent> readings, final List<Alert> alerts,
-            final ArrivalBean arrival, final TimeZone timeZone) {
+            final ArrivalBean arrival, final TimeZone timeZone, final Color color) {
         for (final Alert a : alerts) {
             final ShortTrackerEvent e = EntityUtils.getEntity(readings, a.getTrackerEventId());
             if (e != null) {
@@ -141,7 +141,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
 
         final int size = readings.size();
         if (size > 0) {
-            support.addLastReading(readings.get(size - 1).getTime());
+            support.addLastReading(readings.get(size - 1).getTime(), color);
         }
         if (arrival != null) {
             support.addArrival(arrival.getTime());
@@ -165,7 +165,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 final TemperatureChartRenderer renderer = new TemperatureChartRenderer();
                 renderer.addAlertsData(bean.getReadings(),
                         ShipmentReportBuilder.filterAlerts(bean.getAlerts()), bean.getArrival(),
-                        user.getTimeZone());
+                        user.getTimeZone(), bean.getDeviceColor());
                 renderer.setSeriesShape(0, new Rectangle(0, 0));
                 renderer.setLegendShape(0, new Rectangle(-1, -1, 2, 2));
                 renderer.setSeriesStroke(0, new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
