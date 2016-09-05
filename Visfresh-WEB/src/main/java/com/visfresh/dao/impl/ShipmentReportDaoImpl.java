@@ -90,6 +90,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
         if (s.getShippedFrom() != null) {
             bean.setShippedFrom(s.getShippedFrom().getName());
+            bean.setShippedFromLocation(s.getShippedFrom().getLocation());
         }
         if (s.getShippedTo() != null) {
             bean.setShippedTo(s.getShippedTo().getName());

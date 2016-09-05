@@ -26,6 +26,7 @@ import net.sf.jasperreports.renderers.AbstractRenderer;
 import net.sf.jasperreports.renderers.Graphics2DRenderable;
 
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.reports.shipment.AlertPaintingSupport;
 import com.visfresh.reports.shipment.ShipmentReportBean;
@@ -41,6 +42,7 @@ public class MapRendererImpl extends AbstractRenderer implements
     private static final long serialVersionUID = 3416741245999507093L;
     private final ShipmentReportBean bean;
     private final AbstractGeoMapBuiler builder;
+    private final int iconSize = 16;
 
     /**
      * Default constructor.
@@ -114,15 +116,15 @@ public class MapRendererImpl extends AbstractRenderer implements
      * @return
      */
     private void paintMarkers(final ShipmentReportBean bean,
-            final Graphics2D g, final Point loc, final int zoom) {
+            final Graphics2D g, final Point mapLocation, final int zoom) {
         //create path shape
         final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
         for (final ShortTrackerEvent p : bean.getReadings()) {
             final int x = Math.round(OpenStreetMapBuilder.lon2position(
-                    p.getLongitude(), zoom) - loc.x);
+                    p.getLongitude(), zoom) - mapLocation.x);
             final int y = Math.round(OpenStreetMapBuilder.lat2position(
-                    p.getLatitude(), zoom) - loc.y);
+                    p.getLatitude(), zoom) - mapLocation.y);
             final Point2D cp = path.getCurrentPoint();
             if (cp == null) {
                 path.moveTo(x, y);
@@ -144,27 +146,49 @@ public class MapRendererImpl extends AbstractRenderer implements
             }
         }
 
+        //draw start location
+        final Location startLocation = bean.getShippedFromLocation();
+        if (startLocation != null) {
+            final List<BufferedImage> tmp = new LinkedList<>();
+            tmp.add(ShipmentReportBuilder.createShippedFromImage());
+            drawMapImage(g, support.createCompoundImage(tmp, iconSize), mapLocation, startLocation, zoom);
+        }
+
+        //add arrival notification
+        if (bean.getArrival() != null) {
+            support.addArrival(bean.getArrival().getTime());
+        }
+        //add last reading
         final int readingsCount = bean.getReadings().size();
         if (readingsCount > 0) {
             support.addLastReading(bean.getReadings().get(readingsCount - 1).getTime(),
                     bean.getDeviceColor());
         }
-        if (bean.getArrival() != null) {
-            support.addArrival(bean.getArrival().getTime());
-        }
 
         for (final ShortTrackerEvent p : bean.getReadings()) {
-            final int iconSize = 16;
             final BufferedImage im = support.getRenderedImage(p.getTime(), iconSize);
 
             if (im != null) {
-                final int offset = iconSize / 2;
-                final int x = Math.round(OpenStreetMapBuilder.lon2position(
-                        p.getLongitude(), zoom) - loc.x);
-                final int y = Math.round(OpenStreetMapBuilder.lat2position(
-                        p.getLatitude(), zoom) - loc.y);
-                g.drawImage(im, x - offset, y - offset, null);
+                final Location loc = new Location(p.getLatitude(), p.getLongitude());
+                drawMapImage(g, im, mapLocation, loc, zoom);
             }
         }
+    }
+
+    /**
+     * @param g
+     * @param im
+     * @param mapLocation
+     * @param loc
+     * @param zoom
+     */
+    private void drawMapImage(final Graphics2D g, final BufferedImage im,
+            final Point mapLocation, final Location loc, final int zoom) {
+        final int offset = iconSize / 2;
+        final int x = Math.round(OpenStreetMapBuilder.lon2position(
+                loc.getLongitude(), zoom) - mapLocation.x);
+        final int y = Math.round(OpenStreetMapBuilder.lat2position(
+                loc.getLatitude(), zoom) - mapLocation.y);
+        g.drawImage(im, x - offset, y - offset, null);
     }
 }

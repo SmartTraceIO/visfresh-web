@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 /**
@@ -59,6 +60,7 @@ public class ShipmentReportBean {
     private Color deviceColor = Color.GREEN.darker();
     private int alertSuppressionMinutes;
     private List<String> possibleShippedTo;
+    private Location shippedFromLocation;
 
     /**
      * Default constructor.
@@ -415,5 +417,17 @@ public class ShipmentReportBean {
      */
     public List<String> getPossibleShippedTo() {
         return possibleShippedTo;
+    }
+    /**
+     * @return
+     */
+    public Location getShippedFromLocation() {
+        return shippedFromLocation;
+    }
+    /**
+     * @param loc the shippedFromLocation to set
+     */
+    public void setShippedFromLocation(final Location loc) {
+        this.shippedFromLocation = loc;
     }
 }

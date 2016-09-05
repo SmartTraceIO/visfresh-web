@@ -4,7 +4,6 @@
 package com.visfresh.reports.shipment;
 
 import static com.visfresh.utils.LocalizationUtils.convertToUnits;
-import static com.visfresh.utils.LocalizationUtils.getDegreeSymbol;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -60,6 +59,7 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
+import com.visfresh.utils.LocalizationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -180,9 +180,11 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                         new Color(202, 255, 181, 150));
                 chart.getXYPlot().addRangeMarker(greenLine, Layer.BACKGROUND);
 
-                //correct tick count for temperature axis
+                //temperature axis
                 final ValueAxis rangeAxis = chart.getXYPlot().getRangeAxis(0);
+                rangeAxis.setLabel("Temperature " + LocalizationUtils.getDegreeSymbol(tunits));
 
+                //correct tick count for temperature axis
                 final TickUnits tu = new TickUnits();
                 final NumberFormat format = createTemperatureAxisUnitFromat(
                         rangeAxis.getUpperBound(), rangeAxis.getLowerBound());
@@ -291,8 +293,8 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                     "Time (" + timeZone.getID() + " "
                     + UtilitiesController.createOffsetString(timeZone.getRawOffset()) + ")"))
             .setTimePeriodType(TimePeriod.MILLISECOND)
-            .series(Charts.serie(Columns.column(temperature, java.lang.Double.class))
-                .setLabel("Temperature " + getDegreeSymbol(units)))
+            .series(Charts.serie(Columns.column(temperature, java.lang.Double.class)))
+            .setShowLegend(false)
             .seriesColors(bean.getDeviceColor());
 
         //add data

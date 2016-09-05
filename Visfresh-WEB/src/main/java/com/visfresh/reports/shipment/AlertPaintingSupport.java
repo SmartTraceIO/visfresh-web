@@ -122,10 +122,6 @@ public class AlertPaintingSupport {
         try {
             g.setColor(color);
             g.fillRect(margins, margins, internalSize, internalSize);
-
-            //draw border
-            g.setColor(Color.WHITE);
-            g.drawRect(margins, margins, internalSize, internalSize);
         } finally {
             g.dispose();
         }
@@ -157,44 +153,54 @@ public class AlertPaintingSupport {
 
         final List<BufferedImage> images = getAlertImages(date);
         if (images != null) {
-            //calculate image width
-            final int w = size + images.size() - 1;
-            final int h = w;
-
-            //render complex image
-            final BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-
-            final Graphics2D g = result.createGraphics();
-            try {
-                int i = 0;
-                for (final BufferedImage a : images) {
-                    if (a.getWidth() != size || a.getHeight() != size) {
-                        final Graphics2D g1 = (Graphics2D) g.create(i, i, size, size);
-                        try {
-                            g1.setRenderingHint(RenderingHints.KEY_RENDERING,
-                                    RenderingHints.VALUE_RENDER_QUALITY);
-                            g1.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                            g1.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-                                    RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-                            final double scale = (double) size / a.getWidth();
-                            g1.drawImage(a, AffineTransform.getScaleInstance(scale, scale), null);
-                        } finally {
-                            g1.dispose();
-                        }
-                    } else {
-                        g.drawImage(a, i, i, null);
-                    }
-
-                    i++;
-                }
-            } finally {
-                g.dispose();
-            }
-
+            final BufferedImage result = createCompoundImage(images, size);
             renderedImages.put(date, result);
             return result;
         }
         return null;
+    }
+
+    /**
+     * @param images
+     * @param singleImageSize
+     * @return
+     */
+    public BufferedImage createCompoundImage(final List<BufferedImage> images,
+            final int singleImageSize) {
+        //calculate image width
+        final int w = singleImageSize + images.size() - 1;
+        final int h = w;
+
+        //render complex image
+        final BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+
+        final Graphics2D g = result.createGraphics();
+        try {
+            int i = 0;
+            for (final BufferedImage a : images) {
+                if (a.getWidth() != singleImageSize || a.getHeight() != singleImageSize) {
+                    final Graphics2D g1 = (Graphics2D) g.create(i, i, singleImageSize, singleImageSize);
+                    try {
+                        g1.setRenderingHint(RenderingHints.KEY_RENDERING,
+                                RenderingHints.VALUE_RENDER_QUALITY);
+                        g1.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                        g1.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+                                RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+                        final double scale = (double) singleImageSize / a.getWidth();
+                        g1.drawImage(a, AffineTransform.getScaleInstance(scale, scale), null);
+                    } finally {
+                        g1.dispose();
+                    }
+                } else {
+                    g.drawImage(a, i, i, null);
+                }
+
+                i++;
+            }
+        } finally {
+            g.dispose();
+        }
+        return result;
     }
 }

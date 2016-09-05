@@ -19,6 +19,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureAlert;
@@ -96,9 +97,12 @@ public final class ShipmentReportBuilderTool {
 
         addReadings(bean);
         final List<ShortTrackerEvent> readings = bean.getReadings();
+
         if (readings.size() > 0) {
+            final ShortTrackerEvent first = readings.get(0);
+            bean.setShippedFromLocation(new Location(first.getLatitude(), first.getLongitude()));
             bean.setDateArrived(readings.get(readings.size() - Math.min(readings.size(), 10)).getTime());
-            bean.setDateShipped(readings.get(0).getTime());
+            bean.setDateShipped(first.getTime());
         }
 
         //set arrival
