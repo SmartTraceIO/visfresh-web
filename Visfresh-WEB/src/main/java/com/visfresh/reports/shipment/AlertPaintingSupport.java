@@ -52,14 +52,14 @@ public class AlertPaintingSupport {
      */
     protected void addFiredAlerts(final Date date, final String... alertNames) {
         for (final String name: alertNames) {
-            addFiredAlertImage(date, possibleLoadImage(name));
+            addImageMarkerForDate(date, possibleLoadImage(name));
         }
     }
     /**
      * @param date
      * @param image
      */
-    protected void addFiredAlertImage(final Date date, final BufferedImage image) {
+    public void addImageMarkerForDate(final Date date, final BufferedImage image) {
         List<BufferedImage> list = getAlertImages(date);
         if (list == null) {
             list = new LinkedList<>();
@@ -130,7 +130,7 @@ public class AlertPaintingSupport {
             g.dispose();
         }
 
-        addFiredAlertImage(date, image);
+        addImageMarkerForDate(date, image);
     }
     /**
      * @param date

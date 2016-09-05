@@ -201,6 +201,12 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                     chart.getXYPlot().addAnnotation(new LineWithImageAnnotation(
                             ShipmentReportBuilder.createShippedFromImage(),
                             bean.getDateShipped().getTime()), true);
+
+                    //correct date ranges if need
+                    final long startRange = (long) dateAxis.getLowerBound();
+                    if (bean.getDateShipped().getTime() < startRange) {
+                        dateAxis.setLowerBound(bean.getDateShipped().getTime());
+                    }
                 }
                 if (bean.getDateArrived() != null) {
                     chart.getXYPlot().addAnnotation(new LineWithImageAnnotation(
