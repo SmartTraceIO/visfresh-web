@@ -9,12 +9,12 @@ import static com.visfresh.utils.LocalizationUtils.getDegreeSymbol;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.text.DateFormat;
@@ -47,7 +47,6 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.IntervalMarker;
-import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
@@ -169,6 +168,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                         user.getTimeZone());
                 renderer.setSeriesShape(0, new Rectangle(0, 0));
                 renderer.setLegendShape(0, new Rectangle(-1, -1, 2, 2));
+                renderer.setSeriesStroke(0, new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
                 chart.getXYPlot().setRenderer(0, renderer);
 
@@ -198,16 +198,14 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                         ShipmentReportBuilder.LOCATION_IMAGE_SIZE + 2, 0, 0, 0));
 
                 if (bean.getDateShipped() != null) {
-                    final long value = bean.getDateShipped().getTime();
-                    chart.getXYPlot().addDomainMarker(new ValueMarker(
-                            value, Color.BLACK, new BasicStroke(2f)), Layer.FOREGROUND);
-                    renderer.topMarkers.put(value, ShipmentReportBuilder.createShippedFromImage());
+                    chart.getXYPlot().addAnnotation(new LineWithImageAnnotation(
+                            ShipmentReportBuilder.createShippedFromImage(),
+                            bean.getDateShipped().getTime()), true);
                 }
                 if (bean.getDateArrived() != null) {
-                    final long value = bean.getDateArrived().getTime();
-                    chart.getXYPlot().addDomainMarker(new ValueMarker(
-                            value, Color.BLACK, new BasicStroke(2f)), Layer.FOREGROUND);
-                    renderer.topMarkers.put(value, ShipmentReportBuilder.createShippedToImage());
+                    chart.getXYPlot().addAnnotation(new LineWithImageAnnotation(
+                            ShipmentReportBuilder.createShippedToImage(),
+                            bean.getDateArrived().getTime()), true);
                 }
             }
         };
@@ -233,13 +231,25 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 final int x = (int) plot.getDomainAxis().valueToJava2D(
                         e.getKey(), dataArea, plot.getDomainAxisEdge());
 
-                Image im = e.getValue();
                 final int iconSize = ShipmentReportBuilder.LOCATION_IMAGE_SIZE;
-                if (e.getValue().getWidth() != iconSize || e.getValue().getHeight() != iconSize) {
-                    im = e.getValue().getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH);
-                }
+                final Graphics2D g = (Graphics2D) g2.create(x - iconSize / 2, y - iconSize - 2, iconSize, iconSize);
+                try {
+                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                    g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 
-                g2.drawImage(im, x - iconSize / 2, y - iconSize - 2, null);
+                    final BufferedImage image = e.getValue();
+                    if (image.getWidth() != iconSize || image.getHeight() != iconSize) {
+                        g.drawImage(image, AffineTransform.getScaleInstance(
+                                (double) iconSize / image.getWidth(),
+                                (double) iconSize / image.getHeight()),
+                                null);
+                    } else {
+                        g.drawImage(image, 0, 0, null);
+                    }
+                } finally {
+                    g.dispose();
+                }
             }
         } finally {
             g2.setClip(clip);

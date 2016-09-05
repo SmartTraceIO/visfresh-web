@@ -5,6 +5,7 @@ package com.visfresh.reports.geomap;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -74,15 +75,20 @@ public class MapRendererImpl extends AbstractRenderer implements
                 (int) (r.getX() - (viewArea.getWidth() - r.getWidth()) / 2.),
                 (int) (r.getY() - (viewArea.getHeight() - r.getHeight()) / 2.));
 
-        final Graphics2D g = (Graphics2D) gOrigin.create(
-                (int) viewArea.getX(),
-                (int) viewArea.getY(),
-                width,
-                height);
+        //use image buffer for avoid of problems with alpha chanel.
+        final BufferedImage mapImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g = mapImage.createGraphics();
+
         try {
+            g.setColor(Color.WHITE);
+            g.fillRect(0, 0, width, height);
+
             final Composite comp = g.getComposite();
 
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.6f));
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+
             builder.paint(g, p, zoom, width, height);
 
             g.setComposite(comp);
@@ -92,6 +98,13 @@ public class MapRendererImpl extends AbstractRenderer implements
         } finally {
             g.dispose();
         }
+
+        //draw image to graphics context
+        gOrigin.drawImage(mapImage,
+                (int) viewArea.getX(),
+                (int) viewArea.getY(),
+                null);
+
     }
 
     /**
@@ -118,8 +131,6 @@ public class MapRendererImpl extends AbstractRenderer implements
             }
         }
 
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
         g.setStroke(new BasicStroke(2.f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.setColor(bean.getDeviceColor());
         g.draw(path);
