@@ -4,6 +4,7 @@
 package com.visfresh.dao.impl;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,8 +70,9 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
     @Override
     public ShipmentReportBean createReport(final Shipment s) {
         final ShipmentReportBean bean = new ShipmentReportBean();
+        addArrival(s, bean);
+
         if (s.getArrivalDate() != null) {
-            addArrival(s, bean);
             bean.setDateArrived(s.getArrivalDate());
         }
 
@@ -157,7 +159,6 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         for (final User u: notifiedPersons.values()) {
             bean.getWhoWasNotified().add(u.getEmail());
         }
-
 
         final List<TrackerEvent> events = new LinkedList<>(originEvents);
         if (bean.getAlertSuppressionMinutes() > 0) {
@@ -262,6 +263,13 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             ab.setNotifiedWhenKm(arrival.getNumberOfMettersOfArrival() / 1000);
             ab.setShutdownTime(s.getDeviceShutdownTime());
             ab.setTime(s.getArrivalDate());
+
+            //add notified users.
+            final List<Notification> notifs = notificationDao.getForIssues(Arrays.asList(arrival.getId()));
+            for (final Notification n: notifs) {
+                bean.getWhoWasNotified().add(n.getUser().getEmail());
+            }
+
             bean.setArrival(ab);
         }
     }

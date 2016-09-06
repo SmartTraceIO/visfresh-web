@@ -4,6 +4,8 @@
 package com.visfresh.reports.shipment;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -23,6 +25,7 @@ public class ArrivalBean {
 //    private final List<String> schedules = new LinkedList<>();
     //Time of shutdown 14:53 12 Jun 2016
     private Date shutdownTime;
+    private final List<String> whoIsNotified = new LinkedList<>();
     /**
      * Default constructor.
      */
@@ -89,4 +92,10 @@ public class ArrivalBean {
 //    public List<String> getSchedules() {
 //        return schedules;
 //    }
+    /**
+     * @return
+     */
+    public List<String> getWhoIsNotified() {
+        return whoIsNotified;
+    }
 }

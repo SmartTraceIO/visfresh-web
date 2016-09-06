@@ -19,6 +19,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
+import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Color;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
@@ -153,6 +154,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         assertEquals(locationFromName, report.getShippedFrom());
         assertEquals(locationToName, report.getShippedTo());
+        assertNotNull(report.getShippedFromLocation());
         assertEquals(fmt.format(shipmentDate), fmt.format(report.getDateShipped()));
         assertEquals(fmt.format(arrivalDate), fmt.format(report.getDateArrived()));
     }
@@ -356,6 +358,34 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         assertEquals(loc1.getName(), bean.getPossibleShippedTo().get(0));
         assertEquals(loc2.getName(), bean.getPossibleShippedTo().get(1));
     }
+    @Test
+    public void testArrivalWhoNotified() {
+        final TrackerEvent e = createTrackerEvent(System.currentTimeMillis(), -10);
+
+        final Arrival arrival = createArrival(e);
+
+        final User u1 = createUser("U", "1");
+        createUser("U", "3");
+
+        //create personal schedule for user.
+        final PersonSchedule s1 = createSchedule(u1);
+
+        final NotificationSchedule ns = new NotificationSchedule();
+        ns.setCompany(sharedCompany);
+        ns.setName("JUnit NS");
+        ns.getSchedules().add(s1);
+        context.getBean(NotificationScheduleDao.class).save(ns);
+
+        shipment.getArrivalNotificationSchedules().add(ns);
+        shipmentDao.save(shipment);
+
+        final NotificationService notificator = context.getBean(NotificationService.class);
+
+        notificator.sendNotification(s1, arrival, e);
+
+        final ShipmentReportBean report = dao.createReport(shipment);
+        assertEquals(1, report.getWhoWasNotified().size());
+    }
 
     /**
      * @param name location name.
@@ -397,6 +427,18 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         alert.setShipment(shipment);
         alert.setTrackerEventId(e.getId());
         return context.getBean(AlertDao.class).save(alert);
+    }
+    /**
+     * @return
+     */
+    private Arrival createArrival(final TrackerEvent e) {
+        final Arrival arrival = new Arrival();
+        arrival.setDate(e.getTime());
+        arrival.setDevice(e.getDevice());
+        arrival.setNumberOfMettersOfArrival(100);
+        arrival.setShipment(e.getShipment());
+        arrival.setTrackerEventId(e.getId());
+        return context.getBean(ArrivalDao.class).save(arrival);
     }
     /**
      * @param time reading time.

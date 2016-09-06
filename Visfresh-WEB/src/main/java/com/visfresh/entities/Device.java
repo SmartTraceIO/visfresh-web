@@ -74,6 +74,62 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
         return sb.toString();
     }
     /**
+     * @param battery battery level.
+     * @return converts the battery level to charge persents.
+     */
+    public static double batteryLevelToPersents(final int battery) {
+        if (battery <= 3194.3) {
+            return 0;
+        } else if (battery <= 3241.6) {
+            return 1;
+        } else if (battery <= 3288.9) {
+            return 2;
+        } else if (battery <= 3336.2) {
+            return 3;
+        } else if (battery <= 3383.5) {
+            return 4;
+        } else if (battery <= 3430.8) {
+            return 5;
+        } else if (battery <= 3478.1) {
+            return 6;
+        } else if (battery <= 3525.4) {
+            return 7;
+        } else if (battery <= 3572.7) {
+            return 8;
+        } else if (battery <= 3620) {
+            return 9; // start rolling out
+        } else if (battery <= 3695) {
+            return 10;
+        } else if (battery <=3770) {
+            return 20;
+        } else if (battery <= 3845) {
+            return 30;
+        //} else if (input <= 3920) {
+        } else if (battery <= 3895) {
+            return 40;
+        //} else if (input <= 3995) {
+        } else if (battery <= 3925) {
+            return 50;
+        //} else if (input <= 4070) {
+        } else if (battery <= 3975) {
+            return 60;
+        //} else if (input <= 4109) {
+        } else if (battery <= 4025) {
+            return 70;
+        //} else if (input <= 4148) {
+        } else if (battery <= 4075) {
+            return 80;
+        //} else if (input <= 4187) {
+        } else if (battery <= 4125) {
+            return 90;
+        //} else if (input < 4220) {
+        } else if (battery < 4150) {
+            return 95;
+        } else {
+            return 100;
+        }
+    }
+    /**
      * @return the imei
      */
     public String getImei() {

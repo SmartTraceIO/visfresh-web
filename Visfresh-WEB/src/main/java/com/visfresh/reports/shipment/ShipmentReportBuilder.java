@@ -621,6 +621,23 @@ public class ShipmentReportBuilder {
         status.put(value, bean.getStatus().name());
         rows.add(status);
 
+        //arrival
+        if (bean.getArrival() != null) {
+            //Arrival Notification at: 19:18 4 Sep 2016
+            final Map<String, Object> arrival = new HashMap<>();
+            arrival.put(key, "Arrival Notification at");
+            arrival.put(value, DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone()).format(
+                    bean.getArrival().getNotifiedAt()));
+            rows.add(arrival);
+
+            //Who was notified:     Rob Arpas, Rob Arpas
+            final Map<String, Object> whoNotified = new HashMap<>();
+            whoNotified.put(key, "Who was notified");
+            whoNotified.put(value, StringUtils.combine(bean.getArrival().getWhoIsNotified(), ", "));
+            rows.add(whoNotified);
+        }
+
+        //define columns
         final ColumnBuilder<?, ?>[] cols = new ColumnBuilder<?, ?>[3];
         final StyleBuilder[] styles = new StyleBuilder[cols.length];
 
