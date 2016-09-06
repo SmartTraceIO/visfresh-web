@@ -67,7 +67,7 @@ import com.visfresh.utils.LocalizationUtils;
  */
 @SuppressWarnings("serial")
 public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
-    private static final int ICON_SIZE = 20;
+    private static final int ICON_SIZE = 16;
     private final AlertPaintingSupport support = new AlertPaintingSupport();
     private Map<Long, BufferedImage> topMarkers = new HashMap<>();
 
@@ -157,7 +157,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
             public void customize(final JFreeChart chart, final ReportParameters reportParameters) {
                 //set date format to date axis
                 final DateAxis dateAxis = (DateAxis) chart.getXYPlot().getDomainAxis();
-                dateAxis.setDateFormatOverride(DateTimeUtils.createPrettyFormat(
+                dateAxis.setDateFormatOverride(DateTimeUtils.createDateFormat("HH:mm MM.dd",
                         user.getLanguage(), user.getTimeZone()));
                 dateAxis.setAutoRange(true);
 
@@ -168,7 +168,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                         user.getTimeZone(), bean.getDeviceColor());
                 renderer.setSeriesShape(0, new Rectangle(0, 0));
                 renderer.setLegendShape(0, new Rectangle(-1, -1, 2, 2));
-                renderer.setSeriesStroke(0, new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                renderer.setSeriesStroke(0, new BasicStroke(1f));
 
                 chart.getXYPlot().setRenderer(0, renderer);
 
@@ -201,7 +201,8 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
 
                 if (bean.getDateShipped() != null) {
                     chart.getXYPlot().addAnnotation(new LineWithImageAnnotation(
-                            ShipmentReportBuilder.createShippedFromImage(),
+                            AlertPaintingSupport.createCompoundImage(
+                                    ShipmentReportBuilder.createShippedFromImage(), ICON_SIZE),
                             bean.getDateShipped().getTime()), true);
 
                     //correct date ranges if need
@@ -212,7 +213,8 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 }
                 if (bean.getDateArrived() != null) {
                     chart.getXYPlot().addAnnotation(new LineWithImageAnnotation(
-                            ShipmentReportBuilder.createShippedToImage(),
+                            AlertPaintingSupport.createCompoundImage(
+                                    ShipmentReportBuilder.createShippedToImage(), ICON_SIZE),
                             bean.getDateArrived().getTime()), true);
                 }
             }

@@ -171,7 +171,8 @@ public class MapRendererImpl extends AbstractRenderer implements
         if (startLocation != null) {
             final List<BufferedImage> tmp = new LinkedList<>();
             tmp.add(ShipmentReportBuilder.createShippedFromImage());
-            drawMapImage(g, support.createCompoundImage(tmp, iconSize), mapLocation, startLocation, zoom);
+            drawMapImage(g, AlertPaintingSupport.createCompoundImage(tmp, iconSize),
+                    mapLocation, startLocation, zoom);
         }
     }
 

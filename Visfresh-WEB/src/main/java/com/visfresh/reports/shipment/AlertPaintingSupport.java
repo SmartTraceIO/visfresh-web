@@ -165,7 +165,7 @@ public class AlertPaintingSupport {
      * @param singleImageSize
      * @return
      */
-    public BufferedImage createCompoundImage(final List<BufferedImage> images,
+    public static BufferedImage createCompoundImage(final List<BufferedImage> images,
             final int singleImageSize) {
         //calculate image width
         final int w = singleImageSize + images.size() - 1;
@@ -202,5 +202,16 @@ public class AlertPaintingSupport {
             g.dispose();
         }
         return result;
+    }
+
+    /**
+     * @param image
+     * @param iconSize
+     * @return
+     */
+    public static BufferedImage createCompoundImage(final BufferedImage image, final int iconSize) {
+        final List<BufferedImage> images = new LinkedList<>();
+        images.add(image);
+        return createCompoundImage(images, iconSize);
     }
 }
