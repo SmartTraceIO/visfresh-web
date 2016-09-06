@@ -550,7 +550,7 @@ public class ShipmentReportBuilder {
         final Map<String, Object> shippedFrom = new HashMap<>();
         shippedFrom.put(images, createShippedFromImage());
         shippedFrom.put(key, "Shipped From");
-        shippedFrom.put(value, bean.getShippedFrom() == null ? "" : bean.getShippedFrom());
+        shippedFrom.put(value, bean.getShippedFrom() == null ? "Undetermined" : bean.getShippedFrom());
         rows.add(shippedFrom);
 
         //date shipped
@@ -603,7 +603,7 @@ public class ShipmentReportBuilder {
 
             shippedTo.put(value, locations.toString());
         } else {
-            shippedTo.put(value, bean.getShippedTo() == null ? "" : bean.getShippedTo());
+            shippedTo.put(value, bean.getShippedTo() == null ? "Undetermined" : bean.getShippedTo());
         }
 
         shippedTo.put(key, "Shipped To");

@@ -146,14 +146,6 @@ public class MapRendererImpl extends AbstractRenderer implements
             }
         }
 
-        //draw start location
-        final Location startLocation = bean.getShippedFromLocation();
-        if (startLocation != null) {
-            final List<BufferedImage> tmp = new LinkedList<>();
-            tmp.add(ShipmentReportBuilder.createShippedFromImage());
-            drawMapImage(g, support.createCompoundImage(tmp, iconSize), mapLocation, startLocation, zoom);
-        }
-
         //add arrival notification
         if (bean.getArrival() != null) {
             support.addArrival(bean.getArrival().getTime());
@@ -172,6 +164,14 @@ public class MapRendererImpl extends AbstractRenderer implements
                 final Location loc = new Location(p.getLatitude(), p.getLongitude());
                 drawMapImage(g, im, mapLocation, loc, zoom);
             }
+        }
+
+        //draw start location
+        final Location startLocation = bean.getShippedFromLocation();
+        if (startLocation != null) {
+            final List<BufferedImage> tmp = new LinkedList<>();
+            tmp.add(ShipmentReportBuilder.createShippedFromImage());
+            drawMapImage(g, support.createCompoundImage(tmp, iconSize), mapLocation, startLocation, zoom);
         }
     }
 
