@@ -442,8 +442,6 @@ public class ShipmentReportBuilder {
 
         return list;
     }
-
-
     /**
      * @param bean
      * @return
@@ -469,8 +467,6 @@ public class ShipmentReportBuilder {
 
         return Components.text("openstreetmap service is unavailable now");
     }
-
-
     /**
      * @param readings
      * @return
@@ -483,7 +479,6 @@ public class ShipmentReportBuilder {
         }
         return false;
     }
-
     /**
      * @param readings
      */
@@ -622,11 +617,12 @@ public class ShipmentReportBuilder {
         rows.add(status);
 
         //arrival
+        final DateFormat prettyFormat = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
         if (bean.getArrival() != null) {
             //Arrival Notification at: 19:18 4 Sep 2016
             final Map<String, Object> arrival = new HashMap<>();
             arrival.put(key, "Arrival Notification at");
-            arrival.put(value, DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone()).format(
+            arrival.put(value, prettyFormat.format(
                     bean.getArrival().getNotifiedAt()));
             rows.add(arrival);
 
@@ -635,6 +631,39 @@ public class ShipmentReportBuilder {
             whoNotified.put(key, "Who was notified");
             whoNotified.put(value, StringUtils.combine(bean.getArrival().getWhoIsNotified(), ", "));
             rows.add(whoNotified);
+        }
+
+        //last reading data
+        if (bean.getReadings().size() > 0) {
+            final ShortTrackerEvent lastReading = bean.getReadings().get(0);
+
+            // Time of last reading:   11:43 2 Aug 2016
+            final Map<String, Object> lastReadingTime = new HashMap<>();
+            lastReadingTime.put(key, "Time of last reading");
+            lastReadingTime.put(value, prettyFormat.format(lastReading.getTime()));
+            rows.add(lastReadingTime);
+
+            //Temperature:    23.6℃
+            final Map<String, Object> lastReadingTemperature = new HashMap<>();
+            lastReadingTemperature.put(key, "Temperature");
+            lastReadingTemperature.put(value, getTemperatureString(lastReading.getTemperature(),
+                    user.getTemperatureUnits(), null));
+            rows.add(lastReadingTemperature);
+
+            //Battery Level:  90% (4.1V)
+            final Map<String, Object> batteryLevel = new HashMap<>();
+            batteryLevel.put(key, "Battery Level");
+            batteryLevel.put(value, (int) Device.batteryLevelToPersents(lastReading.getBattery())
+                    + "% (" + LocalizationUtils.formatByOneDecimal(lastReading.getBattery() / 1000) + "V)");
+            rows.add(batteryLevel);
+        }
+
+        if (bean.getShutdownTime() != null) {
+            //Time of shutdown: 21:46 4 Sep 2016
+            final Map<String, Object> shutdownTime = new HashMap<>();
+            shutdownTime.put(key, "Time of shutdown");
+            shutdownTime.put(value, prettyFormat.format(bean.getShutdownTime()));
+            rows.add(shutdownTime);
         }
 
         //define columns

@@ -61,6 +61,7 @@ public class ShipmentReportBean {
     private int alertSuppressionMinutes;
     private List<String> possibleShippedTo;
     private Location shippedFromLocation;
+    private Date shutdownTime;
 
     /**
      * Default constructor.
@@ -429,5 +430,17 @@ public class ShipmentReportBean {
      */
     public void setShippedFromLocation(final Location loc) {
         this.shippedFromLocation = loc;
+    }
+    /**
+     * @return device shutdown time.
+     */
+    public Date getShutdownTime() {
+        return shutdownTime;
+    }
+    /**
+     * @param shutdownTime the shutdownTime to set
+     */
+    public void setShutdownTime(final Date shutdownTime) {
+        this.shutdownTime = shutdownTime;
     }
 }

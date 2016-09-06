@@ -75,7 +75,7 @@ public class RawDataExtractor extends AbstractVisfreshLogParser {
     }
 
     public static void main(final String[] args) throws IOException {
-        final String device = "354430070001467";
+        final String device = "354430070001301";
 
 //        final File inFile = new File("/home/soldatov/tmp/logs/visfresh-dcs-root.log");
         final File inFile = new File("/home/soldatov/tmp/logs/visfresh-dcs.log");

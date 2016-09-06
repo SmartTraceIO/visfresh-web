@@ -123,6 +123,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         final String locationToName = "Myasoedovskaya";
         final Date shipmentDate = new Date(System.currentTimeMillis() - 15 * ONE_DAY);
         final Date arrivalDate = new Date(System.currentTimeMillis() - 10 * ONE_DAY);
+        final Date shutownDate = new Date(System.currentTimeMillis() - 9 * ONE_DAY);
 
         final LocationProfile locTo = new LocationProfile();
         locTo.setAddress("Odessa city, Myasoedovskaya 1, apt.1");
@@ -144,6 +145,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         shipment.setShippedTo(locTo);
         shipment.setShipmentDate(shipmentDate);
         shipment.setArrivalDate(arrivalDate);
+        shipment.setDeviceShutdownTime(shutownDate);
 
         shipmentDao.save(shipment);
 
@@ -157,6 +159,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         assertNotNull(report.getShippedFromLocation());
         assertEquals(fmt.format(shipmentDate), fmt.format(report.getDateShipped()));
         assertEquals(fmt.format(arrivalDate), fmt.format(report.getDateArrived()));
+        assertEquals(fmt.format(shutownDate), fmt.format(report.getShutdownTime()));
     }
     @Test
     public void testTemperature() {

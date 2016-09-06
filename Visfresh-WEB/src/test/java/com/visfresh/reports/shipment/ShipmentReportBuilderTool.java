@@ -103,15 +103,15 @@ public final class ShipmentReportBuilderTool {
             bean.setShippedFromLocation(new Location(first.getLatitude(), first.getLongitude()));
             bean.setDateArrived(readings.get(readings.size() - Math.min(readings.size(), 10)).getTime());
             bean.setDateShipped(first.getTime());
-        }
 
-        //set arrival
-        final ArrivalBean arrival = new ArrivalBean();
-        arrival.setTime(readings.get(random.nextInt(readings.size())).getTime());
-        arrival.setNotifiedAt(bean.getDateArrived());
-        arrival.setShutdownTime(new Date(System.currentTimeMillis() - 10000000));
-        arrival.setNotifiedWhenKm(40);
-        bean.setArrival(arrival);
+            //set arrival
+            final ArrivalBean arrival = new ArrivalBean();
+            arrival.setNotifiedAt(bean.getDateArrived());
+            arrival.setNotifiedWhenKm(40);
+            bean.setArrival(arrival);
+
+            bean.setShutdownTime(new Date(arrival.getNotifiedAt().getTime() + 10000000));
+        }
 
         final long oneHour = 60 * 60 * 1000l;
 

@@ -69,7 +69,7 @@ public class MapRendererImpl extends AbstractRenderer implements
         final int width = (int) Math.floor(viewArea.getWidth());
         final int height = (int) Math.floor(viewArea.getHeight());
 
-        final int zoom = builder.calculateZoom(coords, new Dimension(width, height), 9);
+        final int zoom = builder.calculateZoom(coords, new Dimension(width, height), 10);
 
         final Rectangle r = builder.getMapBounds(coords, zoom);
 
@@ -148,7 +148,7 @@ public class MapRendererImpl extends AbstractRenderer implements
 
         //add arrival notification
         if (bean.getArrival() != null) {
-            support.addArrival(bean.getArrival().getTime());
+            support.addArrival(bean.getArrival().getNotifiedAt());
         }
         //add last reading
         final int readingsCount = bean.getReadings().size();

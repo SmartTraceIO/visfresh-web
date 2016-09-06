@@ -144,7 +144,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
             support.addLastReading(readings.get(size - 1).getTime(), color);
         }
         if (arrival != null) {
-            support.addArrival(arrival.getTime());
+            support.addArrival(arrival.getNotifiedAt());
         }
     }
     /**

@@ -84,6 +84,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         bean.setDevice(s.getDevice().getImei());
         bean.setNumberOfSiblings(s.getSiblingCount());
         bean.setPalletId(s.getPalletId());
+        bean.setShutdownTime(s.getDeviceShutdownTime());
 //        excluding 2hr cooldown period
         bean.setAlertSuppressionMinutes(s.getAlertSuppressionMinutes());
 
@@ -261,8 +262,6 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             final ArrivalBean ab = new ArrivalBean();
             ab.setNotifiedAt(arrival.getDate());
             ab.setNotifiedWhenKm(arrival.getNumberOfMettersOfArrival() / 1000);
-            ab.setShutdownTime(s.getDeviceShutdownTime());
-            ab.setTime(s.getArrivalDate());
 
             //add notified users.
             final List<Notification> notifs = notificationDao.getForIssues(Arrays.asList(arrival.getId()));
