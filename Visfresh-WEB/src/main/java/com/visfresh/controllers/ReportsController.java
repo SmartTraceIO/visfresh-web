@@ -160,7 +160,6 @@ public class ReportsController extends AbstractController {
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip,
-            @RequestParam(required = false) final Boolean sendEmail,
             final HttpServletRequest request,
             final HttpServletResponse response
             ) throws Exception {
@@ -196,10 +195,6 @@ public class ReportsController extends AbstractController {
             //create tmp file with report PDF content.
             final File file = fileDownload.createTmpFile(createFileName(s));
 
-            if(!Boolean.FALSE.equals(sendEmail)) {
-                sendReportByEmail(user, bean, file);
-            }
-
             final OutputStream out = new FileOutputStream(file);
             try {
                 reportBuilder.createShipmentReport(bean, user, out);
@@ -216,25 +211,6 @@ public class ReportsController extends AbstractController {
             throw e;
         }
     }
-    /**
-     * @param user
-     * @param bean
-     * @param file
-     */
-    private void sendReportByEmail(final User user, final ShipmentReportBean bean, final File file) {
-//      Tracker 122(4) - as of 6:45 13 Aug 2016 (EST)
-        final DateFormat fmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
-        final String subject = "Shipment Report. " + bean.getComment()
-                + "Tracker " + Device.getSerialNumber(bean.getDevice())
-                + "(" + bean.getTripCount() + ") - as of "
-                + fmt.format(new Date()) + " (" + user.getTimeZone().getID() + ")";
-        try {
-            emailService.getHelper().sendMessage(new String[]{user.getEmail()}, subject, null, file);
-        } catch (final Exception e) {
-            log.error("Faile to send email with shipment reports", e);
-        }
-    }
-
     /**
      * @param device
      * @param startDate
