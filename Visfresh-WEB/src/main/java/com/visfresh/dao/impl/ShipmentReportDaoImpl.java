@@ -4,11 +4,8 @@
 package com.visfresh.dao.impl;
 
 import java.awt.Color;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,6 +22,7 @@ import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
+import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
@@ -70,7 +68,14 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
     @Override
     public ShipmentReportBean createReport(final Shipment s) {
         final ShipmentReportBean bean = new ShipmentReportBean();
-        addArrival(s, bean);
+        final Arrival arrival = arrivalDao.getArrival(s);
+
+        if (arrival != null) {
+            final ArrivalBean ab = new ArrivalBean();
+            ab.setNotifiedAt(arrival.getDate());
+            ab.setNotifiedWhenKm(arrival.getNumberOfMettersOfArrival() / 1000);
+            bean.setArrival(ab);
+        }
 
         if (s.getArrivalDate() != null) {
             bean.setDateArrived(s.getArrivalDate());
@@ -97,6 +102,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
         if (s.getShippedTo() != null) {
             bean.setShippedTo(s.getShippedTo().getName());
+            bean.setShippedToLocation(s.getShippedTo().getLocation());
         } else {
             final AlternativeLocations alts = alternativeLocationsDao.getBy(s);
             if (alts != null && !alts.getTo().isEmpty()) {
@@ -118,23 +124,6 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
 
         //add temperature history
-        addTemperatureHistory(s, events, bean);
-        return bean;
-    }
-    /**
-     * @param color
-     * @return
-     */
-    private Color parseColor(final com.visfresh.entities.Color color) {
-        return Color.decode(color.getHtmlValue());
-    }
-
-    /**
-     * @param s shipment.
-     * @param bean shipment report bean
-     */
-    private void addTemperatureHistory(final Shipment s,
-            final List<TrackerEvent> originEvents, final ShipmentReportBean bean) {
         if (s.getAlertProfile() != null) {
             final AlertProfile ap = s.getAlertProfile();
             bean.setAlertProfile(ap.getName());
@@ -145,23 +134,57 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         //add fired alerts
         bean.getFiredAlertRules().addAll(ruleEngine.getAlertFired(s));
 
-        //create alert map
-        final Map<Long, User> notifiedPersons = new HashMap<>();
-
         //add notified persons
         final List<Alert> alerts = alertDao.getAlerts(s);
         bean.getAlerts().addAll(alerts);
 
-        final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(alerts));
+        //get notifications
+        final List<NotificationIssue> issues = new LinkedList<NotificationIssue>(alerts);
+        if (arrival != null) {
+            issues.add(arrival);
+        }
+
+        final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(issues));
         for (final Notification n : notifs) {
-            notifiedPersons.put(n.getUser().getId(), n.getUser());
+            final User u = n.getUser();
+            bean.getWhoWasNotified().add(createUserName(u));
         }
 
-        for (final User u: notifiedPersons.values()) {
-            bean.getWhoWasNotified().add(u.getEmail());
+        addTemperatureData(bean, events);
+
+        return bean;
+    }
+    /**
+     * @param u user.
+     * @return user name.
+     */
+    private String createUserName(final User u) {
+        final StringBuilder sb = new StringBuilder();
+        if (u.getFirstName() != null) {
+            sb.append(u.getFirstName());
+        }
+        if (u.getLastName() != null) {
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
+            sb.append(u.getLastName());
         }
 
+        //add email instead name if empty
+        if (sb.length() < 1) {
+            sb.append(u.getEmail());
+        }
+        return sb.toString();
+    }
+
+    /**
+     * @param bean
+     * @param events
+     */
+    private void addTemperatureData(final ShipmentReportBean bean,
+            final List<TrackerEvent> originEvents) {
         final List<TrackerEvent> events = new LinkedList<>(originEvents);
+
         if (bean.getAlertSuppressionMinutes() > 0) {
             //exclude events when alerts suppressed
             final long t0 = bean.getAlertSuppressionMinutes() * 60 * 1000l + bean.getDateShipped().getTime();
@@ -230,6 +253,13 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             }));
         }
     }
+    /**
+     * @param color
+     * @return
+     */
+    private Color parseColor(final com.visfresh.entities.Color color) {
+        return Color.decode(color.getHtmlValue());
+    }
 
     protected long getInsedentTime(final List<TrackerEvent> events, final TemperatureIncedentDetector d) {
         long totalTime = 0;
@@ -250,26 +280,5 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
 
         return totalTime;
-    }
-    /**
-     * @param s shipment.
-     * @param bean shipment report bean.
-     */
-    private void addArrival(final Shipment s, final ShipmentReportBean bean) {
-        final Arrival arrival = arrivalDao.getArrival(s);
-
-        if (arrival != null) {
-            final ArrivalBean ab = new ArrivalBean();
-            ab.setNotifiedAt(arrival.getDate());
-            ab.setNotifiedWhenKm(arrival.getNumberOfMettersOfArrival() / 1000);
-
-            //add notified users.
-            final List<Notification> notifs = notificationDao.getForIssues(Arrays.asList(arrival.getId()));
-            for (final Notification n: notifs) {
-                bean.getWhoWasNotified().add(n.getUser().getEmail());
-            }
-
-            bean.setArrival(ab);
-        }
     }
 }

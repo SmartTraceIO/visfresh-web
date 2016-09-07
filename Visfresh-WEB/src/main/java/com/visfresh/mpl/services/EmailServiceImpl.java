@@ -65,7 +65,7 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
      * @param env
      * @return
      */
-    private static EmailServiceHelper createHelper(final Environment env) {
+    public static EmailServiceHelper createHelper(final Environment env) {
         final boolean useSsl = "true".equalsIgnoreCase(env.getProperty("mail.smtp.useSsl", "false"));
         final EmailServiceHelper helper = new EmailServiceHelper();
         helper.setUseSsl(useSsl);
@@ -148,5 +148,12 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
     @PostConstruct
     public void start() {
         dispatcher.setEmailHandler(this);
+    }
+    /**
+     * @return the helper
+     */
+    @Override
+    public EmailServiceHelper getHelper() {
+        return helper;
     }
 }

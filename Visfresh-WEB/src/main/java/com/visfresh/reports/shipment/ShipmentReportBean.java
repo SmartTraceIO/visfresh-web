@@ -22,7 +22,9 @@ public class ShipmentReportBean {
     private String companyName;
     private int tripCount;
     private String shippedFrom;
+    private Location shippedFromLocation;
     private String shippedTo;
+    private Location shippedToLocation;
     private Date dateShipped;
     private Date dateArrived;
     private ShipmentStatus status;
@@ -39,6 +41,7 @@ public class ShipmentReportBean {
     private final List<AlertRule> firedAlertRules = new LinkedList<>();
     private final List<Alert> alerts = new LinkedList<>();
     private final List<String> whoWasNotified = new LinkedList<>();
+    private final List<String> whoWasNotifiedNames = new LinkedList<>();
     /**
      * Total time of monitoring: 234hrs
      */
@@ -60,7 +63,6 @@ public class ShipmentReportBean {
     private Color deviceColor = Color.GREEN.darker();
     private int alertSuppressionMinutes;
     private List<String> possibleShippedTo;
-    private Location shippedFromLocation;
     private Date shutdownTime;
 
     /**
@@ -82,7 +84,6 @@ public class ShipmentReportBean {
         this.device = device;
     }
     /**
-     * @return the tripCount
      */
     public int getTripCount() {
         return tripCount;
@@ -264,6 +265,12 @@ public class ShipmentReportBean {
         return whoWasNotified;
     }
     /**
+     * @return
+     */
+    public List<String> getWhoWasNotifiedNames() {
+        return whoWasNotifiedNames;
+    }
+    /**
      * @return the totalTime
      */
     public long getTotalTime() {
@@ -430,6 +437,18 @@ public class ShipmentReportBean {
      */
     public void setShippedFromLocation(final Location loc) {
         this.shippedFromLocation = loc;
+    }
+    /**
+     * @return the shippedToLocation
+     */
+    public Location getShippedToLocation() {
+        return shippedToLocation;
+    }
+    /**
+     * @param shippedToLocation the shippedToLocation to set
+     */
+    public void setShippedToLocation(final Location shippedToLocation) {
+        this.shippedToLocation = shippedToLocation;
     }
     /**
      * @return device shutdown time.

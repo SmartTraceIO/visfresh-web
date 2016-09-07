@@ -101,8 +101,11 @@ public final class ShipmentReportBuilderTool {
         if (readings.size() > 0) {
             final ShortTrackerEvent first = readings.get(0);
             bean.setShippedFromLocation(new Location(first.getLatitude(), first.getLongitude()));
-            bean.setDateArrived(readings.get(readings.size() - Math.min(readings.size(), 10)).getTime());
             bean.setDateShipped(first.getTime());
+
+            final ShortTrackerEvent arrived = readings.get(readings.size() - Math.min(readings.size(), 10));
+            bean.setDateArrived(arrived.getTime());
+            bean.setShippedToLocation(new Location(arrived.getLatitude(), arrived.getLongitude()));
 
             //set arrival
             final ArrivalBean arrival = new ArrivalBean();

@@ -11,6 +11,7 @@ import javax.mail.MessagingException;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.io.email.EmailMessage;
+import com.visfresh.io.email.EmailServiceHelper;
 import com.visfresh.services.EmailService;
 
 /**
@@ -51,6 +52,13 @@ public class MockEmailService implements EmailService {
     public void sendMessageToSupport(final String subject, final String message)
             throws MessagingException {
         sendMessage(new String[]{"support@smarttrace.com.au"}, subject, message);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.EmailService#getHelper()
+     */
+    @Override
+    public EmailServiceHelper getHelper() {
+        return null;
     }
 
     /**

@@ -24,9 +24,8 @@ import com.visfresh.entities.AlertType;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class AlertPaintingSupport {
+public class ImagePaintingSupport {
     private Map<Date, BufferedImage> renderedImages = new HashMap<>();
-    private static final String LAST_READING = "LastReading";
     private static final String ARRIVAL = "Arrival";
 
     private Map<Date, List<BufferedImage>> alertsFired = new HashMap<>();
@@ -35,16 +34,25 @@ public class AlertPaintingSupport {
     /**
      * Default constructor.
      */
-    public AlertPaintingSupport() {
+    public ImagePaintingSupport() {
         super();
     }
 
     public void addFiredAlerts(final Date date, final AlertType... alerts) {
-        final String[] alertNames = new String[alerts.length];
-        for (int i = 0; i < alertNames.length; i++) {
-            alertNames[i] = alerts[i].name();
+        final String[] imageNames = new String[alerts.length];
+        for (int i = 0; i < imageNames.length; i++) {
+            final String name = alerts[i].name();
+            imageNames[i] = createAlertPictureName(name);
         }
-        addFiredAlerts(date, alertNames);
+        addFiredAlerts(date, imageNames);
+    }
+    /**
+     * @param name
+     * @param useTiny
+     * @return
+     */
+    private static String createAlertPictureName(final String name) {
+        return "alert" + name;
     }
     /**
      * @param date
@@ -52,7 +60,7 @@ public class AlertPaintingSupport {
      */
     protected void addFiredAlerts(final Date date, final String... alertNames) {
         for (final String name: alertNames) {
-            addImageMarkerForDate(date, possibleLoadImage(name));
+            addImageMarkerForDate(date, possibleLoadAlertImage(name));
         }
     }
     /**
@@ -70,31 +78,44 @@ public class AlertPaintingSupport {
     /**
      * @param type
      */
-    private BufferedImage possibleLoadImage(final String name) {
+    private BufferedImage possibleLoadAlertImage(final String name) {
         BufferedImage image = alertImages.get(name);
         if (image == null) {
-            image = loadAlertImage(name);
+            image = loadReportImage(name);
         }
         alertImages.put(name, image);
         return image;
-    }
-    public static BufferedImage loadLastReaing() {
-        return loadAlertImage(LAST_READING);
     }
     /**
      * @param name
      * @return
      */
-    protected static BufferedImage loadAlertImage(final String name) {
-        final String resourcePath = "reports/images/shipment/alert";
-        final URL url = AlertPaintingSupport.class.getClassLoader().getResource(
-                resourcePath + name + ".png");
+    public static BufferedImage loadReportImage(final String name) {
+        return loadImage("reports/images/shipment/" + name + ".png");
+    }
+    /**
+     * @param name
+     * @return
+     */
+    public static BufferedImage loadImage(final String name) {
+        final URL url = ImagePaintingSupport.class.getClassLoader().getResource(name);
         if (url == null) {
-            throw new RuntimeException("Image not found for alert " + name);
+            throw new RuntimeException("Image not found: " + name);
         }
 
         try {
-            return ImageIO.read(url);
+            final BufferedImage origin = ImageIO.read(url);
+            //for now the image has loaded with byte data buffer need convert it to int buffer
+            //for avoid the painting problems
+            final BufferedImage image = new BufferedImage(origin.getWidth(), origin.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            final Graphics2D g = image.createGraphics();
+            try {
+                g.drawImage(origin, 0, 0, null);
+            } finally {
+                g.dispose();
+            }
+
+            return image;
         } catch (final IOException e) {
             throw new RuntimeException("Unable to load image", e);
         }
@@ -132,14 +153,15 @@ public class AlertPaintingSupport {
      * @param date
      */
     public void addArrival(final Date date) {
-        addFiredAlerts(date, ARRIVAL);
+        addFiredAlerts(date, createAlertPictureName(ARRIVAL));
     }
     /**
      * @param type
+     * @param useTinyImage TODO
      * @return
      */
     public static BufferedImage loadAlertImage(final AlertType type) {
-        return loadAlertImage(type.name());
+        return loadReportImage(createAlertPictureName(type.name()));
     }
     /**
      * @param date
@@ -159,7 +181,6 @@ public class AlertPaintingSupport {
         }
         return null;
     }
-
     /**
      * @param images
      * @param singleImageSize
@@ -168,7 +189,8 @@ public class AlertPaintingSupport {
     public static BufferedImage createCompoundImage(final List<BufferedImage> images,
             final int singleImageSize) {
         //calculate image width
-        final int w = singleImageSize + images.size() - 1;
+        final int gap = 2;
+        final int w = singleImageSize + (images.size() - 1) * gap;
         final int h = w;
 
         //render complex image
@@ -176,6 +198,9 @@ public class AlertPaintingSupport {
 
         final Graphics2D g = result.createGraphics();
         try {
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+
             int i = 0;
             for (final BufferedImage a : images) {
                 if (a.getWidth() != singleImageSize || a.getHeight() != singleImageSize) {
@@ -193,7 +218,7 @@ public class AlertPaintingSupport {
                         g1.dispose();
                     }
                 } else {
-                    g.drawImage(a, i, i, null);
+                    g.drawImage(a, i * gap, i * gap, null);
                 }
 
                 i++;
@@ -203,7 +228,6 @@ public class AlertPaintingSupport {
         }
         return result;
     }
-
     /**
      * @param image
      * @param iconSize
@@ -213,5 +237,24 @@ public class AlertPaintingSupport {
         final List<BufferedImage> images = new LinkedList<>();
         images.add(image);
         return createCompoundImage(images, iconSize);
+    }
+
+    /**
+     * @param createShippedToImage
+     * @return
+     */
+    public static void flip(final BufferedImage a) {
+        final int w = a.getWidth();
+        final int h = a.getHeight();
+
+        final int w2 = w / 2;
+
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w2; x++) {
+                final int tmp = a.getRGB(x, y);
+                a.setRGB(x, y, a.getRGB(w - 1 - x, y));
+                a.setRGB(w - 1 - x, y, tmp);
+            }
+        }
     }
 }

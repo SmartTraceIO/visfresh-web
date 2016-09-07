@@ -7,7 +7,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
@@ -66,9 +65,9 @@ public class LineWithImageAnnotation extends AbstractXYAnnotation {
 
             //draw image
             g2.drawImage(
-                    getCompatibleImage(ShipmentReportBuilder.LOCATION_IMAGE_SIZE),
-                    x - ShipmentReportBuilder.LOCATION_IMAGE_SIZE / 2,
-                    y1 - ShipmentReportBuilder.LOCATION_IMAGE_SIZE - 2,
+                    createNotTransparentImage(),
+                    x - image.getWidth() / 2,
+                    y1 - image.getHeight() - 2,
                     null);
         } finally {
 
@@ -80,19 +79,14 @@ public class LineWithImageAnnotation extends AbstractXYAnnotation {
     /**
      * @return
      */
-    public BufferedImage getCompatibleImage(final int iconSize) {
-        final BufferedImage im = new BufferedImage(iconSize, iconSize, BufferedImage.TYPE_INT_ARGB);
+    private BufferedImage createNotTransparentImage() {
+        final BufferedImage im = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         final Graphics2D g = im.createGraphics();
         try {
             g.setColor(Color.WHITE);
-            g.fillRect(0, 0, iconSize, iconSize);
-
-            if (image.getWidth() != iconSize || image.getHeight() != iconSize) {
-                g.drawImage(image.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH), 0, 0, null);
-            } else {
-                g.drawImage(image, 0, 0, null);
-            }
+            g.fillRect(0, 0, im.getWidth(), im.getHeight());
+            g.drawImage(image, 0, 0, null);
         } finally {
             g.dispose();
         }

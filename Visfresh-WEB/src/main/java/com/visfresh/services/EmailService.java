@@ -5,6 +5,8 @@ package com.visfresh.services;
 
 import javax.mail.MessagingException;
 
+import com.visfresh.io.email.EmailServiceHelper;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -23,4 +25,8 @@ public interface EmailService {
      * @throws MessagingException
      */
     void sendMessageToSupport(String subject, String message) throws MessagingException;
+    /**
+     * @return email helper.
+     */
+    EmailServiceHelper getHelper();
 }

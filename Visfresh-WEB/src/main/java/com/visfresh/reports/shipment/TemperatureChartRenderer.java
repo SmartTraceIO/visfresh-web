@@ -67,8 +67,8 @@ import com.visfresh.utils.LocalizationUtils;
  */
 @SuppressWarnings("serial")
 public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
-    private static final int ICON_SIZE = 16;
-    private final AlertPaintingSupport support = new AlertPaintingSupport();
+    private static final int ICON_SIZE = 17;
+    private final ImagePaintingSupport support = new ImagePaintingSupport();
     private Map<Long, BufferedImage> topMarkers = new HashMap<>();
 
     /**
@@ -130,7 +130,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
      * @param timeZone
      * @param renderer
      */
-    public void addAlertsData(final List<ShortTrackerEvent> readings, final List<Alert> alerts,
+    protected void addAlertsData(final List<ShortTrackerEvent> readings, final List<Alert> alerts,
             final ArrivalBean arrival, final TimeZone timeZone, final Color color) {
         for (final Alert a : alerts) {
             final ShortTrackerEvent e = EntityUtils.getEntity(readings, a.getTrackerEventId());
@@ -157,7 +157,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
             public void customize(final JFreeChart chart, final ReportParameters reportParameters) {
                 //set date format to date axis
                 final DateAxis dateAxis = (DateAxis) chart.getXYPlot().getDomainAxis();
-                dateAxis.setDateFormatOverride(DateTimeUtils.createDateFormat("HH:mm MM.dd",
+                dateAxis.setDateFormatOverride(DateTimeUtils.createDateFormat("HH:mm dd MMM",
                         user.getLanguage(), user.getTimeZone()));
                 dateAxis.setAutoRange(true);
 
@@ -200,9 +200,9 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                         ShipmentReportBuilder.LOCATION_IMAGE_SIZE + 2, 0, 0, 0));
 
                 if (bean.getDateShipped() != null) {
+                    final BufferedImage im = ImagePaintingSupport.loadReportImage("tinyShippedFrom");
                     chart.getXYPlot().addAnnotation(new LineWithImageAnnotation(
-                            AlertPaintingSupport.createCompoundImage(
-                                    ShipmentReportBuilder.createShippedFromImage(), ICON_SIZE),
+                            ImagePaintingSupport.createCompoundImage(im, 16),
                             bean.getDateShipped().getTime()), true);
 
                     //correct date ranges if need
@@ -212,9 +212,11 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                     }
                 }
                 if (bean.getDateArrived() != null) {
+                    final BufferedImage im = ImagePaintingSupport.loadReportImage("tinyShippedTo");
+                    ImagePaintingSupport.flip(im);
+
                     chart.getXYPlot().addAnnotation(new LineWithImageAnnotation(
-                            AlertPaintingSupport.createCompoundImage(
-                                    ShipmentReportBuilder.createShippedToImage(), ICON_SIZE),
+                            ImagePaintingSupport.createCompoundImage(im, 12),
                             bean.getDateArrived().getTime()), true);
                 }
             }
@@ -244,6 +246,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 final int iconSize = ShipmentReportBuilder.LOCATION_IMAGE_SIZE;
                 final Graphics2D g = (Graphics2D) g2.create(x - iconSize / 2, y - iconSize - 2, iconSize, iconSize);
                 try {
+                    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
                     g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                     g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                     g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);

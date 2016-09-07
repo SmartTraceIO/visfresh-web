@@ -28,7 +28,7 @@ import net.sf.jasperreports.renderers.Graphics2DRenderable;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.ShortTrackerEvent;
-import com.visfresh.reports.shipment.AlertPaintingSupport;
+import com.visfresh.reports.shipment.ImagePaintingSupport;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBuilder;
 import com.visfresh.utils.EntityUtils;
@@ -87,7 +87,7 @@ public class MapRendererImpl extends AbstractRenderer implements
 
             final Composite comp = g.getComposite();
 
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.6f));
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.7f));
             g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 
@@ -118,7 +118,7 @@ public class MapRendererImpl extends AbstractRenderer implements
     private void paintMarkers(final ShipmentReportBean bean,
             final Graphics2D g, final Point mapLocation, final int zoom) {
         //create path shape
-        final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+        final GeneralPath path = new GeneralPath();
 
         for (final ShortTrackerEvent p : bean.getReadings()) {
             final int x = Math.round(OpenStreetMapBuilder.lon2position(
@@ -133,12 +133,13 @@ public class MapRendererImpl extends AbstractRenderer implements
             }
         }
 
-        g.setStroke(new BasicStroke(2.f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setStroke(new BasicStroke(2.f));
         g.setColor(bean.getDeviceColor());
         g.draw(path);
 
         //draw alerts
-        final AlertPaintingSupport support = new AlertPaintingSupport();
+        final ImagePaintingSupport support = new ImagePaintingSupport();
         for (final Alert a : ShipmentReportBuilder.filterAlerts(bean.getAlerts())) {
             final ShortTrackerEvent e = EntityUtils.getEntity(bean.getReadings(), a.getTrackerEventId());
             if (e != null) {
@@ -169,10 +170,22 @@ public class MapRendererImpl extends AbstractRenderer implements
         //draw start location
         final Location startLocation = bean.getShippedFromLocation();
         if (startLocation != null) {
-            final List<BufferedImage> tmp = new LinkedList<>();
-            tmp.add(ShipmentReportBuilder.createShippedFromImage());
-            drawMapImage(g, AlertPaintingSupport.createCompoundImage(tmp, iconSize),
+            drawMapImage(g, ImagePaintingSupport.createCompoundImage(
+                    ImagePaintingSupport.loadReportImage("tinyShippedFrom"), iconSize),
                     mapLocation, startLocation, zoom);
+        }
+
+        //draw end location
+        final Location endLocation = bean.getShippedToLocation();
+        if (endLocation != null) {
+            final int size = iconSize - 2;
+            final BufferedImage image = ImagePaintingSupport.createCompoundImage(
+                    ImagePaintingSupport.loadReportImage("tinyShippedTo"), size);
+            final int x = Math.round(OpenStreetMapBuilder.lon2position(
+                    endLocation.getLongitude(), zoom) - mapLocation.x);
+            final int y = Math.round(OpenStreetMapBuilder.lat2position(
+                    endLocation.getLatitude(), zoom) - mapLocation.y);
+            g.drawImage(image, x, y - size, null);
         }
     }
 

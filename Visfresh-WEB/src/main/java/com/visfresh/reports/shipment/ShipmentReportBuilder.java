@@ -10,7 +10,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -19,8 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.base.expression.AbstractSimpleExpression;
@@ -293,12 +290,13 @@ public class ShipmentReportBuilder {
     }
 
     /**
+     * @param useTinyImages TODO
      * @return
      */
     public static Map<AlertType, BufferedImage> loadAlertImages() {
         final Map<AlertType, BufferedImage> map = new HashMap<>();
         for (final AlertType type : AlertType.values()) {
-            map.put(type, AlertPaintingSupport.loadAlertImage(type));
+            map.put(type, ImagePaintingSupport.loadAlertImage(type));
         }
         return map;
     }
@@ -532,6 +530,7 @@ public class ShipmentReportBuilder {
     private ComponentBuilder<?, ?> createShipmentDescription(
             final ShipmentReportBean bean, final User user) {
         final JasperReportBuilder report = new JasperReportBuilder();
+        final DateFormat prettyFormat = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
 
         //column names
         final String images = "images";
@@ -543,7 +542,7 @@ public class ShipmentReportBuilder {
 
         //shipped from
         final Map<String, Object> shippedFrom = new HashMap<>();
-        shippedFrom.put(images, createShippedFromImage());
+        shippedFrom.put(images, ImagePaintingSupport.loadReportImage("shippedFrom"));
         shippedFrom.put(key, "Shipped From");
         shippedFrom.put(value, bean.getShippedFrom() == null ? "Undetermined" : bean.getShippedFrom());
         rows.add(shippedFrom);
@@ -551,7 +550,7 @@ public class ShipmentReportBuilder {
         //date shipped
         final Map<String, Object> dateShipped = new HashMap<>();
         dateShipped.put(key, "Date Shipped");
-        dateShipped.put(value, bean.getDateShipped() == null ? "" : format(user, bean.getDateShipped()));
+        dateShipped.put(value, bean.getDateShipped() == null ? "" : prettyFormat.format(bean.getDateShipped()));
         rows.add(dateShipped);
 
         final Map<String, Object> shippedTo = new HashMap<>();
@@ -559,9 +558,9 @@ public class ShipmentReportBuilder {
 
         //shipped to image
         if (Shipment.isFinalStatus(bean.getStatus())) {
-            shippedTo.put(images, createShippedToImage());
+            shippedTo.put(images, ImagePaintingSupport.loadReportImage("shippedTo"));
         } else {
-            shippedTo.put(images, createImage("reports/images/shipment/shippedToToBeDetermined.png"));
+            shippedTo.put(images, ImagePaintingSupport.loadReportImage("shippedToToBeDetermined"));
         }
 
         //shipped to text
@@ -607,7 +606,7 @@ public class ShipmentReportBuilder {
         //arrival date
         final Map<String, Object> arrivalDate = new HashMap<>();
         arrivalDate.put(key, "Arrival Date");
-        arrivalDate.put(value, bean.getDateArrived() == null ? "" : format(user, bean.getDateArrived()));
+        arrivalDate.put(value, bean.getDateArrived() == null ? "" : prettyFormat.format(bean.getDateArrived()));
         rows.add(arrivalDate);
 
         //shipment status
@@ -617,7 +616,6 @@ public class ShipmentReportBuilder {
         rows.add(status);
 
         //arrival
-        final DateFormat prettyFormat = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
         if (bean.getArrival() != null) {
             //Arrival Notification at: 19:18 4 Sep 2016
             final Map<String, Object> arrival = new HashMap<>();
@@ -625,17 +623,17 @@ public class ShipmentReportBuilder {
             arrival.put(value, prettyFormat.format(
                     bean.getArrival().getNotifiedAt()));
             rows.add(arrival);
-
-            //Who was notified:     Rob Arpas, Rob Arpas
-            final Map<String, Object> whoNotified = new HashMap<>();
-            whoNotified.put(key, "Who was notified");
-            whoNotified.put(value, StringUtils.combine(bean.getArrival().getWhoIsNotified(), ", "));
-            rows.add(whoNotified);
         }
+
+        //Who was notified:     Rob Arpas, Rob Arpas
+        final Map<String, Object> whoNotified = new HashMap<>();
+        whoNotified.put(key, "Who was notified");
+        whoNotified.put(value, StringUtils.combine(bean.getWhoWasNotified(), ", "));
+        rows.add(whoNotified);
 
         //last reading data
         if (bean.getReadings().size() > 0) {
-            final ShortTrackerEvent lastReading = bean.getReadings().get(0);
+            final ShortTrackerEvent lastReading = bean.getReadings().get(bean.getReadings().size() - 1);
 
             // Time of last reading:   11:43 2 Aug 2016
             final Map<String, Object> lastReadingTime = new HashMap<>();
@@ -654,7 +652,7 @@ public class ShipmentReportBuilder {
             final Map<String, Object> batteryLevel = new HashMap<>();
             batteryLevel.put(key, "Battery Level");
             batteryLevel.put(value, (int) Device.batteryLevelToPersents(lastReading.getBattery())
-                    + "% (" + LocalizationUtils.formatByOneDecimal(lastReading.getBattery() / 1000) + "V)");
+                    + "% (" + LocalizationUtils.formatByOneDecimal(lastReading.getBattery() / 1000.) + "V)");
             rows.add(batteryLevel);
         }
 
@@ -736,36 +734,6 @@ public class ShipmentReportBuilder {
         list.setStyle(Styles.style().setBorder(border));
         return list;
     }
-
-    /**
-     * @return
-     */
-    public static BufferedImage createShippedToImage() {
-        return createImage("reports/images/shipment/shippedTo.png");
-    }
-    /**
-     * @return
-     */
-    public static BufferedImage createShippedFromImage() {
-        return createImage("reports/images/shipment/shippedFrom.png");
-    }
-    /**
-     * @param resource
-     * @return
-     */
-    private static BufferedImage createImage(final String resource) {
-        final URL url = ShipmentReportBuilder.class.getClassLoader().getResource(resource);
-        if (url == null) {
-            return null;
-        }
-
-        try {
-            return ImageIO.read(url);
-        } catch (final IOException e) {
-            throw new RuntimeException("Failed to load image", e);
-        }
-    }
-
 
     /**
      * @param bean
@@ -952,7 +920,7 @@ public class ShipmentReportBuilder {
 
         list.add(text);
 
-        final ImageBuilder image = Components.image(createImage("reports/images/shipment/logo.jpg"));
+        final ImageBuilder image = Components.image(ImagePaintingSupport.loadImage("reports/images/shipment/logo.jpg"));
         image.setFixedWidth(110);
         image.setFixedHeight(40);
         image.setImageScale(ImageScale.RETAIN_SHAPE);
@@ -980,17 +948,6 @@ public class ShipmentReportBuilder {
         }
 
         return Styles.style().setFont(font);
-    }
-    /**
-     * @param date
-     * @return
-     */
-    private String format(final User user, final Date date) {
-        if (date == null) {
-            return "";
-        }
-        return DateTimeUtils.createPrettyFormat(
-                user.getLanguage(), user.getTimeZone()).format(date);
     }
     /**
      * @param t
