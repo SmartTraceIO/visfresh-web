@@ -87,7 +87,7 @@ public class MapRendererImpl extends AbstractRenderer implements
 
             final Composite comp = g.getComposite();
 
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.7f));
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.8f));
             g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 
@@ -170,8 +170,8 @@ public class MapRendererImpl extends AbstractRenderer implements
         //draw start location
         final Location startLocation = bean.getShippedFromLocation();
         if (startLocation != null) {
-            drawMapImage(g, ImagePaintingSupport.createCompoundImage(
-                    ImagePaintingSupport.loadReportImage("tinyShippedFrom"), iconSize),
+            drawMapImage(g, ImagePaintingSupport.scaleImage(
+                    ImagePaintingSupport.loadReportPngImage("tinyShippedFrom"), iconSize),
                     mapLocation, startLocation, zoom);
         }
 
@@ -179,13 +179,15 @@ public class MapRendererImpl extends AbstractRenderer implements
         final Location endLocation = bean.getShippedToLocation();
         if (endLocation != null) {
             final int size = iconSize - 2;
-            final BufferedImage image = ImagePaintingSupport.createCompoundImage(
-                    ImagePaintingSupport.loadReportImage("tinyShippedTo"), size);
+            final BufferedImage image = ImagePaintingSupport.scaleImage(
+                    ImagePaintingSupport.loadReportPngImage("tinyShippedTo"), size);
+            ImagePaintingSupport.flip(image);
+
             final int x = Math.round(OpenStreetMapBuilder.lon2position(
                     endLocation.getLongitude(), zoom) - mapLocation.x);
             final int y = Math.round(OpenStreetMapBuilder.lat2position(
                     endLocation.getLatitude(), zoom) - mapLocation.y);
-            g.drawImage(image, x, y - size, null);
+            g.drawImage(image, x - size, y - size, null);
         }
     }
 

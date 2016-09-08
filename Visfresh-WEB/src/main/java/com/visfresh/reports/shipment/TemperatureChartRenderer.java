@@ -200,9 +200,9 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                         ShipmentReportBuilder.LOCATION_IMAGE_SIZE + 2, 0, 0, 0));
 
                 if (bean.getDateShipped() != null) {
-                    final BufferedImage im = ImagePaintingSupport.loadReportImage("tinyShippedFrom");
+                    final BufferedImage im = ImagePaintingSupport.loadReportPngImage("tinyShippedFrom");
                     chart.getXYPlot().addAnnotation(new LineWithImageAnnotation(
-                            ImagePaintingSupport.createCompoundImage(im, 16),
+                            ImagePaintingSupport.scaleImage(im, 16),
                             bean.getDateShipped().getTime()), true);
 
                     //correct date ranges if need
@@ -212,11 +212,11 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                     }
                 }
                 if (bean.getDateArrived() != null) {
-                    final BufferedImage im = ImagePaintingSupport.loadReportImage("tinyShippedTo");
+                    final BufferedImage im = ImagePaintingSupport.loadReportPngImage("tinyShippedTo");
                     ImagePaintingSupport.flip(im);
 
                     chart.getXYPlot().addAnnotation(new LineWithImageAnnotation(
-                            ImagePaintingSupport.createCompoundImage(im, 12),
+                            ImagePaintingSupport.scaleImage(im, 12),
                             bean.getDateArrived().getTime()), true);
                 }
             }

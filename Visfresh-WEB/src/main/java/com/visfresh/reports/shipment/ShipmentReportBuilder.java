@@ -542,7 +542,7 @@ public class ShipmentReportBuilder {
 
         //shipped from
         final Map<String, Object> shippedFrom = new HashMap<>();
-        shippedFrom.put(images, ImagePaintingSupport.loadReportImage("shippedFrom"));
+        shippedFrom.put(images, ImagePaintingSupport.loadReportPngImage("shippedFrom"));
         shippedFrom.put(key, "Shipped From");
         shippedFrom.put(value, bean.getShippedFrom() == null ? "Undetermined" : bean.getShippedFrom());
         rows.add(shippedFrom);
@@ -558,9 +558,11 @@ public class ShipmentReportBuilder {
 
         //shipped to image
         if (Shipment.isFinalStatus(bean.getStatus())) {
-            shippedTo.put(images, ImagePaintingSupport.loadReportImage("shippedTo"));
+            final BufferedImage im = ImagePaintingSupport.loadReportPngImage("shippedTo");
+            ImagePaintingSupport.flip(im);
+            shippedTo.put(images, im);
         } else {
-            shippedTo.put(images, ImagePaintingSupport.loadReportImage("shippedToToBeDetermined"));
+            shippedTo.put(images, ImagePaintingSupport.loadReportPngImage("shippedToToBeDetermined"));
         }
 
         //shipped to text
@@ -920,7 +922,7 @@ public class ShipmentReportBuilder {
 
         list.add(text);
 
-        final ImageBuilder image = Components.image(ImagePaintingSupport.loadImage("reports/images/shipment/logo.jpg"));
+        final ImageBuilder image = Components.image(ImagePaintingSupport.loadImageResource("reports/images/shipment/logo.jpg"));
         image.setFixedWidth(110);
         image.setFixedHeight(40);
         image.setImageScale(ImageScale.RETAIN_SHAPE);

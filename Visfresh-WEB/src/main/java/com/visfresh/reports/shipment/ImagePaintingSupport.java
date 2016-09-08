@@ -81,23 +81,23 @@ public class ImagePaintingSupport {
     private BufferedImage possibleLoadAlertImage(final String name) {
         BufferedImage image = alertImages.get(name);
         if (image == null) {
-            image = loadReportImage(name);
+            image = loadReportPngImage(name);
         }
         alertImages.put(name, image);
         return image;
     }
     /**
-     * @param name
+     * @param name image name.
      * @return
      */
-    public static BufferedImage loadReportImage(final String name) {
-        return loadImage("reports/images/shipment/" + name + ".png");
+    public static BufferedImage loadReportPngImage(final String name) {
+        return loadImageResource("reports/images/shipment/" + name + ".png");
     }
     /**
      * @param name
      * @return
      */
-    public static BufferedImage loadImage(final String name) {
+    public static BufferedImage loadImageResource(final String name) {
         final URL url = ImagePaintingSupport.class.getClassLoader().getResource(name);
         if (url == null) {
             throw new RuntimeException("Image not found: " + name);
@@ -156,16 +156,16 @@ public class ImagePaintingSupport {
         addFiredAlerts(date, createAlertPictureName(ARRIVAL));
     }
     /**
-     * @param type
-     * @param useTinyImage TODO
-     * @return
+     * @param type alert type.
+     * @return buffered image.
      */
     public static BufferedImage loadAlertImage(final AlertType type) {
-        return loadReportImage(createAlertPictureName(type.name()));
+        return loadReportPngImage(createAlertPictureName(type.name()));
     }
     /**
-     * @param date
-     * @return
+     * @param date the date which images are bound to.
+     * @param size target image size
+     * @return compound buffered image with including all images bound to given date.
      */
     public BufferedImage getRenderedImage(final Date date, final int size) {
         final BufferedImage bim = this.renderedImages.get(date);
@@ -233,7 +233,7 @@ public class ImagePaintingSupport {
      * @param iconSize
      * @return
      */
-    public static BufferedImage createCompoundImage(final BufferedImage image, final int iconSize) {
+    public static BufferedImage scaleImage(final BufferedImage image, final int iconSize) {
         final List<BufferedImage> images = new LinkedList<>();
         images.add(image);
         return createCompoundImage(images, iconSize);
