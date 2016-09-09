@@ -16,6 +16,7 @@ import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.User;
 import com.visfresh.io.email.EmailServiceHelper;
 import com.visfresh.l12n.NotificationBundle;
 import com.visfresh.services.RetryableException;
@@ -108,7 +109,10 @@ public class SendNotificationTool extends NotificationServiceImpl {
 
         final String[] emails = {"james@smarttrace.com.au", "vyacheslav.soldatov@inbox.ru"};
         for (final String email : emails) {
-            tool.sendEmailNotification(a, email, e,
+            final User user = new User();
+            user.setEmail(email);
+            user.setFirstName(email);
+            tool.sendEmailNotification(a, user, e,
                     Language.English, TimeZone.getDefault(), TemperatureUnits.Celsius);
         }
     }

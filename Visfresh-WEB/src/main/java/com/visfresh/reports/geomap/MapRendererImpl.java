@@ -43,6 +43,7 @@ public class MapRendererImpl extends AbstractRenderer implements
     private final ShipmentReportBean bean;
     private final AbstractGeoMapBuiler builder;
     private final int iconSize = 16;
+    private EventsOptimizer optimizer = new EventsOptimizer();
 
     /**
      * Default constructor.
@@ -86,15 +87,22 @@ public class MapRendererImpl extends AbstractRenderer implements
             g.fillRect(0, 0, width, height);
 
             final Composite comp = g.getComposite();
-
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.8f));
             g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 
-            builder.paint(g, p, zoom, width, height);
+            //set transparency before draw map
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.8f));
 
+            paintMap(g, p, width, height, zoom);
+
+            //restore transparency
             g.setComposite(comp);
-            paintMarkers(bean, g, p, zoom);
+
+//            final List<ShortTrackerEvent> readings = optimizer.optimize(bean.getReadings());
+            final List<ShortTrackerEvent> readings = bean.getReadings();
+
+            paintPath(g, readings, p, zoom);
+            paintMarkers(g, readings, p, zoom);
         } catch (final IOException ioe) {
             throw new RuntimeException(ioe);
         } finally {
@@ -106,42 +114,32 @@ public class MapRendererImpl extends AbstractRenderer implements
                 (int) viewArea.getX(),
                 (int) viewArea.getY(),
                 null);
-
     }
 
     /**
-     * @param rim
-     * @param bean
-     * @param size
-     * @return
+     * @param g
+     * @param p
+     * @param width
+     * @param height
+     * @param zoom
+     * @throws IOException
      */
-    private void paintMarkers(final ShipmentReportBean bean,
-            final Graphics2D g, final Point mapLocation, final int zoom) {
-        //create path shape
-        final GeneralPath path = new GeneralPath();
-
-        for (final ShortTrackerEvent p : bean.getReadings()) {
-            final int x = Math.round(OpenStreetMapBuilder.lon2position(
-                    p.getLongitude(), zoom) - mapLocation.x);
-            final int y = Math.round(OpenStreetMapBuilder.lat2position(
-                    p.getLatitude(), zoom) - mapLocation.y);
-            final Point2D cp = path.getCurrentPoint();
-            if (cp == null) {
-                path.moveTo(x, y);
-            } else if (Math.round(cp.getX()) != x || Math.round(cp.getY()) != y) {
-                path.lineTo(x, y);
-            }
-        }
-
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setStroke(new BasicStroke(2.f));
-        g.setColor(bean.getDeviceColor());
-        g.draw(path);
-
+    private void paintMap(final Graphics2D g, final Point p, final int width,
+            final int height, final int zoom) throws IOException {
+        builder.paint(g, p, zoom, width, height);
+    }
+    /**
+     * @param g
+     * @param readings
+     * @param mapLocation
+     * @param zoom
+     */
+    private void paintMarkers(final Graphics2D g, final List<ShortTrackerEvent> readings,
+            final Point mapLocation, final int zoom) {
         //draw alerts
         final ImagePaintingSupport support = new ImagePaintingSupport();
         for (final Alert a : ShipmentReportBuilder.filterAlerts(bean.getAlerts())) {
-            final ShortTrackerEvent e = EntityUtils.getEntity(bean.getReadings(), a.getTrackerEventId());
+            final ShortTrackerEvent e = EntityUtils.getEntity(readings, a.getTrackerEventId());
             if (e != null) {
                 support.addFiredAlerts(e.getTime(), a.getType());
             }
@@ -152,13 +150,13 @@ public class MapRendererImpl extends AbstractRenderer implements
             support.addArrival(bean.getArrival().getNotifiedAt());
         }
         //add last reading
-        final int readingsCount = bean.getReadings().size();
+        final int readingsCount = readings.size();
         if (readingsCount > 0) {
-            support.addLastReading(bean.getReadings().get(readingsCount - 1).getTime(),
+            support.addLastReading(readings.get(readingsCount - 1).getTime(),
                     bean.getDeviceColor());
         }
 
-        for (final ShortTrackerEvent p : bean.getReadings()) {
+        for (final ShortTrackerEvent p : readings) {
             final BufferedImage im = support.getRenderedImage(p.getTime(), iconSize);
 
             if (im != null) {
@@ -189,6 +187,35 @@ public class MapRendererImpl extends AbstractRenderer implements
                     endLocation.getLatitude(), zoom) - mapLocation.y);
             g.drawImage(image, x - size, y - size, null);
         }
+    }
+
+    /**
+     * @param g
+     * @param readings
+     * @param mapLocation
+     * @param zoom
+     */
+    private void paintPath(final Graphics2D g, final List<ShortTrackerEvent> readings,
+            final Point mapLocation, final int zoom) {
+        //create path shape
+        final GeneralPath path = new GeneralPath();
+        for (final ShortTrackerEvent p : readings) {
+            final int x = Math.round(OpenStreetMapBuilder.lon2position(
+                    p.getLongitude(), zoom) - mapLocation.x);
+            final int y = Math.round(OpenStreetMapBuilder.lat2position(
+                    p.getLatitude(), zoom) - mapLocation.y);
+            final Point2D cp = path.getCurrentPoint();
+            if (cp == null) {
+                path.moveTo(x, y);
+            } else if (Math.round(cp.getX()) != x || Math.round(cp.getY()) != y) {
+                path.lineTo(x, y);
+            }
+        }
+
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setStroke(new BasicStroke(2.f));
+        g.setColor(bean.getDeviceColor());
+        g.draw(path);
     }
 
     /**

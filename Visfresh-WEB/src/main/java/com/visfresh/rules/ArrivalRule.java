@@ -3,13 +3,7 @@
  */
 package com.visfresh.rules;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,10 +16,8 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
-import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
@@ -33,12 +25,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.User;
-import com.visfresh.reports.PdfReportBuilder;
-import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.rules.state.ShipmentSession;
-import com.visfresh.services.EmailService;
-import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocationUtils;
 
 /**
@@ -57,12 +44,6 @@ public class ArrivalRule extends AbstractNotificationRule {
     protected AlertDao alertDao;
     @Autowired
     protected ShipmentDao shipmentDao;
-    @Autowired
-    private EmailService emailService;
-    @Autowired
-    private PdfReportBuilder reportBuilder;
-    @Autowired
-    private ShipmentReportDao shipmentReportDao;
 
     /**
      * Default constructor.
@@ -172,64 +153,11 @@ public class ArrivalRule extends AbstractNotificationRule {
     protected void sendNotificaion(final Arrival arrival, final TrackerEvent event) {
         final Calendar date = new GregorianCalendar();
 
-        final ShipmentReportBean report = shipmentReportDao.createReport(arrival.getShipment());
-
         //notify subscribers
         final List<PersonSchedule> schedules = getAllPersonalSchedules(event.getShipment());
         for (final PersonSchedule s : schedules) {
             if (matchesTimeFrame(s, date)) {
                 sendNotification(s, arrival, event);
-            }
-
-            sendShipmentReport(report, s.getUser());
-        }
-    }
-    /**
-     * @param report
-     * @param user
-     */
-    private void sendShipmentReport(final ShipmentReportBean report, final User user) {
-        final DateFormat fmt = DateTimeUtils.createDateFormat(
-                "yyyyMMdd HH:mm", user.getLanguage(), user.getTimeZone());
-        final String companyName = report.getCompanyName().replaceAll("[\\p{Punct}]", "");
-
-        final String name = "-" + companyName + "-"
-                + Device.getSerialNumber(report.getDevice())
-                + "(" + report.getTripCount() + ")"
-                + "-" + fmt.format(new Date()) + ".pdf";
-
-        try {
-            final File f = File.createTempFile("report-", name);
-            final OutputStream out = new FileOutputStream(f);
-            try {
-                reportBuilder.createShipmentReport(report, user, out);
-            } finally {
-                out.close();
-                f.delete();
-            }
-
-            final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
-            final String subject = "Shipment Report. " + report.getCompanyName()
-                    + ". Tracker " + Device.getSerialNumber(report.getDevice())
-                    + "(" + report.getTripCount() + ") - as of "
-                    + prettyFmt.format(new Date()) + " (" + user.getTimeZone().getID() + ")";
-
-            sendReportByEmail(user, subject, f);
-        } catch (final IOException e) {
-            log.error("Failed to send shipment report according arrival notification", e);
-        }
-    }
-    /**
-     * @param user
-     * @param bean
-     * @param file
-     */
-    protected void sendReportByEmail(final User user, final String subject, final File file) {
-        if (emailService.getHelper() != null) {//not test mode
-            try {
-                emailService.getHelper().sendMessage(new String[]{user.getEmail()}, subject, null, file);
-            } catch (final Exception e) {
-                log.error("Faile to send email with shipment reports", e);
             }
         }
     }

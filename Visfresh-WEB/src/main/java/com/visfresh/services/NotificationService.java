@@ -10,6 +10,7 @@ import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.User;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -24,13 +25,13 @@ public interface NotificationService {
     void sendNotification(final PersonSchedule s, final NotificationIssue issue, TrackerEvent trackerEvent);
     /**
      * @param issue notification issue.
-     * @param email email address.
+     * @param user email address.
      * @param trackerEvent tracker event.
      * @param lang language.
      * @param tz time zone.
      * @param tu temperature unit.
      */
-    void sendEmailNotification(NotificationIssue issue, String email,
+    void sendEmailNotification(NotificationIssue issue, User user,
             TrackerEvent trackerEvent, Language lang, TimeZone tz,
             TemperatureUnits tu);
 }
