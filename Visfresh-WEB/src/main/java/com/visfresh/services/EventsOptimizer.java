@@ -1,10 +1,13 @@
 /**
  *
  */
-package com.visfresh.reports.geomap;
+package com.visfresh.services;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.utils.LocationUtils;
@@ -13,6 +16,7 @@ import com.visfresh.utils.LocationUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Component
 public class EventsOptimizer {
     /**
      * Default constructor.
@@ -30,7 +34,7 @@ public class EventsOptimizer {
         //[15:58:45] James Richardson: only for 5 readings max
         //[15:58:51] James Richardson: only if moves les than 1km
 
-        final List<ShortTrackerEvent> quarantine = new LinkedList<>();
+        final List<ShortTrackerEvent> toOptimize = new LinkedList<>();
 
         //copy tracker events for avoid of excesses in next usage.
         for (final ShortTrackerEvent eOrigin : origin) {
@@ -38,32 +42,30 @@ public class EventsOptimizer {
 
             switch (eOrigin.getType()) {
                 case STP:
-                    if (!quarantine.isEmpty()) {
-                        flushQuarantine(readings, quarantine);
+                    if (!toOptimize.isEmpty()) {
+                        move(toOptimize, readings);
                     } else {
-                        quarantine.add(e);
+                        toOptimize.add(e);
                     }
                     break;
                 case VIB:
-                    if (!quarantine.isEmpty()) {
-                        normalize(quarantine);
-                        flushQuarantine(readings, quarantine);
+                    if (!toOptimize.isEmpty()) {
+                        normalize(toOptimize);
+                        move(toOptimize, readings);
                     }
                     break;
                 default:
-                    if (quarantine.isEmpty()) {
+                    if (toOptimize.isEmpty()) {
                         readings.add(e);
-                    } else if (isNearFirst(quarantine.get(0), e)) {
-                        quarantine.add(e);
                     } else {
-                        flushQuarantine(readings, quarantine);
+                        toOptimize.add(e);
                     }
             }
         }
 
-        if (!quarantine.isEmpty()) {
-            normalize(quarantine);
-            flushQuarantine(readings, quarantine);
+        if (!toOptimize.isEmpty()) {
+            normalize(toOptimize);
+            move(toOptimize, readings);
         }
 
         return readings;
@@ -74,40 +76,40 @@ public class EventsOptimizer {
      */
     private void normalize(final List<ShortTrackerEvent> events) {
         final List<ShortTrackerEvent> tmp = new LinkedList<>();
+        ShortTrackerEvent first = null;
 
         for (final ShortTrackerEvent e : events) {
-            tmp.add(e);
-            if (tmp.size() > 9) {
-                averageCoordinates(tmp);
+            if (tmp.size() > 5 || (first != null && !isNearFirst(first, e))) {
+                correctCoordinates(tmp);
                 tmp.clear();
+                first = null;
+            }
+
+            tmp.add(e);
+            if (tmp.size() == 1) {
+                first = e;
             }
         }
 
         if (tmp.size() > 0) {
-            averageCoordinates(tmp);
+            correctCoordinates(tmp);
         }
     }
 
     /**
-     * @param events calculates and set average coordinates to all events.
+     * @param events
      */
-    private void averageCoordinates(final List<ShortTrackerEvent> events) {
-        double lat = 0;
-        double lon = 0;
-        for (final ShortTrackerEvent e : events) {
-            lat += e.getLatitude();
-            lon += e.getLongitude();
-        }
+    private void correctCoordinates(final List<ShortTrackerEvent> events) {
+        final Iterator<ShortTrackerEvent> iter = events.iterator();
 
-        lat /= events.size();
-        lon /= events.size();
+        final ShortTrackerEvent first = iter.next();
+        while (iter.hasNext())
 
         for (final ShortTrackerEvent e : events) {
-            e.setLatitude(lat);
-            e.setLongitude(lon);
+            e.setLatitude(first.getLatitude());
+            e.setLongitude(first.getLongitude());
         }
     }
-
     /**
      * @param e1
      * @param e2
@@ -116,16 +118,14 @@ public class EventsOptimizer {
     private boolean isNearFirst(final ShortTrackerEvent e1,
             final ShortTrackerEvent e2) {
         return LocationUtils.getDistanceMeters(e2.getLatitude(), e2.getLongitude(),
-                e1.getLatitude(), e1.getLongitude()) <= 1000;
+                e1.getLatitude(), e1.getLongitude()) <= 2000;
     }
-
     /**
-     * @param readings
-     * @param quarantine
+     * @param src
+     * @param dst
      */
-    private void flushQuarantine(final List<ShortTrackerEvent> readings,
-            final List<ShortTrackerEvent> quarantine) {
-        readings.addAll(quarantine);
-        quarantine.clear();
+    private void move(final List<ShortTrackerEvent> src, final List<ShortTrackerEvent> dst) {
+        dst.addAll(src);
+        src.clear();
     }
 }

@@ -31,6 +31,7 @@ import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.reports.shipment.ImagePaintingSupport;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBuilder;
+import com.visfresh.services.EventsOptimizer;
 import com.visfresh.utils.EntityUtils;
 
 /**

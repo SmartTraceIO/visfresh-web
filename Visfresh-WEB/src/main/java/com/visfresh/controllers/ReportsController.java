@@ -3,7 +3,20 @@
  */
 package com.visfresh.controllers;
 
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +25,10 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,14 +48,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.visfresh.dao.PerformanceReportDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentReportDao;
+import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.reports.PdfReportBuilder;
+import com.visfresh.reports.geomap.AbstractGeoMapBuiler;
+import com.visfresh.reports.geomap.GoogleGeoMapBuiler;
+import com.visfresh.reports.geomap.OpenStreetMapBuilder;
 import com.visfresh.reports.performance.PerformanceReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.services.EmailService;
+import com.visfresh.services.EventsOptimizer;
 import com.visfresh.utils.DateTimeUtils;
 
 /**
@@ -68,6 +91,15 @@ public class ReportsController extends AbstractController {
     private FileDownloadController fileDownload;
     @Autowired
     private EmailService emailService;
+
+    //TODO remove after test
+    @Autowired
+    private TrackerEventDao trackerEventDao;
+    //TODO remove after test
+    private AbstractGeoMapBuiler builder = new GoogleGeoMapBuiler();
+    //TODO remove after test
+    @Autowired
+    private EventsOptimizer eventsOptimizer;
 
     /**
      * Default constructor.
@@ -193,7 +225,7 @@ public class ReportsController extends AbstractController {
             final ShipmentReportBean bean = shipmentReportDao.createReport(s);
 
             //create tmp file with report PDF content.
-            final File file = fileDownload.createTmpFile(createFileName(s));
+            final File file = fileDownload.createTmpFile(createFileName(s, "pdf"));
 
             final OutputStream out = new FileOutputStream(file);
             try {
@@ -211,20 +243,181 @@ public class ReportsController extends AbstractController {
             throw e;
         }
     }
+    @RequestMapping(value = "/demoOptimizer/{authToken}", method = RequestMethod.GET)
+    public void demoOptimizer(@PathVariable final String authToken,
+            @RequestParam(required = false) final Long shipmentId,
+            @RequestParam(required = false) final String sn,
+            @RequestParam(required = false) final Integer trip,
+            final HttpServletRequest request,
+            final HttpServletResponse response
+            ) throws Exception {
+        //check parameters
+        if (shipmentId == null && (sn == null || trip == null)) {
+            throw new IOException("Should be specified shipmentId or (sn and trip) request parameters");
+        }
+
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.NormalUser);
+
+            final Shipment s;
+            if (shipmentId != null) {
+                s = shipmentDao.findOne(shipmentId);
+            } else {
+                s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
+            }
+
+            checkCompanyAccess(user, s);
+            if (s == null) {
+                throw new FileNotFoundException("Unknown shipment: " + sn + "(" + trip + ")");
+            }
+
+            //get readings from DB
+            final List<ShortTrackerEvent> readings = new LinkedList<>();
+            final List<TrackerEvent> events = trackerEventDao.getEvents(s);
+            for (final TrackerEvent e : events) {
+                if (e.getLatitude() != null && e.getLongitude() != null) {
+                    readings.add(new ShortTrackerEvent(e));
+                }
+            }
+
+            final Rectangle viewArea = new Rectangle(612, 612);
+            final int zoom = builder.calculateZoom(getCoordinates(readings),
+                    new Dimension(viewArea.width, viewArea.height), 10);
+
+            //create tmp file with report PDF content.
+            final File file = fileDownload.createTmpFile(createFileName(s, "gif"));
+
+            final OutputStream out = new FileOutputStream(file);
+            try {
+                final BufferedImage im1 = createMapWithPath(readings, zoom);
+                final BufferedImage im2 = createMapWithPath(this.eventsOptimizer.optimize(readings), zoom);
+
+                final BufferedImage image = new BufferedImage(
+                        im1.getWidth() + im2.getWidth(),
+                        Math.max(im1.getHeight(), im2.getHeight()),
+                        BufferedImage.TYPE_INT_ARGB);
+                final Graphics2D g = image.createGraphics();
+                try {
+                    g.drawImage(im1, 0, 0, null);
+                    g.drawImage(im2, im1.getWidth(), 0, null);
+
+                    //paint separator.
+                    g.setStroke(new BasicStroke(3f));
+                    g.setColor(Color.BLACK);
+                    g.drawLine(im1.getWidth(), 0, im1.getWidth(), image.getHeight());
+                } finally {
+                    g.dispose();
+                }
+
+                ImageIO.write(image, "gif", file);
+            } finally {
+                out.close();
+            }
+
+            final int index = request.getRequestURL().indexOf("/demoOptimizer");
+            response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
+                    authToken, file.getName()));
+
+        } catch (final Exception e) {
+            log.error("Failed to create optimizer demo", e);
+            throw e;
+        }
+    }
     /**
-     * @param device
-     * @param startDate
-     * @param endDate
+     * @param readings
      * @return
      */
-    private String createFileName(final Shipment s) {
+    private List<Point2D> getCoordinates(final List<ShortTrackerEvent> readings) {
+        final List<Point2D> coords = new LinkedList<>();
+        for (final ShortTrackerEvent e : readings) {
+            coords.add(new Point2D.Double(e.getLongitude(), e.getLatitude()));
+        }
+        return coords;
+    }
+
+    /**
+     * @return
+     */
+    private BufferedImage createMapWithPath(final List<ShortTrackerEvent> readings, final int zoom) {
+        final Rectangle viewArea = new Rectangle(612, 612);
+
+        final List<Point2D> coords = new LinkedList<>();
+        for (final ShortTrackerEvent e : readings) {
+            coords.add(new Point2D.Double(e.getLongitude(), e.getLatitude()));
+        }
+
+        final int width = (int) Math.floor(viewArea.getWidth());
+        final int height = (int) Math.floor(viewArea.getHeight());
+
+        final Rectangle r = builder.getMapBounds(coords, zoom);
+
+        final Point p = new Point(
+                (int) (r.getX() - (viewArea.getWidth() - r.getWidth()) / 2.),
+                (int) (r.getY() - (viewArea.getHeight() - r.getHeight()) / 2.));
+
+        //use image buffer for avoid of problems with alpha chanel.
+        final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g = image.createGraphics();
+
+        try {
+            g.setColor(Color.WHITE);
+            g.fillRect(0, 0, width, height);
+
+            final Composite comp = g.getComposite();
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+
+            //set transparency before draw map
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.8f));
+
+            builder.paint(g, p, zoom, width, height);
+
+            //restore transparency
+            g.setComposite(comp);
+
+            //create path shape
+            final GeneralPath path = new GeneralPath();
+            for (final ShortTrackerEvent e : readings) {
+                final int x = Math.round(OpenStreetMapBuilder.lon2position(
+                        e.getLongitude(), zoom) - p.x);
+                final int y = Math.round(OpenStreetMapBuilder.lat2position(
+                        e.getLatitude(), zoom) - p.y);
+                final Point2D cp = path.getCurrentPoint();
+                if (cp == null) {
+                    path.moveTo(x, y);
+                } else if (Math.round(cp.getX()) != x || Math.round(cp.getY()) != y) {
+                    path.lineTo(x, y);
+                }
+            }
+
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setStroke(new BasicStroke(2.f));
+            g.setColor(Color.RED);
+            g.draw(path);
+
+        } catch (final IOException ioe) {
+            throw new RuntimeException(ioe);
+        } finally {
+            g.dispose();
+        }
+        return image;
+    }
+
+    /**
+     * @param s shipment.
+     * @param extension file extension.
+     * @return
+     */
+    private String createFileName(final Shipment s, final String extension) {
         final StringBuilder sb = new StringBuilder(Device.getSerialNumber(s.getDevice().getImei()));
         //add shipment trip count
         sb.append('(');
         sb.append(s.getTripCount());
         sb.append(')');
         sb.insert(0, "shipment-");
-        sb.append(".pdf");
+        sb.append("." + extension);
         return sb.toString();
     }
     /**
