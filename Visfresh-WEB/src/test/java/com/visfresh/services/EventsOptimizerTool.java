@@ -27,8 +27,8 @@ public class EventsOptimizerTool extends EventsOptimizer {
     public void runOptimizer() throws Exception {
         final String data = StringUtils.getContent(EventsOptimizerTool.class.getResource(
                 "eventsOptimizerTool.csv"), "UTF-8");
-        final List<ShortTrackerEvent> readings = new ShortTrackerEventsImporter(
-                7l, "9231879017982374").importEvents(new StringReader(data));
+        final List<ShortTrackerEvent> readings = new ShortTrackerEventsImporter(7l).importEvents(
+                new StringReader(data));
         corrector.correct(readings);
         optimize(readings);
     }

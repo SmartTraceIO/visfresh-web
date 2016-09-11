@@ -51,16 +51,16 @@ public class ShipmentReportBuilderTest extends ShipmentReportBuilder {
         assertEquals(12., events.get(3).getLatitude(), 0.001);
         assertEquals(12., events.get(3).getLongitude(), 0.001);
 
-        //moved to 12
-        assertEquals(12., events.get(1).getLatitude(), 0.001);
-        assertEquals(12., events.get(1).getLongitude(), 0.001);
+        //moved to 10
+        assertEquals(10., events.get(1).getLatitude(), 0.001);
+        assertEquals(10., events.get(1).getLongitude(), 0.001);
 
-        assertEquals(12., events.get(2).getLatitude(), 0.001);
-        assertEquals(12., events.get(2).getLongitude(), 0.001);
+        assertEquals(10., events.get(2).getLatitude(), 0.001);
+        assertEquals(10., events.get(2).getLongitude(), 0.001);
 
         //moved to 14
-        assertEquals(14., events.get(4).getLatitude(), 0.001);
-        assertEquals(14., events.get(4).getLongitude(), 0.001);
+        assertEquals(12., events.get(4).getLatitude(), 0.001);
+        assertEquals(12., events.get(4).getLongitude(), 0.001);
     }
     @Test
     public void testCorrectReadingsLocationLastIsNull() {

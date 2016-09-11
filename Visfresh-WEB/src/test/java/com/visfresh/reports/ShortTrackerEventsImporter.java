@@ -20,16 +20,14 @@ import com.visfresh.reports.shipment.ReadingsParser;
  */
 public class ShortTrackerEventsImporter {
     private long shipmentId;
-    private String device;
 
     /**
      * @param shipmentId shipment ID.
      * @param device device.
      *
      */
-    public ShortTrackerEventsImporter(final long shipmentId, final String device) {
+    public ShortTrackerEventsImporter(final long shipmentId) {
         this.shipmentId = shipmentId;
-        this.device = device;
     }
 
     /**
@@ -45,8 +43,8 @@ public class ShortTrackerEventsImporter {
         p.setHandler(new ReadingsHandler() {
             @Override
             public void handleEvent(final ShortTrackerEvent e, final AlertType[] alerts) {
-                e.setDeviceImei(device);
                 readings.add(e);
+                handleEventImported(e);
             }
 
             @Override
@@ -59,4 +57,9 @@ public class ShortTrackerEventsImporter {
         return readings;
     }
 
+    /**
+     * @param e
+     */
+    protected void handleEventImported(final ShortTrackerEvent e) {
+    }
 }

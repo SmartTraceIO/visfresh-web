@@ -44,9 +44,9 @@ public class EventsOptimizer {
                 case STP:
                     if (!toOptimize.isEmpty()) {
                         move(toOptimize, readings);
-                    } else {
-                        toOptimize.add(e);
                     }
+
+                    toOptimize.add(e);
                     break;
                 case VIB:
                     if (!toOptimize.isEmpty()) {
@@ -75,11 +75,13 @@ public class EventsOptimizer {
      * @param events
      */
     private void normalize(final List<ShortTrackerEvent> events) {
+        System.out.println("Events to optimize: " + events.size());
+
         final List<ShortTrackerEvent> tmp = new LinkedList<>();
         ShortTrackerEvent first = null;
 
         for (final ShortTrackerEvent e : events) {
-            if (tmp.size() > 5 || (first != null && !isNearFirst(first, e))) {
+            if (tmp.size() > 100 || (first != null && !isNearFirst(first, e))) {
                 correctCoordinates(tmp);
                 tmp.clear();
                 first = null;

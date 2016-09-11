@@ -163,8 +163,12 @@ public final class ShipmentReportBuilderTool {
     private static void addReadings(final ShipmentReportBean bean) throws IOException, ParseException {
         final String readings = StringUtils.getContent(ShipmentReportBuilderTool.class.getResource("readings.csv"),
                 "UTF-8");
-        final List<ShortTrackerEvent> events = new ShortTrackerEventsImporter(1l, bean.getDevice())
-            .importEvents(new StringReader(readings));
+        final List<ShortTrackerEvent> events = new ShortTrackerEventsImporter(1l) {
+            @Override
+            protected void handleEventImported(final ShortTrackerEvent e) {
+                e.setDeviceImei(bean.getDevice());
+            };
+        }.importEvents(new StringReader(readings));
         bean.getReadings().addAll(events);
     }
 
