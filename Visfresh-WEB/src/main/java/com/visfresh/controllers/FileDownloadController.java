@@ -48,7 +48,7 @@ public class FileDownloadController extends AbstractController {
      * Logger.
      */
     private static final Logger log = LoggerFactory.getLogger(FileDownloadController.class);
-    private static final long ALIVE_TIME_OUT = 5 * 60 * 1000l;
+    private static final long ALIVE_TIME_OUT = 20 * 60 * 1000l;
     private File tmpRoot;
     private Timer timer = new Timer(true);
     private static final String DOWNLOAD_FILE = "downloadFile";
@@ -83,7 +83,7 @@ public class FileDownloadController extends AbstractController {
         //clear temporary directory
         final File[] files = tmpRoot.listFiles();
         for (final File file : files) {
-            if (file.lastModified() - time > ALIVE_TIME_OUT) {
+            if (time - file.lastModified() > ALIVE_TIME_OUT) {
                 file.delete();
             }
         }
@@ -158,11 +158,9 @@ public class FileDownloadController extends AbstractController {
      * @throws IOException
      */
     public synchronized File createTmpFile(final String suffix) throws IOException {
-        final char separator = '-';
-
         long id = 0;
         while (true) {
-            final File file = new File(tmpRoot, Long.toString(id) + separator + suffix);
+            final File file = new File(tmpRoot, Long.toString(id) + "-" + suffix);
             if (!file.exists()) {
                 file.createNewFile();
                 return file;

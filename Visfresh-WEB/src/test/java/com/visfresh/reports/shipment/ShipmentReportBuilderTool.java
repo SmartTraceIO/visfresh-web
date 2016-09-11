@@ -26,6 +26,7 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
+import com.visfresh.reports.ShortTrackerEventsImporter;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -160,28 +161,18 @@ public final class ShipmentReportBuilderTool {
      * @throws IOException
      */
     private static void addReadings(final ShipmentReportBean bean) throws IOException, ParseException {
-        final String readings = StringUtils.getContent(ShipmentReportBuilderTool.class.getResource("readings.csv"), "UTF-8");
-        final ReadingsParser p = new ReadingsParser();
-        p.setHandler(new ReadingsHandler() {
-            @Override
-            public void handleEvent(final ShortTrackerEvent e, final AlertType[] alerts) {
-                e.setDeviceImei(bean.getDevice());
-                bean.getReadings().add(e);
-            }
-
-            @Override
-            public Long getShipmentId(final String sn, final int tripCount) {
-                return 1l;
-            }
-        });
-        p.parse(new StringReader(readings));
+        final String readings = StringUtils.getContent(ShipmentReportBuilderTool.class.getResource("readings.csv"),
+                "UTF-8");
+        final List<ShortTrackerEvent> events = new ShortTrackerEventsImporter(1l, bean.getDevice())
+            .importEvents(new StringReader(readings));
+        bean.getReadings().addAll(events);
     }
 
     /**
-     * @param bean TODO
-     * @param type
-     * @param temperature
-     * @param time
+     * @param bean report bean.
+     * @param type alert type.
+     * @param temperature temperature.
+     * @param time time.
      */
     private static void addFiredAlert(final ShipmentReportBean bean, final AlertType type,
             final double temperature, final long time) {

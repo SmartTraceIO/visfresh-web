@@ -12,12 +12,14 @@ import java.util.List;
 import org.junit.Test;
 
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.services.EventsNullCoordinatesCorrector;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class ShipmentReportBuilderTest extends ShipmentReportBuilder {
+    private EventsNullCoordinatesCorrector corrector = new EventsNullCoordinatesCorrector();
 
     /**
      * Default constructor.
@@ -40,7 +42,7 @@ public class ShipmentReportBuilderTest extends ShipmentReportBuilder {
         events.add(createReading(null, null));
         events.add(createReading(14., 14.));
 
-        correctReadingsLocation(events);
+        corrector.correct(events);
 
         //not touched
         assertEquals(10., events.get(0).getLatitude(), 0.001);
@@ -67,7 +69,7 @@ public class ShipmentReportBuilderTest extends ShipmentReportBuilder {
         events.add(createReading(11., 11.));
         events.add(createReading(null, null));
 
-        correctReadingsLocation(events);
+        corrector.correct(events);
 
         //not touched
         assertEquals(11., events.get(2).getLatitude(), 0.001);

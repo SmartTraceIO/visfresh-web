@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
@@ -72,6 +71,7 @@ import com.visfresh.reports.Colors;
 import com.visfresh.reports.TableSupport;
 import com.visfresh.reports.TableSupportCondition;
 import com.visfresh.reports.geomap.MapRendererImpl;
+import com.visfresh.services.EventsNullCoordinatesCorrector;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.StringUtils;
@@ -90,7 +90,7 @@ public class ShipmentReportBuilder {
 
     @Autowired
     protected RuleBundle ruleBundle;
-
+    private EventsNullCoordinatesCorrector nullCoordinatesCorrector = new EventsNullCoordinatesCorrector();
     /**
      * Default constructor.
      */
@@ -446,7 +446,7 @@ public class ShipmentReportBuilder {
      */
     private ComponentBuilder<?, ?> createMap(final ShipmentReportBean bean) {
         final List<ShortTrackerEvent> readings = bean.getReadings();
-        correctReadingsLocation(readings);
+        nullCoordinatesCorrector.correct(readings);
 
         if (hasReadingsWithLocation(readings)) {
             try {
@@ -477,51 +477,6 @@ public class ShipmentReportBuilder {
         }
         return false;
     }
-    /**
-     * @param readings
-     */
-    protected void correctReadingsLocation(final List<ShortTrackerEvent> readings) {
-        List<ShortTrackerEvent> toRelocate = null;
-        ListIterator<ShortTrackerEvent> iter = readings.listIterator();
-
-        while (iter.hasNext()) {
-            final ShortTrackerEvent e = iter.next();
-            if (e.getLatitude() == null || e.getLongitude() == null) {
-                if (toRelocate == null) {
-                    toRelocate = new LinkedList<ShortTrackerEvent>();
-                }
-                toRelocate.add(e);
-            } else if (toRelocate != null) {
-                for (final ShortTrackerEvent relocating : toRelocate) {
-                    relocating.setLatitude(e.getLatitude());
-                    relocating.setLongitude(e.getLongitude());
-                }
-                toRelocate = null;
-            }
-        }
-
-        //if not relocate last part
-        if (toRelocate != null) {
-            ShortTrackerEvent lastRelocationTarget = null;
-
-            //find first located
-            iter = readings.listIterator(readings.size());
-            while (iter.hasPrevious() && lastRelocationTarget == null) {
-                final ShortTrackerEvent e = iter.previous();
-                if (e.getLatitude() != null && e.getLongitude() != null) {
-                    lastRelocationTarget = e;
-                }
-            }
-
-            if (lastRelocationTarget != null) {
-                for (final ShortTrackerEvent relocating : toRelocate) {
-                    relocating.setLatitude(lastRelocationTarget.getLatitude());
-                    relocating.setLongitude(lastRelocationTarget.getLongitude());
-                }
-            }
-        }
-    }
-
     /**
      * @param bean
      * @param user

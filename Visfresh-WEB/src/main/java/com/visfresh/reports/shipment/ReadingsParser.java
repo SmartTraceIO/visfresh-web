@@ -104,8 +104,14 @@ public class ReadingsParser {
 
         e.setTime(dateParser.parse(reading.remove("time")));
         e.setBattery(Integer.parseInt(reading.remove("battery")));
-        e.setLatitude(Double.parseDouble(reading.remove("latitude")));
-        e.setLongitude(Double.parseDouble(reading.remove("longitude")));
+        final String lat = reading.remove("latitude");
+        if (!lat.isEmpty()) {
+            e.setLatitude(Double.parseDouble(lat));
+        }
+        final String lon = reading.remove("longitude");
+        if (!lon.isEmpty()) {
+            e.setLongitude(Double.parseDouble(lon));
+        }
         e.setDeviceImei(reading.remove("device"));
         e.setCreatedOn(dateParser.parse(reading.remove("createdon")));
         e.setType(getReadingType(reading.remove("type")));

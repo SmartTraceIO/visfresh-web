@@ -101,9 +101,6 @@ public class ShipmentSiblingServiceImpl implements ShipmentSiblingService {
             };
 
             t.start();
-        } else {
-            log.warn("Sibling detection time out is negatieve " + (detectSiblingsTimeOut / 1000l)
-                    + ". Detection thread will not started");
         }
     }
     /**

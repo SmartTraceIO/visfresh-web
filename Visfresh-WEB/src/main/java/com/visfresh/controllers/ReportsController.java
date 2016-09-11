@@ -273,6 +273,7 @@ public class ReportsController extends AbstractController {
                 throw new FileNotFoundException("Unknown shipment: " + sn + "(" + trip + ")");
             }
 
+            log.debug("Get readings from DB");
             //get readings from DB
             final List<ShortTrackerEvent> readings = new LinkedList<>();
             final List<TrackerEvent> events = trackerEventDao.getEvents(s);
@@ -282,40 +283,43 @@ public class ReportsController extends AbstractController {
                 }
             }
 
-            final Rectangle viewArea = new Rectangle(612, 612);
+            log.debug("Calculate the best zoom");
+            final Rectangle viewArea = new Rectangle(250, 250);
             final int zoom = builder.calculateZoom(getCoordinates(readings),
                     new Dimension(viewArea.width, viewArea.height), 10);
 
-            //create tmp file with report PDF content.
-            final File file = fileDownload.createTmpFile(createFileName(s, "gif"));
+            //create picture.
+            final BufferedImage image;
 
-            final OutputStream out = new FileOutputStream(file);
+            log.debug("Create image with not optimized readings");
+            final BufferedImage im1 = createMapWithPath(readings, zoom);
+            log.debug("Create image with optimized readings");
+            final BufferedImage im2 = createMapWithPath(this.eventsOptimizer.optimize(readings), zoom);
+
+            log.debug("Create composite image");
+            image = new BufferedImage(
+                    im1.getWidth() + im2.getWidth(),
+                    Math.max(im1.getHeight(), im2.getHeight()),
+                    BufferedImage.TYPE_INT_ARGB);
+            final Graphics2D g = image.createGraphics();
             try {
-                final BufferedImage im1 = createMapWithPath(readings, zoom);
-                final BufferedImage im2 = createMapWithPath(this.eventsOptimizer.optimize(readings), zoom);
+                g.drawImage(im1, 0, 0, null);
+                g.drawImage(im2, im1.getWidth(), 0, null);
 
-                final BufferedImage image = new BufferedImage(
-                        im1.getWidth() + im2.getWidth(),
-                        Math.max(im1.getHeight(), im2.getHeight()),
-                        BufferedImage.TYPE_INT_ARGB);
-                final Graphics2D g = image.createGraphics();
-                try {
-                    g.drawImage(im1, 0, 0, null);
-                    g.drawImage(im2, im1.getWidth(), 0, null);
-
-                    //paint separator.
-                    g.setStroke(new BasicStroke(3f));
-                    g.setColor(Color.BLACK);
-                    g.drawLine(im1.getWidth(), 0, im1.getWidth(), image.getHeight());
-                } finally {
-                    g.dispose();
-                }
-
-                ImageIO.write(image, "gif", file);
+                //paint separator.
+                g.setStroke(new BasicStroke(3f));
+                g.setColor(Color.BLACK);
+                g.drawLine(im1.getWidth(), 0, im1.getWidth(), image.getHeight());
             } finally {
-                out.close();
+                g.dispose();
             }
 
+            log.debug("Write image to file");
+            //write image to file
+            final File file = fileDownload.createTmpFile(createFileName(s, "gif"));
+            ImageIO.write(image, "gif", file);
+
+            log.debug("Do redirect");
             final int index = request.getRequestURL().indexOf("/demoOptimizer");
             response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
                     authToken, file.getName()));
@@ -372,11 +376,13 @@ public class ReportsController extends AbstractController {
             //set transparency before draw map
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.8f));
 
+            log.debug("Paint map");
             builder.paint(g, p, zoom, width, height);
 
             //restore transparency
             g.setComposite(comp);
 
+            log.debug("Paint path");
             //create path shape
             final GeneralPath path = new GeneralPath();
             for (final ShortTrackerEvent e : readings) {

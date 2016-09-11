@@ -103,9 +103,8 @@ public class EventsOptimizer {
         final Iterator<ShortTrackerEvent> iter = events.iterator();
 
         final ShortTrackerEvent first = iter.next();
-        while (iter.hasNext())
-
-        for (final ShortTrackerEvent e : events) {
+        while (iter.hasNext()) {
+            final ShortTrackerEvent e = iter.next();
             e.setLatitude(first.getLatitude());
             e.setLongitude(first.getLongitude());
         }
