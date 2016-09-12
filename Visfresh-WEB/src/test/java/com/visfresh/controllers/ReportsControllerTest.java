@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -65,6 +66,8 @@ public class ReportsControllerTest extends AbstractRestServiceTest {
      */
     @Before
     public void setUp() throws Exception {
+        context.getBean(MockEmailService.class).clear();
+
         serializer = new ReportsSerializer();
 
         trackerEventDao = context.getBean(TrackerEventDao.class);
@@ -250,5 +253,12 @@ public class ReportsControllerTest extends AbstractRestServiceTest {
 
         trackerEventDao.save(e);
         return e;
+    }
+    /**
+     *
+     */
+    @After
+    public void tearDown() {
+        context.getBean(MockEmailService.class).clear();
     }
 }

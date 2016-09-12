@@ -125,7 +125,7 @@ public class NotificationServiceImpl implements NotificationService {
                     final File attachment = createShipmenentReport(user, (Arrival) issue);
 
                     try {
-                        emailService.sendMessage(new String[]{user.getEmail()}, subject, null, attachment);
+                        emailService.sendMessage(new String[]{user.getEmail()}, subject, message, attachment);
                     } catch (final Exception e) {
                         log.error("Faile to send email with shipment reports", e);
                     } finally {

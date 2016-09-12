@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,6 +33,7 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.mock.MockEmailService;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.state.ShipmentSession;
@@ -457,5 +459,12 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         e.setDevice(shipment.getDevice());
 
         return context.getBean(TrackerEventDao.class).save(e);
+    }
+    /**
+     *
+     */
+    @After
+    public void tearDown() {
+        context.getBean(MockEmailService.class).clear();
     }
 }

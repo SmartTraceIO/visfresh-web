@@ -3470,4 +3470,5 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
     "message": "Success"
   },
   "response": null
-}```
+}
+```
