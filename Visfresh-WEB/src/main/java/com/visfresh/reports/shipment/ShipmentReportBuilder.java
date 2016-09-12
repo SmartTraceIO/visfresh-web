@@ -230,7 +230,7 @@ public class ShipmentReportBuilder {
 
         //add data
         final DRDataSource ds = new DRDataSource(columns);
-        ds.add("xxxxxxxxxxx", bean.getAlertProfile(), StringUtils.combine(bean.getWhoWasNotified(), ", "));
+        ds.add("xxxxxxxxxxx", bean.getAlertProfile(), StringUtils.combine(bean.getWhoWasNotifiedByAlert(), ", "));
 
         report.setDataSource(ds);
         report.setShowColumnTitle(true);
@@ -585,7 +585,7 @@ public class ShipmentReportBuilder {
         //Who was notified:     Rob Arpas, Rob Arpas
         final Map<String, Object> whoNotified = new HashMap<>();
         whoNotified.put(key, "Who was notified");
-        whoNotified.put(value, StringUtils.combine(bean.getWhoWasNotified(), ", "));
+        whoNotified.put(value, StringUtils.combine(bean.getWhoWasNotifiedByArrival(), ", "));
         rows.add(whoNotified);
 
         //last reading data

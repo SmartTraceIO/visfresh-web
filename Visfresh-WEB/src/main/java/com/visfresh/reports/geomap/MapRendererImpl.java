@@ -71,7 +71,17 @@ public class MapRendererImpl extends AbstractRenderer implements
         final int width = (int) Math.floor(viewArea.getWidth());
         final int height = (int) Math.floor(viewArea.getHeight());
 
-        final int zoom = builder.calculateZoom(coords, new Dimension(width, height), 10);
+        final int iconSize = 17;
+        int w1 = width - iconSize;
+        if (w1 < 1) {//not use extended size for icons
+            w1 = width;
+        }
+        int h1 = height - iconSize;
+        if (h1 < 1) {//not use extended size for icons
+            h1 = height;
+        }
+
+        final int zoom = builder.calculateZoom(coords, new Dimension(w1, h1), 10);
 
         final Rectangle r = builder.getMapBounds(coords, zoom);
 

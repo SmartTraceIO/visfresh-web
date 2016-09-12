@@ -345,7 +345,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         notificator.sendNotification(s2, a2, e);
 
         final ShipmentReportBean report = dao.createReport(shipment);
-        assertEquals(2, report.getWhoWasNotified().size());
+        assertEquals(2, report.getWhoWasNotifiedByAlert().size());
     }
     @Test
     public void testPossibleShippedTo() {
@@ -389,7 +389,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         notificator.sendNotification(s1, arrival, e);
 
         final ShipmentReportBean report = dao.createReport(shipment);
-        assertEquals(1, report.getWhoWasNotified().size());
+        assertEquals(1, report.getWhoWasNotifiedByAlert().size());
     }
 
     /**

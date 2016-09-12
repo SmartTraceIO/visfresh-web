@@ -22,7 +22,6 @@ import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
-import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
@@ -139,15 +138,21 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         bean.getAlerts().addAll(alerts);
 
         //get notifications
-        final List<NotificationIssue> issues = new LinkedList<NotificationIssue>(alerts);
-        if (arrival != null) {
-            issues.add(arrival);
-        }
-
-        final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(issues));
+        //notified by alert
+        final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(alerts));
         for (final Notification n : notifs) {
             final User u = n.getUser();
-            bean.getWhoWasNotified().add(createUserName(u));
+            bean.getWhoWasNotifiedByAlert().add(createUserName(u));
+        }
+
+        //arrivals
+        if (arrival != null) {
+            final List<Arrival> arrivals = new LinkedList<>();
+            arrivals.add(arrival);
+            for (final Notification n : notificationDao.getForIssues(EntityUtils.getIdList(arrivals))) {
+                final User u = n.getUser();
+                bean.getWhoWasNotifiedByAlert().add(createUserName(u));
+            }
         }
 
         addTemperatureData(bean, events);

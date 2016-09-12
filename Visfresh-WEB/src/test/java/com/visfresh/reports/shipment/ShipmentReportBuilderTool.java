@@ -129,8 +129,8 @@ public final class ShipmentReportBuilderTool {
         bean.setMaximumTemperature(11.);
         bean.setUpperTemperatureLimit(9);
         bean.setAvgTemperature(7.);
-        bean.getWhoWasNotified().add("user1@smarttrace.com.au");
-        bean.getWhoWasNotified().add("user2@smarttrace.com.au");
+        bean.getWhoWasNotifiedByAlert().add("user1@smarttrace.com.au");
+        bean.getWhoWasNotifiedByAlert().add("user2@smarttrace.com.au");
 
         addFiredAlert(bean, new AlertRule(AlertType.MovementStart));
         addFiredAlert(bean, AlertType.Cold, 0., 60 * 1000l);

@@ -40,8 +40,8 @@ public class ShipmentReportBean {
     private String alertProfile;
     private final List<AlertRule> firedAlertRules = new LinkedList<>();
     private final List<Alert> alerts = new LinkedList<>();
-    private final List<String> whoWasNotified = new LinkedList<>();
-    private final List<String> whoWasNotifiedNames = new LinkedList<>();
+    private final List<String> whoWasNotifiedByAlert = new LinkedList<>();
+    private final List<String> whoWasNotifiedByArrival = new LinkedList<>();
     /**
      * Total time of monitoring: 234hrs
      */
@@ -261,14 +261,14 @@ public class ShipmentReportBean {
     /**
      * @return the whoWasNotified
      */
-    public List<String> getWhoWasNotified() {
-        return whoWasNotified;
+    public List<String> getWhoWasNotifiedByAlert() {
+        return whoWasNotifiedByAlert;
     }
     /**
-     * @return
+     * @return the whoWasNotified
      */
-    public List<String> getWhoWasNotifiedNames() {
-        return whoWasNotifiedNames;
+    public List<String> getWhoWasNotifiedByArrival() {
+        return whoWasNotifiedByArrival;
     }
     /**
      * @return the totalTime
