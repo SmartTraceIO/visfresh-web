@@ -46,7 +46,6 @@ import com.visfresh.reports.geomap.OpenStreetMapBuilder;
 @SuppressWarnings("serial")
 public class EventsOptimizerDebugger extends JFrame {
     private final List<ShortTrackerEvent> originReadings;
-    private final List<ShortTrackerEvent> optimizedReadings;
 
     private AbstractGeoMapBuiler builder = new GoogleGeoMapBuiler();
     private final int zoom;
@@ -62,7 +61,6 @@ public class EventsOptimizerDebugger extends JFrame {
         super("Event Optimizer debugger");
         new EventsNullCoordinatesCorrector().correct(readings);
         this.originReadings = readings;
-        this.optimizedReadings = new EventsOptimizer().optimize(readings);
 
         new EventsNullCoordinatesCorrector().correct(readings);
 
@@ -189,7 +187,7 @@ public class EventsOptimizerDebugger extends JFrame {
 
         final Graphics2D g1 = (Graphics2D) g.create();
         try {
-            paintMapWithPath(g1, optimizedReadings, position);
+            paintMapWithPath(g1, new EventsOptimizer().optimize(originReadings), position);
         } finally {
             g1.dispose();
         }

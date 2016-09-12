@@ -3,6 +3,9 @@
  */
 package com.visfresh.mpl.services;
 
+import java.io.File;
+import java.io.IOException;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.mail.MessagingException;
@@ -149,11 +152,12 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
     public void start() {
         dispatcher.setEmailHandler(this);
     }
-    /**
-     * @return the helper
+    /* (non-Javadoc)
+     * @see com.visfresh.services.EmailService#sendMessage(java.lang.String[], java.lang.String, java.lang.String, java.io.File[])
      */
     @Override
-    public EmailServiceHelper getHelper() {
-        return helper;
+    public void sendMessage(final String[] emails, final String subject, final String text,
+            final File... file) throws MessagingException, IOException {
+        helper.sendMessage(emails, subject, text, file);
     }
 }

@@ -121,11 +121,11 @@ public class NotificationServiceImpl implements NotificationService {
 
         if (user != null) {
             try {
-                if (issue instanceof Arrival && emailService.getHelper() != null) {
+                if (issue instanceof Arrival) {
                     final File attachment = createShipmenentReport(user, (Arrival) issue);
 
                     try {
-                        emailService.getHelper().sendMessage(new String[]{user.getEmail()}, subject, null, attachment);
+                        emailService.sendMessage(new String[]{user.getEmail()}, subject, null, attachment);
                     } catch (final Exception e) {
                         log.error("Faile to send email with shipment reports", e);
                     } finally {

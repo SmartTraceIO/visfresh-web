@@ -25,8 +25,10 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -40,21 +42,27 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.JsonObject;
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.PerformanceReportDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.io.EmailShipmentReportRequest;
+import com.visfresh.io.json.ReportsSerializer;
 import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.reports.geomap.AbstractGeoMapBuiler;
 import com.visfresh.reports.geomap.GoogleGeoMapBuiler;
@@ -91,6 +99,8 @@ public class ReportsController extends AbstractController {
     private FileDownloadController fileDownload;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private UserDao userDao;
 
     //TODO remove after test
     @Autowired
@@ -222,17 +232,7 @@ public class ReportsController extends AbstractController {
             }
 
             //create report bean.
-            final ShipmentReportBean bean = shipmentReportDao.createReport(s);
-
-            //create tmp file with report PDF content.
-            final File file = fileDownload.createTmpFile(createFileName(s, "pdf"));
-
-            final OutputStream out = new FileOutputStream(file);
-            try {
-                reportBuilder.createShipmentReport(bean, user, out);
-            } finally {
-                out.close();
-            }
+            final File file = createShipmentReport(s, user);
 
             final int index = request.getRequestURL().indexOf("/" + GET_SHIPMENT_REPORT);
             response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
@@ -243,6 +243,81 @@ public class ReportsController extends AbstractController {
             throw e;
         }
     }
+    /**
+     * @param s shipment.
+     * @param user user.
+     * @return PDF shipment report.
+     */
+    private File createShipmentReport(final Shipment s, final User user) throws IOException {
+        final ShipmentReportBean bean = shipmentReportDao.createReport(s);
+
+        //create tmp file with report PDF content.
+        final File file = fileDownload.createTmpFile(createFileName(s, "pdf"));
+
+        final OutputStream out = new FileOutputStream(file);
+        try {
+            reportBuilder.createShipmentReport(bean, user, out);
+        } finally {
+            out.close();
+        }
+        return file;
+    }
+
+    /**
+     * @param authToken authentication token.
+     * @param jsonRequest JSON save shipment request.
+     * @return ID of saved shipment.
+     */
+    @RequestMapping(value = "/emailShipmentReport/{authToken}", method = RequestMethod.POST)
+    public JsonObject emailShipmentReport(@PathVariable final String authToken,
+            final @RequestBody JsonObject jsonRequest) {
+        try {
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.NormalUser);
+
+            final ReportsSerializer serializer = getSerializer();
+            final EmailShipmentReportRequest req = serializer.parseEmailShipmentReportRequest(jsonRequest);
+
+            //check parameters
+            if (req.getSn() == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Should be specified sn and trip request parameters");
+            }
+
+            final Shipment s = shipmentDao.findBySnTrip(user.getCompany(), req.getSn(), req.getTrip());
+            if (s == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Unable to found shipment for " + req.getSn() + " (" + req.getTrip()
+                        + ") for given company");
+            }
+
+            final File file = createShipmentReport(s, user);
+            final Set<String> emails = new HashSet<>();
+
+            //add users
+            for (final User u: userDao.findAll(req.getUsers())) {
+                emails.add(u.getEmail());
+            }
+            //add emails
+            emails.addAll(req.getEmails());
+
+            emailService.sendMessage(emails.toArray(new String[emails.size()]),
+                    req.getSubject(), req.getMessageBody(), file);
+
+            return createSuccessResponse(null);
+        } catch (final Exception e) {
+            log.error("Failed to save shipment by request: " + jsonRequest, e);
+            return createErrorResponse(e);
+        }
+    }
+
+    /**
+     * @return
+     */
+    private ReportsSerializer getSerializer() {
+        return new ReportsSerializer();
+    }
+
     @RequestMapping(value = "/demoOptimizer/{authToken}", method = RequestMethod.GET)
     public void demoOptimizer(@PathVariable final String authToken,
             @RequestParam(required = false) final Long shipmentId,

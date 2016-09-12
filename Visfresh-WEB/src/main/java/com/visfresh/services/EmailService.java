@@ -3,9 +3,10 @@
  */
 package com.visfresh.services;
 
-import javax.mail.MessagingException;
+import java.io.File;
+import java.io.IOException;
 
-import com.visfresh.io.email.EmailServiceHelper;
+import javax.mail.MessagingException;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -26,7 +27,11 @@ public interface EmailService {
      */
     void sendMessageToSupport(String subject, String message) throws MessagingException;
     /**
-     * @return email helper.
+     * @param emails eMail.
+     * @param subject subject.
+     * @param message message.
+     * @throws MessagingException
      */
-    EmailServiceHelper getHelper();
+    public void sendMessage(final String[] emails, final String subject, final String text,
+            final File... file) throws MessagingException, IOException;
 }

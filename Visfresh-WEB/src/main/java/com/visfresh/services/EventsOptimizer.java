@@ -42,6 +42,7 @@ public class EventsOptimizer {
 
             switch (eOrigin.getType()) {
                 case STP:
+                case INIT:
                     if (!toOptimize.isEmpty()) {
                         move(toOptimize, readings);
                     }
@@ -53,6 +54,7 @@ public class EventsOptimizer {
                         normalize(toOptimize);
                         move(toOptimize, readings);
                     }
+                    readings.add(e);
                     break;
                 default:
                     if (toOptimize.isEmpty()) {
@@ -75,13 +77,11 @@ public class EventsOptimizer {
      * @param events
      */
     private void normalize(final List<ShortTrackerEvent> events) {
-        System.out.println("Events to optimize: " + events.size());
-
         final List<ShortTrackerEvent> tmp = new LinkedList<>();
         ShortTrackerEvent first = null;
 
         for (final ShortTrackerEvent e : events) {
-            if (tmp.size() > 100 || (first != null && !isNearFirst(first, e))) {
+            if (tmp.size() > 10 || (first != null && !isNearFirst(first, e))) {
                 correctCoordinates(tmp);
                 tmp.clear();
                 first = null;
@@ -97,7 +97,6 @@ public class EventsOptimizer {
             correctCoordinates(tmp);
         }
     }
-
     /**
      * @param events
      */

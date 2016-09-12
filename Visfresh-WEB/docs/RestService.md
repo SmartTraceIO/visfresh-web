@@ -123,6 +123,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 62. [Init Device colors](#markdown-header-init-device-colors)  
 63. [Get Readings](#markdown-header-get-readings)  
 64. [Get Shipment Report](#markdown-header-get-shipment-report)  
+65. [Email Shipment Report](#markdown-header-email-shipment-report)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -533,13 +534,18 @@ This format is used for avoid of URL encoding of dates
 [(example)](#markdown-header-get-readings-example)
 
 ### Get Shipment Report ###
-Method *GET*, method name *getReadings*. Request parameters:
+Method *POST*, method name *getShipmentReport*. Request parameters:
 1. shipmentId shipment ID  
 or  
 1. sn device serial number  
 2. trip shipment trip count  
 Returns PDF file as byte stream  
 [(example)](#markdown-header-get-shipment-report-example)
+
+### Email Shipment Report ###
+Method *POST*, method name *emailShipmentReport*. Request body JSON serialized request.  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-email-shipment-report-example)
 
 ## Objects
 ### Response message ###
@@ -3419,8 +3425,8 @@ Response:
 }
 ```
 ### Get readings example ###
-**GET vf/rest/getReadings/${accessToken}?startDate=2016-07-26T08-17-58&endDate=2016-07-26T09-18-18&device=1234987039487**  
-**GET vf/rest/getReadings/${accessToken}?sn=703948&trip=1**  
+**GET /vf/rest/getReadings/${accessToken}?startDate=2016-07-26T08-17-58&endDate=2016-07-26T09-18-18&device=1234987039487**  
+**GET /vf/rest/getReadings/${accessToken}?sn=703948&trip=1**  
 **CSV text response:**  
 ```
 id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,alerts
@@ -3430,7 +3436,38 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
 ```
 
 ### Get Shipment Report example ###
-**GET vf/rest/getShipmentReport/${accessToken}?shipmentId=2714**  
-**GET vf/rest/getShipmentReport/${accessToken}?sn=3456&trip=1**  
+**GET /vf/rest/getShipmentReport/${accessToken}?shipmentId=2714**  
+**GET /vf/rest/getShipmentReport/${accessToken}?sn=3456&trip=1**  
 
 **Returns PDF file as byte stream**  
+
+### Email Shipment Report example ###
+**GET /vf/rest/emailShipmentReport/${accessToken}**  
+**Request**  
+```json
+{
+  "sn": "39485",
+  "trip": 1,
+  "subject": "Shipment report from JUnit test",
+  "messageBody": "Given report is sent from JUnit test",
+  "recipients": [
+    {
+      "type": "user",
+      "value": 19806
+    },
+    {
+      "type": "email",
+      "value": "junit@smarttrace.com.au"
+    }
+  ]
+}
+```  
+**Response**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
+}```

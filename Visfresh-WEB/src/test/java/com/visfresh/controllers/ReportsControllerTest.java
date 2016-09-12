@@ -3,8 +3,10 @@
  */
 package com.visfresh.controllers;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
@@ -30,6 +32,10 @@ import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.io.EmailShipmentReportRequest;
+import com.visfresh.io.email.EmailMessage;
+import com.visfresh.io.json.ReportsSerializer;
+import com.visfresh.mock.MockEmailService;
 import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.reports.performance.PerformanceReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
@@ -46,6 +52,7 @@ public class ReportsControllerTest extends AbstractRestServiceTest {
     private TrackerEventDao trackerEventDao;
     private AlertDao alertDao;
     private ArrivalDao arrivalDao;
+    private ReportsSerializer serializer;
 
     /**
      * Default constructor.
@@ -58,6 +65,8 @@ public class ReportsControllerTest extends AbstractRestServiceTest {
      */
     @Before
     public void setUp() throws Exception {
+        serializer = new ReportsSerializer();
+
         trackerEventDao = context.getBean(TrackerEventDao.class);
         alertDao = context.getBean(AlertDao.class);
         arrivalDao = context.getBean(ArrivalDao.class);
@@ -103,6 +112,41 @@ public class ReportsControllerTest extends AbstractRestServiceTest {
         final String result = client.doSendGetRequest(client.getPathWithToken(
                 ReportsController.GET_SHIPMENT_REPORT), params);
         assertTrue(result.length() > 0);
+    }
+    @Test
+    public void testEmailShipment() throws IOException, RestServiceException {
+        final Shipment s = createShipment();
+
+        final EmailShipmentReportRequest req = new EmailShipmentReportRequest();
+        req.setSn(s.getDevice().getSn());
+        req.setTrip(s.getTripCount());
+        final String subject = "Shipment report from JUnit test";
+        req.setSubject(subject);
+        final String body = "Given report is sent from JUnit test";
+        req.setMessageBody(body);
+        req.getUsers().add(createUser1().getId());
+        req.getEmails().add("junit@smarttrace.com.au");
+
+        final String result = client.doSendPostRequest(client.getPathWithToken("emailShipmentReport"),
+                serializer.toJson(req));
+        assertTrue(result.length() > 0);
+
+        //check email
+        final MockEmailService emailer = context.getBean(MockEmailService.class);
+
+        assertEquals(1, emailer.getAttachments().size());
+
+        //delete attachment
+        for (final File f : emailer.getAttachments().get(0)) {
+            f.delete();
+        }
+
+        assertEquals(1, emailer.getMessages().size());
+
+        //check message
+        final EmailMessage m = emailer.getMessages().get(0);
+        assertEquals(subject, m.getSubject());
+        assertEquals(body, m.getMessage());
     }
     /**
      * @return
