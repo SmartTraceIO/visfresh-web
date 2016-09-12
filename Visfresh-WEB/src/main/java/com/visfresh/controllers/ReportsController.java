@@ -251,8 +251,21 @@ public class ReportsController extends AbstractController {
     private File createShipmentReport(final Shipment s, final User user) throws IOException {
         final ShipmentReportBean bean = shipmentReportDao.createReport(s);
 
+        final DateFormat fmt = DateTimeUtils.createDateFormat("yyyy-MM-dd_HH-mm",
+                user.getLanguage(), user.getTimeZone());
+
+        final String fileName = s.getCompany().getName().replaceAll("\\W", "_")
+                + " Shipment "
+                + s.getDevice().getSn()
+                + "("
+                + s.getTripCount()
+                + ")"
+                + " as of "
+                + fmt.format(new Date())
+                + DateTimeUtils.getTimeZoneString(user.getTimeZone().getRawOffset())
+                + ".pdf";
         //create tmp file with report PDF content.
-        final File file = fileDownload.createTmpFile(createFileName(s, "pdf"));
+        final File file = fileDownload.createTmpFile(fileName);
 
         final OutputStream out = new FileOutputStream(file);
         try {

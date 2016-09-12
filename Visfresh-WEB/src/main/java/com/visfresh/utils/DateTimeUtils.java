@@ -79,7 +79,7 @@ public final class DateTimeUtils {
      * @param rawOffset
      * @return
      */
-    protected static String getTimeZoneString(final int rawOffset) {
+    public static String getTimeZoneString(final int rawOffset) {
         if (rawOffset == 0) {
             return "";
         }
