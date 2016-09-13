@@ -56,6 +56,7 @@ import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
@@ -433,10 +434,10 @@ public class ReportsController extends AbstractController {
      * @param readings
      * @return
      */
-    private List<Point2D> getCoordinates(final List<ShortTrackerEvent> readings) {
-        final List<Point2D> coords = new LinkedList<>();
+    private List<Location> getCoordinates(final List<ShortTrackerEvent> readings) {
+        final List<Location> coords = new LinkedList<>();
         for (final ShortTrackerEvent e : readings) {
-            coords.add(new Point2D.Double(e.getLongitude(), e.getLatitude()));
+            coords.add(new Location(e.getLatitude(), e.getLongitude()));
         }
         return coords;
     }
@@ -447,15 +448,10 @@ public class ReportsController extends AbstractController {
     private BufferedImage createMapWithPath(final List<ShortTrackerEvent> readings, final int zoom) {
         final Rectangle viewArea = new Rectangle(612, 612);
 
-        final List<Point2D> coords = new LinkedList<>();
-        for (final ShortTrackerEvent e : readings) {
-            coords.add(new Point2D.Double(e.getLongitude(), e.getLatitude()));
-        }
-
         final int width = (int) Math.floor(viewArea.getWidth());
         final int height = (int) Math.floor(viewArea.getHeight());
 
-        final Rectangle r = builder.getMapBounds(coords, zoom);
+        final Rectangle r = builder.getMapBounds(getCoordinates(readings), zoom);
 
         final Point p = new Point(
                 (int) (r.getX() - (viewArea.getWidth() - r.getWidth()) / 2.),

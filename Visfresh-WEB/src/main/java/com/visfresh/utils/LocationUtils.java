@@ -3,6 +3,8 @@
  */
 package com.visfresh.utils;
 
+import com.visfresh.entities.Location;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -25,6 +27,15 @@ public final class LocationUtils {
                 * Math.sin(dLng / 2);
         final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return earthRadius * c;
+    }
+
+    /**
+     * @param l1
+     * @param l2
+     * @return
+     */
+    public static double getDistanceMeters(final Location l1, final Location l2) {
+        return getDistanceMeters(l1.getLatitude(), l1.getLongitude(), l2.getLatitude(), l2.getLongitude());
     }
     /**
      * @param lat the latitude.

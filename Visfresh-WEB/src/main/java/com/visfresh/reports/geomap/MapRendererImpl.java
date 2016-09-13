@@ -10,6 +10,7 @@ import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.GeneralPath;
@@ -17,6 +18,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,11 +30,13 @@ import net.sf.jasperreports.renderers.Graphics2DRenderable;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.reports.Colors;
 import com.visfresh.reports.shipment.ImagePaintingSupport;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBuilder;
 import com.visfresh.services.EventsOptimizer;
 import com.visfresh.utils.EntityUtils;
+import com.visfresh.utils.LocationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -63,9 +67,16 @@ public class MapRendererImpl extends AbstractRenderer implements
     public void render(final JasperReportsContext context,
             final Graphics2D gOrigin, final Rectangle2D viewArea) throws JRException {
 
-        final List<Point2D> coords = new LinkedList<>();
+        render(gOrigin, viewArea);
+    }
+    /**
+     * @param gOrigin
+     * @param viewArea
+     */
+    public void render(final Graphics2D gOrigin, final Rectangle2D viewArea) {
+        final List<Location> coords = new LinkedList<>();
         for (final ShortTrackerEvent e : bean.getReadings()) {
-            coords.add(new Point2D.Double(e.getLongitude(), e.getLatitude()));
+            coords.add(new Location(e.getLatitude(), e.getLongitude()));
         }
 
         final int width = (int) Math.floor(viewArea.getWidth());
@@ -112,7 +123,8 @@ public class MapRendererImpl extends AbstractRenderer implements
 //            final List<ShortTrackerEvent> readings = optimizer.optimize(bean.getReadings());
             final List<ShortTrackerEvent> readings = bean.getReadings();
 
-            paintPath(g, readings, p, zoom);
+            paintPath(g, coords, p, zoom);
+            paintArrows(g, coords, p, zoom);
             paintMarkers(g, readings, p, zoom);
         } catch (final IOException ioe) {
             throw new RuntimeException(ioe);
@@ -125,6 +137,99 @@ public class MapRendererImpl extends AbstractRenderer implements
                 (int) viewArea.getX(),
                 (int) viewArea.getY(),
                 null);
+    }
+
+    /**
+     * @param g
+     * @param points
+     * @param mapLocation
+     * @param zoom
+     */
+    private void paintArrows(final Graphics2D g, final List<Location> points,
+            final Point mapLocation, final int zoom) {
+        if (points.isEmpty()) {
+            return;
+        }
+
+        g.setColor(Colors.shadeColor(bean.getDeviceColor(), -0.3));
+        g.setStroke(new BasicStroke(1.f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        final Rectangle bounds = this.builder.getMapBounds(points, zoom);
+
+        //south west
+        final double whd = LocationUtils.getDistanceMeters(
+                OpenStreetMapBuilder.position2lon(bounds.x + bounds.width, zoom),
+                OpenStreetMapBuilder.position2lat(bounds.y, zoom),
+                OpenStreetMapBuilder.position2lon(bounds.x, zoom),
+                OpenStreetMapBuilder.position2lat(bounds.y + bounds.height, zoom));
+
+        final int le = points.size();
+        final double step = le/7;
+        int count = 0;
+
+        final Iterator<Location> iter = points.iterator();
+        Location prev = iter.next();
+
+        while (iter.hasNext()) {
+            final Location current = iter.next();
+
+            final Point pprev = AbstractGeoMapBuiler.toMapPosition(prev, zoom);
+            final Point pcurrent = AbstractGeoMapBuiler.toMapPosition(current, zoom);
+
+            if (!prev.equals(pcurrent)) {
+                final double d = LocationUtils.getDistanceMeters(prev, current);
+                if (d > whd / 10. || count >= step) {
+                    count = 0;
+                    drawArrow(g, mapLocation, pprev, pcurrent);
+                } else {
+                    count++;
+                }
+
+                prev = current;
+            }
+        }
+    }
+
+    /**
+     * @param g graphics.
+     * @param l1 first location.
+     * @param l2 second location.
+     */
+    private void drawArrow(final Graphics2D g, final Point mapLocation, final Point l1, final Point l2) {
+        //center
+        final double x = (l2.x + l1.x) / 2.;
+        final double y = (l2.y + l1.y) / 2.;
+
+        //direction vector.
+        double lx = l2.x - l1.x;
+        double ly = l2.y - l1.y;
+
+        final double norm = Math.sqrt(lx * lx + ly * ly);
+        lx /= norm;
+        ly /= norm;
+
+        //arrow size
+        final double size = 8;
+
+        //arrow polygon
+        final Polygon p = new Polygon();
+        final double s2 = size / 2.;
+//        final double d = (size + 0.5) / 2;
+        final double d = s2;
+
+        p.addPoint(
+                (int) Math.round(x - lx * s2 + ly * d),
+                (int) Math.round(y - ly * s2 - lx * d));
+        p.addPoint(
+                (int) Math.round(x - lx * s2 - ly * d),
+                (int) Math.round(y - ly * s2 + lx * d));
+        p.addPoint(
+                (int) Math.round(x + lx * s2),
+                (int) Math.round(y + ly * s2));
+        p.translate(-mapLocation.x, -mapLocation.y);
+
+        g.fillPolygon(p);
+        g.drawPolygon(p);
     }
 
     /**
@@ -206,15 +311,16 @@ public class MapRendererImpl extends AbstractRenderer implements
      * @param mapLocation
      * @param zoom
      */
-    private void paintPath(final Graphics2D g, final List<ShortTrackerEvent> readings,
+    private void paintPath(final Graphics2D g, final List<Location> readings,
             final Point mapLocation, final int zoom) {
         //create path shape
         final GeneralPath path = new GeneralPath();
-        for (final ShortTrackerEvent p : readings) {
+        for (final Location p : readings) {
             final int x = Math.round(OpenStreetMapBuilder.lon2position(
                     p.getLongitude(), zoom) - mapLocation.x);
             final int y = Math.round(OpenStreetMapBuilder.lat2position(
                     p.getLatitude(), zoom) - mapLocation.y);
+
             final Point2D cp = path.getCurrentPoint();
             if (cp == null) {
                 path.moveTo(x, y);

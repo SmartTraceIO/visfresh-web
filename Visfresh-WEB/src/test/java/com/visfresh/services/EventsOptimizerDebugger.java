@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
+import com.visfresh.entities.Location;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.reports.ShortTrackerEventsImporter;
 import com.visfresh.reports.geomap.AbstractGeoMapBuiler;
@@ -66,7 +67,7 @@ public class EventsOptimizerDebugger extends JFrame {
 
         final Dimension viewArea = new Dimension(250, 250);
 
-        final List<Point2D> coords = getCoordinates(readings);
+        final List<Location> coords = getCoordinates(readings);
         zoom = builder.calculateZoom(coords, viewArea, 10);
 
         final Rectangle r = builder.getMapBounds(coords, zoom);
@@ -270,10 +271,10 @@ public class EventsOptimizerDebugger extends JFrame {
      * @param readings
      * @return
      */
-    private List<Point2D> getCoordinates(final List<ShortTrackerEvent> readings) {
-        final List<Point2D> coords = new LinkedList<>();
+    private List<Location> getCoordinates(final List<ShortTrackerEvent> readings) {
+        final List<Location> coords = new LinkedList<>();
         for (final ShortTrackerEvent e : readings) {
-            coords.add(new Point2D.Double(e.getLongitude(), e.getLatitude()));
+            coords.add(new Location(e.getLatitude(), e.getLongitude()));
         }
         return coords;
     }

@@ -7,11 +7,12 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import com.visfresh.entities.Location;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -97,7 +98,7 @@ public abstract class AbstractGeoMapBuiler {
      * @param targetSize
      * @return
      */
-    public int calculateZoom(final List<Point2D> points, final Dimension targetSize, final int maxZoom) {
+    public int calculateZoom(final List<Location> points, final Dimension targetSize, final int maxZoom) {
         int bestZoom = Math.min(maxZoom, getMaxZoom());
 
         int zoom = maxZoom;
@@ -125,18 +126,20 @@ public abstract class AbstractGeoMapBuiler {
      * @param zoom
      * @return
      */
-    public Rectangle getMapBounds(final List<Point2D> points, final int zoom) {
+    public Rectangle getMapBounds(final List<Location> points, final int zoom) {
         int minx = Integer.MAX_VALUE;
         int miny = Integer.MAX_VALUE;
         int maxx = Integer.MIN_VALUE;
         int maxy = Integer.MIN_VALUE;
 
-        for (final Point2D p : points) {
-            minx = Math.min(lon2position(p.getX(), zoom), minx);
-            maxx = Math.max(lon2position(p.getX(), zoom), maxx);
+        for (final Location p : points) {
+            final int x = lon2position(p.getLongitude(), zoom);
+            minx = Math.min(x, minx);
+            maxx = Math.max(x, maxx);
 
-            miny = Math.min(lat2position(p.getY(), zoom), miny);
-            maxy = Math.max(lat2position(p.getY(), zoom), maxy);
+            final int y = lat2position(p.getLatitude(), zoom);
+            miny = Math.min(y, miny);
+            maxy = Math.max(y, maxy);
         }
 
         return new Rectangle(minx, miny, maxx - minx, maxy - miny);
@@ -157,6 +160,14 @@ public abstract class AbstractGeoMapBuiler {
     public static int lon2position(final double lon, final int z) {
         final double xmax = TILE_SIZE * (1 << z);
         return (int) Math.floor((lon + 180) / 360 * xmax);
+    }
+    /**
+     * @param loc location.
+     * @param zoom map zoom.
+     * @return
+     */
+    public static Point toMapPosition(final Location loc, final int zoom) {
+        return new Point(lon2position(loc.getLongitude(), zoom), lat2position(loc.getLatitude(), zoom));
     }
 
     /**
