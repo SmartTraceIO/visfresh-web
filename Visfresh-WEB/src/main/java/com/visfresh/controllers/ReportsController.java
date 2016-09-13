@@ -169,7 +169,7 @@ public class ReportsController extends AbstractController {
                 user.getCompany(), d1, d2);
 
         //create tmp file with report PDF content.
-        final File file = fileDownload.createTmpFile("performanceReport.pdf");
+        final File file = fileDownload.createTmpFile("performanceReport","pdf");
 
         try {
             final OutputStream out = new FileOutputStream(file);
@@ -251,21 +251,20 @@ public class ReportsController extends AbstractController {
     private File createShipmentReport(final Shipment s, final User user) throws IOException {
         final ShipmentReportBean bean = shipmentReportDao.createReport(s);
 
-        final DateFormat fmt = DateTimeUtils.createDateFormat("yyyy-MM-dd_HH-mm",
-                user.getLanguage(), user.getTimeZone());
-
-        final String fileName = s.getCompany().getName().replaceAll("\\W", "_")
-                + " Shipment "
-                + s.getDevice().getSn()
-                + "("
-                + s.getTripCount()
-                + ")"
-                + " as of "
-                + fmt.format(new Date())
-                + DateTimeUtils.getTimeZoneString(user.getTimeZone().getRawOffset())
-                + ".pdf";
-        //create tmp file with report PDF content.
-        final File file = fileDownload.createTmpFile(fileName);
+//        final DateFormat fmt = DateTimeUtils.createDateFormat("yyyy-MM-dd_HH-mm",
+//                user.getLanguage(), user.getTimeZone());
+//
+//        final String fileName = s.getCompany().getName().replaceAll("\\W", "_")
+//                + " Shipment "
+//                + s.getDevice().getSn()
+//                + "("
+//                + s.getTripCount()
+//                + ")"
+//                + " as of "
+//                + fmt.format(new Date())
+//                + DateTimeUtils.getTimeZoneString(user.getTimeZone().getRawOffset())
+//                + ".pdf";
+        final File file = createTmpFile(s, "pdf");
 
         final OutputStream out = new FileOutputStream(file);
         try {
@@ -273,6 +272,19 @@ public class ReportsController extends AbstractController {
         } finally {
             out.close();
         }
+        return file;
+    }
+
+    /**
+     * @param s
+     * @param extension
+     * @return
+     * @throws IOException
+     */
+    private File createTmpFile(final Shipment s, final String extension) throws IOException {
+        final String fileName = createFileName(s, "pdf");
+        //create tmp file with report PDF content.
+        final File file = fileDownload.createTmpFile(fileName, "pdf");
         return file;
     }
 
@@ -404,7 +416,7 @@ public class ReportsController extends AbstractController {
 
             log.debug("Write image to file");
             //write image to file
-            final File file = fileDownload.createTmpFile(createFileName(s, "gif"));
+            final File file = createTmpFile(s, "gif");
             ImageIO.write(image, "gif", file);
 
             log.debug("Do redirect");
@@ -511,7 +523,6 @@ public class ReportsController extends AbstractController {
         sb.append(s.getTripCount());
         sb.append(')');
         sb.insert(0, "shipment-");
-        sb.append("." + extension);
         return sb.toString();
     }
     /**

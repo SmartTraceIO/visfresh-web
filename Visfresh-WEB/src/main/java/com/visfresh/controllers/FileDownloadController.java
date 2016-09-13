@@ -153,14 +153,15 @@ public class FileDownloadController extends AbstractController {
         return sb.toString();
     }
     /**
-     * @param suffix file suffix.
+     * @param name file name
+     * @param extension file extension.
      * @return new file by unique name.
      * @throws IOException
      */
-    public synchronized File createTmpFile(final String suffix) throws IOException {
+    public synchronized File createTmpFile(final String name, final String extension) throws IOException {
         long id = 0;
         while (true) {
-            final File file = new File(tmpRoot, Long.toString(id) + "-" + suffix);
+            final File file = new File(tmpRoot, name + "." + Long.toString(id) + "." + extension);
             if (!file.exists()) {
                 file.createNewFile();
                 return file;

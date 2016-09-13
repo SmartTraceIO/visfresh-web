@@ -534,10 +534,10 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
         if (device != null) {
             events = getTrackerEventByDeviceDateRanges(device, startDateArg, endDateArg, user);
-            file = fileDownload.createTmpFile("readings-" + createFileName(device, startDateArg, endDateArg) + ".csv");
+            file = fileDownload.createTmpFile("readings-" + createFileName(device, startDateArg, endDateArg), "csv");
         } else if (sn != null && trip != null) {
             events = getTrackerEventByShipment(user.getCompany(), sn, trip);
-            file = fileDownload.createTmpFile("readings-" + sn + "(" + trip + ").csv");
+            file = fileDownload.createTmpFile("readings-" + sn + "(" + trip + ")", "csv");
         } else {
             throw new IOException("One from device IMEI or SN and trip count should be presented in arguments");
         }
