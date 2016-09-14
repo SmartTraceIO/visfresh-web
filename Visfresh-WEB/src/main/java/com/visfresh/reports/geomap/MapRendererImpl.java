@@ -34,9 +34,7 @@ import com.visfresh.reports.Colors;
 import com.visfresh.reports.shipment.ImagePaintingSupport;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBuilder;
-import com.visfresh.services.EventsOptimizer;
 import com.visfresh.utils.EntityUtils;
-import com.visfresh.utils.LocationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -48,7 +46,6 @@ public class MapRendererImpl extends AbstractRenderer implements
     private final ShipmentReportBean bean;
     private final AbstractGeoMapBuiler builder;
     private final int iconSize = 16;
-    private EventsOptimizer optimizer = new EventsOptimizer();
 
     /**
      * Default constructor.
@@ -120,11 +117,10 @@ public class MapRendererImpl extends AbstractRenderer implements
             //restore transparency
             g.setComposite(comp);
 
-//            final List<ShortTrackerEvent> readings = optimizer.optimize(bean.getReadings());
-            final List<ShortTrackerEvent> readings = bean.getReadings();
+            final List<ShortTrackerEvent> readings = optimize(bean.getReadings());
 
             paintPath(g, coords, p, zoom);
-            paintArrows(g, coords, p, zoom);
+            paintArrows(g, coords, p, zoom, viewArea);
             paintMarkers(g, readings, p, zoom);
         } catch (final IOException ioe) {
             throw new RuntimeException(ioe);
@@ -140,13 +136,23 @@ public class MapRendererImpl extends AbstractRenderer implements
     }
 
     /**
+     * @param readings
+     * @return
+     */
+    protected List<ShortTrackerEvent> optimize(final List<ShortTrackerEvent> readings) {
+//      return optimizer.optimize(bean.getReadings());
+        return readings;
+    }
+
+    /**
      * @param g
      * @param points
      * @param mapLocation
      * @param zoom
+     * @param viewArea TODO
      */
     private void paintArrows(final Graphics2D g, final List<Location> points,
-            final Point mapLocation, final int zoom) {
+            final Point mapLocation, final int zoom, final Rectangle2D viewArea) {
         if (points.isEmpty()) {
             return;
         }
@@ -154,33 +160,25 @@ public class MapRendererImpl extends AbstractRenderer implements
         g.setColor(Colors.shadeColor(bean.getDeviceColor(), -0.3));
         g.setStroke(new BasicStroke(1.f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-        final Rectangle bounds = this.builder.getMapBounds(points, zoom);
-
         //south west
-        final double whd = LocationUtils.getDistanceMeters(
-                OpenStreetMapBuilder.position2lon(bounds.x + bounds.width, zoom),
-                OpenStreetMapBuilder.position2lat(bounds.y, zoom),
-                OpenStreetMapBuilder.position2lon(bounds.x, zoom),
-                OpenStreetMapBuilder.position2lat(bounds.y + bounds.height, zoom));
+        final double maxdist = new Point(0, 0).distance(viewArea.getWidth(), viewArea.getHeight()) / 10.;
 
-        final int le = points.size();
-        final double step = le/7;
+        final int step = points.size() / 7;
         int count = 0;
 
         final Iterator<Location> iter = points.iterator();
-        Location prev = iter.next();
+
+        Point prev = AbstractGeoMapBuiler.toMapPosition(iter.next(), zoom);
+        Point marker = prev;
 
         while (iter.hasNext()) {
-            final Location current = iter.next();
+            final Point current = AbstractGeoMapBuiler.toMapPosition(iter.next(), zoom);
 
-            final Point pprev = AbstractGeoMapBuiler.toMapPosition(prev, zoom);
-            final Point pcurrent = AbstractGeoMapBuiler.toMapPosition(current, zoom);
-
-            if (!prev.equals(pcurrent)) {
-                final double d = LocationUtils.getDistanceMeters(prev, current);
-                if (d > whd / 10. || count >= step) {
+            if (!prev.equals(current)) {
+                if (marker.distance(current) > maxdist || count >= step) {
+                    drawArrow(g, mapLocation, prev, current);
                     count = 0;
-                    drawArrow(g, mapLocation, pprev, pcurrent);
+                    marker = current;
                 } else {
                     count++;
                 }
@@ -220,6 +218,9 @@ public class MapRendererImpl extends AbstractRenderer implements
         p.addPoint(
                 (int) Math.round(x - lx * s2 + ly * d),
                 (int) Math.round(y - ly * s2 - lx * d));
+        p.addPoint(
+                (int) Math.round(x - lx * s2 / 1.5),
+                (int) Math.round(y - ly * s2 / 1.5));
         p.addPoint(
                 (int) Math.round(x - lx * s2 - ly * d),
                 (int) Math.round(y - ly * s2 + lx * d));

@@ -3,17 +3,10 @@
  */
 package com.visfresh.controllers;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -56,7 +49,6 @@ import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Device;
-import com.visfresh.entities.Location;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
@@ -65,9 +57,7 @@ import com.visfresh.entities.User;
 import com.visfresh.io.EmailShipmentReportRequest;
 import com.visfresh.io.json.ReportsSerializer;
 import com.visfresh.reports.PdfReportBuilder;
-import com.visfresh.reports.geomap.AbstractGeoMapBuiler;
-import com.visfresh.reports.geomap.GoogleGeoMapBuiler;
-import com.visfresh.reports.geomap.OpenStreetMapBuilder;
+import com.visfresh.reports.geomap.MapRendererImpl;
 import com.visfresh.reports.performance.PerformanceReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.services.EmailService;
@@ -106,8 +96,6 @@ public class ReportsController extends AbstractController {
     //TODO remove after test
     @Autowired
     private TrackerEventDao trackerEventDao;
-    //TODO remove after test
-    private AbstractGeoMapBuiler builder = new GoogleGeoMapBuiler();
     //TODO remove after test
     @Autowired
     private EventsOptimizer eventsOptimizer;
@@ -283,10 +271,9 @@ public class ReportsController extends AbstractController {
      * @throws IOException
      */
     private File createTmpFile(final Shipment s, final String extension) throws IOException {
-        final String fileName = createFileName(s, "pdf");
+        final String fileName = createFileName(s, extension);
         //create tmp file with report PDF content.
-        final File file = fileDownload.createTmpFile(fileName, "pdf");
-        return file;
+        return fileDownload.createTmpFile(fileName, extension);
     }
 
     /**
@@ -384,18 +371,13 @@ public class ReportsController extends AbstractController {
                 }
             }
 
-            log.debug("Calculate the best zoom");
-            final Rectangle viewArea = new Rectangle(250, 250);
-            final int zoom = builder.calculateZoom(getCoordinates(readings),
-                    new Dimension(viewArea.width, viewArea.height), 10);
-
             //create picture.
             final BufferedImage image;
 
             log.debug("Create image with not optimized readings");
-            final BufferedImage im1 = createMapWithPath(readings, zoom);
+            final BufferedImage im1 = createMapWithPath(readings);
             log.debug("Create image with optimized readings");
-            final BufferedImage im2 = createMapWithPath(this.eventsOptimizer.optimize(readings), zoom);
+            final BufferedImage im2 = createMapWithPath(this.eventsOptimizer.optimize(readings));
 
             log.debug("Create composite image");
             image = new BufferedImage(
@@ -430,80 +412,34 @@ public class ReportsController extends AbstractController {
             throw e;
         }
     }
-    /**
-     * @param readings
-     * @return
-     */
-    private List<Location> getCoordinates(final List<ShortTrackerEvent> readings) {
-        final List<Location> coords = new LinkedList<>();
-        for (final ShortTrackerEvent e : readings) {
-            coords.add(new Location(e.getLatitude(), e.getLongitude()));
-        }
-        return coords;
-    }
 
     /**
      * @return
      */
-    private BufferedImage createMapWithPath(final List<ShortTrackerEvent> readings, final int zoom) {
+    @SuppressWarnings("serial")
+    private BufferedImage createMapWithPath(final List<ShortTrackerEvent> readings) {
+        final ShipmentReportBean bean = new ShipmentReportBean();
+        bean.setDeviceColor(Color.RED);
+        bean.getReadings().addAll(readings);
+
         final Rectangle viewArea = new Rectangle(612, 612);
 
-        final int width = (int) Math.floor(viewArea.getWidth());
-        final int height = (int) Math.floor(viewArea.getHeight());
-
-        final Rectangle r = builder.getMapBounds(getCoordinates(readings), zoom);
-
-        final Point p = new Point(
-                (int) (r.getX() - (viewArea.getWidth() - r.getWidth()) / 2.),
-                (int) (r.getY() - (viewArea.getHeight() - r.getHeight()) / 2.));
 
         //use image buffer for avoid of problems with alpha chanel.
-        final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage image = new BufferedImage(viewArea.width, viewArea.height, BufferedImage.TYPE_INT_ARGB);
         final Graphics2D g = image.createGraphics();
 
         try {
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, width, height);
-
-            final Composite comp = g.getComposite();
-            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-
-            //set transparency before draw map
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.8f));
-
-            log.debug("Paint map");
-            builder.paint(g, p, zoom, width, height);
-
-            //restore transparency
-            g.setComposite(comp);
-
-            log.debug("Paint path");
-            //create path shape
-            final GeneralPath path = new GeneralPath();
-            for (final ShortTrackerEvent e : readings) {
-                final int x = Math.round(OpenStreetMapBuilder.lon2position(
-                        e.getLongitude(), zoom) - p.x);
-                final int y = Math.round(OpenStreetMapBuilder.lat2position(
-                        e.getLatitude(), zoom) - p.y);
-                final Point2D cp = path.getCurrentPoint();
-                if (cp == null) {
-                    path.moveTo(x, y);
-                } else if (Math.round(cp.getX()) != x || Math.round(cp.getY()) != y) {
-                    path.lineTo(x, y);
-                }
-            }
-
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g.setStroke(new BasicStroke(2.f));
-            g.setColor(Color.RED);
-            g.draw(path);
-
-        } catch (final IOException ioe) {
-            throw new RuntimeException(ioe);
+            new MapRendererImpl(bean) {
+                @Override
+                protected List<ShortTrackerEvent> optimize(final List<ShortTrackerEvent> readings) {
+                    return readings;
+                };
+            }.render(g, viewArea);
         } finally {
             g.dispose();
         }
+
         return image;
     }
 
