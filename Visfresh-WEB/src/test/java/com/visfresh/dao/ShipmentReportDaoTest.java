@@ -34,6 +34,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.mock.MockEmailService;
+import com.visfresh.reports.TemperatureStats;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.state.ShipmentSession;
@@ -192,12 +193,13 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
             summ += e.getTemperature();
         }
 
-        assertEquals(summ / events.size(), report.getAvgTemperature(), 0.0001);
-        assertEquals(-20.3, report.getMinimumTemperature(), 0.0001);
-        assertEquals(20.7, report.getMaximumTemperature(), 0.0001);
-        assertEquals(2 * dt, report.getTimeAboveUpperLimit());
-        assertEquals(2 * dt, report.getTimeBelowLowerLimit());
-        assertEquals(8 * dt, report.getTotalTime());
+        final TemperatureStats stats = report.getTemperatureStats();
+        assertEquals(summ / events.size(), stats.getAvgTemperature(), 0.0001);
+        assertEquals(-20.3, stats.getMinimumTemperature(), 0.0001);
+        assertEquals(20.7, stats.getMaximumTemperature(), 0.0001);
+        assertEquals(2 * dt, stats.getTimeAboveUpperLimit());
+        assertEquals(2 * dt, stats.getTimeBelowLowerLimit());
+        assertEquals(8 * dt, stats.getTotalTime());
     }
 
     @Test
@@ -231,12 +233,13 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
             summ += e.getTemperature();
         }
 
-        assertEquals(summ / events.size(), report.getAvgTemperature(), 0.0001);
-        assertEquals(-20.3, report.getMinimumTemperature(), 0.0001);
-        assertEquals(0, report.getMaximumTemperature(), 0.0001);
-        assertEquals(0, report.getTimeAboveUpperLimit());
-        assertEquals(2 * dt, report.getTimeBelowLowerLimit());
-        assertEquals(3 * dt, report.getTotalTime());
+        final TemperatureStats stats = report.getTemperatureStats();
+        assertEquals(summ / events.size(), stats.getAvgTemperature(), 0.0001);
+        assertEquals(-20.3, stats.getMinimumTemperature(), 0.0001);
+        assertEquals(0, stats.getMaximumTemperature(), 0.0001);
+        assertEquals(0, stats.getTimeAboveUpperLimit());
+        assertEquals(2 * dt, stats.getTimeBelowLowerLimit());
+        assertEquals(3 * dt, stats.getTotalTime());
     }
 
     /**
@@ -259,13 +262,14 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
     @Test
     public void testNoReadings() {
         final ShipmentReportBean report = dao.createReport(shipment);
-        assertEquals(0., report.getLowerTemperatureLimit(), 0.001);
-        assertEquals(5., report.getUpperTemperatureLimit(), 0.001);
+        final TemperatureStats stats = report.getTemperatureStats();
+        assertEquals(0., stats.getLowerTemperatureLimit(), 0.001);
+        assertEquals(5., stats.getUpperTemperatureLimit(), 0.001);
 
-        assertNull(report.getAvgTemperature());
-        assertNull(report.getMaximumTemperature());
-        assertNull(report.getMinimumTemperature());
-        assertNull(report.getStandardDevitation());
+        assertNull(stats.getAvgTemperature());
+        assertNull(stats.getMaximumTemperature());
+        assertNull(stats.getMinimumTemperature());
+        assertNull(stats.getStandardDevitation());
     }
 
     @Test

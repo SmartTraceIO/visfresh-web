@@ -12,15 +12,9 @@ import java.util.List;
  *
  */
 public class PerformanceReportBean {
-    private int numberOfShipments;
-    private int numberOfTrackers;
-    private double avgShipmentsPerTracker;
-    private double avgTrackersPerShipment;
-    private Date startDate;
-    private Date endDate;
-
+    private String companyName;
+    private Date date;
     private final List<AlertProfileStats> alertProfiles = new LinkedList<>();
-
     /**
      * Default constructor.
      */
@@ -29,82 +23,33 @@ public class PerformanceReportBean {
     }
 
     /**
-     * @return the numberOfShipments
+     * @return the companyName
      */
-    public int getNumberOfShipments() {
-        return numberOfShipments;
+    public String getCompanyName() {
+        return companyName;
     }
     /**
-     * @param numberOfShipments the numberOfShipments to set
+     * @param companyName the companyName to set
      */
-    public void setNumberOfShipments(final int numberOfShipments) {
-        this.numberOfShipments = numberOfShipments;
+    public void setCompanyName(final String companyName) {
+        this.companyName = companyName;
     }
     /**
-     * @return the numberOfTrackers
+     * @return the date
      */
-    public int getNumberOfTrackers() {
-        return numberOfTrackers;
+    public Date getDate() {
+        return date;
     }
     /**
-     * @param numberOfTrackers the numberOfTrackers to set
+     * @param date the date to set
      */
-    public void setNumberOfTrackers(final int numberOfTrackers) {
-        this.numberOfTrackers = numberOfTrackers;
-    }
-    /**
-     * @return the avgShipmentsPerTracker
-     */
-    public double getAvgShipmentsPerTracker() {
-        return avgShipmentsPerTracker;
-    }
-    /**
-     * @param avgShipmentsPerTracker the avgShipmentsPerTracker to set
-     */
-    public void setAvgShipmentsPerTracker(final double avgShipmentsPerTracker) {
-        this.avgShipmentsPerTracker = avgShipmentsPerTracker;
-    }
-    /**
-     * @return the avgTrackersPerShipment
-     */
-    public double getAvgTrackersPerShipment() {
-        return avgTrackersPerShipment;
-    }
-    /**
-     * @param avgTrackersPerShipment the avgTrackersPerShipment to set
-     */
-    public void setAvgTrackersPerShipment(final double avgTrackersPerShipment) {
-        this.avgTrackersPerShipment = avgTrackersPerShipment;
+    public void setDate(final Date date) {
+        this.date = date;
     }
     /**
      * @return the alertProfiles
      */
     public List<AlertProfileStats> getAlertProfiles() {
         return alertProfiles;
-    }
-
-    /**
-     * @return the startDate
-     */
-    public Date getStartDate() {
-        return startDate;
-    }
-    /**
-     * @param startDate the startDate to set
-     */
-    public void setStartDate(final Date startDate) {
-        this.startDate = startDate;
-    }
-    /**
-     * @return the endDate
-     */
-    public Date getEndDate() {
-        return endDate;
-    }
-    /**
-     * @param endDate the endDate to set
-     */
-    public void setEndDate(final Date endDate) {
-        this.endDate = endDate;
     }
 }

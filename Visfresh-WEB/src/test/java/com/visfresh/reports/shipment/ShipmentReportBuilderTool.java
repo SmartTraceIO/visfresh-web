@@ -27,6 +27,7 @@ import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.ShortTrackerEventsImporter;
+import com.visfresh.reports.TemperatureStats;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -120,15 +121,17 @@ public final class ShipmentReportBuilderTool {
         final long oneHour = 60 * 60 * 1000l;
 
         bean.setAlertProfile("Chilled Beef");
-        bean.setStandardDevitation(0.001 + random.nextDouble() / 0.5);
-        bean.setTotalTime((1 + random.nextInt(3 * 30 * 24)) * oneHour);
-        bean.setMinimumTemperature(-2.);
-        bean.setLowerTemperatureLimit(0);
-        bean.setTimeAboveUpperLimit(10 * 61 * 60 * 1000L);
-        bean.setTimeBelowLowerLimit(2 * 61 * 60 * 1000L);
-        bean.setMaximumTemperature(11.);
-        bean.setUpperTemperatureLimit(9);
-        bean.setAvgTemperature(7.);
+
+        final TemperatureStats stats = bean.getTemperatureStats();
+        stats.setStandardDevitation(0.001 + random.nextDouble() / 0.5);
+        stats.setTotalTime((1 + random.nextInt(3 * 30 * 24)) * oneHour);
+        stats.setMinimumTemperature(-2.);
+        stats.setLowerTemperatureLimit(0);
+        stats.setTimeAboveUpperLimit(10 * 61 * 60 * 1000L);
+        stats.setTimeBelowLowerLimit(2 * 61 * 60 * 1000L);
+        stats.setMaximumTemperature(11.);
+        stats.setUpperTemperatureLimit(9);
+        stats.setAvgTemperature(7.);
         bean.getWhoWasNotifiedByAlert().add("user1@smarttrace.com.au");
         bean.getWhoWasNotifiedByAlert().add("user2@smarttrace.com.au");
 

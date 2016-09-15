@@ -175,8 +175,8 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 final TemperatureUnits tunits = user.getTemperatureUnits();
                 //add green line
                 final IntervalMarker greenLine = new IntervalMarker(
-                        convertToUnits(bean.getLowerTemperatureLimit(), tunits),
-                        convertToUnits(bean.getUpperTemperatureLimit(), tunits),
+                        convertToUnits(bean.getTemperatureStats().getLowerTemperatureLimit(), tunits),
+                        convertToUnits(bean.getTemperatureStats().getUpperTemperatureLimit(), tunits),
                         new Color(202, 255, 181, 150));
                 chart.getXYPlot().addRangeMarker(greenLine, Layer.BACKGROUND);
 

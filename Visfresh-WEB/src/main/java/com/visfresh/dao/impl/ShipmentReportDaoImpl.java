@@ -29,6 +29,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
+import com.visfresh.reports.TemperatureStats;
 import com.visfresh.reports.shipment.ArrivalBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.services.RuleEngine;
@@ -129,8 +130,8 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         if (s.getAlertProfile() != null) {
             final AlertProfile ap = s.getAlertProfile();
             bean.setAlertProfile(ap.getName());
-            bean.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
-            bean.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
+            bean.getTemperatureStats().setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
+            bean.getTemperatureStats().setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
         }
 
         //add fired alerts
@@ -236,9 +237,10 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
                 avg += t / n;
             }
 
-            bean.setAvgTemperature(avg);
-            bean.setMinimumTemperature(min);
-            bean.setMaximumTemperature(max);
+            final TemperatureStats stats = bean.getTemperatureStats();
+            stats.setAvgTemperature(avg);
+            stats.setMinimumTemperature(min);
+            stats.setMaximumTemperature(max);
 
             //standard deviation
             double sd = 0.;
@@ -257,19 +259,19 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
                 sd = 0;
             }
 
-            bean.setTotalTime(endTime - startTime);
-            bean.setStandardDevitation(sd);
+            stats.setTotalTime(endTime - startTime);
+            stats.setStandardDevitation(sd);
 
-            bean.setTimeAboveUpperLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
+            stats.setTimeAboveUpperLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
                 @Override
                 public boolean haveIncedent(final double temperature) {
-                    return temperature > bean.getUpperTemperatureLimit();
+                    return temperature > stats.getUpperTemperatureLimit();
                 }
             }));
-            bean.setTimeBelowLowerLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
+            stats.setTimeBelowLowerLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
                 @Override
                 public boolean haveIncedent(final double temperature) {
-                    return temperature < bean.getLowerTemperatureLimit();
+                    return temperature < stats.getLowerTemperatureLimit();
                 }
             }));
         }

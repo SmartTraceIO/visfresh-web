@@ -13,5 +13,5 @@ import com.visfresh.reports.performance.PerformanceReportBean;
  *
  */
 public interface PerformanceReportDao {
-    PerformanceReportBean createReport(Company c, Date startDate, Date endDate);
+    PerformanceReportBean createReport(Company c, Date month);
 }

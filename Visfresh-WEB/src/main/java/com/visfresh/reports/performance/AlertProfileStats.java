@@ -12,11 +12,9 @@ import java.util.List;
  */
 public class AlertProfileStats {
     private String name;
-    private long totalMonitoringTime;
-    private double avgTemperature;
-    private double standardDeviation;
+    private final List<BiggestTemperatureException> temperatureExceptions = new LinkedList<>();
+    private final List<MonthlyTemperatureStats> monthlyData = new LinkedList<>();
 
-    private List<TemperatureRuleStats> temperatureRules = new LinkedList<>();
     /**
      * Default constructor.
      */
@@ -37,51 +35,15 @@ public class AlertProfileStats {
         this.name = name;
     }
     /**
-     * @return the totalMonitoringTime
+     * @return the monthlyData
      */
-    public long getTotalMonitoringTime() {
-        return totalMonitoringTime;
+    public List<MonthlyTemperatureStats> getMonthlyData() {
+        return monthlyData;
     }
     /**
-     * @param totalMonitoringTime the totalMonitoringTime to set
+     * @return the temperatureExceptions
      */
-    public void setTotalMonitoringTime(final long totalMonitoringTime) {
-        this.totalMonitoringTime = totalMonitoringTime;
-    }
-    /**
-     * @return the avgTemperature
-     */
-    public double getAvgTemperature() {
-        return avgTemperature;
-    }
-    /**
-     * @param avgTemperature the avgTemperature to set
-     */
-    public void setAvgTemperature(final double avgTemperature) {
-        this.avgTemperature = avgTemperature;
-    }
-    /**
-     * @return the standardDeviation
-     */
-    public double getStandardDeviation() {
-        return standardDeviation;
-    }
-    /**
-     * @param standardDeviation the standardDeviation to set
-     */
-    public void setStandardDeviation(final double standardDeviation) {
-        this.standardDeviation = standardDeviation;
-    }
-    /**
-     * @return the temperatureRules
-     */
-    public List<TemperatureRuleStats> getTemperatureRules() {
-        return temperatureRules;
-    }
-    /**
-     * @param temperatureRules the temperatureRules to set
-     */
-    public void setTemperatureRules(final List<TemperatureRuleStats> temperatureRules) {
-        this.temperatureRules = temperatureRules;
+    public List<BiggestTemperatureException> getTemperatureExceptions() {
+        return temperatureExceptions;
     }
 }

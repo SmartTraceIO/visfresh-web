@@ -3,6 +3,13 @@
  */
 package com.visfresh.reports.performance;
 
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.visfresh.entities.TemperatureRule;
+import com.visfresh.reports.TemperatureStats;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -10,7 +17,10 @@ package com.visfresh.reports.performance;
 public class BiggestTemperatureException {
     private String serialNumber;
     private int tripCount;
-    private long time;
+    private final TemperatureStats temperatureStats = new TemperatureStats();
+    private Date dateShipped;
+    private String shippedTo;
+    private final List<TemperatureRule> alertsFired = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -46,13 +56,37 @@ public class BiggestTemperatureException {
     /**
      * @return the time
      */
-    public long getTime() {
-        return time;
+    public TemperatureStats getTemperatureStats() {
+        return temperatureStats;
     }
     /**
-     * @param time the time to set
+     * @return the dateShipped
      */
-    public void setTime(final long time) {
-        this.time = time;
+    public Date getDateShipped() {
+        return dateShipped;
+    }
+    /**
+     * @param dateShipped the dateShipped to set
+     */
+    public void setDateShipped(final Date dateShipped) {
+        this.dateShipped = dateShipped;
+    }
+    /**
+     * @return the shippedTo
+     */
+    public String getShippedTo() {
+        return shippedTo;
+    }
+    /**
+     * @param shippedTo the shippedTo to set
+     */
+    public void setShippedTo(final String shippedTo) {
+        this.shippedTo = shippedTo;
+    }
+    /**
+     * @return the alertsFired
+     */
+    public List<TemperatureRule> getAlertsFired() {
+        return alertsFired;
     }
 }

@@ -4,7 +4,10 @@
 package com.visfresh.reports.performance;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import net.sf.dynamicreports.report.exception.DRException;
@@ -18,6 +21,14 @@ import com.visfresh.entities.User;
  *
  */
 public final class PerformanceReportBuilderTool {
+    private static final Random random = new Random();
+    private static final AlertType[] alertTypes = {
+        AlertType.Hot,
+        AlertType.CriticalHot,
+        AlertType.Cold,
+        AlertType.CriticalCold
+    };
+    private static final String[] serialNums = {"123", "324", "673", "257"};
 
     /**
      * Default constructor.
@@ -35,7 +46,7 @@ public final class PerformanceReportBuilderTool {
     public static void showPerformanceReport(final PerformanceReportBean bean, final User user)
             throws DRException, IOException {
         final PerformanceReportBuilder builder = new PerformanceReportBuilder();
-        builder.createPerformanceReport(bean, user).show();
+        builder.createReport(bean, user).show();
     }
 
     public static void main(final String[] args) throws Exception {
@@ -56,13 +67,8 @@ public final class PerformanceReportBuilderTool {
      */
     private static PerformanceReportBean createPerformanceBean() {
         final PerformanceReportBean bean = new PerformanceReportBean();
-
-        bean.setStartDate(new Date(System.currentTimeMillis() - 10000000000l));
-        bean.setEndDate(new Date());
-        bean.setNumberOfShipments(212);
-        bean.setNumberOfTrackers(122);
-        bean.setAvgShipmentsPerTracker(2.2);
-        bean.setAvgTrackersPerShipment(1.4);
+        bean.setCompanyName("SmartTrace");
+        bean.setDate(new Date());
 
         bean.getAlertProfiles().add(createAlertProfile("Chilled Beef"));
         bean.getAlertProfiles().add(createAlertProfile("Chilled Wine"));
@@ -74,44 +80,57 @@ public final class PerformanceReportBuilderTool {
      * @return random generated alert profile stats.
      */
     private static AlertProfileStats createAlertProfile(final String name) {
-        final AlertType[] types = {AlertType.Hot, AlertType.CriticalHot, AlertType.Cold, AlertType.CriticalCold};
-        final String[] serialNums = {"123", "324", "673", "257"};
-
-        final Random random = new Random();
-        final long oneHour = 60 * 60 * 1000l;
-
         final AlertProfileStats ap = new AlertProfileStats();
-        ap.setAvgTemperature((random.nextDouble() - 0.5) * 20.);
-        ap.setName(name);
-        ap.setStandardDeviation(0.001 + random.nextDouble() / 0.5);
-        ap.setTotalMonitoringTime((1 + random.nextInt(3 * 30 * 24)) * oneHour);
+        final long time = System.currentTimeMillis();
 
-        final int numRules = 3 + random.nextInt(7);
-        for (int i = 0; i < numRules; i++) {
-            final TemperatureRuleStats rule = new TemperatureRuleStats();
-            rule.setTotalTime((3 + random.nextInt(15)) * oneHour);
-
-            //create temperature rule
-            final TemperatureRule tr = new TemperatureRule();
-            tr.setType(types[random.nextInt(types.length)]);
-            tr.setTemperature((random.nextDouble() - 0.5) * 20.);
-            tr.setCumulativeFlag(random.nextBoolean());
-            tr.setTimeOutMinutes((3 + random.nextInt(15)) * 60);
-            rule.setRule(tr);
-
-            //add biggest exceptions
-            final int numBidgest = random.nextInt(5);
-            for (int j = 0; j < numBidgest; j++) {
-                final BiggestTemperatureException b = new BiggestTemperatureException();
-                b.setSerialNumber(serialNums[random.nextInt(serialNums.length)]);
-                b.setTripCount(1 + random.nextInt(4));
-                b.setTime((3 + random.nextInt(5)) * oneHour);
-                rule.getBiggestExceptions().add(b);
-            }
-
-            ap.getTemperatureRules().add(rule);
+        for (int i = 0; i < 3; i++) {
+            ap.getMonthlyData().add(0, generateMonthlyData(new Date(time - i * 28 * 24 * 60 * 60 * 1000l)));
+            ap.getTemperatureExceptions().add(generateException(serialNums[i]));
         }
 
         return ap;
+    }
+
+    /**
+     * @return
+     */
+    protected static BiggestTemperatureException generateException(final String sn) {
+        final BiggestTemperatureException exc = new BiggestTemperatureException();
+        exc.setSerialNumber(sn);
+        exc.setTripCount(random.nextInt(17));
+        exc.setShippedTo("Moscow");
+        exc.setDateShipped(new Date());
+
+        final List<AlertType> rules = new LinkedList<AlertType>(Arrays.asList(alertTypes));
+        for (int i = 0; i < 3; i++) {
+            final AlertType t = rules.remove(random.nextInt(rules.size()));
+            final TemperatureRule rule = new TemperatureRule(t);
+            rule.setCumulativeFlag(random.nextBoolean());
+            rule.setTemperature(random.nextInt(10) - 3);
+            rule.setTimeOutMinutes(1 + random.nextInt(25));
+        }
+
+        exc.getAlertsFired();
+        return exc;
+    }
+
+    /**
+     * @param date
+     * @return
+     */
+    private static MonthlyTemperatureStats generateMonthlyData(final Date date) {
+        final long oneHour = 60 * 60 * 1000l;
+
+        final MonthlyTemperatureStats stats = new MonthlyTemperatureStats(date);
+        stats.setAvgTemperature(3.);
+        stats.setMaximumTemperature(5.);
+        stats.setMinimumTemperature(-1.);
+        stats.setNumShipments(15);
+        stats.setStandardDevitation(2.1);
+        stats.setTotalTime(345 * oneHour);
+        stats.setTimeAboveUpperLimit(11 * oneHour);
+        stats.setTimeBelowLowerLimit(12 * oneHour);
+        stats.setNumExcludedHours(23);
+        return stats;
     }
 }

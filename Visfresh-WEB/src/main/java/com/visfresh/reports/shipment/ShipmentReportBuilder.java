@@ -69,6 +69,7 @@ import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.Colors;
 import com.visfresh.reports.TableSupport;
+import com.visfresh.reports.TemperatureStats;
 import com.visfresh.reports.geomap.MapRendererImpl;
 import com.visfresh.services.EventsNullCoordinatesCorrector;
 import com.visfresh.utils.DateTimeUtils;
@@ -352,24 +353,25 @@ public class ShipmentReportBuilder {
 //      3.3°C 0.6 0.2°C 5.3°C 1.1hrs 0.2hrs 23.3hrs
         final DRDataSource ds = new DRDataSource(columns);
         final TemperatureUnits units = user.getTemperatureUnits();
+        final TemperatureStats temp = bean.getTemperatureStats();
         ds.add("Avg Temp",
                 "SD",
                 "Min Temp",
                 "Max Temp",
-                "Time below " + getTemperatureString(bean.getLowerTemperatureLimit(), units, ""),
-                "Time above " + getTemperatureString(bean.getUpperTemperatureLimit(), units, ""),
+                "Time below " + getTemperatureString(temp.getLowerTemperatureLimit(), units, ""),
+                "Time above " + getTemperatureString(temp.getUpperTemperatureLimit(), units, ""),
                 "Time monitored");
         ds.add(
-                getTemperatureString(bean.getAvgTemperature(), units, "No Readings"),
-                getSdString(bean.getStandardDevitation(), units, "No Readings"),
-                getTemperatureString(bean.getMinimumTemperature(), units, "No Readings"),
-                getTemperatureString(bean.getMaximumTemperature(), units, "No Readings"),
+                getTemperatureString(temp.getAvgTemperature(), units, "No Readings"),
+                getSdString(temp.getStandardDevitation(), units, "No Readings"),
+                getTemperatureString(temp.getMinimumTemperature(), units, "No Readings"),
+                getTemperatureString(temp.getMaximumTemperature(), units, "No Readings"),
                 LocalizationUtils.formatByOneDecimal(
-                        bean.getTimeBelowLowerLimit() / (60 * 60 * 1000.)) + "hrs",
+                        temp.getTimeBelowLowerLimit() / (60 * 60 * 1000.)) + "hrs",
                 LocalizationUtils.formatByOneDecimal(
-                        bean.getTimeAboveUpperLimit() / (60 * 60 * 1000.)) + "hrs",
+                        temp.getTimeAboveUpperLimit() / (60 * 60 * 1000.)) + "hrs",
                 LocalizationUtils.formatByOneDecimal(
-                        bean.getTotalTime() / (60 * 60 * 1000.)) + "hrs"
+                        temp.getTotalTime() / (60 * 60 * 1000.)) + "hrs"
                 );
 
         //init column sizes from first row labels
