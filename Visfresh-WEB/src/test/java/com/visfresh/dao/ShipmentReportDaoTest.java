@@ -315,7 +315,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         assertNotNull(report.getDeviceColor());
     }
     @Test
-    public void testWhoNotified() throws Exception {
+    public void testWhoNotifiedAlerts() throws Exception {
         final TrackerEvent e = createTrackerEvent(System.currentTimeMillis(), -10);
 
         final Alert a1 = createAlert(e);
@@ -342,6 +342,8 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         final NotificationService notificator = context.getBean(NotificationService.class);
 
         notificator.sendNotification(s1, a1, e);
+        notificator.sendNotification(s2, a2, e);
+        //duplicate user
         notificator.sendNotification(s2, a2, e);
 
         final ShipmentReportBean report = dao.createReport(shipment);
@@ -386,6 +388,8 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         final NotificationService notificator = context.getBean(NotificationService.class);
 
+        notificator.sendNotification(s1, arrival, e);
+        //duplicate user
         notificator.sendNotification(s1, arrival, e);
 
         final ShipmentReportBean report = dao.createReport(shipment);

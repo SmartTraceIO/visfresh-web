@@ -4,8 +4,10 @@
 package com.visfresh.dao.impl;
 
 import java.awt.Color;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,7 @@ import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
+import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
@@ -139,26 +142,39 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
 
         //get notifications
         //notified by alert
-        final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(alerts));
-        for (final Notification n : notifs) {
-            final User u = n.getUser();
-            bean.getWhoWasNotifiedByAlert().add(createUserName(u));
-        }
+        bean.getWhoWasNotifiedByAlert().addAll(getNotified(alerts));
 
         //arrivals
         if (arrival != null) {
             final List<Arrival> arrivals = new LinkedList<>();
             arrivals.add(arrival);
-            for (final Notification n : notificationDao.getForIssues(EntityUtils.getIdList(arrivals))) {
-                final User u = n.getUser();
-                bean.getWhoWasNotifiedByAlert().add(createUserName(u));
-            }
+            bean.getWhoWasNotifiedByAlert().addAll(getNotified(arrivals));
         }
 
         addTemperatureData(bean, events);
 
         return bean;
     }
+    /**
+     * @param issues
+     * @return
+     */
+    private List<String> getNotified(final List<? extends NotificationIssue> issues) {
+        final Set<Long> ids = new HashSet<>();
+        final List<String> list = new LinkedList<>();
+
+        final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(issues));
+        for (final Notification n : notifs) {
+            final User u = n.getUser();
+            if (!ids.contains(u.getId())) {
+                ids.add(u.getId()); //avoid duplicates
+                list.add(createUserName(u));
+            }
+        }
+
+        return list;
+    }
+
     /**
      * @param u user.
      * @return user name.
