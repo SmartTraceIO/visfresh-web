@@ -29,6 +29,7 @@ import net.sf.jasperreports.renderers.Graphics2DRenderable;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Location;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.reports.Colors;
 import com.visfresh.reports.shipment.ImagePaintingSupport;
@@ -294,15 +295,25 @@ public class MapRendererImpl extends AbstractRenderer implements
         final Location endLocation = bean.getShippedToLocation();
         if (endLocation != null) {
             final int size = iconSize - 2;
-            final BufferedImage image = ImagePaintingSupport.scaleImage(
-                    ImagePaintingSupport.loadReportPngImage("tinyShippedTo"), size);
-            ImagePaintingSupport.flip(image);
+            final BufferedImage image;
+
+            int shift;
+            if (Shipment.isFinalStatus(bean.getStatus())) {
+                image = ImagePaintingSupport.scaleImage(
+                        ImagePaintingSupport.loadReportPngImage("tinyShippedTo"), size);
+                ImagePaintingSupport.flip(image);
+                shift = size;
+            } else {
+                image = ImagePaintingSupport.scaleImage(
+                        ImagePaintingSupport.loadReportPngImage("shippedToToBeDetermined"), size);
+                shift = (int) Math.round(size * 0.8);
+            }
 
             final int x = Math.round(OpenStreetMapBuilder.lon2position(
                     endLocation.getLongitude(), zoom) - mapLocation.x);
             final int y = Math.round(OpenStreetMapBuilder.lat2position(
                     endLocation.getLatitude(), zoom) - mapLocation.y);
-            g.drawImage(image, x - size, y - size, null);
+            g.drawImage(image, x - shift, y - size, null);
         }
     }
 

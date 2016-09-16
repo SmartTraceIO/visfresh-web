@@ -848,7 +848,7 @@ public class ShipmentReportBuilder {
         }
 
         //create background image.
-        final int size = 10;
+        final int size = 14;
 
         final ImageBuilder imb = Components.image(image);
         imb.setFixedHeight(size);
