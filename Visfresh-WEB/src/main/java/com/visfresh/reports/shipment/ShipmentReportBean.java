@@ -43,7 +43,7 @@ public class ShipmentReportBean {
     private final List<Alert> alerts = new LinkedList<>();
     private final List<String> whoWasNotifiedByAlert = new LinkedList<>();
     private final List<String> whoWasNotifiedByArrival = new LinkedList<>();
-    private final TemperatureStats temperatureStats = new TemperatureStats();
+    private TemperatureStats temperatureStats = new TemperatureStats();
     private Color deviceColor = Color.GREEN.darker();
     private int alertSuppressionMinutes;
     private List<String> possibleShippedTo;
@@ -343,5 +343,11 @@ public class ShipmentReportBean {
      */
     public TemperatureStats getTemperatureStats() {
         return temperatureStats;
+    }
+    /**
+     * @param s the temperatureStats to set
+     */
+    public void setTemperatureStats(final TemperatureStats s) {
+        this.temperatureStats = s;
     }
 }

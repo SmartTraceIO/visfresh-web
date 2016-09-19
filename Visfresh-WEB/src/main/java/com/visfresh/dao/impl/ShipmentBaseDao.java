@@ -147,7 +147,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
     }
     /**
      * @param table
-     * @param s
+     * @param stats
      */
     protected void cleanRefs(final String table, final Long id) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();

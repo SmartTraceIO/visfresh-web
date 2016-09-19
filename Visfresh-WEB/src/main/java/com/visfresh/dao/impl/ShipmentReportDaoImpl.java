@@ -41,10 +41,6 @@ import com.visfresh.utils.EntityUtils;
  */
 @Component
 public class ShipmentReportDaoImpl implements ShipmentReportDao {
-    public interface TemperatureIncedentDetector {
-        boolean haveIncedent(double temperature);
-    }
-
     @Autowired
     private ArrivalDao arrivalDao;
     @Autowired
@@ -152,7 +148,9 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
             bean.getWhoWasNotifiedByAlert().addAll(getNotified(arrivals));
         }
 
-        addTemperatureData(bean, events);
+        if (s.getAlertProfile() != null) {
+            bean.setTemperatureStats(createTemperatureStats(s.getAlertProfile(), events));
+        }
 
         return bean;
     }
@@ -203,78 +201,17 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @param bean
      * @param events
      */
-    private void addTemperatureData(final ShipmentReportBean bean,
+    private TemperatureStats createTemperatureStats(final AlertProfile ap,
             final List<TrackerEvent> originEvents) {
-        final List<TrackerEvent> events = new LinkedList<>(originEvents);
-
-        if (bean.getAlertSuppressionMinutes() > 0) {
-            //exclude events when alerts suppressed
-            final long t0 = bean.getAlertSuppressionMinutes() * 60 * 1000l + bean.getDateShipped().getTime();
-            while (events.size() > 0) {
-                final TrackerEvent e = events.get(0);
-                if (e.getTime().getTime() < t0) {
-                    events.remove(0);
-                } else {
-                    break;
-                }
-            }
+        final TemperatureStatsCollector c = new TemperatureStatsCollector();
+        for (final TrackerEvent e : originEvents) {
+            c.processEvent(e);
         }
 
-        final int n = events.size();
-        if (n > 0) {
-            long startTime = Long.MAX_VALUE;
-            long endTime = Long.MIN_VALUE;
-
-            //min/max/average temperature
-            double min = Double.MAX_VALUE;
-            double max = Double.MIN_VALUE;
-            double avg = 0.;
-
-            for (final TrackerEvent e : events) {
-                final double t = e.getTemperature();
-                min = Math.min(min, t);
-                max = Math.max(max, t);
-                avg += t / n;
-            }
-
-            final TemperatureStats stats = bean.getTemperatureStats();
-            stats.setAvgTemperature(avg);
-            stats.setMinimumTemperature(min);
-            stats.setMaximumTemperature(max);
-
-            //standard deviation
-            double sd = 0.;
-            for (final TrackerEvent e : events) {
-                final double t = e.getTemperature();
-                final double dt = (t - avg);
-                sd += dt * dt;
-
-                startTime = Math.min(startTime, e.getTime().getTime());
-                endTime = Math.max(endTime, e.getTime().getTime());
-            }
-
-            if (n > 1) {
-                sd = Math.sqrt(sd / (n - 1));
-            } else {
-                sd = 0;
-            }
-
-            stats.setTotalTime(endTime - startTime);
-            stats.setStandardDevitation(sd);
-
-            stats.setTimeAboveUpperLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
-                @Override
-                public boolean haveIncedent(final double temperature) {
-                    return temperature > stats.getUpperTemperatureLimit();
-                }
-            }));
-            stats.setTimeBelowLowerLimit(getInsedentTime(events, new TemperatureIncedentDetector() {
-                @Override
-                public boolean haveIncedent(final double temperature) {
-                    return temperature < stats.getLowerTemperatureLimit();
-                }
-            }));
-        }
+        final TemperatureStats stats = c.applyStatistics();
+        stats.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
+        stats.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
+        return stats;
     }
     /**
      * @param color
@@ -282,26 +219,5 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      */
     private Color parseColor(final com.visfresh.entities.Color color) {
         return Color.decode(color.getHtmlValue());
-    }
-
-    protected long getInsedentTime(final List<TrackerEvent> events, final TemperatureIncedentDetector d) {
-        long totalTime = 0;
-        TrackerEvent tre = null;
-
-        for (final TrackerEvent e : events) {
-            if (tre != null){
-                //add incident time
-                totalTime += e.getTime().getTime() - tre.getTime().getTime();
-            }
-
-            if (d.haveIncedent(e.getTemperature())) {
-                //add matched event to incidents.
-                tre = e;
-            } else {
-                tre = null;
-            }
-        }
-
-        return totalTime;
     }
 }

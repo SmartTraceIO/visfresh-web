@@ -3,6 +3,8 @@
  */
 package com.visfresh.entities;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -77,5 +79,34 @@ public class TemperatureRule extends AlertRule {
      */
     public void setCumulativeFlag(final boolean cumulativeFlag) {
         this.cumulativeFlag = cumulativeFlag;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof TemperatureRule)) {
+            return false;
+        }
+
+        final TemperatureRule other = (TemperatureRule) obj;
+
+        return
+                getType() == other.getType() &&
+                getTemperature() == other.getTemperature() &&
+                getTimeOutMinutes() == other.getTimeOutMinutes() &&
+                isCumulativeFlag() == other.isCumulativeFlag();
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final HashCodeBuilder hb = new HashCodeBuilder();
+        hb.append(getType());
+        hb.append(getTemperature());
+        hb.append(getTimeOutMinutes());
+        hb.append(isCumulativeFlag());
+        return hb.toHashCode();
     }
 }

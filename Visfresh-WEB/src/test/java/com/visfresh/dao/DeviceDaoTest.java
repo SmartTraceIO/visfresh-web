@@ -509,7 +509,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
         return getContext().getBean(TrackerEventDao.class).save(e);
     }
     /**
-     * @param s shipment.
+     * @param stats shipment.
      * @param lat latitude.
      * @param lon longitude.
      * @param battery battery.

@@ -11,10 +11,13 @@ import com.visfresh.reports.TemperatureStats;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class MonthlyTemperatureStats extends TemperatureStats {
+public class MonthlyTemperatureStats {
     private int numShipments;
     private final Date month;
     private int numExcludedHours;
+    private final ReportsWithAlertStats alertStats = new ReportsWithAlertStats();
+    private TemperatureStats temperatureStats = new TemperatureStats();
+
     /**
      * Default constructor.
      */
@@ -51,5 +54,23 @@ public class MonthlyTemperatureStats extends TemperatureStats {
      */
     public void setNumExcludedHours(final int numExcludedHours) {
         this.numExcludedHours = numExcludedHours;
+    }
+    /**
+     * @return the alertStats
+     */
+    public ReportsWithAlertStats getAlertStats() {
+        return alertStats;
+    }
+    /**
+     * @return the temperatureStats
+     */
+    public TemperatureStats getTemperatureStats() {
+        return temperatureStats;
+    }
+    /**
+     * @param temperatureStats the temperatureStats to set
+     */
+    public void setTemperatureStats(final TemperatureStats temperatureStats) {
+        this.temperatureStats = temperatureStats;
     }
 }

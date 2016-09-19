@@ -147,7 +147,7 @@ public class LeaveStartLocationRule implements TrackerEventRule {
                 "true");
     }
     /**
-     * @param s shipment.
+     * @param stats shipment.
      * @return
      */
     protected boolean isOutsideStartLocation(final TrackerEvent e) {

@@ -107,14 +107,22 @@ public final class DateTimeUtils {
         }
         return tzString;
     }
-//
-//    /**
-//     * @param time
-//     * @param timeZone
-//     * @return
-//     */
-//    public static Date convertToTimeZone(final Date time, final TimeZone timeZone) {
-//        final long t = time.getTime();
-//        return new Date(t - (TimeZone.getDefault().getOffset(t) - timeZone.getOffset(t)));
-//    }
+    /**
+     * @param time
+     * @param timeZone
+     * @return
+     */
+    public static Date convertToTimeZone(final Date time, final TimeZone timeZone) {
+        final long t = time.getTime();
+        return new Date(t - (TimeZone.getDefault().getOffset(t) - timeZone.getOffset(t)));
+    }
+    /**
+     * @param time
+     * @param timeZone
+     * @return
+     */
+    public static Date convertFromTimeZone(final Date time, final TimeZone timeZone) {
+        final long t = time.getTime();
+        return new Date(t + (TimeZone.getDefault().getOffset(t) - timeZone.getOffset(t)));
+    }
 }

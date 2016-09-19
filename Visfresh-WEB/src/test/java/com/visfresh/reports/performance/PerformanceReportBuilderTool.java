@@ -15,6 +15,7 @@ import net.sf.dynamicreports.report.exception.DRException;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
+import com.visfresh.reports.TemperatureStats;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -121,16 +122,20 @@ public final class PerformanceReportBuilderTool {
     private static MonthlyTemperatureStats generateMonthlyData(final Date date) {
         final long oneHour = 60 * 60 * 1000l;
 
-        final MonthlyTemperatureStats stats = new MonthlyTemperatureStats(date);
+        final MonthlyTemperatureStats ms = new MonthlyTemperatureStats(date);
+        ms.setNumShipments(15);
+        ms.setNumExcludedHours(23);
+
+        final TemperatureStats stats = new TemperatureStats();
+        ms.setTemperatureStats(stats);
+
         stats.setAvgTemperature(3.);
         stats.setMaximumTemperature(5.);
         stats.setMinimumTemperature(-1.);
-        stats.setNumShipments(15);
         stats.setStandardDevitation(2.1);
         stats.setTotalTime(345 * oneHour);
         stats.setTimeAboveUpperLimit(11 * oneHour);
         stats.setTimeBelowLowerLimit(12 * oneHour);
-        stats.setNumExcludedHours(23);
-        return stats;
+        return ms;
     }
 }

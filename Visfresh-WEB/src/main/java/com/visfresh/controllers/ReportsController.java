@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -124,15 +124,37 @@ public class ReportsController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.BasicUser);
 
-            final DateFormat df = DateTimeUtils.createDateFormat(
-                    "yyyy-MM-dd", user.getLanguage(), user.getTimeZone());
-            final Date month = correctToEndOfMonth((d == null) ? new Date() : df.parse(d));
+            //calculate requested date in user's time zone.
+            final Calendar c = new GregorianCalendar(user.getTimeZone());
 
-            //correct null date ranges
+            Date usersDate;
+            if (d != null) {
+                usersDate = new SimpleDateFormat("yyyy-MM").parse(d);
+            } else {
+                usersDate = DateTimeUtils.convertToTimeZone(new Date(), user.getTimeZone());
+            }
+            c.setTime(usersDate);
+
+            //calculate date ranges in user's time zone.
+            c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+            c.set(Calendar.HOUR_OF_DAY, 23);
+            c.set(Calendar.MINUTE, 59);
+            c.set(Calendar.SECOND, 59);
+
+            final Date endDate = DateTimeUtils.convertFromTimeZone(c.getTime(), user.getTimeZone());
+
+            //start date
+            c.setTimeInMillis(c.getTimeInMillis() -28 * 3 * 60 * 60 * 1000l);
+            c.set(Calendar.DAY_OF_MONTH, 1);
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 1);
+
+            final Date startDate = DateTimeUtils.convertFromTimeZone(c.getTime(), user.getTimeZone());
 
             //create report bean.
             final PerformanceReportBean bean = performanceReportDao.createReport(
-                    user.getCompany(), month);
+                    user.getCompany(), startDate, endDate);
 
             //create report bean.
             final File file = createPerformanceReport(bean, user);
@@ -443,21 +465,6 @@ public class ReportsController extends AbstractController {
         sb.append(')');
         sb.insert(0, "shipment-");
         return sb.toString();
-    }
-    /**
-     * @param date
-     * @return
-     */
-    private Date correctToEndOfMonth(final Date date) {
-        final Calendar c = new GregorianCalendar();
-        c.setTime(date);
-
-        c.set(Calendar.MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-        c.set(Calendar.HOUR_OF_DAY, 24);
-        c.set(Calendar.MINUTE, 59);
-        c.set(Calendar.SECOND, 56);
-
-        return c.getTime();
     }
 
     /**

@@ -810,7 +810,16 @@ public class ShipmentReportBuilder {
     private ImageBuilder createImageWithAlerts(final ShipmentReportBean bean) {
         final List<AlertType> types = new LinkedList<>();
         for (final Alert alert: bean.getAlerts()) {
-            types.add(alert.getType());
+            final AlertType type = alert.getType();
+            switch (type) {
+                case Hot:
+                case CriticalHot:
+                case Cold:
+                case CriticalCold:
+                    types.add(type);
+                break;
+                default:
+            }
         }
 
         final List<BufferedImage> images = new LinkedList<>();

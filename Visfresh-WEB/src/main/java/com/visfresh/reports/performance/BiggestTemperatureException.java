@@ -17,7 +17,7 @@ import com.visfresh.reports.TemperatureStats;
 public class BiggestTemperatureException {
     private String serialNumber;
     private int tripCount;
-    private final TemperatureStats temperatureStats = new TemperatureStats();
+    private TemperatureStats temperatureStats = new TemperatureStats();
     private Date dateShipped;
     private String shippedTo;
     private final List<TemperatureRule> alertsFired = new LinkedList<>();
@@ -88,5 +88,11 @@ public class BiggestTemperatureException {
      */
     public List<TemperatureRule> getAlertsFired() {
         return alertsFired;
+    }
+    /**
+     * @param temperatureStats the temperatureStats to set
+     */
+    public void setTemperatureStats(final TemperatureStats temperatureStats) {
+        this.temperatureStats = temperatureStats;
     }
 }

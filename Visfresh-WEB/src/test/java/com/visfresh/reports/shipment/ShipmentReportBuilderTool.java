@@ -15,15 +15,19 @@ import java.util.TimeZone;
 import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.JRException;
 
+import com.visfresh.dao.impl.TemperatureStatsCollector;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Location;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
+import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.ShortTrackerEventsImporter;
@@ -118,20 +122,43 @@ public final class ShipmentReportBuilderTool {
             bean.setShutdownTime(new Date(arrival.getNotifiedAt().getTime() + 10000000));
         }
 
-        final long oneHour = 60 * 60 * 1000l;
-
         bean.setAlertProfile("Chilled Beef");
 
-        final TemperatureStats stats = bean.getTemperatureStats();
-        stats.setStandardDevitation(0.001 + random.nextDouble() / 0.5);
-        stats.setTotalTime((1 + random.nextInt(3 * 30 * 24)) * oneHour);
-        stats.setMinimumTemperature(-2.);
-        stats.setLowerTemperatureLimit(0);
-        stats.setTimeAboveUpperLimit(10 * 61 * 60 * 1000L);
-        stats.setTimeBelowLowerLimit(2 * 61 * 60 * 1000L);
-        stats.setMaximumTemperature(11.);
-        stats.setUpperTemperatureLimit(9);
-        stats.setAvgTemperature(7.);
+        //calculate stats
+        final Shipment s = new Shipment();
+        s.setId(7l);
+
+        final Device device = new Device();
+        device.setImei(bean.getDevice());
+        s.setDevice(device);
+
+        final AlertProfile ap = new AlertProfile();
+        ap.setName(bean.getAlertProfile());
+        ap.setUpperTemperatureLimit(5);
+        ap.setLowerTemperatureLimit(2);
+        s.setAlertProfile(ap);
+
+        final TemperatureStatsCollector collector = new TemperatureStatsCollector();
+        for (final ShortTrackerEvent r : readings) {
+            final TrackerEvent e = new TrackerEvent();
+            e.setShipment(s);
+            e.setDevice(s.getDevice());
+            e.setTime(r.getTime());
+            e.setCreatedOn(r.getCreatedOn());
+            e.setTemperature(r.getTemperature());
+            e.setBattery(r.getBattery());
+            e.setLatitude(r.getLatitude());
+            e.setLongitude(r.getLongitude());
+            e.setType(r.getType());
+
+            collector.processEvent(e);
+        }
+
+        final TemperatureStats stats = collector.applyStatistics();
+        stats.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
+        stats.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
+        bean.setTemperatureStats(stats);
+
         bean.getWhoWasNotifiedByAlert().add("user1@smarttrace.com.au");
         bean.getWhoWasNotifiedByAlert().add("user2@smarttrace.com.au");
 
