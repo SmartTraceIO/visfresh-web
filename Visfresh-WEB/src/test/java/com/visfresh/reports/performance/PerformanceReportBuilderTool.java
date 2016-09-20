@@ -82,6 +82,7 @@ public final class PerformanceReportBuilderTool {
      */
     private static AlertProfileStats createAlertProfile(final String name) {
         final AlertProfileStats ap = new AlertProfileStats();
+        ap.setName(name);
         final long time = System.currentTimeMillis();
 
         for (int i = 0; i < 3; i++) {
@@ -123,7 +124,7 @@ public final class PerformanceReportBuilderTool {
         final long oneHour = 60 * 60 * 1000l;
 
         final MonthlyTemperatureStats ms = new MonthlyTemperatureStats(date);
-        ms.setNumShipments(15);
+        ms.setNumShipments(29);
         ms.setNumExcludedHours(23);
 
         final TemperatureStats stats = new TemperatureStats();
@@ -136,6 +137,11 @@ public final class PerformanceReportBuilderTool {
         stats.setTotalTime(345 * oneHour);
         stats.setTimeAboveUpperLimit(11 * oneHour);
         stats.setTimeBelowLowerLimit(12 * oneHour);
+
+        ms.getAlertStats().setColdAlerts(5);
+        ms.getAlertStats().setHotAlerts(7);
+        ms.getAlertStats().setHotAndColdAlerts(2);
+        ms.getAlertStats().setNotAlerts(15);
         return ms;
     }
 }

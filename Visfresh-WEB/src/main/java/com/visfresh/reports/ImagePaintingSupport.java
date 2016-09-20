@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.reports.shipment;
+package com.visfresh.reports;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

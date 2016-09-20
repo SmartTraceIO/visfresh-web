@@ -74,6 +74,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
     public PerformanceReportBean createReport(final Company c, final Date startDate, final Date endDate) {
         final PerformanceReportBean bean = new PerformanceReportBean();
         bean.setDate(new Date());
+        bean.setCompanyName(c.getName());
 
         final Map<Long, AlertProfileStats> statsMap = createInitialStatsMap(c, startDate, endDate);
         final Map<Long, List<TemperatureAlert>> shipmentAlerts = new HashMap<>();
@@ -269,6 +270,8 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
         for (final AlertProfile ap: alertProfileDao.findByCompany(c, null, null, null)) {
             final AlertProfileStats s = new AlertProfileStats();
             s.setName(ap.getName());
+            s.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
+            s.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
 
             //add monthly data
             for (final Date date : monthDates) {

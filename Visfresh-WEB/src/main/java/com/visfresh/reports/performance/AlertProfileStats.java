@@ -14,6 +14,8 @@ public class AlertProfileStats {
     private String name;
     private final List<BiggestTemperatureException> temperatureExceptions = new LinkedList<>();
     private final List<MonthlyTemperatureStats> monthlyData = new LinkedList<>();
+    private double lowerTemperatureLimit = 0;
+    private double upperTemperatureLimit = 5;
 
     /**
      * Default constructor.
@@ -45,5 +47,30 @@ public class AlertProfileStats {
      */
     public List<BiggestTemperatureException> getTemperatureExceptions() {
         return temperatureExceptions;
+    }
+
+    /**
+     * @return lower temperature limit.
+     */
+    public double getLowerTemperatureLimit() {
+        return lowerTemperatureLimit;
+    }
+    /**
+     * @param lowerTemperatureLimit the lowerTemperatureLimit to set
+     */
+    public void setLowerTemperatureLimit(final double lowerTemperatureLimit) {
+        this.lowerTemperatureLimit = lowerTemperatureLimit;
+    }
+    /**
+     * @return upper temperature limit.
+     */
+    public double getUpperTemperatureLimit() {
+        return upperTemperatureLimit;
+    }
+    /**
+     * @param upperTemperatureLimit the upperTemperatureLimit to set
+     */
+    public void setUpperTemperatureLimit(final double upperTemperatureLimit) {
+        this.upperTemperatureLimit = upperTemperatureLimit;
     }
 }

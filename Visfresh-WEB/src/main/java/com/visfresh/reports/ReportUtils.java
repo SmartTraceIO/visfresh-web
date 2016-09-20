@@ -5,10 +5,17 @@ package com.visfresh.reports;
 
 import java.util.List;
 
+import net.sf.dynamicreports.report.builder.component.Components;
+import net.sf.dynamicreports.report.builder.component.HorizontalListBuilder;
+import net.sf.dynamicreports.report.builder.component.ImageBuilder;
+import net.sf.dynamicreports.report.builder.component.TextFieldBuilder;
 import net.sf.dynamicreports.report.builder.style.ConditionalStyleBuilder;
 import net.sf.dynamicreports.report.builder.style.PenBuilder;
 import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.builder.style.Styles;
+import net.sf.dynamicreports.report.constant.ComponentPositionType;
+import net.sf.dynamicreports.report.constant.ImageScale;
+import net.sf.dynamicreports.report.constant.StretchType;
 import net.sf.dynamicreports.report.definition.ReportParameters;
 
 /**
@@ -16,7 +23,7 @@ import net.sf.dynamicreports.report.definition.ReportParameters;
  *
  */
 @SuppressWarnings("serial")
-public final class TableSupport {
+public final class ReportUtils {
     public static TableSupportCondition firstRowCondition = createFirstRowCondition();
     public static TableSupportCondition notFirstRowCondition = createNotFirstRowCondition();
     public static TableSupportCondition firstColumnCondition = createFirstColumnCondition();
@@ -26,7 +33,7 @@ public final class TableSupport {
     /**
      * Default constructor.
      */
-    private TableSupport() {
+    private ReportUtils() {
         super();
     }
 
@@ -110,5 +117,29 @@ public final class TableSupport {
         }
 
         return style;
+    }
+    /**
+     * @return
+     */
+    public static HorizontalListBuilder createPageFooter() {
+        final HorizontalListBuilder list = Components.horizontalList();
+        final TextFieldBuilder<String> text = Components.text(
+                "For assistance, contact SmartTrace Pty Ltd P: 612 9939 3233 E: contact@smartTrace.com.au");
+        text.setStretchWithOverflow(false);
+        text.setStretchType(StretchType.NO_STRETCH);
+        text.setPositionType(ComponentPositionType.FLOAT);
+
+        text.setStyle(Styles.style().setPadding(Styles.padding().setTop(12))
+                .setForegroundColor(Colors.CELL_BORDER));
+
+        list.add(text);
+
+        final ImageBuilder image = Components.image(ImagePaintingSupport.loadImageResource(
+                "reports/images/shipment/logo.jpg"));
+        image.setFixedWidth(110);
+        image.setFixedHeight(40);
+        image.setImageScale(ImageScale.RETAIN_SHAPE);
+        list.add(image);
+        return list;
     }
 }

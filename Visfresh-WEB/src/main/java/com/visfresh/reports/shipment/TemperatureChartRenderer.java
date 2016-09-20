@@ -57,6 +57,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
+import com.visfresh.reports.ImagePaintingSupport;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;

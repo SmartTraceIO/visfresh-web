@@ -68,7 +68,8 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.Colors;
-import com.visfresh.reports.TableSupport;
+import com.visfresh.reports.ImagePaintingSupport;
+import com.visfresh.reports.ReportUtils;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.reports.geomap.MapRendererImpl;
 import com.visfresh.services.EventsNullCoordinatesCorrector;
@@ -150,7 +151,7 @@ public class ShipmentReportBuilder {
         body.add(TemperatureChartRenderer.createCompatibleChart(bean, user));
 
         //add page footer
-        report.addPageFooter(createPageFooter());
+        report.addPageFooter(ReportUtils.createPageFooter());
 
         //this data source is not used, but required for
         //show the content
@@ -332,7 +333,7 @@ public class ShipmentReportBuilder {
         @SuppressWarnings("unchecked")
         final TextColumnBuilder<String>[] cols = new TextColumnBuilder[styles.length];
 
-        final ConditionalStyleBuilder font = Styles.conditionalStyle(TableSupport.firstRowCondition)
+        final ConditionalStyleBuilder font = Styles.conditionalStyle(ReportUtils.firstRowCondition)
                 .setFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold());
 
         for (int i = 0; i < columns.length; i++) {
@@ -391,7 +392,7 @@ public class ShipmentReportBuilder {
         ds.moveFirst();
 
         //apply styles
-        TableSupport.customizeTableStyles(styles, true);
+        ReportUtils.customizeTableStyles(styles, true);
         for (int i = 0; i < styles.length; i++) {
             cols[i].setStyle(styles[i]);
         }
@@ -672,7 +673,7 @@ public class ShipmentReportBuilder {
         cols[2] = columnBuilder;
 
         //apply styles
-        TableSupport.customizeTableStyles(styles, true);
+        ReportUtils.customizeTableStyles(styles, true);
         for (int i = 0; i < styles.length; i++) {
             cols[i].setStyle(styles[i]);
         }
@@ -751,7 +752,7 @@ public class ShipmentReportBuilder {
         for (int i = 0; i < firstTableStyles.length; i++) {
             firstTableCols[i].setStyle(firstTableStyles[i]);
         }
-        TableSupport.customizeTableStyles(firstTableStyles, true);
+        ReportUtils.customizeTableStyles(firstTableStyles, true);
 
         final JasperReportBuilder firstTable = new JasperReportBuilder();
         firstTable.columns(firstTableCols);
@@ -791,7 +792,7 @@ public class ShipmentReportBuilder {
         for (int i = 0; i < styles.length; i++) {
             cols[i].setStyle(styles[i]);
         }
-        TableSupport.customizeTableStyles(styles, true);
+        ReportUtils.customizeTableStyles(styles, true);
 
         secondTable.columns(cols);
 
@@ -945,28 +946,6 @@ public class ShipmentReportBuilder {
         }
 
         return titles;
-    }
-    /**
-     * @return
-     */
-    private ComponentBuilder<?, ?> createPageFooter() {
-        final HorizontalListBuilder list = Components.horizontalList();
-        final TextFieldBuilder<String> text = Components.text("For assistance, contact SmartTrace Pty Ltd P: 612 9939 3233 E: contact@smartTrace.com.au");
-        text.setStretchWithOverflow(false);
-        text.setStretchType(StretchType.NO_STRETCH);
-        text.setPositionType(ComponentPositionType.FLOAT);
-
-        text.setStyle(Styles.style().setPadding(Styles.padding().setTop(12))
-                .setForegroundColor(Colors.CELL_BORDER));
-
-        list.add(text);
-
-        final ImageBuilder image = Components.image(ImagePaintingSupport.loadImageResource("reports/images/shipment/logo.jpg"));
-        image.setFixedWidth(110);
-        image.setFixedHeight(40);
-        image.setImageScale(ImageScale.RETAIN_SHAPE);
-        list.add(image);
-        return list;
     }
 
     /**
