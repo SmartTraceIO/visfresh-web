@@ -211,7 +211,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         shipment.setShipmentDate(new Date(startTime));
         shipment.setAlertProfile(ap);
-        shipment.setAlertSuppressionMinutes((int) (5 * dt / (60 * 1000l)));
+        shipment.setAlertSuppressionMinutes((int) (5 * dt / (60 * 1000l)) + 1);
         shipmentDao.save(shipment);
 
         createTrackerEvent(startTime + 1 * dt, 20.7);
