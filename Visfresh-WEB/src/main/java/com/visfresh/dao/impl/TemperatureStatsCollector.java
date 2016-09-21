@@ -5,7 +5,9 @@ package com.visfresh.dao.impl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
@@ -115,5 +117,8 @@ public class TemperatureStatsCollector {
      */
     public void setStats(final TemperatureStats stats) {
         this.stats = stats;
+    }
+    public Set<Long> getDetectedShipments() {
+        return new HashSet<>(lastEvents.keySet());
     }
 }

@@ -39,6 +39,7 @@ import com.visfresh.reports.performance.BiggestTemperatureException;
 import com.visfresh.reports.performance.MonthlyTemperatureStats;
 import com.visfresh.reports.performance.PerformanceReportBean;
 import com.visfresh.reports.performance.ReportsWithAlertStats;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -105,7 +106,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
                     if (monthlyCollectors == null) {
                         //add collectors map to profile/months map
                         monthlyCollectors = new HashMap<>();
-                        profileByMonthCollectors.put(alertProfileId, new HashMap<Integer, TemperatureStatsCollector>());
+                        profileByMonthCollectors.put(alertProfileId, monthlyCollectors);
                     }
 
                     //get month of date
@@ -147,6 +148,13 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
                 final TemperatureStatsCollector collector = monthlyCollectors.get(monthKey);
                 if (collector != null) {
                     monthlyStats.setTemperatureStats(collector.applyStatistics());
+                    final int numShipments = collector.getDetectedShipments().size();
+                    monthlyStats.setNumShipments(numShipments);
+
+                    //set shipments without alerts
+                    final ReportsWithAlertStats alertStats = monthlyStats.getAlertStats();
+                    alertStats.setNotAlerts(numShipments - alertStats.getColdAlerts()
+                            - alertStats.getHotAlerts() - alertStats.getHotAndColdAlerts());
                 }
             }
 
@@ -155,27 +163,26 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
                     e.getKey(), shipmentMap, shipmentCollectors);
             final List<Long> orderedShipmentIds = getOrderByMaxIncedents(shipmentStats);
 
-            for (int i = 0; i < 3 && !shipmentStats.isEmpty(); i++) {
+            while(e.getValue().getTemperatureExceptions().size() < 3 && !orderedShipmentIds.isEmpty()) {
                 final Shipment shipment = shipmentMap.get(orderedShipmentIds.remove(0));
-
-                final BiggestTemperatureException exc = new BiggestTemperatureException();
-                e.getValue().getTemperatureExceptions().add(exc);
-
-                exc.setDateShipped(shipment.getShipmentDate());
-                exc.setSerialNumber(shipment.getDevice().getSn());
-                exc.setTripCount(shipment.getTripCount());
-                if (shipment.getShippedTo() != null) {
-                    exc.setShippedTo(shipment.getShippedTo().getName());
-                }
-
                 final TemperatureStats stats = shipmentStats.get(shipment.getId());
-                if (stats != null) {
-                    exc.setTemperatureStats(stats);
-                }
 
-                final List<TemperatureAlert> listShipmentAlerts = shipmentAlerts.get(shipment.getId());
-                if (listShipmentAlerts != null) {
-                    exc.getAlertsFired().addAll(createTemperatureRules(listShipmentAlerts));
+                if (stats != null && (stats.getTimeAboveUpperLimit() > 0 || stats.getTimeBelowLowerLimit() > 0)) {
+                    final BiggestTemperatureException exc = new BiggestTemperatureException();
+                    exc.setTemperatureStats(stats);
+                    e.getValue().getTemperatureExceptions().add(exc);
+
+                    exc.setDateShipped(shipment.getShipmentDate());
+                    exc.setSerialNumber(shipment.getDevice().getSn());
+                    exc.setTripCount(shipment.getTripCount());
+                    if (shipment.getShippedTo() != null) {
+                        exc.setShippedTo(shipment.getShippedTo().getName());
+                    }
+
+                    final List<TemperatureAlert> listShipmentAlerts = shipmentAlerts.get(shipment.getId());
+                    if (listShipmentAlerts != null) {
+                        exc.getAlertsFired().addAll(createTemperatureRules(listShipmentAlerts));
+                    }
                 }
             }
         }
@@ -288,37 +295,16 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
     private List<Date> createMonthDateList(final Date startDate, final Date endDate) {
         final List<Date> months = new LinkedList<>();
 
-        Date month = getMiddleOfMonth(startDate);
-        final Date endMonth = getMiddleOfMonth(endDate);
+        Date month = DateTimeUtils.getMiddleOfMonth(startDate);
+        final Date endMonth = DateTimeUtils.getMiddleOfMonth(endDate);
 
         while (!month.after(endMonth)) {
             months.add(month);
-            month = getMiddleOfMonth(new Date(month.getTime() + 25 * 24 * 60 * 60 * 1000l));
+            month = DateTimeUtils.getMiddleOfMonth(new Date(month.getTime() + 25 * 24 * 60 * 60 * 1000l));
         }
 
         return months;
     }
-
-    /**
-     * @param date
-     * @return
-     */
-    private Date getMiddleOfMonth(final Date date) {
-        final Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-
-        final int day = (calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-                - calendar.getActualMinimum(Calendar.DAY_OF_MONTH)) / 2;
-
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.HOUR_OF_DAY, 8);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 1);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        return calendar.getTime();
-    }
-
     /**
      * @param bean bean to populate
      * @param c company

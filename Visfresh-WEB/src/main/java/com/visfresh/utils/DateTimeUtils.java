@@ -5,7 +5,9 @@ package com.visfresh.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -124,5 +126,25 @@ public final class DateTimeUtils {
     public static Date convertFromTimeZone(final Date time, final TimeZone timeZone) {
         final long t = time.getTime();
         return new Date(t + (TimeZone.getDefault().getOffset(t) - timeZone.getOffset(t)));
+    }
+
+    /**
+     * @param date
+     * @return
+     */
+    public static Date getMiddleOfMonth(final Date date) {
+        final Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        final int day = (calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+                - calendar.getActualMinimum(Calendar.DAY_OF_MONTH)) / 2;
+
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.HOUR_OF_DAY, 8);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 1);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTime();
     }
 }
