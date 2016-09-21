@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
@@ -77,4 +78,13 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
      * @param s shipment.
      */
     void assignShipment(Long id, Shipment s);
+    /**
+     * @param c company.
+     * @param startDate start date.
+     * @param endDate end date.
+     * @param page page.
+     * @return tracker events.
+     */
+    List<TrackerEvent> findByCompanyDateRanges(Company c, Date startDate,
+            Date endDate, Page page);
 }

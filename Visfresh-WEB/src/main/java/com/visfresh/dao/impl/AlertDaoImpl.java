@@ -20,6 +20,7 @@ import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
@@ -227,7 +228,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
 
         final List<Map<String, Object>> list = jdbc.queryForList(
                 "select "
-                + buildSelectAs(createSelectAsMapping())
+                + buildSelectAs("a", createSelectAsMapping())
                 + " from "
                 + TABLE + " a"
                 + " where "
@@ -254,7 +255,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
 
         final List<Map<String, Object>> list = jdbc.queryForList(
                 "select "
-                + buildSelectAs(createSelectAsMapping())
+                + buildSelectAs("a", createSelectAsMapping())
                 + " from "
                 + TABLE + " a"
                 + " where "
@@ -262,6 +263,39 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
                 + (startDate == null ? "" : " and a." + DATE_FIELD + " >= :startDate")
                 + (endDate == null ? "" : " and a." + DATE_FIELD + " <= :endDate")
                 + " order by a.date, a.id",
+                params);
+        final Map<String, Object> cache = new HashMap<>();
+
+        final List<Alert> alerts = new LinkedList<>();
+        for (final Map<String,Object> row : list) {
+            final Alert a = createAlert(row);
+            resolveReferences(a, row, cache);
+            alerts.add(a);
+        }
+
+        return alerts;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.AlertDao#getAlerts(java.lang.String, java.util.Date, java.util.Date)
+     */
+    @Override
+    public List<Alert> getAlerts(final Company company, final Date startDate, final Date endDate) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("company", company.getId());
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
+
+        final String sql = "select "
+            + buildSelectAs("a", createSelectAsMapping())
+            + " from "
+            + TABLE + " a"
+            + " join devices d on a.device = d.imei and d.company = :company "
+            + (startDate == null ? "" : " and a." + DATE_FIELD + " >= :startDate")
+            + (endDate == null ? "" : " and a." + DATE_FIELD + " <= :endDate")
+            + " order by a.date, a.id";
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                sql,
                 params);
         final Map<String, Object> cache = new HashMap<>();
 
@@ -294,7 +328,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
 
         final List<Map<String, Object>> list = jdbc.queryForList(
                 "select "
-                + buildSelectAs(createSelectAsMapping())
+                + buildSelectAs("a", createSelectAsMapping())
                 + " from "
                 + TABLE + " a"
                 + " where "
@@ -313,16 +347,17 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
         return map;
     }
     /**
+     * @param alias TODO
      * @param fields
      * @return
      */
-    private String buildSelectAs(final Map<String, String> fields) {
+    private String buildSelectAs(final String alias, final Map<String, String> fields) {
         final StringBuilder sb = new StringBuilder();
         for (final Map.Entry<String, String> e : fields.entrySet()) {
             if (sb.length() > 0) {
                 sb.append(',');
             }
-            sb.append(e.getKey() + " as " + e.getValue());
+            sb.append(alias + "." + e.getKey() + " as " + e.getValue());
         }
         return sb.toString();
     }

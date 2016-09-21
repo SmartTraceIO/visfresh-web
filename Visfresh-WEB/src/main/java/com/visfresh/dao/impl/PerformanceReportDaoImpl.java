@@ -23,10 +23,8 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlertProfileDao;
-import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.PerformanceReportDao;
-import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
@@ -88,15 +86,13 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
 
         final Calendar calendar = new GregorianCalendar();
 
-        final Filter filter = createFilter(c, startDate, endDate);
-        final Sorting sorting = new Sorting("time", "id");
-
         int page = 1;
         List<TrackerEvent> events;
 
         //should calculate two statistics temperature statistics for alert profile
         //and also for shipment for detect
-        while(!(events = trackerEventDao.findAll(filter, sorting, new Page(page, 1000))).isEmpty()) {
+        while(!(events = trackerEventDao.findByCompanyDateRanges(
+                c, startDate, endDate, new Page(page, 1000))).isEmpty()) {
             for (final TrackerEvent e : events) {
                 if (e.getShipment() != null && e.getShipment().getAlertProfile() != null) {
                     if (!shipmentMap.containsKey(e.getShipment().getId())) {
@@ -346,8 +342,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
             data.put(e.getKey(), new HashMap<String, Map<Long, Map<String, Boolean>>>());
         }
 
-        final Filter f = createFilterByDateRanges(c, startDate, endDate, "alerts", "date");
-        final List<Alert> alerts = alertDao.findAll(f, null, null);
+        final List<Alert> alerts = alertDao.getAlerts(c, startDate, endDate);
 
         for (final Alert alert : alerts) {
             if (alert.getShipment() != null && alert instanceof TemperatureAlert) {
@@ -423,69 +418,5 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
                 }
             }
         }
-    }
-
-    /**
-     * @param c company.
-     * @param startDate start date.
-     * @param endDate end date.
-     * @return filter.
-     */
-    private Filter createFilter(final Company c, final Date startDate, final Date endDate) {
-        return createFilterByDateRanges(c, startDate, endDate, "trackerevents", "time");
-    }
-    /**
-     * @param c
-     * @param startDate
-     * @param endDate
-     * @param tableFielName
-     * @param dateFieldName
-     * @return
-     */
-    protected Filter createFilterByDateRanges(final Company c,
-            final Date startDate, final Date endDate,
-            final String tableFielName, final String dateFieldName) {
-        final Filter f = new Filter();
-        f.addFilter("company", c);
-
-        //start date.
-        final String endDateProp = "enDate";
-        f.addFilter(endDateProp, new SynteticFilter() {
-            @Override
-            public Object[] getValues() {
-                return new Object[] {endDate};
-            }
-
-            @Override
-            public String[] getKeys() {
-                return new String[] {endDateProp};
-            }
-
-            @Override
-            public String getFilter() {
-                return tableFielName + "." + dateFieldName + " >= :" + endDateProp;
-            }
-        });
-
-        //end date.
-        final String startDateProp = "startDate";
-        f.addFilter(startDateProp, new SynteticFilter() {
-            @Override
-            public Object[] getValues() {
-                return new Object[] {startDate};
-            }
-
-            @Override
-            public String[] getKeys() {
-                return new String[] {startDateProp};
-            }
-
-            @Override
-            public String getFilter() {
-                return tableFielName + "." + dateFieldName + " >= :" + startDateProp;
-            }
-        });
-
-        return f;
     }
 }

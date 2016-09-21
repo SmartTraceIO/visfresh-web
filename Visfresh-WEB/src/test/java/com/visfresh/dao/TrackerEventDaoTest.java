@@ -62,8 +62,17 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
      * @return
      */
     protected Device createDevice(final String imei) {
+        return createDevice(sharedCompany, imei);
+    }
+
+    /**
+     * @param company
+     * @param imei
+     * @return
+     */
+    protected Device createDevice(final Company company, final String imei) {
         final Device d = new Device();
-        d.setCompany(sharedCompany);
+        d.setCompany(company);
         d.setImei(imei);
         d.setName("Test Device");
         d.setDescription("JUnit device");
@@ -443,6 +452,46 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
 
         assertEquals(s.getId(), dao.findOne(e.getId()).getShipment().getId());
     }
+    @Test
+    public void testFindByCompanyDateRanges() {
+        final Company c1 = createCompany("C1");
+        final Company c2 = createCompany("C2");
+
+        final Device d1 = createDevice(c1, "32908470987908");
+        final Device d2 = createDevice(c2, "02398470238472");
+        final Shipment s1 = createShipment(d1);
+        final Shipment s2 = createShipment(d1);
+        final Shipment s3 = createShipment(d2);
+
+        final long dt = 100000l;
+        final long startDate = System.currentTimeMillis() - 100 * dt;
+
+        createEvent(s1, new Date(startDate + 5 * dt));
+        createEvent(s1, new Date(startDate + 10 * dt));
+
+        createEvent(s2, new Date(startDate + 15 * dt));
+        createEvent(s2, new Date(startDate + 20 * dt));
+
+        createEvent(s3, new Date(startDate + 25 * dt));
+        createEvent(s3, new Date(startDate + 30 * dt));
+
+        assertEquals(4, dao.findByCompanyDateRanges(c1, null, null, null).size());
+        assertEquals(4, dao.findByCompanyDateRanges(c1,
+                new Date(startDate + 5 * dt), new Date(startDate + 20 * dt), null).size());
+
+        assertEquals(3, dao.findByCompanyDateRanges(c1,
+                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), null).size());
+        assertEquals(2, dao.findByCompanyDateRanges(c1,
+                new Date(startDate + 10 * dt), new Date(startDate + 15 * dt), null).size());
+
+        //test pages
+        assertEquals(2, dao.findByCompanyDateRanges(c1,
+                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), new Page(1, 2)).size());
+        assertEquals(1, dao.findByCompanyDateRanges(c1,
+                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), new Page(2, 2)).size());
+        assertEquals(0, dao.findByCompanyDateRanges(c1,
+                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), new Page(3, 2)).size());
+    }
     /**
      * @param device device.
      * @param shipment shipment.
@@ -462,6 +511,17 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
     private TrackerEvent createEvent(final Device device, final Date date) {
         final TrackerEvent e = createEvent(date, 1.0);
         e.setDevice(device);
+        return dao.save(e);
+    }
+    /**
+     * @param shipment device.
+     * @param date event date.
+     * @return tracker event.
+     */
+    private TrackerEvent createEvent(final Shipment shipment, final Date date) {
+        final TrackerEvent e = createEvent(date, 1.0);
+        e.setDevice(shipment.getDevice());
+        e.setShipment(shipment);
         return dao.save(e);
     }
     /**

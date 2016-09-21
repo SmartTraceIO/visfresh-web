@@ -24,6 +24,7 @@ import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
@@ -474,6 +475,49 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         return jdbc.queryForList(sql.toString(), params);
     }
 
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.TrackerEventDao#getEventsByCompanyDateRanges(com.visfresh.entities.Company, java.util.Date, java.util.Date, com.visfresh.dao.Page)
+     */
+    @Override
+    public List<TrackerEvent> findByCompanyDateRanges(final Company c,
+            final Date startDate, final Date endDate, final Page page) {
+        //create set of device IMEI for avoid of duplicates.
+        final Map<String, Object> params = new HashMap<>();
+        params.put("company", c.getId());
+        if (startDate != null) {
+            params.put("startDate", startDate);
+        }
+        if (endDate != null) {
+            params.put("endDate", endDate);
+        }
+
+        final StringBuilder sql = new StringBuilder(buildSelectBlockForFindAll(null));
+        sql.append(" join devices on devices.imei = trackerevents.device and devices.company = :company");
+        if (startDate != null) {
+            sql.append(" and trackerevents." + TIME_FIELD + " >= :startDate");
+        }
+        if (endDate != null) {
+            sql.append(" and trackerevents." + TIME_FIELD + " <= :endDate");
+        }
+
+        sql.append(" order by trackerevents.time, trackerevents.id");
+        if (page != null) {
+            sql.append(" limit " + ((page.getPageNumber() - 1) * page.getPageSize())
+                    + "," + page.getPageSize());
+        }
+
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql.toString(), params);
+
+        final Map<String, Object> cache = new HashMap<String, Object>();
+        final List<TrackerEvent> result = new LinkedList<>();
+        for (final Map<String,Object> map : rows) {
+            final TrackerEvent e = createEntity(map);
+            resolveReferences(e, map, cache);
+            result.add(e);
+        }
+
+        return result;
+    }
     /**
      * @param row
      * @return

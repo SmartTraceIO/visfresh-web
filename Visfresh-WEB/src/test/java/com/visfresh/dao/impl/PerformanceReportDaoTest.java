@@ -3,6 +3,8 @@
  */
 package com.visfresh.dao.impl;
 
+import java.util.Date;
+
 import org.junit.Test;
 
 import com.visfresh.dao.BaseDaoTest;
@@ -20,6 +22,14 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         super(PerformanceReportDao.class);
     }
 
+    /**
+     * Tests only the method not throws any exception.
+     * Should be removed after strong tests implemented.
+     */
+    @Test
+    public void testJustSelect() {
+        dao.createReport(sharedCompany, new Date(System.currentTimeMillis() - 1000000000l), new Date());
+    }
     @Test
     public void testTwoAlertProfilesOneMonth() {
 

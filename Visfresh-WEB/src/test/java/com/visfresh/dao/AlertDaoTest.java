@@ -252,6 +252,38 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         assertEquals(2, dao.getAlerts(s1.getDevice().getImei(),
                 new Date(startDate + 10 * dt), new Date(startDate + 15 * dt)).size());
     }
+    @Test
+    public void testGetAlertsForCompanyDateRanges() {
+        final Company c1 = createCompany("C1");
+        final Company c2 = createCompany("C2");
+
+        final Device d1 = createDevice(c1, "32908470987908");
+        final Device d2 = createDevice(c2, "02398470238472");
+        final Shipment s1 = createShipment(d1);
+        final Shipment s2 = createShipment(d1);
+        final Shipment s3 = createShipment(d2);
+
+        final long dt = 100000l;
+        final long startDate = System.currentTimeMillis() - 100 * dt;
+
+        createEvent(s1, new Date(startDate + 5 * dt));
+        createEvent(s1, new Date(startDate + 10 * dt));
+
+        createEvent(s2, new Date(startDate + 15 * dt));
+        createEvent(s2, new Date(startDate + 20 * dt));
+
+        createEvent(s3, new Date(startDate + 25 * dt));
+        createEvent(s3, new Date(startDate + 30 * dt));
+
+        assertEquals(4, dao.getAlerts(c1, null, null).size());
+        assertEquals(4, dao.getAlerts(c1,
+                new Date(startDate + 5 * dt), new Date(startDate + 20 * dt)).size());
+
+        assertEquals(3, dao.getAlerts(c1,
+                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt)).size());
+        assertEquals(2, dao.getAlerts(c1,
+                new Date(startDate + 10 * dt), new Date(startDate + 15 * dt)).size());
+    }
     /**
      * @param s
      * @return alert.
@@ -274,15 +306,23 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
         return dao.save(a);
     }
     /**
+     * @param imei device IMEI.
+     * @return device.
+     */
+    private Device createDevice(final String imei) {
+        return createDevice(sharedCompany, imei);
+    }
+    /**
+     * @param company
      * @param imei
      * @return
      */
-    private Device createDevice(final String imei) {
+    protected Device createDevice(final Company company, final String imei) {
         final Device d = new Device();
         d.setImei(imei);
         d.setActive(true);
         d.setName("JUnit-" + imei);
-        d.setCompany(sharedCompany);
+        d.setCompany(company);
         return context.getBean(DeviceDao.class).save(d);
     }
 
