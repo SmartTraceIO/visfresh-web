@@ -404,6 +404,14 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         assertEquals(1, getAlertProfileStats(report, name1).getTemperatureExceptions().size());
         assertEquals(1, getAlertProfileStats(report, name2).getTemperatureExceptions().size());
     }
+    @Test
+    public void testNotCrushWithoutMonthlyData() {
+        final AlertProfile ap = createAlertProfile("JUnit");
+        final PerformanceReportBean r = dao.createReport(ap.getCompany(),
+                getMiddleOfMonth("2016.05"), getMiddleOfMonth("2016.08"));
+
+        assertNotNull(r);
+    }
 
     /**
      * @param ap alert profile

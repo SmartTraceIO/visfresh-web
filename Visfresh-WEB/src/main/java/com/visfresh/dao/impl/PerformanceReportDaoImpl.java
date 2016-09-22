@@ -141,6 +141,10 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
             //merge monthly data
             final Map<Integer, TemperatureStatsCollector> monthlyCollectors = profileByMonthCollectors.get(e.getKey());
             for (final MonthlyTemperatureStats monthlyStats : e.getValue().getMonthlyData()) {
+                if (monthlyCollectors == null) {
+                    continue;
+                }
+
                 //get monthly key
                 calendar.setTime(monthlyStats.getMonth());
                 final int monthKey = calendar.get(Calendar.YEAR) * 100 + calendar.get(Calendar.MONTH);
