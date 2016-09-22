@@ -4,9 +4,13 @@
 package com.visfresh.reports.performance;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.RectangularShape;
+import java.awt.geom.RoundRectangle2D;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,8 +47,16 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.design.JRDesignField;
 
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.PieDataset;
+import org.jfree.ui.RectangleEdge;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.TemperatureRule;
@@ -283,9 +295,10 @@ public class PerformanceReportBuilder {
      * @param monthlyData
      * @param user
      */
+    @SuppressWarnings("serial")
     private void addPercentageOfTimeOutsideRanges(final VerticalListBuilder body,
             final AlertProfileStats alertProfileStats, final User user) {
-        final VerticalListBuilder vl = createStyledVerticalListWithTitle("Shipments With Alerts *");
+        final VerticalListBuilder vl = createStyledVerticalListWithTitle("Percentage of time outside ranges *");
         vl.add(Components.gap(1, 3));
 
         final HorizontalListBuilder list = Components.horizontalList();
@@ -300,11 +313,81 @@ public class PerformanceReportBuilder {
             new Color(231, 35, 72) // red
         };
 
+        final long oneHour = 60 * 60 * 1000l;
+
         //add charts
         final BarChartBuilder chart = Charts.barChart();
         chart.addSeriesColor(colors);
         chart.setShowValues(true);
-        chart.setShowPercentages(true);
+        chart.addCustomizer(new DRIChartCustomizer() {
+            @Override
+            public void customize(final JFreeChart chart, final ReportParameters reportParameters) {
+                final CategoryPlot plot = (CategoryPlot) chart.getPlot();
+
+                //update category axis.
+                final CategoryAxis categoryAxis = plot.getDomainAxis();
+                categoryAxis.setTickLabelsVisible(false);
+                categoryAxis.setAxisLineVisible(false);
+                categoryAxis.setTickMarksVisible(false);
+
+                //update value axis
+                final NumberAxis axis = (NumberAxis) plot.getRangeAxis();
+                axis.setTickLabelsVisible(false);
+                axis.setAxisLineVisible(false);
+                axis.setTickMarksVisible(false);
+
+                //update bar renderer.
+                final BarRenderer r = (BarRenderer) plot.getRenderer();
+                r.setBarPainter(new StandardBarPainter() {
+                    /* (non-Javadoc)
+                     * @see org.jfree.chart.renderer.category.StandardBarPainter#paintBar(java.awt.Graphics2D, org.jfree.chart.renderer.category.BarRenderer, int, int, java.awt.geom.RectangularShape, org.jfree.ui.RectangleEdge)
+                     */
+                    @Override
+                    public void paintBar(final Graphics2D g2, final BarRenderer renderer,
+                            final int row, final int column, final RectangularShape bar,
+                            final RectangleEdge base) {
+                        super.paintBar(g2, renderer, row, column, roundBar(bar), base);
+                    }
+                    /* (non-Javadoc)
+                     * @see org.jfree.chart.renderer.category.StandardBarPainter#paintBarShadow(java.awt.Graphics2D, org.jfree.chart.renderer.category.BarRenderer, int, int, java.awt.geom.RectangularShape, org.jfree.ui.RectangleEdge, boolean)
+                     */
+                    @Override
+                    public void paintBarShadow(final Graphics2D g2,
+                            final BarRenderer renderer, final int row, final int column,
+                            final RectangularShape bar, final RectangleEdge base,
+                            final boolean pegShadow) {
+                        super.paintBarShadow(g2, renderer, row, column, roundBar(bar), base, pegShadow);
+                    }
+                    private RectangularShape roundBar(final RectangularShape bar) {
+                        final double arc = Math.min(20., bar.getHeight() / 2.);
+                        return new RoundRectangle2D.Double(bar.getX(), bar.getY(), bar.getWidth(), bar.getHeight(),
+                                arc, arc);
+                    }
+                });
+                final StandardCategoryItemLabelGenerator labelGenerator = new StandardCategoryItemLabelGenerator(
+                        "{3}% ({2}hrs)", NumberFormat.getInstance()) {
+                    /* (non-Javadoc)
+                     * @see org.jfree.chart.labels.AbstractCategoryItemLabelGenerator#createItemArray(org.jfree.data.category.CategoryDataset, int, int)
+                     */
+                    @Override
+                    protected Object[] createItemArray(final CategoryDataset dataset,
+                            final int row, final int column) {
+                        final Object[] array = super.createItemArray(dataset, row, column);
+                        final TemperatureStats stats = alertProfileStats.getMonthlyData().get(row).getTemperatureStats();
+                        final Number value = dataset.getValue(row, column);
+
+                        if (stats.getTotalTime() > 0 && value != null) {
+                            final double percents = (double) value.longValue() * oneHour / stats.getTotalTime() * 100;
+                            array[3] = LocalizationUtils.formatByOneDecimal(percents);
+                        }
+
+                        return array;
+                    }
+                };
+                r.setSeriesItemLabelGenerator(0, labelGenerator);
+                r.setSeriesItemLabelGenerator(1, labelGenerator);
+            }
+        });
 
         final DRDataSource ds = new DRDataSource("month", "below", "above");
 
@@ -322,8 +405,8 @@ public class PerformanceReportBuilder {
             //set data source
             final TemperatureStats as = stats.getTemperatureStats();
             ds.add(month,
-                (int) (as.getTimeBelowLowerLimit() / 60 * 60 * 1000l),
-                (int) (as.getTimeAboveUpperLimit() / 60 * 60 * 1000l));
+                (int) (as.getTimeBelowLowerLimit() / oneHour),
+                (int) (as.getTimeAboveUpperLimit() / oneHour));
         }
 
         chart.setDataSource(ds);
@@ -366,15 +449,15 @@ public class PerformanceReportBuilder {
             chart.addSerie(Charts.serie("value", Integer.class));
             chart.addSeriesColor(colors);
             chart.setTitle(titleDateFormat.format(stats.getMonth()));
-            chart.setTitleFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE).bold());
+            chart.setTitleFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE + 3).bold());
             chart.setKey("key", String.class);
             chart.setShowValues(true);
             chart.setShowLegend(false);
             chart.addCustomizer(new DRIChartCustomizer() {
                 @Override
                 public void customize(final JFreeChart chart, final ReportParameters reportParameters) {
-                    final PiePlot xyPlot = (PiePlot) chart.getPlot();
-                    xyPlot.setLabelGenerator(new PieLabelGenerator(new HashMap<Comparable<?>, String>()){
+                    final PiePlot plot = (PiePlot) chart.getPlot();
+                    plot.setLabelGenerator(new PieLabelGenerator(new HashMap<Comparable<?>, String>()){
                         @Override
                         public String generateSectionLabel(final PieDataset ds,
                                 @SuppressWarnings("rawtypes") final Comparable key) {
