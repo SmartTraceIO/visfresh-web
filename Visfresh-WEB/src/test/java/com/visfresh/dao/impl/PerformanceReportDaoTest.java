@@ -239,7 +239,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         assertEquals(20.7, stats.getMaximumTemperature(), 0.0001);
         assertEquals(4 * dt, stats.getTimeAboveUpperLimit());
         assertEquals(4 * dt, stats.getTimeBelowLowerLimit());
-        assertEquals(9 * dt, stats.getTotalTime());
+        assertEquals((8 + 8) * dt, stats.getTotalTime());
     }
     @Test
     public void testTemperatureStatsTwoMonths() {
@@ -273,13 +273,13 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         assertEquals(20.7, stats.getAvgTemperature(), 0.0001);
         assertEquals(20.7, stats.getMinimumTemperature(), 0.0001);
         assertEquals(20.7, stats.getMaximumTemperature(), 0.0001);
-        assertEquals(3 * dt, stats.getTotalTime());
+        assertEquals((2 + 2) * dt, stats.getTotalTime());
 
         stats = report.getAlertProfiles().get(0).getMonthlyData().get(1).getTemperatureStats();
         assertEquals(17.7, stats.getAvgTemperature(), 0.0001);
         assertEquals(17.7, stats.getMinimumTemperature(), 0.0001);
         assertEquals(17.7, stats.getMaximumTemperature(), 0.0001);
-        assertEquals(3 * dt, stats.getTotalTime());
+        assertEquals((2 + 2) * dt, stats.getTotalTime());
     }
     @Test
     public void testTemperatureStatsTwoAlertProfiles() {

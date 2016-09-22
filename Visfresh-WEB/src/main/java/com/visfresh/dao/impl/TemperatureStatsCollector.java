@@ -21,9 +21,8 @@ public class TemperatureStatsCollector {
     private int n;
 
     private Map<Long, TrackerEvent> lastEvents = new HashMap<>();
+    private Map<Long, TimeRanges> timeRanges = new HashMap<>();
 
-    private long startTime = Long.MAX_VALUE;
-    private long endTime = Long.MIN_VALUE;
     private double summt2 = 0;
     private double summt = 0;
     private double min = Double.MAX_VALUE;
@@ -62,10 +61,16 @@ public class TemperatureStatsCollector {
         summt2 += t * t;
 
         final long eventTime = e.getTime().getTime();
-        startTime = Math.min(startTime, eventTime);
-        endTime = Math.max(endTime, eventTime);
 
         final Long shipmentId = shipment.getId();
+
+        TimeRanges tr = timeRanges.get(shipmentId);
+        if (tr == null) {
+            tr = new TimeRanges();
+            timeRanges.put(shipmentId, tr);
+        }
+        tr.addTime(eventTime);
+
         final TrackerEvent last = lastEvents.get(shipmentId);
         if (last != null) {
             if (last.getTemperature() > shipment.getAlertProfile().getUpperTemperatureLimit()) {
@@ -93,7 +98,12 @@ public class TemperatureStatsCollector {
 
             stats.setTimeAboveUpperLimit(hotTime);
             stats.setTimeBelowLowerLimit(coldTime);
-            stats.setTotalTime(endTime - startTime);
+
+            long totalTime = 0;
+            for (final TimeRanges tr : timeRanges.values()) {
+                totalTime += tr.getTotalTime();
+            }
+            stats.setTotalTime(totalTime);
         } else {
             stats.setAvgTemperature(0.);
             stats.setMaximumTemperature(0.);
