@@ -86,8 +86,16 @@ public final class PerformanceReportBuilderTool {
         final long time = System.currentTimeMillis();
 
         for (int i = 0; i < 3; i++) {
-            ap.getMonthlyData().add(0, generateMonthlyData(new Date(time - i * 28 * 24 * 60 * 60 * 1000l)));
-            ap.getTemperatureExceptions().add(generateException(serialNums[i]));
+            if (i < 2) {
+                ap.getMonthlyData().add(0, generateMonthlyData(new Date(time - i * 28 * 24 * 60 * 60 * 1000l)));
+                ap.getTemperatureExceptions().add(generateException(serialNums[i]));
+            } else {
+                final MonthlyTemperatureStats stats = new MonthlyTemperatureStats(
+                        new Date(time - i * 28 * 24 * 60 * 60 * 1000l));
+                stats.getTemperatureStats().setTotalTime(10 * 60 * 1000);
+                stats.getTemperatureStats().setTimeAboveUpperLimit(10 * 60 * 1000);
+                ap.getMonthlyData().add(0, stats);
+            }
         }
 
         return ap;
@@ -135,7 +143,7 @@ public final class PerformanceReportBuilderTool {
         stats.setMinimumTemperature(-1.);
         stats.setStandardDevitation(2.1);
         stats.setTotalTime(345 * oneHour);
-        stats.setTimeAboveUpperLimit(11 * oneHour);
+        stats.setTimeAboveUpperLimit(11 * oneHour + oneHour / 2);
         stats.setTimeBelowLowerLimit(12 * oneHour);
 
         ms.getAlertStats().setColdAlerts(5);

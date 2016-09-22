@@ -10,12 +10,14 @@ import java.awt.geom.RoundRectangle2D;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
@@ -313,7 +315,7 @@ public class PerformanceReportBuilder {
             new Color(231, 35, 72) // red
         };
 
-        final long oneHour = 60 * 60 * 1000l;
+        final double oneHour = 60 * 60 * 1000l;
 
         //add charts
         final BarChartBuilder chart = Charts.barChart();
@@ -364,8 +366,12 @@ public class PerformanceReportBuilder {
                                 arc, arc);
                     }
                 });
+                final DecimalFormat fmt = new DecimalFormat("#0.0");
+                final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
+                fmt.setDecimalFormatSymbols(decimalFormatSymbols);
+
                 final StandardCategoryItemLabelGenerator labelGenerator = new StandardCategoryItemLabelGenerator(
-                        "{3}% ({2}hrs)", NumberFormat.getInstance()) {
+                        "{3}% ({2}hrs)", fmt) {
                     /* (non-Javadoc)
                      * @see org.jfree.chart.labels.AbstractCategoryItemLabelGenerator#createItemArray(org.jfree.data.category.CategoryDataset, int, int)
                      */
@@ -373,12 +379,15 @@ public class PerformanceReportBuilder {
                     protected Object[] createItemArray(final CategoryDataset dataset,
                             final int row, final int column) {
                         final Object[] array = super.createItemArray(dataset, row, column);
-                        final TemperatureStats stats = alertProfileStats.getMonthlyData().get(row).getTemperatureStats();
+                        final TemperatureStats stats = alertProfileStats.getMonthlyData().get(column).getTemperatureStats();
                         final Number value = dataset.getValue(row, column);
 
                         if (stats.getTotalTime() > 0 && value != null) {
-                            final double percents = (double) value.longValue() * oneHour / stats.getTotalTime() * 100;
+                            final double percents = value.doubleValue() * oneHour / stats.getTotalTime() * 100;
                             array[3] = LocalizationUtils.formatByOneDecimal(percents);
+                        } else {
+                            array[2] = "0.0";
+                            array[3] = "0.0";
                         }
 
                         return array;
@@ -391,10 +400,10 @@ public class PerformanceReportBuilder {
 
         final DRDataSource ds = new DRDataSource("month", "below", "above");
 
-        chart.addSerie(Charts.serie("below", Integer.class).setLabel("Below "
+        chart.addSerie(Charts.serie("below", Double.class).setLabel("Below "
                 + getTemperatureString(alertProfileStats.getLowerTemperatureLimit(),
                         user.getTemperatureUnits(), "")));
-        chart.addSerie(Charts.serie("above", Integer.class).setLabel("Above "
+        chart.addSerie(Charts.serie("above", Double.class).setLabel("Above "
                 + getTemperatureString(alertProfileStats.getUpperTemperatureLimit(),
                         user.getTemperatureUnits(), "")));
         chart.setCategory("month", String.class);
@@ -405,8 +414,8 @@ public class PerformanceReportBuilder {
             //set data source
             final TemperatureStats as = stats.getTemperatureStats();
             ds.add(month,
-                (int) (as.getTimeBelowLowerLimit() / oneHour),
-                (int) (as.getTimeAboveUpperLimit() / oneHour));
+                as.getTimeBelowLowerLimit() / oneHour,
+                as.getTimeAboveUpperLimit() / oneHour);
         }
 
         chart.setDataSource(ds);
