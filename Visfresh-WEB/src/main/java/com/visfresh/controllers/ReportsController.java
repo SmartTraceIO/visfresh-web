@@ -68,10 +68,7 @@ import com.visfresh.utils.DateTimeUtils;
 @RestController("Reports")
 @RequestMapping("/rest")
 public class ReportsController extends AbstractController {
-    /**
-     *
-     */
-    private static final String GET_PERFORMANCE_REPORT = "getPerformanceReport";
+    public static final String GET_PERFORMANCE_REPORT = "getPerformanceReport";
     public static final String GET_SHIPMENT_REPORT = "getShipmentReport";
     /**
      * Logger.
@@ -125,7 +122,7 @@ public class ReportsController extends AbstractController {
             checkAccess(user, Role.BasicUser);
 
             //calculate requested date in user's time zone.
-            final Calendar c = new GregorianCalendar(user.getTimeZone());
+            final Calendar c = new GregorianCalendar();
 
             Date usersDate;
             if (d != null) {
@@ -141,16 +138,16 @@ public class ReportsController extends AbstractController {
             c.set(Calendar.MINUTE, 59);
             c.set(Calendar.SECOND, 59);
 
-            final Date endDate = DateTimeUtils.convertFromTimeZone(c.getTime(), user.getTimeZone());
+            final Date endDate = c.getTime();
 
             //start date
-            c.setTimeInMillis(c.getTimeInMillis() -28 * 3 * 60 * 60 * 1000l);
+            c.add(Calendar.MONTH, -2);
             c.set(Calendar.DAY_OF_MONTH, 1);
             c.set(Calendar.HOUR_OF_DAY, 0);
             c.set(Calendar.MINUTE, 0);
             c.set(Calendar.SECOND, 1);
 
-            final Date startDate = DateTimeUtils.convertFromTimeZone(c.getTime(), user.getTimeZone());
+            final Date startDate = c.getTime();
 
             //create report bean.
             final PerformanceReportBean bean = performanceReportDao.createReport(

@@ -94,6 +94,16 @@ public class ReportsControllerTest extends AbstractRestServiceTest {
     }
 
     @Test
+    public void testGetPerformanceReport() throws IOException, RestServiceException {
+        createShipment();
+        final Map<String, String> params = new HashMap<>();
+
+        final String result = client.doSendGetRequest(client.getPathWithToken(
+                ReportsController.GET_PERFORMANCE_REPORT), params);
+        assertTrue(result.length() > 0);
+    }
+
+    @Test
     public void testGetShipmentReportById() throws IOException, RestServiceException {
         final Shipment s = createShipment();
 
