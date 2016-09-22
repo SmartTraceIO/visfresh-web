@@ -122,14 +122,14 @@ public class ReportsController extends AbstractController {
             checkAccess(user, Role.BasicUser);
 
             //calculate requested date in user's time zone.
-            final Calendar c = new GregorianCalendar();
-
             Date usersDate;
             if (d != null) {
                 usersDate = new SimpleDateFormat("yyyy-MM").parse(d);
             } else {
                 usersDate = DateTimeUtils.convertToTimeZone(new Date(), user.getTimeZone());
             }
+
+            final Calendar c = new GregorianCalendar();
             c.setTime(usersDate);
 
             //calculate date ranges in user's time zone.
