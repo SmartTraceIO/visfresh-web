@@ -26,6 +26,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
@@ -422,6 +423,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         s.setAlertProfile(ap);
         s.setCompany(device.getCompany());
         s.setDevice(device);
+        s.setStatus(ShipmentStatus.Arrived);
         return context.getBean(ShipmentDao.class).save(s);
     }
     /**

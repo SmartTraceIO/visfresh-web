@@ -92,7 +92,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
 
         //should calculate two statistics temperature statistics for alert profile
         //and also for shipment for detect
-        while(!(events = trackerEventDao.findByCompanyDateRanges(
+        while(!(events = trackerEventDao.findForArrivedShipmentsInDateRanges(
                 c, startDate, endDate, new Page(page, 1000))).isEmpty()) {
             for (final TrackerEvent e : events) {
                 if (e.getShipment() != null && e.getShipment().getAlertProfile() != null) {

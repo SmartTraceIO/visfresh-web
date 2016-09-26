@@ -718,7 +718,7 @@ public class PerformanceReportBuilder {
         title.setHorizontalTextAlignment(HorizontalTextAlignment.LEFT);
         header.add(title);
 
-        final TextFieldBuilder<String> remark = createRemark("* Shipments with \""
+        final TextFieldBuilder<String> remark = createRemark("* Arrived Shipments with \""
                 + alertProfileName + "\" profile").setStyle(
                         createStyleByFont(DEFAULT_FONT_SIZE, false));
         remark.setHorizontalTextAlignment(HorizontalTextAlignment.RIGHT);

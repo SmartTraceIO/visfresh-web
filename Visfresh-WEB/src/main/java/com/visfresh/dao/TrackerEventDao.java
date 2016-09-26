@@ -85,6 +85,6 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, Long> {
      * @param page page.
      * @return tracker events.
      */
-    List<TrackerEvent> findByCompanyDateRanges(Company c, Date startDate,
+    List<TrackerEvent> findForArrivedShipmentsInDateRanges(Company c, Date startDate,
             Date endDate, Page page);
 }

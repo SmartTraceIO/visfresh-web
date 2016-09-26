@@ -409,7 +409,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         for (final ListShipmentItem s : shipments) {
             final List<TrackerEventDto> events = eventMap.get(s.getId());
 
-            final List<KeyLocation> keyLocs = buildKeyLocations(s.getId(), events);
+            final List<KeyLocation> keyLocs = buildKeyLocations(events);
             addInterimStopKeyLocations(keyLocs, s.getInterimStops(), user.getTimeZone());
 
             //add events
@@ -594,7 +594,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param events
      * @return
      */
-    private List<KeyLocation> buildKeyLocations(final Long id, final List<TrackerEventDto> events) {
+    private List<KeyLocation> buildKeyLocations(final List<TrackerEventDto> events) {
         if (events.size() == 0) {
             return null;
         }
