@@ -105,6 +105,7 @@ public class PerformanceReportBuilder {
         report.setDetailSplitType(SplitType.IMMEDIATE);
         report.setShowColumnTitle(false);
         report.setPageMargin(DynamicReports.margin(10).setBottom(0));
+        report.addPageFooter(ReportUtils.createPageFooter());
 
         report.title(createTitle(bean, user));
 
@@ -112,36 +113,27 @@ public class PerformanceReportBuilder {
         report.detail(body);
 
         for (final AlertProfileStats alertProfileStats : bean.getAlertProfiles()) {
-            final TextFieldBuilder<String> remark = createRemark("* Shipments with \""
-                    + alertProfileStats.getName() + "\" profile");
-
-            addShipmentsWithAlerts(body, alertProfileStats.getMonthlyData(), user);
-            body.add(remark);
-
+            addShipmentsWithAlerts(body, alertProfileStats, user);
             body.add(Components.gap(1, 5));
 
             try {
                 addTemperatureHistory(body, alertProfileStats, user);
-                body.add(remark);
+                body.add(Components.gap(1, 5));
             } catch (final JRException e) {
                 e.printStackTrace();
             }
 
             addPercentageOfTimeOutsideRanges(body, alertProfileStats, user);
-            body.add(remark);
+            body.add(Components.gap(1, 5));
 
             try {
                 addThreeBiggestExceptions(body, alertProfileStats, user);
-                body.add(remark);
             } catch (final JRException e) {
                 e.printStackTrace();
             }
 
             body.add(Components.pageBreak());
         }
-
-        //add page footer
-        report.addPageFooter(ReportUtils.createPageFooter());
 
         //this data source is not used, but required for
         //show the content
@@ -158,7 +150,7 @@ public class PerformanceReportBuilder {
             final AlertProfileStats alertProfileData, final User user) throws JRException {
         final List<BiggestTemperatureException> temperatureExceptions = alertProfileData.getTemperatureExceptions();
         final VerticalListBuilder list = createStyledVerticalListWithTitle(temperatureExceptions.size()
-                + " biggest exceptions *");
+                + " biggest exceptions *", alertProfileData.getName());
         list.add(Components.gap(1, 3));
 
         final JasperReportBuilder report = new JasperReportBuilder();
@@ -300,7 +292,8 @@ public class PerformanceReportBuilder {
     @SuppressWarnings("serial")
     private void addPercentageOfTimeOutsideRanges(final VerticalListBuilder body,
             final AlertProfileStats alertProfileStats, final User user) {
-        final VerticalListBuilder vl = createStyledVerticalListWithTitle("Percentage of time outside ranges *");
+        final VerticalListBuilder vl = createStyledVerticalListWithTitle(
+                "Percentage of time outside ranges *", alertProfileStats.getName());
         vl.add(Components.gap(1, 3));
 
         final HorizontalListBuilder list = Components.horizontalList();
@@ -433,8 +426,9 @@ public class PerformanceReportBuilder {
      */
     @SuppressWarnings("serial")
     private void addShipmentsWithAlerts(final VerticalListBuilder body,
-            final List<MonthlyTemperatureStats> monthlyData, final User user) {
-        final VerticalListBuilder vl = createStyledVerticalListWithTitle("Shipments With Alerts *");
+            final AlertProfileStats alertProfileStats, final User user) {
+        final VerticalListBuilder vl = createStyledVerticalListWithTitle("Shipments With Alerts *",
+                alertProfileStats.getName());
         vl.add(Components.gap(1, 3));
 
         final HorizontalListBuilder list = Components.horizontalList();
@@ -453,7 +447,7 @@ public class PerformanceReportBuilder {
 
         //add charts
         int i = 0;
-        for (final MonthlyTemperatureStats stats : monthlyData) {
+        for (final MonthlyTemperatureStats stats : alertProfileStats.getMonthlyData()) {
             final PieChartBuilder chart = Charts.pieChart();
             chart.addSerie(Charts.serie("value", Integer.class));
             chart.addSeriesColor(colors);
@@ -524,7 +518,8 @@ public class PerformanceReportBuilder {
      */
     private void addTemperatureHistory(final VerticalListBuilder body,
             final AlertProfileStats alertProfileData, final User user) throws JRException {
-        final VerticalListBuilder list = createStyledVerticalListWithTitle("Temperature history *");
+        final VerticalListBuilder list = createStyledVerticalListWithTitle("Temperature history *",
+                alertProfileData.getName());
         list.add(Components.gap(1, 3));
 
         final JasperReportBuilder report = new JasperReportBuilder();
@@ -697,7 +692,7 @@ public class PerformanceReportBuilder {
     /**
      * @param titleText
      */
-    private VerticalListBuilder createStyledVerticalListWithTitle(final String titleText) {
+    private VerticalListBuilder createStyledVerticalListWithTitle(final String titleText, final String alertProfileName) {
         final VerticalListBuilder list = Components.verticalList();
 
         //add table border
@@ -706,18 +701,30 @@ public class PerformanceReportBuilder {
         list.setStyle(Styles.style().setBorder(border));
 
         //add table title
-        final StyleBuilder titleStyle = createStyleByFont(DEFAULT_FONT_SIZE, true);
-        titleStyle.setBackgroundColor(Colors.DEFAULT_GREEN);
-        titleStyle.setHorizontalTextAlignment(HorizontalTextAlignment.LEFT);
-        titleStyle.setPadding(Styles.padding(DEFAULT_PADDING));
+        final StyleBuilder headerStyle = Styles.style();
+        headerStyle.setBackgroundColor(Colors.DEFAULT_GREEN);
+        headerStyle.setPadding(Styles.padding(DEFAULT_PADDING));
 
         final BorderBuilder titleBorder = Styles.border(Styles.pen().setLineColor(Colors.DEFAULT_GREEN));
         titleBorder.setBottomPen(Styles.pen1Point().setLineColor(Color.BLACK).setLineWidth(2f)
                 .setLineStyle(LineStyle.SOLID));
-        titleStyle.setBorder(titleBorder);
+        headerStyle.setBorder(titleBorder);
 
-        final TextFieldBuilder<String> title = Components.text(titleText).setStyle(titleStyle);
-        list.add(title);
+        final HorizontalListBuilder header = Components.horizontalList().setStyle(headerStyle);
+
+        //header left and right text
+        final TextFieldBuilder<String> title = Components.text(titleText).setStyle(
+                createStyleByFont(DEFAULT_FONT_SIZE, true));
+        title.setHorizontalTextAlignment(HorizontalTextAlignment.LEFT);
+        header.add(title);
+
+        final TextFieldBuilder<String> remark = createRemark("* Shipments with \""
+                + alertProfileName + "\" profile").setStyle(
+                        createStyleByFont(DEFAULT_FONT_SIZE, false));
+        remark.setHorizontalTextAlignment(HorizontalTextAlignment.RIGHT);
+        header.add(remark);
+
+        list.add(header);
 
         return list;
     }

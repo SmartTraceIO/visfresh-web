@@ -47,6 +47,7 @@ import com.visfresh.utils.StringUtils;
  *
  */
 public class ShipmentSerializer extends AbstractJsonSerializer {
+    private static final String INTERIM_STOPS = "interimStops";
     private static final String INTERIM_LOCATIONS = "interimLocations";
     private static final String CREATED_BY = "createdBy";
     private static final String START_DATE = "startDate";
@@ -121,6 +122,11 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         s.setStartDate(asDate(json.get(START_DATE)));
         s.setCreatedBy(asString(json.get(CREATED_BY)));
 
+        final JsonElement locs = json.get(INTERIM_STOPS);
+        if (locs != null && !locs.isJsonNull()) {
+            s.setInterimStops(asLongList(locs));
+        }
+
         return s;
     }
     /**
@@ -175,6 +181,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(START_DATE, formatDate(s.getStartDate()));
         obj.addProperty(CREATED_BY, s.getCreatedBy());
 
+        //interim locations
         if (s.getInterimLocations() != null) {
             final JsonArray array = new JsonArray();
             obj.add(INTERIM_LOCATIONS, array);
@@ -185,6 +192,19 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         } else {
             obj.add(INTERIM_LOCATIONS, JsonNull.INSTANCE);
         }
+
+        //interim stops
+        if (s.getInterimStops() != null) {
+            final JsonArray array = new JsonArray();
+            obj.add(INTERIM_STOPS, array);
+
+            for (final Long l : s.getInterimStops()) {
+                array.add(new JsonPrimitive(l));
+            }
+        } else {
+            obj.add(INTERIM_STOPS, JsonNull.INSTANCE);
+        }
+
         return obj;
     }
     /**
@@ -703,7 +723,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.add(INTERIM_LOCATIONS, locationsToJson(dto.getInterimLocationAlternatives()));
 
             //interim stops
-            json.add("interimStops", interimStopsTJson(dto.getInterimStops()));
+            json.add(INTERIM_STOPS, interimStopsTJson(dto.getInterimStops()));
 
             //add notes
             final JsonArray notes = new JsonArray();

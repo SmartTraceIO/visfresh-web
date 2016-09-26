@@ -921,7 +921,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(sd);
     }
     @Test
-    public void testInterimStops() throws IOException, RestServiceException {
+    public void testSingleShipmentInterimStops() throws IOException, RestServiceException {
         final Shipment s = createShipment(true);
         createInterimStop(s);
         createInterimStop(s);
@@ -931,6 +931,63 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final JsonArray array = sd.get("interimStops").getAsJsonArray();
 
         assertEquals(3, array.size());
+    }
+    @Test
+    public void testInterimStops() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        createInterimStop(s);
+        createInterimStop(s);
+
+        final List<Long> stopIds = shipmentClient.getShipment(s.getId()).getInterimStops();
+        assertEquals(2, stopIds.size());
+    }
+    @Test
+    public void testInterimStopsNotTouchIfNotInJson() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        createInterimStop(s);
+        createInterimStop(s);
+
+        final SaveShipmentRequest req = new SaveShipmentRequest();
+        final ShipmentDto dto = new ShipmentDto(s);
+        req.setShipment(dto);
+        dto.setInterimStops(null);
+
+        shipmentClient.saveShipment(req);
+        assertEquals(2, shipmentClient.getShipment(s.getId()).getInterimStops().size());
+    }
+    @Test
+    public void testInterimStopsCanDelete() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        final InterimStop stp = createInterimStop(s);
+        createInterimStop(s);
+
+        final SaveShipmentRequest req = new SaveShipmentRequest();
+        final ShipmentDto dto = new ShipmentDto(s);
+        req.setShipment(dto);
+
+        final List<Long> ids = new LinkedList<>();
+        ids.add(stp.getId());
+        dto.setInterimStops(ids);
+
+        shipmentClient.saveShipment(req);
+        assertEquals(1, shipmentClient.getShipment(s.getId()).getInterimStops().size());
+    }
+    @Test
+    public void testInterimStopsCantAdd() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        final Shipment s2 = createShipment(true);
+        final InterimStop stp = createInterimStop(s2);
+
+        final SaveShipmentRequest req = new SaveShipmentRequest();
+        final ShipmentDto dto = new ShipmentDto(s);
+        req.setShipment(dto);
+
+        final List<Long> ids = new LinkedList<>();
+        ids.add(stp.getId());
+        dto.setInterimStops(ids);
+
+        shipmentClient.saveShipment(req);
+        assertEquals(0, shipmentClient.getShipment(s.getId()).getInterimStops().size());
     }
     @Test
     public void testGetSingleShipmentBySnTrip() throws RestServiceException, IOException {

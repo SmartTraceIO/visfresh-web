@@ -205,6 +205,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             }
 
             saveInterimLoations(user, newShipment, req.getShipment().getInterimLocations());
+            updateInterimStops(newShipment, req.getShipment().getInterimStops());
 
             //build response
             final SaveShipmentResponse resp = new SaveShipmentResponse();
@@ -906,6 +907,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
             final ShipmentDto dto = new ShipmentDto(shipment);
             addInterimLocations(dto, shipment);
+            addInterimStops(dto, shipment);
 
             final JsonObject json = getSerializer(user).toJson(dto);
             return createSuccessResponse(json);
@@ -1086,6 +1088,41 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             in.setStopDateIso(isoFormat.format(stp.getDate()));
 
             dto.getInterimStops().add(in);
+        }
+    }
+    /**
+     * @param dto
+     * @param shipment
+     */
+    private void addInterimStops(final ShipmentDto dto, final Shipment shipment) {
+        final List<InterimStop> stops = this.interimStopDao.getByShipment(shipment);
+
+        final List<Long> list = new LinkedList<>();
+        for (final InterimStop stp : stops) {
+            list.add(stp.getId());
+        }
+
+        dto.setInterimStops(list);
+    }
+    /**
+     * Possible delete some interim stops.
+     * @param s shipment base.
+     * @param ids interim stops.
+     * @throws RestServiceException
+     */
+    protected void updateInterimStops(final Shipment s, final List<Long> ids) throws RestServiceException {
+        if (ids == null) {
+            return;
+        }
+
+        final Set<Long> set = new HashSet<>(ids);
+        final List<InterimStop> stops = this.interimStopDao.getByShipment(s);
+
+        //save interim locations
+        for (final InterimStop stp : stops) {
+            if (!set.contains(stp.getId())) {
+                interimStopDao.delete(stp);
+            }
         }
     }
     /**

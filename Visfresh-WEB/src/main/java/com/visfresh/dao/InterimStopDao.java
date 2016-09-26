@@ -19,4 +19,5 @@ public interface InterimStopDao {
     void add(Shipment s, InterimStop locs);
     void updateTime(Long id, int minutes);
     Map<Long, List<InterimStop>> getByShipmentIds(Collection<Long> ids);
+    void delete(InterimStop stp);
 }

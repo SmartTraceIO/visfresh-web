@@ -162,4 +162,14 @@ public class InterimStopDaoImpl implements InterimStopDao {
 
         jdbc.update("update interimstops set pause = :pause where id = :id", params);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.InterimStopDao#delete(com.visfresh.entities.InterimStop)
+     */
+    @Override
+    public void delete(final InterimStop stp) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("id", stp.getId());
+
+        jdbc.update("delete from interimstops where id = :id", params);
+    }
 }
