@@ -194,6 +194,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
 
         //create not temperature alert
         Alert a = new Alert();
+        a.setDate(new Date());
         a.setType(AlertType.LightOn);
         a.setDevice(shipment.getDevice());
         a.setShipment(shipment);
@@ -204,6 +205,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         assertEquals(0, emails.size());
 
         a = new TemperatureAlert();
+        a.setDate(new Date());
         a.setType(AlertType.CriticalHot);
         a.setDevice(shipment.getDevice());
         a.setShipment(shipment);

@@ -20,8 +20,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -56,9 +54,9 @@ import org.jfree.ui.RectangleInsets;
 import com.visfresh.controllers.UtilitiesController;
 import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.AlertType;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.reports.ImagePaintingSupport;
 import com.visfresh.utils.DateTimeUtils;
@@ -185,7 +183,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 chart.getXYPlot().addRangeMarker(greenLine, Layer.BACKGROUND);
 
                 //add yellow lines for light on/off alerts
-                final List<TimeRanges> lightOnOf = getLightOnOff(bean.getAlerts());
+                final List<TimeRanges> lightOnOf = getLightOnOff(bean.getReadings());
                 for (final TimeRanges dateRange : lightOnOf) {
                     final IntervalMarker yellowLine = new IntervalMarker(
                             dateRange.getStartTime(),
@@ -246,30 +244,19 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
         };
     }
     /**
-     * @param originAlerts
+     * @param events
      * @return
      */
-    protected static List<TimeRanges> getLightOnOff(final List<Alert> originAlerts) {
-        final List<Alert> alerts = new LinkedList<Alert>(originAlerts);
-        Collections.sort(alerts, new Comparator<Alert>() {
-            /* (non-Javadoc)
-             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-             */
-            @Override
-            public int compare(final Alert a1, final Alert a2) {
-                return a1.getDate().compareTo(a2.getDate());
-            }
-        });
-
+    protected static List<TimeRanges> getLightOnOff(final List<ShortTrackerEvent> events) {
         final List<TimeRanges> result = new LinkedList<>();
 
         TimeRanges r = null;
-        for (final Alert a : alerts) {
-            if (a.getType() == AlertType.LightOn) {
+        for (final ShortTrackerEvent a : events) {
+            if (a.getType() == TrackerEventType.BRT) {
                 r = new TimeRanges();
-                r.setStartTime(a.getDate().getTime());
-            } else if (a.getType() == AlertType.LightOff && r != null) {
-                r.setEndTime(a.getDate().getTime());
+                r.setStartTime(a.getTime().getTime());
+            } else if (a.getType() == TrackerEventType.DRK && r != null) {
+                r.setEndTime(a.getTime().getTime());
                 result.add(r);
                 r = null;
             }
