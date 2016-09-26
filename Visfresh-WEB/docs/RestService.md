@@ -795,6 +795,9 @@ see [Shipment Object](#markdown-header-shipment)
     "interimLocations": [
       4735,
       4736
+    ],
+    "interimStops": [ // not mandatory field. If not presented in request then not will changed in given shipment
+      980
     ]
 }
 ```
@@ -1847,6 +1850,9 @@ Response:
     "interimLocations": [
       4735,
       4736
+    ],
+    "interimStops": [ // not mandatory field. If not presented in request then not will changed in given shipment
+      980
     ]
   }
 }
@@ -2538,6 +2544,9 @@ Response:
     "interimLocations": [
       4735,
       4736
+    ],
+    "interimStops": [
+      980
     ]
   }
 }
