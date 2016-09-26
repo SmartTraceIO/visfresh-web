@@ -19,8 +19,9 @@ import java.awt.image.BufferedImage;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -53,7 +54,9 @@ import org.jfree.ui.Layer;
 import org.jfree.ui.RectangleInsets;
 
 import com.visfresh.controllers.UtilitiesController;
+import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
@@ -181,20 +184,22 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                         new Color(202, 255, 181, 150));
                 chart.getXYPlot().addRangeMarker(greenLine, Layer.BACKGROUND);
 
+                //add yellow lines for light on/off alerts
+                final List<TimeRanges> lightOnOf = getLightOnOff(bean.getAlerts());
+                for (final TimeRanges dateRange : lightOnOf) {
+                    final IntervalMarker yellowLine = new IntervalMarker(
+                            dateRange.getStartTime(),
+                            dateRange.getEndTime(),
+                            new Color(Color.YELLOW.getRed(), Color.YELLOW.getGreen(), Color.YELLOW.getBlue(), 70));
+                    chart.getXYPlot().addDomainMarker(yellowLine, Layer.BACKGROUND);
+                }
+
                 //temperature axis
                 final ValueAxis rangeAxis = chart.getXYPlot().getRangeAxis(0);
                 rangeAxis.setLabel("Temperature " + LocalizationUtils.getDegreeSymbol(tunits));
 
                 //correct tick count for temperature axis
-                final TickUnits tu = new TickUnits();
-                final NumberFormat format = createTemperatureAxisUnitFromat(
-                        rangeAxis.getUpperBound(), rangeAxis.getLowerBound());
-
-                tu.add(new NumberTickUnit(5., format));
-                tu.add(new NumberTickUnit(1., format));
-                tu.add(new NumberTickUnit(0.1, format));
-                tu.add(new NumberTickUnit(0.01, format));
-                rangeAxis.setStandardTickUnits(tu);
+                rangeAxis.setStandardTickUnits(createTicketUnits(rangeAxis));
 
                 //expand range Axis for draw start and end location icons
                 rangeAxis.getPlot().setInsets(new RectangleInsets(
@@ -221,7 +226,56 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                             bean.getDateArrived().getTime()), true);
                 }
             }
+
+            /**
+             * @param rangeAxis
+             * @return
+             */
+            protected TickUnits createTicketUnits(final ValueAxis rangeAxis) {
+                final DecimalFormat format = new DecimalFormat("#0.0");
+                final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
+                format.setDecimalFormatSymbols(decimalFormatSymbols);
+
+                final TickUnits tu = new TickUnits();
+                tu.add(new NumberTickUnit(5., format));
+                tu.add(new NumberTickUnit(1., format));
+                tu.add(new NumberTickUnit(0.1, format));
+                tu.add(new NumberTickUnit(0.01, format));
+                return tu;
+            }
         };
+    }
+    /**
+     * @param originAlerts
+     * @return
+     */
+    protected static List<TimeRanges> getLightOnOff(final List<Alert> originAlerts) {
+        final List<Alert> alerts = new LinkedList<Alert>(originAlerts);
+        Collections.sort(alerts, new Comparator<Alert>() {
+            /* (non-Javadoc)
+             * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+             */
+            @Override
+            public int compare(final Alert a1, final Alert a2) {
+                return a1.getDate().compareTo(a2.getDate());
+            }
+        });
+
+        final List<TimeRanges> result = new LinkedList<>();
+
+        TimeRanges r = null;
+        for (final Alert a : alerts) {
+            if (a.getType() == AlertType.LightOn) {
+                r = new TimeRanges();
+                r.setStartTime(a.getDate().getTime());
+            } else if (a.getType() == AlertType.LightOff && r != null) {
+                r.setEndTime(a.getDate().getTime());
+                result.add(r);
+                r = null;
+            }
+        }
+
+        return result;
     }
     /* (non-Javadoc)
      * @see org.jfree.chart.renderer.xy.AbstractXYItemRenderer#drawDomainLine(java.awt.Graphics2D, org.jfree.chart.plot.XYPlot, org.jfree.chart.axis.ValueAxis, java.awt.geom.Rectangle2D, double, java.awt.Paint, java.awt.Stroke)
@@ -268,16 +322,6 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
         } finally {
             g2.setClip(clip);
         }
-    }
-    /**
-     * @return
-     */
-    protected static NumberFormat createTemperatureAxisUnitFromat(
-            final double upperBound, final double lowerBound) {
-        final DecimalFormat fmt = new DecimalFormat("#0.0");
-        final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(Locale.US);
-        fmt.setDecimalFormatSymbols(decimalFormatSymbols);
-        return fmt;
     }
     /**
      * @param bean
