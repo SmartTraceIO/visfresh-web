@@ -28,6 +28,7 @@ import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.NoteDto;
+import com.visfresh.io.SaveInterimStopRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
@@ -723,7 +724,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.add(INTERIM_LOCATIONS, locationsToJson(dto.getInterimLocationAlternatives()));
 
             //interim stops
-            json.add(INTERIM_STOPS, interimStopsTJson(dto.getInterimStops()));
+            json.add(INTERIM_STOPS, interimStopsToJson(dto.getInterimStops()));
 
             //add notes
             final JsonArray notes = new JsonArray();
@@ -762,7 +763,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param interimStops
      * @return
      */
-    private JsonArray interimStopsTJson(final List<InterimStopDto> interimStops) {
+    private JsonArray interimStopsToJson(final List<InterimStopDto> interimStops) {
         final JsonArray array = new JsonArray();
         for (final InterimStopDto stop : interimStops) {
             array.add(toJson(stop));
@@ -788,7 +789,45 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.add("location", toJson(stop.getLocation()));
         return json;
     }
+    /**
+     * @param req
+     * @return
+     */
+    public JsonObject toJson(final SaveInterimStopRequest req) {
+        if (req == null) {
+            return null;
+        }
 
+        final JsonObject json = new JsonObject();
+        json.addProperty("shipmentId", req.getShipmentId());
+        json.addProperty("locationId", req.getLocationId());
+        json.addProperty("latitude", req.getLatitude());
+        json.addProperty("longitude", req.getLongitude());
+        json.addProperty("time", req.getTime());
+        json.addProperty("stopDate", isoFormat.format(req.getDate()));
+        return json;
+    }
+
+    public SaveInterimStopRequest parseSaveInterimStopRequest(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
+
+        final SaveInterimStopRequest req = new SaveInterimStopRequest();
+
+        req.setShipmentId(asLong(json.get("shipmentId")));
+        req.setLocationId(asLong(json.get("locationId")));
+        req.setLatitude(asDouble(json.get("latitude")));
+        req.setLongitude(asDouble(json.get("longitude")));
+        req.setTime(asInt(json.get("time")));
+        if (json.has("stopDate")) {
+            req.setDate(parseIsoDate(json.get("stopDate")));
+        }
+
+        return req;
+    }
     /**
      * @param locs locations.
      * @return JSON array of locations.

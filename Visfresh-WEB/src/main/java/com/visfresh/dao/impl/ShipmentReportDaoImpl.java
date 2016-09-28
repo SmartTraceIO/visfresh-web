@@ -145,7 +145,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         if (arrival != null) {
             final List<Arrival> arrivals = new LinkedList<>();
             arrivals.add(arrival);
-            bean.getWhoWasNotifiedByAlert().addAll(getNotified(arrivals));
+            bean.getWhoWasNotifiedByArrival().addAll(getNotified(arrivals));
         }
 
         if (s.getAlertProfile() != null) {

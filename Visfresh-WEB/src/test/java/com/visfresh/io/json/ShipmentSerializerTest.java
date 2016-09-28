@@ -23,6 +23,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.SaveInterimStopRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
@@ -272,7 +273,33 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(sortColumn, req.getSortColumn());
         assertEquals(sortOrder, req.getSortOrder());
     }
+    @Test
+    public void testSaveInterimStopRequest() {
+        final Date date = new Date(System.currentTimeMillis() - 100000000l);
+        final double latitude = 17.17;
+        final double longitude = 18.18;
+        final Long shipmentId = 77l;
+        final int time = 14;
+        final Long locationId = 87l;
 
+        SaveInterimStopRequest req = new SaveInterimStopRequest();
+
+        req.setDate(date);
+        req.setLatitude(latitude);
+        req.setLongitude(longitude);
+        req.setShipmentId(shipmentId);
+        req.setTime(time);
+        req.setLocationId(locationId);
+
+        req = this.serializer.parseSaveInterimStopRequest(serializer.toJson(req));
+
+        assertEquals(format(date), format(req.getDate()));
+        assertEquals(latitude, req.getLatitude(), 0.0001);
+        assertEquals(longitude, req.getLongitude(), 0.0001);
+        assertEquals(locationId, req.getLocationId());
+        assertEquals(shipmentId, req.getShipmentId());
+        assertEquals(time, req.getTime());
+    }
     /**
      * @param date
      * @return

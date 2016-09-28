@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -231,7 +232,7 @@ public class ShipmentReportBuilder {
 
         //add data
         final DRDataSource ds = new DRDataSource(columns);
-        ds.add("xxxxxxxxxxx", bean.getAlertProfile(), StringUtils.combine(bean.getWhoWasNotifiedByAlert(), ", "));
+        ds.add("xxxxxxxxxxx", bean.getAlertProfile(), namesAsString(bean.getWhoWasNotifiedByAlert()));
 
         report.setDataSource(ds);
         report.setShowColumnTitle(true);
@@ -242,6 +243,20 @@ public class ShipmentReportBuilder {
         final BorderBuilder border = Styles.border(Styles.pen1Point().setLineColor(Colors.DEFAULT_GREEN));
         sub.setStyle(Styles.style().setBorder(border));
         return sub;
+    }
+
+    /**
+     * @param names list of names.
+     * @return
+     */
+    private String namesAsString(final List<String> names) {
+//        //remove duplicates
+//        final Set<String> set = new HashSet<>(names);
+//        final List<String> list = new LinkedList<>(set);
+        final List<String> list = new LinkedList<>(names);
+        //sort names.
+        Collections.sort(list);
+        return StringUtils.combine(list, ", ");
     }
 
     /**
@@ -584,7 +599,7 @@ public class ShipmentReportBuilder {
         //Who was notified:     Rob Arpas, Rob Arpas
         final Map<String, Object> whoNotified = new HashMap<>();
         whoNotified.put(key, "Who was notified");
-        whoNotified.put(value, StringUtils.combine(bean.getWhoWasNotifiedByArrival(), ", "));
+        whoNotified.put(value, namesAsString(bean.getWhoWasNotifiedByArrival()));
         rows.add(whoNotified);
 
         //last reading data
