@@ -3511,8 +3511,8 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
   "stopDate": "2016-09-28 06:13"
 }
 ```
-```json  
 **Response:**  
+```json  
 {
   "status": {
     "code": 0,
