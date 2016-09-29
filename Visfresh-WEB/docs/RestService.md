@@ -3498,7 +3498,7 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
 **GET /vf/rest/getPerformanceReport/${accessToken}?month=2016-07**  
 
 **Returns PDF file as byte stream**  
-### Add Interim Stop ###
+### Add Interim Stop example ###
 **POST /vf/rest/addInterimStop/${accessToken}**  
 **Request:**  
 ```json
@@ -3510,7 +3510,8 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
   "time": 10,
   "stopDate": "2016-09-28 06:13"
 }
-```  
+```
+```json  
 **Response:**  
 {
   "status": {
