@@ -39,6 +39,7 @@ import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.InterimStopDao;
+import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
@@ -72,6 +73,7 @@ import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.ReferenceResolver;
+import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
@@ -130,6 +132,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     private ChartBundle chartBundle;
     @Autowired
     private LocationService locationService;
+    @Autowired
+    private LocationProfileDao locationProfileDao;
     @Autowired
     private ShipmentSiblingService siblingService;
     @Autowired
@@ -217,6 +221,53 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 resp.setTemplateId(tplId);
             }
             return createSuccessResponse(serializer.toJson(resp));
+        } catch (final Exception e) {
+            log.error("Failed to save shipment by request: " + jsonRequest, e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param jsonRequest JSON save shipment request.
+     * @return ID of saved shipment.
+     */
+    @RequestMapping(value = "/addInterimStop/{authToken}", method = RequestMethod.POST)
+    public JsonObject addInterimStop(@PathVariable final String authToken,
+            final @RequestBody JsonObject jsonRequest) {
+        try {
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.BasicUser);
+
+            final ShipmentSerializer serializer = getSerializer(user);
+            final AddInterimStopRequest req = serializer.parseSaveInterimStopRequest(jsonRequest);
+
+            //find shipment
+            final Shipment shipment = shipmentDao.findOne(req.getShipmentId());
+            if (shipment == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Unable to found shipment " + req.getShipmentId());
+            }
+            checkCompanyAccess(user, shipment);
+
+            //find location
+            final LocationProfile location = locationProfileDao.findOne(req.getLocationId());
+            if (location == null) {
+                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                        "Unable to found location " + req.getLocationId());
+            }
+            checkCompanyAccess(user, location);
+
+            //create interim stop
+            final InterimStop stop = new InterimStop();
+            stop.setDate(req.getDate());
+            stop.setLatitude(req.getLatitude());
+            stop.setLongitude(req.getLongitude());
+            stop.setLocation(location);
+            stop.setTime(req.getTime());
+
+            interimStopDao.add(shipment, stop);
+
+            return createIdResponse("id", stop.getId());
         } catch (final Exception e) {
             log.error("Failed to save shipment by request: " + jsonRequest, e);
             return createErrorResponse(e);

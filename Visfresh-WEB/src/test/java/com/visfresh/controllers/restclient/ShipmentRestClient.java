@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
+import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
@@ -78,6 +79,18 @@ public class ShipmentRestClient extends RestClient {
                 serializer.toJson(req)).getAsJsonObject();
         final SaveShipmentResponse resp = serializer.parseSaveShipmentResponse(e);
         return resp;
+    }
+    /**
+     * @param req save shipment request.
+     * @return save shipment response.
+     * @throws IOException
+     * @throws RestServiceException
+     */
+    public Long addInterimStop(final AddInterimStopRequest req)
+            throws IOException, RestServiceException {
+        final JsonObject e = sendPostRequest(getPathWithToken("addInterimStop"),
+                serializer.toJson(req)).getAsJsonObject();
+        return parseId(e);
     }
     /* (non-Javadoc)
      * @see com.visfresh.io.ReferenceResolver#getShipment(java.lang.Long)

@@ -134,21 +134,21 @@ public class InterimStopDaoImpl implements InterimStopDao {
      * @see com.visfresh.dao.InterimStopDao#add(com.visfresh.entities.Shipment, com.visfresh.entities.InterimStop)
      */
     @Override
-    public void add(final Shipment s, final InterimStop locs) {
+    public void add(final Shipment s, final InterimStop stop) {
         final Map<String, Object> params = new HashMap<>();
         params.put("shipment", s.getId());
-        params.put("location", locs.getLocation().getId());
-        params.put("latitude", locs.getLatitude());
-        params.put("longitude", locs.getLongitude());
-        params.put("pause", locs.getTime());
-        params.put("date", locs.getDate());
+        params.put("location", stop.getLocation().getId());
+        params.put("latitude", stop.getLatitude());
+        params.put("longitude", stop.getLongitude());
+        params.put("pause", stop.getTime());
+        params.put("date", stop.getDate());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update("insert into interimstops(shipment, location, latitude, longitude, pause, `date`)"
                 + " values(:shipment, :location, :latitude, :longitude, :pause, :date)",
                 new MapSqlParameterSource(params), keyHolder);
         if (keyHolder.getKey() != null) {
-            locs.setId(keyHolder.getKey().longValue());
+            stop.setId(keyHolder.getKey().longValue());
         }
     }
     /* (non-Javadoc)

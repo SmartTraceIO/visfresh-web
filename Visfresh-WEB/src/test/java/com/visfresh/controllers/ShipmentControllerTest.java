@@ -11,6 +11,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -59,6 +61,7 @@ import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.SaveShipmentRequest;
@@ -989,6 +992,38 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentClient.saveShipment(req);
         assertEquals(0, shipmentClient.getShipment(s.getId()).getInterimStops().size());
     }
+    @Test
+    public void testAddInterimStop() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        final LocationProfile loc = createLocationProfile(true);
+
+        final Date date = new Date(System.currentTimeMillis() - 100000000l);
+        final double latitude = 11.11;
+        final double longitude = 12.12;
+        final int time = 10;
+
+        final AddInterimStopRequest req = new AddInterimStopRequest();
+        req.setDate(date);
+        req.setLatitude(latitude);
+        req.setLongitude(longitude);
+        req.setShipmentId(s.getId());
+        req.setLocationId(loc.getId());
+        req.setTime(time);
+
+        final Long id = shipmentClient.addInterimStop(req);
+        assertNotNull(id);
+
+        final InterimStop stop = context.getBean(InterimStopDao.class).getByShipment(s).get(0);
+        final DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+
+        assertEquals(id, stop.getId());
+        assertEquals(fmt.format(date), fmt.format(stop.getDate()));
+        assertEquals(latitude, stop.getLatitude(), 0.0001);
+        assertEquals(longitude, stop.getLongitude(), 0.0001);
+        assertEquals(loc.getId(), stop.getLocation().getId());
+        assertEquals(time, stop.getTime());
+    }
+
     @Test
     public void testGetSingleShipmentBySnTrip() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);

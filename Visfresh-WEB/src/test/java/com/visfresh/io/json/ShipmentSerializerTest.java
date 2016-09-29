@@ -23,7 +23,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
-import com.visfresh.io.SaveInterimStopRequest;
+import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
@@ -282,7 +282,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final int time = 14;
         final Long locationId = 87l;
 
-        SaveInterimStopRequest req = new SaveInterimStopRequest();
+        AddInterimStopRequest req = new AddInterimStopRequest();
 
         req.setDate(date);
         req.setLatitude(latitude);

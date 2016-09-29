@@ -9,7 +9,7 @@ import java.util.Date;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class SaveInterimStopRequest {
+public class AddInterimStopRequest {
     private Long shipmentId;
     private Long locationId;
     private double latitude;
@@ -20,7 +20,7 @@ public class SaveInterimStopRequest {
     /**
      * Default constructor.
      */
-    public SaveInterimStopRequest() {
+    public AddInterimStopRequest() {
         super();
     }
 

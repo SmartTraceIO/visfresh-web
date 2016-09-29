@@ -28,7 +28,7 @@ import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.NoteDto;
-import com.visfresh.io.SaveInterimStopRequest;
+import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
@@ -793,7 +793,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param req
      * @return
      */
-    public JsonObject toJson(final SaveInterimStopRequest req) {
+    public JsonObject toJson(final AddInterimStopRequest req) {
         if (req == null) {
             return null;
         }
@@ -808,14 +808,14 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         return json;
     }
 
-    public SaveInterimStopRequest parseSaveInterimStopRequest(final JsonElement e) {
+    public AddInterimStopRequest parseSaveInterimStopRequest(final JsonElement e) {
         if (e == null || e.isJsonNull()) {
             return null;
         }
 
         final JsonObject json = e.getAsJsonObject();
 
-        final SaveInterimStopRequest req = new SaveInterimStopRequest();
+        final AddInterimStopRequest req = new AddInterimStopRequest();
 
         req.setShipmentId(asLong(json.get("shipmentId")));
         req.setLocationId(asLong(json.get("locationId")));

@@ -397,7 +397,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         notificator.sendNotification(s1, arrival, e);
 
         final ShipmentReportBean report = dao.createReport(shipment);
-        assertEquals(1, report.getWhoWasNotifiedByAlert().size());
+        assertEquals(1, report.getWhoWasNotifiedByArrival().size());
     }
 
     /**

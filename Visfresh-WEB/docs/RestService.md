@@ -125,6 +125,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 64. [Get Shipment Report](#markdown-header-get-shipment-report)  
 65. [Email Shipment Report](#markdown-header-email-shipment-report)  
 66. [Get Performance Report](#markdown-header-get-performance-report)  
+67. [Add Interim Stop](#markdown-header-add-interim-stop)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -553,6 +554,11 @@ Method *GET*, method name *getPerformanceReport*. Request parameters:
 1. month (yyyy-MM) end month of report. Not require, by default current month will used.  
 Returns PDF file as byte stream  
 [(example)](#markdown-header-get-performance-report-example)
+
+### Add Interim Stop ###
+Method *POST*, method name *addInterimStop*. Request body JSON serialized request.  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-add-interim-stop-example)
 
 ## Objects
 ### Response message ###
@@ -3492,3 +3498,27 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
 **GET /vf/rest/getPerformanceReport/${accessToken}?month=2016-07**  
 
 **Returns PDF file as byte stream**  
+### Add Interim Stop ###
+**POST /vf/rest/addInterimStop/${accessToken}**  
+**Request:**  
+```json
+{
+  "shipmentId": 32348,
+  "locationId": 33197,
+  "latitude": 11.11,
+  "longitude": 12.12,
+  "time": 10,
+  "stopDate": "2016-09-28 06:13"
+}
+```  
+**Response:**  
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "id": 1134
+  }
+}
+```
