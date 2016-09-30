@@ -40,18 +40,11 @@ public class TemperatureStatsCollector {
     }
 
     public void processEvent(final TrackerEvent e) {
-        //check possible should ignore
-        final Shipment shipment = e.getShipment();
-        if (shipment == null || shipment.getAlertProfile() == null) {
+        if (filter(e)) {
             return;
         }
 
-        //check alert suppressed.
-        if (shipment.getAlertSuppressionMinutes() > 0
-                && e.getTime().before(new Date(shipment.getShipmentDate().getTime()
-                + 60 * 1000l * shipment.getAlertSuppressionMinutes()))) {
-            return;
-        }
+        final Shipment shipment = e.getShipment();
 
         n++;
         final double t = e.getTemperature();
@@ -81,6 +74,31 @@ public class TemperatureStatsCollector {
         }
 
         lastEvents.put(shipmentId, e);
+    }
+
+    /**
+     * @param e
+     * @return
+     */
+    protected boolean filter(final TrackerEvent e) {
+        //check possible should ignore
+        final Shipment shipment = e.getShipment();
+        if (shipment == null || shipment.getAlertProfile() == null) {
+            return true;
+        }
+
+        //check alert suppressed.
+        if (shipment.getAlertSuppressionMinutes() > 0
+                && e.getTime().before(new Date(shipment.getShipmentDate().getTime()
+                + 60 * 1000l * shipment.getAlertSuppressionMinutes()))) {
+            return true;
+        }
+
+        if (shipment.getArrivalDate() != null && e.getTime().after(shipment.getArrivalDate())) {
+            return true;
+        }
+
+        return false;
     }
 
     public TemperatureStats applyStatistics() {
