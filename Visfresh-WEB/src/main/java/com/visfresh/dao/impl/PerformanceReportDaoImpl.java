@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.AlertDao;
@@ -30,6 +29,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
@@ -50,8 +50,6 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
     private static final String HAS_HOT = "hasHot";
     private static final String HAS_COLD = "hasCold";
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbc;
     @Autowired
     private TrackerEventDao trackerEventDao;
     @Autowired
@@ -335,11 +333,18 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
         final List<Alert> alerts = alertDao.getAlerts(c, startDate, endDate);
 
         for (final Alert alert : alerts) {
-            if (alert.getShipment() != null && alert instanceof TemperatureAlert) {
+            final Shipment shipment = alert.getShipment();
+            if (shipment != null && shipment.getStatus() == ShipmentStatus.Arrived && alert instanceof TemperatureAlert) {
                 //alert profile scope
-                final Long alertProfileId = alert.getShipment().getAlertProfile().getId();
+                final Long alertProfileId = shipment.getAlertProfile().getId();
 
                 final Map<String, Map<Long, Map<String, Boolean>>> alertProfileData = data.get(alertProfileId);
+                if (alertProfileData == null) {
+                    //Please not remove this block. The alert profile can be moved to another company
+                    //manually, therefore shipment can have alert profile from left company
+                    continue;
+                }
+
                 //monthly scope
                 final String yearMonth = fmt.format(alert.getDate());
 
@@ -350,7 +355,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
                 final Map<Long, Map<String, Boolean>> monthlyData = alertProfileData.get(yearMonth);
 
                 //shipment scope
-                final Long shipmentId = alert.getShipment().getId();
+                final Long shipmentId = shipment.getId();
                 if (!monthlyData.containsKey(shipmentId)) {
                     monthlyData.put(shipmentId, new HashMap<String, Boolean>());
                 }

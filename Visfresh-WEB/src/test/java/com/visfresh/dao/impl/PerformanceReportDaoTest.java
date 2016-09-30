@@ -109,6 +109,49 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
         assertEquals(1, stats.getNotAlerts());
     }
     @Test
+    public void testExcludeNotArrivedShipments() {
+        final AlertProfile ap = createAlertProfile("JUnit-AlertProfile");
+        final Shipment s1 = createShipment(ap, ShipmentStatus.Default);
+        final Shipment s2 = createShipment(ap, ShipmentStatus.Ended);
+        final Shipment s3 = createShipment(ap, ShipmentStatus.Ended);
+        final Shipment s4 = createShipment(ap, ShipmentStatus.Default);
+        createShipment(ap, ShipmentStatus.Default);
+
+        final Date time = getMiddleOfMonth("2016.08");
+
+        final TrackerEvent e1 = createEvent(s1, time, 1.);
+        final TrackerEvent e2 = createEvent(s2, time, 1.);
+        final TrackerEvent e3 = createEvent(s3, time, 1.);
+        createEvent(s4, time, 1.);
+
+        createAlert(e1, AlertType.Hot);
+        createAlert(e1, AlertType.Hot);
+        createAlert(e1, AlertType.CriticalHot);
+        createAlert(e2, AlertType.Cold);
+        createAlert(e2, AlertType.Cold);
+        createAlert(e2, AlertType.CriticalCold);
+        createAlert(e3, AlertType.Hot);
+        createAlert(e3, AlertType.Cold);
+
+        final PerformanceReportBean report = dao.createReport(ap.getCompany(),
+                new Date(time.getTime() - 10000000l), new Date(time.getTime() + 10000000l));
+
+        assertNotNull(report);
+        assertEquals(1, report.getAlertProfiles().size());
+
+        final List<MonthlyTemperatureStats> monthlyStats = report.getAlertProfiles().get(0).getMonthlyData();
+        assertEquals(1, monthlyStats.size());
+
+        final MonthlyTemperatureStats ms = monthlyStats.get(0);
+        assertEquals(0, ms.getNumShipments());
+
+        final ReportsWithAlertStats stats = ms.getAlertStats();
+        assertEquals(0, stats.getHotAlerts());
+        assertEquals(0, stats.getColdAlerts());
+        assertEquals(0, stats.getHotAndColdAlerts());
+        assertEquals(0, stats.getNotAlerts());
+    }
+    @Test
     public void testShipmentStatsTwoMonths() {
         final AlertProfile ap = createAlertProfile("JUnit-AlertProfile");
         final Shipment s1 = createShipment(ap);
@@ -419,11 +462,21 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
      * @return
      */
     private Shipment createShipment(final AlertProfile ap) {
+        return createShipment(ap, ShipmentStatus.Arrived);
+    }
+
+    /**
+     * @param ap
+     * @param status
+     * @return
+     */
+    protected Shipment createShipment(final AlertProfile ap,
+            final ShipmentStatus status) {
         final Shipment s = new Shipment();
         s.setAlertProfile(ap);
         s.setCompany(device.getCompany());
         s.setDevice(device);
-        s.setStatus(ShipmentStatus.Arrived);
+        s.setStatus(status);
         return context.getBean(ShipmentDao.class).save(s);
     }
     /**
