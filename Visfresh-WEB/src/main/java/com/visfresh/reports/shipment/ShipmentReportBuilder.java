@@ -327,7 +327,7 @@ public class ShipmentReportBuilder {
         if (bean.getAlertSuppressionMinutes() > 0) {
             titleText += " (excluding "
                     + LocalizationUtils.formatByOneDecimal(bean.getAlertSuppressionMinutes() / 60.) + "hrs"
-                    + " cooldown period)";
+                    + " cooldown and post-arrival)";
         }
 
         final VerticalListBuilder list = createStyledVerticalListWithTitle(titleText);

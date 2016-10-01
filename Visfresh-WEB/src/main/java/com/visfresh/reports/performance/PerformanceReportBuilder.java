@@ -330,6 +330,7 @@ public class PerformanceReportBuilder {
                 axis.setTickLabelsVisible(false);
                 axis.setAxisLineVisible(false);
                 axis.setTickMarksVisible(false);
+                axis.setRange(0., 110.);
 
                 //update bar renderer.
                 final BarRenderer r = (BarRenderer) plot.getRenderer();
@@ -372,12 +373,14 @@ public class PerformanceReportBuilder {
                     protected Object[] createItemArray(final CategoryDataset dataset,
                             final int row, final int column) {
                         final Object[] array = super.createItemArray(dataset, row, column);
-                        final TemperatureStats stats = alertProfileStats.getMonthlyData().get(column).getTemperatureStats();
+                        final TemperatureStats stats = alertProfileStats.getMonthlyData().get(column)
+                                .getTemperatureStats();
                         final Number value = dataset.getValue(row, column);
 
                         if (stats.getTotalTime() > 0 && value != null) {
-                            final double percents = value.doubleValue() * oneHour / stats.getTotalTime() * 100;
-                            array[3] = LocalizationUtils.formatByOneDecimal(percents);
+                            final double time = row == 0 ? stats.getTimeBelowLowerLimit() : stats.getTimeAboveUpperLimit();
+                            array[2] = LocalizationUtils.formatByOneDecimal(time / oneHour);
+                            array[3] = LocalizationUtils.formatByOneDecimal(time / stats.getTotalTime() * 100);
                         } else {
                             array[2] = "0.0";
                             array[3] = "0.0";
@@ -406,9 +409,13 @@ public class PerformanceReportBuilder {
 
             //set data source
             final TemperatureStats as = stats.getTemperatureStats();
-            ds.add(month,
-                as.getTimeBelowLowerLimit() / oneHour,
-                as.getTimeAboveUpperLimit() / oneHour);
+            if (as.getTotalTime() > 0) {
+                ds.add(month,
+                        (double) as.getTimeBelowLowerLimit() / as.getTotalTime() * 100.,
+                        (double) as.getTimeAboveUpperLimit() / as.getTotalTime() * 100.);
+            } else {
+                ds.add(month, 0.0, 0.0);
+            }
         }
 
         chart.setDataSource(ds);
@@ -719,7 +726,7 @@ public class PerformanceReportBuilder {
         header.add(title);
 
         final TextFieldBuilder<String> remark = createRemark("* Arrived Shipments with \""
-                + alertProfileName + "\" profile").setStyle(
+                + alertProfileName + "\" profile (excludes cooldown and post-arrival period)").setStyle(
                         createStyleByFont(DEFAULT_FONT_SIZE, false));
         remark.setHorizontalTextAlignment(HorizontalTextAlignment.RIGHT);
         header.add(remark);
