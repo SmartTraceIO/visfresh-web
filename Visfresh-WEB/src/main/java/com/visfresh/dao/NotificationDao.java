@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.visfresh.entities.Notification;
+import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.User;
 
 /**
@@ -40,7 +41,8 @@ public interface NotificationDao extends
     int getEntityCount(User user, boolean excludeLight, Filter filter);
     /**
      * @param ids collection of ID.
+     * @param type issue type.
      * @return list of notifications for given ID collection.
      */
-    List<Notification> getForIssues(Collection<Long> ids);
+    List<Notification> getForIssues(Collection<Long> ids, NotificationType type);
 }

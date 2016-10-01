@@ -3,6 +3,10 @@
  */
 package com.visfresh.reports;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 import net.sf.dynamicreports.report.builder.component.Components;
@@ -14,6 +18,7 @@ import net.sf.dynamicreports.report.builder.style.PenBuilder;
 import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.builder.style.Styles;
 import net.sf.dynamicreports.report.constant.ComponentPositionType;
+import net.sf.dynamicreports.report.constant.HorizontalImageAlignment;
 import net.sf.dynamicreports.report.constant.ImageScale;
 import net.sf.dynamicreports.report.constant.StretchType;
 import net.sf.dynamicreports.report.definition.ReportParameters;
@@ -141,5 +146,45 @@ public final class ReportUtils {
         image.setImageScale(ImageScale.RETAIN_SHAPE);
         list.add(image);
         return list;
+    }
+    /**
+     * @return
+     */
+    public static ImageBuilder createDeviceRect(final Color c, final int padding) {
+        //create background image.
+        final BufferedImage bim = createDeviceRectImage(c, padding);
+
+        final ImageBuilder image = Components.image(bim);
+        image.setFixedDimension(bim.getWidth(), bim.getHeight());
+        image.setImageScale(ImageScale.RETAIN_SHAPE);
+        image.setHorizontalImageAlignment(HorizontalImageAlignment.LEFT);
+        image.setStretchType(StretchType.CONTAINER_HEIGHT);
+        image.setStyle(Styles.style().setPadding(padding));
+
+        return image;
+    }
+
+    /**
+     * @param c
+     * @param padding
+     * @return
+     */
+    public static BufferedImage createDeviceRectImage(final Color c,
+            final int padding) {
+        final int size = 10 + 2 * padding;
+
+        final BufferedImage bim = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB_PRE);
+        final Graphics2D g = bim.createGraphics();
+        try {
+            g.setColor(c);
+            g.fillRect(0, 0, size, size);
+
+            g.setColor(Color.BLACK);
+            g.setStroke(new BasicStroke(1f));
+            g.drawRect(0, 0, size - 1, size - 1);
+        } finally {
+            g.dispose();
+        }
+        return bim;
     }
 }

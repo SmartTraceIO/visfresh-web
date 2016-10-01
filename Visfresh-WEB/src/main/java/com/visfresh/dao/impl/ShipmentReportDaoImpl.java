@@ -25,6 +25,7 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
@@ -139,13 +140,13 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
 
         //get notifications
         //notified by alert
-        bean.getWhoWasNotifiedByAlert().addAll(getNotified(alerts));
+        bean.getWhoWasNotifiedByAlert().addAll(getNotified(alerts, NotificationType.Alert));
 
         //arrivals
         if (arrival != null) {
             final List<Arrival> arrivals = new LinkedList<>();
             arrivals.add(arrival);
-            bean.getWhoWasNotifiedByArrival().addAll(getNotified(arrivals));
+            bean.getWhoWasNotifiedByArrival().addAll(getNotified(arrivals, NotificationType.Arrival));
         }
 
         if (s.getAlertProfile() != null) {
@@ -158,11 +159,11 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @param issues
      * @return
      */
-    private List<String> getNotified(final List<? extends NotificationIssue> issues) {
+    private List<String> getNotified(final List<? extends NotificationIssue> issues, final NotificationType type) {
         final Set<Long> ids = new HashSet<>();
         final List<String> list = new LinkedList<>();
 
-        final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(issues));
+        final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(issues), type);
         for (final Notification n : notifs) {
             final User u = n.getUser();
             if (!ids.contains(u.getId())) {

@@ -3,7 +3,6 @@
  */
 package com.visfresh.reports.shipment;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -754,7 +753,7 @@ public class ShipmentReportBuilder {
         firstTableCols[1] = Columns.componentColumn("value", deviceWithAlerts);
 
         //add device
-        final ImageBuilder deviceRect = createDeviceRect(bean.getDeviceColor());
+        final ImageBuilder deviceRect = ReportUtils.createDeviceRect(bean.getDeviceColor(), DEFAULT_PADDING);
         deviceWithAlerts.add(deviceRect);
 
         //add shipment number
@@ -896,35 +895,6 @@ public class ShipmentReportBuilder {
         rows.add(row);
     }
 
-    /**
-     * @return
-     */
-    private ImageBuilder createDeviceRect(final Color c) {
-        //create background image.
-        final int size = 10 + 2 * DEFAULT_PADDING;
-
-        final BufferedImage bim = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB_PRE);
-        final Graphics2D g = bim.createGraphics();
-        try {
-            g.setColor(c);
-            g.fillRect(0, 0, size, size);
-
-            g.setColor(Color.BLACK);
-            g.setStroke(new BasicStroke(1f));
-            g.drawRect(0, 0, size - 1, size - 1);
-        } finally {
-            g.dispose();
-        }
-
-        final ImageBuilder image = Components.image(bim);
-        image.setFixedDimension(bim.getWidth(), bim.getHeight());
-        image.setImageScale(ImageScale.RETAIN_SHAPE);
-        image.setHorizontalImageAlignment(HorizontalImageAlignment.LEFT);
-        image.setStretchType(StretchType.CONTAINER_HEIGHT);
-        image.setStyle(Styles.style().setPadding(DEFAULT_PADDING));
-
-        return image;
-    }
 
     /**
      * @param bean report bean.

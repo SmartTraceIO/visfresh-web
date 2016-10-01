@@ -453,11 +453,9 @@ public class PerformanceReportBuilder {
         };
 
         //add charts
-        int i = 0;
         for (final MonthlyTemperatureStats stats : alertProfileStats.getMonthlyData()) {
             final PieChartBuilder chart = Charts.pieChart();
             chart.addSerie(Charts.serie("value", Integer.class));
-            chart.addSeriesColor(colors);
             chart.setTitle(titleDateFormat.format(stats.getMonth()));
             chart.setTitleFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE + 3).bold());
             chart.setKey("key", String.class);
@@ -467,6 +465,8 @@ public class PerformanceReportBuilder {
                 @Override
                 public void customize(final JFreeChart chart, final ReportParameters reportParameters) {
                     final PiePlot plot = (PiePlot) chart.getPlot();
+                    plot.setIgnoreNullValues(true);
+                    plot.setIgnoreZeroValues(true);
                     plot.setLabelGenerator(new PieLabelGenerator(new HashMap<Comparable<?>, String>()){
                         @Override
                         public String generateSectionLabel(final PieDataset ds,
@@ -480,15 +480,21 @@ public class PerformanceReportBuilder {
             //set data source
             final ReportsWithAlertStats as = stats.getAlertStats();
             final DRDataSource ds = new DRDataSource("key", "value");
-            ds.add(i + "_1", as.getNotAlerts());
-            ds.add(i + "_2", as.getHotAlerts());
-            ds.add(i + "_3", as.getColdAlerts());
-            ds.add(i + "_4", as.getHotAndColdAlerts());
+            ds.add("notAlerts", as.getNotAlerts());
+            ds.add("hotAlerts", as.getHotAlerts());
+            ds.add("coldAlerts", as.getColdAlerts());
+            ds.add("hotAndColdAlerts", as.getHotAndColdAlerts());
 
             chart.setDataSource(ds);
 
+            //set colors
+            chart.addSeriesColorByName("notAlerts", colors[0]);
+            chart.addSeriesColorByName("hotAlerts", colors[1]);
+            chart.addSeriesColorByName("coldAlerts", colors[2]);
+            chart.addSeriesColorByName("hotAndColdAlerts", colors[3]);
+
+
             list.add(chart);
-            i++;
         }
 
         //add title component

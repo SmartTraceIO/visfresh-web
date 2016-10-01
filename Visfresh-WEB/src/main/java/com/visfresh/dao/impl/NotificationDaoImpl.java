@@ -232,18 +232,21 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * @see com.visfresh.dao.NotificationDao#getForIssue(java.util.Collection)
      */
     @Override
-    public List<Notification> getForIssues(final Collection<Long> ids) {
+    public List<Notification> getForIssues(final Collection<Long> ids, final NotificationType type) {
         if (ids.isEmpty()) {
             return new LinkedList<>();
         }
 
-        final String sql = "select * from " + getTableName() + " where "
+        final String sql = "select * from " + getTableName() + " where type = :type and "
             +  ISSUE_FIELD + " in (" + StringUtils.combine(ids, ",") + ")";
 
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                sql, new HashMap<String, Object>());
+        final HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("type", type.name());
 
-        final Map<String, Object> cache = new HashMap<String, Object>();
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                sql, params);
+
+        final Map<String, Object> cache = params;
         final List<Notification> result = new LinkedList<Notification>();
         for (final Map<String,Object> map : list) {
             final Notification t = createEntity(map);

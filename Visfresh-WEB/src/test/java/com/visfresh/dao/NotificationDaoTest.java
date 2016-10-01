@@ -236,7 +236,8 @@ public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notificat
         ids.add(a1.getId());
         ids.add(a3.getId());
 
-        assertEquals(2, dao.getForIssues(ids).size());
+        assertEquals(2, dao.getForIssues(ids, NotificationType.Alert).size());
+        assertEquals(0, dao.getForIssues(ids, NotificationType.Arrival).size());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()

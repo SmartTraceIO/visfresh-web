@@ -30,6 +30,7 @@ public final class PerformanceReportBuilderTool {
         AlertType.CriticalCold
     };
     private static final String[] serialNums = {"123", "324", "673", "257"};
+    private static int count;
 
     /**
      * Default constructor.
@@ -146,10 +147,21 @@ public final class PerformanceReportBuilderTool {
         stats.setTimeAboveUpperLimit(11 * oneHour + oneHour / 2);
         stats.setTimeBelowLowerLimit(12 * oneHour);
 
-        ms.getAlertStats().setColdAlerts(5);
-        ms.getAlertStats().setHotAlerts(7);
-        ms.getAlertStats().setHotAndColdAlerts(2);
-        ms.getAlertStats().setNotAlerts(15);
+        final int n = count % 4;
+        if (n != 0) {
+            ms.getAlertStats().setColdAlerts(5);
+        }
+        if (n != 1) {
+            ms.getAlertStats().setHotAlerts(7);
+        }
+        if (n != 2) {
+            ms.getAlertStats().setHotAndColdAlerts(2);
+        }
+        if (n != 3) {
+            ms.getAlertStats().setNotAlerts(15);
+        }
+        count++;
+
         return ms;
     }
 }
