@@ -28,6 +28,7 @@ import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.ShortTrackerEventsImporter;
@@ -236,6 +237,11 @@ public final class ShipmentReportBuilderTool {
             alert = ta;
         } else {
             alert = new Alert(rule.getType());
+            if (rule.getType() == AlertType.LightOn) {
+                e.setType(TrackerEventType.BRT);
+            } else if (rule.getType() == AlertType.LightOff) {
+                e.setType(TrackerEventType.DRK);
+            }
         }
 
         alert.setDate(e.getTime());

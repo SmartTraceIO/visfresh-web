@@ -255,11 +255,16 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
             if (a.getType() == TrackerEventType.BRT) {
                 r = new TimeRanges();
                 r.setStartTime(a.getTime().getTime());
+                result.add(r);
             } else if (a.getType() == TrackerEventType.DRK && r != null) {
                 r.setEndTime(a.getTime().getTime());
-                result.add(r);
                 r = null;
             }
+        }
+
+        if (r != null) {
+            //expand yellow line to end of chart.
+            r.setEndTime(events.get(events.size() - 1).getTime().getTime());
         }
 
         return result;
