@@ -5,6 +5,7 @@ package com.visfresh.io;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.visfresh.entities.Shipment;
@@ -18,6 +19,8 @@ public class ShipmentDto extends ShipmentBaseDto {
     private String deviceImei;
     private String deviceSN;
     private String deviceName;
+    private List<Long> interimStops;
+
     /**
      * Pallet ID.
      */
@@ -313,5 +316,17 @@ public class ShipmentDto extends ShipmentBaseDto {
      */
     public Map<String, String> getCustomFields() {
         return customFields;
+    }
+    /**
+     * @return the interimStops
+     */
+    public List<Long> getInterimStops() {
+        return interimStops;
+    }
+    /**
+     * @param interimStops the interimStops to set
+     */
+    public void setInterimStops(final List<Long> interimStops) {
+        this.interimStops = interimStops;
     }
 }

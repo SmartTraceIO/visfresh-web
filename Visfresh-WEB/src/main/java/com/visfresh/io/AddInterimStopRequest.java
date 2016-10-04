@@ -12,8 +12,8 @@ import java.util.Date;
 public class AddInterimStopRequest {
     private Long shipmentId;
     private Long locationId;
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
     private Date date;
     private int time;
 
@@ -51,7 +51,7 @@ public class AddInterimStopRequest {
     /**
      * @return the latitude
      */
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
     /**
@@ -63,7 +63,7 @@ public class AddInterimStopRequest {
     /**
      * @return the longitude
      */
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
     /**

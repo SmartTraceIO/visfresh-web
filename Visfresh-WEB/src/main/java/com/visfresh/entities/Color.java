@@ -42,7 +42,7 @@ public enum Color {
     IndianRed("#CD5C5C"),
     Indigo("#4B0082"),
 //    Lime("#00FF00"),
-//    Magenta("#FF00FF"),
+    Magenta("#FF00FF"),
     Maroon("#800000"),
     MediumAquamarine("#66CDAA"),
     MediumsLateBlue("#7B68EE"),

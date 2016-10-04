@@ -80,7 +80,6 @@ public class ShipmentBaseDto {
      */
     private boolean isAutostart;
     private List<Long> interimLocations;
-    private List<Long> interimStops;
 
     /**
      * Default constructor.
@@ -301,17 +300,5 @@ public class ShipmentBaseDto {
      */
     public List<Long> getInterimLocations() {
         return interimLocations;
-    }
-    /**
-     * @return the interimStops
-     */
-    public List<Long> getInterimStops() {
-        return interimStops;
-    }
-    /**
-     * @param interimStops the interimStops to set
-     */
-    public void setInterimStops(final List<Long> interimStops) {
-        this.interimStops = interimStops;
     }
 }

@@ -24,11 +24,11 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
+import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.NoteDto;
-import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
@@ -804,7 +804,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("latitude", req.getLatitude());
         json.addProperty("longitude", req.getLongitude());
         json.addProperty("time", req.getTime());
-        json.addProperty("stopDate", isoFormat.format(req.getDate()));
+        json.addProperty("stopDate", req.getDate() == null ? null : isoFormat.format(req.getDate()));
         return json;
     }
 

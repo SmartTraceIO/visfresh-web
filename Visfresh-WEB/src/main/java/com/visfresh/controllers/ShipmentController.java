@@ -69,11 +69,11 @@ import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.ReferenceResolver;
-import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
@@ -259,9 +259,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
             //create interim stop
             final InterimStop stop = new InterimStop();
-            stop.setDate(req.getDate());
-            stop.setLatitude(req.getLatitude());
-            stop.setLongitude(req.getLongitude());
+            stop.setDate(req.getDate() == null ? new Date() : req.getDate());
+            stop.setLatitude(req.getLatitude() == null ? location.getLocation().getLatitude() : req.getLatitude());
+            stop.setLongitude(req.getLongitude() == null ? location.getLocation().getLongitude() : req.getLongitude());
             stop.setLocation(location);
             stop.setTime(req.getTime());
 

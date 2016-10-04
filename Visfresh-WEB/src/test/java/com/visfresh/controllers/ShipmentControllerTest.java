@@ -1023,6 +1023,30 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(loc.getId(), stop.getLocation().getId());
         assertEquals(time, stop.getTime());
     }
+    @Test
+    public void testAddInterimStopNullValues() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        final LocationProfile loc = createLocationProfile(true);
+
+        final int time = 10;
+
+        final AddInterimStopRequest req = new AddInterimStopRequest();
+        req.setShipmentId(s.getId());
+        req.setLocationId(loc.getId());
+        req.setTime(time);
+
+        final Long id = shipmentClient.addInterimStop(req);
+        assertNotNull(id);
+
+        final InterimStop stop = context.getBean(InterimStopDao.class).getByShipment(s).get(0);
+
+        assertEquals(id, stop.getId());
+        assertNotNull(stop.getDate());
+        assertNotNull(stop.getLatitude());
+        assertNotNull(stop.getLongitude());
+        assertEquals(loc.getId(), stop.getLocation().getId());
+        assertEquals(time, stop.getTime());
+    }
 
     @Test
     public void testGetSingleShipmentBySnTrip() throws RestServiceException, IOException {
