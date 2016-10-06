@@ -3,6 +3,7 @@
  */
 package com.visfresh.io.json;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,6 +15,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.entities.EntityWithId;
+import com.visfresh.entities.Language;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -187,5 +190,21 @@ public class AbstractJsonSerializer {
      */
     public TimeZone getTimeZone() {
         return timeZone;
+    }
+    /**
+     * @param lang language.
+     * @param tz time zone
+     * @return
+     */
+    protected DateFormat createPrettyFormat(final Language lang, final TimeZone tz) {
+        return DateTimeUtils.createPrettyFormat(lang, tz);
+    }
+    /**
+     * @param lang language.
+     * @param tz time zone
+     * @return
+     */
+    protected DateFormat createIsoFormat(final Language lang, final TimeZone tz) {
+        return DateTimeUtils.createIsoFormat(lang, tz);
     }
 }

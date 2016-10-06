@@ -126,6 +126,9 @@ List items is short representations of base entities, like as [Alert Profile](#m
 65. [Email Shipment Report](#markdown-header-email-shipment-report)  
 66. [Get Performance Report](#markdown-header-get-performance-report)  
 67. [Add Interim Stop](#markdown-header-add-interim-stop)  
+68. [Save Interim Stop](#markdown-header-save-interim-stop)  
+69. [Delete Interim Stop](#markdown-header-delete-interim-stop)  
+70. [Get Interim Stop](#markdown-header-get-interim-stop)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -559,6 +562,25 @@ Returns PDF file as byte stream
 Method *POST*, method name *addInterimStop*. Request body JSON serialized request.  
 Response is [Standard JSON response](#markdown-header-response-message)  
 [(example)](#markdown-header-add-interim-stop-example)
+
+### Save Interim Stop ###
+Method *POST*, method name *saveInterimStop*. Request body JSON serialized request.  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-save-interim-stop-example)
+
+### Delete Interim Stop ###
+Method *GET*, method name *deleteInterimStop*. Request parameters:  
+1. id - interim stop ID  
+2. shipment - shipment ID  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-delete-interim-stop-example)
+
+### Get Interim Stop ###
+Method *GET*, method name *getInterimStop*. Request parameters:  
+1. id - interim stop ID  
+2. shipment - shipment ID  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-get-interim-stop-example)
 
 ## Objects
 ### Response message ###
@@ -3521,5 +3543,71 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
   "response": {
     "id": 1134
   }
+}
+```
+
+### Save Interim Stop example ###
+**POST /vf/rest/saveInterimStop/${accessToken}**  
+**Request:**  
+```json
+{
+  "id": 1515,
+  "shipmentId": 37536,
+  "locationId": 38660,
+  "time": 10,
+  "stopDate": "2016-10-05 11:20"
+}
+```
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "id": 1516
+  }
+}
+```
+
+### Delete Interim Stop example ###
+**GET /vf/rest/deleteInterimStop/${accessToken}?id=1517&shipment=37537**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
+}
+```
+
+### Get Interim Stop example ###
+**GET /vf/rest/getInterimStops/${accessToken}?shipment=37540**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "id": 1520,
+      "shipmentId": 37540,
+      "locationId": 38674,
+      "time": 15,
+      "stopDate": "2016-10-06 15:07"
+    },
+    {
+      "id": 1521,
+      "shipmentId": 37540,
+      "locationId": 38674,
+      "time": 15,
+      "stopDate": "2016-10-06 15:07"
+    }
+  ]
 }
 ```

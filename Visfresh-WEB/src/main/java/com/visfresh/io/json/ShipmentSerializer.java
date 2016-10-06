@@ -24,9 +24,8 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
-import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.GetFilteredShipmentsRequest;
-import com.visfresh.io.InterimStopDto;
+import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.NoteDto;
 import com.visfresh.io.SaveShipmentRequest;
@@ -39,7 +38,6 @@ import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.lists.ListShipmentItem;
-import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -69,8 +67,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         noteSerializer = new NoteSerializer(user.getTimeZone());
 
         this.user = user;
-        this.isoFormat = createIsoFormat(user);
-        this.prettyFormat = createPrettyFormat(user);
+        this.isoFormat = createIsoFormat(user.getLanguage(), user.getTimeZone());
+        this.prettyFormat = createPrettyFormat(user.getLanguage(), user.getTimeZone());
     }
     /**
      * @param obj
@@ -358,7 +356,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("firstReadingTimeISO", dto.getFirstReadingTimeISO());
 
         int i = 1;
-        for (final InterimStopDto stp : dto.getInterimStops()) {
+        for (final SingleShipmentInterimStop stp : dto.getInterimStops()) {
             final String prefix = "interimStop" + i;
             json.addProperty(prefix, stp.getLocation().getName());
             json.addProperty(prefix + "Time", stp.getStopDate());
@@ -763,9 +761,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param interimStops
      * @return
      */
-    private JsonArray interimStopsToJson(final List<InterimStopDto> interimStops) {
+    private JsonArray interimStopsToJson(final List<SingleShipmentInterimStop> interimStops) {
         final JsonArray array = new JsonArray();
-        for (final InterimStopDto stop : interimStops) {
+        for (final SingleShipmentInterimStop stop : interimStops) {
             array.add(toJson(stop));
         }
         return array;
@@ -774,7 +772,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param stop
      * @return
      */
-    private JsonObject toJson(final InterimStopDto stop) {
+    private JsonObject toJson(final SingleShipmentInterimStop stop) {
         if (stop == null) {
             return null;
         }
@@ -788,45 +786,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("stopDateISO", stop.getStopDateIso());
         json.add("location", toJson(stop.getLocation()));
         return json;
-    }
-    /**
-     * @param req
-     * @return
-     */
-    public JsonObject toJson(final AddInterimStopRequest req) {
-        if (req == null) {
-            return null;
-        }
-
-        final JsonObject json = new JsonObject();
-        json.addProperty("shipmentId", req.getShipmentId());
-        json.addProperty("locationId", req.getLocationId());
-        json.addProperty("latitude", req.getLatitude());
-        json.addProperty("longitude", req.getLongitude());
-        json.addProperty("time", req.getTime());
-        json.addProperty("stopDate", req.getDate() == null ? null : isoFormat.format(req.getDate()));
-        return json;
-    }
-
-    public AddInterimStopRequest parseSaveInterimStopRequest(final JsonElement e) {
-        if (e == null || e.isJsonNull()) {
-            return null;
-        }
-
-        final JsonObject json = e.getAsJsonObject();
-
-        final AddInterimStopRequest req = new AddInterimStopRequest();
-
-        req.setShipmentId(asLong(json.get("shipmentId")));
-        req.setLocationId(asLong(json.get("locationId")));
-        req.setLatitude(asDouble(json.get("latitude")));
-        req.setLongitude(asDouble(json.get("longitude")));
-        req.setTime(asInt(json.get("time")));
-        if (json.has("stopDate")) {
-            req.setDate(parseIsoDate(json.get("stopDate")));
-        }
-
-        return req;
     }
     /**
      * @param locs locations.
@@ -923,21 +882,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
         json.addProperty("type", alert.getType());
         return json;
-    }
-
-    /**
-     * @param u
-     * @return
-     */
-    private DateFormat createPrettyFormat(final User u) {
-        return DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
-    }
-    /**
-     * @param u
-     * @return
-     */
-    private DateFormat createIsoFormat(final User u) {
-        return DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
     }
 
     public static void main(final String[] args) throws Exception {

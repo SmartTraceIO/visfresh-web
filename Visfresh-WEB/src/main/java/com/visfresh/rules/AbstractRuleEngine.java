@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -29,6 +30,7 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentBase;
@@ -69,7 +71,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     protected EngineShipmentSessionManager sessionManager;
 
     private final DeviceDcsNativeEventSerializer deviceEventParser = new DeviceDcsNativeEventSerializer();
-    private final InterimStopSerializer interimSerializer = new InterimStopSerializer();
+    private final InterimStopSerializer interimSerializer = new InterimStopSerializer(
+            Language.English, TimeZone.getDefault());
     private final Map<String, TrackerEventRule> rules = new HashMap<>();
 
     /**
@@ -333,7 +336,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                 final List<LocationProfile> locs = new LinkedList<>();
                 final JsonArray array = SerializerUtils.parseJson(str).getAsJsonArray();
                 for (final JsonElement e : array) {
-                    locs.add(interimSerializer.parseLocation(e.getAsJsonObject()));
+                    locs.add(interimSerializer.parseLocationProfile(e.getAsJsonObject()));
                 }
                 return locs;
             }

@@ -69,15 +69,14 @@ import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
-import com.visfresh.io.AddInterimStopRequest;
 import com.visfresh.io.GetFilteredShipmentsRequest;
-import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
+import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.shipment.DeviceGroupDto;
@@ -221,53 +220,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 resp.setTemplateId(tplId);
             }
             return createSuccessResponse(serializer.toJson(resp));
-        } catch (final Exception e) {
-            log.error("Failed to save shipment by request: " + jsonRequest, e);
-            return createErrorResponse(e);
-        }
-    }
-    /**
-     * @param authToken authentication token.
-     * @param jsonRequest JSON save shipment request.
-     * @return ID of saved shipment.
-     */
-    @RequestMapping(value = "/addInterimStop/{authToken}", method = RequestMethod.POST)
-    public JsonObject addInterimStop(@PathVariable final String authToken,
-            final @RequestBody JsonObject jsonRequest) {
-        try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
-            final ShipmentSerializer serializer = getSerializer(user);
-            final AddInterimStopRequest req = serializer.parseSaveInterimStopRequest(jsonRequest);
-
-            //find shipment
-            final Shipment shipment = shipmentDao.findOne(req.getShipmentId());
-            if (shipment == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Unable to found shipment " + req.getShipmentId());
-            }
-            checkCompanyAccess(user, shipment);
-
-            //find location
-            final LocationProfile location = locationProfileDao.findOne(req.getLocationId());
-            if (location == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Unable to found location " + req.getLocationId());
-            }
-            checkCompanyAccess(user, location);
-
-            //create interim stop
-            final InterimStop stop = new InterimStop();
-            stop.setDate(req.getDate() == null ? new Date() : req.getDate());
-            stop.setLatitude(req.getLatitude() == null ? location.getLocation().getLatitude() : req.getLatitude());
-            stop.setLongitude(req.getLongitude() == null ? location.getLocation().getLongitude() : req.getLongitude());
-            stop.setLocation(location);
-            stop.setTime(req.getTime());
-
-            interimStopDao.add(shipment, stop);
-
-            return createIdResponse("id", stop.getId());
         } catch (final Exception e) {
             log.error("Failed to save shipment by request: " + jsonRequest, e);
             return createErrorResponse(e);
@@ -596,10 +548,10 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @throws ParseException
      */
     private void addInterimStopKeyLocations(final List<KeyLocation> keyLocs,
-            final List<InterimStopDto> interimStops, final TimeZone tz) throws ParseException {
+            final List<SingleShipmentInterimStop> interimStops, final TimeZone tz) throws ParseException {
         final DateFormat fmt = DateTimeUtils.createIsoFormat(Language.English, tz);
 
-        for (final InterimStopDto stp : interimStops) {
+        for (final SingleShipmentInterimStop stp : interimStops) {
             final KeyLocation loc = createKeyLocation(stp);
             loc.setTime(fmt.parse(stp.getStopDateIso()).getTime());
             insertKeyLocation(loc, keyLocs);
@@ -632,7 +584,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param stp
      * @return
      */
-    private KeyLocation createKeyLocation(final InterimStopDto stp) {
+    private KeyLocation createKeyLocation(final SingleShipmentInterimStop stp) {
         final KeyLocation loc = new KeyLocation();
         loc.setKey("interimStop");
         loc.setDescription(stp.getLocation().getName());
@@ -709,11 +661,13 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         final Map<Long, List<InterimStop>> stopMap = interimStopDao.getByShipmentIds(EntityUtils.getIdList(shipments));
         for (final ListShipmentItem s : shipments) {
             for (final InterimStop stop : stopMap.get(s.getId())) {
-                final InterimStopDto dto = new InterimStopDto();
+                final SingleShipmentInterimStop dto = new SingleShipmentInterimStop();
                 dto.setId(stop.getId());
-                dto.setLatitude(stop.getLatitude());
-                dto.setLongitude(stop.getLongitude());
-                dto.setLocation(stop.getLocation());
+
+                final LocationProfile l = stop.getLocation();
+                dto.setLatitude(l.getLocation().getLatitude());
+                dto.setLongitude(l.getLocation().getLongitude());
+                dto.setLocation(l);
                 dto.setStopDate(prettyFmt.format(stop.getDate()));
                 dto.setStopDateIso(isoFmt.format(stop.getDate()));
 
@@ -1129,11 +1083,13 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             final DateFormat isoFormat, final DateFormat prettyFormat) {
         final List<InterimStop> stops = interimStopDao.getByShipment(s);
         for (final InterimStop stp : stops) {
-            final InterimStopDto in = new InterimStopDto();
+            final SingleShipmentInterimStop in = new SingleShipmentInterimStop();
             in.setId(stp.getId());
-            in.setLatitude(stp.getLatitude());
-            in.setLongitude(stp.getLongitude());
-            in.setLocation(stp.getLocation());
+
+            final LocationProfile l = stp.getLocation();
+            in.setLatitude(l.getLocation().getLatitude());
+            in.setLongitude(l.getLocation().getLongitude());
+            in.setLocation(l);
             in.setTime(stp.getTime());
             in.setStopDate(prettyFormat.format(stp.getDate()));
             in.setStopDateIso(isoFormat.format(stp.getDate()));
@@ -1172,7 +1128,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         //save interim locations
         for (final InterimStop stp : stops) {
             if (!set.contains(stp.getId())) {
-                interimStopDao.delete(stp);
+                interimStopDao.delete(s, stp);
             }
         }
     }

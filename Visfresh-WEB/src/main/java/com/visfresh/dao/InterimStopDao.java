@@ -16,8 +16,9 @@ import com.visfresh.entities.Shipment;
  */
 public interface InterimStopDao {
     List<InterimStop> getByShipment(Shipment s);
-    void add(Shipment s, InterimStop locs);
+    void save(Shipment s, InterimStop locs);
     void updateTime(Long id, int minutes);
     Map<Long, List<InterimStop>> getByShipmentIds(Collection<Long> ids);
-    void delete(InterimStop stp);
+    void delete(Shipment shipment, InterimStop stp);
+    InterimStop findOne(Shipment shipment, Long id);
 }

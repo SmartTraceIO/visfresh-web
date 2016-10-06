@@ -12,7 +12,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.io.InterimStopDto;
+import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.KeyLocation;
 
 /**
@@ -61,7 +61,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private Double firstReadingLong;
     private String firstReadingTime;
     private String firstReadingTimeISO;
-    private final List<InterimStopDto> interimStops = new LinkedList<>();
+    private final List<SingleShipmentInterimStop> interimStops = new LinkedList<>();
     private List<KeyLocation> keyLocations;
 
     /**
@@ -519,7 +519,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @return
      */
-    public List<InterimStopDto> getInterimStops() {
+    public List<SingleShipmentInterimStop> getInterimStops() {
         return interimStops;
     }
     /**

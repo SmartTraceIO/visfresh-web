@@ -73,6 +73,33 @@ public class InterimStopDaoImpl implements InterimStopDao {
      * @see com.visfresh.dao.InterimStopDao#getByShipment(com.visfresh.entities.Shipment)
      */
     @Override
+    public InterimStop findOne(final Shipment shipment, final Long id) {
+        if (id == null) {
+            return null;
+        }
+
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("id", id);
+        params.put("shipment", shipment.getId());
+
+        final Map<InterimStop, Long> stopToLocation = new HashMap<>();
+        final List<InterimStop> stops = new LinkedList<>();
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                "select * from interimstops where id = :id and shipment = :shipment", params);
+
+        for (final Map<String, Object> row : rows) {
+            final InterimStop stop = createInterimStop(row);
+            stopToLocation.put(stop, ((Number) row.get("location")).longValue());
+            stops.add(stop);
+        }
+
+        resolveLocations(stopToLocation);
+        return stops.size() == 0 ? null : stops.get(0);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.InterimStopDao#getByShipment(com.visfresh.entities.Shipment)
+     */
+    @Override
     public Map<Long, List<InterimStop>> getByShipmentIds(final Collection<Long> ids) {
         if (ids.isEmpty()) {
             return new HashMap<>();
@@ -107,8 +134,6 @@ public class InterimStopDaoImpl implements InterimStopDao {
         final InterimStop stop = new InterimStop();
         stop.setId(((Number) row.get("id")).longValue());
         stop.setDate((Date) row.get("date"));
-        stop.setLatitude(((Number) row.get("latitude")).doubleValue());
-        stop.setLongitude(((Number) row.get("longitude")).doubleValue());
         stop.setTime(((Number) row.get("pause")).intValue());
         return stop;
     }
@@ -129,26 +154,30 @@ public class InterimStopDaoImpl implements InterimStopDao {
             e.getKey().setLocation(locMap.get(e.getValue()));
         }
     }
-
     /* (non-Javadoc)
      * @see com.visfresh.dao.InterimStopDao#add(com.visfresh.entities.Shipment, com.visfresh.entities.InterimStop)
      */
     @Override
-    public void add(final Shipment s, final InterimStop stop) {
+    public void save(final Shipment s, final InterimStop stop) {
         final Map<String, Object> params = new HashMap<>();
         params.put("shipment", s.getId());
         params.put("location", stop.getLocation().getId());
-        params.put("latitude", stop.getLatitude());
-        params.put("longitude", stop.getLongitude());
         params.put("pause", stop.getTime());
         params.put("date", stop.getDate());
 
-        final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbc.update("insert into interimstops(shipment, location, latitude, longitude, pause, `date`)"
-                + " values(:shipment, :location, :latitude, :longitude, :pause, :date)",
-                new MapSqlParameterSource(params), keyHolder);
-        if (keyHolder.getKey() != null) {
-            stop.setId(keyHolder.getKey().longValue());
+        if (stop.getId() == null) {
+            final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbc.update("insert into interimstops(shipment, location, pause, `date`, latitude, longitude)"
+                    + " values(:shipment, :location, :pause, :date, 0, 0)",
+                    new MapSqlParameterSource(params), keyHolder);
+            if (keyHolder.getKey() != null) {
+                stop.setId(keyHolder.getKey().longValue());
+            }
+        } else {
+            params.put("id", stop.getId());
+            jdbc.update("update interimstops (shipment = :shipment, location = :location,"
+                    + " pause = :pause, `date` = :date)"
+                    + " where id = :id", params);
         }
     }
     /* (non-Javadoc)
@@ -166,10 +195,11 @@ public class InterimStopDaoImpl implements InterimStopDao {
      * @see com.visfresh.dao.InterimStopDao#delete(com.visfresh.entities.InterimStop)
      */
     @Override
-    public void delete(final InterimStop stp) {
+    public void delete(final Shipment shipment, final InterimStop stp) {
         final Map<String, Object> params = new HashMap<>();
         params.put("id", stp.getId());
+        params.put("shipment", shipment.getId());
 
-        jdbc.update("delete from interimstops where id = :id", params);
+        jdbc.update("delete from interimstops where id = :id and shipment = :shipment", params);
     }
 }

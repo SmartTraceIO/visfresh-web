@@ -30,6 +30,7 @@ public class ReadingsParser {
     private ReadingsHandler handler;
     protected DateFormat dateParser = DeviceController.createCsvDateFormat(
           Language.English, TimeZone.getTimeZone("UTC"));
+
     /**
      * Default constructor.
      */

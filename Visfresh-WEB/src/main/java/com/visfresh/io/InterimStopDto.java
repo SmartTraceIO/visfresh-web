@@ -3,7 +3,10 @@
  */
 package com.visfresh.io;
 
-import com.visfresh.entities.LocationProfile;
+import java.util.Date;
+
+import com.visfresh.entities.InterimStop;
+import com.visfresh.entities.Shipment;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -11,11 +14,9 @@ import com.visfresh.entities.LocationProfile;
  */
 public class InterimStopDto {
     private Long id;
-    private LocationProfile location;
-    private double latitude;
-    private double longitude;
-    private String stopDate;
-    private String stopDateIso;
+    private Long shipmentId;
+    private Long locationId;
+    private Date date;
     private int time;
 
     /**
@@ -23,6 +24,17 @@ public class InterimStopDto {
      */
     public InterimStopDto() {
         super();
+    }
+    /**
+     * Default constructor.
+     */
+    public InterimStopDto(final Shipment s, final InterimStop stp) {
+        super();
+        setId(stp.getId());
+        setShipmentId(s.getId());
+        setLocationId(stp.getLocation().getId());
+        setDate(stp.getDate());
+        setTime(stp.getTime());
     }
 
     /**
@@ -38,75 +50,51 @@ public class InterimStopDto {
         this.id = id;
     }
     /**
-     * @return the location
+     * @return the shipmentId
      */
-    public LocationProfile getLocation() {
-        return location;
+    public Long getShipmentId() {
+        return shipmentId;
     }
     /**
-     * @param location the location to set
+     * @param shipmentId the shipmentId to set
      */
-    public void setLocation(final LocationProfile location) {
-        this.location = location;
+    public void setShipmentId(final Long shipmentId) {
+        this.shipmentId = shipmentId;
     }
     /**
-     * @return the latitude
+     * @return the locationId
      */
-    public double getLatitude() {
-        return latitude;
+    public Long getLocationId() {
+        return locationId;
     }
     /**
-     * @param latitude the latitude to set
+     * @param locationId the locationId to set
      */
-    public void setLatitude(final double latitude) {
-        this.latitude = latitude;
+    public void setLocationId(final Long locationId) {
+        this.locationId = locationId;
     }
     /**
-     * @return the longitude
+     * @return the date
      */
-    public double getLongitude() {
-        return longitude;
+    public Date getDate() {
+        return date;
     }
     /**
-     * @param longitude the longitude to set
+     * @param date the date to set
      */
-    public void setLongitude(final double longitude) {
-        this.longitude = longitude;
-    }
-    /**
-     * @return the stopDate
-     */
-    public String getStopDate() {
-        return stopDate;
-    }
-    /**
-     * @param stopDate the stopDate to set
-     */
-    public void setStopDate(final String stopDate) {
-        this.stopDate = stopDate;
-    }
-    /**
-     * @return the stopDateIso
-     */
-    public String getStopDateIso() {
-        return stopDateIso;
-    }
-    /**
-     * @param stopDateIso the stopDateIso to set
-     */
-    public void setStopDateIso(final String stopDateIso) {
-        this.stopDateIso = stopDateIso;
-    }
-    /**
-     * @param time the time to set
-     */
-    public void setTime(final int time) {
-        this.time = time;
+    public void setDate(final Date date) {
+        this.date = date;
     }
     /**
      * @return the time
      */
     public int getTime() {
         return time;
+    }
+    /**
+     * @param time the time to set
+     */
+    public void setTime(final int time) {
+        this.time = time;
     }
 }

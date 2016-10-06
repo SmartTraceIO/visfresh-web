@@ -12,8 +12,6 @@ import java.util.Date;
 public class InterimStop implements EntityWithId<Long> {
     private Long id;
     private LocationProfile location;
-    private double latitude;
-    private double longitude;
     private Date date;
     private int time;
 
@@ -42,30 +40,6 @@ public class InterimStop implements EntityWithId<Long> {
      */
     public void setLocation(final LocationProfile location) {
         this.location = location;
-    }
-    /**
-     * @return the latitude
-     */
-    public double getLatitude() {
-        return latitude;
-    }
-    /**
-     * @param latitude the latitude to set
-     */
-    public void setLatitude(final double latitude) {
-        this.latitude = latitude;
-    }
-    /**
-     * @return the longitude
-     */
-    public double getLongitude() {
-        return longitude;
-    }
-    /**
-     * @param longitude the longitude to set
-     */
-    public void setLongitude(final double longitude) {
-        this.longitude = longitude;
     }
     /**
      * @return the date

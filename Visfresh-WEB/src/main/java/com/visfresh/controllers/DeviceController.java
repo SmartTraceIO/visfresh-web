@@ -217,7 +217,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             }
 
             //create new device
-            final Device newDevice = createVistualDevice(oldDevice);
+            final Device newDevice = createVirtualDevice(oldDevice);
 
             //switch device to new company
             dao.moveToNewCompany(oldDevice, c);
@@ -255,7 +255,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param device
      * @return
      */
-    private Device createVistualDevice(final Device device) {
+    private Device createVirtualDevice(final Device device) {
         final Device d = new Device();
         d.setActive(device.isActive());
         d.setAutostartTemplateId(null);

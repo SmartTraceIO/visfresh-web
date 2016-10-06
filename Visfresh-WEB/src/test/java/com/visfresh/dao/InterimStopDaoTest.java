@@ -4,6 +4,8 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -51,12 +53,37 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
         this.shipment = getContext().getBean(ShipmentDao.class).save(s);
     }
     @Test
-    public void testSave() {
+    public void testGetById() {
+        final Shipment s1 = createShipment(shipment.getDevice());
+        final Shipment s2 = createShipment(shipment.getDevice());
+
+        final InterimStop stop = createStop("A1");
+        dao.save(s1, stop);
+
+        assertNotNull(dao.findOne(s1, stop.getId()));
+        assertNull(dao.findOne(s2, stop.getId()));
+    }
+    @Test
+    public void testDelete() {
+        final Shipment s1 = createShipment(shipment.getDevice());
+        final Shipment s2 = createShipment(shipment.getDevice());
+
+        final InterimStop stop = createStop("A1");
+        dao.save(s1, stop);
+
+        dao.delete(s2, stop);
+        assertNotNull(dao.findOne(s1, stop.getId()));
+
+        dao.delete(s1, stop);
+        assertNull(dao.findOne(s1, stop.getId()));
+    }
+    @Test
+    public void testSaveNew() {
         final InterimStop stop1 = createStop("A");
         final InterimStop stop2 = createStop("B");
 
-        dao.add(shipment, stop1);
-        dao.add(shipment, stop2);
+        dao.save(shipment, stop1);
+        dao.save(shipment, stop2);
 
         final List<InterimStop> stops = dao.getByShipment(shipment);
         assertEquals(2, stops.size());
@@ -65,16 +92,37 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
         assertEquals(stop1.getId(), stop.getId());
 
         assertEquals(format.format(stop1.getDate()), format.format(stop.getDate()));
-        assertEquals(stop1.getLatitude(), stop.getLatitude(), 0.00001);
-        assertEquals(stop1.getLongitude(), stop.getLongitude(), 0.00001);
         assertEquals(stop1.getLocation().getId(), stop.getLocation().getId());
         assertEquals(stop1.getTime(), stop.getTime());
+    }
+    @Test
+    public void testUpate() {
+        InterimStop stop = createStop("A");
+
+        final LocationProfile loc = createLocation("B");
+        final Date date = new Date(System.currentTimeMillis() - 100000000l);
+        final int time = 300;
+
+        stop.setLocation(loc);
+        stop.setDate(date);
+        stop.setTime(time);
+
+        dao.save(shipment, stop);
+
+        final Long id = stop.getId();
+        stop = dao.findOne(shipment, id);
+
+        assertEquals(id, stop.getId());
+
+        assertEquals(format.format(date), format.format(stop.getDate()));
+        assertEquals(loc.getId(), stop.getLocation().getId());
+        assertEquals(time, stop.getTime());
     }
     @Test
     public void testUpdateTime() {
         final int minutes = 777737;
         InterimStop stop = createStop("A");
-        dao.add(shipment, stop);
+        dao.save(shipment, stop);
 
         dao.updateTime(stop.getId(), minutes);
 
@@ -87,12 +135,12 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
         final Shipment s2 = createShipment(shipment.getDevice());
         final Shipment s3 = createShipment(shipment.getDevice());
 
-        dao.add(s1, createStop("A1"));
-        dao.add(s1, createStop("A2"));
-        dao.add(s2, createStop("B1"));
-        dao.add(s2, createStop("B2"));
-        dao.add(s3, createStop("C1"));
-        dao.add(s3, createStop("C3"));
+        dao.save(s1, createStop("A1"));
+        dao.save(s1, createStop("A2"));
+        dao.save(s2, createStop("B1"));
+        dao.save(s2, createStop("B2"));
+        dao.save(s3, createStop("C1"));
+        dao.save(s3, createStop("C3"));
 
         final List<Long> ids = new LinkedList<>();
         ids.add(s1.getId());
@@ -125,8 +173,6 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
         final InterimStop stop = new InterimStop();
         stop.setLocation(loc);
         stop.setDate(new Date());
-        stop.setLatitude(1.0);
-        stop.setLongitude(2.0);
         stop.setTime(15);
 
         return stop;

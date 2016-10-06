@@ -139,13 +139,30 @@ public class InterimStopRule implements TrackerEventRule {
                 && !req.isProcessed(this)
                 && !shipment.hasFinalStatus()
                 && LeaveStartLocationRule.isSetLeaving(session)
-                && getInterimLocations(shipment) != null
-                && (isInInterimStop(session)
-                || isNearInterimStop(shipment, session, event.getLatitude(), event.getLongitude()));
+                && getInterimLocations(shipment) != null;
+
+        if (accept) {
+            if (isInInterimStop(session)) {
+                return true;
+            }
+
+            if(isNearInterimStop(shipment, session, event.getLatitude(), event.getLongitude())) {
+                //only one interim stop can be used in given version of API.
+                return !hasInterimStops(shipment);
+            } else {
+                return false;
+            }
+        }
 
         return accept;
     }
-
+    /**
+     * @param shipment
+     * @return
+     */
+    protected boolean hasInterimStops(final Shipment shipment) {
+        return (interimStopDao.getByShipment(shipment).size() > 0);
+    }
     private boolean isNearInterimStop(final Shipment shipment, final ShipmentSession state, final Double latitude,
             final Double longitude) {
         if (latitude == null || longitude == null) {
@@ -222,8 +239,6 @@ public class InterimStopRule implements TrackerEventRule {
             if (shouldCreateStop) {
                 //update stop time
                 final InterimStop s = new InterimStop();
-                s.setLatitude(stop.getLatitude());
-                s.setLongitude(stop.getLongitude());
                 s.setLocation(getBestLocation(locs, event.getLatitude(), event.getLongitude()));
                 s.setDate(new Date(stop.getStartTime()));
                 s.setTime((int) ((event.getTime().getTime() - stop.getStartTime()) / MINUTE));
@@ -265,7 +280,7 @@ public class InterimStopRule implements TrackerEventRule {
      * @return
      */
     protected Long save(final Shipment shipment, final InterimStop stop) {
-        interimStopDao.add(shipment, stop);
+        interimStopDao.save(shipment, stop);
         return stop.getId();
     }
     /**

@@ -295,4 +295,11 @@ public class InterimStopRuleTest extends InterimStopRule {
         p.setRadius(500);
         return p;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.InterimStopRule#hasInterimStops(com.visfresh.entities.Shipment)
+     */
+    @Override
+    protected boolean hasInterimStops(final Shipment shipment) {
+        return false;
+    }
 }
