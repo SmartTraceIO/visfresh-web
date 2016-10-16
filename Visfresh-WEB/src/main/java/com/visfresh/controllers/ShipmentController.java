@@ -998,27 +998,79 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             }
 
             final SingleShipmentDto dto = createDto(s, user);
-            addLocationAlternatives(dto, s);
-
-            //add interim stops
-            final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
-            final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
-
-            addInterimStops(dto, s, isoFmt, prettyFmt);
-
-            //add siblings
-            final List<Shipment> siblings = siblingService.getSiblings(s);
-            for (final Shipment sibling : siblings) {
-                dto.getSiblings().add(createDto(sibling, user));
-            }
-
-            addDeviceGroups(dto);
+            addRelevantData(user, s, dto);
 
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get single shipment: " + shipmentId, e);
             return createErrorResponse(e);
         }
+    }
+    @RequestMapping(value = "/getSingleShipmentLite/{authToken}", method = RequestMethod.GET)
+    public JsonObject getSingleShipmentLite(@PathVariable final String authToken,
+            @RequestParam(required = false) final Long shipmentId,
+            @RequestParam(required = false) final String sn,
+            @RequestParam(required = false) final Integer trip
+            ) {
+        //check parameters
+        if (shipmentId == null && (sn == null || trip == null)) {
+            return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Should be specified shipmentId or (sn and trip) request parameters");
+        }
+
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.NormalUser);
+
+            final ShipmentSerializer ser = getSerializer(user);
+
+            final Shipment s;
+            if (shipmentId != null) {
+                s = shipmentDao.findOne(shipmentId);
+            } else {
+                s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
+            }
+
+            checkCompanyAccess(user, s);
+            if (s == null) {
+                return createSuccessResponse(null);
+            }
+
+            final SingleShipmentDto dto = createDto(s, user);
+            final SingleShipmentFilter300 filter = new SingleShipmentFilter300();
+            filter.filter(dto.getLocations(), dto.getNotes());
+
+            addRelevantData(user, s, dto);
+
+            return createSuccessResponse(dto == null ? null : ser.toJson(dto));
+        } catch (final Exception e) {
+            log.error("Failed to get single shipment: " + shipmentId, e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param user
+     * @param s
+     * @param dto
+     */
+    protected void addRelevantData(final User user, final Shipment s,
+            final SingleShipmentDto dto) {
+        addLocationAlternatives(dto, s);
+
+        //add interim stops
+        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
+
+        addInterimStops(dto, s, isoFmt, prettyFmt);
+
+        //add siblings
+        final List<Shipment> siblings = siblingService.getSiblings(s);
+        for (final Shipment sibling : siblings) {
+            dto.getSiblings().add(createDto(sibling, user));
+        }
+
+        addDeviceGroups(dto);
     }
     /**
      * @param dto

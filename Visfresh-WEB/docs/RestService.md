@@ -89,46 +89,47 @@ List items is short representations of base entities, like as [Alert Profile](#m
 28. [Get Shipments](#markdown-header-get-shipments)  
 29. [Get Shipment](#markdown-header-get-shipment)  
 30. [Get Single Shipment](#markdown-header-get-single-shipment)
-31. [Delete Shipment](#markdown-header-delete-shipment)  
-32. [Suppress alerts](#markdown-header-suppress-alerts)  
-33. [Save Device](#markdown-header-save-device) 
-34. [Shutdown Device](#markdown-header-shutdown-device) 
-35. [Get Device](#markdown-header-get-device)  
-36. [Get Devices](#markdown-header-get-devices)  
-37. [Save Device Group](#markdown-header-save-device-group) 
-38. [Move Device](#markdown-header-move-device)  
-39. [Get Device Group](#markdown-header-get-device-group)  
-40. [Get Device Groups](#markdown-header-get-device-groups)  
-41. [Delete Device Group](#markdown-header-delete-device-group)  
-42. [Add Device to Group](#markdown-header-add-device-to-group)  
-43. [Remove Device from Group](#markdown-header-remove-device-from-group)  
-44. [Get Devices of Group](#markdown-header-get-devices-of-group)    
-45. [Get Groups of Device](#markdown-header-get-groups-of-device)  
-46. [Get Notifications](#markdown-header-get-notifications)  
-47. [Send Command to Device](#markdown-header-send-command-to-device)  
-48. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
-49. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
-50. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
-51. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
-52. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
-53. [Save Note](#markdown-header-save-note) 
-54. [Get Notes](#markdown-header-get-notes)  
-55. [Delete Note](#markdown-header-delete-note)  
-56. [Create (save) Simulator](#markdown-header-save-simulator)  
-57. [Delete Simulator](#markdown-header-delete-simulator)  
-58. [Start Simulator](#markdown-header-start-simulator)  
-59. [Stop Simulator](#markdown-header-stop-simulator)  
-60. [Get Simulator](#markdown-header-get-simulator)  
-61. [Autostart new Shipment](#markdown-header-autostart-new-shipment)  
-62. [Init Device colors](#markdown-header-init-device-colors)  
-63. [Get Readings](#markdown-header-get-readings)  
-64. [Get Shipment Report](#markdown-header-get-shipment-report)  
-65. [Email Shipment Report](#markdown-header-email-shipment-report)  
-66. [Get Performance Report](#markdown-header-get-performance-report)  
-67. [Add Interim Stop](#markdown-header-add-interim-stop)  
-68. [Save Interim Stop](#markdown-header-save-interim-stop)  
-69. [Delete Interim Stop](#markdown-header-delete-interim-stop)  
-70. [Get Interim Stop](#markdown-header-get-interim-stop)  
+31. [Get Single Shipment Lite](#markdown-header-get-single-shipment-lite)
+32. [Delete Shipment](#markdown-header-delete-shipment)  
+33. [Suppress alerts](#markdown-header-suppress-alerts)  
+34. [Save Device](#markdown-header-save-device) 
+35. [Shutdown Device](#markdown-header-shutdown-device) 
+36. [Get Device](#markdown-header-get-device)  
+37. [Get Devices](#markdown-header-get-devices)  
+38. [Save Device Group](#markdown-header-save-device-group) 
+39. [Move Device](#markdown-header-move-device)  
+40. [Get Device Group](#markdown-header-get-device-group)  
+41. [Get Device Groups](#markdown-header-get-device-groups)  
+42. [Delete Device Group](#markdown-header-delete-device-group)  
+43. [Add Device to Group](#markdown-header-add-device-to-group)  
+44. [Remove Device from Group](#markdown-header-remove-device-from-group)  
+45. [Get Devices of Group](#markdown-header-get-devices-of-group)    
+46. [Get Groups of Device](#markdown-header-get-groups-of-device)  
+47. [Get Notifications](#markdown-header-get-notifications)  
+48. [Send Command to Device](#markdown-header-send-command-to-device)  
+49. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
+50. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
+51. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
+52. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
+53. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
+54. [Save Note](#markdown-header-save-note) 
+55. [Get Notes](#markdown-header-get-notes)  
+56. [Delete Note](#markdown-header-delete-note)  
+57. [Create (save) Simulator](#markdown-header-save-simulator)  
+58. [Delete Simulator](#markdown-header-delete-simulator)  
+59. [Start Simulator](#markdown-header-start-simulator)  
+60. [Stop Simulator](#markdown-header-stop-simulator)  
+61. [Get Simulator](#markdown-header-get-simulator)  
+62. [Autostart new Shipment](#markdown-header-autostart-new-shipment)  
+63. [Init Device colors](#markdown-header-init-device-colors)  
+64. [Get Readings](#markdown-header-get-readings)  
+65. [Get Shipment Report](#markdown-header-get-shipment-report)  
+66. [Email Shipment Report](#markdown-header-email-shipment-report)  
+67. [Get Performance Report](#markdown-header-get-performance-report)  
+68. [Add Interim Stop](#markdown-header-add-interim-stop)  
+69. [Save Interim Stop](#markdown-header-save-interim-stop)  
+70. [Delete Interim Stop](#markdown-header-delete-interim-stop)  
+71. [Get Interim Stop](#markdown-header-get-interim-stop)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -428,6 +429,14 @@ or
 1. sn device serial number  
 2. trip shipment trip count  
 [(example)](#markdown-header-get-single-shipment-example)
+
+### Get Single Shipment Lite ###
+Method *GET*, method *getSingleShipmentLite*. Request parameters:  
+1. shipmentId shipment ID  
+or  
+1. sn device serial number  
+2. trip shipment trip count  
+[(example)](#markdown-header-get-single-shipment-lite-example)
 
 ### Get Notifications ###
 Method *GET*, method name getNotifications, method parameters:  
@@ -2604,6 +2613,338 @@ Response:
 ### Get Single Shipment example ###
 **GET /vf/rest/getSingleShipment/${accessToken}?shipmentId=9088**  
 **GET /vf/rest/getSingleShipment/${accessToken}?shipmentId=sn=11&trip=1**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "shipmentId": 9088,
+    "deviceSN": "000011",
+    "deviceColor": "Crimson",
+    "deviceName": "Device Name",
+    "tripCount": 1,
+    "shipmentDescription": "Any Description",
+    "palletId": "palettid",
+    "assetNum": "10515",
+    "assetType": "SeaContainer",
+    "status": "InProgress",
+    "isLatestShipment": true,
+    "trackerPositionFrontPercent": 0,
+    "trackerPositionLeftPercent": 100,
+    "alertProfileId": 3985,
+    "alertProfileName": "AnyAlert",
+    "alertSuppressionMinutes": 55,
+    "alertPeopleToNotify": "Alexander Suvorov, Alexander Suvorov",
+    "alertsNotificationSchedules": [
+      {
+        "notificationScheduleId": 6388,
+        "notificationScheduleName": "Sched"
+      }
+    ],
+    "alertSummary": [
+      "Hot",
+      "Battery"
+    ],
+    "alertYetToFire": "<-11.0°C for 1 min in total, >6.0°C for 0 min in total, >7.0°C for 2 min in total, <-7.0°C for 40 min in total, <-5.0°C for 55 min in total",
+    "alertFired": ">18.0°C for 0 min in total, >17.0°C for 1 min in total, <-12.0°C for 0 min in total",
+    "arrivalNotificationTimeISO": "2016-03-12 18:26",
+    "arrivalNotificationWithinKm": 111,
+    "excludeNotificationsIfNoAlerts": true,
+    "arrivalPeopleToNotify": "Mikhael Kutuzov, Mikhael Kutuzov",
+    "commentsForReceiver": "Comments for receiver",
+    "arrivalNotificationSchedules": [
+      {
+        "notificationScheduleId": 6389,
+        "notificationScheduleName": "Sched"
+      }
+    ],
+    "shutdownDeviceAfterMinutes": 155,
+    "noAlertsAfterArrivalMinutes": null,
+    "shutDownAfterStartMinutes": null,
+    "shutdownTimeISO": null,
+    "startLocation": "Loc-3",
+    "startTimeISO": "2016-03-01 04:40",
+    "startLocationForMap": {
+      "latitude": 100.5,
+      "longitude": 100.501
+    },
+    "endLocation": "Loc-4",
+    "etaISO": null,
+    "arrivalTimeISO": null,
+    "endLocationForMap": {
+      "latitude": 100.5,
+      "longitude": 100.501
+    },
+    "lastReadingLocation": "Bankstown Warehouse",
+    "lastReadingTimeISO": "2016-03-12 18:27",
+    "lastReadingTemperature": 56.0,
+    "batteryLevel": 1234,
+    "lastReadingForMap": null,
+    "minTemp": 56.0,
+    "maxTemp": 56.0,
+    "firstReadingTimeISO": "2016-03-12 18:27",
+    "firstReadingTime": "6:27PM 12 Mar 2016",
+    "alertsSuppressed": true,
+    "alertsSuppressionTime": "11:34AM 7 Apr 2016",
+    "alertsSuppressionTimeIso": "2016-04-07 11:34",
+    "locations": [
+      {
+        "lat": 50.5,
+        "long": 51.51,
+        "temperature": 56.0,
+        "timeISO": "2016-03-29 09:15",
+        "time": "21:05 16 Apr 2016",
+        "type": "Reading",
+        "alerts": [
+          {
+            "title": "Low Battery Alert for Tracker 39485(1)",
+            "Line1": "56.0°C  |  9:15AM 29 Mar 2016",
+            "type": "Battery"
+          },
+          {
+            "title": "Hot Alert for Tracker 39485(1)",
+            "Line1": "Above 5.0°C for more than 55 mins",
+            "Line2": "56.0°C  |  9:15AM 29 Mar 2016",
+            "type": "Hot"
+          },
+          {
+            "title": "Arrival Alert for Tracker 39485(1)",
+            "Line1": "56.0°C  |  9:15AM 29 Mar 2016",
+            "type": "ArrivalNotice"
+          }
+        ]
+      },
+      {
+        "lat": 50.5,
+        "long": 51.51,
+        "temperature": 56.0,
+        "timeISO": "2016-03-29 09:15",
+        "time": "21:05 16 Apr 2016",
+        "type": "Reading",
+        "alerts": [
+          {
+            "title": "Last reading for Tracker #39485(1)",
+            "Line1": "56.0°C  |  9:15AM 29 Mar 2016",
+            "type": "LastReading"
+          }
+        ]
+      }
+    ],
+    "startLocationAlternatives": [
+      {
+        "locationId": 11288,
+        "locationName": "L1",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      },
+      {
+        "locationId": 11289,
+        "locationName": "L2",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      }
+    ],
+    "endLocationAlternatives": [
+      {
+        "locationId": 11290,
+        "locationName": "L3",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      },
+      {
+        "locationId": 11291,
+        "locationName": "L4",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      }
+    ],
+    "interimLocations": [
+      {
+        "locationId": 4617,
+        "locationName": "L5",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      },
+      {
+        "locationId": 4618,
+        "locationName": "L6",
+        "companyName": "Sun Microsystems",
+        "notes": "Any notes",
+        "address": "",
+        "location": {
+          "lat": 100.5,
+          "lon": 100.501
+        },
+        "radiusMeters": 1000,
+        "startFlag": "Y",
+        "interimFlag": "Y",
+        "endFlag": "Y"
+      }
+    ],
+    "interimStops": [
+      {
+        "id": 16,
+        "latitude": 1.0,
+        "longitude": 2.0,
+        "time": 15,
+        "stopDate": "21:41 16 Apr 2016",
+        "stopDateISO": "2016-04-16 21:41",
+        "location": {
+          "locationId": 12220,
+          "locationName": "Loc-5",
+          "companyName": "Sun Microsystems",
+          "notes": "Any notes",
+          "address": "Bankstown Warehouse",
+          "location": {
+            "lat": 100.5,
+            "lon": 100.501
+          },
+          "radiusMeters": 1000,
+          "startFlag": "Y",
+          "interimFlag": "Y",
+          "endFlag": "Y"
+        }
+      },
+      {
+        "id": 17,
+        "latitude": 1.0,
+        "longitude": 2.0,
+        "time": 15,
+        "date": "2016-03-26T17:05",
+        "location": {
+          "locationId": 12221,
+          "locationName": "Loc-6",
+          "companyName": "Sun Microsystems",
+          "notes": "Any notes",
+          "address": "Bankstown Warehouse",
+          "location": {
+            "lat": 100.5,
+            "lon": 100.501
+          },
+          "radiusMeters": 1000,
+          "startFlag": "Y",
+          "interimFlag": "Y",
+          "endFlag": "Y"
+        }
+      },
+      {
+        "id": 18,
+        "latitude": 1.0,
+        "longitude": 2.0,
+        "time": 15,
+        "date": "2016-03-26T17:05",
+        "location": {
+          "locationId": 12222,
+          "locationName": "Loc-7",
+          "companyName": "Sun Microsystems",
+          "notes": "Any notes",
+          "address": "Bankstown Warehouse",
+          "location": {
+            "lat": 100.5,
+            "lon": 100.501
+          },
+          "radiusMeters": 1000,
+          "startFlag": "Y",
+          "interimFlag": "Y",
+          "endFlag": "Y"
+        }
+      }
+    ],
+    "notes": [
+      {
+        "activeFlag": true,
+        "createdBy": "a@b.c",
+        "creationDate": "2016-03-31 16:16",
+        "noteNum": 1,
+        "noteText": "Note 1",
+        "shipmentId": 9088,
+        "noteType": "Simple",
+        "sn": "11",
+        "trip": 1,
+        "timeOnChart": "2016-03-31 16:16",
+        "createdByName": "Yury G"
+      },
+      {
+        "activeFlag": true,
+        "createdBy": "a@b.c",
+        "creationDate": "2016-03-31 16:16",
+        "noteNum": 2,
+        "noteText": "Note 2",
+        "shipmentId": 9088,
+        "noteType": "Simple",
+        "sn": "11",
+        "trip": 1,
+        "timeOnChart": "2016-03-31 16:16",
+        "createdByName": "Yury G"
+      }
+    ],
+    "deviceGroups": [
+      {
+        "groupId": 299,
+        "name": "GR1",
+        "description": "Description of group GR1"
+      },
+      {
+        "groupId": 300,
+        "name": "GR2",
+        "description": "Description of group GR2"
+      }
+    ],
+    "siblings": []
+  }
+}
+```
+### Get Single Shipment Lite example ###
+**GET /vf/rest/getSingleShipmentLite/${accessToken}?shipmentId=9088**  
+**GET /vf/rest/getSingleShipmentLite/${accessToken}?shipmentId=sn=11&trip=1**  
 **Response:**  
 ```json
 {

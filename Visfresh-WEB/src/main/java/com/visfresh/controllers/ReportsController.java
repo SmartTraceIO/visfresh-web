@@ -122,9 +122,10 @@ public class ReportsController extends AbstractController {
             checkAccess(user, Role.BasicUser);
 
             //calculate requested date in user's time zone.
+            final SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy-MM");
             Date usersDate;
             if (d != null) {
-                usersDate = new SimpleDateFormat("yyyy-MM").parse(d);
+                usersDate = monthFormat.parse(d);
             } else {
                 usersDate = DateTimeUtils.convertToTimeZone(new Date(), user.getTimeZone());
             }
@@ -154,7 +155,7 @@ public class ReportsController extends AbstractController {
                     user.getCompany(), startDate, endDate);
 
             //create report bean.
-            final File file = createPerformanceReport(bean, user);
+            final File file = createPerformanceReport(bean, d == null ? monthFormat.format(endDate) : d, user);
 
             final int index = request.getRequestURL().indexOf("/" + GET_PERFORMANCE_REPORT);
             response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
@@ -252,13 +253,14 @@ public class ReportsController extends AbstractController {
      * @param bean
      * @return
      */
-    private File createPerformanceReport(final PerformanceReportBean bean, final User user) throws IOException {
+    private File createPerformanceReport(final PerformanceReportBean bean, final String month, final User user)
+            throws IOException {
         String companyName = bean.getCompanyName().replaceAll("\\W", "_");
         if (companyName.length() > 8) {
             companyName = companyName.substring(0, 8);
         }
 
-        final File file = fileDownload.createTmpFile("performance_" + companyName, "pdf");
+        final File file = fileDownload.createTmpFile("perf_" + companyName + "_" + month, "pdf");
 
         final OutputStream out = new FileOutputStream(file);
         try {

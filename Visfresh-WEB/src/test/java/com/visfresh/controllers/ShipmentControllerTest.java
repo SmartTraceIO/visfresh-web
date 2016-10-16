@@ -882,6 +882,37 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(sd);
     }
     @Test
+    public void testGetSingleShipmentLite() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+
+        //mark any rules as processed
+        final ShipmentSession session = new ShipmentSession(s.getId());
+        int count = 0;
+        for(final TemperatureRule rule: s.getAlertProfile().getAlertRules()) {
+            if (count > 2) {
+                break;
+            }
+            AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
+            count++;
+        }
+        context.getBean(ShipmentSessionDao.class).saveSession(s, session);
+
+        //add tracker event.
+        createEvent(s, TrackerEventType.AUT);
+        createEvent(s, TrackerEventType.AUT);
+
+        //add alert
+        createAlert(s, AlertType.Battery);
+        createTemperatureAlert(s, AlertType.Hot);
+        createArrival(s);
+
+        createNote(s, "Note 1");
+        createNote(s, "Note 2");
+
+        final JsonObject sd = shipmentClient.getSingleShipmentLite(s).getAsJsonObject();
+        assertNotNull(sd);
+    }
+    @Test
     public void testGetSingleShipmentAlternatives() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
         final LocationProfile l1 = createLocationProfile("L1");

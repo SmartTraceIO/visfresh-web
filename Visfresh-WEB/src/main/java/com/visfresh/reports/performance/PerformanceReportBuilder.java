@@ -668,7 +668,7 @@ public class PerformanceReportBuilder {
         final VerticalListBuilder titles = Components.verticalList();
 
 //      SHIPMENT REPORT
-        TextFieldBuilder<String> f = Components.text("PEFFORMANCE REPORT");
+        TextFieldBuilder<String> f = Components.text("PERFORMANCE REPORT");
         f.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
         f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 3, true));
 
@@ -729,12 +729,15 @@ public class PerformanceReportBuilder {
         final TextFieldBuilder<String> title = Components.text(titleText).setStyle(
                 createStyleByFont(DEFAULT_FONT_SIZE, true));
         title.setHorizontalTextAlignment(HorizontalTextAlignment.LEFT);
+        title.setColumns(1);
         header.add(title);
 
-        final TextFieldBuilder<String> remark = createRemark("* Arrived Shipments with \""
-                + alertProfileName + "\" profile (excludes cooldown and post-arrival period)").setStyle(
+        //Shipments with “Chilled Beef" profile (exc. cooldown and post-arrival)
+        final String remarkText = "* Shipments with \"" + alertProfileName + "\" profile (exc. cooldown and post-arrival)";
+        final TextFieldBuilder<String> remark = createRemark(remarkText).setStyle(
                         createStyleByFont(DEFAULT_FONT_SIZE, false));
         remark.setHorizontalTextAlignment(HorizontalTextAlignment.RIGHT);
+        remark.setColumns(2);
         header.add(remark);
 
         list.add(header);
