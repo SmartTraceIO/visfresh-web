@@ -3,10 +3,7 @@
  */
 package com.visfresh.rules;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.AlertDao;
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -98,14 +94,11 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
         for (final Alert alert : alerts) {
             saveAlert(alert);
 
-            final Calendar date = new GregorianCalendar();
             //notify subscribers
-            final List<PersonSchedule> schedules = getAllPersonalSchedules(
-                    context.getEvent().getShipment());
+            final List<PersonSchedule> schedules = getPersonalSchedules(
+                    context.getEvent().getShipment().getAlertsNotificationSchedules(), new Date());
             for (final PersonSchedule s : schedules) {
-                if (matchesTimeFrame(s, date)) {
-                    sendNotification(s, alert, context.getEvent());
-                }
+                sendNotification(s, alert, context.getEvent());
             }
         }
 
@@ -123,20 +116,4 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
      * @return alert if created, null otherwise.
      */
     protected abstract Alert[] handleInternal(RuleContext context);
-
-    /**
-     * @param shipment shipment.
-     * @return
-     */
-    protected List<PersonSchedule> getAllPersonalSchedules(final Shipment shipment) {
-        final List<PersonSchedule> all = new LinkedList<PersonSchedule>();
-
-        final List<NotificationSchedule> schedules = shipment.getAlertsNotificationSchedules();
-        for (final NotificationSchedule schedule : schedules) {
-            final List<PersonSchedule> personalSchedules = schedule.getSchedules();
-            all.addAll(personalSchedules);
-        }
-
-        return all;
-    }
 }

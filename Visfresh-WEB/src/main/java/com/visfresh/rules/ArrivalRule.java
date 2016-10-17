@@ -3,9 +3,7 @@
  */
 package com.visfresh.rules;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.LinkedList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -20,7 +18,6 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
@@ -151,14 +148,11 @@ public class ArrivalRule extends AbstractNotificationRule {
      * @param arrival
      */
     protected void sendNotificaion(final Arrival arrival, final TrackerEvent event) {
-        final Calendar date = new GregorianCalendar();
-
         //notify subscribers
-        final List<PersonSchedule> schedules = getAllPersonalSchedules(event.getShipment());
+        final List<PersonSchedule> schedules = getPersonalSchedules(
+                event.getShipment().getArrivalNotificationSchedules(), new Date());
         for (final PersonSchedule s : schedules) {
-            if (matchesTimeFrame(s, date)) {
-                sendNotification(s, arrival, event);
-            }
+            sendNotification(s, arrival, event);
         }
     }
     /**
@@ -166,22 +160,6 @@ public class ArrivalRule extends AbstractNotificationRule {
      */
     protected void saveArrival(final Arrival a) {
         arrivalDao.save(a);
-    }
-
-    /**
-     * @param shipment shipment.
-     * @return
-     */
-    protected List<PersonSchedule> getAllPersonalSchedules(final Shipment shipment) {
-        final List<PersonSchedule> all = new LinkedList<PersonSchedule>();
-
-        final List<NotificationSchedule> schedules = shipment.getArrivalNotificationSchedules();
-        for (final NotificationSchedule schedule : schedules) {
-            final List<PersonSchedule> personalSchedules = schedule.getSchedules();
-            all.addAll(personalSchedules);
-        }
-
-        return all;
     }
 
     @Override

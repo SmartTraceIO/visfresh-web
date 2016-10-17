@@ -3,6 +3,11 @@
  */
 package com.visfresh.l12n;
 
+import static com.visfresh.utils.DateTimeUtils.createDateFormat;
+import static com.visfresh.utils.DateTimeUtils.createIsoFormat;
+
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -10,6 +15,7 @@ import java.util.TimeZone;
 
 import org.springframework.stereotype.Component;
 
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
@@ -111,8 +117,63 @@ public class NotificationBundle extends NotificationIssueBundle {
      */
     public String getEmailSubject(final NotificationIssue issue, final TrackerEvent trackerEvent,
             final Language lang, final TimeZone tz, final TemperatureUnits tu) {
-        final String str = getBundle().getString("Email.Subject." + createBundleKey(issue));
+        final String str = getBundle().getString("Email.Subject." + createBundleKey(issue)).trim();
         return StringUtils.getMessage(str, createReplacementMap(issue, trackerEvent, lang, tz, tu));
+    }
+    public String getArrivalReportEmailMessage(final Shipment s,
+            final Language lang, final TimeZone tz, final TemperatureUnits tu) {
+        final String str = getBundle().getString("Email.ArrivalReport");
+        return StringUtils.getMessage(str, createReplacementMap(s, lang, tz, tu, s.getArrivalDate()));
+    }
+    public String getArrivalReportEmailSubject(final Shipment s,
+            final Language lang, final TimeZone tz, final TemperatureUnits tu) {
+        final String str = getBundle().getString("Email.Subject.ArrivalReport").trim();
+        return StringUtils.getMessage(str, createReplacementMap(s, lang, tz, tu, s.getArrivalDate()));
+    }
+    /**
+     * @param issue alert.
+     * @param trackerEvent tracker event.
+     * @return map of replacements.
+     */
+    private Map<String, String> createReplacementMap(
+            final Shipment shipment, final Language lang, final TimeZone tz, final TemperatureUnits tu,
+            final Date issueDate) {
+        final Device device = shipment.getDevice();
+
+        final Map<String, String> map = new HashMap<String, String>();
+
+        //supported place holders:
+        //${date} alert issue date include day and year
+        map.put("date", createIsoFormat(lang, tz).format(issueDate));
+        //${time} the time in scope of day.
+        final DateFormat sdf = createDateFormat("H:mm", lang, tz);
+        map.put("time", sdf.format(issueDate));
+        //${device} device IMEI
+        map.put("device", device.getImei());
+        //${devicesn} device serial number
+        map.put("devicesn", normalizeSn(device.getSn()));
+
+        if (shipment != null) {
+            //${tripCount} trip count for given device of shipment.
+            map.put("tripCount", Integer.toString(shipment.getTripCount()));
+            //${shippedFrom}      location shipped from
+            map.put("shippedFrom", shipment.getShippedFrom() == null
+                    ? "" : shipment.getShippedFrom().getName());
+            //${shippedTo}        location shipped to
+            map.put("shippedTo", shipment.getShippedTo() == null
+                    ? "" : shipment.getShippedTo().getName());
+            //${shipmentDescription}  the shipment desc
+            map.put("shipmentDescription", shipment.getShipmentDescription() == null
+                    ? "" : shipment.getShipmentDescription());
+            map.put("shipmentId", shipment.getId().toString());
+        }
+
+        map.put("readingTime", "?");
+        map.put("readingDate", "?");
+        map.put("readingTemperature", "?");
+        map.put("temperature", "?");
+
+        return map;
     }
     /**
      * @return resource bundle.

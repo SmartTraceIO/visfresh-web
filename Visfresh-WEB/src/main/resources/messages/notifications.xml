@@ -148,6 +148,14 @@
 		Description: ${shipmentDescription}
 		https://smarttrace.com.au/webapp/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
+	<entry key="Email.ArrivalReport">
+		Arrival Report for Shipment ${devicesn}(${tripCount}) 
+		Arrival Date: ${time}
+		Shipped From: ${shippedFrom}
+		Shipped To: ${shippedTo}
+		Description: ${shipmentDescription}
+		https://smarttrace.com.au/webapp/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
+	</entry>
 
 	<!-- Subjects -->	
 
@@ -191,6 +199,10 @@
 	<!-- Arrival -->
 	<entry key="Email.Subject.Arrival">
 		Arrival Notification for Shipment ${devicesn}(${tripCount}) 		
+	</entry>
+	<!-- Arrival -->
+	<entry key="Email.Subject.ArrivalReport">
+		Arrival Report for Shipment ${devicesn}(${tripCount}) 		
 	</entry>
 	
 	<!-- *********************************************************** SMS notifications *************************************************** -->

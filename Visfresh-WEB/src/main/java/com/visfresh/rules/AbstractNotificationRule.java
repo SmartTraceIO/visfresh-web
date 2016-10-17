@@ -4,6 +4,10 @@
 package com.visfresh.rules;
 
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -13,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -74,13 +79,36 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
         }
         return false;
     }
+
+    /**
+     * @param shipment shipment.
+     * @return
+     */
+    public static List<PersonSchedule> getPersonalSchedules(
+            final List<NotificationSchedule> schedules, final Date date) {
+        final Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        final List<PersonSchedule> all = new LinkedList<PersonSchedule>();
+
+        for (final NotificationSchedule schedule : schedules) {
+            final List<PersonSchedule> personalSchedules = schedule.getSchedules();
+            for (final PersonSchedule s : personalSchedules) {
+                if (matchesTimeFrame(s, calendar)) {
+                    all.add(s);
+                }
+            }
+        }
+
+        return all;
+    }
     /**
      * This method is made as protected for unit test purposes.
      * @param s personal notification schedule.
      * @param c the time to match as calendar object.
      * @return true if matches the schedule time frames, false otherwise.
      */
-    protected boolean matchesTimeFrame(final PersonSchedule s, final Calendar c) {
+    private static boolean matchesTimeFrame(final PersonSchedule s, final Calendar c) {
         boolean matches = false;
 
         //check matches week days.

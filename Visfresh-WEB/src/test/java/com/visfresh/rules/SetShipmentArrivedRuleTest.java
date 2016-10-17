@@ -8,18 +8,29 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.UserDao;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.NotificationSchedule;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.entities.User;
+import com.visfresh.io.email.EmailMessage;
+import com.visfresh.mock.MockEmailService;
 import com.visfresh.mock.MockShipmentShutdownService;
 import com.visfresh.services.ArrivalService;
 import com.visfresh.services.RuleEngine;
@@ -144,6 +155,40 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         assertNotNull(shipment.getArrivalDate());
     }
     @Test
+    public void testSendReport() {
+        shipment.setArrivalNotificationWithinKm(1);
+
+        final String email = "arrival.developer@visfresh.com";
+        final NotificationSchedule sched = createEmailNotificaitonSchedule(email);
+
+        shipment.getArrivalNotificationSchedules().add(sched);
+
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
+        final SessionHolder h = createSessionHolder(true);
+
+        final TrackerEvent e1 = createEventNearLocation(loc);
+        e1.setTime(new Date(e.getTime().getTime() - 30 * 60 * 1000l));
+        service.handleNearLocation(loc, e1, h.getSession(shipment));
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        //set nearest location
+        final RuleContext req = new RuleContext(e, h);
+        assertTrue(rule.accept(req));
+        rule.handle(req);
+
+        //check notification send
+        final List<EmailMessage> emails = context.getBean(MockEmailService.class).getMessages();
+        assertEquals(1, emails.size());
+
+        final EmailMessage msg = emails.get(0);
+        assertEquals(1, msg.getEmails().length);
+        assertEquals(email, msg.getEmails()[0]);
+        assertTrue(msg.getMessage().contains(shipment.getDevice().getSn()));
+    }
+    @Test
     public void testPreventOfDoubleHandling() {
         shipment.setArrivalNotificationWithinKm(0);
 
@@ -207,5 +252,36 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
             LeaveStartLocationRule.setLeavingStartLocation(h.getSession(shipment));
         }
         return h;
+    }
+    /**
+     * @param email email.
+     * @return notification schedule.
+     */
+    private NotificationSchedule createEmailNotificaitonSchedule(final String email) {
+        //create user
+        final User user = new User();
+        user.setCompany(company);
+        user.setPassword("password");
+        user.setEmail(email);
+        user.setActive(true);
+        user.setLanguage(Language.English);
+        user.setTimeZone(TimeZone.getDefault());
+        user.setFirstName("Arrival");
+        user.setLastName("Developer");
+        context.getBean(UserDao.class).save(user);
+
+        //create notification schedule
+        final PersonSchedule schedule = new PersonSchedule();
+        schedule.setSendEmail(true);
+        schedule.setFromTime(0);
+        Arrays.fill(schedule.getWeekDays(), true);
+        schedule.setToTime(60 * 24 - 1);
+        schedule.setUser(user);
+
+        final NotificationSchedule s = new NotificationSchedule();
+        s.setName("Arrival Notification");
+        s.getSchedules().add(schedule);
+        s.setCompany(company);
+        return context.getBean(NotificationScheduleDao.class).save(s);
     }
 }

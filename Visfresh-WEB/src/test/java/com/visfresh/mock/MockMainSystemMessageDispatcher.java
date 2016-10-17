@@ -3,10 +3,13 @@
  */
 package com.visfresh.mock;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.entities.SystemMessageType;
 import com.visfresh.mpl.services.MainSystemMessageDispatcher;
 
 /**
@@ -23,6 +26,17 @@ public class MockMainSystemMessageDispatcher extends
     public MockMainSystemMessageDispatcher(final Environment env) {
         super(env);
     }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.services.AbstractSystemMessageDispatcher#sendSystemMessage(java.lang.String, com.visfresh.entities.SystemMessageType, java.util.Date)
+     */
+    @Override
+    public void sendSystemMessage(final String messagePayload,
+            final SystemMessageType type, final Date retryOn) {
+        super.sendSystemMessage(messagePayload, type, retryOn);
+        processMessages("junit-main-dispatcher");
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.services.AbstractSystemMessageDispatcher#start()
      */
