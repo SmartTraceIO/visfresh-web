@@ -9,13 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.DeviceGroupConstants;
-import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
@@ -48,8 +46,6 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
 
-    @Autowired
-    private DeviceDao deviceDao;
     /**
      * Default constructor.
      */

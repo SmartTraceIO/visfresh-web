@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
 import com.visfresh.dao.DeviceCommandDao;
-import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.SystemMessage;
@@ -44,8 +43,6 @@ public class DeviceCommandServiceImpl implements DeviceCommandService, SystemMes
 
     @Autowired
     private DeviceCommandDao deviceCommandDao;
-    @Autowired
-    private ShipmentDao shipmentDao;
     @Autowired
     private MainSystemMessageDispatcher dispatcher;
 

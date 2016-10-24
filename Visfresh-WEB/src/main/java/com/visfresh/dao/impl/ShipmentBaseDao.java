@@ -16,7 +16,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 
 import com.visfresh.dao.AlertProfileDao;
-import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DaoBase;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.LocationProfileDao;
@@ -64,8 +63,6 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
     private NotificationScheduleDao notificationScheduleDao;
     @Autowired
     private LocationProfileDao locationProfileDao;
-    @Autowired
-    private CompanyDao companyDao;
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)

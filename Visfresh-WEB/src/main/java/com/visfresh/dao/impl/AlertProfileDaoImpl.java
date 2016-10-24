@@ -10,14 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
-import com.visfresh.dao.CompanyDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureRule;
@@ -43,8 +41,6 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
     private static final String LOWERTEMPLIMIT_FIELD = "lowertemplimit";
     private static final String COMPANY_FIELD = "company";
 
-    @Autowired
-    private CompanyDao companyDao;
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
 
     /**

@@ -26,7 +26,6 @@ import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
-import com.visfresh.l12n.ChartBundle;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.lists.ListAlertProfileItem;
 
@@ -46,8 +45,6 @@ public class AlertProfileController extends AbstractController implements AlertP
      */
     @Autowired
     private AlertProfileDao dao;
-    @Autowired
-    private ChartBundle alertDescriptionBuilder;
     @Autowired
     private RuleBundle ruleBundle;
 

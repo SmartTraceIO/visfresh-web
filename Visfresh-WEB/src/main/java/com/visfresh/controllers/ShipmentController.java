@@ -39,7 +39,6 @@ import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.InterimStopDao;
-import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
@@ -71,7 +70,6 @@ import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.KeyLocation;
-import com.visfresh.io.ReferenceResolver;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
@@ -126,13 +124,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     @Autowired
     private TrackerEventDao trackerEventDao;
     @Autowired
-    private ReferenceResolver referenceResolver;
-    @Autowired
     private ChartBundle chartBundle;
     @Autowired
     private LocationService locationService;
-    @Autowired
-    private LocationProfileDao locationProfileDao;
     @Autowired
     private ShipmentSiblingService siblingService;
     @Autowired

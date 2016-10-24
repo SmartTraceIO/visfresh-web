@@ -38,7 +38,6 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.NotificationItem;
 import com.visfresh.io.json.NotificationSerializer;
-import com.visfresh.l12n.ChartBundle;
 import com.visfresh.l12n.NotificationBundle;
 import com.visfresh.utils.DateTimeUtils;
 
@@ -56,8 +55,6 @@ public class NotificationController extends AbstractController implements Notifi
 
     @Autowired
     private NotificationDao dao;
-    @Autowired
-    private ChartBundle descriptionBuilder;
     @Autowired
     private NotificationBundle notificationBundle;
     @Autowired

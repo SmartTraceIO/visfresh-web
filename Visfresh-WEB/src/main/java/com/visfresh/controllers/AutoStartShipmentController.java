@@ -59,8 +59,6 @@ public class AutoStartShipmentController extends AbstractController
     @Autowired
     private LocationProfileDao locationProfileDao;
     @Autowired
-    private ShipmentTemplateDao template;
-    @Autowired
     private AlertProfileDao alertProfileDao;
     @Autowired
     private NotificationScheduleDao notificationScheduleDao;

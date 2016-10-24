@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
@@ -51,8 +50,6 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
     private ShipmentDao shipmentDao;
     @Autowired
     private AutoStartShipmentDao autoStartShipmentDao;
-    @Autowired
-    private TrackerEventDao trackerEventDao;
     @Autowired
     private AlternativeLocationsDao altLocDao;
     @Autowired

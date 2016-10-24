@@ -10,14 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.UserConstants;
 import com.visfresh.dao.Filter;
-import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.MeasurementUnits;
@@ -57,8 +55,6 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
     private static final String EXTERNAL_FIELD = "external";
     private static final String SETTINGS_FIELD = "settings";
 
-    @Autowired
-    private ShipmentDao shipmentDao;
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
 
     /**

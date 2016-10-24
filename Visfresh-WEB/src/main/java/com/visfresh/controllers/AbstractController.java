@@ -21,7 +21,6 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.entities.EntityWithCompany;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
-import com.visfresh.io.ReferenceResolver;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
@@ -39,8 +38,6 @@ public abstract class AbstractController {
      */
     @Autowired
     protected AuthService authService;
-    @Autowired
-    private ReferenceResolver resolver;
     /**
      *
      */
