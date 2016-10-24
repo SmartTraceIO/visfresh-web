@@ -65,16 +65,6 @@ public class MockEmailService implements EmailService {
 
         this.messages.add(msg);
         this.attachments.add(Arrays.asList(file));
-//
-//        //TODO remove after debug
-//        final File logFile = new File(System.getProperty("user.home"), ".junitemailer.txt");
-//        final Writer out = new FileWriter(logFile, true);
-//        try {
-//            new Exception("Message with attachment has sent").printStackTrace(new PrintWriter(out));
-//            out.flush();
-//        } finally {
-//            out.close();
-//        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.EmailService#sendMessageToSupport(java.lang.String, java.lang.String)

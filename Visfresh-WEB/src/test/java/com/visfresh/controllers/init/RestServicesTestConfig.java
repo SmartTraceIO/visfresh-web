@@ -10,7 +10,6 @@ import com.visfresh.controllers.AbstractController;
 import com.visfresh.junit.db.JUnitDbConfig;
 import com.visfresh.l12n.XmlResourceBundle;
 import com.visfresh.mock.MockSystemMessageDispatcher;
-import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.services.RuleEngine;
 
 /**
@@ -25,7 +24,6 @@ import com.visfresh.services.RuleEngine;
         RuleEngine.class, //services package
         JUnitDbConfig.class, //JUnit DB DAO configuration
         XmlResourceBundle.class, //resource bundles
-        PdfReportBuilder.class,
         MockSystemMessageDispatcher.class // mock services
         })
 @Configuration

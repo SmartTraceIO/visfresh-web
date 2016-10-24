@@ -4,7 +4,6 @@
 package com.visfresh.l12n;
 
 import static com.visfresh.utils.DateTimeUtils.createDateFormat;
-import static com.visfresh.utils.DateTimeUtils.createIsoFormat;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -22,6 +21,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.mpl.services.NotificationIssueBundle;
+import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -123,19 +123,19 @@ public class NotificationBundle extends NotificationIssueBundle {
     public String getArrivalReportEmailMessage(final Shipment s,
             final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final String str = getBundle().getString("Email.ArrivalReport");
-        return StringUtils.getMessage(str, createReplacementMap(s, lang, tz, tu, s.getArrivalDate()));
+        return StringUtils.getMessage(str, createReplacementMapForArrivalReport(s, lang, tz, tu, s.getArrivalDate()));
     }
     public String getArrivalReportEmailSubject(final Shipment s,
             final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final String str = getBundle().getString("Email.Subject.ArrivalReport").trim();
-        return StringUtils.getMessage(str, createReplacementMap(s, lang, tz, tu, s.getArrivalDate()));
+        return StringUtils.getMessage(str, createReplacementMapForArrivalReport(s, lang, tz, tu, s.getArrivalDate()));
     }
     /**
      * @param issue alert.
      * @param trackerEvent tracker event.
      * @return map of replacements.
      */
-    private Map<String, String> createReplacementMap(
+    private Map<String, String> createReplacementMapForArrivalReport(
             final Shipment shipment, final Language lang, final TimeZone tz, final TemperatureUnits tu,
             final Date issueDate) {
         final Device device = shipment.getDevice();
@@ -144,7 +144,7 @@ public class NotificationBundle extends NotificationIssueBundle {
 
         //supported place holders:
         //${date} alert issue date include day and year
-        map.put("date", createIsoFormat(lang, tz).format(issueDate));
+        map.put("date", DateTimeUtils.createPrettyFormat(lang, tz).format(issueDate));
         //${time} the time in scope of day.
         final DateFormat sdf = createDateFormat("H:mm", lang, tz);
         map.put("time", sdf.format(issueDate));

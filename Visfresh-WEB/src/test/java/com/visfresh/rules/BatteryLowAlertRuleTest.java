@@ -67,7 +67,7 @@ public class BatteryLowAlertRuleTest extends BaseRuleTest {
     }
     @After
     public void tearDown() {
-        context.getBean(MockEmailService.class).getMessages().clear();
+        context.getBean(MockEmailService.class).clear();
     }
     /**
      * @param lat latitude.

@@ -4,7 +4,6 @@
 package com.visfresh.mpl.services;
 
 import static com.visfresh.utils.DateTimeUtils.createDateFormat;
-import static com.visfresh.utils.DateTimeUtils.createIsoFormat;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -22,6 +21,7 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
 
 /**
@@ -63,7 +63,7 @@ public class NotificationIssueBundle {
 
         //supported place holders:
         //${date} alert issue date include day and year
-        map.put("date", createIsoFormat(lang, tz).format(issueDate));
+        map.put("date", DateTimeUtils.createPrettyFormat(lang, tz).format(issueDate));
         //${time} the time in scope of day.
         final DateFormat sdf = createDateFormat("H:mm", lang, tz);
         map.put("time", sdf.format(issueDate));

@@ -10,9 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.dao.AlternativeLocationsDao;
-import com.visfresh.dao.AutoStartShipmentDao;
-import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
@@ -34,13 +31,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
      */
     public static final String NAME = "AutoStartShipment";
     @Autowired
-    private ShipmentDao shipmentDao;
-    @Autowired
-    private AutoStartShipmentDao autoStartShipmentDao;
-    @Autowired
     private TrackerEventDao trackerEventDao;
-    @Autowired
-    private AlternativeLocationsDao altLocDao;
     @Autowired
     private AbstractRuleEngine engine;
     @Autowired

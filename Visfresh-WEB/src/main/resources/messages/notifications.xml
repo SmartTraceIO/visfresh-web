@@ -150,7 +150,7 @@
 	</entry>
 	<entry key="Email.ArrivalReport">
 		Arrival Report for Shipment ${devicesn}(${tripCount}) 
-		Arrival Date: ${time}
+		Arrival Time: ${date}
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}

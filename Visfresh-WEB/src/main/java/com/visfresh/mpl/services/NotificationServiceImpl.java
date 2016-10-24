@@ -3,8 +3,16 @@
  */
 package com.visfresh.mpl.services;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.TimeZone;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.mail.MessagingException;
 
 import org.slf4j.Logger;
@@ -12,28 +20,49 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonObject;
+import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.NotificationDao;
+import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentReportDao;
+import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.PersonSchedule;
+import com.visfresh.entities.Shipment;
+import com.visfresh.entities.SystemMessage;
+import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.NotificationBundle;
+import com.visfresh.reports.PdfReportBuilder;
+import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.NotificationService;
+import com.visfresh.services.RetryableException;
 import com.visfresh.services.SmsService;
+import com.visfresh.services.SystemMessageHandler;
+import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class NotificationServiceImpl implements NotificationService {
+public class NotificationServiceImpl implements NotificationService, SystemMessageHandler {
+    /**
+     *
+     */
+    private static final String USER = "user";
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
+    private static final String SHIPMENT = "shipment";
 
     @Autowired
     private SmsService smsService;
@@ -43,6 +72,20 @@ public class NotificationServiceImpl implements NotificationService {
     private NotificationDao notificationDao;
     @Autowired
     protected NotificationBundle bundle;
+    @Autowired
+    private MainSystemMessageDispatcher dispatcher;
+    @Autowired
+    protected ShipmentDao shipmentDao;
+    @Autowired
+    private PdfReportBuilder reportBuilder;
+    @Autowired
+    private ShipmentReportDao shipmentReportDao;
+    @Autowired
+    private ArrivalDao arrivalDao;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private TrackerEventDao trackerEventDao;
 
     /**
      * Default constructor.
@@ -105,10 +148,14 @@ public class NotificationServiceImpl implements NotificationService {
         final String message = bundle.getEmailMessage(issue, trackerEvent, lang, tz, tu);
 
         if (user != null) {
-            try {
-                emailService.sendMessage(new String[] {user.getEmail()}, subject, message);
-            } catch (final MessagingException e) {
-                log.error("Failed to send email message to " + user, e);
+            if (issue instanceof Arrival) {
+                sendShipmentReport(issue.getShipment(), user);
+            } else {
+                try {
+                    emailService.sendMessage(new String[] {user.getEmail()}, subject, message);
+                } catch (final MessagingException e) {
+                    log.error("Failed to send email message to " + user, e);
+                }
             }
         } else {
             log.warn("Email has not set for personal schedule for " + user + " , email can't be send");
@@ -122,5 +169,117 @@ public class NotificationServiceImpl implements NotificationService {
         final User u = s.getUser();
         return u.getFirstName() + " " + u.getLastName() + ", "+ u.getPosition() + " of "
                 + u.getCompany().getName();
+    }
+    /**
+     * @param shipment
+     * @param user
+     */
+    @Override
+    public void sendShipmentReport(final Shipment shipment, final User user) {
+        final JsonObject json = new JsonObject();
+        json.addProperty(SHIPMENT, shipment.getId());
+        json.addProperty(USER, user.getId());
+
+        dispatcher.sendSystemMessage(json.toString(), SystemMessageType.ArrivalReport);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.SystemMessageHandler#handle(com.visfresh.entities.SystemMessage)
+     */
+    @Override
+    public void handle(final SystemMessage msg) throws RetryableException {
+        final JsonObject json = SerializerUtils.parseJson(msg.getMessageInfo()).getAsJsonObject();
+
+        final long shipmentId = json.get(SHIPMENT).getAsLong();
+        final Shipment s = shipmentDao.findOne(shipmentId);
+
+        final Long userId = json.get(USER).getAsLong();
+        final User user = userDao.findOne(userId);
+
+        if (s == null) {
+            log.error("Failed to send shipment arrived report for " + shipmentId + ". Shipment not found");
+        } else if (user == null) {
+            log.error("Failed to send shipment arrived report for " + userId + ". User not found");
+        } else {
+            sendShipmentReportImmediately(s, user);
+        }
+    }
+    /**
+     * @param s shipment.
+     * @param user user.
+     */
+    private void sendShipmentReportImmediately(final Shipment s, final User user) {
+        final Arrival arrival = arrivalDao.getArrival(s);
+
+        final Language lang = user.getLanguage();
+        final TimeZone tz = user.getTimeZone();
+        final TemperatureUnits tu = user.getTemperatureUnits();
+
+        final String subject;
+        final String message;
+
+        if (arrival != null) {// shipment really arrived.
+            TrackerEvent trackerEvent = null;
+            if (arrival.getTrackerEventId() != null) {
+                trackerEvent = trackerEventDao.findOne(arrival.getTrackerEventId());
+            }
+
+            subject = bundle.getEmailSubject(arrival, trackerEvent, lang, tz, tu);
+            message = bundle.getEmailMessage(arrival, trackerEvent, lang, tz, tu);
+        } else {
+            subject = bundle.getArrivalReportEmailSubject(s, lang, tz, tu);
+            message = bundle.getArrivalReportEmailMessage(s, lang, tz, tu);
+        }
+
+        final File attachment = createShipmenentReport(user, s);
+
+        log.debug("Sending shipment arrived report for " + user.getEmail());
+        try {
+            emailService.sendMessage(new String[]{user.getEmail()}, subject, message, attachment);
+        } catch (final Exception e) {
+            log.error("Faile to send email with shipment reports", e);
+        } finally {
+            attachment.delete();
+        }
+    }
+    /**
+     * @param user user.
+     * @param shipment shipment.
+     * @return report file.
+     */
+    private File createShipmenentReport(final User user, final Shipment shipment) {
+        final ShipmentReportBean report = shipmentReportDao.createReport(shipment);
+
+        final DateFormat fmt = DateTimeUtils.createDateFormat(
+                "yyyyMMdd HH:mm", user.getLanguage(), user.getTimeZone());
+        final String companyName = report.getCompanyName().replaceAll("[\\p{Punct}]", "");
+
+        final String name = "-" + companyName + "-"
+                + Device.getSerialNumber(report.getDevice())
+                + "(" + report.getTripCount() + ")"
+                + "-" + fmt.format(new Date()) + ".pdf";
+
+        try {
+            final File f = File.createTempFile("report-", name);
+            final OutputStream out = new FileOutputStream(f);
+            try {
+                reportBuilder.createShipmentReport(report, user, out);
+            } finally {
+                out.close();
+            }
+
+            return f;
+        } catch (final IOException e) {
+            log.error("Failed to send shipment report according arrival notification", e);
+        }
+
+        return null;
+    }
+    @PostConstruct
+    public void init() {
+        dispatcher.setSystemMessageHandler(SystemMessageType.ArrivalReport, this);
+    }
+    @PreDestroy
+    public void destroy() {
+        dispatcher.setSystemMessageHandler(SystemMessageType.ArrivalReport, null);
     }
 }

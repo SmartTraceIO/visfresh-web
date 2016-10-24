@@ -8,6 +8,7 @@ import java.util.TimeZone;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.PersonSchedule;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
@@ -20,7 +21,7 @@ public interface NotificationService {
     /**
      * @param s person schedule.
      * @param issue notification issue.
-     * @param trackerEvent TODO
+     * @param trackerEvent tracker event.
      */
     void sendNotification(final PersonSchedule s, final NotificationIssue issue, TrackerEvent trackerEvent);
     /**
@@ -34,4 +35,9 @@ public interface NotificationService {
     void sendEmailNotification(NotificationIssue issue, User user,
             TrackerEvent trackerEvent, Language lang, TimeZone tz,
             TemperatureUnits tu);
+    /**
+     * @param shipment shipment.
+     * @param user user.
+     */
+    void sendShipmentReport(Shipment shipment, User user);
 }

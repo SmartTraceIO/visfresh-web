@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,14 +31,10 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.entities.User;
 import com.visfresh.io.EmailShipmentReportRequest;
 import com.visfresh.io.email.EmailMessage;
 import com.visfresh.io.json.ReportsSerializer;
 import com.visfresh.mock.MockEmailService;
-import com.visfresh.reports.PdfReportBuilder;
-import com.visfresh.reports.performance.PerformanceReportBean;
-import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.RestServiceException;
@@ -77,20 +72,6 @@ public class ReportsControllerTest extends AbstractRestServiceTest {
         client = new RestClient();
         client.setServiceUrl(getServiceUrl());
         client.setAuthToken(login());
-
-        context.getBean(ReportsController.class).setReportBuilder(new PdfReportBuilder() {
-            @Override
-            public void createShipmentReport(final ShipmentReportBean bean, final User user,
-                    final OutputStream out) throws IOException {
-                out.write("response pdf".getBytes());
-            }
-
-            @Override
-            public void createPerformanceReport(final PerformanceReportBean bean, final User user,
-                    final OutputStream out) throws IOException {
-                out.write("response pdf".getBytes());
-            }
-        });
     }
 
     @Test

@@ -113,7 +113,8 @@ public class ArrivalRule extends AbstractNotificationRule {
 
         log.debug("Handle arrival for shipment " + shipment.getId());
         context.setProcessed(this);
-        context.getSessionManager().getSession(shipment).setArrivalProcessed(true);
+        final ShipmentSession session = context.getSessionManager().getSession(shipment);
+        session.setArrivalProcessed(true);
 
         arrival.setDate(event.getTime());
         arrival.setDevice(event.getDevice());
@@ -126,9 +127,24 @@ public class ArrivalRule extends AbstractNotificationRule {
 
         if (!shipment.isExcludeNotificationsIfNoAlerts() || hasTemperatureAlerts(shipment)) {
             sendNotificaion(arrival, event);
+            setArrivalNotificationSent(session);
         }
 
         return false;
+    }
+
+    /**
+     * @param session shipment session.
+     */
+    public static void setArrivalNotificationSent(final ShipmentSession session) {
+        session.setShipmentProperty("ArrivalNotificationSent", "true");
+    }
+    /**
+     * @param session the shipment session.
+     * @return true if arrival notification has sent for given shipment.
+     */
+    public static boolean isArrivalNotificationSent(final ShipmentSession session) {
+        return "true".equals(session.getShipmentProperty("ArrivalNotificationSent"));
     }
 
     /**

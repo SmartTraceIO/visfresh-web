@@ -156,7 +156,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
     }
     @Test
     public void testSendReport() {
-        shipment.setArrivalNotificationWithinKm(1);
+        shipment.setArrivalNotificationWithinKm(0);
 
         final String email = "arrival.developer@visfresh.com";
         final NotificationSchedule sched = createEmailNotificaitonSchedule(email);
@@ -179,14 +179,25 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         assertTrue(rule.accept(req));
         rule.handle(req);
 
+        final MockEmailService emailer = context.getBean(MockEmailService.class);
         //check notification send
-        final List<EmailMessage> emails = context.getBean(MockEmailService.class).getMessages();
+        final List<EmailMessage> emails = emailer.getMessages();
         assertEquals(1, emails.size());
+        assertEquals(1, emailer.getAttachments().size());
+        assertNotNull(emailer.getAttachments().get(0));
 
         final EmailMessage msg = emails.get(0);
         assertEquals(1, msg.getEmails().length);
         assertEquals(email, msg.getEmails()[0]);
         assertTrue(msg.getMessage().contains(shipment.getDevice().getSn()));
+
+        //check not send report if already notified.
+        emailer.clear();
+
+        ArrivalRule.setArrivalNotificationSent(h.getSession(shipment));
+        rule.handle(req);
+        assertEquals(0, emailer.getMessages().size());
+        assertEquals(0, emailer.getAttachments().size());
     }
     @Test
     public void testPreventOfDoubleHandling() {

@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
@@ -39,8 +38,6 @@ public class RepeatShutdownRule implements TrackerEventRule {
     private AbstractRuleEngine engine;
     @Autowired
     private ShipmentDao shipmentDao;
-    @Autowired
-    private TrackerEventDao trackerEventDao;
     @Autowired
     private DeviceCommandService commandService;
 

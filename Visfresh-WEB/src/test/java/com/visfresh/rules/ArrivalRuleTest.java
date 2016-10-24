@@ -21,6 +21,7 @@ import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
@@ -142,6 +143,35 @@ public class ArrivalRuleTest extends BaseRuleTest {
         assertEquals(e.getId(), arrival.getTrackerEventId());
     }
     @Test
+    public void testSendReport() {
+        final String email = "arrival.developer@visfresh.com";
+        final NotificationSchedule sched = createEmailNotificaitonSchedule(email);
+
+        shipment.getArrivalNotificationSchedules().add(sched);
+        shipment.setArrivalNotificationWithinKm(1);
+
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        //set nearest location
+        final RuleContext req = new RuleContext(e, createSessionHolder(true));
+        assertTrue(rule.accept(req));
+        rule.handle(req);
+
+        //check notification send
+        final List<EmailMessage> emails = context.getBean(MockEmailService.class).getMessages();
+        assertEquals(1, emails.size());
+
+        final EmailMessage msg = emails.get(0);
+        assertEquals(1, msg.getEmails().length);
+        assertEquals(email, msg.getEmails()[0]);
+        assertTrue(msg.getMessage().contains(shipment.getDevice().getSn()));
+    }
+
+    @Test
     public void testNotification() {
         shipment.setArrivalNotificationWithinKm(0);
 
@@ -168,6 +198,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         assertEquals(1, msg.getEmails().length);
         assertEquals(email, msg.getEmails()[0]);
         assertTrue(msg.getMessage().contains(shipment.getDevice().getSn()));
+        assertTrue(ArrivalRule.isArrivalNotificationSent(req.getSessionManager().getSession(shipment)));
     }
     @Test
     public void testExcludeNotificationIfNotAlerts() {
@@ -269,7 +300,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         e.setType(TrackerEventType.AUT);
         e.setLatitude(lat);
         e.setLongitude(lon);
-        return e;
+        return context.getBean(TrackerEventDao.class).save(e);
     }
     /**
      * @return location.
@@ -317,6 +348,6 @@ public class ArrivalRuleTest extends BaseRuleTest {
     }
     @After
     public void tearDown() {
-        context.getBean(MockEmailService.class).getMessages().clear();
+        context.getBean(MockEmailService.class).clear();
     }
 }
