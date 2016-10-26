@@ -39,29 +39,31 @@ public class EventsOptimizer {
         //copy tracker events for avoid of excesses in next usage.
         for (final ShortTrackerEvent eOrigin : origin) {
             final ShortTrackerEvent e = new ShortTrackerEvent(eOrigin);
+            if (e.getLatitude() != null && e.getLongitude() != null) {
 
-            switch (eOrigin.getType()) {
-                case STP:
-                case INIT:
-                    if (!toOptimize.isEmpty()) {
-                        move(toOptimize, readings);
-                    }
+                switch (eOrigin.getType()) {
+                    case STP:
+                    case INIT:
+                        if (!toOptimize.isEmpty()) {
+                            move(toOptimize, readings);
+                        }
 
-                    toOptimize.add(e);
-                    break;
-                case VIB:
-                    if (!toOptimize.isEmpty()) {
-                        normalize(toOptimize);
-                        move(toOptimize, readings);
-                    }
-                    readings.add(e);
-                    break;
-                default:
-                    if (toOptimize.isEmpty()) {
-                        readings.add(e);
-                    } else {
                         toOptimize.add(e);
-                    }
+                        break;
+                    case VIB:
+                        if (!toOptimize.isEmpty()) {
+                            normalize(toOptimize);
+                            move(toOptimize, readings);
+                        }
+                        readings.add(e);
+                        break;
+                    default:
+                        if (toOptimize.isEmpty()) {
+                            readings.add(e);
+                        } else {
+                            toOptimize.add(e);
+                        }
+                }
             }
         }
 

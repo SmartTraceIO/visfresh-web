@@ -14,7 +14,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -45,22 +44,25 @@ import com.visfresh.reports.geomap.OpenStreetMapBuilder;
  *
  */
 @SuppressWarnings("serial")
-public class EventsOptimizerDebugger extends JFrame {
-    private final List<ShortTrackerEvent> originReadings;
+public class EventsDebugger extends JFrame {
+    private final List<ShortTrackerEvent> readings;
 
     private AbstractGeoMapBuiler builder = new GoogleGeoMapBuiler();
     private final int zoom;
     private Point mapLocation;
     private BufferedImage map;
     private int position;
+    private volatile int sleepTimeOut = 51;
+    private volatile Thread debugThread;
+    private GeneralPath path = new GeneralPath();
 
     private final JPanel viewPanel;
     /**
      * Default constructor.
      */
-    public EventsOptimizerDebugger(final List<ShortTrackerEvent> readings) {
+    public EventsDebugger(final List<ShortTrackerEvent> readings) {
         super("Event Optimizer debugger");
-        this.originReadings = readings;
+        this.readings = readings;
 
         final Dimension viewArea = new Dimension(250, 250);
 
@@ -101,7 +103,7 @@ public class EventsOptimizerDebugger extends JFrame {
             }
         };
         viewPanel.setBackground(Color.WHITE);
-        cp.setPreferredSize(new Dimension(map.getWidth() * 2, map.getHeight()));
+        cp.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
         cp.add(viewPanel, BorderLayout.CENTER);
     }
 
@@ -123,27 +125,38 @@ public class EventsOptimizerDebugger extends JFrame {
         return new AbstractAction("Run") {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        while (position < originReadings.size()) {
-                            try {
-                                Thread.sleep(50);
-                            } catch (final InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            SwingUtilities.invokeLater(new Runnable() {
-                                /* (non-Javadoc)
-                                 * @see java.lang.Runnable#run()
-                                 */
-                                @Override
-                                public void run() {
-                                    doDebug();
+                if (debugThread == null) {
+                    debugThread = new Thread() {
+                        @Override
+                        public void run() {
+                            while (debugThread != null) {
+                                if (position < readings.size() - 1) {
+                                    try {
+                                        Thread.sleep(sleepTimeOut);
+                                    } catch (final InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        /* (non-Javadoc)
+                                         * @see java.lang.Runnable#run()
+                                         */
+                                        @Override
+                                        public void run() {
+                                            doDebug();
+                                        }
+                                    });
+                                } else {
+                                    break;
                                 }
-                            });
+                            }
+
+                            debugThread = null;
                         }
-                    }
-                }.start();
+                    };
+                    debugThread.start();
+                } else {
+                    debugThread = null;
+                }
             }
         };
     }
@@ -152,10 +165,56 @@ public class EventsOptimizerDebugger extends JFrame {
      *
      */
     protected void doDebug() {
-        if (position < originReadings.size()) {
-            position++;
+        if (setPosition(position + 1)) {
             viewPanel.repaint();
         }
+    }
+
+    /**
+     * @param pos
+     * @return
+     */
+    private boolean setPosition(final int pos) {
+        if (pos < readings.size() && pos != position) {
+            //create path
+            if (pos == -1) {
+                path = null;
+            } else {
+                int i= 0;
+                final GeneralPath p = new GeneralPath();
+
+                //create path shape
+                for (final ShortTrackerEvent e : readings) {
+                    if (i >= pos) {
+                        break;
+                    }
+                    if (e.getLatitude() != null && e.getLongitude() != null) {
+                        final int x = Math.round(OpenStreetMapBuilder.lon2position(
+                                e.getLongitude(), zoom) - mapLocation.x);
+                        final int y = Math.round(OpenStreetMapBuilder.lat2position(
+                                e.getLatitude(), zoom) - mapLocation.y);
+                        final Point2D cp = p.getCurrentPoint();
+                        if (cp == null) {
+                            p.moveTo(x, y);
+                        } else if (Math.round(cp.getX()) != x || Math.round(cp.getY()) != y) {
+                            p.lineTo(x, y);
+                        }
+                    }
+
+                    i++;
+                }
+                this.path = p;
+
+                final ShortTrackerEvent e = readings.get(pos);
+                if (e.getLatitude() == null || e.getLongitude() == null) {
+                    System.out.println("Null coordinates will not read. Size to paint: " + position);
+                }
+            }
+
+            position = pos;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -165,7 +224,7 @@ public class EventsOptimizerDebugger extends JFrame {
         return new AbstractAction("Reset") {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                position = 0;
+                setPosition(-1);
                 viewPanel.repaint();
             }
         };
@@ -175,37 +234,15 @@ public class EventsOptimizerDebugger extends JFrame {
      * @param g
      */
     protected void paintMap(final Graphics2D g) {
-        final AffineTransform oldTransform = g.getTransform();
-        final AffineTransform at = new AffineTransform(oldTransform);
-
-        paintMapWithPath(g, originReadings, position);
-
-        at.translate(map.getWidth(), 0);
-        g.setTransform(at);
-
-        final Graphics2D g1 = (Graphics2D) g.create();
-        try {
-            paintMapWithPath(g1, new EventsOptimizer().optimize(originReadings), position);
-        } finally {
-            g1.dispose();
-        }
-
-        g.setTransform(oldTransform);
-        g.setColor(Color.BLACK);
-        g.setStroke(new BasicStroke(3f));
-
-        g.drawLine(map.getWidth() - 1, 0, map.getWidth() - 1, map.getWidth());
-    }
-
-    /**
-     * @param g
-     * @param readings
-     * @param pos
-     */
-    private void paintMapWithPath(final Graphics2D g,
-            final List<ShortTrackerEvent> readings, final int pos) {
         g.drawImage(map, 0, 0, null);
-        drawReadings(g, readings, pos);
+
+        final GeneralPath p = path;
+        if (p != null) {
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setStroke(new BasicStroke(2.f));
+            g.setColor(Color.RED);
+            g.draw(p);
+        }
     }
 
     /**
@@ -235,39 +272,6 @@ public class EventsOptimizerDebugger extends JFrame {
         return image;
     }
 
-    private void drawReadings(final Graphics2D g, final List<ShortTrackerEvent> readings, final int sizeToPaint) {
-        int i= 0;
-
-        //create path shape
-        final GeneralPath path = new GeneralPath();
-        for (final ShortTrackerEvent e : readings) {
-            if (i >= sizeToPaint) {
-                break;
-            }
-            if (e.getLatitude() != null && e.getLongitude() != null) {
-                final int x = Math.round(OpenStreetMapBuilder.lon2position(
-                        e.getLongitude(), zoom) - mapLocation.x);
-                final int y = Math.round(OpenStreetMapBuilder.lat2position(
-                        e.getLatitude(), zoom) - mapLocation.y);
-                final Point2D cp = path.getCurrentPoint();
-                if (cp == null) {
-                    path.moveTo(x, y);
-                } else if (Math.round(cp.getX()) != x || Math.round(cp.getY()) != y) {
-                    path.lineTo(x, y);
-                }
-            } else {
-                System.out.println("Null coordinates will not read. Size to paint: " + sizeToPaint);
-            }
-
-            i++;
-        }
-
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setStroke(new BasicStroke(2.f));
-        g.setColor(Color.RED);
-        g.draw(path);
-    }
-
     /**
      * @param readings
      * @return
@@ -283,7 +287,7 @@ public class EventsOptimizerDebugger extends JFrame {
     }
 
     public static void main(final String[] args) throws Exception {
-        final JFrame f = new EventsOptimizerDebugger(importReadings(new File(args[0])));
+        final JFrame f = new EventsDebugger(importReadings(new File(args[0])));
         f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         f.pack();
 

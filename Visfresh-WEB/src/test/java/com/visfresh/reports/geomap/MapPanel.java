@@ -299,16 +299,27 @@ public class MapPanel extends JPanel {
         //create path shape
         final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
+        Double lat = null;
+        Double lon = null;
         for (final ShortTrackerEvent p : readings) {
-            final int x = Math.round(OpenStreetMapBuilder.lon2position(
-                    p.getLongitude(), zoom) - loc.x);
-            final int y = Math.round(OpenStreetMapBuilder.lat2position(
-                    p.getLatitude(), zoom) - loc.y);
-            final Point2D cp = path.getCurrentPoint();
-            if (cp == null) {
-                path.moveTo(x, y);
-            } else if (Math.round(cp.getX()) != x || Math.round(cp.getY()) != y) {
-                path.lineTo(x, y);
+            if (p.getLatitude() != null && p.getLongitude() != null) {
+                lat = p.getLatitude();
+                lon = p.getLongitude();
+            } else {
+                System.out.println("Null location, previous coordinates are used");
+            }
+
+            if (lat != null && lon != null) {
+                final int x = Math.round(OpenStreetMapBuilder.lon2position(lon, zoom) - loc.x);
+                final int y = Math.round(OpenStreetMapBuilder.lat2position(lat, zoom) - loc.y);
+                final Point2D cp = path.getCurrentPoint();
+                if (cp == null) {
+                    path.moveTo(x, y);
+                } else if (Math.round(cp.getX()) != x || Math.round(cp.getY()) != y) {
+                    path.lineTo(x, y);
+                }
+            } else {
+                System.out.println("Have not available coorinages will not painted");
             }
         }
 
