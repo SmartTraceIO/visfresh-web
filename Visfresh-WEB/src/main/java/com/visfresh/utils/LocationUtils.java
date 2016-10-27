@@ -4,6 +4,7 @@
 package com.visfresh.utils;
 
 import com.visfresh.entities.Location;
+import com.visfresh.entities.LocationProfile;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -70,6 +71,27 @@ public final class LocationUtils {
         }
 
         return lon;
+    }
+    public static boolean isNearLocation(final LocationProfile loc, final Location l) {
+        if (loc != null) {
+            final int distance = getNumberOfMetersForArrival(
+                    l.getLatitude(), l.getLongitude(), loc);
+            return distance == 0;
+        }
+        return false;
+    }
+    /**
+     * @param latitude
+     * @param longitude
+     * @param endLocation
+     * @return
+     */
+    public static int getNumberOfMetersForArrival(final double latitude,
+            final double longitude, final LocationProfile endLocation) {
+        final Location end = endLocation.getLocation();
+        double distance = LocationUtils.getDistanceMeters(latitude, longitude, end.getLatitude(), end.getLongitude());
+        distance = Math.max(0., distance - endLocation.getRadius());
+        return (int) Math.round(distance);
     }
 
     public static void main(final String[] args) {

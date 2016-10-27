@@ -22,9 +22,9 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.rules.state.ShipmentSession;
-import com.visfresh.services.ArrivalService;
 import com.visfresh.services.NotificationService;
 import com.visfresh.services.ShipmentShutdownService;
+import com.visfresh.utils.LocationUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -40,8 +40,6 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
     private AbstractRuleEngine engine;
     @Autowired
     protected ShipmentShutdownService shutdownService;
-    @Autowired
-    private ArrivalService arrivalService;
     @Autowired
     private ShipmentDao shipmentDao;
     @Autowired
@@ -71,12 +69,11 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
                 && shipment.getShippedTo() != null
                 && !shipment.hasFinalStatus()
                 && LeaveStartLocationRule.isSetLeaving(session)
-                && arrivalService.isNearLocation(shipment.getShippedTo(),
+                && LocationUtils.isNearLocation(shipment.getShippedTo(),
                         new Location(event.getLatitude(), event.getLongitude()));
 
         return accept;
     }
-
     /* (non-Javadoc)
      * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
      */
@@ -87,27 +84,21 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
 
         context.setProcessed(this);
 
-        if (arrivalService.handleNearLocation(
-                shipment.getShippedTo(),
-                event,
-                context.getSessionManager().getSession(shipment))) {
+        shipment.setStatus(ShipmentStatus.Arrived);
+        shipment.setArrivalDate(event.getTime());
+        shipmentDao.save(shipment);
+        log.debug("Shipment status for " + shipment.getId()
+                + " has set to "+ ShipmentStatus.Arrived);
 
-            shipment.setStatus(ShipmentStatus.Arrived);
-            shipment.setArrivalDate(event.getTime());
-            shipmentDao.save(shipment);
-            log.debug("Shipment status for " + shipment.getId()
-                    + " has set to "+ ShipmentStatus.Arrived);
+        if (shipment.getShutdownDeviceAfterMinutes() != null) {
+            final long date = System.currentTimeMillis()
+                    + shipment.getShutdownDeviceAfterMinutes() * 60 * 1000l;
+            shutdownService.sendShipmentShutdown(shipment, new Date(date));
+        }
 
-            if (shipment.getShutdownDeviceAfterMinutes() != null) {
-                final long date = System.currentTimeMillis()
-                        + shipment.getShutdownDeviceAfterMinutes() * 60 * 1000l;
-                shutdownService.sendShipmentShutdown(shipment, new Date(date));
-            }
-
-            //if shipment report is not sent, do it now.
-            if (!ArrivalRule.isArrivalNotificationSent(context.getSessionManager().getSession(shipment))) {
-                sendShipmentReport(shipment);
-            }
+        //if shipment report is not sent, do it now.
+        if (!ArrivalRule.isArrivalNotificationSent(context.getSessionManager().getSession(shipment))) {
+            sendShipmentReport(shipment);
         }
 
         return false;

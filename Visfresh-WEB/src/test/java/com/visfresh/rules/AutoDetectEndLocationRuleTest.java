@@ -20,6 +20,7 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.SerializerUtils;
 /**
@@ -185,6 +186,59 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         assertFalse(accept(new RuleContext(e, state)));
 
         //test location assigned
+        assertEquals(loc2.getId(), shipment.getShippedTo().getId());
+    }
+    @Test
+    public void testHandleIgnoreOtherLocation() {
+        final SessionHolder state = new SessionHolder();
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setShipment(shipment);
+        e.setLatitude(2.0);
+        e.setLongitude(0.);
+
+        final LocationProfile loc1 = createLocation(1., 0.);
+        final LocationProfile loc2 = createLocation(2., 0.);
+        final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
+
+        needAutodetect(autoStart, state.getSession(shipment));
+
+        //check ignores first reading
+        assertFalse(handle(new RuleContext(e, state)));
+        assertTrue(accept(new RuleContext(e, state)));
+        assertNull(shipment.getShippedTo());
+
+        //check not autodetect next
+        e.setLongitude(loc1.getLocation().getLongitude());
+        e.setLatitude(loc1.getLocation().getLatitude());
+        assertFalse(handle(new RuleContext(e, state)));
+        assertTrue(accept(new RuleContext(e, state)));
+        assertNull(shipment.getShippedTo());
+
+        //check autodetect next time
+        assertTrue(handle(new RuleContext(e, state)));
+        assertFalse(accept(new RuleContext(e, state)));
+        assertNotNull(shipment.getShippedTo());
+    }
+    @Test
+    public void testHandleBrt() {
+        final SessionHolder state = new SessionHolder();
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setType(TrackerEventType.BRT);
+        e.setShipment(shipment);
+        e.setLatitude(2.0);
+        e.setLongitude(0.);
+
+        final LocationProfile loc1 = createLocation(1., 0.);
+        final LocationProfile loc2 = createLocation(2., 0.);
+        final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
+
+        needAutodetect(autoStart, state.getSession(shipment));
+
+        //check ignores first reading
+        assertTrue(handle(new RuleContext(e, state)));
+        assertNotNull(shipment.getShippedTo());
         assertEquals(loc2.getId(), shipment.getShippedTo().getId());
     }
     /**

@@ -22,6 +22,7 @@ import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.SerializerUtils;
@@ -43,6 +44,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
 
     protected static class AutodetectData {
         private int numReadings = 0;
+        private Long locationId;
         private final List<LocationProfile> locations = new LinkedList<>();
 
         public AutodetectData() {
@@ -65,6 +67,18 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
          */
         public void setNumReadings(final int numReadings) {
             this.numReadings = numReadings;
+        }
+        /**
+         * @return the locationId
+         */
+        public Long getLocationId() {
+            return locationId;
+        }
+        /**
+         * @param locationId the locationId to set
+         */
+        public void setLocationId(final Long locationId) {
+            this.locationId = locationId;
         }
     }
 
@@ -124,15 +138,26 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
 
         final AutodetectData data = getAutoDetectData(session);
         final LocationProfile loc = getMatchesLocation(data, e.getLatitude(), e.getLongitude());
+        boolean isDetected = false;
+
         if (loc == null) {
             data.setNumReadings(0);
             session.setShipmentProperty(getLocationsKey(), toJSon(data).toString());
-        } else if (data.getNumReadings() == 0) {
+        } else if (!loc.getId().equals(data.getLocationId()) || data.getNumReadings() == 0) {
             data.setNumReadings(1);
+            data.setLocationId(loc.getId());
             session.setShipmentProperty(getLocationsKey(), toJSon(data).toString());
             log.debug("Found location candidate '" + loc.getName()
                     + "' for shipment " + shipment.getId() + ". Waiting of next reading");
         } else {
+            isDetected = true;
+        }
+
+        if (e.getType() == TrackerEventType.BRT) {
+            isDetected = true;
+        }
+
+        if (isDetected) {
             log.debug("Location '" + loc.getName() + "' has detected and set to shipment " + shipment.getId());
             shipment.setShippedTo(loc);
             saveShipment(shipment);
@@ -172,6 +197,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
 
         //add num readings
         obj.addProperty("numReadings", data.getNumReadings());
+        obj.addProperty("location", data.getLocationId());
 
         //add locations
         final JsonArray array = new JsonArray();
@@ -209,6 +235,12 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
             array = json.get("locations").getAsJsonArray();
             //get number of readings
             data.setNumReadings(json.get("numReadings").getAsInt());
+            if (json.has("location")) {
+                final JsonElement e = json.get("location");
+                if (!e.isJsonNull()) {
+                    data.setLocationId(e.getAsLong());
+                }
+            }
         }
 
         for (final JsonElement jsonElement : array) {
