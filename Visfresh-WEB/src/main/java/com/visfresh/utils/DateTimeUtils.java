@@ -12,6 +12,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import com.visfresh.dao.impl.TimeAtom;
+import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Language;
 
@@ -127,24 +129,88 @@ public final class DateTimeUtils {
         final long t = time.getTime();
         return new Date(t + (TimeZone.getDefault().getOffset(t) - timeZone.getOffset(t)));
     }
-
     /**
-     * @param date
+     * @param t
      * @return
      */
-    public static Date getMiddleOfMonth(final Date date) {
+    public static TimeRanges getTimeRanges(final long t, final TimeAtom timeAtom) {
+        final TimeRanges r = new TimeRanges();
+
         final Calendar calendar = new GregorianCalendar();
+        Date date = new Date(t);
         calendar.setTime(date);
 
-        final int day = (calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-                - calendar.getActualMinimum(Calendar.DAY_OF_MONTH)) / 2;
+        //start range
+        switch(timeAtom) {
+            case Month:
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+                break;
+            case Quarter:
+                final int month = calendar.get(Calendar.MONTH);
+                final int quarter = month / 3;
 
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.HOUR_OF_DAY, 8);
+                final int startMonth = quarter * 3;
+                calendar.set(Calendar.MONTH, startMonth);
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+                break;
+            case Week:
+                final int day = getDayFromMonday(calendar);
+                if (day != 0) {
+                    calendar.add(Calendar.DAY_OF_YEAR, -day);
+                }
+                break;
+                default:
+                    throw new RuntimeException("Unexpected time atom: " + timeAtom);
+        }
+
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 1);
-        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 1);
+        r.setStartTime(calendar.getTimeInMillis());
 
-        return calendar.getTime();
+        //end range
+        calendar.setTime(date);
+        switch(timeAtom) {
+            case Month:
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+                break;
+            case Quarter:
+                final int month = calendar.get(Calendar.MONTH);
+                final int quarter = month / 3;
+
+                final int startMonth = quarter * 3 + 2;
+                calendar.set(Calendar.MONTH, startMonth);
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+                break;
+            case Week:
+                final int day = getDayFromMonday(calendar);
+                if (day != 6) {
+                    calendar.add(Calendar.DAY_OF_YEAR, 6 - day);
+                }
+                break;
+                default:
+                    throw new RuntimeException("Unexpected time atom: " + timeAtom);
+        }
+
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        r.setEndTime(calendar.getTimeInMillis());
+
+        return r;
+    }
+
+    /**
+     * @param calendar
+     * @return
+     */
+    private static int getDayFromMonday(final Calendar calendar) {
+        int day = calendar.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY;
+        if (day < 0) {
+            day = 7 + day;
+        }
+        return day;
     }
 }

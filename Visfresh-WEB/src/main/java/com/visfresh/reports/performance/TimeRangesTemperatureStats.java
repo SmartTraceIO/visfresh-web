@@ -3,17 +3,16 @@
  */
 package com.visfresh.reports.performance;
 
-import java.util.Date;
-
+import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.reports.TemperatureStats;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class MonthlyTemperatureStats {
+public class TimeRangesTemperatureStats {
     private int numShipments;
-    private final Date month;
+    private final TimeRanges timeRanges;
     private int numExcludedHours;
     private final ReportsWithAlertStats alertStats = new ReportsWithAlertStats();
     private TemperatureStats temperatureStats = new TemperatureStats();
@@ -21,9 +20,9 @@ public class MonthlyTemperatureStats {
     /**
      * Default constructor.
      */
-    public MonthlyTemperatureStats(final Date month) {
+    public TimeRangesTemperatureStats(final TimeRanges r) {
         super();
-        this.month = month;
+        this.timeRanges = r;
     }
     /**
      * @return the numShipments
@@ -40,8 +39,8 @@ public class MonthlyTemperatureStats {
     /**
      * @return the month
      */
-    public Date getMonth() {
-        return month;
+    public TimeRanges getTimeRanges() {
+        return timeRanges;
     }
     /**
      * @return the numExcludedHours

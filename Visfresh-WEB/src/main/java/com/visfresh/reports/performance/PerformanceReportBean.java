@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.visfresh.dao.impl.TimeAtom;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -15,6 +17,7 @@ public class PerformanceReportBean {
     private String companyName;
     private Date date;
     private final List<AlertProfileStats> alertProfiles = new LinkedList<>();
+    private TimeAtom timeAtom;
     /**
      * Default constructor.
      */
@@ -51,5 +54,18 @@ public class PerformanceReportBean {
      */
     public List<AlertProfileStats> getAlertProfiles() {
         return alertProfiles;
+    }
+
+    /**
+     * @param atom the time atom.
+     */
+    public void setTimeAtom(final TimeAtom atom) {
+        this.timeAtom = atom;
+    }
+    /**
+     * @return the timeAtom
+     */
+    public TimeAtom getTimeAtom() {
+        return timeAtom;
     }
 }

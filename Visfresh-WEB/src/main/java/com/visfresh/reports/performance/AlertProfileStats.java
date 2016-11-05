@@ -13,7 +13,7 @@ import java.util.List;
 public class AlertProfileStats {
     private String name;
     private final List<BiggestTemperatureException> temperatureExceptions = new LinkedList<>();
-    private final List<MonthlyTemperatureStats> monthlyData = new LinkedList<>();
+    private final List<TimeRangesTemperatureStats> timedData = new LinkedList<>();
     private double lowerTemperatureLimit = 0;
     private double upperTemperatureLimit = 5;
 
@@ -39,8 +39,8 @@ public class AlertProfileStats {
     /**
      * @return the monthlyData
      */
-    public List<MonthlyTemperatureStats> getMonthlyData() {
-        return monthlyData;
+    public List<TimeRangesTemperatureStats> getTimedData() {
+        return timedData;
     }
     /**
      * @return the temperatureExceptions

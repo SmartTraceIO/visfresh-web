@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -39,12 +40,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ErrorCodes;
+import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.PerformanceReportDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.dao.impl.TimeAtom;
+import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
@@ -89,6 +94,8 @@ public class ReportsController extends AbstractController {
     private EmailService emailService;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private LocationProfileDao locationProfileDao;
 
     //TODO remove after test
     @Autowired
@@ -112,7 +119,10 @@ public class ReportsController extends AbstractController {
     @RequestMapping(value = "/" + GET_PERFORMANCE_REPORT + "/{authToken}", method = RequestMethod.GET)
     public void getPerformanceReport(
             @PathVariable final String authToken,
-            @RequestParam(required = false, value = "month") final String d,
+            @RequestParam(required = false, value = "month") final String anchorMonth,
+            @RequestParam(required = false, value = "anchor") final String anchorDate,
+            @RequestParam(required = false, value = "period") final String period,
+            @RequestParam(required = false, value = "location") final Long locationId,
             final HttpServletRequest request,
             final HttpServletResponse response
             )
@@ -121,41 +131,50 @@ public class ReportsController extends AbstractController {
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.BasicUser);
 
-            //calculate requested date in user's time zone.
-            final SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy-MM");
-            Date usersDate;
-            if (d != null) {
-                usersDate = monthFormat.parse(d);
-            } else {
-                usersDate = DateTimeUtils.convertToTimeZone(new Date(), user.getTimeZone());
+            //period
+            TimeAtom atom = TimeAtom.Month;
+            if (period != null) {
+                atom = TimeAtom.getAtom(period);
             }
 
-            final Calendar c = new GregorianCalendar();
-            c.setTime(usersDate);
+            //anchor date
+            Date anchor = new Date();
+            if (anchorDate != null) {
+                anchor = parseAnchorDate(anchorDate, user.getTimeZone());
+            } else if (anchorMonth != null) {
+                anchor = parseAnchorDate(anchorMonth, user.getTimeZone());
+            }
 
-            //calculate date ranges in user's time zone.
-            c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-            c.set(Calendar.HOUR_OF_DAY, 23);
-            c.set(Calendar.MINUTE, 59);
-            c.set(Calendar.SECOND, 59);
+            //location
+            final LocationProfile location = locationId == null
+                    ? null : locationProfileDao.findOne(locationId);
+            if (location != null) {
+                checkCompanyAccess(user, location);
+            }
 
-            final Date endDate = c.getTime();
+            final TimeRanges ranges = createTimeRanges(anchor, atom);
 
-            //start date
-            c.add(Calendar.MONTH, -2);
-            c.set(Calendar.DAY_OF_MONTH, 1);
-            c.set(Calendar.HOUR_OF_DAY, 0);
-            c.set(Calendar.MINUTE, 0);
-            c.set(Calendar.SECOND, 1);
-
-            final Date startDate = c.getTime();
+            //calculate requested date in user's time zone.
+            final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM");
 
             //create report bean.
             final PerformanceReportBean bean = performanceReportDao.createReport(
-                    user.getCompany(), startDate, endDate);
+                    user.getCompany(), new Date(ranges.getStartTime()),
+                    new Date(ranges.getEndTime()),
+                    TimeAtom.Month,
+                    location);
 
             //create report bean.
-            final File file = createPerformanceReport(bean, d == null ? monthFormat.format(endDate) : d, user);
+            final File file = createPerformanceReportFile(bean, df.format(anchor),
+                    location, user);
+
+            //write report to file
+            final OutputStream out = new FileOutputStream(file);
+            try {
+                reportBuilder.createPerformanceReport(bean, user, out);
+            } finally {
+                out.close();
+            }
 
             final int index = request.getRequestURL().indexOf("/" + GET_PERFORMANCE_REPORT);
             response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
@@ -166,6 +185,66 @@ public class ReportsController extends AbstractController {
             throw e;
         }
     }
+    /**
+     * @param str
+     * @param timeZone
+     * @return
+     * @throws Exception
+     */
+    private Date parseAnchorDate(final String str, final TimeZone timeZone) throws Exception {
+        String fmt;
+        if (str.length() == 7) {
+            fmt = "yyyy-MM";
+        } else if (str.length() == 10) {
+            fmt = "yyyy-MM-dd";
+        } else {
+            throw new Exception("Undefined date format " + str);
+        }
+
+        final SimpleDateFormat df = new SimpleDateFormat(fmt);
+        return df.parse(str);
+    }
+
+    /**
+     * @param anchor
+     * @param atom
+     * @return
+     */
+    private TimeRanges createTimeRanges(final Date anchor, final TimeAtom atom) {
+        final Calendar c = new GregorianCalendar();
+        c.setTime(anchor);
+
+        //calculate date ranges in user's time zone.
+        c.setTimeInMillis(DateTimeUtils.getTimeRanges(anchor.getTime(), atom).getEndTime());
+        c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+
+        final TimeRanges r = new TimeRanges();
+        r.setEndTime(c.getTimeInMillis());
+
+        //start date
+        switch (atom) {
+            case Month:
+                c.set(Calendar.DAY_OF_MONTH, 1);
+                break;
+            case Week:
+                c.add(Calendar.DAY_OF_YEAR, -6);
+                break;
+            case Quarter:
+                c.add(Calendar.MONTH, -2);
+                c.set(Calendar.DAY_OF_MONTH, 1);
+                break;
+            default:
+                throw new RuntimeException("Unexpected time atom " + atom);
+        }
+
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 1);
+
+        r.setStartTime(c.getTimeInMillis());
+        return r;
+    }
+
     /**
      * @param authToken authentication token.
      * @param defShipment alert profile.
@@ -253,24 +332,38 @@ public class ReportsController extends AbstractController {
      * @param bean
      * @return
      */
-    private File createPerformanceReport(final PerformanceReportBean bean, final String month, final User user)
+    private File createPerformanceReportFile(final PerformanceReportBean bean,
+            final String anchorDate,
+            final LocationProfile location,
+            final User user)
             throws IOException {
-        String companyName = bean.getCompanyName().replaceAll("\\W", "_");
-        if (companyName.length() > 8) {
-            companyName = companyName.substring(0, 8);
+        final StringBuilder fname = new StringBuilder("perf_");
+
+        final String companyName = normalizeName(bean.getCompanyName(), 8);
+
+        fname.append(companyName);
+        fname.append(' ').append(anchorDate);
+
+        if (location != null) {
+            fname.append(' ').append(location.getName());
         }
 
-        final File file = fileDownload.createTmpFile("perf_" + companyName + "_" + month, "pdf");
-
-        final OutputStream out = new FileOutputStream(file);
-        try {
-            reportBuilder.createPerformanceReport(bean, user, out);
-        } finally {
-            out.close();
-        }
-        return file;
+        return fileDownload.createTmpFile(fname.toString(), "pdf");
     }
 
+
+    /**
+     * @param originName
+     * @param len
+     * @return
+     */
+    private String normalizeName(final String originName, final int len) {
+        String name = originName.replaceAll("\\W", "_");
+        if (name.length() > 8) {
+            name = name.substring(0, 8);
+        }
+        return name;
+    }
 
     /**
      * @param s

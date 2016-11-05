@@ -17,6 +17,7 @@ import javax.mail.MessagingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +39,7 @@ import com.visfresh.utils.StringUtils;
 public class VisfreshRuleEngine extends AbstractRuleEngine {
     private static final Integer DEFAULT_PRIORITY = new Integer(0);
     private static Logger log = LoggerFactory.getLogger(VisfreshRuleEngine.class);
+    @Autowired
     private EmailService emailer;
     private final Map<String, Integer> priorityMap = new ConcurrentHashMap<>();
     private volatile TrackerEventRule[] rules = {};

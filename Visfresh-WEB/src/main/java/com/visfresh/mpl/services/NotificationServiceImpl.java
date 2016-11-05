@@ -25,6 +25,7 @@ import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentReportDao;
+import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Arrival;
@@ -43,6 +44,7 @@ import com.visfresh.entities.User;
 import com.visfresh.l12n.NotificationBundle;
 import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.reports.shipment.ShipmentReportBean;
+import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.NotificationService;
 import com.visfresh.services.RetryableException;
@@ -86,6 +88,8 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     private UserDao userDao;
     @Autowired
     private TrackerEventDao trackerEventDao;
+    @Autowired
+    private ShipmentSessionDao shipmentSessionDao;
 
     /**
      * Default constructor.
@@ -200,7 +204,17 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
         } else if (user == null) {
             log.error("Failed to send shipment arrived report for " + userId + ". User not found");
         } else {
-            sendShipmentReportImmediately(s, user);
+            final ShipmentSession session = shipmentSessionDao.getSession(s);
+            final String key = "arrReport-" + user.getEmail();
+
+            if (session.getShipmentProperty(key) == null) {
+                session.setShipmentProperty(key, "true");
+                shipmentSessionDao.saveSession(s, session);
+
+                sendShipmentReportImmediately(s, user);
+            } else {
+                log.debug("Arrival have already sent to " + user.getEmail());
+            }
         }
     }
     /**

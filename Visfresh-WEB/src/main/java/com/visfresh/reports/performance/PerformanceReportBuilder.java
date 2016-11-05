@@ -12,12 +12,41 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.general.PieDataset;
+import org.jfree.ui.RectangleEdge;
+import org.springframework.stereotype.Component;
+
+import com.visfresh.dao.impl.TimeAtom;
+import com.visfresh.dao.impl.TimeRanges;
+import com.visfresh.entities.TemperatureRule;
+import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.User;
+import com.visfresh.l12n.RuleBundle;
+import com.visfresh.reports.Colors;
+import com.visfresh.reports.ReportUtils;
+import com.visfresh.reports.TemperatureStats;
+import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.utils.LocalizationUtils;
+import com.visfresh.utils.StringUtils;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
@@ -47,30 +76,6 @@ import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.charts.util.PieLabelGenerator;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.design.JRDesignField;
-
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.StandardBarPainter;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.general.PieDataset;
-import org.jfree.ui.RectangleEdge;
-import org.springframework.stereotype.Component;
-
-import com.visfresh.entities.TemperatureRule;
-import com.visfresh.entities.TemperatureUnits;
-import com.visfresh.entities.User;
-import com.visfresh.l12n.RuleBundle;
-import com.visfresh.reports.Colors;
-import com.visfresh.reports.ReportUtils;
-import com.visfresh.reports.TemperatureStats;
-import com.visfresh.utils.DateTimeUtils;
-import com.visfresh.utils.LocalizationUtils;
-import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -113,17 +118,17 @@ public class PerformanceReportBuilder {
         report.detail(body);
 
         for (final AlertProfileStats alertProfileStats : bean.getAlertProfiles()) {
-            addShipmentsWithAlerts(body, alertProfileStats, user);
+            addShipmentsWithAlerts(body, alertProfileStats, user, bean.getTimeAtom());
             body.add(Components.gap(1, 5));
 
             try {
-                addTemperatureHistory(body, alertProfileStats, user);
+                addTemperatureHistory(body, alertProfileStats, user, bean.getTimeAtom());
                 body.add(Components.gap(1, 5));
             } catch (final JRException e) {
                 e.printStackTrace();
             }
 
-            addPercentageOfTimeOutsideRanges(body, alertProfileStats, user);
+            addPercentageOfTimeOutsideRanges(body, alertProfileStats, user, bean.getTimeAtom());
             body.add(Components.gap(1, 5));
 
             try {
@@ -291,16 +296,13 @@ public class PerformanceReportBuilder {
      */
     @SuppressWarnings("serial")
     private void addPercentageOfTimeOutsideRanges(final VerticalListBuilder body,
-            final AlertProfileStats alertProfileStats, final User user) {
+            final AlertProfileStats alertProfileStats, final User user, final TimeAtom atom) {
         final VerticalListBuilder vl = createStyledVerticalListWithTitle(
                 "Percentage of time outside ranges *", alertProfileStats.getName());
         vl.add(Components.gap(1, 3));
 
         final HorizontalListBuilder list = Components.horizontalList();
         vl.add(list);
-
-        final DateFormat titleDateFormat = DateTimeUtils.createDateFormat(
-                "MMM yyyy", user.getLanguage(), user.getTimeZone());
 
         //colors
         final Color[] colors = {
@@ -373,7 +375,7 @@ public class PerformanceReportBuilder {
                     protected Object[] createItemArray(final CategoryDataset dataset,
                             final int row, final int column) {
                         final Object[] array = super.createItemArray(dataset, row, column);
-                        final TemperatureStats stats = alertProfileStats.getMonthlyData().get(column)
+                        final TemperatureStats stats = alertProfileStats.getTimedData().get(column)
                                 .getTemperatureStats();
                         final Number value = dataset.getValue(row, column);
 
@@ -404,8 +406,8 @@ public class PerformanceReportBuilder {
                         user.getTemperatureUnits(), "")));
         chart.setCategory("month", String.class);
 
-        for (final MonthlyTemperatureStats stats : alertProfileStats.getMonthlyData()) {
-            final String month = titleDateFormat.format(stats.getMonth());
+        for (final TimeRangesTemperatureStats stats : alertProfileStats.getTimedData()) {
+            final String month = getRangesTitle(stats.getTimeRanges(), user, atom);
 
             //set data source
             final TemperatureStats as = stats.getTemperatureStats();
@@ -433,16 +435,13 @@ public class PerformanceReportBuilder {
      */
     @SuppressWarnings("serial")
     private void addShipmentsWithAlerts(final VerticalListBuilder body,
-            final AlertProfileStats alertProfileStats, final User user) {
+            final AlertProfileStats alertProfileStats, final User user, final TimeAtom atom) {
         final VerticalListBuilder vl = createStyledVerticalListWithTitle("Shipments With Alerts *",
                 alertProfileStats.getName());
         vl.add(Components.gap(1, 3));
 
         final HorizontalListBuilder list = Components.horizontalList();
         vl.add(list);
-
-        final DateFormat titleDateFormat = DateTimeUtils.createDateFormat(
-                "MMM yyyy", user.getLanguage(), user.getTimeZone());
 
         //colors
         final Color[] colors = {
@@ -453,10 +452,10 @@ public class PerformanceReportBuilder {
         };
 
         //add charts
-        for (final MonthlyTemperatureStats stats : alertProfileStats.getMonthlyData()) {
+        for (final TimeRangesTemperatureStats stats : alertProfileStats.getTimedData()) {
             final PieChartBuilder chart = Charts.pieChart();
             chart.addSerie(Charts.serie("value", Integer.class));
-            chart.setTitle(titleDateFormat.format(stats.getMonth()));
+            chart.setTitle(getRangesTitle(stats.getTimeRanges(), user, atom));
             chart.setTitleFont(Styles.font().setFontSize(DEFAULT_FONT_SIZE + 3).bold());
             chart.setKey("key", String.class);
             chart.setShowValues(true);
@@ -524,13 +523,50 @@ public class PerformanceReportBuilder {
     }
 
     /**
+     * @param timeRanges
+     * @return
+     */
+    private String getRangesTitle(final TimeRanges timeRanges, final User user, final TimeAtom atom) {
+        switch (atom) {
+            case Month:
+                final DateFormat monthFmt = DateTimeUtils.createDateFormat(
+                        "MMM yyyy", user.getLanguage(), user.getTimeZone());
+                return monthFmt.format(new Date((timeRanges.getEndTime() + timeRanges.getStartTime()) / 2));
+            case Week:
+                final DateFormat weekFmt = new SimpleDateFormat("dd:mm");
+                return weekFmt.format(timeRanges.getStartTime())
+                        + "-" + weekFmt.format(new Date(timeRanges.getEndTime()));
+            case Quarter:
+                final DateFormat quarterFmt = DateTimeUtils.createDateFormat("MMM", user.getLanguage(), user.getTimeZone());
+                final StringBuilder sb = new StringBuilder();
+
+                //first month
+                final Calendar c = new GregorianCalendar();
+                c.setTimeInMillis(timeRanges.getStartTime());
+                sb.append(quarterFmt.format(c.getTime())).append(' ');
+
+                //second month
+                c.add(Calendar.MONTH, 1);
+                sb.append(quarterFmt.format(c.getTime())).append(' ');
+
+                //second month
+                c.add(Calendar.MONTH, 1);
+                sb.append(quarterFmt.format(c.getTime()));
+
+                return sb.toString();
+            default:
+                throw new RuntimeException("Unsupported " + atom);
+        }
+    }
+
+    /**
      * @param body
      * @param monthlyData
      * @param user
      * @throws JRException
      */
     private void addTemperatureHistory(final VerticalListBuilder body,
-            final AlertProfileStats alertProfileData, final User user) throws JRException {
+            final AlertProfileStats alertProfileData, final User user, final TimeAtom atom) throws JRException {
         final VerticalListBuilder list = createStyledVerticalListWithTitle("Temperature history *",
                 alertProfileData.getName());
         list.add(Components.gap(1, 3));
@@ -570,8 +606,6 @@ public class PerformanceReportBuilder {
 
 //      Avg Temp SD Min Temp Max Temp Time below 0C Time above 5C Time monitored
 //      3.3°C 0.6 0.2°C 5.3°C 1.1hrs 0.2hrs 23.3hrs
-        final DateFormat monthFormatter = DateTimeUtils.createDateFormat(
-                "MMM yyyy", user.getLanguage(), user.getTimeZone());
         final DRDataSource ds = new DRDataSource(columns);
         final TemperatureUnits units = user.getTemperatureUnits();
 
@@ -584,10 +618,10 @@ public class PerformanceReportBuilder {
                 "Time above " + getTemperatureString(alertProfileData.getUpperTemperatureLimit(), units, ""),
                 "Time monitored");
 
-        for (final MonthlyTemperatureStats stats : alertProfileData.getMonthlyData()) {
+        for (final TimeRangesTemperatureStats stats : alertProfileData.getTimedData()) {
             final TemperatureStats temp = stats.getTemperatureStats();
             ds.add(
-                    monthFormatter.format(stats.getMonth()),
+                    getRangesTitle(stats.getTimeRanges(), user, atom),
                     getTemperatureString(temp.getAvgTemperature(), units, "No Readings"),
                     getSdString(temp.getStandardDevitation(), units, "No Readings"),
                     getTemperatureString(temp.getMinimumTemperature(), units, "No Readings"),

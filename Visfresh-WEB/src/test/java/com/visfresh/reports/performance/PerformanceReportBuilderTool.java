@@ -3,6 +3,8 @@
  */
 package com.visfresh.reports.performance;
 
+import static com.visfresh.utils.DateTimeUtils.getTimeRanges;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -10,12 +12,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import net.sf.dynamicreports.report.exception.DRException;
-
+import com.visfresh.dao.impl.TimeAtom;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.reports.TemperatureStats;
+
+import net.sf.dynamicreports.report.exception.DRException;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -68,12 +71,15 @@ public final class PerformanceReportBuilderTool {
      * @return the bean to visualize.
      */
     private static PerformanceReportBean createPerformanceBean() {
+        final TimeAtom atom = TimeAtom.Month;
+
         final PerformanceReportBean bean = new PerformanceReportBean();
         bean.setCompanyName("SmartTrace");
         bean.setDate(new Date());
+        bean.setTimeAtom(atom);
 
-        bean.getAlertProfiles().add(createAlertProfile("Chilled Beef"));
-        bean.getAlertProfiles().add(createAlertProfile("Chilled Wine"));
+        bean.getAlertProfiles().add(createAlertProfile("Chilled Beef", atom));
+        bean.getAlertProfiles().add(createAlertProfile("Chilled Wine", atom));
         return bean;
     }
 
@@ -81,21 +87,21 @@ public final class PerformanceReportBuilderTool {
      * @param name alert profile name.
      * @return random generated alert profile stats.
      */
-    private static AlertProfileStats createAlertProfile(final String name) {
+    private static AlertProfileStats createAlertProfile(final String name, final TimeAtom atom) {
         final AlertProfileStats ap = new AlertProfileStats();
         ap.setName(name);
         final long time = System.currentTimeMillis();
 
         for (int i = 0; i < 3; i++) {
             if (i < 2) {
-                ap.getMonthlyData().add(0, generateMonthlyData(new Date(time - i * 28 * 24 * 60 * 60 * 1000l)));
+                ap.getTimedData().add(0, generateMonthlyData(new Date(time - i * 28 * 24 * 60 * 60 * 1000l), atom));
                 ap.getTemperatureExceptions().add(generateException(serialNums[i]));
             } else {
-                final MonthlyTemperatureStats stats = new MonthlyTemperatureStats(
-                        new Date(time - i * 28 * 24 * 60 * 60 * 1000l));
+                final TimeRangesTemperatureStats stats = new TimeRangesTemperatureStats(
+                        getTimeRanges(time - i * 28 * 24 * 60 * 60 * 1000l, atom));
                 stats.getTemperatureStats().setTotalTime(10 * 60 * 1000);
                 stats.getTemperatureStats().setTimeAboveUpperLimit(10 * 60 * 1000);
-                ap.getMonthlyData().add(0, stats);
+                ap.getTimedData().add(0, stats);
             }
         }
 
@@ -129,10 +135,10 @@ public final class PerformanceReportBuilderTool {
      * @param date
      * @return
      */
-    private static MonthlyTemperatureStats generateMonthlyData(final Date date) {
+    private static TimeRangesTemperatureStats generateMonthlyData(final Date date, final TimeAtom atom) {
         final long oneHour = 60 * 60 * 1000l;
 
-        final MonthlyTemperatureStats ms = new MonthlyTemperatureStats(date);
+        final TimeRangesTemperatureStats ms = new TimeRangesTemperatureStats(getTimeRanges(date.getTime(), atom));
         ms.setNumShipments(29);
         ms.setNumExcludedHours(23);
 

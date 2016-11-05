@@ -19,6 +19,7 @@ import org.junit.Test;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.LocationProfile;
@@ -32,6 +33,8 @@ import com.visfresh.entities.User;
 import com.visfresh.io.email.EmailMessage;
 import com.visfresh.mock.MockEmailService;
 import com.visfresh.mock.MockShipmentShutdownService;
+import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.rules.state.ShipmentSessionManager;
 import com.visfresh.services.RuleEngine;
 
 /**
@@ -160,7 +163,18 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
 
         final LocationProfile loc = createLocation();
         final TrackerEvent e = createEventNearLocation(loc);
-        final SessionHolder h = createSessionHolder(true);
+
+        //create session manager with peresistence
+        final ShipmentSessionDao sessionDao = context.getBean(ShipmentSessionDao.class);
+        final ShipmentSession session = new ShipmentSession(shipment.getId());
+        final ShipmentSessionManager h = new ShipmentSessionManager() {
+            @Override
+            public ShipmentSession getSession(final Shipment s) {
+                return session;
+            }
+        };
+        LeaveStartLocationRule.setLeavingStartLocation(session);
+        sessionDao.saveSession(shipment, session);
 
         final TrackerEvent e1 = createEventNearLocation(loc);
         e1.setTime(new Date(e.getTime().getTime() - 30 * 60 * 1000l));
@@ -188,8 +202,9 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         //check not send report if already notified.
         emailer.clear();
 
-        ArrivalRule.setArrivalNotificationSent(h.getSession(shipment));
         rule.handle(req);
+        sessionDao.saveSession(shipment, sessionDao.getSession(shipment));
+
         assertEquals(0, emailer.getMessages().size());
         assertEquals(0, emailer.getAttachments().size());
     }

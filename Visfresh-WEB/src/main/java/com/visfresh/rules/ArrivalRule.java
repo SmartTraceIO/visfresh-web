@@ -127,26 +127,10 @@ public class ArrivalRule extends AbstractNotificationRule {
 
         if (!shipment.isExcludeNotificationsIfNoAlerts() || hasTemperatureAlerts(shipment)) {
             sendNotificaion(arrival, event);
-            setArrivalNotificationSent(session);
         }
 
         return false;
     }
-
-    /**
-     * @param session shipment session.
-     */
-    public static void setArrivalNotificationSent(final ShipmentSession session) {
-        session.setShipmentProperty("ArrivalNotificationSent", "true");
-    }
-    /**
-     * @param session the shipment session.
-     * @return true if arrival notification has sent for given shipment.
-     */
-    public static boolean isArrivalNotificationSent(final ShipmentSession session) {
-        return "true".equals(session.getShipmentProperty("ArrivalNotificationSent"));
-    }
-
     /**
      * @param shipment
      * @return

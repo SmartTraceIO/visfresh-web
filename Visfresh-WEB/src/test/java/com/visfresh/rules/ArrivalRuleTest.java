@@ -21,6 +21,7 @@ import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Alert;
@@ -38,6 +39,7 @@ import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.io.email.EmailMessage;
 import com.visfresh.mock.MockEmailService;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -58,6 +60,10 @@ public class ArrivalRuleTest extends BaseRuleTest {
     public void setUp() {
         rule = context.getBean(ArrivalRule.class);
         shipment = createDefaultShipment(ShipmentStatus.InProgress, createDevice("9283470987"));
+
+        //create shipment session for avoid of NullPointerException
+        final ShipmentSessionDao ssd = context.getBean(ShipmentSessionDao.class);
+        ssd.saveSession(shipment, new ShipmentSession(shipment.getId()));
     }
 
     @Test
@@ -198,7 +204,6 @@ public class ArrivalRuleTest extends BaseRuleTest {
         assertEquals(1, msg.getEmails().length);
         assertEquals(email, msg.getEmails()[0]);
         assertTrue(msg.getMessage().contains(shipment.getDevice().getSn()));
-        assertTrue(ArrivalRule.isArrivalNotificationSent(req.getSessionManager().getSession(shipment)));
     }
     @Test
     public void testExcludeNotificationIfNotAlerts() {

@@ -93,6 +93,28 @@ public class ReportsControllerTest extends AbstractRestServiceTest {
                 ReportsController.GET_PERFORMANCE_REPORT), params);
         assertTrue(result.length() > 0);
     }
+    @Test
+    public void testGetPerformanceReportByWeek() throws IOException, RestServiceException {
+        createShipment();
+        final Map<String, String> params = new HashMap<>();
+        params.put("month", "2016-07-01");
+        params.put("period", "week");
+
+        final String result = client.doSendGetRequest(client.getPathWithToken(
+                ReportsController.GET_PERFORMANCE_REPORT), params);
+        assertTrue(result.length() > 0);
+    }
+    @Test
+    public void testGetPerformanceReportQuarter() throws IOException, RestServiceException {
+        createShipment();
+        final Map<String, String> params = new HashMap<>();
+        params.put("month", "2016-07-01");
+        params.put("period", "quarter");
+
+        final String result = client.doSendGetRequest(client.getPathWithToken(
+                ReportsController.GET_PERFORMANCE_REPORT), params);
+        assertTrue(result.length() > 0);
+    }
 
     @Test
     public void testGetShipmentReportById() throws IOException, RestServiceException {

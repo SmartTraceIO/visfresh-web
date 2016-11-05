@@ -3,13 +3,11 @@
  */
 package com.visfresh.dao.impl;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import static com.visfresh.utils.DateTimeUtils.getTimeRanges;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -28,6 +26,7 @@ import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureAlert;
@@ -36,10 +35,9 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.reports.performance.AlertProfileStats;
 import com.visfresh.reports.performance.BiggestTemperatureException;
-import com.visfresh.reports.performance.MonthlyTemperatureStats;
 import com.visfresh.reports.performance.PerformanceReportBean;
 import com.visfresh.reports.performance.ReportsWithAlertStats;
-import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.reports.performance.TimeRangesTemperatureStats;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -68,22 +66,23 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
      * @see com.visfresh.dao.PerformanceReportDao#createReport(com.visfresh.entities.Company, java.util.Date, java.util.Date)
      */
     @Override
-    public PerformanceReportBean createReport(final Company c, final Date startDate, final Date endDate) {
+    public PerformanceReportBean createReport(final Company c, final Date startDate, final Date endDate,
+            final TimeAtom timeAtom, final LocationProfile location) {
+        final List<TimeRanges> timeRanges = divideToTimeRanges(startDate, endDate, timeAtom);
         final PerformanceReportBean bean = new PerformanceReportBean();
         bean.setDate(new Date());
         bean.setCompanyName(c.getName());
+        bean.setTimeAtom(timeAtom);
 
-        final Map<Long, AlertProfileStats> statsMap = createInitialStatsMap(c, startDate, endDate);
+        final Map<Long, AlertProfileStats> statsMap = createInitialStatsMap(c, startDate, endDate, timeRanges);
         final Map<Long, List<TemperatureAlert>> shipmentAlerts = new HashMap<>();
 
-        addShipmentStats(c, startDate, endDate, statsMap, shipmentAlerts);
+        addShipmentStats(c, startDate, endDate, statsMap, shipmentAlerts, timeAtom, location);
 
         //add collector to each alert profile
-        final Map<Long, Map<Integer, TemperatureStatsCollector>> profileByMonthCollectors = new HashMap<>();
+        final Map<Long, Map<TimeRanges, TemperatureStatsCollector>> profileByTimeRangesCollectors = new HashMap<>();
         final Map<Long, TemperatureStatsCollector> shipmentCollectors = new HashMap<>();
         final Map<Long, Shipment> shipmentMap = new HashMap<>();
-
-        final Calendar calendar = new GregorianCalendar();
 
         int page = 1;
         List<TrackerEvent> events;
@@ -91,7 +90,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
         //should calculate two statistics temperature statistics for alert profile
         //and also for shipment for detect
         while(!(events = trackerEventDao.findForArrivedShipmentsInDateRanges(
-                c, startDate, endDate, new Page(page, 1000))).isEmpty()) {
+                c, startDate, endDate, location, new Page(page, 1000))).isEmpty()) {
             for (final TrackerEvent e : events) {
                 if (e.getShipment() != null && e.getShipment().getAlertProfile() != null) {
                     if (!shipmentMap.containsKey(e.getShipment().getId())) {
@@ -100,24 +99,22 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
 
                     final Long alertProfileId = e.getShipment().getAlertProfile().getId();
 
-                    Map<Integer, TemperatureStatsCollector> monthlyCollectors = profileByMonthCollectors.get(alertProfileId);
-                    if (monthlyCollectors == null) {
-                        //add collectors map to profile/months map
-                        monthlyCollectors = new HashMap<>();
-                        profileByMonthCollectors.put(alertProfileId, monthlyCollectors);
+                    Map<TimeRanges, TemperatureStatsCollector> rimeRangesCollectors = profileByTimeRangesCollectors.get(alertProfileId);
+                    if (rimeRangesCollectors == null) {
+                        //add collectors map to profile/time ranges stats map
+                        rimeRangesCollectors = new HashMap<>();
+                        profileByTimeRangesCollectors.put(alertProfileId, rimeRangesCollectors);
                     }
 
-                    //get month of date
-                    calendar.setTime(e.getTime());
-                    final int monthKey = calendar.get(Calendar.YEAR) * 100 + calendar.get(Calendar.MONTH);
+                    final TimeRanges key = getRangesForDate(e.getTime(), timeRanges);
 
-                    TemperatureStatsCollector collector = monthlyCollectors.get(monthKey);
+                    TemperatureStatsCollector collector = rimeRangesCollectors.get(key);
                     if (collector == null) {
                         collector = new TemperatureStatsCollector();
-                        monthlyCollectors.put(monthKey, collector);
+                        rimeRangesCollectors.put(key, collector);
                     }
 
-                    //process event by monthly collector
+                    //process event by time ranges collector
                     collector.processEvent(e);
 
                     //shipment stats
@@ -136,25 +133,21 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
 
         //merge alert profile stats
         for (final Map.Entry<Long, AlertProfileStats> e : statsMap.entrySet()) {
-            //merge monthly data
-            final Map<Integer, TemperatureStatsCollector> monthlyCollectors = profileByMonthCollectors.get(e.getKey());
-            for (final MonthlyTemperatureStats monthlyStats : e.getValue().getMonthlyData()) {
-                if (monthlyCollectors == null) {
+            //merge time ranges data
+            final Map<TimeRanges, TemperatureStatsCollector> timeRangesCollectors = profileByTimeRangesCollectors.get(e.getKey());
+            for (final TimeRangesTemperatureStats timeRangesStats : e.getValue().getTimedData()) {
+                if (timeRangesCollectors == null) {
                     continue;
                 }
 
-                //get monthly key
-                calendar.setTime(monthlyStats.getMonth());
-                final int monthKey = calendar.get(Calendar.YEAR) * 100 + calendar.get(Calendar.MONTH);
-
-                final TemperatureStatsCollector collector = monthlyCollectors.get(monthKey);
+                final TemperatureStatsCollector collector = timeRangesCollectors.get(timeRangesStats.getTimeRanges());
                 if (collector != null) {
-                    monthlyStats.setTemperatureStats(collector.applyStatistics());
+                    timeRangesStats.setTemperatureStats(collector.applyStatistics());
                     final int numShipments = collector.getDetectedShipments().size();
-                    monthlyStats.setNumShipments(numShipments);
+                    timeRangesStats.setNumShipments(numShipments);
 
                     //set shipments without alerts
-                    final ReportsWithAlertStats alertStats = monthlyStats.getAlertStats();
+                    final ReportsWithAlertStats alertStats = timeRangesStats.getAlertStats();
                     alertStats.setNotAlerts(numShipments - alertStats.getColdAlerts()
                             - alertStats.getHotAlerts() - alertStats.getHotAndColdAlerts());
                 }
@@ -191,6 +184,41 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
 
         bean.getAlertProfiles().addAll(statsMap.values());
         return bean;
+    }
+
+    /**
+     * @param startDate
+     * @param endDate
+     * @param timeAtom
+     * @return
+     */
+    private List<TimeRanges> divideToTimeRanges(final Date startDate, final Date endDate, final TimeAtom timeAtom) {
+        final List<TimeRanges> ranges = new LinkedList<>();
+
+        TimeRanges r = getTimeRanges(startDate.getTime(), timeAtom);
+        final TimeRanges endRanges = getTimeRanges(endDate.getTime(), timeAtom);
+
+        while (!r.after(endRanges)) {
+            ranges.add(r);
+
+            r = getTimeRanges(r.getEndTime() +  (r.getEndTime() - r.getStartTime()) / 2, timeAtom);
+        }
+
+        return ranges;
+    }
+    /**
+     * @param time
+     * @param timeRanges
+     * @return
+     */
+    private TimeRanges getRangesForDate(final Date time, final List<TimeRanges> timeRanges) {
+        final long t = time.getTime();
+        for (final TimeRanges r : timeRanges) {
+            if (r.contains(t)) {
+                return r;
+            }
+        }
+        return null;
     }
 
     /**
@@ -266,10 +294,8 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
      * @return
      */
     protected Map<Long, AlertProfileStats> createInitialStatsMap(
-            final Company c, final Date startDate, final Date endDate) {
-        final List<Date> monthDates = createMonthDateList(startDate, endDate);
-
-        //Warning!!! the number of shipments per alert profile and month
+            final Company c, final Date startDate, final Date endDate, final List<TimeRanges> timeRanges) {
+        //Warning!!! the number of shipments per alert profile and time ranges
         //should be added after
         final Map<Long, AlertProfileStats> statsMap = new HashMap<>();
         for (final AlertProfile ap: alertProfileDao.findByCompany(c, null, null, null)) {
@@ -278,34 +304,15 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
             s.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
             s.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
 
-            //add monthly data
-            for (final Date date : monthDates) {
-                final MonthlyTemperatureStats ms = new MonthlyTemperatureStats(date);
-                s.getMonthlyData().add(ms);
+            //add time ranges data
+            for (final TimeRanges r : timeRanges) {
+                final TimeRangesTemperatureStats ms = new TimeRangesTemperatureStats(r);
+                s.getTimedData().add(ms);
             }
 
             statsMap.put(ap.getId(), s);
         }
         return statsMap;
-    }
-
-    /**
-     * @param startDate
-     * @param endDate
-     * @return
-     */
-    private List<Date> createMonthDateList(final Date startDate, final Date endDate) {
-        final List<Date> months = new LinkedList<>();
-
-        Date month = DateTimeUtils.getMiddleOfMonth(startDate);
-        final Date endMonth = DateTimeUtils.getMiddleOfMonth(endDate);
-
-        while (!month.after(endMonth)) {
-            months.add(month);
-            month = DateTimeUtils.getMiddleOfMonth(new Date(month.getTime() + 25 * 24 * 60 * 60 * 1000l));
-        }
-
-        return months;
     }
     /**
      * @param bean bean to populate
@@ -316,51 +323,50 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
      */
     public void addShipmentStats(final Company c,
             final Date startDate, final Date endDate, final Map<Long, AlertProfileStats> result,
-            final Map<Long, List<TemperatureAlert>> shipmentAlerts) {
-        //create year+month formatter.
-        final DateFormat fmt = new SimpleDateFormat("yyyyMM");
-
+            final Map<Long, List<TemperatureAlert>> shipmentAlerts, final TimeAtom atom, final LocationProfile loc) {
         //alertProfileId
-        //   year+month
+        //   timeRanges
         //      shipment
         //          hotAlerts
         //          coldAlerts
-        final Map<Long, Map<String, Map<Long, Map<String, Boolean>>>> data = new HashMap<>();
+        final Map<Long, Map<TimeRanges, Map<Long, Map<String, Boolean>>>> data = new HashMap<>();
         for (final Map.Entry<Long, AlertProfileStats> e : result.entrySet()) {
-            data.put(e.getKey(), new HashMap<String, Map<Long, Map<String, Boolean>>>());
+            data.put(e.getKey(), new HashMap<TimeRanges, Map<Long, Map<String, Boolean>>>());
         }
 
         final List<Alert> alerts = alertDao.getAlerts(c, startDate, endDate);
 
         for (final Alert alert : alerts) {
             final Shipment shipment = alert.getShipment();
-            if (shipment != null && shipment.getStatus() == ShipmentStatus.Arrived && alert instanceof TemperatureAlert) {
+            if (shipment != null
+                    && shipment.getStatus() == ShipmentStatus.Arrived
+                    && (loc == null || (shipment.getShippedTo() != null && shipment.getShippedTo().getId().equals(loc.getId())))
+                    && alert instanceof TemperatureAlert) {
                 //alert profile scope
                 final Long alertProfileId = shipment.getAlertProfile().getId();
 
-                final Map<String, Map<Long, Map<String, Boolean>>> alertProfileData = data.get(alertProfileId);
+                final Map<TimeRanges, Map<Long, Map<String, Boolean>>> alertProfileData = data.get(alertProfileId);
                 if (alertProfileData == null) {
                     //Please not remove this block. The alert profile can be moved to another company
                     //manually, therefore shipment can have alert profile from left company
                     continue;
                 }
 
-                //monthly scope
-                final String yearMonth = fmt.format(alert.getDate());
-
-                if (!alertProfileData.containsKey(yearMonth)) {
-                    alertProfileData.put(yearMonth, new HashMap<Long, Map<String, Boolean>>());
+                //time ranges scope
+                final TimeRanges ranges = getTimeRanges(alert.getDate().getTime(), atom);
+                if (!alertProfileData.containsKey(ranges)) {
+                    alertProfileData.put(ranges, new HashMap<Long, Map<String, Boolean>>());
                 }
 
-                final Map<Long, Map<String, Boolean>> monthlyData = alertProfileData.get(yearMonth);
+                final Map<Long, Map<String, Boolean>> timeRangesData = alertProfileData.get(ranges);
 
                 //shipment scope
                 final Long shipmentId = shipment.getId();
-                if (!monthlyData.containsKey(shipmentId)) {
-                    monthlyData.put(shipmentId, new HashMap<String, Boolean>());
+                if (!timeRangesData.containsKey(shipmentId)) {
+                    timeRangesData.put(shipmentId, new HashMap<String, Boolean>());
                 }
 
-                final Map<String, Boolean> shipmentData = monthlyData.get(shipmentId);
+                final Map<String, Boolean> shipmentData = timeRangesData.get(shipmentId);
 
                 switch (alert.getType()) {
                     case Cold:
@@ -387,12 +393,12 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
         }
 
         //convert accepted data to stats
-        for (final Map.Entry<Long, Map<String, Map<Long, Map<String, Boolean>>>> e: data.entrySet()) {
+        for (final Map.Entry<Long, Map<TimeRanges, Map<Long, Map<String, Boolean>>>> e: data.entrySet()) {
             final AlertProfileStats s = result.get(e.getKey());
-            for (final MonthlyTemperatureStats monthlyStats : s.getMonthlyData()) {
-                final String monthKey = fmt.format(monthlyStats.getMonth());
+            for (final TimeRangesTemperatureStats timeRangesStats : s.getTimedData()) {
+                final TimeRanges key = timeRangesStats.getTimeRanges();
 
-                final Map<Long, Map<String, Boolean>> shipments = e.getValue().get(monthKey);
+                final Map<Long, Map<String, Boolean>> shipments = e.getValue().get(key);
                 //if found any alerts.
                 if (shipments != null) {
                     //process shipments
@@ -400,7 +406,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
                         final boolean hasCold = Boolean.TRUE == shipment.get(HAS_COLD);
                         final boolean hasHot = Boolean.TRUE == shipment.get(HAS_HOT);
 
-                        final ReportsWithAlertStats as = monthlyStats.getAlertStats();
+                        final ReportsWithAlertStats as = timeRangesStats.getAlertStats();
 
                         if (hasCold && hasHot) {
                             as.setHotAndColdAlerts(as.getHotAndColdAlerts() + 1);

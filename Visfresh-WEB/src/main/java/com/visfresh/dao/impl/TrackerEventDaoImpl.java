@@ -26,6 +26,7 @@ import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
@@ -481,7 +482,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
      */
     @Override
     public List<TrackerEvent> findForArrivedShipmentsInDateRanges(final Company c,
-            final Date startDate, final Date endDate, final Page page) {
+            final Date startDate, final Date endDate, final LocationProfile location, final Page page) {
         //create set of device IMEI for avoid of duplicates.
         final Map<String, Object> params = new HashMap<>();
         params.put("company", c.getId());
@@ -492,10 +493,16 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         if (endDate != null) {
             params.put("endDate", endDate);
         }
+        if (location != null) {
+            params.put("location", location.getId());
+        }
 
         final StringBuilder sql = new StringBuilder(buildSelectBlockForFindAll(null));
         sql.append(" join devices on devices.imei = trackerevents.device and devices.company = :company");
         sql.append(" join shipments on shipments.id = trackerevents.shipment and shipments.status = :status");
+        if (location != null) {
+            sql.append(" and shipments.shippedto = :location");
+        }
         if (startDate != null) {
             sql.append(" and trackerevents." + TIME_FIELD + " >= :startDate");
         }

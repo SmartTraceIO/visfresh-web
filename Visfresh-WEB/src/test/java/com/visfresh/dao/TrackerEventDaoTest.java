@@ -484,22 +484,22 @@ public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEv
         createEvent(s3, new Date(startDate + 25 * dt));
         createEvent(s3, new Date(startDate + 30 * dt));
 
-        assertEquals(4, dao.findForArrivedShipmentsInDateRanges(c1, null, null, null).size());
+        assertEquals(4, dao.findForArrivedShipmentsInDateRanges(c1, null, null, null, null).size());
         assertEquals(4, dao.findForArrivedShipmentsInDateRanges(c1,
-                new Date(startDate + 5 * dt), new Date(startDate + 20 * dt), null).size());
+                new Date(startDate + 5 * dt), new Date(startDate + 20 * dt), null, null).size());
 
         assertEquals(3, dao.findForArrivedShipmentsInDateRanges(c1,
-                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), null).size());
+                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), null, null).size());
         assertEquals(2, dao.findForArrivedShipmentsInDateRanges(c1,
-                new Date(startDate + 10 * dt), new Date(startDate + 15 * dt), null).size());
+                new Date(startDate + 10 * dt), new Date(startDate + 15 * dt), null, null).size());
 
         //test pages
         assertEquals(2, dao.findForArrivedShipmentsInDateRanges(c1,
-                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), new Page(1, 2)).size());
+                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), null, new Page(1, 2)).size());
         assertEquals(1, dao.findForArrivedShipmentsInDateRanges(c1,
-                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), new Page(2, 2)).size());
+                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), null, new Page(2, 2)).size());
         assertEquals(0, dao.findForArrivedShipmentsInDateRanges(c1,
-                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), new Page(3, 2)).size());
+                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt), null, new Page(3, 2)).size());
     }
     /**
      * @param device device.

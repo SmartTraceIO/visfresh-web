@@ -7,7 +7,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,7 +26,6 @@ import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.reports.TemperatureStats;
-import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -215,7 +216,10 @@ public class TemperatureStatsCollectorTest {
     private static Date getMiddleOfMonth(final String month) {
         try {
             final Date date = new SimpleDateFormat("yyyy.MM").parse(month);
-            return DateTimeUtils.getMiddleOfMonth(date);
+            final Calendar c = new GregorianCalendar();
+            c.setTime(date);
+            c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH) / 2);
+            return c.getTime();
         } catch (final ParseException e) {
             throw new RuntimeException(e);
         }

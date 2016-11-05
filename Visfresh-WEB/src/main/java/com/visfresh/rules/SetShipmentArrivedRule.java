@@ -96,10 +96,9 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
             shutdownService.sendShipmentShutdown(shipment, new Date(date));
         }
 
-        //if shipment report is not sent, do it now.
-        if (!ArrivalRule.isArrivalNotificationSent(context.getSessionManager().getSession(shipment))) {
-            sendShipmentReport(shipment);
-        }
+        //send shipment report. Given report can be sent before, but
+        //the notification service will prevent duplicate sending of report.
+        sendShipmentReport(shipment);
 
         return false;
     }
