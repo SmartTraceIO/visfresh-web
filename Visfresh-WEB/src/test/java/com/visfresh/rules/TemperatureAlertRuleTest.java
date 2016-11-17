@@ -4,6 +4,8 @@
 package com.visfresh.rules;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
@@ -565,6 +567,60 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
 
         e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
         rule.handle(new RuleContext(e, mgr));
+    }
+    @Test
+    public void testNotCumulativeFlag() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final TemperatureRule r = new TemperatureRule(AlertType.CriticalCold);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(false);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        final SessionHolder mgr = new SessionHolder();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 5);
+        rule.handle(new RuleContext(e, mgr));
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, mgr));
+
+        final TemperatureAlert a = (TemperatureAlert) alertDao.findAll(null, null, null).get(0);
+        assertFalse(a.isCumulative());
+    }
+    @Test
+    public void testCumulativeFlag() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final TemperatureRule r = new TemperatureRule(AlertType.CriticalCold);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(true);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - timeOutMinutes * minute - 3;
+        final SessionHolder mgr = new SessionHolder();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 5);
+        rule.handle(new RuleContext(e, mgr));
+        e = createEvent(startTime + 31 * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, mgr));
+
+        final TemperatureAlert a = (TemperatureAlert) alertDao.findAll(null, null, null).get(0);
+        assertTrue(a.isCumulative());
     }
     /**
      * @param date date.

@@ -188,7 +188,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         final TemperatureAlert alert = new TemperatureAlert();
         defaultAssign(event, alert);
         alert.setMinutes(rule.getTimeOutMinutes());
-        alert.setCumulative(true);
+        alert.setCumulative(rule.isCumulativeFlag());
         alert.setTemperature(rule.getTemperature());
         alert.setType(rule.getType());
         alert.setRuleId(rule.getId());
