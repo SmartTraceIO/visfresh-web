@@ -137,8 +137,7 @@ public final class DateTimeUtils {
         final TimeRanges r = new TimeRanges();
 
         final Calendar calendar = new GregorianCalendar();
-        Date date = new Date(t);
-        calendar.setTime(date);
+        calendar.setTimeInMillis(t);
 
         //start range
         switch(timeAtom) {
@@ -170,7 +169,7 @@ public final class DateTimeUtils {
         r.setStartTime(calendar.getTimeInMillis());
 
         //end range
-        calendar.setTime(date);
+        calendar.setTimeInMillis(t);
         switch(timeAtom) {
             case Month:
                 calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));

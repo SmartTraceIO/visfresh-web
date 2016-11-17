@@ -94,7 +94,7 @@ public final class PerformanceReportBuilderTool {
 
         for (int i = 0; i < 3; i++) {
             if (i < 2) {
-                ap.getTimedData().add(0, generateMonthlyData(new Date(time - i * 28 * 24 * 60 * 60 * 1000l), atom));
+                ap.getTimedData().add(0, generateTimePeriodData(new Date(time - i * 28 * 24 * 60 * 60 * 1000l), atom));
                 ap.getTemperatureExceptions().add(generateException(serialNums[i]));
             } else {
                 final TimeRangesTemperatureStats stats = new TimeRangesTemperatureStats(
@@ -135,7 +135,7 @@ public final class PerformanceReportBuilderTool {
      * @param date
      * @return
      */
-    private static TimeRangesTemperatureStats generateMonthlyData(final Date date, final TimeAtom atom) {
+    private static TimeRangesTemperatureStats generateTimePeriodData(final Date date, final TimeAtom atom) {
         final long oneHour = 60 * 60 * 1000l;
 
         final TimeRangesTemperatureStats ms = new TimeRangesTemperatureStats(getTimeRanges(date.getTime(), atom));

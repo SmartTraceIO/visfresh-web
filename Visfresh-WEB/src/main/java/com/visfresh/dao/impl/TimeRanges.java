@@ -21,6 +21,15 @@ public class TimeRanges {
     public TimeRanges() {
         super();
     }
+    /**
+     * @param startTime
+     * @param endTime
+     */
+    public TimeRanges(final long startTime, final long endTime) {
+        super();
+        setStartTime(startTime);
+        setEndTime(endTime);
+    }
 
     /**
      * @return the startTime

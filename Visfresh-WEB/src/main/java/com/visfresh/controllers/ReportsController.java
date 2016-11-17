@@ -3,6 +3,8 @@
  */
 package com.visfresh.controllers;
 
+import static com.visfresh.utils.DateTimeUtils.getTimeRanges;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -14,9 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -211,38 +211,14 @@ public class ReportsController extends AbstractController {
      * @return
      */
     private TimeRanges createTimeRanges(final Date anchor, final TimeAtom atom) {
-        final Calendar c = new GregorianCalendar();
-        c.setTime(anchor);
+        TimeRanges r = DateTimeUtils.getTimeRanges(anchor.getTime(), atom);
+        final long endTime = r.getEndTime();
 
-        //calculate date ranges in user's time zone.
-        c.setTimeInMillis(DateTimeUtils.getTimeRanges(anchor.getTime(), atom).getEndTime());
-        c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-
-        final TimeRanges r = new TimeRanges();
-        r.setEndTime(c.getTimeInMillis());
-
-        //start date
-        switch (atom) {
-            case Month:
-                c.set(Calendar.DAY_OF_MONTH, 1);
-                break;
-            case Week:
-                c.add(Calendar.DAY_OF_YEAR, -6);
-                break;
-            case Quarter:
-                c.add(Calendar.MONTH, -2);
-                c.set(Calendar.DAY_OF_MONTH, 1);
-                break;
-            default:
-                throw new RuntimeException("Unexpected time atom " + atom);
+        for (int i = 0; i < 2; i++) {
+            r = getTimeRanges(r.getStartTime() -  (r.getEndTime() - r.getStartTime()) / 2, atom);
         }
 
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 1);
-
-        r.setStartTime(c.getTimeInMillis());
-        return r;
+        return new TimeRanges(r.getStartTime(), endTime);
     }
 
     /**
