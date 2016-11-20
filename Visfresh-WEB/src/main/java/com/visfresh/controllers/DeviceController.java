@@ -341,12 +341,12 @@ public class DeviceController extends AbstractController implements DeviceConsta
             dto.setLastReadingLong(item.getLongitude());
             dto.setLastReadingTemperature(LocalizationUtils.getTemperatureString(
                     item.getTemperature(), temperatureUnits));
+        }
 
-            if (item.getShipmentId() != null) {
-                dto.setLastShipmentId(item.getShipmentId());
-                dto.setShipmentNumber(dto.getSn() + "(" + item.getTripCount() + ")");
-                dto.setShipmentStatus(item.getShipmentStatus().name());
-            }
+        if (item.getShipmentId() != null) {
+            dto.setLastShipmentId(item.getShipmentId());
+            dto.setShipmentNumber(dto.getSn() + "(" + item.getTripCount() + ")");
+            dto.setShipmentStatus(item.getShipmentStatus().name());
         }
 
         return dto;
