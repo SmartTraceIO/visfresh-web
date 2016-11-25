@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -51,6 +54,7 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
 
     @Autowired
     private UserDao userDao;
+    private DefaultCache<List<PersonSchedule>, Long> personScheduleCache;
 
     /**
      * Default constructor.
@@ -67,10 +71,17 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("NotificationScheduleDao", 1000, 4 * 60, 20 * 60);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends NotificationSchedule> S save(final S sched) {
+    public <S extends NotificationSchedule> S saveImpl(final S sched) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;
@@ -141,6 +152,17 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
             jdbc.update("delete from " + PERSONAL_SCHEDULE_TABLE + " where id = :id",
                     paramMap);
         }
+
+        personScheduleCache.clear();
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#cacheEntity(com.visfresh.entities.EntityWithId, java.util.Map)
+     */
+    @Override
+    protected void cacheEntity(final NotificationSchedule t, final Map<String, Object> map) {
+        super.cacheEntity(t, map);
+        //cache person schedules
+        personScheduleCache.put(t.getId(), new LinkedList<>(t.getSchedules()));
     }
 
     private void savePersonalSchedule(final Long schedId, final PersonSchedule ps) {
@@ -273,9 +295,21 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
         no.setId(((Number) map.get(ID_FIELD)).longValue());
         no.setName((String) map.get(NAME_FIELD));
         no.setDescription((String) map.get(DESCRIPTION_FIELD));
-
-        no.getSchedules().addAll(findPersonalSchedulesFor(no.getId()));
         return no;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
+     */
+    @Override
+    protected void resolveReferences(final NotificationSchedule t, final Map<String, Object> row, final Map<String, Object> cache) {
+        super.resolveReferences(t, row, cache);
+
+        final List<PersonSchedule> list = this.personScheduleCache.get(t.getId());
+        if (list != null) {
+            t.getSchedules().addAll(list);
+        } else {
+            t.getSchedules().addAll(findPersonalSchedulesFor(t.getId()));
+        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.NotificationScheduleDao#getDbReferences(java.lang.Long)
@@ -308,5 +342,15 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
             refs.add(ref);
         }
         return refs;
+    }
+
+    @PostConstruct
+    public void initPersonScheduleCache() {
+        personScheduleCache = new DefaultCache<>("PersonScheduleDao", 1000, 4 * 60, 20 * 60);
+        personScheduleCache.initialize();
+    }
+    @PreDestroy
+    public void destroyPersonScheduleCache() {
+        personScheduleCache.destroy();
     }
 }

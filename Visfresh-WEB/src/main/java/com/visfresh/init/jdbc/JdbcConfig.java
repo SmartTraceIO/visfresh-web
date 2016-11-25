@@ -3,6 +3,7 @@
  */
 package com.visfresh.init.jdbc;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.TransactionManagementConfigure
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
+import net.sf.ehcache.CacheManager;
 
 /**
  * Base JPA configuration for test and production environment.
@@ -36,6 +39,10 @@ public class JdbcConfig implements TransactionManagementConfigurer {
         super();
     }
 
+    @PostConstruct
+    public void destroyCache() {
+        CacheManager.getInstance().shutdown();
+    }
     /**
      * @return JDBC data source.
      */

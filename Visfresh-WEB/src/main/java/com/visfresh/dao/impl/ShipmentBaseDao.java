@@ -68,7 +68,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends E> S save(final S s) {
+    public <S extends E> S saveImpl(final S s) {
         final Map<String, Object> paramMap = createParameterMap(s);
 
         String sql;

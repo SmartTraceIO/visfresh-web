@@ -11,6 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -30,12 +33,14 @@ import com.visfresh.utils.StringUtils;
 public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Serializable&Comparable<ID>>
         implements DaoBase<T, ID> {
     protected static final String DEFAULT_FILTER_KEY_PREFIX = "filter_";
+    protected int defaultCacheTimeSeconds = 3 * 60;
 
     /**
      * JDBC template.
      */
     @Autowired(required = true)
     protected NamedParameterJdbcTemplate jdbc;
+    private EntityCache<ID> cache;
 
     /**
      * @param repository class.
@@ -55,6 +60,14 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         }
         return result;
     }
+    @Override
+    public final <S extends T> S save(final S entity) {
+        final S s = saveImpl(entity);
+        cache.remove(s.getId());
+        return s;
+    }
+    public abstract <S extends T> S saveImpl(final S entity);
+
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findAll(java.util.Collection)
      */
@@ -248,12 +261,31 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      */
     @Override
     public T findOne(final ID id) {
+        final T e = getFromCache(id);
+        if (e != null) {
+            return e;
+        }
+
         final Filter f = new Filter();
         f.addFilter(getIdFieldName(), id);
 
         final List<T> list = findAll(f, null, null);
         return list.size() == 0 ? null : list.get(0);
     }
+    /**
+     * @param id
+     * @return
+     */
+    protected T getFromCache(final ID id) {
+        final Map<String, Object> map = cache.get(id);
+        if (map != null) {
+            final T e = createEntity(map);
+            resolveReferences(e, map, new HashMap<String, Object>());
+            return e;
+        }
+        return null;
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#getEntityCount(com.visfresh.dao.Filter)
      */
@@ -293,6 +325,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @return
      */
     protected abstract String getIdFieldName();
+    protected abstract EntityCache<ID> createCache();
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findAll()
      */
@@ -322,10 +355,20 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         for (final Map<String,Object> map : list) {
             final T t = createEntity(map);
             resolveReferences(t, map, cache);
+            //cache result
+            cacheEntity(t, map);
             result.add(t);
         }
         return result;
     }
+    /**
+     * @param t
+     * @param map
+     */
+    protected void cacheEntity(final T t, final Map<String, Object> map) {
+        this.cache.put(t.getId(), map);
+    }
+
     /**
      * @param filter the filter.
      * @return select all string depending of filter.
@@ -354,6 +397,21 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("id", id);
         jdbc.update("delete from " + getTableName() + " where " + getIdFieldName() + " = :id", paramMap);
+        deleteFromCache(id);
+    }
+    public void deleteFromCache(final ID id) {
+        cache.remove(id);
+    }
+    @PostConstruct
+    public void initCache() {
+        cache = createCache();
+        cache.initialize();
+    }
+    @PreDestroy
+    public void destroyCache() {
+        if (cache != null) {
+            cache.destroy();
+        }
     }
     /**
      * @param strings

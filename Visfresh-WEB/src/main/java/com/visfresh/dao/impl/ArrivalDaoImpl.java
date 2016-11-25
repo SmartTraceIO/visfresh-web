@@ -53,12 +53,19 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements Arriva
     public ArrivalDaoImpl() {
         super();
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<Long>("ArrivalDao", 1000, defaultCacheTimeSeconds, 2 * defaultCacheTimeSeconds);
+    }
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends Arrival> S save(final S arrival) {
+    public <S extends Arrival> S saveImpl(final S arrival) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

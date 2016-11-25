@@ -63,12 +63,19 @@ public class CompanyDaoImpl extends DaoImplBase<Company, Long> implements Compan
         propertyToDbFields.put(CompanyConstants.BILLING_PERSON, BILLING_PERSON_FIELD);
         propertyToDbFields.put(CompanyConstants.LANGUAGE, LANGUAGE_FIELD);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<Long>("CompanyDao", 1000, defaultCacheTimeSeconds, 5 * defaultCacheTimeSeconds);
+    }
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends Company> S save(final S company) {
+    public <S extends Company> S saveImpl(final S company) {
         final Map<String, Object> paramMap = createParameterMap(company);
         final LinkedList<String> fields = new LinkedList<String>(paramMap.keySet());
 

@@ -58,10 +58,17 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<Long>("AlertsDao", 1000, defaultCacheTimeSeconds, 2 * defaultCacheTimeSeconds);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <A extends Alert> A save(final A alert) {
+    public <A extends Alert> A saveImpl(final A alert) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

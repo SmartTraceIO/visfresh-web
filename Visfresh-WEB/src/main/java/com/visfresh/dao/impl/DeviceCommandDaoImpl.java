@@ -43,10 +43,17 @@ public class DeviceCommandDaoImpl extends DaoImplBase<DeviceCommand, Long> imple
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("DeviceCommandDao", 20, defaultCacheTimeSeconds, defaultCacheTimeSeconds);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends DeviceCommand> S save(final S cmd) {
+    public <S extends DeviceCommand> S saveImpl(final S cmd) {
         final Long commandId = cmd.getId();
         final String command = cmd.getCommand();
         final String deviceImei = cmd.getDevice().getImei();

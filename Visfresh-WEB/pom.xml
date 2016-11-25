@@ -44,6 +44,13 @@
 			<artifactId>spring-web</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		
+		<!-- Cache -->
+		<dependency>
+		    <groupId>net.sf.ehcache</groupId>
+		    <artifactId>ehcache</artifactId>
+		    <version>2.10.3</version>
+		</dependency>
 
 		<!-- JDBC -->
 		<dependency>

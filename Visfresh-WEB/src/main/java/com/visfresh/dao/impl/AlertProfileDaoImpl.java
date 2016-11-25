@@ -66,7 +66,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends AlertProfile> S save(final S ap) {
+    public <S extends AlertProfile> S saveImpl(final S ap) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         final List<String> fields = getFields(false);
@@ -101,6 +101,13 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
 
         updateTemperatureIssues(ap.getId(), ap.getAlertRules());
         return ap;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<Long>("AlertProfileDao", 1000, 10 * 60, 20 * 60);
     }
     /**
      * @param id alert profile ID.

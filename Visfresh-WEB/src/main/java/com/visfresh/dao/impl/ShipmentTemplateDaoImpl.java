@@ -67,6 +67,13 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
         return new ShipmentTemplate();
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("ShipmentTemplateDao", 100, 60, 60);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#createEntity(java.util.Map, java.util.Map)
      */
     @Override
@@ -93,7 +100,7 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
      * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
      */
     @Override
-    protected String buildSelectBlockForFindAll(Filter filter) {
+    protected String buildSelectBlockForFindAll(final Filter filter) {
         return "select "
                 + getTableName()
                 + ".*"

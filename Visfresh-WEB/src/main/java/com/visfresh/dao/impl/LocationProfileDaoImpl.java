@@ -62,10 +62,17 @@ public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<Locatio
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("LocationProfileDao", 1000, 4 * 60, 20 * 60);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends LocationProfile> S save(final S lp) {
+    public <S extends LocationProfile> S saveImpl(final S lp) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

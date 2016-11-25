@@ -62,12 +62,11 @@ public class AutoStartShipmentDaoImpl
     public AutoStartShipmentDaoImpl() {
         super();
     }
-
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <E extends AutoStartShipment> E save(final E aut) {
+    public <E extends AutoStartShipment> E saveImpl(final E aut) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         paramMap.put(ID_FIELD, aut.getId());
@@ -97,6 +96,13 @@ public class AutoStartShipmentDaoImpl
 
         mergeLocations(aut);
         return aut;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("AutoStartDao", 1000, defaultCacheTimeSeconds, defaultCacheTimeSeconds);
     }
     private void mergeLocations(final AutoStartShipment cfg) {
         final List<Long> oldLocFrom = new LinkedList<>();
@@ -406,6 +412,7 @@ public class AutoStartShipmentDaoImpl
     public void delete(final AutoStartShipment entity) {
         //delete template, entity should be deleted by DB trigger
         shipmentTemplateDao.delete(entity.getTemplate().getId());
+        deleteFromCache(entity.getId());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()

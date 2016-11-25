@@ -57,10 +57,17 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("DeviceGroupDao",100, 60, 60);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends DeviceGroup> S save(final S group) {
+    public <S extends DeviceGroup> S saveImpl(final S group) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

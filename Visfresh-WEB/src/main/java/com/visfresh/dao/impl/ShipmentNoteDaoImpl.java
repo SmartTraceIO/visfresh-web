@@ -51,10 +51,17 @@ public class ShipmentNoteDaoImpl extends DaoImplBase<ShipmentNote, Long> impleme
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("ShipmentNoteDao", 1000, 60, 3 * 60);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends ShipmentNote> S save(final S note) {
+    public <S extends ShipmentNote> S saveImpl(final S note) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

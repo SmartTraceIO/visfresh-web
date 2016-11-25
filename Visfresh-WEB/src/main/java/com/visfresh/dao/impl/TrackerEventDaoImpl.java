@@ -83,10 +83,17 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("TrackerEventDao", 10000, 60, 120);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends TrackerEvent> S save(final S event) {
+    public <S extends TrackerEvent> S saveImpl(final S event) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

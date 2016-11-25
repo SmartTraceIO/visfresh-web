@@ -44,10 +44,17 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, Long> imple
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("SystemMessageDao", 100, 60, 60);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <A extends SystemMessage> A save(final A msg) {
+    public <A extends SystemMessage> A saveImpl(final A msg) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

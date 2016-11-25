@@ -9,6 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -67,6 +70,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     private final DeviceStateSerializer stateSerializer = new DeviceStateSerializer();
+    private DefaultCache<DeviceState, String> deviceStateCache;
     /**
      * Default constructor.
      */
@@ -79,10 +83,26 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<String> createCache() {
+        return new EntityCache<String>("DeviceDaoDevice",
+                1000, defaultCacheTimeSeconds, 5 * defaultCacheTimeSeconds);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#deleteFromCache(java.io.Serializable)
+     */
+    @Override
+    public void deleteFromCache(final String id) {
+        super.deleteFromCache(id);
+        deviceStateCache.remove(id);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends Device> S save(final S device) {
+    public <S extends Device> S saveImpl(final S device) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put(IMEI_FIELD, device.getId());
         paramMap.put(NAME_FIELD, device.getName());
@@ -183,17 +203,23 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
      */
     @Override
     public DeviceState getState(final String imei) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("device", imei);
+        DeviceState st = deviceStateCache.get(imei);
+        if (st == null) {
+            final Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("device", imei);
 
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                "select state as state from devicestates where device = :device", paramMap);
-        if (list.size() == 0) {
-            return null;
+            final List<Map<String, Object>> list = jdbc.queryForList(
+                    "select state as state from devicestates where device = :device", paramMap);
+            if (list.size() == 0) {
+                return null;
+            }
+
+            final String state = (String) list.get(0).get("state");
+            st = stateSerializer.parseState(state);
+            deviceStateCache.put(imei, st);
         }
 
-        final String state = (String) list.get(0).get("state");
-        return stateSerializer.parseState(state);
+        return st;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceDao#save(java.lang.String, com.visfresh.rules.DeviceState)
@@ -209,6 +235,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         } else {
             jdbc.update("update devicestates set state = :state where device = :device", params);
         }
+        deviceStateCache.remove(imei);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceGroupDao#getDevices(java.lang.String)
@@ -235,6 +262,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         params.put("company", c.getId());
 
         jdbc.update(sql, params);
+        deleteFromCache(device.getImei());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)
@@ -345,12 +373,12 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
             return;
         }
 
-
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("imei", d.getImei());
         params.put("color", color == null ? null : color.name());
 
         jdbc.update("update " + TABLE + " set " + COLOR_FIELD + "=:color where " + IMEI_FIELD + "=:imei", params);
+        deleteFromCache(d.getImei());
     }
     /**
      * @param row
@@ -400,5 +428,14 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
             }
         }
         return item;
+    }
+    @PostConstruct
+    public void initDeviceStateCache() {
+        deviceStateCache = new DefaultCache<>("DeviceDaoState", 1000, defaultCacheTimeSeconds, 5 * defaultCacheTimeSeconds);
+        deviceStateCache.initialize();
+    }
+    @PreDestroy
+    public void destroyDeviceStateCache() {
+        deviceStateCache.destroy();
     }
 }

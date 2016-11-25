@@ -105,10 +105,17 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implem
         return list;
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("UserDao", 1000, 60, 20 * 60);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends User> S save(final S user) {
+    public <S extends User> S saveImpl(final S user) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

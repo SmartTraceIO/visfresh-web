@@ -89,6 +89,13 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         propertyToDbMap.put(NotificationConstants.PROPERTY_CLOSED, ISREAD_FIELD);
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("NotificationDao", 1000, 60, 120);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.NotificationDao#findByShipment(java.lang.Long)
      */
     @Override
@@ -126,6 +133,11 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
 
         jdbc.update("update " + TABLE + " set "
                 + ISREAD_FIELD + " = true where user = :user and (" + idPart + ")", paramMap);
+
+        //clear cache
+        for (final Long id : ids) {
+            deleteFromCache(id);
+        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
@@ -186,7 +198,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends Notification> S save(final S no) {
+    public <S extends Notification> S saveImpl(final S no) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

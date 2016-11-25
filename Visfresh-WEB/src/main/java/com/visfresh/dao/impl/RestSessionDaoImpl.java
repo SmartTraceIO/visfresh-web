@@ -47,10 +47,17 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, Long> implement
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("RestSessionDao", 10, 60, 60);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends RestSession> S save(final S session) {
+    public <S extends RestSession> S saveImpl(final S session) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put(ID, session.getId());
         paramMap.put(USER, session.getUser().getId());

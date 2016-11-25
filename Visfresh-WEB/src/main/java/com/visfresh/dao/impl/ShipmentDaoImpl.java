@@ -101,6 +101,13 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         return new Shipment();
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
+     */
+    @Override
+    protected EntityCache<Long> createCache() {
+        return new EntityCache<>("ShipmentDao", 1000, 10 * 60, 20 * 60);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#findActiveShipments(com.visfresh.entities.Company)
      */
     @Override
@@ -315,13 +322,13 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
      * @see com.visfresh.dao.impl.ShipmentBaseDao#save(com.visfresh.entities.ShipmentBase)
      */
     @Override
-    public <S extends Shipment> S save(final S s) {
+    public <S extends Shipment> S saveImpl(final S s) {
         final boolean insert = s.getId() == null;
         if (insert) {
             s.setTripCount(s.getDevice().getTripCount() + 1);
             s.getDevice().setTripCount(s.getTripCount());
         }
-        final S result = super.save(s);
+        final S result = super.saveImpl(s);
         if (insert) {
             deviceDao.save(s.getDevice());
         }
