@@ -39,6 +39,7 @@ import com.visfresh.entities.User;
 import com.visfresh.io.NotificationItem;
 import com.visfresh.io.json.NotificationSerializer;
 import com.visfresh.l12n.NotificationBundle;
+import com.visfresh.services.AuthenticationException;
 import com.visfresh.utils.DateTimeUtils;
 
 /**
@@ -110,6 +111,9 @@ public class NotificationController extends AbstractController implements Notifi
             }
 
             return createListSuccessResponse(array, total);
+        } catch (final AuthenticationException e) {
+            log.error("Failed to get notifications: " + e.getMessage());
+            return createErrorResponse(e);
         } catch (final Exception e) {
             log.error("Failed to get notifications", e);
             return createErrorResponse(e);

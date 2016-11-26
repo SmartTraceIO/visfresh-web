@@ -134,17 +134,19 @@ public class DefaultSiblingDetector implements SiblingDetector {
             final Map<Long, Set<Long>> siblingMap = new HashMap<>();
             //initialize sibling map
             for (final Shipment s : shipments) {
-                siblingMap.put(s.getId(), new HashSet<Long>());
+                siblingMap.put(s.getId(), new HashSet<Long>(s.getSiblings()));
             }
 
             //get shipments for group
             while (!shipments.isEmpty()) {
                 final Shipment master = shipments.remove(0);
+
+                log.debug("Search siblings for shipment " + master.getId());
                 findSiblings(master, shipments, siblingMap);
 
-                log.debug("Found siblings (" + StringUtils.combine(siblingMap.get(master.getId()), ",")
-                        + ") for shipment " + master.getId());
                 if (!isEquals(master.getSiblings(), siblingMap.get(master.getId()))) {
+                    log.debug("Uplate siblings (" + StringUtils.combine(siblingMap.get(master.getId()), ",")
+                    + ") for shipment " + master.getId());
                     updateSiblingInfo(master, siblingMap.get(master.getId()));
                 }
             }
@@ -161,36 +163,24 @@ public class DefaultSiblingDetector implements SiblingDetector {
             final Map<Long, Set<Long>> siblingMap) {
         final List<Shipment> shipments = new LinkedList<>(originShipments);
 
-        //create shipment map
-        final Map<Long, Shipment> shipmentMap = new HashMap<>();
-        for (final Shipment s : shipments) {
-            shipmentMap.put(s.getId(), s);
-        }
-
-        //add inactive siblings
-        final Set<Long> ids = new HashSet<>();
-        for (final Long id : master.getSiblings()) {
-            if (!shipmentMap.containsKey(id)) {
-                ids.add(id);
+        //ignore old siblings
+        final Set<Long> siblings = master.getSiblings();
+        final Iterator<Shipment> iter = shipments.iterator();
+        while (iter.hasNext()) {
+            if (siblings.contains(iter.next())) {
+                iter.remove();
             }
         }
 
-        //get shipments from DB
-        final List<Shipment> otherSiblings = getShipments(ids);
-        for (final Shipment s : otherSiblings) {
-            if (s.hasFinalStatus() && s.getCompany().getId().equals(master.getCompany().getId())) {
-                shipments.add(s);
-            }
-        }
-
-        final List<TrackerEvent> masterEvents = getTrackeEvents(master);
-        for (final Shipment s : shipments) {
-            final List<TrackerEvent> events = getTrackeEvents(s);
-            if (isSiblings(masterEvents, events)) {
-                siblingMap.get(master.getId()).add(s.getId());
-            }
-            if (!s.hasFinalStatus() && isSiblings(events, masterEvents)) {
-                siblingMap.get(s.getId()).add(master.getId());
+        //continue only if shipment list is not empty
+        if (!shipments.isEmpty()) {
+            final List<TrackerEvent> masterEvents = getTrackeEvents(master);
+            for (final Shipment s : shipments) {
+                final List<TrackerEvent> events = getTrackeEvents(s);
+                if (isSiblings(masterEvents, events)) {
+                    siblingMap.get(master.getId()).add(s.getId());
+                    siblingMap.get(s.getId()).add(master.getId());
+                }
             }
         }
     }
@@ -287,8 +277,7 @@ public class DefaultSiblingDetector implements SiblingDetector {
         //get events of given tracker after the intersecting time
         cutEventsAfterDate(e1, e2.get(e2.size() - 1).getTime());
 
-        final double summ = getAvgDistance(e1, e2);
-        final boolean isSiblings = summ < MAX_DISTANCE_AVERAGE;
+        final boolean isSiblings = isSiblingsByDistance(e1, e2, MAX_DISTANCE_AVERAGE);
 
         //check given tracker lives the sibling area
         return isSiblings
@@ -323,13 +312,17 @@ public class DefaultSiblingDetector implements SiblingDetector {
     }
 
     /**
-     * @param e1
-     * @param e2
+     * @param e1 first list of events
+     * @param e2 secondd list of events
+     * @param maxAvg max acceptable average distance.
      * @return
      */
-    private double getAvgDistance(final List<TrackerEvent> e1, final List<TrackerEvent> e2) {
+    private boolean isSiblingsByDistance(
+            final List<TrackerEvent> e1, final List<TrackerEvent> e2, final double maxAvg) {
         //calculate the distance in intersected time
-        final List<Double> distances = new LinkedList<>();
+        int count = 0;
+        final double maxSumm = maxAvg * e1.size(); // max acceptable summ
+        double summ = 0;
 
         final Iterator<TrackerEvent> iter1 = e1.iterator();
         final Iterator<TrackerEvent> iter2 = e2.iterator();
@@ -342,7 +335,14 @@ public class DefaultSiblingDetector implements SiblingDetector {
                 while (iter2.hasNext()) {
                     final TrackerEvent after = iter2.next();
                     if (!after.getTime().before(e.getTime())) {
-                        distances.add(getDistance(e, before, after));
+                        summ += getDistance(e, before, after);
+                        count++;
+
+                        //if max possible avg is more than avg limit, should return the max distance
+                        //as for not siblings
+                        if (summ >= maxSumm) {
+                            return false;
+                        }
                         before = after;
                         break;
                     }
@@ -353,16 +353,11 @@ public class DefaultSiblingDetector implements SiblingDetector {
             }
         }
 
-        if (distances.isEmpty()) {
-            return Double.MAX_VALUE;
+        if (count == 0) {
+            return false;
         }
 
-        double summ = 0;
-        final double norma = distances.size();
-        for (final Double d : distances) {
-            summ += d / norma;
-        }
-        return summ;
+        return summ / count < maxAvg;
     }
 
     /**
@@ -418,18 +413,20 @@ public class DefaultSiblingDetector implements SiblingDetector {
         }
 
         final Date t = e.getTime();
-        if (!t.after(mt1)) {
-            return getDistance(e, me1);
-        }
-        if (!t.before(mt2)) {
-            return getDistance(e, me2);
-        }
+        final long dt = mt2.getTime() - mt1.getTime();
 
-        //ordinary situation
-        final double delta = (double) (t.getTime() - mt1.getTime()) / (mt2.getTime() - mt1.getTime());
+        final double lat;
+        final double lon;
 
-        final double lat = me1.getLatitude() + delta * (me2.getLatitude() - me1.getLatitude());
-        final double lon = me1.getLongitude() + delta * (me2.getLongitude() - me1.getLongitude());
+        if (dt == 0) {
+            lat = me1.getLatitude();
+            lon = me1.getLongitude();
+        } else {
+            final double delta = (double) (t.getTime() - mt1.getTime()) / dt;
+
+            lat = me1.getLatitude() + delta * (me2.getLatitude() - me1.getLatitude());
+            lon = me1.getLongitude() + delta * (me2.getLongitude() - me1.getLongitude());
+        }
 
         return getDistanceMeters(e.getLatitude(), e.getLongitude(), lat, lon);
     }
