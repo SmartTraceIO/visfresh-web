@@ -21,7 +21,7 @@ public class RulesInitializationTest extends BaseRuleTest {
 
     @Test
     public void testInitialized() {
-        assertTrue(engine.hasRule(ArrivalRule.NAME));
+        assertTrue(engine.hasRule(ArrivalNotificationRule.NAME));
         assertTrue(engine.hasRule(AssignShipmentRule.NAME));
         assertTrue(engine.hasRule(AutoDetectEndLocationRule.NAME));
         assertTrue(engine.hasRule(AutoStartShipmentRule.NAME));

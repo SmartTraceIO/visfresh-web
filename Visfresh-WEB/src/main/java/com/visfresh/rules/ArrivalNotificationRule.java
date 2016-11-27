@@ -30,10 +30,10 @@ import com.visfresh.utils.LocationUtils;
  *
  */
 @Component
-public class ArrivalRule extends AbstractNotificationRule {
-    private static final Logger log = LoggerFactory.getLogger(ArrivalRule.class);
+public class ArrivalNotificationRule extends AbstractNotificationRule {
+    private static final Logger log = LoggerFactory.getLogger(ArrivalNotificationRule.class);
 
-    public static final String NAME = "Arrival";
+    public static final String NAME = "ArrivalNotification";
 
     @Autowired
     protected ArrivalDao arrivalDao;
@@ -42,10 +42,13 @@ public class ArrivalRule extends AbstractNotificationRule {
     @Autowired
     protected ShipmentDao shipmentDao;
 
+    private EnteringDetectionSupport enteringChecker = new EnteringDetectionSupport(
+            3, NAME + "_enteringChecker");
+
     /**
      * Default constructor.
      */
-    public ArrivalRule() {
+    public ArrivalNotificationRule() {
         super();
     }
 
@@ -64,10 +67,54 @@ public class ArrivalRule extends AbstractNotificationRule {
 
         final boolean accept = !session.isArrivalProcessed()
                 && LeaveStartLocationRule.isSetLeaving(session)
-                && isNearEndLocation(shipment,
-                        event.getLatitude(), event.getLongitude());
+                && (enteringChecker.isInControl(session)
+                        ||isNearEndLocation(shipment, event.getLatitude(), event.getLongitude()));
         return accept;
     }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
+     */
+    @Override
+    public final boolean handle(final RuleContext context) {
+        final Arrival arrival = new Arrival();
+        final TrackerEvent event = context.getEvent();
+        final Shipment shipment = event.getShipment();
+
+        log.debug("Process arrival notification rule for shipment " + shipment.getId());
+        context.setProcessed(this);
+        final ShipmentSession session = context.getSessionManager().getSession(shipment);
+
+        if (!isNearEndLocation(shipment, event.getLatitude(), event.getLongitude())) {
+            log.debug("Watching of arrival notification state has cleaned for " + shipment.getId());
+            enteringChecker.clearInControl(session);
+            return false;
+        }
+
+        if (enteringChecker.handleEntered(session)) {
+            log.debug("Detected needs arrival notification for " + shipment.getId());
+
+            session.setArrivalProcessed(true);
+
+            arrival.setDate(event.getTime());
+            arrival.setDevice(event.getDevice());
+            arrival.setNumberOfMettersOfArrival(getNumberOfMetersForArrival(
+                    event.getLatitude(), event.getLongitude(), shipment.getShippedTo()));
+            arrival.setShipment(shipment);
+            arrival.setTrackerEventId(event.getId());
+
+            saveArrival(arrival);
+
+            if (!shipment.isExcludeNotificationsIfNoAlerts() || hasTemperatureAlerts(shipment)) {
+                sendNotificaion(arrival, event);
+            }
+        } else {
+            log.debug("Arrival notification not yet needs for " + shipment.getId());
+        }
+
+        return false;
+    }
+
     /**
      * @param shipment shipment.
      * @param latitude latitude of device location.
@@ -100,36 +147,6 @@ public class ArrivalRule extends AbstractNotificationRule {
         double distance = LocationUtils.getDistanceMeters(latitude, longitude, end.getLatitude(), end.getLongitude());
         distance = Math.max(0., distance - endLocation.getRadius());
         return (int) Math.round(distance);
-    }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.drools.TrackerEventRule#handle(com.visfresh.drools.TrackerEventRequest)
-     */
-    @Override
-    public final boolean handle(final RuleContext context) {
-        final Arrival arrival = new Arrival();
-        final TrackerEvent event = context.getEvent();
-        final Shipment shipment = event.getShipment();
-
-        log.debug("Handle arrival for shipment " + shipment.getId());
-        context.setProcessed(this);
-        final ShipmentSession session = context.getSessionManager().getSession(shipment);
-        session.setArrivalProcessed(true);
-
-        arrival.setDate(event.getTime());
-        arrival.setDevice(event.getDevice());
-        arrival.setNumberOfMettersOfArrival(getNumberOfMetersForArrival(
-                event.getLatitude(), event.getLongitude(), shipment.getShippedTo()));
-        arrival.setShipment(shipment);
-        arrival.setTrackerEventId(event.getId());
-
-        saveArrival(arrival);
-
-        if (!shipment.isExcludeNotificationsIfNoAlerts() || hasTemperatureAlerts(shipment)) {
-            sendNotificaion(arrival, event);
-        }
-
-        return false;
     }
     /**
      * @param shipment

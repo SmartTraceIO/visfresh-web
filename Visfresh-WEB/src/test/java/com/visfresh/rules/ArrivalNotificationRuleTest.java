@@ -47,20 +47,20 @@ import com.visfresh.rules.state.ShipmentSession;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ArrivalRuleTest extends BaseRuleTest {
-    private ArrivalRule rule;
+public class ArrivalNotificationRuleTest extends BaseRuleTest {
+    private ArrivalNotificationRule rule;
     private Shipment shipment;
 
     /**
      * Default constructor.
      */
-    public ArrivalRuleTest() {
+    public ArrivalNotificationRuleTest() {
         super();
     }
 
     @Before
     public void setUp() {
-        rule = context.getBean(ArrivalRule.class);
+        rule = context.getBean(ArrivalNotificationRule.class);
         shipment = createDefaultShipment(ShipmentStatus.InProgress, createDevice("9283470987"));
 
         //create shipment session for avoid of NullPointerException
@@ -94,6 +94,31 @@ public class ArrivalRuleTest extends BaseRuleTest {
         e.setLatitude(10.);
         e.setLongitude(10.);
         assertTrue(rule.accept(req));
+    }
+    @Test
+    public void testAcceptInControl() {
+        shipment.setArrivalNotificationWithinKm(1);
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setDevice(shipment.getDevice());
+        e.setShipment(shipment);
+        e.setTime(new Date());
+        e.setType(TrackerEventType.AUT);
+
+        final LocationProfile loc = createLocation();
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        final SessionHolder holder = createSessionHolder(true);
+
+        e.setLatitude(loc.getLocation().getLatitude());
+        e.setLongitude(loc.getLocation().getLongitude());
+        rule.handle(new RuleContext(e, holder));
+
+        e.setLatitude(0.);
+        e.setLongitude(0.);
+        assertTrue(rule.accept(new RuleContext(e, holder)));
     }
     @Test
     public void testNotAcceptNotLeavingStart() {
@@ -138,10 +163,15 @@ public class ArrivalRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e, createSessionHolder(true));
-        assertTrue(rule.accept(req));
-        rule.handle(req);
+        final SessionHolder holder = createSessionHolder(true);
 
+        rule.handle(new RuleContext(e, holder));
+        assertEquals(0, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
+
+        rule.handle(new RuleContext(e, holder));
+        assertEquals(0, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
+
+        rule.handle(new RuleContext(e, holder));
         //check arrival created
         final List<Arrival> arrivals = context.getBean(ArrivalDao.class).findAll(null, null, null);
         assertEquals(1, arrivals.size());
@@ -149,6 +179,46 @@ public class ArrivalRuleTest extends BaseRuleTest {
         final Arrival arrival = arrivals.get(0);
         assertEquals(shipment.getId(), arrival.getShipment().getId());
         assertEquals(e.getId(), arrival.getTrackerEventId());
+    }
+    @Test
+    public void testClearInControlState() {
+        shipment.setArrivalNotificationWithinKm(1);
+
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
+        final double lat = e.getLatitude();
+        final double lon = e.getLongitude();
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        //set nearest location
+        final SessionHolder holder = createSessionHolder(true);
+
+        rule.handle(new RuleContext(e, holder));
+        assertEquals(0, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
+
+        rule.handle(new RuleContext(e, holder));
+        assertEquals(0, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
+
+        //initiate the flush of state
+        e.setLatitude(lat + 10);
+        rule.handle(new RuleContext(e, holder));
+        assertEquals(0, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
+
+        //revert coordinates back
+        e.setLatitude(lat);
+        e.setLongitude(lon);
+
+        //check arrival created
+        rule.handle(new RuleContext(e, holder));
+        assertEquals(0, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
+
+        rule.handle(new RuleContext(e, holder));
+        assertEquals(0, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
+
+        rule.handle(new RuleContext(e, holder));
+        assertEquals(1, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
     }
     @Test
     public void testSendReport() {
@@ -165,9 +235,12 @@ public class ArrivalRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e, createSessionHolder(true));
-        assertTrue(rule.accept(req));
-        rule.handle(req);
+        final SessionHolder holder = createSessionHolder(true);
+
+        //need three continuous events
+        rule.handle(new RuleContext(e, holder));
+        rule.handle(new RuleContext(e, holder));
+        rule.handle(new RuleContext(e, holder));
 
         //check notification send
         final List<EmailMessage> emails = context.getBean(MockEmailService.class).getMessages();
@@ -196,6 +269,8 @@ public class ArrivalRuleTest extends BaseRuleTest {
         //set nearest location
         final RuleContext req = new RuleContext(e, createSessionHolder(true));
         assertTrue(rule.accept(req));
+        rule.handle(req);
+        rule.handle(req);
         rule.handle(req);
 
         //check notification send
@@ -291,6 +366,8 @@ public class ArrivalRuleTest extends BaseRuleTest {
         //set nearest location
         final RuleContext req = new RuleContext(e, state);
         assertTrue(rule.accept(req));
+        rule.handle(req);
+        rule.handle(req);
         rule.handle(req);
 
         assertFalse(rule.accept(new RuleContext(e, state)));

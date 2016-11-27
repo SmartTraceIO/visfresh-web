@@ -86,6 +86,62 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         assertTrue(rule.accept(req));
     }
     @Test
+    public void testAcceptInEnteringControl() {
+        shipment.setArrivalNotificationWithinKm(1);
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setDevice(shipment.getDevice());
+        e.setShipment(shipment);
+        e.setTime(new Date());
+        e.setType(TrackerEventType.AUT);
+
+        final LocationProfile loc = createLocation();
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        final SessionHolder h = createSessionHolder(true);
+
+        //so far
+        e.setLatitude(0.);
+        e.setLongitude(0.);
+        assertFalse(rule.accept(new RuleContext(e, h)));
+
+        //set nearest location
+        e.setLatitude(loc.getLocation().getLatitude());
+        e.setLongitude(loc.getLocation().getLongitude());
+        rule.handle(new RuleContext(e, h));
+
+        e.setLatitude(0.);
+        e.setLongitude(0.);
+        assertTrue(rule.accept(new RuleContext(e, h)));
+    }
+    @Test
+    public void testClearInEnteringControl() {
+        shipment.setArrivalNotificationWithinKm(1);
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setDevice(shipment.getDevice());
+        e.setShipment(shipment);
+        e.setTime(new Date());
+        e.setType(TrackerEventType.AUT);
+
+        final LocationProfile loc = createLocation();
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        final SessionHolder h = createSessionHolder(true);
+
+        //so far
+        e.setLatitude(loc.getLocation().getLatitude());
+        e.setLongitude(loc.getLocation().getLongitude());
+        rule.handle(new RuleContext(e, h));
+
+        e.setLatitude(0.);
+        e.setLongitude(0.);
+        rule.handle(new RuleContext(e, h));
+        assertFalse(rule.accept(new RuleContext(e, h)));
+    }
+    @Test
     public void testNotAcceptNotLeavingStartLocation() {
         shipment.setArrivalNotificationWithinKm(1);
 
@@ -123,7 +179,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
 
         //set nearest location
         final RuleContext req = new RuleContext(e, h);
-        rule.accept(req);
+        rule.handle(req);
         rule.handle(req);
 
         //check shipment shutdown request has sent
@@ -138,18 +194,52 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         final TrackerEvent e = createEventNearLocation(loc);
         final SessionHolder h = createSessionHolder(true);
 
-        final TrackerEvent e1 = createEventNearLocation(loc);
-        e1.setTime(new Date(e.getTime().getTime() - 30 * 60 * 1000l));
-
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
-        final RuleContext req = new RuleContext(e, h);
-        assertTrue(rule.accept(req));
-        rule.handle(req);
+        rule.handle(new RuleContext(e, h));
+        assertEquals(ShipmentStatus.InProgress, shipment.getStatus());
 
+        rule.handle(new RuleContext(e, h));
         assertEquals(ShipmentStatus.Arrived, shipment.getStatus());
+
+        assertNotNull(shipment.getArrivalDate());
+    }
+    @Test
+    public void testHandleStpImmediatelly() {
+        shipment.setArrivalNotificationWithinKm(1);
+
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
+        e.setType(TrackerEventType.STP);
+
+        final SessionHolder h = createSessionHolder(true);
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        rule.handle(new RuleContext(e, h));
+        assertEquals(ShipmentStatus.Arrived, shipment.getStatus());
+
+        assertNotNull(shipment.getArrivalDate());
+    }
+    @Test
+    public void testHandleBrtImmediatelly() {
+        shipment.setArrivalNotificationWithinKm(1);
+
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
+        e.setType(TrackerEventType.BRT);
+
+        final SessionHolder h = createSessionHolder(true);
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        rule.handle(new RuleContext(e, h));
+        assertEquals(ShipmentStatus.Arrived, shipment.getStatus());
+
         assertNotNull(shipment.getArrivalDate());
     }
     @Test
@@ -185,6 +275,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         //set nearest location
         final RuleContext req = new RuleContext(e, h);
         assertTrue(rule.accept(req));
+        rule.handle(req);
         rule.handle(req);
 
         final MockEmailService emailer = context.getBean(MockEmailService.class);

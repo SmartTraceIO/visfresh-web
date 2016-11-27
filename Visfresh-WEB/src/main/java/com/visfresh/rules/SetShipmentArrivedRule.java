@@ -20,6 +20,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.NotificationService;
@@ -45,6 +46,9 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
     @Autowired
     private NotificationService notificationService;
 
+    private EnteringDetectionSupport enteringChecker = new EnteringDetectionSupport(
+            2, NAME + "_enteringChecker");
+
     /**
      * Default constructor.
      */
@@ -69,8 +73,9 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
                 && shipment.getShippedTo() != null
                 && !shipment.hasFinalStatus()
                 && LeaveStartLocationRule.isSetLeaving(session)
-                && LocationUtils.isNearLocation(shipment.getShippedTo(),
-                        new Location(event.getLatitude(), event.getLongitude()));
+                && (enteringChecker.isInControl(session)
+                        || LocationUtils.isNearLocation(shipment.getShippedTo(),
+                                new Location(event.getLatitude(), event.getLongitude())));
 
         return accept;
     }
@@ -84,21 +89,39 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
 
         context.setProcessed(this);
 
-        shipment.setStatus(ShipmentStatus.Arrived);
-        shipment.setArrivalDate(event.getTime());
-        shipmentDao.save(shipment);
-        log.debug("Shipment status for " + shipment.getId()
-                + " has set to "+ ShipmentStatus.Arrived);
+        log.debug("Process arrival rule for shipment " + shipment.getId());
+        final ShipmentSession session = context.getSessionManager().getSession(shipment);
 
-        if (shipment.getShutdownDeviceAfterMinutes() != null) {
-            final long date = System.currentTimeMillis()
-                    + shipment.getShutdownDeviceAfterMinutes() * 60 * 1000l;
-            shutdownService.sendShipmentShutdown(shipment, new Date(date));
+        if (!LocationUtils.isNearLocation(shipment.getShippedTo(),
+                new Location(event.getLatitude(), event.getLongitude()))) {
+            log.debug("Watching of InArrival state has cleaned for " + shipment.getId());
+            enteringChecker.clearInControl(session);
+            return false;
         }
 
-        //send shipment report. Given report can be sent before, but
-        //the notification service will prevent duplicate sending of report.
-        sendShipmentReport(shipment);
+        final TrackerEventType type = event.getType();
+        boolean isArrival = (type == TrackerEventType.STP || type == TrackerEventType.BRT);
+        if (!isArrival) {
+            isArrival = enteringChecker.handleEntered(session);
+        }
+
+        if (isArrival) {
+            shipment.setStatus(ShipmentStatus.Arrived);
+            shipment.setArrivalDate(event.getTime());
+            shipmentDao.save(shipment);
+            log.debug("Shipment status for " + shipment.getId()
+                    + " has set to "+ ShipmentStatus.Arrived);
+
+            if (shipment.getShutdownDeviceAfterMinutes() != null) {
+                final long date = System.currentTimeMillis()
+                        + shipment.getShutdownDeviceAfterMinutes() * 60 * 1000l;
+                shutdownService.sendShipmentShutdown(shipment, new Date(date));
+            }
+
+            //send shipment report. Given report can be sent before, but
+            //the notification service will prevent duplicate sending of report.
+            sendShipmentReport(shipment);
+        }
 
         return false;
     }
