@@ -16,6 +16,9 @@ import java.util.Set;
 
 import com.visfresh.dao.DaoBase;
 import com.visfresh.entities.EntityWithId;
+import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -101,5 +104,29 @@ public final class EntityUtils {
         Collections.sort(result.getDeleted());
 
         return result;
+    }
+    /**
+     * @param shipment
+     * @param listShipmentAlerts
+     * @return
+     */
+    public static Set<TemperatureRule> getTemperatureRules(final List<TemperatureAlert> listShipmentAlerts) {
+        final Set<TemperatureRule> rules = new HashSet<>();
+        for (final TemperatureAlert a : listShipmentAlerts) {
+            final Shipment shipment = a.getShipment();
+            TemperatureRule rule = null;
+
+            for (final TemperatureRule r : shipment.getAlertProfile().getAlertRules()) {
+                if (r.getId().equals(a.getRuleId())) {
+                    rule = r;
+                    break;
+                }
+            }
+
+            if (rule != null) { //old version where rule ID has not set
+                rules.add(rule);
+            }
+        }
+        return rules;
     }
 }

@@ -18,7 +18,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,7 +36,6 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.impl.TimeAtom;
 import com.visfresh.dao.impl.TimeRanges;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.RuleBundle;
@@ -46,7 +44,6 @@ import com.visfresh.reports.ReportUtils;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
-import com.visfresh.utils.StringUtils;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
@@ -216,7 +213,7 @@ public class PerformanceReportBuilder {
                     stats.getSerialNumber() + "(" + stats.getTripCount() + ")",
                     dateShippedFormatter.format(stats.getDateShipped()),
                     stats.getShippedTo() == null ? "" : stats.getShippedTo(),
-                    getAlertsFiredString(stats.getAlertsFired(), units),
+                    ruleBundle.getAlertsFiredString(stats.getAlertsFired(), units),
                     getTemperatureString(temp.getAvgTemperature(), units, "No Readings"),
                     getSdString(temp.getStandardDevitation(), units, "No Readings"),
                     LocalizationUtils.formatByOneDecimal(
@@ -263,18 +260,6 @@ public class PerformanceReportBuilder {
         list.add(sub);
 
         body.add(list);
-    }
-
-    /**
-     * @param alertsFired
-     * @return
-     */
-    private String getAlertsFiredString(final List<TemperatureRule> alertsFired, final TemperatureUnits units) {
-        final List<String> alerts = new LinkedList<>();
-        for (final TemperatureRule alert: alertsFired) {
-            alerts.add(ruleBundle.buildDescription(alert, units));
-        }
-        return StringUtils.combine(alerts, ",");
     }
 
     /**

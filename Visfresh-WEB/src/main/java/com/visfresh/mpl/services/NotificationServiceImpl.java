@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
+import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.ShipmentDao;
@@ -28,6 +31,7 @@ import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Language;
@@ -38,6 +42,7 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
+import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
@@ -84,6 +89,8 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     private ShipmentReportDao shipmentReportDao;
     @Autowired
     private ArrivalDao arrivalDao;
+    @Autowired
+    private AlertDao alertDao;
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -148,14 +155,13 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     public void sendEmailNotification(final NotificationIssue issue,
             final User user, final TrackerEvent trackerEvent,
             final Language lang, final TimeZone tz, final TemperatureUnits tu) {
-        final String subject = bundle.getEmailSubject(issue, trackerEvent, lang, tz, tu);
-        final String message = bundle.getEmailMessage(issue, trackerEvent, lang, tz, tu);
-
         if (user != null) {
             if (issue instanceof Arrival) {
                 sendShipmentReport(issue.getShipment(), user);
             } else {
                 try {
+                    final String subject = bundle.getEmailSubject(issue, trackerEvent, lang, tz, tu);
+                    final String message = bundle.getEmailMessage((Alert) issue, trackerEvent, lang, tz, tu);
                     emailService.sendMessage(new String[] {user.getEmail()}, subject, message);
                 } catch (final MessagingException e) {
                     log.error("Failed to send email message to " + user, e);
@@ -231,6 +237,8 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
         final String subject;
         final String message;
 
+        final List<TemperatureAlert> alertsFired = getTemperatureAlerts(s);
+
         if (arrival != null) {// shipment really arrived.
             TrackerEvent trackerEvent = null;
             if (arrival.getTrackerEventId() != null) {
@@ -238,10 +246,10 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
             }
 
             subject = bundle.getEmailSubject(arrival, trackerEvent, lang, tz, tu);
-            message = bundle.getEmailMessage(arrival, trackerEvent, lang, tz, tu);
+            message = bundle.getEmailMessage(arrival, trackerEvent, alertsFired, lang, tz, tu);
         } else {
             subject = bundle.getArrivalReportEmailSubject(s, lang, tz, tu);
-            message = bundle.getArrivalReportEmailMessage(s, lang, tz, tu);
+            message = bundle.getArrivalReportEmailMessage(s, alertsFired, lang, tz, tu);
         }
 
         final File attachment = createShipmenentReport(user, s);
@@ -255,6 +263,23 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
             attachment.delete();
         }
     }
+    /**
+     * @param s
+     * @return
+     */
+    private List<TemperatureAlert> getTemperatureAlerts(final Shipment s) {
+        final List<Alert> alerts = alertDao.getAlerts(s);
+
+        final List<TemperatureAlert> result = new LinkedList<>();
+        for (final Alert a : alerts) {
+            if (a instanceof TemperatureAlert) {
+                result.add((TemperatureAlert) a);
+            }
+        }
+
+        return result;
+    }
+
     /**
      * @param user user.
      * @param shipment shipment.

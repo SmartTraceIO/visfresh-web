@@ -8,20 +8,26 @@ import static com.visfresh.utils.DateTimeUtils.createDateFormat;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 
 import org.springframework.stereotype.Component;
 
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.mpl.services.NotificationIssueBundle;
 import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -39,28 +45,6 @@ public class NotificationBundle extends NotificationIssueBundle {
         super();
     }
 
-    /**
-     *  supported place holders:
-     *    ${date} alert issue date include day and year
-     *    ${time} the time in scope of day.
-     *    ${type} alert type
-     *    ${device} device IMEI
-     *    ${devicesn} device serial number
-     *    ${tripCount} trip count for given device of shipment.
-     *
-     *  for temperature alerts:
-     *    ${temperature}
-     *    ${period}
-     * @param user target user.
-     * @param issue alert
-     * @param trackerEvent tracker event
-     * @return description for given alert.
-     */
-    public String getEmailMessage(final NotificationIssue issue,
-            final TrackerEvent trackerEvent, final Language lang, final TimeZone tz, final TemperatureUnits tu) {
-        final String str = getBundle().getString("Email." + createBundleKey(issue));
-        return StringUtils.getMessage(str, createReplacementMap(issue, trackerEvent, lang, tz, tu));
-    }
     /**
      *  supported place holders:
      *    ${date} alert issue date include day and year
@@ -110,6 +94,51 @@ public class NotificationBundle extends NotificationIssueBundle {
         return StringUtils.getMessage(str, map);
     }
     /**
+     *  supported place holders:
+     *    ${date} alert issue date include day and year
+     *    ${time} the time in scope of day.
+     *    ${type} alert type
+     *    ${device} device IMEI
+     *    ${devicesn} device serial number
+     *    ${tripCount} trip count for given device of shipment.
+     *
+     *  for temperature alerts:
+     *    ${temperature}
+     *    ${period}
+     * @param user target user.
+     * @param issue alert
+     * @param trackerEvent tracker event
+     * @return description for given alert.
+     */
+    public String getEmailMessage(final Alert issue,
+            final TrackerEvent trackerEvent, final Language lang, final TimeZone tz, final TemperatureUnits tu) {
+        final String str = getBundle().getString("Email." + createBundleKey(issue));
+        return StringUtils.getMessage(str, createReplacementMap(issue, trackerEvent, lang, tz, tu));
+    }
+    public String getEmailMessage(final Arrival issue,
+            final TrackerEvent trackerEvent, final List<TemperatureAlert> alertsFired,
+            final Language lang, final TimeZone tz, final TemperatureUnits tu) {
+        final String str = getBundle().getString("Email.Arrival");
+
+        final Map<String, String> map = createReplacementMap(issue, trackerEvent, lang, tz, tu);
+        map.put("alerts", new RuleBundle().getAlertsFiredString(
+                new LinkedList<>(EntityUtils.getTemperatureRules(alertsFired)), tu));
+
+        return StringUtils.getMessage(str, map);
+    }
+    public String getArrivalReportEmailMessage(
+            final Shipment s, final List<TemperatureAlert> alertsFired,
+            final Language lang, final TimeZone tz, final TemperatureUnits tu) {
+        final String str = getBundle().getString("Email.ArrivalReport");
+
+        final Map<String, String> map = createReplacementMapForArrivalReport(s, lang, tz, tu, s.getArrivalDate());
+        map.put("alerts", new RuleBundle().getAlertsFiredString(
+                new LinkedList<>(EntityUtils.getTemperatureRules(alertsFired)), tu));
+
+        return StringUtils.getMessage(str, map);
+    }
+
+    /**
      * @param user the user.
      * @param issue notification issue.
      * @param trackerEvent tracker event, can be NULL
@@ -119,11 +148,6 @@ public class NotificationBundle extends NotificationIssueBundle {
             final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         final String str = getBundle().getString("Email.Subject." + createBundleKey(issue)).trim();
         return StringUtils.getMessage(str, createReplacementMap(issue, trackerEvent, lang, tz, tu));
-    }
-    public String getArrivalReportEmailMessage(final Shipment s,
-            final Language lang, final TimeZone tz, final TemperatureUnits tu) {
-        final String str = getBundle().getString("Email.ArrivalReport");
-        return StringUtils.getMessage(str, createReplacementMapForArrivalReport(s, lang, tz, tu, s.getArrivalDate()));
     }
     public String getArrivalReportEmailSubject(final Shipment s,
             final Language lang, final TimeZone tz, final TemperatureUnits tu) {

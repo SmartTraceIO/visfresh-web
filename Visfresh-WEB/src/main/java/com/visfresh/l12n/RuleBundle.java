@@ -4,6 +4,8 @@
 package com.visfresh.l12n;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -77,5 +79,16 @@ public class RuleBundle {
      */
     private ResourceBundle getBundle() {
         return ResourceBundle.getBundle(BUNDLE_NAME, XmlControl.INSTANCE);
+    }
+    /**
+     * @param alertsFired
+     * @return
+     */
+    public String getAlertsFiredString(final List<TemperatureRule> alertsFired, final TemperatureUnits units) {
+        final List<String> alerts = new LinkedList<>();
+        for (final TemperatureRule alert: alertsFired) {
+            alerts.add(buildDescription(alert, units));
+        }
+        return StringUtils.combine(alerts, ",");
     }
 }

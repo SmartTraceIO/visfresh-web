@@ -13,7 +13,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +59,28 @@ public class DefaultSiblingDetector implements SiblingDetector {
     @Autowired
     private TrackerEventDao trackerEventDao;
 
+    private ThreadFactory threadFactory = new ThreadFactory() {
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix = "pool-siblingetect-thread-";
+
+        {
+            final SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() :
+                                  Thread.currentThread().getThreadGroup();
+        }
+
+        @Override
+        public Thread newThread(final Runnable r) {
+            final Thread t = new Thread(group, r,
+                                  namePrefix + threadNumber.getAndIncrement(),
+                                  0);
+            t.setDaemon(false);
+            t.setPriority((Thread.NORM_PRIORITY + Thread.MIN_PRIORITY) / 2);
+            return t;
+        }
+    };
+
     /**
      * @param env spring environment.
      */
@@ -96,7 +120,7 @@ public class DefaultSiblingDetector implements SiblingDetector {
     public void detectSiblings() {
         log.debug("Sibling detection has started");
 
-        final ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads);
+        final ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads, threadFactory);
         try {
             //TODO add pagination
             final List<Company> compaines = companyDao.findAll(null, null, null);

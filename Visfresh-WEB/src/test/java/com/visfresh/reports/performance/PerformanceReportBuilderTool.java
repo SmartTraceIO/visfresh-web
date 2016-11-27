@@ -127,7 +127,6 @@ public final class PerformanceReportBuilderTool {
             rule.setTimeOutMinutes(1 + random.nextInt(25));
         }
 
-        exc.getAlertsFired();
         return exc;
     }
 

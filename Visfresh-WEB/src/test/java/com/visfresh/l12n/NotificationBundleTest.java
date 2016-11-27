@@ -6,8 +6,7 @@ package com.visfresh.l12n;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
-
-import junit.framework.AssertionFailedError;
+import java.util.LinkedList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +23,8 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -186,8 +187,8 @@ public class NotificationBundleTest extends NotificationBundle {
         arrival.setShipment(shipment);
 
         //mail
-        String msg = getEmailMessage(arrival, trackerEvent, user.getLanguage(),
-                user.getTimeZone(), user.getTemperatureUnits());
+        String msg = getEmailMessage(arrival, trackerEvent, new LinkedList<TemperatureAlert>(),
+                user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
         assertNotNull(msg);
         assertPlaceholdersResolved(arrival, msg);
 

@@ -140,12 +140,13 @@
 
 	<!-- Arrival Email -->
 	<entry key="Email.Arrival">
-		Arrival Alert for Shipment ${devicesn}(${tripCount}) 
-		Time of Alert: ${readingTime} ${readingDate}
+		Arrival for Shipment ${devicesn}(${tripCount}) 
+		Arrival Time: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
+		Alerts Fired: ${alerts}
 		https://smarttrace.com.au/webapp/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 	<entry key="Email.ArrivalReport">
@@ -154,6 +155,7 @@
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}
+		Alerts Fired: ${alerts}
 		https://smarttrace.com.au/webapp/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}
 	</entry>
 
@@ -226,7 +228,7 @@
 	<!-- Battery -->
 	<entry key="SMS.Battery">Low Battery Alert for Shipment ${devicesn}(${tripCount})</entry>
 	<!-- Arrival -->
-	<entry key="SMS.Arrival">Arrival Alert for Shipment ${devicesn}(${tripCount})</entry>
+	<entry key="SMS.Arrival">Arrival for Shipment ${devicesn}(${tripCount})</entry>
 
 	<!-- ***************************************************** App notifications *********************************************************** -->
 	<entry key="LinkToShipment">https://smarttrace.com.au/webapp/#/view-shipment-detail?sn=${devicesn}&amp;trip=${tripCount}</entry>
@@ -286,7 +288,7 @@
 	</entry>
 	<!-- Arrival -->
 	<entry key="App.Arrival">
-		Arrival Alert for Shipment ${devicesn}(${tripCount})
+		Arrival for Shipment ${devicesn}(${tripCount})
 		Description: ${shipmentDescription}	
 	</entry>
 	<!-- MovementStart -->

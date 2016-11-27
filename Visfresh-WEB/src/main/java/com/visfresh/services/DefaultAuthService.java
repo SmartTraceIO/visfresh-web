@@ -492,7 +492,7 @@ public class DefaultAuthService implements AuthService {
         s.setUser(user);
         s.setToken(token);
         saveSession(s);
-        log.debug("Rest session for user " + user.getEmail() + " has saved parsisted");
+        log.debug("Rest session for user " + user.getEmail() + " has saved");
     }
 
     /**

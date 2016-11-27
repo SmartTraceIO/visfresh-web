@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
@@ -25,6 +26,7 @@ import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Language;
@@ -210,6 +212,7 @@ public class ArrivalRuleTest extends BaseRuleTest {
         shipment.setArrivalNotificationWithinKm(0);
         shipment.setExcludeNotificationsIfNoAlerts(true);
 
+        //set location profile
         final LocationProfile loc = createLocation();
         final TrackerEvent e = createEventNearLocation(loc);
 
@@ -217,6 +220,15 @@ public class ArrivalRuleTest extends BaseRuleTest {
         final NotificationSchedule sched = createEmailNotificaitonSchedule(email);
 
         shipment.setShippedTo(loc);
+
+        //set alert profile
+        final AlertProfile ap = new AlertProfile();
+        ap.setCompany(company);
+        ap.setName("JUnit AP");
+        ap.setDescription("JUnit AP");
+        context.getBean(AlertProfileDao.class).save(ap);
+        shipment.setAlertProfile(ap);
+
         shipment.getArrivalNotificationSchedules().add(sched);
         context.getBean(ShipmentDao.class).save(shipment);
 

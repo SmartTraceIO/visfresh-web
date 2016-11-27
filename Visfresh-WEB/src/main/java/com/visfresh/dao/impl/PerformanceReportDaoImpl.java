@@ -9,11 +9,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,7 +28,6 @@ import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureAlert;
-import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.reports.performance.AlertProfileStats;
@@ -38,6 +35,7 @@ import com.visfresh.reports.performance.BiggestTemperatureException;
 import com.visfresh.reports.performance.PerformanceReportBean;
 import com.visfresh.reports.performance.ReportsWithAlertStats;
 import com.visfresh.reports.performance.TimeRangesTemperatureStats;
+import com.visfresh.utils.EntityUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -176,7 +174,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
 
                     final List<TemperatureAlert> listShipmentAlerts = shipmentAlerts.get(shipment.getId());
                     if (listShipmentAlerts != null) {
-                        exc.getAlertsFired().addAll(createTemperatureRules(listShipmentAlerts));
+                        exc.getAlertsFired().addAll(EntityUtils.getTemperatureRules(listShipmentAlerts));
                     }
                 }
             }
@@ -262,29 +260,6 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
         }
 
         return result;
-    }
-
-    /**
-     * @param shipment
-     * @param listShipmentAlerts
-     * @return
-     */
-    private Set<TemperatureRule> createTemperatureRules(final List<TemperatureAlert> listShipmentAlerts) {
-        final Set<TemperatureRule> rules = new HashSet<>();
-        for (final TemperatureAlert a : listShipmentAlerts) {
-            final Shipment shipment = a.getShipment();
-            TemperatureRule rule = null;
-
-            for (final TemperatureRule r : shipment.getAlertProfile().getAlertRules()) {
-                if (r.getId().equals(a.getRuleId())) {
-                    rule = r;
-                    break;
-                }
-            }
-
-            rules.add(rule);
-        }
-        return rules;
     }
 
     /**
