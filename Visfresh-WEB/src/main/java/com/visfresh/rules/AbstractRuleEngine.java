@@ -25,6 +25,7 @@ import com.google.gson.JsonElement;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
@@ -44,6 +45,7 @@ import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.mpl.services.TrackerMessageDispatcher;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.rules.state.ShipmentSessionManager;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.SystemMessageHandler;
@@ -68,13 +70,37 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     @Autowired
     private AlternativeLocationsDao altLocDao;
     @Autowired
-    protected EngineShipmentSessionManager sessionManager;
+    private ShipmentSessionDao shipmentSessionDao;
 
     private final DeviceDcsNativeEventSerializer deviceEventParser = new DeviceDcsNativeEventSerializer();
     private final InterimStopSerializer interimSerializer = new InterimStopSerializer(
             Language.English, TimeZone.getDefault());
     private final Map<String, TrackerEventRule> rules = new HashMap<>();
 
+    protected class SessionProvider implements ShipmentSessionManager {
+        private final Map<Long, ShipmentSession> sessions;
+
+        public SessionProvider(final Map<Long, ShipmentSession> sessions) {
+            this.sessions = sessions;
+        }
+        /* (non-Javadoc)
+         * @see com.visfresh.rules.state.ShipmentSessionManager#getSession(com.visfresh.entities.Shipment)
+         */
+        @Override
+        public ShipmentSession getSession(final Shipment s) {
+            ShipmentSession session = sessions.get(s.getId());
+            if (session == null) {
+                session = shipmentSessionDao.getSession(s);
+                if (session == null) {
+                    session = new ShipmentSession(s.getId());
+                    shipmentSessionDao.saveSession(session);
+                }
+
+                sessions.put(s.getId(), session);
+            }
+            return session;
+        }
+    }
     /**
      *
      */
@@ -113,7 +139,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             state = new DeviceState();
         }
 
-        final RuleContext context = new RuleContext(e, sessionManager);
+        final Map<Long, ShipmentSession> sessions = new HashMap<>();
+        final RuleContext context = new RuleContext(e, new SessionProvider(sessions));
         context.setDeviceState(state);
 
         saveTrackerEvent(e);
@@ -132,8 +159,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             }
         } finally {
             saveDeviceState(event.getImei(), state);
-            if (e.getShipment() != null) {
-                sessionManager.unloadSession(e.getShipment(), true);
+            for (final ShipmentSession session : sessions.values()) {
+                shipmentSessionDao.saveSession(session);
             }
         }
     }
@@ -252,26 +279,41 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         }
 
         //check device state is set.
-        final ShipmentSession session = sessionManager.loadSessionFromDb(s);
-        for (final TemperatureRule rule: alertProfile.getAlertRules()) {
-            switch (rule.getType()) {
-                case Cold:
-                case CriticalCold:
-                case Hot:
-                case CriticalHot:
-                    final boolean isRuleProcessed = isTemperatureRuleProcessed(session, rule);
-                    if (!onlyProcessed && !isRuleProcessed && (session == null || !session.isAlertsSuppressed())) {
-                        alerts.add(rule);
-                    } else if (onlyProcessed && isRuleProcessed){
-                        alerts.add(rule);
-                    }
-                    break;
-                    default:
-                        //nothing
+        final ShipmentSession session = getShipmentSession(s);
+        if (session != null) {
+            for (final TemperatureRule rule: alertProfile.getAlertRules()) {
+                switch (rule.getType()) {
+                    case Cold:
+                    case CriticalCold:
+                    case Hot:
+                    case CriticalHot:
+                        final boolean isRuleProcessed = isTemperatureRuleProcessed(session, rule);
+                        if (!onlyProcessed && !isRuleProcessed && (session == null || !session.isAlertsSuppressed())) {
+                            alerts.add(rule);
+                        } else if (onlyProcessed && isRuleProcessed){
+                            alerts.add(rule);
+                        }
+                        break;
+                        default:
+                            //nothing
+                }
             }
         }
 
         return alerts;
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    protected ShipmentSession getShipmentSession(final Shipment s) {
+        ShipmentSession session = shipmentSessionDao.getSession(s);
+        if (session == null) {
+            session = new ShipmentSession(s.getId());
+            shipmentSessionDao.saveSession(session);
+        }
+        return session;
     }
     /**
      * @param rule
@@ -317,21 +359,21 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
 
         if (base instanceof Shipment) {
             final Shipment s = (Shipment) base;
-            final ShipmentSession state = sessionManager.loadSession(s, key);
+            final ShipmentSession session = getShipmentSession(s);
             try {
-                state.setShipmentProperty(key, array.toString());
+                session.setShipmentProperty(key, array.toString());
             } finally {
-                sessionManager.unloadSession(s, key, true);
+                shipmentSessionDao.saveSession(session);
             }
         }
     }
     @Override
     public List<LocationProfile> getInterimLocations(final Shipment s) {
         final String key = createInterimLocationsKey();
-        final ShipmentSession state = sessionManager.loadSession(s, key);
+        final ShipmentSession session = getShipmentSession(s);
 
         try {
-            final String str = state.getShipmentProperty(key);
+            final String str = session.getShipmentProperty(key);
             if (str != null) {
                 final List<LocationProfile> locs = new LinkedList<>();
                 final JsonArray array = SerializerUtils.parseJson(str).getAsJsonArray();
@@ -341,7 +383,7 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
                 return locs;
             }
         } finally {
-            sessionManager.unloadSession(s, key, false);
+            shipmentSessionDao.saveSession(session);
         }
 
         return null;
@@ -372,12 +414,11 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     @Override
     public void suppressNextAlerts(final Shipment s) {
-        final String loaderId = "suppressAlerts";
-        final ShipmentSession session = sessionManager.loadSession(s, loaderId);
+        final ShipmentSession session = getShipmentSession(s);
         try {
             session.setAlertsSuppressed(true);
         } finally {
-            sessionManager.unloadSession(s, loaderId, true);
+            shipmentSessionDao.saveSession(session);
         }
     }
     /* (non-Javadoc)
@@ -385,26 +426,16 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     @Override
     public Date getAlertsSuppressionDate(final Shipment s) {
-        final String loaderId = "alertsSuppressionDate";
-        final ShipmentSession session = sessionManager.loadSession(s, loaderId);
-        try {
-            return session.getAlertsSuppressionDate();
-        } finally {
-            sessionManager.unloadSession(s, loaderId, false);
-        }
+        final ShipmentSession session = getShipmentSession(s);
+        return session.getAlertsSuppressionDate();
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.RuleEngine#isAlertsSuppressed(com.visfresh.entities.Shipment)
      */
     @Override
     public boolean isAlertsSuppressed(final Shipment s) {
-        final String loaderId = "alertsSuppression";
-        final ShipmentSession session = sessionManager.loadSession(s, loaderId);
-        try {
-            return session.isAlertsSuppressed();
-        } finally {
-            sessionManager.unloadSession(s, loaderId, false);
-        }
+        final ShipmentSession session = getShipmentSession(s);
+        return session.isAlertsSuppressed();
     }
     /**
      * @param imei device IMEI.

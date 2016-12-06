@@ -161,7 +161,7 @@ public class ReportsController extends AbstractController {
             final PerformanceReportBean bean = performanceReportDao.createReport(
                     user.getCompany(), new Date(ranges.getStartTime()),
                     new Date(ranges.getEndTime()),
-                    TimeAtom.Month,
+                    atom,
                     location);
 
             //create report bean.

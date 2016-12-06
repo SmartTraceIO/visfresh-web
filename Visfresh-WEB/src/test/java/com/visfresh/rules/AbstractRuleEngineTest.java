@@ -48,33 +48,12 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
     private int numInvoked = 0;
     private Company company;
     private Map<Long, AlternativeLocations> alternativeLocations = new HashMap<>();
-    protected Map<Long, ?> sessionCache;
 
     /**
      * Default constructor.
      */
     public AbstractRuleEngineTest() {
         super();
-
-        sessionManager = new EngineShipmentSessionManager(){
-            {
-                AbstractRuleEngineTest.this.sessionCache = this.sessionCache;
-            }
-            /* (non-Javadoc)
-             * @see com.visfresh.rules.AbstractRuleEngine#loadSession(com.visfresh.entities.Shipment)
-             */
-            @Override
-            protected ShipmentSession loadSessionFromDb(final Shipment s) {
-                return sessions.get(s.getId());
-            }
-            /* (non-Javadoc)
-             * @see com.visfresh.rules.AbstractRuleEngine#saveSession(com.visfresh.entities.Shipment, com.visfresh.rules.state.ShipmentSession)
-             */
-            @Override
-            protected void saveSessionToDb(final Shipment s, final ShipmentSession ss) {
-                sessions.put(s.getId(), ss);
-            }
-        };
     }
 
     @Before
@@ -150,27 +129,6 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
 
         assertEquals(1, savedShipments.size());
         assertEquals(1, sessions.size());
-    }
-    @Test
-    public void testShipmentStateCache() throws RetryableException {
-        final Device device = createDevice("3249870239847908");
-        final Shipment s = new Shipment();
-        s.setId(77l);
-        s.setShipmentDescription("JUnit shipment");
-        detectedShipment = s;
-
-        //run
-        final DeviceDcsNativeEvent e = new DeviceDcsNativeEvent();
-        e.setDate(new Date(System.currentTimeMillis() - 10000));
-        e.setLocation(11.12, 13.14);
-        e.setType("AUT");
-        e.setImei(device.getImei());
-
-        suppressNextAlerts(s);
-        processDcsEvent(e);
-
-        //check tracker event saved
-        assertEquals(0, this.sessionCache.size());
     }
     @Test
     public void testAlertYetToFire() {
@@ -262,7 +220,8 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         e.setDevice(createDevice("0329487093287"));
         e.setType(TrackerEventType.AUT);
 
-        final RuleContext context = new RuleContext(e, this.sessionManager);
+        final Map<Long, ShipmentSession> sessions = new HashMap<>();
+        final RuleContext context = new RuleContext(e, new SessionProvider(sessions));
 
         assertTrue(getRule(ruleName).accept(context));
 
@@ -290,7 +249,7 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         numInvoked++;
         context.getEvent().setShipment(detectedShipment);
         if (detectedShipment != null) {
-            context.getSessionManager().getSession(detectedShipment);
+            getShipmentSession(detectedShipment);
         }
     }
 
@@ -344,6 +303,18 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
     @Override
     protected void saveAlternativeLocations(final ShipmentBase s, final AlternativeLocations v) {
         alternativeLocations.put(s.getId(), v);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.AbstractRuleEngine#getShipmentSession(com.visfresh.entities.Shipment)
+     */
+    @Override
+    protected ShipmentSession getShipmentSession(final Shipment s) {
+        ShipmentSession ss = sessions.get(s.getId());
+        if (ss == null) {
+            ss = new ShipmentSession(s.getId());
+            sessions.put(s.getId(), ss);
+        }
+        return ss;
     }
 }
 

@@ -190,7 +190,7 @@ public class ReportsControllerTest extends AbstractRestServiceTest {
             AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
             count++;
         }
-        context.getBean(ShipmentSessionDao.class).saveSession(s, session);
+        context.getBean(ShipmentSessionDao.class).saveSession(session);
 
         //add tracker event.
         final List<TrackerEvent> events = new LinkedList<>();

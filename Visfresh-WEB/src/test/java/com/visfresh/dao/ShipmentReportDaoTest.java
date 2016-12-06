@@ -289,10 +289,10 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         shipment.setAlertProfile(ap);
         shipmentDao.save(shipment);
 
-        final ShipmentSession session = new ShipmentSession();
+        final ShipmentSession session = new ShipmentSession(shipment.getId());
         AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
         AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
-        context.getBean(ShipmentSessionDao.class).saveSession(shipment, session);
+        context.getBean(ShipmentSessionDao.class).saveSession(session);
 
         final ShipmentReportBean report = dao.createReport(shipment);
         assertEquals(1, report.getFiredAlertRules().size());

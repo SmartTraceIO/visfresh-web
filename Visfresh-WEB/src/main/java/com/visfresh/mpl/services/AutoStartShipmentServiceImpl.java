@@ -5,11 +5,9 @@ package com.visfresh.mpl.services;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
@@ -28,9 +27,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.AutoDetectEndLocationRule;
-import com.visfresh.rules.EngineShipmentSessionManager;
 import com.visfresh.rules.state.ShipmentSession;
-import com.visfresh.rules.state.ShipmentSessionManager;
 import com.visfresh.services.AutoStartShipmentService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocationUtils;
@@ -53,9 +50,9 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
     @Autowired
     private AlternativeLocationsDao altLocDao;
     @Autowired
-    private EngineShipmentSessionManager sessionManager;
-    @Autowired
     private AbstractRuleEngine ruleEngine;
+    @Autowired
+    private ShipmentSessionDao shipmentSessionDao;
 
     private static class ShipmentInit {
         private AutoStartShipment autoStart;
@@ -102,34 +99,6 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
             this.to = to;
         }
     }
-    private class ShipmentSessionManagerImpl implements ShipmentSessionManager {
-        private Map<Long, Shipment> shipments = new HashMap<>();
-        private Map<Long, ShipmentSession> sessions = new HashMap<>();
-
-        private String loaderId = "autostartService_" + Thread.currentThread().getId();
-
-        /* (non-Javadoc)
-         * @see com.visfresh.rules.state.ShipmentSessionManager#getSession(com.visfresh.entities.Shipment)
-         */
-        @Override
-        public ShipmentSession getSession(final Shipment s) {
-            ShipmentSession session = sessions.get(s.getId());
-            if (session == null) {
-                session = sessionManager.loadSession(s, loaderId);
-                shipments.put(s.getId(), s);
-                sessions.put(s.getId(), session);
-            }
-
-            return session;
-        }
-        public void unloadSession() {
-            final Iterator<Shipment> iter = shipments.values().iterator();
-            while (iter.hasNext()) {
-                final Shipment s = iter.next();
-                sessionManager.unloadSession(s, loaderId, true);
-            }
-        }
-    }
     /**
      * Default constructor.
      */
@@ -140,16 +109,6 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
     @Override
     public Shipment autoStartNewShipment(final Device device, final Double latitude,
             final Double longitude, final Date shipmentDate) {
-        final ShipmentSessionManagerImpl mgr = new ShipmentSessionManagerImpl();
-        try {
-            return autoStartNewShipmentImpl(device, latitude, longitude, shipmentDate, mgr);
-        } finally {
-            mgr.unloadSession();
-        }
-    }
-
-    private Shipment autoStartNewShipmentImpl(final Device device, final Double latitude,
-            final Double longitude, final Date shipmentDate, final ShipmentSessionManager mgr) {
 
         final Shipment last = shipmentDao.findLastShipment(device.getImei());
 
@@ -207,11 +166,25 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
         }
 
         if (init != null) {
-            final ShipmentSession session = mgr.getSession(shipment);
+            final ShipmentSession session = getShipmentSession(shipment);
             AutoDetectEndLocationRule.needAutodetect(init.getAutoStart(), session);
+            shipmentSessionDao.saveSession(session);
         }
 
         return shipment;
+    }
+
+    /**
+     * @param shipment
+     * @return
+     */
+    protected ShipmentSession getShipmentSession(final Shipment shipment) {
+        ShipmentSession ss = shipmentSessionDao.getSession(shipment);
+        if (ss == null) {
+            ss = new ShipmentSession(shipment.getId());
+            shipmentSessionDao.saveSession(ss);
+        }
+        return ss;
     }
 
     /**

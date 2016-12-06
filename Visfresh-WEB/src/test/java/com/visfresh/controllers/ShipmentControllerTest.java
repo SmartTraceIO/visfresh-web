@@ -864,7 +864,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
             AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
             count++;
         }
-        context.getBean(ShipmentSessionDao.class).saveSession(s, session);
+        context.getBean(ShipmentSessionDao.class).saveSession(session);
 
         //add tracker event.
         createEvent(s, TrackerEventType.AUT);
@@ -895,7 +895,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
             AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
             count++;
         }
-        context.getBean(ShipmentSessionDao.class).saveSession(s, session);
+        context.getBean(ShipmentSessionDao.class).saveSession(session);
 
         //add tracker event.
         createEvent(s, TrackerEventType.AUT);

@@ -213,9 +213,9 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
             final ShipmentSession session = shipmentSessionDao.getSession(s);
             final String key = "arrReport-" + user.getEmail();
 
-            if (session.getShipmentProperty(key) == null) {
+            if (session == null || session.getShipmentProperty(key) == null) {
                 session.setShipmentProperty(key, "true");
-                shipmentSessionDao.saveSession(s, session);
+                shipmentSessionDao.saveSession(session);
 
                 sendShipmentReportImmediately(s, user);
             } else {

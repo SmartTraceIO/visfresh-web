@@ -65,7 +65,7 @@ public class ArrivalNotificationRuleTest extends BaseRuleTest {
 
         //create shipment session for avoid of NullPointerException
         final ShipmentSessionDao ssd = context.getBean(ShipmentSessionDao.class);
-        ssd.saveSession(shipment, new ShipmentSession(shipment.getId()));
+        ssd.saveSession(new ShipmentSession(shipment.getId()));
     }
 
     @Test

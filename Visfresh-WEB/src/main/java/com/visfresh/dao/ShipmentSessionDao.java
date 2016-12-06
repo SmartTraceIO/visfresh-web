@@ -18,8 +18,7 @@ public interface ShipmentSessionDao {
     ShipmentSession getSession(Shipment shipment);
 
     /**
-     * @param shipment shipment.
      * @param session shipment session.
      */
-    void saveSession(Shipment shipment, ShipmentSession session);
+    void saveSession(ShipmentSession session);
 }

@@ -140,8 +140,8 @@
 
 	<!-- Arrival Email -->
 	<entry key="Email.Arrival">
-		Arrival for Shipment ${devicesn}(${tripCount}) 
-		Arrival Time: ${readingTime} ${readingDate}
+		Arrival Notification for Shipment ${devicesn}(${tripCount}) 
+		Notification Time: ${readingTime} ${readingDate}
 		Temperature: ${readingTemperature}
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
@@ -151,7 +151,7 @@
 	</entry>
 	<entry key="Email.ArrivalReport">
 		Arrival Report for Shipment ${devicesn}(${tripCount}) 
-		Arrival Time: ${date}
+		Notification Time: ${date}
 		Shipped From: ${shippedFrom}
 		Shipped To: ${shippedTo}
 		Description: ${shipmentDescription}

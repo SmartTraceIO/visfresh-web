@@ -29,7 +29,7 @@ public class SessionHolder implements ShipmentSessionManager {
      *
      */
     public SessionHolder(final Shipment s) {
-        this(s, new ShipmentSession());
+        this(s, new ShipmentSession(s.getId()));
     }
     /**
      *

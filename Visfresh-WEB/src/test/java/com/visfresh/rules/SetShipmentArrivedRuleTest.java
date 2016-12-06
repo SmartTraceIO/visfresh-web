@@ -264,7 +264,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
             }
         };
         LeaveStartLocationRule.setLeavingStartLocation(session);
-        sessionDao.saveSession(shipment, session);
+        sessionDao.saveSession(session);
 
         final TrackerEvent e1 = createEventNearLocation(loc);
         e1.setTime(new Date(e.getTime().getTime() - 30 * 60 * 1000l));
@@ -294,7 +294,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         emailer.clear();
 
         rule.handle(req);
-        sessionDao.saveSession(shipment, sessionDao.getSession(shipment));
+        sessionDao.saveSession(sessionDao.getSession(shipment));
 
         assertEquals(0, emailer.getMessages().size());
         assertEquals(0, emailer.getAttachments().size());

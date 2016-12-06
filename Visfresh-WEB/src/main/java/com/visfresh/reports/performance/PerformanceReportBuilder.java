@@ -14,9 +14,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -518,27 +516,13 @@ public class PerformanceReportBuilder {
                         "MMM yyyy", user.getLanguage(), user.getTimeZone());
                 return monthFmt.format(new Date((timeRanges.getEndTime() + timeRanges.getStartTime()) / 2));
             case Week:
-                final DateFormat weekFmt = new SimpleDateFormat("dd:mm");
+                final DateFormat weekFmt = new SimpleDateFormat("dMMM", user.getLanguage().getLocale());
                 return weekFmt.format(timeRanges.getStartTime())
                         + "-" + weekFmt.format(new Date(timeRanges.getEndTime()));
             case Quarter:
-                final DateFormat quarterFmt = DateTimeUtils.createDateFormat("MMM", user.getLanguage(), user.getTimeZone());
-                final StringBuilder sb = new StringBuilder();
-
-                //first month
-                final Calendar c = new GregorianCalendar();
-                c.setTimeInMillis(timeRanges.getStartTime());
-                sb.append(quarterFmt.format(c.getTime())).append(' ');
-
-                //second month
-                c.add(Calendar.MONTH, 1);
-                sb.append(quarterFmt.format(c.getTime())).append(' ');
-
-                //second month
-                c.add(Calendar.MONTH, 1);
-                sb.append(quarterFmt.format(c.getTime()));
-
-                return sb.toString();
+                final DateFormat quarterFmt = new SimpleDateFormat("dMMM", user.getLanguage().getLocale());
+                return quarterFmt.format(timeRanges.getStartTime())
+                        + "-" + quarterFmt.format(new Date(timeRanges.getEndTime()));
             default:
                 throw new RuntimeException("Unsupported " + atom);
         }

@@ -52,12 +52,12 @@ public class ShipmentSessionDaoTest extends BaseDaoTest<ShipmentSessionDao> {
         final ShipmentSession s = new ShipmentSession(shipment.getId());
         s.setShipmentProperty("key1", "value1");
 
-        dao.saveSession(shipment, s);
+        dao.saveSession(s);
         assertEquals("value1", dao.getSession(shipment).getShipmentProperty("key1"));
 
         //check update
         s.setShipmentProperty("key1", "value2");
-        dao.saveSession(shipment, s);
+        dao.saveSession(s);
 
         assertEquals("value2", dao.getSession(shipment).getShipmentProperty("key1"));
     }

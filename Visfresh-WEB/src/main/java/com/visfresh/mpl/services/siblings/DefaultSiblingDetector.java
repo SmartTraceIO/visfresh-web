@@ -198,6 +198,7 @@ public class DefaultSiblingDetector implements SiblingDetector {
 
         //continue only if shipment list is not empty
         if (!shipments.isEmpty()) {
+            log.debug("Fetch readings for master shipment " + master.getId());
             final List<TrackerEvent> masterEvents = getTrackeEvents(master);
             for (final Shipment s : shipments) {
                 final List<TrackerEvent> events = getTrackeEvents(s);
