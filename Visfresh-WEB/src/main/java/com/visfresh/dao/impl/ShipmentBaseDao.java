@@ -46,6 +46,9 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
     protected static final String NOALERTIFCOODOWN_FIELD = "noalertsifcooldown";
     protected static final String ARRIVALNOTIFWITHIN_FIELD = "arrivalnotifwithIn";
     protected static final String NONOTIFSIFNOALERTS_FIELD = "nonotifsifnoalerts";
+    private static final String SEND_ARRIVAL_REPORT_FIELD = "arrivalreport";
+    private static final String ARRIVAL_REPORT_ONLYIFALERTS_FIELD = "arrivalreportonlyifalerts";
+
     protected static final String SHUTDOWNTIMEOUT_FIELD = "shutdownafterarrivalminutes";
     protected static final String NOALERT_AFTER_ARRIVAL_TIMOUT_FIELD = "noalertsafterarrivalminutes";
     protected static final String NOALERT_AFTER_START_TIMOUT_FIELD = "noalertsafterstartminutes";
@@ -160,6 +163,8 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
         map.put(NOALERTIFCOODOWN_FIELD, s.getAlertSuppressionMinutes());
         map.put(ARRIVALNOTIFWITHIN_FIELD, s.getArrivalNotificationWithinKm());
         map.put(NONOTIFSIFNOALERTS_FIELD, s.isExcludeNotificationsIfNoAlerts());
+        map.put(SEND_ARRIVAL_REPORT_FIELD, s.isSendArrivalReport());
+        map.put(ARRIVAL_REPORT_ONLYIFALERTS_FIELD, s.isSendArrivalReportOnlyIfAlerts());
         map.put(SHUTDOWNTIMEOUT_FIELD, s.getShutdownDeviceAfterMinutes());
         map.put(NOALERT_AFTER_ARRIVAL_TIMOUT_FIELD, s.getNoAlertsAfterArrivalMinutes());
         map.put(NOALERT_AFTER_START_TIMOUT_FIELD, s.getNoAlertsAfterStartMinutes());
@@ -287,6 +292,9 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
             no.setArrivalNotificationWithinKm(arrivalNotifWithIn.intValue());
         }
         no.setExcludeNotificationsIfNoAlerts((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
+        no.setSendArrivalReport((Boolean) map.get(SEND_ARRIVAL_REPORT_FIELD));
+        no.setSendArrivalReportOnlyIfAlerts((Boolean) map.get(ARRIVAL_REPORT_ONLYIFALERTS_FIELD));
+
         no.setShipmentDescription((String) map.get(DESCRIPTION_FIELD));
         no.setCommentsForReceiver((String) map.get(COMMENTS_FIELD));
         id = ((Number) map.get(SHIPPEDFROM_FIELD));

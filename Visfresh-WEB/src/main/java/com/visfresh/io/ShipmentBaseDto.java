@@ -57,6 +57,14 @@ public class ShipmentBaseDto {
      */
     private boolean excludeNotificationsIfNoAlerts;
     /**
+     * Send arrival report at the arrival.
+     */
+    private boolean sendArrivalReport = true;
+    /**
+     * Send arrival report only if there is alerts.
+     */
+    private boolean sendArrivalReportOnlyIfAlerts = false;
+    /**
      * Shutdown device time out in minutes.
      */
     private Integer shutdownDeviceAfterMinutes;
@@ -107,6 +115,8 @@ public class ShipmentBaseDto {
         setNoAlertsAfterArrivalMinutes(tpl.getNoAlertsAfterArrivalMinutes());
         setNoAlertsAfterStartMinutes(tpl.getNoAlertsAfterStartMinutes());
         setShutDownAfterStartMinutes(tpl.getShutDownAfterStartMinutes());
+        setSendArrivalReport(tpl.isSendArrivalReport());
+        setSendArrivalReportOnlyIfAlerts(tpl.isSendArrivalReportOnlyIfAlerts());
     }
     /**
      * @return the id
@@ -300,5 +310,29 @@ public class ShipmentBaseDto {
      */
     public List<Long> getInterimLocations() {
         return interimLocations;
+    }
+    /**
+     * @return the sendArrivalReport
+     */
+    public boolean isSendArrivalReport() {
+        return sendArrivalReport;
+    }
+    /**
+     * @param sendArrivalReport the sendArrivalReport to set
+     */
+    public void setSendArrivalReport(final boolean sendArrivalReport) {
+        this.sendArrivalReport = sendArrivalReport;
+    }
+    /**
+     * @return the sendArrivalReportOnlyIfAlerts
+     */
+    public boolean isSendArrivalReportOnlyIfAlerts() {
+        return sendArrivalReportOnlyIfAlerts;
+    }
+    /**
+     * @param sendArrivalReportOnlyIfAlerts the sendArrivalReportOnlyIfAlerts to set
+     */
+    public void setSendArrivalReportOnlyIfAlerts(final boolean sendArrivalReportOnlyIfAlerts) {
+        this.sendArrivalReportOnlyIfAlerts = sendArrivalReportOnlyIfAlerts;
     }
 }

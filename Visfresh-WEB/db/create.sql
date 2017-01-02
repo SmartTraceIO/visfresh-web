@@ -233,6 +233,8 @@ create table shipments (
     noalertsifcooldown int not null,
     arrivalnotifwithIn int(11),
     nonotifsifnoalerts boolean not null,
+    arrivalreport boolean not null default true,
+    arrivalreportonlyifalerts boolean not null default false,
     shutdownafterarrivalminutes int default null,
 	noalertsafterarrivalminutes int default null,
 	noalertsafterstartminutes int default null,

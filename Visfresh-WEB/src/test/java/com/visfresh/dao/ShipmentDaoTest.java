@@ -4,6 +4,7 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -15,8 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-
-import junit.framework.AssertionFailedError;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +32,8 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -184,6 +185,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         s.setAlertProfile(alertProfile);
         s.setAlertSuppressionMinutes(5);
         s.setArrivalNotificationWithinKm(17);
+        s.setSendArrivalReport(false);
+        s.setSendArrivalReportOnlyIfAlerts(true);
         s.setCompany(sharedCompany);
         s.getCustomFields().put("field1", "Custom field 1");
         s.setExcludeNotificationsIfNoAlerts(true);
@@ -231,6 +234,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertNotNull(s.getAlertProfile());
         assertEquals(5, s.getAlertSuppressionMinutes());
         assertEquals(17, s.getArrivalNotificationWithinKm().intValue());
+        assertFalse(s.isSendArrivalReport());
+        assertTrue(s.isSendArrivalReportOnlyIfAlerts());
         assertEquals(sharedCompany.getId(), s.getCompany().getId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
         assertEquals(true, s.isExcludeNotificationsIfNoAlerts());
@@ -295,6 +300,8 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertNotNull(s.getAlertProfile());
         assertEquals(5, s.getAlertSuppressionMinutes());
         assertEquals(17, s.getArrivalNotificationWithinKm().intValue());
+        assertFalse(s.isSendArrivalReport());
+        assertTrue(s.isSendArrivalReportOnlyIfAlerts());
         assertEquals(sharedCompany.getId(), s.getCompany().getId());
         assertEquals("Custom field 1", s.getCustomFields().get("field1"));
         assertEquals(true, s.isExcludeNotificationsIfNoAlerts());

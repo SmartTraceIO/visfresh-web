@@ -152,6 +152,8 @@ public class ShipmentTemplateDaoTest
         s.setAlertProfile(alertProfile);
         s.setAlertSuppressionMinutes(5);
         s.setArrivalNotificationWithinKm(17);
+        s.setSendArrivalReport(false);
+        s.setSendArrivalReportOnlyIfAlerts(true);
         s.setCompany(sharedCompany);
         s.setExcludeNotificationsIfNoAlerts(true);
         s.setName("Shipment-1");
@@ -175,6 +177,8 @@ public class ShipmentTemplateDaoTest
         assertNotNull(tpl.getAlertProfile());
         assertEquals(5, tpl.getAlertSuppressionMinutes());
         assertEquals(17, tpl.getArrivalNotificationWithinKm().intValue());
+        assertFalse(tpl.isSendArrivalReport());
+        assertTrue(tpl.isSendArrivalReportOnlyIfAlerts());
         assertEquals(sharedCompany.getId(), tpl.getCompany().getId());
         assertEquals(true, tpl.isExcludeNotificationsIfNoAlerts());
         assertEquals("Shipment-1", tpl.getName());
@@ -217,6 +221,8 @@ public class ShipmentTemplateDaoTest
         assertNotNull(tpl.getAlertProfile());
         assertEquals(5, tpl.getAlertSuppressionMinutes());
         assertEquals(17, tpl.getArrivalNotificationWithinKm().intValue());
+        assertFalse(tpl.isSendArrivalReport());
+        assertTrue(tpl.isSendArrivalReportOnlyIfAlerts());
         assertEquals(sharedCompany.getId(), tpl.getCompany().getId());
         assertEquals(true, tpl.isExcludeNotificationsIfNoAlerts());
         assertEquals("Shipment-1", tpl.getName());

@@ -57,6 +57,15 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      */
     private boolean excludeNotificationsIfNoAlerts;
     /**
+     * Send arrival report at the arrival.
+     */
+    private boolean sendArrivalReport = true;
+    /**
+     * Send arrival report only if there is alerts.
+     */
+    private boolean sendArrivalReportOnlyIfAlerts = false;
+
+    /**
      * Shutdown device time out in minutes.
      */
     private Integer shutdownDeviceAfterMinutes;
@@ -103,6 +112,8 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
         setExcludeNotificationsIfNoAlerts(shipment.isExcludeNotificationsIfNoAlerts());
         setShutdownDeviceAfterMinutes(shipment.getShutdownDeviceAfterMinutes());
         setCommentsForReceiver(shipment.getCommentsForReceiver());
+        setSendArrivalReport(shipment.isSendArrivalReport());
+        setSendArrivalReportOnlyIfAlerts(shipment.isSendArrivalReportOnlyIfAlerts());
     }
 
     /**
@@ -314,5 +325,30 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      */
     public void setAutostart(final boolean isAutostart) {
         this.isAutostart = isAutostart;
+    }
+
+    /**
+     * @return the sendArrivalReport
+     */
+    public boolean isSendArrivalReport() {
+        return sendArrivalReport;
+    }
+    /**
+     * @param sendArrivalReport the sendArrivalReport to set
+     */
+    public void setSendArrivalReport(final boolean sendArrivalReport) {
+        this.sendArrivalReport = sendArrivalReport;
+    }
+    /**
+     * @return the sendArrivalReportOnlyIfAlerts
+     */
+    public boolean isSendArrivalReportOnlyIfAlerts() {
+        return sendArrivalReportOnlyIfAlerts;
+    }
+    /**
+     * @param sendArrivalReportOnlyIfAlerts the sendArrivalReportOnlyIfAlerts to set
+     */
+    public void setSendArrivalReportOnlyIfAlerts(final boolean sendArrivalReportOnlyIfAlerts) {
+        this.sendArrivalReportOnlyIfAlerts = sendArrivalReportOnlyIfAlerts;
     }
 }

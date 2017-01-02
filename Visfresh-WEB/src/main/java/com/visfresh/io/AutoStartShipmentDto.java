@@ -71,6 +71,14 @@ public class AutoStartShipmentDto {
      */
     private boolean excludeNotificationsIfNoAlerts;
     /**
+     * Send arrival report at the arrival.
+     */
+    private boolean sendArrivalReport = true;
+    /**
+     * Send arrival report only if there is alerts.
+     */
+    private boolean sendArrivalReportOnlyIfAlerts = false;
+    /**
      * Shutdown device time out in minutes.
      */
     private Integer shutdownDeviceAfterMinutes;
@@ -146,6 +154,8 @@ public class AutoStartShipmentDto {
         setNoAlertsAfterStartMinutes(tpl.getNoAlertsAfterStartMinutes());
         setShutDownAfterStartMinutes(tpl.getShutDownAfterStartMinutes());
         setCommentsForReceiver(tpl.getCommentsForReceiver());
+        setSendArrivalReport(tpl.isSendArrivalReport());
+        setSendArrivalReportOnlyIfAlerts(tpl.isSendArrivalReportOnlyIfAlerts());
     }
     /**
      * @return the list of locations.
@@ -387,5 +397,29 @@ public class AutoStartShipmentDto {
      */
     public void setStartOnLeaveLocation(final boolean startOnLeaveLocation) {
         this.startOnLeaveLocation = startOnLeaveLocation;
+    }
+    /**
+     * @return the sendArrivalReport
+     */
+    public boolean isSendArrivalReport() {
+        return sendArrivalReport;
+    }
+    /**
+     * @param sendArrivalReport the sendArrivalReport to set
+     */
+    public void setSendArrivalReport(final boolean sendArrivalReport) {
+        this.sendArrivalReport = sendArrivalReport;
+    }
+    /**
+     * @return the sendArrivalReportOnlyIfAlerts
+     */
+    public boolean isSendArrivalReportOnlyIfAlerts() {
+        return sendArrivalReportOnlyIfAlerts;
+    }
+    /**
+     * @param sendArrivalReportOnlyIfAlerts the sendArrivalReportOnlyIfAlerts to set
+     */
+    public void setSendArrivalReportOnlyIfAlerts(final boolean sendArrivalReportOnlyIfAlerts) {
+        this.sendArrivalReportOnlyIfAlerts = sendArrivalReportOnlyIfAlerts;
     }
 }

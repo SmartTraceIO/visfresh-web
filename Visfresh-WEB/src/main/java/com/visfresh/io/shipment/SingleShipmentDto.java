@@ -12,8 +12,8 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.NoteDto;
+import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.lists.ListNotificationScheduleItem;
 
 /**
@@ -37,6 +37,8 @@ public class SingleShipmentDto {
     private Integer arrivalNotificationWithinKm;
     boolean excludeNotificationsIfNoAlerts;
     private final List<ListNotificationScheduleItem> arrivalNotificationSchedules = new LinkedList<>();
+    private boolean sendArrivalReport = true;
+    private boolean sendArrivalReportOnlyIfAlerts = false;
     private Integer shutdownDeviceAfterMinutes;
     private Integer noAlertsAfterArrivalMinutes;
     private Integer shutDownAfterStartMinutes;
@@ -806,5 +808,29 @@ public class SingleShipmentDto {
      */
     public boolean isLatestShipment() {
         return isLatestShipment;
+    }
+    /**
+     * @return the sendArrivalReport
+     */
+    public boolean isSendArrivalReport() {
+        return sendArrivalReport;
+    }
+    /**
+     * @param sendArrivalReport the sendArrivalReport to set
+     */
+    public void setSendArrivalReport(final boolean sendArrivalReport) {
+        this.sendArrivalReport = sendArrivalReport;
+    }
+    /**
+     * @return the sendArrivalReportOnlyIfAlerts
+     */
+    public boolean isSendArrivalReportOnlyIfAlerts() {
+        return sendArrivalReportOnlyIfAlerts;
+    }
+    /**
+     * @param sendArrivalReportOnlyIfAlerts the sendArrivalReportOnlyIfAlerts to set
+     */
+    public void setSendArrivalReportOnlyIfAlerts(final boolean sendArrivalReportOnlyIfAlerts) {
+        this.sendArrivalReportOnlyIfAlerts = sendArrivalReportOnlyIfAlerts;
     }
 }

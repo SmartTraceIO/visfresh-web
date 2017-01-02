@@ -4,5 +4,6 @@
 	"AssignShipment": 100,
 	"LeaveStartLocation": 90,
 	"AutoStartShipment": 50,
-	"AutoDetectEndLocation": 49
+	"AutoDetectEndLocation": 49,
+	"ArrivalNotification": 10
 }

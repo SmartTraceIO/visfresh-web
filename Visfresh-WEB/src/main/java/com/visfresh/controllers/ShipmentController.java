@@ -1383,6 +1383,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         dto.setNoAlertsAfterStartMinutes(shipment.getNoAlertsAfterStartMinutes());
         dto.setShutDownAfterStartMinutes(shipment.getShutDownAfterStartMinutes());
         dto.setDeviceColor(shipment.getDevice().getColor() == null ? null : shipment.getDevice().getColor().name());
+        dto.setSendArrivalReport(shipment.isSendArrivalReport());
+        dto.setSendArrivalReportOnlyIfAlerts(shipment.isSendArrivalReportOnlyIfAlerts());
 
         final Date startTime = shipment.getShipmentDate();
 
