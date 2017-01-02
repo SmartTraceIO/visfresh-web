@@ -24,12 +24,10 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
 import com.visfresh.dao.AlertDao;
-import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.ShipmentSessionDao;
-import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
@@ -88,13 +86,9 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     @Autowired
     private ShipmentReportDao shipmentReportDao;
     @Autowired
-    private ArrivalDao arrivalDao;
-    @Autowired
     private AlertDao alertDao;
     @Autowired
     private UserDao userDao;
-    @Autowired
-    private TrackerEventDao trackerEventDao;
     @Autowired
     private ShipmentSessionDao shipmentSessionDao;
 
@@ -156,16 +150,21 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
             final User user, final TrackerEvent trackerEvent,
             final Language lang, final TimeZone tz, final TemperatureUnits tu) {
         if (user != null) {
-            if (issue instanceof Arrival) {
-                sendShipmentReport(issue.getShipment(), user);
-            } else {
-                try {
-                    final String subject = bundle.getEmailSubject(issue, trackerEvent, lang, tz, tu);
-                    final String message = bundle.getEmailMessage((Alert) issue, trackerEvent, lang, tz, tu);
-                    emailService.sendMessage(new String[] {user.getEmail()}, subject, message);
-                } catch (final MessagingException e) {
-                    log.error("Failed to send email message to " + user, e);
+            try {
+                final String subject = bundle.getEmailSubject(issue, trackerEvent, lang, tz, tu);
+                final String message;
+                if (issue instanceof Alert) {
+                    message = bundle.getEmailMessage((Alert) issue, trackerEvent, lang, tz, tu);
+                } else {
+                    final Arrival arrival = (Arrival) issue;
+                    final List<TemperatureAlert> alertsFired = getTemperatureAlerts(arrival.getShipment());
+
+                    message = bundle.getEmailMessage(arrival, trackerEvent, alertsFired, lang, tz, tu);
                 }
+
+                emailService.sendMessage(new String[] {user.getEmail()}, subject, message);
+            } catch (final MessagingException e) {
+                log.error("Failed to send email message to " + user, e);
             }
         } else {
             log.warn("Email has not set for personal schedule for " + user + " , email can't be send");
@@ -228,8 +227,6 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
      * @param user user.
      */
     private void sendShipmentReportImmediately(final Shipment s, final User user) {
-        final Arrival arrival = arrivalDao.getArrival(s);
-
         final Language lang = user.getLanguage();
         final TimeZone tz = user.getTimeZone();
         final TemperatureUnits tu = user.getTemperatureUnits();
@@ -239,18 +236,8 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
 
         final List<TemperatureAlert> alertsFired = getTemperatureAlerts(s);
 
-        if (arrival != null) {// shipment really arrived.
-            TrackerEvent trackerEvent = null;
-            if (arrival.getTrackerEventId() != null) {
-                trackerEvent = trackerEventDao.findOne(arrival.getTrackerEventId());
-            }
-
-            subject = bundle.getEmailSubject(arrival, trackerEvent, lang, tz, tu);
-            message = bundle.getEmailMessage(arrival, trackerEvent, alertsFired, lang, tz, tu);
-        } else {
-            subject = bundle.getArrivalReportEmailSubject(s, lang, tz, tu);
-            message = bundle.getArrivalReportEmailMessage(s, alertsFired, lang, tz, tu);
-        }
+        subject = bundle.getArrivalReportEmailSubject(s, lang, tz, tu);
+        message = bundle.getArrivalReportEmailMessage(s, alertsFired, lang, tz, tu);
 
         final File attachment = createShipmenentReport(user, s);
 

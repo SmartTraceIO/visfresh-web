@@ -153,7 +153,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
             isDetected = true;
         }
 
-        if (loc != null && e.getType() == TrackerEventType.BRT) {
+        if (loc != null && (e.getType() == TrackerEventType.BRT || e.getType() == TrackerEventType.STP)) {
             isDetected = true;
         }
 

@@ -241,6 +241,27 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         assertNotNull(shipment.getShippedTo());
         assertEquals(loc2.getId(), shipment.getShippedTo().getId());
     }
+    @Test
+    public void testHandleStp() {
+        final SessionHolder state = new SessionHolder();
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setType(TrackerEventType.STP);
+        e.setShipment(shipment);
+        e.setLatitude(2.0);
+        e.setLongitude(0.);
+
+        final LocationProfile loc1 = createLocation(1., 0.);
+        final LocationProfile loc2 = createLocation(2., 0.);
+        final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
+
+        needAutodetect(autoStart, state.getSession(shipment));
+
+        //check ignores first reading
+        assertTrue(handle(new RuleContext(e, state)));
+        assertNotNull(shipment.getShippedTo());
+        assertEquals(loc2.getId(), shipment.getShippedTo().getId());
+    }
     /**
      * @param loc locations.
      * @return

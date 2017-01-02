@@ -5,6 +5,7 @@ package com.visfresh.rules;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -221,7 +222,7 @@ public class ArrivalNotificationRuleTest extends BaseRuleTest {
         assertEquals(1, context.getBean(ArrivalDao.class).findAll(null, null, null).size());
     }
     @Test
-    public void testSendReport() {
+    public void testSendNotification() {
         final String email = "arrival.developer@visfresh.com";
         final NotificationSchedule sched = createEmailNotificaitonSchedule(email);
 
@@ -242,14 +243,18 @@ public class ArrivalNotificationRuleTest extends BaseRuleTest {
         rule.handle(new RuleContext(e, holder));
         rule.handle(new RuleContext(e, holder));
 
+        final MockEmailService emailer = context.getBean(MockEmailService.class);
         //check notification send
-        final List<EmailMessage> emails = context.getBean(MockEmailService.class).getMessages();
+        final List<EmailMessage> emails = emailer.getMessages();
         assertEquals(1, emails.size());
 
         final EmailMessage msg = emails.get(0);
         assertEquals(1, msg.getEmails().length);
         assertEquals(email, msg.getEmails()[0]);
         assertTrue(msg.getMessage().contains(shipment.getDevice().getSn()));
+
+        //check not report sent
+        assertNull(emailer.getAttachments().get(0));
     }
 
     @Test
