@@ -58,6 +58,9 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES, tpl.getNoAlertsAfterStartMinutes());
         obj.addProperty(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES, tpl.getShutDownAfterStartMinutes());
 
+        obj.addProperty(ShipmentConstants.SEND_ARRIVAL_REPORT, tpl.isSendArrivalReport());
+        obj.addProperty(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS, tpl.isSendArrivalReportOnlyIfAlerts());
+
         if (tpl.getInterimLocations() != null) {
             final JsonArray array = new JsonArray();
             obj.add(INTERIM_LOCATIONS, array);
@@ -105,6 +108,13 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         final JsonElement locs = obj.get(INTERIM_LOCATIONS);
         if (locs != null && !locs.isJsonNull()) {
             shp.setInterimLocations(asLongList(locs));
+        }
+
+        if (has(obj, ShipmentConstants.SEND_ARRIVAL_REPORT)) {
+            shp.setSendArrivalReport(asBoolean(obj.get(ShipmentConstants.SEND_ARRIVAL_REPORT)));
+        }
+        if (has(obj, ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS)) {
+            shp.setSendArrivalReportOnlyIfAlerts(asBoolean(obj.get(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS)));
         }
 
         return shp;

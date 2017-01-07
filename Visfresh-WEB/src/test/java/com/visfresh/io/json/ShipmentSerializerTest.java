@@ -81,6 +81,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final String createdBy = "developer";
         final Date startDate = new Date(10000l);
         final Date deviceShutdownTime = new Date(923847092834l);
+        final boolean sendArrivalReport = false;
+        final boolean sendArrivalReportOnlyIfAlerts = true;
 
         ShipmentDto s = new ShipmentDto();
         s.setAlertProfile(alertProfile);
@@ -112,6 +114,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         s.setCreatedBy(createdBy);
         s.setStartDate(startDate);
         s.setDeviceShutdownTime(deviceShutdownTime);
+        s.setSendArrivalReport(sendArrivalReport);
+        s.setSendArrivalReportOnlyIfAlerts(sendArrivalReportOnlyIfAlerts);
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
         s = serializer.parseShipment(obj);
@@ -145,6 +149,24 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(createdBy, s.getCreatedBy());
         assertEquals(dateFormat.format(startDate), dateFormat.format(s.getStartDate()));
         assertEquals(dateFormat.format(deviceShutdownTime), dateFormat.format(s.getDeviceShutdownTime()));
+        assertEquals(sendArrivalReport, s.isSendArrivalReport());
+        assertEquals(sendArrivalReportOnlyIfAlerts, s.isSendArrivalReportOnlyIfAlerts());
+    }
+    @Test
+    public void testShipmentDefaults() {
+        ShipmentDto s = new ShipmentDto();
+        s.setId(77l);
+
+        final JsonObject obj = serializer.toJson(s).getAsJsonObject();
+        s = serializer.parseShipment(obj);
+
+        assertNull(s.getAlertProfile());
+        assertNotNull(s.getAlertsNotificationSchedules());
+        assertNotNull(s.getArrivalNotificationSchedules());
+        assertNull(s.getShippedFrom());
+        assertNull(s.getShippedTo());
+        assertTrue(s.isSendArrivalReport());
+        assertFalse(s.isSendArrivalReportOnlyIfAlerts());
     }
     @Test
     public void testSaveShipmentResponse() {

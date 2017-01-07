@@ -115,6 +115,13 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
         dto.setShipmentDescription(asString(json.get(ShipmentTemplateConstants.SHIPMENT_DESCRIPTION)));
         dto.setAddDateShipped(asBoolean(json.get(ShipmentTemplateConstants.ADD_DATE_SHIPPED)));
 
+        if (has(json, ShipmentConstants.SEND_ARRIVAL_REPORT)) {
+            dto.setSendArrivalReport(asBoolean(json.get(ShipmentConstants.SEND_ARRIVAL_REPORT)));
+        }
+        if (has(json, ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS)) {
+            dto.setSendArrivalReportOnlyIfAlerts(asBoolean(json.get(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS)));
+        }
+
         return dto;
     }
 
@@ -201,6 +208,10 @@ public class AutoStartShipmentSerializer extends AbstractJsonSerializer
         json.addProperty(ShipmentConstants.NO_ALERTS_AFTER_ARRIVAL_MINUTES, as.getNoAlertsAfterArrivalMinutes());
         json.addProperty(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES, as.getNoAlertsAfterStartMinutes());
         json.addProperty(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES, as.getShutDownAfterStartMinutes());
+
+        json.addProperty(ShipmentConstants.SEND_ARRIVAL_REPORT, as.isSendArrivalReport());
+        json.addProperty(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS, as.isSendArrivalReportOnlyIfAlerts());
+
         return json;
     }
     /**

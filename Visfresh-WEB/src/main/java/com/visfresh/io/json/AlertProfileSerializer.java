@@ -116,15 +116,6 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         return p;
     }
     /**
-     * @param obj
-     * @param property
-     * @return
-     */
-    private boolean has(final JsonObject obj, final String property) {
-        final JsonElement child = obj.get(property);
-        return child != null && !child.isJsonNull();
-    }
-    /**
      * @param issue temperature issue.
      * @return
      */

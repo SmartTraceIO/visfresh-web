@@ -13,6 +13,7 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.Language;
@@ -177,6 +178,19 @@ public class AbstractJsonSerializer {
             }
         }
         return false;
+    }
+    /**
+     * @param parent
+     * @param name
+     * @return
+     */
+    public boolean has(final JsonObject parent, final String name) {
+        if (parent == null || !parent.has(name)) {
+            return false;
+        }
+
+        final JsonElement e = parent.get(name);
+        return e != null && !e.isJsonNull();
     }
 
     /**

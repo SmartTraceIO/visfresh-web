@@ -4,12 +4,17 @@
 package com.visfresh.io.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.gson.JsonObject;
 import com.visfresh.io.AutoStartShipmentDto;
 
 /**
@@ -65,6 +70,8 @@ public class AutoStartShipmentSerializerTest {
         final String shipmentDescription = "JUnit shipment";
         final boolean addDateShipped = true;
         final boolean startOnLeaveLocation = true;
+        final boolean sendArrivalReport = false;
+        final boolean sendArrivalReportOnlyIfAlerts = true;
 
         dto.setAlertSuppressionMinutes(alertSuppressionMinutes);
         dto.setAlertProfile(alertProfile);
@@ -99,6 +106,8 @@ public class AutoStartShipmentSerializerTest {
         dto.getInterimStops().add(loc6);
         dto.getInterimStopsNames().add(locName6);
         dto.setStartOnLeaveLocation(startOnLeaveLocation);
+        dto.setSendArrivalReport(sendArrivalReport);
+        dto.setSendArrivalReportOnlyIfAlerts(sendArrivalReportOnlyIfAlerts);
 
         dto = serializer.parseAutoStartShipmentDto(serializer.toJson(dto));
 
@@ -138,5 +147,21 @@ public class AutoStartShipmentSerializerTest {
         assertEquals(name, dto.getName());
         assertEquals(shipmentDescription, dto.getShipmentDescription());
         assertEquals(addDateShipped, dto.isAddDateShipped());
+        assertEquals(sendArrivalReport, dto.isSendArrivalReport());
+        assertEquals(sendArrivalReportOnlyIfAlerts, dto.isSendArrivalReportOnlyIfAlerts());
+    }
+    @Test
+    public void testDefaults() {
+        AutoStartShipmentDto s = new AutoStartShipmentDto();
+        s.setId(77l);
+
+        final JsonObject obj = serializer.toJson(s).getAsJsonObject();
+        s = serializer.parseAutoStartShipmentDto(obj);
+
+        assertNull(s.getAlertProfile());
+        assertNotNull(s.getAlertsNotificationSchedules());
+        assertNotNull(s.getArrivalNotificationSchedules());
+        assertTrue(s.isSendArrivalReport());
+        assertFalse(s.isSendArrivalReportOnlyIfAlerts());
     }
 }

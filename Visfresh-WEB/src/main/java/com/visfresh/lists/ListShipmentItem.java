@@ -12,8 +12,8 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.KeyLocation;
+import com.visfresh.io.SingleShipmentInterimStop;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -64,6 +64,9 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private final List<SingleShipmentInterimStop> interimStops = new LinkedList<>();
     private List<KeyLocation> keyLocations;
 
+    private boolean sendArrivalReport;
+    private boolean sendArrivalReportOnlyIfAlerts;
+
     /**
      * Default constructor.
      */
@@ -86,6 +89,8 @@ public class ListShipmentItem implements EntityWithId<Long> {
         this.setShippedTo(s.getShippedTo() == null ? null : s.getShippedTo().getName());
         this.setStatus(s.getStatus());
         this.setTripcount(s.getTripCount());
+        this.setSendArrivalReport(s.isSendArrivalReport());
+        this.setSendArrivalReportOnlyIfAlerts(s.isSendArrivalReportOnlyIfAlerts());
     }
     /**
      * @return the shipmentId
@@ -533,5 +538,29 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public void setKeyLocations(final List<KeyLocation> keyLocations) {
         this.keyLocations = keyLocations;
+    }
+    /**
+     * @return the sendArrivalReport
+     */
+    public boolean isSendArrivalReport() {
+        return sendArrivalReport;
+    }
+    /**
+     * @param sendArrivalReport the sendArrivalReport to set
+     */
+    public void setSendArrivalReport(final boolean sendArrivalReport) {
+        this.sendArrivalReport = sendArrivalReport;
+    }
+    /**
+     * @return the sendArrivalReportOnlyIfAlerts
+     */
+    public boolean isSendArrivalReportOnlyIfAlerts() {
+        return sendArrivalReportOnlyIfAlerts;
+    }
+    /**
+     * @param sendArrivalReportOnlyIfAlerts the sendArrivalReportOnlyIfAlerts to set
+     */
+    public void setSendArrivalReportOnlyIfAlerts(final boolean sendArrivalReportOnlyIfAlerts) {
+        this.sendArrivalReportOnlyIfAlerts = sendArrivalReportOnlyIfAlerts;
     }
 }

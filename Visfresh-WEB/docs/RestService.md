@@ -759,6 +759,8 @@ see [ResponseStatus](#markdown-header-response-status)
     "noAlertsAfterArrivalMinutes": null,
     "noAlertsAfterStartMinutes": null,
     "shutDownAfterStartMinutes": null,
+    "sendArrivalReport": true,
+    "arrivalReportOnlyIfAlerts": false,
     "interimLocations": [
       5296,
       5297
@@ -826,6 +828,8 @@ see [Shipment Object](#markdown-header-shipment)
 	"shutdownDeviceAfterMinutes": 155,
     "noAlertsAfterArrivalMinutes": null,
     "shutDownAfterStartMinutes": null,
+    "sendArrivalReport": true,
+    "arrivalReportOnlyIfAlerts": false,
 	"customFields": {
 	  "field1": "value1"
 	},
@@ -858,6 +862,8 @@ see [Shipment Object](#markdown-header-shipment)
   "percentageComplete": 0,
   "alertProfileId": 293,
   "alertProfileName": "AnyAlert",
+  "sendArrivalReport": true,
+  "arrivalReportOnlyIfAlerts": false,
   "alertSummary": {
     "MovementStart": "4",
     "LightOn": "1",
@@ -982,7 +988,9 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "shutdownDeviceAfterMinutes": 99,
   "noAlertsAfterArrivalMinutes": 43,
   "noAlertsAfterStartMinutes": null,
-  "shutDownAfterStartMinutes": 47
+  "shutDownAfterStartMinutes": 47,
+  "sendArrivalReport": true,
+  "arrivalReportOnlyIfAlerts": false
 }
 ```
 ### Expanded List User Item ###
@@ -1775,6 +1783,8 @@ Response:
   "shutdownDeviceAfterMinutes": 155,
   "noAlertsAfterArrivalMinutes": null,
   "shutDownAfterStartMinutes": null,
+  "sendArrivalReport": true,
+  "arrivalReportOnlyIfAlerts": false,
   "interimLocations": [
     5296,
     5297
@@ -1881,6 +1891,8 @@ Response:
     "shutdownDeviceAfterMinutes": 155,
     "noAlertsAfterArrivalMinutes": null,
     "shutDownAfterStartMinutes": null,
+    "sendArrivalReport": true,
+    "arrivalReportOnlyIfAlerts": false,
     "customFields": {
       "field1": "value1"
     },
@@ -1991,7 +2003,9 @@ Response:
       "shippedFromLat": 100.5,
       "shippedFromLong": 100.501,
       "shippedToLat": 100.5,
-      "shippedToLong": 100.501
+      "shippedToLong": 100.501,
+      "sendArrivalReport": true,
+      "arrivalReportOnlyIfAlerts": false
     },
     {
       "status": "Arrived",
@@ -2030,7 +2044,9 @@ Response:
       "shippedFromLat": 100.5,
       "shippedFromLong": 100.501,
       "shippedToLat": 100.5,
-      "shippedToLong": 100.501
+      "shippedToLong": 100.501,
+      "sendArrivalReport": true,
+      "arrivalReportOnlyIfAlerts": false
     }
   ],
   "totalCount": 2
@@ -2499,6 +2515,8 @@ Response:
     "shutdownDeviceAfterMinutes": 155,
     "noAlertsAfterArrivalMinutes": null,
     "shutDownAfterStartMinutes": null,
+    "sendArrivalReport": true,
+    "arrivalReportOnlyIfAlerts": false,
     "interimLocations": [
       5296,
       5297
@@ -2689,7 +2707,8 @@ Response:
     "firstReadingTime": "6:27PM 12 Mar 2016",
     "alertsSuppressed": true,
     "alertsSuppressionTime": "11:34AM 7 Apr 2016",
-    "alertsSuppressionTimeIso": "2016-04-07 11:34",
+    "sendArrivalReport": true,
+    "arrivalReportOnlyIfAlerts": false,
     "locations": [
       {
         "lat": 50.5,
@@ -3022,6 +3041,8 @@ Response:
     "alertsSuppressed": true,
     "alertsSuppressionTime": "11:34AM 7 Apr 2016",
     "alertsSuppressionTimeIso": "2016-04-07 11:34",
+    "sendArrivalReport": true,
+    "arrivalReportOnlyIfAlerts": false,
     "locations": [
       {
         "lat": 50.5,
@@ -3466,7 +3487,9 @@ Response:
   "shutdownDeviceAfterMinutes": 99,
   "noAlertsAfterArrivalMinutes": 43,
   "noAlertsAfterStartMinutes": null,
-  "shutDownAfterStartMinutes": 47
+  "shutDownAfterStartMinutes": 47,
+  "shutDownAfterStartMinutes": null,
+  "sendArrivalReport": true,
 }
 ```  
 **Response:**  
@@ -3521,7 +3544,9 @@ Response:
     "shutdownDeviceAfterMinutes": null,
     "noAlertsAfterArrivalMinutes": null,
     "noAlertsAfterStartMinutes": null,
-    "shutDownAfterStartMinutes": null
+    "shutDownAfterStartMinutes": null,
+    "shutDownAfterStartMinutes": null,
+    "sendArrivalReport": true,
   }
 }
 ```
@@ -3566,7 +3591,9 @@ Response:
       "shutdownDeviceAfterMinutes": null,
       "noAlertsAfterArrivalMinutes": null,
       "noAlertsAfterStartMinutes": null,
-      "shutDownAfterStartMinutes": null
+      "shutDownAfterStartMinutes": null,
+      "sendArrivalReport": true,
+      "arrivalReportOnlyIfAlerts": false
     },
     {
       "priority": 77,
@@ -3599,7 +3626,9 @@ Response:
       "shutdownDeviceAfterMinutes": null,
       "noAlertsAfterArrivalMinutes": null,
       "noAlertsAfterStartMinutes": null,
-      "shutDownAfterStartMinutes": null
+      "shutDownAfterStartMinutes": null,
+      "sendArrivalReport": true,
+      "arrivalReportOnlyIfAlerts": false
     }
   ],
   "totalCount": 2

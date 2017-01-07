@@ -25,13 +25,13 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
-import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.NoteDto;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
+import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
 import com.visfresh.io.shipment.SingleShipmentDto;
@@ -97,6 +97,13 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         final JsonElement locs = obj.get(INTERIM_LOCATIONS);
         if (locs != null && !locs.isJsonNull()) {
             shp.setInterimLocations(asLongList(locs));
+        }
+
+        if (has(obj, ShipmentConstants.SEND_ARRIVAL_REPORT)) {
+            shp.setSendArrivalReport(asBoolean(obj.get(ShipmentConstants.SEND_ARRIVAL_REPORT)));
+        }
+        if (has(obj, ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS)) {
+            shp.setSendArrivalReportOnlyIfAlerts(asBoolean(obj.get(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS)));
         }
     }
     public ShipmentDto parseShipment(final JsonObject json) {
@@ -175,6 +182,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(ShipmentConstants.NO_ALERTS_AFTER_ARRIVAL_MINUTES, s.getNoAlertsAfterArrivalMinutes());
         obj.addProperty(ShipmentConstants.NO_ALERTS_AFTER_START_MINUTES, s.getNoAlertsAfterStartMinutes());
         obj.addProperty(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES, s.getShutDownAfterStartMinutes());
+
+        obj.addProperty(ShipmentConstants.SEND_ARRIVAL_REPORT, s.isSendArrivalReport());
+        obj.addProperty(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS, s.isSendArrivalReportOnlyIfAlerts());
 
         obj.add(ShipmentConstants.CUSTOM_FIELDS, SerializerUtils.toJson(s.getCustomFields()));
         obj.addProperty(START_DATE, formatDate(s.getStartDate()));
@@ -383,6 +393,10 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         //end location
         json.addProperty("shippedToLat", dto.getShippedToLat());
         json.addProperty("shippedToLong", dto.getShippedToLong());
+
+        //arrival report
+        json.addProperty(ShipmentConstants.SEND_ARRIVAL_REPORT, dto.isSendArrivalReport());
+        json.addProperty(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS, dto.isSendArrivalReportOnlyIfAlerts());
 
         return json;
     }
@@ -702,6 +716,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("alertsSuppressed", dto.isAlertsSuppressed());
             json.addProperty("alertsSuppressionTime", dto.getAlertsSuppressionTime());
             json.addProperty("alertsSuppressionTimeIso", dto.getAlertsSuppressionTimeIso());
+
+            json.addProperty(ShipmentConstants.SEND_ARRIVAL_REPORT, dto.isSendArrivalReport());
+            json.addProperty(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS, dto.isSendArrivalReportOnlyIfAlerts());
 
             final JsonArray locations = new JsonArray();
             for (final SingleShipmentLocation l : dto.getLocations()) {

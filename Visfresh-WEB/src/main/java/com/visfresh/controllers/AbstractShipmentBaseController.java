@@ -173,5 +173,7 @@ public abstract class AbstractShipmentBaseController extends AbstractController 
         tpl.setNoAlertsAfterArrivalMinutes(dto.getNoAlertsAfterArrivalMinutes());
         tpl.setNoAlertsAfterStartMinutes(dto.getNoAlertsAfterStartMinutes());
         tpl.setShutDownAfterStartMinutes(dto.getShutDownAfterStartMinutes());
+        tpl.setSendArrivalReport(dto.isSendArrivalReport());
+        tpl.setSendArrivalReportOnlyIfAlerts(dto.isSendArrivalReportOnlyIfAlerts());
     }
 }

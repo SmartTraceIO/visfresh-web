@@ -22,4 +22,6 @@ public interface BaseShipmentConstants {
     String SHUTDOWN_DEVICE_AFTER_START_MINUTES = "shutDownAfterStartMinutes";
     String COMMENTS_FOR_RECEIVER = "commentsForReceiver";
     String SHIPMENT_DESCRIPTION = "shipmentDescription";
+    String SEND_ARRIVAL_REPORT = "sendArrivalReport";
+    String ARRIVAL_REPORT_ONLY_IF_ALERTS = "arrivalReportOnlyIfAlerts";
 }
