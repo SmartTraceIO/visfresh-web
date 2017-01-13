@@ -130,16 +130,24 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
      * @param shipment
      */
     private void sendShipmentReport(final Shipment shipment) {
-        final List<PersonSchedule> schedules = AbstractNotificationRule.getPersonalSchedules(
-                shipment.getArrivalNotificationSchedules(), new Date());
+        if (shipment.isSendArrivalReport()) {
+            if (shipment.isSendArrivalReportOnlyIfAlerts() && engine.getAlertFired(shipment).isEmpty()) {
+                log.debug("Shipment " + shipment.getId() + " is configured to send arrival "
+                        + "report only if alerts but has not alerts. Report will not send");
+                return;
+            }
 
-        for (final PersonSchedule sched : schedules) {
-            final User user = sched.getUser();
-            if (sched.isSendEmail()) {
-                notificationService.sendShipmentReport(shipment, user);
-            } else {
-                log.debug("Pesonal scheule for user " + user.getEmail()
-                        + " is not configured for email. Shipment Arrived report will not sent");
+            final List<PersonSchedule> schedules = AbstractNotificationRule.getPersonalSchedules(
+                    shipment.getArrivalNotificationSchedules(), new Date());
+
+            for (final PersonSchedule sched : schedules) {
+                final User user = sched.getUser();
+                if (sched.isSendEmail()) {
+                    notificationService.sendShipmentReport(shipment, user);
+                } else {
+                    log.debug("Pesonal scheule for user " + user.getEmail()
+                            + " is not configured for email. Shipment Arrived report will not sent");
+                }
             }
         }
     }

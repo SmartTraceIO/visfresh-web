@@ -300,6 +300,64 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         assertEquals(0, emailer.getAttachments().size());
     }
     @Test
+    public void testNotSendReport() {
+        shipment.setArrivalNotificationWithinKm(0);
+
+        final NotificationSchedule sched = createEmailNotificaitonSchedule("arrival.developer@visfresh.com");
+        shipment.getArrivalNotificationSchedules().add(sched);
+
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
+
+        //create session manager with peresistence
+        final ShipmentSessionDao sessionDao = context.getBean(ShipmentSessionDao.class);
+        final ShipmentSession session = new ShipmentSession(shipment.getId());
+        final ShipmentSessionManager h = new ShipmentSessionManager() {
+            @Override
+            public ShipmentSession getSession(final Shipment s) {
+                return session;
+            }
+        };
+        LeaveStartLocationRule.setLeavingStartLocation(session);
+        sessionDao.saveSession(session);
+
+        final TrackerEvent e1 = createEventNearLocation(loc);
+        e1.setTime(new Date(e.getTime().getTime() - 30 * 60 * 1000l));
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        //set nearest location
+        final RuleContext req = new RuleContext(e, h);
+        assertTrue(rule.accept(req));
+        shipment.setSendArrivalReport(false);
+        rule.handle(req);
+        rule.handle(req);
+
+        final MockEmailService emailer = context.getBean(MockEmailService.class);
+        //check notification send
+        final List<EmailMessage> emails = emailer.getMessages();
+        assertEquals(0, emails.size());
+        assertEquals(0, emailer.getAttachments().size());
+
+        emailer.clear();
+
+        //check not send arrival report if alerts not triggered
+        shipment.setSendArrivalReport(true);
+        shipment.setSendArrivalReportOnlyIfAlerts(true);
+        rule.handle(req);
+
+        assertEquals(0, emailer.getMessages().size());
+        assertEquals(0, emailer.getAttachments().size());
+
+        //check send arrival
+        shipment.setSendArrivalReportOnlyIfAlerts(false);
+        rule.handle(req);
+
+        assertEquals(1, emailer.getMessages().size());
+        assertEquals(1, emailer.getAttachments().size());
+    }
+    @Test
     public void testPreventOfDoubleHandling() {
         shipment.setArrivalNotificationWithinKm(0);
 
