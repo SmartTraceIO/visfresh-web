@@ -18,6 +18,30 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Device;
+import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.User;
+import com.visfresh.l12n.RuleBundle;
+import com.visfresh.reports.Colors;
+import com.visfresh.reports.ImagePaintingSupport;
+import com.visfresh.reports.ReportUtils;
+import com.visfresh.reports.TemperatureStats;
+import com.visfresh.reports.geomap.MapRendererImpl;
+import com.visfresh.services.EventsNullCoordinatesCorrector;
+import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.utils.LocalizationUtils;
+import com.visfresh.utils.StringUtils;
+
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.base.expression.AbstractSimpleExpression;
 import net.sf.dynamicreports.report.builder.DynamicReports;
@@ -52,30 +76,6 @@ import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 import net.sf.jasperreports.engine.design.JRDesignField;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.visfresh.entities.Alert;
-import com.visfresh.entities.AlertRule;
-import com.visfresh.entities.AlertType;
-import com.visfresh.entities.Device;
-import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShortTrackerEvent;
-import com.visfresh.entities.TemperatureUnits;
-import com.visfresh.entities.User;
-import com.visfresh.l12n.RuleBundle;
-import com.visfresh.reports.Colors;
-import com.visfresh.reports.ImagePaintingSupport;
-import com.visfresh.reports.ReportUtils;
-import com.visfresh.reports.TemperatureStats;
-import com.visfresh.reports.geomap.MapRendererImpl;
-import com.visfresh.services.EventsNullCoordinatesCorrector;
-import com.visfresh.utils.DateTimeUtils;
-import com.visfresh.utils.LocalizationUtils;
-import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -721,6 +721,10 @@ public class ShipmentReportBuilder {
         //pallet ID
         if (bean.getPalletId() != null) {
             addGoodsRow(rows, "Pallet ID", bean.getPalletId());
+        }
+        //assert num
+        if (bean.getAssetNum() != null) {
+            addGoodsRow(rows, "Asset Num", bean.getAssetNum());
         }
         //comments
         if (bean.getComment() != null) {
