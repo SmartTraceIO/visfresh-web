@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -19,6 +17,8 @@ import com.visfresh.DeviceMessageParser;
 import com.visfresh.DeviceMessageType;
 import com.visfresh.StationSignal;
 import com.visfresh.spring.mock.JUnitConfig;
+
+import junit.framework.TestCase;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -110,10 +110,12 @@ public class MessageDaoTest extends TestCase {
         assertEquals(battery, row.get(MessageDao.BATTERY_FIELD));
         assertEquals(imei, row.get(MessageDao.IMEI_FIELD));
         assertEquals(Double.toString(temperature), "" + row.get(MessageDao.TEMPERATURE_FIELD));
-        assertEquals(format(time, "yyyyMMdd HHmmss"),
-                format((Date) row.get(MessageDao.TIME_FIELD), "yyyyMMdd HHmmss"));
-        assertEquals(format(retryOn, "yyyyMMdd HHmmss"),
-                format((Date) row.get(MessageDao.RETRYON_FIELD), "yyyyMMdd HHmmss"));
+
+        final String dateFormat = "yyyyMMdd HHmm";
+        assertEquals(format(time, dateFormat),
+                format((Date) row.get(MessageDao.TIME_FIELD), dateFormat));
+        assertEquals(format(retryOn, dateFormat),
+                format((Date) row.get(MessageDao.RETRYON_FIELD), dateFormat));
         assertEquals(numRetry, row.get(MessageDao.NUMRETRY_FIELD));
         assertEquals(type.toString(), row.get(MessageDao.TYPE_FIELD));
 
@@ -140,14 +142,18 @@ public class MessageDaoTest extends TestCase {
     }
 
     public void testMarkDeviceMessagesForProcess() {
+        final Date retryOn = new Date(System.currentTimeMillis() - 10000);
+
         final DeviceMessage m1 = new DeviceMessage();
         m1.setImei("11111");
         m1.setTime(new Date());
+        m1.setRetryOn(retryOn);
         m1.setType(DeviceMessageType.INIT);
 
         final DeviceMessage m2 = new DeviceMessage();
         m2.setImei("22222");
         m2.setTime(new Date());
+        m2.setRetryOn(retryOn);
         m2.setType(DeviceMessageType.INIT);
 
         dao.create(m1);
@@ -167,10 +173,12 @@ public class MessageDaoTest extends TestCase {
     }
     public void testGetDeviceMessagesForProcess() {
         long time = System.currentTimeMillis() + 3 * 100000L;
+        final Date retryOn = new Date(System.currentTimeMillis() - 100000l);
 
         final DeviceMessage m1 = new DeviceMessage();
         m1.setImei("11111");
         m1.setTime(new Date((time += 100000L)));
+        m1.setRetryOn(retryOn);
         m1.setType(DeviceMessageType.INIT);
         m1.setBattery(101);
         m1.setTemperature(500);
@@ -187,11 +195,13 @@ public class MessageDaoTest extends TestCase {
         final DeviceMessage m2 = new DeviceMessage();
         m2.setImei("22222");
         m2.setTime(new Date((time += 100000L)));
+        m2.setRetryOn(retryOn);
         m2.setType(DeviceMessageType.INIT);
 
         final DeviceMessage m3 = new DeviceMessage();
         m3.setImei("22222");
         m3.setTime(new Date((time += 100000L)));
+        m3.setRetryOn(retryOn);
         m3.setType(DeviceMessageType.INIT);
 
         dao.create(m1);
@@ -209,7 +219,8 @@ public class MessageDaoTest extends TestCase {
         final DeviceMessage msg = list.get(0);
 
         //check first message
-        assertEquals(format(m1.getTime(), "yyyyMMdd:HH:mm:ss"), format(msg.getTime(), "yyyyMMdd:HH:mm:ss"));
+        final String dateFormat = "yyyyMMdd:HH:mm";
+        assertEquals(format(m1.getTime(), dateFormat), format(msg.getTime(), dateFormat));
         assertEquals(m1.getBattery(), msg.getBattery());
         assertEquals(m1.getImei(), msg.getImei());
         assertEquals(m1.getTemperature(), msg.getTemperature());
