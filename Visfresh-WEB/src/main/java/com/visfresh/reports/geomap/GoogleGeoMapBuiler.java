@@ -7,9 +7,13 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
+
+import org.jfree.util.Log;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -55,8 +59,16 @@ public class GoogleGeoMapBuiler extends AbstractGeoMapBuiler {
                     + h
                     + "&maptype=roadmap";
 
-            img = ImageIO.read(new URL(imageUrl));
-            cache.put(pos.x, pos.y, w, h, zoom, img);
+            final HttpURLConnection url = (HttpURLConnection) new URL(imageUrl).openConnection();
+            url.setConnectTimeout(30000);
+
+            try (InputStream in = url.getInputStream()) {
+                img = ImageIO.read(ImageIO.createImageInputStream(in));
+                cache.put(pos.x, pos.y, w, h, zoom, img);
+            } catch (final IOException ioe) {
+                Log.error("Failed to obtain the map from Google Maps", ioe);
+                throw ioe;
+            }
         }
 
         gOrig.drawImage(img, 0, 0, null);

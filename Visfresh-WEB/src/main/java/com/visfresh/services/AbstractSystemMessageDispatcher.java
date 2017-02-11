@@ -187,7 +187,7 @@ public abstract class AbstractSystemMessageDispatcher {
 
         if (!messageHandlers.isEmpty()) {
             final List<SystemMessage> messages = messageDao.selectMessagesForProcessing(
-                    messageTypes, processorId, getBatchLimit(), new Date());
+                    messageTypes, processorId, getBatchLimit(), new Date(System.currentTimeMillis() + 1000l));
 
             for (final SystemMessage msg : messages) {
                 try {

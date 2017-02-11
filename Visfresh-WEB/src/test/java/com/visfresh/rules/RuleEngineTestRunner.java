@@ -11,6 +11,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import com.visfresh.dao.DaoTestRunner;
 import com.visfresh.junit.db.JUnitDbConfig;
+import com.visfresh.mock.MockEmailService;
 import com.visfresh.mock.MockNotificationService;
 import com.visfresh.services.RuleEngine;
 
@@ -71,6 +72,9 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
      */
     private void cleanUp() {
         DaoTestRunner.clearDb(context);
+        try {
+            context.getBean(MockEmailService.class).clear();
+        } catch (final Exception e) {}
     }
 
     /* (non-Javadoc)

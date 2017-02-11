@@ -84,7 +84,7 @@ public class SystemMessageDaoTest extends
         assertEquals(0, dao.selectMessagesForProcessing(types, processor, 100,
                 new Date(m1.getRetryOn().getTime() - 10000L)).size());
         assertEquals(1, dao.selectMessagesForProcessing(types, processor, 100,
-                new Date(m1.getRetryOn().getTime() + 10L)).size());
+                new Date(m1.getRetryOn().getTime() + 1000L)).size());
 
         //clear processor field
         dao.save(m1);

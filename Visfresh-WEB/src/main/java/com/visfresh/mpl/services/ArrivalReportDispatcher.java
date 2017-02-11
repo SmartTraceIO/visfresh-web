@@ -18,7 +18,7 @@ import com.visfresh.services.AbstractSystemMessageDispatcher;
  *
  */
 @Component
-public class MainSystemMessageDispatcher extends AbstractSystemMessageDispatcher {
+public class ArrivalReportDispatcher extends AbstractSystemMessageDispatcher {
     /**
      * Processor ID.
      */
@@ -28,15 +28,15 @@ public class MainSystemMessageDispatcher extends AbstractSystemMessageDispatcher
      * @param env spring environment.
      */
     @Autowired
-    public MainSystemMessageDispatcher(final Environment env) {
-        super(SystemMessageType.ShutdownShipment, SystemMessageType.DeviceCommand);
-        processorId = env.getProperty("main.dispatcher.baseProcessorId", "main-dispatcher");
-        setBatchLimit(Integer.parseInt(env.getProperty("main.dispatcher.batchLimit", "10")));
-        setRetryLimit(Integer.parseInt(env.getProperty("main.dispatcher.retryLimit", "5")));
+    public ArrivalReportDispatcher(final Environment env) {
+        super(SystemMessageType.ArrivalReport);
+        processorId = env.getProperty("main.dispatcher.baseProcessorId", "arrival-report");
+        setBatchLimit(Integer.parseInt(env.getProperty("arrival.dispatcher.batchLimit", "10")));
+        setRetryLimit(Integer.parseInt(env.getProperty("arrival.dispatcher.retryLimit", "5")));
         //number of threads should be hardcoded to 1
         //setNumThreads(Integer.parseInt(env.getProperty("main.dispatcher.numThreads", "1")));
         setNumThreads(1);
-        setInactiveTimeOut(Long.parseLong(env.getProperty("main.dispatcher.retryLimit", "3000")));
+        setInactiveTimeOut(Long.parseLong(env.getProperty("arrival.dispatcher.retryLimit", "3000")));
     }
 
     /* (non-Javadoc)

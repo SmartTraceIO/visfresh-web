@@ -78,7 +78,7 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     @Autowired
     protected NotificationBundle bundle;
     @Autowired
-    private MainSystemMessageDispatcher dispatcher;
+    private ArrivalReportDispatcher dispatcher;
     @Autowired
     protected ShipmentDao shipmentDao;
     @Autowired
@@ -216,7 +216,12 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
                 session.setShipmentProperty(key, "true");
                 shipmentSessionDao.saveSession(session);
 
-                sendShipmentReportImmediately(s, user);
+                try {
+                    sendShipmentReportImmediately(s, user);
+                } catch (final IOException e) {
+                    log.error("Failed to send arrival report for" + shipmentId, e);
+                    throw new RetryableException(e);
+                }
             } else {
                 log.debug("Arrival have already sent to " + user.getEmail());
             }
@@ -226,7 +231,7 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
      * @param s shipment.
      * @param user user.
      */
-    private void sendShipmentReportImmediately(final Shipment s, final User user) {
+    private void sendShipmentReportImmediately(final Shipment s, final User user) throws IOException {
         final Language lang = user.getLanguage();
         final TimeZone tz = user.getTimeZone();
         final TemperatureUnits tu = user.getTemperatureUnits();
@@ -272,7 +277,7 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
      * @param shipment shipment.
      * @return report file.
      */
-    private File createShipmenentReport(final User user, final Shipment shipment) {
+    private File createShipmenentReport(final User user, final Shipment shipment) throws IOException {
         final ShipmentReportBean report = shipmentReportDao.createReport(shipment);
 
         final DateFormat fmt = DateTimeUtils.createDateFormat(
@@ -284,21 +289,13 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
                 + "(" + report.getTripCount() + ")"
                 + "-" + fmt.format(new Date()) + ".pdf";
 
-        try {
-            final File f = File.createTempFile("report-", name);
-            final OutputStream out = new FileOutputStream(f);
-            try {
-                reportBuilder.createShipmentReport(report, user, out);
-            } finally {
-                out.close();
-            }
+        final File f = File.createTempFile("report-", name);
 
-            return f;
-        } catch (final IOException e) {
-            log.error("Failed to send shipment report according arrival notification", e);
+        try (final OutputStream out = new FileOutputStream(f)) {
+            reportBuilder.createShipmentReport(report, user, out);
         }
 
-        return null;
+        return f;
     }
     @PostConstruct
     public void init() {

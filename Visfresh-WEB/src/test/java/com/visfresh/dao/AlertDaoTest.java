@@ -245,12 +245,12 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
 
         assertEquals(4, dao.getAlerts(s1.getDevice().getImei(), null, null).size());
         assertEquals(4, dao.getAlerts(s1.getDevice().getImei(),
-                new Date(startDate + 5 * dt), new Date(startDate + 20 * dt)).size());
+                new Date(startDate + 4 * dt), new Date(startDate + 21 * dt)).size());
 
         assertEquals(3, dao.getAlerts(s1.getDevice().getImei(),
-                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt)).size());
+                new Date(startDate + 9 * dt), new Date(startDate + 21 * dt)).size());
         assertEquals(2, dao.getAlerts(s1.getDevice().getImei(),
-                new Date(startDate + 10 * dt), new Date(startDate + 15 * dt)).size());
+                new Date(startDate + 9 * dt), new Date(startDate + 16 * dt)).size());
     }
     @Test
     public void testGetAlertsForCompanyDateRanges() {
@@ -277,12 +277,12 @@ public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
 
         assertEquals(4, dao.getAlerts(c1, null, null).size());
         assertEquals(4, dao.getAlerts(c1,
-                new Date(startDate + 5 * dt), new Date(startDate + 20 * dt)).size());
+                new Date(startDate + 4 * dt), new Date(startDate + 21 * dt)).size());
 
         assertEquals(3, dao.getAlerts(c1,
-                new Date(startDate + 10 * dt), new Date(startDate + 20 * dt)).size());
+                new Date(startDate + 9 * dt), new Date(startDate + 21 * dt)).size());
         assertEquals(2, dao.getAlerts(c1,
-                new Date(startDate + 10 * dt), new Date(startDate + 15 * dt)).size());
+                new Date(startDate + 9 * dt), new Date(startDate + 16 * dt)).size());
     }
     /**
      * @param s
