@@ -103,7 +103,7 @@ public class SystemMessageDaoTest extends
         dao.save(m3);
 
         final List<SystemMessage> messages = dao.selectMessagesForProcessing(types, processor, 2,
-                new Date(m3.getRetryOn().getTime() + 10L));
+                new Date(m3.getRetryOn().getTime() + 1500L));
         assertEquals(2, messages.size());
 
         //test ordering
