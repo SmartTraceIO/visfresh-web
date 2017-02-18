@@ -84,7 +84,7 @@ public class MessageExtractor extends AbstractVisfreshLogParser {
             for (final DeviceMessage m: ms) {
                 m.setLoggTime(u.getDate());
                 if (getLocationProvider() != null && m.getStations().size() > 0) {
-                    m.setLocation(getLocationProvider().getLocation(m.getStations()));
+                    m.setLocation(getLocationProvider().getLocation(m.getImei(), m.getStations()));
                 }
 
                 fireMessageExtracted(u, m);

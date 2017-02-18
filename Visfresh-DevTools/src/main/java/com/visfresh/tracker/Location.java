@@ -8,8 +8,8 @@ package com.visfresh.tracker;
  *
  */
 public class Location {
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
 
     /**
      * Default constructor.
@@ -30,7 +30,7 @@ public class Location {
     /**
      * @return the latitude
      */
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
     /**
@@ -42,7 +42,7 @@ public class Location {
     /**
      * @return the longitude
      */
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
     /**

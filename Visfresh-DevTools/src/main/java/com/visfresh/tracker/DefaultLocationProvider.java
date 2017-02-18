@@ -25,7 +25,7 @@ public class DefaultLocationProvider implements LocationProvider {
      * @see com.visfresh.tracker.LocationProvider#getLocation(java.util.List)
      */
     @Override
-    public Location getLocation(final List<StationSignal> signals) {
+    public Location getLocation(String device, final List<StationSignal> signals) {
         return locations.get(createKey(signals));
     }
     public void addLocation(final List<StationSignal> signals, final Location location) {

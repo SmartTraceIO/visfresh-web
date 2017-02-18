@@ -10,5 +10,5 @@ import java.util.List;
  *
  */
 public interface LocationProvider {
-    Location getLocation(List<StationSignal> signals);
+    Location getLocation(String device, List<StationSignal> signals);
 }
