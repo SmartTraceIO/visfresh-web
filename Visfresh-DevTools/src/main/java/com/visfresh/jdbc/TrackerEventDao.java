@@ -43,7 +43,7 @@ public class TrackerEventDao {
         super();
     }
 
-    public void save(final DeviceMessage event) {
+    public void save(final DeviceMessage event, final Long shipment) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         paramMap.put(CREATED_ON_FIELD, event.getTime());
@@ -56,6 +56,9 @@ public class TrackerEventDao {
             paramMap.put(LONGITUDE_FIELD, event.getLocation().getLongitude());
         }
         paramMap.put(DEVICE_FIELD, event.getImei());
+        if (shipment != null) {
+            paramMap.put("shipment", shipment);
+        }
 
         final String sql = createInsertScript(paramMap.keySet());
         jdbc.update(sql, paramMap);

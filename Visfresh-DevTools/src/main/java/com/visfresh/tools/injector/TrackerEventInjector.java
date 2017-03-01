@@ -30,6 +30,7 @@ public class TrackerEventInjector implements ExtractedMessageHandler {
     private final Set<String> types = new HashSet<>();
     private List<DeviceMessage> messages = new LinkedList<>();
     private final Date endDate;
+    private final Date startDate;
 
     /**
      * Default constructor.
@@ -37,8 +38,8 @@ public class TrackerEventInjector implements ExtractedMessageHandler {
      */
     public TrackerEventInjector() throws ParseException {
         super();
-        this.endDate = new SimpleDateFormat("yyyy-MM-dd mm:HH:ss").parse("2017-02-12 22:07:16");
-
+        this.startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2017-01-01 00:07:00");
+        this.endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2017-02-12 22:07:16");
         types.add("INIT");
         types.add("AUT");
         types.add("RSP");
@@ -58,7 +59,7 @@ public class TrackerEventInjector implements ExtractedMessageHandler {
      */
     @Override
     public void handle(final LogUnit u, final DeviceMessage m) {
-        if (m.getTime().after(endDate)){
+        if (m.getTime().after(endDate) || m.getTime().before(startDate)){
             return;
         }
 
@@ -101,7 +102,7 @@ public class TrackerEventInjector implements ExtractedMessageHandler {
             //insert messages into DB.
             final TrackerEventDao dao = ctx.getBean(TrackerEventDao.class);
             for (final DeviceMessage msg : collector.getMessages()) {
-                dao.save(msg);
+                dao.save(msg, 4181l);
             }
         } finally {
             ctx.close();
