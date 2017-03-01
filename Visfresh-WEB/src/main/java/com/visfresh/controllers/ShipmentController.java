@@ -226,21 +226,24 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
     }
     /* (non-Javadoc)
-     * @see com.visfresh.controllers.AbstractShipmentBaseController#saveInterimLoations(com.visfresh.entities.ShipmentBase, com.visfresh.entities.AlternativeLocations)
+     * @see com.visfresh.controllers.AbstractShipmentBaseController#saveAlternativeAndInterimLoations(com.visfresh.entities.ShipmentBase, java.util.Collection, java.util.Collection)
      */
     @Override
-    protected void saveAlternativeLoations(final ShipmentBase s, final AlternativeLocations altLocations) {
-        super.saveAlternativeLoations(s, altLocations);
-
-        //update shipment session.
-        if (altLocations != null) {
+    protected void saveAlternativeAndInterimLoations(final ShipmentBase s, final Collection<LocationProfile> interims,
+            final Collection<LocationProfile> alternativeEnds) {
+        super.saveAlternativeAndInterimLoations(s, interims, alternativeEnds);
+        if (interims != null || alternativeEnds != null) {
             ShipmentSession session = shipmentSessionDao.getSession((Shipment) s);
             if (session == null) {
                 session = new ShipmentSession(s.getId());
             }
 
-            ruleEngine.updateInterimLocations(session, altLocations.getInterim());
-            ruleEngine.updateAutodetectingEndLocations(session, altLocations.getTo());
+            if (interims != null) {
+                ruleEngine.updateInterimLocations(session, new LinkedList<>(interims));
+            }
+            if (alternativeEnds != null) {
+                ruleEngine.updateAutodetectingEndLocations(session, new LinkedList<>(alternativeEnds));
+            }
 
             shipmentSessionDao.saveSession(session);
         }

@@ -194,6 +194,18 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         obj.addProperty(START_DATE, formatDate(s.getStartDate()));
         obj.addProperty(CREATED_BY, s.getCreatedBy());
 
+        //end location alternatives
+        if (s.getEndLocationAlternatives() != null) {
+            final JsonArray array = new JsonArray();
+            obj.add(ShipmentConstants.END_LOCATION_ALTERNATIVES, array);
+
+            for (final Long l : s.getEndLocationAlternatives()) {
+                array.add(new JsonPrimitive(l));
+            }
+        } else {
+            obj.add(ShipmentConstants.END_LOCATION_ALTERNATIVES, JsonNull.INSTANCE);
+        }
+
         //interim locations
         if (s.getInterimLocations() != null) {
             final JsonArray array = new JsonArray();

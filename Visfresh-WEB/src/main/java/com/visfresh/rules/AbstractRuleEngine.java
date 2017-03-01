@@ -43,7 +43,6 @@ import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
 import com.visfresh.io.json.InterimStopSerializer;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.mpl.services.TrackerMessageDispatcher;
-import com.visfresh.rules.AutoDetectEndLocationRule.AutodetectData;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.rules.state.ShipmentSessionManager;
@@ -357,9 +356,8 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
     }
     @Override
     public void updateAutodetectingEndLocations(final ShipmentSession session, final List<LocationProfile> to) {
-        final AutodetectData autoDetect = AutoDetectEndLocationRule.getAutoDetectData(session);
-        if (autoDetect != null) {
-            AutoDetectEndLocationRule.updateAutodetectLocations(autoDetect, to);
+        if (AutoDetectEndLocationRule.hasAutoDetectData(session)) {
+            AutoDetectEndLocationRule.setAutoDetectLocations(session, to);
         }
     }
     @Override

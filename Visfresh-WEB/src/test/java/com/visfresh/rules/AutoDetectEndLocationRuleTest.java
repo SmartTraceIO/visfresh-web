@@ -112,7 +112,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         final LocationProfile loc2 = createLocation(1., 0.);
         final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
 
-        needAutodetect(autoStart, state);
+        setAutoDetectLocations(state, autoStart.getShippedTo());
 
         final String prop = state.getShipmentProperty(getLocationsKey());
         assertNotNull(prop);
@@ -137,7 +137,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         final LocationProfile loc2 = createLocation(2., 0.);
         final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
 
-        needAutodetect(autoStart, state.getSession(shipment));
+        setAutoDetectLocations(state.getSession(shipment), autoStart.getShippedTo());
 
         //test accept correct
         assertTrue(accept(new RuleContext(e, state)));
@@ -174,7 +174,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         final LocationProfile loc2 = createLocation(2., 0.);
         final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
 
-        needAutodetect(autoStart, state.getSession(shipment));
+        setAutoDetectLocations(state.getSession(shipment), autoStart.getShippedTo());
 
         //check ignores first reading
         assertFalse(handle(new RuleContext(e, state)));
@@ -201,7 +201,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         final LocationProfile loc2 = createLocation(2., 0.);
         final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
 
-        needAutodetect(autoStart, state.getSession(shipment));
+        setAutoDetectLocations(state.getSession(shipment), autoStart.getShippedTo());
 
         //check ignores first reading
         assertFalse(handle(new RuleContext(e, state)));
@@ -234,7 +234,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         final LocationProfile loc2 = createLocation(2., 0.);
         final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
 
-        needAutodetect(autoStart, state.getSession(shipment));
+        setAutoDetectLocations(state.getSession(shipment), autoStart.getShippedTo());
 
         //check ignores first reading
         assertTrue(handle(new RuleContext(e, state)));
@@ -255,7 +255,7 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         final LocationProfile loc2 = createLocation(2., 0.);
         final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
 
-        needAutodetect(autoStart, state.getSession(shipment));
+        setAutoDetectLocations(state.getSession(shipment), autoStart.getShippedTo());
 
         //check ignores first reading
         assertTrue(handle(new RuleContext(e, state)));

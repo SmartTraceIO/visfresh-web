@@ -16,8 +16,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,11 +64,14 @@ import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.rules.AbstractRuleEngine;
+import com.visfresh.rules.AutoDetectEndLocationRule;
 import com.visfresh.rules.EtaCalculationRule;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.RuleEngine;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -273,6 +274,61 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         //check locations
         assertEquals(1, alDao.getBy(s).getInterim().size());
         assertEquals(1, eng.getInterimLocations(s).size());
+    }
+    @Test
+    public void testSaveAlternativeDesinations() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+
+        //imitate that the shipment already started and
+        //have configured autodetection data.
+        final ShipmentSessionDao sessionDao = context.getBean(ShipmentSessionDao.class);
+        ShipmentSession session = new ShipmentSession(s.getId());
+        AutoDetectEndLocationRule.setAutoDetectLocations(session, new LinkedList<>());
+        sessionDao.saveSession(session);
+
+        //add alternative locations
+        final LocationProfile l1 = createLocationProfile(true);
+        final LocationProfile l2 = createLocationProfile(true);
+
+        final List<Long> locs = new LinkedList<>();
+        locs.add(l1.getId());
+        locs.add(l2.getId());
+
+        final SaveShipmentRequest req = new SaveShipmentRequest();
+        final ShipmentDto dto = new ShipmentDto(s);
+        req.setShipment(dto);
+        dto.setEndLocationAlternatives(locs);
+
+        shipmentClient.saveShipment(req);
+
+        //check alternative locations saved
+        final AlternativeLocationsDao alDao = context.getBean(AlternativeLocationsDao.class);
+        assertEquals(2, alDao.getBy(s).getTo().size());
+
+        //check alternative locations configured in shipment session.
+        sessionDao.clearCache();
+        session = sessionDao.getSession(s);
+        assertEquals(2, AutoDetectEndLocationRule.getAutoDetectLocations(session).size());
+
+        //check interim locations
+        locs.remove(locs.size() - 1);
+        shipmentClient.saveShipment(req);
+
+        //check locations
+        assertEquals(1, alDao.getBy(s).getTo().size());
+        sessionDao.clearCache();
+        session = sessionDao.getSession(s);
+        assertEquals(1, AutoDetectEndLocationRule.getAutoDetectLocations(session).size());
+
+        //check if interims not present in request, that not then changed
+        dto.setEndLocationAlternatives(null);
+        shipmentClient.saveShipment(req);
+
+        //check locations
+        assertEquals(1, alDao.getBy(s).getTo().size());
+        sessionDao.clearCache();
+        session = sessionDao.getSession(s);
+        assertEquals(1, AutoDetectEndLocationRule.getAutoDetectLocations(session).size());
     }
     @Test
     public void testSaveShipmentOverDefaultWithExpiredEvent() throws RestServiceException, IOException {

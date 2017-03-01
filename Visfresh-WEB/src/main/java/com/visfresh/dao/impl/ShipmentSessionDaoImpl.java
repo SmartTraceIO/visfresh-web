@@ -53,6 +53,10 @@ public class ShipmentSessionDaoImpl implements ShipmentSessionDao {
     public void destroyCache() {
         cache.destroy();
     }
+    @Override
+    public void clearCache() {
+        cache.clear();
+    }
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceDao#getState(java.lang.String)

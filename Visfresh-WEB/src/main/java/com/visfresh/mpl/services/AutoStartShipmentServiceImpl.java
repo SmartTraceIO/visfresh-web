@@ -141,7 +141,7 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
         if (init != null) {
             final ShipmentSession session = getShipmentSession(shipment);
             //set autodetect end location data to shipment session
-            AutoDetectEndLocationRule.needAutodetect(init.getAutoStart(), session);
+            AutoDetectEndLocationRule.setAutoDetectLocations(session, init.getAutoStart().getShippedTo());
 
             //set up alternative locations
             final AlternativeLocations v = new AlternativeLocations();

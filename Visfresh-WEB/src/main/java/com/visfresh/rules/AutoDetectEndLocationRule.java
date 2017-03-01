@@ -17,7 +17,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
@@ -42,7 +41,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
     @Autowired
     private AbstractRuleEngine engine;
 
-    protected static class AutodetectData {
+    public static class AutodetectData {
         private int numReadings = 0;
         private Long locationId;
         private final List<LocationProfile> locations = new LinkedList<>();
@@ -178,22 +177,30 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
         shipmentDao.save(shipment);
     }
     /**
-     * @param autoStart autostart issue.
      * @param state device state.
+     * @param autoStart autostart issue.
      */
-    public static void needAutodetect(final AutoStartShipment autoStart,
-            final ShipmentSession state) {
+    public static void setAutoDetectLocations(final ShipmentSession state,
+            final List<LocationProfile> locations) {
         final AutodetectData data = new AutodetectData();
-        data.getLocations().addAll(autoStart.getShippedTo());
+        data.getLocations().addAll(locations);
 
         setAutoDetectData(state, data);
+    }
+    /**
+     * @param state shipment session.
+     * @param autodetecting location.
+     */
+    public static List<LocationProfile> getAutoDetectLocations(final ShipmentSession state) {
+        final AutodetectData data = getAutoDetectData(state);
+        return data == null ? null : data.getLocations();
     }
 
     /**
      * @param state
      * @param data
      */
-    public static void setAutoDetectData(final ShipmentSession state, final AutodetectData data) {
+    private static void setAutoDetectData(final ShipmentSession state, final AutodetectData data) {
         state.setShipmentProperty(getLocationsKey(), toJSon(data).toString());
     }
     /**
@@ -269,13 +276,20 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
      * @param context
      * @return
      */
-    public static AutodetectData getAutoDetectData(final ShipmentSession state) {
+    private static AutodetectData getAutoDetectData(final ShipmentSession state) {
         final String str = state.getShipmentProperty(getLocationsKey());
         if (str == null) {
             return null;
         }
         final AutodetectData data = parseAutodetectData(SerializerUtils.parseJson(str).getAsJsonObject());
         return data;
+    }
+    /**
+     * @param context
+     * @return
+     */
+    public static boolean hasAutoDetectData(final ShipmentSession state) {
+        return state.getShipmentProperty(getLocationsKey()) != null;
     }
 
     /**

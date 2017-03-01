@@ -21,4 +21,9 @@ public interface ShipmentSessionDao {
      * @param session shipment session.
      */
     void saveSession(ShipmentSession session);
+
+    /**
+     *
+     */
+    void clearCache();
 }
