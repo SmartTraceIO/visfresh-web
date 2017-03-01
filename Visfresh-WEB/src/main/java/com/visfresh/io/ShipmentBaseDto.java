@@ -88,6 +88,7 @@ public class ShipmentBaseDto {
      */
     private boolean isAutostart;
     private List<Long> interimLocations;
+    private List<Long> endLocationAlternatives;
 
     /**
      * Default constructor.
@@ -310,6 +311,18 @@ public class ShipmentBaseDto {
      */
     public List<Long> getInterimLocations() {
         return interimLocations;
+    }
+    /**
+     * @return the endLocationAlternatives
+     */
+    public List<Long> getEndLocationAlternatives() {
+        return endLocationAlternatives;
+    }
+    /**
+     * @param endLocationAlternatives the endLocationAlternatives to set
+     */
+    public void setEndLocationAlternatives(final List<Long> endLocationAlternatives) {
+        this.endLocationAlternatives = endLocationAlternatives;
     }
     /**
      * @return the sendArrivalReport

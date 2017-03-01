@@ -298,13 +298,6 @@ public class AbstractRuleEngineTest extends AbstractRuleEngine {
         return alternativeLocations.get(s.getId());
     }
     /* (non-Javadoc)
-     * @see com.visfresh.rules.AbstractRuleEngine#saveAlternativeLocations(com.visfresh.entities.Shipment, com.visfresh.entities.AlternativeLocations)
-     */
-    @Override
-    protected void saveAlternativeLocations(final ShipmentBase s, final AlternativeLocations v) {
-        alternativeLocations.put(s.getId(), v);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.rules.AbstractRuleEngine#getShipmentSession(com.visfresh.entities.Shipment)
      */
     @Override

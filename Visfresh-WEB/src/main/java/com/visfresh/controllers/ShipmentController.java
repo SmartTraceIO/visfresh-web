@@ -42,6 +42,7 @@ import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
@@ -86,6 +87,7 @@ import com.visfresh.l12n.ChartBundle;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.lists.ListShipmentItem;
+import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AutoStartShipmentService;
 import com.visfresh.services.LocationService;
 import com.visfresh.services.RestServiceException;
@@ -145,6 +147,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     private AutoStartShipmentService autoStartService;
     @Autowired
     private DeviceGroupDao deviceGroupDao;
+    @Autowired
+    private ShipmentSessionDao shipmentSessionDao;
 
     /**
      * Default constructor.
@@ -201,7 +205,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 id = saveNewShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
             }
 
-            saveInterimLoations(user, newShipment, req.getShipment().getInterimLocations());
+            saveAlternativeAndInterimLoations(user, newShipment,
+                    req.getShipment().getInterimLocations(),
+                    req.getShipment().getEndLocationAlternatives());
             updateInterimStops(newShipment, req.getShipment().getInterimStops());
 
             //build response
@@ -220,13 +226,24 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
     }
     /* (non-Javadoc)
-     * @see com.visfresh.controllers.AbstractShipmentBaseController#saveInterimLoations(com.visfresh.entities.ShipmentBase, java.util.Collection)
+     * @see com.visfresh.controllers.AbstractShipmentBaseController#saveInterimLoations(com.visfresh.entities.ShipmentBase, com.visfresh.entities.AlternativeLocations)
      */
     @Override
-    protected void saveInterimLoations(final ShipmentBase s,
-            final Collection<LocationProfile> locs) {
-        super.saveInterimLoations(s, locs);
-        ruleEngine.setInterimLocations(s, new LinkedList<>(locs));
+    protected void saveAlternativeLoations(final ShipmentBase s, final AlternativeLocations altLocations) {
+        super.saveAlternativeLoations(s, altLocations);
+
+        //update shipment session.
+        if (altLocations != null) {
+            ShipmentSession session = shipmentSessionDao.getSession((Shipment) s);
+            if (session == null) {
+                session = new ShipmentSession(s.getId());
+            }
+
+            ruleEngine.updateInterimLocations(session, altLocations.getInterim());
+            ruleEngine.updateAutodetectingEndLocations(session, altLocations.getTo());
+
+            shipmentSessionDao.saveSession(session);
+        }
     }
     /**
      * @param dto

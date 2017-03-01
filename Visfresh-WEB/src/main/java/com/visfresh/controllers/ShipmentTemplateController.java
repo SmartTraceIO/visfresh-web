@@ -73,7 +73,9 @@ public class ShipmentTemplateController extends AbstractShipmentBaseController i
             resolveReferences(user, dto, t);
 
             final Long id = shipmentTemplateDao.save(t).getId();
-            saveInterimLoations(user, t, dto.getInterimLocations());
+            saveAlternativeAndInterimLoations(user, t,
+                    dto.getInterimLocations(),
+                    dto.getEndLocationAlternatives());
             return createIdResponse("shipmentTemplateId", id);
         } catch (final Exception e) {
             log.error("Failed to save shipment template", e);

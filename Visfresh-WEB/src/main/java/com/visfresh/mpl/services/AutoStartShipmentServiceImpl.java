@@ -139,6 +139,11 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
 
         shipmentDao.save(shipment);
         if (init != null) {
+            final ShipmentSession session = getShipmentSession(shipment);
+            //set autodetect end location data to shipment session
+            AutoDetectEndLocationRule.needAutodetect(init.getAutoStart(), session);
+
+            //set up alternative locations
             final AlternativeLocations v = new AlternativeLocations();
             if(init.getFrom().size() > 0) {
                 final List<LocationProfile> variants = new LinkedList<>(init.getFrom());
@@ -147,12 +152,16 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
             }
 
             v.getTo().addAll(init.getAutoStart().getShippedTo());
+            v.getInterim().addAll(init.getAutoStart().getInterimStops());
 
-            if (!(v.getFrom().isEmpty() && v.getTo().isEmpty())) {
+            if (!v.isEmpty()) {
+                //update interim locations
+                if (!v.getInterim().isEmpty()) {
+                    ruleEngine.updateInterimLocations(session, v.getTo());
+                }
+
                 altLocDao.save(shipment, v);
-            }
-            if (!init.getAutoStart().getInterimStops().isEmpty()) {
-                ruleEngine.setInterimLocations(shipment, init.getAutoStart().getInterimStops());
+                shipmentSessionDao.saveSession(session);
             }
 
             shipmentDao.markAsAutostarted(shipment);
@@ -163,12 +172,6 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
             log.debug("Close old active shipment " + last.getShipmentDescription()
                     + " for device " + device.getImei());
             closeOldShipment(last);
-        }
-
-        if (init != null) {
-            final ShipmentSession session = getShipmentSession(shipment);
-            AutoDetectEndLocationRule.needAutodetect(init.getAutoStart(), session);
-            shipmentSessionDao.saveSession(session);
         }
 
         return shipment;

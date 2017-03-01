@@ -93,6 +93,10 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         shp.setShutDownAfterStartMinutes(asInteger(obj.get(ShipmentConstants.SHUTDOWN_DEVICE_AFTER_START_MINUTES)));
         shp.setCommentsForReceiver(asString(obj.get(ShipmentConstants.COMMENTS_FOR_RECEIVER)));
 
+        final JsonElement endLocs = obj.get(ShipmentConstants.END_LOCATION_ALTERNATIVES);
+        if (endLocs != null && !endLocs.isJsonNull()) {
+            shp.setEndLocationAlternatives(asLongList(endLocs));
+        }
         //TODO correct
         final JsonElement locs = obj.get(INTERIM_LOCATIONS);
         if (locs != null && !locs.isJsonNull()) {
@@ -735,7 +739,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
             //alternatives
             json.add("startLocationAlternatives", locationsToJson(dto.getStartLocationAlternatives()));
-            json.add("endLocationAlternatives", locationsToJson(dto.getEndLocationAlternatives()));
+            json.add(ShipmentConstants.END_LOCATION_ALTERNATIVES, locationsToJson(dto.getEndLocationAlternatives()));
             json.add(INTERIM_LOCATIONS, locationsToJson(dto.getInterimLocationAlternatives()));
 
             //interim stops

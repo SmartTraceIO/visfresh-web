@@ -40,4 +40,11 @@ public class AlternativeLocations {
     public List<LocationProfile> getInterim() {
         return interim;
     }
+
+    /**
+     * @return true if is empty.
+     */
+    public boolean isEmpty() {
+        return getFrom().isEmpty() && getTo().isEmpty() && getInterim().isEmpty();
+    }
 }

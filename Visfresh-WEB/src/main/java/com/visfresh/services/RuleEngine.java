@@ -10,9 +10,9 @@ import java.util.Set;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShipmentBase;
 import com.visfresh.rules.RuleContext;
 import com.visfresh.rules.TrackerEventRule;
+import com.visfresh.rules.state.ShipmentSession;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -60,11 +60,6 @@ public interface RuleEngine {
     Date getAlertsSuppressionDate(Shipment s);
     /**
      * @param s shipment.
-     * @param stops interim stop locations.
-     */
-    void setInterimLocations(ShipmentBase s, List<LocationProfile> stops);
-    /**
-     * @param s shipment.
      * @return interim locations.
      */
     List<LocationProfile> getInterimLocations(Shipment s);
@@ -72,4 +67,14 @@ public interface RuleEngine {
      * @return
      */
     Set<String> getRules();
+    /**
+     * @param session shipment session.
+     * @param interims interim locations.
+     */
+    void updateInterimLocations(ShipmentSession session, List<LocationProfile> interims);
+    /**
+     * @param session shipment session.
+     * @param to target locations.
+     */
+    void updateAutodetectingEndLocations(ShipmentSession session, List<LocationProfile> to);
 }

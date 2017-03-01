@@ -3,7 +3,6 @@
  */
 package com.visfresh.controllers;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -114,26 +113,45 @@ public abstract class AbstractShipmentBaseController extends AbstractController 
      * @param locs locations.
      * @throws RestServiceException
      */
-    protected void saveInterimLoations(final User user, final ShipmentBase s,
-            final List<Long> locs) throws RestServiceException {
-        if (locs == null) {
+    protected void saveAlternativeAndInterimLoations(final User user, final ShipmentBase s,
+            final List<Long> locs, final List<Long> alternativeEnds) throws RestServiceException {
+        if (locs == null && alternativeEnds == null) {
             return;
         }
 
-        //save interim locations
-        final Map<Long, LocationProfile> map = EntityUtils.resolveEntities(
-                locationProfileDao, new HashSet<Long>(locs));
-        checkCompanyAccess(user, map.values());
-        saveInterimLoations(s, map.values());
+        AlternativeLocations a = alternativeLocationsDao.getBy(s);
+        if (a == null && (locs != null || alternativeEnds != null)) {
+            a = new AlternativeLocations();
+        }
+
+        if (locs != null) {
+            //save interim locations
+            final Map<Long, LocationProfile> map = EntityUtils.resolveEntities(
+                    locationProfileDao, new HashSet<Long>(locs));
+            checkCompanyAccess(user, map.values());
+
+            a.getInterim().clear();
+            a.getInterim().addAll(map.values());
+        }
+        if (alternativeEnds != null) {
+            //save interim locations
+            final Map<Long, LocationProfile> map = EntityUtils.resolveEntities(
+                    locationProfileDao, new HashSet<Long>(alternativeEnds));
+            checkCompanyAccess(user, map.values());
+
+            a.getTo().clear();
+            a.getTo().addAll(map.values());
+        }
+
+        if (a != null) {
+            saveAlternativeLoations(s, a);
+        }
     }
     /**
      * @param s shipment.
      * @param values locations.
      */
-    protected void saveInterimLoations(final ShipmentBase s, final Collection<LocationProfile> values) {
-        final AlternativeLocations a = alternativeLocationsDao.getBy(s);
-        a.getInterim().clear();
-        a.getInterim().addAll(values);
+    protected void saveAlternativeLoations(final ShipmentBase s, final AlternativeLocations a) {
         alternativeLocationsDao.save(s, a);
     }
     /**

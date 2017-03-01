@@ -142,11 +142,11 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
 
         if (loc == null) {
             data.setNumReadings(0);
-            session.setShipmentProperty(getLocationsKey(), toJSon(data).toString());
+            setAutoDetectData(session, data);
         } else if (!loc.getId().equals(data.getLocationId()) || data.getNumReadings() == 0) {
             data.setNumReadings(1);
             data.setLocationId(loc.getId());
-            session.setShipmentProperty(getLocationsKey(), toJSon(data).toString());
+            setAutoDetectData(session, data);
             log.debug("Found location candidate '" + loc.getName()
                     + "' for shipment " + shipment.getId() + ". Waiting of next reading");
         } else {
@@ -186,6 +186,14 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
         final AutodetectData data = new AutodetectData();
         data.getLocations().addAll(autoStart.getShippedTo());
 
+        setAutoDetectData(state, data);
+    }
+
+    /**
+     * @param state
+     * @param data
+     */
+    public static void setAutoDetectData(final ShipmentSession state, final AutodetectData data) {
         state.setShipmentProperty(getLocationsKey(), toJSon(data).toString());
     }
     /**
@@ -261,7 +269,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
      * @param context
      * @return
      */
-    protected AutodetectData getAutoDetectData(final ShipmentSession state) {
+    public static AutodetectData getAutoDetectData(final ShipmentSession state) {
         final String str = state.getShipmentProperty(getLocationsKey());
         if (str == null) {
             return null;
@@ -275,5 +283,17 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
      */
     protected static String getLocationsKey() {
         return NAME + ".locations";
+    }
+
+    /**
+     * @param autoDetect
+     * @param to
+     */
+    public static void updateAutodetectLocations(
+            final AutodetectData autoDetect, final List<LocationProfile> to) {
+        autoDetect.setLocationId(null);
+        autoDetect.getLocations().clear();
+        autoDetect.getLocations().addAll(to);
+        autoDetect.setNumReadings(0);
     }
 }

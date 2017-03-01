@@ -43,6 +43,7 @@ import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
 import com.visfresh.io.json.InterimStopSerializer;
 import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 import com.visfresh.mpl.services.TrackerMessageDispatcher;
+import com.visfresh.rules.AutoDetectEndLocationRule.AutodetectData;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.rules.state.ShipmentSessionManager;
@@ -342,29 +343,23 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
         session.getTemperatureAlerts().getProperties().put(createProcessedKey(rule), "true");
     }
     @Override
-    public void setInterimLocations(final ShipmentBase base, final List<LocationProfile> stops) {
-        final String key = createInterimLocationsKey();
+    public void updateInterimLocations(final ShipmentSession session, final List<LocationProfile> interims) {
+        final String interimsKey = createInterimLocationsKey();
 
-        //add interims to alternative locations
-        final AlternativeLocations v = getAlternativeLocations(base);
-        v.getInterim().clear();
-        v.getInterim().addAll(stops);
-        saveAlternativeLocations(base, v);
-
+        //should override
         //save interim location
         final JsonArray array = new JsonArray();
-        for (final LocationProfile l : stops) {
+        for (final LocationProfile l : interims) {
             array.add(interimSerializer.toJson(l));
         }
 
-        if (base instanceof Shipment) {
-            final Shipment s = (Shipment) base;
-            final ShipmentSession session = getShipmentSession(s);
-            try {
-                session.setShipmentProperty(key, array.toString());
-            } finally {
-                shipmentSessionDao.saveSession(session);
-            }
+        session.setShipmentProperty(interimsKey, array.toString());
+    }
+    @Override
+    public void updateAutodetectingEndLocations(final ShipmentSession session, final List<LocationProfile> to) {
+        final AutodetectData autoDetect = AutoDetectEndLocationRule.getAutoDetectData(session);
+        if (autoDetect != null) {
+            AutoDetectEndLocationRule.updateAutodetectLocations(autoDetect, to);
         }
     }
     @Override
@@ -393,14 +388,6 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      */
     private static String createInterimLocationsKey() {
         return "InterimStop-locations";
-    }
-    /**
-     * @param s
-     * @param v
-     */
-    protected void saveAlternativeLocations(final ShipmentBase s,
-            final AlternativeLocations v) {
-        altLocDao.save(s, v);
     }
     /**
      * @param s
