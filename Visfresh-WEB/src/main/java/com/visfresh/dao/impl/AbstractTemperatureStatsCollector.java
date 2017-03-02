@@ -15,14 +15,14 @@ import com.visfresh.reports.TemperatureStats;
  *
  */
 public abstract class AbstractTemperatureStatsCollector {
-    private int n;
+    protected int n;
 
-    private double summt2 = 0;
-    private double summt = 0;
-    private double min = Double.MAX_VALUE;
-    private double max = Double.MIN_VALUE;
-    private long hotTime;
-    private long coldTime;
+    protected double summt2 = 0;
+    protected double summt = 0;
+    protected double min = Double.MAX_VALUE;
+    protected double max = Double.MIN_VALUE;
+    protected long hotTime;
+    protected long coldTime;
 
     /**
      *
@@ -61,21 +61,6 @@ public abstract class AbstractTemperatureStatsCollector {
 
         saveAsLastEvent(e);
     }
-
-    /**
-     * @param e tracer event.
-     */
-    protected abstract void saveAsLastEvent(final TrackerEvent e);
-    /**
-     * @param e tacker event.
-     * @return previous event for given tracker event.
-     */
-    protected abstract TrackerEvent getPreviousEvent(final TrackerEvent e);
-    /**
-     * @param e tracker event.
-     * @return time ranges.
-     */
-    protected abstract TimeRanges getTimeRanges(final TrackerEvent e);
     /**
      * @param e
      * @return
@@ -136,8 +121,66 @@ public abstract class AbstractTemperatureStatsCollector {
 
         return stats;
     }
+
     /**
      * @return all collected time ranges.
      */
     protected abstract Collection<TimeRanges> getCollectedTimeRanges();
+    /**
+     * @param e tracer event.
+     */
+    protected abstract void saveAsLastEvent(final TrackerEvent e);
+    /**
+     * @param e tacker event.
+     * @return previous event for given tracker event.
+     */
+    protected abstract TrackerEvent getPreviousEvent(final TrackerEvent e);
+    /**
+     * @param e tracker event.
+     * @return time ranges.
+     */
+    protected abstract TimeRanges getTimeRanges(final TrackerEvent e);
+
+    /**
+     * @return the n
+     */
+    public int getN() {
+        return n;
+    }
+    /**
+     * @return the summt2
+     */
+    public double getSummt2() {
+        return summt2;
+    }
+    /**
+     * @return the summt
+     */
+    public double getSummt() {
+        return summt;
+    }
+    /**
+     * @return the min
+     */
+    public double getMin() {
+        return min;
+    }
+    /**
+     * @return the max
+     */
+    public double getMax() {
+        return max;
+    }
+    /**
+     * @return the hotTime
+     */
+    public long getHotTime() {
+        return hotTime;
+    }
+    /**
+     * @return the coldTime
+     */
+    public long getColdTime() {
+        return coldTime;
+    }
 }

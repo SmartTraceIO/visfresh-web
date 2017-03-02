@@ -14,8 +14,8 @@ import com.visfresh.entities.TrackerEvent;
  *
  */
 public class ShipmentTemperatureStatsCollector extends AbstractTemperatureStatsCollector {
-    private TimeRanges timeRanges;
-    private TrackerEvent lastEvent;
+    protected TimeRanges timeRanges;
+    protected TrackerEvent lastEvent;
 
     /**
      * Default constructor.
@@ -59,5 +59,17 @@ public class ShipmentTemperatureStatsCollector extends AbstractTemperatureStatsC
             return new LinkedList<TimeRanges>();
         }
         return Collections.singletonList(timeRanges);
+    }
+    /**
+     * @return the lastEvent
+     */
+    public TrackerEvent getLastEvent() {
+        return lastEvent;
+    }
+    /**
+     * @return the timeRanges
+     */
+    public TimeRanges getTimeRanges() {
+        return timeRanges;
     }
 }
