@@ -1896,6 +1896,9 @@ Response:
     "customFields": {
       "field1": "value1"
     },
+    "endLocationAlternatives": [
+      2795
+    ],
     "interimLocations": [
       4735,
       4736
@@ -2596,6 +2599,9 @@ Response:
     "customFields": {
       "field1": "value1"
     },
+    "endLocationAlternatives": [
+      2795
+    ],
     "interimLocations": [
       4735,
       4736
