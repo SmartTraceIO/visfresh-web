@@ -15,7 +15,7 @@ import java.util.TimeZone;
 import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.JRException;
 
-import com.visfresh.dao.impl.TemperatureStatsCollector;
+import com.visfresh.dao.impl.AlertProfileTemperatureStatsCollector;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
@@ -139,7 +139,7 @@ public final class ShipmentReportBuilderTool {
         ap.setLowerTemperatureLimit(2);
         s.setAlertProfile(ap);
 
-        final TemperatureStatsCollector collector = new TemperatureStatsCollector();
+        final AlertProfileTemperatureStatsCollector collector = new AlertProfileTemperatureStatsCollector();
         for (final ShortTrackerEvent r : readings) {
             final TrackerEvent e = new TrackerEvent();
             e.setShipment(s);
@@ -155,7 +155,7 @@ public final class ShipmentReportBuilderTool {
             collector.processEvent(e);
         }
 
-        final TemperatureStats stats = collector.applyStatistics();
+        final TemperatureStats stats = collector.getStatistics();
         stats.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
         stats.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
         bean.setTemperatureStats(stats);

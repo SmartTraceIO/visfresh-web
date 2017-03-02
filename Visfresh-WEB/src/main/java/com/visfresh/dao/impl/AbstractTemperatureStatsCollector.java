@@ -3,11 +3,8 @@
  */
 package com.visfresh.dao.impl;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
@@ -17,11 +14,8 @@ import com.visfresh.reports.TemperatureStats;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class TemperatureStatsCollector {
+public abstract class AbstractTemperatureStatsCollector {
     private int n;
-
-    private Map<Long, TrackerEvent> lastEvents = new HashMap<>();
-    private Map<Long, TimeRanges> timeRanges = new HashMap<>();
 
     private double summt2 = 0;
     private double summt = 0;
@@ -30,12 +24,10 @@ public class TemperatureStatsCollector {
     private long hotTime;
     private long coldTime;
 
-    private TemperatureStats stats = new TemperatureStats();
-
     /**
      *
      */
-    public TemperatureStatsCollector() {
+    public AbstractTemperatureStatsCollector() {
         super();
     }
 
@@ -55,16 +47,10 @@ public class TemperatureStatsCollector {
 
         final long eventTime = e.getTime().getTime();
 
-        final Long shipmentId = shipment.getId();
-
-        TimeRanges tr = timeRanges.get(shipmentId);
-        if (tr == null) {
-            tr = new TimeRanges();
-            timeRanges.put(shipmentId, tr);
-        }
+        final TimeRanges tr = getTimeRanges(e);
         tr.addTime(eventTime);
 
-        final TrackerEvent last = lastEvents.get(shipmentId);
+        final TrackerEvent last = getPreviousEvent(e);
         if (last != null) {
             if (last.getTemperature() > shipment.getAlertProfile().getUpperTemperatureLimit()) {
                 this.hotTime += eventTime - last.getTime().getTime();
@@ -73,9 +59,23 @@ public class TemperatureStatsCollector {
             }
         }
 
-        lastEvents.put(shipmentId, e);
+        saveAsLastEvent(e);
     }
 
+    /**
+     * @param e tracer event.
+     */
+    protected abstract void saveAsLastEvent(final TrackerEvent e);
+    /**
+     * @param e tacker event.
+     * @return previous event for given tracker event.
+     */
+    protected abstract TrackerEvent getPreviousEvent(final TrackerEvent e);
+    /**
+     * @param e tracker event.
+     * @return time ranges.
+     */
+    protected abstract TimeRanges getTimeRanges(final TrackerEvent e);
     /**
      * @param e
      * @return
@@ -101,7 +101,9 @@ public class TemperatureStatsCollector {
         return false;
     }
 
-    public TemperatureStats applyStatistics() {
+    public TemperatureStats getStatistics() {
+        final TemperatureStats stats = new TemperatureStats();
+
         if (n > 0) {
             final double avg = summt / n;
             stats.setAvgTemperature(avg);
@@ -118,7 +120,7 @@ public class TemperatureStatsCollector {
             stats.setTimeBelowLowerLimit(coldTime);
 
             long totalTime = 0;
-            for (final TimeRanges tr : timeRanges.values()) {
+            for (final TimeRanges tr : getCollectedTimeRanges()) {
                 totalTime += tr.getTotalTime();
             }
             stats.setTotalTime(totalTime);
@@ -135,18 +137,7 @@ public class TemperatureStatsCollector {
         return stats;
     }
     /**
-     * @return the stats
+     * @return all collected time ranges.
      */
-    public TemperatureStats getStats() {
-        return stats;
-    }
-    /**
-     * @param stats the stats to set
-     */
-    public void setStats(final TemperatureStats stats) {
-        this.stats = stats;
-    }
-    public Set<Long> getDetectedShipments() {
-        return new HashSet<>(lastEvents.keySet());
-    }
+    protected abstract Collection<TimeRanges> getCollectedTimeRanges();
 }

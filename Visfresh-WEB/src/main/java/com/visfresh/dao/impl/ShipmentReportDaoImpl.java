@@ -204,12 +204,12 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      */
     private TemperatureStats createTemperatureStats(final AlertProfile ap,
             final List<TrackerEvent> originEvents) {
-        final TemperatureStatsCollector c = new TemperatureStatsCollector();
+        final AlertProfileTemperatureStatsCollector c = new AlertProfileTemperatureStatsCollector();
         for (final TrackerEvent e : originEvents) {
             c.processEvent(e);
         }
 
-        final TemperatureStats stats = c.applyStatistics();
+        final TemperatureStats stats = c.getStatistics();
         stats.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
         stats.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
         return stats;

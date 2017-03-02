@@ -32,7 +32,7 @@ import com.visfresh.reports.TemperatureStats;
  *
  */
 public class TemperatureStatsCollectorTest {
-    private TemperatureStatsCollector collector;
+    private AlertProfileTemperatureStatsCollector collector;
     private Device device;
     private AlertProfile alertProfile;
     private long lastId = 1l;
@@ -59,7 +59,7 @@ public class TemperatureStatsCollectorTest {
         final AlertProfile ap = createAlertProfile("JUnit");
         this.alertProfile = ap;
 
-        collector = new TemperatureStatsCollector();
+        collector = new AlertProfileTemperatureStatsCollector();
     }
     @Test
     public void testTemperatureStats() {
@@ -91,7 +91,7 @@ public class TemperatureStatsCollectorTest {
             summ += e.getTemperature();
         }
 
-        final TemperatureStats stats = collector.applyStatistics();
+        final TemperatureStats stats = collector.getStatistics();
         assertEquals(summ / events.size(), stats.getAvgTemperature(), 0.0001);
         assertEquals(-20.3, stats.getMinimumTemperature(), 0.0001);
         assertEquals(20.7, stats.getMaximumTemperature(), 0.0001);
@@ -115,7 +115,7 @@ public class TemperatureStatsCollectorTest {
             collector.processEvent(e);
         }
 
-        final TemperatureStats stats = collector.applyStatistics();
+        final TemperatureStats stats = collector.getStatistics();
         assertEquals(20.7, stats.getAvgTemperature(), 0.0001);
     }
     @Test
@@ -137,7 +137,7 @@ public class TemperatureStatsCollectorTest {
             summ += e.getTemperature();
         }
 
-        final TemperatureStats stats = collector.applyStatistics();
+        final TemperatureStats stats = collector.getStatistics();
         assertEquals(summ / events.size(), stats.getAvgTemperature(), 0.0001);
     }
     @Test
@@ -160,7 +160,7 @@ public class TemperatureStatsCollectorTest {
         }
         final double avg = summ / events.size();
 
-        final TemperatureStats stats = collector.applyStatistics();
+        final TemperatureStats stats = collector.getStatistics();
 
         //calculate SD on standard manner
         double sd = 0;

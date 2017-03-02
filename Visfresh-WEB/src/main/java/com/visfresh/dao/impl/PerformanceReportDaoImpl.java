@@ -78,8 +78,8 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
         addShipmentStats(c, startDate, endDate, statsMap, shipmentAlerts, timeAtom, location);
 
         //add collector to each alert profile
-        final Map<Long, Map<TimeRanges, TemperatureStatsCollector>> profileByTimeRangesCollectors = new HashMap<>();
-        final Map<Long, TemperatureStatsCollector> shipmentCollectors = new HashMap<>();
+        final Map<Long, Map<TimeRanges, AlertProfileTemperatureStatsCollector>> profileByTimeRangesCollectors = new HashMap<>();
+        final Map<Long, AlertProfileTemperatureStatsCollector> shipmentCollectors = new HashMap<>();
         final Map<Long, Shipment> shipmentMap = new HashMap<>();
 
         int page = 1;
@@ -97,7 +97,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
 
                     final Long alertProfileId = e.getShipment().getAlertProfile().getId();
 
-                    Map<TimeRanges, TemperatureStatsCollector> rimeRangesCollectors = profileByTimeRangesCollectors.get(alertProfileId);
+                    Map<TimeRanges, AlertProfileTemperatureStatsCollector> rimeRangesCollectors = profileByTimeRangesCollectors.get(alertProfileId);
                     if (rimeRangesCollectors == null) {
                         //add collectors map to profile/time ranges stats map
                         rimeRangesCollectors = new HashMap<>();
@@ -106,9 +106,9 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
 
                     final TimeRanges key = getRangesForDate(e.getTime(), timeRanges);
 
-                    TemperatureStatsCollector collector = rimeRangesCollectors.get(key);
+                    AlertProfileTemperatureStatsCollector collector = rimeRangesCollectors.get(key);
                     if (collector == null) {
-                        collector = new TemperatureStatsCollector();
+                        collector = new AlertProfileTemperatureStatsCollector();
                         rimeRangesCollectors.put(key, collector);
                     }
 
@@ -116,9 +116,9 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
                     collector.processEvent(e);
 
                     //shipment stats
-                    TemperatureStatsCollector sc = shipmentCollectors.get(e.getShipment().getId());
+                    AlertProfileTemperatureStatsCollector sc = shipmentCollectors.get(e.getShipment().getId());
                     if (sc == null) {
-                        sc = new TemperatureStatsCollector();
+                        sc = new AlertProfileTemperatureStatsCollector();
                         shipmentCollectors.put(e.getShipment().getId(), sc);
                     }
 
@@ -132,15 +132,15 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
         //merge alert profile stats
         for (final Map.Entry<Long, AlertProfileStats> e : statsMap.entrySet()) {
             //merge time ranges data
-            final Map<TimeRanges, TemperatureStatsCollector> timeRangesCollectors = profileByTimeRangesCollectors.get(e.getKey());
+            final Map<TimeRanges, AlertProfileTemperatureStatsCollector> timeRangesCollectors = profileByTimeRangesCollectors.get(e.getKey());
             for (final TimeRangesTemperatureStats timeRangesStats : e.getValue().getTimedData()) {
                 if (timeRangesCollectors == null) {
                     continue;
                 }
 
-                final TemperatureStatsCollector collector = timeRangesCollectors.get(timeRangesStats.getTimeRanges());
+                final AlertProfileTemperatureStatsCollector collector = timeRangesCollectors.get(timeRangesStats.getTimeRanges());
                 if (collector != null) {
-                    timeRangesStats.setTemperatureStats(collector.applyStatistics());
+                    timeRangesStats.setTemperatureStats(collector.getStatistics());
                     final int numShipments = collector.getDetectedShipments().size();
                     timeRangesStats.setNumShipments(numShipments);
 
@@ -250,12 +250,12 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
      */
     private Map<Long, TemperatureStats> getShipmentStatsForProfile(final Long alertProfileId,
             final Map<Long, Shipment> shipmentMap,
-            final Map<Long, TemperatureStatsCollector> shipmentCollectors) {
+            final Map<Long, AlertProfileTemperatureStatsCollector> shipmentCollectors) {
         final Map<Long, TemperatureStats> result = new HashMap<>();
         for (final Long id : shipmentCollectors.keySet()) {
             final Shipment s = shipmentMap.get(id);
             if (s.getAlertProfile().getId().equals(alertProfileId)) {
-                result.put(s.getId(), shipmentCollectors.get(id).applyStatistics());
+                result.put(s.getId(), shipmentCollectors.get(id).getStatistics());
             }
         }
 
