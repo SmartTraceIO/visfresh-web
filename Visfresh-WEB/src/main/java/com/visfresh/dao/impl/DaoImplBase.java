@@ -137,7 +137,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @param idFieldName ID field name.
      * @return insert.
      */
-    protected String createInsertScript(final String tableName, final List<String> fields) {
+    protected static String createInsertScript(final String tableName, final List<String> fields) {
         final StringBuilder names = new StringBuilder();
         final StringBuilder values = new StringBuilder();
 

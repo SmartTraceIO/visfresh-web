@@ -11,6 +11,7 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.gson.JsonObject;
 import com.visfresh.dao.impl.ShipmentTemperatureStatsCollector;
 import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.entities.Language;
@@ -70,7 +71,10 @@ public class ShipmentStatisticsCollectorSerializerTest {
             }
         };
 
-        collector = serializer.parseShipmentTemperatureStatsCollector(serializer.toJson(collector));
+        final JsonObject json = serializer.toJson(collector);
+        System.out.println(json);
+        System.out.println(json.toString().length());
+        collector = serializer.parseShipmentTemperatureStatsCollector(json);
 
         // time ranges
         assertEquals(ranges.getStartTime(), collector.getTimeRanges().getStartTime(), 0.001);
