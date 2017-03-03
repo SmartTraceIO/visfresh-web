@@ -4,6 +4,7 @@
 package com.visfresh.rules.state;
 
 import com.visfresh.dao.impl.ShipmentTemperatureStatsCollector;
+import com.visfresh.reports.TemperatureStats;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -167,5 +168,18 @@ public class ShipmentStatistics {
      */
     public void setCollector(final ShipmentTemperatureStatsCollector collector) {
         this.collector = collector;
+    }
+
+    /**
+     * @param ts temperature statistics
+     */
+    public void set(final TemperatureStats ts) {
+        this.setAvgTemperature(ts.getAvgTemperature());
+        this.setMaximumTemperature(ts.getMaximumTemperature());
+        this.setMinimumTemperature(ts.getMinimumTemperature());
+        this.setStandardDevitation(ts.getStandardDevitation());
+        this.setTimeAboveUpperLimit(ts.getTimeAboveUpperLimit());
+        this.setTimeBelowLowerLimit(ts.getTimeBelowLowerLimit());
+        this.setTotalTime(ts.getTotalTime());
     }
 }
