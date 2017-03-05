@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.visfresh.logs.LogUnit;
-import com.visfresh.tracker.DeviceMessage;
+import com.visfresh.model.DeviceMessage;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

@@ -22,11 +22,11 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonObject;
 import com.visfresh.jdbc.JdbcConfig;
 import com.visfresh.logs.LogUnit;
+import com.visfresh.model.DeviceMessage;
+import com.visfresh.model.Location;
 import com.visfresh.tools.ExtractedMessageHandler;
 import com.visfresh.tools.LocationProviderBuilder;
 import com.visfresh.tools.MessageExtractor;
-import com.visfresh.tracker.DeviceMessage;
-import com.visfresh.tracker.Location;
 import com.visfresh.tracker.LocationProvider;
 
 /**

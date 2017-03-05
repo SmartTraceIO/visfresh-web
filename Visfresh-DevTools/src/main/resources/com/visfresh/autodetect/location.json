@@ -1,0 +1,17 @@
+{
+	"locationId": 149,
+	"locationName": "Qantas Brisbane",
+	"companyName": "Qantas",
+	"notes": "Brisbane Qantas Flight Catering",
+	"address": "Gahnia Street, Brisbane Airport QLD 4008, Australia",
+	"location": 
+	{
+		"lat": -27.3932355,
+		"lon": 153.114098
+	},
+
+	"radiusMeters": 3000,
+	"startFlag": "N",
+	"interimFlag": "N",
+	"endFlag": "Y"
+}

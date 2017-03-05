@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import com.visfresh.model.DeviceMessage;
+import com.visfresh.model.StationSignal;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *

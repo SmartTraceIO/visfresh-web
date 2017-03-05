@@ -23,9 +23,9 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.visfresh.tracker.Location;
+import com.visfresh.model.Location;
+import com.visfresh.model.StationSignal;
 import com.visfresh.tracker.LocationProvider;
-import com.visfresh.tracker.StationSignal;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

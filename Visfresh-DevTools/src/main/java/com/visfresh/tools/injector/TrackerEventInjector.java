@@ -17,9 +17,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import com.visfresh.jdbc.JdbcConfig;
 import com.visfresh.jdbc.TrackerEventDao;
 import com.visfresh.logs.LogUnit;
+import com.visfresh.model.DeviceMessage;
 import com.visfresh.tools.ExtractedMessageHandler;
 import com.visfresh.tools.MessageExtractor;
-import com.visfresh.tracker.DeviceMessage;
 import com.visfresh.unwiredlabs.UnwiredLabsLocationService;
 
 /**

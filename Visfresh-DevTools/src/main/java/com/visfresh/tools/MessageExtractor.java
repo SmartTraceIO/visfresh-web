@@ -15,7 +15,7 @@ import java.util.Set;
 
 import com.visfresh.logs.AbstractVisfreshLogParser;
 import com.visfresh.logs.LogUnit;
-import com.visfresh.tracker.DeviceMessage;
+import com.visfresh.model.DeviceMessage;
 import com.visfresh.tracker.DeviceMessageParser;
 import com.visfresh.tracker.LocationProvider;
 

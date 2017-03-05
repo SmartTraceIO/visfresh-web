@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.tracker;
+package com.visfresh.model;
 
 import java.util.Date;
 import java.util.LinkedList;

@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.tracker;
+package com.visfresh.model;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

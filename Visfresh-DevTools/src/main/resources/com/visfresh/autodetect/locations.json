@@ -1,0 +1,109 @@
+[
+	{
+		"locationId": 57,
+		"locationName": "Scotts Xdock in Adelaide",
+		"companyName": "Scott's Refrigerated Freightways",
+		"notes": null,
+		"address": "15 Caribou Dr, Direk SA 5110, Australia",
+		"location": 
+		{
+			"lat": -34.720962530537996,
+			"lon": 138.6051155086534
+		},
+
+		"radiusMeters": 2000,
+		"startFlag": "N",
+		"interimFlag": "Y",
+		"endFlag": "Y"
+	},
+
+	{
+		"locationId": 147,
+		"locationName": "Qantas Mascot",
+		"companyName": "Qantas",
+		"notes": "Qantas Jet Base",
+		"address": "Qantas Dr, Mascot NSW 2020, Australia",
+		"location": 
+		{
+			"lat": -33.927011788282044,
+			"lon": 151.18089648524256
+		},
+
+		"radiusMeters": 2000,
+		"startFlag": "N",
+		"interimFlag": "N",
+		"endFlag": "Y"
+	},
+
+	{
+		"locationId": 148,
+		"locationName": "Qantas Melbourne",
+		"companyName": "Qantas",
+		"notes": "Q Catering Melbourne",
+		"address": "East St, Melbourne Airport VIC 3045, Australia",
+		"location": 
+		{
+			"lat": -37.66693679999999,
+			"lon": 144.8548492
+		},
+
+		"radiusMeters": 2000,
+		"startFlag": "N",
+		"interimFlag": "N",
+		"endFlag": "Y"
+	},
+
+	{
+		"locationId": 149,
+		"locationName": "Qantas Brisbane",
+		"companyName": "Qantas",
+		"notes": "Brisbane Qantas Flight Catering",
+		"address": "Gahnia Street, Brisbane Airport QLD 4008, Australia",
+		"location": 
+		{
+			"lat": -27.3932355,
+			"lon": 153.114098
+		},
+
+		"radiusMeters": 3000,
+		"startFlag": "N",
+		"interimFlag": "N",
+		"endFlag": "Y"
+	},
+
+	{
+		"locationId": 228,
+		"locationName": "Dominos Weston",
+		"companyName": "Dominos",
+		"notes": null,
+		"address": "19 Trenerry St, Weston ACT 2611, Australia",
+		"location": 
+		{
+			"lat": -35.3415452,
+			"lon": 149.05130340000005
+		},
+
+		"radiusMeters": 2000,
+		"startFlag": "N",
+		"interimFlag": "N",
+		"endFlag": "Y"
+	},
+
+	{
+		"locationId": 234,
+		"locationName": "Coles Laverton DC",
+		"companyName": "Coles",
+		"notes": null,
+		"address": "17 Distribution Dr, Truganina VIC 3029, Australia",
+		"location": 
+		{
+			"lat": -37.814919,
+			"lon": 144.76261899999997
+		},
+
+		"radiusMeters": 3000,
+		"startFlag": "N",
+		"interimFlag": "N",
+		"endFlag": "Y"
+	}
+]
