@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import com.visfresh.model.DeviceMessage;
 import com.visfresh.model.Location;
 import com.visfresh.model.LocationProfile;
 import com.visfresh.utils.LocationUtils;
+import com.visfresh.utils.ToStringer;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -30,6 +32,7 @@ import com.visfresh.utils.LocationUtils;
  */
 public class CheckAllWrongAutodetected {
     private final NamedParameterJdbcTemplate jdbc;
+    final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     /**
      * Default constructor
@@ -40,24 +43,123 @@ public class CheckAllWrongAutodetected {
     }
 
     public void run() {
+        final List<ShipmentResult> results = getShipmentStatistics();
+        printResult(results);
+    }
+
+    /**
+     * @param results
+     */
+    private void printResult(final List<ShipmentResult> origin) {
+        final List<ShipmentResult> issuesShipments = new LinkedList<>(origin);
+        final List<ShipmentResult> correctShipments = cutCorrectShipments(issuesShipments);
+
+        //print correct shipment
+        if (correctShipments.size() > 0) {
+            getLog().println("-- Correct shipments (" + correctShipments.size() + ").--");
+            for (final ShipmentResult s : correctShipments) {
+                System.out.println(s.getShipment() + ", number of locations: "
+                        + s.getLocationResults().size() + ", min distance: " + s.getMinDistance());
+            }
+        }
+
+        //print issues shipments
+        if (issuesShipments.size() > 0) {
+            getLog().println();
+            getLog().println("-- Issues shipments (" + issuesShipments.size() + ").--");
+
+            getLog().println("List of issues shipments: [" + String.join("],[",
+                getToStringList(issuesShipments, o -> o.toString())) + "]");
+            getLog().println("Exspanded shipment info:");
+
+            for (final ShipmentResult s : issuesShipments) {
+                getLog().println();
+                getLog().println("-- Shipment: " + s.getShipment() + ". Min distance: " + s.getMinDistance());
+                getLog().println("Location list: ["
+                        + String.join("],[", getToStringList(s.getLocationResults(), l -> l.getLocation().getName()))
+                        + "]");
+
+                //print expanded location info
+                for (final LocationResult lr : s.getLocationResults()) {
+                    getLog().println(lr.getLocation() + ", number of visits: "
+                            + lr.getMessagesInsideLocation().size() + ", min distance: " + lr.getMinDinstance());
+                    if (lr.getMessagesInsideLocation().size() > 0) {
+                        getLog().println("Number of events inside locations " + lr.getMessagesInsideLocation().size()
+                                + ", events in location: ");
+                        for (final DeviceMessage dm : lr.getMessagesInsideLocation()) {
+                            System.out.println(df.format(dm.getTime()) + " (" + dm.getType() + ")");
+                        }
+                    }
+                }
+
+                getLog().println();
+                getLog().println("Research result:");
+            }
+        }
+    }
+
+    /**
+     * @param issuesShipments
+     * @return
+     */
+    private List<ShipmentResult> cutCorrectShipments(final List<ShipmentResult> issuesShipments) {
+        final List<ShipmentResult> correct = new LinkedList<>();
+        final Iterator<ShipmentResult> iter = issuesShipments.iterator();
+        while (iter.hasNext()) {
+            final ShipmentResult res = iter.next();
+            if (res.getMinDistance() > 100) {
+                iter.remove();
+                correct.add(res);
+            }
+        }
+
+        return correct;
+    }
+
+    /**
+     * @param issuesShipments
+     * @return
+     */
+    private <M> List<String> getToStringList(final List<M> list, final ToStringer<M> toStringer) {
+        final List<String> toStrings = new LinkedList<>();
+        list.forEach(s -> toStrings.add(toStringer.toString(s)));
+        return toStrings;
+    }
+
+    /**
+     * The logger.
+     */
+    private PrintStream getLog() {
+        return System.out;
+    }
+
+    /**
+     * @return
+     */
+    protected List<ShipmentResult> getShipmentStatistics() {
+        final List<ShipmentResult> results = new LinkedList<>();
+
         final Set<Shipment> shipments = getAllWrongShipments();
         for (final Shipment shipment : shipments) {
-            final List<LocationProfile> locations = getAlternativeLocations(shipment.getId());
-            getOutput().println("Shipment: " + shipment);
+            final ShipmentResult result = new ShipmentResult();
+            result.setShipment(shipment);
+            results.add(result);
 
-            if (locations.isEmpty()) {
-                getOutput().println("Not found alternative locations for shipment");
-            } else {
-                //print locations
-                getOutput().println("Location list (size: " + locations.size() + "):");
-                for (final LocationProfile loc : locations) {
-                    getOutput().println(loc);
-                }
-                final List<DeviceMessage> messages = getMessages(shipment.getId());
-                doCheck(messages, locations);
+            final List<LocationProfile> locations = getAlternativeLocations(shipment.getId());
+            final List<LocationResult> lresults = new LinkedList<>();
+            result.setLocationResults(lresults);
+
+            for (final LocationProfile loc : locations) {
+                final LocationResult lr = new LocationResult();
+                lr.setLocation(loc);
+                lresults.add(lr);
             }
-            getOutput().println("------==================---------");
+
+            final List<DeviceMessage> messages = getMessages(shipment.getId());
+            result.setMessages(messages);
+            result.setMinDistance(doCheck(messages, lresults));
         }
+        return results;
     }
 
     /**
@@ -175,17 +277,17 @@ public class CheckAllWrongAutodetected {
     /**
      * @param messages
      * @param locations
+     * return global for all location minimal distance.
      */
-    private void doCheck(final List<DeviceMessage> messages, final List<LocationProfile> locations) {
-        double minDistance = Double.MAX_VALUE;
-
-        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private double doCheck(final List<DeviceMessage> messages, final List<LocationResult> locations) {
+        double globalMinDistance = Double.MAX_VALUE;
 
         final Map<LocationProfile, Integer> visitedLocations = new HashMap<>();
 
-        for (final LocationProfile location : locations) {
-            getOutput().println();
-            getOutput().println("Checking locaiton: " + location);
+        for (final LocationResult result : locations) {
+            final LocationProfile location = result.getLocation();
+
+            double minDistance = Double.MAX_VALUE;
             for (final DeviceMessage dm : messages) {
                 final Location l = dm.getLocation();
 
@@ -198,12 +300,10 @@ public class CheckAllWrongAutodetected {
 
                     minDistance = Math.min(distance, minDistance);
                     if (distance < 0.1) {
+                        result.getMessagesInsideLocation().add(dm);
                         if (!alreadyStartedPrintMessages) {
-                            System.out.println("Messages inside of end location:");
                             alreadyStartedPrintMessages = true;
                         }
-                        getOutput().println(dm.getType() + ", " + df.format(dm.getTime()) + " ("
-                                + l + "), distance: " + distance);
 
                         Integer numVisits = visitedLocations.get(location);
                         if (numVisits == null) {
@@ -213,30 +313,12 @@ public class CheckAllWrongAutodetected {
                         visitedLocations.put(location, numVisits + 1);
                     }
                 }
-//                else {
-//                    getOutput().println();
-//                    getOutput().println("Null locatiion: " + dm.getType() + ", " + df.format(dm.getTime()));
-//                }
             }
 
-            getOutput().println("Min distance for location "
-                    + location.getName() + ": " + minDistance);
+            globalMinDistance = Math.min(globalMinDistance, minDistance);
         }
 
-        getOutput().println();
-        final Set<LocationProfile> visLocsSet = visitedLocations.keySet();
-
-        getOutput().println("Number of visited locations: " + visLocsSet.size());
-        for (final LocationProfile loc : visLocsSet) {
-            getOutput().println(loc + ". Number of visits: " + visitedLocations.get(loc));
-        }
-    }
-
-    /**
-     * @return
-     */
-    protected PrintStream getOutput() {
-        return System.out;
+        return globalMinDistance;
     }
 
     public static void main(final String[] args) {
