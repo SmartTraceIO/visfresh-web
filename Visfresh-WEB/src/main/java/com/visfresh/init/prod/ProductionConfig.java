@@ -6,6 +6,7 @@ package com.visfresh.init.prod;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.visfresh.controllers.AbstractController;
 import com.visfresh.dao.impl.DaoImplBase;
@@ -30,6 +31,7 @@ import com.visfresh.services.DefaultAuthService;
         XmlResourceBundle.class,
         PdfReportBuilder.class,
         TrackerMessageDispatcher.class})
+@EnableScheduling
 @PropertySource("classpath:/app.properties")
 public class ProductionConfig {
     /**
