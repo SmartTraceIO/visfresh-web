@@ -72,7 +72,7 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
                 && event.getLongitude() != null
                 && shipment.getShippedTo() != null
                 && !shipment.hasFinalStatus()
-                && LeaveStartLocationRule.isSetLeaving(session)
+                && (LeaveStartLocationRule.isSetLeaving(session) || shipment.getShippedFrom() == null)
                 && (enteringChecker.isInControl(session)
                         || LocationUtils.isNearLocation(shipment.getShippedTo(),
                                 new Location(event.getLatitude(), event.getLongitude())));
@@ -100,7 +100,8 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
         }
 
         final TrackerEventType type = event.getType();
-        boolean isArrival = (type == TrackerEventType.STP || type == TrackerEventType.BRT);
+        boolean isArrival = (AutoDetectEndLocationRule.isAutodetected(context)
+                || type == TrackerEventType.STP || type == TrackerEventType.BRT);
         if (!isArrival) {
             isArrival = enteringChecker.handleEntered(session);
         }

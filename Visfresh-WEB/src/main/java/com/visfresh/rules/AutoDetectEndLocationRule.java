@@ -163,6 +163,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
 
             //stop check end location
             session.setShipmentProperty(getLocationsKey(), null);
+            setAutodetected(context);
             return true;
         }
 
@@ -298,7 +299,25 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
     protected static String getLocationsKey() {
         return NAME + ".locations";
     }
-
+    /**
+     * @return
+     */
+    private static String getIsAutodetectedKey() {
+        return NAME + ".isAutodetected";
+    }
+    /**
+     * @param context rule context.
+     * @return true if end location was just autodetected.
+     */
+    public static boolean isAutodetected(final RuleContext context) {
+        return Boolean.TRUE == context.getClientProperty(getIsAutodetectedKey());
+    }
+    /**
+     * @param context
+     */
+    public static void setAutodetected(final RuleContext context) {
+        context.putClientProperty(getIsAutodetectedKey(), Boolean.TRUE);
+    }
     /**
      * @param autoDetect
      * @param to

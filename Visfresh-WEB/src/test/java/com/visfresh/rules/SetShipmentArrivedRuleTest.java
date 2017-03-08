@@ -142,6 +142,26 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         assertFalse(rule.accept(new RuleContext(e, h)));
     }
     @Test
+    public void testAcceptNullStartLocation() {
+        shipment.setArrivalNotificationWithinKm(1);
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setDevice(shipment.getDevice());
+        e.setShipment(shipment);
+        e.setTime(new Date());
+        e.setType(TrackerEventType.AUT);
+
+        final RuleContext req = new RuleContext(e, createSessionHolder(false));
+
+        shipment.setShippedTo(createLocation(10., 10.));
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        //set nearest location
+        e.setLatitude(10.);
+        e.setLongitude(10.);
+        assertTrue(rule.accept(req));
+    }
+    @Test
     public void testNotAcceptNotLeavingStartLocation() {
         shipment.setArrivalNotificationWithinKm(1);
 
@@ -153,7 +173,8 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
 
         final RuleContext req = new RuleContext(e, createSessionHolder(false));
 
-        shipment.setShippedTo(createLocation());
+        shipment.setShippedFrom(createLocation(10, 10));
+        shipment.setShippedTo(createLocation(11, 11));
         context.getBean(ShipmentDao.class).save(shipment);
 
         //set nearest location
@@ -220,6 +241,28 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         context.getBean(ShipmentDao.class).save(shipment);
 
         rule.handle(new RuleContext(e, h));
+        assertEquals(ShipmentStatus.Arrived, shipment.getStatus());
+
+        assertNotNull(shipment.getArrivalDate());
+    }
+    @Test
+    public void testHandleAutodetectedImediatelly() {
+        shipment.setArrivalNotificationWithinKm(1);
+
+        final LocationProfile loc = createLocation();
+        final TrackerEvent e = createEventNearLocation(loc);
+        e.setType(TrackerEventType.AUT);
+
+        final SessionHolder h = createSessionHolder(true);
+
+        shipment.setShippedTo(loc);
+        context.getBean(ShipmentDao.class).save(shipment);
+
+        final RuleContext ctxt = new RuleContext(e, h);
+        //mark given context as autodetected
+        AutoDetectEndLocationRule.setAutodetected(ctxt);
+
+        rule.handle(ctxt);
         assertEquals(ShipmentStatus.Arrived, shipment.getStatus());
 
         assertNotNull(shipment.getArrivalDate());
@@ -402,12 +445,21 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
      * @return location.
      */
     private LocationProfile createLocation() {
+        return createLocation(10, 10);
+    }
+
+    /**
+     * @param lat
+     * @param lon
+     * @return
+     */
+    protected LocationProfile createLocation(final double lat, final double lon) {
         LocationProfile loc = new LocationProfile();
         loc.setAddress("SPb");
         loc.setCompany(company);
         loc.setName("Finish location");
-        loc.getLocation().setLatitude(10);
-        loc.getLocation().setLongitude(10);
+        loc.getLocation().setLatitude(lat);
+        loc.getLocation().setLongitude(lon);
         loc = context.getBean(LocationProfileDao.class).save(loc);
         return loc;
     }
