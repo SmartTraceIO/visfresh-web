@@ -9,7 +9,7 @@ package com.visfresh.autodetect;
  */
 public class Shipment {
     private long id;
-    private String sn;
+    private String device;
     private int tripCount;
 
     /**
@@ -35,13 +35,19 @@ public class Shipment {
      * @return the sn
      */
     public String getSn() {
-        return sn;
+        return getSerialNumber(getDevice());
     }
     /**
-     * @param sn the sn to set
+     * @param device device
      */
-    public void setSn(final String sn) {
-        this.sn = sn;
+    public void setDevice(final String device) {
+        this.device = device;
+    }
+    /**
+     * @return the device
+     */
+    public String getDevice() {
+        return device;
     }
     /**
      * @return the tripCount

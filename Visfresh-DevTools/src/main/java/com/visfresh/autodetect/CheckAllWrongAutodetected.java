@@ -74,7 +74,10 @@ public class CheckAllWrongAutodetected {
 
             for (final ShipmentResult s : issuesShipments) {
                 getLog().println();
-                getLog().println("-- Shipment: " + s.getShipment() + ". Min distance: " + s.getMinDistance());
+                getLog().println("-- Shipment: " + s.getShipment()
+                    + ", device: " + s.getShipment().getDevice()
+                    + ", min distance: " + s.getMinDistance()
+                    + ", total number of readings: " + s.getMessages().size());
                 getLog().println("Location list: ["
                         + String.join("],[", getToStringList(s.getLocationResults(), l -> l.getLocation().getName()))
                         + "]");
@@ -87,7 +90,8 @@ public class CheckAllWrongAutodetected {
                         getLog().println("Number of events inside locations " + lr.getMessagesInsideLocation().size()
                                 + ", events in location: ");
                         for (final DeviceMessage dm : lr.getMessagesInsideLocation()) {
-                            System.out.println(df.format(dm.getTime()) + " (" + dm.getType() + ")");
+                            System.out.println(df.format(dm.getTime()) + " (" + dm.getType() + ")"
+                                    + ", " + dm.getLocation());
                         }
                     }
                 }
@@ -269,7 +273,7 @@ public class CheckAllWrongAutodetected {
     private Shipment createShipment(final Map<String, Object> row) {
         final Shipment s = new Shipment();
         s.setId(((Number) row.get("id")).longValue());
-        s.setSn(Shipment.getSerialNumber((String) row.get("device")));
+        s.setDevice((String) row.get("device"));
         s.setTripCount(((Number) row.get("tripcount")).intValue());
         return s;
     }
