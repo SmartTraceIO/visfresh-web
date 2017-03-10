@@ -16,6 +16,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.rules.state.ShipmentStatistics;
+import com.visfresh.services.ShipmentStatisticsService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -29,6 +30,8 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
     private AbstractRuleEngine engine;
     @Autowired
     private ShipmentStatisticsDao dao;
+    @Autowired
+    private ShipmentStatisticsService service;
 
     /**
      * Default constructor.
@@ -39,7 +42,7 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
 
     @PostConstruct
     public final void initalize() {
-        //TODO uncomment when need working
+        //TODO uncomment after implement
 //        engine.setRule(NAME, this);
     }
 
@@ -83,9 +86,9 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
         //process event
         ShipmentStatistics stats = dao.getStatistics(s);
         if (stats == null) {
-            stats = new ShipmentStatistics();
-            //TODO recaucluate from start
-            //TODO if min/max is change at alert profile should be recauculated too
+            log.debug("Statustics for shipment " + s + " was not calculated before, will recalculated from "
+                    + "start of shipment");
+            stats = service.calculate(s);
         }
 
         stats.getCollector().processEvent(e);

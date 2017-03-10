@@ -114,6 +114,9 @@ public class OldShipmentAutoclosingThread {
     }
     @Scheduled(fixedDelay = 1 * 60 * 60 * 1000l)
     public void deleteTooLongInactiveShipments() {
+        log.debug("Deleting of too long active shipments has started");
+        int deleted = 0;
+
         final Date date = new Date(System.currentTimeMillis() - getMaxInactivityTimeOutDays() * ONE_DAY);
         final List<String> devices = dao.findDevicesWithoutReadingsAfter(date);
 
@@ -122,8 +125,10 @@ public class OldShipmentAutoclosingThread {
             for (final Map.Entry<String, List<Long>> e : deviceShipments.entrySet()) {
                 log.debug("Found active shipments (" + StringUtils.combine(e.getValue(), ",")
                     + " for device " + e.getKey() + ". Will auto closed");
-                dao.closeShipments(e.getValue());
+                deleted += dao.closeShipments(e.getValue());
             }
         }
+
+        log.debug("Deleting of too long active shipments has finished. " + deleted + " shipments have deleted");
     }
 }
