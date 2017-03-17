@@ -265,23 +265,28 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> 
         deleteFromCache(device.getImei());
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)
+     * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()
      */
     @Override
-    protected void addFilterValue(final String property, final Object value,
-            final Map<String, Object> params, final List<String> filters) {
-        if (PROPERTY_DEVICE_GROUP.equals(property)) {
-            final Long group = value instanceof DeviceGroup
-                    ? ((DeviceGroup) value).getId() : (Long) value;
-            final String key = DEFAULT_FILTER_KEY_PREFIX + "group";
+    public SelectAllSupport createSelectAllSupport() {
+        return new SelectAllSupport(getTableName()) {
+            @Override
+            protected void addFilterValue(final String property, final Object value,
+                    final Map<String, Object> params, final List<String> filters) {
+                if (PROPERTY_DEVICE_GROUP.equals(property)) {
+                    final Long group = value instanceof DeviceGroup
+                            ? ((DeviceGroup) value).getId() : (Long) value;
+                    final String key = DEFAULT_FILTER_KEY_PREFIX + "group";
 
-            filters.add(IMEI_FIELD + " in (select " + DeviceGroupDaoImpl.RELATIONS_DEVICE
-                    + " from " + DeviceGroupDaoImpl.RELATIONS_TABLE
-                    + " where `" + DeviceGroupDaoImpl.RELATIONS_GROUP + "` = :" + key + ")");
-            params.put(key, group);
-        } else {
-            super.addFilterValue(property, value, params, filters);
-        }
+                    filters.add(IMEI_FIELD + " in (select " + DeviceGroupDaoImpl.RELATIONS_DEVICE
+                            + " from " + DeviceGroupDaoImpl.RELATIONS_TABLE
+                            + " where `" + DeviceGroupDaoImpl.RELATIONS_GROUP + "` = :" + key + ")");
+                    params.put(key, group);
+                } else {
+                    super.addFilterValue(property, value, params, filters);
+                }
+            }
+        };
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceDao#getListDeviceItems(com.visfresh.entities.Company, com.visfresh.dao.Sorting, com.visfresh.dao.Page)

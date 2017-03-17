@@ -20,8 +20,6 @@ import com.visfresh.dao.DaoBase;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
-import com.visfresh.dao.Page;
-import com.visfresh.dao.Sorting;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.ShipmentBase;
@@ -175,50 +173,16 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
         map.put(COMMENTS_FIELD, s.getCommentsForReceiver());
         return map;
     }
-
     /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findAll()
+     * @see com.visfresh.dao.impl.DaoImplBase#customizeSupport(com.visfresh.dao.impl.SelectAllSupport)
      */
     @Override
-    public List<E> findAll(final Filter filter, final Sorting sorting, final Page page) {
-        final Filter f = new Filter(filter);
-        f.addFilter(ISTEMPLATE_FIELD, isTemplate());
-        return daoBaseFindAll(f, sorting, page);
-    }
-    /**
-     * @param f
-     * @param sorting
-     * @param page
-     * @return
-     */
-    protected List<E> daoBaseFindAll(final Filter f, final Sorting sorting,
-            final Page page) {
-        return super.findAll(f, sorting, page);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#getEntityCount(com.visfresh.dao.Filter)
-     */
-    @Override
-    public int getEntityCount(final Filter filter) {
-        final Filter f = new Filter(filter);
-        f.addFilter(ISTEMPLATE_FIELD, isTemplate());
-        return super.getEntityCount(f);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
-     */
-    @Override
-    public E findOne(final Long id) {
-        if (id == null) {
-            return null;
-        }
+    protected void customizeSupport(final SelectAllSupport support) {
+        super.customizeSupport(support);
 
         final Filter f = new Filter();
-        f.addFilter(ID_FIELD, id);
         f.addFilter(ISTEMPLATE_FIELD, isTemplate());
-
-        final List<E> list = findAll(f, null, null);
-        return list.size() == 0 ? null : list.get(0);
+        support.addFilter(f);
     }
     /**
      * @param ship

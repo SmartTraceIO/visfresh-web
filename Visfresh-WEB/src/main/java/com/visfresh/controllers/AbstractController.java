@@ -174,26 +174,6 @@ public abstract class AbstractController {
         }
         return user;
     }
-//    /**
-//     * @param text the resource name.
-//     * @throws RestServiceException
-//     * @throws IOException
-//     */
-//    protected JsonObject getJSonObject(final String text) throws RestServiceException {
-//        return getJSon(text).getAsJsonObject();
-//    }
-//    /**
-//     * @param text the resource name.
-//     * @throws RestServiceException
-//     * @throws IOException
-//     */
-//    protected JsonElement getJSon(final String text) throws RestServiceException {
-//        try {
-//            return SerializerUtils.parseJson(text);
-//        } catch (final Exception e) {
-//            throw new RestServiceException(ErrorCodes.INVALID_JSON, "Invalid JSON format");
-//        }
-//    }
     /**
      * @param sc sort column
      * @param so sorting order.

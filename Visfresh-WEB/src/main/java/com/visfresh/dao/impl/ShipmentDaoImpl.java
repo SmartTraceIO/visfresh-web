@@ -403,70 +403,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         return propertyToDbFields;
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.String, java.lang.Object, java.util.Map, java.util.List)
-     */
-    @Override
-    protected void addFilterValue(final String property, final Object value, final Map<String, Object> params,
-            final List<String> filters) {
-        final String defaultKey = DEFAULT_FILTER_KEY_PREFIX + property;
-
-        if (STATUS_FIELD.equals(property)) {
-            super.addFilterValue(property, value == null ? null : value.toString(), params, filters);
-        } else if (ShipmentConstants.SHIPPED_TO.equals(property)){
-            //create placeholder for 'in' operator
-            final List<String> in = new LinkedList<String>();
-            int num = 0;
-            for (final Object obj : ((List<?>) value)) {
-                final String key = defaultKey + "_" + num;
-                params.put(key, obj);
-                in.add(":" + key);
-                num++;
-            }
-
-            filters.add(TABLE + "." + SHIPPEDTO_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
-        } else if (ShipmentConstants.SHIPPED_FROM.equals(property)){
-            //create placeholder for 'in' operator
-            final List<String> in = new LinkedList<String>();
-            int num = 0;
-            for (final Object obj : ((List<?>) value)) {
-                final String key = defaultKey + "_" + num;
-                params.put(key, obj);
-                in.add(":" + key);
-                num++;
-            }
-
-            filters.add(SHIPPEDFROM_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
-        } else if (ShipmentConstants.SHIPPED_TO_DATE.equals(property)){
-            //shipped to date
-            params.put(defaultKey, value);
-            filters.add(TABLE + "." + SHIPMENTDATE_FIELD + " <= :" + defaultKey);
-        } else if (ShipmentConstants.SHIPPED_FROM_DATE.equals(property)){
-            //shipped from date
-            params.put(defaultKey, value);
-            filters.add("COALESCE(" + TABLE + "." + LASTEVENT_FIELD + "," + TABLE + "." + SHIPMENTDATE_FIELD + ") >= :" + defaultKey);
-        } else if (ShipmentConstants.SHIPMENT_DESCRIPTION.equals(property)){
-            params.put(defaultKey, "%" + value + "%");
-            filters.add(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
-        } else if (ShipmentConstants.DEVICE_SN.equals(property)){
-            filters.add(ShipmentConstants.DEVICE_SN + " = :" + defaultKey);
-        } else if (ShipmentConstants.GOODS.equals(property)){
-            params.put(defaultKey, "%" + value + "%");
-            final StringBuilder sb = new StringBuilder();
-            sb.append('(');
-            sb.append(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
-            sb.append(" or ");
-            sb.append(TABLE + "." + PALETTID_FIELD + " like :" + defaultKey);
-            sb.append(" or ");
-            sb.append(TABLE + "." + ASSETNUM_FIELD + " like :" + defaultKey);
-            sb.append(')');
-            filters.add(sb.toString());
-        } else if (ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS.equals(property)){
-            //nothing in where clause
-        } else {
-            super.addFilterValue(property, value, params, filters);
-        }
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#getBySnTrip(java.lang.String, java.lang.Integer)
      */
     @Override
@@ -514,103 +450,175 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         return null;
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#addFiltes(com.visfresh.dao.Filter, java.util.Map, java.util.List, java.util.Map)
+     * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()
      */
     @Override
-    protected void addFiltesForFindAll(final Filter filter, final Map<String, Object> params,
-            final List<String> filters) {
-        final Object value = filter.getFilter(ShipmentConstants.ONLY_WITH_ALERTS);
-        if (value != null) {
-            filter.removeFilter(ShipmentConstants.ONLY_WITH_ALERTS);
-        }
+    public SelectAllSupport createSelectAllSupport() {
+        return new SelectAllSupport(getTableName()){
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.DaoImplBase#addFiltes(com.visfresh.dao.Filter, java.util.Map, java.util.List, java.util.Map)
+             */
+            @Override
+            protected void addFiltesForFindAll(final Filter filter, final Map<String, Object> params,
+                    final List<String> filters) {
+                final Object value = filter.getFilter(ShipmentConstants.ONLY_WITH_ALERTS);
+                if (value != null) {
+                    filter.removeFilter(ShipmentConstants.ONLY_WITH_ALERTS);
+                }
 
-        super.addFiltesForFindAll(filter, params, filters);
+                super.addFiltesForFindAll(filter, params, filters);
 
-        if (Boolean.TRUE.equals(value)) {
-            filters.add("exists (select * from alerts where"
-                    + " alerts.shipment = shipments.id and alerts.type <> 'LightOn' and alerts.type <> 'LightOff')");
-        }
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
-     */
-    @Override
-    protected String buildSelectBlockForFindAll(final Filter filter) {
-        String selectAll = "select "
-            + getTableName()
-            + ".*"
-            + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6)"
-            + " as " + ShipmentConstants.DEVICE_SN
-            + " , sfrom." + LocationProfileDaoImpl.NAME_FIELD
-            + " as " + ShipmentConstants.SHIPPED_FROM_LOCATION_NAME
-            + " , sto." + LocationProfileDaoImpl.NAME_FIELD
-            + " as " + ShipmentConstants.SHIPPED_TO_LOCATION_NAME
-            + " , te.temperature"
-            + " as " + ShipmentConstants.LAST_READING_TEMPERATURE
-            + " , (select count(*) from " + AlertDaoImpl.TABLE
-            + " al where al." + AlertDaoImpl.SHIPMENT_FIELD + " = " + TABLE + "." + ID_FIELD + ")"
-            + " as " + ShipmentConstants.ALERT_SUMMARY
-            + " from " + getTableName()
-            + " left outer join " + DeviceDaoImpl.TABLE + " as d"
-            + " on " + getTableName() + "." + DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
-            + " left outer join " + LocationProfileDaoImpl.TABLE + " as sfrom"
-            + " on " + getTableName() + "." + SHIPPEDFROM_FIELD + " = sfrom." + LocationProfileDaoImpl.ID_FIELD
-            + " left outer join " + LocationProfileDaoImpl.TABLE + " as sto"
-            + " on " + getTableName() + "." + SHIPPEDTO_FIELD + " = sto." + LocationProfileDaoImpl.ID_FIELD
-            + " left outer join (select"
-            + " t." + TrackerEventDaoImpl.TEMPERATURE_FIELD + " as temperature,"
-            + " t." + TrackerEventDaoImpl.SHIPMENT_FIELD + " as shipment"
-            + " from " + TrackerEventDaoImpl.TABLE + " t"
-            + " join (select max(id) as id from " + TrackerEventDaoImpl.TABLE
-            + " group by " + TrackerEventDaoImpl.SHIPMENT_FIELD + ") t1"
-            + " on t1.id = t.id) te\n"
-            + "on te.shipment = " + getTableName() + "." + ID_FIELD + "\n";
-        if (filter != null && Boolean.TRUE.equals(filter.getFilter(ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS))) {
-            selectAll += "\njoin (select max(id) as id, device as device from shipments group by device) newest on "
-                    + TABLE + ".id = newest.id and "
-                    + TABLE + ".device = newest.device\n";
-        }
+                if (Boolean.TRUE.equals(value)) {
+                    filters.add("exists (select * from alerts where"
+                            + " alerts.shipment = shipments.id and alerts.type <> 'LightOn' and alerts.type <> 'LightOff')");
+                }
+            }
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
+             */
+            @Override
+            protected String buildSelectBlockForFindAll(final Filter filter) {
+                String selectAll = "select "
+                    + getTableName()
+                    + ".*"
+                    + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6)"
+                    + " as " + ShipmentConstants.DEVICE_SN
+                    + " , sfrom." + LocationProfileDaoImpl.NAME_FIELD
+                    + " as " + ShipmentConstants.SHIPPED_FROM_LOCATION_NAME
+                    + " , sto." + LocationProfileDaoImpl.NAME_FIELD
+                    + " as " + ShipmentConstants.SHIPPED_TO_LOCATION_NAME
+                    + " , te.temperature"
+                    + " as " + ShipmentConstants.LAST_READING_TEMPERATURE
+                    + " , (select count(*) from " + AlertDaoImpl.TABLE
+                    + " al where al." + AlertDaoImpl.SHIPMENT_FIELD + " = " + TABLE + "." + ID_FIELD + ")"
+                    + " as " + ShipmentConstants.ALERT_SUMMARY
+                    + " from " + getTableName()
+                    + " left outer join " + DeviceDaoImpl.TABLE + " as d"
+                    + " on " + getTableName() + "." + DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
+                    + " left outer join " + LocationProfileDaoImpl.TABLE + " as sfrom"
+                    + " on " + getTableName() + "." + SHIPPEDFROM_FIELD + " = sfrom." + LocationProfileDaoImpl.ID_FIELD
+                    + " left outer join " + LocationProfileDaoImpl.TABLE + " as sto"
+                    + " on " + getTableName() + "." + SHIPPEDTO_FIELD + " = sto." + LocationProfileDaoImpl.ID_FIELD
+                    + " left outer join (select"
+                    + " t." + TrackerEventDaoImpl.TEMPERATURE_FIELD + " as temperature,"
+                    + " t." + TrackerEventDaoImpl.SHIPMENT_FIELD + " as shipment"
+                    + " from " + TrackerEventDaoImpl.TABLE + " t"
+                    + " join (select max(id) as id from " + TrackerEventDaoImpl.TABLE
+                    + " group by " + TrackerEventDaoImpl.SHIPMENT_FIELD + ") t1"
+                    + " on t1.id = t.id) te\n"
+                    + "on te.shipment = " + getTableName() + "." + ID_FIELD + "\n";
+                if (filter != null && Boolean.TRUE.equals(filter.getFilter(ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS))) {
+                    selectAll += "\njoin (select max(id) as id, device as device from shipments group by device) newest on "
+                            + TABLE + ".id = newest.id and "
+                            + TABLE + ".device = newest.device\n";
+                }
 
-        return selectAll;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForEntityCount(com.visfresh.dao.Filter)
-     */
-    @Override
-    protected String buildSelectBlockForEntityCount(final Filter filter) {
-        String selectAll = super.buildSelectBlockForEntityCount(filter);
-        if (filter != null && Boolean.TRUE.equals(filter.getFilter(ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS))) {
-            selectAll += "\njoin (select max(id) as id, device as device from shipments group by device) newest on "
-                    + TABLE + ".id = newest.id and "
-                    + TABLE + ".device = newest.device\n";
-        }
-        return selectAll;
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#addSortForDbField(java.lang.String, java.util.List, boolean)
-     */
-    @Override
-    protected void addSortForDbField(final String field, final List<String> sorts,
-            final boolean isAscent) {
-        if (ShipmentConstants.DEVICE_SN.equals(field)) {
-            //also add the trip count to sort
-            super.addSortForDbField(field, sorts, isAscent);
-            super.addSortForDbField(TABLE + "." + TRIPCOUNT_FIELD, sorts, isAscent);
-        } else if (ShipmentConstants.SHIPPED_FROM_LOCATION_NAME.equals(field)){
-            super.addSortForDbField(field, sorts, isAscent);
-        } else if (ShipmentConstants.SHIPPED_TO_LOCATION_NAME.equals(field)){
-            super.addSortForDbField(field, sorts, isAscent);
-        } else if (ShipmentConstants.LAST_READING_TEMPERATURE.equals(field)){
-            super.addSortForDbField(field, sorts, isAscent);
-        } else if (ShipmentConstants.ALERT_SUMMARY.equals(field)){
-            super.addSortForDbField(field, sorts, isAscent);
-        } else if (ShipmentConstants.SHIPPED_FROM_DATE.equals(field)){
-            //shipped from date
-            super.addSortForDbField("COALESCE(" + field
-                    + "," + SHIPMENTDATE_FIELD + ")", sorts, isAscent);
-        } else {
-            super.addSortForDbField(TABLE + "." + field, sorts, isAscent);
-        }
+                return selectAll;
+            }
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForEntityCount(com.visfresh.dao.Filter)
+             */
+            @Override
+            protected String buildSelectBlockForEntityCount(final Filter filter) {
+                String selectAll = super.buildSelectBlockForEntityCount(filter);
+                if (filter != null && Boolean.TRUE.equals(filter.getFilter(ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS))) {
+                    selectAll += "\njoin (select max(id) as id, device as device from shipments group by device) newest on "
+                            + TABLE + ".id = newest.id and "
+                            + TABLE + ".device = newest.device\n";
+                }
+                return selectAll;
+            }
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.DaoImplBase#addSortForDbField(java.lang.String, java.util.List, boolean)
+             */
+            @Override
+            protected void addSortForDbField(final String field, final List<String> sorts,
+                    final boolean isAscent) {
+                if (ShipmentConstants.DEVICE_SN.equals(field)) {
+                    //also add the trip count to sort
+                    super.addSortForDbField(field, sorts, isAscent);
+                    super.addSortForDbField(TABLE + "." + TRIPCOUNT_FIELD, sorts, isAscent);
+                } else if (ShipmentConstants.SHIPPED_FROM_LOCATION_NAME.equals(field)){
+                    super.addSortForDbField(field, sorts, isAscent);
+                } else if (ShipmentConstants.SHIPPED_TO_LOCATION_NAME.equals(field)){
+                    super.addSortForDbField(field, sorts, isAscent);
+                } else if (ShipmentConstants.LAST_READING_TEMPERATURE.equals(field)){
+                    super.addSortForDbField(field, sorts, isAscent);
+                } else if (ShipmentConstants.ALERT_SUMMARY.equals(field)){
+                    super.addSortForDbField(field, sorts, isAscent);
+                } else if (ShipmentConstants.SHIPPED_FROM_DATE.equals(field)){
+                    //shipped from date
+                    super.addSortForDbField("COALESCE(" + field
+                            + "," + SHIPMENTDATE_FIELD + ")", sorts, isAscent);
+                } else {
+                    super.addSortForDbField(TABLE + "." + field, sorts, isAscent);
+                }
+            }
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.String, java.lang.Object, java.util.Map, java.util.List)
+             */
+            @Override
+            protected void addFilterValue(final String property, final Object value, final Map<String, Object> params,
+                    final List<String> filters) {
+                final String defaultKey = DEFAULT_FILTER_KEY_PREFIX + property;
+
+                if (STATUS_FIELD.equals(property)) {
+                    super.addFilterValue(property, value == null ? null : value.toString(), params, filters);
+                } else if (ShipmentConstants.SHIPPED_TO.equals(property)){
+                    //create placeholder for 'in' operator
+                    final List<String> in = new LinkedList<String>();
+                    int num = 0;
+                    for (final Object obj : ((List<?>) value)) {
+                        final String key = defaultKey + "_" + num;
+                        params.put(key, obj);
+                        in.add(":" + key);
+                        num++;
+                    }
+
+                    filters.add(TABLE + "." + SHIPPEDTO_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
+                } else if (ShipmentConstants.SHIPPED_FROM.equals(property)){
+                    //create placeholder for 'in' operator
+                    final List<String> in = new LinkedList<String>();
+                    int num = 0;
+                    for (final Object obj : ((List<?>) value)) {
+                        final String key = defaultKey + "_" + num;
+                        params.put(key, obj);
+                        in.add(":" + key);
+                        num++;
+                    }
+
+                    filters.add(SHIPPEDFROM_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
+                } else if (ShipmentConstants.SHIPPED_TO_DATE.equals(property)){
+                    //shipped to date
+                    params.put(defaultKey, value);
+                    filters.add(TABLE + "." + SHIPMENTDATE_FIELD + " <= :" + defaultKey);
+                } else if (ShipmentConstants.SHIPPED_FROM_DATE.equals(property)){
+                    //shipped from date
+                    params.put(defaultKey, value);
+                    filters.add("COALESCE(" + TABLE + "." + LASTEVENT_FIELD + "," + TABLE + "." + SHIPMENTDATE_FIELD + ") >= :" + defaultKey);
+                } else if (ShipmentConstants.SHIPMENT_DESCRIPTION.equals(property)){
+                    params.put(defaultKey, "%" + value + "%");
+                    filters.add(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
+                } else if (ShipmentConstants.DEVICE_SN.equals(property)){
+                    filters.add(ShipmentConstants.DEVICE_SN + " = :" + defaultKey);
+                } else if (ShipmentConstants.GOODS.equals(property)){
+                    params.put(defaultKey, "%" + value + "%");
+                    final StringBuilder sb = new StringBuilder();
+                    sb.append('(');
+                    sb.append(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
+                    sb.append(" or ");
+                    sb.append(TABLE + "." + PALETTID_FIELD + " like :" + defaultKey);
+                    sb.append(" or ");
+                    sb.append(TABLE + "." + ASSETNUM_FIELD + " like :" + defaultKey);
+                    sb.append(')');
+                    filters.add(sb.toString());
+                } else if (ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS.equals(property)){
+                    //nothing in where clause
+                } else {
+                    super.addFilterValue(property, value, params, filters);
+                }
+            }
+        };
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#createNewFrom(com.visfresh.entities.ShipmentTemplate)
@@ -622,10 +630,15 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         }
 
         //in fact the template and the shipment is some table.
+        final SelectAllSupport support = createSelectAllSupport();
+        support.addAliases(getPropertyToDbMap());
+
         final Filter f = new Filter();
         f.addFilter(ID_FIELD, tpl.getId());
 
-        final List<Shipment> list = daoBaseFindAll(f, null, null);
+        support.buildSelectAll(f, null, null);
+
+        final List<Shipment> list = findAll(support);
         if (!list.isEmpty()) {
             final Shipment s = list.get(0);
             s.setId(null);
@@ -667,6 +680,8 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
                 + "," + SIBLINGS_FIELD + " = :siblings"
                 + " where " + ID_FIELD + "=:s",
                 params);
+
+        deleteFromCache(s.getId());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#updateLastEventDate(com.visfresh.entities.Shipment, java.util.Date)

@@ -41,7 +41,7 @@ public class AbstractJsonSerializer {
      * @param e
      * @return
      */
-    protected double asDouble(final JsonElement e) {
+    protected static double asDouble(final JsonElement e) {
         return e == null || e.isJsonNull() ? 0 : e.getAsDouble();
     }
 
@@ -49,14 +49,14 @@ public class AbstractJsonSerializer {
      * @param e
      * @return
      */
-    protected int asInt(final JsonElement e) {
+    protected static int asInt(final JsonElement e) {
         return e == null || e.isJsonNull() ? 0 : e.getAsInt();
     }
     /**
      * @param e
      * @return
      */
-    protected Integer asInteger(final JsonElement e) {
+    protected static Integer asInteger(final JsonElement e) {
         return e == null || e.isJsonNull() ? null : e.getAsInt();
     }
 
@@ -64,7 +64,7 @@ public class AbstractJsonSerializer {
      * @param e JSON element.
      * @return JSON element as long.
      */
-    protected Long asLong(final JsonElement e) {
+    protected static Long asLong(final JsonElement e) {
         return e == null || e.isJsonNull() ? null : e.getAsLong();
     }
 
@@ -72,7 +72,7 @@ public class AbstractJsonSerializer {
      * @param e JSON element.
      * @return JSON element as string.
      */
-    protected String asString(final JsonElement e) {
+    protected static String asString(final JsonElement e) {
         return e == null || e.isJsonNull() ? null : e.getAsString();
     }
 
@@ -80,7 +80,7 @@ public class AbstractJsonSerializer {
      * @param e JSON element.
      * @return JSON element as boolean.
      */
-    protected Boolean asBoolean(final JsonElement e) {
+    protected static Boolean asBoolean(final JsonElement e) {
         return e == null || e.isJsonNull() ? null : e.getAsBoolean();
     }
 
@@ -97,11 +97,18 @@ public class AbstractJsonSerializer {
      * @return
      */
     protected String formatDate(final Date date) {
+        return formatDate(date, this.timeZone);
+    }
+    /**
+     * @param date
+     * @param t
+     * @return
+     */
+    protected String formatDate(final Date date, final TimeZone t) {
         if (date == null) {
             return null;
         }
 
-        final TimeZone t = this.timeZone;
         final SimpleDateFormat sdf = createDateFormat();
         sdf.setTimeZone(t);
         return sdf.format(date);
@@ -111,12 +118,20 @@ public class AbstractJsonSerializer {
      * @return
      */
     public Date parseDate(final String str) {
+        return parseDate(str, timeZone);
+    }
+    /**
+     * @param str
+     * @param tz
+     * @return
+     */
+    protected Date parseDate(final String str, final TimeZone tz) {
         if (str == null) {
             return null;
         }
 
         final SimpleDateFormat sdf = createDateFormat();
-        sdf.setTimeZone(timeZone);
+        sdf.setTimeZone(tz);
 
         try {
             return sdf.parse(str);
@@ -139,7 +154,7 @@ public class AbstractJsonSerializer {
      * @param array
      * @return
      */
-    protected List<Long> asLongList(final JsonArray array) {
+    protected static List<Long> asLongList(final JsonArray array) {
         final List<Long> list = new LinkedList<Long>();
         for (final JsonElement l : array) {
             list.add(l.getAsLong());
@@ -150,7 +165,7 @@ public class AbstractJsonSerializer {
      * @param e JSON elmeent.
      * @return
      */
-    protected List<Long> asLongList(final JsonElement e) {
+    protected static List<Long> asLongList(final JsonElement e) {
         if (e == null || e.isJsonNull()) {
             return null;
         }

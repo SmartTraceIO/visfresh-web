@@ -77,6 +77,7 @@ import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.TrackerEventDto;
+import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
@@ -374,7 +375,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.NormalUser);
 
-            final ShipmentSerializer ser = getSerializer(user);
+            final GetShipmentsRequestParser ser = new GetShipmentsRequestParser(user.getTimeZone());
             final GetFilteredShipmentsRequest req = ser.parseGetFilteredShipmentsRequest(request);
 
             final Integer pageIndex = req.getPageIndex();
@@ -398,9 +399,10 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             //add events data
             addKeyLocations(shipments, user);
 
+            final ShipmentSerializer shs = new ShipmentSerializer(user);
             final JsonArray array = new JsonArray();
             for (final ListShipmentItem s : shipments) {
-                array.add(ser.toJson(s));
+                array.add(shs.toJson(s));
             }
 
             return createListSuccessResponse(array, total);
@@ -714,7 +716,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     /**
      * @return
      */
-    private String[] getDefaultListShipmentsSortingOrder() {
+    public static String[] getDefaultListShipmentsSortingOrder() {
         return new String[] {
             SHIPMENT_ID,
             SHIPMENT_DATE,
@@ -736,7 +738,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         };
     }
 
-    private Filter createFilter(final GetFilteredShipmentsRequest req) {
+    public static Filter createFilter(final GetFilteredShipmentsRequest req) {
         Date shippedFrom = req.getShipmentDateFrom();
         final Date shippedTo = req.getShipmentDateTo();
 

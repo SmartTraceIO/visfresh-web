@@ -32,7 +32,6 @@ import com.visfresh.utils.StringUtils;
 @Component
 public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Serializable&Comparable<ID>>
         implements DaoBase<T, ID> {
-    protected static final String DEFAULT_FILTER_KEY_PREFIX = "filter_";
     protected int defaultCacheTimeSeconds = 3 * 60;
 
     /**
@@ -81,12 +80,12 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         final Iterator<ID> iter = ids.iterator();
         int i = 0;
         while(iter.hasNext()) {
-            keys[i] = DEFAULT_FILTER_KEY_PREFIX + "_id_" + iter.next();
+            keys[i] = SelectAllSupport.DEFAULT_FILTER_KEY_PREFIX + "_id_" + iter.next();
             i++;
         }
 
         final Filter f = new Filter();
-        f.addFilter(DEFAULT_FILTER_KEY_PREFIX + ".getAllById",
+        f.addFilter(SelectAllSupport.DEFAULT_FILTER_KEY_PREFIX + ".getAllById",
                 new SynteticFilter() {
 
                     @Override
@@ -176,86 +175,6 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         sb.append(" where " + idField + " =:").append(idField);
         return sb.toString();
     }
-    /**
-     * @param sorts
-     * @param params
-     * @param sorting
-     */
-    protected void addSortsForFindAll(final List<String> sorts, final Map<String, Object> params,
-            final Sorting sorting) {
-        final boolean isAscent = sorting.isAscentDirection();
-        for (final String property : sorting.getSortProperties()) {
-            addSortForFindAll(property, sorts, isAscent);
-        }
-    }
-
-    /**
-     * @param property property.
-     * @param sorts sorts list.
-     * @param isAscent is accent.
-     */
-    protected void addSortForFindAll(final String property,
-            final List<String> sorts,
-            final boolean isAscent) {
-        final String field = getPropertyToDbMap().get(property);
-        if (field != null) {
-            addSortForDbField(field, sorts, isAscent);
-        } else {
-            addSortForDbField(property, sorts, isAscent);
-        }
-    }
-
-    /**
-     * @param field
-     * @param sorts
-     * @param isAscent
-     */
-    protected void addSortForDbField(final String field,
-            final List<String> sorts, final boolean isAscent) {
-        sorts.add(field + (isAscent ? " asc" : " desc"));
-    }
-    /**
-     * @param filter
-     * @param params
-     * @param filters
-     */
-    protected void addFiltesForFindAll(final Filter filter, final Map<String, Object> params,
-            final List<String> filters) {
-        for (final String property : filter.getFilteredProperties()) {
-            final Object value = filter.getFilter(property);
-            addFilterValue(property, value, params, filters);
-        }
-    }
-    /**
-     * @param property property name.
-     * @param value property value.
-     * @param params parameter map.
-     * @param filters filter segments.
-     */
-    protected void addFilterValue(final String property, final Object value,
-            final Map<String, Object> params, final List<String> filters) {
-        if (!(value instanceof SynteticFilter)) {
-            final String key = DEFAULT_FILTER_KEY_PREFIX + property;
-
-            String dbFieldName = getPropertyToDbMap().get(property);
-            if (dbFieldName == null) {
-                dbFieldName = property;
-            }
-
-            params.put(key, value);
-            filters.add(getTableName() + "." + dbFieldName + "= :" + key);
-        } else {
-            final SynteticFilter sf = (SynteticFilter) value;
-            final String[] keys = sf.getKeys();
-            final Object[] values = sf.getValues();
-
-            for (int i = 0; i < keys.length; i++) {
-                params.put(keys[i], values[i]);
-            }
-
-            filters.add(sf.getFilter());
-        }
-    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
      */
@@ -291,32 +210,12 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      */
     @Override
     public int getEntityCount(final Filter filter) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        final List<String> filters = new LinkedList<String>();
+        final SelectAllSupport support = getSelectAllSupport();
+        support.buildGetCount(filter);
 
-        if (filter != null) {
-            addFiltesForFindAll(filter, params, filters);
-        }
-
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                buildSelectBlockForEntityCount(filter)
-                + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")),
-                params);
+        final List<Map<String, Object>> list = jdbc.queryForList(support.getQuery(), support.getParameters());
         return ((Number) list.get(0).get("count")).intValue();
     }
-
-    /**
-     * @param filter the filter.
-     * @return
-     */
-    protected String buildSelectBlockForEntityCount(final Filter filter) {
-        return "select count(*) as count from " + getTableName();
-    }
-
-    /**
-     * @return
-     */
-    protected abstract Map<String, String> getPropertyToDbMap();
     /**
      * @return
      */
@@ -330,25 +229,19 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @see com.visfresh.dao.DaoBase#findAll()
      */
     @Override
-    public List<T> findAll(final Filter filter, final Sorting sorting, final Page page) {
-        final Map<String, Object> params = new HashMap<String, Object>();
-        final List<String> filters = new LinkedList<String>();
-        final List<String> sorts = new LinkedList<String>();
+    public final List<T> findAll(final Filter filter, final Sorting sorting, final Page page) {
+        final SelectAllSupport support = getSelectAllSupport();
+        support.buildSelectAll(filter, sorting, page);
+        return findAll(support);
+    }
 
-        final String selectAll = buildSelectBlockForFindAll(filter);
-        if (filter != null) {
-            addFiltesForFindAll(filter, params, filters);
-        }
-        if (sorting != null) {
-            addSortsForFindAll(sorts, params, sorting);
-        }
-
-        final String sql = selectAll + (filters.size() == 0 ? "" : " where " + StringUtils.combine(filters, " and ")) + (sorts.size() == 0 ? "" : " order by " + StringUtils.combine(sorts, ",")) + (page == null ? "" : " limit "
-                + ((page.getPageNumber() - 1) * page.getPageSize())
-                + "," + page.getPageSize());
-        final List<Map<String, Object>> list = jdbc.queryForList(
-                sql,
-                params);
+    /**
+     * @param support
+     * @return
+     */
+    protected List<T> findAll(final SelectAllSupport support) {
+        final String sql = support.getQuery();
+        final List<Map<String, Object>> list = jdbc.queryForList(sql, support.getParameters());
 
         final Map<String, Object> cache = new HashMap<String, Object>();
         final List<T> result = new LinkedList<T>();
@@ -362,19 +255,36 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         return result;
     }
     /**
+     * @return
+     */
+    private SelectAllSupport getSelectAllSupport() {
+        final SelectAllSupport support = createSelectAllSupport();
+        customizeSupport(support);
+        return support;
+    }
+    /**
+     * @param support
+     */
+    protected void customizeSupport(final SelectAllSupport support) {
+        support.addAliases(getPropertyToDbMap());
+    }
+    /**
+     * @return
+     */
+    protected SelectAllSupport createSelectAllSupport() {
+        return new SelectAllSupport(getTableName());
+    }
+    /**
+     * @return
+     */
+    protected abstract Map<String, String> getPropertyToDbMap();
+
+    /**
      * @param t
      * @param map
      */
     protected void cacheEntity(final T t, final Map<String, Object> map) {
         this.cache.put(t.getId(), map);
-    }
-
-    /**
-     * @param filter the filter.
-     * @return select all string depending of filter.
-     */
-    protected String buildSelectBlockForFindAll(final Filter filter) {
-        return "select * from " + getTableName();
     }
     /**
      * @param t

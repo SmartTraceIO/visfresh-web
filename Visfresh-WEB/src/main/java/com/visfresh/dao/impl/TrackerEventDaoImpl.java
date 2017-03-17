@@ -319,16 +319,24 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         e.setDevice(device);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)
+     * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()
      */
     @Override
-    protected void addFilterValue(final String property, final Object value,
-            final Map<String, Object> params, final List<String> filters) {
-        if (value instanceof Shipment) {
-            super.addFilterValue(property, ((Shipment) value).getId(), params, filters);
-        } else {
-            super.addFilterValue(property, value, params, filters);
-        }
+    public SelectAllSupport createSelectAllSupport() {
+        return new SelectAllSupport(getTableName()){
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)
+             */
+            @Override
+            protected void addFilterValue(final String property, final Object value,
+                    final Map<String, Object> params, final List<String> filters) {
+                if (value instanceof Shipment) {
+                    super.addFilterValue(property, ((Shipment) value).getId(), params, filters);
+                } else {
+                    super.addFilterValue(property, value, params, filters);
+                }
+            }
+        };
     }
 
     /* (non-Javadoc)
@@ -375,7 +383,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
         for (final String imei : imeis) {
             final String key = "imei_" + index;
 
-            final String sql = "(" + buildSelectBlockForFindAll(null)
+            final String sql = "(select * from " + getTableName()
                     + " where " + DEVICE_FIELD + "=:" + key
                     + " order by " + ID_FIELD + " desc limit 1"
                     + ")";
@@ -471,7 +479,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
             params.put("endDate", endDate);
         }
 
-        final StringBuilder sql = new StringBuilder(buildSelectBlockForFindAll(null));
+        final StringBuilder sql = new StringBuilder("select * from " + getTableName());
         sql.append(" where " + DEVICE_FIELD + "=:device");
         if (startDate != null) {
             sql.append(" and " + TIME_FIELD + " >= :startDate");
@@ -504,7 +512,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
             params.put("location", location.getId());
         }
 
-        final StringBuilder sql = new StringBuilder(buildSelectBlockForFindAll(null));
+        final StringBuilder sql = new StringBuilder("select * from " + getTableName());
         sql.append(" join devices on devices.imei = trackerevents.device and devices.company = :company");
         sql.append(" join shipments on shipments.id = trackerevents.shipment and shipments.status = :status");
         if (location != null) {

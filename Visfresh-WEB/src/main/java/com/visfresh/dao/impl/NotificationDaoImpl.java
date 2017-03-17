@@ -140,30 +140,38 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Long> impleme
         }
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
+     * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()
      */
     @Override
-    protected String buildSelectBlockForFindAll(final Filter filter) {
-        final String table = getTableName();
-        return "select "
-                + table
-                + ".*"
-                + " from " + table
-                + " left outer join alerts"
-                + " on " + table + "." + TYPE_FIELD + "='" + NotificationType.Alert.name() + "'"
-                + " and alerts.id=" + table + "." + ISSUE_FIELD;
-    }
-    /**
-     * @return
-     */
-    @Override
-    protected String buildSelectBlockForEntityCount(final Filter filter) {
-        final String table = getTableName();
-        return "select count(*) as count"
-                + " from " + table
-                + " left outer join alerts"
-                + " on " + table + "." + TYPE_FIELD + "='" + NotificationType.Alert.name() + "'"
-                + " and alerts.id=" + table + "." + ISSUE_FIELD;
+    public SelectAllSupport createSelectAllSupport() {
+        return new SelectAllSupport(getTableName()){
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.SelectAllSupport#buildSelectBlockForFindAll(com.visfresh.dao.Filter)
+             */
+            @Override
+            protected String buildSelectBlockForFindAll(final Filter filter) {
+                final String table = getTableName();
+                return "select "
+                        + table
+                        + ".*"
+                        + " from " + table
+                        + " left outer join alerts"
+                        + " on " + table + "." + TYPE_FIELD + "='" + NotificationType.Alert.name() + "'"
+                        + " and alerts.id=" + table + "." + ISSUE_FIELD;
+            }
+            /**
+             * @return
+             */
+            @Override
+            protected String buildSelectBlockForEntityCount(final Filter filter) {
+                final String table = getTableName();
+                return "select count(*) as count"
+                        + " from " + table
+                        + " left outer join alerts"
+                        + " on " + table + "." + TYPE_FIELD + "='" + NotificationType.Alert.name() + "'"
+                        + " and alerts.id=" + table + "." + ISSUE_FIELD;
+            }
+        };
     }
     /**
      * @param user

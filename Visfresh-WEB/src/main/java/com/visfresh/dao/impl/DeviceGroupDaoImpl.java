@@ -202,21 +202,29 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
         return findAll(filter, sorting, null);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)
+     * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()
      */
     @Override
-    protected void addFilterValue(final String property, final Object value,
-            final Map<String, Object> params, final List<String> filters) {
-        if (PROPERTY_DEVICE.equals(property)) {
-            final String imei = value instanceof Device ? ((Device) value).getImei() : value.toString();
-            final String key = DEFAULT_FILTER_KEY_PREFIX + "imei";
+    public SelectAllSupport createSelectAllSupport() {
+        return new SelectAllSupport(getTableName()) {
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.SelectAllSupport#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)
+             */
+            @Override
+            protected void addFilterValue(final String property, final Object value,
+                    final Map<String, Object> params, final List<String> filters) {
+                if (PROPERTY_DEVICE.equals(property)) {
+                    final String imei = value instanceof Device ? ((Device) value).getImei() : value.toString();
+                    final String key = DEFAULT_FILTER_KEY_PREFIX + "imei";
 
-            filters.add(ID_FIELD + " in (select `" + RELATIONS_GROUP
-                    + "` from " + RELATIONS_TABLE + " where " + RELATIONS_DEVICE + " = :" + key + ")");
-            params.put(key, imei);
-        } else {
-            super.addFilterValue(property, value, params, filters);
-        }
+                    filters.add(ID_FIELD + " in (select `" + RELATIONS_GROUP
+                            + "` from " + RELATIONS_TABLE + " where " + RELATIONS_DEVICE + " = :" + key + ")");
+                    params.put(key, imei);
+                } else {
+                    super.addFilterValue(property, value, params, filters);
+                }
+            }
+        };
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceGroupDao#getShipmentGroups(java.util.Set)

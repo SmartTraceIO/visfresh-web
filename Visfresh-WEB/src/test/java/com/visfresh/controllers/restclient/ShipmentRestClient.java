@@ -17,6 +17,7 @@ import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
+import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.services.RestServiceException;
 
@@ -26,6 +27,7 @@ import com.visfresh.services.RestServiceException;
  */
 public class ShipmentRestClient extends RestClient {
     private ShipmentSerializer serializer;
+    private GetShipmentsRequestParser reqParser;
 
     /**
      *
@@ -33,6 +35,7 @@ public class ShipmentRestClient extends RestClient {
     public ShipmentRestClient(final User user) {
         super();
         this.serializer = new ShipmentSerializer(user);
+        this.reqParser = new GetShipmentsRequestParser(user.getTimeZone());
     }
     public JsonElement getSingleShipment(final Shipment shipment)
             throws IOException, RestServiceException {
@@ -164,7 +167,7 @@ public class ShipmentRestClient extends RestClient {
     public JsonArray getShipments(final GetFilteredShipmentsRequest req)
             throws IOException, RestServiceException {
         return sendPostRequest(getPathWithToken("getShipments"),
-                serializer.toJson(req)).getAsJsonArray();
+                reqParser.toJson(req)).getAsJsonArray();
     }
     /**
      * @param device
