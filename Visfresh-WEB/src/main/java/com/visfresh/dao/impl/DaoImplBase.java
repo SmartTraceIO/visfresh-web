@@ -71,13 +71,28 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @see com.visfresh.dao.DaoBase#findAll(java.util.Collection)
      */
     @Override
-    public List<T> findAll(final Collection<ID> ids) {
-        if (ids.size() == 0) {
-            return new LinkedList<T>();
+    public List<T> findAll(final Collection<ID> originIds) {
+        final List<ID> ids = new LinkedList<>(originIds);
+        final List<T> result = new LinkedList<T>();
+
+        //first of all attempt to get from cache;
+        Iterator<ID> iter = ids.iterator();
+        while (iter.hasNext()) {
+            final ID id = iter.next();
+            final T entity = getFromCache(id);
+            if (entity != null) {
+                result.add(entity);
+                iter.remove();
+            }
         }
 
+        if (ids.size() == 0) {
+            return result;
+        }
+
+        //get other from DB
         final String[] keys = new String[ids.size()];
-        final Iterator<ID> iter = ids.iterator();
+        iter = ids.iterator();
         int i = 0;
         while(iter.hasNext()) {
             keys[i] = SelectAllSupport.DEFAULT_FILTER_KEY_PREFIX + "_id_" + iter.next();
@@ -86,24 +101,25 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
 
         final Filter f = new Filter();
         f.addFilter(SelectAllSupport.DEFAULT_FILTER_KEY_PREFIX + ".getAllById",
-                new SynteticFilter() {
+            new SynteticFilter() {
 
-                    @Override
-                    public Object[] getValues() {
-                        return ids.toArray();
-                    }
-                    @Override
-                    public String[] getKeys() {
-                        return keys;
-                    }
-                    @Override
-                    public String getFilter() {
-                        return getTableName() + "." + getIdFieldName()
-                                + " in (:" + StringUtils.combine(getKeys(), ",:") + ")";
-                    }
-                });
+                @Override
+                public Object[] getValues() {
+                    return ids.toArray();
+                }
+                @Override
+                public String[] getKeys() {
+                    return keys;
+                }
+                @Override
+                public String getFilter() {
+                    return getTableName() + "." + getIdFieldName()
+                            + " in (:" + StringUtils.combine(getKeys(), ",:") + ")";
+                }
+            });
 
-        return findAll(f, null, null);
+        result.addAll(findAll(f, null, null));
+        return result;
     }
     /* (non-Javadoc)
      * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Object)
