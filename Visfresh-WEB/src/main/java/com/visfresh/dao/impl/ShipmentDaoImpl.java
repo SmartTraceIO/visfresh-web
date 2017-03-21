@@ -38,16 +38,16 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
     protected static final String TRIPCOUNT_FIELD = "tripcount";
     protected static final String PALETTID_FIELD = "palletid";
     protected static final String ASSETNUM_FIELD = "assetnum";
-    protected static final String SHIPMENTDATE_FIELD = "shipmentdate";
+    public static final String SHIPMENTDATE_FIELD = "shipmentdate";
     protected static final String START_DATE = "startdate";
     protected static final String CRETED_BY = "createdby";
-    protected static final String ARRIVALDATE_FIELD = "arrivaldate";
-    protected static final String ETA_FIELD = "eta";
+    public static final String ARRIVALDATE_FIELD = "arrivaldate";
+    public static final String ETA_FIELD = "eta";
     protected static final String CUSTOMFIELDS_FIELD = "customfiels";
-    protected static final String STATUS_FIELD = "status";
+    public static final String STATUS_FIELD = "status";
     protected static final String DEVICE_FIELD = "device";
     protected static final String SIBLINGS_FIELD = "siblings";
-    protected static final String SIBLINGCOUNT_FIELD = "siblingcount";
+    public static final String SIBLINGCOUNT_FIELD = "siblingcount";
     protected static final String ASSETTYPE_FIELD = "assettype";
     protected static final String LASTEVENT_FIELD = "lasteventdate";
     protected static final String DEVICESHUTDOWNDATE_FIELD = "deviceshutdowndate";
@@ -449,6 +449,14 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
 
         return null;
     }
+    /*
+     * Changed the visibility to public.
+     * @see com.visfresh.dao.impl.DaoImplBase#getSelectAllSupport()
+     */
+    @Override
+    public SelectAllSupport getSelectAllSupport() {
+        return super.getSelectAllSupport();
+    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()
      */
@@ -492,7 +500,11 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
                     + " , (select count(*) from " + AlertDaoImpl.TABLE
                     + " al where al." + AlertDaoImpl.SHIPMENT_FIELD + " = " + TABLE + "." + ID_FIELD + ")"
                     + " as " + ShipmentConstants.ALERT_SUMMARY
+                    + " , ap." + AlertProfileDaoImpl.UPPERTEMPLIMIT_FIELD + " as upperTemperatureLimit"
+                    + " , ap." + AlertProfileDaoImpl.LOWERTEMPLIMIT_FIELD + " as lowerTemperatureLimit"
                     + " from " + getTableName()
+                    + " left outer join " + AlertProfileDaoImpl.TABLE + " as ap"
+                    + " on " + getTableName() + "." + ALERT_FIELD + " = ap.id"
                     + " left outer join " + DeviceDaoImpl.TABLE + " as d"
                     + " on " + getTableName() + "." + DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
                     + " left outer join " + LocationProfileDaoImpl.TABLE + " as sfrom"

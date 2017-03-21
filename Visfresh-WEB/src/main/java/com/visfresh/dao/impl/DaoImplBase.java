@@ -37,7 +37,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
     /**
      * JDBC template.
      */
-    @Autowired(required = true)
+    @Autowired
     protected NamedParameterJdbcTemplate jdbc;
     private EntityCache<ID> cache;
 
@@ -273,7 +273,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
     /**
      * @return
      */
-    private SelectAllSupport getSelectAllSupport() {
+    protected SelectAllSupport getSelectAllSupport() {
         final SelectAllSupport support = createSelectAllSupport();
         customizeSupport(support);
         return support;

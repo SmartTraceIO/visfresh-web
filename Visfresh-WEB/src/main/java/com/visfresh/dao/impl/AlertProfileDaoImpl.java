@@ -40,8 +40,8 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
     private static final String ONMOVEMENTSTART_FIELD = "onmovementstart";
     private static final String ONMOVEMENTSTOP_FIELD = "onmovementstop";
     private static final String ONBATTERYLOW_FIELD = "onbatterylow";
-    private static final String UPPERTEMPLIMIT_FIELD = "uppertemplimit";
-    private static final String LOWERTEMPLIMIT_FIELD = "lowertemplimit";
+    protected static final String UPPERTEMPLIMIT_FIELD = "uppertemplimit";
+    protected static final String LOWERTEMPLIMIT_FIELD = "lowertemplimit";
     private static final String COMPANY_FIELD = "company";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();

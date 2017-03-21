@@ -10,7 +10,7 @@ import java.util.Date;
  *
  */
 public class LiteKeyLocation {
-
+    private long id;
     private double temperature;
     private Date time;
 
@@ -53,5 +53,17 @@ public class LiteKeyLocation {
      */
     public void setTime(final Date time) {
         this.time = time;
+    }
+    /**
+     * @return the id
+     */
+    public long getId() {
+        return id;
+    }
+    /**
+     * @param id the id to set
+     */
+    public void setId(final long id) {
+        this.id = id;
     }
 }
