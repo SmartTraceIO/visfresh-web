@@ -63,6 +63,52 @@ public class LiteShipmentDao {
     public LiteShipmentResult getShipments(final Company company, final Sorting sorting,
             final Filter filter, final Page page,
             final User user) {
+        final List<Map<String, Object>> list = getShipmentsDbData(company, sorting, filter, page);
+
+        //parse result to lite shipment items.
+        final LiteShipmentResult result = new LiteShipmentResult();
+
+        for (final Map<String,Object> map : list) {
+            final LiteShipment t = createLiteShipment(map);
+            result.getResult().add(t);
+        }
+
+        //add total entity count
+        result.setTotalCount(getTotalCount(company, filter));
+
+        //add key locations
+        addKeyLocations(result.getResult());
+
+        return result;
+    }
+
+    /**
+     * @param company
+     * @param filter
+     * @return
+     */
+    protected int getTotalCount(final Company company, final Filter filter) {
+        //select shipments using standard query builder
+        final SelectAllSupport support = shipmentDao.getSelectAllSupport();
+        //add company to filter
+        final Filter f = new Filter(filter);
+        if (company != null) {
+            f.addFilter("company", company.getId());
+        }
+        support.buildGetCount(f);
+
+        final List<Map<String, Object>> list = jdbc.queryForList(support.getQuery(), support.getParameters());
+        return ((Number) list.get(0).get("count")).intValue();
+    }
+
+    /**
+     * @param company
+     * @param sorting
+     * @param filter
+     * @param page
+     * @return
+     */
+    protected List<Map<String, Object>> getShipmentsDbData(final Company company, final Sorting sorting, final Filter filter, final Page page) {
         //select shipments using standard query builder
         final SelectAllSupport support = shipmentDao.getSelectAllSupport();
         //add company to filter
@@ -75,26 +121,7 @@ public class LiteShipmentDao {
         support.buildSelectAll(f, sorting, page);
 
         final String sql = support.getQuery();
-        List<Map<String, Object>> list = jdbc.queryForList(sql, support.getParameters());
-
-        //parse result to lite shipment items.
-        final LiteShipmentResult result = new LiteShipmentResult();
-
-        for (final Map<String,Object> map : list) {
-            final LiteShipment t = createLiteShipment(map);
-            result.getResult().add(t);
-        }
-
-        //add total entity count
-        support.buildGetCount(f);
-
-        list = jdbc.queryForList(support.getQuery(), support.getParameters());
-        result.setTotalCount(((Number) list.get(0).get("count")).intValue());
-
-        //add key locations
-        addKeyLocations(result.getResult());
-
-        return result;
+        return jdbc.queryForList(sql, support.getParameters());
     }
 
     /**
@@ -131,8 +158,8 @@ public class LiteShipmentDao {
     private void addKeyLocationsToShipmentPart(final List<LiteShipment> shipments) {
 
         //create set of shipment IDs.
-        final Map<Long, LiteShipment> ids = new HashMap<>();
-        shipments.forEach(s -> ids.put(s.getShipmentId(), s));
+        final Map<Long, LiteShipment> shipmentsById = new HashMap<>();
+        shipments.forEach(s -> shipmentsById.put(s.getShipmentId(), s));
 
         final int max = getMaxReadingsToProcess();
 
@@ -142,18 +169,8 @@ public class LiteShipmentDao {
         final List<LiteKeyLocation> currentKeyLocations = new LinkedList<>();
         int offset = 0;
 
-        while (ids.size() > 0) {
-            final String in = "(" + StringUtils.combine(ids.keySet(), ",") + ")";
-            final String query = "select te.id as id, te.temperature as temperature, te.time as time,"
-                    + " a.type as alertType, te.shipment as shipment from trackerevents te"
-                    + " left outer join alerts a on a.event = te.id and a.shipment"
-                    + " in "
-                    + in
-                    + " where te.shipment in "
-                    + in
-                    + " order by te.shipment, te.time, te.id limit " + offset + "," + max;
-
-            final List<Map<String, Object>> rows = jdbc.queryForList(query, new HashMap<>());
+        while (shipmentsById.size() > 0) {
+            final List<Map<String, Object>> rows = getKeyLocations(shipmentsById.keySet(), offset, max);
             for (final Map<String, Object> row : rows) {
                 final Long shipmentId = ((Number) row.get("shipment")).longValue();
 
@@ -164,14 +181,14 @@ public class LiteShipmentDao {
                         addKeyLocations(currentShipment, currentEvents, currentKeyLocations);
 
                         //remove the shipment for list of ID
-                        ids.remove(currentShipment.getShipmentId());
+                        shipmentsById.remove(currentShipment.getShipmentId());
                         currentIds.clear();
                         currentEvents.clear();
                         currentKeyLocations.clear();
 
                         //set next shipment as current shipment
                         offset = 0;
-                        currentShipment = ids.get(shipmentId);
+                        currentShipment = shipmentsById.get(shipmentId);
                     }
                 }
 
@@ -200,6 +217,24 @@ public class LiteShipmentDao {
             //collected key location info
             addKeyLocations(currentShipment, currentEvents, currentKeyLocations);
         }
+    }
+    /**
+     * @param ids
+     * @param offset
+     * @param max
+     * @return
+     */
+    protected List<Map<String, Object>> getKeyLocations(final Set<Long> ids, final int offset, final int max) {
+        final String in = "(" + StringUtils.combine(ids, ",") + ")";
+        final String query = "select te.id as id, te.temperature as temperature, te.time as time,"
+                + " a.type as alertType, te.shipment as shipment from trackerevents te"
+                + " left outer join alerts a on a.event = te.id and a.shipment"
+                + " in "
+                + in
+                + " where te.shipment in "
+                + in
+                + " order by te.shipment, te.time, te.id limit " + offset + "," + max;
+        return jdbc.queryForList(query, new HashMap<>());
     }
 
     /**
