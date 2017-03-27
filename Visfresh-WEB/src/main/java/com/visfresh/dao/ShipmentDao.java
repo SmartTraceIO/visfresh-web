@@ -6,6 +6,7 @@ package com.visfresh.dao;
 import java.util.Date;
 import java.util.List;
 
+import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
@@ -79,4 +80,8 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @return
      */
     Integer getTripCount(Long shipmentId);
+    /**
+     * @return
+     */
+    SelectAllSupport getSelectAllSupport();
 }

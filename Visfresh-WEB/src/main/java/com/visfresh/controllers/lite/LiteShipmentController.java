@@ -23,9 +23,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.controllers.AbstractController;
 import com.visfresh.controllers.ShipmentController;
-import com.visfresh.controllers.lite.dao.LiteShipmentDao;
-import com.visfresh.controllers.lite.dao.LiteShipmentResult;
 import com.visfresh.dao.Filter;
+import com.visfresh.dao.LiteShipmentDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Role;
@@ -85,7 +84,7 @@ public class LiteShipmentController extends AbstractController {
                             req.getSortOrder(),
                             ShipmentController.getDefaultListShipmentsSortingOrder(), 2),
                     filter,
-                    page, user);
+                    page);
             final List<LiteShipment> shipments = result.getResult();
             final int total = result.getTotalCount();
 

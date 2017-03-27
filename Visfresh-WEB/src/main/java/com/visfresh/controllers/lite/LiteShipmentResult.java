@@ -1,12 +1,10 @@
 /**
  *
  */
-package com.visfresh.controllers.lite.dao;
+package com.visfresh.controllers.lite;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import com.visfresh.controllers.lite.LiteShipment;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

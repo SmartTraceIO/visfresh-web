@@ -597,7 +597,7 @@ public class ShipmentReportBuilder {
 
         //Who was notified:     Rob Arpas, Rob Arpas
         final Map<String, Object> whoNotified = new HashMap<>();
-        whoNotified.put(key, "Who was notified");
+        whoNotified.put(key, "Who received report");
         whoNotified.put(value, namesAsString(bean.getWhoWasNotifiedByArrival()));
         rows.add(whoNotified);
 

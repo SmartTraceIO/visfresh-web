@@ -1,16 +1,15 @@
 /**
  *
  */
-package com.visfresh.controllers.lite.dao;
+package com.visfresh.dao.impl.lite;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -19,14 +18,16 @@ import org.springframework.stereotype.Component;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.controllers.lite.LiteKeyLocation;
 import com.visfresh.controllers.lite.LiteShipment;
+import com.visfresh.controllers.lite.LiteShipmentResult;
 import com.visfresh.dao.Filter;
+import com.visfresh.dao.LiteShipmentDao;
 import com.visfresh.dao.Page;
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.dao.impl.ShipmentDaoImpl;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.entities.User;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -34,9 +35,9 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class LiteShipmentDao {
+public class LiteShipmentDaoImpl implements LiteShipmentDao {
     @Autowired
-    private ShipmentDaoImpl shipmentDao;
+    private ShipmentDao shipmentDao;
     /**
      * JDBC template.
      */
@@ -48,7 +49,7 @@ public class LiteShipmentDao {
     /**
      * Default constructor.
      */
-    public LiteShipmentDao() {
+    public LiteShipmentDaoImpl() {
         super();
     }
 
@@ -57,12 +58,11 @@ public class LiteShipmentDao {
      * @param sorting sorting.
      * @param filter filter.
      * @param page page.
-     * @param user
      * @return
      */
+    @Override
     public LiteShipmentResult getShipments(final Company company, final Sorting sorting,
-            final Filter filter, final Page page,
-            final User user) {
+            final Filter filter, final Page page) {
         final List<Map<String, Object>> list = getShipmentsDbData(company, sorting, filter, page);
 
         //parse result to lite shipment items.
@@ -155,55 +155,33 @@ public class LiteShipmentDao {
     /**
      * @param shipments
      */
-    private void addKeyLocationsToShipmentPart(final List<LiteShipment> shipments) {
-
+    protected void addKeyLocationsToShipmentPart(final List<LiteShipment> shipments) {
         //create set of shipment IDs.
         final Map<Long, LiteShipment> shipmentsById = new HashMap<>();
         shipments.forEach(s -> shipmentsById.put(s.getShipmentId(), s));
+        final Set<Long> ids = new HashSet<>(shipmentsById.keySet());
 
         final int max = getMaxReadingsToProcess();
+        final AtomicInteger offset = new AtomicInteger();
 
-        LiteShipment currentShipment = null;
-        final Set<Long> currentIds = new HashSet<>();
-        final List<LiteKeyLocation> currentEvents = new LinkedList<>();
-        final List<LiteKeyLocation> currentKeyLocations = new LinkedList<>();
-        int offset = 0;
+        final KeyLocationsBuilder builder = new KeyLocationsBuilder();
+        builder.setListener((oldId, newId) -> {
+            ids.remove(oldId);
+            offset.set(0);
+        });
 
+        //calculate key locations for shipment group
         while (shipmentsById.size() > 0) {
-            final List<Map<String, Object>> rows = getKeyLocations(shipmentsById.keySet(), offset, max);
+            final List<Map<String, Object>> rows = getKeyLocations(ids, offset.get(), max);
             for (final Map<String, Object> row : rows) {
                 final Long shipmentId = ((Number) row.get("shipment")).longValue();
-
-                if (currentShipment == null || !currentShipment.getShipmentId().equals(shipmentId)) {
-                    if (currentShipment != null) {
-                        //add key locations to latest processed shipment using
-                        //collected key location info
-                        addKeyLocations(currentShipment, currentEvents, currentKeyLocations);
-
-                        //remove the shipment for list of ID
-                        shipmentsById.remove(currentShipment.getShipmentId());
-                        currentIds.clear();
-                        currentEvents.clear();
-                        currentKeyLocations.clear();
-
-                        //set next shipment as current shipment
-                        offset = 0;
-                        currentShipment = shipmentsById.get(shipmentId);
-                    }
-                }
-
-                //process next event
                 final Long id = ((Number) row.get("id")).longValue();
-                if (!currentIds.contains(id)) {
-                    final LiteKeyLocation loc = createKeyLocation(id, row);
-                    currentEvents.add(loc);
+                final Date time = (Date) row.get("time");
+                final double temperature = ((Number) row.get("temperature")).doubleValue();
+                final boolean hasAlerts = row.get("alertType") != null;
 
-                    //if has alerts, should be added to key locations immediately
-                    if (row.get("alertType") != null) {
-                        currentKeyLocations.add(loc);
-                    }
-                }
-                offset++;
+                builder.addNextReading(shipmentsById.get(shipmentId), id, time, temperature, hasAlerts);
+                offset.incrementAndGet();
             }
 
             //break if 0 or <max selected.
@@ -212,10 +190,9 @@ public class LiteShipmentDao {
             }
         }
 
-        if (currentShipment != null) {
-            //add key locations to latest processed shipment using
-            //collected key location info
-            addKeyLocations(currentShipment, currentEvents, currentKeyLocations);
+        //add key locations from builder to shipments
+        for (final Map.Entry<Long, List<LiteKeyLocation>> e : builder.build().entrySet()) {
+            shipmentsById.get(e.getKey()).getKeyLocations().addAll(e.getValue());
         }
     }
     /**
@@ -248,93 +225,6 @@ public class LiteShipmentDao {
      */
     public void setMaxReadingsToProcess(final int maxReadingsToProcess) {
         this.maxReadingsToProcess = maxReadingsToProcess;
-    }
-    /**
-     * @param id key location ID.
-     * @param row the DB data row.
-     * @return key location from row data.
-     */
-    private LiteKeyLocation createKeyLocation(final Long id, final Map<String, Object> row) {
-        final LiteKeyLocation loc = new LiteKeyLocation();
-        loc.setId(id);
-        loc.setTemperature(((Number) row.get("temperature")).doubleValue());
-        loc.setTime((Date) row.get("time"));
-        return loc;
-    }
-
-    /**
-     * @param shipment
-     * @param currentEvents
-     * @param currentKeyLocations
-     */
-    private void addKeyLocations(final LiteShipment shipment, final List<LiteKeyLocation> currentEvents,
-            final List<LiteKeyLocation> currentKeyLocations) {
-        final List<List<LiteKeyLocation>> groups = new LinkedList<>();
-        final int maxGroupSize = Math.max(1, currentEvents.size() / currentKeyLocations.size());
-        List<LiteKeyLocation> currentGroup = null;
-
-        for (final LiteKeyLocation e : currentEvents) {
-            if (currentKeyLocations.remove(e)) {
-                //if is already selected as key location, should create separate group for it
-                //this group will contain only one element.
-                currentGroup = new LinkedList<>();
-                groups.add(currentGroup);
-                currentGroup.add(e);
-
-                currentGroup = null;
-            } else {
-                if (currentGroup == null) {
-                    currentGroup = new LinkedList<>();
-                    groups.add(currentGroup);
-                }
-
-                currentGroup.add(e);
-                if (currentGroup.size() >= maxGroupSize) {
-                    //stop populate current group if group size is equals by
-                    //max group size.
-                    currentGroup = null;
-                }
-            }
-        }
-
-        //convert groups to key locations
-        for (final List<LiteKeyLocation> group : groups) {
-            shipment.getKeyLocations().add(getBestKeyLocation(group));
-        }
-    }
-
-    /**
-     * @param group key location group.
-     * @return best key location.
-     */
-    private LiteKeyLocation getBestKeyLocation(final List<LiteKeyLocation> group) {
-        if (group.size() == 1) {
-            return group.get(0);
-        }
-
-        //calculate avg temperature
-        double avg = 0;
-        for (final LiteKeyLocation e : group) {
-            avg += e.getTemperature();
-        }
-
-        avg /= group.size();
-
-        //select location with nearest by avg temperature
-        final Iterator<LiteKeyLocation> iter = group.iterator();
-        LiteKeyLocation loc = iter.next();
-        double min = Math.abs(loc.getTemperature() - avg);
-
-        while (iter.hasNext()) {
-            final LiteKeyLocation next = iter.next();
-            final double currentMin = Math.abs(next.getTemperature() - avg);
-            if (currentMin < min) {
-                min = currentMin;
-                loc = next;
-            }
-        }
-
-        return loc;
     }
 
     /**
