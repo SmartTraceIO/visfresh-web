@@ -65,7 +65,7 @@ public class RestClient  {
         req.put("email", email);
         req.put("password", password);
 
-        final JsonObject response = sendGetRequest(REST_SERVICE + "/login", req).getAsJsonObject();
+        final JsonObject response = sendGetRequest(getServiceUri() + "/login", req).getAsJsonObject();
         return parseAuthToken(response);
     }
 
@@ -83,7 +83,7 @@ public class RestClient  {
      * @throws IOException
      */
     public final String getToken() throws IOException, RestServiceException {
-        final JsonObject response = sendGetRequest(REST_SERVICE + "/getToken",
+        final JsonObject response = sendGetRequest(getServiceUri() + "/getToken",
                 new HashMap<String, String>()).getAsJsonObject();
         return parseAuthToken(response);
     }
@@ -111,7 +111,7 @@ public class RestClient  {
         params.put("password", newpassword);
         params.put("token", token);
 
-        sendGetRequest(REST_SERVICE + "/resetPassword", params);
+        sendGetRequest(getServiceUri() + "/resetPassword", params);
     }
     /**
      * @param email email.
@@ -124,7 +124,13 @@ public class RestClient  {
         params.put("email", email);
         params.put("baseUrl", baseUrl);
 
-        sendGetRequest(REST_SERVICE + "/forgetRequest", params);
+        sendGetRequest(getServiceUri() + "/forgetRequest", params);
+    }
+    /**
+     * @return
+     */
+    protected String getServiceUri() {
+        return REST_SERVICE;
     }
     /**
      * @param path URL path.
@@ -285,7 +291,7 @@ public class RestClient  {
      * @throws RestServiceException
      */
     public String getPathWithToken(final String methodPath) throws RestServiceException {
-        return REST_SERVICE + "/" + methodPath + "/" + getAuthToken();
+        return getServiceUri() + "/" + methodPath + "/" + getAuthToken();
     }
 
     /**

@@ -100,12 +100,12 @@ public class LiteShipmentSerializer extends AbstractJsonSerializer {
         s.setTripCount(asInt(json.get("tripCount")));
 
         s.setShipmentId(asLong(json.get("shipmentId")));
-        s.setShipmentDate(parseISO(json.get("shipmentDateISO").getAsString()));
+        s.setShipmentDate(parseISO(json.get("shipmentDateISO")));
 
         s.setShippedFrom(asString(json.get("shippedFrom")));
         s.setShippedTo(asString(json.get("shippedTo")));
-        s.setEstArrivalDate(parseISO(json.get("estArrivalDateISO").getAsString()));
-        s.setActualArrivalDate(parseISO(json.get("actualArrivalDateISO").getAsString()));
+        s.setEstArrivalDate(parseISO(json.get("estArrivalDateISO")));
+        s.setActualArrivalDate(parseISO(json.get("actualArrivalDateISO")));
         s.setPercentageComplete(asInt(json.get("percentageComplete")));
 
         s.setLowerTemperatureLimit(convertFromUnits(asInt(json.get("lowerTemperatureLimit"))));
@@ -162,7 +162,7 @@ public class LiteShipmentSerializer extends AbstractJsonSerializer {
 
         final LiteKeyLocation loc = new LiteKeyLocation();
         loc.setTemperature(convertFromUnits(asDouble(json.get("temperature"))));
-        loc.setTime(parseISO(json.get("timeISO").getAsString()));
+        loc.setTime(parseISO(json.get("timeISO")));
         return loc;
     }
     /**
@@ -190,11 +190,15 @@ public class LiteShipmentSerializer extends AbstractJsonSerializer {
      * @param str date string.
      * @return date.
      */
-    private Date parseISO(final String str) {
+    private Date parseISO(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
         try {
-            return isoFormat.parse(str);
-        } catch (final ParseException e) {
-            throw new RuntimeException(e);
+            return isoFormat.parse(e.getAsString());
+        } catch (final ParseException exc) {
+            throw new RuntimeException(exc);
         }
     }
     /**
