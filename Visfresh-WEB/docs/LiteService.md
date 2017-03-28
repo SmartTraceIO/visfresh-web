@@ -28,15 +28,15 @@ In case of error the “response” element of JSON response is absent.
 ### Lite methods.
 # User should be authorized using REST service. See RestService.md document#
 
-1. [Get Shipments](#markdown-header-get-shipments-example) 
+1. [Get Shipments](#markdown-header-get-shipments) 
 
 ## Special Request objects ##
 1. [Get Shipments filter](#markdown-header-get-shipments-filter)
 
 ### Get Shipments ###
 Method *POST*, method name getShipments, request body [Get Shipments filter](#markdown-header-get-shipments-filter)  
-Returns array of [Shipment List items](#markdown-header-shipment-list-item) and total items count,
-it is not same as [Shipment Object](#markdown-header-shipment).  
+Returns array of Lite shipment items and total items count,
+it is not same as shipment object.  
 [(example)](#markdown-header-get-shipments-example)
 
 ## Objects
@@ -90,7 +90,7 @@ see [ResponseStatus](#markdown-header-response-status)
 
 ## Examples ##
 ### Get Shipments example ###
-**POST /vf/lite/getShipments/64-6b0f1687e59aa11bb2bf6afc14a8aece**  
+**POST /vf/lite/getShipments/${accessToken}**  
 **Request:**  
 ```json
 {
