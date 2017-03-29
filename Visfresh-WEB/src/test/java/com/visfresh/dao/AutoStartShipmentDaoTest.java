@@ -250,6 +250,43 @@ public class AutoStartShipmentDaoTest extends
         assertEquals(a2.getId(), all.get(1).getId());
     }
     @Test
+    public void testLocationDuplicates() {
+        final ShipmentTemplate tpl = createTemplate();
+        final AutoStartShipment auto1 = dao.save(createAutoStart(tpl));
+        final AutoStartShipment auto2 = dao.save(createAutoStart(tpl));
+
+        final LocationProfile a = createLocation("A");
+        final LocationProfile b = createLocation("B");
+        final LocationProfile c = createLocation("C");
+        final LocationProfile e = createLocation("E");
+
+        //a1
+        auto1.getShippedFrom().clear();
+        auto1.getShippedTo().clear();
+        auto1.getShippedFrom().add(c);
+        auto1.getShippedTo().add(a);
+        auto1.getShippedTo().add(b);
+
+        dao.save(auto1);
+
+        //a2
+        auto2.getShippedFrom().clear();
+        auto2.getShippedTo().clear();
+        auto2.getShippedFrom().add(e);
+        auto2.getShippedTo().add(a);
+        auto2.getShippedTo().add(b);
+
+        dao.save(auto2);
+
+        //run test
+        final List<AutoStartShipment> all = dao.findAll(null,
+                new Sorting(true, AutoStartShipmentConstants.START_LOCATIONS), null);
+
+        //just check correct loaded
+        assertEquals(auto1.getId(), all.get(0).getId());
+        assertEquals(auto2.getId(), all.get(1).getId());
+    }
+    @Test
     public void testSortByAlertProfileName() {
         final AlertProfile ap1 = createAlertProfile("A");
         final AlertProfile ap2 = createAlertProfile("B");

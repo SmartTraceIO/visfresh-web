@@ -30,6 +30,7 @@ import com.visfresh.rules.AutoDetectEndLocationRule;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AutoStartShipmentService;
 import com.visfresh.utils.DateTimeUtils;
+import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocationUtils;
 
 /**
@@ -157,7 +158,7 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
             if (!v.isEmpty()) {
                 //update interim locations
                 if (!v.getInterim().isEmpty()) {
-                    ruleEngine.updateInterimLocations(session, v.getTo());
+                    ruleEngine.updateInterimLocations(session, v.getInterim());
                 }
 
                 altLocDao.save(shipment, v);
@@ -214,7 +215,7 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
             //if found autostart with given ID.
             if (auto != null) {
                 return getFromTemplate(auto,
-                        getSortedMatchedLocations(auto, latitude, longitude),
+                        getSortedMatchedStartLocations(auto, latitude, longitude),
                         device);
             }
         }
@@ -223,7 +224,7 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
         //old schema
         for (final AutoStartShipment auto : autoStarts) {
             //if autostart not assigned to device or assigned to given device
-            final List<LocationProfile> best = getSortedMatchedLocations(auto, latitude, longitude);
+            final List<LocationProfile> best = getSortedMatchedStartLocations(auto, latitude, longitude);
             if (!best.isEmpty()) {
                 return getFromTemplate(auto, best, device);
             }
@@ -294,7 +295,7 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
      * @param auto
      * @return
      */
-    private List<LocationProfile> getSortedMatchedLocations(final AutoStartShipment auto,
+    private List<LocationProfile> getSortedMatchedStartLocations(final AutoStartShipment auto,
             final Double latitude,
             final Double longitude) {
         if (latitude == null || longitude == null) {
@@ -304,7 +305,8 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
         //get all available location profiles.
         final List<LocationProfile> profiles = new LinkedList<LocationProfile>();
         profiles.addAll(auto.getShippedFrom());
-        if (auto.getTemplate().getShippedFrom() != null) {
+        if (auto.getTemplate().getShippedFrom() != null
+                && !contains(profiles, auto.getTemplate().getShippedFrom())) {
             profiles.add(auto.getTemplate().getShippedFrom());
         }
 
@@ -344,6 +346,15 @@ public class AutoStartShipmentServiceImpl implements AutoStartShipmentService {
 
         return matches;
     }
+    /**
+     * @param list
+     * @param l
+     * @return
+     */
+    private boolean contains(final List<LocationProfile> list, final LocationProfile l) {
+        return l != null && EntityUtils.getEntity(list, l.getId()) != null;
+    }
+
     /**
      * @param shipment
      */

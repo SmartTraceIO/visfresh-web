@@ -80,9 +80,9 @@ public class VisfreshRuleEngine extends AbstractRuleEngine {
                     log.error("Fatal rulle processing error", e);
                     try {
                         emailer.sendMessageToSupport("Fatal rule processing error: " + e.getMessage(),
-                                StringUtils.getSteackTrace(e));
+                                StringUtils.getSteackTrace(e, 10) + "\n...");
                     } catch (final MessagingException e1) {
-                        e1.printStackTrace();
+                        log.error("Failed to send message to support", e1);
                     }
                 }
             }

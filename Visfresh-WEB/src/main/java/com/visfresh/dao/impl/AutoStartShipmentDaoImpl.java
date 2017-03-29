@@ -6,10 +6,12 @@ package com.visfresh.dao.impl;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -291,7 +293,7 @@ public class AutoStartShipmentDaoImpl
         getLocationIds(t, locFrom, locTo, locInterim);
 
         //get locations
-        final List<Long> locationIds = new LinkedList<>();
+        final Set<Long> locationIds = new HashSet<>();
         locationIds.addAll(locFrom);
         locationIds.addAll(locTo);
         locationIds.addAll(locInterim);

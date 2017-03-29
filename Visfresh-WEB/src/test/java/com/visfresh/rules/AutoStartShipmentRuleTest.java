@@ -9,8 +9,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.junit.Before;
@@ -40,7 +38,6 @@ import com.visfresh.rules.state.ShipmentSession;
 public class AutoStartShipmentRuleTest extends BaseRuleTest {
     private TrackerEventRule rule;
     private Device device;
-    private DateFormat fmt = new SimpleDateFormat("yyyyMMddHHmm");
 
     /**
      * Default constructor.
@@ -119,7 +116,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
 
         Shipment shipment = shipmentDao.findOne(shipmentId);
         assertNotNull(shipment);
-        assertEquals(fmt.format(e.getTime()), fmt.format(shipment.getShipmentDate()));
+        assertTrue(e.getTime().getTime() - shipment.getShipmentDate().getTime() < 60000l);
 
         // check not duplicate handle
         assertFalse(rule.accept(c));
@@ -135,7 +132,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         shipment = shipmentDao.findOne(e.getShipment().getId());
         assertTrue(!shipmentId.equals(shipment.getId()));
         assertTrue(old.getTripCount() < shipment.getTripCount());
-        assertEquals(fmt.format(e.getTime()), fmt.format(shipment.getShipmentDate()));
+        assertTrue(e.getTime().getTime() - shipment.getShipmentDate().getTime() < 60000l);
     }
     @Test
     public void testHandleNullLocation() {
@@ -152,7 +149,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
 
         Shipment shipment = shipmentDao.findOne(shipmentId);
         assertNotNull(shipment);
-        assertEquals(fmt.format(e.getTime()), fmt.format(shipment.getShipmentDate()));
+        assertTrue(e.getTime().getTime() - shipment.getShipmentDate().getTime() < 60000l);
 
         // check not duplicate handle
         assertFalse(rule.accept(c));
@@ -168,7 +165,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         shipment = shipmentDao.findOne(e.getShipment().getId());
         assertTrue(!shipmentId.equals(shipment.getId()));
         assertTrue(old.getTripCount() < shipment.getTripCount());
-        assertEquals(fmt.format(e.getTime()), fmt.format(shipment.getShipmentDate()));
+        assertTrue(e.getTime().getTime() - shipment.getShipmentDate().getTime() < 60000l);
     }
 
     @Test
@@ -201,7 +198,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         Shipment shipment = shipmentDao.findOne(shipmentId);
         assertTrue(shipment.isAutostart());
         assertNotNull(shipment);
-        assertEquals(fmt.format(e.getTime()), fmt.format(shipment.getShipmentDate()));
+        assertTrue(e.getTime().getTime() - shipment.getShipmentDate().getTime() < 60000l);
         // check correct start location selected.
         assertEquals(lok.getId(), shipment.getShippedFrom().getId());
         // check created from correct template
@@ -222,7 +219,32 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         shipment = shipmentDao.findOne(e.getShipment().getId());
         assertTrue(!shipmentId.equals(shipment.getId()));
         assertTrue(old.getTripCount() < shipment.getTripCount());
-        assertEquals(fmt.format(e.getTime()), fmt.format(shipment.getShipmentDate()));
+        assertTrue(e.getTime().getTime() - shipment.getShipmentDate().getTime() < 60000l);
+    }
+    @Test
+    public void testSelectAutoStartShipmentLocFromDuplicates() {
+        // create locations
+        final LocationProfile loc = createLocationProfile(2, 2, 1000);
+
+        // create shipment templates
+        final ShipmentTemplate tpl = createTemplate("t1");
+        tpl.setShippedFrom(loc);
+        tpl.setShippedTo(loc);
+        context.getBean(ShipmentTemplateDao.class).save(tpl);
+
+        // create auto start shipments
+        final AutoStartShipment a1 = createAutoStartShipment(tpl, 1000, loc);
+        a1.getShippedTo().add(loc);
+        context.getBean(AutoStartShipmentDao.class).save(a1);
+
+        final TrackerEvent e = createEvent(17.14, 18.16, new Date());
+
+        final RuleContext c = new RuleContext(e, new SessionHolder());
+        //handle and check not exception
+        rule.handle(c);
+
+        // check shipment created.
+        assertNotNull(e.getShipment());
     }
     @Test
     public void testSelectAutoStartShipmentWithBadLocations() {
@@ -250,7 +272,7 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
 
         final Shipment s = shipmentDao.findOne(shipmentId);
         assertNotNull(s);
-        assertEquals(fmt.format(e.getTime()), fmt.format(s.getShipmentDate()));
+        assertTrue(e.getTime().getTime() - s.getShipmentDate().getTime() < 60000l);
         // check correct start location selected.
         assertNull(s.getShippedFrom());
         // check created from correct template
