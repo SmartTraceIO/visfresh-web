@@ -93,7 +93,6 @@ import com.visfresh.services.AutoStartShipmentService;
 import com.visfresh.services.LocationService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.RuleEngine;
-import com.visfresh.services.ShipmentSiblingService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;
@@ -130,8 +129,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     private ChartBundle chartBundle;
     @Autowired
     private LocationService locationService;
-    @Autowired
-    private ShipmentSiblingService siblingService;
     @Autowired
     private RuleEngine ruleEngine;
     @Autowired
@@ -816,7 +813,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             result.add(dto);
 
             //siblings.
-            dto.setSiblingCount(siblingService.getSiblingCount(s));
+            dto.setSiblingCount(s.getSiblingCount());
             //alerts
             final List<Alert> alerts = alertDao.getAlerts(s);
             dto.getAlertSummary().putAll(toSummaryMap(alerts));
@@ -1081,12 +1078,19 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         addInterimStops(dto, s, isoFmt, prettyFmt);
 
         //add siblings
-        final List<Shipment> siblings = siblingService.getSiblings(s);
+        final List<Shipment> siblings = getSiblings(s);
         for (final Shipment sibling : siblings) {
             dto.getSiblings().add(createDto(sibling, user));
         }
 
         addDeviceGroups(dto);
+    }
+    /**
+     * @param s shipment.
+     * @return sibling list
+     */
+    private List<Shipment> getSiblings(final Shipment s) {
+        return shipmentDao.findAll(s.getSiblings());
     }
     /**
      * @param dto

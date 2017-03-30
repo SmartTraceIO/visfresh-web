@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.mpl.services.siblings;
+package com.visfresh.rules;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -11,19 +11,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Company;
@@ -37,7 +33,7 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class DefaultSiblingDetector implements SiblingDetector {
+public class SiblingDetectionRule implements TrackerEventRule {
     /**
      * Minimal path for siblings.
      */
@@ -45,139 +41,94 @@ public class DefaultSiblingDetector implements SiblingDetector {
     /**
      * The logger.
      */
-    private static final Logger log = LoggerFactory.getLogger(DefaultSiblingDetector.class);
+    private static final Logger log = LoggerFactory.getLogger(SiblingDetectionRule.class);
     protected static final double MAX_DISTANCE_AVERAGE = 3000; //meters
+    private static final String NAME = "SiblingDetectionRule";
 
-    /**
-     * Number of sibling detection threads.
-     */
-    private int numberOfThreads = 1;
     @Autowired
-    private CompanyDao companyDao;
+    private AbstractRuleEngine engine;
     @Autowired
     private ShipmentDao shipmentDao;
     @Autowired
     private TrackerEventDao trackerEventDao;
 
-    private ThreadFactory threadFactory = new ThreadFactory() {
-        private final ThreadGroup group;
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
-        private final String namePrefix = "pool-siblingetect-thread-";
-
-        {
-            final SecurityManager s = System.getSecurityManager();
-            group = (s != null) ? s.getThreadGroup() :
-                                  Thread.currentThread().getThreadGroup();
-        }
-
-        @Override
-        public Thread newThread(final Runnable r) {
-            final Thread t = new Thread(group, r,
-                                  namePrefix + threadNumber.getAndIncrement(),
-                                  0);
-            t.setDaemon(false);
-            t.setPriority((Thread.NORM_PRIORITY + Thread.MIN_PRIORITY) / 2);
-            return t;
-        }
-    };
-
     /**
      * @param env spring environment.
      */
-    @Autowired
-    public DefaultSiblingDetector(final Environment env) {
-        this(Integer.parseInt(env.getProperty("sibling.detect.numThreads", "1")));
+    public SiblingDetectionRule() {
+        super();
     }
 
-    /**
-     * @param threadNum number of threads.
-     */
-    protected DefaultSiblingDetector(final int threadNum) {
-        numberOfThreads = threadNum;
+    @PostConstruct
+    public final void initalize() {
+        engine.setRule(NAME, this);
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.siblings.SiblingDetector#getSiblings(com.visfresh.entities.Shipment)
-     */
-    @Override
-    public List<Shipment> getSiblings(final Shipment shipment) {
-        if (shipment.getSiblings().isEmpty()) {
-            return new LinkedList<>();
-        }
-
-        final List<Shipment> group = shipmentDao.findAll(shipment.getSiblings());
-        return group;
+    @PreDestroy
+    public final void destroy() {
+        engine.setRule(NAME, null);
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.services.SiblingDetectorService#getSiblingCount(com.visfresh.entities.Shipment)
+     * @see com.visfresh.rules.TrackerEventRule#accept(com.visfresh.rules.RuleContext)
      */
     @Override
-    public int getSiblingCount(final Shipment shipment) {
-        return shipment.getSiblingCount();
+    public boolean accept(final RuleContext context) {
+        final TrackerEvent event = context.getEvent();
+        final Shipment shipment = event.getShipment();
+
+        return shipment != null
+                && !context.isProcessed(this)
+                && !shipment.hasFinalStatus();
     }
 
-    public void detectSiblings() {
-        log.debug("Sibling detection has started");
-
-        final ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads, threadFactory);
-        try {
-            //TODO add pagination
-            final List<Company> compaines = companyDao.findAll(null, null, null);
-            for (final Company company : compaines) {
-                pool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateShipmentSiblingsForCompany(company);
-                    }
-                });
-            }
-
-            pool.shutdown();
-            if (!pool.awaitTermination(1, TimeUnit.HOURS)) {
-                log.warn("End of sibling searching is not reached");
-            }
-        } catch (final Throwable t) {
-            log.error("Failed to detect siblings", t);
-        } finally {
-            pool.shutdown();
-        }
-
-        log.debug("Sibling detection has finished");
-    }
-    /**
-     * @param company company to process.
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.TrackerEventRule#handle(com.visfresh.rules.RuleContext)
      */
-    public void updateShipmentSiblingsForCompany(final Company company) {
-        log.debug("Start of search shipment siblings for company " + company.getName());
+    @Override
+    public boolean handle(final RuleContext context) {
+        return updateSiblings(context.getEvent().getShipment());
+    }
 
-        final List<Shipment> shipments = new LinkedList<>(findActiveShipments(company));
+    /**
+     * @param master
+     * @return
+     */
+    private boolean updateSiblings(final Shipment master) {
+        log.debug("Start search of siblings for shipment " + master.getId());
+
+        final List<Shipment> shipments = new LinkedList<>(findActiveShipments(master.getCompany()));
 
         //detect siblings.
-        if (!shipments.isEmpty()) {
-            final Map<Long, Set<Long>> siblingMap = new HashMap<>();
-            //initialize sibling map
-            for (final Shipment s : shipments) {
-                siblingMap.put(s.getId(), new HashSet<Long>(s.getSiblings()));
-            }
+        final Map<Long, Set<Long>> siblingMap = new HashMap<>();
+        //initialize sibling map
+        for (final Shipment s : shipments) {
+            siblingMap.put(s.getId(), new HashSet<Long>(s.getSiblings()));
+        }
 
-            //get shipments for group
-            while (!shipments.isEmpty()) {
-                final Shipment master = shipments.remove(0);
-
-                log.debug("Search siblings for shipment " + master.getId());
-                findSiblings(master, shipments, siblingMap);
-
-                if (!isEquals(master.getSiblings(), siblingMap.get(master.getId()))) {
-                    log.debug("Uplate siblings (" + StringUtils.combine(siblingMap.get(master.getId()), ",")
-                    + ") for shipment " + master.getId());
-                    updateSiblingInfo(master, siblingMap.get(master.getId()));
-                }
+        //remove self
+        final Iterator<Shipment> iter = shipments.iterator();
+        while (iter.hasNext()) {
+            if (master.getId().equals(iter.next().getId())) {
+                iter.remove();
             }
         }
 
-        log.debug("End of search shipment siblings for company " + company.getName());
+        if (!shipments.isEmpty()) {
+            //get shipments for group
+            findSiblings(master, shipments, siblingMap);
+
+            if (!isEquals(master.getSiblings(), siblingMap.get(master.getId()))) {
+                log.debug("Uplate siblings (" + StringUtils.combine(siblingMap.get(master.getId()), ",")
+                + ") for shipment " + master.getId());
+                updateSiblingInfo(master, siblingMap.get(master.getId()));
+                return true;
+            }
+        }
+
+        log.debug("End search of siblings for shipment " + master.getId());
+        return false;
     }
+
     /**
      * @param master
      * @param originShipments
@@ -209,14 +160,6 @@ public class DefaultSiblingDetector implements SiblingDetector {
             }
         }
     }
-    /**
-     * @param ids set of shipment ID.
-     * @return shipment list.
-     */
-    protected List<Shipment> getShipments(final Set<Long> ids) {
-        return shipmentDao.findAll(ids);
-    }
-
     /**
      * @param master
      * @param set

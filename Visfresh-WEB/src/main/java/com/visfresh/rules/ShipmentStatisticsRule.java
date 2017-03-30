@@ -51,6 +51,7 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
      */
     @Override
     public boolean accept(final RuleContext context) {
+        //TODO prevent double processing
         final TrackerEvent e = context.getEvent();
 
         //check possible should ignore

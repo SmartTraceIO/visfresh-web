@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.mpl.services.siblings;
+package com.visfresh.rules;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -28,17 +28,17 @@ import com.visfresh.utils.LocationUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
+public class SiblingDetectionRuleTest extends SiblingDetectionRule {
+    /**
+     * Default constructor.
+     */
+    public SiblingDetectionRuleTest() {
+        super();
+    }
     private final List<Shipment> shipments = new LinkedList<>();
     private final Map<Long, List<TrackerEvent>> trackerEvents = new HashMap<>();
 
     private Company company;
-    /**
-     * Default constructor.
-     */
-    public DefaultSiblingDetectorTest() {
-        super(0);
-    }
 
     @Before
     public void setUp() {
@@ -47,6 +47,40 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         company.setName("JUnit Company");
     }
 
+    @Test
+    public void testNotAcceptIfNotShipment() {
+        //crete master event list
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        //intersected time
+        final TrackerEvent e = createTrackerEvent(10., 10., t0 );
+        assertFalse(accept(new RuleContext(e, null)));
+    }
+    @Test
+    public void testNotAcceptIfNotActiveShipment() {
+        final Shipment s = createShipment(7l);
+        s.setStatus(ShipmentStatus.Arrived);
+
+        //crete master event list
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        //intersected time
+        final TrackerEvent e = createTrackerEvent(10., 10., t0 );
+        e.setShipment(s);
+
+        assertFalse(accept(new RuleContext(e, null)));
+    }
+    @Test
+    public void testNotAcceptIfAlreadyHandled() {
+        final Shipment s = createShipment(7l);
+        s.setStatus(ShipmentStatus.Default);
+
+        //crete master event list
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        //intersected time
+        final TrackerEvent e = createTrackerEvent(10., 10., t0 );
+        e.setShipment(s);
+
+        assertTrue(accept(new RuleContext(e, null)));
+    }
     @Test
     public void testIsSiblings() {
         final Shipment master = createShipment(1l);
@@ -214,8 +248,9 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
 
         //intersected time
         final int count = (int) Math.round(minPath / 0.01) + 1;
+        TrackerEvent lastEvent = null;
         for (int i = 0; i < count; i++) {
-            addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
+            lastEvent = addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
                     t0 + i * dt);
             addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
                     y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
@@ -223,7 +258,7 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
                     y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
         }
 
-        this.updateShipmentSiblingsForCompany(company);
+        assertTrue(handle(new RuleContext(lastEvent, null)));
 
         //check sibling group
         assertTrue(master.getSiblings().contains(sibling.getId()));
@@ -231,12 +266,10 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
 
         //check sibling count
         assertEquals(2, master.getSiblingCount());
-        assertEquals(1, sibling.getSiblingCount());
-        assertEquals(0, oldSibling.getSiblingCount());
     }
 
     @Test
-    public void testUpdateShipmentSiblingsForCompany() {
+    public void testUpdateSiblings() {
         final Shipment master = createShipment(1l);
         final Shipment sibling = createShipment(2l);
         final Shipment notSibling = createShipment(3l);
@@ -249,9 +282,10 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
         final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
 
         //intersected time
+        TrackerEvent lastEvent = null;
         final int count = (int) Math.round(minPath / 0.01) + 1;
         for (int i = 0; i < count; i++) {
-            addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
+            lastEvent = addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
                     t0 + i * dt);
             addEvent(trackerEvents, sibling, x0 + 0.01 * i + 0.005,
                     y0 + 0.01 * i + 0.005, t0 + i * dt + 60 * 1000l);
@@ -260,20 +294,38 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
                     t0 + dt * i + 60 * 1000l);
         }
 
-        this.updateShipmentSiblingsForCompany(company);
+        assertTrue(handle(new RuleContext(lastEvent, null)));
 
         assertTrue(master.getSiblings().contains(sibling.getId()));
         assertFalse(master.getSiblings().contains(notSibling.getId()));
 
-        assertTrue(sibling.getSiblings().contains(master.getId()));
-        assertFalse(sibling.getSiblings().contains(notSibling.getId()));
-
-        assertEquals(0, notSibling.getSiblings().size());
-
         //check sibling count
-        assertEquals(1, getSiblingCount(master));
-        assertEquals(1, getSiblingCount(sibling));
-        assertEquals(0, getSiblingCount(notSibling));
+        assertEquals(1, master.getSiblingCount());
+    }
+    @Test
+    public void testHandleReturnsFalseIfNotSiblings() {
+        final Shipment master = createShipment(1l);
+        final Shipment notSibling = createShipment(3l);
+
+        //crete master event list
+        final double x0 = 10.;
+        final double y0 = 10.;
+        final long t0 = System.currentTimeMillis() - 1000000l;
+        final long dt = 10 * 60 * 1000l;
+        final double minPath = LocationUtils.getLongitudeDiff(y0, MIN_PATH);
+
+        //intersected time
+        TrackerEvent lastEvent = null;
+        final int count = (int) Math.round(minPath / 0.01) + 1;
+        for (int i = 0; i < count; i++) {
+            lastEvent = addEvent(trackerEvents, master, x0 + 0.01 * i, y0 + 0.01 * i,
+                    t0 + i * dt);
+            addEvent(trackerEvents, notSibling,
+                    x0 - 0.1 * i - 0.05, y0 - 0.1 * i - 0.05,
+                    t0 + dt * i + 60 * 1000l);
+        }
+
+        assertFalse(handle(new RuleContext(lastEvent, null)));
     }
 
     /**
@@ -375,6 +427,7 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
      */
     @Override
     protected void updateSiblingInfo(final Shipment master, final Set<Long> set) {
+        master.setSiblingCount(set.size());
         master.getSiblings().clear();
         master.getSiblings().addAll(set);
         master.setSiblingCount(set.size());
@@ -389,18 +442,5 @@ public class DefaultSiblingDetectorTest extends DefaultSiblingDetector {
             return new LinkedList<>();
         }
         return new LinkedList<TrackerEvent>(events);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#getShipments(java.util.Set)
-     */
-    @Override
-    protected List<Shipment> getShipments(final Set<Long> ids) {
-        final List<Shipment> list = new LinkedList<>();
-        for (final Shipment s : this.shipments) {
-            if (ids.contains(s.getId())) {
-                list.add(s);
-            }
-        }
-        return list;
     }
 }
