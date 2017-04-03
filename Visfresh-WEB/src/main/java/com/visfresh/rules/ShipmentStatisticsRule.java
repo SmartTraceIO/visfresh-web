@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.visfresh.dao.ShipmentStatisticsDao;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.reports.TemperatureStats;
 import com.visfresh.rules.state.ShipmentStatistics;
 import com.visfresh.services.ShipmentStatisticsService;
 
@@ -51,12 +50,11 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
      */
     @Override
     public boolean accept(final RuleContext context) {
-        //TODO prevent double processing
         final TrackerEvent e = context.getEvent();
 
         //check possible should ignore
         final Shipment shipment = e.getShipment();
-        if (shipment == null || shipment.getAlertProfile() == null) {
+        if (context.isProcessed(this) || shipment == null || shipment.getAlertProfile() == null) {
             return false;
         }
 
@@ -79,6 +77,8 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
      */
     @Override
     public boolean handle(final RuleContext context) {
+        context.setProcessed(this);
+
         final TrackerEvent e = context.getEvent();
         final Shipment s = e.getShipment();
 
@@ -90,13 +90,10 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
             log.debug("Statustics for shipment " + s + " was not calculated before, will recalculated from "
                     + "start of shipment");
             stats = service.calculate(s);
+        } else {
+            stats.getCollector().processEvent(e);
+            stats.synchronizeWithCollector();
         }
-
-        stats.getCollector().processEvent(e);
-
-        //update statistic
-        final TemperatureStats ts = stats.getCollector().getStatistics();
-        stats.set(ts);
 
         dao.saveStatistics(stats);
         return false;

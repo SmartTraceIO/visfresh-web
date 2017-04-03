@@ -169,17 +169,17 @@ public class ShipmentStatistics {
     public void setCollector(final ShipmentTemperatureStatsCollector collector) {
         this.collector = collector;
     }
+    public void synchronizeWithCollector() {
+        if (collector != null) {
+            final TemperatureStats ts = collector.getStatistics();
 
-    /**
-     * @param ts temperature statistics
-     */
-    public void set(final TemperatureStats ts) {
-        this.setAvgTemperature(ts.getAvgTemperature());
-        this.setMaximumTemperature(ts.getMaximumTemperature());
-        this.setMinimumTemperature(ts.getMinimumTemperature());
-        this.setStandardDevitation(ts.getStandardDevitation());
-        this.setTimeAboveUpperLimit(ts.getTimeAboveUpperLimit());
-        this.setTimeBelowLowerLimit(ts.getTimeBelowLowerLimit());
-        this.setTotalTime(ts.getTotalTime());
+            this.setAvgTemperature(ts.getAvgTemperature());
+            this.setMaximumTemperature(ts.getMaximumTemperature());
+            this.setMinimumTemperature(ts.getMinimumTemperature());
+            this.setStandardDevitation(ts.getStandardDevitation());
+            this.setTimeAboveUpperLimit(ts.getTimeAboveUpperLimit());
+            this.setTimeBelowLowerLimit(ts.getTimeBelowLowerLimit());
+            this.setTotalTime(ts.getTotalTime());
+        }
     }
 }

@@ -25,6 +25,7 @@ import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
+import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -86,6 +87,7 @@ public class SiblingDetectionRule implements TrackerEventRule {
      */
     @Override
     public boolean handle(final RuleContext context) {
+        context.setProcessed(this);
         return updateSiblings(context.getEvent().getShipment());
     }
 
@@ -110,6 +112,7 @@ public class SiblingDetectionRule implements TrackerEventRule {
         while (iter.hasNext()) {
             if (master.getId().equals(iter.next().getId())) {
                 iter.remove();
+                break;
             }
         }
 
@@ -117,10 +120,22 @@ public class SiblingDetectionRule implements TrackerEventRule {
             //get shipments for group
             findSiblings(master, shipments, siblingMap);
 
-            if (!isEquals(master.getSiblings(), siblingMap.get(master.getId()))) {
+            final Set<Long> newSiblings = getNewSiblings(
+                    master.getSiblings(), siblingMap.get(master.getId()));
+            if (!newSiblings.isEmpty()) {
                 log.debug("Uplate siblings (" + StringUtils.combine(siblingMap.get(master.getId()), ",")
                 + ") for shipment " + master.getId());
                 updateSiblingInfo(master, siblingMap.get(master.getId()));
+
+                //update sibling info also for new found sblings
+                for (final Long id : newSiblings) {
+                    final Shipment sibling = EntityUtils.getEntity(shipments, id);
+                    final Set<Long> set = new HashSet<>(siblingMap.get(id));
+                    set.add(master.getId());
+
+                    log.debug("Sibling info has updated also for new found sibling " + id);
+                    updateSiblingInfo(sibling, set);
+                }
                 return true;
             }
         }
@@ -170,23 +185,15 @@ public class SiblingDetectionRule implements TrackerEventRule {
         master.setSiblingCount(master.getSiblings().size());
         shipmentDao.updateSiblingInfo(master);
     }
-
-    /**
-     * @param set1
-     * @param set2
-     * @return
-     */
-    private boolean isEquals(final Set<Long> set1, final Set<Long> set2) {
-        if (set1.size() != set2.size()) {
-            return false;
-        }
-
-        for (final Long id : set1) {
-            if (!set2.contains(id)) {
-                return false;
+    private Set<Long> getNewSiblings(
+            final Set<Long> oldSiblings, final Set<Long> newSiblings) {
+        final Set<Long> result = new HashSet<>();
+        for (final Long id : newSiblings) {
+            if (!oldSiblings.contains(id)) {
+                result.add(id);
             }
         }
-        return true;
+        return result;
     }
 
     /**

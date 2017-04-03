@@ -67,8 +67,8 @@ public class ShipmentStatisticsDaoTest extends BaseDaoTest<ShipmentStatisticsDao
         final long timeBelowLowerLimit = 23947987324l;
         final long totalTime = 2390870293879l;
 
-        s.setAvgTemperature(avgTemperature);
         s.setCollector(collector);
+        s.setAvgTemperature(avgTemperature);
         s.setMaximumTemperature(maximumTemperature);
         s.setMinimumTemperature(minimumTemperature);
         s.setStandardDevitation(standardDevitation);

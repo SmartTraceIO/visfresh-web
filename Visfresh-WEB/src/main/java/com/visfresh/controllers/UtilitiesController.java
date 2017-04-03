@@ -20,11 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.dao.LocationProfileDao;
+import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Color;
 import com.visfresh.entities.Language;
@@ -47,6 +50,10 @@ public class UtilitiesController extends AbstractController {
     private TimeZoneService timeZoneService;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private ShipmentDao shipmentDao;
+    @Autowired
+    private LocationProfileDao locationDao;
 
     /**
      * Default constructor.
@@ -250,6 +257,39 @@ public class UtilitiesController extends AbstractController {
             json.addProperty("timeZoneId", tz.getID());
             json.addProperty("timeZoneString", tz.getDisplayName());
             return createSuccessResponse(json);
+        } catch (final Exception e) {
+            log.error("Failed to list roles", e);
+            return createErrorResponse(e);
+        }
+    }
+    @RequestMapping(value = "/clearCache/{authToken}", method = RequestMethod.GET)
+    public JsonObject clearCache(@PathVariable final String authToken,
+            @RequestParam(required = false) final Long shipment,
+            @RequestParam(required = false) final Long location
+            ) {
+        try {
+            final User u = getLoggedInUser(authToken);
+            boolean isClean = false;
+            if (shipment != null) {
+                if (shipmentDao.clearCache(u.getCompany(), shipment)) {
+                    log.debug("Cache cleaned for shipment " + shipment);
+                    isClean = true;
+                } else {
+                    log.warn("Cache not cleaned for shipment " + shipment);
+                }
+            }
+            if (location != null) {
+                if (locationDao.clearCache(u.getCompany(), location)) {
+                    log.debug("Cache cleaned for location " + location);
+                    isClean = true;
+                } else {
+                    log.warn("Cache not cleaned for location " + location);
+                }
+            }
+
+            final JsonObject resp = new JsonObject();
+            resp.addProperty("clean", isClean);
+            return createSuccessResponse(resp);
         } catch (final Exception e) {
             log.error("Failed to list roles", e);
             return createErrorResponse(e);

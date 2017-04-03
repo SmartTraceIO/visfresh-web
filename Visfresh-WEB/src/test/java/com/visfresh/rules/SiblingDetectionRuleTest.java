@@ -79,7 +79,10 @@ public class SiblingDetectionRuleTest extends SiblingDetectionRule {
         final TrackerEvent e = createTrackerEvent(10., 10., t0 );
         e.setShipment(s);
 
-        assertTrue(accept(new RuleContext(e, null)));
+        final RuleContext context = new RuleContext(e, null);
+        assertTrue(accept(context));
+        handle(context);
+        assertFalse(accept(context));
     }
     @Test
     public void testIsSiblings() {
@@ -299,8 +302,12 @@ public class SiblingDetectionRuleTest extends SiblingDetectionRule {
         assertTrue(master.getSiblings().contains(sibling.getId()));
         assertFalse(master.getSiblings().contains(notSibling.getId()));
 
+        assertTrue(sibling.getSiblings().contains(master.getId()));
+        assertFalse(notSibling.getSiblings().contains(master.getId()));
+
         //check sibling count
         assertEquals(1, master.getSiblingCount());
+        assertEquals(1, sibling.getSiblingCount());
     }
     @Test
     public void testHandleReturnsFalseIfNotSiblings() {
