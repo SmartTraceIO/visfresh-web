@@ -94,7 +94,8 @@ public class ShipmentStatisticsServiceImpl implements ShipmentStatisticsService 
     private List<Long> getShipmentsWithoutStatistics(final int limit) {
         final String query = "select s.id as id, stats.shipment as statsId from shipments s"
                 + " left outer join shipmentstats stats on stats.shipment = s.id"
-                + " where stats.shipment is NULL order by s.company, s.id limit " + limit;
+                + " where not s.istemplate and stats.shipment is NULL"
+                + " order by s.company, s.id limit " + limit;
 
         final List<Long> result = new LinkedList<>();
         for (final Map<String, Object> row : jdbc.queryForList(query, new HashMap<>())) {
@@ -107,7 +108,9 @@ public class ShipmentStatisticsServiceImpl implements ShipmentStatisticsService 
      * @param s the shipment.
      */
     private void createStatisticsForShipment(final Shipment s) {
-        log.debug("Calculate statistics for shipment " + s + " of " + s.getCompany().getName());
+        final String companyName = s.getCompany() == null ? "company NULL" : s.getCompany().getName();
+        log.debug("Calculate statistics for shipment " + s + " of " + companyName);
+
         final ShipmentStatistics stats = calculate(s);
         dao.saveStatistics(stats);
 
