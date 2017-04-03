@@ -41,8 +41,7 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
 
     @PostConstruct
     public final void initalize() {
-        //TODO uncomment after implement
-//        engine.setRule(NAME, this);
+        engine.setRule(NAME, this);
     }
 
     /* (non-Javadoc)
