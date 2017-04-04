@@ -3,8 +3,6 @@
  */
 package com.visfresh.rules;
 
-import java.util.Date;
-
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
@@ -15,24 +13,27 @@ import com.visfresh.dao.ShipmentStatisticsDao;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.rules.state.ShipmentStatistics;
+import com.visfresh.services.ShipmentStatisticsService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ShipmentStatisticsRule implements TrackerEventRule {
-    private static final Logger log = LoggerFactory.getLogger(ShipmentStatisticsRule.class);
-    private static final String NAME = "ShipmentStatisticsRule";
+public class ShipmentStatisticsInitRule implements TrackerEventRule {
+    private static final Logger log = LoggerFactory.getLogger(ShipmentStatisticsInitRule.class);
+    private static final String NAME = "ShipmentStatisticsInitializeRule";
 
     @Autowired
     private AbstractRuleEngine engine;
     @Autowired
     private ShipmentStatisticsDao dao;
+    @Autowired
+    private ShipmentStatisticsService service;
 
     /**
      * Default constructor.
      */
-    public ShipmentStatisticsRule() {
+    public ShipmentStatisticsInitRule() {
         super();
     }
 
@@ -49,24 +50,10 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
         final TrackerEvent e = context.getEvent();
 
         //check possible should ignore
-        final Shipment shipment = e.getShipment();
-        if (context.isProcessed(this) || shipment == null
-                || shipment.getAlertProfile() == null || shipment.hasFinalStatus()) {
+        if (context.isProcessed(this) || e.getShipment() == null) {
             return false;
         }
-
-        //check alert suppressed.
-        if (shipment.getAlertSuppressionMinutes() > 0
-                && e.getTime().before(new Date(shipment.getShipmentDate().getTime()
-                + 60 * 1000l * shipment.getAlertSuppressionMinutes()))) {
-            return false;
-        }
-
-        if (shipment.getArrivalDate() != null && e.getTime().after(shipment.getArrivalDate())) {
-            return false;
-        }
-
-        return true;
+        return getStatistics(e.getShipment()) == null;
     }
 
     /* (non-Javadoc)
@@ -79,19 +66,30 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
         final TrackerEvent e = context.getEvent();
         final Shipment s = e.getShipment();
 
-        log.debug("Update statistics for shipment: " + s);
+        log.debug("Initialize statistics for shipment: " + s);
 
         //process event
-        final ShipmentStatistics stats = getStatistics(s);
-        stats.getCollector().processEvent(e);
-        stats.synchronizeWithCollector();
+        ShipmentStatistics stats = getStatistics(s);
+        if (stats == null) {
+            log.debug("Statustics for shipment " + s
+                    + " was not calculated before, will calculated from "
+                    + "start of shipment");
+            stats = calculateStatistics(s);
+            saveStatistics(stats);
+        }
 
-        saveStatistics(stats);
         return false;
     }
 
     /**
-     * @param stats shipment statistics.
+     * @param s
+     * @return
+     */
+    protected ShipmentStatistics calculateStatistics(final Shipment s) {
+        return service.calculate(s);
+    }
+    /**
+     * @param stats statistics.
      */
     protected void saveStatistics(final ShipmentStatistics stats) {
         dao.saveStatistics(stats);
