@@ -71,7 +71,7 @@ public class ShipmentStatisticsInitRule implements TrackerEventRule {
         //process event
         ShipmentStatistics stats = getStatistics(s);
         if (stats == null) {
-            log.debug("Statustics for shipment " + s
+            log.debug("Statistics for shipment " + s
                     + " was not calculated before, will calculated from "
                     + "start of shipment");
             stats = calculateStatistics(s);
