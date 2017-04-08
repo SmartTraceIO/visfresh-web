@@ -4,19 +4,24 @@
 package com.visfresh.controllers.restclient;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.visfresh.controllers.lite.LiteShipment;
 import com.visfresh.controllers.lite.LiteShipmentSerializer;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -108,6 +113,36 @@ public class LiteShipmentRestClient extends RestClient {
             throws IOException, RestServiceException {
         final JsonArray array = sendPostRequest(getPathWithToken("getShipments"),
                 reqParser.toJson(req)).getAsJsonArray();
+
+        final List<LiteShipment> shipments = new LinkedList<>();
+        for (final JsonElement e : array) {
+            shipments.add(this.serializer.parseLiteShipment(e));
+        }
+
+        return shipments;
+    }
+    /**
+     * @param latitude location latitude.
+     * @param longitude location longitude.
+     * @param radius location radius.
+     * @param date from date.
+     * @return list of lite shipments.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public List<LiteShipment> getShipmentsNearBy(final double latitude, final double longitude,
+            final int radius, final Date date) throws IOException, RestServiceException {
+        final Map<String, String> params = new HashMap<>();
+        params.put("lat", Double.toString(latitude));
+        params.put("lon", Double.toString(longitude));
+        params.put("radius", Integer.toString(radius));
+        if (date != null) {
+            final DateFormat fmt = DateTimeUtils.createDateFormat(
+                    "yyyy-MM-dd'T'HH-mm-ss", Language.English, serializer.getTimeZone());
+            params.put("from", fmt.format(date));
+        }
+
+        final JsonArray array = sendGetRequest(getPathWithToken("getShipmentsNearby"), params).getAsJsonArray();
 
         final List<LiteShipment> shipments = new LinkedList<>();
         for (final JsonElement e : array) {

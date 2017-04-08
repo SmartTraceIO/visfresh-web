@@ -6,6 +6,7 @@ package com.visfresh.dao.impl.lite;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,7 @@ import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.dao.impl.ShipmentDaoImpl;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -53,6 +55,68 @@ public class LiteShipmentDaoImpl implements LiteShipmentDao {
         super();
     }
 
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.LiteShipmentDao#getShipmentsNear(com.visfresh.entities.Company, double, double, int, java.util.Date)
+     */
+    @Override
+    public List<LiteShipment> getShipmentsNearby(final Company company, final double lat, final double lon, final int radius, final Date startDate) {
+        final String sql = "select shipments.* ,"
+                + " substring(shipments.device, -7, 6) as deviceSN,"
+                + " sfrom.name as shippedFromLocationName,"
+                + " sto.name as shippedToLocationName,"
+                + " te.temperature as lastReadingTemperature,"
+                + " te.latitude as lat,"
+                + " te.longitude as lon,"
+                + " (select count(*) from alerts al where al.shipment = shipments.id) as alertSummary,"
+                + " ap.uppertemplimit as upperTemperatureLimit,"
+                + " ap.lowertemplimit as lowerTemperatureLimit"
+                + " from shipments"
+                + " left outer join alertprofiles as ap on shipments.alert = ap.id"
+                + " left outer join locationprofiles as sfrom on shipments.shippedfrom = sfrom.id"
+                + " left outer join locationprofiles as sto on shipments.shippedto = sto.id"
+                // select last event te
+                + " left outer join (select t.temperature as temperature,"
+                + "    t.shipment as shipment,"
+                + "    t.latitude as latitude,"
+                + "    t.longitude as longitude,"
+                + "    t.time as time from trackerevents t"
+                + "    join (select max(id) as id from trackerevents group by shipment) t1 on t1.id = t.id) te"
+                + " on te.shipment = shipments.id"
+                //end of last event
+                + " where shipments.company= :company"
+                + (startDate == null ? "" : " and  te.time >= :time ")
+                + " and not shipments.istemplate";
+
+        //create parameter map
+        final Map<String, Object> params = new HashMap<>();
+        params.put("company", company.getId());
+        if (startDate != null) {
+            params.put("time", startDate);
+        }
+
+        //execute query
+        final List<Map<String,Object>> rows = jdbc.queryForList(sql, params);
+
+        //convert to objects and filter not near
+        final List<LiteShipment> shipments = new LinkedList<>();
+        for (final Map<String,Object> map : rows) {
+            final Number latObj = (Number) map.get("lat");
+            final Number lonObj = (Number) map.get("lon");
+
+            if (latObj != null && lonObj != null) {
+                final double dinst = LocationUtils.getDistanceMeters(
+                        lat, lon, latObj.doubleValue(), lonObj.doubleValue());
+                if (dinst <= radius) {
+                    shipments.add(createLiteShipment(map));
+                }
+            }
+        }
+
+        //add key locations
+        addKeyLocations(shipments);
+
+        return shipments;
+    }
     /**
      * @param company company.
      * @param sorting sorting.

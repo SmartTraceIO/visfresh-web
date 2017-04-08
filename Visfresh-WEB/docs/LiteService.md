@@ -39,6 +39,17 @@ Returns array of Lite shipment items and total items count,
 it is not same as shipment object.  
 [(example)](#markdown-header-get-shipments-example)
 
+### Get Shipments Nearby ###
+Method *GET*, method name getShipmentsNearby, request parameters:
+lat=20.0&lon=20.0&radius=500&from=2017-04-08T16-05-48
+1. lat - location latitude  
+2. lon - location longitude  
+3. radius - location radius  
+4. from - optional parameter the max oldest date for last reading  
+Returns array of Lite shipment items and total items count,
+it is not same as shipment object.  
+[(example)](#markdown-header-get-shipments-nearby-example)
+
 ## Objects
 ### Response message ###
 ```json
@@ -193,5 +204,86 @@ see [ResponseStatus](#markdown-header-response-status)
     }
   ],
   "totalCount": 2
+}
+```
+## Examples ##
+### Get Shipments Nearby example ###
+**GET /vf/lite/getShipmentsNearby/${accessToken}?lat=20.0&lon=20.0&radius=500&from=2017-04-08T16-05-48**  
+**Response:**
+```json  
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "status": "InProgress",
+      "deviceSN": "039485",
+      "tripCount": 0,
+      "shipmentId": 565,
+      "shipmentDate": "5:07 28 Mar 2017",
+      "shipmentDateISO": "2017-03-28 05:07",
+      "shippedFrom": null,
+      "shippedTo": null,
+      "estArrivalDate": null,
+      "estArrivalDateISO": null,
+      "actualArrivalDate": null,
+      "actualArrivalDateISO": null,
+      "percentageComplete": 0,
+      "lowerTemperatureLimit": 0.0,
+      "upperTemperatureLimit": 5.0,
+      "alertSummary": {},
+      "siblingCount": 0,
+      "keyLocations": [
+        {
+          "temperature": 2.0,
+          "time": "16:07 8 Apr 2017",
+          "timeISO": "2017-04-08 16:07"
+        },
+        {
+          "temperature": 2.0,
+          "time": "16:07 8 Apr 2017",
+          "timeISO": "2017-04-08 16:07"
+        },
+        {
+          "temperature": 6.0,
+          "time": "16:07 8 Apr 2017",
+          "timeISO": "2017-04-08 16:07"
+        },
+        {
+          "temperature": 6.0,
+          "time": "16:07 8 Apr 2017",
+          "timeISO": "2017-04-08 16:07"
+        },
+        {
+          "temperature": 5.0,
+          "time": "16:07 8 Apr 2017",
+          "timeISO": "2017-04-08 16:07"
+        },
+        {
+          "temperature": 4.0,
+          "time": "16:07 8 Apr 2017",
+          "timeISO": "2017-04-08 16:07"
+        },
+        {
+          "temperature": 2.0,
+          "time": "16:07 8 Apr 2017",
+          "timeISO": "2017-04-08 16:07"
+        },
+        {
+          "temperature": 2.0,
+          "time": "16:07 8 Apr 2017",
+          "timeISO": "2017-04-08 16:07"
+        },
+        {
+          "temperature": 2.0,
+          "time": "16:07 8 Apr 2017",
+          "timeISO": "2017-04-08 16:07"
+        }
+      ]
+    }
+  ],
+  "totalCount": 1
 }
 ```

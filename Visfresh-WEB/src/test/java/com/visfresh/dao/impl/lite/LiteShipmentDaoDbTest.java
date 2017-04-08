@@ -19,6 +19,7 @@ import com.visfresh.dao.LiteShipmentDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -80,7 +81,7 @@ public class LiteShipmentDaoDbTest extends BaseDaoTest<LiteShipmentDao> {
      * @param temperature temperature
      * @return
      */
-    protected TrackerEvent createEvent(final Shipment shipment, final Date time, final double temperature) {
+    private TrackerEvent createEvent(final Shipment shipment, final Date time, final double temperature) {
         final TrackerEvent e = new TrackerEvent();
         e.setBattery(27);
         e.setDevice(shipment.getDevice());
@@ -90,6 +91,23 @@ public class LiteShipmentDaoDbTest extends BaseDaoTest<LiteShipmentDao> {
         e.setType(TrackerEventType.INIT);
         e.setLatitude(0.);
         e.setLongitude(0.);
+        return context.getBean(TrackerEventDao.class).save(e);
+    }
+    /**
+     * @param time
+     * @param temperature temperature
+     * @return
+     */
+    private TrackerEvent createEvent(final Shipment shipment, final double lat, final double lon) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setBattery(27);
+        e.setDevice(shipment.getDevice());
+        e.setShipment(shipment);
+        e.setTemperature(1.);
+        e.setTime(new Date());
+        e.setType(TrackerEventType.INIT);
+        e.setLatitude(lat);
+        e.setLongitude(lon);
         return context.getBean(TrackerEventDao.class).save(e);
     }
     @Test
@@ -109,6 +127,54 @@ public class LiteShipmentDaoDbTest extends BaseDaoTest<LiteShipmentDao> {
         assertEquals(1, shipments.size());
         assertEquals(3, result.getTotalCount());
         assertEquals(s3.getId(), shipments.get(0).getShipmentId());
+    }
+    @Test
+    public void testGetNearBy() {
+        final double lat = 10.;
+        final double lon = 10.;
+
+        //create shipment
+        final Shipment s = createShipment(device);
+
+        //create two events, latest is nearby
+        createEvent(s, lat + 20, lon + 20);
+        createEvent(s, lat, lon);
+
+        //check near by
+        assertEquals(1, dao.getShipmentsNearby(s.getCompany(), lat, lon, 500, null).size());
+
+        //check not near by
+        assertEquals(0, dao.getShipmentsNearby(s.getCompany(), lat - 20, lon - 20, 500, null).size());
+    }
+    @Test
+    public void testGetNearByExcludeTooOld() {
+        //create shipment
+        final Shipment s = createShipment(device);
+        final Date time = new Date(System.currentTimeMillis() - 1000000);
+
+        //create two events, latest is nearby
+        final TrackerEvent e = createEvent(s, time, 10.);
+
+        assertEquals(1, dao.getShipmentsNearby(s.getCompany(), e.getLatitude(), e.getLongitude(), 500,
+                new Date(time.getTime() - 100000l)).size());
+
+        //check near by
+        assertEquals(0, dao.getShipmentsNearby(s.getCompany(), e.getLatitude(), e.getLongitude(), 500,
+                new Date(time.getTime() + 100000l)).size());
+    }
+    @Test
+    public void testExcludeLeftCompany() {
+        //create shipment
+        final Shipment s = createShipment(device);
+
+        //create two events, latest is nearby
+        final TrackerEvent e = createEvent(s, new Date(), 10.);
+
+        assertEquals(1, dao.getShipmentsNearby(s.getCompany(), e.getLatitude(), e.getLongitude(), 500, null).size());
+
+        //create left company
+        final Company c = createCompany("Left");
+        assertEquals(0, dao.getShipmentsNearby(c, e.getLatitude(), e.getLongitude(), 500, null).size());
     }
     @Test
     public void testGetShipmentsKeyLocations() {
