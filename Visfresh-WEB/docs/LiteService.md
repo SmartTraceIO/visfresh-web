@@ -29,6 +29,7 @@ In case of error the “response” element of JSON response is absent.
 # User should be authorized using REST service. See RestService.md document#
 
 1. [Get Shipments](#markdown-header-get-shipments) 
+2. [Get Shipments Nearby](#markdown-header-get-shipments-nearby)  
 
 ## Special Request objects ##
 1. [Get Shipments filter](#markdown-header-get-shipments-filter)
@@ -41,7 +42,7 @@ it is not same as shipment object.
 
 ### Get Shipments Nearby ###
 Method *GET*, method name getShipmentsNearby, request parameters:
-lat=20.0&lon=20.0&radius=500&from=2017-04-08T16-05-48
+lat=20.0&lon=20.0&radius=500&from=2017-04-08T16-05-48  
 1. lat - location latitude  
 2. lon - location longitude  
 3. radius - location radius  
