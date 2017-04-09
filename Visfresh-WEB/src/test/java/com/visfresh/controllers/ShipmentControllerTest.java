@@ -1376,6 +1376,80 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Shipment s = shipmentDao.findOne(id);
         assertNotNull(s);
     }
+    @Test
+    public void testGetShipmentsNearBy() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        s.getShippedTo().setAddress("Coles Perth DC");
+        shipmentDao.save(s);
+        //create second shipment
+        createShipment(true);
+
+        final long t = System.currentTimeMillis() - 10000000l;
+        createEvent(s, t + 1000l, 2.0);
+        createEvent(s, t + 2000l, 2.0);
+        createEvent(s, t + 3000l, 6.0);
+        createEvent(s, t + 4000l, 6.0);
+        createEvent(s, t + 5000l, 5.0);
+        createEvent(s, t + 6000l, 4.0);
+        createEvent(s, t + 7000l, 2.0);
+        createEvent(s, t + 8000l, 2.0);
+
+        //create last event.
+        final TrackerEvent last = createEvent(s, t + 9000l, 2.0);
+        //set coordinates
+        last.setLatitude(last.getLatitude() + 10.);
+        last.setLongitude(last.getLongitude() + 10.);
+        trackerEventDao.save(last);
+
+        final List<JsonObject> shipments = shipmentClient.getShipmentsNearBy(
+                last.getLatitude(), last.getLongitude(), 500, new Date(last.getTime().getTime() - 100000l));
+
+        assertEquals(1, shipments.size());
+    }
+    @Test
+    public void testGetShipmentsNearByNotDate() throws IOException, RestServiceException {
+        final Shipment s = createShipment(true);
+        s.getShippedTo().setAddress("Coles Perth DC");
+        shipmentDao.save(s);
+
+        final long t = System.currentTimeMillis() - 10000000l;
+        createEvent(s, t + 1000l, 2.0);
+        createEvent(s, t + 2000l, 2.0);
+        createEvent(s, t + 3000l, 6.0);
+        createEvent(s, t + 4000l, 6.0);
+        createEvent(s, t + 5000l, 5.0);
+        createEvent(s, t + 6000l, 4.0);
+        createEvent(s, t + 7000l, 2.0);
+        createEvent(s, t + 8000l, 2.0);
+
+        //create last event.
+        final TrackerEvent last = createEvent(s, t + 9000l, 2.0);
+        //set coordinates
+        last.setLatitude(last.getLatitude() + 10.);
+        last.setLongitude(last.getLongitude() + 10.);
+        trackerEventDao.save(last);
+
+        final List<JsonObject> shipments = shipmentClient.getShipmentsNearBy(
+                last.getLatitude(), last.getLongitude(), 500, null);
+
+        assertEquals(1, shipments.size());
+    }
+
+    private TrackerEvent createEvent(final Shipment shipment,
+            final long time, final double temperature) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setShipment(shipment);
+        e.setDevice(shipment.getDevice());
+        e.setBattery(1234);
+        e.setTemperature(temperature);
+        e.setTime(new Date(time));
+        e.setType(TrackerEventType.AUT);
+        e.setLatitude(10.);
+        e.setLongitude(10.);
+
+        trackerEventDao.save(e);
+        return e;
+    }
     /**
      * @param s
      * @return

@@ -87,49 +87,50 @@ List items is short representations of base entities, like as [Alert Profile](#m
 26. [Delete Shipment Template](#markdown-header-delete-shipment-template)  
 27. [Save Shipment](#markdown-header-save-shipment)  
 28. [Get Shipments](#markdown-header-get-shipments)  
-29. [Get Shipment](#markdown-header-get-shipment)  
-30. [Get Single Shipment](#markdown-header-get-single-shipment)
-31. [Get Single Shipment Lite](#markdown-header-get-single-shipment-lite)
-32. [Delete Shipment](#markdown-header-delete-shipment)  
-33. [Suppress alerts](#markdown-header-suppress-alerts)  
-34. [Save Device](#markdown-header-save-device) 
-35. [Shutdown Device](#markdown-header-shutdown-device) 
-36. [Get Device](#markdown-header-get-device)  
-37. [Get Devices](#markdown-header-get-devices)  
-38. [Save Device Group](#markdown-header-save-device-group) 
-39. [Move Device](#markdown-header-move-device)  
-40. [Get Device Group](#markdown-header-get-device-group)  
-41. [Get Device Groups](#markdown-header-get-device-groups)  
-42. [Delete Device Group](#markdown-header-delete-device-group)  
-43. [Add Device to Group](#markdown-header-add-device-to-group)  
-44. [Remove Device from Group](#markdown-header-remove-device-from-group)  
-45. [Get Devices of Group](#markdown-header-get-devices-of-group)    
-46. [Get Groups of Device](#markdown-header-get-groups-of-device)  
-47. [Get Notifications](#markdown-header-get-notifications)  
-48. [Send Command to Device](#markdown-header-send-command-to-device)  
-49. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
-50. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
-51. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
-52. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
-53. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
-54. [Save Note](#markdown-header-save-note) 
-55. [Get Notes](#markdown-header-get-notes)  
-56. [Delete Note](#markdown-header-delete-note)  
-57. [Create (save) Simulator](#markdown-header-save-simulator)  
-58. [Delete Simulator](#markdown-header-delete-simulator)  
-59. [Start Simulator](#markdown-header-start-simulator)  
-60. [Stop Simulator](#markdown-header-stop-simulator)  
-61. [Get Simulator](#markdown-header-get-simulator)  
-62. [Autostart new Shipment](#markdown-header-autostart-new-shipment)  
-63. [Init Device colors](#markdown-header-init-device-colors)  
-64. [Get Readings](#markdown-header-get-readings)  
-65. [Get Shipment Report](#markdown-header-get-shipment-report)  
-66. [Email Shipment Report](#markdown-header-email-shipment-report)  
-67. [Get Performance Report](#markdown-header-get-performance-report)  
-68. [Add Interim Stop](#markdown-header-add-interim-stop)  
-69. [Save Interim Stop](#markdown-header-save-interim-stop)  
-70. [Delete Interim Stop](#markdown-header-delete-interim-stop)  
-71. [Get Interim Stop](#markdown-header-get-interim-stop)  
+29. [Get Shipments Nearby](#markdown-header-get-shipments-nearby)  
+30. [Get Shipment](#markdown-header-get-shipment)  
+31. [Get Single Shipment](#markdown-header-get-single-shipment)
+32. [Get Single Shipment Lite](#markdown-header-get-single-shipment-lite)
+33. [Delete Shipment](#markdown-header-delete-shipment)  
+34. [Suppress alerts](#markdown-header-suppress-alerts)  
+35. [Save Device](#markdown-header-save-device) 
+36. [Shutdown Device](#markdown-header-shutdown-device) 
+37. [Get Device](#markdown-header-get-device)  
+38. [Get Devices](#markdown-header-get-devices)  
+39. [Save Device Group](#markdown-header-save-device-group) 
+40. [Move Device](#markdown-header-move-device)  
+41. [Get Device Group](#markdown-header-get-device-group)  
+42. [Get Device Groups](#markdown-header-get-device-groups)  
+43. [Delete Device Group](#markdown-header-delete-device-group)  
+44. [Add Device to Group](#markdown-header-add-device-to-group)  
+45. [Remove Device from Group](#markdown-header-remove-device-from-group)  
+46. [Get Devices of Group](#markdown-header-get-devices-of-group)    
+47. [Get Groups of Device](#markdown-header-get-groups-of-device)  
+48. [Get Notifications](#markdown-header-get-notifications)  
+49. [Send Command to Device](#markdown-header-send-command-to-device)  
+50. [Mark Notification as read](#markdown-header-mark-notification-as-read) 
+51. [Save AutoStart Shipment](#markdown-header-save-autostart-shipment) 
+52. [Get AutoStart Shipment](#markdown-header-get-autostart-shipment)  
+53. [Get AutoStart Shipments](#markdown-header-get-autostart-shipments)  
+54. [Delete AutoStart Shipment](#markdown-header-delete-autostart-shipment)  
+55. [Save Note](#markdown-header-save-note) 
+56. [Get Notes](#markdown-header-get-notes)  
+57. [Delete Note](#markdown-header-delete-note)  
+58. [Create (save) Simulator](#markdown-header-save-simulator)  
+59. [Delete Simulator](#markdown-header-delete-simulator)  
+60. [Start Simulator](#markdown-header-start-simulator)  
+61. [Stop Simulator](#markdown-header-stop-simulator)  
+62. [Get Simulator](#markdown-header-get-simulator)  
+63. [Autostart new Shipment](#markdown-header-autostart-new-shipment)  
+64. [Init Device colors](#markdown-header-init-device-colors)  
+65. [Get Readings](#markdown-header-get-readings)  
+66. [Get Shipment Report](#markdown-header-get-shipment-report)  
+67. [Email Shipment Report](#markdown-header-email-shipment-report)  
+68. [Get Performance Report](#markdown-header-get-performance-report)  
+69. [Add Interim Stop](#markdown-header-add-interim-stop)  
+70. [Save Interim Stop](#markdown-header-save-interim-stop)  
+71. [Delete Interim Stop](#markdown-header-delete-interim-stop)  
+72. [Get Interim Stop](#markdown-header-get-interim-stop)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -411,6 +412,17 @@ Method *POST*, method name getShipments, request body [Get Shipments filter](#ma
 Returns array of [Shipment List items](#markdown-header-shipment-list-item) and total items count,
 it is not same as [Shipment Object](#markdown-header-shipment).  
 [(example)](#markdown-header-get-shipments-example)
+
+### Get Shipments Nearby ###
+Method *GET*, method name getShipmentsNearby, request parameters:
+lat=20.0&lon=20.0&radius=500&from=2017-04-08T16-05-48  
+1. lat - location latitude  
+2. lon - location longitude  
+3. radius - location radius  
+4. from - optional parameter the max oldest date for last reading  
+Returns array of Lite shipment items and total items count,
+it is not same as shipment object.  
+[(example)](#markdown-header-get-shipments-nearby-example)
 
 ### Delete Shipment ###
 Method *GET*, method name deleteShipment, method parameters:  
@@ -2053,6 +2065,139 @@ Response:
     }
   ],
   "totalCount": 2
+}
+```
+### Get Shipments Nearby example ###
+**GET /vf/lite/getShipmentsNearby/${accessToken}?lat=20.0&lon=20.0&radius=500&from=2017-04-08T16-05-48**  
+**Response:**
+```json  
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "status": "InProgress",
+      "deviceSN": "39485",
+      "deviceName": "Device Name",
+      "tripCount": 1,
+      "shipmentId": 1230,
+      "shipmentDescription": "Any Description",
+      "shipmentDate": "4:32 29 Mar 2017",
+      "shipmentDateISO": "2017-03-29 04:32",
+      "palletId": "palettid",
+      "assetNum": "10515",
+      "assetType": "SeaContainer",
+      "shippedFrom": "Loc-3",
+      "shippedTo": "Loc-4",
+      "estArrivalDate": null,
+      "estArrivalDateISO": null,
+      "actualArrivalDate": null,
+      "actualArrivalDateISO": null,
+      "percentageComplete": 0,
+      "alertProfileId": 606,
+      "alertProfileName": "AnyAlert",
+      "alertSummary": {},
+      "siblingCount": 0,
+      "lastReadingTime": "18:19 9 Apr 2017",
+      "lastReadingTimeISO": "2017-04-09 18:19",
+      "lastReadingTemperature": 2.0,
+      "lastReadingBattery": 1234,
+      "lastReadingLat": 20.0,
+      "lastReadingLong": 20.0,
+      "firstReadingLat": 10.0,
+      "firstReadingLong": 10.0,
+      "firstReadingTime": "15:32 9 Apr 2017",
+      "firstReadingTimeISO": "2017-04-09 15:32",
+      "keyLocations": [
+        {
+          "key": "firstReading",
+          "lat": 10.0,
+          "lon": 10.0,
+          "desc": null,
+          "time": "15:32 9 Apr 2017"
+        },
+        {
+          "key": "reading",
+          "lat": 10.0,
+          "lon": 10.0,
+          "desc": null,
+          "time": "15:32 9 Apr 2017"
+        },
+        {
+          "key": "reading",
+          "lat": 10.0,
+          "lon": 10.0,
+          "desc": null,
+          "time": "15:33 9 Apr 2017"
+        },
+        {
+          "key": "reading",
+          "lat": 10.0,
+          "lon": 10.0,
+          "desc": null,
+          "time": "15:33 9 Apr 2017"
+        },
+        {
+          "key": "reading",
+          "lat": 10.0,
+          "lon": 10.0,
+          "desc": null,
+          "time": "15:33 9 Apr 2017"
+        },
+        {
+          "key": "reading",
+          "lat": 10.0,
+          "lon": 10.0,
+          "desc": null,
+          "time": "15:33 9 Apr 2017"
+        },
+        {
+          "key": "reading",
+          "lat": 10.0,
+          "lon": 10.0,
+          "desc": null,
+          "time": "15:33 9 Apr 2017"
+        },
+        {
+          "key": "reading",
+          "lat": 10.0,
+          "lon": 10.0,
+          "desc": null,
+          "time": "15:33 9 Apr 2017"
+        },
+        {
+          "key": "shippedFrom",
+          "lat": 100.5,
+          "lon": 100.501,
+          "desc": "Loc-3",
+          "time": "15:33 9 Apr 2017"
+        },
+        {
+          "key": "shippedTo",
+          "lat": 100.5,
+          "lon": 100.501,
+          "desc": "Loc-4",
+          "time": "15:33 9 Apr 2017"
+        },
+        {
+          "key": "lastReading",
+          "lat": 20.0,
+          "lon": 20.0,
+          "desc": null,
+          "time": "15:33 9 Apr 2017"
+        }
+      ],
+      "shippedFromLat": 100.5,
+      "shippedFromLong": 100.501,
+      "shippedToLat": 100.5,
+      "shippedToLong": 100.501,
+      "sendArrivalReport": true,
+      "arrivalReportOnlyIfAlerts": false
+    }
+  ],
+  "totalCount": 1
 }
 ```
 ### Delete Shipment example ###

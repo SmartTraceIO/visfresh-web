@@ -96,6 +96,7 @@ import com.visfresh.services.RuleEngine;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;
+import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -405,6 +406,83 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return createListSuccessResponse(array, total);
         } catch (final Exception e) {
             log.error("Failed to get shipments", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param pageIndex page index.
+     * @param pageSize page size.
+     * @return list of shipments.
+     */
+    @RequestMapping(value = "/getShipmentsNearby/{authToken}", method = RequestMethod.GET)
+    public JsonObject getShipmentsNearby(@PathVariable final String authToken,
+            @RequestParam(value = "lat") final String latStr,
+            @RequestParam(value = "lon") final String lonStr,
+            @RequestParam final int radius,
+            @RequestParam(required = false, value = "from") final String fromStr) {
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.BasicUser);
+
+            //parse request parameters.
+            final double lat = Double.parseDouble(latStr);
+            final double lon = Double.parseDouble(lonStr);
+            final Date startDate;
+            if (fromStr == null) {
+                startDate = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000l);
+            } else {
+                startDate = DateTimeUtils.createDateFormat("yyyy-MM-dd'T'HH-mm-ss",
+                        user.getLanguage(), user.getTimeZone()).parse(fromStr);
+            }
+
+            //request shipments from DB
+            int page = 1;
+            final int limit = 100;
+            final Sorting sorting = new Sorting(SHIPMENT_ID);
+            final DateFormat fmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+
+            final List<ListShipmentItem> shipments = new LinkedList<>();
+            List<ListShipmentItem> part;
+            do {
+                part = getShipments(user.getCompany(), sorting, null, new Page(page, limit), user);
+                for (final ListShipmentItem item : part) {
+                    //Check date and location nearby
+                    final Double itemLat = item.getLastReadingLat();
+                    final Double itemLon = item.getLastReadingLong();
+
+                    if (itemLat != null && itemLon != null) {
+                        final double dinst = LocationUtils.getDistanceMeters(
+                                lat, lon, itemLat, itemLon);
+                        if (dinst <= radius && item.getLastReadingTimeISO() != null) {
+                            final Date lastDate = fmt.parse(item.getLastReadingTimeISO());
+                            //check the last reading time
+                            if (!lastDate.before(startDate)) {
+                                shipments.add(item);
+                            }
+                        }
+                    }
+                }
+
+                page++;
+            } while (part.size() >= limit);
+
+            //add interim stops
+            addInterimStops(shipments, user);
+
+            //add events data
+            addKeyLocations(shipments, user);
+
+            final ShipmentSerializer shs = new ShipmentSerializer(user);
+            final JsonArray array = new JsonArray();
+            for (final ListShipmentItem s : shipments) {
+                array.add(shs.toJson(s));
+            }
+
+            return createListSuccessResponse(array, shipments.size());
+        } catch (final Exception e) {
+            log.error("Failed to get shipments near (" + latStr + ", " + lonStr + "), radius: " + radius, e);
             return createErrorResponse(e);
         }
     }

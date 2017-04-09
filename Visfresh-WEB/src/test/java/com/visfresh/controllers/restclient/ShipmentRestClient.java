@@ -4,13 +4,18 @@
 package com.visfresh.controllers.restclient;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
@@ -20,6 +25,7 @@ import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.services.RestServiceException;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -181,5 +187,35 @@ public class ShipmentRestClient extends RestClient {
 
         final JsonElement el = sendGetRequest(getPathWithToken("createNewAutoSthipment"), params);
         return parseId(el.getAsJsonObject());
+    }
+    /**
+     * @param latitude
+     * @param longitude
+     * @param radius
+     * @param date
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public List<JsonObject> getShipmentsNearBy(final Double latitude, final Double longitude, final int radius, final Date date)
+            throws IOException, RestServiceException {
+        final Map<String, String> params = new HashMap<>();
+        params.put("lat", Double.toString(latitude));
+        params.put("lon", Double.toString(longitude));
+        params.put("radius", Integer.toString(radius));
+        if (date != null) {
+            final DateFormat fmt = DateTimeUtils.createDateFormat(
+                    "yyyy-MM-dd'T'HH-mm-ss", Language.English, serializer.getTimeZone());
+            params.put("from", fmt.format(date));
+        }
+
+        final JsonArray array = sendGetRequest(getPathWithToken("getShipmentsNearby"), params).getAsJsonArray();
+
+        final List<JsonObject> shipments = new LinkedList<>();
+        for (final JsonElement e : array) {
+            shipments.add(e.getAsJsonObject());
+        }
+
+        return shipments;
     }
 }

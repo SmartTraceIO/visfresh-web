@@ -207,7 +207,6 @@ see [ResponseStatus](#markdown-header-response-status)
   "totalCount": 2
 }
 ```
-## Examples ##
 ### Get Shipments Nearby example ###
 **GET /vf/lite/getShipmentsNearby/${accessToken}?lat=20.0&lon=20.0&radius=500&from=2017-04-08T16-05-48**  
 **Response:**
