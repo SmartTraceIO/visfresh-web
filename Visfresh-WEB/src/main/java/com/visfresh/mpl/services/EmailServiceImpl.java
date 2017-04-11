@@ -108,7 +108,14 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
     }
     @Override
     public void sendMessageToSupport(final String subject, final String message) throws MessagingException {
-        sendMessage(new String[]{supportAddress}, subject, message);
+        sendMessage(new String[]{getSupportAddress()}, subject, message);
+    }
+    /**
+     * @return
+     */
+    @Override
+    public String getSupportAddress() {
+        return supportAddress;
     }
 
     /* (non-Javadoc)
@@ -119,7 +126,12 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
         final EmailMessage m = serializer.parseEmailMessage(
                 SerializerUtils.parseJson(msg.getMessageInfo()));
         log.debug("Email message dequeued: " + msg.getMessageInfo());
-        sendImediatelly(m.getEmails(), m.getSubject(), m.getMessage());
+        try {
+            sendImediatelly(m.getEmails(), m.getSubject(), m.getMessage());
+        } catch (final MessagingException e) {
+            log.error("Failed to send email", e);
+            throw new RetryableException("Failed to send email", e);
+        }
     }
     /**
      * @param payload
@@ -132,16 +144,13 @@ public class EmailServiceImpl implements EmailService, SystemMessageHandler {
      * @param emails
      * @param subject
      * @param text
+     * @throws MessagingException
      * @throws RetryableException
      */
+    @Override
     public void sendImediatelly(final String[] emails,
-            final String subject, final String text) throws RetryableException {
-        try {
-            helper.sendMessage(emails, subject, text);
-        } catch (final MessagingException e) {
-            log.error("Failed to send email", e);
-            throw new RetryableException("Failed to send email", e);
-        }
+            final String subject, final String text) throws MessagingException {
+        helper.sendMessage(emails, subject, text);
     }
 
     @PreDestroy

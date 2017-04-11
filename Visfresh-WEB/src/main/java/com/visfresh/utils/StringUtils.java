@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
@@ -126,28 +125,5 @@ public final class StringUtils {
         }
         hex.insert(0, '#');
         return hex.toString();
-    }
-
-    /**
-     * @param e
-     * @return
-     */
-    public static String getSteackTrace(final Throwable e, final int maxLines) {
-        final StringWriter s = new StringWriter();
-        final PrintWriter wr = new PrintWriter(s);
-
-        if (maxLines > 0) {
-            // Print our stack trace
-            wr.println(e);
-            final StackTraceElement[] trace = e.getStackTrace();
-            final int len = Math.min(maxLines, trace.length) - 1;
-            for (int i = 0; i < len; i++) {
-                wr.println("\tat " + trace[i]);
-            }
-        } else {
-            e.printStackTrace(new PrintWriter(wr));
-        }
-
-        return s.toString();
     }
 }

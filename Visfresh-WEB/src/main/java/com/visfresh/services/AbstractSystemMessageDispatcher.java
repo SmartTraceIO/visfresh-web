@@ -3,6 +3,7 @@
  */
 package com.visfresh.services;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
+import com.visfresh.utils.ExceptionUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -209,7 +211,13 @@ public abstract class AbstractSystemMessageDispatcher {
      * @param e the exception.
      */
     protected void handleError(final SystemMessage msg, final Throwable e) {
-        if (e instanceof RetryableException && ((RetryableException) e).canRetry()) {
+        if (ExceptionUtils.containsException(e, SQLException.class)) {
+            if (isStoped.get()) {
+                log.warn("SQL exception occured because the system is stopped");
+            } else {
+                log.error("Unexpected SQL exception has occured", e);
+            }
+        } else if (e instanceof RetryableException && ((RetryableException) e).canRetry()) {
             if (msg.getNumberOfRetry() < getRetryLimit()) {
                 final RetryableException re = (RetryableException) e;
 

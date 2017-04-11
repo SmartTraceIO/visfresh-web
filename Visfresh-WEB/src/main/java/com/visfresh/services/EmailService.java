@@ -34,4 +34,15 @@ public interface EmailService {
      */
     public void sendMessage(final String[] emails, final String subject, final String text,
             final File... file) throws MessagingException, IOException;
+    /**
+     * @param emails
+     * @param subject
+     * @param text
+     * @throws MessagingException
+     */
+    void sendImediatelly(String[] emails, String subject, String text) throws MessagingException;
+    /**
+     * @return
+     */
+    String getSupportAddress();
 }

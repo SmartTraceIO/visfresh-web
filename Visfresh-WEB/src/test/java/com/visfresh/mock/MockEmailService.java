@@ -87,8 +87,23 @@ public class MockEmailService implements EmailService {
     public List<List<File>> getAttachments() {
         return attachments;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.EmailService#getSupportAddress()
+     */
+    @Override
+    public String getSupportAddress() {
+        return "support@smarttrace.com.au";
+    }
     public void clear() {
         messages.clear();
         attachments.clear();
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.services.EmailService#sendImediatelly(java.lang.String[], java.lang.String, java.lang.String)
+     */
+    @Override
+    public void sendImediatelly(final String[] emails, final String subject, final String text) throws MessagingException {
+        sendMessage(emails, subject, text);
     }
 }

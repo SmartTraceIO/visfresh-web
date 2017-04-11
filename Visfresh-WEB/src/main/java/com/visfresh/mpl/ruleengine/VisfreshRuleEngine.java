@@ -27,6 +27,7 @@ import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.RuleContext;
 import com.visfresh.rules.TrackerEventRule;
 import com.visfresh.services.EmailService;
+import com.visfresh.utils.ExceptionUtils;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -80,7 +81,7 @@ public class VisfreshRuleEngine extends AbstractRuleEngine {
                     log.error("Fatal rulle processing error", e);
                     try {
                         emailer.sendMessageToSupport("Fatal rule processing error: " + e.getMessage(),
-                                StringUtils.getSteackTrace(e, 10) + "\n...");
+                                ExceptionUtils.getSteackTraceAsString(e, 10) + "\n...");
                     } catch (final MessagingException e1) {
                         log.error("Failed to send message to support", e1);
                     }
