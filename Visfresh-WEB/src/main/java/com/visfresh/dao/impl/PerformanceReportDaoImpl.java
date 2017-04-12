@@ -154,7 +154,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
             //merge shipment data
             final Map<Long, TemperatureStats> shipmentStats = getShipmentStatsForProfile(
                     e.getKey(), shipmentMap, shipmentCollectors);
-            final List<Long> orderedShipmentIds = getOrderByMaxIncedents(shipmentStats);
+            final List<Long> orderedShipmentIds = getOrderedByMaxIncedents(shipmentStats);
 
             while(e.getValue().getTemperatureExceptions().size() < 3 && !orderedShipmentIds.isEmpty()) {
                 final Shipment shipment = shipmentMap.get(orderedShipmentIds.remove(0));
@@ -223,7 +223,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
      * @param shipmentStats
      * @return
      */
-    private List<Long> getOrderByMaxIncedents(
+    private List<Long> getOrderedByMaxIncedents(
             final Map<Long, TemperatureStats> shipmentStats) {
         final List<Long> result = new LinkedList<Long>(shipmentStats.keySet());
         Collections.sort(result, new Comparator<Long>() {
