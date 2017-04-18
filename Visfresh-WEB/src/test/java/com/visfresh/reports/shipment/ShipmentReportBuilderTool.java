@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 
-import net.sf.dynamicreports.report.exception.DRException;
-import net.sf.jasperreports.engine.JRException;
-
 import com.visfresh.dao.impl.AlertProfileTemperatureStatsCollector;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
@@ -34,6 +31,9 @@ import com.visfresh.l12n.RuleBundle;
 import com.visfresh.reports.ShortTrackerEventsImporter;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.utils.StringUtils;
+
+import net.sf.dynamicreports.report.exception.DRException;
+import net.sf.jasperreports.engine.JRException;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -76,7 +76,7 @@ public final class ShipmentReportBuilderTool {
      * @throws ParseException
      * @throws IOException
      */
-    private static ShipmentReportBean createPerformanceBean(final User user) throws IOException, ParseException {
+    private static ShipmentReportBean createShipmentReportBean(final User user) throws IOException, ParseException {
         final ShipmentReportBean bean = new ShipmentReportBean();
 
         bean.setCompanyName("Test Company");
@@ -101,6 +101,10 @@ public final class ShipmentReportBuilderTool {
         bean.setStatus(ShipmentStatus.Default);
         bean.setTripCount(14);
         bean.setAlertSuppressionMinutes(110);
+
+        //add receivers
+        bean.getWhoReceivedReport().add("Max Plank");
+        bean.getWhoReceivedReport().add("Alexander Makedonsky");
 
         addReadings(bean);
         final List<ShortTrackerEvent> readings = bean.getReadings();
@@ -270,6 +274,6 @@ public final class ShipmentReportBuilderTool {
 
     public static void main(final String[] args) throws Exception {
         final User user = createUser();
-        showShipmentReport(createPerformanceBean(user), user);
+        showShipmentReport(createShipmentReportBean(user), user);
     }
 }

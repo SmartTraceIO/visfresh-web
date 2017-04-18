@@ -33,6 +33,7 @@ import com.visfresh.entities.User;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.reports.shipment.ArrivalBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
+import com.visfresh.reports.shipment.ShipmentReportBuilder;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.utils.EntityUtils;
 
@@ -66,7 +67,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @see com.visfresh.dao.ShipmentReportDao#createReport(com.visfresh.entities.Shipment)
      */
     @Override
-    public ShipmentReportBean createReport(final Shipment s) {
+    public ShipmentReportBean createReport(final Shipment s, final List<User> usersReceivedReports) {
         final ShipmentReportBean bean = new ShipmentReportBean();
         final Arrival arrival = arrivalDao.getArrival(s);
 
@@ -140,13 +141,11 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
 
         //get notifications
         //notified by alert
-        bean.getWhoWasNotifiedByAlert().addAll(getNotified(alerts, NotificationType.Alert));
+        bean.getWhoWasNotifiedByAlert().addAll(
+                toNameList(getNotifiedUsers(alerts, NotificationType.Alert)));
 
-        //arrivals
-        if (arrival != null) {
-            final List<Arrival> arrivals = new LinkedList<>();
-            arrivals.add(arrival);
-            bean.getWhoWasNotifiedByArrival().addAll(getNotified(arrivals, NotificationType.Arrival));
+        if (usersReceivedReports != null) {
+            bean.getWhoReceivedReport().addAll(toNameList(usersReceivedReports));
         }
 
         if (s.getAlertProfile() != null) {
@@ -159,45 +158,28 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @param issues
      * @return
      */
-    private List<String> getNotified(final List<? extends NotificationIssue> issues, final NotificationType type) {
+    private List<User> getNotifiedUsers(final List<? extends NotificationIssue> issues, final NotificationType type) {
         final Set<Long> ids = new HashSet<>();
-        final List<String> list = new LinkedList<>();
+        final List<User> list = new LinkedList<>();
 
         final List<Notification> notifs = notificationDao.getForIssues(EntityUtils.getIdList(issues), type);
         for (final Notification n : notifs) {
             final User u = n.getUser();
             if (!ids.contains(u.getId())) {
                 ids.add(u.getId()); //avoid duplicates
-                list.add(createUserName(u));
+                list.add(u);
             }
         }
 
         return list;
     }
-
-    /**
-     * @param u user.
-     * @return user name.
-     */
-    private String createUserName(final User u) {
-        final StringBuilder sb = new StringBuilder();
-        if (u.getFirstName() != null) {
-            sb.append(u.getFirstName());
+    private List<String> toNameList(final List<User> users) {
+        final List<String> names = new LinkedList<>();
+        for (final User u : users) {
+            names.add(ShipmentReportBuilder.createUserName(u));
         }
-        if (u.getLastName() != null) {
-            if (sb.length() > 0) {
-                sb.append(' ');
-            }
-            sb.append(u.getLastName());
-        }
-
-        //add email instead name if empty
-        if (sb.length() < 1) {
-            sb.append(u.getEmail());
-        }
-        return sb.toString();
+        return names;
     }
-
     /**
      * @param bean
      * @param events

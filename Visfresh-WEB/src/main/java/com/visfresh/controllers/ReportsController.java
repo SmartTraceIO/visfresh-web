@@ -262,7 +262,9 @@ public class ReportsController extends AbstractController {
             }
 
             //create report bean.
-            final File file = createShipmentReport(s, user);
+            final List<User> allReceivers = new LinkedList<>();
+            allReceivers.add(user);
+            final File file = createShipmentReport(s, user, allReceivers);
 
             final int index = request.getRequestURL().indexOf("/" + GET_SHIPMENT_REPORT);
             response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
@@ -278,22 +280,9 @@ public class ReportsController extends AbstractController {
      * @param user user.
      * @return PDF shipment report.
      */
-    private File createShipmentReport(final Shipment s, final User user) throws IOException {
-        final ShipmentReportBean bean = shipmentReportDao.createReport(s);
-
-//        final DateFormat fmt = DateTimeUtils.createDateFormat("yyyy-MM-dd_HH-mm",
-//                user.getLanguage(), user.getTimeZone());
-//
-//        final String fileName = s.getCompany().getName().replaceAll("\\W", "_")
-//                + " Shipment "
-//                + s.getDevice().getSn()
-//                + "("
-//                + s.getTripCount()
-//                + ")"
-//                + " as of "
-//                + fmt.format(new Date())
-//                + DateTimeUtils.getTimeZoneString(user.getTimeZone().getRawOffset())
-//                + ".pdf";
+    private File createShipmentReport(final Shipment s, final User user, final List<User> allReceivers)
+            throws IOException {
+        final ShipmentReportBean bean = shipmentReportDao.createReport(s, allReceivers);
         final File file = createTmpFile(s, "pdf");
 
         final OutputStream out = new FileOutputStream(file);
@@ -381,11 +370,12 @@ public class ReportsController extends AbstractController {
                         + ") for given company");
             }
 
-            final File file = createShipmentReport(s, user);
+            final List<User> allReceivers = userDao.findAll(req.getUsers());
+            final File file = createShipmentReport(s, user, allReceivers);
             final Set<String> emails = new HashSet<>();
 
             //add users
-            for (final User u: userDao.findAll(req.getUsers())) {
+            for (final User u: allReceivers) {
                 emails.add(u.getEmail());
             }
             //add emails

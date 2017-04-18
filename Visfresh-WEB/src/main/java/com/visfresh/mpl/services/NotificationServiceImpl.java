@@ -22,7 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.ShipmentDao;
@@ -66,6 +69,7 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
      *
      */
     private static final String USER = "user";
+    private static final String RECEVIERS = "receivers";
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
     private static final String SHIPMENT = "shipment";
 
@@ -184,10 +188,19 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
      * @param user
      */
     @Override
-    public void sendShipmentReport(final Shipment shipment, final User user) {
+    public void sendShipmentReport(final Shipment shipment, final User user, final List<User> usersReceivedReports) {
         final JsonObject json = new JsonObject();
         json.addProperty(SHIPMENT, shipment.getId());
         json.addProperty(USER, user.getId());
+
+        if (!usersReceivedReports.isEmpty()) {
+            final JsonArray array = new JsonArray();
+            for (final User u : usersReceivedReports) {
+                array.add(new JsonPrimitive(u.getId()));
+            }
+
+            json.add(RECEVIERS, array);
+        }
 
         dispatcher.sendSystemMessage(json.toString(), SystemMessageType.ArrivalReport);
     }
@@ -217,21 +230,34 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
                 shipmentSessionDao.saveSession(session);
 
                 try {
-                    sendShipmentReportImmediately(s, user);
+                    final List<User> usersReceivedReports = new LinkedList<>();
+                    if (json.has(RECEVIERS)) {
+                        final JsonArray array = json.get(RECEVIERS).getAsJsonArray();
+                        for (final JsonElement el : array) {
+                            final User receiver = userDao.findOne(el.getAsLong());
+                            if (receiver != null) {
+                                usersReceivedReports.add(receiver);
+                            }
+                        }
+                    }
+
+                    sendShipmentReportImmediately(s, user, usersReceivedReports);
                 } catch (final IOException e) {
                     log.error("Failed to send arrival report for" + shipmentId, e);
                     throw new RetryableException(e);
                 }
             } else {
-                log.debug("Arrival have already sent to " + user.getEmail());
+                log.debug("Shipment arrived report is already sent to " + user.getEmail());
             }
         }
     }
     /**
      * @param s shipment.
      * @param user user.
+     * @param usersReceivedReports users who received reports.
      */
-    private void sendShipmentReportImmediately(final Shipment s, final User user) throws IOException {
+    private void sendShipmentReportImmediately(final Shipment s, final User user,
+            final List<User> usersReceivedReports) throws IOException {
         final Language lang = user.getLanguage();
         final TimeZone tz = user.getTimeZone();
         final TemperatureUnits tu = user.getTemperatureUnits();
@@ -244,7 +270,7 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
         subject = bundle.getArrivalReportEmailSubject(s, lang, tz, tu);
         message = bundle.getArrivalReportEmailMessage(s, alertsFired, lang, tz, tu);
 
-        final File attachment = createShipmenentReport(user, s);
+        final File attachment = createShipmenentReport(user, s, usersReceivedReports);
 
         log.debug("Sending shipment arrived report for " + user.getEmail());
         try {
@@ -275,10 +301,12 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     /**
      * @param user user.
      * @param shipment shipment.
+     * @param usersReceivedReports users who received report.
      * @return report file.
      */
-    private File createShipmenentReport(final User user, final Shipment shipment) throws IOException {
-        final ShipmentReportBean report = shipmentReportDao.createReport(shipment);
+    private File createShipmenentReport(final User user, final Shipment shipment,
+            final List<User> usersReceivedReports) throws IOException {
+        final ShipmentReportBean report = shipmentReportDao.createReport(shipment, usersReceivedReports);
 
         final DateFormat fmt = DateTimeUtils.createDateFormat(
                 "yyyyMMdd HH:mm", user.getLanguage(), user.getTimeZone());

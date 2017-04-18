@@ -3,6 +3,7 @@
  */
 package com.visfresh.services;
 
+import java.util.List;
 import java.util.TimeZone;
 
 import com.visfresh.entities.Language;
@@ -38,6 +39,7 @@ public interface NotificationService {
     /**
      * @param shipment shipment.
      * @param user user.
+     * @param usersReceivedReports TODO
      */
-    void sendShipmentReport(Shipment shipment, User user);
+    void sendShipmentReport(Shipment shipment, User user, List<User> usersReceivedReports);
 }

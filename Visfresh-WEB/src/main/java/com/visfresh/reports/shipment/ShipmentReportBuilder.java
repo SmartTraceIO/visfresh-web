@@ -176,8 +176,6 @@ public class ShipmentReportBuilder {
         }
         return result;
     }
-
-
     /**
      * @param bean
      * @return
@@ -598,7 +596,7 @@ public class ShipmentReportBuilder {
         //Who was notified:     Rob Arpas, Rob Arpas
         final Map<String, Object> whoNotified = new HashMap<>();
         whoNotified.put(key, "Who received report");
-        whoNotified.put(value, namesAsString(bean.getWhoWasNotifiedByArrival()));
+        whoNotified.put(value, namesAsString(bean.getWhoReceivedReport()));
         rows.add(whoNotified);
 
         //last reading data
@@ -995,5 +993,27 @@ public class ShipmentReportBuilder {
             .setFont(fond)
             .setPadding(DEFAULT_PADDING);
         return style;
+    }
+    /**
+     * @param u user.
+     * @return user name.
+     */
+    public static String createUserName(final User u) {
+        final StringBuilder sb = new StringBuilder();
+        if (u.getFirstName() != null) {
+            sb.append(u.getFirstName());
+        }
+        if (u.getLastName() != null) {
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
+            sb.append(u.getLastName());
+        }
+
+        //add email instead name if empty
+        if (sb.length() < 1) {
+            sb.append(u.getEmail());
+        }
+        return sb.toString();
     }
 }

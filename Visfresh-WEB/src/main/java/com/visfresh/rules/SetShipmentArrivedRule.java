@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Location;
-import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
@@ -138,17 +137,11 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
                 return;
             }
 
-            final List<PersonSchedule> schedules = AbstractNotificationRule.getPersonalSchedules(
+            final List<User> usersReceivedReports = AbstractNotificationRule.getEmailingUsers(
                     shipment.getArrivalNotificationSchedules(), new Date());
 
-            for (final PersonSchedule sched : schedules) {
-                final User user = sched.getUser();
-                if (sched.isSendEmail()) {
-                    notificationService.sendShipmentReport(shipment, user);
-                } else {
-                    log.debug("Pesonal scheule for user " + user.getEmail()
-                            + " is not configured for email. Shipment Arrived report will not sent");
-                }
+            for (final User user : usersReceivedReports) {
+                notificationService.sendShipmentReport(shipment, user, usersReceivedReports);
             }
         }
     }

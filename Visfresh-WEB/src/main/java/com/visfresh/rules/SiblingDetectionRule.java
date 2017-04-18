@@ -127,7 +127,7 @@ public class SiblingDetectionRule implements TrackerEventRule {
                 + ") for shipment " + master.getId());
                 updateSiblingInfo(master, siblingMap.get(master.getId()));
 
-                //update sibling info also for new found sblings
+                //update sibling info also for new found siblings
                 for (final Long id : newSiblings) {
                     final Shipment sibling = EntityUtils.getEntity(shipments, id);
                     final Set<Long> set = new HashSet<>(siblingMap.get(id));
@@ -137,6 +137,8 @@ public class SiblingDetectionRule implements TrackerEventRule {
                     updateSiblingInfo(sibling, set);
                 }
                 return true;
+            } else {
+                log.debug("Sibling list is not changed for shipment " + master.getId());
             }
         }
 

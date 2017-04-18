@@ -42,7 +42,7 @@ public class ShipmentReportBean {
     private final List<AlertRule> firedAlertRules = new LinkedList<>();
     private final List<Alert> alerts = new LinkedList<>();
     private final List<String> whoWasNotifiedByAlert = new LinkedList<>();
-    private final List<String> whoWasNotifiedByArrival = new LinkedList<>();
+    private final List<String> whoReceivedReport = new LinkedList<>();
     private TemperatureStats temperatureStats = new TemperatureStats();
     private Color deviceColor = Color.GREEN.darker();
     private int alertSuppressionMinutes;
@@ -251,8 +251,8 @@ public class ShipmentReportBean {
     /**
      * @return the whoWasNotified
      */
-    public List<String> getWhoWasNotifiedByArrival() {
-        return whoWasNotifiedByArrival;
+    public List<String> getWhoReceivedReport() {
+        return whoReceivedReport;
     }
     /**
      * @return the companyName
