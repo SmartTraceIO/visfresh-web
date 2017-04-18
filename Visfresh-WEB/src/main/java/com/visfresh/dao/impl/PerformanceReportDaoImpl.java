@@ -71,6 +71,9 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
         bean.setDate(new Date());
         bean.setCompanyName(c.getName());
         bean.setTimeAtom(timeAtom);
+        if (location != null) {
+            bean.setLocationName(location.getName());
+        }
 
         final Map<Long, AlertProfileStats> statsMap = createInitialStatsMap(c, startDate, endDate, timeRanges);
         final Map<Long, List<TemperatureAlert>> shipmentAlerts = new HashMap<>();

@@ -75,6 +75,7 @@ public final class PerformanceReportBuilderTool {
 
         final PerformanceReportBean bean = new PerformanceReportBean();
         bean.setCompanyName("SmartTrace");
+        bean.setLocationName("Odessa");
         bean.setDate(new Date());
         bean.setTimeAtom(atom);
 

@@ -185,6 +185,7 @@ public class PerformanceReportDaoTest extends BaseDaoTest<PerformanceReportDao> 
                 new Date(time.getTime() - 10000000l), new Date(time.getTime() + 10000000l), TimeAtom.Month, l1);
 
         assertNotNull(report);
+        assertNotNull(report.getLocationName());
         assertEquals(1, report.getAlertProfiles().size());
 
         final List<TimeRangesTemperatureStats> monthlyStats = report.getAlertProfiles().get(0).getTimedData();

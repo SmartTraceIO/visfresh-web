@@ -670,14 +670,20 @@ public class PerformanceReportBuilder {
         //title
         final VerticalListBuilder titles = Components.verticalList();
 
-//      SHIPMENT REPORT
+//      PERFORMANCE REPORT
         TextFieldBuilder<String> f = Components.text("PERFORMANCE REPORT");
         f.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
         f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 3, true));
 
         titles.add(f);
 //      Primo Moraitis Fresh
-        f = Components.text(bean.getCompanyName());
+        final StringBuilder sb = new StringBuilder(bean.getCompanyName());
+        if (bean.getLocationName() != null) {
+            sb.append(" shipments to ");
+            sb.append(bean.getLocationName());
+        }
+
+        f = Components.text(sb.toString());
         f.setHorizontalTextAlignment(HorizontalTextAlignment.CENTER);
         f.setStyle(createStyleByFont(DEFAULT_FONT_SIZE + 2, true));
 

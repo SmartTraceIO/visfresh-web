@@ -575,7 +575,7 @@ Response is [Standard JSON response](#markdown-header-response-message)
 
 ### Get Performance Report ###
 Method *GET*, method name *getPerformanceReport*. Request parameters:
-1. month (yyyy-MM) end month of report. Not require, by default current month will used.  
+1. month (yyyy-MM) end month of report. Not required, by default current month will used.  
 Returns PDF file as byte stream  
 [(example)](#markdown-header-get-performance-report-example)
 

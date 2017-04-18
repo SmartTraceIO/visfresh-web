@@ -18,6 +18,8 @@ public class PerformanceReportBean {
     private Date date;
     private final List<AlertProfileStats> alertProfiles = new LinkedList<>();
     private TimeAtom timeAtom;
+    private String locationName;
+
     /**
      * Default constructor.
      */
@@ -67,5 +69,17 @@ public class PerformanceReportBean {
      */
     public TimeAtom getTimeAtom() {
         return timeAtom;
+    }
+    /**
+     * @return the locationName
+     */
+    public String getLocationName() {
+        return locationName;
+    }
+    /**
+     * @param locationName the locationName to set
+     */
+    public void setLocationName(final String locationName) {
+        this.locationName = locationName;
     }
 }
