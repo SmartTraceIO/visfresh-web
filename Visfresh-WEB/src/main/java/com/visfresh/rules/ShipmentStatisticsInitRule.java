@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ShipmentStatisticsDao;
 import com.visfresh.entities.Shipment;
@@ -19,6 +20,7 @@ import com.visfresh.services.ShipmentStatisticsService;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Component
 public class ShipmentStatisticsInitRule implements TrackerEventRule {
     private static final Logger log = LoggerFactory.getLogger(ShipmentStatisticsInitRule.class);
     private static final String NAME = "ShipmentStatisticsInitializeRule";
