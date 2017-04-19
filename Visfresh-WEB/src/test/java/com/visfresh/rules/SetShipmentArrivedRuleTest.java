@@ -289,10 +289,12 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
     public void testSendReport() {
         shipment.setArrivalNotificationWithinKm(0);
 
-        final String email = "arrival.developer@visfresh.com";
-        final NotificationSchedule sched = createEmailNotificaitonSchedule(email);
+        final String email1 = "arrival.developer@visfresh.com";
+        final NotificationSchedule sched = createEmailNotificaitonSchedule(email1);
 
         shipment.getArrivalNotificationSchedules().add(sched);
+        final String email2 = "arrival.developer@smarttrace.com.au";
+        shipment.getArrivalNotificationSchedules().add(createEmailNotificaitonSchedule(email2));
 
         final LocationProfile loc = createLocation();
         final TrackerEvent e = createEventNearLocation(loc);
@@ -324,14 +326,20 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         final MockEmailService emailer = context.getBean(MockEmailService.class);
         //check notification send
         final List<EmailMessage> emails = emailer.getMessages();
-        assertEquals(1, emails.size());
-        assertEquals(1, emailer.getAttachments().size());
+        assertEquals(2, emails.size());
+        assertEquals(2, emailer.getAttachments().size());
         assertNotNull(emailer.getAttachments().get(0));
 
-        final EmailMessage msg = emails.get(0);
+        //first message
+        EmailMessage msg = emails.get(0);
         assertEquals(1, msg.getEmails().length);
-        assertEquals(email, msg.getEmails()[0]);
+        assertEquals(email1, msg.getEmails()[0]);
         assertTrue(msg.getMessage().contains(shipment.getDevice().getSn()));
+
+        //second message
+        msg = emails.get(1);
+        assertEquals(1, msg.getEmails().length);
+        assertEquals(email2, msg.getEmails()[0]);
 
         //check not send report if already notified.
         emailer.clear();
@@ -352,7 +360,7 @@ public class SetShipmentArrivedRuleTest extends BaseRuleTest {
         final LocationProfile loc = createLocation();
         final TrackerEvent e = createEventNearLocation(loc);
 
-        //create session manager with peresistence
+        //create session manager with persistence
         final ShipmentSessionDao sessionDao = context.getBean(ShipmentSessionDao.class);
         final ShipmentSession session = new ShipmentSession(shipment.getId());
         final ShipmentSessionManager h = new ShipmentSessionManager() {

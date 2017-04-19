@@ -262,9 +262,7 @@ public class ReportsController extends AbstractController {
             }
 
             //create report bean.
-            final List<User> allReceivers = new LinkedList<>();
-            allReceivers.add(user);
-            final File file = createShipmentReport(s, user, allReceivers);
+            final File file = createShipmentReport(s, user);
 
             final int index = request.getRequestURL().indexOf("/" + GET_SHIPMENT_REPORT);
             response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
@@ -280,9 +278,9 @@ public class ReportsController extends AbstractController {
      * @param user user.
      * @return PDF shipment report.
      */
-    private File createShipmentReport(final Shipment s, final User user, final List<User> allReceivers)
+    private File createShipmentReport(final Shipment s, final User user)
             throws IOException {
-        final ShipmentReportBean bean = shipmentReportDao.createReport(s, allReceivers);
+        final ShipmentReportBean bean = shipmentReportDao.createReport(s);
         final File file = createTmpFile(s, "pdf");
 
         final OutputStream out = new FileOutputStream(file);
@@ -370,12 +368,11 @@ public class ReportsController extends AbstractController {
                         + ") for given company");
             }
 
-            final List<User> allReceivers = userDao.findAll(req.getUsers());
-            final File file = createShipmentReport(s, user, allReceivers);
+            final File file = createShipmentReport(s, user);
             final Set<String> emails = new HashSet<>();
 
             //add users
-            for (final User u: allReceivers) {
+            for (final User u: userDao.findAll(req.getUsers())) {
                 emails.add(u.getEmail());
             }
             //add emails

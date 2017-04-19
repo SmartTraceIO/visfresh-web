@@ -9,7 +9,6 @@ import static org.junit.Assert.assertNull;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -114,7 +113,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment, null);
+        final ShipmentReportBean report = dao.createReport(shipment);
 
         assertEquals(shipment.getDevice().getImei(), report.getDevice());
         assertEquals(tripCount, report.getTripCount());
@@ -153,7 +152,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment, null);
+        final ShipmentReportBean report = dao.createReport(shipment);
 
         final DateFormat fmt = DateTimeUtils.createPrettyFormat(
                 user.getLanguage(), user.getTimeZone());
@@ -185,7 +184,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         createTrackerEvent(startTime + 8 * dt, -20.3);
         createTrackerEvent(startTime + 9 * dt, 0);
 
-        final ShipmentReportBean report = dao.createReport(shipment, null);
+        final ShipmentReportBean report = dao.createReport(shipment);
 
         final List<TrackerEvent> events = context.getBean(TrackerEventDao.class).findAll(
                 null, null, null);
@@ -225,7 +224,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         createTrackerEvent(startTime + 8 * dt, -20.3);
         createTrackerEvent(startTime + 9 * dt, 0);
 
-        final ShipmentReportBean report = dao.createReport(shipment, null);
+        final ShipmentReportBean report = dao.createReport(shipment);
 
         final List<TrackerEvent> events = context.getBean(TrackerEventDao.class).findAll(
                 null, null, null).subList(5, 9);
@@ -262,7 +261,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
      */
     @Test
     public void testNoReadings() {
-        final ShipmentReportBean report = dao.createReport(shipment, null);
+        final ShipmentReportBean report = dao.createReport(shipment);
         final TemperatureStats stats = report.getTemperatureStats();
         assertEquals(0., stats.getLowerTemperatureLimit(), 0.001);
         assertEquals(5., stats.getUpperTemperatureLimit(), 0.001);
@@ -295,7 +294,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
         context.getBean(ShipmentSessionDao.class).saveSession(session);
 
-        final ShipmentReportBean report = dao.createReport(shipment, null);
+        final ShipmentReportBean report = dao.createReport(shipment);
         assertEquals(1, report.getFiredAlertRules().size());
         assertEquals(a1.getType(), report.getFiredAlertRules().get(0).getType());
     }
@@ -307,7 +306,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         createAlert(e);
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment, null);
+        final ShipmentReportBean report = dao.createReport(shipment);
         assertEquals(2, report.getAlerts().size());
         assertEquals(a1.getType(), report.getAlerts().get(0).getType());
     }
@@ -316,7 +315,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         shipment.getDevice().setColor(Color.DarkGoldenrod);
         shipmentDao.save(shipment);
 
-        final ShipmentReportBean report = dao.createReport(shipment, null);
+        final ShipmentReportBean report = dao.createReport(shipment);
         assertNotNull(report.getDeviceColor());
     }
     @Test
@@ -351,7 +350,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         //duplicate user
         notificator.sendNotification(s2, a2, e);
 
-        final ShipmentReportBean report = dao.createReport(shipment, null);
+        final ShipmentReportBean report = dao.createReport(shipment);
         assertEquals(2, report.getWhoWasNotifiedByAlert().size());
     }
     @Test
@@ -365,55 +364,111 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         context.getBean(AlternativeLocationsDao.class).save(shipment, alts);
 
-        final ShipmentReportBean bean = dao.createReport(shipment, null);
+        final ShipmentReportBean bean = dao.createReport(shipment);
         assertEquals(2, bean.getPossibleShippedTo().size());
         assertEquals(loc1.getName(), bean.getPossibleShippedTo().get(0));
         assertEquals(loc2.getName(), bean.getPossibleShippedTo().get(1));
     }
     @Test
-    public void testArrivalWhoNotified() {
+    public void testArrivalWhoNotifiedArrivedShipment() {
         final TrackerEvent e = createTrackerEvent(System.currentTimeMillis(), -10);
 
         final Arrival arrival = createArrival(e);
 
         final User u1 = createUser("U", "1");
+        final User u2 = createUser("U", "2");
         createUser("U", "3");
 
-        //create personal schedule for user.
         final PersonSchedule s1 = createSchedule(u1);
+        final PersonSchedule s2 = createSchedule(u2);
 
+        //create personal schedule for user.
         final NotificationSchedule ns = new NotificationSchedule();
         ns.setCompany(sharedCompany);
         ns.setName("JUnit NS");
         ns.getSchedules().add(s1);
+        ns.getSchedules().add(s2);
         context.getBean(NotificationScheduleDao.class).save(ns);
 
         shipment.getArrivalNotificationSchedules().add(ns);
+        shipment.setStatus(ShipmentStatus.Arrived);
         shipmentDao.save(shipment);
 
+        //test without notification sent
+        ShipmentReportBean report = dao.createReport(shipment);
+        assertEquals(0, report.getWhoReceivedReport().size());
+
+        //test with notification sent
         final NotificationService notificator = context.getBean(NotificationService.class);
 
         notificator.sendNotification(s1, arrival, e);
-        //duplicate user
-        notificator.sendNotification(s1, arrival, e);
+        notificator.sendNotification(s2, arrival, e);
 
-        final ShipmentReportBean report = dao.createReport(shipment, null);
-        assertNotNull(report.getArrival());
+        report = dao.createReport(shipment);
+        assertEquals(2, report.getWhoReceivedReport().size());
     }
     @Test
-    public void testUsersReceivedReports() {
-        createTrackerEvent(System.currentTimeMillis(), -10);
-
-        //create user list
+    public void testArrivalWhoNotifiedDefaultShipment() {
         final User u1 = createUser("U", "1");
-        final User u2 = createUser("U", "3");
+        final User u2 = createUser("U", "2");
+        createUser("U", "3");
 
-        final List<User> users = new LinkedList<>();
-        users.add(u1);
-        users.add(u2);
+        final PersonSchedule s1 = createSchedule(u1);
+        final PersonSchedule s2 = createSchedule(u2);
 
-        final ShipmentReportBean report = dao.createReport(shipment, users);
+        //create personal schedule for user.
+        final NotificationSchedule ns = new NotificationSchedule();
+        ns.setCompany(sharedCompany);
+        ns.setName("JUnit NS");
+        ns.getSchedules().add(s1);
+        ns.getSchedules().add(s2);
+        context.getBean(NotificationScheduleDao.class).save(ns);
+
+        shipment.getArrivalNotificationSchedules().add(ns);
+        shipment.setStatus(ShipmentStatus.Default);
+        shipmentDao.save(shipment);
+
+        final ShipmentReportBean report = dao.createReport(shipment);
         assertEquals(2, report.getWhoReceivedReport().size());
+    }
+
+    @Test
+    public void testArrivalWhoNotifiedEndedShipment() {
+        final TrackerEvent e = createTrackerEvent(System.currentTimeMillis(), -10);
+
+        final Arrival arrival = createArrival(e);
+
+        final User u1 = createUser("U", "1");
+        final User u2 = createUser("U", "2");
+        createUser("U", "3");
+
+        final PersonSchedule s1 = createSchedule(u1);
+        final PersonSchedule s2 = createSchedule(u2);
+
+        //create personal schedule for user.
+        final NotificationSchedule ns = new NotificationSchedule();
+        ns.setCompany(sharedCompany);
+        ns.setName("JUnit NS");
+        ns.getSchedules().add(s1);
+        ns.getSchedules().add(s2);
+        context.getBean(NotificationScheduleDao.class).save(ns);
+
+        shipment.getArrivalNotificationSchedules().add(ns);
+        shipment.setStatus(ShipmentStatus.Ended);
+        shipmentDao.save(shipment);
+
+        //test without notification sent
+        ShipmentReportBean report = dao.createReport(shipment);
+        assertEquals(0, report.getWhoReceivedReport().size());
+
+        //test with notification sent
+        final NotificationService notificator = context.getBean(NotificationService.class);
+
+        notificator.sendNotification(s1, arrival, e);
+        notificator.sendNotification(s2, arrival, e);
+
+        report = dao.createReport(shipment);
+        assertEquals(0, report.getWhoReceivedReport().size());
     }
 
     /**

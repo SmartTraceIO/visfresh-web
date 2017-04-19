@@ -38,8 +38,7 @@ public interface NotificationService {
             TemperatureUnits tu);
     /**
      * @param shipment shipment.
-     * @param user user.
      * @param usersReceivedReports TODO
      */
-    void sendShipmentReport(Shipment shipment, User user, List<User> usersReceivedReports);
+    void sendShipmentReport(Shipment shipment, List<User> usersReceivedReports);
 }

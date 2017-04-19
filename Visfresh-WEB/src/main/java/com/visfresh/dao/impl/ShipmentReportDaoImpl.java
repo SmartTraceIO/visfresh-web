@@ -4,9 +4,11 @@
 package com.visfresh.dao.impl;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +27,11 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationIssue;
+import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.NotificationType;
+import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
@@ -67,7 +72,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @see com.visfresh.dao.ShipmentReportDao#createReport(com.visfresh.entities.Shipment)
      */
     @Override
-    public ShipmentReportBean createReport(final Shipment s, final List<User> usersReceivedReports) {
+    public ShipmentReportBean createReport(final Shipment s) {
         final ShipmentReportBean bean = new ShipmentReportBean();
         final Arrival arrival = arrivalDao.getArrival(s);
 
@@ -142,11 +147,30 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         //get notifications
         //notified by alert
         bean.getWhoWasNotifiedByAlert().addAll(
-                toNameList(getNotifiedUsers(alerts, NotificationType.Alert)));
+            toNameList(getNotifiedUsers(alerts, NotificationType.Alert)));
 
-        if (usersReceivedReports != null) {
-            bean.getWhoReceivedReport().addAll(toNameList(usersReceivedReports));
+        List<User> usersReceivedReports = new LinkedList<>();
+        if (s.getStatus() == ShipmentStatus.Arrived) {
+            if (arrival != null) {
+                //notified users
+                final List<Arrival> arrivals = new LinkedList<>();
+                arrivals.add(arrival);
+                usersReceivedReports = getNotifiedUsers(arrivals, NotificationType.Arrival);
+            }
+        } else if (!s.hasFinalStatus()){
+            //user to be notified map. Map - because need to avoid of duplicates.
+            final Map<Long, User> all = new HashMap<>();
+            //get not potentially notified users without filtering by time frames
+            for (final NotificationSchedule schedule : s.getArrivalNotificationSchedules()) {
+                final List<PersonSchedule> personalSchedules = schedule.getSchedules();
+                for (final PersonSchedule ps : personalSchedules) {
+                    all.put(ps.getUser().getId(), ps.getUser());
+                }
+            }
+            usersReceivedReports = new LinkedList<>(all.values());
         }
+
+        bean.getWhoReceivedReport().addAll(toNameList(usersReceivedReports));
 
         if (s.getAlertProfile() != null) {
             bean.setTemperatureStats(createTemperatureStats(s.getAlertProfile(), events));

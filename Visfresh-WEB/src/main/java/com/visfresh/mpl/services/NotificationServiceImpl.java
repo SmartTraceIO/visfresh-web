@@ -50,6 +50,7 @@ import com.visfresh.entities.User;
 import com.visfresh.l12n.NotificationBundle;
 import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.reports.shipment.ShipmentReportBean;
+import com.visfresh.reports.shipment.ShipmentReportBuilder;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.NotificationService;
@@ -69,7 +70,7 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
      *
      */
     private static final String USER = "user";
-    private static final String RECEVIERS = "receivers";
+    private static final String USERS = "receivers";
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
     private static final String SHIPMENT = "shipment";
 
@@ -185,24 +186,24 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     }
     /**
      * @param shipment
-     * @param user
      */
     @Override
-    public void sendShipmentReport(final Shipment shipment, final User user, final List<User> usersReceivedReports) {
-        final JsonObject json = new JsonObject();
-        json.addProperty(SHIPMENT, shipment.getId());
-        json.addProperty(USER, user.getId());
+    public void sendShipmentReport(final Shipment shipment, final List<User> users) {
+        if (!users.isEmpty()) {
+            final JsonObject json = new JsonObject();
+            json.addProperty(SHIPMENT, shipment.getId());
 
-        if (!usersReceivedReports.isEmpty()) {
             final JsonArray array = new JsonArray();
-            for (final User u : usersReceivedReports) {
+            for (final User u : users) {
                 array.add(new JsonPrimitive(u.getId()));
             }
 
-            json.add(RECEVIERS, array);
-        }
+            json.add(USERS, array);
 
-        dispatcher.sendSystemMessage(json.toString(), SystemMessageType.ArrivalReport);
+            dispatcher.sendSystemMessage(json.toString(), SystemMessageType.ArrivalReport);
+        } else {
+            log.error("Empty user list for send report to " + shipment.getId());
+        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.SystemMessageHandler#handle(com.visfresh.entities.SystemMessage)
@@ -214,40 +215,59 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
         final long shipmentId = json.get(SHIPMENT).getAsLong();
         final Shipment s = shipmentDao.findOne(shipmentId);
 
-        final Long userId = json.get(USER).getAsLong();
-        final User user = userDao.findOne(userId);
+        final List<User> users = new LinkedList<>();
+        if (json.has(USER)) { //TODO old schema. Should remove after one day time out
+            final Long userId = json.get(USER).getAsLong();
+            final User user = userDao.findOne(userId);
+            if (user != null) {
+                users.add(user);
+            } else {
+                log.error("User not found: " + userId);
+            }
+        } else if (json.has(USERS)) {
+            final JsonArray array = json.get(USERS).getAsJsonArray();
+            for (final JsonElement el : array) {
+                final User receiver = userDao.findOne(el.getAsLong());
+                if (receiver != null) {
+                    users.add(receiver);
+                } else {
+                    log.error("User not found: " + el.getAsLong());
+                }
+            }
+        }
 
         if (s == null) {
             log.error("Failed to send shipment arrived report for " + shipmentId + ". Shipment not found");
-        } else if (user == null) {
-            log.error("Failed to send shipment arrived report for " + userId + ". User not found");
-        } else {
+        } else if (users.isEmpty()) {
+            log.error("Empty user list for send arrived report for " + shipmentId);
+        }else {
+            //create report bean
+            final ShipmentReportBean report = shipmentReportDao.createReport(s);
+
+            //in this case the list of report receivers is fully determined
+            report.getWhoReceivedReport().clear();
+            for (final User u : users) {
+                report.getWhoReceivedReport().add(ShipmentReportBuilder.createUserName(u));
+            }
+
             final ShipmentSession session = shipmentSessionDao.getSession(s);
-            final String key = "arrReport-" + user.getEmail();
 
-            if (session == null || session.getShipmentProperty(key) == null) {
-                session.setShipmentProperty(key, "true");
-                shipmentSessionDao.saveSession(session);
+            for (final User user : users) {
+                final String key = "arrReport-" + user.getEmail();
 
-                try {
-                    final List<User> usersReceivedReports = new LinkedList<>();
-                    if (json.has(RECEVIERS)) {
-                        final JsonArray array = json.get(RECEVIERS).getAsJsonArray();
-                        for (final JsonElement el : array) {
-                            final User receiver = userDao.findOne(el.getAsLong());
-                            if (receiver != null) {
-                                usersReceivedReports.add(receiver);
-                            }
-                        }
+                if (session == null || session.getShipmentProperty(key) == null) {
+                    session.setShipmentProperty(key, "true");
+                    shipmentSessionDao.saveSession(session);
+
+                    try {
+                        sendShipmentReportImmediately(s, user, report);
+                    } catch (final IOException e) {
+                        log.error("Failed to send arrival report for" + shipmentId, e);
+                        throw new RetryableException(e);
                     }
-
-                    sendShipmentReportImmediately(s, user, usersReceivedReports);
-                } catch (final IOException e) {
-                    log.error("Failed to send arrival report for" + shipmentId, e);
-                    throw new RetryableException(e);
+                } else {
+                    log.debug("Shipment arrived report is already sent to " + user.getEmail());
                 }
-            } else {
-                log.debug("Shipment arrived report is already sent to " + user.getEmail());
             }
         }
     }
@@ -257,7 +277,7 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
      * @param usersReceivedReports users who received reports.
      */
     private void sendShipmentReportImmediately(final Shipment s, final User user,
-            final List<User> usersReceivedReports) throws IOException {
+            final ShipmentReportBean report) throws IOException {
         final Language lang = user.getLanguage();
         final TimeZone tz = user.getTimeZone();
         final TemperatureUnits tu = user.getTemperatureUnits();
@@ -270,20 +290,20 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
         subject = bundle.getArrivalReportEmailSubject(s, lang, tz, tu);
         message = bundle.getArrivalReportEmailMessage(s, alertsFired, lang, tz, tu);
 
-        final File attachment = createShipmenentReport(user, s, usersReceivedReports);
+        final File attachment = createShipmenentReport(user, report);
 
-        log.debug("Sending shipment arrived report for " + user.getEmail());
         try {
+            log.debug("Sending shipment arrived report for " + user.getEmail());
             emailService.sendMessage(new String[]{user.getEmail()}, subject, message, attachment);
         } catch (final Exception e) {
-            log.error("Faile to send email with shipment reports", e);
+            log.error("Failed to send email with shipment report", e);
         } finally {
             attachment.delete();
         }
     }
     /**
-     * @param s
-     * @return
+     * @param s shipment.
+     * @return list of temperature alerts for given shipment.
      */
     private List<TemperatureAlert> getTemperatureAlerts(final Shipment s) {
         final List<Alert> alerts = alertDao.getAlerts(s);
@@ -300,14 +320,11 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
 
     /**
      * @param user user.
-     * @param shipment shipment.
+     * @param report report bean.
      * @param usersReceivedReports users who received report.
      * @return report file.
      */
-    private File createShipmenentReport(final User user, final Shipment shipment,
-            final List<User> usersReceivedReports) throws IOException {
-        final ShipmentReportBean report = shipmentReportDao.createReport(shipment, usersReceivedReports);
-
+    private File createShipmenentReport(final User user, final ShipmentReportBean report) throws IOException {
         final DateFormat fmt = DateTimeUtils.createDateFormat(
                 "yyyyMMdd HH:mm", user.getLanguage(), user.getTimeZone());
         final String companyName = report.getCompanyName().replaceAll("[\\p{Punct}]", "");

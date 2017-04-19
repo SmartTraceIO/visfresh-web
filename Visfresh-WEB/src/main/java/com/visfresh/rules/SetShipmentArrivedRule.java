@@ -137,12 +137,9 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
                 return;
             }
 
-            final List<User> usersReceivedReports = AbstractNotificationRule.getEmailingUsers(
+            final List<User> users = AbstractNotificationRule.getEmailingUsers(
                     shipment.getArrivalNotificationSchedules(), new Date());
-
-            for (final User user : usersReceivedReports) {
-                notificationService.sendShipmentReport(shipment, user, usersReceivedReports);
-            }
+            notificationService.sendShipmentReport(shipment, users);
         }
     }
 
