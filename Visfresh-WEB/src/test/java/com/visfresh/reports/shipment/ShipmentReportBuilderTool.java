@@ -99,6 +99,8 @@ public final class ShipmentReportBuilderTool {
         bean.setPossibleShippedTo(altLocs);
 
         bean.setStatus(ShipmentStatus.Default);
+        bean.setStatus(ShipmentStatus.Arrived);
+//        bean.setStatus(ShipmentStatus.Ended);
         bean.setTripCount(14);
         bean.setAlertSuppressionMinutes(110);
 

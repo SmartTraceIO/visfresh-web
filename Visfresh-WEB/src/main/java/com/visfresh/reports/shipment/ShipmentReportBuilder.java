@@ -28,6 +28,7 @@ import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
@@ -594,10 +595,19 @@ public class ShipmentReportBuilder {
         }
 
         //Who was notified:     Rob Arpas, Rob Arpas
-        final Map<String, Object> whoNotified = new HashMap<>();
-        whoNotified.put(key, "Who received report");
-        whoNotified.put(value, namesAsString(bean.getWhoReceivedReport()));
-        rows.add(whoNotified);
+        if (!Shipment.isFinalStatus(bean.getStatus()) || bean.getStatus() == ShipmentStatus.Arrived) {
+            final Map<String, Object> whoNotified = new HashMap<>();
+//          If Arrived, can we label it "Arrival Report sent to"
+//          if Default, can we label it "Arrival Report to be sent to"
+//          if Ended, no need to show row
+            if (bean.getStatus() == ShipmentStatus.Arrived) {
+                whoNotified.put(key, "Arrival Report sent to");
+            } else {
+                whoNotified.put(key, "Arrival Report to be sent to");
+            }
+            whoNotified.put(value, namesAsString(bean.getWhoReceivedReport()));
+            rows.add(whoNotified);
+        }
 
         //last reading data
         if (bean.getReadings().size() > 0) {
