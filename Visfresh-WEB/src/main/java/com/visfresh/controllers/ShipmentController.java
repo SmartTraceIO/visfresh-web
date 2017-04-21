@@ -91,6 +91,7 @@ import com.visfresh.lists.ListShipmentItem;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AutoStartShipmentService;
 import com.visfresh.services.LocationService;
+import com.visfresh.services.NotificationService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.utils.DateTimeUtils;
@@ -148,6 +149,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     private DeviceGroupDao deviceGroupDao;
     @Autowired
     private ShipmentSessionDao shipmentSessionDao;
+    @Autowired
+    private NotificationService notificationService;
 
     /**
      * Default constructor.
@@ -1489,6 +1492,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         dto.setDeviceColor(shipment.getDevice().getColor() == null ? null : shipment.getDevice().getColor().name());
         dto.setSendArrivalReport(shipment.isSendArrivalReport());
         dto.setSendArrivalReportOnlyIfAlerts(shipment.isSendArrivalReportOnlyIfAlerts());
+        dto.setArrivalReportSent(notificationService.isArrivalReportSent(shipment));
 
         final Date startTime = shipment.getShipmentDate();
 

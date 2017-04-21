@@ -381,7 +381,7 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
 
         final Shipment one = dao.findOne(s.getId());
         assertNotNull(one);
-        assertEquals(time.getTime(), one.getDeviceShutdownTime().getTime(), 1000);
+        assertTrue(time.getTime() - one.getDeviceShutdownTime().getTime() < 2000);
     }
     @Test
     public void testGetShipmentDeviceInfo() {

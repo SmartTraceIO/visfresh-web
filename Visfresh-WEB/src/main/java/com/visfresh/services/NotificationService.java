@@ -38,7 +38,12 @@ public interface NotificationService {
             TemperatureUnits tu);
     /**
      * @param shipment shipment.
-     * @param usersReceivedReports TODO
+     * @param usersReceivedReports report receivers.
      */
     void sendShipmentReport(Shipment shipment, List<User> usersReceivedReports);
+    /**
+     * @param shipment the shipment session.
+     * @return true if arrival report has sent for given shipment.
+     */
+    boolean isArrivalReportSent(Shipment shipment);
 }

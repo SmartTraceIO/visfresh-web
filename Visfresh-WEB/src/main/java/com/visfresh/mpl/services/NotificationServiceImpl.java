@@ -69,6 +69,10 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     /**
      *
      */
+    private static final String ARRIVAL_REPORT_PREFIX = "arrReport-";
+    /**
+     *
+     */
     private static final String USER = "user";
     private static final String USERS = "receivers";
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
@@ -120,7 +124,7 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
             sendEmailNotification(issue, user, trackerEvent, lang, tz, tu);
         }
 
-        final String person = getPersonDescription(s);
+        //send SMS
         if (s.isSendSms()) {
             final String message = bundle.getSmsMessage(issue, trackerEvent, lang, tz, tu);
 
@@ -129,7 +133,8 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
             if (phone != null && phone.length() > 0) {
                 smsService.sendMessage(new String[] {phone}, null, message);
             } else {
-                log.warn("Phone number has not set for personal schedule for " + person + " , SMS can't be send");
+                log.warn("Phone number has not set for personal schedule for "
+                        + getPersonDescription(s) + " , SMS can't be send");
             }
         }
 
@@ -190,20 +195,28 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     @Override
     public void sendShipmentReport(final Shipment shipment, final List<User> users) {
         if (!users.isEmpty()) {
-            final JsonObject json = new JsonObject();
-            json.addProperty(SHIPMENT, shipment.getId());
-
-            final JsonArray array = new JsonArray();
-            for (final User u : users) {
-                array.add(new JsonPrimitive(u.getId()));
-            }
-
-            json.add(USERS, array);
-
+            final JsonObject json = createSendShipmentReportMessage(shipment, users);
             dispatcher.sendSystemMessage(json.toString(), SystemMessageType.ArrivalReport);
         } else {
             log.error("Empty user list for send report to " + shipment.getId());
         }
+    }
+    /**
+     * @param shipment shipment.
+     * @param users report recipients.
+     * @return system message payload.
+     */
+    protected JsonObject createSendShipmentReportMessage(final Shipment shipment, final List<User> users) {
+        final JsonObject json = new JsonObject();
+        json.addProperty(SHIPMENT, shipment.getId());
+
+        final JsonArray array = new JsonArray();
+        for (final User u : users) {
+            array.add(new JsonPrimitive(u.getId()));
+        }
+
+        json.add(USERS, array);
+        return json;
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.SystemMessageHandler#handle(com.visfresh.entities.SystemMessage)
@@ -241,54 +254,66 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
         } else if (users.isEmpty()) {
             log.error("Empty user list for send arrived report for " + shipmentId);
         }else {
-            //create report bean
-            final ShipmentReportBean report = shipmentReportDao.createReport(s);
+            ShipmentSession session = shipmentSessionDao.getSession(s);
+            if (!isArrivalReportSent(session)) {
+                //mark the session about the arrival report sent
+                if (session == null) {
+                    session = new ShipmentSession();
+                    session.setShipmentId(s.getId());
+                }
+                session.setShipmentProperty(ARRIVAL_REPORT_PREFIX + new Date(), "true");
+                shipmentSessionDao.saveSession(session);
 
-            //in this case the list of report receivers is fully determined
-            report.getWhoReceivedReport().clear();
-            for (final User u : users) {
-                report.getWhoReceivedReport().add(ShipmentReportBuilder.createUserName(u));
-            }
+                //create report bean
+                final ShipmentReportBean report = shipmentReportDao.createReport(s);
 
-            final ShipmentSession session = shipmentSessionDao.getSession(s);
+                //in this case the list of report receivers is fully determined
+                report.getWhoReceivedReport().clear();
+                for (final User u : users) {
+                    report.getWhoReceivedReport().add(ShipmentReportBuilder.createUserName(u));
+                }
 
-            for (final User user : users) {
-                final String key = "arrReport-" + user.getEmail();
-
-                if (session == null || session.getShipmentProperty(key) == null) {
-                    session.setShipmentProperty(key, "true");
-                    shipmentSessionDao.saveSession(session);
-
+                //send report to users.
+                for (final User user : users) {
                     try {
-                        sendShipmentReportImmediately(s, user, report);
+                        sendReportToUser(user, s, report);
                     } catch (final IOException e) {
                         log.error("Failed to send arrival report for" + shipmentId, e);
                         throw new RetryableException(e);
                     }
-                } else {
-                    log.debug("Shipment arrived report is already sent to " + user.getEmail());
                 }
+            } else {
+                log.debug("Shipment (" + s.getId() + ") arrived report is already sent");
             }
         }
     }
+    @Override
+    public boolean isArrivalReportSent(final Shipment shipment) {
+        return isArrivalReportSent(shipmentSessionDao.getSession(shipment));
+    }
+    private boolean isArrivalReportSent(final ShipmentSession session) {
+        if (session != null) {
+            for (final String key : session.getShipmentKeys()) {
+                if (key.startsWith(ARRIVAL_REPORT_PREFIX)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     /**
-     * @param s shipment.
      * @param user user.
+     * @param s shipment.
      * @param usersReceivedReports users who received reports.
      */
-    private void sendShipmentReportImmediately(final Shipment s, final User user,
+    private void sendReportToUser(final User user, final Shipment s,
             final ShipmentReportBean report) throws IOException {
         final Language lang = user.getLanguage();
         final TimeZone tz = user.getTimeZone();
         final TemperatureUnits tu = user.getTemperatureUnits();
 
-        final String subject;
-        final String message;
-
-        final List<TemperatureAlert> alertsFired = getTemperatureAlerts(s);
-
-        subject = bundle.getArrivalReportEmailSubject(s, lang, tz, tu);
-        message = bundle.getArrivalReportEmailMessage(s, alertsFired, lang, tz, tu);
+        final String subject = bundle.getArrivalReportEmailSubject(s, lang, tz, tu);
+        final String message = bundle.getArrivalReportEmailMessage(s, getTemperatureAlerts(s), lang, tz, tu);
 
         final File attachment = createShipmenentReport(user, report);
 

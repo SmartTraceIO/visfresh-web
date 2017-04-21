@@ -89,6 +89,7 @@ public class SingleShipmentDto {
     private final List<DeviceGroupDto> deviceGroups = new LinkedList<>();
     private String deviceColor;
     private boolean isLatestShipment;
+    private boolean arrivalReportSent;
 
     /**
      * Default constructor.
@@ -832,5 +833,17 @@ public class SingleShipmentDto {
      */
     public void setSendArrivalReportOnlyIfAlerts(final boolean sendArrivalReportOnlyIfAlerts) {
         this.sendArrivalReportOnlyIfAlerts = sendArrivalReportOnlyIfAlerts;
+    }
+    /**
+     * @return the arrivalReportSent
+     */
+    public boolean isArrivalReportSent() {
+        return arrivalReportSent;
+    }
+    /**
+     * @param arrivalReportSent the arrivalReportSent to set
+     */
+    public void setArrivalReportSent(final boolean arrivalReportSent) {
+        this.arrivalReportSent = arrivalReportSent;
     }
 }

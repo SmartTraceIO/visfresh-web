@@ -597,6 +597,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
             json.addProperty(ShipmentConstants.SEND_ARRIVAL_REPORT, dto.isSendArrivalReport());
             json.addProperty(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS, dto.isSendArrivalReportOnlyIfAlerts());
+            json.addProperty("arrivalReportSent", dto.isArrivalReportSent());
 
             final JsonArray locations = new JsonArray();
             for (final SingleShipmentLocation l : dto.getLocations()) {

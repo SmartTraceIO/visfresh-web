@@ -76,7 +76,12 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
             context.getBean(MockEmailService.class).clear();
         } catch (final Exception e) {}
     }
-
+    /**
+     * @return the context
+     */
+    public static AnnotationConfigApplicationContext getContext() {
+        return context;
+    }
     /* (non-Javadoc)
      * @see org.junit.runners.BlockJUnit4ClassRunner#createTest()
      */

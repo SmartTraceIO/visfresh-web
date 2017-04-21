@@ -2860,6 +2860,7 @@ Response:
     "alertsSuppressionTime": "11:34AM 7 Apr 2016",
     "sendArrivalReport": true,
     "arrivalReportOnlyIfAlerts": false,
+    "arrivalReportSent": false,
     "locations": [
       {
         "lat": 50.5,
