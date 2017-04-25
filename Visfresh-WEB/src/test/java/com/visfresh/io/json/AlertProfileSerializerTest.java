@@ -85,6 +85,7 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         final double temperature = 15.;
         final int timeOutMinutes = 20;
         final AlertType type = AlertType.CriticalCold;
+        final Integer maxRateMinutes = 78;
         final Long id = 77l;
 
         TemperatureRule issue = new TemperatureRule();
@@ -94,6 +95,7 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         issue.setTimeOutMinutes(timeOutMinutes);
         issue.setType(type);
         issue.setCumulativeFlag(true);
+        issue.setMaxRateMinutes(maxRateMinutes);
 
         final JsonObject obj = serializer.toJson(issue);
         issue = serializer.parseTemperatureIssue(obj);
@@ -101,6 +103,7 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         assertEquals(temperature, issue.getTemperature(), 0.0001);
         assertEquals(type, issue.getType());
         assertEquals(timeOutMinutes, issue.getTimeOutMinutes());
+        assertEquals(maxRateMinutes, issue.getMaxRateMinutes());
         assertEquals(id, issue.getId());
         assertTrue(issue.isCumulativeFlag());
     }

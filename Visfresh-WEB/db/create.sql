@@ -186,6 +186,7 @@ create table temperaturerules (
     temp float not null,
     timeout int not null,
     cumulative boolean not null default false,
+    maxrateminutes int default null,
     alertprofile bigint(20) not null,
     primary key (id),
     foreign key (alertprofile)

@@ -126,6 +126,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         obj.addProperty("temperature", LocalizationUtils.convertToUnits(issue.getTemperature(), tempUnits));
         obj.addProperty("timeOutMinutes", issue.getTimeOutMinutes());
         obj.addProperty("cumulativeFlag", issue.isCumulativeFlag());
+        obj.addProperty("maxRateMinutes", issue.getMaxRateMinutes());
         return obj;
     }
     /**
@@ -139,6 +140,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         issue.setTemperature(LocalizationUtils.convertFromUnits(asDouble(json.get("temperature")), tempUnits));
         issue.setTimeOutMinutes(asInt(json.get("timeOutMinutes")));
         issue.setCumulativeFlag(asBoolean(json.get("cumulativeFlag")));
+        issue.setMaxRateMinutes(asInteger(json.get("maxRateMinutes")));
         return issue;
     }
     public JsonObject toJson(final ListAlertProfileItem item) {

@@ -146,6 +146,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             paramMap.put("type", issue.getType().toString());
             paramMap.put("timeOut", issue.getTimeOutMinutes());
             paramMap.put("cumulative", issue.isCumulativeFlag());
+            paramMap.put("maxrateminutes", issue.getMaxRateMinutes());
             paramMap.put("apid", id);
 
             if (issueId != null) {
@@ -156,13 +157,14 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
                         + " type = :type,"
                         + " temp = :temperature,"
                         + " timeout = :timeOut,"
-                        + " cumulative = :cumulative"
+                        + " cumulative = :cumulative,"
+                        + " maxrateminutes = :maxrateminutes"
                         + " where id = :id", paramMap);
             } else {
                 final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
                 jdbc.update("insert into temperaturerules"
-                        + "(type, temp, timeout, cumulative, alertprofile)"
-                        + " values(:type, :temperature, :timeOut, :cumulative, :apid)",
+                        + "(type, temp, timeout, cumulative, maxrateminutes, alertprofile)"
+                        + " values(:type, :temperature, :timeOut, :cumulative, :maxrateminutes, :apid)",
                         new MapSqlParameterSource(paramMap), keyHolder);
                 if (keyHolder.getKey() != null) {
                     issue.setId(keyHolder.getKey().longValue());
@@ -212,6 +214,10 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             issue.setCumulativeFlag(Boolean.TRUE.equals(row.get("cumulative")));
             issue.setTimeOutMinutes(((Number) row.get("timeout")).intValue());
             issue.setType(AlertType.valueOf((String) row.get("type")));
+            final Number maxRateMinutes = (Number) row.get("maxrateminutes");
+            if (maxRateMinutes != null) {
+                issue.setMaxRateMinutes(maxRateMinutes.intValue());
+            }
 
             list.add(issue);
         }

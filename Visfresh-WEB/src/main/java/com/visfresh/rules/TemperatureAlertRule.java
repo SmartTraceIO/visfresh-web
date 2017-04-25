@@ -3,20 +3,25 @@
  */
 package com.visfresh.rules;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -68,11 +73,11 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         for (final TemperatureRule rule : event.getShipment().getAlertProfile().getAlertRules()) {
 
             //if rule is not already processed. Each rule should be processed one time.
-            if (!AbstractRuleEngine.isTemperatureRuleProcessed(session, rule)) {
-                final boolean isCumulative = rule.isCumulativeFlag();
+            if (!AbstractRuleEngine.isTemperatureRuleProcessed(session, rule)
+                    || canProcessAgain(session, rule)) {
                 if (isMatches(rule, t)) {
                     Alert a = null;
-                    if (isCumulative) {
+                    if (rule.isCumulativeFlag()) {
                         //process cumulative rule
                         if (prev != null) {
                             a = processComulativeRule(rule, context, prev);
@@ -87,12 +92,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
                         alerts.add(a);
                     }
                 } else {
-                    if (!isCumulative) {
-                        //clear first issue date
-                        final Map<String, String> props = session.getTemperatureAlerts()
-                                .getProperties();
-                        props.remove(createStartIssueKey(rule));
-                    }
+                    clearNotCummulativeDates(session, rule);
                 }
             }
         }
@@ -100,6 +100,34 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         return alerts.toArray(new Alert[alerts.size()]);
     }
 
+    /**
+     * @param rule rule.
+     * @param context rule context.
+     * @param prev previous event.
+     */
+    private Alert processComulativeRule(final TemperatureRule rule, final RuleContext context,
+            final TrackerEvent prev) {
+        final ShipmentSession session = context.getSessionManager().getSession(context.getEvent().getShipment());
+        final Map<String, String> props = session.getTemperatureAlerts()
+                .getProperties();
+
+        //process cumulative rule
+        final String cumulativeTotalKey = createCumulativeTotalKey(rule);
+        final TrackerEvent event = context.getEvent();
+
+        //update summary
+        final String totalStr = props.get(cumulativeTotalKey);
+        long total = totalStr == null ? 0 : Long.parseLong(totalStr);
+        total += Math.abs(event.getTime().getTime() - prev.getTime().getTime());
+
+        if (shouldFireAlert(rule, session, event.getTime(), total)) {
+            return fireAlert(rule, session, event, total);
+        } else {
+            props.put(cumulativeTotalKey, Long.toString(total));
+        }
+
+        return null;
+    }
     /**
      * @param rule rule.
      * @param context rule context.
@@ -119,44 +147,9 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         }
 
         final TrackerEvent event = context.getEvent();
-        final long total = (event.getTime().getTime() - firstIssue.getTime()) / MINUTE;
-        if (total >= rule.getTimeOutMinutes()) {
-            final TemperatureAlert a = createAlert(rule, event);
-            a.setMinutes((int) total);
-            AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
-            return a;
-        }
-
-        return null;
-    }
-
-    /**
-     * @param rule rule.
-     * @param context rule context.
-     * @param prev previous event.
-     */
-    private Alert processComulativeRule(final TemperatureRule rule, final RuleContext context,
-            final TrackerEvent prev) {
-        final ShipmentSession session = context.getSessionManager().getSession(context.getEvent().getShipment());
-        final Map<String, String> props = session.getTemperatureAlerts()
-                .getProperties();
-
-        //process cumulative rule
-        final String cumulativeTotalKey = createBaseRuleKey(rule) + "_total";
-        final TrackerEvent event = context.getEvent();
-
-        //update summary
-        final String totalStr = props.get(cumulativeTotalKey);
-        long total = totalStr == null ? 0 : Long.parseLong(totalStr);
-        total += Math.abs(event.getTime().getTime() - prev.getTime().getTime());
-
-        if (total >= rule.getTimeOutMinutes() * 60000L) {
-            final TemperatureAlert alert = createAlert(rule, event);
-            alert.setMinutes((int) (total / 60000l));
-            AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
-            return alert;
-        } else {
-            props.put(cumulativeTotalKey, Long.toString(total));
+        final long total = (event.getTime().getTime() - firstIssue.getTime());
+        if (shouldFireAlert(rule, session, event.getTime(), total)) {
+            return fireAlert(rule, session, event, total);
         }
 
         return null;
@@ -164,9 +157,130 @@ public class TemperatureAlertRule extends AbstractAlertRule {
 
     /**
      * @param rule
+     * @param session
+     * @param event
+     * @param total
      * @return
      */
-    protected String createStartIssueKey(final TemperatureRule rule) {
+    protected TemperatureAlert fireAlert(final TemperatureRule rule, final ShipmentSession session,
+            final TrackerEvent event, final long total) {
+        final TemperatureAlert a = createAlert(rule, event);
+        a.setMinutes((int) (total / MINUTE));
+
+        //mark the rule already processed
+        AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
+
+        //set last processed date to shipment property
+        session.setShipmentProperty(createAlertTimeKey(rule),
+                createTimeFormat().format(event.getTime()));
+
+        //clear processing fields
+        clearNotCummulativeDates(session, rule);
+        clearCummulativeDates(session, rule);
+        return a;
+    }
+
+    /**
+     * @param rule
+     * @param total
+     * @return
+     */
+    protected boolean shouldFireAlert(final TemperatureRule rule,
+            final ShipmentSession session, final Date date, final long total) {
+        if (rule.getMaxRateMinutes() != null && AbstractRuleEngine.isTemperatureRuleProcessed(session, rule)) {
+            final Date lastAlert = getLastAlertTime(session, rule);
+            if (lastAlert == null || date.getTime() - lastAlert.getTime() < rule.getMaxRateMinutes() * MINUTE) {
+                return false;
+            }
+        }
+
+        return total >= rule.getTimeOutMinutes() * MINUTE;
+    }
+    /**
+     * @param session
+     * @param rule
+     * @return
+     */
+    private boolean canProcessAgain(final ShipmentSession session, final TemperatureRule rule) {
+        return rule.getMaxRateMinutes() != null && getLastAlertTime(session, rule) != null;
+    }
+
+    /**
+     * @param session
+     * @param rule
+     * @return
+     */
+    private Date getLastAlertTime(final ShipmentSession session, final TemperatureRule rule) {
+        final String key = createAlertTimeKey(rule);
+
+        final String timeStr = session.getShipmentProperty(key);
+        if (timeStr == null) {
+            return null;
+        }
+
+        Date lastProcessed;
+        try {
+            lastProcessed = createTimeFormat().parse(timeStr);
+        } catch (final ParseException e) {
+            throw new RuntimeException("Failed to parse the time string " + timeStr);
+        }
+
+        return lastProcessed;
+    }
+
+    /**
+     * @param session
+     * @param rule
+     */
+    private void clearNotCummulativeDates(final ShipmentSession session, final TemperatureRule rule) {
+        if (!rule.isCumulativeFlag()) {
+            //clear first issue date
+            final Map<String, String> props = session.getTemperatureAlerts()
+                    .getProperties();
+            props.remove(createStartIssueKey(rule));
+        }
+    }
+    /**
+     * @param session
+     * @param rule
+     */
+    private void clearCummulativeDates(final ShipmentSession session, final TemperatureRule rule) {
+        if (rule.isCumulativeFlag()) {
+            final Map<String, String> props = session.getTemperatureAlerts()
+                    .getProperties();
+
+            //process cumulative rule
+            final String cumulativeTotalKey = createCumulativeTotalKey(rule);
+            props.remove(cumulativeTotalKey);
+        }
+    }
+    /**
+     * @return time format.
+     */
+    private DateFormat createTimeFormat() {
+        return DateTimeUtils.createDateFormat("yyyy-MM-dd'T'HH:mm:ss",
+                Language.English, TimeZone.getDefault());
+    }
+
+    /**
+     * @param rule temperature rule.
+     * @return key for shipment properties.
+     */
+    private String createAlertTimeKey(final TemperatureRule rule) {
+        return NAME + "_" + rule.getType() + "_" + rule.getId() + "-time";
+    }
+    /**
+     * @param rule
+     * @return
+     */
+    private String createCumulativeTotalKey(final TemperatureRule rule) {
+        return createBaseRuleKey(rule) + "_total";
+    }
+    /**
+     * @param rule
+     * @return
+     */
+    private String createStartIssueKey(final TemperatureRule rule) {
         final String ruleKey = createBaseRuleKey(rule);
         return ruleKey + "_start";
     }
@@ -175,7 +289,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param rule
      * @return
      */
-    protected static String createBaseRuleKey(final TemperatureRule rule) {
+    private static String createBaseRuleKey(final TemperatureRule rule) {
         return NAME + "_" + rule.getType() + "_" + rule.getId();
     }
 

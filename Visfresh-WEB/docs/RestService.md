@@ -1362,49 +1362,57 @@ Response:
       "type": "CriticalHot",
       "temperature": 18.0,
       "timeOutMinutes": 0,
-      "cumulativeFlag": true
+      "cumulativeFlag": true,
+      "maxRateMinutes": null
     },
     {
       "type": "CriticalHot",
       "temperature": 17.0,
       "timeOutMinutes": 1,
-      "cumulativeFlag": true
+      "cumulativeFlag": true,
+      "maxRateMinutes": null
     },
     {
       "type": "CriticalCold",
       "temperature": -12.0,
       "timeOutMinutes": 0,
-      "cumulativeFlag": true
+      "cumulativeFlag": true,
+      "maxRateMinutes": null
     },
     {
       "type": "CriticalCold",
       "temperature": -11.0,
       "timeOutMinutes": 1,
-      "cumulativeFlag": false
+      "cumulativeFlag": false,
+      "maxRateMinutes": null
     },
     {
       "type": "Hot",
       "temperature": 6.0,
       "timeOutMinutes": 0,
-      "cumulativeFlag": false
+      "cumulativeFlag": false,
+      "maxRateMinutes": null
     },
     {
       "type": "Hot",
       "temperature": 7.0,
       "timeOutMinutes": 2,
-      "cumulativeFlag": true
+      "cumulativeFlag": true,
+      "maxRateMinutes": null
     },
     {
       "type": "Cold",
       "temperature": -7.0,
       "timeOutMinutes": 40,
-      "cumulativeFlag": true
+      "cumulativeFlag": true,
+      "maxRateMinutes": null
     },
     {
       "type": "Cold",
       "temperature": -5.0,
       "timeOutMinutes": 55,
-      "cumulativeFlag": true
+      "cumulativeFlag": true,
+      "maxRateMinutes": null
     }
   ]
 }
@@ -1447,56 +1455,64 @@ Response:
         "type": "CriticalHot",
         "temperature": 18.0,
         "timeOutMinutes": 0,
-        "cumulativeFlag": true
+        "cumulativeFlag": true,
+        "maxRateMinutes": null
       },
       {
         "id": 983,
         "type": "CriticalHot",
         "temperature": 17.0,
         "timeOutMinutes": 1,
-        "cumulativeFlag": true
+        "cumulativeFlag": true,
+        "maxRateMinutes": null
       },
       {
         "id": 984,
         "type": "CriticalCold",
         "temperature": -12.0,
         "timeOutMinutes": 0,
-        "cumulativeFlag": true
+        "cumulativeFlag": true,
+        "maxRateMinutes": null
       },
       {
         "id": 985,
         "type": "CriticalCold",
         "temperature": -11.0,
         "timeOutMinutes": 1,
-        "cumulativeFlag": true
+        "cumulativeFlag": true,
+        "maxRateMinutes": null
       },
       {
         "id": 986,
         "type": "Hot",
         "temperature": 6.0,
         "timeOutMinutes": 0,
-        "cumulativeFlag": true
+        "cumulativeFlag": true,
+        "maxRateMinutes": null
       },
       {
         "id": 987,
         "type": "Hot",
         "temperature": 7.0,
         "timeOutMinutes": 2,
-        "cumulativeFlag": true
+        "cumulativeFlag": true,
+        "maxRateMinutes": null
       },
       {
         "id": 988,
         "type": "Cold",
         "temperature": -7.0,
         "timeOutMinutes": 40,
-        "cumulativeFlag": true
+        "cumulativeFlag": true,
+        "maxRateMinutes": null
       },
       {
         "id": 989,
         "type": "Cold",
         "temperature": -5.0,
         "timeOutMinutes": 55,
-        "cumulativeFlag": true
+        "cumulativeFlag": true,
+        "maxRateMinutes": null
       }
     ]
   }

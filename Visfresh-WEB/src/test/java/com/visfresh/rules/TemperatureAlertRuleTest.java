@@ -622,6 +622,79 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         final TemperatureAlert a = (TemperatureAlert) alertDao.findAll(null, null, null).get(0);
         assertTrue(a.isCumulative());
     }
+    @Test
+    public void testRepeatTimeOutCummulative() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final TemperatureRule r = new TemperatureRule(AlertType.CriticalCold);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setCumulativeFlag(true);
+        r.setMaxRateMinutes(1);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - 2 * timeOutMinutes * minute - 6;
+        final SessionHolder mgr = new SessionHolder();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 5);
+        rule.handle(new RuleContext(e, mgr));
+        e = createEvent(startTime + (timeOutMinutes + 1) * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, mgr));
+
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //repeat
+        e = createEvent(startTime + (timeOutMinutes + 1) * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, mgr));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //repeat
+        e = createEvent(startTime + (2 * timeOutMinutes + 1) * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, mgr));
+        assertEquals(2, alertDao.findAll(null, null, null).size());
+    }
+    @Test
+    public void testRepeatTimeOut() {
+        final long minute = 60000l;
+        final double temperature = 10.;
+        final int timeOutMinutes = 30;
+
+        //create alert rule
+        final TemperatureRule r = new TemperatureRule(AlertType.CriticalCold);
+        r.setTemperature(temperature);
+        r.setTimeOutMinutes(timeOutMinutes);
+        r.setMaxRateMinutes(1);
+
+        alertProfile.getAlertRules().add(r);
+        alertProfileDao.save(alertProfile);
+
+        //check first iteration
+        final long startTime = System.currentTimeMillis() - 2 * timeOutMinutes * minute - 6;
+        final SessionHolder mgr = new SessionHolder();
+
+        TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 5);
+        rule.handle(new RuleContext(e, mgr));
+        e = createEvent(startTime + (timeOutMinutes + 1) * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, mgr));
+
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //repeat
+        e = createEvent(startTime + (timeOutMinutes + 1) * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, mgr));
+        assertEquals(1, alertDao.findAll(null, null, null).size());
+
+        //repeat
+        e = createEvent(startTime + (2 * timeOutMinutes + 1) * minute, TrackerEventType.AUT, temperature - 1);
+        rule.handle(new RuleContext(e, mgr));
+        assertEquals(2, alertDao.findAll(null, null, null).size());
+    }
     /**
      * @param date date.
      * @param type type.

@@ -3,6 +3,8 @@
  */
 package com.visfresh.entities;
 
+import java.util.Objects;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
@@ -13,6 +15,8 @@ public class TemperatureRule extends AlertRule {
     private double temperature;
     private int timeOutMinutes;
     private boolean cumulativeFlag;
+    //max rate = one time per maxRateMinutes
+    private Integer maxRateMinutes;
 
     /**
      * Default constructor.
@@ -80,6 +84,18 @@ public class TemperatureRule extends AlertRule {
     public void setCumulativeFlag(final boolean cumulativeFlag) {
         this.cumulativeFlag = cumulativeFlag;
     }
+    /**
+     * @return the maxRateMinutes
+     */
+    public Integer getMaxRateMinutes() {
+        return maxRateMinutes;
+    }
+    /**
+     * @param maxRateMinutes the maxRateMinutes to set
+     */
+    public void setMaxRateMinutes(final Integer maxRateMinutes) {
+        this.maxRateMinutes = maxRateMinutes;
+    }
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -95,7 +111,8 @@ public class TemperatureRule extends AlertRule {
                 getType() == other.getType() &&
                 getTemperature() == other.getTemperature() &&
                 getTimeOutMinutes() == other.getTimeOutMinutes() &&
-                isCumulativeFlag() == other.isCumulativeFlag();
+                isCumulativeFlag() == other.isCumulativeFlag() &&
+                Objects.equals(getMaxRateMinutes(), other.getMaxRateMinutes());
     }
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
@@ -107,6 +124,7 @@ public class TemperatureRule extends AlertRule {
         hb.append(getTemperature());
         hb.append(getTimeOutMinutes());
         hb.append(isCumulativeFlag());
+        hb.append(getMaxRateMinutes());
         return hb.toHashCode();
     }
 }

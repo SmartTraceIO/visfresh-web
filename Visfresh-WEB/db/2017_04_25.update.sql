@@ -1,0 +1,1 @@
+alter table temperaturerules add column maxrateminutes int default null;

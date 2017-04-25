@@ -175,6 +175,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         expected.setTemperature(15);
         expected.setTimeOutMinutes(0);
         expected.setCumulativeFlag(true);
+        expected.setMaxRateMinutes(14);
         ap.getAlertRules().add(expected);
 
         dao.save(ap);
@@ -185,6 +186,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertEquals(expected.getTimeOutMinutes(), actual.getTimeOutMinutes());
         assertEquals(expected.getType(), actual.getType());
         assertEquals(expected.isCumulativeFlag(), actual.isCumulativeFlag());
+        assertEquals(expected.getMaxRateMinutes(), actual.getMaxRateMinutes());
     }
     @Override
     @Test
@@ -198,6 +200,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         expected.setTemperature(15);
         expected.setTimeOutMinutes(0);
         expected.setCumulativeFlag(false);
+        expected.setMaxRateMinutes(77);
         ap.getAlertRules().add(expected);
 
         dao.save(ap);
@@ -205,6 +208,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         ap = dao.findOne(ap.getId());
         expected = ap.getAlertRules().get(0);
         expected.setCumulativeFlag(true);
+        expected.setMaxRateMinutes(78);
         dao.save(ap);
 
         ap = dao.findOne(ap.getId());
@@ -214,5 +218,6 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertEquals(expected.getTimeOutMinutes(), actual.getTimeOutMinutes());
         assertEquals(expected.getType(), actual.getType());
         assertEquals(expected.isCumulativeFlag(), actual.isCumulativeFlag());
+        assertEquals(expected.getMaxRateMinutes(), actual.getMaxRateMinutes());
     }
 }
