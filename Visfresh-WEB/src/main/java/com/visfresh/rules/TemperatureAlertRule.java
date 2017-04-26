@@ -74,7 +74,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
 
             //if rule is not already processed. Each rule should be processed one time.
             if (!AbstractRuleEngine.isTemperatureRuleProcessed(session, rule)
-                    || canProcessAgain(session, rule)) {
+                    || canProcessAgain(session, rule, event.getTime())) {
                 if (isMatches(rule, t)) {
                     Alert a = null;
                     if (rule.isCumulativeFlag()) {
@@ -120,7 +120,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
         long total = totalStr == null ? 0 : Long.parseLong(totalStr);
         total += Math.abs(event.getTime().getTime() - prev.getTime().getTime());
 
-        if (shouldFireAlert(rule, session, event.getTime(), total)) {
+        if (shouldFireAlert(rule, session, total)) {
             return fireAlert(rule, session, event, total);
         } else {
             props.put(cumulativeTotalKey, Long.toString(total));
@@ -148,7 +148,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
 
         final TrackerEvent event = context.getEvent();
         final long total = (event.getTime().getTime() - firstIssue.getTime());
-        if (shouldFireAlert(rule, session, event.getTime(), total)) {
+        if (shouldFireAlert(rule, session, total)) {
             return fireAlert(rule, session, event, total);
         }
 
@@ -186,14 +186,7 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @return
      */
     protected boolean shouldFireAlert(final TemperatureRule rule,
-            final ShipmentSession session, final Date date, final long total) {
-        if (rule.getMaxRateMinutes() != null && AbstractRuleEngine.isTemperatureRuleProcessed(session, rule)) {
-            final Date lastAlert = getLastAlertTime(session, rule);
-            if (lastAlert == null || date.getTime() - lastAlert.getTime() < rule.getMaxRateMinutes() * MINUTE) {
-                return false;
-            }
-        }
-
+            final ShipmentSession session, final long total) {
         return total >= rule.getTimeOutMinutes() * MINUTE;
     }
     /**
@@ -201,8 +194,15 @@ public class TemperatureAlertRule extends AbstractAlertRule {
      * @param rule
      * @return
      */
-    private boolean canProcessAgain(final ShipmentSession session, final TemperatureRule rule) {
-        return rule.getMaxRateMinutes() != null && getLastAlertTime(session, rule) != null;
+    private boolean canProcessAgain(final ShipmentSession session, final TemperatureRule rule, final Date date) {
+        final Integer maxRateMinutes = rule.getMaxRateMinutes();
+        final Date lastAlert = getLastAlertTime(session, rule);
+
+        if(maxRateMinutes != null && lastAlert != null) {
+            return date.getTime() - lastAlert.getTime() >= rule.getMaxRateMinutes() * MINUTE;
+        }
+
+        return false;
     }
 
     /**
