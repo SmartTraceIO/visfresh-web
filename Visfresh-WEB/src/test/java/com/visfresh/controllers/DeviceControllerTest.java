@@ -13,8 +13,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +23,6 @@ import com.visfresh.controllers.restclient.DeviceRestClient;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.AutoStartShipmentDao;
-import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DeviceCommandDao;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.DeviceGroupDao;
@@ -59,6 +56,8 @@ import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -596,15 +595,6 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         a.setDevice(d);
         a.setShipment(s);
         return context.getBean(ArrivalDao.class).save(a);
-    }
-    /**
-     * @param name company name.
-     * @return company.
-     */
-    private Company createCompany(final String name) {
-        final Company c = new Company();
-        c.setName(name);
-        return context.getBean(CompanyDao.class).save(c);
     }
     /**
      * @param device device.

@@ -80,6 +80,8 @@ import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.shipment.DeviceGroupDto;
+import com.visfresh.io.shipment.ShipmentCompanyDto;
+import com.visfresh.io.shipment.ShipmentUserDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
 import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
@@ -1534,6 +1536,13 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         dto.getAlertsNotificationSchedules().addAll(toListItems(shipment.getAlertsNotificationSchedules()));
         dto.getArrivalNotificationSchedules().addAll(toListItems(shipment.getArrivalNotificationSchedules()));
+
+        for (final User u : shipment.getUserAccess()) {
+            dto.getUserAccess().add(new ShipmentUserDto(u));
+        }
+        for (final Company c : shipment.getCompanyAccess()) {
+            dto.getCompanyAccess().add(new ShipmentCompanyDto(c));
+        }
         return dto;
     }
     /**

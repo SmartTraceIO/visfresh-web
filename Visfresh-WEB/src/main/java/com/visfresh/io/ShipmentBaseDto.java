@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.visfresh.entities.ShipmentBase;
+import com.visfresh.utils.EntityUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -89,6 +90,14 @@ public class ShipmentBaseDto {
     private boolean isAutostart;
     private List<Long> interimLocations;
     private List<Long> endLocationAlternatives;
+    /**
+     * External company excess.
+     */
+    private final List<Long> companyAccess = new LinkedList<>();
+    /**
+     * External user access.
+     */
+    private final List<Long> userAccess = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -118,6 +127,8 @@ public class ShipmentBaseDto {
         setShutDownAfterStartMinutes(tpl.getShutDownAfterStartMinutes());
         setSendArrivalReport(tpl.isSendArrivalReport());
         setSendArrivalReportOnlyIfAlerts(tpl.isSendArrivalReportOnlyIfAlerts());
+        getUserAccess().addAll(EntityUtils.getIdList(tpl.getUserAccess()));
+        getCompanyAccess().addAll(EntityUtils.getIdList(tpl.getCompanyAccess()));
     }
     /**
      * @return the id
@@ -347,5 +358,17 @@ public class ShipmentBaseDto {
      */
     public void setSendArrivalReportOnlyIfAlerts(final boolean sendArrivalReportOnlyIfAlerts) {
         this.sendArrivalReportOnlyIfAlerts = sendArrivalReportOnlyIfAlerts;
+    }
+    /**
+     * @return the companyAccess
+     */
+    public List<Long> getCompanyAccess() {
+        return companyAccess;
+    }
+    /**
+     * @return the userAccess
+     */
+    public List<Long> getUserAccess() {
+        return userAccess;
     }
 }

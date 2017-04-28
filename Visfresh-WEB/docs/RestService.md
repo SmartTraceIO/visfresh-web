@@ -776,6 +776,14 @@ see [ResponseStatus](#markdown-header-response-status)
     "interimLocations": [
       5296,
       5297
+    ],
+    "userAccess": [
+      2113,
+      2114
+    ],
+    "companyAccess": [
+      1306,
+      1307
     ]
 }
 ```  
@@ -851,6 +859,14 @@ see [Shipment Object](#markdown-header-shipment)
     ],
     "interimStops": [ // not mandatory field. If not presented in request then not will changed in given shipment
       980
+    ],
+    "userAccess": [ //array of user ID
+      2033,
+      2034
+    ],
+    "companyAccess": [ //array of company ID
+      1278,
+      1279
     ]
 }
 ```
@@ -1816,6 +1832,14 @@ Response:
   "interimLocations": [
     5296,
     5297
+  ],
+  "userAccess": [
+    2113,
+    2114
+  ],
+  "companyAccess": [
+    1306,
+    1307
   ]
 }
 ```  
@@ -1933,6 +1957,14 @@ Response:
     ],
     "interimStops": [ // not mandatory field. If not presented in request then not will changed in given shipment
       980
+    ],
+    "userAccess": [
+      2038,
+      2039
+    ],
+    "companyAccess": [
+      1281,
+      1282
     ]
   }
 }
@@ -2684,6 +2716,14 @@ Response:
     "interimLocations": [
       5296,
       5297
+    ],
+    "userAccess": [
+      2154,
+      2155
+    ],
+    "companyAccess": [
+      1321,
+      1322
     ]
   }
 }
@@ -2767,8 +2807,14 @@ Response:
       4735,
       4736
     ],
-    "interimStops": [
-      980
+    "interimStops": [],
+    "userAccess": [
+      2033,
+      2034
+    ],
+    "companyAccess": [
+      1278,
+      1279
     ]
   }
 }
@@ -3125,7 +3171,27 @@ Response:
         "description": "Description of group GR2"
       }
     ],
-    "siblings": []
+    "siblings": [],
+    "userAccess": [
+      {
+        "userId": 2341,
+        "email": "asuvorov-5@mail.ru"
+      },
+      {
+        "userId": 2342,
+        "email": "mkutuzov-6@mail.ru"
+      }
+    ],
+    "companyAccess": [
+      {
+        "companyId": 1372,
+        "companyName": "C1"
+      },
+      {
+        "companyId": 1373,
+        "companyName": "C2"
+      }
+    ]
   }
 }
 ```

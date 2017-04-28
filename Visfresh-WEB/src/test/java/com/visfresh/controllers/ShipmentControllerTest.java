@@ -143,8 +143,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testSaveShipment() throws RestServiceException, IOException {
         final String comments = "Some comments for receiver saved for shipment";
 
-        final Shipment shp = createShipment(true);
-        final ShipmentDto s = new ShipmentDto(shp);
+        final ShipmentDto s = new ShipmentDto(createShipment(true));
         s.setCommentsForReceiver(comments);
 
         //add interim locations
@@ -153,11 +152,18 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         locs.add(createLocationProfile(true).getId());
         s.setInterimLocations(locs);
 
+        //add user access
+        s.getUserAccess().add(createUser1().getId());
+        s.getUserAccess().add(createUser2().getId());
+
+        //add company access
+        s.getCompanyAccess().add(createCompany("C1").getId());
+        s.getCompanyAccess().add(createCompany("C2").getId());
+
         s.setId(null);
 
         final SaveShipmentResponse resp = shipmentClient.saveShipment(s, "NewTemplate.tpl", true);
         assertNotNull(resp.getShipmentId());
-        shp.setId(resp.getShipmentId());
 
         //check new template is saved
         final long id = resp.getTemplateId();
@@ -166,6 +172,10 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(tpl);
         assertNotNull(tpl.getName());
         assertEquals(comments, tpl.getCommentsForReceiver());
+
+        final Shipment shp = context.getBean(ShipmentDao.class).findOne(resp.getShipmentId());
+        assertEquals(2, shp.getUserAccess().size());
+        assertEquals(2, shp.getCompanyAccess().size());
         assertEquals(2, context.getBean(AlternativeLocationsDao.class).getBy(shp).getInterim().size());
     }
     @Test
@@ -865,6 +875,13 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
     public void testGetShipment() throws IOException, RestServiceException {
         final Shipment sp = createShipment(true);
         sp.setDeviceShutdownTime(new Date(System.currentTimeMillis() - 10000000l));
+        //user access
+        sp.getUserAccess().add(createUser1());
+        sp.getUserAccess().add(createUser2());
+        //company access
+        sp.getCompanyAccess().add(createCompany("C1"));
+        sp.getCompanyAccess().add(createCompany("C2"));
+
         saveShipmentDirectly(sp);
 
         final AlternativeLocations loc = new AlternativeLocations();
@@ -877,6 +894,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final ShipmentDto dto = shipmentClient.getShipment(sp.getId());
         assertNotNull(dto);
         assertEquals(2, dto.getInterimLocations().size());
+        assertEquals(2, dto.getCompanyAccess().size());
+        assertEquals(2, dto.getUserAccess().size());
     }
     @Test
     public void testDeleteShipment() throws IOException, RestServiceException {
@@ -1079,6 +1098,12 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Shipment s = createShipment(true);
         final Device device = createDevice("1923087980000117", true);
         s.setDevice(device);
+        //user access
+        s.getUserAccess().add(createUser1());
+        s.getUserAccess().add(createUser2());
+        //company access
+        s.getCompanyAccess().add(createCompany("C1"));
+        s.getCompanyAccess().add(createCompany("C2"));
         saveShipmentDirectly(s);
 
         //add tracker event.

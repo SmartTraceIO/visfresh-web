@@ -43,4 +43,6 @@ public interface ShipmentConstants extends BaseShipmentConstants {
     String LAST_READING_TEMPERATURE = "lastReadingTemperature";
     String ALERT_SUMMARY = "alertSummary";
     String END_LOCATION_ALTERNATIVES = "endLocationAlternatives";
+    String USER_ACCESS = "userAccess";
+    String COMPANY_ACCESS = "companyAccess";
 }

@@ -3,6 +3,7 @@
  */
 package com.visfresh.controllers;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -14,9 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.AlternativeLocationsDao;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
+import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlternativeLocations;
+import com.visfresh.entities.Company;
+import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.ShipmentBase;
@@ -38,6 +43,10 @@ public abstract class AbstractShipmentBaseController extends AbstractController 
     private NotificationScheduleDao notificationScheduleDao;
     @Autowired
     private AlternativeLocationsDao alternativeLocationsDao;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private CompanyDao companyDao;
 
     /**
      * Default constructor.
@@ -58,7 +67,38 @@ public abstract class AbstractShipmentBaseController extends AbstractController 
         resolveAlertProfile(user, t, dto);
         resolveLocations(user, t, dto);
         resolveNotificationSchedules(user, t, dto);
+        resolveUserAccess(user, t, dto);
+        resolveCompanyAccess(user, t, dto);
     }
+    /**
+     * @param user user.
+     * @param t shipment.
+     * @param dto shipment DTO
+     * @throws RestServiceException
+     */
+    private void resolveUserAccess(final User user, final ShipmentBase t, final ShipmentBaseDto dto)
+            throws RestServiceException {
+        final Set<Long> ids = new HashSet<>();
+        ids.addAll(dto.getUserAccess());
+
+        final Map<Long, User> map = EntityUtils.resolveEntities(userDao, ids);
+        resolveEntities(map, dto.getUserAccess(), t.getUserAccess());
+    }
+    /**
+     * @param user user.
+     * @param t shipment.
+     * @param dto shipment DTO
+     * @throws RestServiceException
+     */
+    private void resolveCompanyAccess(final User user, final ShipmentBase t, final ShipmentBaseDto dto)
+            throws RestServiceException {
+        final Set<Long> ids = new HashSet<>();
+        ids.addAll(dto.getCompanyAccess());
+
+        final Map<Long, Company> map = EntityUtils.resolveEntities(companyDao, ids);
+        resolveEntities(map, dto.getCompanyAccess(), t.getCompanyAccess());
+    }
+
     /**
      * @param s shipment template.
      * @param dto shipment template DTO.
@@ -106,8 +146,8 @@ public abstract class AbstractShipmentBaseController extends AbstractController 
         final Map<Long, NotificationSchedule> map = EntityUtils.resolveEntities(notificationScheduleDao, ids);
         checkCompanyAccess(user, map.values());
 
-        resolveSchedules(map, dto.getAlertsNotificationSchedules(), t.getAlertsNotificationSchedules());
-        resolveSchedules(map, dto.getArrivalNotificationSchedules(), t.getArrivalNotificationSchedules());
+        resolveEntities(map, dto.getAlertsNotificationSchedules(), t.getAlertsNotificationSchedules());
+        resolveEntities(map, dto.getArrivalNotificationSchedules(), t.getArrivalNotificationSchedules());
     }
     /**
      * @param s shipment base.
@@ -175,10 +215,11 @@ public abstract class AbstractShipmentBaseController extends AbstractController 
      * @param ids list of ID.
      * @param schedules list of notification schedules.
      */
-    private void resolveSchedules(final Map<Long, NotificationSchedule> source,
-            final List<Long> ids, final List<NotificationSchedule> schedules) {
-        for (final Long id : ids) {
-            final NotificationSchedule sched = source.get(id);
+    private <ID extends Serializable & Comparable<ID>, E extends EntityWithId<ID>> void resolveEntities(
+            final Map<ID, E> source,
+            final List<ID> ids, final List<E> schedules) {
+        for (final ID id : ids) {
+            final E sched = source.get(id);
             if (sched != null) {
                 schedules.add(sched);
             }

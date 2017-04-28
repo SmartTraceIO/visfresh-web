@@ -90,6 +90,8 @@ public class SingleShipmentDto {
     private String deviceColor;
     private boolean isLatestShipment;
     private boolean arrivalReportSent;
+    private final List<ShipmentUserDto> userAccess = new LinkedList<>();
+    private final List<ShipmentCompanyDto> companyAccess = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -845,5 +847,17 @@ public class SingleShipmentDto {
      */
     public void setArrivalReportSent(final boolean arrivalReportSent) {
         this.arrivalReportSent = arrivalReportSent;
+    }
+    /**
+     * @return the userAccess
+     */
+    public List<ShipmentUserDto> getUserAccess() {
+        return userAccess;
+    }
+    /**
+     * @return the companyAccess
+     */
+    public List<ShipmentCompanyDto> getCompanyAccess() {
+        return companyAccess;
     }
 }

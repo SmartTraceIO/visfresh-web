@@ -71,6 +71,8 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         } else {
             obj.add(INTERIM_LOCATIONS, JsonNull.INSTANCE);
         }
+        obj.add(ShipmentConstants.USER_ACCESS, toJsonArray(tpl.getUserAccess()));
+        obj.add(ShipmentConstants.COMPANY_ACCESS, toJsonArray(tpl.getCompanyAccess()));
 
         return obj;
     }
@@ -115,6 +117,14 @@ public class ShipmentTemplateSerializer extends AbstractJsonSerializer {
         }
         if (has(obj, ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS)) {
             shp.setSendArrivalReportOnlyIfAlerts(asBoolean(obj.get(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS)));
+        }
+        final JsonElement cAccess = obj.get(ShipmentConstants.COMPANY_ACCESS);
+        if (cAccess != null && !cAccess.isJsonNull()) {
+            shp.getCompanyAccess().addAll(asLongList(cAccess));
+        }
+        final JsonElement uAccess = obj.get(ShipmentConstants.USER_ACCESS);
+        if (uAccess != null && !uAccess.isJsonNull()) {
+            shp.getUserAccess().addAll(asLongList(uAccess));
         }
 
         return shp;

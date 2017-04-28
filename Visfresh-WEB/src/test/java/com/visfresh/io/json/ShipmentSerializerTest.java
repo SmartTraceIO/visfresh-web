@@ -80,6 +80,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         final Date deviceShutdownTime = new Date(923847092834l);
         final boolean sendArrivalReport = false;
         final boolean sendArrivalReportOnlyIfAlerts = true;
+        final Long externalUser = 14l;
+        final Long externalCompany = 15l;
 
         ShipmentDto s = new ShipmentDto();
         s.setAlertProfile(alertProfile);
@@ -113,6 +115,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         s.setDeviceShutdownTime(deviceShutdownTime);
         s.setSendArrivalReport(sendArrivalReport);
         s.setSendArrivalReportOnlyIfAlerts(sendArrivalReportOnlyIfAlerts);
+        s.getUserAccess().add(externalUser);
+        s.getCompanyAccess().add(externalCompany);
 
         final JsonObject obj = serializer.toJson(s).getAsJsonObject();
         s = serializer.parseShipment(obj);
@@ -148,6 +152,8 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
         assertEquals(dateFormat.format(deviceShutdownTime), dateFormat.format(s.getDeviceShutdownTime()));
         assertEquals(sendArrivalReport, s.isSendArrivalReport());
         assertEquals(sendArrivalReportOnlyIfAlerts, s.isSendArrivalReportOnlyIfAlerts());
+        assertEquals(externalUser, s.getUserAccess().get(0));
+        assertEquals(externalCompany, s.getCompanyAccess().get(0));
     }
     @Test
     public void testShipmentDefaults() {

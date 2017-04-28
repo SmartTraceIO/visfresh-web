@@ -71,18 +71,29 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
 
     @Test
     public void testSaveShipmentTemplate() throws RestServiceException, IOException {
-        final ShipmentTemplate tpl = createShipmentTemplate(true);
-        final ShipmentTemplateDto t = new ShipmentTemplateDto(tpl);
+        final ShipmentTemplateDto t = new ShipmentTemplateDto(createShipmentTemplate(true));
         t.setId(null);
+
         final List<Long> locs = new LinkedList<>();
         locs.add(createLocationProfile(true).getId());
         locs.add(createLocationProfile(true).getId());
         t.setInterimLocations(locs);
 
+        //add user access
+        t.getUserAccess().add(createUser1().getId());
+        t.getUserAccess().add(createUser2().getId());
+
+        //add company access
+        t.getCompanyAccess().add(createCompany("C1").getId());
+        t.getCompanyAccess().add(createCompany("C2").getId());
+
         final Long id = client.saveShipmentTemplate(t);
         assertNotNull(id);
 
-        tpl.setId(id);
+        final ShipmentTemplate tpl = context.getBean(ShipmentTemplateDao.class).findOne(id);
+        assertEquals(2, tpl.getUserAccess().size());
+        assertEquals(2, tpl.getCompanyAccess().size());
+
         assertEquals(2, context.getBean(AlternativeLocationsDao.class).getBy(tpl).getInterim().size());
     }
     @Test
@@ -113,6 +124,14 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
     @Test
     public void testGetShipmentTemplate() throws IOException, RestServiceException {
         final ShipmentTemplate sp = createShipmentTemplate(true);
+        //user access
+        sp.getUserAccess().add(createUser1());
+        sp.getUserAccess().add(createUser2());
+        //company access
+        sp.getCompanyAccess().add(createCompany("C1"));
+        sp.getCompanyAccess().add(createCompany("C2"));
+
+        saveShipmentTemplateDirectly(sp);
 
         //create interim locations.
         final AlternativeLocations locs = new AlternativeLocations();
@@ -124,6 +143,8 @@ public class ShipmentTemplateControllerTest extends AbstractRestServiceTest {
         final ShipmentTemplateDto dto = client.getShipmentTemplate(sp.getId());
         assertNotNull(dto);
         assertEquals(2, dto.getInterimLocations().size());
+        assertEquals(2, dto.getUserAccess().size());
+        assertEquals(2, dto.getCompanyAccess().size());
     }
     @Test
     public void testDeleteShipmentTemplate() throws IOException, RestServiceException {

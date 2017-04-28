@@ -91,6 +91,15 @@ public abstract class AbstractRestServiceTest {
         return u;
     }
     /**
+     * @param name company name.
+     * @return company
+     */
+    protected Company createCompany(final String name) {
+        final Company c = new Company();
+        c.setName(name);
+        return context.getBean(CompanyDao.class).save(c);
+    }
+    /**
      * @param save TODO
      * @return any alert profile.
      */

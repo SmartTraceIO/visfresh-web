@@ -92,6 +92,8 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         final Integer shutDownAfterStartMinutes = 5;
         final boolean sendArrivalReport = false;
         final boolean sendArrivalReportOnlyIfAlerts = true;
+        final Long externalUser = 14l;
+        final Long externalCompany = 15l;
 
         final List<Long> interimLocations = new LinkedList<>();
         interimLocations.add(5l);
@@ -119,6 +121,8 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         t.setInterimLocations(interimLocations);
         t.setSendArrivalReport(sendArrivalReport);
         t.setSendArrivalReportOnlyIfAlerts(sendArrivalReportOnlyIfAlerts);
+        t.getUserAccess().add(externalUser);
+        t.getCompanyAccess().add(externalCompany);
 
         final JsonObject obj = serializer.toJson(t).getAsJsonObject();
 
@@ -145,6 +149,8 @@ public class ShipmentTemplateSerializerTest extends AbstractSerializerTest {
         assertEquals(2, t.getInterimLocations().size());
         assertEquals(sendArrivalReport, t.isSendArrivalReport());
         assertEquals(sendArrivalReportOnlyIfAlerts, t.isSendArrivalReportOnlyIfAlerts());
+        assertEquals(externalUser, t.getUserAccess().get(0));
+        assertEquals(externalCompany, t.getCompanyAccess().get(0));
     }
     @Test
     public void testShipmentDefaults() {

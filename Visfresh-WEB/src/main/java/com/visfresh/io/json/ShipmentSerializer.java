@@ -32,6 +32,8 @@ import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.shipment.DeviceGroupDto;
+import com.visfresh.io.shipment.ShipmentCompanyDto;
+import com.visfresh.io.shipment.ShipmentUserDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
 import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
@@ -105,6 +107,14 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
         if (has(obj, ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS)) {
             shp.setSendArrivalReportOnlyIfAlerts(asBoolean(obj.get(ShipmentConstants.ARRIVAL_REPORT_ONLY_IF_ALERTS)));
+        }
+        final JsonElement cAccess = obj.get(ShipmentConstants.COMPANY_ACCESS);
+        if (cAccess != null && !cAccess.isJsonNull()) {
+            shp.getCompanyAccess().addAll(asLongList(cAccess));
+        }
+        final JsonElement uAccess = obj.get(ShipmentConstants.USER_ACCESS);
+        if (uAccess != null && !uAccess.isJsonNull()) {
+            shp.getUserAccess().addAll(asLongList(uAccess));
         }
     }
     public ShipmentDto parseShipment(final JsonObject json) {
@@ -226,6 +236,9 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         } else {
             obj.add(INTERIM_STOPS, JsonNull.INSTANCE);
         }
+
+        obj.add(ShipmentConstants.USER_ACCESS, toJsonArray(s.getUserAccess()));
+        obj.add(ShipmentConstants.COMPANY_ACCESS, toJsonArray(s.getCompanyAccess()));
 
         return obj;
     }
@@ -633,6 +646,26 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.add("deviceGroups", deviceGroups);
         for (final DeviceGroupDto grp : dto.getDeviceGroups()) {
             deviceGroups.add(toJson(grp));
+        }
+
+        //company access
+        final JsonArray userAccess = new JsonArray();
+        json.add("userAccess", userAccess);
+        for (final ShipmentUserDto u : dto.getUserAccess()) {
+            final JsonObject cobj = new JsonObject();
+            cobj.addProperty("userId", u.getId());
+            cobj.addProperty("email", u.getEmail());
+            userAccess.add(cobj);
+        }
+
+        //company access
+        final JsonArray companyAccess = new JsonArray();
+        json.add("companyAccess", companyAccess);
+        for (final ShipmentCompanyDto c : dto.getCompanyAccess()) {
+            final JsonObject cobj = new JsonObject();
+            cobj.addProperty("companyId", c.getId());
+            cobj.addProperty("companyName", c.getName());
+            companyAccess.add(cobj);
         }
 
         return json;
