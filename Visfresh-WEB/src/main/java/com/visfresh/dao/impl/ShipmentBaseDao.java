@@ -3,26 +3,28 @@
  */
 package com.visfresh.dao.impl;
 
-import java.util.Collection;
+import java.io.Serializable;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 
 import com.visfresh.dao.AlertProfileDao;
+import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DaoBase;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NotificationScheduleDao;
-import com.visfresh.entities.EntityWithId;
+import com.visfresh.dao.UserDao;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.ShipmentBase;
+import com.visfresh.entities.User;
+import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -32,6 +34,14 @@ import com.visfresh.utils.StringUtils;
 public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWithCompanyDaoImplBase<E, Long>
     implements DaoBase<E, Long> {
 
+    /**
+     *
+     */
+    private static final String EXTERNALCOMPANIES_TABLE = "externalcompanies";
+    /**
+     *
+     */
+    private static final String EXTERNALUSERS_TABLE = "externalusers";
     public static final String TABLE = "shipments";
     public static final String ARRIVALNOTIFSCHEDULES_TABLE = "arrivalnotifschedules";
     public static final String ALERTNOTIFSCHEDULES_TABLE = "alertnotifschedules";
@@ -64,7 +74,35 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
     private NotificationScheduleDao notificationScheduleDao;
     @Autowired
     private LocationProfileDao locationProfileDao;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private CompanyDao companyDao;
 
+    private static class RefUpdate <ID extends Serializable & Comparable<ID>> {
+        Long shipmentId;
+        String tableName;
+        String shipmentRefField = "shipment";
+        String idRefField;
+        List<ID> updated;
+
+        /**
+         * @param entityId
+         * @param tableName
+         * @param idRefField
+         * @param shipmentRefField
+         * @param updated
+         */
+        public RefUpdate(final Long entityId, final String tableName, final String idRefField,
+                final String shipmentRefField, final List<ID> updated) {
+            super();
+            this.shipmentId = entityId;
+            this.tableName = tableName;
+            this.idRefField = idRefField;
+            this.shipmentRefField = shipmentRefField;
+            this.updated = updated;
+        }
+    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
@@ -106,52 +144,56 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
         return s;
     }
     protected void updateReferences(final E s) {
-        clearManyToManyRefs(s.getId());
-        createManyToManyRefs(s);
+        final List<RefUpdate<Long>> updates = new LinkedList<>();
+        updates.add(new RefUpdate<Long>(s.getId(), ALERTNOTIFSCHEDULES_TABLE, "notification",
+                "shipment", EntityUtils.getIdList(s.getAlertsNotificationSchedules())));
+        updates.add(new RefUpdate<Long>(s.getId(), ARRIVALNOTIFSCHEDULES_TABLE, "notification",
+                "shipment", EntityUtils.getIdList(s.getArrivalNotificationSchedules())));
+
+        updates.add(new RefUpdate<Long>(s.getId(), EXTERNALUSERS_TABLE, "user",
+                "shipment", EntityUtils.getIdList(s.getUserAccess())));
+        updates.add(new RefUpdate<Long>(s.getId(), EXTERNALCOMPANIES_TABLE, "company",
+                "shipment", EntityUtils.getIdList(s.getCompanyAccess())));
+
+        for (final RefUpdate<Long> refUpdate : updates) {
+            updateRefs(refUpdate);
+        }
     }
     /**
-     * @param s
+     * @param refUpdate
      */
-    protected void createManyToManyRefs(final E s) {
-        createRefs(ALERTNOTIFSCHEDULES_TABLE, s.getId(), "notification", s.getAlertsNotificationSchedules());
-        createRefs(ARRIVALNOTIFSCHEDULES_TABLE, s.getId(), "notification", s.getArrivalNotificationSchedules());
-    }
-    /**
-     * @param table
-     * @param e
-     */
-    private <M extends EntityWithId<Long>> void createRefs(final String table,
-            final Long id, final String fieldName,  final Collection<M> e) {
-        final Set<Long> ids = new HashSet<Long>();
-        for (final M m : e) {
-            ids.add(m.getId());
+    private void updateRefs(final RefUpdate<Long> refUpdate) {
+        //remove redundant references
+        final Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("shipment", refUpdate.shipmentId);
+
+        //delete personal schedule
+        String sql = "delete from " + refUpdate.tableName + " where "
+                + refUpdate.shipmentRefField + " = :shipment";
+
+        if (refUpdate.updated.size() > 0) {
+            sql += " and not " + refUpdate.idRefField
+                    + " in (" + StringUtils.combine(refUpdate.updated, ",") + ")";
         }
 
-        for (final Long m : ids) {
-            final HashMap<String, Object> params = new HashMap<String, Object>();
-            params.put("shipment", id);
-            params.put(fieldName, m);
-            jdbc.update("insert into " + table + " (shipment, " + fieldName + ")"
-                    + " values(:shipment,:" + fieldName + ")",
-                    params);
+        jdbc.update(sql, paramMap);
+
+        //add new references
+        if (refUpdate.updated.size() > 0) {
+            sql = "insert ignore into " + refUpdate.tableName
+                    + " (" + refUpdate.shipmentRefField + ", " + refUpdate.idRefField + ") values ";
+
+            final List<String> values = new LinkedList<>();
+            int i = 0;
+            for (final Long m : refUpdate.updated) {
+                final String fName = "ref_" + i;
+                paramMap.put(fName, m);
+                values.add("(:shipment,:" + fName + ")");
+                i++;
+            }
+
+            jdbc.update(sql + StringUtils.combine(values, ","), paramMap);
         }
-    }
-    /**
-     * @param id
-     */
-    protected void clearManyToManyRefs(final Long id) {
-        cleanRefs(ALERTNOTIFSCHEDULES_TABLE, id);
-        cleanRefs(ARRIVALNOTIFSCHEDULES_TABLE, id);
-    }
-    /**
-     * @param table
-     * @param stats
-     */
-    protected void cleanRefs(final String table, final Long id) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("id", id);
-        //delete personal schedule
-        jdbc.update("delete from " + table + " where shipment = :id", paramMap);
     }
     protected Map<String, Object> createParameterMap(final E s) {
         final Map<String, Object> map= new HashMap<String, Object>();
@@ -209,6 +251,48 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
         return result;
     }
     /**
+     * @param s
+     * @return
+     */
+    private List<User> findExternalUsers(final E s) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("shipment", s.getId());
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select user from " + EXTERNALUSERS_TABLE + " where shipment =:shipment",
+                params);
+
+        final List<User> result = new LinkedList<>();
+        for (final Map<String,Object> row : list) {
+            final Long id = ((Number) row.get("user")).longValue();
+            final User user = userDao.findOne(id);
+            if (user != null) {
+                result.add(user);
+            }
+        }
+        return result;
+    }
+    /**
+     * @param s
+     * @return
+     */
+    private List<Company> findExternalCompanies(final E s) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("shipment", s.getId());
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select company from " + EXTERNALCOMPANIES_TABLE + " where shipment =:shipment",
+                params);
+
+        final List<Company> result = new LinkedList<>();
+        for (final Map<String,Object> row : list) {
+            final Long id = ((Number) row.get("company")).longValue();
+            final Company company = companyDao.findOne(id);
+            if (company != null) {
+                result.add(company);
+            }
+        }
+        return result;
+    }
+    /**
      * @return
      */
     protected abstract E createEntity();
@@ -243,53 +327,55 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
      */
     @Override
     protected E createEntity(final Map<String, Object> map) {
-        final E no = createEntity();
+        final E s = createEntity();
 
-        no.setId(((Number) map.get(ID_FIELD)).longValue());
+        s.setId(((Number) map.get(ID_FIELD)).longValue());
         Number id = (Number) map.get(ALERT_FIELD);
         if (id != null) {
-            no.setAlertProfile(alertProfileDao.findOne(id.longValue()));
+            s.setAlertProfile(alertProfileDao.findOne(id.longValue()));
         }
-        no.setAlertSuppressionMinutes(((Number) map.get(NOALERTIFCOODOWN_FIELD)).intValue());
+        s.setAlertSuppressionMinutes(((Number) map.get(NOALERTIFCOODOWN_FIELD)).intValue());
         final Number arrivalNotifWithIn = (Number) map.get(ARRIVALNOTIFWITHIN_FIELD);
         if (arrivalNotifWithIn != null) {
-            no.setArrivalNotificationWithinKm(arrivalNotifWithIn.intValue());
+            s.setArrivalNotificationWithinKm(arrivalNotifWithIn.intValue());
         }
-        no.setExcludeNotificationsIfNoAlerts((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
-        no.setSendArrivalReport((Boolean) map.get(SEND_ARRIVAL_REPORT_FIELD));
-        no.setSendArrivalReportOnlyIfAlerts((Boolean) map.get(ARRIVAL_REPORT_ONLYIFALERTS_FIELD));
+        s.setExcludeNotificationsIfNoAlerts((Boolean) map.get(NONOTIFSIFNOALERTS_FIELD));
+        s.setSendArrivalReport((Boolean) map.get(SEND_ARRIVAL_REPORT_FIELD));
+        s.setSendArrivalReportOnlyIfAlerts((Boolean) map.get(ARRIVAL_REPORT_ONLYIFALERTS_FIELD));
 
-        no.setShipmentDescription((String) map.get(DESCRIPTION_FIELD));
-        no.setCommentsForReceiver((String) map.get(COMMENTS_FIELD));
+        s.setShipmentDescription((String) map.get(DESCRIPTION_FIELD));
+        s.setCommentsForReceiver((String) map.get(COMMENTS_FIELD));
         id = ((Number) map.get(SHIPPEDFROM_FIELD));
         if (id != null) {
-            no.setShippedFrom(locationProfileDao.findOne(id.longValue()));
+            s.setShippedFrom(locationProfileDao.findOne(id.longValue()));
         }
         id = ((Number) map.get(SHIPPEDTO_FIELD));
         if (id != null) {
-            no.setShippedTo(locationProfileDao.findOne(id.longValue()));
+            s.setShippedTo(locationProfileDao.findOne(id.longValue()));
         }
         final Number shutdownAfterMinutes = (Number) map.get(SHUTDOWNTIMEOUT_FIELD);
         if (shutdownAfterMinutes != null) {
-            no.setShutdownDeviceAfterMinutes(shutdownAfterMinutes.intValue());
+            s.setShutdownDeviceAfterMinutes(shutdownAfterMinutes.intValue());
         }
         final Number noalertAfterArrivalTimeOut = (Number) map.get(NOALERT_AFTER_ARRIVAL_TIMOUT_FIELD);
         if (noalertAfterArrivalTimeOut != null) {
-            no.setNoAlertsAfterArrivalMinutes(noalertAfterArrivalTimeOut.intValue());
+            s.setNoAlertsAfterArrivalMinutes(noalertAfterArrivalTimeOut.intValue());
         }
         final Number noalertAfterStartTimeOut = (Number) map.get(NOALERT_AFTER_START_TIMOUT_FIELD);
         if (noalertAfterStartTimeOut != null) {
-            no.setNoAlertsAfterStartMinutes(noalertAfterStartTimeOut.intValue());
+            s.setNoAlertsAfterStartMinutes(noalertAfterStartTimeOut.intValue());
         }
         final Number shutDownAfterStartMinutes = (Number) map.get(SHUTDOWN_AFTER_START_TIMOUT_FIELD);
         if (shutDownAfterStartMinutes != null) {
-            no.setShutDownAfterStartMinutes(shutDownAfterStartMinutes.intValue());
+            s.setShutDownAfterStartMinutes(shutDownAfterStartMinutes.intValue());
         }
 
-        no.getAlertsNotificationSchedules().addAll(findNotificationSchedules(no, ALERTNOTIFSCHEDULES_TABLE));
-        no.getArrivalNotificationSchedules().addAll(findNotificationSchedules(no, ARRIVALNOTIFSCHEDULES_TABLE));
-        no.setAutostart(Boolean.TRUE.equals(map.get(AUTOSTART_FIELD)));
+        s.getAlertsNotificationSchedules().addAll(findNotificationSchedules(s, ALERTNOTIFSCHEDULES_TABLE));
+        s.getArrivalNotificationSchedules().addAll(findNotificationSchedules(s, ARRIVALNOTIFSCHEDULES_TABLE));
+        s.getUserAccess().addAll(findExternalUsers(s));
+        s.getCompanyAccess().addAll(findExternalCompanies(s));
+        s.setAutostart(Boolean.TRUE.equals(map.get(AUTOSTART_FIELD)));
 
-        return no;
+        return s;
     }
 }

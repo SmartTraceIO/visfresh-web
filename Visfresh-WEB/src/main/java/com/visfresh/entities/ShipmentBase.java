@@ -87,6 +87,14 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      * Is autostart template flag.
      */
     private boolean isAutostart;
+    /**
+     * External company excess.
+     */
+    private final List<Company> companyAccess = new LinkedList<>();
+    /**
+     * External user access.
+     */
+    private final List<User> userAccess = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -350,5 +358,17 @@ public abstract class ShipmentBase implements EntityWithId<Long>, EntityWithComp
      */
     public void setSendArrivalReportOnlyIfAlerts(final boolean sendArrivalReportOnlyIfAlerts) {
         this.sendArrivalReportOnlyIfAlerts = sendArrivalReportOnlyIfAlerts;
+    }
+    /**
+     * @return the companyAccess
+     */
+    public List<Company> getCompanyAccess() {
+        return companyAccess;
+    }
+    /**
+     * @return the userAccess
+     */
+    public List<User> getUserAccess() {
+        return userAccess;
     }
 }

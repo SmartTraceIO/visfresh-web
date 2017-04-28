@@ -42,7 +42,7 @@ public final class EntityUtils {
      * @param entities
      * @return
      */
-    public static <ID extends Serializable & Comparable<ID>> Collection<ID> getIdList(
+    public static <ID extends Serializable & Comparable<ID>> List<ID> getIdList(
             final List<? extends EntityWithId<ID>> entities) {
         final List<ID> list = new LinkedList<ID>();
         for (final EntityWithId<ID> e : entities) {

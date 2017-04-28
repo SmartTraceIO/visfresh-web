@@ -286,6 +286,48 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
         assertEquals(1, s.getAlertsNotificationSchedules().size());
         assertEquals(1, s.getArrivalNotificationSchedules().size());
     }
+    @Test
+    public void testCompanyAccess() {
+        Shipment s = createTestEntity();
+        final Company c1 = createCompany("C1");
+        final Company c2 = createCompany("C2");
+
+        s.getCompanyAccess().add(c1);
+        s.getCompanyAccess().add(c2);
+
+        dao.save(s);
+        s = dao.findOne(s.getId());
+
+        assertEquals(2, s.getCompanyAccess().size());
+
+        //attempt to remove schedules
+        s.getCompanyAccess().remove(0);
+        s = dao.save(s);
+        s = dao.findOne(s.getId());
+
+        assertEquals(1, s.getCompanyAccess().size());
+    }
+    @Test
+    public void testUserAccess() {
+        Shipment s = createTestEntity();
+        final User u1 = createUser("u1@smarttrace.com.au");
+        final User u2 = createUser("u2@smarttrace.com.au");
+
+        s.getUserAccess().add(u1);
+        s.getUserAccess().add(u2);
+
+        dao.save(s);
+        s = dao.findOne(s.getId());
+
+        assertEquals(2, s.getUserAccess().size());
+
+        //attempt to remove schedules
+        s.getUserAccess().remove(0);
+        s = dao.save(s);
+        s = dao.findOne(s.getId());
+
+        assertEquals(1, s.getUserAccess().size());
+    }
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#assertTestGetAllOk(int, java.util.List)

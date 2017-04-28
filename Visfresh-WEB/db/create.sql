@@ -2,6 +2,8 @@
 drop table if exists notes;
 drop table if exists shipmentsessions;
 drop table if exists devicestates;
+drop table if exists externalusers;
+drop table if exists externalcompanies;
 drop table if exists alertnotifschedules;
 drop table if exists arrivalnotifschedules;
 drop table if exists devicecommands;
@@ -414,6 +416,30 @@ create table arrivalnotifschedules (
         ON DELETE CASCADE,
     foreign key (notification)
         references notificationschedules (id)
+        ON DELETE CASCADE
+);
+
+create table externalusers (
+    shipment bigint(20) not null,
+    user bigint(20) not null,
+    primary key (shipment , user),
+    foreign key (shipment)
+        references shipments (id)
+        ON DELETE CASCADE,
+    foreign key (user)
+        references users (id)
+        ON DELETE CASCADE
+);
+
+create table externalcompanies (
+    shipment bigint(20) not null,
+    company bigint(20) not null,
+    primary key (shipment , company),
+    foreign key (shipment)
+        references shipments (id)
+        ON DELETE CASCADE,
+    foreign key (company)
+        references companies (id)
         ON DELETE CASCADE
 );
 
