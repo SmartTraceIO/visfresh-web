@@ -770,16 +770,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 s.getInterimStops().add(dto);
             }
         }
-//
-//"interimStop1": "ABC Warehouse",
-//"interimStop1Time": "14:33 02-May-2016",
-//"interimStop1TimeISO": "2016-05-02 02:32",
-//
-//"interimStop2": "XYZ Warehouse",
-//"interimStop2Time": "14:33 02-May-2016",
-//"interimStop2TimeISO": "2016-05-02 02:32",
-//
-
     }
     private Sorting createSortingShipments(final String sc, final String so,
             final String[] defaultSortOrder, final int maxNumOfSortColumns) {
@@ -1077,7 +1067,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            checkAccess(user, Role.BasicUser);
 
             final ShipmentSerializer ser = getSerializer(user);
 
@@ -1088,9 +1078,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
             }
 
-            checkCompanyAccess(user, s);
             if (s == null) {
                 return createSuccessResponse(null);
+            }
+
+            if (!hasExternalUserAccess(user, s)) {
+                throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
             }
 
             final SingleShipmentDto dto = createDto(s, user);
@@ -1163,7 +1156,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         //add siblings
         final List<Shipment> siblings = getSiblings(s);
         for (final Shipment sibling : siblings) {
-            dto.getSiblings().add(createDto(sibling, user));
+            if (hasExternalUserAccess(user, sibling)) {
+                dto.getSiblings().add(createDto(sibling, user));
+            }
         }
 
         addDeviceGroups(dto);
@@ -1722,5 +1717,40 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
 
         return best;
+    }
+    /**
+     * @param user user
+     * @param s shipment.
+     * @throws RestServiceException
+     */
+    private boolean hasExternalUserAccess(final User user, final Shipment s) {
+        if (Role.SmartTraceAdmin.hasRole(user)) {
+            return true;
+        }
+
+        final Company usersCompany = user.getCompany();
+        if (s == null || s.getCompany() == null) {
+            return false;
+        }
+
+        if (s.getCompany().getId().equals(usersCompany.getId())) {
+            return true;
+        }
+
+        //check user access
+        for (final User u : s.getUserAccess()) {
+            if (u.getId().equals(user.getId())) {
+                return true;
+            }
+        }
+
+        //check company access
+        for (final Company c : s.getCompanyAccess()) {
+            if (c.getId().equals(usersCompany.getId())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

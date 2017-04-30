@@ -43,6 +43,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.InterimStop;
@@ -918,6 +919,52 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         context.getBean(RuleEngine.class).suppressNextAlerts(sp);
 
         //run client only for obtain the HTTP dump
+        shipmentClient.getSingleShipment(sp).getAsJsonObject();
+    }
+    @Test
+    public void testGetSingleShipmentUserAccess() throws IOException, RestServiceException {
+        final Company c = createCompany("C1");
+        final User u = createUser("junit", c);
+
+        final Shipment sp = createShipment(true);
+
+        //run client only for obtain the HTTP dump
+        final String auth = login(u);
+        shipmentClient.setAuthToken(auth);
+
+        try {
+            shipmentClient.getSingleShipment(sp).getAsJsonObject();
+            throw new AssertionFailedError("Company access error should be thrown");
+        } catch (final Exception e) {
+            // normal
+        }
+
+        sp.getUserAccess().add(u);
+        saveShipmentDirectly(sp);
+
+        shipmentClient.getSingleShipment(sp).getAsJsonObject();
+    }
+    @Test
+    public void testGetSingleShipmentCompanyAccess() throws IOException, RestServiceException {
+        final Company c = createCompany("C1");
+        final User u = createUser("junit", c);
+
+        final Shipment sp = createShipment(true);
+
+        //run client only for obtain the HTTP dump
+        final String auth = login(u);
+        shipmentClient.setAuthToken(auth);
+
+        try {
+            shipmentClient.getSingleShipment(sp).getAsJsonObject();
+            throw new AssertionFailedError("Company access error should be thrown");
+        } catch (final Exception e) {
+            // normal
+        }
+
+        sp.getCompanyAccess().add(c);
+        saveShipmentDirectly(sp);
+
         shipmentClient.getSingleShipment(sp).getAsJsonObject();
     }
     //@RequestMapping(value = "/getShipmentData/{authToken}", method = RequestMethod.GET)

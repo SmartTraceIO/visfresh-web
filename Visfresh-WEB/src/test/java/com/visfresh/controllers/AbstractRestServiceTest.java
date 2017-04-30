@@ -5,6 +5,8 @@ package com.visfresh.controllers;
 
 import java.net.URL;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.junit.runner.RunWith;
@@ -26,6 +28,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
@@ -90,6 +93,27 @@ public abstract class AbstractRestServiceTest {
         getContext().getBean(UserDao.class).save(u);
         return u;
     }
+    public User createUser(final String userName, final Company c) {
+        final User u = new User();
+        u.setCompany(c);
+        u.setEmail(userName + "@mail.ru");
+        u.setFirstName(userName);
+        u.setLastName("JUnit");
+
+        //add roles
+        final Set<Role> roles = new HashSet<>();
+        roles.add(Role.BasicUser);
+        u.setRoles(roles);
+
+        getContext().getBean(UserDao.class).save(u);
+        u.setPhone(Long.toString(10000000000l + u.getId()));
+
+        //authorize user
+        context.getBean(AuthService.class).saveUser(u, "", false);
+
+        return u;
+    }
+
     /**
      * @param name company name.
      * @return company
@@ -363,9 +387,18 @@ public abstract class AbstractRestServiceTest {
         }
         return null;
     }
+    /**
+     * @return authentication token.
+     */
     protected String login() {
+        return login(context.getBean(UserDao.class).findAll(null, null, null).get(0));
+    }
+    /**
+     * @param user user to login.
+     * @return authentication token.
+     */
+    protected String login(final User user) {
         try {
-            final User user = context.getBean(UserDao.class).findAll(null, null, null).get(0);
             return context.getBean(AuthService.class).login(user.getEmail(),"").getToken();
         } catch (final Exception e) {
             throw new RuntimeException(e);
