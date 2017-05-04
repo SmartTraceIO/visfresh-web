@@ -5,6 +5,7 @@ package com.visfresh.dao.impl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import com.visfresh.dao.UserDao;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthToken;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -28,6 +30,7 @@ import com.visfresh.services.AuthToken;
 @Component
 public class RestSessionDaoImpl extends DaoImplBase<RestSession, Long> implements RestSessionDao {
     private static final String TABLE = "restsessions";
+    private static final String PROPERTIES = "restproperties";
 
     private static final String ID = "id";
     private static final String USER = "user";
@@ -83,6 +86,8 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, Long> implement
             session.setId(keyHolder.getKey().longValue());
         }
 
+        saveProperties(session);
+
         return session;
     }
 
@@ -127,7 +132,88 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, Long> implement
             }
             t.setUser(user);
         }
+
+        //load properties
+        loadProperties(t);
     }
+    /**
+     * @param session
+     */
+    private void saveProperties(final RestSession session) {
+        //remove redundant references
+        final Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("session", session.getId());
+
+        //delete personal schedule
+        String sql = "delete from " + PROPERTIES + " where session = :session";
+
+        final Map<String, String> props = withoutNullProperties(session.getProperties());
+        if (props.size() > 0) {
+            final List<String> values = new LinkedList<>();
+            int i = 0;
+            for (final Map.Entry<String, String> e : props.entrySet()) {
+                final String name = "name_" + i;
+                final String value = "value_" + i;
+                paramMap.put(name, e.getKey());
+                paramMap.put(value, e.getValue());
+
+                values.add(":" + name);
+                i++;
+            }
+            sql += " and not name in (" + StringUtils.combine(values, ",") + ")";
+        }
+
+        jdbc.update(sql, paramMap);
+
+        //add new references
+        if (props.size() > 0) {
+            sql = "insert ignore into " + PROPERTIES + " (session, name, value) values ";
+
+            final List<String> values = new LinkedList<>();
+            for (int i = 0; i < props.size(); i++) {
+                final String name = "name_" + i;
+                final String value = "value_" + i;
+
+                values.add("(:session,:" + name + ", :" + value + ")");
+            }
+
+            jdbc.update(sql + StringUtils.combine(values, ",")
+                + " on duplicate key update value = values(value)", paramMap);
+        }
+    }
+
+    /**
+     * @param props
+     * @return
+     */
+    private Map<String, String> withoutNullProperties(final Map<String, String> props) {
+        final Map<String, String> map = new HashMap<>(props);
+
+        final Iterator<Map.Entry<String, String>> iter = map.entrySet().iterator();
+        while (iter.hasNext()) {
+            if (iter.next().getValue() == null) {
+                iter.remove();
+            }
+        }
+
+        return map;
+    }
+
+    /**
+     * @param session
+     */
+    private void loadProperties(final RestSession session) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("session", session.getId());
+
+        final String query = "select name as name, value as value from " + PROPERTIES
+                + " where session = :session";
+        final List<Map<String, Object>> rows = jdbc.queryForList(query, params);
+        for (final Map<String, Object> row : rows) {
+            session.getProperties().put((String) row.get("name"), (String) row.get("value"));
+        }
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.dao.RestSessionDao#findByToken(java.lang.String)
      */

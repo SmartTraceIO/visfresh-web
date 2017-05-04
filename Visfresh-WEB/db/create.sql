@@ -29,6 +29,7 @@ drop table if exists devicegrouprelations;
 drop table if exists simulators;
 drop table if exists devices;
 drop table if exists devicegroups;
+drop table if exists restproperties;
 drop table if exists restsessions;
 drop table if exists users;
 drop table if exists companies;
@@ -132,6 +133,16 @@ create table restsessions (
     primary key (id),
     FOREIGN KEY (user)
         REFERENCES users (id)
+		on delete cascade
+);
+
+create table restproperties (
+    session bigint(20) not null,
+    name varchar(50) not null,
+    value varchar(50) not null,
+    primary key (session, name),
+    FOREIGN KEY (session)
+        REFERENCES restsessions (id)
 		on delete cascade
 );
 
