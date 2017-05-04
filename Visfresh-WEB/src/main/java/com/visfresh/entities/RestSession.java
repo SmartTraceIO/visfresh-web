@@ -3,13 +3,16 @@
  */
 package com.visfresh.entities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.visfresh.services.AuthToken;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class RestSession implements EntityWithId<Long> {
+public class RestSession implements EntityWithId<Long>, Comparable<RestSession> {
     /**
      * Session ID.
      */
@@ -22,6 +25,10 @@ public class RestSession implements EntityWithId<Long> {
      * Authentication token.
      */
     private AuthToken token;
+    /**
+     * Session properties.
+     */
+    private final Map<String, String> properties = new HashMap<>();
 
     /**
      * Default constructor.
@@ -66,5 +73,18 @@ public class RestSession implements EntityWithId<Long> {
      */
     public void setId(final Long id) {
         this.id = id;
+    }
+    /**
+     * @return the properties
+     */
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(final RestSession o) {
+        return getToken().getCreatedTime().compareTo(o.getToken().getCreatedTime());
     }
 }
