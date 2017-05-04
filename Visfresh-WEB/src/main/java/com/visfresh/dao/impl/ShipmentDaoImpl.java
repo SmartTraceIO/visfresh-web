@@ -420,7 +420,9 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         serialNum.append('_');
 
         final Filter f = new Filter();
-        f.addFilter(COMPANY_FIELD, company.getId());
+        if (company != null) {
+            f.addFilter(COMPANY_FIELD, company.getId());
+        }
         f.addFilter(DEVICE_FIELD, new SynteticFilter() {
             @Override
             public Object[] getValues() {
@@ -448,6 +450,13 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements Shipme
         }
 
         return null;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#findAllBySnTrip(java.lang.String, int)
+     */
+    @Override
+    public Shipment findBySnTrip(final String sn, final int trip) {
+        return findBySnTrip(null, sn, trip);
     }
     /*
      * Changed the visibility to public.

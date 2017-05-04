@@ -84,4 +84,10 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
      * @return
      */
     SelectAllSupport getSelectAllSupport();
+    /**
+     * @param sn shipment serial number.
+     * @param trip shipment trip count.
+     * @return first found shipment by given serial number and trip count.
+     */
+    Shipment findBySnTrip(String sn, int trip);
 }

@@ -945,6 +945,29 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         shipmentClient.getSingleShipment(sp).getAsJsonObject();
     }
     @Test
+    public void testGetSingleShipmentUserAccessSnTrip() throws IOException, RestServiceException {
+        final Company c = createCompany("C1");
+        final User u = createUser("junit", c);
+
+        final Shipment sp = createShipment(true);
+
+        //run client only for obtain the HTTP dump
+        final String auth = login(u);
+        shipmentClient.setAuthToken(auth);
+
+        try {
+            shipmentClient.getSingleShipment(sp.getDevice().getSn(), sp.getTripCount()).getAsJsonObject();
+            throw new AssertionFailedError("Company access error should be thrown");
+        } catch (final Exception e) {
+            // normal
+        }
+
+        sp.getUserAccess().add(u);
+        saveShipmentDirectly(sp);
+
+        shipmentClient.getSingleShipment(sp).getAsJsonObject();
+    }
+    @Test
     public void testGetSingleShipmentCompanyAccess() throws IOException, RestServiceException {
         final Company c = createCompany("C1");
         final User u = createUser("junit", c);
