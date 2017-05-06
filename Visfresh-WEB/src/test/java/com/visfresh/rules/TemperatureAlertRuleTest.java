@@ -639,7 +639,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         alertProfileDao.save(alertProfile);
 
         //check first iteration
-        final long startTime = System.currentTimeMillis() - 2 * timeOutMinutes * minute - 6;
+        final long startTime = System.currentTimeMillis() - 10 * timeOutMinutes * minute - 6;
         final SessionHolder mgr = new SessionHolder();
 
         TrackerEvent e = createEvent(startTime, TrackerEventType.AUT, temperature - 5);
@@ -655,7 +655,7 @@ public class TemperatureAlertRuleTest extends BaseRuleTest {
         assertEquals(1, alertDao.findAll(null, null, null).size());
 
         //repeat
-        e = createEvent(startTime + (2 * timeOutMinutes + 1) * minute, TrackerEventType.AUT, temperature - 1);
+        e = createEvent(startTime + 3 * timeOutMinutes * minute, TrackerEventType.AUT, temperature - 1);
         rule.handle(new RuleContext(e, mgr));
         assertEquals(2, alertDao.findAll(null, null, null).size());
     }

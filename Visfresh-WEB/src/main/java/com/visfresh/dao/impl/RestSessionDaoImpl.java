@@ -5,10 +5,10 @@ package com.visfresh.dao.impl;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -147,15 +147,15 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, Long> implement
         //delete personal schedule
         String sql = "delete from " + PROPERTIES + " where session = :session";
 
-        final Map<String, String> props = withoutNullProperties(session.getProperties());
-        if (props.size() > 0) {
+        final Set<String> keys = session.getPropertyKeys();
+        if (keys.size() > 0) {
             final List<String> values = new LinkedList<>();
             int i = 0;
-            for (final Map.Entry<String, String> e : props.entrySet()) {
+            for (final String key : keys) {
                 final String name = "name_" + i;
                 final String value = "value_" + i;
-                paramMap.put(name, e.getKey());
-                paramMap.put(value, e.getValue());
+                paramMap.put(name, key);
+                paramMap.put(value, session.getProperty(key));
 
                 values.add(":" + name);
                 i++;
@@ -166,11 +166,11 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, Long> implement
         jdbc.update(sql, paramMap);
 
         //add new references
-        if (props.size() > 0) {
+        if (keys.size() > 0) {
             sql = "insert ignore into " + PROPERTIES + " (session, name, value) values ";
 
             final List<String> values = new LinkedList<>();
-            for (int i = 0; i < props.size(); i++) {
+            for (int i = 0; i < keys.size(); i++) {
                 final String name = "name_" + i;
                 final String value = "value_" + i;
 
@@ -180,23 +180,6 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, Long> implement
             jdbc.update(sql + StringUtils.combine(values, ",")
                 + " on duplicate key update value = values(value)", paramMap);
         }
-    }
-
-    /**
-     * @param props
-     * @return
-     */
-    private Map<String, String> withoutNullProperties(final Map<String, String> props) {
-        final Map<String, String> map = new HashMap<>(props);
-
-        final Iterator<Map.Entry<String, String>> iter = map.entrySet().iterator();
-        while (iter.hasNext()) {
-            if (iter.next().getValue() == null) {
-                iter.remove();
-            }
-        }
-
-        return map;
     }
 
     /**
@@ -210,7 +193,7 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, Long> implement
                 + " where session = :session";
         final List<Map<String, Object>> rows = jdbc.queryForList(query, params);
         for (final Map<String, Object> row : rows) {
-            session.getProperties().put((String) row.get("name"), (String) row.get("value"));
+            session.putProperty((String) row.get("name"), (String) row.get("value"));
         }
     }
 

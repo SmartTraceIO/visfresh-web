@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
@@ -19,6 +21,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.google.gson.Gson;
@@ -26,6 +29,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
+import com.visfresh.controllers.audit.AuditInterceptor;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -36,6 +40,8 @@ import com.visfresh.utils.StringUtils;
 @EnableWebMvc
 public class WebConfig extends WebMvcConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(WebConfig.class);
+    @Autowired
+    private ApplicationContext context;
 
     /**
      * Default constructor.
@@ -110,5 +116,13 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         };
         gsonConverter.setGson(gson);
         return gsonConverter;
+    }
+    /* (non-Javadoc)
+     * @see org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter#addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry)
+     */
+    @Override
+    public void addInterceptors(final InterceptorRegistry registry) {
+        super.addInterceptors(registry);
+        registry.addInterceptor(context.getBean(AuditInterceptor.class));
     }
 }

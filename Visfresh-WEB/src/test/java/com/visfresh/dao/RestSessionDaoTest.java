@@ -48,29 +48,29 @@ public class RestSessionDaoTest extends BaseCrudTest<RestSessionDao, RestSession
         RestSession s1 = dao.save(createTestEntity());
         RestSession s2 = dao.save(createTestEntity());
 
-        s1.getProperties().put("key1", "value1");
-        s1.getProperties().put("key2", "value2");
-        s1.getProperties().put("key3", "value3");
+        s1.putProperty("key1", "value1");
+        s1.putProperty("key2", "value2");
+        s1.putProperty("key3", "value3");
 
         dao.save(s1);
 
         s1 = dao.findOne(s1.getId());
-        assertEquals("value1", s1.getProperties().get("key1"));
-        assertEquals("value2", s1.getProperties().get("key2"));
-        assertEquals("value3", s1.getProperties().get("key3"));
+        assertEquals("value1", s1.getProperty("key1"));
+        assertEquals("value2", s1.getProperty("key2"));
+        assertEquals("value3", s1.getProperty("key3"));
 
         s2 = dao.findOne(s2.getId());
-        assertEquals(0, s2.getProperties().size());
+        assertEquals(0, s2.getPropertyKeys().size());
 
         //test update
-        s1.getProperties().remove("key1");
-        s1.getProperties().put("key2", null);
+        s1.putProperty("key1", null);
+        s1.putProperty("key2", null);
         dao.save(s1);
 
         s1 = dao.findOne(s1.getId());
 
-        assertEquals(1, s1.getProperties().size());
-        assertEquals("value3", s1.getProperties().get("key3"));
+        assertEquals(1, s1.getPropertyKeys().size());
+        assertEquals("value3", s1.getProperty("key3"));
     }
 
     /**

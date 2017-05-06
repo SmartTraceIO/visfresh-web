@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,13 +14,14 @@ import java.util.Map;
 
 import javax.mail.MessagingException;
 
-import junit.framework.AssertionFailedError;
-
+import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
 import com.visfresh.io.email.EmailMessage;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -39,33 +39,31 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
     public DefaultAuthServiceTest() {
         super();
     }
-
-    @Test
-    public void testRestoreSessionsOnInitialize() {
-        //create one user
-        final User u1 = createUser();
-
-        final RestSession s1 = new RestSession();
-        s1.setUser(u1);
-        s1.setToken(generateNewToken(u1));
-
-        saveSession(s1);
-
-        //create second user
-        final User u2 = createUser();
-
-        final RestSession s2 = new RestSession();
-        s2.setUser(u2);
-        s2.setToken(generateNewToken(u2));
-
-        saveSession(s2);
-
-        //initialize
-        init();
-
-        //check sessions loaded
-        assertEquals(u1.getId(), getUserForToken(s1.getToken().getToken()).getId());
-        assertEquals(u2.getId(), getUserForToken(s2.getToken().getToken()).getId());
+    @Before
+    public void setUp() {
+        this.sessionManager = new DefaultRestSessionManager() {
+            /* (non-Javadoc)
+             * @see com.visfresh.services.DefaultRestSessionManager#deleteSession(com.visfresh.entities.RestSession)
+             */
+            @Override
+            protected void deleteSession(final RestSession s) {
+                deleteSessionImpl(s);
+            }
+            /* (non-Javadoc)
+             * @see com.visfresh.services.DefaultRestSessionManager#findSessionByToken(java.lang.String)
+             */
+            @Override
+            protected RestSession findSessionByToken(final String token) {
+                return findSessionByTokenImpl(token);
+            }
+            /* (non-Javadoc)
+             * @see com.visfresh.services.DefaultRestSessionManager#saveSession(com.visfresh.entities.RestSession)
+             */
+            @Override
+            protected RestSession saveSession(final RestSession s) {
+                return saveSessionImpl(s);
+            }
+        };
     }
 
     @Test
@@ -95,6 +93,16 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         assertEquals(0, sessions.size());
     }
     @Test
+    public void testRefreshToken() throws AuthenticationException {
+        //create one user
+        final User u = createUser();
+        final String token = login(u.getEmail(), "password").getToken();
+
+        final AuthToken newToken = refreshToken(token);
+        assertNotNull(sessionManager.getSession(newToken.getToken()));
+        assertNull(sessionManager.getSession(token));
+    }
+    @Test
     public void testNotUser() {
         try {
             login("email@junit.ru", "password1");
@@ -103,19 +111,6 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
             //correct behavior;
         }
 
-        assertEquals(0, sessions.size());
-    }
-    @Test
-    public void testSessionExcpired() throws AuthenticationException {
-        //create one user
-        final User u = createUser();
-        final AuthToken token = login(u.getEmail(), "password");
-        token.setExpirationTime(new Date(System.currentTimeMillis() - 100000000l));
-
-        this.removeExpiredTokens();
-
-        assertNull(getUserForToken(token.getToken()));
-        //test REST session has removed from DB.
         assertEquals(0, sessions.size());
     }
     /**
@@ -133,11 +128,7 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         return u;
     }
 
-    /* (non-Javadoc)
-     * @see com.visfresh.services.DefaultAuthService#deleteSession(com.visfresh.entities.RestSession)
-     */
-    @Override
-    protected void deleteSession(final RestSession s) {
+    protected void deleteSessionImpl(final RestSession s) {
         sessions.remove(s.getId());
     }
     /* (non-Javadoc)
@@ -152,11 +143,7 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         }
         return null;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.DefaultAuthService#findSessionByToken(java.lang.String)
-     */
-    @Override
-    protected RestSession findSessionByToken(final String token) {
+    protected RestSession findSessionByTokenImpl(final String token) {
         for (final RestSession s: sessions.values()) {
             if (s.getToken().getToken().equals(token)) {
                 return s;
@@ -164,11 +151,7 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         }
         return null;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.DefaultAuthService#saveSession(com.visfresh.entities.RestSession)
-     */
-    @Override
-    protected RestSession saveSession(final RestSession s) {
+    protected RestSession saveSessionImpl(final RestSession s) {
         if (s.getId() == null) {
             s.setId(lastId++);
         }
@@ -196,12 +179,5 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         e.setSubject(subject);
         e.setMessage(message);
         emails.add(e);
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.services.DefaultAuthService#loadSessions()
-     */
-    @Override
-    protected List<RestSession> loadSessions() {
-        return new LinkedList<>(sessions.values());
     }
 }

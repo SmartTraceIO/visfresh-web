@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.dao.RestSessionDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
@@ -45,7 +43,7 @@ public class DefaultAuthService implements AuthService {
     @Autowired
     private EmailService emailService;
     @Autowired
-    private RestSessionDao sessionDao;
+    protected DefaultRestSessionManager sessionManager;
 
     private static final Logger log = LoggerFactory.getLogger(DefaultAuthService.class);
 
@@ -56,7 +54,6 @@ public class DefaultAuthService implements AuthService {
 
     private final AtomicBoolean isStopped = new AtomicBoolean();
 
-    private final Map<String, RestSession> sessions = new HashMap<>();
     private final Map<String, PasswordResetRequest> passwordResets = new HashMap<>();
     private static final Random random = new Random();
 
@@ -67,19 +64,6 @@ public class DefaultAuthService implements AuthService {
         super();
     }
 
-    @PostConstruct
-    public void init() {
-        final List<RestSession> sessions = loadSessions();
-        final Date now = new Date();
-
-        synchronized (sessions) {
-            for (final RestSession s : sessions) {
-                if (s.getToken().getExpirationTime().after(now)) {
-                    this.sessions.put(s.getToken().getToken(), s);
-                }
-            }
-        }
-    }
 
     /* (non-Javadoc)
      * @see com.visfresh.services.AuthService#login(java.lang.String, java.lang.String)
@@ -104,53 +88,27 @@ public class DefaultAuthService implements AuthService {
             }
 
             final AuthToken authToken = generateNewToken(user);
-            synchronized (sessions) {
-                final RestSession s = createSession(user, authToken);
-                sessions.put(s.getToken().getToken(), s);
+            sessionManager.createSession(user, authToken);
 
-                saveSession(s);
-                log.debug("Rest session for user " + user.getEmail() + " has created. Token: "
-                        + s.getToken().getToken());
-
-                removeExpiredUsers(email);
-                return s.getToken();
-            }
+            removeExpiredUsers(user.getEmail());
+            return authToken;
         }
 
         throw new AuthenticationException("Authentication failed");
     }
 
     /**
-     * @param user
-     * @param authToken
-     * @return
-     */
-    private RestSession createSession(final User user, final AuthToken authToken) {
-        final RestSession u = new RestSession();
-        u.setUser(user);
-        u.setToken(authToken);
-        return u;
-    }
-
-    /**
      * @param email user email.
      */
     private void removeExpiredUsers(final String email) {
-        final List<RestSession> list = new LinkedList<>();
-
-        for (final RestSession ui : sessions.values()) {
-            if (ui.getUser().getEmail().equals(email)) {
-                list.add(ui);
-            }
-        }
+        final List<RestSession> list = new LinkedList<>(sessionManager.getAllUserSessions(email));
 
         if (list.size() > USER_LOGIN_LIMIT) {
             //sort users and remove oldest
             Collections.sort(list);
             while (list.size() > USER_LOGIN_LIMIT) {
                 final RestSession toRemove = list.remove(0);
-                sessions.remove(toRemove.getToken().getToken());
-                deleteSession(toRemove);
+                sessionManager.closeSession(toRemove);
                 log.debug("Old auth token for " + toRemove.getUser().getEmail()
                         + " has removed according of max logged in users limit");
             }
@@ -198,7 +156,6 @@ public class DefaultAuthService implements AuthService {
 
     @PostConstruct
     public void start() {
-        startCheckTokensThread();
         startPasswordResetsExpirationThread();
     }
 
@@ -227,52 +184,6 @@ public class DefaultAuthService implements AuthService {
                 }
             }
         }.start();
-    }
-    /**
-     *
-     */
-    protected void startCheckTokensThread() {
-        new Thread() {
-            @Override
-            public void run() {
-                while (true) {
-                    removeExpiredTokens();
-
-                    synchronized (isStopped) {
-                        try {
-                            isStopped.wait(TIMEOUT);
-                        } catch (final InterruptedException e) {
-                            log.error("Check token expiration thread has interrupted", e);
-                            return;
-                        }
-                        if (isStopped.get()) {
-                            log.debug("Check token expiration thread has stopped");
-                            return;
-                        }
-                    }
-                }
-            }
-        }.start();
-    }
-
-    /**
-     *
-     */
-    protected void removeExpiredTokens() {
-        final long time = System.currentTimeMillis();
-
-        synchronized (sessions) {
-            final Iterator<RestSession> iter = sessions.values().iterator();
-            while (iter.hasNext()) {
-                final RestSession session  = iter.next();
-                if (session.getToken().getExpirationTime().getTime() < time) {
-                    log.debug("Access token for user " + session.getUser().getEmail()
-                            + " has expired and will removed");
-                    iter.remove();
-                    deleteSession(session);
-                }
-            }
-        }
     }
     /**
      *
@@ -385,26 +296,15 @@ public class DefaultAuthService implements AuthService {
     @Override
     public AuthToken refreshToken(final String oldToken)
             throws AuthenticationException {
-        final RestSession s = getRuntimeSession(oldToken);
+        final RestSession s = sessionManager.getSession(oldToken);
         if (s == null) {
             throw new AuthenticationException("Not authorized or token expired");
         }
 
         s.setToken(generateNewToken(s.getUser()));
-        saveSession(s);
         log.debug("Rest session for user " + s.getUser().getEmail() + " has renewed. Token: "
                 + s.getToken().getToken());
         return s.getToken();
-    }
-
-    /**
-     * @param authToken
-     * @return
-     */
-    private RestSession getRuntimeSession(final String authToken) {
-        synchronized (sessions) {
-            return sessions.get(authToken);
-        }
     }
 
     /* (non-Javadoc)
@@ -412,7 +312,7 @@ public class DefaultAuthService implements AuthService {
      */
     @Override
     public User getUserForToken(final String authToken) {
-        final RestSession info = getRuntimeSession(authToken);
+        final RestSession info = sessionManager.getSession(authToken);
         return info == null ? null : info.getUser();
     }
 
@@ -438,12 +338,9 @@ public class DefaultAuthService implements AuthService {
      */
     @Override
     public void logout(final String authToken) {
-        RestSession s;
-        synchronized (sessions) {
-            s = sessions.remove(authToken);
-        }
+        final RestSession s = sessionManager.getSession(authToken);
         if (s != null) {
-            deleteSession(s);
+            sessionManager.closeSession(s);
             log.debug("User " + s.getUser().getEmail() + "/" + authToken + " has logged out");
         }
     }
@@ -452,31 +349,7 @@ public class DefaultAuthService implements AuthService {
      */
     @Override
     public void forceLogout(final User u) {
-        int count = 0;
-
-        final Long id = u.getId();
-        synchronized (sessions) {
-            final Iterator<Entry<String, RestSession>> iter = sessions.entrySet().iterator();
-            while(iter.hasNext()) {
-                final Entry<String, RestSession> entry = iter.next();
-                final RestSession info = entry.getValue();
-                if (id.equals(info.getUser().getId())) {
-                    iter.remove();
-                    deleteSession(info);
-                    count++;
-                }
-            }
-        }
-
-        log.debug(count + " user sessions have been closed for force logout of " + u.getEmail());
-    }
-
-    /**
-     * @param s
-     * @return
-     */
-    protected RestSession saveSession(final RestSession s) {
-        return sessionDao.save(s);
+        sessionManager.closeAllSessions(u);
     }
     /**
      * @param user user.
@@ -484,21 +357,6 @@ public class DefaultAuthService implements AuthService {
      */
     protected User saveUser(final User user) {
         return userDao.save(user);
-    }
-    /**
-     * @param s
-     */
-    protected void deleteSession(final RestSession s) {
-        sessionDao.delete(s);
-        log.debug("Rest session " + s.getToken().getToken()
-                + " for user " + s.getUser().getEmail() + " has deleted");
-    }
-    /**
-     * @param token
-     * @return
-     */
-    protected RestSession findSessionByToken(final String token) {
-        return sessionDao.findByToken(token);
     }
     /**
      * @param email email.
@@ -516,11 +374,5 @@ public class DefaultAuthService implements AuthService {
     protected void sendEmail(final String email, final String subject, final String message)
             throws MessagingException {
         emailService.sendMessage(new String[]{email}, subject, message);
-    }
-    /**
-     * @return
-     */
-    protected List<RestSession> loadSessions() {
-        return sessionDao.findAll(null, null, null);
     }
 }
