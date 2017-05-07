@@ -3,7 +3,6 @@
  */
 package com.visfresh.services;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,6 +17,8 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.controllers.session.RestSessionListener;
@@ -31,7 +32,8 @@ import com.visfresh.entities.User;
  *
  */
 @Component
-public class DefaultRestSessionManager implements RestSessionManager {
+public class DefaultRestSessionManager implements RestSessionManager,
+        ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private RestSessionDao sessionDao;
 
@@ -54,22 +56,28 @@ public class DefaultRestSessionManager implements RestSessionManager {
         super();
     }
 
-    @PostConstruct
-    public void init() {
-        final List<RestSession> sessions = loadSessions();
-        final Date now = new Date();
-
-        synchronized (sessions) {
-            for (final RestSession s : sessions) {
-                if (s.getToken().getExpirationTime().after(now)) {
-                    createSession(s.getUser(), s.getToken());
-                }
-            }
-        }
-
+    /* (non-Javadoc)
+     * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
+     */
+    @Override
+    public void onApplicationEvent(final ContextRefreshedEvent event) {
+        //removing of expired tokens and start check tokens thread should
+        //be run after all context has initialized for be sure
+        //that all listeners are installed.
+        removeExpiredTokens();
         startCheckTokensThread();
     }
 
+    @PostConstruct
+    public void init() {
+        final List<RestSession> sessions = loadSessions();
+
+        synchronized (sessions) {
+            for (final RestSession s : sessions) {
+                this.sessions.put(s.getToken().getToken(), s);
+            }
+        }
+    }
     /**
      * @param user
      * @param authToken
@@ -83,10 +91,10 @@ public class DefaultRestSessionManager implements RestSessionManager {
         synchronized (sessions) {
             sessions.put(s.getToken().getToken(), s);
             saveSession(s);
-
-            log.debug("Rest session for user " + user.getEmail() + " has created. Token: "
-                    + s.getToken().getToken());
         }
+
+        log.debug("Rest session for user " + user.getEmail() + " has created. Token: "
+                + s.getToken().getToken());
 
         //add session listener
         s.addRestSessionListener(new RestSessionListener() {
