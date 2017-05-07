@@ -11,5 +11,5 @@ import com.visfresh.entities.RestSession;
  */
 public interface SessionManagerListener {
     void sessionCreated(RestSession session);
-    void sessionDestroyed(RestSession session);
+    void sessionClosed(RestSession session);
 }

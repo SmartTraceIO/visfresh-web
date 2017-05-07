@@ -110,6 +110,7 @@ import com.visfresh.utils.StringUtils;
 @RestController("Shipment")
 @RequestMapping("/rest")
 public class ShipmentController extends AbstractShipmentBaseController implements ShipmentConstants {
+    public static final String GET_SINGLE_SHIPMENT = "getSingleShipment";
     /**
      * 2 hours by default.
      */
@@ -1052,7 +1053,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/getSingleShipment/{authToken}", method = RequestMethod.GET)
+    @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT + "/{authToken}", method = RequestMethod.GET)
     public JsonObject getSingleShipment(@PathVariable final String authToken,
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
@@ -1082,7 +1083,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 return createSuccessResponse(null);
             }
 
-            if (!hasExternalUserAccess(user, s)) {
+            if (!hasViewSingleShipmentAccess(user, s)) {
                 throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
             }
 
@@ -1156,7 +1157,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         //add siblings
         final List<Shipment> siblings = getSiblings(s);
         for (final Shipment sibling : siblings) {
-            if (hasExternalUserAccess(user, sibling)) {
+            if (hasViewSingleShipmentAccess(user, sibling)) {
                 dto.getSiblings().add(createDto(sibling, user));
             }
         }
@@ -1723,7 +1724,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param s shipment.
      * @throws RestServiceException
      */
-    private boolean hasExternalUserAccess(final User user, final Shipment s) {
+    public static boolean hasViewSingleShipmentAccess(final User user, final Shipment s) {
         if (Role.SmartTraceAdmin.hasRole(user)) {
             return true;
         }

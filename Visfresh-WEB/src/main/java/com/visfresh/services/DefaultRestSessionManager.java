@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.controllers.session.RestSessionListener;
+import com.visfresh.controllers.session.SessionManagerListener;
 import com.visfresh.dao.RestSessionDao;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
@@ -41,6 +42,10 @@ public class DefaultRestSessionManager implements RestSessionManager {
     private final AtomicBoolean isStopped = new AtomicBoolean();
 
     private final Map<String, RestSession> sessions = new HashMap<>();
+    /**
+     * The listener list.
+     */
+    private final List<SessionManagerListener> listeners = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -94,6 +99,11 @@ public class DefaultRestSessionManager implements RestSessionManager {
             }
         });
 
+        //notify listeners
+        for (final SessionManagerListener l : getListeners()) {
+            l.sessionCreated(s);
+        }
+
         return s;
     }
     /**
@@ -103,6 +113,10 @@ public class DefaultRestSessionManager implements RestSessionManager {
     public void closeSession(final RestSession session) {
         sessions.remove(session.getToken().getToken());
         deleteSession(session);
+
+        for (final SessionManagerListener l : getListeners()) {
+            l.sessionClosed(session);
+        }
     }
 
     /**
@@ -259,6 +273,32 @@ public class DefaultRestSessionManager implements RestSessionManager {
                     break;
                 }
             }
+        }
+    }
+    /**
+     * @param l listener to add.
+     */
+    @Override
+    public void addSessionManagerListener(final SessionManagerListener l) {
+        synchronized (listeners) {
+            listeners.add(l);
+        }
+    }
+    /**
+     * @param l listener to remove.
+     */
+    @Override
+    public void removeSessionManagerListener(final SessionManagerListener l) {
+        synchronized (listeners) {
+            listeners.remove(l);
+        }
+    }
+    /**
+     * @return list of listeners.
+     */
+    protected List<SessionManagerListener> getListeners() {
+        synchronized (listeners) {
+            return new LinkedList<>(listeners);
         }
     }
 }
