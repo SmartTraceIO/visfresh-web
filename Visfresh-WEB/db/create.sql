@@ -12,6 +12,7 @@ drop table if exists usershipments;
 drop table if exists trackerevents;
 drop table if exists arrivals;
 drop table if exists alerts;
+drop table if exists shipmentaudits;
 drop table if exists notifications;
 drop table if exists userprofiles;
 drop table if exists shipmentdevices;
@@ -354,6 +355,19 @@ create table shipmentstats (
     primary key (shipment),
     FOREIGN KEY (shipment)
         REFERENCES shipments (id) ON DELETE CASCADE
+);
+
+create table shipmentaudits (
+    id bigint(20) auto_increment not null,
+    time timestamp NULL default NULL,
+    user bigint(20) default null,
+    shipment bigint(20) not null,
+    action varchar(127) not null,
+	info longtext not null,
+	
+    primary key (id),
+    FOREIGN KEY (shipment) REFERENCES shipments (id) on delete cascade,
+    FOREIGN KEY (user) REFERENCES users (id) on delete cascade
 );
 
 create table alerts (
