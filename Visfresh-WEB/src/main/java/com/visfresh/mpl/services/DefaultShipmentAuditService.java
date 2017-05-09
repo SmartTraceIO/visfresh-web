@@ -55,6 +55,9 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
             if (session == null) {
                 log.error("Current session is not bound to ThreadLocal for user "
                         + user.getEmail(), new IllegalStateException("Current session not bound"));
+                if (!isAuto(action)) {
+                    shouldSaveAudit = false;
+                }
             } else {
                 final String oldValue = session.getProperty(SHIPMENT_AUDIT);
                 final String value = buildSessionAuditValue(action, shipment);
@@ -70,12 +73,22 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
                     session.putProperty(SHIPMENT_AUDIT, value);
                 }
             }
+        } else if (!isAuto(action)) {
+            shouldSaveAudit = false;
         }
 
         if (shouldSaveAudit) {
             final ShipmentAuditItem item = createAuditItem(shipment, user, action, details);
             save(item);
         }
+    }
+
+    /**
+     * @param action
+     * @return
+     */
+    protected boolean isAuto(final ShipmentAuditAction action) {
+        return action == ShipmentAuditAction.Autocreated;
     }
 
     /**

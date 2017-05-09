@@ -26,7 +26,7 @@ public class CurrentSessionHolder implements Auditor {
     @Autowired
     private RestSessionManager m;
 
-    private static final ThreadLocal<RestSession> currentSession = new ThreadLocal<>();
+    protected static final ThreadLocal<RestSession> currentSession = new ThreadLocal<>();
 
     /**
      * Default constructor.
