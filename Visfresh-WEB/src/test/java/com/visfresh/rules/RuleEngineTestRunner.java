@@ -13,6 +13,8 @@ import com.visfresh.dao.DaoTestRunner;
 import com.visfresh.junit.db.JUnitDbConfig;
 import com.visfresh.mock.MockEmailService;
 import com.visfresh.mock.MockNotificationService;
+import com.visfresh.mock.MockRestSessionManager;
+import com.visfresh.mock.MockShipmentAuditService;
 import com.visfresh.services.RuleEngine;
 
 /**
@@ -74,6 +76,8 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
         DaoTestRunner.clearDb(context);
         try {
             context.getBean(MockEmailService.class).clear();
+            context.getBean(MockShipmentAuditService.class).clear();
+            context.getBean(MockRestSessionManager.class).clear();
         } catch (final Exception e) {}
     }
     /**

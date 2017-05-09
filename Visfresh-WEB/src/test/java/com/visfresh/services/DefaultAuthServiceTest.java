@@ -20,6 +20,7 @@ import org.junit.Test;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
 import com.visfresh.io.email.EmailMessage;
+import com.visfresh.mpl.services.DefaultRestSessionManager;
 
 import junit.framework.AssertionFailedError;
 
@@ -60,8 +61,8 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
              * @see com.visfresh.services.DefaultRestSessionManager#saveSession(com.visfresh.entities.RestSession)
              */
             @Override
-            protected RestSession saveSession(final RestSession s) {
-                return saveSessionImpl(s);
+            protected void saveSession(final RestSession s) {
+                saveSessionImpl(s);
             }
         };
     }

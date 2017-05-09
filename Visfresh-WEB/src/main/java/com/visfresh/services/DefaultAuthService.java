@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
+import com.visfresh.mpl.services.DefaultRestSessionManager;
 import com.visfresh.utils.HashGenerator;
 import com.visfresh.utils.Messages;
 

@@ -33,6 +33,9 @@ import com.visfresh.dao.DaoTestRunner;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
+import com.visfresh.mock.MockEmailService;
+import com.visfresh.mock.MockRestSessionManager;
+import com.visfresh.mock.MockShipmentAuditService;
 import com.visfresh.services.AuthService;
 
 /**
@@ -186,10 +189,13 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
         return test;
     }
     /**
-     *
+     * Clears the DB and Mock services.
      */
     private void cleanUp() {
         DaoTestRunner.clearDb(context);
+        context.getBean(MockEmailService.class).clear();
+        context.getBean(MockShipmentAuditService.class).clear();
+        context.getBean(MockRestSessionManager.class).clear();
     }
     /* (non-Javadoc)
      * @see java.lang.Object#finalize()

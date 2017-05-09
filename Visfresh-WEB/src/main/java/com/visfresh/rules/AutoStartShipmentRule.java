@@ -10,11 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.services.AutoStartShipmentService;
+import com.visfresh.services.ShipmentAuditService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -36,6 +38,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
     private AbstractRuleEngine engine;
     @Autowired
     private AutoStartShipmentService service;
+    @Autowired
+    private ShipmentAuditService auditService;
 
     /**
      * Default constructor.
@@ -84,6 +88,8 @@ public class AutoStartShipmentRule implements TrackerEventRule {
 
         event.setShipment(shipment);
         trackerEventDao.save(event);
+
+        auditService.handleShipmentAction(shipment, null, ShipmentAuditAction.Autocreated, null);
         return true;
     }
 }

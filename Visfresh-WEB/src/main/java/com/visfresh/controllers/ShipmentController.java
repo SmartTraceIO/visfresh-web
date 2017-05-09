@@ -32,6 +32,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ErrorCodes;
 import com.visfresh.constants.ShipmentConstants;
+import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
@@ -96,6 +97,7 @@ import com.visfresh.services.LocationService;
 import com.visfresh.services.NotificationService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.RuleEngine;
+import com.visfresh.services.ShipmentAuditService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;
@@ -154,6 +156,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     private ShipmentSessionDao shipmentSessionDao;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private ShipmentAuditService auditService;
 
     /**
      * Default constructor.
@@ -224,6 +228,14 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                         user.getCompany(), newShipment, req.getTemplateName());
                 resp.setTemplateId(tplId);
             }
+
+            //audit
+            if (id == null) {
+                auditService.handleShipmentAction(newShipment, user, ShipmentAuditAction.ManyallyCreated, null);
+            } else {
+                auditService.handleShipmentAction(newShipment, user, ShipmentAuditAction.Updated, null);
+            }
+
             return createSuccessResponse(serializer.toJson(resp));
         } catch (final Exception e) {
             log.error("Failed to save shipment by request: " + jsonRequest, e);
@@ -1002,6 +1014,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             addInterimStops(dto, shipment);
 
             final JsonObject json = getSerializer(user).toJson(dto);
+
+            auditService.handleShipmentAction(shipment, user, ShipmentAuditAction.LoadedForEdit, null);
             return createSuccessResponse(json);
         } catch (final Exception e) {
             log.error("Failed to get shipment " + shipmentId, e);
@@ -1047,6 +1061,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             if (s != null) {
                 ruleEngine.suppressNextAlerts(s);
             }
+
+            auditService.handleShipmentAction(s, user, ShipmentAuditAction.SuppressedAlerts, null);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete shipment " + shipmentId, e);
@@ -1090,6 +1106,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             final SingleShipmentDto dto = createDto(s, user);
             addRelevantData(user, s, dto);
 
+            if (dto != null) {
+                auditService.handleShipmentAction(s, user, ShipmentAuditAction.Viewed, null);
+            }
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get single shipment: " + shipmentId, e);
@@ -1133,6 +1152,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
             addRelevantData(user, s, dto);
 
+            if (dto != null) {
+                auditService.handleShipmentAction(s, user, ShipmentAuditAction.ViewedLite, null);
+            }
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
             log.error("Failed to get single shipment: " + shipmentId, e);
@@ -1219,6 +1241,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             }
 
             final Shipment s = autoStartService.autoStartNewShipment(d, e.getLatitude(), e.getLongitude(), new Date());
+            if (s != null) {
+                auditService.handleShipmentAction(s, user, ShipmentAuditAction.ManyallyCreatedFromAutostart, null);
+            }
             return createIdResponse("shipmentId", s.getId());
         } catch (final Exception e) {
             log.error("Failed to get autostart templates", e);

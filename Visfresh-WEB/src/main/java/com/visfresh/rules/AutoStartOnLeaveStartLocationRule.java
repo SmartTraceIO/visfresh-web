@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.dao.AutoStartShipmentDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
@@ -36,6 +37,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.LeaveLocationState;
 import com.visfresh.services.AutoStartShipmentService;
+import com.visfresh.services.ShipmentAuditService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.SerializerUtils;
@@ -61,6 +63,8 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
     private AutoStartShipmentService autoStartService;
     @Autowired
     private ShipmentDao shipmentDao;
+    @Autowired
+    private ShipmentAuditService auditService;
 
     /**
      * Default constructor.
@@ -185,6 +189,7 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
                 }
             }
 
+            auditService.handleShipmentAction(s, null, ShipmentAuditAction.Autocreated, null);
             return true;
         }
 

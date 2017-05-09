@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
+import com.visfresh.mpl.services.DefaultRestSessionManager;
 import com.visfresh.utils.HashGenerator;
 
 /**
@@ -113,12 +114,11 @@ public class DefaultRestSessionManagerTest extends DefaultRestSessionManager {
      * @see com.visfresh.services.DefaultAuthService#saveSession(com.visfresh.entities.RestSession)
      */
     @Override
-    protected RestSession saveSession(final RestSession s) {
+    protected void saveSession(final RestSession s) {
         if (s.getId() == null) {
             s.setId(lastId++);
         }
         sessions.put(s.getId(), s);
-        return s;
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.DefaultAuthService#loadSessions()

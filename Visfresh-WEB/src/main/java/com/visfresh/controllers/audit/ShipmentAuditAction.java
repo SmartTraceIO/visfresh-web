@@ -11,5 +11,9 @@ public enum ShipmentAuditAction {
     Autocreated,
     ManyallyCreated,
     Viewed,
-    Updated
+    Updated,
+    LoadedForEdit,
+    SuppressedAlerts,
+    ViewedLite,
+    ManyallyCreatedFromAutostart
 }

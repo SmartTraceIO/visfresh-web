@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services;
+package com.visfresh.mpl.services;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +26,8 @@ import com.visfresh.controllers.session.SessionManagerListener;
 import com.visfresh.dao.RestSessionDao;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
+import com.visfresh.services.AuthToken;
+import com.visfresh.services.RestSessionManager;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -217,10 +219,9 @@ public class DefaultRestSessionManager implements RestSessionManager,
 
     /**
      * @param s
-     * @return
      */
-    protected RestSession saveSession(final RestSession s) {
-        return sessionDao.save(s);
+    protected void saveSession(final RestSession s) {
+        sessionDao.save(s);
     }
     /**
      * @param s
