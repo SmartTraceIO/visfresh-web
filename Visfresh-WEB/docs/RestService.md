@@ -619,7 +619,7 @@ Method *GET*, method name *getInterimStop*. Request parameters:
 Response is [Standard JSON response](#markdown-header-response-message)  
 [(example)](#markdown-header-get-interim-stop-example)
 
-### Get Shipment Audits example ###
+### Get Shipment Audits ###
 Method *GET*, method name *getShipmentAudits*. Request parameters:  
 1. shipmentId - shipment ID (not mandatory)  
 2. userId - user ID (not mandatory)  
@@ -1322,8 +1322,8 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```
 ### Delete User example ###
-**GET /vf/rest/deleteUser/${accessToken}?userId=1711**
-Response:
+**GET /vf/rest/deleteUser/${accessToken}?userId=1711**  
+**Response:**  
 ```json
 {
   "status": {
