@@ -14,12 +14,15 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.controllers.restclient.NoteRestClient;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.entities.Note;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentAuditItem;
 import com.visfresh.entities.User;
 import com.visfresh.io.NoteDto;
+import com.visfresh.mock.MockShipmentAuditService;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
@@ -77,6 +80,11 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         assertEquals(noteText, note.getNoteText());
         assertEquals(noteType, note.getNoteType());
         assertEquals(timeOnChart, isoFormat.format(note.getTimeOnChart()));
+
+        //test audit
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.AddedNote, items.get(0).getAction());
     }
     @Test
     public void testSaveNewBySnTrip() throws IOException, RestServiceException {
@@ -102,6 +110,11 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         assertEquals(noteText, note.getNoteText());
         assertEquals(noteType, note.getNoteType());
         assertEquals(timeOnChart, isoFormat.format(note.getTimeOnChart()));
+
+        //test audit
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.AddedNote, items.get(0).getAction());
     }
     @Test
     public void testGetNotesByShipmentId() throws IOException, RestServiceException {
@@ -149,6 +162,11 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         assertEquals(1, notes.size());
 
         assertEquals("B", notes.get(0).getNoteText());
+
+        //test audit
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.UpdatedNote, items.get(0).getAction());
     }
     @Test
     public void testDeleteNote() throws IOException, RestServiceException {
@@ -158,6 +176,11 @@ public class NoteControllerTest extends AbstractRestServiceTest {
 
         client.deleteNote(shipment.getId(), a.getNoteNum());
         assertEquals(2, dao.findByShipment(shipment).size());
+
+        //test audit
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.DeletedNote, items.get(0).getAction());
 
         client.deleteNote(shipment.getDevice().getSn(), shipment.getTripCount(), b.getNoteNum());
         assertEquals(1, dao.findByShipment(shipment).size());

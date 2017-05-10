@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.visfresh.constants.LocationConstants;
 import com.visfresh.constants.ShipmentConstants;
+import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.controllers.restclient.RestIoListener;
 import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.dao.AlertDao;
@@ -51,6 +52,7 @@ import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Note;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.ShipmentAuditItem;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureAlert;
@@ -64,6 +66,7 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.json.ShipmentSerializer;
+import com.visfresh.mock.MockShipmentAuditService;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.AutoDetectEndLocationRule;
 import com.visfresh.rules.EtaCalculationRule;
@@ -178,6 +181,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(2, shp.getUserAccess().size());
         assertEquals(2, shp.getCompanyAccess().size());
         assertEquals(2, context.getBean(AlternativeLocationsDao.class).getBy(shp).getInterim().size());
+
+        //test audit
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.ManuallyCreated, items.get(0).getAction());
     }
     @Test
     public void testSaveShipmentAddDateShipped() throws RestServiceException, IOException {
@@ -224,6 +232,10 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Shipment saved = context.getBean(ShipmentDao.class).findOne(oldId);
 
         assertEquals(comments, saved.getCommentsForReceiver());
+
+        //test audits
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
     }
     @Test
     public void testSaveShipmentOverInProgress() throws RestServiceException, IOException {
@@ -897,6 +909,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(2, dto.getInterimLocations().size());
         assertEquals(2, dto.getCompanyAccess().size());
         assertEquals(2, dto.getUserAccess().size());
+
+        //test audits
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.LoadedForEdit, items.get(0).getAction());
     }
     @Test
     public void testDeleteShipment() throws IOException, RestServiceException {
@@ -912,6 +929,10 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final ShipmentSession session = context.getBean(ShipmentSessionDao.class).getSession(sp);
         assertTrue(session.isAlertsSuppressed());
         assertNotNull(session.getAlertsSuppressionDate());
+        //test audits
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.SuppressedAlerts, items.get(0).getAction());
     }
     @Test
     public void testGetSingleShipmentWithSuppressedAlerts() throws IOException, RestServiceException {
@@ -943,6 +964,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         saveShipmentDirectly(sp);
 
         shipmentClient.getSingleShipment(sp).getAsJsonObject();
+
+        //test audits
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.Viewed, items.get(0).getAction());
     }
     @Test
     public void testGetSingleShipmentUserAccessSnTrip() throws IOException, RestServiceException {
@@ -1056,6 +1082,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         final JsonObject sd = shipmentClient.getSingleShipmentLite(s).getAsJsonObject();
         assertNotNull(sd);
+
+        //test audits
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.ViewedLite, items.get(0).getAction());
     }
     @Test
     public void testGetSingleShipmentAlternatives() throws RestServiceException, IOException {
@@ -1127,6 +1158,12 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         dto.setInterimStops(null);
 
         shipmentClient.saveShipment(req);
+
+        //test audits
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.Updated, items.get(0).getAction());
+
         assertEquals(2, shipmentClient.getShipment(s.getId()).getInterimStops().size());
     }
     @Test
@@ -1435,6 +1472,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Shipment s = shipmentDao.findOne(id);
         assertNull(s.getShutdownDeviceAfterMinutes());
         assertNull(s.getArrivalNotificationWithinKm());
+
+        //test audits
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.ManuallyCreated, items.get(0).getAction());
     }
     @Test
     public void autoStartShipment() throws IOException, RestServiceException {
@@ -1470,6 +1512,11 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(id);
         final Shipment s = shipmentDao.findOne(id);
         assertNotNull(s);
+
+        //test audits
+        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        assertEquals(1, items.size());
+        assertEquals(ShipmentAuditAction.ManuallyCreatedFromAutostart, items.get(0).getAction());
     }
     @Test
     public void testGetShipmentsNearBy() throws IOException, RestServiceException {

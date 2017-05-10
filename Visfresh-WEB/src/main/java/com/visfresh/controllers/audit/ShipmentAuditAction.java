@@ -9,11 +9,15 @@ package com.visfresh.controllers.audit;
  */
 public enum ShipmentAuditAction {
     Autocreated,
-    ManyallyCreated,
+    ManuallyCreated,
     Viewed,
     Updated,
     LoadedForEdit,
     SuppressedAlerts,
     ViewedLite,
-    ManyallyCreatedFromAutostart
+    ManuallyCreatedFromAutostart,
+    ViewAccessDenied,
+    AddedNote,
+    DeletedNote,
+    UpdatedNote
 }

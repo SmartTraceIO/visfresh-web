@@ -100,10 +100,10 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
         final User user = createUser("a@b.c");
         createCurrentSession(user);
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManyallyCreated, null);
+        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManuallyCreated, null);
         assertEquals(1, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManyallyCreated, null);
+        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManuallyCreated, null);
         assertEquals(2, this.items.size());
 
     }
@@ -112,10 +112,10 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
         handleShipmentAction(shipment1, null, ShipmentAuditAction.LoadedForEdit, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, null, ShipmentAuditAction.ManyallyCreated, null);
+        handleShipmentAction(shipment1, null, ShipmentAuditAction.ManuallyCreated, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, null, ShipmentAuditAction.ManyallyCreatedFromAutostart, null);
+        handleShipmentAction(shipment1, null, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
         assertEquals(0, this.items.size());
 
         handleShipmentAction(shipment1, null, ShipmentAuditAction.SuppressedAlerts, null);
@@ -168,10 +168,10 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
         handleShipmentAction(shipment1, user, ShipmentAuditAction.LoadedForEdit, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManyallyCreated, null);
+        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManuallyCreated, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManyallyCreatedFromAutostart, null);
+        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
         assertEquals(0, this.items.size());
 
         handleShipmentAction(shipment1, user, ShipmentAuditAction.SuppressedAlerts, null);

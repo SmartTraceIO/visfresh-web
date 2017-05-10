@@ -21,6 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.DeviceConstants;
 import com.visfresh.constants.ErrorCodes;
+import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.Note;
@@ -29,6 +30,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 import com.visfresh.io.NoteDto;
 import com.visfresh.io.json.NoteSerializer;
+import com.visfresh.services.ShipmentAuditService;
 import com.visfresh.utils.DateTimeUtils;
 
 /**
@@ -46,6 +48,8 @@ public class NoteController extends AbstractController implements DeviceConstant
     private ShipmentDao shipmentDao;
     @Autowired
     private NoteDao noteDao;
+    @Autowired
+    private ShipmentAuditService auditService;
 
     /**
      * Default constructor.
@@ -145,6 +149,8 @@ public class NoteController extends AbstractController implements DeviceConstant
             note.setActive(false);
             noteDao.save(s, note);
 
+            auditService.handleShipmentAction(s, user, ShipmentAuditAction.DeletedNote, null);
+
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete note: " + shipmentId, e);
@@ -215,7 +221,14 @@ public class NoteController extends AbstractController implements DeviceConstant
             note.setTimeOnChart(iso.parse(dto.getTimeOnChart()));
             note.setActive(dto.isActiveFlag());
 
+            final boolean isNew = note.getNoteNum() == null;
             note = noteDao.save(s, note);
+
+            if (isNew) {
+                auditService.handleShipmentAction(s, user, ShipmentAuditAction.AddedNote, null);
+            } else {
+                auditService.handleShipmentAction(s, user, ShipmentAuditAction.UpdatedNote, null);
+            }
 
             return createSuccessResponse(ser.createSaveResponse(note));
         } catch (final Exception e) {

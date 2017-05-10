@@ -181,7 +181,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             Long id = serializer.getShipmentIdFromSaveRequest(jsonRequest);
             Shipment oldShipment = null;
 
-            if (id != null) {
+            final boolean isNew = id == null;
+            if (!isNew) {
                 //merge the shipment from request by existing shipment
                 //it is required to avoid the set to null the fields
                 //which are absent in save request.
@@ -230,8 +231,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             }
 
             //audit
-            if (id == null) {
-                auditService.handleShipmentAction(newShipment, user, ShipmentAuditAction.ManyallyCreated, null);
+            if (isNew) {
+                auditService.handleShipmentAction(newShipment, user, ShipmentAuditAction.ManuallyCreated, null);
             } else {
                 auditService.handleShipmentAction(newShipment, user, ShipmentAuditAction.Updated, null);
             }
@@ -1242,7 +1243,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
             final Shipment s = autoStartService.autoStartNewShipment(d, e.getLatitude(), e.getLongitude(), new Date());
             if (s != null) {
-                auditService.handleShipmentAction(s, user, ShipmentAuditAction.ManyallyCreatedFromAutostart, null);
+                auditService.handleShipmentAction(s, user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
             }
             return createIdResponse("shipmentId", s.getId());
         } catch (final Exception e) {
