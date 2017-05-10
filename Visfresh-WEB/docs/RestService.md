@@ -131,6 +131,7 @@ List items is short representations of base entities, like as [Alert Profile](#m
 70. [Save Interim Stop](#markdown-header-save-interim-stop)  
 71. [Delete Interim Stop](#markdown-header-delete-interim-stop)  
 72. [Get Interim Stop](#markdown-header-get-interim-stop)  
+73. [Get Shipment Audits](#markdown-header-get-shipment-audits)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -138,6 +139,21 @@ List items is short representations of base entities, like as [Alert Profile](#m
 3. [Get Time Zones](#markdown-header-get-time-zones)  
 4. [Get User Time](#markdown-header-get-user-time)  
 5. [Get Measurement Units](#markdown-header-get-measurement-units)  
+
+### Shipment Audit ###
+## Actions: ##
+1. Autocreated Shipent autocreated.  
+2. ManuallyCreated Shipment manually created by user.  
+3. Viewed [Get Single Shipment](#markdown-header-get-single-shipment) method is called by user.  
+4. Updated Shipment is updated by user.  
+5. LoadedForEdit [Get Shipment](#markdown-header-get-shipment) is called by user.  
+6. SuppressedAlerts alerts suppressed by user.  
+7. ViewedLite Get Single Shipment lite method is called by user.  
+8. ManuallyCreatedFromAutostart Shipment manually autostarted from template.  
+9. ViewAccessDenied Access Denied error is occured during view the shipment.  
+10. AddedNote User adds the note.  
+11. DeletedNote User deletes the note.  
+12. UpdatedNote User updates the note.  
 
 ### Authentication.###
 Method *GET*, method name *login*, request parameters login - the user login name and password - the user password  
@@ -602,6 +618,17 @@ Method *GET*, method name *getInterimStop*. Request parameters:
 2. shipment - shipment ID  
 Response is [Standard JSON response](#markdown-header-response-message)  
 [(example)](#markdown-header-get-interim-stop-example)
+
+### Get Shipment Audits example ###
+Method *GET*, method name *getShipmentAudits*. Request parameters:  
+1. shipmentId - shipment ID (not mandatory)  
+2. userId - user ID (not mandatory)  
+3. sc - sorting column (not mandatory)  
+4. so - sorting order (not mandatory)  
+5. pageIndex - page index (not mandatory)  
+6. pageSize - page size (not mandatory)  
+One shipmentId or userId should be specified. Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-get-shipment-audits-example)
 
 ## Objects
 ### Response message ###
@@ -4213,5 +4240,42 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
       "stopDate": "2016-10-06 15:07"
     }
   ]
+}
+```
+
+### Get Shipment Audits example ###
+**GET /vf/rest/getShipmentAudits/${accessToken}?sc=userId&pageIndex=1&pageSize=100&so=asc&userId=7491**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "id": 443,
+      "action": "Autocreated",
+      "shipmentId": 5632,
+      "time": "2017-04-29T04:33",
+      "userId": 7491,
+      "additionalInfo": {
+        "key1": "value1",
+        "key2": "value2"
+      }
+    },
+    {
+      "id": 444,
+      "action": "Autocreated",
+      "shipmentId": 5633,
+      "time": "2017-04-29T04:33",
+      "userId": 7491,
+      "additionalInfo": {
+        "key1": "value1",
+        "key2": "value2"
+      }
+    }
+  ],
+  "totalCount": 2
 }
 ```
