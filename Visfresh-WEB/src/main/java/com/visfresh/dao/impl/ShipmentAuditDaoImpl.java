@@ -6,6 +6,7 @@ package com.visfresh.dao.impl;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -15,7 +16,11 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonElement;
 import com.visfresh.constants.ShipmentAuditConstants;
 import com.visfresh.controllers.audit.ShipmentAuditAction;
+import com.visfresh.dao.Filter;
+import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentAuditDao;
+import com.visfresh.dao.Sorting;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.ShipmentAuditItem;
 import com.visfresh.utils.SerializerUtils;
 
@@ -26,6 +31,8 @@ import com.visfresh.utils.SerializerUtils;
 @Component
 public class ShipmentAuditDaoImpl extends DaoImplBase<ShipmentAuditItem, Long>
         implements ShipmentAuditDao {
+    private static final String SHIPMENTS_COMPANY = "shipmentsCompany";
+
     private static final String TABLE = "shipmentaudits";
 
     private static final String ID = "id";
@@ -146,5 +153,75 @@ public class ShipmentAuditDaoImpl extends DaoImplBase<ShipmentAuditItem, Long>
     @Override
     protected String getTableName() {
         return TABLE;
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentAuditDao#findAll(com.visfresh.entities.Company, com.visfresh.dao.Filter, com.visfresh.dao.Sorting, com.visfresh.dao.Page)
+     */
+    @Override
+    public List<ShipmentAuditItem> findAll(final Company company, final Filter filter, final Sorting sorting, final Page page) {
+        final Filter f = new Filter(filter);
+        f.addFilter(SHIPMENTS_COMPANY, company.getId());
+        return findAll(f, sorting, page);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentAuditDao#getEntityCount(com.visfresh.entities.Company, com.visfresh.dao.Filter)
+     */
+    @Override
+    public int getEntityCount(final Company company, final Filter filter) {
+        final Filter f = new Filter(filter);
+        f.addFilter(SHIPMENTS_COMPANY, company.getId());
+        return super.getEntityCount(f);
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()
+     */
+    @Override
+    protected SelectAllSupport createSelectAllSupport() {
+        return new SelectAllSupport(getTableName()) {
+            /**
+             * @param filter the filter.
+             * @return
+             */
+            @Override
+            protected String buildSelectBlockForEntityCount(final Filter filter) {
+                return addCompanyBlock("select count(*) as count from " + getTableName(), filter);
+            }
+
+            /**
+             * @param filter the filter.
+             * @return select all string depending of filter.
+             */
+            @Override
+            protected String buildSelectBlockForFindAll(final Filter filter) {
+                return addCompanyBlock("select " + getTableName() + ".* from " + getTableName(), filter);
+            }
+
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.SelectAllSupport#addFilterValue(java.lang.String, java.lang.Object, java.util.Map, java.util.List)
+             */
+            @Override
+            protected void addFilterValue(final String property, final Object value, final Map<String, Object> params,
+                    final List<String> filters) {
+                if (SHIPMENTS_COMPANY.equals(property)) {
+                    params.put("company", value);
+                } else {
+                    super.addFilterValue(property, value, params, filters);
+                }
+            }
+            /**
+             * @param sql origin query.
+             * @param filter filter.
+             * @return possible updated query.
+             */
+            protected String addCompanyBlock(final String sql, final Filter filter) {
+                if (filter != null && filter.getFilter(SHIPMENTS_COMPANY) != null) {
+                    return sql+ " join shipments on " + getTableName()
+                            + ".shipment = shipments.id and shipments.company = :company";
+                }
+                return sql;
+            }
+        };
     }
 }
