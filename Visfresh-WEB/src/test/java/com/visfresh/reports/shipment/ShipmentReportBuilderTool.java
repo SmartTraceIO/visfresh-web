@@ -121,12 +121,12 @@ public final class ShipmentReportBuilderTool {
             bean.setShippedToLocation(new Location(arrived.getLatitude(), arrived.getLongitude()));
 
             //set arrival
-            final ArrivalBean arrival = new ArrivalBean();
-            arrival.setNotifiedAt(bean.getDateArrived());
-            arrival.setNotifiedWhenKm(40);
-            bean.setArrival(arrival);
-
-            bean.setShutdownTime(new Date(arrival.getNotifiedAt().getTime() + 10000000));
+//            final ArrivalBean arrival = new ArrivalBean();
+//            arrival.setNotifiedAt(bean.getDateArrived());
+//            arrival.setNotifiedWhenKm(40);
+//            bean.setArrival(arrival);
+//
+//            bean.setShutdownTime(new Date(arrival.getNotifiedAt().getTime() + 10000000));
         }
 
         bean.setAlertProfile("Chilled Beef");

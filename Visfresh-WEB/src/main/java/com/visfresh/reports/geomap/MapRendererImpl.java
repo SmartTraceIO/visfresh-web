@@ -22,27 +22,25 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperReportsContext;
-import net.sf.jasperreports.renderers.AbstractRenderer;
-import net.sf.jasperreports.renderers.Graphics2DRenderable;
-
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.reports.AbstractGraphics2DRenderer;
 import com.visfresh.reports.Colors;
 import com.visfresh.reports.ImagePaintingSupport;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBuilder;
 import com.visfresh.utils.EntityUtils;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperReportsContext;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class MapRendererImpl extends AbstractRenderer implements
-        Graphics2DRenderable {
+public class MapRendererImpl extends AbstractGraphics2DRenderer {
     private static final long serialVersionUID = 3416741245999507093L;
     private final ShipmentReportBean bean;
     private final AbstractGeoMapBuiler builder;
