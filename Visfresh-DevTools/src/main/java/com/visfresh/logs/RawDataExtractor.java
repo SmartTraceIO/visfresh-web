@@ -10,15 +10,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class RawDataExtractor extends AbstractVisfreshLogParser {
-    private Set<String> devices = new HashSet<String>();
+    private String device;
     private InputStream input;
     private OutputStream output;
 
@@ -32,8 +30,8 @@ public class RawDataExtractor extends AbstractVisfreshLogParser {
         this.output = out;
     }
 
-    public void addDevice(final String imei) {
-        devices.add(imei);
+    public void setDevice(final String imei) {
+        this.device = imei;
     }
 
     public void extraceRawData() throws IOException {
@@ -66,12 +64,7 @@ public class RawDataExtractor extends AbstractVisfreshLogParser {
      * @return
      */
     private boolean containsDevice(final String message) {
-        for (final String imei : devices) {
-            if (message.contains(imei)) {
-                return true;
-            }
-        }
-        return false;
+        return device != null && message.contains(device);
     }
 
     public static void main(final String[] args) throws IOException {
@@ -86,7 +79,7 @@ public class RawDataExtractor extends AbstractVisfreshLogParser {
             final OutputStream out = new FileOutputStream(outFile);
             try {
                 final RawDataExtractor e = new RawDataExtractor(in, out);
-                e.addDevice(device);
+                e.setDevice(device);
                 e.extraceRawData();
             } finally {
                 out.close();
