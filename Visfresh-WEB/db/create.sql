@@ -475,7 +475,7 @@ create table systemmessages (
     processor varchar(32),
     retryon timestamp NULL default NULL,
     numretry int not null default 0,
-    message varchar(512) not null,
+    message longtext not null,
     PRIMARY KEY (id)
 );
 
