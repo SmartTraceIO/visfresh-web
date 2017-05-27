@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,6 +67,9 @@ import junit.framework.AssertionFailedError;
 public class DeviceControllerTest extends AbstractRestServiceTest {
     private DeviceDao dao;
     private DeviceRestClient client = new DeviceRestClient(UTC);
+    //check latest reading:
+    final DateFormat format = DateTimeUtils.createDateFormat(
+            "yyyy-MM-dd HH:mm", Language.English, UTC);
 
     /**
      * Default constructor.
@@ -450,17 +454,13 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         data =  client.getReadings(d1, null, null);
         assertEquals(4, data.split("\n").length);
 
-        //check latest reading:
-        final DateFormat fmt = DateTimeUtils.createDateFormat(
-                "yyyy-MM-dd HH:mm", Language.English, UTC);
-
         final String[] str = data.split("\n")[3].split(",");
         //id
         assertEquals(Long.toString(e.getId()), str[0]);
         //shipment
         assertEquals("703948(1)", str[1]);
         //time
-        assertEquals(fmt.format(e.getTime()), str[2]);
+        assertTrue(getDiferenceMs(e.getTime(), str[2]) < 61000);
         //temperature
         assertEquals(LocalizationUtils.convertToUnitsString(e.getTemperature(), TemperatureUnits.Celsius), str[3]);
         //battery
@@ -472,10 +472,23 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         //device
         assertEquals("\"" + e.getDevice().getImei() + "\"", str[7]);
         //createdon
-        assertEquals(fmt.format(e.getCreatedOn()), str[8]);
+        assertTrue(getDiferenceMs(e.getCreatedOn(), str[8]) <  61000);
         //type
         assertEquals("SwitchedOn", str[9]);
     }
+    /**
+     * @param date
+     * @param dateStr
+     * @return
+     */
+    private long getDiferenceMs(final Date date, final String dateStr) {
+        try {
+            return Math.abs(date.getTime() - format.parse(dateStr).getTime());
+        } catch (final ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Test
     public void testGetReadingsBySnTrip() throws IOException, RestServiceException {
         final Device d1 = createDevice("1234987039487", true);
@@ -495,17 +508,13 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         final String data =  client.getReadings(s);
         assertEquals(2, data.split("\n").length);
 
-        //check latest reading:
-        final DateFormat fmt = DateTimeUtils.createDateFormat(
-                "yyyy-MM-dd HH:mm", Language.English, UTC);
-
         final String[] str = data.split("\n")[1].split(",");
         //id
         assertEquals(Long.toString(e.getId()), str[0]);
         //shipment
         assertEquals("703948(1)", str[1]);
         //time
-        assertEquals(fmt.format(e.getTime()), str[2]);
+        assertTrue(getDiferenceMs(e.getTime(), str[2]) < 61000l);
         //temperature
         assertEquals(LocalizationUtils.convertToUnitsString(e.getTemperature(), TemperatureUnits.Celsius), str[3]);
         //battery
@@ -517,7 +526,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         //device
         assertEquals("\"" + e.getDevice().getImei() + "\"", str[7]);
         //createdon
-        assertEquals(fmt.format(e.getCreatedOn()), str[8]);
+        assertTrue(getDiferenceMs(e.getCreatedOn(), str[8]) < 61000l);
         //type
         assertEquals("SwitchedOn", str[9]);
     }

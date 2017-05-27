@@ -61,6 +61,8 @@ import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.reports.geomap.MapRendererImpl;
 import com.visfresh.reports.performance.PerformanceReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBean;
+import com.visfresh.reports.shipment.ShipmentReportBuilder;
+import com.visfresh.rules.AbstractNotificationRule;
 import com.visfresh.services.EmailService;
 import com.visfresh.services.EventsOptimizer;
 import com.visfresh.utils.DateTimeUtils;
@@ -281,6 +283,18 @@ public class ReportsController extends AbstractController {
     private File createShipmentReport(final Shipment s, final User user)
             throws IOException {
         final ShipmentReportBean bean = shipmentReportDao.createReport(s);
+
+        //correct report recipient list if report really sent
+        if (s.getArrivalDate() != null) {
+            bean.getWhoReceivedReport().clear();
+
+            //calculate report receivers
+            for(final User u: AbstractNotificationRule.getEmailingUsers(
+                    s.getArrivalNotificationSchedules(), s.getArrivalDate())) {
+                bean.getWhoReceivedReport().add(ShipmentReportBuilder.createUserName(u));
+            }
+        }
+
         final File file = createTmpFile(s, "pdf");
 
         final OutputStream out = new FileOutputStream(file);
