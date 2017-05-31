@@ -47,7 +47,7 @@
 			"lon": 144.8548492
 		},
 
-		"radiusMeters": 2000,
+		"radiusMeters": 3000,
 		"startFlag": "N",
 		"interimFlag": "N",
 		"endFlag": "Y"

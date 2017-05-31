@@ -58,12 +58,12 @@ public class CsvEventParser {
                 e.setLocation(location);
                 //latitude
                 final String latitude = data[5];
-                if (!latitude.equals("NULL")) {
+                if (!(latitude.equals("NULL") || latitude.length() == 0)) {
                     location.setLatitude(Double.parseDouble(latitude));
                 }
                 //latitude
                 final String longitude = data[6];
-                if (!longitude.equals("NULL")) {
+                if (!(longitude.equals("NULL") || longitude.length() == 0)) {
                     location.setLongitude(Double.parseDouble(longitude));
                 }
                 //device

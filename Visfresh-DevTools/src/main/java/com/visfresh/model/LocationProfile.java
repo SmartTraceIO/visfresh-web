@@ -176,6 +176,7 @@ public class LocationProfile {
      */
     @Override
     public String toString() {
-        return getId() + ": " + getAddress() + " (" + getLocation() + ")";
+        return getId() + ": " + getAddress() + " (inside "
+                + getRadius() + " meters around of " + getLocation() + ")";
     }
 }

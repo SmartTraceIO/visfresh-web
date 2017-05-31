@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -82,6 +84,16 @@ public class DegugLocationEntering {
                 DegugLocationEntering.class.getResourceAsStream("locations.json")));
     }
     public void run() {
+        final Map<LocationProfile, Double> distances = new HashMap<>();
+        final Map<LocationProfile, List<DeviceMessage>> nearestEvents = new HashMap<>();
+
+        //fill maps
+        for (final LocationProfile loc : locations) {
+            distances.put(loc, Double.MAX_VALUE);
+            nearestEvents.put(loc, new LinkedList<>());
+        }
+
+
         for (final DeviceMessage dm : messages) {
             final Location location = dm.getLocation();
 
@@ -91,11 +103,38 @@ public class DegugLocationEntering {
                     double distance = LocationUtils.getDistanceMeters(
                             location.getLatitude(), location.getLongitude(), end.getLatitude(), end.getLongitude());
                     distance = Math.max(0., distance - loc.getRadius());
+
+                    //save nearest event info
+                    final double old = distances.get(loc);
+                    if (distance < old) {
+                        distances.put(loc, distance);
+                    }
+
+                    //if inside the location.
                     if (distance == 0) {
+                        nearestEvents.get(loc).add(dm);
                         System.out.println(loc.getName());
-//                        return;
                     }
                 }
+            }
+        }
+
+        //print result
+        for (final LocationProfile loc : locations) {
+            System.out.println("------------------====================-------------------");
+            System.out.println(loc);
+            System.out.println("Min distance: " + distances.get(loc) + " meters");
+            System.out.println();
+
+            final List<DeviceMessage> msgs = nearestEvents.get(loc);
+            if (msgs.size() > 0) {
+                System.out.println("Readings inside of locations:");
+
+                for (final DeviceMessage msg : msgs) {
+                    System.out.println(msg);
+                }
+            } else {
+                System.out.println("Not readings inside of given location.");
             }
         }
     }
