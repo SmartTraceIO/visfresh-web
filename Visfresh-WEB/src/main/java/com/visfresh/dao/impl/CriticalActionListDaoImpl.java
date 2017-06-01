@@ -145,13 +145,13 @@ public class CriticalActionListDaoImpl extends EntityWithCompanyDaoImplBase<Crit
      * @return
      */
     private List<String> parseActions(final String json) {
-        return new CriticalActionListSerializer().parseActions(SerializerUtils.parseJson(json).getAsJsonArray());
+        return new CriticalActionListSerializer(null).parseActions(SerializerUtils.parseJson(json).getAsJsonArray());
     }
     /**
      * @param a
      * @return
      */
     private String toJson(final List<String> a) {
-        return new CriticalActionListSerializer().toJson(a).toString();
+        return new CriticalActionListSerializer(null).toJson(a).toString();
     }
 }

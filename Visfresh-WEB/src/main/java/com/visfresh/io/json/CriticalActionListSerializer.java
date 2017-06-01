@@ -9,18 +9,25 @@ import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.constants.CriticalActionListConstants;
+import com.visfresh.entities.Company;
+import com.visfresh.entities.CriticalActionList;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class CriticalActionListSerializer extends AbstractJsonSerializer {
+    private final Company company;
+
     /**
      * Default constructor.
      */
-    public CriticalActionListSerializer() {
+    public CriticalActionListSerializer(final Company c) {
         super(TimeZone.getDefault());
+        this.company = c;
     }
 
     /**
@@ -44,5 +51,34 @@ public class CriticalActionListSerializer extends AbstractJsonSerializer {
             array.add(new JsonPrimitive(action));
         }
         return array;
+    }
+
+    /**
+     * @param json JSON representation of critical action list
+     * @return critical action list.
+     */
+    public CriticalActionList parseCriticalActionList(final JsonObject json) {
+        if (json == null || json.isJsonNull()) {
+            return null;
+        }
+
+        final CriticalActionList list = new CriticalActionList();
+        list.setCompany(company);
+        list.setId(asLong(json.get(CriticalActionListConstants.LIST_ID)));
+        list.setName(json.get(CriticalActionListConstants.LIST_NAME).getAsString());
+        list.getActions().addAll(parseActions(json.get(CriticalActionListConstants.ACTIONS).getAsJsonArray()));
+        return list;
+    }
+
+    /**
+     * @param list critical action list.
+     * @return JSON representation of critical action list.
+     */
+    public JsonObject toJson(final CriticalActionList list) {
+        final JsonObject json = new JsonObject();
+        json.addProperty(CriticalActionListConstants.LIST_ID, list.getId());
+        json.addProperty(CriticalActionListConstants.LIST_NAME, list.getName());
+        json.add(CriticalActionListConstants.ACTIONS, toJson(list.getActions()));
+        return json;
     }
 }

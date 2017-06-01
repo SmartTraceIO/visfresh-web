@@ -10,4 +10,5 @@ package com.visfresh.constants;
 public interface CriticalActionListConstants {
     String LIST_NAME = "listName";
     String LIST_ID = "listId";
+    String ACTIONS = "actions";
 }
