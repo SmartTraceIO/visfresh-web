@@ -99,10 +99,7 @@ public class DegugLocationEntering {
 
             if (location.getLatitude() != null && location.getLongitude() != null) {
                 for (final LocationProfile loc : locations) {
-                    final Location end = loc.getLocation();
-                    double distance = LocationUtils.getDistanceMeters(
-                            location.getLatitude(), location.getLongitude(), end.getLatitude(), end.getLongitude());
-                    distance = Math.max(0., distance - loc.getRadius());
+                    final double distance = getDistance(loc, location);
 
                     //save nearest event info
                     final double old = distances.get(loc);
@@ -137,6 +134,30 @@ public class DegugLocationEntering {
                 System.out.println("Not readings inside of given location.");
             }
         }
+
+        //check nearest location.
+        if (messages.size() > 0) {
+            System.out.println();
+            System.out.println("Distances on given moment:");
+
+            final Location lastLocation = messages.get(messages.size() - 1).getLocation();
+            for (final LocationProfile locationProfile : locations) {
+                final double d = getDistance(locationProfile, lastLocation);
+                System.out.println(locationProfile + " in " + d + " meters");
+            }
+        }
+    }
+    /**
+     * @param loc
+     * @param location
+     * @return
+     */
+    protected double getDistance(final LocationProfile loc, final Location location) {
+        final Location end = loc.getLocation();
+        double distance = LocationUtils.getDistanceMeters(
+                location.getLatitude(), location.getLongitude(), end.getLatitude(), end.getLongitude());
+        distance = Math.max(0., distance - loc.getRadius());
+        return distance;
     }
 
     public static void main(final String[] args) throws IOException, ParseException {
