@@ -132,6 +132,10 @@ List items is short representations of base entities, like as [Alert Profile](#m
 71. [Delete Interim Stop](#markdown-header-delete-interim-stop)  
 72. [Get Interim Stop](#markdown-header-get-interim-stop)  
 73. [Get Shipment Audits](#markdown-header-get-shipment-audits)  
+74. [Get Critical Action List](#markdown-header-get-critical-action-list)  
+75. [Save Critical Action List](#markdown-header-save-critical-action-list)  
+76. [Delete Critical Action List](#markdown-header-delete-critical-action-list)  
+77. [Get Critical Action Lists](#markdown-header-get-critical-action-lists)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -629,6 +633,32 @@ Method *GET*, method name *getShipmentAudits*. Request parameters:
 6. pageSize - page size (not mandatory)  
 One shipmentId or userId should be specified. Response is [Standard JSON response](#markdown-header-response-message)  
 [(example)](#markdown-header-get-shipment-audits-example)
+
+### Get Critical Action list ###
+Method *GET*, method name *getCriticalActionList*. Request parameters:  
+1. id - critical action list ID  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-get-critical-action-list-example)
+
+### Save Critical Action list ###
+Method *POST*, method name *saveCriticalActionList*. Request body JSON serialized request.  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-save-critical-action-list-example)
+
+### Delete Critical Action list ###
+Method *GET*, method name *deleteCriticalActionList*. Request parameters:  
+1. id - critical action list ID  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-delete-critical-action-list-example)
+
+### Get Critical Action lists ###
+Method *GET*, method name *getCriticalActionLists*. Request parameters:  
+1. sc - sorting column (not mandatory)  
+2. so - sorting order (not mandatory)  
+3. pageIndex - page index (not mandatory)  
+4. pageSize - page size (not mandatory)  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-get-critical-action-lists-example)
 
 ## Objects
 ### Response message ###
@@ -4242,7 +4272,6 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
   ]
 }
 ```
-
 ### Get Shipment Audits example ###
 **GET /vf/rest/getShipmentAudits/${accessToken}?sc=userId&pageIndex=1&pageSize=100&so=asc&userId=7491**  
 **Response:**  
@@ -4277,5 +4306,98 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
     }
   ],
   "totalCount": 2
+}
+```
+### Get Critical Action list example ###
+**GET /vf/rest/getCriticalActionList/${accessToken}?id=52**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "listId": 52,
+    "listName": "JUnit action list",
+    "actions": [
+      "a",
+      "b"
+    ]
+  }
+}
+```
+### Save Critical Action list example ###
+**GET /vf/rest/saveCriticalActionList/${accessToken}**  
+**Request:**  
+```json
+{
+  "listId": null,
+  "listName": "JUnit action list",
+  "actions": [
+    "a",
+    "b"
+  ]
+}
+```  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "listId": 52,
+    "listName": "JUnit action list",
+    "actions": [
+      "a",
+      "b"
+    ]
+  }
+}
+```
+### Delete Critical Action list example ###
+**GET /vf/rest/deleteCriticalActionList/${accessToken}?id=52**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
+}
+```
+### Get Critical Action lists example ###
+**GET /vf/rest/getCriticalActionLists/${accessToken}?sc=listId&pageIndex=1&pageSize=10000&so=asc**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "listId": 53,
+      "listName": "b",
+      "actions": [
+         "First action",
+         "Second action"
+      ]
+    },
+    {
+      "listId": 54,
+      "listName": "a",
+      "actions": []
+    },
+    {
+      "listId": 55,
+      "listName": "c",
+      "actions": []
+    }
+  ],
+  "totalCount": 3
 }
 ```
