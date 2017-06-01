@@ -4206,7 +4206,6 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
   }
 }
 ```
-
 ### Save Interim Stop example ###
 **POST /vf/rest/saveInterimStop/${accessToken}**  
 **Request:**  
