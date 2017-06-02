@@ -18,36 +18,36 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.visfresh.constants.CriticalActionListConstants;
-import com.visfresh.dao.CriticalActionListDao;
+import com.visfresh.constants.CorrectiveActionsConstants;
+import com.visfresh.dao.CorrectiveActionListDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.Company;
-import com.visfresh.entities.CriticalActionList;
+import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
-import com.visfresh.io.json.CriticalActionListSerializer;
+import com.visfresh.io.json.CorrectiveActionListSerializer;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-@RestController("CriticalActionList")
+@RestController("CorrectiveAction")
 @RequestMapping("/rest")
-public class CriticalActionListController extends AbstractController implements CriticalActionListConstants {
+public class CorrectiveActionController extends AbstractController implements CorrectiveActionsConstants {
     /**
      * Logger.
      */
-    private static final Logger log = LoggerFactory.getLogger(CriticalActionListController.class);
+    private static final Logger log = LoggerFactory.getLogger(CorrectiveActionController.class);
     /**
      * REST service.
      */
     @Autowired
-    private CriticalActionListDao dao;
+    private CorrectiveActionListDao dao;
 
     /**
      * Default constructor.
      */
-    public CriticalActionListController() {
+    public CorrectiveActionController() {
         super();
     }
 
@@ -56,16 +56,16 @@ public class CriticalActionListController extends AbstractController implements 
      * @param list critical action list.
      * @return ID of saved critical action list.
      */
-    @RequestMapping(value = "/saveCriticalActionList/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveCriticalActionList(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveCorrectiveActionList/{authToken}", method = RequestMethod.POST)
+    public JsonObject saveCorrectiveActionList(@PathVariable final String authToken,
             final @RequestBody JsonObject list) {
         try {
             final User user = getLoggedInUser(authToken);
-            final CriticalActionList p = createSerializer(user.getCompany()).parseCriticalActionList(list);
+            final CorrectiveActionList p = createSerializer(user.getCompany()).parseCorrectiveActionList(list);
 
             checkAccess(user, Role.BasicUser);
 
-            final CriticalActionList old = dao.findOne(p.getId());
+            final CorrectiveActionList old = dao.findOne(p.getId());
             checkCompanyAccess(user, old);
 
             final Long id = dao.save(p).getId();
@@ -80,15 +80,15 @@ public class CriticalActionListController extends AbstractController implements 
      * @param id critical action list ID.
      * @return critical action list.
      */
-    @RequestMapping(value = "/getCriticalActionList/{authToken}", method = RequestMethod.GET)
-    public JsonObject getCriticalActionList(@PathVariable final String authToken,
+    @RequestMapping(value = "/getCorrectiveActionList/{authToken}", method = RequestMethod.GET)
+    public JsonObject getCorrectiveActionList(@PathVariable final String authToken,
             @RequestParam final Long id) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.NormalUser);
 
-            final CriticalActionList list = dao.findOne(id);
+            final CorrectiveActionList list = dao.findOne(id);
             checkCompanyAccess(user, list);
 
             return createSuccessResponse(createSerializer(list.getCompany()).toJson(list));
@@ -102,15 +102,15 @@ public class CriticalActionListController extends AbstractController implements 
      * @param id critical action list ID.
      * @return critical action list.
      */
-    @RequestMapping(value = "/deleteCriticalActionList/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteCriticalActionList(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteCorrectiveActionList/{authToken}", method = RequestMethod.GET)
+    public JsonObject deleteCorrectiveActionList(@PathVariable final String authToken,
             @RequestParam final Long id) {
         try {
             //check logged in.
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.BasicUser);
 
-            final CriticalActionList p = dao.findOne(id);
+            final CorrectiveActionList p = dao.findOne(id);
             checkCompanyAccess(user, p);
             dao.delete(p);
 
@@ -126,8 +126,8 @@ public class CriticalActionListController extends AbstractController implements 
      * @param pageSize the page size.
      * @return list of critical action lists.
      */
-    @RequestMapping(value = "/getCriticalActionLists/{authToken}", method = RequestMethod.GET)
-    public JsonElement getCriticalActionLists(@PathVariable final String authToken,
+    @RequestMapping(value = "/getCorrectiveActionLists/{authToken}", method = RequestMethod.GET)
+    public JsonElement getCorrectiveActionLists(@PathVariable final String authToken,
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -140,9 +140,9 @@ public class CriticalActionListController extends AbstractController implements 
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.NormalUser);
 
-            final CriticalActionListSerializer ser = createSerializer(user.getCompany());
+            final CorrectiveActionListSerializer ser = createSerializer(user.getCompany());
 
-            final List<CriticalActionList> lists = dao.findByCompany(
+            final List<CorrectiveActionList> lists = dao.findByCompany(
                     user.getCompany(),
                     createSorting(sc, so, getDefaultSortOrder(), 2),
                     page,
@@ -150,7 +150,7 @@ public class CriticalActionListController extends AbstractController implements 
             final int total = dao.getEntityCount(user.getCompany(), null);
 
             final JsonArray array = new JsonArray();
-            for (final CriticalActionList a : lists) {
+            for (final CorrectiveActionList a : lists) {
                 array.add(ser.toJson(a));
             }
 
@@ -163,8 +163,8 @@ public class CriticalActionListController extends AbstractController implements 
     /**
      * @return
      */
-    private CriticalActionListSerializer createSerializer(final Company company) {
-        return new CriticalActionListSerializer(company);
+    private CorrectiveActionListSerializer createSerializer(final Company company) {
+        return new CorrectiveActionListSerializer(company);
     }
 
     /**

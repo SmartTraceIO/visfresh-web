@@ -10,25 +10,25 @@ import java.util.List;
 import org.junit.Test;
 
 import com.visfresh.entities.Company;
-import com.visfresh.entities.CriticalActionList;
+import com.visfresh.entities.CorrectiveActionList;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class CriticalActionListDaoTest extends BaseCrudTest<CriticalActionListDao, CriticalActionList, Long> {
+public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionListDao, CorrectiveActionList, Long> {
     /**
      * Default constructor.
      */
-    public CriticalActionListDaoTest() {
-        super(CriticalActionListDao.class);
+    public CorrectiveActionListDaoTest() {
+        super(CorrectiveActionListDao.class);
     }
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.BaseCrudTest#createTestEntity()
      */
     @Override
-    protected CriticalActionList createTestEntity() {
+    protected CorrectiveActionList createTestEntity() {
         return createList(sharedCompany);
     }
 
@@ -36,8 +36,8 @@ public class CriticalActionListDaoTest extends BaseCrudTest<CriticalActionListDa
      * @param c
      * @return
      */
-    protected CriticalActionList createList(final Company c) {
-        final CriticalActionList list = new CriticalActionList();
+    protected CorrectiveActionList createList(final Company c) {
+        final CorrectiveActionList list = new CorrectiveActionList();
         list.setCompany(c);
         list.setName("JUnit action list");
         list.getActions().add("Run JUnit and check result");
@@ -48,7 +48,7 @@ public class CriticalActionListDaoTest extends BaseCrudTest<CriticalActionListDa
      * @see com.visfresh.dao.BaseCrudTest#assertCreateTestEntityOk(com.visfresh.entities.EntityWithId)
      */
     @Override
-    protected void assertCreateTestEntityOk(final CriticalActionList list) {
+    protected void assertCreateTestEntityOk(final CorrectiveActionList list) {
         assertEquals(sharedCompany.getId(), list.getCompany().getId());
         assertEquals("JUnit action list", list.getName());
         assertEquals("Run JUnit and check result", list.getActions().get(0));
@@ -72,7 +72,7 @@ public class CriticalActionListDaoTest extends BaseCrudTest<CriticalActionListDa
     /**
      * @param c
      */
-    private CriticalActionList createAndSaveAlertProfile(final Company c) {
+    private CorrectiveActionList createAndSaveAlertProfile(final Company c) {
         return dao.save(createList(c));
     }
     /* (non-Javadoc)
@@ -80,16 +80,16 @@ public class CriticalActionListDaoTest extends BaseCrudTest<CriticalActionListDa
      */
     @Override
     protected void assertTestGetAllOk(final int numberOfCreatedEntities,
-            final List<CriticalActionList> all) {
+            final List<CorrectiveActionList> all) {
         super.assertTestGetAllOk(numberOfCreatedEntities, all);
         assertCreateTestEntityOk(all.get(0));
     }
     @Override
     @Test
     public void testUpdate() {
-        CriticalActionList list = new CriticalActionList();
+        CorrectiveActionList list = new CorrectiveActionList();
         list.setCompany(sharedCompany);
-        list.setName("JUnit-CriticalActionList");
+        list.setName("JUnit-CorrectiveActionList");
 
         dao.save(list);
 
@@ -99,7 +99,7 @@ public class CriticalActionListDaoTest extends BaseCrudTest<CriticalActionListDa
         list.getActions().add("A2");
 
         dao.save(list);
-        final CriticalActionList actual = dao.findOne(list.getId());
+        final CorrectiveActionList actual = dao.findOne(list.getId());
 
         //check updated
         assertEquals(list.getName(), actual.getName());

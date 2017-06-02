@@ -132,10 +132,10 @@ List items is short representations of base entities, like as [Alert Profile](#m
 71. [Delete Interim Stop](#markdown-header-delete-interim-stop)  
 72. [Get Interim Stop](#markdown-header-get-interim-stop)  
 73. [Get Shipment Audits](#markdown-header-get-shipment-audits)  
-74. [Get Critical Action List](#markdown-header-get-critical-action-list)  
-75. [Save Critical Action List](#markdown-header-save-critical-action-list)  
-76. [Delete Critical Action List](#markdown-header-delete-critical-action-list)  
-77. [Get Critical Action Lists](#markdown-header-get-critical-action-lists)  
+74. [Get Corrective Action List](#markdown-header-get-corrective-action-list)  
+75. [Save Corrective Action List](#markdown-header-save-corrective-action-list)  
+76. [Delete Corrective Action List](#markdown-header-delete-corrective-action-list)  
+77. [Get Corrective Action Lists](#markdown-header-get-corrective-action-lists)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -634,31 +634,31 @@ Method *GET*, method name *getShipmentAudits*. Request parameters:
 One shipmentId or userId should be specified. Response is [Standard JSON response](#markdown-header-response-message)  
 [(example)](#markdown-header-get-shipment-audits-example)
 
-### Get Critical Action list ###
-Method *GET*, method name *getCriticalActionList*. Request parameters:  
-1. id - critical action list ID  
+### Get Corrective Action list ###
+Method *GET*, method name *getCorrectiveActionList*. Request parameters:  
+1. id - Corrective Action list ID  
 Response is [Standard JSON response](#markdown-header-response-message)  
-[(example)](#markdown-header-get-critical-action-list-example)
+[(example)](#markdown-header-get-corrective-action-list-example)
 
-### Save Critical Action list ###
-Method *POST*, method name *saveCriticalActionList*. Request body JSON serialized request.  
+### Save Corrective Action list ###
+Method *POST*, method name *saveCorrectiveActionList*. Request body JSON serialized request.  
 Response is [Standard JSON response](#markdown-header-response-message)  
-[(example)](#markdown-header-save-critical-action-list-example)
+[(example)](#markdown-header-save-corrective-action-list-example)
 
-### Delete Critical Action list ###
-Method *GET*, method name *deleteCriticalActionList*. Request parameters:  
-1. id - critical action list ID  
+### Delete Corrective Action list ###
+Method *GET*, method name *deleteCorrectiveActionList*. Request parameters:  
+1. id - Corrective Action list ID  
 Response is [Standard JSON response](#markdown-header-response-message)  
-[(example)](#markdown-header-delete-critical-action-list-example)
+[(example)](#markdown-header-delete-corrective-action-list-example)
 
-### Get Critical Action lists ###
-Method *GET*, method name *getCriticalActionLists*. Request parameters:  
+### Get Corrective Action lists ###
+Method *GET*, method name *getCorrectiveActionLists*. Request parameters:  
 1. sc - sorting column (not mandatory)  
 2. so - sorting order (not mandatory)  
 3. pageIndex - page index (not mandatory)  
 4. pageSize - page size (not mandatory)  
 Response is [Standard JSON response](#markdown-header-response-message)  
-[(example)](#markdown-header-get-critical-action-lists-example)
+[(example)](#markdown-header-get-corrective-action-lists-example)
 
 ## Objects
 ### Response message ###
@@ -4307,8 +4307,8 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
   "totalCount": 2
 }
 ```
-### Get Critical Action list example ###
-**GET /vf/rest/getCriticalActionList/${accessToken}?id=52**  
+### Get Corrective Action list example ###
+**GET /vf/rest/getCorrectiveActionList/${accessToken}?id=52**  
 **Response:**  
 ```json
 {
@@ -4326,8 +4326,8 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
   }
 }
 ```
-### Save Critical Action list example ###
-**GET /vf/rest/saveCriticalActionList/${accessToken}**  
+### Save Corrective Action list example ###
+**GET /vf/rest/saveCorrectiveActionList/${accessToken}**  
 **Request:**  
 ```json
 {
@@ -4356,8 +4356,8 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
   }
 }
 ```
-### Delete Critical Action list example ###
-**GET /vf/rest/deleteCriticalActionList/${accessToken}?id=52**  
+### Delete Corrective Action list example ###
+**GET /vf/rest/deleteCorrectiveActionList/${accessToken}?id=52**  
 **Response:**  
 ```json
 {
@@ -4368,8 +4368,8 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
   "response": null
 }
 ```
-### Get Critical Action lists example ###
-**GET /vf/rest/getCriticalActionLists/${accessToken}?sc=listId&pageIndex=1&pageSize=10000&so=asc**  
+### Get Corrective Action lists example ###
+**GET /vf/rest/getCorrectiveActionLists/${accessToken}?sc=listId&pageIndex=1&pageSize=10000&so=asc**  
 **Response:**  
 ```json
 {

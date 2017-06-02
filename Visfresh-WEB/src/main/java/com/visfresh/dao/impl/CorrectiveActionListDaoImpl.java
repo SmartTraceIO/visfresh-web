@@ -12,10 +12,10 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.constants.CriticalActionListConstants;
-import com.visfresh.dao.CriticalActionListDao;
-import com.visfresh.entities.CriticalActionList;
-import com.visfresh.io.json.CriticalActionListSerializer;
+import com.visfresh.constants.CorrectiveActionsConstants;
+import com.visfresh.dao.CorrectiveActionListDao;
+import com.visfresh.entities.CorrectiveActionList;
+import com.visfresh.io.json.CorrectiveActionListSerializer;
 import com.visfresh.utils.SerializerUtils;
 
 /**
@@ -23,9 +23,10 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 @Component
-public class CriticalActionListDaoImpl extends EntityWithCompanyDaoImplBase<CriticalActionList, Long>
-        implements CriticalActionListDao {
-    public static final String TABLE = "criticalactions";
+public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<CorrectiveActionList, Long>
+        implements CorrectiveActionListDao {
+//    public static final String TABLE = "criticalactions";
+    public static final String TABLE = "correctiveactions";
 
     public static final String ID_FIELD = "id";
     public static final String NAME_FIELD = "name";
@@ -38,19 +39,19 @@ public class CriticalActionListDaoImpl extends EntityWithCompanyDaoImplBase<Crit
     /**
      * Default constructor.
      */
-    public CriticalActionListDaoImpl() {
+    public CorrectiveActionListDaoImpl() {
         super();
 
         //build property to field map
-        propertyToDbFields.put(CriticalActionListConstants.LIST_NAME, NAME_FIELD);
-        propertyToDbFields.put(CriticalActionListConstants.LIST_ID, ID_FIELD);
+        propertyToDbFields.put(CorrectiveActionsConstants.LIST_NAME, NAME_FIELD);
+        propertyToDbFields.put(CorrectiveActionsConstants.LIST_ID, ID_FIELD);
     }
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends CriticalActionList> S saveImpl(final S list) {
+    public <S extends CorrectiveActionList> S saveImpl(final S list) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         final List<String> fields = getFields(false);
@@ -82,7 +83,7 @@ public class CriticalActionListDaoImpl extends EntityWithCompanyDaoImplBase<Crit
      */
     @Override
     protected EntityCache<Long> createCache() {
-        return new EntityCache<Long>("CriticalActionListDao", 1000, 10 * 60, 20 * 60);
+        return new EntityCache<Long>("CorrectiveActionListDao", 1000, 10 * 60, 20 * 60);
     }
 
     private List<String> getFields(final boolean includeId) {
@@ -130,8 +131,8 @@ public class CriticalActionListDaoImpl extends EntityWithCompanyDaoImplBase<Crit
      * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
      */
     @Override
-    protected CriticalActionList createEntity(final Map<String, Object> map) {
-        final CriticalActionList list = new CriticalActionList();
+    protected CorrectiveActionList createEntity(final Map<String, Object> map) {
+        final CorrectiveActionList list = new CorrectiveActionList();
 
         list.setId(((Number) map.get(ID_FIELD)).longValue());
         list.setName((String) map.get(NAME_FIELD));
@@ -145,13 +146,13 @@ public class CriticalActionListDaoImpl extends EntityWithCompanyDaoImplBase<Crit
      * @return
      */
     private List<String> parseActions(final String json) {
-        return new CriticalActionListSerializer(null).parseActions(SerializerUtils.parseJson(json).getAsJsonArray());
+        return new CorrectiveActionListSerializer(null).parseActions(SerializerUtils.parseJson(json).getAsJsonArray());
     }
     /**
      * @param a
      * @return
      */
     private String toJson(final List<String> a) {
-        return new CriticalActionListSerializer(null).toJson(a).toString();
+        return new CorrectiveActionListSerializer(null).toJson(a).toString();
     }
 }

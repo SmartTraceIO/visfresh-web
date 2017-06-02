@@ -12,23 +12,23 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.visfresh.entities.CriticalActionList;
-import com.visfresh.io.json.CriticalActionListSerializer;
+import com.visfresh.entities.CorrectiveActionList;
+import com.visfresh.io.json.CorrectiveActionListSerializer;
 import com.visfresh.services.RestServiceException;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class CriticalActionListRestClient extends RestClient {
-    private CriticalActionListSerializer serializer;
+public class CorrectiveActionListRestClient extends RestClient {
+    private CorrectiveActionListSerializer serializer;
 
     /**
      * Default constructor.
      */
-    public CriticalActionListRestClient() {
+    public CorrectiveActionListRestClient() {
         super();
-        serializer = new CriticalActionListSerializer(null);
+        serializer = new CorrectiveActionListSerializer(null);
     }
 
     /**
@@ -40,7 +40,7 @@ public class CriticalActionListRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public List<CriticalActionList> getCriticalActionLists(final Integer pageIndex, final Integer pageSize,
+    public List<CorrectiveActionList> getCorrectiveActionLists(final Integer pageIndex, final Integer pageSize,
             final String sortColumn,
             final String sortOrder) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
@@ -55,28 +55,28 @@ public class CriticalActionListRestClient extends RestClient {
             params.put("so", sortOrder);
         }
 
-        final JsonArray response = sendGetRequest(getPathWithToken("getCriticalActionLists"),
+        final JsonArray response = sendGetRequest(getPathWithToken("getCorrectiveActionLists"),
                 params).getAsJsonArray();
 
-        final List<CriticalActionList> profiles = new ArrayList<CriticalActionList>(response.size());
+        final List<CorrectiveActionList> profiles = new ArrayList<CorrectiveActionList>(response.size());
         for (int i = 0; i < response.size(); i++) {
-            profiles.add(serializer.parseCriticalActionList(response.get(i).getAsJsonObject()));
+            profiles.add(serializer.parseCorrectiveActionList(response.get(i).getAsJsonObject()));
         }
         return profiles;
     }
-    public CriticalActionList getCriticalActionList(final Long id) throws IOException, RestServiceException {
+    public CorrectiveActionList getCorrectiveActionList(final Long id) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("id", id.toString());
 
-        final JsonElement response = sendGetRequest(getPathWithToken("getCriticalActionList"),
+        final JsonElement response = sendGetRequest(getPathWithToken("getCorrectiveActionList"),
                 params);
-        return response == JsonNull.INSTANCE ? null : serializer.parseCriticalActionList(
+        return response == JsonNull.INSTANCE ? null : serializer.parseCorrectiveActionList(
                 response.getAsJsonObject());
     }
 
-    public Long saveCriticalActionList(final CriticalActionList list)
+    public Long saveCorrectiveActionList(final CorrectiveActionList list)
             throws RestServiceException, IOException {
-        final JsonObject e = sendPostRequest(getPathWithToken("saveCriticalActionList"),
+        final JsonObject e = sendPostRequest(getPathWithToken("saveCorrectiveActionList"),
                 serializer.toJson(list)).getAsJsonObject();
         return parseId(e);
     }
@@ -85,14 +85,14 @@ public class CriticalActionListRestClient extends RestClient {
      * @throws RestServiceException
      * @throws IOException
      */
-    public void deleteCriticalActionList(final CriticalActionList p) throws IOException, RestServiceException {
+    public void deleteCorrectiveActionList(final CorrectiveActionList p) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("id", p.getId().toString());
-        sendGetRequest(getPathWithToken("deleteCriticalActionList"), params);
+        sendGetRequest(getPathWithToken("deleteCorrectiveActionList"), params);
     }
 
-    public List<CriticalActionList> getCriticalActionLists(final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
-        return getCriticalActionLists(pageIndex, pageSize, null, null);
+    public List<CorrectiveActionList> getCorrectiveActionLists(final Integer pageIndex, final Integer pageSize) throws RestServiceException, IOException {
+        return getCorrectiveActionLists(pageIndex, pageSize, null, null);
     }
 
 }

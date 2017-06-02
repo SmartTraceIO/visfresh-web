@@ -1,5 +1,6 @@
 -- drops
 drop table if exists notes;
+drop table if exists correctiveactions;
 drop table if exists shipmentsessions;
 drop table if exists devicestates;
 drop table if exists externalusers;
@@ -509,7 +510,7 @@ create table notes (
         references shipments (id) on delete cascade
 );
 
-create table criticalactions (
+create table correctiveactions (
     id bigint(20) NOT NULL AUTO_INCREMENT,
     name varchar(256) NOT NULL,
     company bigint(20) not null,

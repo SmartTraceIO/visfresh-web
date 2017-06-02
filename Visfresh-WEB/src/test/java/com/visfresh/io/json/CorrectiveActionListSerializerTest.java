@@ -9,20 +9,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.entities.Company;
-import com.visfresh.entities.CriticalActionList;
+import com.visfresh.entities.CorrectiveActionList;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class CriticalActionListSerializerTest {
+public class CorrectiveActionListSerializerTest {
     private Company company;
-    private CriticalActionListSerializer serializer;
+    private CorrectiveActionListSerializer serializer;
 
     /**
      * Default construtor.
      */
-    public CriticalActionListSerializerTest() {
+    public CorrectiveActionListSerializerTest() {
         super();
     }
 
@@ -31,7 +31,7 @@ public class CriticalActionListSerializerTest {
         company = new Company(7l);
         company.setName("JUnit");
 
-        serializer = new CriticalActionListSerializer(company);
+        serializer = new CorrectiveActionListSerializer(company);
     }
 
     /**
@@ -44,14 +44,14 @@ public class CriticalActionListSerializerTest {
         final String a1 = "First Action";
         final String a2 = "Second Action";
 
-        CriticalActionList list = new CriticalActionList();
+        CorrectiveActionList list = new CorrectiveActionList();
         list.setCompany(company);
         list.setId(id);
         list.setName(name);
         list.getActions().add(a1);
         list.getActions().add(a2);
 
-        list = serializer.parseCriticalActionList(serializer.toJson(list));
+        list = serializer.parseCorrectiveActionList(serializer.toJson(list));
 
         assertEquals(id, list.getId());
         assertEquals(name, list.getName());

@@ -11,21 +11,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.visfresh.constants.CriticalActionListConstants;
+import com.visfresh.constants.CorrectiveActionsConstants;
 import com.visfresh.entities.Company;
-import com.visfresh.entities.CriticalActionList;
+import com.visfresh.entities.CorrectiveActionList;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class CriticalActionListSerializer extends AbstractJsonSerializer {
+public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
     private final Company company;
 
     /**
      * Default constructor.
      */
-    public CriticalActionListSerializer(final Company c) {
+    public CorrectiveActionListSerializer(final Company c) {
         super(TimeZone.getDefault());
         this.company = c;
     }
@@ -57,16 +57,16 @@ public class CriticalActionListSerializer extends AbstractJsonSerializer {
      * @param json JSON representation of critical action list
      * @return critical action list.
      */
-    public CriticalActionList parseCriticalActionList(final JsonObject json) {
+    public CorrectiveActionList parseCorrectiveActionList(final JsonObject json) {
         if (json == null || json.isJsonNull()) {
             return null;
         }
 
-        final CriticalActionList list = new CriticalActionList();
+        final CorrectiveActionList list = new CorrectiveActionList();
         list.setCompany(company);
-        list.setId(asLong(json.get(CriticalActionListConstants.LIST_ID)));
-        list.setName(json.get(CriticalActionListConstants.LIST_NAME).getAsString());
-        list.getActions().addAll(parseActions(json.get(CriticalActionListConstants.ACTIONS).getAsJsonArray()));
+        list.setId(asLong(json.get(CorrectiveActionsConstants.LIST_ID)));
+        list.setName(json.get(CorrectiveActionsConstants.LIST_NAME).getAsString());
+        list.getActions().addAll(parseActions(json.get(CorrectiveActionsConstants.ACTIONS).getAsJsonArray()));
         return list;
     }
 
@@ -74,11 +74,11 @@ public class CriticalActionListSerializer extends AbstractJsonSerializer {
      * @param list critical action list.
      * @return JSON representation of critical action list.
      */
-    public JsonObject toJson(final CriticalActionList list) {
+    public JsonObject toJson(final CorrectiveActionList list) {
         final JsonObject json = new JsonObject();
-        json.addProperty(CriticalActionListConstants.LIST_ID, list.getId());
-        json.addProperty(CriticalActionListConstants.LIST_NAME, list.getName());
-        json.add(CriticalActionListConstants.ACTIONS, toJson(list.getActions()));
+        json.addProperty(CorrectiveActionsConstants.LIST_ID, list.getId());
+        json.addProperty(CorrectiveActionsConstants.LIST_NAME, list.getName());
+        json.add(CorrectiveActionsConstants.ACTIONS, toJson(list.getActions()));
         return json;
     }
 }

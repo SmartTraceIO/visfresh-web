@@ -10,7 +10,7 @@ import java.util.List;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class CriticalActionList implements EntityWithId<Long>, EntityWithCompany {
+public class CorrectiveActionList implements EntityWithId<Long>, EntityWithCompany {
     /**
      * List ID.
      */
@@ -31,7 +31,7 @@ public class CriticalActionList implements EntityWithId<Long>, EntityWithCompany
     /**
      * Default constructor.
      */
-    public CriticalActionList() {
+    public CorrectiveActionList() {
         super();
     }
 
