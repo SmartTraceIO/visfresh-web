@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.CorrectiveActionsConstants;
 import com.visfresh.dao.CorrectiveActionListDao;
+import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.io.json.CorrectiveActionListSerializer;
 import com.visfresh.utils.SerializerUtils;
@@ -145,14 +146,14 @@ public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<Co
      * @param json
      * @return
      */
-    private List<String> parseActions(final String json) {
+    private List<CorrectiveAction> parseActions(final String json) {
         return new CorrectiveActionListSerializer(null).parseActions(SerializerUtils.parseJson(json).getAsJsonArray());
     }
     /**
      * @param a
      * @return
      */
-    private String toJson(final List<String> a) {
+    private String toJson(final List<CorrectiveAction> a) {
         return new CorrectiveActionListSerializer(null).toJson(a).toString();
     }
 }

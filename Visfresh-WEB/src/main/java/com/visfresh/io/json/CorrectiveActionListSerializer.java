@@ -10,9 +10,9 @@ import java.util.TimeZone;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.CorrectiveActionsConstants;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
 
 /**
@@ -20,6 +20,14 @@ import com.visfresh.entities.CorrectiveActionList;
  *
  */
 public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
+    /**
+     *
+     */
+    private static final String REQUEST_VERIFICATION = "requestVerification";
+    /**
+     *
+     */
+    private static final String ACTION = "action";
     private final Company company;
 
     /**
@@ -34,10 +42,10 @@ public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
      * @param array
      * @return
      */
-    public List<String> parseActions(final JsonArray array) {
-        final List<String> list = new LinkedList<>();
+    public List<CorrectiveAction> parseActions(final JsonArray array) {
+        final List<CorrectiveAction> list = new LinkedList<>();
         for (final JsonElement e : array) {
-            list.add(e.getAsString());
+            list.add(parseCorrectiveAction(e));
         }
         return list;
     }
@@ -45,12 +53,40 @@ public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
      * @param list action list.
      * @return JSON array.
      */
-    public JsonArray toJson(final List<String> list) {
+    public JsonArray toJson(final List<CorrectiveAction> list) {
         final JsonArray array = new JsonArray();
-        for (final String action : list) {
-            array.add(new JsonPrimitive(action));
+        for (final CorrectiveAction action : list) {
+            array.add(toJson(action));
         }
         return array;
+    }
+
+    /**
+     * @param e JSON element.
+     * @return
+     */
+    private CorrectiveAction parseCorrectiveAction(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
+        final CorrectiveAction action = new CorrectiveAction();
+
+        action.setAction(asString(json.get(ACTION)));
+        action.setRequestVerification(json.get(REQUEST_VERIFICATION).getAsBoolean());
+
+        return action;
+    }
+    /**
+     * @param action
+     * @return
+     */
+    private JsonObject toJson(final CorrectiveAction action) {
+        final JsonObject json = new JsonObject();
+        json.addProperty(ACTION, action.getAction());
+        json.addProperty(REQUEST_VERIFICATION, action.isRequestVerification());
+        return json;
     }
 
     /**

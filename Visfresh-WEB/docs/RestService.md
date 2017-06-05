@@ -4311,17 +4311,24 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
 **GET /vf/rest/getCorrectiveActionList/${accessToken}?id=52**  
 **Response:**  
 ```json
+Response:
 {
   "status": {
     "code": 0,
     "message": "Success"
   },
   "response": {
-    "listId": 52,
+    "listId": 61,
     "listName": "JUnit action list",
     "actions": [
-      "a",
-      "b"
+      {
+        "action": "a",
+        "requestVerification": false
+      },
+      {
+        "action": "b",
+        "requestVerification": false
+      }
     ]
   }
 }
@@ -4334,8 +4341,14 @@ id,type,time,battery,temperature,latitude,longitude,device,shipment,createdon,al
   "listId": null,
   "listName": "JUnit action list",
   "actions": [
-    "a",
-    "b"
+    {
+      "action": "a",
+      "requestVerification": false
+    },
+    {
+      "action": "b",
+      "requestVerification": false
+    }
   ]
 }
 ```  

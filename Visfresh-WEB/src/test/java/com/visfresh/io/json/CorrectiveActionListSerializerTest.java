@@ -4,11 +4,14 @@
 package com.visfresh.io.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.entities.Company;
+import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
 
 /**
@@ -48,15 +51,17 @@ public class CorrectiveActionListSerializerTest {
         list.setCompany(company);
         list.setId(id);
         list.setName(name);
-        list.getActions().add(a1);
-        list.getActions().add(a2);
+        list.getActions().add(new CorrectiveAction(a1, true));
+        list.getActions().add(new CorrectiveAction(a2, false));
 
         list = serializer.parseCorrectiveActionList(serializer.toJson(list));
 
         assertEquals(id, list.getId());
         assertEquals(name, list.getName());
-        assertEquals(a1, list.getActions().get(0));
-        assertEquals(a2, list.getActions().get(1));
+        assertEquals(a1, list.getActions().get(0).getAction());
+        assertTrue(list.getActions().get(0).isRequestVerification());
+        assertEquals(a2, list.getActions().get(1).getAction());
+        assertFalse(list.getActions().get(1).isRequestVerification());
         assertEquals(company.getId(), list.getCompany().getId());
     }
 }

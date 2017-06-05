@@ -4,12 +4,14 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.junit.Test;
 
 import com.visfresh.entities.Company;
+import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
 
 /**
@@ -40,8 +42,8 @@ public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionLi
         final CorrectiveActionList list = new CorrectiveActionList();
         list.setCompany(c);
         list.setName("JUnit action list");
-        list.getActions().add("Run JUnit and check result");
-        list.getActions().add("Run JUnit and check result again");
+        list.getActions().add(createAction("Run JUnit and check result"));
+        list.getActions().add(createAction("Run JUnit and check result again"));
         return list;
     }
     /* (non-Javadoc)
@@ -51,8 +53,9 @@ public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionLi
     protected void assertCreateTestEntityOk(final CorrectiveActionList list) {
         assertEquals(sharedCompany.getId(), list.getCompany().getId());
         assertEquals("JUnit action list", list.getName());
-        assertEquals("Run JUnit and check result", list.getActions().get(0));
-        assertEquals("Run JUnit and check result again", list.getActions().get(1));
+        assertEquals("Run JUnit and check result", list.getActions().get(0).getAction());
+        assertTrue(list.getActions().get(0).isRequestVerification());
+        assertEquals("Run JUnit and check result again", list.getActions().get(1).getAction());
     }
     @Test
     public void testFindByCompany() {
@@ -95,8 +98,8 @@ public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionLi
 
         list = dao.findOne(list.getId());
         list.setName("New name");
-        list.getActions().add("A1");
-        list.getActions().add("A2");
+        list.getActions().add(createAction("A1"));
+        list.getActions().add(createAction("A2"));
 
         dao.save(list);
         final CorrectiveActionList actual = dao.findOne(list.getId());
@@ -104,5 +107,15 @@ public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionLi
         //check updated
         assertEquals(list.getName(), actual.getName());
         assertEquals(list.getActions().size(), actual.getActions().size());
+    }
+    /**
+     * @param text action text.
+     * @return corrective action.
+     */
+    private CorrectiveAction createAction(final String text) {
+        final CorrectiveAction action = new CorrectiveAction();
+        action.setAction(text);
+        action.setRequestVerification(true);
+        return action;
     }
 }

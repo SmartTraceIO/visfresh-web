@@ -26,7 +26,7 @@ public class CorrectiveActionList implements EntityWithId<Long>, EntityWithCompa
     /**
      * List of actions.
      */
-    private final List<String> actions = new LinkedList<>();
+    private final List<CorrectiveAction> actions = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -77,7 +77,7 @@ public class CorrectiveActionList implements EntityWithId<Long>, EntityWithCompa
     /**
      * @return the actions
      */
-    public List<String> getActions() {
+    public List<CorrectiveAction> getActions() {
         return actions;
     }
 }

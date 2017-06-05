@@ -16,6 +16,7 @@ import com.visfresh.constants.CorrectiveActionsConstants;
 import com.visfresh.controllers.restclient.CorrectiveActionListRestClient;
 import com.visfresh.dao.CorrectiveActionListDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
@@ -59,8 +60,8 @@ public class CorrectiveActionControllerTest extends AbstractRestServiceTest {
     @Test
     public void testSaveCorrectiveActionList() throws RestServiceException, IOException {
         final CorrectiveActionList list = createCorrectiveActionList(false);
-        list.getActions().add("a");
-        list.getActions().add("b");
+        list.getActions().add(new CorrectiveAction("a"));
+        list.getActions().add(new CorrectiveAction("b"));
 
         final Long id = client.saveCorrectiveActionList(list);
         assertNotNull(id);
@@ -69,22 +70,22 @@ public class CorrectiveActionControllerTest extends AbstractRestServiceTest {
         assertNotNull(actual);
 
         assertEquals(list.getName(), actual.getName());
-        assertEquals("a", list.getActions().get(0));
-        assertEquals("b", list.getActions().get(1));
+        assertEquals("a", list.getActions().get(0).getAction());
+        assertEquals("b", list.getActions().get(1).getAction());
     }
     @Test
     public void testGetCorrectiveActionList() throws IOException, RestServiceException {
         final CorrectiveActionList list = createCorrectiveActionList(true);
-        list.getActions().add("a");
-        list.getActions().add("b");
+        list.getActions().add(new CorrectiveAction("a"));
+        list.getActions().add(new CorrectiveAction("b"));
         dao.save(list);
 
         final CorrectiveActionList actual = client.getCorrectiveActionList(list.getId());
         assertNotNull(actual);
 
         assertEquals(list.getName(), actual.getName());
-        assertEquals("a", list.getActions().get(0));
-        assertEquals("b", list.getActions().get(1));
+        assertEquals("a", list.getActions().get(0).getAction());
+        assertEquals("b", list.getActions().get(1).getAction());
     }
     @Test
     public void testDeleteCorrectiveActionList() throws RestServiceException, IOException {
