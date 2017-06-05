@@ -105,7 +105,9 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
             return false;
         }
 
-        return getAutoDetectData(context.getSessionManager().getSession(shipment)) != null;
+        final ShipmentSession session = context.getSessionManager().getSession(shipment);
+        return getAutoDetectData(session) != null
+                && LeaveStartLocationRule.isLeavingStartLocation(shipment, session);
     }
     /**
      * @param context
@@ -146,7 +148,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
             data.setNumReadings(1);
             data.setLocationId(loc.getId());
             setAutoDetectData(session, data);
-            log.debug("Found location candidate '" + loc.getName()
+            log.debug("Found location candidate '" + loc
                     + "' for shipment " + shipment.getId() + ". Waiting of next reading");
         } else {
             isDetected = true;
@@ -157,7 +159,7 @@ public class AutoDetectEndLocationRule implements TrackerEventRule {
         }
 
         if (isDetected) {
-            log.debug("Location '" + loc.getName() + "' has detected and set to shipment " + shipment.getId());
+            log.debug("Location '" + loc + "' has detected and set to shipment " + shipment.getId());
             shipment.setShippedTo(loc);
             saveShipment(shipment);
 

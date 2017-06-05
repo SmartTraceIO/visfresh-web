@@ -133,6 +133,7 @@ public class ArrivalNotificationRuleTest extends BaseRuleTest {
 
         final LocationProfile loc = createLocation();
 
+        shipment.setShippedFrom(loc);
         shipment.setShippedTo(loc);
         context.getBean(ShipmentDao.class).save(shipment);
 

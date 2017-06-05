@@ -129,9 +129,11 @@ public class LeaveStartLocationRule implements TrackerEventRule {
      * @param session
      * @return
      */
-    public static boolean isSetLeaving(final ShipmentSession session) {
-        return "true".equals(
-                session.getShipmentProperty(IS_SET_LEAVING_START_LOCATION));
+    private static boolean isSetLeaving(final ShipmentSession session) {
+        return "true".equals(session.getShipmentProperty(IS_SET_LEAVING_START_LOCATION));
+    }
+    public static boolean isLeavingStartLocation(final Shipment s, final ShipmentSession session) {
+        return s.getShippedFrom() == null || isSetLeaving(session);
     }
     /**
      * @param session

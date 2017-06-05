@@ -108,7 +108,7 @@ public class LeaveStartLocationRuleTest extends LeaveStartLocationRule {
         setWatchStarted(h.getSession(shipment));
 
         assertTrue(handle(new RuleContext(e, h)));
-        assertTrue(isSetLeaving(h.getSession(shipment)));
+        assertTrue(isLeavingStartLocation(shipment, h.getSession(shipment)));
     }
     @Test
     public void testHandleNotStartCheck() {
@@ -120,7 +120,7 @@ public class LeaveStartLocationRuleTest extends LeaveStartLocationRule {
 
         assertFalse(handle(new RuleContext(e, h)));
         assertTrue(isStartWatch(h.getSession(shipment)));
-        assertFalse(isSetLeaving(h.getSession(shipment)));
+        assertFalse(isLeavingStartLocation(shipment, h.getSession(shipment)));
     }
     @Test
     public void testHandleNotStartCheckAndLeaving() {
@@ -129,7 +129,7 @@ public class LeaveStartLocationRuleTest extends LeaveStartLocationRule {
 
         assertTrue(handle(new RuleContext(e, h)));
         assertTrue(isStartWatch(h.getSession(shipment)));
-        assertTrue(isSetLeaving(h.getSession(shipment)));
+        assertTrue(isLeavingStartLocation(shipment, h.getSession(shipment)));
     }
     @Test
     public void testHandleNotStartCheckAndLeavingInPast() {
@@ -145,7 +145,7 @@ public class LeaveStartLocationRuleTest extends LeaveStartLocationRule {
         assertTrue(handle(new RuleContext(e, h)));
         assertTrue(isStartWatch(h.getSession(shipment)));
         //check leaving in past.
-        assertTrue(isSetLeaving(h.getSession(shipment)));
+        assertTrue(isLeavingStartLocation(shipment, h.getSession(shipment)));
     }
 
     /**

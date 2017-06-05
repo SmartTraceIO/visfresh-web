@@ -162,6 +162,35 @@ public class AutoDetectEndLocationRuleTest extends AutoDetectEndLocationRule {
         assertFalse(accept(new RuleContext(e, new SessionHolder())));
     }
     @Test
+    public void testNotAcceptIfNotLeavedStartLocation() {
+        final SessionHolder state = new SessionHolder();
+
+        final TrackerEvent e = new TrackerEvent();
+        e.setShipment(shipment);
+        e.setLatitude(2.0);
+        e.setLongitude(0.);
+
+        final LocationProfile loc1 = createLocation(1., 0.);
+        final LocationProfile loc2 = createLocation(2., 0.);
+        final AutoStartShipment autoStart = createAutoStart(loc1, loc2);
+
+        final ShipmentSession session = state.getSession(shipment);
+        setAutoDetectLocations(session, autoStart.getShippedTo());
+
+        //test accept correct
+        assertTrue(accept(new RuleContext(e, state)));
+
+        //test not accept if not leaved start location.
+        final LocationProfile start = createLocation(2., 0.);
+        shipment.setShippedFrom(start);
+
+        assertFalse(accept(new RuleContext(e, state)));
+
+        //test accept if leaved start location.
+        LeaveStartLocationRule.setLeavingStartLocation(session);
+        assertTrue(accept(new RuleContext(e, state)));
+    }
+    @Test
     public void testHandle() {
         final SessionHolder state = new SessionHolder();
 

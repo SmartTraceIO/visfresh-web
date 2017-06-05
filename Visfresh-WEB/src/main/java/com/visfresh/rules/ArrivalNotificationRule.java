@@ -66,7 +66,7 @@ public class ArrivalNotificationRule extends AbstractNotificationRule {
         final ShipmentSession session = req.getSessionManager().getSession(shipment);
 
         final boolean accept = !session.isArrivalProcessed()
-                && LeaveStartLocationRule.isSetLeaving(session)
+                && LeaveStartLocationRule.isLeavingStartLocation(shipment, session)
                 && (enteringChecker.isInControl(session)
                         ||isNearEndLocation(shipment, event.getLatitude(), event.getLongitude()));
         return accept;

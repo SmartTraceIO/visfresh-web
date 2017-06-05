@@ -95,6 +95,7 @@ public class InterimStopRuleTest extends InterimStopRule {
         final SessionHolder mgr = createSessionHolder(false);
 
         //test accept correct request
+        shipment.setShippedFrom(createLocation(111, 111));
         saveInterimLocations(shipment, locations);
         assertFalse(accept(new RuleContext(createTrackerEvent(shipment, 1, 2), mgr)));
     }

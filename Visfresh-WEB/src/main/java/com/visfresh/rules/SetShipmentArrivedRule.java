@@ -71,7 +71,7 @@ public class SetShipmentArrivedRule implements TrackerEventRule {
                 && event.getLongitude() != null
                 && shipment.getShippedTo() != null
                 && !shipment.hasFinalStatus()
-                && (LeaveStartLocationRule.isSetLeaving(session) || shipment.getShippedFrom() == null)
+                && (LeaveStartLocationRule.isLeavingStartLocation(shipment, session))
                 && (enteringChecker.isInControl(session)
                         || LocationUtils.isNearLocation(shipment.getShippedTo(),
                                 new Location(event.getLatitude(), event.getLongitude())));

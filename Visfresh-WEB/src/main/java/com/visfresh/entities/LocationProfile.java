@@ -195,6 +195,15 @@ public class LocationProfile implements EntityWithId<Long>, EntityWithCompany {
      */
     @Override
     public String toString() {
-        return getId() + ": " + getAddress() + " (" + getLocation() + ")";
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getId());
+        sb.append(" (");
+        if (getName() != null) {
+            sb.append(getName());
+        } else {
+            sb.append(getAddress());
+        }
+        sb.append(')');
+        return sb.toString();
     }
 }
