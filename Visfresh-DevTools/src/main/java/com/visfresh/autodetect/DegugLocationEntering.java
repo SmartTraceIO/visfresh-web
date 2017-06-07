@@ -93,11 +93,13 @@ public class DegugLocationEntering {
             nearestEvents.put(loc, new LinkedList<>());
         }
 
+        Location lastLocation = null;
 
         for (final DeviceMessage dm : messages) {
             final Location location = dm.getLocation();
 
             if (location.getLatitude() != null && location.getLongitude() != null) {
+                lastLocation = location;
                 for (final LocationProfile loc : locations) {
                     final double distance = getDistance(loc, location);
 
@@ -140,7 +142,6 @@ public class DegugLocationEntering {
             System.out.println();
             System.out.println("Distances on given moment:");
 
-            final Location lastLocation = messages.get(messages.size() - 1).getLocation();
             for (final LocationProfile locationProfile : locations) {
                 final double d = getDistance(locationProfile, lastLocation);
                 System.out.println(locationProfile + " in " + d + " meters");
