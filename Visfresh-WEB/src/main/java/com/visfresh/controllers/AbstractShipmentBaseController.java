@@ -229,7 +229,7 @@ public abstract class AbstractShipmentBaseController extends AbstractController 
      * @param dto
      * @param tpl
      */
-    protected void copyBaseData(final ShipmentBaseDto dto, final ShipmentBase tpl) {
+    protected <T extends ShipmentBase> T copyBaseData(final ShipmentBaseDto dto, final T tpl) {
         tpl.setId(dto.getId());
         tpl.setShipmentDescription(dto.getShipmentDescription());
         tpl.setAlertSuppressionMinutes(dto.getAlertSuppressionMinutes());
@@ -242,5 +242,6 @@ public abstract class AbstractShipmentBaseController extends AbstractController 
         tpl.setShutDownAfterStartMinutes(dto.getShutDownAfterStartMinutes());
         tpl.setSendArrivalReport(dto.isSendArrivalReport());
         tpl.setSendArrivalReportOnlyIfAlerts(dto.isSendArrivalReportOnlyIfAlerts());
+        return tpl;
     }
 }

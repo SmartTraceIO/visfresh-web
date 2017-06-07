@@ -6,12 +6,15 @@ package com.visfresh.utils;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
@@ -107,7 +110,109 @@ public final class SerializerUtils {
 
         return result;
     }
+    /**
+     * Warning!!! This feature does not support of merging of arrays.
+     * @param source source object.
+     * @param pattern pattern object.
+     * @return result JSON.
+     */
+    public static JsonObject diff(final JsonElement source,
+            final JsonElement result) {
+        final JsonObject diff = new JsonObject();
 
+        if (notChangedFastCheck(source, result)) {
+        } else if (changedAndNotNeedRecursion(source, result)) {
+            diff.add("old", clone(source));
+            diff.add("new", clone(result));
+        } else if (source.isJsonObject()){
+            //do recursion
+            final JsonObject srcObj = clone(source).getAsJsonObject();
+            final JsonObject dstObj = clone(result).getAsJsonObject();
+
+            final Set<String> keys = new HashSet<>();
+            keys.addAll(getKeys(srcObj));
+            keys.addAll(getKeys(dstObj));
+
+            for (final String key : keys) {
+                final JsonObject e = diff(srcObj.get(key), dstObj.get(key));
+                if (e != null) {
+                    diff.add(key, e);
+                }
+            }
+        } else if (source.isJsonArray()) {
+            //do array recursion
+            final JsonArray srcArray = clone(source).getAsJsonArray();
+            final JsonArray dstArray = clone(result).getAsJsonArray();
+
+            final int len = Math.max(srcArray.size(), dstArray.size());
+            for (int i = 0; i < len; i++) {
+                final JsonObject e = diff(
+                        srcArray.size() > i ? srcArray.get(i) : null,
+                        dstArray.size() > i ? dstArray.get(i) : null);
+                if (e != null) {
+                    diff.add("[" + i + "]", e);
+                }
+            }
+        }
+
+        return diff.entrySet().isEmpty() ? null : diff;
+    }
+
+    /**
+     * @param srcObj
+     * @return
+     */
+    private static Set<String> getKeys(final JsonObject srcObj) {
+        final Set<String> keys = new HashSet<>();
+        for (final Map.Entry<String, JsonElement> e : srcObj.entrySet()) {
+            keys.add(e.getKey());
+        }
+        return keys;
+    }
+    /**
+     * @param source
+     * @param result
+     * @return
+     */
+    private static boolean notChangedFastCheck(final JsonElement source, final JsonElement result) {
+        if (source == null && result == null) {
+            return true;
+        }
+        if (source != null && result != null && source.isJsonPrimitive() && source.equals(result)) {
+            return true;
+        }
+        return false;
+    }
+    /**
+     * @param source
+     * @param result
+     * @return
+     */
+    private static boolean changedAndNotNeedRecursion(final JsonElement source, final JsonElement result) {
+        if (source != null && result == null || source == null && result != null) {
+            return true;
+        }
+        if (source.isJsonArray() && !result.isJsonArray() || !source.isJsonArray() && result.isJsonArray()) {
+            return true;
+        }
+        if (source.isJsonObject() && !result.isJsonObject() || !source.isJsonObject() && result.isJsonObject()) {
+            return true;
+        }
+        return source.isJsonPrimitive() && !source.equals(result);
+    }
+    /**
+     * @param result
+     * @return
+     */
+    private static JsonElement clone(final JsonElement result) {
+        if (result == null) {
+            return JsonNull.INSTANCE;
+        }
+        if (result.isJsonNull() || result.isJsonPrimitive()) {
+            return result;
+        }
+        return parseJson(result.toString());
+    }
     /**
      * @param customFields
      * @return
