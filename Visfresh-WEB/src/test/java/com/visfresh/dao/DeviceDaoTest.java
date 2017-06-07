@@ -30,7 +30,7 @@ import com.visfresh.rules.state.DeviceState;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, String> {
+public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, String> {
     private int num;
     private AutoStartShipment autoStart;
     /**

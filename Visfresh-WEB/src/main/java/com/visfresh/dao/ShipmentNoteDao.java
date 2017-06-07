@@ -13,7 +13,7 @@ import com.visfresh.entities.User;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface ShipmentNoteDao extends DaoBase<ShipmentNote, Long> {
+public interface ShipmentNoteDao extends DaoBase<ShipmentNote, ShipmentNote, Long> {
     /**
      * @param shipment shipment.
      * @param user note owner.

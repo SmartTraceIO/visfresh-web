@@ -29,7 +29,7 @@ import com.visfresh.entities.User;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notification, Long> {
+public class NotificationDaoTest extends BaseCrudTest<NotificationDao, Notification, Notification, Long> {
     private DeviceDao deviceDao;
     private UserDao userDao;
     private ShipmentDao shipmentDao;

@@ -22,7 +22,7 @@ import com.visfresh.entities.Shipment;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, LocationProfile, Long> {
+public class LocationProfileDaoTest extends BaseCrudTest<LocationProfileDao, LocationProfile, LocationProfile, Long> {
     private Device device;
     /**
      * Default constructor.

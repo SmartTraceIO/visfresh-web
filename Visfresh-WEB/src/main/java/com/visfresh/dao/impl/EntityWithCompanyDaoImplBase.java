@@ -25,9 +25,10 @@ import com.visfresh.entities.EntityWithId;
  */
 @Component
 public abstract class EntityWithCompanyDaoImplBase<
+    V extends T,
     T extends EntityWithId<ID> & EntityWithCompany,
     ID extends Serializable & Comparable<ID>
-    > extends DaoImplBase<T, ID> implements EntityWithCompanyDaoBase<T, ID> {
+    > extends DaoImplBase<V, T, ID> implements EntityWithCompanyDaoBase<V, T, ID> {
 
     @Autowired
     private CompanyDao companyDao;
@@ -41,7 +42,7 @@ public abstract class EntityWithCompanyDaoImplBase<
      * @see com.visfresh.dao.EntityWithCompanyDaoBase#findByCompany(com.visfresh.entities.Company, com.visfresh.dao.Sorting, com.visfresh.dao.Page, com.visfresh.dao.Filter)
      */
     @Override
-    public final List<T> findByCompany(final Company company, final Sorting sorting, final Page page,
+    public final List<V> findByCompany(final Company company, final Sorting sorting, final Page page,
             final Filter filter) {
         final Filter f = new Filter(filter);
         f.addFilter(getCompanyFieldName(), company.getId());

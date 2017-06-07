@@ -26,7 +26,7 @@ import com.visfresh.entities.TemperatureAlert;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Long> {
+public class AlertDaoTest extends BaseCrudTest<AlertDao, Alert, Alert, Long> {
     /**
      * Device DAO.
      */

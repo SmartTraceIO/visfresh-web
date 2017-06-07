@@ -19,7 +19,7 @@ import com.visfresh.entities.DeviceCommand;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DeviceCommandDaoTest extends BaseCrudTest<DeviceCommandDao, DeviceCommand, Long> {
+public class DeviceCommandDaoTest extends BaseCrudTest<DeviceCommandDao, DeviceCommand, DeviceCommand, Long> {
     private DeviceDao deviceDao;
     private Device device;
 

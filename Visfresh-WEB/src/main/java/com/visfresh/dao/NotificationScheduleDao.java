@@ -12,7 +12,7 @@ import com.visfresh.entities.ReferenceInfo;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface NotificationScheduleDao extends EntityWithCompanyDaoBase<NotificationSchedule, Long> {
+public interface NotificationScheduleDao extends EntityWithCompanyDaoBase<NotificationSchedule, NotificationSchedule, Long> {
     /**
      * @param id notification schedule ID.
      * @return list of DB references to schedule with given ID.

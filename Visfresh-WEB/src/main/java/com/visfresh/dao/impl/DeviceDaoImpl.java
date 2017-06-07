@@ -36,7 +36,7 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, String> implements DeviceDao {
+public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, String> implements DeviceDao {
     private static final Logger log = LoggerFactory.getLogger(DeviceDaoImpl.class);
 
     /**

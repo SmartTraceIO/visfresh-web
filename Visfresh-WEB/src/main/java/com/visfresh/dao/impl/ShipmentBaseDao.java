@@ -31,8 +31,8 @@ import com.visfresh.utils.StringUtils;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWithCompanyDaoImplBase<E, Long>
-    implements DaoBase<E, Long> {
+public abstract class ShipmentBaseDao<V extends E, E extends ShipmentBase> extends EntityWithCompanyDaoImplBase<V, E, Long>
+    implements DaoBase<V, E, Long> {
 
     /**
      *
@@ -295,7 +295,7 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
     /**
      * @return
      */
-    protected abstract E createEntity();
+    protected abstract V createEntity();
 
     /**
      * @return
@@ -326,8 +326,8 @@ public abstract class ShipmentBaseDao<E extends ShipmentBase> extends EntityWith
      * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
      */
     @Override
-    protected E createEntity(final Map<String, Object> map) {
-        final E s = createEntity();
+    protected V createEntity(final Map<String, Object> map) {
+        final V s = createEntity();
 
         s.setId(((Number) map.get(ID_FIELD)).longValue());
         Number id = (Number) map.get(ALERT_FIELD);

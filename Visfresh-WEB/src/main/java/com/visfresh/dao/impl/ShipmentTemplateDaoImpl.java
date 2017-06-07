@@ -18,7 +18,7 @@ import com.visfresh.entities.ShipmentTemplate;
  *
  */
 @Component
-public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate>
+public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate, ShipmentTemplate>
     implements ShipmentTemplateDao {
 
     private static final String ADDDATASHIPPED_FIELD = "adddatashipped";

@@ -33,7 +33,7 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment> implements ShipmentDao {
+public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> implements ShipmentDao {
     protected static final String PONUM_FIELD = "ponum";
     protected static final String TRIPCOUNT_FIELD = "tripcount";
     protected static final String PALETTID_FIELD = "palletid";

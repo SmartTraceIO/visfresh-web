@@ -20,7 +20,7 @@ import com.visfresh.entities.TemperatureRule;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProfile, Long> {
+public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProfile, AlertProfile, Long> {
     /**
      * Default constructor.
      */

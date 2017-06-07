@@ -30,8 +30,8 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Serializable&Comparable<ID>>
-        implements DaoBase<T, ID> {
+public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID extends Serializable&Comparable<ID>>
+        implements DaoBase<V, T, ID> {
     protected int defaultCacheTimeSeconds = 3 * 60;
 
     /**
@@ -71,15 +71,15 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @see com.visfresh.dao.DaoBase#findAll(java.util.Collection)
      */
     @Override
-    public List<T> findAll(final Collection<ID> originIds) {
+    public List<V> findAll(final Collection<ID> originIds) {
         final List<ID> ids = new LinkedList<>(originIds);
-        final List<T> result = new LinkedList<T>();
+        final List<V> result = new LinkedList<>();
 
         //first of all attempt to get from cache;
         Iterator<ID> iter = ids.iterator();
         while (iter.hasNext()) {
             final ID id = iter.next();
-            final T entity = getFromCache(id);
+            final V entity = getFromCache(id);
             if (entity != null) {
                 result.add(entity);
                 iter.remove();
@@ -195,8 +195,8 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @see com.visfresh.dao.DaoBase#findOne(java.io.Serializable)
      */
     @Override
-    public T findOne(final ID id) {
-        final T e = getFromCache(id);
+    public V findOne(final ID id) {
+        final V e = getFromCache(id);
         if (e != null) {
             return e;
         }
@@ -204,17 +204,17 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
         final Filter f = new Filter();
         f.addFilter(getIdFieldName(), id);
 
-        final List<T> list = findAll(f, null, null);
+        final List<V> list = findAll(f, null, null);
         return list.size() == 0 ? null : list.get(0);
     }
     /**
      * @param id
      * @return
      */
-    protected T getFromCache(final ID id) {
+    protected V getFromCache(final ID id) {
         final Map<String, Object> map = cache.get(id);
         if (map != null) {
-            final T e = createEntity(map);
+            final V e = createEntity(map);
             resolveReferences(e, map, new HashMap<String, Object>());
             return e;
         }
@@ -245,7 +245,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @see com.visfresh.dao.DaoBase#findAll()
      */
     @Override
-    public final List<T> findAll(final Filter filter, final Sorting sorting, final Page page) {
+    public final List<V> findAll(final Filter filter, final Sorting sorting, final Page page) {
         final SelectAllSupport support = getSelectAllSupport();
         support.buildSelectAll(filter, sorting, page);
         return findAll(support);
@@ -255,14 +255,14 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @param support
      * @return
      */
-    protected List<T> findAll(final SelectAllSupport support) {
+    protected List<V> findAll(final SelectAllSupport support) {
         final String sql = support.getQuery();
         final List<Map<String, Object>> list = jdbc.queryForList(sql, support.getParameters());
 
         final Map<String, Object> cache = new HashMap<String, Object>();
-        final List<T> result = new LinkedList<T>();
+        final List<V> result = new LinkedList<>();
         for (final Map<String,Object> map : list) {
-            final T t = createEntity(map);
+            final V t = createEntity(map);
             resolveReferences(t, map, cache);
             //cache result
             cacheEntity(t, map);
@@ -313,7 +313,7 @@ public abstract class DaoImplBase<T extends EntityWithId<ID>, ID extends Seriali
      * @param map
      * @return
      */
-    protected abstract T createEntity(Map<String, Object> map);
+    protected abstract V createEntity(Map<String, Object> map);
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#delete(java.io.Serializable)

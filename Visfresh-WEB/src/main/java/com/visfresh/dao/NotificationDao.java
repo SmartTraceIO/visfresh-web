@@ -16,7 +16,7 @@ import com.visfresh.entities.User;
  *
  */
 public interface NotificationDao extends
-        DaoBase<Notification, Long> {
+        DaoBase<Notification, Notification, Long> {
 
     /**
      * @param user user

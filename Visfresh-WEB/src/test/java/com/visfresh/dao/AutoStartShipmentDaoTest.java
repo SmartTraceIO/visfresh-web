@@ -24,7 +24,7 @@ import com.visfresh.entities.ShipmentTemplate;
  *
  */
 public class AutoStartShipmentDaoTest extends
-        BaseCrudTest<AutoStartShipmentDao, AutoStartShipment, Long> {
+        BaseCrudTest<AutoStartShipmentDao, AutoStartShipment, AutoStartShipment, Long> {
     private LocationProfile locFrom;
     private LocationProfile locTo;
     private LocationProfile locInterim;

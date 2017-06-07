@@ -29,7 +29,7 @@ import com.visfresh.entities.Shipment;
  *
  */
 @Component
-public class ArrivalDaoImpl extends DaoImplBase<Arrival, Long> implements ArrivalDao {
+public class ArrivalDaoImpl extends DaoImplBase<Arrival, Arrival, Long> implements ArrivalDao {
     /**
      * Table name.
      */

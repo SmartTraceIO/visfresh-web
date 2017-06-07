@@ -23,7 +23,7 @@ import com.visfresh.entities.Shipment;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Long> {
+public class ArrivalDaoTest extends BaseCrudTest<ArrivalDao, Arrival, Arrival, Long> {
     private DeviceDao deviceDao;
     private ShipmentDao shipmentDao;
     private Device device;

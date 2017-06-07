@@ -19,7 +19,7 @@ import com.visfresh.services.AuthToken;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class RestSessionDaoTest extends BaseCrudTest<RestSessionDao, RestSession, Long>{
+public class RestSessionDaoTest extends BaseCrudTest<RestSessionDao, RestSession, RestSession, Long>{
     private User user;
     private long lastId = 1;
 

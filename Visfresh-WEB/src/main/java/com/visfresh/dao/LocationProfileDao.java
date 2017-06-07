@@ -12,7 +12,7 @@ import com.visfresh.entities.ShortShipmentInfo;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface LocationProfileDao extends EntityWithCompanyDaoBase<LocationProfile, Long> {
+public interface LocationProfileDao extends EntityWithCompanyDaoBase<LocationProfile, LocationProfile, Long> {
     /**
      * @param location location.
      * @return list of owner shipments which contains given location as start of end location.

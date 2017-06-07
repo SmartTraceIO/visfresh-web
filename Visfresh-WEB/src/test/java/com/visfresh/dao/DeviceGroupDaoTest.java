@@ -22,7 +22,7 @@ import com.visfresh.entities.ShipmentStatus;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DeviceGroupDaoTest extends BaseCrudTest<DeviceGroupDao, DeviceGroup, Long> {
+public class DeviceGroupDaoTest extends BaseCrudTest<DeviceGroupDao, DeviceGroup, DeviceGroup, Long> {
     private static final String NAME_PREFIX = "dg_";
     private int lastId = 0;
 

@@ -39,7 +39,7 @@ import junit.framework.AssertionFailedError;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Long> {
+public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipment, Long> {
     private AlertProfile alertProfile;
     private LocationProfile shippedFrom;
     private LocationProfile shippedTo;

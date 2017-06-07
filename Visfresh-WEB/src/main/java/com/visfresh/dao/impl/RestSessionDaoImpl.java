@@ -28,7 +28,7 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class RestSessionDaoImpl extends DaoImplBase<RestSession, Long> implements RestSessionDao {
+public class RestSessionDaoImpl extends DaoImplBase<RestSession, RestSession, Long> implements RestSessionDao {
     private static final String TABLE = "restsessions";
     private static final String PROPERTIES = "restproperties";
 

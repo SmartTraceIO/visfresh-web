@@ -10,5 +10,5 @@ import com.visfresh.entities.AutoStartShipment;
  *
  */
 public interface AutoStartShipmentDao
-    extends EntityWithCompanyDaoBase<AutoStartShipment, Long> {
+    extends EntityWithCompanyDaoBase<AutoStartShipment, AutoStartShipment, Long> {
 }

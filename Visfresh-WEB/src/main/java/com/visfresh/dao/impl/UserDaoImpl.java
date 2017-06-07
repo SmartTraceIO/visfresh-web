@@ -30,7 +30,7 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 @Component
-public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, Long> implements UserDao {
+public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, User, Long> implements UserDao {
     private static final String FIRSTNAME_FIELD = "firstname";
     private static final String LASTNAME_FIELD = "lastname";
     private static final String EXTERNALCOMPANY_FIELD = "externalcompany";

@@ -40,7 +40,7 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, Long>
+public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent, Long>
     implements TrackerEventDao {
 
     /**

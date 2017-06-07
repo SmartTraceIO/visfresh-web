@@ -17,7 +17,7 @@ import com.visfresh.entities.EntityWithId;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWithId<ID>,
+public abstract class BaseCrudTest<T extends DaoBase<V, E, ID>, V extends E, E extends EntityWithId<ID>,
         ID extends Serializable & Comparable<ID>> extends BaseDaoTest<T> {
     /**
      *
@@ -72,7 +72,7 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
      * @param numberOfCreatedEntities
      * @param all
      */
-    protected void assertTestGetAllOk(final int numberOfCreatedEntities, final List<E> all) {
+    protected void assertTestGetAllOk(final int numberOfCreatedEntities, final List<V> all) {
         assertEquals(numberOfCreatedEntities, all.size());
     }
     /**
@@ -87,17 +87,17 @@ public abstract class BaseCrudTest<T extends DaoBase<E, ID>, E extends EntityWit
         dao.save(e2);
         dao.delete(e1);
 
-        final List<E> all = dao.findAll(null, null, null);
+        final List<V> all = dao.findAll(null, null, null);
         assertEquals(1, all.size());
         assertEquals(e2.getId(), all.get(0).getId());
     }
     @Test
     public void testUpdate() {
-        final E e1 = createTestEntity();
+        final V e1 = createTestEntity();
         dao.save(e1);
         dao.save(e1);
         assertCreateTestEntityOk(dao.findOne(e1.getId()));
     }
 
-    protected abstract E createTestEntity();
+    protected abstract V createTestEntity();
 }

@@ -16,7 +16,7 @@ import com.visfresh.rules.state.DeviceState;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface DeviceDao extends EntityWithCompanyDaoBase<Device, String> {
+public interface DeviceDao extends EntityWithCompanyDaoBase<Device, Device, String> {
     /**
      * Is equivalent of find by ID.
      * @param imei device IMEI.

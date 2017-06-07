@@ -14,7 +14,7 @@ import com.visfresh.entities.SystemMessageType;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface SystemMessageDao extends DaoBase<SystemMessage, Long> {
+public interface SystemMessageDao extends DaoBase<SystemMessage, SystemMessage, Long> {
     /**
      * @param messageTypes set of message types.
      * @param processor processor.

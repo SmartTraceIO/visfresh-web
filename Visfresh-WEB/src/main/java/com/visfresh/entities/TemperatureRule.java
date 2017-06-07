@@ -17,6 +17,7 @@ public class TemperatureRule extends AlertRule {
     private boolean cumulativeFlag;
     //max rate = one time per maxRateMinutes
     private Integer maxRateMinutes;
+    private CorrectiveActionList correctiveActions;
 
     /**
      * Default constructor.
@@ -112,7 +113,20 @@ public class TemperatureRule extends AlertRule {
                 getTemperature() == other.getTemperature() &&
                 getTimeOutMinutes() == other.getTimeOutMinutes() &&
                 isCumulativeFlag() == other.isCumulativeFlag() &&
-                Objects.equals(getMaxRateMinutes(), other.getMaxRateMinutes());
+                Objects.equals(getMaxRateMinutes(), other.getMaxRateMinutes()) &&
+                Objects.equals(getCorrectiveActions(), other.getCorrectiveActions());
+    }
+    /**
+     * @return the correctiveActions
+     */
+    public CorrectiveActionList getCorrectiveActions() {
+        return correctiveActions;
+    }
+    /**
+     * @param correctiveActions the correctiveActions to set
+     */
+    public void setCorrectiveActions(final CorrectiveActionList correctiveActions) {
+        this.correctiveActions = correctiveActions;
     }
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
@@ -125,6 +139,7 @@ public class TemperatureRule extends AlertRule {
         hb.append(getTimeOutMinutes());
         hb.append(isCumulativeFlag());
         hb.append(getMaxRateMinutes());
+        hb.append(getCorrectiveActions());
         return hb.toHashCode();
     }
 }

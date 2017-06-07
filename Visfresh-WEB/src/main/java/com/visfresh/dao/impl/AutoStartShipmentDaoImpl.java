@@ -35,7 +35,7 @@ import com.visfresh.utils.StringUtils;
  */
 @Component
 public class AutoStartShipmentDaoImpl
-    extends EntityWithCompanyDaoImplBase<AutoStartShipment, Long>
+    extends EntityWithCompanyDaoImplBase<AutoStartShipment, AutoStartShipment, Long>
     implements AutoStartShipmentDao {
 
     public static final String TABLE = "autostartshipments";

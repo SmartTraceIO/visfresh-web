@@ -55,10 +55,10 @@ public final class EntityUtils {
      * @param ids
      * @return
      */
-    public static <E extends EntityWithId<ID>,ID extends Serializable & Comparable<ID>>
-            Map<ID, E> resolveEntities(final DaoBase<E, ID> dao, final Set<ID> ids) {
-        final Map<ID, E> map = new HashMap<>();
-        for (final E e : dao.findAll(ids)) {
+    public static <V extends E, E extends EntityWithId<ID>,ID extends Serializable & Comparable<ID>>
+            Map<ID, V> resolveEntities(final DaoBase<V, E, ID> dao, final Set<ID> ids) {
+        final Map<ID, V> map = new HashMap<>();
+        for (final V e : dao.findAll(ids)) {
             map.put(e.getId(), e);
         }
         return map;

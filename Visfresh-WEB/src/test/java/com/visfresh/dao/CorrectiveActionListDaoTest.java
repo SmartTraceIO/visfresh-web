@@ -18,7 +18,8 @@ import com.visfresh.entities.CorrectiveActionList;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionListDao, CorrectiveActionList, Long> {
+public class CorrectiveActionListDaoTest extends BaseCrudTest<CorrectiveActionListDao,
+        CorrectiveActionList, CorrectiveActionList, Long> {
     /**
      * Default constructor.
      */

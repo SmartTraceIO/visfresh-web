@@ -10,7 +10,7 @@ import com.visfresh.entities.DeviceCommand;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface DeviceCommandDao extends DaoBase<DeviceCommand, Long> {
+public interface DeviceCommandDao extends DaoBase<DeviceCommand, DeviceCommand, Long> {
     /**
      * @param command command.
      * @param imei device IMEI.

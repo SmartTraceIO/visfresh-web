@@ -28,7 +28,7 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup, Long> implements DeviceGroupDao {
+public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup, DeviceGroup, Long> implements DeviceGroupDao {
     /**
      * Table name.
      */

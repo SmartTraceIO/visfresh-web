@@ -31,7 +31,7 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class AlertDaoImpl extends DaoImplBase<Alert, Long> implements AlertDao {
+public class AlertDaoImpl extends DaoImplBase<Alert, Alert, Long> implements AlertDao {
     public static final String TABLE = "alerts";
 
     private static final String TYPE_FIELD = "type";

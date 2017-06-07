@@ -12,7 +12,7 @@ import com.visfresh.entities.User;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface UserDao extends EntityWithCompanyDaoBase<User, Long> {
+public interface UserDao extends EntityWithCompanyDaoBase<User, User, Long> {
     /**
      * @param email email.
      * @return user by given email.

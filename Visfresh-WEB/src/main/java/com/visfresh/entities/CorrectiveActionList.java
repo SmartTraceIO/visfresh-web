@@ -5,6 +5,9 @@ package com.visfresh.entities;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+
+import com.visfresh.utils.CollectionUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -79,5 +82,36 @@ public class CorrectiveActionList implements EntityWithId<Long>, EntityWithCompa
      */
     public List<CorrectiveAction> getActions() {
         return actions;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof CorrectiveActionList)) {
+            return false;
+        }
+
+        final CorrectiveActionList other = (CorrectiveActionList) obj;
+        return Objects.equals(getId(), other.getId())
+                && getCompany().getId().equals(other.getCompany().getId())
+                && Objects.equals(getName(), other.getName())
+                && CollectionUtils.equals(getActions(), other.getActions());
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final List<Object> hash = new LinkedList<>();
+        hash.add(getId());
+        hash.add(getName());
+        hash.add(getCompany().getId());
+
+        for (final CorrectiveAction a : getActions()) {
+            hash.add(a);
+        }
+
+        return Objects.hash(hash.toArray(new Object[hash.size()]));
     }
 }

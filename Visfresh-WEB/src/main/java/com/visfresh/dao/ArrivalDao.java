@@ -13,7 +13,7 @@ import com.visfresh.entities.Shipment;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface ArrivalDao extends DaoBase<Arrival, Long> {
+public interface ArrivalDao extends DaoBase<Arrival, Arrival, Long> {
     /**
      * @param shipment shipment.
      * @return

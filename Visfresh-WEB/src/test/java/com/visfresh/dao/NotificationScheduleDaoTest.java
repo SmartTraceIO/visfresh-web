@@ -25,7 +25,7 @@ import com.visfresh.entities.User;
  *
  */
 public class NotificationScheduleDaoTest
-    extends BaseCrudTest<NotificationScheduleDao, NotificationSchedule, Long> {
+    extends BaseCrudTest<NotificationScheduleDao, NotificationSchedule, NotificationSchedule, Long> {
 
     private User user;
     /**

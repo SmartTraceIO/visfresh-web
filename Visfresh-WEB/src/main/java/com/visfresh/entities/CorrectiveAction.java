@@ -3,6 +3,8 @@
  */
 package com.visfresh.entities;
 
+import java.util.Objects;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -56,5 +58,18 @@ public class CorrectiveAction {
      */
     public void setRequestVerification(final boolean requestVerification) {
         this.requestVerification = requestVerification;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof CorrectiveAction)) {
+            return false;
+        }
+
+        final CorrectiveAction other = (CorrectiveAction) obj;
+        return Objects.equals(getAction(), other.getAction())
+                && isRequestVerification() == other.isRequestVerification();
     }
 }

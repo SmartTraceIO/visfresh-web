@@ -25,7 +25,7 @@ import com.visfresh.entities.SystemMessageType;
  *
  */
 @Component
-public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, Long> implements SystemMessageDao {
+public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessage, Long> implements SystemMessageDao {
     public static final String TABLE = "systemmessages";
 
     public static final String ID_FIELD = "id";

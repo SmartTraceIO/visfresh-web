@@ -28,7 +28,7 @@ import com.visfresh.entities.User;
  *
  */
 public class ShipmentTemplateDaoTest
-    extends BaseCrudTest<ShipmentTemplateDao, ShipmentTemplate, Long> {
+    extends BaseCrudTest<ShipmentTemplateDao, ShipmentTemplate, ShipmentTemplate, Long> {
 
     private AlertProfile alertProfile;
     private LocationProfile shippedFrom;

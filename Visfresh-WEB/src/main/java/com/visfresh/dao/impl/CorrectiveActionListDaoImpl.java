@@ -24,7 +24,7 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 @Component
-public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<CorrectiveActionList, Long>
+public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<CorrectiveActionList, CorrectiveActionList, Long>
         implements CorrectiveActionListDao {
 //    public static final String TABLE = "criticalactions";
     public static final String TABLE = "correctiveactions";

@@ -30,7 +30,7 @@ import com.visfresh.io.TrackerEventDto;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEvent, Long> {
+public class TrackerEventDaoTest extends BaseCrudTest<TrackerEventDao, TrackerEvent, TrackerEvent, Long> {
     /**
      * Device DAO.
      */

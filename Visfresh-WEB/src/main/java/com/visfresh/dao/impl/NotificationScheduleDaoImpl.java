@@ -30,7 +30,7 @@ import com.visfresh.entities.ReferenceInfo;
  *
  */
 @Component
-public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<NotificationSchedule, Long>
+public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<NotificationSchedule, NotificationSchedule, Long>
     implements NotificationScheduleDao {
 
     public static final String TABLE = "notificationschedules";

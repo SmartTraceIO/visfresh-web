@@ -26,7 +26,7 @@ import com.visfresh.entities.User;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, ShipmentAuditItem, Long> {
+public class ShipmentAuditDaoTest extends BaseCrudTest<ShipmentAuditDao, ShipmentAuditItem, ShipmentAuditItem, Long> {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss");
 
     private Shipment shipment;

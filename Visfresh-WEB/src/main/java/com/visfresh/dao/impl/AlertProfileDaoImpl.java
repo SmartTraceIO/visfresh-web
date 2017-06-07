@@ -28,7 +28,7 @@ import com.visfresh.entities.TemperatureRule;
  *
  */
 @Component
-public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfile, Long> implements AlertProfileDao {
+public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfile, AlertProfile, Long> implements AlertProfileDao {
     public static final String TABLE = "alertprofiles";
 
     public static final String ID_FIELD = "id";

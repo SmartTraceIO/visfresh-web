@@ -22,7 +22,7 @@ import com.visfresh.entities.ShortShipmentInfo;
  *
  */
 @Component
-public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<LocationProfile, Long>
+public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<LocationProfile, LocationProfile, Long>
     implements LocationProfileDao {
 
     public static final String TABLE = "locationprofiles";

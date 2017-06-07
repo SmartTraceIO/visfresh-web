@@ -29,7 +29,7 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 @Component
-public class ShipmentAuditDaoImpl extends DaoImplBase<ShipmentAuditItem, Long>
+public class ShipmentAuditDaoImpl extends DaoImplBase<ShipmentAuditItem, ShipmentAuditItem, Long>
         implements ShipmentAuditDao {
     private static final String SHIPMENTS_COMPANY = "shipmentsCompany";
 

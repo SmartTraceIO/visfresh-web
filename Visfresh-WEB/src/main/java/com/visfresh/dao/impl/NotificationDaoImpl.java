@@ -34,7 +34,7 @@ import com.visfresh.utils.StringUtils;
  *
  */
 @Component
-public class NotificationDaoImpl extends DaoImplBase<Notification, Long> implements NotificationDao {
+public class NotificationDaoImpl extends DaoImplBase<Notification, Notification, Long> implements NotificationDao {
     /**
      * Table name.
      */

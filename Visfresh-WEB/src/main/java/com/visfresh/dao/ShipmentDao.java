@@ -16,7 +16,7 @@ import com.visfresh.entities.ShipmentTemplate;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Long> {
+public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment, Long> {
     /**
      * @param imei device IMEI.
      * @return active shipment for given devcie.

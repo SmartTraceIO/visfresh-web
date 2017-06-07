@@ -18,7 +18,7 @@ import com.visfresh.entities.PaymentMethod;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class CompanyDaoTest extends BaseCrudTest<CompanyDao, Company, Long> {
+public class CompanyDaoTest extends BaseCrudTest<CompanyDao, Company, Company, Long> {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     /**

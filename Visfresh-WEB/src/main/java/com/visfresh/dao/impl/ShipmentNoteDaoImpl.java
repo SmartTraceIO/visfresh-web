@@ -27,7 +27,7 @@ import com.visfresh.entities.User;
  *
  */
 @Component
-public class ShipmentNoteDaoImpl extends DaoImplBase<ShipmentNote, Long> implements ShipmentNoteDao {
+public class ShipmentNoteDaoImpl extends DaoImplBase<ShipmentNote,ShipmentNote, Long> implements ShipmentNoteDao {
     /**
      * Table name.
      */

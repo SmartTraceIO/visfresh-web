@@ -21,7 +21,7 @@ import com.visfresh.entities.DeviceCommand;
  *
  */
 @Component
-public class DeviceCommandDaoImpl extends DaoImplBase<DeviceCommand, Long> implements DeviceCommandDao {
+public class DeviceCommandDaoImpl extends DaoImplBase<DeviceCommand, DeviceCommand, Long> implements DeviceCommandDao {
     /**
      * Table name.
      */

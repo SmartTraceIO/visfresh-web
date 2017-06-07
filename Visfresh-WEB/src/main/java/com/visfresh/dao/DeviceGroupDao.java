@@ -15,7 +15,7 @@ import com.visfresh.io.shipment.DeviceGroupDto;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface DeviceGroupDao extends EntityWithCompanyDaoBase<DeviceGroup, Long> {
+public interface DeviceGroupDao extends EntityWithCompanyDaoBase<DeviceGroup, DeviceGroup, Long> {
     /**
      * Adds device to group.
      * @param group group.

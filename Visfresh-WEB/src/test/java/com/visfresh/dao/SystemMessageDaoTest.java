@@ -25,7 +25,7 @@ import com.visfresh.mpl.services.DeviceDcsNativeEvent;
  *
  */
 public class SystemMessageDaoTest extends
-        BaseCrudTest<SystemMessageDao, SystemMessage, Long> {
+        BaseCrudTest<SystemMessageDao, SystemMessage, SystemMessage, Long> {
     private final DeviceDcsNativeEventSerializer eventSerializer = new DeviceDcsNativeEventSerializer();
 
     /**

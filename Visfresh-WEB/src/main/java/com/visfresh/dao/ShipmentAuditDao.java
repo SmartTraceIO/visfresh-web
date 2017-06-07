@@ -12,7 +12,7 @@ import com.visfresh.entities.ShipmentAuditItem;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface ShipmentAuditDao extends DaoBase<ShipmentAuditItem, Long> {
+public interface ShipmentAuditDao extends DaoBase<ShipmentAuditItem, ShipmentAuditItem, Long> {
     /**
      * @param company company.
      * @param filter additional filter.

@@ -24,7 +24,7 @@ import com.visfresh.entities.PaymentMethod;
  *
  */
 @Component
-public class CompanyDaoImpl extends DaoImplBase<Company, Long> implements CompanyDao {
+public class CompanyDaoImpl extends DaoImplBase<Company, Company, Long> implements CompanyDao {
     public static final String TABLE = "companies";
     /**
      * Description field.

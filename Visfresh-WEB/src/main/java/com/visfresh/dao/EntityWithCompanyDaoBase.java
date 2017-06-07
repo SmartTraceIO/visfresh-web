@@ -18,10 +18,11 @@ import com.visfresh.entities.EntityWithId;
  */
 public interface EntityWithCompanyDaoBase
         <
+        V extends T,
         T extends EntityWithId<ID> & EntityWithCompany,
         ID extends Serializable & Comparable<ID>
         >
-    extends DaoBase<T, ID>{
+    extends DaoBase<V, T, ID>{
     /**
      * @param company company.
      * @param sorting sorting parameters.
@@ -29,7 +30,7 @@ public interface EntityWithCompanyDaoBase
      * @param filter filter object.
      * @return list of devices.
      */
-    List<T> findByCompany(Company company, Sorting sorting, Page page, Filter filter);
+    List<V> findByCompany(Company company, Sorting sorting, Page page, Filter filter);
     /**
      * @param company company.
      * @param filter filter.

@@ -30,7 +30,7 @@ import com.visfresh.entities.User;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class UserDaoTest extends BaseCrudTest<UserDao, User, Long> {
+public class UserDaoTest extends BaseCrudTest<UserDao, User, User, Long> {
     private int ids;
     private NotificationSchedule notificationSchedule;
     private Alert alert;

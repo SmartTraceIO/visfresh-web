@@ -6,10 +6,12 @@ package com.visfresh.utils;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.visfresh.entities.EntityWithId;
 
@@ -60,5 +62,28 @@ public final class CollectionUtils {
                 return o1.getId().compareTo(o2.getId());
             }
         });
+    }
+    /**
+     * @param l1 first list.
+     * @param l2 second list.
+     * @return true if lists are equals.
+     */
+    public static boolean equals(final List<?> l1, final List<?> l2) {
+        if (l1 == l2) {
+            return true;
+        }
+        if (l1 == null || l2 == null || l1.size() != l2.size()) {
+            return false;
+        }
+
+        final Iterator<?> iter1 = l1.iterator();
+        final Iterator<?> iter2 = l2.iterator();
+        while (iter1.hasNext()) {
+            if (!Objects.equals(iter1.next(), iter2.next())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

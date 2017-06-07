@@ -17,7 +17,7 @@ import com.visfresh.entities.Shipment;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface AlertDao extends DaoBase<Alert, Long> {
+public interface AlertDao extends DaoBase<Alert, Alert, Long> {
     /**
      * @param shipment
      * @return
