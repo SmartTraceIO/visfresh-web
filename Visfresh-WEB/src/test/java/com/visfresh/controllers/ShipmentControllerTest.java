@@ -381,6 +381,82 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(ShipmentStatus.Ended, old.getStatus());
     }
     @Test
+    public void testSwitchToArrivedShipmnetLatest() throws RestServiceException, IOException {
+        final long minutes10 = 10 * 60 * 1000l;
+        final long time = System.currentTimeMillis() - 50 * minutes10;
+
+        Shipment s = createShipment(true);
+        s.setStatus(ShipmentStatus.Ended);
+        s.setShipmentDate(new Date(time));
+        s.setLastEventDate(new Date(time));
+        getContext().getBean(ShipmentDao.class).save(s);
+
+        //create tracker event
+        final TrackerEvent e1 = createTrackerEvent(s.getDevice(), new Date(time + 1 * minutes10));
+        final TrackerEvent e2 = createTrackerEvent(s.getDevice(), new Date(time + 2 * minutes10));
+        final TrackerEvent e3 = createTrackerEvent(s.getDevice(), new Date(time + 3 * minutes10));
+
+        //create left device message
+        final Device d = createDevice("9203457029347", true);
+        final TrackerEvent e4 = createTrackerEvent(d, new Date(time + 4 * minutes10));
+
+        //change status from Ended to Arrived
+        s.setStatus(ShipmentStatus.Arrived);
+        shipmentClient.saveShipment(new ShipmentDto(s), null, false);
+
+        s = context.getBean(ShipmentDao.class).findOne(s.getId());
+
+        //check status changed
+        assertEquals(ShipmentStatus.Arrived, s.getStatus());
+        assertEquals(s.getId(), context.getBean(TrackerEventDao.class).findOne(e1.getId()).getShipment().getId());
+        assertEquals(s.getId(), context.getBean(TrackerEventDao.class).findOne(e2.getId()).getShipment().getId());
+        assertEquals(s.getId(), context.getBean(TrackerEventDao.class).findOne(e3.getId()).getShipment().getId());
+
+        assertNull(context.getBean(TrackerEventDao.class).findOne(e4.getId()).getShipment());
+    }
+    @Test
+    public void testSwitchToArrivedShipmnetNotLatest() throws RestServiceException, IOException {
+        final long minutes10 = 10 * 60 * 1000l;
+        long time = System.currentTimeMillis() - 50 * minutes10;
+
+        Shipment s = createShipment(true);
+        s.setStatus(ShipmentStatus.Ended);
+        s.setShipmentDate(new Date(time));
+        s.setLastEventDate(new Date(time));
+        getContext().getBean(ShipmentDao.class).save(s);
+
+        //create tracker event
+        final TrackerEvent e1 = createTrackerEvent(s.getDevice(), new Date(time + 1 * minutes10));
+        final TrackerEvent e2 = createTrackerEvent(s.getDevice(), new Date(time + 2 * minutes10));
+        final TrackerEvent e3 = createTrackerEvent(s.getDevice(), new Date(time + 3 * minutes10));
+
+        //create left device message
+        time = time + 5 * minutes10;
+
+        final Shipment s1 = createShipment(true);
+        s1.setStatus(ShipmentStatus.Default);
+        s1.setShipmentDate(new Date(time));
+        getContext().getBean(ShipmentDao.class).save(s1);
+
+        final TrackerEvent e4 = createTrackerEvent(s1, new Date(time + 1 * minutes10));
+        final TrackerEvent e5 = createTrackerEvent(s1.getDevice(), new Date(time + 2 * minutes10));
+
+        //change status from Ended to Arrived
+        s.setStatus(ShipmentStatus.Arrived);
+        shipmentClient.saveShipment(new ShipmentDto(s), null, false);
+
+        s = context.getBean(ShipmentDao.class).findOne(s.getId());
+
+        //check status changed
+        assertEquals(ShipmentStatus.Arrived, s.getStatus());
+        assertEquals(s.getId(), context.getBean(TrackerEventDao.class).findOne(e1.getId()).getShipment().getId());
+        assertEquals(s.getId(), context.getBean(TrackerEventDao.class).findOne(e2.getId()).getShipment().getId());
+        assertEquals(s.getId(), context.getBean(TrackerEventDao.class).findOne(e3.getId()).getShipment().getId());
+
+        assertEquals(s1.getId(), context.getBean(TrackerEventDao.class).findOne(e4.getId()).getShipment().getId());
+        assertNull(context.getBean(TrackerEventDao.class).findOne(e5.getId()).getShipment());
+    }
+    @Test
     public void testGetShipments() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
         s.getShippedTo().setAddress("Coles Perth DC");
@@ -1716,6 +1792,35 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         e.setDevice(shipment.getDevice());
         e.setTime(new Date());
         e.setTemperature(temperature);
+        e.setLatitude(0.);
+        e.setLongitude(0.);
+        return context.getBean(TrackerEventDao.class).save(e);
+    }
+    /**
+     * @param device device.
+     * @param date date.
+     */
+    private TrackerEvent createTrackerEvent(final Shipment s, final Date date) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setType(TrackerEventType.AUT);
+        e.setDevice(s.getDevice());
+        e.setShipment(s);
+        e.setTime(date);
+        e.setTemperature(17);
+        e.setLatitude(0.);
+        e.setLongitude(0.);
+        return context.getBean(TrackerEventDao.class).save(e);
+    }
+    /**
+     * @param device device.
+     * @param date date.
+     */
+    private TrackerEvent createTrackerEvent(final Device device, final Date date) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setType(TrackerEventType.AUT);
+        e.setDevice(device);
+        e.setTime(date);
+        e.setTemperature(17);
         e.setLatitude(0.);
         e.setLongitude(0.);
         return context.getBean(TrackerEventDao.class).save(e);

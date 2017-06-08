@@ -179,23 +179,25 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
             final ShipmentSerializer serializer = getSerializer(user);
             Long id = serializer.getShipmentIdFromSaveRequest(jsonRequest);
-            ShipmentDto oldShipment = null;
+
+            ShipmentDto oldShipmentDto = null;
+            Shipment oldShipment = null;
 
             final boolean isNew = id == null;
             if (!isNew) {
                 //merge the shipment from request by existing shipment
                 //it is required to avoid the set to null the fields
                 //which are absent in save request.
-                final Shipment old = shipmentDao.findOne(id);
-                if (old != null) {
-                    checkCompanyAccess(user, old);
-                    oldShipment = createShipmentDto(old);
+                oldShipment = shipmentDao.findOne(id);
+                if (oldShipment != null) {
+                    checkCompanyAccess(user, oldShipment);
+                    oldShipmentDto = createShipmentDto(oldShipment);
 
                     final JsonObject shipmentFromReqest = serializer.getShipmentFromRequest(
                             jsonRequest);
                     final JsonObject merged = SerializerUtils.merge(
                             shipmentFromReqest,
-                            serializer.toJson(oldShipment).getAsJsonObject());
+                            serializer.toJson(oldShipmentDto).getAsJsonObject());
                     //correct shipment to save in request
                     serializer.setShipmentToRequest(jsonRequest, merged);
                 } else {
@@ -213,16 +215,16 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             newShipment.setCreatedBy(user.getEmail());
 
             if (id != null) {
-                if (!canChangeStatus(oldShipment.getStatus(), newShipment.getStatus())) {
-                    log.debug("Is not allowed to change status from " + oldShipment.getStatus()
+                if (!canChangeStatus(oldShipmentDto.getStatus(), newShipment.getStatus())) {
+                    log.debug("Is not allowed to change status from " + oldShipmentDto.getStatus()
                         + " to " + newShipment.getStatus() + " for shipment " + newShipment);
-                    newShipment.setStatus(oldShipment.getStatus());
+                    newShipment.setStatus(oldShipmentDto.getStatus());
                 }
                 shipmentDao.save(newShipment);
 
                 //check
-                if (oldShipment.getStatus() != newShipment.getStatus()) {
-                    handleStatusChanged(newShipment, oldShipment.getStatus(), newShipment.getStatus());
+                if (oldShipmentDto.getStatus() != newShipment.getStatus()) {
+                    handleStatusChanged(newShipment, oldShipmentDto.getStatus(), newShipment.getStatus());
                 }
             } else {
                 id = saveNewShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
@@ -249,7 +251,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             } else {
                 final Map<String, String> details = new HashMap<>();
                 final JsonObject diff = SerializerUtils.diff(
-                        serializer.toJson(oldShipment),
+                        serializer.toJson(oldShipmentDto),
                         serializer.toJson(createShipmentDto(newShipment)));
                 details.put("diff", diff == null ? null : diff.toString());
                 auditService.handleShipmentAction(newShipment, user, ShipmentAuditAction.Updated, details);
@@ -301,7 +303,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         boolean foundAssigned = false;
         Date endDate = new Date(startDate.getTime() + 60 * 60 * 1000l);
 
-        while (!foundAssigned && new Date().before(startDate)) {
+        while (!foundAssigned && !startDate.after(new Date())) {
             final List<ShortTrackerEvent> events = trackerEventDao.findBy(s.getDevice().getImei(), startDate, endDate);
             for (final ShortTrackerEvent e : events) {
                 if (e.getShipmentId() == null) {
@@ -343,12 +345,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     }
     /**
      * @param dto
-     * @param oldShipment
+     * @param old
      * @return
      */
-    private Shipment createShipment(final ShipmentDto dto, final ShipmentDto oldShipment) {
-        final boolean isNew = oldShipment == null;
-        final Shipment s = isNew ? new Shipment() : copyBaseData(oldShipment, new Shipment());
+    private Shipment createShipment(final ShipmentDto dto, final Shipment old) {
+        final boolean isNew = old == null;
+        final Shipment s = isNew ? new Shipment() : old;
         copyBaseData(dto, s);
 
         s.setPalletId(dto.getPalletId());
