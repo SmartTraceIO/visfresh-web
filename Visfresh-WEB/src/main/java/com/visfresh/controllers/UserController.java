@@ -226,7 +226,7 @@ public class UserController extends AbstractController implements UserConstants 
                 newUser = dao.findOne(newUser.getId());
                 checkCompanyAccess(user, newUser);
 
-                newUser = merteUsers(newUser, r.getUser());
+                newUser = mergeUsers(newUser, r.getUser());
             } else if (newUser.getRoles() == null) {
                 newUser.setRoles(new HashSet<Role>());
             }
@@ -265,7 +265,7 @@ public class UserController extends AbstractController implements UserConstants 
      * @param newUser new user.
      * @return
      */
-    private User merteUsers(final User oldUser, final User newUser) {
+    private User mergeUsers(final User oldUser, final User newUser) {
         if (newUser.getCompany() != null) {
             oldUser.setCompany(newUser.getCompany());
         }

@@ -93,11 +93,11 @@ public abstract class BaseCrudTest<T extends DaoBase<V, E, ID>, V extends E, E e
     }
     @Test
     public void testUpdate() {
-        final V e1 = createTestEntity();
+        final E e1 = createTestEntity();
         dao.save(e1);
         dao.save(e1);
         assertCreateTestEntityOk(dao.findOne(e1.getId()));
     }
 
-    protected abstract V createTestEntity();
+    protected abstract E createTestEntity();
 }

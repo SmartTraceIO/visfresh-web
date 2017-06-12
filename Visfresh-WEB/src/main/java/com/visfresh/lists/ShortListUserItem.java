@@ -58,15 +58,23 @@ public class ShortListUserItem {
      * @return full user name.
      */
     public static String buildFullName(final User u) {
+        return buildFullName(u.getFirstName(), u.getLastName());
+    }
+    /**
+     * @param firstName first name.
+     * @param lastName last name.
+     * @return full user name.
+     */
+    public static String buildFullName(final String firstName, final String lastName) {
         final StringBuilder sb = new StringBuilder();
-        if (u.getFirstName() != null) {
-            sb.append(u.getFirstName());
+        if (firstName != null) {
+            sb.append(firstName);
         }
-        if (u.getLastName() != null) {
+        if (lastName != null) {
             if (sb.length() > 0) {
                 sb.append(' ');
             }
-            sb.append(u.getLastName());
+            sb.append(lastName);
         }
         return sb.toString();
     }

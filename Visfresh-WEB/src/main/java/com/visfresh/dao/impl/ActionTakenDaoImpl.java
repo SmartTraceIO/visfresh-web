@@ -15,8 +15,13 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ActionTakenDao;
+import com.visfresh.dao.Filter;
 import com.visfresh.entities.ActionTaken;
 import com.visfresh.entities.ActionTakenView;
+import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.AlertType;
+import com.visfresh.entities.TemperatureRule;
+import com.visfresh.lists.ShortListUserItem;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -27,6 +32,7 @@ import com.visfresh.utils.StringUtils;
 public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken, Long> implements ActionTakenDao {
     public static final String TABLE = "actiontakens";
 
+    //action taken fields
     private static final String ID = "id";
     private static final String ALERT = "alert";
     private static final String CONFIRMED_BY = "confirmedby";
@@ -35,6 +41,25 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
     private static final String COMMENTS = "comments";
     private static final String TIME = "time";
     private static final String SHIPMENT = "shipment";
+
+    //action taken view fields
+    private static final String SHIPMENT_TRIP_COUNT = "shipmentTripCount";
+    private static final String SHIPMENT_SN = "shipmentSn";
+    private static final String VERIFIED_BY_FIRSTNAME = "verifiedByFirstName";
+    private static final String VERIFIED_BY_LASTTNAME = "verifiedByLastName";
+    private static final String VERIFIED_BY_EMAIL = "verifiedByEmail";
+    private static final String CONFIRMED_BY_FIRSTNAME = "confirmedByFirstName";
+    private static final String CONFIRMED_BY_LASTNAME = "confirmedByLastName";
+    private static final String CONFIRMED_BY_EMAIL = "confirmedByEmail";
+
+    //alert
+    private static final String ALERT_TIME = "alertTime";
+    private static final String ALERT_TYPE = "type";
+
+    //temperature alert fields
+    private static final String ALERT_TEMPERATURE = "temperature";
+    private static final String ALERT_MINUTES = "minutes";
+    private static final String ALERT_CUMULATIVE = "cumulative";
 
     /**
      * Default constructor.
@@ -128,14 +153,70 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         t.setShipment(asLong(map.get(SHIPMENT)));
         t.setTime((Date) map.get(TIME));
         t.setVerifiedBy(asLong(map.get(VERIFIED_BY)));
+
+        t.setAlertTime((Date) map.get(ALERT_TIME));
+        t.setAlertRule(createAlertRule(map));
+        t.setConfirmedByEmail((String) map.get(CONFIRMED_BY_EMAIL));
+        t.setConfirmedByName(ShortListUserItem.buildFullName(
+                (String) map.get(CONFIRMED_BY_FIRSTNAME), (String) map.get(CONFIRMED_BY_LASTNAME)));
+        t.setVerifiedByEmail((String) map.get(VERIFIED_BY_EMAIL));
+        t.setVerifiedByName(ShortListUserItem.buildFullName(
+                (String) map.get(VERIFIED_BY_FIRSTNAME), (String) map.get(VERIFIED_BY_LASTTNAME)));
+        t.setShipmentSn((String) map.get(SHIPMENT_SN));
+        t.setShipmentTripCount(((Number) map.get(SHIPMENT_TRIP_COUNT)).intValue());
         return t;
     }
+    /**
+     * @param map
+     * @return
+     */
+    private AlertRule createAlertRule(final Map<String, Object> map) {
+        final Number temperature = (Number) map.get(ALERT_TEMPERATURE);
+        if (temperature != null) {
+            final TemperatureRule r = new TemperatureRule();
+            r.setType(AlertType.valueOf((String) map.get(ALERT_TYPE)));
+            r.setTemperature(temperature.doubleValue());
+            r.setCumulativeFlag((Boolean) map.get(ALERT_CUMULATIVE));
+            r.setTimeOutMinutes(((Number) map.get(ALERT_MINUTES)).intValue());
+            return r;
+        } else {
+            return new AlertRule(AlertType.valueOf((String) map.get(ALERT_TYPE)));
+        }
+    }
+
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()
      */
     @Override
     protected SelectAllSupport createSelectAllSupport() {
-        return new SelectAllSupport(getTableName());
+        return new SelectAllSupport(getTableName()) {
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.SelectAllSupport#buildSelectBlockForFindAll(com.visfresh.dao.Filter)
+             */
+            @Override
+            protected String buildSelectBlockForFindAll(final Filter filter) {
+                return "select actiontakens.*,"
+                        + "\ns.tripcount as " + SHIPMENT_TRIP_COUNT
+                        + "\n, substring(s.device, -7, 6) " + SHIPMENT_SN
+                        + "\n, vu.firstname as " + VERIFIED_BY_FIRSTNAME
+                        + "\n, vu.lastname as " + VERIFIED_BY_LASTTNAME
+                        + "\n, vu.email as " + VERIFIED_BY_EMAIL
+                        + "\n, cu.firstname as " + CONFIRMED_BY_FIRSTNAME
+                        + "\n, cu.lastname as " + CONFIRMED_BY_LASTNAME
+                        + "\n, cu.email as " + CONFIRMED_BY_EMAIL
+                        + "\n, a.date as " + ALERT_TIME
+                        + "\n, a.type as " + ALERT_TYPE
+                        + "\n, r.temp as " + ALERT_TEMPERATURE
+                        + "\n, r.cumulative as " + ALERT_CUMULATIVE
+                        + "\n, r.timeout as " + ALERT_MINUTES
+                        + "\nfrom actiontakens"
+                        + "\njoin shipments s on s.id = actiontakens.shipment"
+                        + "\nleft outer join users vu on vu.id = actiontakens.verifiedby"
+                        + "\njoin users cu on cu.id = actiontakens.confirmedby"
+                        + "\njoin alerts a on a.id = actiontakens.alert"
+                        + "\nleft outer join temperaturerules r on r.id = a.rule";
+            }
+        };
     }
 
     /**

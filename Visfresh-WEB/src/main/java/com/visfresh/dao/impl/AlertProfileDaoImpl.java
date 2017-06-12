@@ -124,9 +124,9 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
     }
     /**
      * @param id alert profile ID.
-     * @param issues temperature issues.
+     * @param rules temperature rules.
      */
-    private void updateTemperatureIssues(final Long id, final List<TemperatureRule> issues) {
+    private void updateTemperatureIssues(final Long id, final List<TemperatureRule> rules) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("apid", id);
 
@@ -139,14 +139,14 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         }
 
         //process issues
-        for (final TemperatureRule issue : issues) {
-            final Long issueId = issue.getId();
+        for (final TemperatureRule rule : rules) {
+            final Long issueId = rule.getId();
             final Map<String, Object> paramMap = new HashMap<String, Object>();
-            paramMap.put("temperature", issue.getTemperature());
-            paramMap.put("type", issue.getType().toString());
-            paramMap.put("timeOut", issue.getTimeOutMinutes());
-            paramMap.put("cumulative", issue.isCumulativeFlag());
-            paramMap.put("maxrateminutes", issue.getMaxRateMinutes());
+            paramMap.put("temperature", rule.getTemperature());
+            paramMap.put("type", rule.getType().toString());
+            paramMap.put("timeOut", rule.getTimeOutMinutes());
+            paramMap.put("cumulative", rule.isCumulativeFlag());
+            paramMap.put("maxrateminutes", rule.getMaxRateMinutes());
             paramMap.put("apid", id);
 
             if (issueId != null) {
@@ -167,7 +167,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
                         + " values(:type, :temperature, :timeOut, :cumulative, :maxrateminutes, :apid)",
                         new MapSqlParameterSource(paramMap), keyHolder);
                 if (keyHolder.getKey() != null) {
-                    issue.setId(keyHolder.getKey().longValue());
+                    rule.setId(keyHolder.getKey().longValue());
                 }
             }
         }

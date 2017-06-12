@@ -12,6 +12,7 @@ drop table if exists systemmessages;
 drop table if exists usershipments;
 drop table if exists trackerevents;
 drop table if exists arrivals;
+drop table if exists actiontakens;
 drop table if exists alerts;
 drop table if exists shipmentaudits;
 drop table if exists notifications;
@@ -387,6 +388,26 @@ create table alerts (
         references shipments (id),
     foreign key (device)
         references devices (imei)
+);
+
+create table actiontakens (
+    id bigint(20) auto_increment not null,
+    shipment bigint(20) not null,
+    alert bigint(20) not null,
+    confirmedby bigint(20) not null,
+    verifiedby bigint(20),
+    `action` longtext not null,
+    comments longtext,
+    `time` timestamp null default null,
+    primary key (id),
+    foreign key (shipment)
+        references shipments (id) on delete cascade,
+    foreign key (alert)
+        references alerts (id) on delete cascade,
+    foreign key (confirmedby)
+        references users (id),
+    foreign key (verifiedby)
+        references users (id)
 );
 
 create table arrivals (

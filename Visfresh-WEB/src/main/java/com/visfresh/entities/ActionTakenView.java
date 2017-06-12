@@ -11,7 +11,7 @@ import java.util.Date;
  */
 public class ActionTakenView extends ActionTaken {
     private Date alertTime;
-    private String alertDescription;
+    private AlertRule alertRule;
     private String confirmedByEmail;
     private String confirmedByName;
     private String verifiedByEmail;
@@ -41,14 +41,14 @@ public class ActionTakenView extends ActionTaken {
     /**
      * @return the alertDescription
      */
-    public String getAlertDescription() {
-        return alertDescription;
+    public AlertRule getAlertRule() {
+        return alertRule;
     }
     /**
-     * @param alertDescription the alertDescription to set
+     * @param r alert rule.
      */
-    public void setAlertDescription(final String alertDescription) {
-        this.alertDescription = alertDescription;
+    public void setAlertRule(final AlertRule r) {
+        this.alertRule = r;
     }
     /**
      * @return the confirmedByEmail
