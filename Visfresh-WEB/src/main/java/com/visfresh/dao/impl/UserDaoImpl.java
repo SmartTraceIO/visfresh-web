@@ -244,26 +244,13 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, User, Long> 
      */
     @Override
     public User findByEmail(final String email) {
-        final Filter f = new Filter();
+        final DefaultCustomFilter customFilter = new DefaultCustomFilter();
         final String key = "filterPrefix_email";
-        final SynteticFilter sf = new SynteticFilter() {
-            @Override
-            public Object[] getValues() {
-                return new Object[]{email.toLowerCase()};
-            }
+        customFilter.addValue(key, email.toLowerCase());
+        customFilter.setFilter("LCASE(" + EMAIL_FIELD + ") = :" + key);
 
-            @Override
-            public String[] getKeys() {
-                return new String[] {key};
-            }
-
-            @Override
-            public String getFilter() {
-                return "LCASE(" + EMAIL_FIELD + ") = :" + key;
-            }
-        };
-
-        f.addFilter(EMAIL_FIELD, sf);
+        final Filter f = new Filter();
+        f.addFilter(EMAIL_FIELD, customFilter);
 
         final List<User> all = findAll(f, null, null);
         return all.size() == 0 ? null : all.get(0);

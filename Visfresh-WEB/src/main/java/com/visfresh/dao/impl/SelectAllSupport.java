@@ -90,7 +90,7 @@ public class SelectAllSupport {
      */
     protected void addFilterValue(final String property, final Object value,
             final Map<String, Object> params, final List<String> filters) {
-        if (!(value instanceof SynteticFilter)) {
+        if (!(value instanceof CustomFilter)) {
             final String key = DEFAULT_FILTER_KEY_PREFIX + property;
 
             String dbFieldName = aliases.get(property);
@@ -101,12 +101,10 @@ public class SelectAllSupport {
             params.put(key, value);
             filters.add(getTableName() + "." + dbFieldName + "= :" + key);
         } else {
-            final SynteticFilter sf = (SynteticFilter) value;
+            final CustomFilter sf = (CustomFilter) value;
             final String[] keys = sf.getKeys();
-            final Object[] values = sf.getValues();
-
             for (int i = 0; i < keys.length; i++) {
-                params.put(keys[i], values[i]);
+                params.put(keys[i], sf.getValue(keys[i]));
             }
 
             filters.add(sf.getFilter());

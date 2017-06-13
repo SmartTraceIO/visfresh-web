@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +21,8 @@ import com.visfresh.entities.ActionTaken;
 import com.visfresh.entities.ActionTakenView;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Company;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.lists.ShortListUserItem;
 import com.visfresh.utils.StringUtils;
@@ -40,7 +43,6 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
     private static final String ACTION = "action";
     private static final String COMMENTS = "comments";
     private static final String TIME = "time";
-    private static final String SHIPMENT = "shipment";
 
     //action taken view fields
     private static final String SHIPMENT_TRIP_COUNT = "shipmentTripCount";
@@ -108,7 +110,6 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         paramMap.put(ACTION, t.getAction());
         paramMap.put(COMMENTS, t.getComments());
         paramMap.put(TIME, t.getTime());
-        paramMap.put(SHIPMENT, t.getShipment());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql.toString(), new MapSqlParameterSource(paramMap), keyHolder);
@@ -128,7 +129,6 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         fields.add(ACTION);
         fields.add(COMMENTS);
         fields.add(TIME);
-        fields.add(SHIPMENT);
         return fields;
     }
     /* (non-Javadoc)
@@ -150,7 +150,6 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         t.setComments((String) map.get(COMMENTS));
         t.setConfirmedBy(asLong(map.get(CONFIRMED_BY)));
         t.setId(asLong(map.get(ID)));
-        t.setShipment(asLong(map.get(SHIPMENT)));
         t.setTime((Date) map.get(TIME));
         t.setVerifiedBy(asLong(map.get(VERIFIED_BY)));
 
@@ -210,15 +209,41 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
                         + "\n, r.cumulative as " + ALERT_CUMULATIVE
                         + "\n, r.timeout as " + ALERT_MINUTES
                         + "\nfrom actiontakens"
-                        + "\njoin shipments s on s.id = actiontakens.shipment"
+                        + "\njoin alerts a on a.id = actiontakens.alert"
+                        + "\njoin shipments s on s.id = a.shipment"
                         + "\nleft outer join users vu on vu.id = actiontakens.verifiedby"
                         + "\njoin users cu on cu.id = actiontakens.confirmedby"
-                        + "\njoin alerts a on a.id = actiontakens.alert"
                         + "\nleft outer join temperaturerules r on r.id = a.rule";
             }
         };
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ActionTakenDao#findByShipment(com.visfresh.entities.Shipment)
+     */
+    @Override
+    public List<ActionTakenView> findByShipment(final Shipment shipment) {
+        final DefaultCustomFilter cf = new DefaultCustomFilter();
+        cf.addValue("actionTaken_shipment", shipment.getId());
+        cf.setFilter("s.id = :actionTaken_shipment");
 
+        final Filter f = new Filter();
+        f.addFilter("actionTaken_shipment", cf);
+        return findAll(f, null, null);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ActionTakenDao#findOne(java.lang.Long, com.visfresh.entities.Company)
+     */
+    @Override
+    public ActionTakenView findOne(final Long id, final Company company) {
+        final DefaultCustomFilter cf = new DefaultCustomFilter();
+        cf.addValue("actionTaken_company", company.getId());
+        cf.setFilter("s.company = :actionTaken_company");
+
+        final Filter f = new Filter();
+        f.addFilter("actionTaken_company", cf);
+        final List<ActionTakenView> all = findAll(f, null, null);
+        return all.size() == 0 ? null : all.get(0);
+    }
     /**
      * @param object
      * @return

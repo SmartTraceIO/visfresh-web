@@ -77,6 +77,46 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         verifiedBy = createUser("User2");
     }
 
+    @Test
+    public void testNullVerifiedBy() {
+        final ActionTaken e = createTestEntity();
+        e.setVerifiedBy(null);
+        dao.save(e);
+
+        final ActionTakenView v = dao.findOne(e.getId());
+        assertNull(v.getVerifiedBy());
+        assertNull(v.getVerifiedByEmail());
+        assertEquals(0, v.getVerifiedByName().length());
+    }
+    @Test
+    public void testFindByIdAndCompany() {
+        final ActionTaken e = createTestEntity();
+        dao.save(e);
+
+        assertNotNull(dao.findOne(e.getId(), sharedCompany));
+        assertNull(dao.findOne(e.getId(), createCompany("Other")));
+    }
+    @Test
+    public void testFindByShipment() {
+        final Shipment s1 = createShipment(shipment.getDevice(), shipment.getAlertProfile());
+        final Shipment s2 = createShipment(shipment.getDevice(), shipment.getAlertProfile());
+
+        final TemperatureAlert alert = createAlert(AlertType.Hot, new Date(), s1);
+
+        //create action takes for first shipment
+        final ActionTaken e1 = createTestEntity();
+        e1.setAlert(alert.getId());
+        dao.save(e1);
+
+        final ActionTaken e2 = createTestEntity();
+        e2.setAlert(alert.getId());
+        dao.save(e2);
+
+        //check result
+        assertEquals(2, dao.findByShipment(s1).size());
+        assertEquals(0, dao.findByShipment(s2).size());
+    }
+
     /**
      * @param name
      * @return
@@ -115,7 +155,6 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         at.setComments("Any comments");
         at.setConfirmedBy(confirmedBy.getId());
         at.setVerifiedBy(verifiedBy.getId());
-        at.setShipment(shipment.getId());
         at.setTime(new Date());
         return at;
     }
@@ -131,7 +170,6 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         assertEquals("Any comments", at.getComments());
         assertEquals(confirmedBy.getId(), at.getConfirmedBy());
         assertEquals(verifiedBy.getId(), at.getVerifiedBy());
-        assertEquals(shipment.getId(), at.getShipment());
         assertNotNull(at.getTime());
 
         assertTrue(at instanceof ActionTakenView);
@@ -152,17 +190,6 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         assertEquals(rule.getTimeOutMinutes(), ((TemperatureRule) v.getAlertRule()).getTimeOutMinutes());
         assertEquals(rule.getType(), ((TemperatureRule) v.getAlertRule()).getType());
     }
-    @Test
-    public void testNullVerifiedBy() {
-        final ActionTaken e = createTestEntity();
-        e.setVerifiedBy(null);
-        dao.save(e);
-
-        final ActionTakenView v = dao.findOne(e.getId());
-        assertNull(v.getVerifiedBy());
-        assertNull(v.getVerifiedByEmail());
-        assertEquals(0, v.getVerifiedByName().length());
-    }
 
     /**
      * @param type alert type.
@@ -170,10 +197,20 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
      * @return
      */
     protected TemperatureAlert createAlert(final AlertType type, final Date date) {
+        return createAlert(type, date, shipment);
+    }
+
+    /**
+     * @param type
+     * @param date
+     * @param s
+     * @return
+     */
+    protected TemperatureAlert createAlert(final AlertType type, final Date date, final Shipment s) {
         final TemperatureAlert alert = new TemperatureAlert();
         alert.setDate(date);
-        alert.setDevice(shipment.getDevice());
-        alert.setShipment(shipment);
+        alert.setDevice(s.getDevice());
+        alert.setShipment(s);
         alert.setType(type);
         alert.setTemperature(100);
         alert.setCumulative(true);

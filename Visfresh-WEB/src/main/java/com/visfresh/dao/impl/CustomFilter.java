@@ -7,8 +7,8 @@ package com.visfresh.dao.impl;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface SynteticFilter {
+public interface CustomFilter {
     String[] getKeys();
-    Object[] getValues();
+    Object getValue(String key);
     String getFilter();
 }

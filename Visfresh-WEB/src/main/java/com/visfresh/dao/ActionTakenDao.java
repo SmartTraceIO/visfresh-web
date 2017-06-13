@@ -8,6 +8,8 @@ import java.util.List;
 
 import com.visfresh.entities.ActionTaken;
 import com.visfresh.entities.ActionTakenView;
+import com.visfresh.entities.Company;
+import com.visfresh.entities.Shipment;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -29,4 +31,15 @@ public interface ActionTakenDao extends DaoBase<ActionTakenView, ActionTaken, Lo
      */
     @Override
     List<ActionTakenView> findAll(Filter filter, Sorting sorting, Page page);
+    /**
+     * @param id action taken ID.
+     * @param company company ID.
+     * @return action taken view.
+     */
+    ActionTakenView findOne(Long id, Company company);
+    /**
+     * @param shipment shipment.
+     * @return list of action taken view.
+     */
+    List<ActionTakenView> findByShipment(Shipment shipment);
 }

@@ -423,20 +423,11 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         if (company != null) {
             f.addFilter(COMPANY_FIELD, company.getId());
         }
-        f.addFilter(DEVICE_FIELD, new SynteticFilter() {
-            @Override
-            public Object[] getValues() {
-                return new Object[]{serialNum.toString()};
-            }
-            @Override
-            public String[] getKeys() {
-                return new String[]{key};
-            }
-            @Override
-            public String getFilter() {
-                return DEVICE_FIELD + " like :" + key;
-            }
-        });
+
+        final DefaultCustomFilter customFilter = new DefaultCustomFilter();
+        customFilter.addValue(key, serialNum.toString());
+        customFilter.setFilter(DEVICE_FIELD + " like :" + key);
+        f.addFilter(DEVICE_FIELD, customFilter);
 
         //add trip count filter
         f.addFilter(TRIPCOUNT_FIELD, trip);

@@ -17,7 +17,6 @@ public class ActionTaken implements EntityWithId<Long> {
     private String action;
     private String comments;
     private Date time;
-    private Long shipment;
 
     /**
      * Default constructor.
@@ -110,17 +109,5 @@ public class ActionTaken implements EntityWithId<Long> {
      */
     public void setTime(final Date time) {
         this.time = time;
-    }
-    /**
-     * @return the shipmentId
-     */
-    public Long getShipment() {
-        return shipment;
-    }
-    /**
-     * @param shipmentId the shipmentId to set
-     */
-    public void setShipment(final Long shipmentId) {
-        this.shipment = shipmentId;
     }
 }

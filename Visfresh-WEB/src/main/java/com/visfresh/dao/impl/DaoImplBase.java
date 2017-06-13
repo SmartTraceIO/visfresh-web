@@ -90,33 +90,21 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
             return result;
         }
 
+        final DefaultCustomFilter idFilter = new DefaultCustomFilter();
+
         //get other from DB
-        final String[] keys = new String[ids.size()];
         iter = ids.iterator();
-        int i = 0;
         while(iter.hasNext()) {
-            keys[i] = SelectAllSupport.DEFAULT_FILTER_KEY_PREFIX + "_id_" + iter.next();
-            i++;
+            final ID id = iter.next();
+            idFilter.addValue(SelectAllSupport.DEFAULT_FILTER_KEY_PREFIX + "_id_" + id, id);
         }
+
+        idFilter.setFilter(getTableName() + "." + getIdFieldName()
+            + " in (:" + StringUtils.combine(idFilter.getKeys(), ",:") + ")");
 
         final Filter f = new Filter();
         f.addFilter(SelectAllSupport.DEFAULT_FILTER_KEY_PREFIX + ".getAllById",
-            new SynteticFilter() {
-
-                @Override
-                public Object[] getValues() {
-                    return ids.toArray();
-                }
-                @Override
-                public String[] getKeys() {
-                    return keys;
-                }
-                @Override
-                public String getFilter() {
-                    return getTableName() + "." + getIdFieldName()
-                            + " in (:" + StringUtils.combine(getKeys(), ",:") + ")";
-                }
-            });
+            idFilter);
 
         result.addAll(findAll(f, null, null));
         return result;

@@ -183,21 +183,10 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Notification,
         final Filter f = new Filter(originFilter);
         f.addFilter(USER_FIELD, user.getId());
         if (excludeLight) {
-            f.addFilter("ExcludeLights", new SynteticFilter() {
-                @Override
-                public Object[] getValues() {
-                    return new Object[0];
-                }
-                @Override
-                public String[] getKeys() {
-                    return new String[0];
-                }
-                @Override
-                public String getFilter() {
-                    return "(alerts.type is NULL or not alerts.type in ('"
-                            + AlertType.LightOff + "', '" + AlertType.LightOn + "'))";
-                }
-            });
+            final DefaultCustomFilter filter = new DefaultCustomFilter();
+            filter.setFilter("(alerts.type is NULL or not alerts.type in ('"
+                    + AlertType.LightOff + "', '" + AlertType.LightOn + "'))");
+            f.addFilter("ExcludeLights", filter);
         }
         return f;
     }
