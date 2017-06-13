@@ -55,14 +55,7 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
      * @return
      */
     public JsonObject toJson(final ActionTakenView at) {
-        final JsonObject json = new JsonObject();
-        json.addProperty(ID, at.getId());
-        json.addProperty(ACTION, at.getAction());
-        json.addProperty(TIME, formatDate(at.getTime()));
-        json.addProperty(COMMENTS, at.getComments());
-        json.addProperty(ALERT, at.getAlert());
-        json.addProperty(CONFIRMED_BY, at.getConfirmedBy());
-        json.addProperty(VERIFIED_BY, at.getVerifiedBy());
+        final JsonObject json = createJsonWithBaseParams(at);
 
         //view constants
         json.addProperty(ALERT_TIME, formatDate(at.getAlertTime()));
@@ -74,6 +67,22 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
         json.addProperty(SHIPMENT_SN, at.getShipmentSn());
         json.addProperty(SHIPMENT_TRIP_COUNT, at.getShipmentTripCount());
 
+        return json;
+    }
+
+    /**
+     * @param at action taken.
+     * @return JSON representation of action taken.
+     */
+    public JsonObject createJsonWithBaseParams(final ActionTaken at) {
+        final JsonObject json = new JsonObject();
+        json.addProperty(ID, at.getId());
+        json.addProperty(ACTION, at.getAction());
+        json.addProperty(TIME, formatDate(at.getTime()));
+        json.addProperty(COMMENTS, at.getComments());
+        json.addProperty(ALERT, at.getAlert());
+        json.addProperty(CONFIRMED_BY, at.getConfirmedBy());
+        json.addProperty(VERIFIED_BY, at.getVerifiedBy());
         return json;
     }
 }

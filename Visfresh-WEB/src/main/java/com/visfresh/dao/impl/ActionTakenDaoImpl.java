@@ -113,8 +113,11 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql.toString(), new MapSqlParameterSource(paramMap), keyHolder);
-        if (keyHolder.getKey() != null) {
-            t.setId(keyHolder.getKey().longValue());
+
+        if(t.getId() == null) {
+            if (keyHolder.getKey() != null) {
+                t.setId(keyHolder.getKey().longValue());
+            }
         }
 
         return t;
