@@ -677,7 +677,7 @@ Response is [Standard JSON response](#markdown-header-response-message)
 
 ### Delete Action Taken ###
 Method *GET*, method name *deleteActionTaken*. Request parameters:  
-1. id - Corrective Action list ID  
+1. id - Action Taken ID  
 Response is [Standard JSON response](#markdown-header-response-message)  
 [(example)](#markdown-header-delete-action-taken-example)
 
@@ -4506,7 +4506,7 @@ Response:
   "response": null
 }
 ```
-### Get Action Takens ###
+### Get Action Takens example ###
 **GET /vf/rest/getActionTakens/${accessToken}?shipment=1294**  
 **Response:**  
 ```json
