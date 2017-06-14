@@ -136,6 +136,10 @@ List items is short representations of base entities, like as [Alert Profile](#m
 75. [Save Corrective Action List](#markdown-header-save-corrective-action-list)  
 76. [Delete Corrective Action List](#markdown-header-delete-corrective-action-list)  
 77. [Get Corrective Action Lists](#markdown-header-get-corrective-action-lists)  
+78. [Get Action Taken](#markdown-header-get-action-taken)  
+79. [Save Action Taken](#markdown-header-save-action-taken)  
+80. [Delete Action Taken](#markdown-header-delete-action-taken)  
+81. [Get Action Takens](#markdown-header-get-action-takens)  
 
 ### Utility methods ###
 1. [Get Languages](#markdown-header-get-languages)  
@@ -659,6 +663,29 @@ Method *GET*, method name *getCorrectiveActionLists*. Request parameters:
 4. pageSize - page size (not mandatory)  
 Response is [Standard JSON response](#markdown-header-response-message)  
 [(example)](#markdown-header-get-corrective-action-lists-example)
+
+### Get Action Taken ###
+Method *GET*, method name *getActionTaken*. Request parameters:  
+1. id - Action Taken ID  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-get-action-taken-example)
+
+### Save Action Taken ###
+Method *POST*, method name *saveActionTaken*. Request body JSON serialized request.  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-save-action-taken-example)
+
+### Delete Action Taken ###
+Method *GET*, method name *deleteActionTaken*. Request parameters:  
+1. id - Corrective Action list ID  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-delete-action-taken-example)
+
+### Get Action Takens ###
+Method *GET*, method name *getActionTakens*. Request parameters:  
+1. shipment associated shipment  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-get-action-takens-example)
 
 ## Objects
 ### Response message ###
@@ -4334,7 +4361,7 @@ Response:
 }
 ```
 ### Save Corrective Action list example ###
-**GET /vf/rest/saveCorrectiveActionList/${accessToken}**  
+**POST /vf/rest/saveCorrectiveActionList/${accessToken}**  
 **Request:**  
 ```json
 {
@@ -4411,5 +4438,119 @@ Response:
     }
   ],
   "totalCount": 3
+}
+```
+### Get Action Taken example ###
+**GET /vf/rest/getActionTaken/${accessToken}?id=121**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "id": 121,
+    "action": "Check the door opened",
+    "time": "2017-06-14T09:25",
+    "comments": "Any comments",
+    "alert": 582,
+    "confirmedBy": 1714,
+    "verifiedBy": null,
+    "alertTime": "2017-06-14T09:25", //view only parameter
+    "alertDescription": ">18.0°C for 0 min in total", //view only parameter
+    "confirmedByEmail": "a@b.c", //view only parameter
+    "confirmedByName": "Yury Gagarin", //view only parameter
+    "verifiedByEmail": null, //view only parameter
+    "verifiedByName": "", //view only parameter
+    "shipmentSn": "039485", //view only parameter
+    "shipmentTripCount": 1 //view only parameter
+  }
+}
+```
+### Save Action Taken example ###
+**POST /vf/rest/saveActionTaken/${accessToken}**  
+**Request:**  
+```json
+{
+  "id": 117,
+  "action": "Check the door opened",
+  "time": "2017-06-14T09:25",
+  "comments": "Any comments",
+  "alert": 576,
+  "confirmedBy": 1705,
+  "verifiedBy": null
+}
+```  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": {
+    "actionTakenId": 117
+  }
+}
+```
+### Delete Action Taken example ###
+**GET /vf/rest/deleteActionTaken/${accessToken}?id=120**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
+}
+```
+### Get Action Takens ###
+**GET /vf/rest/getActionTakens/${accessToken}?shipment=1294**  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": [
+    {
+      "id": 118,
+      "action": "Check the door opened",
+      "time": "2017-06-14T09:25",
+      "comments": "Any comments",
+      "alert": 578,
+      "confirmedBy": 1708,
+      "verifiedBy": null,
+      "alertTime": "2017-06-14T09:25",
+      "alertDescription": ">18.0°C for 0 min in total",
+      "confirmedByEmail": "a@b.c",
+      "confirmedByName": "Yury Gagarin",
+      "verifiedByEmail": null,
+      "verifiedByName": "",
+      "shipmentSn": "039485",
+      "shipmentTripCount": 1
+    },
+    {
+      "id": 119,
+      "action": "Close the door",
+      "time": "2017-06-14T09:40",
+      "comments": "Any comments",
+      "alert": 579,
+      "confirmedBy": 1708,
+      "verifiedBy": null,
+      "alertTime": "2017-06-14T09:40",
+      "alertDescription": "entering bright environment",
+      "confirmedByEmail": "a@b.c",
+      "confirmedByName": "Yury Gagarin",
+      "verifiedByEmail": null,
+      "verifiedByName": "",
+      "shipmentSn": "039485",
+      "shipmentTripCount": 1
+    }
+  ],
+  "totalCount": 2
 }
 ```
