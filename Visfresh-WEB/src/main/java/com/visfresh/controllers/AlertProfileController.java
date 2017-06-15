@@ -22,6 +22,7 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
@@ -65,14 +66,12 @@ public class AlertProfileController extends AbstractController implements AlertP
             final @RequestBody JsonObject alert) {
         try {
             final User user = getLoggedInUser(authToken);
-
-            final AlertProfile p = createSerializer(user).parseAlertProfile(alert);
-            p.setCompany(user.getCompany());
-
             checkAccess(user, Role.BasicUser);
 
+            final AlertProfile p = createSerializer(user, user.getCompany()).parseAlertProfile(alert);
+
             final AlertProfile old = dao.findOne(p.getId());
-            checkCompanyAccess(user, old);
+            checkCompany(old, user.getCompany());
 
             final Long id = dao.save(p).getId();
             return createIdResponse("alertProfileId", id);
@@ -97,7 +96,7 @@ public class AlertProfileController extends AbstractController implements AlertP
             final AlertProfile alert = dao.findOne(alertProfileId);
             checkCompanyAccess(user, alert);
 
-            return createSuccessResponse(createSerializer(user).toJson(alert));
+            return createSuccessResponse(createSerializer(user, alert.getCompany()).toJson(alert));
         } catch (final Exception e) {
             log.error("Failed to get alert profiles", e);
             return createErrorResponse(e);
@@ -146,7 +145,7 @@ public class AlertProfileController extends AbstractController implements AlertP
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.NormalUser);
 
-            final AlertProfileSerializer ser = createSerializer(user);
+            final AlertProfileSerializer ser = createSerializer(user, user.getCompany());
 
             final List<AlertProfile> alerts = dao.findByCompany(
                     user.getCompany(),
@@ -180,8 +179,8 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @param user
      * @return
      */
-    private AlertProfileSerializer createSerializer(final User user) {
-        return new AlertProfileSerializer(user.getTimeZone(), user.getTemperatureUnits());
+    private AlertProfileSerializer createSerializer(final User user, final Company company) {
+        return new AlertProfileSerializer(company, user.getTimeZone(), user.getTemperatureUnits());
     }
 
     /**

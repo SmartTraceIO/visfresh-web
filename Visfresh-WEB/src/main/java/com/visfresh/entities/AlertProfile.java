@@ -31,11 +31,12 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     /**
      * List of temperature issues.
      */
-    private List<TemperatureRule> temperatureIssues = new LinkedList<TemperatureRule>();
+    private List<TemperatureRule> alertRules = new LinkedList<TemperatureRule>();
     /**
      * Alert for enter bright environment.
      */
     private boolean watchEnterBrightEnvironment;
+    private CorrectiveActionList lightOnCorrectiveActions;
     /**
      * Alert for enter dark environment.
      */
@@ -44,6 +45,7 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
      * Alert for batterry low.
      */
     private boolean watchBatteryLow;
+    private CorrectiveActionList batteryLowCorrectiveActions;
     private boolean watchMovementStart;
     private boolean watchMovementStop;
 
@@ -173,7 +175,7 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
      * @return the temperatureIssues
      */
     public List<TemperatureRule> getAlertRules() {
-        return temperatureIssues;
+        return alertRules;
     }
     /**
      * @return the loverTemperatureLimit
@@ -198,5 +200,29 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
      */
     public void setUpperTemperatureLimit(final double upperTemperatureLimit) {
         this.upperTemperatureLimit = upperTemperatureLimit;
+    }
+    /**
+     * @return the batteryLowCorrectiveActions
+     */
+    public CorrectiveActionList getBatteryLowCorrectiveActions() {
+        return batteryLowCorrectiveActions;
+    }
+    /**
+     * @param batteryLowCorrectiveActions the batteryLowCorrectiveActions to set
+     */
+    public void setBatteryLowCorrectiveActions(final CorrectiveActionList batteryLowCorrectiveActions) {
+        this.batteryLowCorrectiveActions = batteryLowCorrectiveActions;
+    }
+    /**
+     * @return the lightOnCorrectiveActions
+     */
+    public CorrectiveActionList getLightOnCorrectiveActions() {
+        return lightOnCorrectiveActions;
+    }
+    /**
+     * @param lightOnCorrectiveActions the lightOnCorrectiveActions to set
+     */
+    public void setLightOnCorrectiveActions(final CorrectiveActionList lightOnCorrectiveActions) {
+        this.lightOnCorrectiveActions = lightOnCorrectiveActions;
     }
 }

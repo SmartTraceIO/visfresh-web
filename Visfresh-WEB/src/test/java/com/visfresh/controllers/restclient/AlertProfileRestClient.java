@@ -34,7 +34,7 @@ public class AlertProfileRestClient extends RestClient {
      */
     public AlertProfileRestClient(final TimeZone tz, final TemperatureUnits units) {
         super();
-        serializer = new AlertProfileSerializer(tz, units);
+        serializer = new AlertProfileSerializer(null, tz, units);
     }
     /**
      * @param pageIndex

@@ -93,10 +93,12 @@ public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
      * @param json JSON representation of critical action list
      * @return critical action list.
      */
-    public CorrectiveActionList parseCorrectiveActionList(final JsonObject json) {
-        if (json == null || json.isJsonNull()) {
+    public CorrectiveActionList parseCorrectiveActionList(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
             return null;
         }
+
+        final JsonObject json =  e.getAsJsonObject();
 
         final CorrectiveActionList list = new CorrectiveActionList();
         list.setCompany(company);
@@ -111,6 +113,10 @@ public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
      * @return JSON representation of critical action list.
      */
     public JsonObject toJson(final CorrectiveActionList list) {
+        if (list == null) {
+            return null;
+        }
+
         final JsonObject json = new JsonObject();
         json.addProperty(CorrectiveActionsConstants.LIST_ID, list.getId());
         json.addProperty(CorrectiveActionsConstants.LIST_NAME, list.getName());

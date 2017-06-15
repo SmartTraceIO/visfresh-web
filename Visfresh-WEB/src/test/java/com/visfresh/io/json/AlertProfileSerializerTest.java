@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.lists.ListAlertProfileItem;
@@ -35,7 +36,7 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
      */
     @Before
     public void setUp() {
-        serializer = new AlertProfileSerializer(UTC, TemperatureUnits.Celsius);
+        serializer = new AlertProfileSerializer(null, UTC, TemperatureUnits.Celsius);
     }
 
     @Test
@@ -118,7 +119,7 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
         issue.setType(AlertType.CriticalCold);
 
         final TemperatureUnits units = TemperatureUnits.Fahrenheit;
-        final AlertProfileSerializer serializer = new AlertProfileSerializer(UTC, units);
+        final AlertProfileSerializer serializer = new AlertProfileSerializer(null, UTC, units);
 
         final JsonObject obj = serializer.toJson(issue);
 
@@ -148,5 +149,64 @@ public class AlertProfileSerializerTest extends AbstractSerializerTest {
 
         assertEquals("abra", item.getAlertRuleList().get(0));
         assertEquals("kadabra", item.getAlertRuleList().get(1));
+    }
+    @Test
+    public void testCorrectiveActions() {
+        AlertProfile ap = new AlertProfile();
+        ap.setId(77l);
+        ap.setName("Junit Alerts");
+
+        final Long loId = 44l;
+        final String loName = "Light On Actions";
+        final Long blId = 55l;
+        final String blName = "Battery Low Actions";
+
+        final CorrectiveActionList loActions = new CorrectiveActionList();
+        loActions.setId(loId);
+        loActions.setName(loName);
+
+        ap.setLightOnCorrectiveActions(loActions);
+
+        final CorrectiveActionList blActions = new CorrectiveActionList();
+        blActions.setId(blId);
+        blActions.setName(blName);
+        ap.setBatteryLowCorrectiveActions(blActions);
+
+        ap = serializer.parseAlertProfile(serializer.toJson(ap));
+
+        assertEquals(loId, ap.getLightOnCorrectiveActions().getId());
+        assertEquals(loName, ap.getLightOnCorrectiveActions().getName());
+
+        assertEquals(blId, ap.getBatteryLowCorrectiveActions().getId());
+        assertEquals(blName, ap.getBatteryLowCorrectiveActions().getName());
+    }
+    @Test
+    public void testRuleCorrectiveActions() {
+        final AlertProfile ap = new AlertProfile();
+        ap.setId(77l);
+        ap.setName("Junit Alerts");
+
+        final Long id = 44l;
+        final String name = "Light On Actions";
+
+        final TemperatureRule issue = new TemperatureRule();
+        issue.setId(77l);
+        issue.setTemperature(19);
+        issue.setTimeOutMinutes(5);
+        issue.setType(AlertType.CriticalCold);
+        issue.setCumulativeFlag(true);
+
+        CorrectiveActionList actions = new CorrectiveActionList();
+        actions.setId(id);
+        actions.setName(name);
+
+        issue.setCorrectiveActions(actions);
+        ap.getAlertRules().add(issue);
+
+        actions = serializer.parseAlertProfile(serializer.toJson(ap))
+                .getAlertRules().get(0).getCorrectiveActions();
+
+        assertEquals(id, actions.getId());
+        assertEquals(name, actions.getName());
     }
 }

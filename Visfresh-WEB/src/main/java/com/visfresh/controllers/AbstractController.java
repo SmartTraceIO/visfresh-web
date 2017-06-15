@@ -18,6 +18,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.Sorting;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.EntityWithCompany;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
@@ -56,6 +57,13 @@ public abstract class AbstractController {
         if (s != null && s.getCompany() != null && !(
                 Role.SmartTraceAdmin.hasRole(user)
                 || s.getCompany().getId().equals(user.getCompany().getId()))) {
+            throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
+        }
+    }
+    protected void checkCompany(final EntityWithCompany s, final Company company)
+            throws RestServiceException {
+        if (s != null && s.getCompany() != null
+                && !s.getCompany().getId().equals(company.getId())) {
             throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
         }
     }

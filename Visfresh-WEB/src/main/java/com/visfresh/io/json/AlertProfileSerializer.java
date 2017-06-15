@@ -14,6 +14,7 @@ import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.Company;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.lists.ListAlertProfileItem;
@@ -24,14 +25,18 @@ import com.visfresh.utils.LocalizationUtils;
  *
  */
 public class AlertProfileSerializer extends AbstractJsonSerializer {
+    private final Company company;
     private final TemperatureUnits tempUnits;
+    private final CorrectiveActionListSerializer correctiveActionsSerializer;
 
     /**
      * @param tz time zone.
      */
-    public AlertProfileSerializer(final TimeZone tz, final TemperatureUnits tempUnits) {
+    public AlertProfileSerializer(final Company company, final TimeZone tz, final TemperatureUnits tempUnits) {
         super(tz);
         this.tempUnits = tempUnits;
+        this.company = company;
+        correctiveActionsSerializer = new CorrectiveActionListSerializer(company);
     }
     /**
      * @param alert alert profile.
@@ -68,6 +73,10 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         for (final TemperatureRule issue : alert.getAlertRules()) {
             tempIssues.add(toJson(issue));
         }
+        obj.add("lightOnCorrectiveActions", correctiveActionsSerializer.toJson(
+                alert.getLightOnCorrectiveActions()));
+        obj.add("batteryLowCorrectiveActions", correctiveActionsSerializer.toJson(
+                alert.getBatteryLowCorrectiveActions()));
 
         return obj;
     }
@@ -77,6 +86,7 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
      */
     public AlertProfile parseAlertProfile(final JsonObject alert) {
         final AlertProfile p = new AlertProfile();
+        p.setCompany(company);
 
         p.setId(asLong(alert.get(AlertProfileConstants.ALERT_PROFILE_ID)));
         p.setDescription(asString(alert.get(AlertProfileConstants.ALERT_PROFILE_DESCRIPTION)));
@@ -112,6 +122,14 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
             p.setUpperTemperatureLimit(LocalizationUtils.convertFromUnits(
                     asDouble(alert.get(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT)), tempUnits));
         }
+        if (has(alert, "lightOnCorrectiveActions")) {
+            p.setLightOnCorrectiveActions(correctiveActionsSerializer.parseCorrectiveActionList(
+                    alert.get("lightOnCorrectiveActions")));
+        }
+        if (has(alert, "batteryLowCorrectiveActions")) {
+            p.setBatteryLowCorrectiveActions(correctiveActionsSerializer.parseCorrectiveActionList(
+                    alert.get("batteryLowCorrectiveActions")));
+        }
 
         return p;
     }
@@ -127,6 +145,9 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         obj.addProperty("timeOutMinutes", issue.getTimeOutMinutes());
         obj.addProperty("cumulativeFlag", issue.isCumulativeFlag());
         obj.addProperty("maxRateMinutes", issue.getMaxRateMinutes());
+
+        obj.add("correctiveActions", correctiveActionsSerializer.toJson(issue.getCorrectiveActions()));
+
         return obj;
     }
     /**
@@ -141,6 +162,10 @@ public class AlertProfileSerializer extends AbstractJsonSerializer {
         issue.setTimeOutMinutes(asInt(json.get("timeOutMinutes")));
         issue.setCumulativeFlag(asBoolean(json.get("cumulativeFlag")));
         issue.setMaxRateMinutes(asInteger(json.get("maxRateMinutes")));
+
+        issue.setCorrectiveActions(correctiveActionsSerializer.parseCorrectiveActionList(
+                json.get("correctiveActions")));
+
         return issue;
     }
     public JsonObject toJson(final ListAlertProfileItem item) {

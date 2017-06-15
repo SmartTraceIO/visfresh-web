@@ -184,10 +184,12 @@ create table alertprofiles (
     `name` varchar(127) not null,
     description varchar(255) default null,
     onenterbright boolean not null,
+    lightonactions longtext,
     onenterdark boolean not null,
     onmovementstart boolean not null,
     onmovementstop boolean not null,
     onbatterylow boolean not null,
+    batterylowactions longtext,
     company bigint(20) not null,
 	lowertemplimit double not null default 0,
 	uppertemplimit double not null default 5,
@@ -204,6 +206,7 @@ create table temperaturerules (
     cumulative boolean not null default false,
     maxrateminutes int default null,
     alertprofile bigint(20) not null,
+    corractions longtext,
     primary key (id),
     foreign key (alertprofile)
 		references alertprofiles (id)
