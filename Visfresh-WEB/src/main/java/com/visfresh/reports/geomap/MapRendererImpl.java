@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Location;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.reports.AbstractGraphics2DRenderer;
@@ -282,15 +283,15 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
         }
 
         //draw start location
-        final Location startLocation = bean.getShippedFromLocation();
+        final LocationProfile startLocation = bean.getShippedFrom();
         if (startLocation != null) {
             drawMapImage(g, ImagePaintingSupport.scaleImage(
                     ImagePaintingSupport.loadReportPngImage("tinyShippedFrom"), iconSize),
-                    mapLocation, startLocation, zoom);
+                    mapLocation, startLocation.getLocation(), zoom);
         }
 
         //draw end location
-        final Location endLocation = bean.getShippedToLocation();
+        final LocationProfile endLocation = bean.getShippedTo();
         if (endLocation != null) {
             final int size = iconSize - 2;
             final BufferedImage image;
@@ -308,9 +309,9 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
             }
 
             final int x = Math.round(OpenStreetMapBuilder.lon2position(
-                    endLocation.getLongitude(), zoom) - mapLocation.x);
+                    endLocation.getLocation().getLongitude(), zoom) - mapLocation.x);
             final int y = Math.round(OpenStreetMapBuilder.lat2position(
-                    endLocation.getLatitude(), zoom) - mapLocation.y);
+                    endLocation.getLocation().getLatitude(), zoom) - mapLocation.y);
             g.drawImage(image, x - shift, y - size, null);
         }
     }

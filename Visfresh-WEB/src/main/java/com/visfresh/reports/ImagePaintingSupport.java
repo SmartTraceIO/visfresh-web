@@ -91,7 +91,15 @@ public class ImagePaintingSupport {
      * @return
      */
     public static BufferedImage loadReportPngImage(final String name) {
-        return loadImageResource("reports/images/shipment/" + name + ".png");
+        return loadImageResource(expandPngResourceName(name));
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public static String expandPngResourceName(final String name) {
+        return "reports/images/shipment/" + name + ".png";
     }
     /**
      * @param name
@@ -107,8 +115,10 @@ public class ImagePaintingSupport {
             final BufferedImage origin = ImageIO.read(url);
             //for now the image has loaded with byte data buffer need convert it to int buffer
             //for avoid the painting problems
-            final BufferedImage image = new BufferedImage(origin.getWidth(), origin.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            final BufferedImage image = new BufferedImage(origin.getWidth(), origin.getHeight(),
+                    BufferedImage.TYPE_INT_ARGB);
             final Graphics2D g = image.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             try {
                 g.drawImage(origin, 0, 0, null);
             } finally {
@@ -240,20 +250,20 @@ public class ImagePaintingSupport {
     }
 
     /**
-     * @param createShippedToImage
+     * @param im image
      * @return
      */
-    public static void flip(final BufferedImage a) {
-        final int w = a.getWidth();
-        final int h = a.getHeight();
+    public static void flip(final BufferedImage im) {
+        final int w = im.getWidth();
+        final int h = im.getHeight();
 
         final int w2 = w / 2;
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w2; x++) {
-                final int tmp = a.getRGB(x, y);
-                a.setRGB(x, y, a.getRGB(w - 1 - x, y));
-                a.setRGB(w - 1 - x, y, tmp);
+                final int tmp = im.getRGB(x, y);
+                im.setRGB(x, y, im.getRGB(w - 1 - x, y));
+                im.setRGB(w - 1 - x, y, tmp);
             }
         }
     }

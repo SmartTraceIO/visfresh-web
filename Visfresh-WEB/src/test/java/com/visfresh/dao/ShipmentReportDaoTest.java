@@ -157,9 +157,8 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         final DateFormat fmt = DateTimeUtils.createPrettyFormat(
                 user.getLanguage(), user.getTimeZone());
 
-        assertEquals(locationFromName, report.getShippedFrom());
-        assertEquals(locationToName, report.getShippedTo());
-        assertNotNull(report.getShippedFromLocation());
+        assertEquals(locationFromName, report.getShippedFrom().getName());
+        assertEquals(locationToName, report.getShippedTo().getName());
         assertEquals(fmt.format(shipmentDate), fmt.format(report.getDateShipped()));
         assertEquals(fmt.format(arrivalDate), fmt.format(report.getDateArrived()));
         assertEquals(fmt.format(shutownDate), fmt.format(report.getShutdownTime()));

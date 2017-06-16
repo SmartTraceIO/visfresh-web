@@ -5,10 +5,6 @@ package com.visfresh.reports.shipment;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +27,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
@@ -79,7 +77,6 @@ import net.sf.dynamicreports.report.datasource.DRDataSource;
 import net.sf.dynamicreports.report.definition.ReportParameters;
 import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperReportsContext;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 import net.sf.jasperreports.engine.design.JRDesignField;
 
@@ -93,7 +90,7 @@ public class ShipmentReportBuilder {
 
     public static final int LOCATION_IMAGE_SIZE = 14;
     private static final int DEFAULT_FONT_SIZE = 8;
-    private static final int DEFAULT_PADDING = 3;
+    static final int DEFAULT_PADDING = 3;
 
     @Autowired
     protected RuleBundle ruleBundle;
@@ -514,28 +511,51 @@ public class ShipmentReportBuilder {
 
         //shipped from
         final Map<String, Object> shippedFrom = new HashMap<>();
-        shippedFrom.put(images, ImagePaintingSupport.loadReportPngImage("shippedFrom"));
+        shippedFrom.put(images, new ImageRenderingInfo("shippedFrom"));
         shippedFrom.put(key, "Shipped From");
-        shippedFrom.put(value, bean.getShippedFrom() == null ? "Undetermined" : bean.getShippedFrom());
+
+        final StringBuilder shfBuilder = new StringBuilder();
+        if (bean.getShippedFrom() != null) {
+            shfBuilder.append(bean.getShippedFrom().getName());
+        } else {
+            shfBuilder.append("Undetermined");
+        }
+        //add data shipped to shipped from
+        if (bean.getDateShipped() != null) {
+            shfBuilder.append('\n');
+            shfBuilder.append(prettyFormat.format(bean.getDateShipped()));
+        }
+
+        shippedFrom.put(value, shfBuilder.toString());
         rows.add(shippedFrom);
 
-        //date shipped
-        final Map<String, Object> dateShipped = new HashMap<>();
-        dateShipped.put(key, "Date Shipped");
-        dateShipped.put(value, bean.getDateShipped() == null ? "" : prettyFormat.format(bean.getDateShipped()));
-        rows.add(dateShipped);
+        //add interim stops
+        int j = 0;
+        final Iterator<InterimStop> iter = bean.getInterimStops().iterator();
+        while (iter.hasNext()) {
+            final Map<String, Object> row = new HashMap<>();
+            final InterimStop stop = iter.next();
 
+            row.put(images, j + 1);
+            row.put(key, "Interim Stop " + j);
+            row.put(value, stop.getLocation().getName()
+                    + "\n" + prettyFormat.format(stop.getDate()));
+            rows.add(row);
+            j++;
+        }
+
+        //add shipped to
         final Map<String, Object> shippedTo = new HashMap<>();
         final List<String> possibleShippedTo = bean.getPossibleShippedTo();
 
         //shipped to image
+        final ImageRenderingInfo im;
         if (Shipment.isFinalStatus(bean.getStatus())) {
-            final BufferedImage im = ImagePaintingSupport.loadReportPngImage("shippedTo");
-            ImagePaintingSupport.flip(im);
-            shippedTo.put(images, im);
+            im = new ImageRenderingInfo("shippedTo", true);
         } else {
-            shippedTo.put(images, ImagePaintingSupport.loadReportPngImage("shippedToToBeDetermined"));
+            im = new ImageRenderingInfo("shippedToToBeDetermined");
         }
+        shippedTo.put(images, im);
 
         //shipped to text
         if (bean.getShippedTo() == null
@@ -571,7 +591,7 @@ public class ShipmentReportBuilder {
 
             shippedTo.put(value, locations.toString());
         } else {
-            shippedTo.put(value, bean.getShippedTo() == null ? "Undetermined" : bean.getShippedTo());
+            shippedTo.put(value, bean.getShippedTo() == null ? "Undetermined" : bean.getShippedTo().getName());
         }
 
         shippedTo.put(key, "Shipped To");
@@ -664,55 +684,23 @@ public class ShipmentReportBuilder {
             @Override
             public AbstractGraphics2DRenderer evaluate(final ReportParameters reportParameters) {
                 final int row = reportParameters.getColumnRowNumber();
-                final Image im = (Image) rows.get(row - 1).get(images);
+                final Object data = rows.get(row - 1).get(images);
 
-                if (im != null) {
-                    return new AbstractGraphics2DRenderer() {
-                        @Override
-                        public void render(final JasperReportsContext ctxt, final Graphics2D g, final Rectangle2D r)
-                                throws JRException {
-                            final Rectangle rect = calculateImageRect(im.getWidth(null), im.getHeight(null),
-                                    r);
-                            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                            g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-                            g.drawImage(im, rect.x, rect.y, rect.width, rect.height, null);
-                        }
-
-                        private Rectangle calculateImageRect(final int imWidth, final int imHeight, final Rectangle2D r) {
-                            final int margins = DEFAULT_PADDING;
-
-                            final Rectangle viewRect = r.getBounds();
-                            viewRect.x += margins;
-                            viewRect.y += margins;
-                            viewRect.width -= 2 * margins;
-                            viewRect.height -= 2 * margins;
-
-                            final double scale = Math.min((double) viewRect.width/ imWidth,
-                                    (double) viewRect.height / imHeight);
-                            final double w = imWidth * scale;
-                            final double h = imHeight * scale;
-
-                            return new Rectangle(
-                                    (int) Math.round(viewRect.x + (viewRect.width - w) / 2),
-                                    viewRect.y,
-                                    (int) Math.round(w),
-                                    (int) Math.round(h)
-                            );
-                        }
-                    };
+                if (data instanceof ImageRenderingInfo) {
+                    final ImageRenderingInfo info = (ImageRenderingInfo) data;
+                    final Color bg = (row % 2 != 0) ? Color.WHITE : Colors.CELL_BG;
+                    return new FirstRowIconRenderer(info, bg);
+                } else if (data instanceof Integer) {
+                    return new InterinStopIconRenderer((Integer) data);
                 }
 
                 return null;
             }
         }
         );
-//        imageBuilder.setStretchType(StretchType.CONTAINER_HEIGHT);
-//        imageBuilder.setHorizontalImageAlignment(HorizontalImageAlignment.CENTER);
         imageBuilder.setStyle(Styles.style().setPadding(DEFAULT_PADDING));
-//        imageBuilder.setImageScale(ImageScale.RETAIN_SHAPE);
 
         //add image wrapped to list
-//        final ComponentBuilder<?, ?> imageWrapper = Components.verticalList(imageBuilder);
         final ComponentBuilder<?, ?> imageWrapper = imageBuilder;
 
         final ComponentColumnBuilder imageColumnBuilder = Columns.componentColumn(images,

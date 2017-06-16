@@ -10,7 +10,8 @@ import java.util.List;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
-import com.visfresh.entities.Location;
+import com.visfresh.entities.InterimStop;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.reports.TemperatureStats;
@@ -22,10 +23,9 @@ public class ShipmentReportBean {
     private String device;
     private String companyName;
     private int tripCount;
-    private String shippedFrom;
-    private Location shippedFromLocation;
-    private String shippedTo;
-    private Location shippedToLocation;
+    private LocationProfile shippedFrom;
+    private final List<InterimStop> interimStops = new LinkedList<>();
+    private LocationProfile shippedTo;
     private Date dateShipped;
     private Date dateArrived;
     private ShipmentStatus status;
@@ -81,26 +81,32 @@ public class ShipmentReportBean {
     /**
      * @return the shippedFrom
      */
-    public String getShippedFrom() {
+    public LocationProfile getShippedFrom() {
         return shippedFrom;
     }
     /**
      * @param shippedFrom the shippedFrom to set
      */
-    public void setShippedFrom(final String shippedFrom) {
+    public void setShippedFrom(final LocationProfile shippedFrom) {
         this.shippedFrom = shippedFrom;
     }
     /**
      * @return the shippedTo
      */
-    public String getShippedTo() {
+    public LocationProfile getShippedTo() {
         return shippedTo;
     }
     /**
      * @param shippedTo the shippedTo to set
      */
-    public void setShippedTo(final String shippedTo) {
+    public void setShippedTo(final LocationProfile shippedTo) {
         this.shippedTo = shippedTo;
+    }
+    /**
+     * @return the interimStops
+     */
+    public List<InterimStop> getInterimStops() {
+        return interimStops;
     }
     /**
      * @return the dateShipped
@@ -301,30 +307,6 @@ public class ShipmentReportBean {
      */
     public List<String> getPossibleShippedTo() {
         return possibleShippedTo;
-    }
-    /**
-     * @return
-     */
-    public Location getShippedFromLocation() {
-        return shippedFromLocation;
-    }
-    /**
-     * @param loc the shippedFromLocation to set
-     */
-    public void setShippedFromLocation(final Location loc) {
-        this.shippedFromLocation = loc;
-    }
-    /**
-     * @return the shippedToLocation
-     */
-    public Location getShippedToLocation() {
-        return shippedToLocation;
-    }
-    /**
-     * @param shippedToLocation the shippedToLocation to set
-     */
-    public void setShippedToLocation(final Location shippedToLocation) {
-        this.shippedToLocation = shippedToLocation;
     }
     /**
      * @return device shutdown time.

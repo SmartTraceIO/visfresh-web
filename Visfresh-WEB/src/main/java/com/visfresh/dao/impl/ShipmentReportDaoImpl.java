@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.TrackerEventDao;
@@ -58,6 +59,8 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
     private NotificationDao notificationDao;
     @Autowired
     private AlternativeLocationsDao alternativeLocationsDao;
+    @Autowired
+    private InterimStopDao interimStopDao;
     @Autowired
     private RuleEngine ruleEngine;
 
@@ -102,13 +105,11 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         if (s.getDevice().getColor() != null) {
             bean.setDeviceColor(parseColor(s.getDevice().getColor()));
         }
-        if (s.getShippedFrom() != null) {
-            bean.setShippedFrom(s.getShippedFrom().getName());
-            bean.setShippedFromLocation(s.getShippedFrom().getLocation());
-        }
+        bean.setShippedFrom(s.getShippedFrom());
+        bean.getInterimStops().addAll(interimStopDao.getByShipment(s));
+
         if (s.getShippedTo() != null) {
-            bean.setShippedTo(s.getShippedTo().getName());
-            bean.setShippedToLocation(s.getShippedTo().getLocation());
+            bean.setShippedTo(s.getShippedTo());
         } else {
             final AlternativeLocations alts = alternativeLocationsDao.getBy(s);
             if (alts != null && !alts.getTo().isEmpty()) {

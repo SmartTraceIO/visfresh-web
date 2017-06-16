@@ -18,7 +18,8 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
-import com.visfresh.entities.Location;
+import com.visfresh.entities.InterimStop;
+import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
@@ -88,8 +89,6 @@ public final class ShipmentReportBuilderTool {
         bean.setDevice(device.getImei());
         bean.setNumberOfSiblings(7);
         bean.setPalletId("12345");
-        bean.setShippedFrom("De Costi Office Lidcombe");
-        bean.setShippedTo("De Costi Office Lidcombe");
         final List<String> altLocs = new LinkedList<>();
         altLocs.add("De Costi Office Lidcombe");
         altLocs.add("Odessa deribasovskaya");
@@ -113,13 +112,23 @@ public final class ShipmentReportBuilderTool {
 
         if (readings.size() > 0) {
             final ShortTrackerEvent first = readings.get(0);
-            bean.setShippedFromLocation(new Location(first.getLatitude(), first.getLongitude()));
+            final LocationProfile from = new LocationProfile();
+            from.setName("De Costi Office Lidcombe");
+            from.getLocation().setLatitude(first.getLatitude());
+            from.getLocation().setLongitude(first.getLongitude());
+            bean.setShippedFrom(from);
+
             bean.setDateShipped(first.getTime());
 
             final ShortTrackerEvent arrived = readings.get(readings.size() - Math.min(readings.size(), 10));
             bean.setDateArrived(arrived.getTime());
-            bean.setShippedToLocation(new Location(arrived.getLatitude(), arrived.getLongitude()));
 
+            final LocationProfile to = new LocationProfile();
+            to.setName("De Costi Office Lidcombe");
+            to.getLocation().setLatitude(arrived.getLatitude());
+            to.getLocation().setLongitude(arrived.getLongitude());
+
+            bean.setShippedTo(to);
             //set arrival
 //            final ArrivalBean arrival = new ArrivalBean();
 //            arrival.setNotifiedAt(bean.getDateArrived());
@@ -127,6 +136,27 @@ public final class ShipmentReportBuilderTool {
 //            bean.setArrival(arrival);
 //
 //            bean.setShutdownTime(new Date(arrival.getNotifiedAt().getTime() + 10000000));
+        }
+
+        //add interim stops
+        final int num = readings.size() / 5;
+        int count = num;
+        while (count < readings.size()) {
+            final ShortTrackerEvent e = readings.get(count);
+
+            //create location of interim stop
+            final LocationProfile loc = new LocationProfile();
+            loc.setName("De Costi Office Lidcombe " + bean.getInterimStops().size());
+            loc.getLocation().setLatitude(e.getLatitude());
+            loc.getLocation().setLongitude(e.getLongitude());
+
+            final InterimStop stop = new InterimStop();
+            stop.setLocation(loc);
+            stop.setDate(e.getTime());
+
+            bean.getInterimStops().add(stop);
+
+            count += num;
         }
 
         bean.setAlertProfile("Chilled Beef");

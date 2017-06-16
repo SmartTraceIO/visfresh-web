@@ -28,15 +28,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import net.sf.dynamicreports.report.builder.chart.Charts;
-import net.sf.dynamicreports.report.builder.chart.TimeSeriesChartBuilder;
-import net.sf.dynamicreports.report.builder.column.Columns;
-import net.sf.dynamicreports.report.constant.TimePeriod;
-import net.sf.dynamicreports.report.datasource.DRDataSource;
-import net.sf.dynamicreports.report.defaults.Defaults;
-import net.sf.dynamicreports.report.definition.ReportParameters;
-import net.sf.dynamicreports.report.definition.chart.DRIChartCustomizer;
-
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberTickUnit;
@@ -62,6 +53,15 @@ import com.visfresh.reports.ImagePaintingSupport;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;
+
+import net.sf.dynamicreports.report.builder.chart.Charts;
+import net.sf.dynamicreports.report.builder.chart.TimeSeriesChartBuilder;
+import net.sf.dynamicreports.report.builder.column.Columns;
+import net.sf.dynamicreports.report.constant.TimePeriod;
+import net.sf.dynamicreports.report.datasource.DRDataSource;
+import net.sf.dynamicreports.report.defaults.Defaults;
+import net.sf.dynamicreports.report.definition.ReportParameters;
+import net.sf.dynamicreports.report.definition.chart.DRIChartCustomizer;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
