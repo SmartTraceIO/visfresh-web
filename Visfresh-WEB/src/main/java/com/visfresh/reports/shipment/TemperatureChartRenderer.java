@@ -45,6 +45,7 @@ import org.jfree.ui.RectangleInsets;
 import com.visfresh.controllers.UtilitiesController;
 import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEventType;
@@ -78,13 +79,6 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
      */
     public TemperatureChartRenderer() {
         super();
-    }
-    /**
-     * @param lines
-     * @param shapes
-     */
-    public TemperatureChartRenderer(final boolean lines, final boolean shapes) {
-        super(lines, shapes);
     }
 
     /* (non-Javadoc)
@@ -202,6 +196,14 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
                 //expand range Axis for draw start and end location icons
                 rangeAxis.getPlot().setInsets(new RectangleInsets(
                         ShipmentReportBuilder.LOCATION_IMAGE_SIZE + 2, 0, 0, 0));
+
+                //draw interim stop lines
+                int i = 1;
+                for (final InterimStop stp : bean.getInterimStops()) {
+                    chart.getXYPlot().addAnnotation(
+                            new LineWithInterimStopAnnotation(i, stp.getDate().getTime()));
+                    i++;
+                }
 
                 if (bean.getDateShipped() != null) {
                     final BufferedImage im = ImagePaintingSupport.loadReportPngImage("tinyShippedFrom");

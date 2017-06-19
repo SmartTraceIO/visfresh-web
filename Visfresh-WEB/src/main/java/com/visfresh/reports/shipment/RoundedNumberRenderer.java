@@ -43,6 +43,7 @@ public class RoundedNumberRenderer {
         //set rendering hints
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//        g.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 120);
 
         //draw circle
         final int d = Math.min(rect.width - 2 * margins, rect.height - 2 * margins);

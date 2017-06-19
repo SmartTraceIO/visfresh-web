@@ -39,7 +39,6 @@ import com.visfresh.reports.Colors;
 import com.visfresh.reports.ImagePaintingSupport;
 import com.visfresh.reports.ReportUtils;
 import com.visfresh.reports.TemperatureStats;
-import com.visfresh.reports.geomap.MapRendererImpl;
 import com.visfresh.services.EventsNullCoordinatesCorrector;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
@@ -533,11 +532,12 @@ public class ShipmentReportBuilder {
         int j = 0;
         final Iterator<InterimStop> iter = bean.getInterimStops().iterator();
         while (iter.hasNext()) {
+            final int num = j + 1;
             final Map<String, Object> row = new HashMap<>();
             final InterimStop stop = iter.next();
 
-            row.put(images, j + 1);
-            row.put(key, "Interim Stop " + j);
+            row.put(images, num);
+            row.put(key, "Interim Stop " + num);
             row.put(value, stop.getLocation().getName()
                     + "\n" + prettyFormat.format(stop.getDate()));
             rows.add(row);
@@ -691,7 +691,7 @@ public class ShipmentReportBuilder {
                     final Color bg = (row % 2 != 0) ? Color.WHITE : Colors.CELL_BG;
                     return new FirstRowIconRenderer(info, bg);
                 } else if (data instanceof Integer) {
-                    return new InterinStopIconRenderer((Integer) data);
+                    return new InterimStopIconRenderer((Integer) data);
                 }
 
                 return null;

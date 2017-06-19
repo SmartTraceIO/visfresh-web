@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.reports.geomap;
+package com.visfresh.reports.shipment;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
@@ -30,8 +31,9 @@ import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.reports.AbstractGraphics2DRenderer;
 import com.visfresh.reports.Colors;
 import com.visfresh.reports.ImagePaintingSupport;
-import com.visfresh.reports.shipment.ShipmentReportBean;
-import com.visfresh.reports.shipment.ShipmentReportBuilder;
+import com.visfresh.reports.geomap.AbstractGeoMapBuiler;
+import com.visfresh.reports.geomap.GoogleGeoMapBuiler;
+import com.visfresh.reports.geomap.OpenStreetMapBuilder;
 import com.visfresh.utils.EntityUtils;
 
 import net.sf.jasperreports.engine.JRException;
@@ -46,6 +48,7 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
     private final ShipmentReportBean bean;
     private final AbstractGeoMapBuiler builder;
     private final int iconSize = 16;
+    private final RoundedNumberRenderer interimStopRenderer = new RoundedNumberRenderer();
 
     /**
      * Default constructor.
@@ -281,6 +284,14 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
                 drawMapImage(g, im, mapLocation, loc, zoom);
             }
         }
+        //draw interim stops
+        int i = 1;
+        final Iterator<InterimStop> iter = bean.getInterimStops().iterator();
+        while (iter.hasNext()) {
+            final InterimStop stop = iter.next();
+            drawInterimStop(g, mapLocation, stop.getLocation().getLocation(), i, zoom);
+            i++;
+        }
 
         //draw start location
         final LocationProfile startLocation = bean.getShippedFrom();
@@ -361,5 +372,25 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
         final int y = Math.round(OpenStreetMapBuilder.lat2position(
                 loc.getLatitude(), zoom) - mapLocation.y);
         g.drawImage(im, x - offset, y - offset, null);
+    }
+    /**
+     * @param g graphics context.
+     * @param mapLocation
+     * @param loc location.
+     * @param num interim stop number.
+     * @param zoom current map zoom.
+     */
+    private void drawInterimStop(final Graphics2D g, final Point mapLocation, final Location loc,
+            final int num, final int zoom) {
+        g.setColor(Color.BLACK);
+
+        final int size = iconSize + 2;
+        final int offset = size / 2;
+        final int x = Math.round(OpenStreetMapBuilder.lon2position(
+                loc.getLongitude(), zoom) - mapLocation.x) - offset;
+        final int y = Math.round(OpenStreetMapBuilder.lat2position(
+                loc.getLatitude(), zoom) - mapLocation.y) - offset;
+
+        interimStopRenderer.render(g, new Rectangle(x, y, size, size), num);
     }
 }

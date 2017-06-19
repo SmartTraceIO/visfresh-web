@@ -16,7 +16,7 @@ import net.sf.jasperreports.engine.JasperReportsContext;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class InterinStopIconRenderer extends AbstractGraphics2DRenderer {
+public class InterimStopIconRenderer extends AbstractGraphics2DRenderer {
     private static final long serialVersionUID = -6796826878702077466L;
     private final int number;
     private final RoundedNumberRenderer renderer = new RoundedNumberRenderer();
@@ -24,7 +24,7 @@ public class InterinStopIconRenderer extends AbstractGraphics2DRenderer {
     /**
      *
      */
-    public InterinStopIconRenderer(final int number) {
+    public InterimStopIconRenderer(final int number) {
         super();
         this.number = number;
     }
