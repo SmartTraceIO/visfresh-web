@@ -19,9 +19,14 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.dao.AlertProfileDao;
+import com.visfresh.dao.Filter;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.CorrectiveAction;
+import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.TemperatureRule;
+import com.visfresh.io.json.CorrectiveActionListSerializer;
+import com.visfresh.utils.SerializerUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -46,6 +51,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
     private DefaultCache<List<TemperatureRule>, Long> rulesCache;
+    private CorrectiveActionListSerializer actionsSerializer = new CorrectiveActionListSerializer(null);
 
     /**
      * Default constructor.
@@ -106,6 +112,11 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         paramMap.put(LOWERTEMPLIMIT_FIELD, ap.getLowerTemperatureLimit());
         paramMap.put(UPPERTEMPLIMIT_FIELD, ap.getUpperTemperatureLimit());
 
+        paramMap.put("batterylowactions", ap.getBatteryLowCorrectiveActions() == null
+                ? null : ap.getBatteryLowCorrectiveActions().getId());
+        paramMap.put("lightonactions", ap.getLightOnCorrectiveActions() == null
+                ? null : ap.getLightOnCorrectiveActions().getId());
+
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
         if (keyHolder.getKey() != null) {
@@ -147,6 +158,8 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             paramMap.put("timeOut", rule.getTimeOutMinutes());
             paramMap.put("cumulative", rule.isCumulativeFlag());
             paramMap.put("maxrateminutes", rule.getMaxRateMinutes());
+            paramMap.put("corractions", rule.getCorrectiveActions() == null
+                    ? null : rule.getCorrectiveActions().getId());
             paramMap.put("apid", id);
 
             if (issueId != null) {
@@ -158,13 +171,14 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
                         + " temp = :temperature,"
                         + " timeout = :timeOut,"
                         + " cumulative = :cumulative,"
-                        + " maxrateminutes = :maxrateminutes"
+                        + " maxrateminutes = :maxrateminutes,"
+                        + " corractions = :corractions"
                         + " where id = :id", paramMap);
             } else {
                 final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
                 jdbc.update("insert into temperaturerules"
-                        + "(type, temp, timeout, cumulative, maxrateminutes, alertprofile)"
-                        + " values(:type, :temperature, :timeOut, :cumulative, :maxrateminutes, :apid)",
+                        + "(type, temp, timeout, cumulative, maxrateminutes, alertprofile, corractions)"
+                        + " values(:type, :temperature, :timeOut, :cumulative, :maxrateminutes, :apid, :corractions)",
                         new MapSqlParameterSource(paramMap), keyHolder);
                 if (keyHolder.getKey() != null) {
                     rule.setId(keyHolder.getKey().longValue());
@@ -191,6 +205,20 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
     protected void resolveReferences(final AlertProfile t, final Map<String, Object> row, final Map<String, Object> cache) {
         super.resolveReferences(t, row, cache);
         t.getAlertRules().addAll(loadTemperatureIssues(t.getId()));
+
+        //update company for corrective actions
+        for (final TemperatureRule r: t.getAlertRules()) {
+            if (r.getCorrectiveActions() != null) {
+                r.getCorrectiveActions().setCompany(t.getCompany());
+            }
+        }
+        if (t.getBatteryLowCorrectiveActions() != null) {
+            t.getBatteryLowCorrectiveActions().setCompany(t.getCompany());
+        }
+        if (t.getLightOnCorrectiveActions() != null) {
+            t.getLightOnCorrectiveActions().setCompany(t.getCompany());
+        }
+
         rulesCache.put(t.getId(), t.getAlertRules());
     }
 
@@ -203,28 +231,76 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
 
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("alertprofile", id);
-        final List<Map<String, Object>> rows = jdbc.queryForList("select * from temperaturerules"
-                + " where alertprofile = :alertprofile", paramMap);
+        final List<Map<String, Object>> rows = jdbc.queryForList("select r.*"
+                + ""
+                + ",\n ca.id as actionsId"
+                + ",\n ca.name as actionsName"
+                + ",\n ca.actions as actionsActions"
+                + " from temperaturerules r"
+                + "\nleft outer join correctiveactions ca on ca.id = r.corractions"
+                + " where r.alertprofile = :alertprofile", paramMap);
 
         //create temperature issues from DB rows
         for (final Map<String, Object> row : rows) {
-            final TemperatureRule issue = new TemperatureRule();
-            issue.setId(((Number) row.get("id")).longValue());
-            issue.setTemperature(((Number) row.get("temp")).doubleValue());
-            issue.setCumulativeFlag(Boolean.TRUE.equals(row.get("cumulative")));
-            issue.setTimeOutMinutes(((Number) row.get("timeout")).intValue());
-            issue.setType(AlertType.valueOf((String) row.get("type")));
+            final TemperatureRule r = new TemperatureRule();
+            r.setId(((Number) row.get("id")).longValue());
+            r.setTemperature(((Number) row.get("temp")).doubleValue());
+            r.setCumulativeFlag(Boolean.TRUE.equals(row.get("cumulative")));
+            r.setTimeOutMinutes(((Number) row.get("timeout")).intValue());
+            r.setType(AlertType.valueOf((String) row.get("type")));
             final Number maxRateMinutes = (Number) row.get("maxrateminutes");
             if (maxRateMinutes != null) {
-                issue.setMaxRateMinutes(maxRateMinutes.intValue());
+                r.setMaxRateMinutes(maxRateMinutes.intValue());
             }
 
-            list.add(issue);
+            final Number listId = (Number) row.get("actionsId");
+            if (listId != null) {
+                final CorrectiveActionList a = new CorrectiveActionList();
+                a.setId(listId.longValue());
+                a.setName((String) row.get("actionsName"));
+                a.getActions().addAll(parseCorrectiveActions((String) row.get("actionsActions")));
+                r.setCorrectiveActions(a);
+            }
+
+            list.add(r);
         }
 
         return list;
     }
+    /**
+     * @param actions
+     * @return
+     */
+    private List<CorrectiveAction> parseCorrectiveActions(final String actions) {
+        return actionsSerializer.parseActions(SerializerUtils.parseJson(actions).getAsJsonArray());
+    }
 
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()
+     */
+    @Override
+    protected SelectAllSupport createSelectAllSupport() {
+        return new SelectAllSupport(getTableName()) {
+            /* (non-Javadoc)
+             * @see com.visfresh.dao.impl.SelectAllSupport#buildSelectBlockForFindAll(com.visfresh.dao.Filter)
+             */
+            @Override
+            protected String buildSelectBlockForFindAll(final Filter filter) {
+                final String table = getTableName();
+                return "select " + table + ".*"
+                        + ",\n loa.id as loaActionsId"
+                        + ",\n loa.name as loaActionsName"
+                        + ",\n loa.actions as loaActionsActions"
+                        + ",\n bla.id as blaActionsId"
+                        + ",\n bla.name as blaActionsName"
+                        + ",\n bla.actions as blaActionsActions"
+                        + " from " + table
+                        + "\nleft outer join correctiveactions bla on bla.id = " + table + ".batterylowactions"
+                        + "\nleft outer join correctiveactions loa on loa.id = " + table + ".lightonactions"
+                        ;
+            }
+        };
+    }
     private List<String> getFields(final boolean includeId) {
         final List<String> fields = new LinkedList<String>();
         fields.add(NAME_FIELD);
@@ -238,6 +314,8 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         fields.add(COMPANY_FIELD);
         fields.add(LOWERTEMPLIMIT_FIELD);
         fields.add(UPPERTEMPLIMIT_FIELD);
+        fields.add("batterylowactions");
+        fields.add("lightonactions");
 
         if (includeId) {
             fields.add(ID_FIELD);
@@ -278,20 +356,39 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
      * @see com.visfresh.dao.impl.DaoImplBase#createEntity(java.util.Map)
      */
     @Override
-    protected AlertProfile createEntity(final Map<String, Object> map) {
+    protected AlertProfile createEntity(final Map<String, Object> row) {
         final AlertProfile ap = new AlertProfile();
 
-        ap.setId(((Number) map.get(ID_FIELD)).longValue());
+        ap.setId(((Number) row.get(ID_FIELD)).longValue());
 
-        ap.setName((String) map.get(NAME_FIELD));
-        ap.setDescription((String) map.get(DESCRIPTION_FIELD));
-        ap.setWatchEnterBrightEnvironment((Boolean) map.get(ONENTERBRIGHT_FIELD));
-        ap.setWatchEnterDarkEnvironment((Boolean) map.get(ONENTERDARK_FIELD));
-        ap.setWatchMovementStart((Boolean) map.get(ONMOVEMENTSTART_FIELD));
-        ap.setWatchMovementStop((Boolean) map.get(ONMOVEMENTSTOP_FIELD));
-        ap.setWatchBatteryLow((Boolean) map.get(ONBATTERYLOW_FIELD));
-        ap.setLowerTemperatureLimit(((Number) map.get(LOWERTEMPLIMIT_FIELD)).doubleValue());
-        ap.setUpperTemperatureLimit(((Number) map.get(UPPERTEMPLIMIT_FIELD)).doubleValue());
+        ap.setName((String) row.get(NAME_FIELD));
+        ap.setDescription((String) row.get(DESCRIPTION_FIELD));
+        ap.setWatchEnterBrightEnvironment((Boolean) row.get(ONENTERBRIGHT_FIELD));
+        ap.setWatchEnterDarkEnvironment((Boolean) row.get(ONENTERDARK_FIELD));
+        ap.setWatchMovementStart((Boolean) row.get(ONMOVEMENTSTART_FIELD));
+        ap.setWatchMovementStop((Boolean) row.get(ONMOVEMENTSTOP_FIELD));
+        ap.setWatchBatteryLow((Boolean) row.get(ONBATTERYLOW_FIELD));
+        ap.setLowerTemperatureLimit(((Number) row.get(LOWERTEMPLIMIT_FIELD)).doubleValue());
+        ap.setUpperTemperatureLimit(((Number) row.get(UPPERTEMPLIMIT_FIELD)).doubleValue());
+
+        //light on corrective actions
+        if (row.get("loaActionsId") != null) {
+            final CorrectiveActionList l = new CorrectiveActionList();
+            l.setId(((Number) row.get("loaActionsId")).longValue());
+            l.setName((String) row.get("loaActionsName"));
+            l.getActions().addAll(parseCorrectiveActions((String) row.get("loaActionsActions")));
+            ap.setLightOnCorrectiveActions(l);
+        }
+
+        //battery low corrective actions
+        if (row.get("blaActionsId") != null) {
+            final CorrectiveActionList l = new CorrectiveActionList();
+            l.setId(((Number) row.get("blaActionsId")).longValue());
+            l.setName((String) row.get("blaActionsName"));
+            l.getActions().addAll(parseCorrectiveActions((String) row.get("blaActionsActions")));
+            ap.setBatteryLowCorrectiveActions(l);
+        }
+
         return ap;
     }
 }

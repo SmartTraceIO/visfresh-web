@@ -81,12 +81,12 @@ public class DaoTestRunner extends BlockJUnit4ClassRunner {
         context.getBean(TrackerEventDao.class).deleteAll();
         context.getBean(DeviceCommandDao.class).deleteAll();
         context.getBean(NotificationDao.class).deleteAll();
-        context.getBean(CorrectiveActionListDao.class).deleteAll();
         context.getBean(AlertDao.class).deleteAll();
         context.getBean(ArrivalDao.class).deleteAll();
         context.getBean(ShipmentDao.class).deleteAll();
         context.getBean(ShipmentTemplateDao.class).deleteAll();
         context.getBean(AlertProfileDao.class).deleteAll();
+        context.getBean(CorrectiveActionListDao.class).deleteAll();
         context.getBean(LocationProfileDao.class).deleteAll();
         context.getBean(NotificationScheduleDao.class).deleteAll();
         context.getBean(DeviceGroupDao.class).deleteAll();
