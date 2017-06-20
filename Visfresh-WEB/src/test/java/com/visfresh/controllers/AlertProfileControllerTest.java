@@ -16,9 +16,12 @@ import org.junit.Test;
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.controllers.restclient.AlertProfileRestClient;
 import com.visfresh.dao.AlertProfileDao;
+import com.visfresh.dao.CorrectiveActionListDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.CorrectiveAction;
+import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
@@ -194,5 +197,100 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         first = client.getAlertProfiles(1, 10000,
                 AlertProfileConstants.ALERT_PROFILE_DESCRIPTION, "desc").get(maxIndex);
         assertEquals((long) p3.getId(), first.getAlertProfileId());
+    }
+    @Test
+    public void testGetCorrectiveActions() throws IOException, RestServiceException {
+        final AlertProfile ap = createAlertProfile(true);
+
+        final CorrectiveActionList lo = createCorrectiveActions();
+        final CorrectiveActionList bl = createCorrectiveActions();
+
+        ap.setLightOnCorrectiveActions(lo);
+        ap.setBatteryLowCorrectiveActions(bl);
+        dao.save(ap);
+
+        final AlertProfile actual = client.getAlertProfile(ap.getId());
+        final CorrectiveActionList actualLo = actual.getLightOnCorrectiveActions();
+        final CorrectiveActionList actualBl = actual.getBatteryLowCorrectiveActions();
+
+        assertEquals(lo.getId(), actualLo.getId());
+        assertEquals(bl.getId(), actualBl.getId());
+
+        //check LightOn action
+        assertEquals(lo.getName(), actualLo.getName());
+        assertEquals(lo.getActions().size(), actualLo.getActions().size());
+
+        //check BatteryLow action
+        assertEquals(bl.getName(), actualBl.getName());
+        assertEquals(bl.getActions().size(), actualBl.getActions().size());
+    }
+    @Test
+    public void testSaveCorrectiveActions() throws RestServiceException, IOException {
+        final AlertProfile ap = createAlertProfile(true);
+
+        ap.setLightOnCorrectiveActions(createCorrectiveActions());
+        ap.setBatteryLowCorrectiveActions(createCorrectiveActions());
+        client.saveAlertProfile(ap);
+
+        final AlertProfile actual = dao.findOne(ap.getId());
+        assertEquals(actual.getLightOnCorrectiveActions().getId(), ap.getLightOnCorrectiveActions().getId());
+        assertEquals(actual.getBatteryLowCorrectiveActions().getId(), ap.getBatteryLowCorrectiveActions().getId());
+    }
+    @Test
+    public void testGetTemperatureRuleCorrectiveActions() throws IOException, RestServiceException {
+        final AlertProfile ap = new AlertProfile();
+        ap.setCompany(getCompany());
+        ap.setName("AnyAlert");
+        ap.setDescription("Any description");
+
+        final TemperatureRule criticalHot = new TemperatureRule(AlertType.CriticalHot);
+        criticalHot.setTemperature(17);
+        ap.getAlertRules().add(criticalHot);
+
+        final CorrectiveActionList actions = createCorrectiveActions();
+        criticalHot.setCorrectiveActions(actions);
+
+        dao.save(ap);
+
+        final CorrectiveActionList actual = client.getAlertProfile(ap.getId()).getAlertRules().get(0).getCorrectiveActions();
+
+        assertEquals(actions.getId(), actual.getId());
+        assertEquals(actions.getName(), actual.getName());
+        assertEquals(actions.getActions().size(), actual.getActions().size());
+    }
+    @Test
+    public void testSaveTemperatureRuleCorrectiveActions() throws RestServiceException, IOException {
+        final AlertProfile ap = new AlertProfile();
+        ap.setCompany(getCompany());
+        ap.setName("AnyAlert");
+        ap.setDescription("Any description");
+
+        final TemperatureRule criticalHot = new TemperatureRule(AlertType.CriticalHot);
+        criticalHot.setTemperature(17);
+        ap.getAlertRules().add(criticalHot);
+
+        dao.save(ap);
+
+        final CorrectiveActionList actions = createCorrectiveActions();
+        criticalHot.setCorrectiveActions(actions);
+        client.saveAlertProfile(ap);
+
+        final CorrectiveActionList actual = dao.findOne(ap.getId()).getAlertRules().get(0).getCorrectiveActions();
+
+        assertEquals(actions.getId(), actual.getId());
+        assertEquals(actions.getName(), actual.getName());
+        assertEquals(actions.getActions().size(), actual.getActions().size());
+    }
+
+    /**
+     * @return corrective action list.
+     */
+    private CorrectiveActionList createCorrectiveActions() {
+        final CorrectiveActionList list = new CorrectiveActionList();
+        list.setCompany(getCompany());
+        list.setName("JUnit actions");
+        list.getActions().add(new CorrectiveAction("First action", true));
+        list.getActions().add(new CorrectiveAction("Second action", true));
+        return context.getBean(CorrectiveActionListDao.class).save(list);
     }
 }

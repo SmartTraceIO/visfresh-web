@@ -1448,6 +1448,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 **Request body:**  
 ```json
 {
+  "alertProfileId": 2141,
   "alertProfileName": "AnyAlert",
   "alertProfileDescription": "Any description",
   "watchBatteryLow": true,
@@ -1455,66 +1456,122 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "watchEnterDarkEnvironment": true,
   "watchMovementStart": true,
   "watchMovementStop": true,
-  "lowerTemperatureLimit": -1.0, // if absent, default is 0C
-  "upperTemperatureLimit": 7.0,  // if absent, default is 5C
+  "lowerTemperatureLimit": 0.0,
+  "upperTemperatureLimit": 5.0,
   "temperatureIssues": [
     {
+      "id": 11749,
       "type": "CriticalHot",
       "temperature": 18.0,
       "timeOutMinutes": 0,
       "cumulativeFlag": true,
-      "maxRateMinutes": null
+      "maxRateMinutes": null,
+      "correctiveActions": null
     },
     {
+      "id": 11750,
       "type": "CriticalHot",
       "temperature": 17.0,
       "timeOutMinutes": 1,
       "cumulativeFlag": true,
-      "maxRateMinutes": null
+      "maxRateMinutes": null,
+      "correctiveActions": null
     },
     {
+      "id": 11751,
       "type": "CriticalCold",
       "temperature": -12.0,
       "timeOutMinutes": 0,
       "cumulativeFlag": true,
-      "maxRateMinutes": null
+      "maxRateMinutes": null,
+      "correctiveActions": null
     },
     {
+      "id": 11752,
       "type": "CriticalCold",
       "temperature": -11.0,
       "timeOutMinutes": 1,
-      "cumulativeFlag": false,
-      "maxRateMinutes": null
+      "cumulativeFlag": true,
+      "maxRateMinutes": null,
+      "correctiveActions": null
     },
     {
+      "id": 11753,
       "type": "Hot",
       "temperature": 6.0,
       "timeOutMinutes": 0,
-      "cumulativeFlag": false,
-      "maxRateMinutes": null
+      "cumulativeFlag": true,
+      "maxRateMinutes": null,
+      "correctiveActions": null
     },
     {
+      "id": 11754,
       "type": "Hot",
       "temperature": 7.0,
       "timeOutMinutes": 2,
       "cumulativeFlag": true,
-      "maxRateMinutes": null
+      "maxRateMinutes": null,
+      "correctiveActions": null
     },
     {
+      "id": 11755,
       "type": "Cold",
       "temperature": -7.0,
       "timeOutMinutes": 40,
       "cumulativeFlag": true,
-      "maxRateMinutes": null
+      "maxRateMinutes": null,
+      "correctiveActions": null
     },
     {
+      "id": 11756,
       "type": "Cold",
       "temperature": -5.0,
       "timeOutMinutes": 55,
       "cumulativeFlag": true,
-      "maxRateMinutes": null
+      "maxRateMinutes": null,
+      "correctiveActions": {
+        "listId": 325,
+        "listName": "JUnit actions",
+        "actions": [
+          {
+            "action": "First action",
+            "requestVerification": true
+          },
+          {
+            "action": "Second action",
+            "requestVerification": true
+          }
+        ]
     }
-  ]
+  ],
+  "lightOnCorrectiveActions": {
+    "listId": 309,
+    "listName": "JUnit actions",
+    "actions": [
+      {
+        "action": "First action",
+        "requestVerification": true
+      },
+      {
+        "action": "Second action",
+        "requestVerification": true
+      }
+    ]
+  },
+  "batteryLowCorrectiveActions": {
+    "listId": 310,
+    "listName": "JUnit actions",
+    "actions": [
+      {
+        "action": "First action",
+        "requestVerification": true
+      },
+      {
+        "action": "Second action",
+        "requestVerification": true
+      }
+    ]
+  }
 }
 ```
 **Response:** 
@@ -1530,7 +1587,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```
 ### Get Alert Profile example ###
-**GET /vf/rest/getAlertProfile/${accessToken}?alertProfileId=5**  
+**GET /vf/rest/getAlertProfile/${accessToken}?alertProfileId=2156**  
 **Response:**  
 ```json
 {
@@ -1539,7 +1596,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "message": "Success"
   },
   "response": {
-    "alertProfileId": 182,
+    "alertProfileId": 2156,
     "alertProfileName": "AnyAlert",
     "alertProfileDescription": "Any description",
     "watchBatteryLow": true,
@@ -1547,74 +1604,123 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "watchEnterDarkEnvironment": true,
     "watchMovementStart": true,
     "watchMovementStop": true,
-    "lowerTemperatureLimit": -1.0, // if absent, default is 0C
-    "upperTemperatureLimit": 7.0,  // if absent, default is 5C
+    "lowerTemperatureLimit": 0.0,
+    "upperTemperatureLimit": 5.0,
     "temperatureIssues": [
       {
-        "id": 982,
+        "id": 11841,
         "type": "CriticalHot",
         "temperature": 18.0,
         "timeOutMinutes": 0,
         "cumulativeFlag": true,
-        "maxRateMinutes": null
+        "maxRateMinutes": null,
+        "correctiveActions": null
       },
       {
-        "id": 983,
+        "id": 11842,
         "type": "CriticalHot",
         "temperature": 17.0,
         "timeOutMinutes": 1,
         "cumulativeFlag": true,
-        "maxRateMinutes": null
+        "maxRateMinutes": null,
+        "correctiveActions": null
       },
       {
-        "id": 984,
+        "id": 11843,
         "type": "CriticalCold",
         "temperature": -12.0,
         "timeOutMinutes": 0,
         "cumulativeFlag": true,
-        "maxRateMinutes": null
+        "maxRateMinutes": null,
+        "correctiveActions": null
       },
       {
-        "id": 985,
+        "id": 11844,
         "type": "CriticalCold",
         "temperature": -11.0,
         "timeOutMinutes": 1,
         "cumulativeFlag": true,
-        "maxRateMinutes": null
+        "maxRateMinutes": null,
+        "correctiveActions": null
       },
       {
-        "id": 986,
+        "id": 11845,
         "type": "Hot",
         "temperature": 6.0,
         "timeOutMinutes": 0,
         "cumulativeFlag": true,
-        "maxRateMinutes": null
+        "maxRateMinutes": null,
+        "correctiveActions": null
       },
       {
-        "id": 987,
+        "id": 11846,
         "type": "Hot",
         "temperature": 7.0,
         "timeOutMinutes": 2,
         "cumulativeFlag": true,
-        "maxRateMinutes": null
+        "maxRateMinutes": null,
+        "correctiveActions": null
       },
       {
-        "id": 988,
+        "id": 11847,
         "type": "Cold",
         "temperature": -7.0,
         "timeOutMinutes": 40,
         "cumulativeFlag": true,
-        "maxRateMinutes": null
+        "maxRateMinutes": null,
+        "correctiveActions": null
       },
       {
-        "id": 989,
+        "id": 11848,
         "type": "Cold",
         "temperature": -5.0,
         "timeOutMinutes": 55,
         "cumulativeFlag": true,
-        "maxRateMinutes": null
+        "maxRateMinutes": null,
+        "correctiveActions": {
+          "listId": 332,
+          "listName": "JUnit actions",
+          "actions": [
+            {
+              "action": "First action",
+              "requestVerification": true
+            },
+            {
+              "action": "Second action",
+              "requestVerification": true
+            }
+          ]
+        }
       }
-    ]
+    ],
+    "lightOnCorrectiveActions": {
+      "listId": 317,
+      "listName": "JUnit actions",
+      "actions": [
+        {
+          "action": "First action",
+          "requestVerification": true
+        },
+        {
+          "action": "Second action",
+          "requestVerification": true
+        }
+      ]
+    },
+    "batteryLowCorrectiveActions": {
+      "listId": 318,
+      "listName": "JUnit actions",
+      "actions": [
+        {
+          "action": "First action",
+          "requestVerification": true
+        },
+        {
+          "action": "Second action",
+          "requestVerification": true
+        }
+      ]
+    }
   }
 }
 ```
