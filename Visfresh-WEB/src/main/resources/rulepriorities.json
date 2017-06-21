@@ -6,5 +6,6 @@
 	"AutoStartShipment": 50,
 	"AutoDetectEndLocation": 49,
 	"ShipmentStatisticsInitializeRule": 49,
+	"LeaveInterimStop": 48,
 	"ArrivalNotification": 10
 }

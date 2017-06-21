@@ -12,8 +12,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.entities.InterimStop;
+import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.TrackerEvent;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.SerializerUtils;
@@ -105,25 +107,30 @@ public abstract class AbstractInterimStopRule implements TrackerEventRule {
         super();
     }
 
-    /**
-     * @param shipment
-     * @return
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.TrackerEventRule#accept(com.visfresh.rules.RuleContext)
      */
-    protected boolean hasInterimStops(final Shipment shipment) {
-        return (interimStopDao.getByShipment(shipment).size() > 0);
-    }
-    protected boolean isNearInterimStop(final Shipment shipment, final ShipmentSession state,
-            final Double latitude, final Double longitude) {
-        if (latitude == null || longitude == null) {
-            return false;
-        }
+    @Override
+    public boolean accept(final RuleContext req) {
+        final TrackerEvent event = req.getEvent();
+        final Shipment shipment = event.getShipment();
+        final ShipmentSession session = shipment == null ? null : req.getSessionManager().getSession(shipment);
 
+        return shipment != null
+            && !req.isProcessed(this)
+            && !shipment.hasFinalStatus()
+            && LeaveStartLocationRule.isLeavingStartLocation(shipment, session)
+            && getInterimLocations(shipment) != null;
+    }
+
+    protected LocationProfile getBestLocation(final Shipment shipment,
+            final Double latitude, final Double longitude) {
         final List<LocationProfile> locs = getInterimLocations(shipment);
         if (locs != null) {
-            final LocationProfile p = getBestLocation(locs, latitude, longitude);
-            return p != null;
+            return getBestLocation(locs, latitude, longitude);
         }
-        return false;
+
+        return null;
     }
 
     /**
@@ -132,8 +139,12 @@ public abstract class AbstractInterimStopRule implements TrackerEventRule {
      * @param longitude longitude.
      * @return mathes location.
      */
-    protected static LocationProfile getBestLocation(final List<LocationProfile> locs,
-            final double latitude, final double longitude) {
+    protected LocationProfile getBestLocation(final List<LocationProfile> locs,
+            final Double latitude, final Double longitude) {
+        if (latitude == null || longitude == null) {
+            return null;
+        }
+
         int maxDistance = Integer.MAX_VALUE;
         LocationProfile best = null;
 
@@ -175,21 +186,6 @@ public abstract class AbstractInterimStopRule implements TrackerEventRule {
         return stop.getId();
     }
     /**
-     * @param stop interim stop info.
-     * @param minutes stop time in minutes.
-     */
-    protected void updateStopTime(final InterimStopInfo stop, final int minutes) {
-        interimStopDao.updateTime(stop.getId(), minutes);
-    }
-
-    /**
-     * @param state
-     * @return
-     */
-    protected static boolean isInInterimStop(final ShipmentSession state) {
-        return getInterimStop(state) != null;
-    }
-    /**
      * @param state
      * @return
      */
@@ -201,6 +197,33 @@ public abstract class AbstractInterimStopRule implements TrackerEventRule {
             return parseInterimStopInfo(SerializerUtils.parseJson(info).getAsJsonObject());
         }
         return null;
+    }
+    /**
+     * @param event
+     * @param shipment
+     * @param info
+     * @return
+     */
+    protected boolean leaveInterimStop(final TrackerEvent event, final Shipment shipment,
+            final InterimStopInfo info) {
+        if (info.getId() == null) {
+            final LocationProfile bestLocation = getBestLocation(shipment,
+                    info.getLatitude(), info.getLongitude());
+            return !LocationUtils.isNearLocation(bestLocation,
+                    new Location(event.getLatitude(), event.getLongitude()));
+        } else {
+            final InterimStop stp = getInterimStop(shipment, info);
+            return !LocationUtils.isNearLocation(stp.getLocation(),
+                    new Location(event.getLatitude(), event.getLongitude()));
+        }
+    }
+    /**
+     * @param shipment
+     * @param info
+     * @return
+     */
+    protected InterimStop getInterimStop(final Shipment shipment, final InterimStopInfo info) {
+        return interimStopDao.findOne(shipment, info.getId());
     }
     /**
      * @param json JSON object.
@@ -230,7 +253,7 @@ public abstract class AbstractInterimStopRule implements TrackerEventRule {
     /**
      * @return
      */
-    private static String createInterimStopKey() {
+    protected static String createInterimStopKey() {
         return "InterimStop-stop";
     }
 }

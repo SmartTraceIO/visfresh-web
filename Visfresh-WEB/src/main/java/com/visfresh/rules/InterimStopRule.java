@@ -56,26 +56,16 @@ public class InterimStopRule extends AbstractInterimStopRule {
         final Shipment shipment = event.getShipment();
         final ShipmentSession session = shipment == null ? null : req.getSessionManager().getSession(shipment);
 
-        final boolean accept = shipment != null
-                && !req.isProcessed(this)
-                && !shipment.hasFinalStatus()
-                && LeaveStartLocationRule.isLeavingStartLocation(shipment, session)
-                && getInterimLocations(shipment) != null;
-
-        if (accept) {
-            if (isInInterimStop(session)) {
-                return true;
-            }
-
-            if(isNearInterimStop(shipment, session, event.getLatitude(), event.getLongitude())) {
-                //only one interim stop can be used in given version of API.
-                return !hasInterimStops(shipment);
+        if (super.accept(req)) {
+            final InterimStopInfo stp = getInterimStop(session);
+            if (stp == null) {
+                return getBestLocation(shipment, event.getLatitude(), event.getLongitude()) != null;
             } else {
-                return false;
+                return stp.getId() == null && !leaveInterimStop(event, shipment, stp);
             }
         }
 
-        return accept;
+        return false;
     }
 
     /* (non-Javadoc)
@@ -87,62 +77,52 @@ public class InterimStopRule extends AbstractInterimStopRule {
 
         final TrackerEvent event = context.getEvent();
         final ShipmentSession state = context.getSessionManager().getSession(event.getShipment());
-        if (isNearInterimStop(event.getShipment(), state, event.getLatitude(), event.getLongitude())) {
-            InterimStopInfo stop = getInterimStop(state);
-            final List<LocationProfile> locs = getInterimLocations(event.getShipment());
-            boolean shouldCreateStop = false;
 
-            if (stop == null) {
-                stop = new InterimStopInfo();
-                stop.setLatitude(event.getLatitude());
-                stop.setLongitude(event.getLongitude());
-                stop.setStartTime(event.getTime().getTime());
+        InterimStopInfo stop = getInterimStop(state);
+        final List<LocationProfile> locs = getInterimLocations(event.getShipment());
+        boolean shouldCreateStop = false;
 
-                //if STP message type, then not need to wait next reading inside of location
-                //just need save interim stop
-                if (event.getType() == TrackerEventType.STP) {
-                    shouldCreateStop = true;
-                }
-            } else if (stop.getId() == null){
+        if (stop == null) {
+            stop = new InterimStopInfo();
+            stop.setStartTime(event.getTime().getTime());
+
+            //if STP message type, then not need to wait next reading inside of location
+            //just need save interim stop
+            if (event.getType() == TrackerEventType.STP) {
                 shouldCreateStop = true;
-            } else {
-                //update stop time in DB
-                final int minutes = (int) ((event.getTime().getTime() - stop.getStartTime()) / MINUTE);
-                updateStopTime(stop, minutes);
-                log.debug("Stop time for shipment " + event.getShipment().getId()
-                        + " has update to " + minutes + " min");
             }
-
-            if (shouldCreateStop) {
-                //update stop time
-                final InterimStop s = new InterimStop();
-                s.setLocation(getBestLocation(locs, event.getLatitude(), event.getLongitude()));
-                s.setDate(new Date(stop.getStartTime()));
-                s.setTime((int) ((event.getTime().getTime() - stop.getStartTime()) / MINUTE));
-
-                log.debug("Interim stop detected near location " + s.getLocation().getId()
-                        + " (" + s.getLocation().getName() + ")");
-                final Long id = save(event.getShipment(), s);
-                stop.setId(id);
-            }
-
-            setInterimStopState(state, stop);
-        } else if (isInInterimStop(state)) {
-            //remove interim stop
-            log.debug("Interim stop of shipment " + event.getShipment().getId() + " has finished");
-            state.setShipmentProperty(createInterimStopKey(), null);
+        } else if (stop.getId() == null){
+            shouldCreateStop = true;
         }
+
+        stop.setLatitude(event.getLatitude());
+        stop.setLongitude(event.getLongitude());
+
+        final LocationProfile bestLocation = getBestLocation(locs, event.getLatitude(), event.getLongitude());
+        if (shouldCreateStop) {
+            //update stop time
+            final InterimStop s = new InterimStop();
+            s.setLocation(bestLocation);
+            s.setDate(new Date(stop.getStartTime()));
+            s.setTime((int) ((event.getTime().getTime() - stop.getStartTime()) / MINUTE));
+
+            log.debug("Interim stop detected near location " + s.getLocation().getId()
+                    + " (" + s.getLocation().getName() + ")");
+            final Long id = save(event.getShipment(), s);
+            stop.setId(id);
+        } else {
+            log.debug("The shipment " + event.getShipment().getId()
+                    + " just entering location ("
+                    + bestLocation.getName()
+                    + ") start to watch a possible interim stop");
+        }
+
+        setInterimStopState(state, stop);
 
         return false;
     }
 
     public String getName() {
         return NAME;
-    }
-    /**
-     * @return
-     */
-    private static String createInterimStopKey() {
-        return NAME + "-stop";
     }
 }

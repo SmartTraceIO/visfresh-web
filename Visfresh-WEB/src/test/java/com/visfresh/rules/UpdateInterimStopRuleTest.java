@@ -5,7 +5,6 @@ package com.visfresh.rules;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
@@ -29,8 +28,9 @@ import com.visfresh.entities.TrackerEventType;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class InterimStopRuleTest extends InterimStopRule {
+public class UpdateInterimStopRuleTest extends UpdateInterimStopRule {
     private long ids = 0;
+    private final Map<Long, Integer> stopMinutes = new HashMap<>();
     private final Map<Long, List<InterimStop>> stops = new HashMap<>();
     private List<LocationProfile> locations;
     private Shipment shipment;
@@ -39,7 +39,7 @@ public class InterimStopRuleTest extends InterimStopRule {
     /**
      * Default constructor.
      */
-    public InterimStopRuleTest() {
+    public UpdateInterimStopRuleTest() {
         super();
     }
 
@@ -57,6 +57,8 @@ public class InterimStopRuleTest extends InterimStopRule {
 
         this.locations = locs;
         this.shipment = s;
+
+        saveInterimLocations(shipment, locations);
     }
 
     @Test
@@ -64,102 +66,35 @@ public class InterimStopRuleTest extends InterimStopRule {
         //test success accept
         final SessionHolder mgr = createSessionHolder(true);
 
-        saveInterimLocations(shipment, locations);
+        final LocationProfile loc = locations.get(0);
+        final InterimStopInfo info = createInterimStopInfo(loc);
+        setInterimStopState(mgr.getSession(shipment), info);
+        assertFalse(accept(new RuleContext(createTrackerEvent(loc), mgr)));
 
-        //test not accept far location
-        assertFalse(accept(new RuleContext(createTrackerEvent(shipment, 7, 8), mgr)));
-
-        shipment.setStatus(ShipmentStatus.InProgress);
-
-        //test not accept far location but in interim stop state
-        setInterimStopState(mgr.getSession(shipment), new InterimStopInfo());
-        assertFalse(accept(new RuleContext(createTrackerEvent(shipment, 7, 8), mgr)));
-    }
-    @Test
-    public void testAcceptInInterimState() {
-        //test success accept
-        final SessionHolder mgr = createSessionHolder(true);
-
-        saveInterimLocations(shipment, locations);
-
-        //test not accept far location
-        assertFalse(accept(new RuleContext(createTrackerEvent(shipment, 7, 8), mgr)));
-
-        shipment.setStatus(ShipmentStatus.InProgress);
-
-        //test not accept far location but in interim stop state
-        final LocationProfile loc1 = locations.get(0);
-        final LocationProfile loc2 = locations.get(1);
-        final InterimStopInfo info = createInterimStopInfo(loc1);
+        //test far interim stop
+        final InterimStop stop = createInterimStop(shipment, loc);
+        info.setId(stop.getId());
         setInterimStopState(mgr.getSession(shipment), info);
 
-        assertTrue(accept(new RuleContext(createTrackerEvent(shipment,
-                loc1.getLocation().getLatitude(), loc1.getLocation().getLongitude()), mgr)));
-        assertFalse(accept(new RuleContext(createTrackerEvent(shipment,
-                loc2.getLocation().getLatitude(), loc2.getLocation().getLongitude()), mgr)));
-
-        info.setId(77l);
-        setInterimStopState(mgr.getSession(shipment), info);
-        assertFalse(accept(new RuleContext(createTrackerEvent(shipment,
-                loc1.getLocation().getLatitude(), loc1.getLocation().getLongitude()), mgr)));
+        assertFalse(accept(new RuleContext(createTrackerEvent(locations.get(1)), mgr)));
+        assertTrue(accept(new RuleContext(createTrackerEvent(loc), mgr)));
     }
     @Test
-    public void testNotAcceptNotLeavingStartLocation() {
-        //test success accept
-        final SessionHolder mgr = createSessionHolder(false);
-
-        //test accept correct request
-        shipment.setShippedFrom(createLocation(111, 111));
-        saveInterimLocations(shipment, locations);
-        assertFalse(accept(new RuleContext(createTrackerEvent(shipment, 1, 2), mgr)));
-    }
-    @Test
-    public void testHandleFirstReading() {
+    public void testHandle() {
         //test success accept
         final SessionHolder mgr = createSessionHolder(true);
-        saveInterimLocations(shipment, locations);
-
-        final TrackerEvent e = createTrackerEvent(locations.get(0));
-        assertFalse(handle(new RuleContext(e, mgr)));
-
-        //check interim stop info supplied at state
-        assertNotNull(getInterimStop(mgr.getSession(shipment)));
-
-        //but not interim stop created
-        assertEquals(0, stops.size());
-    }
-    @Test
-    public void testHandleFirstReadingWithInit() {
-        //test success accept
-        final SessionHolder mgr = createSessionHolder(true);
-        saveInterimLocations(shipment, locations);
-
-        final TrackerEvent e = createTrackerEvent(locations.get(0));
-        e.setType(TrackerEventType.STP);
-        assertFalse(handle(new RuleContext(e, mgr)));
-
-        //check interim stop info supplied at state
-        assertNotNull(getInterimStop(mgr.getSession(shipment)));
-
-        //and interim stop created too
-        assertEquals(1, stops.size());
-    }
-
-    @Test
-    public void testHandleSecondReading() {
-        //test success accept
-        final SessionHolder state = createSessionHolder(true);
         saveInterimLocations(shipment, locations);
 
         //simulate previous stop
-        setInterimStopState(state.getSession(shipment), new InterimStopInfo());
+        setInterimStopState(mgr.getSession(shipment), new InterimStopInfo());
 
         final TrackerEvent e = createTrackerEvent(locations.get(0));
-        assertFalse(handle(new RuleContext(e, state)));
 
-        //and interim stop created too
-        assertEquals(1, stops.size());
+        //check update time
+        assertFalse(handle(new RuleContext(e, mgr)));
+        assertEquals(1, this.stopMinutes.size());
     }
+
     /**
      * @param l
      * @return
@@ -204,6 +139,13 @@ public class InterimStopRuleTest extends InterimStopRule {
 
         stop.setId(++ids);
         return stop.getId();
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.InterimStopRule#updateStopTime(com.visfresh.rules.InterimStopRule.InterimStopInfo, int)
+     */
+    @Override
+    protected void updateStopTime(final InterimStopInfo stop, final int minutes) {
+        stopMinutes.put(stop.getId(), minutes);
     }
     /**
      * @return
@@ -275,5 +217,27 @@ public class InterimStopRuleTest extends InterimStopRule {
         stop.setLongitude(loc.getLocation().getLongitude());
         stop.setStartTime(System.currentTimeMillis());
         return stop;
+    }
+    /**
+     * @param locationProfile
+     * @return
+     */
+    private InterimStop createInterimStop(final Shipment shipment, final LocationProfile locationProfile) {
+        final InterimStop stop = new InterimStop();
+        stop.setDate(new Date());
+        stop.setId(ids++);
+        stop.setLocation(locationProfile);
+        stop.setTime(0);
+
+        save(shipment, stop);
+        return stop;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.rules.AbstractInterimStopRule#getInterimStop(com.visfresh.entities.Shipment, com.visfresh.rules.AbstractInterimStopRule.InterimStopInfo)
+     */
+    @Override
+    protected InterimStop getInterimStop(final Shipment shipment, final InterimStopInfo info) {
+        final List<InterimStop> list = stops.get(shipment.getId());
+        return list == null || list.size() == 0 ? null : list.get(0);
     }
 }
