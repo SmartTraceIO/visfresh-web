@@ -38,6 +38,10 @@ public class SystemMessage {
      * Current message processor.
      */
     private String processor;
+    /**
+     * Message group.
+     */
+    private String group;
 
     /**
      * Default constructor.
@@ -132,6 +136,18 @@ public class SystemMessage {
      */
     public void setProcessor(final String processor) {
         this.processor = processor;
+    }
+    /**
+     * @return the group
+     */
+    public String getGroup() {
+        return group;
+    }
+    /**
+     * @param group the group to set
+     */
+    public void setGroup(final String group) {
+        this.group = group;
     }
 
     /* (non-Javadoc)

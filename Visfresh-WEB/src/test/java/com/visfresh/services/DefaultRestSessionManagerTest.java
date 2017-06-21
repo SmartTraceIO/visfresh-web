@@ -17,7 +17,7 @@ import org.junit.Test;
 
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
-import com.visfresh.mpl.services.DefaultRestSessionManager;
+import com.visfresh.impl.services.DefaultRestSessionManager;
 import com.visfresh.utils.HashGenerator;
 
 /**

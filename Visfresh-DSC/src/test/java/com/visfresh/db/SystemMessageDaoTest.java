@@ -8,8 +8,6 @@ import java.io.StringReader;
 import java.util.Date;
 import java.util.HashMap;
 
-import junit.framework.TestCase;
-
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -20,6 +18,8 @@ import com.visfresh.DeviceMessageType;
 import com.visfresh.Location;
 import com.visfresh.SystemMessage;
 import com.visfresh.spring.mock.JUnitConfig;
+
+import junit.framework.TestCase;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -79,6 +79,7 @@ public class SystemMessageDaoTest extends TestCase {
         final Reader in = new StringReader(sm.getMessageInfo());
         final JsonElement e = new JsonParser().parse(in);
         assertNotNull(e);
+        assertEquals(m.getImei(), sm.getGroup());
     }
     public void testSupportsNullLocations() {
         final int battery = 90;

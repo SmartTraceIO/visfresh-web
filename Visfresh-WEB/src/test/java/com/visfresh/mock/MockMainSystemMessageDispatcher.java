@@ -10,7 +10,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.SystemMessageType;
-import com.visfresh.mpl.services.MainSystemMessageDispatcher;
+import com.visfresh.impl.services.MainSystemMessageDispatcher;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

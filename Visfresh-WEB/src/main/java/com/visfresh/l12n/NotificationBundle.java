@@ -25,7 +25,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.mpl.services.NotificationIssueBundle;
+import com.visfresh.impl.services.NotificationIssueBundle;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.StringUtils;

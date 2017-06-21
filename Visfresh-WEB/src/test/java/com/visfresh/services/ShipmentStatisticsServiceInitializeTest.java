@@ -18,7 +18,7 @@ import com.visfresh.dao.ShipmentStatisticsDao;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.mpl.services.ShipmentStatisticsServiceImpl;
+import com.visfresh.impl.services.ShipmentStatisticsServiceImpl;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

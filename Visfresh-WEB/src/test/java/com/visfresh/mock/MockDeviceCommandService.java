@@ -5,7 +5,7 @@ package com.visfresh.mock;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.mpl.services.DeviceCommandServiceImpl;
+import com.visfresh.impl.services.DeviceCommandServiceImpl;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

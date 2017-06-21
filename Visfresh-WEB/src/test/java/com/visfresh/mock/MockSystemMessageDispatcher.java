@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.mpl.services.TrackerMessageDispatcher;
+import com.visfresh.impl.services.TrackerMessageDispatcher;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

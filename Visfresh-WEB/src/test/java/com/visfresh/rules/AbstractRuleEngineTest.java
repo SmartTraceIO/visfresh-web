@@ -27,7 +27,7 @@ import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.mpl.services.DeviceDcsNativeEvent;
+import com.visfresh.impl.services.DeviceDcsNativeEvent;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.RetryableException;

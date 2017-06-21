@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.google.gson.JsonElement;
 import com.visfresh.entities.Location;
-import com.visfresh.mpl.services.DeviceDcsNativeEvent;
+import com.visfresh.impl.services.DeviceDcsNativeEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.User;
-import com.visfresh.mpl.services.NotificationServiceImpl;
+import com.visfresh.impl.services.NotificationServiceImpl;
 import com.visfresh.services.RetryableException;
 
 /**

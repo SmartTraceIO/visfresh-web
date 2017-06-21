@@ -5,7 +5,7 @@ package com.visfresh.mock;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.mpl.services.AutoStartShipmentServiceImpl;
+import com.visfresh.impl.services.AutoStartShipmentServiceImpl;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

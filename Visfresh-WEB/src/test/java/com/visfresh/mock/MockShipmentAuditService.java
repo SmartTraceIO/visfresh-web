@@ -9,7 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.ShipmentAuditItem;
-import com.visfresh.mpl.services.DefaultShipmentAuditService;
+import com.visfresh.impl.services.DefaultShipmentAuditService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

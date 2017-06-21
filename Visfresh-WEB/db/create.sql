@@ -496,6 +496,7 @@ create table externalcompanies (
 create table systemmessages (
     id bigint(20) NOT NULL AUTO_INCREMENT,
     type varchar(128) NOT NULL,
+    group varchar(128),
     time datetime NOT NULL,
     processor varchar(32),
     retryon timestamp NULL default NULL,

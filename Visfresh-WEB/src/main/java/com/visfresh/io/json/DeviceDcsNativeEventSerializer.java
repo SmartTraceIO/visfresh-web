@@ -10,7 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.TrackerEventConstants;
-import com.visfresh.mpl.services.DeviceDcsNativeEvent;
+import com.visfresh.impl.services.DeviceDcsNativeEvent;
 import com.visfresh.utils.SerializerUtils;
 
 /**

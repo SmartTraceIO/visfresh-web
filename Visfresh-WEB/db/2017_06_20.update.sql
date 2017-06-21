@@ -1,0 +1,1 @@
+alter table systemmessages add column group varchar(128);

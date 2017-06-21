@@ -19,7 +19,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.mpl.services.ShipmentStatisticsServiceImpl;
+import com.visfresh.impl.services.ShipmentStatisticsServiceImpl;
 import com.visfresh.rules.state.ShipmentStatistics;
 
 /**

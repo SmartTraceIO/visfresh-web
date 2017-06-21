@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.RestSession;
-import com.visfresh.mpl.services.DefaultRestSessionManager;
+import com.visfresh.impl.services.DefaultRestSessionManager;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

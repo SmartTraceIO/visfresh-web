@@ -17,8 +17,8 @@ import org.junit.Test;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.impl.services.DeviceDcsNativeEvent;
 import com.visfresh.io.json.DeviceDcsNativeEventSerializer;
-import com.visfresh.mpl.services.DeviceDcsNativeEvent;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

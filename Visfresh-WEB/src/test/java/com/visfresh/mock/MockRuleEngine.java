@@ -5,7 +5,7 @@ package com.visfresh.mock;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.mpl.ruleengine.VisfreshRuleEngine;
+import com.visfresh.impl.ruleengine.VisfreshRuleEngine;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

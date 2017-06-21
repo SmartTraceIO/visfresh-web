@@ -19,8 +19,8 @@ import org.junit.Test;
 
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
+import com.visfresh.impl.services.DefaultRestSessionManager;
 import com.visfresh.io.email.EmailMessage;
-import com.visfresh.mpl.services.DefaultRestSessionManager;
 
 import junit.framework.AssertionFailedError;
 
