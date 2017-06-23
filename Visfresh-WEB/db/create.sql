@@ -1,4 +1,5 @@
 -- drops
+drop table if exists grouplocks;
 drop table if exists notes;
 drop table if exists correctiveactions;
 drop table if exists shipmentsessions;
@@ -554,4 +555,12 @@ create table simulators (
     primary key (user),
     FOREIGN KEY (user) REFERENCES users (id),
     FOREIGN KEY (target) REFERENCES devices (imei) ON DELETE CASCADE
+);
+
+create table grouplocks (
+    `type` varchar(20) not null,
+    `group` varchar(128) not null,
+    locker varchar(128) not null,
+    lastupdate timestamp null default null,
+    primary key (`type`, `group`)
 );

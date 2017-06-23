@@ -35,6 +35,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
     public static final String RETRYON_FIELD = "retryon";
     public static final String NUMRETRY_FIELD = "numretry";
     public static final String MESSAGE_FIELD = "message";
+    public static final String GROUP_FIELD = "group";
 
     /**
      * Default constructor.
@@ -68,6 +69,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
                     , PROCESSOR_FIELD
                     , NUMRETRY_FIELD
                     , MESSAGE_FIELD
+                    , "`" + GROUP_FIELD + "`"
                 ) + ")" + " values("
                     + ":"+ TYME_FIELD
                     + ", :" + TYPE_FIELD
@@ -75,6 +77,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
                     + ", :" + PROCESSOR_FIELD
                     + ", :" + NUMRETRY_FIELD
                     + ", :" + MESSAGE_FIELD
+                    + ", :" + GROUP_FIELD
                     + ")";
         } else {
             //update
@@ -85,6 +88,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
                 + "," + PROCESSOR_FIELD + "=:" + PROCESSOR_FIELD
                 + "," + NUMRETRY_FIELD + "=:" + NUMRETRY_FIELD
                 + "," + MESSAGE_FIELD + "=:" + MESSAGE_FIELD
+                + ",`" + GROUP_FIELD + "`=:" + GROUP_FIELD
                 + " where id = :" + ID_FIELD
             ;
         }
@@ -96,6 +100,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
         paramMap.put(PROCESSOR_FIELD, msg.getProcessor());
         paramMap.put(NUMRETRY_FIELD, msg.getNumberOfRetry());
         paramMap.put(MESSAGE_FIELD, msg.getMessageInfo());
+        paramMap.put(GROUP_FIELD, msg.getGroup());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -117,6 +122,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
         list.add(RETRYON_FIELD);
         list.add(NUMRETRY_FIELD);
         list.add(MESSAGE_FIELD);
+        list.add("`" + GROUP_FIELD + "`");
         return list;
     }
     /* (non-Javadoc)
@@ -214,6 +220,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
         m.setRetryOn((Date) map.get(RETRYON_FIELD));
         m.setNumberOfRetry(((Number) map.get(NUMRETRY_FIELD)).intValue());
         m.setMessageInfo((String) map.get(MESSAGE_FIELD));
+        m.setGroup((String) map.get(GROUP_FIELD));
         return m;
     }
 }

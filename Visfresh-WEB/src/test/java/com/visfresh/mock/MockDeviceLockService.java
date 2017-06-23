@@ -42,9 +42,9 @@ public class MockDeviceLockService implements DeviceLockService {
      * @see com.visfresh.services.DeviceLockService#unlock(java.lang.String)
      */
     @Override
-    public boolean unlock(final String imei) {
+    public boolean unlock(final String device, String lockerId) {
         synchronized (this) {
-            locks.remove(imei);
+            locks.remove(device);
             return true;
         }
     }

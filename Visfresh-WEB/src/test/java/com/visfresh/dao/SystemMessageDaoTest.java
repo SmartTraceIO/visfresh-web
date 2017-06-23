@@ -55,6 +55,7 @@ public class SystemMessageDaoTest extends
         msg.setRetryOn(new Date(System.currentTimeMillis() + 10000000l));
         msg.setTime(new Date(System.currentTimeMillis() - 10000000l));
         msg.setType(SystemMessageType.Tracker);
+        msg.setGroup("junit");
         return msg;
     }
 
@@ -69,6 +70,7 @@ public class SystemMessageDaoTest extends
         assertTrue(msg.getRetryOn().after(new Date(System.currentTimeMillis() + 10000l)));
         assertTrue(msg.getTime().before(new Date(System.currentTimeMillis() - 10000l)));
         assertEquals(SystemMessageType.Tracker, msg.getType());
+        assertEquals("junit", msg.getGroup());
 
     }
     @Test

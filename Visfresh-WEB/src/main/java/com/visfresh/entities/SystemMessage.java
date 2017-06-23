@@ -15,6 +15,10 @@ public class SystemMessage implements EntityWithId<Long> {
      */
     private Long id;
     /**
+     * System message group.
+     */
+    private String group;
+    /**
      * Message type.
      */
     private SystemMessageType type;
@@ -130,6 +134,18 @@ public class SystemMessage implements EntityWithId<Long> {
      */
     public void setProcessor(final String processor) {
         this.processor = processor;
+    }
+    /**
+     * @return the group
+     */
+    public String getGroup() {
+        return group;
+    }
+    /**
+     * @param group the group to set
+     */
+    public void setGroup(final String group) {
+        this.group = group;
     }
 
     /* (non-Javadoc)

@@ -18,12 +18,18 @@ public interface DeviceLockDao {
     boolean lock(String device, String lockKey);
     /**
      * @param device device.
-     * @param lockKeyPrefix lock key prefix.
+     * @param lockKey lock key.
      * @return true if successfully unlocked, false if is there system messages for given device.
      */
-    boolean unlockIfNoMessages(String device, String lockKeyPrefix);
+    boolean unlockIfNoMessages(String device, String lockKey);
     /**
      * @param beforeDate start date.
+     * @return TODO
      */
-    void unlockAll(Date beforeDate);
+    int unlockOlder(Date beforeDate);
+    /**
+     * deletes all locks. For tests only. Please not use it in production because
+     * the locks can be owned by different application instance, possible on remote server.
+     */
+    void deleteAll();
 }
