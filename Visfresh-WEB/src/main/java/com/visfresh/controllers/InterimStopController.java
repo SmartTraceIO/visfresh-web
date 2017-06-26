@@ -90,14 +90,6 @@ public class InterimStopController extends AbstractShipmentBaseController implem
             }
             checkCompanyAccess(user, shipment);
 
-            if (req.getId() == null) {
-                //check number of already saved
-                if (interimStopDao.getByShipment(shipment).size() > 0) {
-                    return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                            "Only one interim stop can be saved for given API version");
-                }
-            }
-
             //find location
             final LocationProfile location = locationProfileDao.findOne(req.getLocationId());
             if (location == null) {
