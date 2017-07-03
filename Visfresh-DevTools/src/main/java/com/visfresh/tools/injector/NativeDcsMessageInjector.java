@@ -41,6 +41,7 @@ public class NativeDcsMessageInjector implements ExtractedMessageHandler {
     public static final String TABLE = "systemmessages";
 
     public static final String TYPE_FIELD = "type";
+    public static final String GROUP_FIELD = "group";
     public static final String TIME_FIELD = "time";
     public static final String PROCESSOR_FIELD = "processor";
     public static final String RETRYON_FIELD = "retryon";
@@ -78,33 +79,45 @@ public class NativeDcsMessageInjector implements ExtractedMessageHandler {
      * @see com.visfresh.tools.ExtractedMessageHandler#handle(com.visfresh.tracker.DeviceMessage)
      */
     @Override
-    public void handle(LogUnit u, final DeviceMessage m) {
-        if (types.contains(m.getType())) {
+    public void handle(final LogUnit u, final DeviceMessage m) {
+        final String type = m.getType();
+        if (supportsType(type)) {
             final String payload = buildSystemMessagePayload(m);
-            saveSystemMessage(payload);
+            saveSystemMessage(m.getImei(), payload);
         }
+    }
+
+    /**
+     * @param type
+     * @return
+     */
+    protected boolean supportsType(final String type) {
+        return types.contains(type);
     }
 
     /**
      * @param payload
      */
-    private void saveSystemMessage(final String payload) {
+    private void saveSystemMessage(final String device, final String payload) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         final String sql = "insert into " + TABLE + " (" +
                 TIME_FIELD
                 + "," + TYPE_FIELD
+                + ",`" + GROUP_FIELD + "`"
                 + "," + RETRYON_FIELD
                 + "," + MESSAGE_FIELD
              + ")" + " values("
                 + ":"+ TIME_FIELD
                 + ", :" + TYPE_FIELD
+                + ", :" + GROUP_FIELD
                 + ", :" + RETRYON_FIELD
                 + ", :" + MESSAGE_FIELD
                 + ")";
 
         paramMap.put(TIME_FIELD, new Date());
         paramMap.put(TYPE_FIELD, "Tracker");
+        paramMap.put(GROUP_FIELD, device);
         paramMap.put(RETRYON_FIELD, new Date());
         paramMap.put(MESSAGE_FIELD, payload);
 

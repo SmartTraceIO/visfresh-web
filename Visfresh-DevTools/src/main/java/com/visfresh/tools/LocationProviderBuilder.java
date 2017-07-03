@@ -68,14 +68,14 @@ public class LocationProviderBuilder extends AbstractVisfreshLogParser {
 
         if (containsDevice(u.getMessage())) {
             if (logLocation.contains("DeviceMessageDispatcher")) {
-                parseIncommingMessage(u);
+                parseLocation(u);
             }
         }
     }
     /**
      * @param u log unit.
      */
-    private void parseIncommingMessage(final LogUnit u) {
+    private void parseLocation(final LogUnit u) {
         //Location (lat: -34.755534, lon: 138.601866) has detected for message
         final String text = u.getMessage();
         final String prefix = "Location (";
