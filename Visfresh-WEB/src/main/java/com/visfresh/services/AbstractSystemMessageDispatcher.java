@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,11 +50,11 @@ public abstract class AbstractSystemMessageDispatcher {
      */
     protected long retryTimeOut;
 
-    private final AtomicBoolean isStoped = new AtomicBoolean(false);
+    protected final AtomicBoolean isStoped = new AtomicBoolean(false);
 
-    private final Map<SystemMessageType, SystemMessageHandler> messageHandlers
+    protected final Map<SystemMessageType, SystemMessageHandler> messageHandlers
         = new HashMap<SystemMessageType, SystemMessageHandler>();
-    private final Set<SystemMessageType> messageTypes = new LinkedHashSet<>();
+    protected final Set<SystemMessageType> messageTypes = new LinkedHashSet<>();
 
     @Autowired
     private SystemMessageDao messageDao;
@@ -82,7 +81,9 @@ public abstract class AbstractSystemMessageDispatcher {
                     final int numProcessed = processMessages(id);
                     if (numProcessed == 0 && getInactiveTimeOut() > 0){
                         synchronized (isStoped) {
-                            isStoped.wait(getInactiveTimeOut());
+                            if (!isStoped.get()) {
+                                isStoped.wait(getInactiveTimeOut());
+                            }
                         }
                     }
                 } catch (final InterruptedException e) {
@@ -184,33 +185,14 @@ public abstract class AbstractSystemMessageDispatcher {
      * @param processorId
      * @return
      */
-    protected int processMessages(final String processorId) {
-        int count = 0;
-
-        if (!messageHandlers.isEmpty()) {
-            final List<SystemMessage> messages = messageDao.selectMessagesForProcessing(
-                    messageTypes, processorId, getBatchLimit(), new Date(System.currentTimeMillis() + 1000l));
-
-            for (final SystemMessage msg : messages) {
-                try {
-                    messageHandlers.get(msg.getType()).handle(msg);
-                    handleSuccess(msg);
-                } catch(final Throwable e) {
-                    handleError(msg, e);
-                }
-            }
-
-            count += messages.size();
-        }
-
-        return count;
-    }
+    protected abstract int processMessages(final String processorId);
 
     /**
      * @param msg the message.
      * @param e the exception.
+     * @return true if message updated to reprocess.
      */
-    protected void handleError(final SystemMessage msg, final Throwable e) {
+    protected boolean handleError(final SystemMessage msg, final Throwable e) {
         if (ExceptionUtils.containsException(e, SQLException.class)) {
             if (isStoped.get()) {
                 log.warn("SQL exception occured because the system is stopped");
@@ -219,27 +201,53 @@ public abstract class AbstractSystemMessageDispatcher {
             }
         } else if (e instanceof RetryableException && ((RetryableException) e).canRetry()) {
             if (msg.getNumberOfRetry() < getRetryLimit()) {
-                final RetryableException re = (RetryableException) e;
-
-                log.error("Retryable exception has occured for message " + msg + ", will retry later", re);
-                long timeOut = getRetryTimeOut();
-                if (re.getRetryTimeOut() > 0) { // if retry time out is set on exception, use it
-                    timeOut = re.getRetryTimeOut();
-                }
-
-                msg.setRetryOn(new Date(msg.getRetryOn().getTime() + timeOut));
-                msg.setNumberOfRetry(msg.getNumberOfRetry() + 1);
-                msg.setProcessor(null);//clear processor
-                messageDao.save(msg);
+                prepareForNextRetry(msg, e);
+                saveMessage(msg);
+                return true;
             } else {
                 log.error("Retry limit has exceed for message " + msg + ", will not dispatched next", e);
-                messageDao.delete(msg);
+                deleteMessage(msg);
             }
         } else {
             log.error("Not retryable exception has occured for message " + msg.getId()
                     + ", will not dispatched next", e);
-            messageDao.delete(msg);
+            deleteMessage(msg);
         }
+
+        return false;
+    }
+
+    /**
+     * @param msg
+     * @param e
+     */
+    protected void prepareForNextRetry(final SystemMessage msg, final Throwable e) {
+        final RetryableException re = (RetryableException) e;
+
+        log.error("Retryable exception has occured for message " + msg + ", will retry later", re);
+        long timeOut = getRetryTimeOut();
+        if (re.getRetryTimeOut() > 0) { // if retry time out is set on exception, use it
+            timeOut = re.getRetryTimeOut();
+        }
+
+        msg.setRetryOn(new Date(msg.getRetryOn().getTime() + timeOut));
+        msg.setNumberOfRetry(msg.getNumberOfRetry() + 1);
+        msg.setProcessor(null);//clear processor
+    }
+
+    /**
+     * @param msg
+     */
+    protected void deleteMessage(final SystemMessage msg) {
+        messageDao.delete(msg);
+    }
+
+    /**
+     * @param msg
+     * @return
+     */
+    protected SystemMessage saveMessage(final SystemMessage msg) {
+        return messageDao.save(msg);
     }
     /**
      * @param msg the message.
@@ -247,7 +255,7 @@ public abstract class AbstractSystemMessageDispatcher {
     protected void handleSuccess(final SystemMessage msg) {
         log.debug("The message " + msg.getId() + " successfully processed by " + getProcessorId()
                 + ", will not dispatched next");
-        messageDao.delete(msg);
+        deleteMessage(msg);
     }
 
     /**
@@ -303,7 +311,7 @@ public abstract class AbstractSystemMessageDispatcher {
         sm.setMessageInfo(messagePayload);
         sm.setTime(new Date());
         sm.setRetryOn(retryOn);
-        messageDao.save(sm);
+        saveMessage(sm);
     }
     /**
      * @return the messageDao

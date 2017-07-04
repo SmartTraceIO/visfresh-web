@@ -30,4 +30,13 @@ public interface SystemMessageDao extends DaoBase<SystemMessage, SystemMessage, 
      * @return list of system messages.
      */
     List<SystemMessage> findTrackerEvents(boolean b);
+
+    /**
+     * @param messageType message type
+     * @param group device IMEI as group.
+     * @param readyOn ready on time.
+     * @param batchLimit batch limit.
+     * @return
+     */
+    List<SystemMessage> getMessagesForGoup(SystemMessageType messageType, String group, Date readyOn, int batchLimit);
 }

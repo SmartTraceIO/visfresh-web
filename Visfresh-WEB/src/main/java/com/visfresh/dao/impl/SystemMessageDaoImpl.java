@@ -168,6 +168,29 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
         return result;
     }
     /* (non-Javadoc)
+     * @see com.visfresh.dao.SystemMessageDao#getMessagesForGoup(com.visfresh.entities.SystemMessageType, java.lang.String, int, java.util.Date)
+     */
+    @Override
+    public List<SystemMessage> getMessagesForGoup(final SystemMessageType messageType, final String group,
+            final Date readyOn, final int batchLimit) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("type", messageType.name());
+        params.put("group", group);
+        params.put("retryOn", readyOn);
+        params.put("limit", batchLimit);
+
+        final List<Map<String, Object>> list = jdbc.queryForList(
+                "select * from " + TABLE
+                + " where `type` = :type and `group` = :group and retryon <= :retryOn limit :limit", params);
+
+        final LinkedList<SystemMessage> result = new LinkedList<SystemMessage>();
+        for (final Map<String,Object> row : list) {
+            result.add(createEntity(row));
+        }
+
+        return result;
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.dao.SystemMessageDao#findTrackerEvents(boolean)
      */
     @Override

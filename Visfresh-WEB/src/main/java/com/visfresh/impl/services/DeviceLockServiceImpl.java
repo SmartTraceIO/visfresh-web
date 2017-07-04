@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.services;
+package com.visfresh.impl.services;
 
 import java.util.Date;
 import java.util.Timer;
@@ -17,17 +17,17 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.DeviceLockDao;
+import com.visfresh.services.DeviceLockService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class DefaultDeviceLockService implements DeviceLockService {
-    private static Logger log = LoggerFactory.getLogger(DefaultDeviceLockService.class);
+public class DeviceLockServiceImpl implements DeviceLockService {
+    private static Logger log = LoggerFactory.getLogger(DeviceLockServiceImpl.class);
 
-    private static final long TIME_OUT = 15 * 60 * 1000l; // 15 minutes
-    private static final long MAX_LOCK_TIME = 20 * 60 * 1000l;// 20 minutes
+    private static final long TIME_OUT = 15 * 1000l; // 15 seconds
 
     @Autowired
     private DeviceLockDao dao;
@@ -39,7 +39,7 @@ public class DefaultDeviceLockService implements DeviceLockService {
      * Default constructor.
      */
     @Autowired
-    public DefaultDeviceLockService(final Environment env) {
+    public DeviceLockServiceImpl(final Environment env) {
         super();
         instanceId = env.getProperty("instance.id");
     }
@@ -59,9 +59,10 @@ public class DefaultDeviceLockService implements DeviceLockService {
      *
      */
     protected void unlockOlds() {
-        log.debug("Ustarted of unlocking very old locks if found");
-        dao.unlockOlder(new Date(System.currentTimeMillis() - MAX_LOCK_TIME));
-        log.debug("Finished of unlocking very old locks");
+        final int unlocked = dao.unlockOlder(new Date());
+        if (unlocked > 0) {
+            log.debug(unlocked + " locks have unlocked by device lock service");
+        }
     }
 
     @PreDestroy
@@ -77,11 +78,18 @@ public class DefaultDeviceLockService implements DeviceLockService {
         return dao.lock(device, createLockKey(lockerId));
     }
     /* (non-Javadoc)
+     * @see com.visfresh.services.DeviceLockService#setUnlockOn(java.lang.String, java.lang.String, java.util.Date)
+     */
+    @Override
+    public void setUnlockOn(final String device, final String lockerId, final Date unlockOn) {
+        dao.setUnlockOn(device, createLockKey(lockerId), unlockOn);
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.services.DeviceLockService#unlock(java.lang.String)
      */
     @Override
-    public boolean unlock(final String device, final String lockerId) {
-        return dao.unlockIfNoMessages(device, createLockKey(lockerId));
+    public void unlock(final String device, final String lockerId) {
+        dao.unlock(device, createLockKey(lockerId));
     }
 
     /**

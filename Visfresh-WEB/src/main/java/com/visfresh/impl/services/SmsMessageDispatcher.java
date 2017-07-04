@@ -11,7 +11,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.SystemMessageType;
-import com.visfresh.services.AbstractSystemMessageDispatcher;
+import com.visfresh.services.AbstractAssyncSystemMessageDispatcher;
 import com.visfresh.services.SystemMessageHandler;
 
 /**
@@ -19,7 +19,7 @@ import com.visfresh.services.SystemMessageHandler;
  *
  */
 @Component
-public class SmsMessageDispatcher extends AbstractSystemMessageDispatcher {
+public class SmsMessageDispatcher extends AbstractAssyncSystemMessageDispatcher {
     /**
      * Processor ID.
      */

@@ -113,6 +113,42 @@ public class SystemMessageDaoTest extends
         assertNull(dao.findOne(m3.getId()).getProcessor());
     }
     @Test
+    public void testGetMessagesForGoup() {
+        final SystemMessage m1 = createTestEntity(null);
+        dao.save(m1);
+
+        //test date
+        final String group = m1.getGroup();
+        final SystemMessageType messageType = SystemMessageType.Tracker;
+
+        assertEquals(0, dao.getMessagesForGoup(messageType, group,
+                new Date(m1.getRetryOn().getTime() - 10000L), 100).size());
+        assertEquals(1, dao.getMessagesForGoup(messageType, group,
+                new Date(m1.getRetryOn().getTime() + 1000L), 100).size());
+        assertEquals(0, dao.getMessagesForGoup(messageType, group + "abrakadabra",
+                new Date(m1.getRetryOn().getTime() + 1000L), 100).size());
+
+        //clear processor field
+        dao.save(m1);
+
+        //check message type
+        assertEquals(0, dao.getMessagesForGoup(SystemMessageType.ArrivalReport, group,
+                new Date(m1.getRetryOn().getTime() + 1000L), 100).size());
+
+        //test limit
+        final SystemMessage m2 = createTestEntity(null);
+        dao.save(m2);
+        final SystemMessage m3 = createTestEntity(null);
+        dao.save(m3);
+
+        final List<SystemMessage> messages = dao.getMessagesForGoup(messageType, group,
+                new Date(m1.getRetryOn().getTime() + 1000L), 2);
+        assertEquals(2, messages.size());
+
+        //test ordering
+        assertEquals(m1.getId(), messages.get(0).getId());
+    }
+    @Test
     public void testFindTrackerEvents() {
         final long dt = 100000;
         final long t = System.currentTimeMillis() - 20 * dt;

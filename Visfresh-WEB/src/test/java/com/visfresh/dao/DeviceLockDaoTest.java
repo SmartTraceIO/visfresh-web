@@ -55,7 +55,7 @@ public class DeviceLockDaoTest extends BaseDaoTest<DeviceLockDao> {
         final String device = "anydevice";
 
         assertTrue(dao.lock(device, lockKey));
-        assertTrue(dao.unlockIfNoMessages(device, lockKey));
+        dao.unlock(device, lockKey);
         assertTrue(dao.lock(device, lockKey));
     }
     @Test
@@ -64,42 +64,21 @@ public class DeviceLockDaoTest extends BaseDaoTest<DeviceLockDao> {
         final String lockKey = "anyLock";
         assertTrue(dao.lock(device, lockKey));
 
+        final Date unlockOn = new Date(System.currentTimeMillis() + 10000000l);
+        dao.setUnlockOn(device, lockKey, unlockOn);
+
         //update time to very old
         final Map<String, Object> params = new HashMap<>();
-        final Date date = new Date(System.currentTimeMillis() - 10000000000l);
-        params.put("time", date);
-        jdbc.update("update grouplocks set lastupdate = :time", params);
+        params.put("device", device);
+        params.put("lockKey", lockKey);
+        final List<Map<String, Object>> rows = jdbc.queryForList("select unlockon from grouplocks"
+                + " where `group` = :device and locker = :lockKey", params);
 
-        //add system message for given device
-        final Date readyOn = new Date(System.currentTimeMillis() - 100000l);
-        createSystemMessage(device, readyOn);
-
-        //check not unlocked
-        assertFalse(dao.unlockIfNoMessages(device, lockKey));
-
-        //check updated last time
-        final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select lastupdate from grouplocks", new HashMap<>());
-        assertEquals(1, rows.size());
-        assertTrue(Math.abs(((Date) rows.get(0).get("lastupdate")).getTime() - date.getTime()) > 100000l);
+        assertTrue(Math.abs(((Date) rows.get(0).get("unlockon")).getTime() - unlockOn.getTime()) < 1000l);
     }
-
     @Test
-    public void testIgnoresNotReady() {
-        final String device = "device";
-        final String lockKey = "anyLock";
-        assertTrue(dao.lock(device, lockKey));
+    public void testSetUnlockTime() {
 
-        //add system message for given device
-        createSystemMessage(device, new Date(System.currentTimeMillis() + 100000l));
-
-        //check not unlocked
-        assertTrue(dao.unlockIfNoMessages(device, lockKey));
-
-        //check updated last time
-        final List<Map<String, Object>> rows = jdbc.queryForList(
-                "select lastupdate from grouplocks", new HashMap<>());
-        assertEquals(0, rows.size());
     }
     @Test
     public void testDeleteOldLocks() {
@@ -109,7 +88,7 @@ public class DeviceLockDaoTest extends BaseDaoTest<DeviceLockDao> {
         //update time to very old
         final Map<String, Object> params = new HashMap<>();
         params.put("time", new Date(System.currentTimeMillis() - 10000000000l));
-        jdbc.update("update grouplocks set lastupdate = :time", params);
+        jdbc.update("update grouplocks set unlockon = :time", params);
 
         //create new lock
         assertTrue(dao.lock("d3", "l3"));
@@ -117,6 +96,43 @@ public class DeviceLockDaoTest extends BaseDaoTest<DeviceLockDao> {
         dao.unlockOlder(new Date(System.currentTimeMillis() - 100000000l));
 
         assertEquals(1, jdbc.queryForList("select * from grouplocks", new HashMap<>()).size());
+    }
+    @Test
+    public void testGetNotLockedDevicesWithReadyMessagesLimit() {
+        final Date msgReadyOn = new Date(System.currentTimeMillis() - 10000000000l);
+
+        createSystemMessage("d1", msgReadyOn);
+        createSystemMessage("d1", msgReadyOn);
+
+        createSystemMessage("d2", msgReadyOn);
+        createSystemMessage("d2", msgReadyOn);
+
+        final Date readyOn = new Date(System.currentTimeMillis() - 1000000000l);
+        assertEquals(1, dao.getNotLockedDevicesWithReadyMessages(readyOn, 1).size());
+        assertEquals(2, dao.getNotLockedDevicesWithReadyMessages(readyOn, 2).size());
+        assertEquals(2, dao.getNotLockedDevicesWithReadyMessages(readyOn, 3).size());
+
+        //lock one device
+        dao.lock("d1", "junit");
+        assertEquals(1, dao.getNotLockedDevicesWithReadyMessages(readyOn, 2).size());
+    }
+    @Test
+    public void testGetNotLockedDevicesWithReadyMessagesReadyOn() {
+        final Date readyOn1 = new Date(System.currentTimeMillis() - 10000000000l);
+        final Date readyOn2 = new Date(System.currentTimeMillis() - 1000000000l);
+
+        createSystemMessage("d1", readyOn1);
+        createSystemMessage("d1", readyOn1);
+
+        createSystemMessage("d2", readyOn2);
+        createSystemMessage("d2", readyOn2);
+
+        assertEquals(1, dao.getNotLockedDevicesWithReadyMessages(
+                new Date((readyOn1.getTime() + readyOn2.getTime()) / 2), 100).size());
+        assertEquals("d1", dao.getNotLockedDevicesWithReadyMessages(
+                new Date((readyOn1.getTime() + readyOn2.getTime()) / 2), 100).get(0));
+        assertEquals(2, dao.getNotLockedDevicesWithReadyMessages(
+                new Date(readyOn2.getTime() + 100000l), 100).size());
     }
     /**
      * @param device the device.

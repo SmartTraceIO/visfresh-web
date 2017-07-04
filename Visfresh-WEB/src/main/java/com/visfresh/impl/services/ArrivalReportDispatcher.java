@@ -11,14 +11,14 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.SystemMessageType;
-import com.visfresh.services.AbstractSystemMessageDispatcher;
+import com.visfresh.services.AbstractAssyncSystemMessageDispatcher;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class ArrivalReportDispatcher extends AbstractSystemMessageDispatcher {
+public class ArrivalReportDispatcher extends AbstractAssyncSystemMessageDispatcher {
     /**
      * Processor ID.
      */
