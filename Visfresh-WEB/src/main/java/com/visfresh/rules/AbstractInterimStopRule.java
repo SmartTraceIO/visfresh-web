@@ -117,6 +117,8 @@ public abstract class AbstractInterimStopRule implements TrackerEventRule {
         final ShipmentSession session = shipment == null ? null : req.getSessionManager().getSession(shipment);
 
         return shipment != null
+            && event.getLatitude() != null
+            && event.getLongitude() != null
             && !req.isProcessed(this)
             && !shipment.hasFinalStatus()
             && LeaveStartLocationRule.isLeavingStartLocation(shipment, session)
