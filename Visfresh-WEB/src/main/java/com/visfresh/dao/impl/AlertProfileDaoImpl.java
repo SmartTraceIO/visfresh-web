@@ -235,6 +235,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
                 + ""
                 + ",\n ca.id as actionsId"
                 + ",\n ca.name as actionsName"
+                + ",\n ca.description as actionsDescription"
                 + ",\n ca.actions as actionsActions"
                 + " from temperaturerules r"
                 + "\nleft outer join correctiveactions ca on ca.id = r.corractions"
@@ -258,6 +259,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
                 final CorrectiveActionList a = new CorrectiveActionList();
                 a.setId(listId.longValue());
                 a.setName((String) row.get("actionsName"));
+                a.setDescription((String) row.get("actionsDescription"));
                 a.getActions().addAll(parseCorrectiveActions((String) row.get("actionsActions")));
                 r.setCorrectiveActions(a);
             }
@@ -290,9 +292,11 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
                 return "select " + table + ".*"
                         + ",\n loa.id as loaActionsId"
                         + ",\n loa.name as loaActionsName"
+                        + ",\n loa.description as loaActionsDescription"
                         + ",\n loa.actions as loaActionsActions"
                         + ",\n bla.id as blaActionsId"
                         + ",\n bla.name as blaActionsName"
+                        + ",\n bla.description as blaActionsDescription"
                         + ",\n bla.actions as blaActionsActions"
                         + " from " + table
                         + "\nleft outer join correctiveactions bla on bla.id = " + table + ".batterylowactions"
@@ -376,6 +380,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             final CorrectiveActionList l = new CorrectiveActionList();
             l.setId(((Number) row.get("loaActionsId")).longValue());
             l.setName((String) row.get("loaActionsName"));
+            l.setDescription((String) row.get("loaActionsDescription"));
             l.getActions().addAll(parseCorrectiveActions((String) row.get("loaActionsActions")));
             ap.setLightOnCorrectiveActions(l);
         }
@@ -385,6 +390,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             final CorrectiveActionList l = new CorrectiveActionList();
             l.setId(((Number) row.get("blaActionsId")).longValue());
             l.setName((String) row.get("blaActionsName"));
+            l.setDescription((String) row.get("blaActionsDescription"));
             l.getActions().addAll(parseCorrectiveActions((String) row.get("blaActionsActions")));
             ap.setBatteryLowCorrectiveActions(l);
         }

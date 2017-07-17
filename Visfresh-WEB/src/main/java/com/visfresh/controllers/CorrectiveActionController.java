@@ -173,7 +173,8 @@ public class CorrectiveActionController extends AbstractController implements Co
     private String[] getDefaultSortOrder() {
         return new String[] {
                 LIST_ID,
-                LIST_NAME
+                LIST_NAME,
+                DESCRIPTION
         };
     }
 }

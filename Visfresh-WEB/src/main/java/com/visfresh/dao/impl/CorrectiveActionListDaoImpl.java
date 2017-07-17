@@ -26,11 +26,11 @@ import com.visfresh.utils.SerializerUtils;
 @Component
 public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<CorrectiveActionList, CorrectiveActionList, Long>
         implements CorrectiveActionListDao {
-//    public static final String TABLE = "criticalactions";
-    public static final String TABLE = "correctiveactions";
+    private static final String TABLE = "correctiveactions";
 
-    public static final String ID_FIELD = "id";
-    public static final String NAME_FIELD = "name";
+    private static final String ID_FIELD = "id";
+    private static final String NAME_FIELD = "name";
+    private static final String DESCRIPTION = "description";
 
     private static final String COMPANY_FIELD = "company";
     private static final String ACTIONS = "actions";
@@ -68,6 +68,7 @@ public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<Co
 
         paramMap.put(ID_FIELD, list.getId());
         paramMap.put(NAME_FIELD, list.getName());
+        paramMap.put(DESCRIPTION, list.getDescription());
         paramMap.put(ACTIONS, toJson(list.getActions()));
         paramMap.put(COMPANY_FIELD, list.getCompany().getId());
 
@@ -90,6 +91,7 @@ public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<Co
     private List<String> getFields(final boolean includeId) {
         final List<String> fields = new LinkedList<String>();
         fields.add(NAME_FIELD);
+        fields.add(DESCRIPTION);
         fields.add(ACTIONS);
         fields.add(COMPANY_FIELD);
 
@@ -137,6 +139,7 @@ public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<Co
 
         list.setId(((Number) map.get(ID_FIELD)).longValue());
         list.setName((String) map.get(NAME_FIELD));
+        list.setDescription((String) map.get(DESCRIPTION));
         list.getActions().addAll(parseActions((String) map.get(ACTIONS)));
 
         return list;

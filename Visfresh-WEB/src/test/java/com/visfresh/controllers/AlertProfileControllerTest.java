@@ -279,6 +279,7 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
 
         assertEquals(actions.getId(), actual.getId());
         assertEquals(actions.getName(), actual.getName());
+        assertEquals(actions.getDescription(), actual.getDescription());
         assertEquals(actions.getActions().size(), actual.getActions().size());
     }
 
@@ -289,6 +290,7 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         final CorrectiveActionList list = new CorrectiveActionList();
         list.setCompany(getCompany());
         list.setName("JUnit actions");
+        list.setDescription("JUnit action list description");
         list.getActions().add(new CorrectiveAction("First action", true));
         list.getActions().add(new CorrectiveAction("Second action", true));
         return context.getBean(CorrectiveActionListDao.class).save(list);

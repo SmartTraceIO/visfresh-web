@@ -130,6 +130,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         final CorrectiveActionList actions = new CorrectiveActionList();
         actions.setCompany(sharedCompany);
         actions.setName("Rule action");
+        actions.setName("Rule action description");
         actions.getActions().add(new CorrectiveAction("test", true));
         context.getBean(CorrectiveActionListDao.class).save(actions);
 
@@ -156,6 +157,7 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         assertEquals(actions.getId(), actualActions.getId());
         assertNotNull(actions.getCompany());
         assertEquals(actions.getName(), actualActions.getName());
+        assertEquals(actions.getDescription(), actualActions.getDescription());
         assertEquals(actions.getActions().size(), actualActions.getActions().size());
     }
     @Test
@@ -184,6 +186,38 @@ public class AlertProfileDaoTest extends BaseCrudTest<AlertProfileDao, AlertProf
         ap = dao.findOne(ap.getId());
 
         assertEquals(a2.getId(), actual.getCorrectiveActions().getId());
+    }
+    @Test
+    public void testLightOnCorrectiveActions() {
+        AlertProfile ap = createTestEntity();
+
+        final CorrectiveActionList action = createCorrectiveActions();
+        ap.setLightOnCorrectiveActions(action);
+
+        dao.save(ap);
+        ap = dao.findOne(ap.getId());
+
+        final CorrectiveActionList actual = ap.getLightOnCorrectiveActions();
+        assertEquals(action.getId(), actual.getId());
+        assertEquals(action.getName(), actual.getName());
+        assertEquals(action.getDescription(), actual.getDescription());
+        assertEquals(action.getActions().size(), actual.getActions().size());
+    }
+    @Test
+    public void testBatteryLowActions() {
+        AlertProfile ap = createTestEntity();
+
+        final CorrectiveActionList action = createCorrectiveActions();
+        ap.setBatteryLowCorrectiveActions(action);
+
+        dao.save(ap);
+        ap = dao.findOne(ap.getId());
+
+        final CorrectiveActionList actual = ap.getBatteryLowCorrectiveActions();
+        assertEquals(action.getId(), actual.getId());
+        assertEquals(action.getName(), actual.getName());
+        assertEquals(action.getDescription(), actual.getDescription());
+        assertEquals(action.getActions().size(), actual.getActions().size());
     }
     @Override
     @Test

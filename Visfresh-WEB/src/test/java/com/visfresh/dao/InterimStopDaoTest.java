@@ -6,9 +6,8 @@ package com.visfresh.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +28,7 @@ import com.visfresh.entities.ShipmentStatus;
  */
 public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
     private Shipment shipment;
-    private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm");
+//    private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm");
 
     /**
      * Default constructor.
@@ -91,7 +90,7 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
         final InterimStop stop = stops.get(0);
         assertEquals(stop1.getId(), stop.getId());
 
-        assertEquals(format.format(stop1.getDate()), format.format(stop.getDate()));
+        assertTrue(Math.abs(stop1.getDate().getTime() - stop.getDate().getTime()) < 1000);
         assertEquals(stop1.getLocation().getId(), stop.getLocation().getId());
         assertEquals(stop1.getTime(), stop.getTime());
     }
@@ -114,7 +113,7 @@ public class InterimStopDaoTest extends BaseDaoTest<InterimStopDao> {
 
         assertEquals(id, stop.getId());
 
-        assertEquals(format.format(date), format.format(stop.getDate()));
+        assertTrue(Math.abs(date.getTime() - stop.getDate().getTime()) < 1000);
         assertEquals(loc.getId(), stop.getLocation().getId());
         assertEquals(time, stop.getTime());
     }

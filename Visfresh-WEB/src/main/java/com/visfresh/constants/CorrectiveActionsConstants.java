@@ -11,4 +11,5 @@ public interface CorrectiveActionsConstants {
     String LIST_NAME = "listName";
     String LIST_ID = "listId";
     String ACTIONS = "actions";
+    String DESCRIPTION = "description";
 }

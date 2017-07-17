@@ -46,10 +46,12 @@ public class CorrectiveActionListSerializerTest {
         final String name = "JUnit Action list";
         final String a1 = "First Action";
         final String a2 = "Second Action";
+        final String description = "List description";
 
         CorrectiveActionList list = new CorrectiveActionList();
         list.setCompany(company);
         list.setId(id);
+        list.setDescription(description);
         list.setName(name);
         list.getActions().add(new CorrectiveAction(a1, true));
         list.getActions().add(new CorrectiveAction(a2, false));
@@ -58,6 +60,7 @@ public class CorrectiveActionListSerializerTest {
 
         assertEquals(id, list.getId());
         assertEquals(name, list.getName());
+        assertEquals(description, list.getDescription());
         assertEquals(a1, list.getActions().get(0).getAction());
         assertTrue(list.getActions().get(0).isRequestVerification());
         assertEquals(a2, list.getActions().get(1).getAction());

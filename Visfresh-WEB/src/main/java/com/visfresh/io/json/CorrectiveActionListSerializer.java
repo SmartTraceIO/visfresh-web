@@ -104,6 +104,7 @@ public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
         list.setCompany(company);
         list.setId(asLong(json.get(CorrectiveActionsConstants.LIST_ID)));
         list.setName(json.get(CorrectiveActionsConstants.LIST_NAME).getAsString());
+        list.setDescription(asString(json.get(CorrectiveActionsConstants.DESCRIPTION)));
         list.getActions().addAll(parseActions(json.get(CorrectiveActionsConstants.ACTIONS).getAsJsonArray()));
         return list;
     }
@@ -120,6 +121,7 @@ public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
         final JsonObject json = new JsonObject();
         json.addProperty(CorrectiveActionsConstants.LIST_ID, list.getId());
         json.addProperty(CorrectiveActionsConstants.LIST_NAME, list.getName());
+        json.addProperty(CorrectiveActionsConstants.DESCRIPTION, list.getDescription());
         json.add(CorrectiveActionsConstants.ACTIONS, toJson(list.getActions()));
         return json;
     }

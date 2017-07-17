@@ -139,6 +139,31 @@ public class CorrectiveActionControllerTest extends AbstractRestServiceTest {
                 CorrectiveActionsConstants.LIST_NAME, "desc").get(maxIndex);
         assertEquals(p2.getId(), first.getId());
     }
+    @Test
+    public void testGetSortedByDescrition() throws RestServiceException, IOException {
+        final CorrectiveActionList p1 = createCorrectiveActionList(false);
+        p1.setDescription("b");
+        dao.save(p1);
+
+        final CorrectiveActionList p2 = createCorrectiveActionList(false);
+        p2.setDescription("a");
+        dao.save(p2);
+
+        final CorrectiveActionList p3 = createCorrectiveActionList(false);
+        p3.setDescription("c");
+        dao.save(p3);
+
+        final int maxIndex = 2;
+
+        //test sort by ID
+        CorrectiveActionList first = client.getCorrectiveActionLists(1, 10000,
+                CorrectiveActionsConstants.DESCRIPTION, "asc").get(0);
+        assertEquals(p2.getId(), first.getId());
+
+        first = client.getCorrectiveActionLists(1, 10000,
+                CorrectiveActionsConstants.DESCRIPTION, "desc").get(maxIndex);
+        assertEquals(p2.getId(), first.getId());
+    }
 
     /**
      * @param save

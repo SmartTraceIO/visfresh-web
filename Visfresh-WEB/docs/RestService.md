@@ -1532,6 +1532,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
       "correctiveActions": {
         "listId": 325,
         "listName": "JUnit actions",
+        "description": null,
         "actions": [
           {
             "action": "First action",
@@ -1547,6 +1548,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "lightOnCorrectiveActions": {
     "listId": 309,
     "listName": "JUnit actions",
+    "description": null,
     "actions": [
       {
         "action": "First action",
@@ -1561,6 +1563,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "batteryLowCorrectiveActions": {
     "listId": 310,
     "listName": "JUnit actions",
+    "description": null,
     "actions": [
       {
         "action": "First action",
@@ -1680,6 +1683,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         "correctiveActions": {
           "listId": 332,
           "listName": "JUnit actions",
+          "description": null,
           "actions": [
             {
               "action": "First action",
@@ -1696,6 +1700,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "lightOnCorrectiveActions": {
       "listId": 317,
       "listName": "JUnit actions",
+      "description": null,
       "actions": [
         {
           "action": "First action",
@@ -1710,6 +1715,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     "batteryLowCorrectiveActions": {
       "listId": 318,
       "listName": "JUnit actions",
+      "description": null,
       "actions": [
         {
           "action": "First action",
@@ -2798,7 +2804,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 }
 ```
 ### Mark Notification as read example ###
-**POST /vf/rest/markNotificationsAsRead/${accessToken}**    
+**POST /vf/rest/markNotificationsAsRead/${accessToken}**  
 **Request body:**  
 ```json
 [ //array of notification ID
@@ -4453,6 +4459,7 @@ Response:
   "response": {
     "listId": 61,
     "listName": "JUnit action list",
+    "description": null,
     "actions": [
       {
         "action": "a",
@@ -4473,6 +4480,7 @@ Response:
 {
   "listId": null,
   "listName": "JUnit action list",
+  "description": null,
   "actions": [
     {
       "action": "a",
@@ -4495,6 +4503,7 @@ Response:
   "response": {
     "listId": 52,
     "listName": "JUnit action list",
+    "description": null,
     "actions": [
       "a",
       "b"
@@ -4527,6 +4536,7 @@ Response:
     {
       "listId": 53,
       "listName": "b",
+      "description": null,
       "actions": [
          "First action",
          "Second action"
@@ -4535,11 +4545,13 @@ Response:
     {
       "listId": 54,
       "listName": "a",
+      "description": null,
       "actions": []
     },
     {
       "listId": 55,
       "listName": "c",
+      "description": null,
       "actions": []
     }
   ],
