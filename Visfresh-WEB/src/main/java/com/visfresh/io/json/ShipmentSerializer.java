@@ -31,6 +31,7 @@ import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.SingleShipmentInterimStop;
+import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
 import com.visfresh.io.shipment.ShipmentUserDto;
@@ -668,6 +669,26 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             companyAccess.add(cobj);
         }
 
+        //sent alerts
+        final JsonArray sentAlerts = new JsonArray();
+        for (final AlertDto a : dto.getSentAlerts()) {
+            sentAlerts.add(toJson(a));
+        }
+        json.add("sentAlerts", sentAlerts);
+
+        return json;
+    }
+    /**
+     * @param a alert DTO.
+     * @return JSON object.
+     */
+    private JsonObject toJson(final AlertDto a) {
+        final JsonObject json = new JsonObject();
+        json.addProperty("id", a.getId());
+        json.addProperty("description", a.getDescription());
+        json.addProperty("time", a.getTime());
+        json.addProperty("timeISO", a.getTimeISO());
+        json.addProperty("type", a.getType().toString());
         return json;
     }
     /**

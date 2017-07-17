@@ -3387,6 +3387,15 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         "companyId": 1373,
         "companyName": "C2"
       }
+    ],
+    "sentAlerts": [
+      {
+        "id": 478,
+        "description": "battery low",
+        "time": "14:10 16 Jul 2017",
+        "timeISO": "2017-07-16 14:10",
+        "type": "Battery"
+      }
     ]
   }
 }

@@ -92,6 +92,7 @@ public class SingleShipmentDto {
     private boolean arrivalReportSent;
     private final List<ShipmentUserDto> userAccess = new LinkedList<>();
     private final List<ShipmentCompanyDto> companyAccess = new LinkedList<>();
+    private final List<AlertDto> sentAlerts = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -859,5 +860,11 @@ public class SingleShipmentDto {
      */
     public List<ShipmentCompanyDto> getCompanyAccess() {
         return companyAccess;
+    }
+    /**
+     * @return the sentAlerts
+     */
+    public List<AlertDto> getSentAlerts() {
+        return sentAlerts;
     }
 }

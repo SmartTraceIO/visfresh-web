@@ -67,6 +67,7 @@ import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
@@ -80,6 +81,7 @@ import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
+import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
 import com.visfresh.io.shipment.ShipmentUserDto;
@@ -1424,6 +1426,10 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         final SingleShipmentDto dto = createSingleShipmentData(s, user);
 
+        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
+
+        final List<AlertRule> firedRules = ruleEngine.getAlertFired(s);
         final Map<AlertType, Integer> alertSummary = new HashMap<>();
         if (events.size() > 0) {
             //add battery level.
@@ -1434,7 +1440,23 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             for (final Alert alert : alerts) {
                 final SingleShipmentTimeItem item = getBestCandidate(items, alert);
                 item.getAlerts().add(alert);
+
+                //create expanded alert info.
+                final AlertDto a = new AlertDto();
+                a.setType(alert.getType());
+                a.setId(alert.getId());
+                a.setTime(prettyFmt.format(alert.getDate()));
+                a.setTimeISO(isoFmt.format(alert.getDate()));
+
+                final AlertRule rule = findRule(firedRules, alert);
+                if (rule != null) {
+                    a.setDescription(ruleBundle.buildDescription(rule, user.getTemperatureUnits()));
+                    dto.getSentAlerts().add(a);
+                }
             }
+
+            //sort sent alerts
+            Collections.sort(dto.getSentAlerts(), (a1, a2) -> a1.getTimeISO().compareTo(a2.getTimeISO()));
 
             alertSummary.putAll(toSummaryMap(alerts));
 
@@ -1475,9 +1497,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         dto.setMinTemp(minTemp);
         dto.setMaxTemp(maxTemp);
 
-        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
-        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
-
         dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
         dto.setFirstReadingTime(prettyFmt.format(new Date(timeOfFirstReading)));
         //last readings
@@ -1490,7 +1509,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         dto.getAlertSummary().addAll(alertSummary.keySet());
         dto.setAlertYetToFire(alertsToOneString(ruleEngine.getAlertYetFoFire(s), user));
-        dto.setAlertFired(alertsToOneString(ruleEngine.getAlertFired(s), user));
+        dto.setAlertFired(alertsToOneString(firedRules, user));
 
         final Arrival arrival = getArrival(items);
         if (arrival != null) {
@@ -1545,6 +1564,25 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
 
         return dto;
+    }
+    /**
+     * @param firedRules
+     * @param alert
+     * @return
+     */
+    private AlertRule findRule(final List<AlertRule> firedRules, final Alert alert) {
+        if (alert instanceof TemperatureAlert) {
+            final Long ruleId = ((TemperatureAlert) alert).getId();
+            for (final AlertRule rule : firedRules) {
+                if (rule.getId().equals(ruleId)) {
+                    return rule;
+                }
+            }
+        } else {
+            return new AlertRule(alert.getType());
+        }
+
+        return null;
     }
     /**
      * @param list
