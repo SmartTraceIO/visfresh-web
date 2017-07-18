@@ -688,6 +688,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("description", a.getDescription());
         json.addProperty("time", a.getTime());
         json.addProperty("timeISO", a.getTimeISO());
+        json.addProperty("correctiveActionListId", a.getCorrectiveActionListId());
         json.addProperty("type", a.getType().toString());
         return json;
     }

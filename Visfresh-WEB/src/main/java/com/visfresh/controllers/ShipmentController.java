@@ -1442,9 +1442,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 final SingleShipmentTimeItem item = getBestCandidate(items, alert);
                 item.getAlerts().add(alert);
 
-                final AlertRule rule = findRule(alert);
+                final AlertRule rule = getAlertWithCorrectiveAction(alert);
                 if (rule != null) {
                     final AlertDto a = new AlertDto();
+                    if (rule instanceof TemperatureRule) {
+                        a.setCorrectiveActionListId(((TemperatureRule) rule).getCorrectiveActions().getId());
+                    }
                     a.setType(alert.getType());
                     a.setId(alert.getId());
                     a.setTime(prettyFmt.format(alert.getDate()));
@@ -1569,7 +1572,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param alert
      * @return
      */
-    private AlertRule findRule(final Alert alert) {
+    private AlertRule getAlertWithCorrectiveAction(final Alert alert) {
         final AlertProfile alertProfile = alert.getShipment().getAlertProfile();
 
         if (alert instanceof TemperatureAlert) {

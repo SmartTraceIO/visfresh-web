@@ -30,6 +30,7 @@ public class AlertDto {
      * Time.
      */
     private String time;
+    private Long correctiveActionListId;
 
     /**
      * Default constructor.
@@ -97,5 +98,17 @@ public class AlertDto {
      */
     public void setTime(final String time) {
         this.time = time;
+    }
+    /**
+     * @return corrective action list ID.
+     */
+    public Long getCorrectiveActionListId() {
+        return correctiveActionListId;
+    }
+    /**
+     * @param correctiveActionListId the correctiveActionListId to set
+     */
+    public void setCorrectiveActionListId(final Long correctiveActionListId) {
+        this.correctiveActionListId = correctiveActionListId;
     }
 }
