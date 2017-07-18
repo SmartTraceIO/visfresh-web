@@ -670,11 +670,11 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         }
 
         //sent alerts
-        final JsonArray sentAlerts = new JsonArray();
+        final JsonArray alertsWithCorrectiveActions = new JsonArray();
         for (final AlertDto a : dto.getSentAlerts()) {
-            sentAlerts.add(toJson(a));
+            alertsWithCorrectiveActions.add(toJson(a));
         }
-        json.add("sentAlerts", sentAlerts);
+        json.add("alertsWithCorrectiveActions", alertsWithCorrectiveActions);
 
         return json;
     }

@@ -4,6 +4,7 @@
 package com.visfresh.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -18,6 +19,7 @@ import com.visfresh.entities.ActionTakenView;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
@@ -150,7 +152,7 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
     @Override
     protected ActionTaken createTestEntity() {
         final ActionTaken at = new ActionTaken();
-        at.setAction("Do anything");
+        at.setAction(new CorrectiveAction("Do anything"));
         at.setAlert(alert.getId());
         at.setComments("Any comments");
         at.setConfirmedBy(confirmedBy.getId());
@@ -164,7 +166,8 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
     @Override
     protected void assertCreateTestEntityOk(final ActionTaken at) {
         assertNotNull(at.getId());
-        assertEquals("Do anything", at.getAction());
+        assertEquals("Do anything", at.getAction().getAction());
+        assertFalse(at.getAction().isRequestVerification());
 
         assertEquals(alert.getId(), at.getAlert());
         assertEquals("Any comments", at.getComments());

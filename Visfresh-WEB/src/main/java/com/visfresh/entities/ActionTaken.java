@@ -14,7 +14,7 @@ public class ActionTaken implements EntityWithId<Long> {
     private Long alert;
     private Long confirmedBy;
     private Long verifiedBy;
-    private String action;
+    private CorrectiveAction action;
     private String comments;
     private Date time;
 
@@ -77,13 +77,13 @@ public class ActionTaken implements EntityWithId<Long> {
     /**
      * @return the action
      */
-    public String getAction() {
+    public CorrectiveAction getAction() {
         return action;
     }
     /**
      * @param action the action to set
      */
-    public void setAction(final String action) {
+    public void setAction(final CorrectiveAction action) {
         this.action = action;
     }
     /**

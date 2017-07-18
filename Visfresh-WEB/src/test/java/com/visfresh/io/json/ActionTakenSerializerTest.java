@@ -17,6 +17,7 @@ import com.visfresh.constants.ActionTakenConstants;
 import com.visfresh.entities.ActionTaken;
 import com.visfresh.entities.ActionTakenView;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.l12n.RuleBundle;
@@ -51,7 +52,6 @@ public class ActionTakenSerializerTest {
         rule.setTemperature(19.0);
         rule.setTimeOutMinutes(15);
 
-        final String action = "Any action";
         final Long alert = 1l;
         final Date alertTime = new Date(System.currentTimeMillis() - 10000000l);
         final String comments = "Any comments";
@@ -65,6 +65,7 @@ public class ActionTakenSerializerTest {
         final Long verifiedBy = 8l;
         final String verifiedByEmail = verifiedBy + "@junit.ru";
         final String verifiedByName= "Name2";
+        final CorrectiveAction action = new CorrectiveAction("Any action");
 
         final ActionTakenView at = new ActionTakenView();
         at.setAction(action);
@@ -87,7 +88,8 @@ public class ActionTakenSerializerTest {
 
         final ActionTaken actual = serializer.parseActionTaken(json);
 
-        assertEquals(actual.getAction(), action);
+        assertEquals(actual.getAction().getAction(), action.getAction());
+        assertEquals(actual.getAction().isRequestVerification(), action.isRequestVerification());
         assertEquals(actual.getAlert(), alert);
         assertEquals(actual.getComments(), comments);
         assertEquals(actual.getConfirmedBy(), confirmedBy);

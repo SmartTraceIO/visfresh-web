@@ -20,6 +20,7 @@ import com.visfresh.dao.UserDao;
 import com.visfresh.entities.ActionTaken;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
@@ -125,7 +126,7 @@ public class ActionTakenControllerTest extends AbstractRestServiceTest {
      */
     private ActionTaken createActionTaken(final Alert alert, final String action) {
         final ActionTaken at = new ActionTaken();
-        at.setAction(action);
+        at.setAction(new CorrectiveAction(action));
         at.setAlert(alert.getId());
         at.setComments("Any comments");
         at.setConfirmedBy(user.getId());

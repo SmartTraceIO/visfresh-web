@@ -24,7 +24,9 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureRule;
+import com.visfresh.io.json.CorrectiveActionListSerializer;
 import com.visfresh.lists.ShortListUserItem;
+import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -107,7 +109,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         paramMap.put(ALERT, t.getAlert());
         paramMap.put(CONFIRMED_BY, t.getConfirmedBy());
         paramMap.put(VERIFIED_BY, t.getVerifiedBy());
-        paramMap.put(ACTION, t.getAction());
+        paramMap.put(ACTION, CorrectiveActionListSerializer.toJson(t.getAction()).toString());
         paramMap.put(COMMENTS, t.getComments());
         paramMap.put(TIME, t.getTime());
 
@@ -148,7 +150,8 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
     @Override
     protected ActionTakenView createEntity(final Map<String, Object> map) {
         final ActionTakenView t = new ActionTakenView();
-        t.setAction((String) map.get(ACTION));
+        t.setAction(CorrectiveActionListSerializer.parseCorrectiveAction(
+                SerializerUtils.parseJson((String) map.get(ACTION))));
         t.setAlert(asLong(map.get(ALERT)));
         t.setComments((String) map.get(COMMENTS));
         t.setConfirmedBy(asLong(map.get(CONFIRMED_BY)));

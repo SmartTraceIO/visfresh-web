@@ -48,6 +48,7 @@ import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
@@ -68,6 +69,7 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
@@ -1429,7 +1431,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
         final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
 
-        final List<AlertRule> firedRules = ruleEngine.getAlertFired(s);
         final Map<AlertType, Integer> alertSummary = new HashMap<>();
         if (events.size() > 0) {
             //add battery level.
@@ -1441,16 +1442,15 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 final SingleShipmentTimeItem item = getBestCandidate(items, alert);
                 item.getAlerts().add(alert);
 
-                //create expanded alert info.
-                final AlertDto a = new AlertDto();
-                a.setType(alert.getType());
-                a.setId(alert.getId());
-                a.setTime(prettyFmt.format(alert.getDate()));
-                a.setTimeISO(isoFmt.format(alert.getDate()));
-
-                final AlertRule rule = findRule(firedRules, alert);
+                final AlertRule rule = findRule(alert);
                 if (rule != null) {
+                    final AlertDto a = new AlertDto();
+                    a.setType(alert.getType());
+                    a.setId(alert.getId());
+                    a.setTime(prettyFmt.format(alert.getDate()));
+                    a.setTimeISO(isoFmt.format(alert.getDate()));
                     a.setDescription(ruleBundle.buildDescription(rule, user.getTemperatureUnits()));
+
                     dto.getSentAlerts().add(a);
                 }
             }
@@ -1509,7 +1509,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         dto.getAlertSummary().addAll(alertSummary.keySet());
         dto.setAlertYetToFire(alertsToOneString(ruleEngine.getAlertYetFoFire(s), user));
-        dto.setAlertFired(alertsToOneString(firedRules, user));
+        dto.setAlertFired(alertsToOneString(ruleEngine.getAlertFired(s), user));
 
         final Arrival arrival = getArrival(items);
         if (arrival != null) {
@@ -1566,20 +1566,25 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         return dto;
     }
     /**
-     * @param firedRules
      * @param alert
      * @return
      */
-    private AlertRule findRule(final List<AlertRule> firedRules, final Alert alert) {
+    private AlertRule findRule(final Alert alert) {
+        final AlertProfile alertProfile = alert.getShipment().getAlertProfile();
+
         if (alert instanceof TemperatureAlert) {
-            final Long ruleId = ((TemperatureAlert) alert).getId();
-            for (final AlertRule rule : firedRules) {
-                if (rule.getId().equals(ruleId)) {
+            final Long ruleId = ((TemperatureAlert) alert).getRuleId();
+            for (final TemperatureRule rule : alertProfile.getAlertRules()) {
+                if (rule.getCorrectiveActions() != null && rule.getId().equals(ruleId)) {
                     return rule;
                 }
             }
         } else {
-            return new AlertRule(alert.getType());
+            final AlertType type = alert.getType();
+            if (type == AlertType.Battery && alertProfile.getBatteryLowCorrectiveActions() != null
+                    || type == AlertType.LightOn && alertProfile.getLightOnCorrectiveActions() != null) {
+                return new AlertRule(alert.getType());
+            }
         }
 
         return null;

@@ -3388,7 +3388,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         "companyName": "C2"
       }
     ],
-    "sentAlerts": [
+    "correctiveActionInfo": [
       {
         "id": 478,
         "description": "battery low",
@@ -4578,7 +4578,10 @@ Response:
   },
   "response": {
     "id": 121,
-    "action": "Check the door opened",
+    "action": {
+      "action": "Check the door opened",
+      "requestVerification": false
+    },
     "time": "2017-06-14T09:25",
     "comments": "Any comments",
     "alert": 582,
@@ -4645,7 +4648,10 @@ Response:
   "response": [
     {
       "id": 118,
-      "action": "Check the door opened",
+      "action": {
+        "action": "Check the door opened",
+        "requestVerification": false
+      },
       "time": "2017-06-14T09:25",
       "comments": "Any comments",
       "alert": 578,
@@ -4662,7 +4668,10 @@ Response:
     },
     {
       "id": 119,
-      "action": "Close the door",
+      "action": {
+        "action": "Check the door opened",
+        "requestVerification": false
+      },
       "time": "2017-06-14T09:40",
       "comments": "Any comments",
       "alert": 579,

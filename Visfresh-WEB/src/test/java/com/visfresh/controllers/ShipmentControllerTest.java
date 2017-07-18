@@ -32,6 +32,7 @@ import com.visfresh.controllers.restclient.ShipmentRestClient;
 import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.CorrectiveActionListDao;
 import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.LocationProfileDao;
@@ -41,10 +42,13 @@ import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.CorrectiveAction;
+import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.InterimStop;
@@ -1102,16 +1106,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         final Shipment s = createShipment(true);
 
         //mark any rules as processed
-        final ShipmentSession session = new ShipmentSession(s.getId());
-        int count = 0;
-        for(final TemperatureRule rule: s.getAlertProfile().getAlertRules()) {
-            if (count > 2) {
-                break;
-            }
-            AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
-            count++;
-        }
-        context.getBean(ShipmentSessionDao.class).saveSession(session);
+        final List<TemperatureRule> firedRules = s.getAlertProfile().getAlertRules();
+        markAsFiredRules(s, firedRules.get(0), firedRules.get(1));
 
         //add tracker event.
         createEvent(s, TrackerEventType.AUT);
@@ -1129,20 +1125,57 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertNotNull(sd);
     }
     @Test
+    public void testGetSingleShipmentCorrectiveActions() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+
+        final CorrectiveActionList ca = createCorrectiveActionList();
+
+        final AlertProfile alertProfile = s.getAlertProfile();
+        final TemperatureRule rule1 = alertProfile.getAlertRules().get(0);
+        final TemperatureRule rule2 = alertProfile.getAlertRules().get(1);
+        markAsFiredRules(s, rule1, rule2);
+
+        //add corrective actions always
+        alertProfile.setLightOnCorrectiveActions(ca);
+        alertProfile.setBatteryLowCorrectiveActions(ca);
+        rule1.setCorrectiveActions(ca);
+        rule2.setCorrectiveActions(ca);
+
+        saveAlertProfileDirectly(alertProfile);
+        //create alerts for each
+
+        //add tracker event.
+        createEvent(s, TrackerEventType.AUT);
+        createEvent(s, TrackerEventType.AUT);
+
+        //add alert
+        createAlert(s, AlertType.Battery);
+        createAlert(s, AlertType.LightOn);
+        createAlert(s, AlertType.MovementStart);
+        createTemperatureAlert(s, rule1);
+        createTemperatureAlert(s, rule2);
+
+        JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
+        assertEquals(4, sd.get("alertsWithCorrectiveActions").getAsJsonArray().size());
+
+        //disable all corrective actions
+        alertProfile.setLightOnCorrectiveActions(null);
+        alertProfile.setBatteryLowCorrectiveActions(null);
+        rule1.setCorrectiveActions(null);
+        rule2.setCorrectiveActions(null);
+
+        saveAlertProfileDirectly(alertProfile);
+
+        sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
+        assertEquals(0, sd.get("alertsWithCorrectiveActions").getAsJsonArray().size());
+    }
+    @Test
     public void testGetSingleShipmentLite() throws RestServiceException, IOException {
         final Shipment s = createShipment(true);
 
         //mark any rules as processed
-        final ShipmentSession session = new ShipmentSession(s.getId());
-        int count = 0;
-        for(final TemperatureRule rule: s.getAlertProfile().getAlertRules()) {
-            if (count > 2) {
-                break;
-            }
-            AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
-            count++;
-        }
-        context.getBean(ShipmentSessionDao.class).saveSession(session);
+        final List<TemperatureRule> firedRules = s.getAlertProfile().getAlertRules();
+        markAsFiredRules(s, firedRules.get(0), firedRules.get(1));
 
         //add tracker event.
         createEvent(s, TrackerEventType.AUT);
@@ -1715,6 +1748,23 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         return alert;
     }
     /**
+     * @param s
+     * @param rule
+     * @return
+     */
+    private TemperatureAlert createTemperatureAlert(final Shipment s, final TemperatureRule rule) {
+        final TemperatureAlert alert = new TemperatureAlert();
+        alert.setDate(new Date());
+        alert.setType(rule.getType());
+        alert.setRuleId(rule.getId());
+        alert.setTemperature(5);
+        alert.setMinutes(55);
+        alert.setDevice(s.getDevice());
+        alert.setShipment(s);
+        alertDao.save(alert);
+        return alert;
+    }
+    /**
      * @param shipment shipment.
      * @return tracker event.
      */
@@ -1889,6 +1939,29 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         dg.setDescription("Description of group " + name);
         return context.getBean(DeviceGroupDao.class).save(dg);
     }
+    /**
+     * @return corrective action list.
+     */
+    private CorrectiveActionList createCorrectiveActionList() {
+        final CorrectiveActionList list = new CorrectiveActionList();
+        list.setCompany(getCompany());
+        list.setName("JUnit");
+        list.getActions().add(new CorrectiveAction("A1"));
+        list.getActions().add(new CorrectiveAction("A2"));
+        return context.getBean(CorrectiveActionListDao.class).save(list);
+    }
+    /**
+     * @param s
+     * @param rules rules to mark as fired
+     */
+    private void markAsFiredRules(final Shipment s, final TemperatureRule... rules) {
+        final ShipmentSession session = new ShipmentSession(s.getId());
+        for(final TemperatureRule rule: rules) {
+            AbstractRuleEngine.setProcessedTemperatureRule(session, rule);
+        }
+        context.getBean(ShipmentSessionDao.class).saveSession(session);
+    }
+
     /**
      * @param shipmentJson
      * @return

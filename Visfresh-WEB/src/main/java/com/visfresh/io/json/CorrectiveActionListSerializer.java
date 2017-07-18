@@ -65,7 +65,7 @@ public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
      * @param e JSON element.
      * @return
      */
-    private CorrectiveAction parseCorrectiveAction(final JsonElement e) {
+    public static CorrectiveAction parseCorrectiveAction(final JsonElement e) {
         if (e == null || e.isJsonNull()) {
             return null;
         }
@@ -82,7 +82,7 @@ public class CorrectiveActionListSerializer extends AbstractJsonSerializer {
      * @param action
      * @return
      */
-    private JsonObject toJson(final CorrectiveAction action) {
+    public static JsonObject toJson(final CorrectiveAction action) {
         final JsonObject json = new JsonObject();
         json.addProperty(ACTION, action.getAction());
         json.addProperty(REQUEST_VERIFICATION, action.isRequestVerification());
