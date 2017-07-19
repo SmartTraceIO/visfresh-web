@@ -43,6 +43,7 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
         at.setId(asLong(json.get(ID)));
         at.setAction(CorrectiveActionListSerializer.parseCorrectiveAction(json.get(ACTION)));
         at.setTime(parseDate(asString(json.get(TIME))));
+        at.setVerifiedTime(parseDate(asString(json.get(VERIFIED_TIME))));
         at.setComments(asString(json.get(COMMENTS)));
         at.setAlert(asLong(json.get(ALERT)));
         at.setConfirmedBy(asLong(json.get(CONFIRMED_BY)));
@@ -79,6 +80,7 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
         json.addProperty(ID, at.getId());
         json.add(ACTION, CorrectiveActionListSerializer.toJson(at.getAction()));
         json.addProperty(TIME, formatDate(at.getTime()));
+        json.addProperty(VERIFIED_TIME, formatDate(at.getVerifiedTime()));
         json.addProperty(COMMENTS, at.getComments());
         json.addProperty(ALERT, at.getAlert());
         json.addProperty(CONFIRMED_BY, at.getConfirmedBy());

@@ -405,6 +405,7 @@ create table actiontakens (
     `action` longtext not null,
     comments longtext,
     `time` timestamp null default null,
+    verifiedtime timestamp null default null,
     primary key (id),
     foreign key (alert)
         references alerts (id) on delete cascade,

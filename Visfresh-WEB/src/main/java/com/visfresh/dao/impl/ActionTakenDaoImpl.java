@@ -45,6 +45,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
     private static final String ACTION = "action";
     private static final String COMMENTS = "comments";
     private static final String TIME = "time";
+    private static final String VERIFIED_TIME = "verifiedtime";
 
     //action taken view fields
     private static final String SHIPMENT_TRIP_COUNT = "shipmentTripCount";
@@ -112,6 +113,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         paramMap.put(ACTION, CorrectiveActionListSerializer.toJson(t.getAction()).toString());
         paramMap.put(COMMENTS, t.getComments());
         paramMap.put(TIME, t.getTime());
+        paramMap.put(VERIFIED_TIME, t.getVerifiedTime());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql.toString(), new MapSqlParameterSource(paramMap), keyHolder);
@@ -134,6 +136,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         fields.add(ACTION);
         fields.add(COMMENTS);
         fields.add(TIME);
+        fields.add(VERIFIED_TIME);
         return fields;
     }
     /* (non-Javadoc)
@@ -157,6 +160,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         t.setConfirmedBy(asLong(map.get(CONFIRMED_BY)));
         t.setId(asLong(map.get(ID)));
         t.setTime((Date) map.get(TIME));
+        t.setVerifiedTime((Date) map.get(VERIFIED_TIME));
         t.setVerifiedBy(asLong(map.get(VERIFIED_BY)));
 
         t.setAlertTime((Date) map.get(ALERT_TIME));

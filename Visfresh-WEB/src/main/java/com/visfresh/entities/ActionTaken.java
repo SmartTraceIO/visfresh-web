@@ -17,6 +17,7 @@ public class ActionTaken implements EntityWithId<Long> {
     private CorrectiveAction action;
     private String comments;
     private Date time;
+    private Date verifiedTime;
 
     /**
      * Default constructor.
@@ -109,5 +110,17 @@ public class ActionTaken implements EntityWithId<Long> {
      */
     public void setTime(final Date time) {
         this.time = time;
+    }
+    /**
+     * @return the verifiedTime
+     */
+    public Date getVerifiedTime() {
+        return verifiedTime;
+    }
+    /**
+     * @param verifiedTime the verifiedTime to set
+     */
+    public void setVerifiedTime(final Date verifiedTime) {
+        this.verifiedTime = verifiedTime;
     }
 }

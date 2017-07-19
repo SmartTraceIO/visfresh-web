@@ -16,6 +16,7 @@ public interface ActionTakenConstants {
     String ALERT = "alert";
     String CONFIRMED_BY = "confirmedBy";
     String VERIFIED_BY = "verifiedBy";
+    String VERIFIED_TIME = "verifiedTime";
 
     //view constants
     String ALERT_TIME = "alertTime";

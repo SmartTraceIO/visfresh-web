@@ -6,9 +6,8 @@ package com.visfresh.dao;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -25,7 +24,6 @@ import com.visfresh.entities.ShipmentStatus;
  *
  */
 public class NoteDaoTest extends BaseDaoTest<NoteDao> {
-    private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm");
     private Shipment shipment;
 
     /**
@@ -72,11 +70,11 @@ public class NoteDaoTest extends BaseDaoTest<NoteDao> {
 
         n = notes.get(0);
         assertEquals(createdBy, n.getCreatedBy());
-        assertEquals(format.format(creationDate), format.format(n.getCreationDate()));
+        assertTrue(Math.abs(creationDate.getTime() - n.getCreationDate().getTime()) < 1000l);
         assertEquals(noteNum, n.getNoteNum());
         assertEquals(noteText, n.getNoteText());
         assertEquals(noteType, n.getNoteType());
-        assertEquals(format.format(timeOnChart), format.format(n.getTimeOnChart()));
+        assertTrue(Math.abs(timeOnChart.getTime() - n.getTimeOnChart().getTime()) < 1000l);
     }
     @Test
     public void testUpdate() {
@@ -111,11 +109,11 @@ public class NoteDaoTest extends BaseDaoTest<NoteDao> {
 
         n = notes.get(0);
         assertEquals(createdBy, n.getCreatedBy());
-        assertEquals(format.format(creationDate), format.format(n.getCreationDate()));
+        assertTrue(Math.abs(creationDate.getTime() - n.getCreationDate().getTime()) < 1000l);
         assertEquals(noteNum, n.getNoteNum().intValue());
         assertEquals(noteText, n.getNoteText());
         assertEquals(noteType, n.getNoteType());
-        assertEquals(format.format(timeOnChart), format.format(n.getTimeOnChart()));
+        assertTrue(Math.abs(timeOnChart.getTime() - n.getTimeOnChart().getTime()) < 1000l);
     }
     @Test
     public void testGetForShipment() {

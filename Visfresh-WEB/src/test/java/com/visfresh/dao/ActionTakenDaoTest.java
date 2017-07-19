@@ -91,6 +91,16 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         assertEquals(0, v.getVerifiedByName().length());
     }
     @Test
+    public void testVerifiedTime() {
+        final Date time = new Date(System.currentTimeMillis() - 10000000000l);
+        final ActionTaken e = createTestEntity();
+        e.setVerifiedTime(time);
+        dao.save(e);
+
+        final ActionTakenView v = dao.findOne(e.getId());
+        assertTrue(Math.abs(time.getTime() - v.getVerifiedTime().getTime()) < 1000l);
+    }
+    @Test
     public void testFindByIdAndCompany() {
         final ActionTaken e = createTestEntity();
         dao.save(e);
