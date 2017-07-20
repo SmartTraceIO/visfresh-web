@@ -44,6 +44,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
     private static final String VERIFIED_BY = "verifiedby";
     private static final String ACTION = "action";
     private static final String COMMENTS = "comments";
+    private static final String VERIFIED_COMMENTS = "verifiedcomments";
     private static final String TIME = "time";
     private static final String VERIFIED_TIME = "verifiedtime";
 
@@ -112,6 +113,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         paramMap.put(VERIFIED_BY, t.getVerifiedBy());
         paramMap.put(ACTION, CorrectiveActionListSerializer.toJson(t.getAction()).toString());
         paramMap.put(COMMENTS, t.getComments());
+        paramMap.put(VERIFIED_COMMENTS, t.getVerifiedComments());
         paramMap.put(TIME, t.getTime());
         paramMap.put(VERIFIED_TIME, t.getVerifiedTime());
 
@@ -135,6 +137,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         fields.add(VERIFIED_BY);
         fields.add(ACTION);
         fields.add(COMMENTS);
+        fields.add(VERIFIED_COMMENTS);
         fields.add(TIME);
         fields.add(VERIFIED_TIME);
         return fields;
@@ -157,6 +160,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
                 SerializerUtils.parseJson((String) map.get(ACTION))));
         t.setAlert(asLong(map.get(ALERT)));
         t.setComments((String) map.get(COMMENTS));
+        t.setVerifiedComments((String) map.get(VERIFIED_COMMENTS));
         t.setConfirmedBy(asLong(map.get(CONFIRMED_BY)));
         t.setId(asLong(map.get(ID)));
         t.setTime((Date) map.get(TIME));

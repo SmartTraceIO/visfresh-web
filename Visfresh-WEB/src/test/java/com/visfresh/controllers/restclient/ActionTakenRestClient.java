@@ -78,4 +78,17 @@ public class ActionTakenRestClient extends RestClient {
         params.put("id", p.getId().toString());
         sendGetRequest(getPathWithToken("deleteActionTaken"), params);
     }
+    /**
+     * @param id action ID.
+     * @param comments verified comments.
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public void verifyActionTaken(final Long id, final String comments)
+            throws IOException, RestServiceException {
+        final JsonObject json = new JsonObject();
+        json.addProperty("id", id);
+        json.addProperty("comments", comments);
+        sendPostRequest(getPathWithToken("verifyActionTaken"), json);
+    }
 }

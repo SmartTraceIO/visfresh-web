@@ -106,6 +106,33 @@ public class ActionTakenControllerTest extends AbstractRestServiceTest {
         assertNotNull(client.getActionTaken(ap.getId()));
     }
     @Test
+    public void testVerifyActionTaken() throws IOException, RestServiceException {
+        ActionTaken a1 = createActionTaken(temperatureAlert, "Action 1");
+        ActionTaken a2 = createActionTaken(temperatureAlert, "Action 2");
+
+        //test verify by comments
+        client.verifyActionTaken(a1.getId(), "Comments for verify");
+
+        a1 = dao.findOne(a1.getId());
+        assertEquals("Comments for verify", a1.getVerifiedComments());
+        assertEquals(user.getId(), a1.getVerifiedBy());
+        assertNotNull(a1.getVerifiedTime());
+
+        //test verify without comments
+        client.verifyActionTaken(a2.getId(), null);
+
+        a2 = dao.findOne(a2.getId());
+        assertNull(a2.getVerifiedComments());
+        assertEquals(user.getId(), a2.getVerifiedBy());
+        assertNotNull(a2.getVerifiedTime());
+
+        //test not verify if verified
+        client.verifyActionTaken(a1.getId(), "Other comment");
+
+        a1 = dao.findOne(a1.getId());
+        assertEquals("Comments for verify", a1.getVerifiedComments());
+    }
+    @Test
     public void testDeleteActionTaken() throws RestServiceException, IOException {
         final ActionTaken p = createActionTaken(temperatureAlert, "Check the door opened");
         client.deleteActionTaken(p);

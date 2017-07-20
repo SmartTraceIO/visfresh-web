@@ -165,6 +165,7 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         at.setAction(new CorrectiveAction("Do anything"));
         at.setAlert(alert.getId());
         at.setComments("Any comments");
+        at.setVerifiedComments("Any verified comments");
         at.setConfirmedBy(confirmedBy.getId());
         at.setVerifiedBy(verifiedBy.getId());
         at.setTime(new Date());
@@ -181,6 +182,7 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
 
         assertEquals(alert.getId(), at.getAlert());
         assertEquals("Any comments", at.getComments());
+        assertEquals("Any verified comments", at.getVerifiedComments());
         assertEquals(confirmedBy.getId(), at.getConfirmedBy());
         assertEquals(verifiedBy.getId(), at.getVerifiedBy());
         assertNotNull(at.getTime());

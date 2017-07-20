@@ -55,6 +55,7 @@ public class ActionTakenSerializerTest {
         final Long alert = 1l;
         final Date alertTime = new Date(System.currentTimeMillis() - 10000000l);
         final String comments = "Any comments";
+        final String verifiedComments = "Verified comments";
         final Long confirmedBy = 2l;
         final String confirmedByEmail = confirmedBy + "@junit.ru";
         final String confirmedByName = "Name2";
@@ -74,6 +75,7 @@ public class ActionTakenSerializerTest {
         at.setAlertRule(rule);
         at.setAlertTime(alertTime);
         at.setComments(comments);
+        at.setVerifiedComments(verifiedComments);
         at.setConfirmedBy(confirmedBy);
         at.setConfirmedByEmail(confirmedByEmail);
         at.setConfirmedByName(confirmedByName);
@@ -94,6 +96,7 @@ public class ActionTakenSerializerTest {
         assertEquals(actual.getAction().isRequestVerification(), action.isRequestVerification());
         assertEquals(actual.getAlert(), alert);
         assertEquals(actual.getComments(), comments);
+        assertEquals(actual.getVerifiedComments(), verifiedComments);
         assertEquals(actual.getConfirmedBy(), confirmedBy);
         assertEquals(actual.getId(), id);
         assertTrue(Math.abs(actual.getTime().getTime() - at.getTime().getTime()) < 61000l);

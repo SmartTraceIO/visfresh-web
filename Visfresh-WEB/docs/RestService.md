@@ -675,6 +675,11 @@ Method *POST*, method name *saveActionTaken*. Request body JSON serialized reque
 Response is [Standard JSON response](#markdown-header-response-message)  
 [(example)](#markdown-header-save-action-taken-example)
 
+### Verify Action Taken ###
+Method *POST*, method name *verifyActionTaken*. Request body JSON serialized request.  
+Response is [Standard JSON response](#markdown-header-response-message)  
+[(example)](#markdown-header-verify-action-taken-example)
+
 ### Delete Action Taken ###
 Method *GET*, method name *deleteActionTaken*. Request parameters:  
 1. id - Action Taken ID  
@@ -3388,13 +3393,38 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
         "companyName": "C2"
       }
     ],
-    "correctiveActionInfo": [
+    "alertsWithCorrectiveActions": [
       {
-        "id": 478,
+        "id": 1063,
         "description": "battery low",
-        "time": "14:10 16 Jul 2017",
-        "timeISO": "2017-07-16 14:10",
+        "time": "13:03 18 Jul 2017",
+        "timeISO": "2017-07-18 13:03",
+        "correctiveActionListId": null,
         "type": "Battery"
+      },
+      {
+        "id": 1064,
+        "description": "entering bright environment",
+        "time": "13:03 18 Jul 2017",
+        "timeISO": "2017-07-18 13:03",
+        "correctiveActionListId": null,
+        "type": "LightOn"
+      },
+      {
+        "id": 1066,
+        "description": ">18.0°C for 0 min in total",
+        "time": "16:50 19 Jul 2017",
+        "timeISO": "2017-07-19 16:50",
+        "correctiveActionListId": 222,
+        "type": "CriticalHot"
+      },
+      {
+        "id": 1067,
+        "description": ">17.0°C for 1 min in total",
+        "time": "16:50 19 Jul 2017",
+        "timeISO": "2017-07-19 16:50",
+        "correctiveActionListId": 222,
+        "type": "CriticalHot"
       }
     ]
   }
@@ -4584,6 +4614,7 @@ Response:
     },
     "time": "2017-06-14T09:25",
     "comments": "Any comments",
+    "verifiedComments": "Verified comments",
     "alert": 582,
     "confirmedBy": 1714,
     "verifiedBy": null,
@@ -4610,6 +4641,7 @@ Response:
   },
   "time": "2017-06-14T09:25",
   "comments": "Any comments",
+  "verifiedComments": "Verified comments",
   "alert": 576,
   "confirmedBy": 1705,
   "verifiedBy": null
@@ -4625,6 +4657,26 @@ Response:
   "response": {
     "actionTakenId": 117
   }
+}
+```
+
+### Verify Action Taken example ###
+**POST /vf/rest/verifyActionTaken/${accessToken}**  
+**Request:**  
+```json
+{
+  "id": 152,
+  "comments": "Other comment"
+}
+```  
+**Response:**  
+```json
+{
+  "status": {
+    "code": 0,
+    "message": "Success"
+  },
+  "response": null
 }
 ```
 ### Delete Action Taken example ###
@@ -4657,6 +4709,7 @@ Response:
       },
       "time": "2017-06-14T09:25",
       "comments": "Any comments",
+      "verifiedComments": "Verified comments",
       "alert": 578,
       "confirmedBy": 1708,
       "verifiedBy": null,
@@ -4677,6 +4730,7 @@ Response:
       },
       "time": "2017-06-14T09:40",
       "comments": "Any comments",
+      "verifiedComments": "Verified comments",
       "alert": 579,
       "confirmedBy": 1708,
       "verifiedBy": null,

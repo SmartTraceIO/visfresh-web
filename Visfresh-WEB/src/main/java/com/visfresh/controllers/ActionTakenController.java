@@ -3,6 +3,8 @@
  */
 package com.visfresh.controllers;
 
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +84,44 @@ public class ActionTakenController extends AbstractController {
 
             final Long id = dao.save(p).getId();
             return createIdResponse("actionTakenId", id);
+        } catch (final Exception e) {
+            log.error("Failed to save action taken", e);
+            return createErrorResponse(e);
+        }
+    }
+    /**
+     * @param authToken authentication token.
+     * @param alert action taken.
+     * @return ID of saved action taken.
+     */
+    @RequestMapping(value = "/verifyActionTaken/{authToken}", method = RequestMethod.POST)
+    public JsonObject verifyActionTaken(@PathVariable final String authToken,
+            final @RequestBody JsonObject req) {
+        try {
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.BasicUser);
+
+            final Long id = req.get("id").getAsLong();
+            String comments = null;
+            final JsonElement json = req.get("comments");
+            if (json != null && !json.isJsonNull()) {
+                comments = json.getAsString();
+            }
+
+            final ActionTaken p = dao.findOne(id);
+            final Alert alert = alertDao.findOne(p.getAlert());
+
+            checkCompanyAccess(user, alert.getShipment());
+
+            if (p.getVerifiedBy() == null) {//ignore if already verified
+                p.setVerifiedComments(comments);
+                p.setVerifiedBy(user.getId());
+                p.setVerifiedTime(new Date());
+
+                dao.save(p).getId();
+            }
+
+            return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to save action taken", e);
             return createErrorResponse(e);

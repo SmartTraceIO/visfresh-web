@@ -404,6 +404,7 @@ create table actiontakens (
     verifiedby bigint(20),
     `action` longtext not null,
     comments longtext,
+    verifiedcomments longtext,
     `time` timestamp null default null,
     verifiedtime timestamp null default null,
     primary key (id),

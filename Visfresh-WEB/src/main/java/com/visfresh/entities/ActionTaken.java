@@ -16,6 +16,7 @@ public class ActionTaken implements EntityWithId<Long> {
     private Long verifiedBy;
     private CorrectiveAction action;
     private String comments;
+    private String verifiedComments;
     private Date time;
     private Date verifiedTime;
 
@@ -122,5 +123,17 @@ public class ActionTaken implements EntityWithId<Long> {
      */
     public void setVerifiedTime(final Date verifiedTime) {
         this.verifiedTime = verifiedTime;
+    }
+    /**
+     * @return the verifiedComments
+     */
+    public String getVerifiedComments() {
+        return verifiedComments;
+    }
+    /**
+     * @param verifiedComments the verifiedComments to set
+     */
+    public void setVerifiedComments(final String verifiedComments) {
+        this.verifiedComments = verifiedComments;
     }
 }
