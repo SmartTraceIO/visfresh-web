@@ -9,9 +9,11 @@ import static org.junit.Assert.assertNull;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import com.visfresh.Device;
 import com.visfresh.DeviceCommand;
 import com.visfresh.DeviceMessage;
 import com.visfresh.DeviceMessageType;
+import com.visfresh.db.MessageSnapshootDao;
 import com.visfresh.mail.mock.MockEmailMessage;
 
 /**
@@ -34,6 +37,8 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
     private final List<DeviceMessage> messages = new LinkedList<>();
     private final List<MockEmailMessage> alerts =  new LinkedList<>();
     private Device device;
+
+    private Set<String> signatures = new HashSet<>();
 
     /**
      * Default constructor.
@@ -119,6 +124,29 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
 
         process(msgs);
 
+        assertEquals(0, messages.size());
+    }
+    @Test
+    public void testIgnoreAlreadyProcessed() {
+        final Device device = addDevice("10982734098127304");
+        final DeviceMessage m = createDeviceMessage(device.getImei(), DeviceMessageType.INIT);
+
+        final List<DeviceMessage> msgs = new LinkedList<DeviceMessage>();
+        msgs.add(m);
+
+        process(msgs);
+        assertEquals(1, messages.size());
+
+        //check process again
+        messages.clear();
+        process(msgs);
+        assertEquals(0, messages.size());
+    }
+    @Test
+    public void testEmptyMessageList() {
+        final List<DeviceMessage> msgs = new LinkedList<DeviceMessage>();
+
+        process(msgs);
         assertEquals(0, messages.size());
     }
     @Test
@@ -246,5 +274,12 @@ public class DeviceMessageServiceTest extends DeviceMessageService {
         m.setMessage(message);
 
         alerts.add(m);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.service.DeviceMessageService#saveSignature(java.util.List)
+     */
+    @Override
+    protected boolean saveSignature(final List<DeviceMessage> msgs) {
+        return signatures.add(MessageSnapshootDao.createSignature(msgs));
     }
 }

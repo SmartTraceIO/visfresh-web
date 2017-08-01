@@ -18,6 +18,7 @@ import com.visfresh.DeviceMessageType;
 import com.visfresh.db.DeviceCommandDao;
 import com.visfresh.db.DeviceDao;
 import com.visfresh.db.MessageDao;
+import com.visfresh.db.MessageSnapshootDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,6 +33,8 @@ public class DeviceMessageService {
     private MessageDao messageDao;
     @Autowired
     private DeviceDao deviceDao;
+    @Autowired
+    private MessageSnapshootDao snapshootDao;
     @Autowired
     private DeviceCommandDao deviceCommandDao;
     @Autowired
@@ -49,6 +52,15 @@ public class DeviceMessageService {
      * @return
      */
     public DeviceCommand process(final List<DeviceMessage> msgs) {
+        if (msgs.size() == 0) {
+            return null;
+        }
+
+        if (!saveSignature(msgs)) {
+            log.warn("The message batch is already processed, will ignored: " + msgs);
+            return null;
+        }
+
         Device device = null;
         boolean hasInitMessage = false;
 
@@ -109,6 +121,14 @@ public class DeviceMessageService {
 
         return cmd;
     }
+    /**
+     * @param msgs list of messages.
+     * @return
+     */
+    protected boolean saveSignature(final List<DeviceMessage> msgs) {
+        return this.snapshootDao.saveSignature(msgs);
+    }
+
     /**
      * @param subject
      * @param message

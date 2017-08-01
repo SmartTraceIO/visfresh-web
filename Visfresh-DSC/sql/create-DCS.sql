@@ -12,3 +12,10 @@ CREATE TABLE devicemsg (
   stations varchar(256) NOT NULL,
   PRIMARY KEY (id)
 );
+
+drop table if exists snapshoots;
+create table snapshoots (
+  imei varchar(15) NOT NULL,
+  signature varchar(255) not null,
+  primary key (imei, signature)
+);
