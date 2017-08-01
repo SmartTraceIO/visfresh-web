@@ -186,9 +186,9 @@ public class UtilitiesController extends AbstractController {
             getLoggedInUser(authToken);
 
             final JsonArray array = new JsonArray();
-            for (final Role roles : Role.values()) {
-                if (roles != Role.SmartTraceAdmin) {
-                    array.add(new JsonPrimitive(roles.toString()));
+            for (final Role role : Role.values()) {
+                if (role != Role.SmartTraceAdmin && role != Role.BasicUser) {
+                    array.add(new JsonPrimitive(role.toString()));
                 }
             }
 
