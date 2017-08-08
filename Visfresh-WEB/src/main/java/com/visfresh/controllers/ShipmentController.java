@@ -84,6 +84,7 @@ import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.shipment.AlertDto;
+import com.visfresh.io.shipment.AlertProfileDto;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
 import com.visfresh.io.shipment.ShipmentUserDto;
@@ -1632,8 +1633,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
 
         final SingleShipmentDto dto = new SingleShipmentDto();
-        dto.setAlertProfileId(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getId());
-        dto.setAlertProfileName(shipment.getAlertProfile() == null ? null : shipment.getAlertProfile().getName());
+
+        if (shipment.getAlertProfile() != null) {
+            dto.setAlertProfileId(shipment.getAlertProfile().getId());
+            dto.setAlertProfileName(shipment.getAlertProfile().getName());
+            dto.setAlertProfile(new AlertProfileDto(shipment.getAlertProfile()));
+        }
 
         dto.setAlertSuppressionMinutes(shipment.getAlertSuppressionMinutes());
         dto.setArrivalNotificationWithinKm(shipment.getArrivalNotificationWithinKm());

@@ -93,6 +93,7 @@ public class SingleShipmentDto {
     private final List<ShipmentUserDto> userAccess = new LinkedList<>();
     private final List<ShipmentCompanyDto> companyAccess = new LinkedList<>();
     private final List<AlertDto> sentAlerts = new LinkedList<>();
+    private AlertProfileDto alertProfile;
 
     /**
      * Default constructor.
@@ -866,5 +867,18 @@ public class SingleShipmentDto {
      */
     public List<AlertDto> getSentAlerts() {
         return sentAlerts;
+    }
+
+    /**
+     * @param alertProfileDto
+     */
+    public void setAlertProfile(final AlertProfileDto alertProfileDto) {
+        this.alertProfile = alertProfileDto;
+    }
+    /**
+     * @return the alertProfile
+     */
+    public AlertProfileDto getAlertProfile() {
+        return alertProfile;
     }
 }

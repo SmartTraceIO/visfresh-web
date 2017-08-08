@@ -17,6 +17,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Location;
@@ -32,6 +33,7 @@ import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.shipment.AlertDto;
+import com.visfresh.io.shipment.AlertProfileDto;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
 import com.visfresh.io.shipment.ShipmentUserDto;
@@ -40,6 +42,7 @@ import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.lists.ListShipmentItem;
+import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -57,6 +60,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     private final DateFormat prettyFormat;
     private final LocationSerializer locationSerializer;
     private final NoteSerializer noteSerializer;
+    private TemperatureUnits tempUnits;
 
     /**
      * @param user user.
@@ -69,6 +73,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         this.user = user;
         this.isoFormat = createIsoFormat(user.getLanguage(), user.getTimeZone());
         this.prettyFormat = createPrettyFormat(user.getLanguage(), user.getTimeZone());
+        this.tempUnits = user.getTemperatureUnits();
     }
     /**
      * @param obj
@@ -532,6 +537,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         if (isNotSibling) {
             json.addProperty("alertProfileId", dto.getAlertProfileId());
             json.addProperty("alertProfileName", dto.getAlertProfileName());
+            json.add("alertProfile", toJson(dto.getAlertProfile()));
             json.addProperty("alertSuppressionMinutes", dto.getAlertSuppressionMinutes());
 
             json.addProperty("alertPeopleToNotify", createPeopleToNotifyString(
@@ -677,6 +683,38 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.add("alertsWithCorrectiveActions", alertsWithCorrectiveActions);
 
         return json;
+    }
+    /**
+     * @param alert
+     * @return
+     */
+    private JsonObject toJson(final AlertProfileDto alert) {
+        if (alert == null) {
+            return null;
+        }
+
+        final JsonObject obj = new JsonObject();
+        //alertProfileId, alertProfileName, alertProfileDescription, highTemperature, criticalHighTemperature, lowTemperature, criticalHighTemperature, watchEnterBrightEnvironment, watchEnterDarkEnvironment, watchMovementStart
+        obj.addProperty(AlertProfileConstants.ALERT_PROFILE_ID, alert.getId());
+        obj.addProperty(AlertProfileConstants.ALERT_PROFILE_NAME, alert.getName());
+        obj.addProperty(AlertProfileConstants.ALERT_PROFILE_DESCRIPTION, alert.getDescription());
+
+        obj.addProperty(AlertProfileConstants.WATCH_BATTERY_LOW,
+                alert.isWatchBatteryLow());
+        obj.addProperty(AlertProfileConstants.WATCH_ENTER_BRIGHT_ENVIRONMENT,
+                alert.isWatchEnterBrightEnvironment());
+        obj.addProperty(AlertProfileConstants.WATCH_ENTER_DARK_ENVIRONMENT,
+                alert.isWatchEnterDarkEnvironment());
+        obj.addProperty(AlertProfileConstants.WATCH_MOVEMENT_START,
+                alert.isWatchMovementStart());
+        obj.addProperty(AlertProfileConstants.WATCH_MOVEMENT_STOP,
+                alert.isWatchMovementStop());
+        obj.addProperty(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT,
+                LocalizationUtils.convertToUnits(alert.getLowerTemperatureLimit(), tempUnits));
+        obj.addProperty(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT,
+                LocalizationUtils.convertToUnits(alert.getUpperTemperatureLimit(), tempUnits));
+
+        return obj;
     }
     /**
      * @param a alert DTO.
