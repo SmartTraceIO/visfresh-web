@@ -5,11 +5,10 @@ package com.visfresh.io.json;
 
 import java.util.TimeZone;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.LocationConstants;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.io.shipment.LocationProfileDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -27,9 +26,9 @@ public class LocationSerializer extends AbstractJsonSerializer {
      * @param location
      * @return
      */
-    public JsonElement toJson(final LocationProfile location) {
+    public JsonObject toJson(final LocationProfileDto location) {
         if (location == null) {
-            return JsonNull.INSTANCE;
+            return null;
         }
 
         final JsonObject obj = new JsonObject();
@@ -59,7 +58,23 @@ public class LocationSerializer extends AbstractJsonSerializer {
      */
     public LocationProfile parseLocationProfile(final JsonObject obj) {
         final LocationProfile location = new LocationProfile();
-
+        parseLocationProfile(obj, location);
+        return location;
+    }
+    /**
+     * @param obj encoded location profile.
+     * @return location profile.
+     */
+    public LocationProfileDto parseLocationProfileDto(final JsonObject obj) {
+        final LocationProfileDto location = new LocationProfileDto();
+        parseLocationProfile(obj, location);
+        return location;
+    }
+    /**
+     * @param obj
+     * @param location
+     */
+    protected void parseLocationProfile(final JsonObject obj, final LocationProfileDto location) {
         location.setId(asLong(obj.get(LocationConstants.PROPERTY_LOCATION_ID)));
         location.setCompanyName(asString(obj.get(LocationConstants.PROPERTY_COMPANY_NAME)));
         location.setName(asString(obj.get(LocationConstants.PROPERTY_LOCATION_NAME)));
@@ -75,7 +90,5 @@ public class LocationSerializer extends AbstractJsonSerializer {
         location.getLocation().setLongitude(loc.get(LocationConstants.PROPERTY_LON).getAsDouble());
 
         location.setRadius(asInt(obj.get(LocationConstants.PROPERTY_RADIUS_METERS)));
-
-        return location;
     }
 }

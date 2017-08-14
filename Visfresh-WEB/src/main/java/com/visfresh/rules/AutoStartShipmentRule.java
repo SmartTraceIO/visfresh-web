@@ -89,7 +89,7 @@ public class AutoStartShipmentRule implements TrackerEventRule {
         event.setShipment(shipment);
         trackerEventDao.save(event);
 
-        auditService.handleShipmentAction(shipment, null, ShipmentAuditAction.Autocreated, null);
+        auditService.handleShipmentAction(shipment.getId(), null, ShipmentAuditAction.Autocreated, null);
         return true;
     }
 }

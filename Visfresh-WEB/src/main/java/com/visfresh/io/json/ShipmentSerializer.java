@@ -21,7 +21,6 @@ import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Location;
-import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.User;
@@ -35,6 +34,7 @@ import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.AlertProfileDto;
 import com.visfresh.io.shipment.DeviceGroupDto;
+import com.visfresh.io.shipment.LocationProfileDto;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
 import com.visfresh.io.shipment.ShipmentUserDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
@@ -780,20 +780,20 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param locs locations.
      * @return JSON array of locations.
      */
-    private JsonArray locationsToJson(final List<LocationProfile> locs) {
+    private JsonArray locationsToJson(final List<LocationProfileDto> locs) {
         final JsonArray array = new JsonArray();
-        for (final LocationProfile loc : locs) {
+        for (final LocationProfileDto loc : locs) {
             array.add(toJson(loc));
         }
         return array;
     }
 
     /**
-     * @param loc
+     * @param location
      * @return
      */
-    protected JsonElement toJson(final LocationProfile loc) {
-        return locationSerializer.toJson(loc);
+    protected JsonElement toJson(final LocationProfileDto location) {
+        return locationSerializer.toJson(location);
     }
     /**
      * @param summary

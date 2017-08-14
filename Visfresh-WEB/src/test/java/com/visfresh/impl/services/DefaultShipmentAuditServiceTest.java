@@ -21,7 +21,6 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentAuditItem;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.User;
-import com.visfresh.impl.services.DefaultShipmentAuditService;
 import com.visfresh.services.AuthToken;
 
 /**
@@ -101,37 +100,37 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
         final User user = createUser("a@b.c");
         createCurrentSession(user);
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManuallyCreated, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.ManuallyCreated, null);
         assertEquals(1, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManuallyCreated, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.ManuallyCreated, null);
         assertEquals(2, this.items.size());
 
     }
     @Test
     public void testWithoutUser() {
-        handleShipmentAction(shipment1, null, ShipmentAuditAction.LoadedForEdit, null);
+        handleShipmentAction(shipment1.getId(), null, ShipmentAuditAction.LoadedForEdit, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, null, ShipmentAuditAction.ManuallyCreated, null);
+        handleShipmentAction(shipment1.getId(), null, ShipmentAuditAction.ManuallyCreated, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, null, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
+        handleShipmentAction(shipment1.getId(), null, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, null, ShipmentAuditAction.SuppressedAlerts, null);
+        handleShipmentAction(shipment1.getId(), null, ShipmentAuditAction.SuppressedAlerts, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, null, ShipmentAuditAction.Updated, null);
+        handleShipmentAction(shipment1.getId(), null, ShipmentAuditAction.Updated, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, null, ShipmentAuditAction.Viewed, null);
+        handleShipmentAction(shipment1.getId(), null, ShipmentAuditAction.Viewed, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, null, ShipmentAuditAction.ViewedLite, null);
+        handleShipmentAction(shipment1.getId(), null, ShipmentAuditAction.ViewedLite, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, null, ShipmentAuditAction.Autocreated, null);
+        handleShipmentAction(shipment1.getId(), null, ShipmentAuditAction.Autocreated, null);
         assertEquals(1, this.items.size());
     }
     @Test
@@ -139,13 +138,13 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
         final User user = createUser("a@b.c");
         createCurrentSession(user);
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.Viewed, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.Viewed, null);
         assertEquals(1, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.Viewed, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.Viewed, null);
         assertEquals(1, this.items.size());
 
-        handleShipmentAction(shipment2, user, ShipmentAuditAction.Viewed, null);
+        handleShipmentAction(shipment2.getId(), user, ShipmentAuditAction.Viewed, null);
         assertEquals(2, this.items.size());
     }
     @Test
@@ -153,41 +152,41 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
         final User user = createUser("a@b.c");
         createCurrentSession(user);
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ViewedLite, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.ViewedLite, null);
         assertEquals(1, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ViewedLite, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.ViewedLite, null);
         assertEquals(1, this.items.size());
 
-        handleShipmentAction(shipment2, user, ShipmentAuditAction.ViewedLite, null);
+        handleShipmentAction(shipment2.getId(), user, ShipmentAuditAction.ViewedLite, null);
         assertEquals(2, this.items.size());
     }
     @Test
     public void testSingleShipmentActionWithoutSession() {
         final User user = createUser("a@b.c");
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.LoadedForEdit, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.LoadedForEdit, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManuallyCreated, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.ManuallyCreated, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.SuppressedAlerts, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.SuppressedAlerts, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.Updated, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.Updated, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.Viewed, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.Viewed, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.ViewedLite, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.ViewedLite, null);
         assertEquals(0, this.items.size());
 
-        handleShipmentAction(shipment1, user, ShipmentAuditAction.Autocreated, null);
+        handleShipmentAction(shipment1.getId(), user, ShipmentAuditAction.Autocreated, null);
         assertEquals(1, this.items.size());
     }
 

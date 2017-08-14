@@ -11,6 +11,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.io.shipment.SingleShipmentDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -90,4 +91,11 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment
      * @return first found shipment by given serial number and trip count.
      */
     Shipment findBySnTrip(String sn, int trip);
+    /**
+     * @param shipmentId shipment ID.
+     * @param sn serial number.
+     * @param trip trip count.
+     * @return single shipment data.
+     */
+    SingleShipmentDto findSingleShipmentBean(Long shipmentId, String sn, Integer trip);
 }

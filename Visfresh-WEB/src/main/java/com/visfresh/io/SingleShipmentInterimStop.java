@@ -3,7 +3,7 @@
  */
 package com.visfresh.io;
 
-import com.visfresh.entities.LocationProfile;
+import com.visfresh.io.shipment.LocationProfileDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -11,7 +11,7 @@ import com.visfresh.entities.LocationProfile;
  */
 public class SingleShipmentInterimStop {
     private Long id;
-    private LocationProfile location;
+    private LocationProfileDto location;
     private double latitude;
     private double longitude;
     private String stopDate;
@@ -40,13 +40,13 @@ public class SingleShipmentInterimStop {
     /**
      * @return the location
      */
-    public LocationProfile getLocation() {
+    public LocationProfileDto getLocation() {
         return location;
     }
     /**
      * @param location the location to set
      */
-    public void setLocation(final LocationProfile location) {
+    public void setLocation(final LocationProfileDto location) {
         this.location = location;
     }
     /**

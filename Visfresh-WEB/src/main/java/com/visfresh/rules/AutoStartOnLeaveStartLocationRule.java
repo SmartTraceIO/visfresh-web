@@ -189,7 +189,7 @@ public class AutoStartOnLeaveStartLocationRule implements TrackerEventRule {
                 }
             }
 
-            auditService.handleShipmentAction(s, null, ShipmentAuditAction.Autocreated, null);
+            auditService.handleShipmentAction(s.getId(), null, ShipmentAuditAction.Autocreated, null);
             return true;
         }
 

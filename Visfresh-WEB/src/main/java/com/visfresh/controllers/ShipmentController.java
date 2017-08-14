@@ -118,6 +118,7 @@ import com.visfresh.utils.StringUtils;
 @RequestMapping("/rest")
 public class ShipmentController extends AbstractShipmentBaseController implements ShipmentConstants {
     public static final String GET_SINGLE_SHIPMENT = "getSingleShipment";
+    public static final String GET_SINGLE_SHIPMENT_V2 = "getSingleShipmentV2";
     /**
      * 2 hours by default.
      */
@@ -252,14 +253,14 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
             //audit
             if (isNew) {
-                auditService.handleShipmentAction(newShipment, user, ShipmentAuditAction.ManuallyCreated, null);
+                auditService.handleShipmentAction(newShipment.getId(), user, ShipmentAuditAction.ManuallyCreated, null);
             } else {
                 final Map<String, String> details = new HashMap<>();
                 final JsonObject diff = SerializerUtils.diff(
                         serializer.toJson(oldShipmentDto),
                         serializer.toJson(createShipmentDto(newShipment)));
                 details.put("diff", diff == null ? null : diff.toString());
-                auditService.handleShipmentAction(newShipment, user, ShipmentAuditAction.Updated, details);
+                auditService.handleShipmentAction(newShipment.getId(), user, ShipmentAuditAction.Updated, details);
             }
 
             return createSuccessResponse(serializer.toJson(resp));
@@ -1095,7 +1096,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             final ShipmentDto dto = createShipmentDto(shipment);
             final JsonObject json = getSerializer(user).toJson(dto);
 
-            auditService.handleShipmentAction(shipment, user, ShipmentAuditAction.LoadedForEdit, null);
+            auditService.handleShipmentAction(shipment.getId(), user, ShipmentAuditAction.LoadedForEdit, null);
             return createSuccessResponse(json);
         } catch (final Exception e) {
             log.error("Failed to get shipment " + shipmentId, e);
@@ -1152,7 +1153,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 ruleEngine.suppressNextAlerts(s);
             }
 
-            auditService.handleShipmentAction(s, user, ShipmentAuditAction.SuppressedAlerts, null);
+            auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.SuppressedAlerts, null);
             return createSuccessResponse(null);
         } catch (final Exception e) {
             log.error("Failed to delete shipment " + shipmentId, e);
@@ -1197,9 +1198,45 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             addRelevantData(user, s, dto);
 
             if (dto != null) {
-                auditService.handleShipmentAction(s, user, ShipmentAuditAction.Viewed, null);
+                auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.Viewed, null);
             }
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
+        } catch (final Exception e) {
+            log.error("Failed to get single shipment: " + shipmentId, e);
+            return createErrorResponse(e);
+        }
+    }
+    @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT_V2 + "/{authToken}", method = RequestMethod.GET)
+    public JsonObject getSingleShipmentNew(@PathVariable final String authToken,
+            @RequestParam(required = false) final Long shipmentId,
+            @RequestParam(required = false) final String sn,
+            @RequestParam(required = false) final Integer trip
+            ) {
+        //check parameters
+        if (shipmentId == null && (sn == null || trip == null)) {
+            return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Should be specified shipmentId or (sn and trip) request parameters");
+        }
+
+        try {
+            //check logged in.
+            final User user = getLoggedInUser(authToken);
+            checkAccess(user, Role.BasicUser);
+
+            final SingleShipmentDto s = shipmentDao.findSingleShipmentBean(shipmentId, sn, trip);
+
+            if (s == null) {
+                return createSuccessResponse(null);
+            }
+
+            if (!hasViewSingleShipmentAccess(user, s)) {
+                throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
+            }
+
+            auditService.handleShipmentAction(s.getShipmentId(), user, ShipmentAuditAction.Viewed, null);
+
+            final ShipmentSerializer ser = getSerializer(user);
+            return createSuccessResponse(s == null ? null : ser.toJson(s));
         } catch (final Exception e) {
             log.error("Failed to get single shipment: " + shipmentId, e);
             return createErrorResponse(e);
@@ -1243,7 +1280,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             addRelevantData(user, s, dto);
 
             if (dto != null) {
-                auditService.handleShipmentAction(s, user, ShipmentAuditAction.ViewedLite, null);
+                auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.ViewedLite, null);
             }
             return createSuccessResponse(dto == null ? null : ser.toJson(dto));
         } catch (final Exception e) {
@@ -1332,7 +1369,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
             final Shipment s = autoStartService.autoStartNewShipment(d, e.getLatitude(), e.getLongitude(), new Date());
             if (s != null) {
-                auditService.handleShipmentAction(s, user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
+                auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
             }
             return createIdResponse("shipmentId", s.getId());
         } catch (final Exception e) {
@@ -1633,6 +1670,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
 
         final SingleShipmentDto dto = new SingleShipmentDto();
+        dto.setCompanyId(shipment.getCompany().getId());
 
         if (shipment.getAlertProfile() != null) {
             dto.setAlertProfileId(shipment.getAlertProfile().getId());
@@ -1908,6 +1946,41 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         //check company access
         for (final Company c : s.getCompanyAccess()) {
+            if (c.getId().equals(usersCompany.getId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    /**
+     * @param user
+     * @param s
+     * @return
+     */
+    private boolean hasViewSingleShipmentAccess(final User user, final SingleShipmentDto s) {
+        if (Role.SmartTraceAdmin.hasRole(user)) {
+            return true;
+        }
+
+        final Company usersCompany = user.getCompany();
+        if (s == null || s.getCompanyId() == null) {
+            return false;
+        }
+
+        if (s.getCompanyId().equals(usersCompany.getId())) {
+            return true;
+        }
+
+        //check user access
+        for (final ShipmentUserDto u : s.getUserAccess()) {
+            if (u.getId().equals(user.getId())) {
+                return true;
+            }
+        }
+
+        //check company access
+        for (final ShipmentCompanyDto c : s.getCompanyAccess()) {
             if (c.getId().equals(usersCompany.getId())) {
                 return true;
             }

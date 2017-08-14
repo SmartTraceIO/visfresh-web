@@ -10,7 +10,6 @@ import java.util.Set;
 
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Location;
-import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.NoteDto;
 import com.visfresh.io.SingleShipmentInterimStop;
@@ -22,6 +21,7 @@ import com.visfresh.lists.ListNotificationScheduleItem;
  */
 public class SingleShipmentDto {
     private long shipmentId;
+    private Long companyId;
     private String deviceSN;
     private String deviceName;
     private int tripCount;
@@ -81,9 +81,9 @@ public class SingleShipmentDto {
     private Integer noAlertsAfterStartMinutes;
     private String shipmentType;
 
-    private final List<LocationProfile> startLocationAlternatives = new LinkedList<>();
-    private final List<LocationProfile> endLocationAlternatives = new LinkedList<>();
-    private final List<LocationProfile> interimLocationAlternatives = new LinkedList<>();
+    private final List<LocationProfileDto> startLocationAlternatives = new LinkedList<>();
+    private final List<LocationProfileDto> endLocationAlternatives = new LinkedList<>();
+    private final List<LocationProfileDto> interimLocationAlternatives = new LinkedList<>();
     private final List<SingleShipmentInterimStop> interimStops = new LinkedList<>();
     private final List<NoteDto> notes = new LinkedList<>();
     private final List<DeviceGroupDto> deviceGroups = new LinkedList<>();
@@ -715,19 +715,19 @@ public class SingleShipmentDto {
     /**
      * @return the startLocationAlternatives
      */
-    public List<LocationProfile> getStartLocationAlternatives() {
+    public List<LocationProfileDto> getStartLocationAlternatives() {
         return startLocationAlternatives;
     }
     /**
      * @return the endLocationAlternatives
      */
-    public List<LocationProfile> getEndLocationAlternatives() {
+    public List<LocationProfileDto> getEndLocationAlternatives() {
         return endLocationAlternatives;
     }
     /**
      * @return the interimLocationAlternatives
      */
-    public List<LocationProfile> getInterimLocationAlternatives() {
+    public List<LocationProfileDto> getInterimLocationAlternatives() {
         return interimLocationAlternatives;
     }
     /**
@@ -880,5 +880,17 @@ public class SingleShipmentDto {
      */
     public AlertProfileDto getAlertProfile() {
         return alertProfile;
+    }
+    /**
+     * @return
+     */
+    public Long getCompanyId() {
+        return companyId;
+    }
+    /**
+     * @param companyId the companyId to set
+     */
+    public void setCompanyId(final Long companyId) {
+        this.companyId = companyId;
     }
 }

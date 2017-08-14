@@ -14,7 +14,6 @@ import com.visfresh.controllers.audit.CurrentSessionHolder;
 import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.dao.ShipmentAuditDao;
 import com.visfresh.entities.RestSession;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentAuditItem;
 import com.visfresh.entities.User;
 import com.visfresh.services.ShipmentAuditService;
@@ -45,7 +44,7 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
      * @see com.visfresh.services.ShipmentAuditService#handleShipmentAction(com.visfresh.entities.Shipment, com.visfresh.entities.User, com.visfresh.controllers.audit.ShipmentAuditAction, java.util.Map)
      */
     @Override
-    public void handleShipmentAction(final Shipment shipment, final User user,
+    public void handleShipmentAction(final Long shipmentId, final User user,
             final ShipmentAuditAction action, final Map<String, String> details) {
         boolean shouldSaveAudit = true;
 
@@ -60,7 +59,7 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
                 }
             } else {
                 final String oldValue = session.getProperty(SHIPMENT_AUDIT);
-                final String value = buildSessionAuditValue(action, shipment);
+                final String value = buildSessionAuditValue(action, shipmentId);
 
                 final boolean isChanged = !value.equals(oldValue);
 
@@ -78,7 +77,7 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
         }
 
         if (shouldSaveAudit) {
-            final ShipmentAuditItem item = createAuditItem(shipment, user, action, details);
+            final ShipmentAuditItem item = createAuditItem(shipmentId, user, action, details);
             save(item);
         }
     }
@@ -96,8 +95,8 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
      * @param shipment shipment.
      * @return session value for given action and shipment.
      */
-    private String buildSessionAuditValue(final ShipmentAuditAction action, final Shipment shipment) {
-        return action + "-" + shipment.getId();
+    private String buildSessionAuditValue(final ShipmentAuditAction action, final Long shipmentId) {
+        return action + "-" + shipmentId;
     }
 
     /**
@@ -122,10 +121,10 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
      * @param details audit details.
      * @return shipment audit item.
      */
-    protected ShipmentAuditItem createAuditItem(final Shipment shipment, final User user,
+    protected ShipmentAuditItem createAuditItem(final Long shipmentId, final User user,
             final ShipmentAuditAction action, final Map<String, String> details) {
         final ShipmentAuditItem item = new ShipmentAuditItem();
-        item.setShipmentId(shipment.getId());
+        item.setShipmentId(shipmentId);
         if (user != null) {
             item.setUserId(user.getId());
         }

@@ -25,6 +25,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -631,6 +632,14 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
                 }
             }
         };
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#findSingleShipmentBean(java.lang.Long, java.lang.String, java.lang.Integer)
+     */
+    @Override
+    public SingleShipmentDto findSingleShipmentBean(final Long shipmentId, final String sn, final Integer trip) {
+        // TODO Auto-generated method stub
+        return null;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#createNewFrom(com.visfresh.entities.ShipmentTemplate)

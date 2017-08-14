@@ -6,7 +6,6 @@ package com.visfresh.services;
 import java.util.Map;
 
 import com.visfresh.controllers.audit.ShipmentAuditAction;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
 
 /**
@@ -15,11 +14,11 @@ import com.visfresh.entities.User;
  */
 public interface ShipmentAuditService {
     /**
-     * @param shipment shipment.
+     * @param shipmentId shipment.
      * @param user user, can be null.
      * @param action action.
      * @param details action details, can be null.
      */
-    void handleShipmentAction(Shipment shipment, User user,
+    void handleShipmentAction(Long shipmentId, User user,
             ShipmentAuditAction action, Map<String, String> details);
 }

@@ -149,7 +149,7 @@ public class NoteController extends AbstractController implements DeviceConstant
             note.setActive(false);
             noteDao.save(s, note);
 
-            auditService.handleShipmentAction(s, user, ShipmentAuditAction.DeletedNote, null);
+            auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.DeletedNote, null);
 
             return createSuccessResponse(null);
         } catch (final Exception e) {
@@ -225,9 +225,9 @@ public class NoteController extends AbstractController implements DeviceConstant
             note = noteDao.save(s, note);
 
             if (isNew) {
-                auditService.handleShipmentAction(s, user, ShipmentAuditAction.AddedNote, null);
+                auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.AddedNote, null);
             } else {
-                auditService.handleShipmentAction(s, user, ShipmentAuditAction.UpdatedNote, null);
+                auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.UpdatedNote, null);
             }
 
             return createSuccessResponse(ser.createSaveResponse(note));
