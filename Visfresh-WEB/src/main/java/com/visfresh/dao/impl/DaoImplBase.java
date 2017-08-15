@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -316,10 +315,10 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
     public void deleteFromCache(final ID id) {
         cache.remove(id);
     }
-    @PostConstruct
-    public void initCache() {
+    @Autowired
+    public void initCache(final CacheManagerHolder h) {
         cache = createCache();
-        cache.initialize();
+        cache.initialize(h);
     }
     @PreDestroy
     public void destroyCache() {

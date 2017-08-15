@@ -6,7 +6,6 @@ package com.visfresh.dao.impl;
 import java.io.Serializable;
 
 import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
@@ -40,8 +39,8 @@ public class DefaultCache <T, Key extends Serializable> {
     /**
      * Initializes the cache.
      */
-    public void initialize() {
-        CacheManager.getInstance().addCache(cache);
+    public void initialize(final CacheManagerHolder holder) {
+        holder.getCacheManager().addCache(cache);
     }
     /**
      * Shuts down the cache.

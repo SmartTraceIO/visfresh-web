@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +51,10 @@ public class ShipmentStatisticsDaoImpl implements ShipmentStatisticsDao {
         super();
     }
 
-    @PostConstruct
-    public void initCache() {
+    @Autowired
+    public void initCache(final CacheManagerHolder h) {
         cache = new DefaultCache<>("ShipmentStatisticsDao", 10000, 60, 20 * 60);
-        cache.initialize();
+        cache.initialize(h);
     }
     @PreDestroy
     public void destroyCache() {

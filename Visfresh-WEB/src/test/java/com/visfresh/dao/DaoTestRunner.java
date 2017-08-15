@@ -17,7 +17,7 @@ import com.visfresh.junit.db.JUnitDbConfig;
  *
  */
 public class DaoTestRunner extends BlockJUnit4ClassRunner {
-    private AbstractApplicationContext context;
+    private static AbstractApplicationContext context = createContext();
     private BaseDaoTest<?> test;
 
     /**
@@ -26,6 +26,17 @@ public class DaoTestRunner extends BlockJUnit4ClassRunner {
      */
     public DaoTestRunner(final Class<?> klass) throws InitializationError {
         super(klass);
+    }
+
+    /**
+     * @return
+     */
+    private static AbstractApplicationContext createContext() {
+        final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
+        ctxt.setId(DaoTestRunner.class.getName());
+        ctxt.scan(JUnitDbConfig.class.getPackage().getName());
+        ctxt.refresh();
+        return ctxt;
     }
 
     /* (non-Javadoc)
@@ -41,22 +52,6 @@ public class DaoTestRunner extends BlockJUnit4ClassRunner {
         return test;
     }
     /* (non-Javadoc)
-     * @see org.junit.runners.ParentRunner#run(org.junit.runner.notification.RunNotifier)
-     */
-    @Override
-    public void run(final RunNotifier notifier) {
-        final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
-        ctxt.scan(JUnitDbConfig.class.getPackage().getName());
-        ctxt.refresh();
-        context = ctxt;
-
-        try {
-            super.run(notifier);
-        } finally {
-            context.destroy();
-        }
-    }
-    /* (non-Javadoc)
      * @see org.junit.runners.BlockJUnit4ClassRunner#runChild(org.junit.runners.model.FrameworkMethod, org.junit.runner.notification.RunNotifier)
      */
     @Override
@@ -64,10 +59,8 @@ public class DaoTestRunner extends BlockJUnit4ClassRunner {
         try {
             super.runChild(method, notifier);
         } finally {
-            if (context != null) {
-                if (this.test != null) {
-                    clearDb(context);
-                }
+            if (this.test != null) {
+                clearDb(context);
             }
         }
     }

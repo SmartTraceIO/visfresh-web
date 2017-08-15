@@ -45,4 +45,7 @@ public interface ShipmentConstants extends BaseShipmentConstants {
     String END_LOCATION_ALTERNATIVES = "endLocationAlternatives";
     String USER_ACCESS = "userAccess";
     String COMPANY_ACCESS = "companyAccess";
+
+    String INTERIM_STOPS = "interimStops";
+    String INTERIM_LOCATIONS = "interimLocations";
 }

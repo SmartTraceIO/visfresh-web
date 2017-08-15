@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -72,10 +72,10 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         propertyToDbFields.put(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT, UPPERTEMPLIMIT_FIELD);
     }
 
-    @PostConstruct
-    public void initRulesCache() {
+    @Autowired
+    public void initRulesCache(final CacheManagerHolder h) {
         rulesCache = new DefaultCache<>("AlertProfileDaoRules", 10000, 60, 20 * 60);
-        rulesCache.initialize();
+        rulesCache.initialize(h);
     }
     @PreDestroy
     public void destroyRulesCache() {

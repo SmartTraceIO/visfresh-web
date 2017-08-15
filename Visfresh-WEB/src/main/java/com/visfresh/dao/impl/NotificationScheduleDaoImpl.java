@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -344,10 +343,10 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
         return refs;
     }
 
-    @PostConstruct
-    public void initPersonScheduleCache() {
+    @Autowired
+    public void initPersonScheduleCache(final CacheManagerHolder h) {
         personScheduleCache = new DefaultCache<>("PersonScheduleDao", 1000, 4 * 60, 20 * 60);
-        personScheduleCache.initialize();
+        personScheduleCache.initialize(h);
     }
     @PreDestroy
     public void destroyPersonScheduleCache() {

@@ -36,22 +36,8 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
      * @return spring context.
      */
     private static  AnnotationConfigApplicationContext createContext() {
-        final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext() {
-
-            /* (non-Javadoc)
-             * @see java.lang.Object#finalize()
-             */
-            @Override
-            protected void finalize() throws Throwable {
-                try {
-                    destroy();
-                    System.out.println("Application context for rule engine has destroyed");
-                } catch (final Throwable t) {
-                    t.printStackTrace();
-                }
-                super.finalize();
-            }
-        };
+        final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
+        ctxt.setId(RuleEngineTestRunner.class.getName());
         ctxt.scan(JUnitDbConfig.class.getPackage().getName(),
             MockNotificationService.class.getPackage().getName());
         ctxt.refresh();

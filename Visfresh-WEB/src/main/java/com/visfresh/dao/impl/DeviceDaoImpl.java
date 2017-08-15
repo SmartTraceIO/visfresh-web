@@ -9,11 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.constants.DeviceConstants;
@@ -434,10 +434,10 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
         }
         return item;
     }
-    @PostConstruct
-    public void initDeviceStateCache() {
+    @Autowired
+    public void initDeviceStateCache(final CacheManagerHolder h) {
         deviceStateCache = new DefaultCache<>("DeviceDaoState", 1000, defaultCacheTimeSeconds, 5 * defaultCacheTimeSeconds);
-        deviceStateCache.initialize();
+        deviceStateCache.initialize(h);
     }
     @PreDestroy
     public void destroyDeviceStateCache() {

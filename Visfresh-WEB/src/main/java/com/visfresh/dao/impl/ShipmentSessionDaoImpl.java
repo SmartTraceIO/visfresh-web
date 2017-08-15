@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +43,10 @@ public class ShipmentSessionDaoImpl implements ShipmentSessionDao {
         super();
     }
 
-    @PostConstruct
-    public void initCache() {
+    @Autowired
+    public void initCache(final CacheManagerHolder h) {
         cache = new DefaultCache<>("ShipmentSessionDao", 10000, 60, 20 * 60);
-        cache.initialize();
+        cache.initialize(h);
     }
     @PreDestroy
     public void destroyCache() {

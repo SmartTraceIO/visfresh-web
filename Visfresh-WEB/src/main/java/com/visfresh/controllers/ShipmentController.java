@@ -83,6 +83,7 @@ import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
+import com.visfresh.io.json.SingleShipmentSerializer;
 import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.AlertProfileDto;
 import com.visfresh.io.shipment.DeviceGroupDto;
@@ -1177,8 +1178,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.BasicUser);
 
-            final ShipmentSerializer ser = getSerializer(user);
-
             final Shipment s;
             if (shipmentId != null) {
                 s = shipmentDao.findOne(shipmentId);
@@ -1200,7 +1199,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             if (dto != null) {
                 auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.Viewed, null);
             }
-            return createSuccessResponse(dto == null ? null : ser.toJson(dto));
+
+            final SingleShipmentSerializer ser = getSingleShipmentSerializer(user);
+            return createSuccessResponse(dto == null ? null : ser.exportToViewData(dto));
         } catch (final Exception e) {
             log.error("Failed to get single shipment: " + shipmentId, e);
             return createErrorResponse(e);
@@ -1235,12 +1236,19 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
             auditService.handleShipmentAction(s.getShipmentId(), user, ShipmentAuditAction.Viewed, null);
 
-            final ShipmentSerializer ser = getSerializer(user);
-            return createSuccessResponse(s == null ? null : ser.toJson(s));
+            final SingleShipmentSerializer ser = getSingleShipmentSerializer(user);
+            return createSuccessResponse(s == null ? null : ser.exportToViewData(s));
         } catch (final Exception e) {
             log.error("Failed to get single shipment: " + shipmentId, e);
             return createErrorResponse(e);
         }
+    }
+    /**
+     * @param user
+     * @return
+     */
+    private SingleShipmentSerializer getSingleShipmentSerializer(final User user) {
+        return new SingleShipmentSerializer(user);
     }
     @RequestMapping(value = "/getSingleShipmentLite/{authToken}", method = RequestMethod.GET)
     public JsonObject getSingleShipmentLite(@PathVariable final String authToken,
@@ -1258,8 +1266,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             //check logged in.
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.NormalUser);
-
-            final ShipmentSerializer ser = getSerializer(user);
 
             final Shipment s;
             if (shipmentId != null) {
@@ -1282,7 +1288,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             if (dto != null) {
                 auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.ViewedLite, null);
             }
-            return createSuccessResponse(dto == null ? null : ser.toJson(dto));
+
+            final SingleShipmentSerializer ser = getSingleShipmentSerializer(user);
+            return createSuccessResponse(dto == null ? null : ser.exportToViewData(dto));
         } catch (final Exception e) {
             log.error("Failed to get single shipment: " + shipmentId, e);
             return createErrorResponse(e);
