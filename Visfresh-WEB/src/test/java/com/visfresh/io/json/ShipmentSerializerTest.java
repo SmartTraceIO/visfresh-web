@@ -18,8 +18,8 @@ import org.junit.Test;
 
 import com.google.gson.JsonObject;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.entities.User;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
@@ -44,10 +44,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
      */
     @Before
     public void setUp() {
-        final User user = new User();
-        user.setTimeZone(UTC);
-
-        serializer = new ShipmentSerializer(user);
+        serializer = new ShipmentSerializer(Language.English, UTC);
     }
 
     @Test

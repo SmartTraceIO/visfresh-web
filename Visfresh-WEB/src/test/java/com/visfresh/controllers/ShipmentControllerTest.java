@@ -1967,7 +1967,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
      * @return
      */
     private List<KeyLocation> getKeyLocations(final JsonObject shipmentJson) {
-        final ShipmentSerializer ser = new ShipmentSerializer(user);
+        final ShipmentSerializer ser = new ShipmentSerializer(user.getLanguage(), user.getTimeZone());
 
         final JsonElement el = shipmentJson.get("keyLocations");
         if (el == null || el.isJsonNull()) {

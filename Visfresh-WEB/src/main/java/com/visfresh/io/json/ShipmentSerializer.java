@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -14,8 +15,8 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ShipmentConstants;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.entities.User;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
@@ -37,13 +38,14 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     private final DateFormat prettyFormat;
 
     /**
-     * @param user user.
+     * @param lang language.
+     * @param tz time zone.
      */
-    public ShipmentSerializer(final User user) {
-        super(user.getTimeZone());
+    public ShipmentSerializer(final Language lang, final TimeZone tz) {
+        super(tz);
 
-        this.isoFormat = createIsoFormat(user.getLanguage(), user.getTimeZone());
-        this.prettyFormat = createPrettyFormat(user.getLanguage(), user.getTimeZone());
+        this.isoFormat = createIsoFormat(lang, tz);
+        this.prettyFormat = createPrettyFormat(lang, tz);
     }
     /**
      * @param obj
@@ -429,7 +431,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     }
 
     public static void main(final String[] args) throws Exception {
-        final ShipmentSerializer ser = new ShipmentSerializer(new User());
+        final ShipmentSerializer ser = new ShipmentSerializer(Language.English, TimeZone.getDefault());
 
         final String req;
         final InputStream in = ShipmentSerializer.class.getResourceAsStream("req.json");

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -16,20 +17,29 @@ import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.entities.AlertType;
+import com.visfresh.entities.CorrectiveAction;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.TemperatureUnits;
-import com.visfresh.entities.User;
 import com.visfresh.io.NoteDto;
 import com.visfresh.io.SingleShipmentInterimStop;
+import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.AlertProfileDto;
+import com.visfresh.io.shipment.AlertRuleBean;
+import com.visfresh.io.shipment.CorrectiveActionListBean;
 import com.visfresh.io.shipment.DeviceGroupDto;
-import com.visfresh.io.shipment.LocationProfileDto;
+import com.visfresh.io.shipment.LocationProfileBean;
+import com.visfresh.io.shipment.NotificationIssueBean;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
 import com.visfresh.io.shipment.ShipmentUserDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
+import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
+import com.visfresh.io.shipment.SingleShipmentLocationBean;
+import com.visfresh.io.shipment.TemperatureAlertBean;
+import com.visfresh.io.shipment.TemperatureRuleBean;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.StringUtils;
@@ -43,14 +53,11 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
     private final NoteSerializer noteSerializer;
     private final LocationSerializer locationSerializer;
 
-    /**
-     * @param tz
-     */
-    public SingleShipmentSerializer(final User user) {
-        super(user.getTimeZone());
-        locationSerializer = new LocationSerializer(user.getTimeZone());
-        noteSerializer = new NoteSerializer(user.getTimeZone());
-        this.tempUnits = user.getTemperatureUnits();
+    public SingleShipmentSerializer(final Language lang, final TimeZone tz, final TemperatureUnits units) {
+        super(tz);
+        locationSerializer = new LocationSerializer(tz);
+        noteSerializer = new NoteSerializer(tz);
+        this.tempUnits = units;
     }
     /**
      * @param dto
@@ -199,48 +206,72 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
             json.add(ShipmentConstants.INTERIM_STOPS, interimStopsToJson(dto.getInterimStops()));
 
             //add notes
-            final JsonArray notes = new JsonArray();
-            for (final NoteDto n : dto.getNotes()) {
-                notes.add(noteSerializer.toJson(n));
-            }
-            json.add("notes", notes);
+            json.add("notes", notesToJson(dto.getNotes()));
         }
 
         //add device groups
-        final JsonArray deviceGroups = new JsonArray();
-        json.add("deviceGroups", deviceGroups);
-        for (final DeviceGroupDto grp : dto.getDeviceGroups()) {
-            deviceGroups.add(toJson(grp));
-        }
+        json.add("deviceGroups", deviceGroupsToJson(dto.getDeviceGroups()));
 
         //company access
-        final JsonArray userAccess = new JsonArray();
-        json.add("userAccess", userAccess);
-        for (final ShipmentUserDto u : dto.getUserAccess()) {
-            final JsonObject cobj = new JsonObject();
-            cobj.addProperty("userId", u.getId());
-            cobj.addProperty("email", u.getEmail());
-            userAccess.add(cobj);
-        }
+        json.add("userAccess", userAcessToJson(dto.getUserAccess()));
 
         //company access
-        final JsonArray companyAccess = new JsonArray();
-        json.add("companyAccess", companyAccess);
-        for (final ShipmentCompanyDto c : dto.getCompanyAccess()) {
+        json.add("companyAccess", companyAccessToJson(dto.getCompanyAccess()));
+
+        //sent alerts
+        json.add("alertsWithCorrectiveActions", sentAlertsToJson(dto.getSentAlerts()));
+
+        return json;
+    }
+    /**
+     * @param sentAlerts
+     * @return
+     */
+    protected JsonArray sentAlertsToJson(final List<AlertDto> sentAlerts) {
+        final JsonArray array = new JsonArray();
+        for (final AlertDto a : sentAlerts) {
+            array.add(toJson(a));
+        }
+        return array;
+    }
+    /**
+     * @param companyAccess
+     * @return
+     */
+    protected JsonArray companyAccessToJson(final List<ShipmentCompanyDto> companyAccess) {
+        final JsonArray array = new JsonArray();
+        for (final ShipmentCompanyDto c : companyAccess) {
             final JsonObject cobj = new JsonObject();
             cobj.addProperty("companyId", c.getId());
             cobj.addProperty("companyName", c.getName());
-            companyAccess.add(cobj);
+            array.add(cobj);
         }
-
-        //sent alerts
-        final JsonArray alertsWithCorrectiveActions = new JsonArray();
-        for (final AlertDto a : dto.getSentAlerts()) {
-            alertsWithCorrectiveActions.add(toJson(a));
+        return array;
+    }
+    /**
+     * @param userAccess
+     * @return
+     */
+    protected JsonArray userAcessToJson(final List<ShipmentUserDto> userAccess) {
+        final JsonArray array = new JsonArray();
+        for (final ShipmentUserDto u : userAccess) {
+            final JsonObject cobj = new JsonObject();
+            cobj.addProperty("userId", u.getId());
+            cobj.addProperty("email", u.getEmail());
+            array.add(cobj);
         }
-        json.add("alertsWithCorrectiveActions", alertsWithCorrectiveActions);
-
-        return json;
+        return array;
+    }
+    /**
+     * @param dg
+     * @return
+     */
+    protected JsonArray deviceGroupsToJson(final List<DeviceGroupDto> dg) {
+        final JsonArray deviceGroups = new JsonArray();
+        for (final DeviceGroupDto grp : dg) {
+            deviceGroups.add(toJson(grp));
+        }
+        return deviceGroups;
     }
     /**
      * @param alert
@@ -355,9 +386,9 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
      * @param locs locations.
      * @return JSON array of locations.
      */
-    private JsonArray locationsToJson(final List<LocationProfileDto> locs) {
+    private JsonArray locationsToJson(final List<LocationProfileBean> locs) {
         final JsonArray array = new JsonArray();
-        for (final LocationProfileDto loc : locs) {
+        for (final LocationProfileBean loc : locs) {
             array.add(toJson(loc));
         }
         return array;
@@ -462,7 +493,245 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
      * @param location
      * @return
      */
-    protected JsonElement toJson(final LocationProfileDto location) {
+    protected JsonElement toJson(final LocationProfileBean location) {
         return locationSerializer.toJson(location);
+    }
+
+    //Single shipment bean
+    public JsonObject toJson(final SingleShipmentBean s) {
+        if (s == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("shipmentId", s.getShipmentId());
+        json.addProperty("companyId", s.getCompanyId());
+        json.addProperty("deviceSN", s.getDeviceSN());
+        json.addProperty("deviceName", s.getDeviceName());
+        json.addProperty("tripCount", s.getTripCount());
+        json.addProperty("shipmentDescription", s.getShipmentDescription());
+        json.addProperty("palletId", s.getPalletId());
+        json.addProperty("assetNum", s.getAssetNum());
+        json.addProperty("assetType", s.getAssetType());
+        json.addProperty("status", s.getStatus().name());
+        json.addProperty("alertSuppressionMinutes", s.getAlertSuppressionMinutes());
+        json.add("alertsNotificationSchedules",
+                createNotificationScheduleArray(s.getAlertsNotificationSchedules()));
+        json.addProperty("commentsForReceiver", s.getCommentsForReceiver());
+        json.addProperty("arrivalNotificationWithinKm", s.getArrivalNotificationWithinKm());
+        json.addProperty("excludeNotificationsIfNoAlerts", s.isExcludeNotificationsIfNoAlerts());
+        json.add("arrivalNotificationSchedules", createNotificationScheduleArray(
+                s.getArrivalNotificationSchedules()));
+        json.addProperty("sendArrivalReport", s.isSendArrivalReport());
+        json.addProperty("sendArrivalReportOnlyIfAlerts", s.isSendArrivalReportOnlyIfAlerts());
+        json.addProperty("shutdownDeviceAfterMinutes", s.getShutdownDeviceAfterMinutes());
+        json.addProperty("noAlertsAfterArrivalMinutes", s.getNoAlertsAfterArrivalMinutes());
+        json.addProperty("shutDownAfterStartMinutes", s.getShutDownAfterStartMinutes());
+        json.add("startLocation", toJson(s.getStartLocation()));
+        json.addProperty("startTime", formatDate(s.getStartTime()));
+        json.add("endLocation", toJson(s.getEndLocation()));
+        json.addProperty("eta", formatDate(s.getEta()));
+        json.add("currentLocation", toJson(s.getCurrentLocation()));
+        json.addProperty("currentLocationDescription", s.getCurrentLocationDescription());
+        json.addProperty("percentageComplete", s.getPercentageComplete());
+
+        json.addProperty("minTemp", s.getMinTemp());
+        json.addProperty("maxTem", s.getMaxTemp());
+        json.addProperty("timeOfFirstReading", formatDate(s.getTimeOfFirstReading()));
+
+        final JsonArray locations = new JsonArray();
+        for (final SingleShipmentLocationBean b : s.getLocations()) {
+            locations.add(toJson(b));
+        }
+        json.add("locations", locations);
+
+        json.add("siblings", toJsonArray(s.getSiblings()));
+        json.add("alertSummary", createAlertSummaryArray(s.getAlertSummary()));
+        json.add("alertYetToFire", alertsToJson(s.getAlertYetToFire()));
+        json.add("alertFired", alertsToJson(s.getAlertFired()));
+        json.addProperty("arrivalNotificationTime", formatDate(s.getArrivalNotificationTime()));
+        json.addProperty("shutdownTime", formatDate(s.getShutdownTime()));
+        json.addProperty("arrivalTime", formatDate(s.getArrivalTime()));
+        json.addProperty("alertsSuppressed", s.isAlertsSuppressed());
+        json.addProperty("alertsSuppressionTime", formatDate(s.getAlertsSuppressionTime()));
+        json.addProperty("firstReadingTime", formatDate(s.getFirstReadingTime()));
+        json.addProperty("lastReadingTime", formatDate(s.getLastReadingTime()));
+        json.addProperty("lastReadingTemperature", s.getLastReadingTemperature());
+        json.addProperty("batteryLevel", s.getBatteryLevel());
+        json.addProperty("noAlertsAfterStartMinutes", s.getNoAlertsAfterStartMinutes());
+        json.addProperty("shipmentType", s.getShipmentType());
+
+        json.add("startLocationAlternatives", locationsToJson(s.getStartLocationAlternatives()));
+        json.add("endLocationAlternatives", locationsToJson(s.getEndLocationAlternatives()));
+        json.add("interimLocationAlternatives", locationsToJson(s.getInterimLocationAlternatives()));
+
+        final JsonArray interimStops = new JsonArray();
+        for (final SingleShipmentInterimStop stp : s.getInterimStops()) {
+            interimStops.add(toJson(stp));
+        }
+        json.add("interimStops", interimStops);
+        json.add("notes", notesToJson(s.getNotes()));
+        json.add("deviceGroups", deviceGroupsToJson(s.getDeviceGroups()));
+        json.addProperty("deviceColor", s.getDeviceColor());
+        json.addProperty("isLatestShipment", s.isLatestShipment());
+        json.addProperty("arrivalReportSent", s.isArrivalReportSent());
+        json.add("userAccess", userAcessToJson(s.getUserAccess()));
+        json.add("companyAccess", companyAccessToJson(s.getCompanyAccess()));
+        json.add("sentAlerts", sentAlertsToJson(s.getSentAlerts()));
+        json.add("alertProfile", toJson(s.getAlertProfile()));
+
+        return json;
+    }
+    /**
+     * @param loc
+     * @return
+     */
+    private JsonObject toJson(final SingleShipmentLocationBean loc) {
+        if (loc == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("latitude", loc.getLatitude());
+        json.addProperty("longitude", loc.getLongitude());
+        json.addProperty("temperature", loc.getTemperature());
+        json.addProperty("time", formatDate(loc.getTime()));
+
+        final JsonArray array = new JsonArray();
+        for (final AlertBean a : loc.getAlerts()) {
+            array.add(toJson(a));
+        }
+        json.add("alerts", array);
+
+        json.addProperty("type", loc.getType());
+        return json;
+    }
+    /**
+     * @param a
+     * @return
+     */
+    private JsonObject toJson(final AlertBean a) {
+        if (a == null) {
+            return null;
+        }
+
+        final JsonObject json = notiticationIssueToJson(a);
+        json.addProperty("type", a.getType().name());
+
+        if (a instanceof TemperatureAlertBean) {
+            final TemperatureAlertBean ta = (TemperatureAlertBean) a;
+
+            json.addProperty("temperature", ta.getTemperature());
+            json.addProperty("minutes", ta.getMinutes());
+            json.addProperty("cumulative", ta.isCumulative());
+            json.addProperty("ruleId", ta.getRuleId());
+        }
+
+        return json;
+    }
+    /**
+     * @param nb
+     * @return
+     */
+    private JsonObject notiticationIssueToJson(final NotificationIssueBean nb) {
+        final JsonObject json = new JsonObject();
+        json.addProperty("id", nb.getId());
+        json.addProperty("date", formatDate(nb.getDate()));
+        json.addProperty("trackerEventId", nb.getTrackerEventId());
+        return json;
+    }
+    /**
+     * @param s
+     * @return
+     */
+    protected JsonArray notesToJson(final List<NoteDto> notes) {
+        final JsonArray array = new JsonArray();
+        for (final NoteDto note : notes) {
+            array.add(noteSerializer.toJson(note));
+        }
+        return array;
+    }
+    /**
+     * @param alerts
+     * @return
+     */
+    private JsonArray alertsToJson(final List<AlertRuleBean> alerts) {
+        final JsonArray array = new JsonArray();
+        for (final AlertRuleBean a : alerts) {
+            array.add(toJson(a));
+        }
+        return array;
+    }
+    /**
+     * @param r
+     * @return
+     */
+    private JsonObject toJson(final AlertRuleBean r) {
+        if (r == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("type", r.getType().name());
+        json.addProperty("id", r.getId());
+
+        if (r instanceof TemperatureRuleBean) {
+            final TemperatureRuleBean tr = (TemperatureRuleBean) r;
+            json.addProperty("temperature", tr.getTemperature());
+            json.addProperty("timeOutMinutes", tr.getTimeOutMinutes());
+            json.addProperty("cumulativeFlag", tr.hasCumulativeFlag());
+            json.addProperty("maxRateMinutes", tr.getMaxRateMinutes());
+            json.addProperty("maxRateMinutes", tr.getMaxRateMinutes());
+            json.add("correctiveActions", toJson(tr.getCorrectiveActions()));
+        }
+
+        return json;
+    }
+    /**
+     * @param actions
+     * @return
+     */
+    private JsonObject toJson(final CorrectiveActionListBean actions) {
+        if (actions == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("id", actions.getId());
+        json.addProperty("name", actions.getName());
+        json.addProperty("description", actions.getDescription());
+
+        final JsonArray array = new JsonArray();
+        for (final CorrectiveAction a : actions.getActions()) {
+            array.add(toJson(a));
+        }
+        json.add("actions", array);
+
+        return json;
+    }
+    /**
+     * @param a corrective action.
+     * @return JSON object.
+     */
+    private JsonObject toJson(final CorrectiveAction a) {
+        if (a == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("action", a.getAction());
+        json.addProperty("requestVerification", a.isRequestVerification());
+        return json;
+    }
+    /**
+     * @param sched
+     * @return
+     */
+    protected JsonArray createNotificationScheduleArray(final List<ListNotificationScheduleItem> sched) {
+        final JsonArray arrivalNotificationSchedules = new JsonArray();
+        for (final ListNotificationScheduleItem item : sched) {
+            arrivalNotificationSchedules.add(toJson(item));
+        }
+        return arrivalNotificationSchedules;
     }
 }

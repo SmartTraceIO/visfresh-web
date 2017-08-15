@@ -3,13 +3,13 @@
  */
 package com.visfresh.entities;
 
-import com.visfresh.io.shipment.LocationProfileDto;
+import com.visfresh.io.shipment.LocationProfileBean;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class LocationProfile extends LocationProfileDto implements EntityWithId<Long>, EntityWithCompany {
+public class LocationProfile extends LocationProfileBean implements EntityWithId<Long>, EntityWithCompany {
     /**
      * Company
      */

@@ -3,6 +3,7 @@
  */
 package com.visfresh.io.shipment;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +20,7 @@ import com.visfresh.lists.ListNotificationScheduleItem;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class SingleShipmentDto {
+public class SingleShipmentBean {
     private long shipmentId;
     private Long companyId;
     private String deviceSN;
@@ -30,7 +31,6 @@ public class SingleShipmentDto {
     private String assetNum;
     private String assetType;
     private ShipmentStatus status;
-    private Long alertProfileId;
     private Integer alertSuppressionMinutes;
     private final List<ListNotificationScheduleItem> alertsNotificationSchedules = new LinkedList<>();
     private String commentsForReceiver;
@@ -42,40 +42,30 @@ public class SingleShipmentDto {
     private Integer shutdownDeviceAfterMinutes;
     private Integer noAlertsAfterArrivalMinutes;
     private Integer shutDownAfterStartMinutes;
-    private String startLocation;
-    private String startTimeISO;
-    private String startTime;
-    private String endLocation;
-    private String etaIso;
-    private String eta;
-    private String currentLocation;
-    private Location startLocationForMap;
-    private Location endLocationForMap;
-    private Location currentLocationForMap;
+    private LocationProfileBean startLocation;
+    private Date startTime;
+    private LocationProfileBean endLocation;
+    private Date eta;
+    private Location currentLocation;
+    private String currentLocationDescription;
     private int percentageComplete;
 
     private double minTemp;
     private double maxTemp;
-    private String timeOfFirstReading;
+    private Date timeOfFirstReading;
 
-    private final List<SingleShipmentLocation> locations = new LinkedList<>();
-    private final List<SingleShipmentDto> siblings = new LinkedList<>();
-    private String alertProfileName;
+    private final List<SingleShipmentLocationBean> locations = new LinkedList<>();
+    private final List<Long> siblings = new LinkedList<>();
     private final Set<AlertType> alertSummary = new HashSet<>();
-    private String alertYetToFire;
-    private String alertFired;
-    private String arrivalNotificationTimeIso;
-    private String arrivalNotificationTime;
-    private String shutdownTimeIso;
-    private String shutdownTime;
-    private String arrivalTimeIso;
-    private String arrivalTime;
+    private final List<AlertRuleBean> alertYetToFire = new LinkedList<>();
+    private final List<AlertRuleBean> alertFired = new LinkedList<>();
+    private Date arrivalNotificationTime;
+    private Date shutdownTime;
+    private Date arrivalTime;
     private boolean alertsSuppressed;
-    private String alertsSuppressionTimeIso;
-    private String alertsSuppressionTime;
-    private String firstReadingTime;
-    private String lastReadingTimeIso;
-    private String lastReadingTime;
+    private Date alertsSuppressionTime;
+    private Date firstReadingTime;
+    private Date lastReadingTime;
     private double lastReadingTemperature;
     private Integer batteryLevel;
     private Integer noAlertsAfterStartMinutes;
@@ -98,7 +88,7 @@ public class SingleShipmentDto {
     /**
      * Default constructor.
      */
-    public SingleShipmentDto() {
+    public SingleShipmentBean() {
         super();
     }
 
@@ -223,27 +213,6 @@ public class SingleShipmentDto {
         this.status = status;
     }
     /**
-     * @return the alertProfileId
-     */
-    public Long getAlertProfileId() {
-        return alertProfileId;
-    }
-    /**
-     * @param alertProfileId the alertProfileId to set
-     */
-    public void setAlertProfileId(final Long alertProfileId) {
-        this.alertProfileId = alertProfileId;
-    }
-    public String getAlertProfileName() {
-        return alertProfileName;
-    }
-    /**
-     * @param alertProfileName the alertProfileName to set
-     */
-    public void setAlertProfileName(final String alertProfileName) {
-        this.alertProfileName = alertProfileName;
-    }
-    /**
      * @return the alertSuppressionMinutes
      */
     public Integer getAlertSuppressionMinutes() {
@@ -307,98 +276,50 @@ public class SingleShipmentDto {
     /**
      * @return the startLocation
      */
-    public String getStartLocation() {
+    public LocationProfileBean getStartLocation() {
         return startLocation;
     }
     /**
      * @param startLocation the startLocation to set
      */
-    public void setStartLocation(final String startLocation) {
+    public void setStartLocation(final LocationProfileBean startLocation) {
         this.startLocation = startLocation;
-    }
-    /**
-     * @return the startTimeISO
-     */
-    public String getStartTimeISO() {
-        return startTimeISO;
-    }
-    /**
-     * @param startTimeISO the startTimeISO to set
-     */
-    public void setStartTimeISO(final String startTimeISO) {
-        this.startTimeISO = startTimeISO;
     }
     /**
      * @return the endLocation
      */
-    public String getEndLocation() {
+    public LocationProfileBean getEndLocation() {
         return endLocation;
     }
     /**
      * @param endLocation the endLocation to set
      */
-    public void setEndLocation(final String endLocation) {
+    public void setEndLocation(final LocationProfileBean endLocation) {
         this.endLocation = endLocation;
-    }
-    /**
-     * @return the eta
-     */
-    public String getEtaIso() {
-        return etaIso;
-    }
-    /**
-     * @param eta the eta to set
-     */
-    public void setEtaIso(final String eta) {
-        this.etaIso = eta;
     }
     /**
      * @return the currentLocation
      */
-    public String getCurrentLocation() {
+    public Location getCurrentLocation() {
         return currentLocation;
     }
     /**
      * @param currentLocation the currentLocation to set
      */
-    public void setCurrentLocation(final String currentLocation) {
+    public void setCurrentLocation(final Location currentLocation) {
         this.currentLocation = currentLocation;
     }
     /**
-     * @return the startLocationForMap
+     * @return the currentLocationDescription
      */
-    public Location getStartLocationForMap() {
-        return startLocationForMap;
+    public String getCurrentLocationDescription() {
+        return currentLocationDescription;
     }
     /**
-     * @param startLocationForMap the startLocationForMap to set
+     * @param currentLocationDescription the currentLocationDescription to set
      */
-    public void setStartLocationForMap(final Location startLocationForMap) {
-        this.startLocationForMap = startLocationForMap;
-    }
-    /**
-     * @return the endLocationForMap
-     */
-    public Location getEndLocationForMap() {
-        return endLocationForMap;
-    }
-    /**
-     * @param endLocationForMap the endLocationForMap to set
-     */
-    public void setEndLocationForMap(final Location endLocationForMap) {
-        this.endLocationForMap = endLocationForMap;
-    }
-    /**
-     * @return the currentLocationForMap
-     */
-    public Location getCurrentLocationForMap() {
-        return currentLocationForMap;
-    }
-    /**
-     * @param currentLocationForMap the currentLocationForMap to set
-     */
-    public void setCurrentLocationForMap(final Location currentLocationForMap) {
-        this.currentLocationForMap = currentLocationForMap;
+    public void setCurrentLocationDescription(final String currentLocationDescription) {
+        this.currentLocationDescription = currentLocationDescription;
     }
     /**
      * @return the alertsNotificationSchedules
@@ -415,16 +336,15 @@ public class SingleShipmentDto {
     /**
      * @return the locations
      */
-    public List<SingleShipmentLocation> getLocations() {
+    public List<SingleShipmentLocationBean> getLocations() {
         return locations;
     }
     /**
      * @return the siblings
      */
-    public List<SingleShipmentDto> getSiblings() {
+    public List<Long> getSiblings() {
         return siblings;
     }
-
     /**
      * @return the minTemp
      */
@@ -452,13 +372,13 @@ public class SingleShipmentDto {
     /**
      * @return the timeOfFirstReading
      */
-    public String getTimeOfFirstReading() {
+    public Date getTimeOfFirstReading() {
         return timeOfFirstReading;
     }
     /**
      * @param timeOfFirstReading the timeOfFirstReading to set
      */
-    public void setTimeOfFirstReading(final String timeOfFirstReading) {
+    public void setTimeOfFirstReading(final Date timeOfFirstReading) {
         this.timeOfFirstReading = timeOfFirstReading;
     }
     /**
@@ -488,71 +408,14 @@ public class SingleShipmentDto {
     /**
      * @return
      */
-    public String getAlertYetToFire() {
+    public List<AlertRuleBean> getAlertYetToFire() {
         return alertYetToFire;
-    }
-    /**
-     * @param alertYetToFire the alertYetToFire to set
-     */
-    public void setAlertYetToFire(final String alertYetToFire) {
-        this.alertYetToFire = alertYetToFire;
     }
     /**
      * @return the alertFired
      */
-    public String getAlertFired() {
+    public List<AlertRuleBean> getAlertFired() {
         return alertFired;
-    }
-    public void setAlertFired(final String alertFired) {
-        this.alertFired = alertFired;
-    }
-    /**
-     * @return the arrivalNotificationTimeIso
-     */
-    public String getArrivalNotificationTimeIso() {
-        return arrivalNotificationTimeIso;
-    }
-    /**
-     * @param arrivalNotificationTimeIso the arrivalNotificationTimeIso to set
-     */
-    public void setArrivalNotificationTimeIso(final String arrivalNotificationTimeIso) {
-        this.arrivalNotificationTimeIso = arrivalNotificationTimeIso;
-    }
-    /**
-     * @return shutdown time ISO string.
-     */
-    public String getShutdownTimeIso() {
-        return shutdownTimeIso;
-    }
-    /**
-     * @param time shutdown time ISO string.
-     */
-    public void setShutdownTimeIso(final String time) {
-        this.shutdownTimeIso = time;
-    }
-    /**
-     * @return arrival time ISO string.
-     */
-    public String getArrivalTimeIso() {
-        return arrivalTimeIso;
-    }
-    /**
-     * @param time arrival time ISO string.
-     */
-    public void setArrivalTimeIso(final String time) {
-        this.arrivalTimeIso = time;
-    }
-    /**
-     * @return last event time in ISO format.
-     */
-    public String getLastReadingTimeIso() {
-        return lastReadingTimeIso;
-    }
-    /**
-     * @param time last event time in ISO format.
-     */
-    public void setLastReadingTimeIso(final String time) {
-        this.lastReadingTimeIso = time;
     }
     /**
      * @return the batteryLevel
@@ -618,98 +481,98 @@ public class SingleShipmentDto {
     /**
      * @return the startTime
      */
-    public String getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
     /**
      * @param startTime the startTime to set
      */
-    public void setStartTime(final String startTime) {
+    public void setStartTime(final Date startTime) {
         this.startTime = startTime;
     }
 
     /**
      * @return the etaPretty
      */
-    public String getEta() {
+    public Date getEta() {
         return eta;
     }
 
     /**
      * @param etaPretty the etaPretty to set
      */
-    public void setEta(final String etaPretty) {
+    public void setEta(final Date etaPretty) {
         this.eta = etaPretty;
     }
 
     /**
      * @return the arrivalNotificationTime
      */
-    public String getArrivalNotificationTime() {
+    public Date getArrivalNotificationTime() {
         return arrivalNotificationTime;
     }
 
     /**
      * @param arrivalNotificationTime the arrivalNotificationTime to set
      */
-    public void setArrivalNotificationTime(final String arrivalNotificationTime) {
+    public void setArrivalNotificationTime(final Date arrivalNotificationTime) {
         this.arrivalNotificationTime = arrivalNotificationTime;
     }
 
     /**
      * @return the shutdownTime
      */
-    public String getShutdownTime() {
+    public Date getShutdownTime() {
         return shutdownTime;
     }
 
     /**
      * @param shutdownTime the shutdownTime to set
      */
-    public void setShutdownTime(final String shutdownTime) {
+    public void setShutdownTime(final Date shutdownTime) {
         this.shutdownTime = shutdownTime;
     }
 
     /**
      * @return the arrivalTime
      */
-    public String getArrivalTime() {
+    public Date getArrivalTime() {
         return arrivalTime;
     }
 
     /**
      * @param arrivalTime the arrivalTime to set
      */
-    public void setArrivalTime(final String arrivalTime) {
+    public void setArrivalTime(final Date arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 
     /**
      * @return the firstReadingTime
      */
-    public String getFirstReadingTime() {
+    public Date getFirstReadingTime() {
         return firstReadingTime;
     }
 
     /**
      * @param firstReadingTime the firstReadingTime to set
      */
-    public void setFirstReadingTime(final String firstReadingTime) {
+    public void setFirstReadingTime(final Date firstReadingTime) {
         this.firstReadingTime = firstReadingTime;
     }
 
     /**
      * @return the lastReadingTime
      */
-    public String getLastReadingTime() {
+    public Date getLastReadingTime() {
         return lastReadingTime;
     }
 
     /**
      * @param lastReadingTime the lastReadingTime to set
      */
-    public void setLastReadingTime(final String lastReadingTime) {
+    public void setLastReadingTime(final Date lastReadingTime) {
         this.lastReadingTime = lastReadingTime;
     }
     /**
@@ -770,30 +633,16 @@ public class SingleShipmentDto {
     }
 
     /**
-     * @return the alertsSuppressionTimeIso
-     */
-    public String getAlertsSuppressionTimeIso() {
-        return alertsSuppressionTimeIso;
-    }
-
-    /**
-     * @param alertsSuppressionTimeIso the alertsSuppressionTimeIso to set
-     */
-    public void setAlertsSuppressionTimeIso(final String alertsSuppressionTimeIso) {
-        this.alertsSuppressionTimeIso = alertsSuppressionTimeIso;
-    }
-
-    /**
      * @return the alertsSuppressionTime
      */
-    public String getAlertsSuppressionTime() {
+    public Date getAlertsSuppressionTime() {
         return alertsSuppressionTime;
     }
 
     /**
      * @param alertsSuppressionTime the alertsSuppressionTime to set
      */
-    public void setAlertsSuppressionTime(final String alertsSuppressionTime) {
+    public void setAlertsSuppressionTime(final Date alertsSuppressionTime) {
         this.alertsSuppressionTime = alertsSuppressionTime;
     }
     /**

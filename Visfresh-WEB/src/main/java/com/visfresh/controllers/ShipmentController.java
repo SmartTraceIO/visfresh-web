@@ -500,7 +500,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             //add events data
             addKeyLocations(shipments, user);
 
-            final ShipmentSerializer shs = new ShipmentSerializer(user);
+            final ShipmentSerializer shs = new ShipmentSerializer(user.getLanguage(), user.getTimeZone());
             final JsonArray array = new JsonArray();
             for (final ListShipmentItem s : shipments) {
                 array.add(shs.toJson(s));
@@ -577,7 +577,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             //add events data
             addKeyLocations(shipments, user);
 
-            final ShipmentSerializer shs = new ShipmentSerializer(user);
+            final ShipmentSerializer shs = new ShipmentSerializer(user.getLanguage(), user.getTimeZone());
             final JsonArray array = new JsonArray();
             for (final ListShipmentItem s : shipments) {
                 array.add(shs.toJson(s));
@@ -1119,7 +1119,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @return
      */
     private ShipmentSerializer getSerializer(final User user) {
-        return new ShipmentSerializer(user);
+        return new ShipmentSerializer(user.getLanguage(), user.getTimeZone());
     }
     @RequestMapping(value = "/deleteShipment/{authToken}", method = RequestMethod.GET)
     public JsonObject deleteShipment(@PathVariable final String authToken,
@@ -1248,7 +1248,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @return
      */
     private SingleShipmentSerializer getSingleShipmentSerializer(final User user) {
-        return new SingleShipmentSerializer(user);
+        return new SingleShipmentSerializer(user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
     }
     @RequestMapping(value = "/getSingleShipmentLite/{authToken}", method = RequestMethod.GET)
     public JsonObject getSingleShipmentLite(@PathVariable final String authToken,

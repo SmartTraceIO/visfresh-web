@@ -8,7 +8,7 @@ import java.util.TimeZone;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.LocationConstants;
 import com.visfresh.entities.LocationProfile;
-import com.visfresh.io.shipment.LocationProfileDto;
+import com.visfresh.io.shipment.LocationProfileBean;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -26,7 +26,7 @@ public class LocationSerializer extends AbstractJsonSerializer {
      * @param location
      * @return
      */
-    public JsonObject toJson(final LocationProfileDto location) {
+    public JsonObject toJson(final LocationProfileBean location) {
         if (location == null) {
             return null;
         }
@@ -65,8 +65,8 @@ public class LocationSerializer extends AbstractJsonSerializer {
      * @param obj encoded location profile.
      * @return location profile.
      */
-    public LocationProfileDto parseLocationProfileDto(final JsonObject obj) {
-        final LocationProfileDto location = new LocationProfileDto();
+    public LocationProfileBean parseLocationProfileDto(final JsonObject obj) {
+        final LocationProfileBean location = new LocationProfileBean();
         parseLocationProfile(obj, location);
         return location;
     }
@@ -74,7 +74,7 @@ public class LocationSerializer extends AbstractJsonSerializer {
      * @param obj
      * @param location
      */
-    protected void parseLocationProfile(final JsonObject obj, final LocationProfileDto location) {
+    protected void parseLocationProfile(final JsonObject obj, final LocationProfileBean location) {
         location.setId(asLong(obj.get(LocationConstants.PROPERTY_LOCATION_ID)));
         location.setCompanyName(asString(obj.get(LocationConstants.PROPERTY_COMPANY_NAME)));
         location.setName(asString(obj.get(LocationConstants.PROPERTY_LOCATION_NAME)));

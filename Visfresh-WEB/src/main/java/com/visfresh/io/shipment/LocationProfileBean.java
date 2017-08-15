@@ -9,7 +9,7 @@ import com.visfresh.entities.Location;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class LocationProfileDto {
+public class LocationProfileBean {
     /**
      * Profile ID.
      */
@@ -54,7 +54,7 @@ public class LocationProfileDto {
     /**
      * Default constructor.
      */
-    public LocationProfileDto() {
+    public LocationProfileBean() {
         super();
     }
 
