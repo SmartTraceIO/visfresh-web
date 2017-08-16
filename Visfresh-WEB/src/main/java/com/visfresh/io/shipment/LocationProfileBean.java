@@ -4,6 +4,7 @@
 package com.visfresh.io.shipment;
 
 import com.visfresh.entities.Location;
+import com.visfresh.entities.LocationProfile;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -56,6 +57,23 @@ public class LocationProfileBean {
      */
     public LocationProfileBean() {
         super();
+    }
+
+    /**
+     * @param p location profile.
+     */
+    public LocationProfileBean(final LocationProfile p) {
+        super();
+
+        setId(p.getId());
+        setName(p.getName());
+        setCompanyName(p.getCompanyName());
+        setNotes(p.getNotes());
+        setAddress(p.getAddress());
+        setRadius(p.getRadius());
+        setStart(p.isStart());
+        setInterim(p.isInterim());
+        setStop(p.isStop());
     }
 
     /**

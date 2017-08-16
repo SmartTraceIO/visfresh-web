@@ -21,6 +21,12 @@ public class AlertProfileDto {
     private double lowerTemperatureLimit = 0.;
     private double upperTemperatureLimit = 5.;
 
+    /**
+     * Default constructor.
+     */
+    public AlertProfileDto() {
+        super();
+    }
     public AlertProfileDto(final AlertProfile ap) {
         super();
         setDescription(ap.getDescription());

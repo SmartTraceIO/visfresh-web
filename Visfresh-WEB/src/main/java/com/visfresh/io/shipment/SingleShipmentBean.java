@@ -13,7 +13,6 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.NoteDto;
-import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.lists.ListNotificationScheduleItem;
 
 /**
@@ -74,7 +73,7 @@ public class SingleShipmentBean {
     private final List<LocationProfileBean> startLocationAlternatives = new LinkedList<>();
     private final List<LocationProfileBean> endLocationAlternatives = new LinkedList<>();
     private final List<LocationProfileBean> interimLocationAlternatives = new LinkedList<>();
-    private final List<SingleShipmentInterimStop> interimStops = new LinkedList<>();
+    private final List<InterimStopBean> interimStops = new LinkedList<>();
     private final List<NoteDto> notes = new LinkedList<>();
     private final List<DeviceGroupDto> deviceGroups = new LinkedList<>();
     private String deviceColor;
@@ -82,7 +81,7 @@ public class SingleShipmentBean {
     private boolean arrivalReportSent;
     private final List<ShipmentUserDto> userAccess = new LinkedList<>();
     private final List<ShipmentCompanyDto> companyAccess = new LinkedList<>();
-    private final List<AlertDto> sentAlerts = new LinkedList<>();
+    private final List<AlertBean> sentAlerts = new LinkedList<>();
     private AlertProfileDto alertProfile;
 
     /**
@@ -596,7 +595,7 @@ public class SingleShipmentBean {
     /**
      * @return the interimStops
      */
-    public List<SingleShipmentInterimStop> getInterimStops() {
+    public List<InterimStopBean> getInterimStops() {
         return interimStops;
     }
     /**
@@ -714,7 +713,7 @@ public class SingleShipmentBean {
     /**
      * @return the sentAlerts
      */
-    public List<AlertDto> getSentAlerts() {
+    public List<AlertBean> getSentAlerts() {
         return sentAlerts;
     }
 

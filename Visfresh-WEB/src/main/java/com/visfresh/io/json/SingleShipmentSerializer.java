@@ -20,6 +20,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.Location;
+import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.io.NoteDto;
 import com.visfresh.io.SingleShipmentInterimStop;
@@ -29,6 +30,7 @@ import com.visfresh.io.shipment.AlertProfileDto;
 import com.visfresh.io.shipment.AlertRuleBean;
 import com.visfresh.io.shipment.CorrectiveActionListBean;
 import com.visfresh.io.shipment.DeviceGroupDto;
+import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.io.shipment.LocationProfileBean;
 import com.visfresh.io.shipment.NotificationIssueBean;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
@@ -227,12 +229,34 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
      * @param sentAlerts
      * @return
      */
-    protected JsonArray sentAlertsToJson(final List<AlertDto> sentAlerts) {
+    private JsonArray sentAlertsToJson(final List<AlertDto> sentAlerts) {
         final JsonArray array = new JsonArray();
         for (final AlertDto a : sentAlerts) {
             array.add(toJson(a));
         }
         return array;
+    }
+    /**
+     * @param sentAlerts
+     * @return
+     */
+    protected JsonArray alertsToJson(final List<AlertBean> sentAlerts) {
+        final JsonArray array = new JsonArray();
+        for (final AlertBean a : sentAlerts) {
+            array.add(toJson(a));
+        }
+        return array;
+    }
+    /**
+     * @param array
+     * @return
+     */
+    private List<AlertBean> parseAlertBeans(final JsonArray array) {
+        final List<AlertBean> alerts = new LinkedList<>();
+        for (final JsonElement e : array) {
+            alerts.add(parseAlertBean(e));
+        }
+        return alerts;
     }
     /**
      * @param companyAccess
@@ -249,6 +273,22 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         return array;
     }
     /**
+     * @param array
+     * @return
+     */
+    private List<ShipmentCompanyDto> parseCompanyAccessArray(final JsonArray array) {
+        final List<ShipmentCompanyDto> companies = new LinkedList<>();
+        for (final JsonElement e : array) {
+            final JsonObject json = e.getAsJsonObject();
+            final ShipmentCompanyDto c = new ShipmentCompanyDto();
+            c.setId(asLong(json.get("companyId")));
+            c.setName(asString(json.get("companyName")));
+
+            companies.add(c);
+        }
+        return companies;
+    }
+    /**
      * @param userAccess
      * @return
      */
@@ -263,6 +303,22 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         return array;
     }
     /**
+     * @param array
+     * @return
+     */
+    private List<ShipmentUserDto> parseUserAccessArray(final JsonArray array) {
+        final List<ShipmentUserDto> users = new LinkedList<>();
+        for (final JsonElement e : array) {
+            final JsonObject json = e.getAsJsonObject();
+            final ShipmentUserDto user = new ShipmentUserDto();
+
+            user.setId(asLong(json.get("userId")));
+            user.setEmail(asString(json.get("email")));
+            users.add(user);
+        }
+        return users;
+    }
+    /**
      * @param dg
      * @return
      */
@@ -274,10 +330,38 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         return deviceGroups;
     }
     /**
+     * @param array
+     * @return
+     */
+    private List<DeviceGroupDto> parseDeviceGroups(final JsonArray array) {
+        final List<DeviceGroupDto> groups = new LinkedList<>();
+        for (final JsonElement e : array) {
+            groups.add(parseDeviceGroupDto(e));
+        }
+        return groups;
+    }
+    /**
      * @param alert
      * @return
      */
     private JsonObject toJson(final AlertProfileDto alert) {
+        if (alert == null) {
+            return null;
+        }
+
+        final JsonObject obj = alertProfileBeanToJson(alert);
+        obj.addProperty(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT,
+                LocalizationUtils.convertToUnits(alert.getLowerTemperatureLimit(), tempUnits));
+        obj.addProperty(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT,
+                LocalizationUtils.convertToUnits(alert.getUpperTemperatureLimit(), tempUnits));
+
+        return obj;
+    }
+    /**
+     * @param alert
+     * @return
+     */
+    private JsonObject alertProfileBeanToJson(final AlertProfileDto alert) {
         if (alert == null) {
             return null;
         }
@@ -298,12 +382,33 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
                 alert.isWatchMovementStart());
         obj.addProperty(AlertProfileConstants.WATCH_MOVEMENT_STOP,
                 alert.isWatchMovementStop());
-        obj.addProperty(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT,
-                LocalizationUtils.convertToUnits(alert.getLowerTemperatureLimit(), tempUnits));
-        obj.addProperty(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT,
-                LocalizationUtils.convertToUnits(alert.getUpperTemperatureLimit(), tempUnits));
+        obj.addProperty(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT, alert.getLowerTemperatureLimit());
+        obj.addProperty(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT, alert.getUpperTemperatureLimit());
 
         return obj;
+    }
+    /**
+     * @param el
+     * @return
+     */
+    private AlertProfileDto parseAlertProfileBean(final JsonElement el) {
+        if (isNull(el)) {
+            return null;
+        }
+
+        final JsonObject json = el.getAsJsonObject();
+        final AlertProfileDto ap = new AlertProfileDto();
+        ap.setId(asLong(json.get(AlertProfileConstants.ALERT_PROFILE_ID)));
+        ap.setName(asString(json.get(AlertProfileConstants.ALERT_PROFILE_NAME)));
+        ap.setDescription(asString(json.get(AlertProfileConstants.ALERT_PROFILE_DESCRIPTION)));
+        ap.setWatchBatteryLow(asBoolean(json.get(AlertProfileConstants.WATCH_BATTERY_LOW)));
+        ap.setWatchEnterBrightEnvironment(asBoolean(json.get(AlertProfileConstants.WATCH_ENTER_BRIGHT_ENVIRONMENT)));
+        ap.setWatchEnterDarkEnvironment(asBoolean(json.get(AlertProfileConstants.WATCH_ENTER_DARK_ENVIRONMENT)));
+        ap.setWatchMovementStart(asBoolean(json.get(AlertProfileConstants.WATCH_MOVEMENT_START)));
+        ap.setWatchMovementStop(asBoolean(json.get(AlertProfileConstants.WATCH_MOVEMENT_STOP)));
+        ap.setLowerTemperatureLimit(asDouble(json.get(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT)));
+        ap.setUpperTemperatureLimit(asDouble(json.get(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT)));
+        return ap;
     }
 
     /**
@@ -319,6 +424,22 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("notificationScheduleId", item.getNotificationScheduleId());
         json.addProperty("notificationScheduleName", item.getNotificationScheduleName());
         return json;
+    }
+    /**
+     * @param e
+     * @return
+     */
+    private ListNotificationScheduleItem parseListNotificationScheduleItem(final JsonElement e) {
+        if (isNull(e)) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
+
+        final ListNotificationScheduleItem item = new ListNotificationScheduleItem();
+        item.setNotificationScheduleId(asLong(json.get("notificationScheduleId")));
+        item.setNotificationScheduleName(asString(json.get("notificationScheduleName")));
+        return item;
     }
 
     /**
@@ -394,6 +515,21 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         return array;
     }
     /**
+     * @param jsonElement
+     * @return
+     */
+    private List<LocationProfileBean> parseLocationProfileBans(final JsonElement jsonElement) {
+        if (jsonElement == null || jsonElement.isJsonNull()) {
+            return null;
+        }
+
+        final List<LocationProfileBean> locs = new LinkedList<>();
+        for (final JsonElement el : jsonElement.getAsJsonArray()) {
+            locs.add(parseLocationProfileBean(el));
+        }
+        return locs;
+    }
+    /**
      * @param interimStops
      * @return
      */
@@ -403,6 +539,17 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
             array.add(toJson(stop));
         }
         return array;
+    }
+    /**
+     * @param array
+     * @return
+     */
+    private List<InterimStopBean> parseInterimStops(final JsonArray array) {
+        final List<InterimStopBean> list = new LinkedList<>();
+        for (final JsonElement e : array) {
+            list.add(parseInterimStopBean(e));
+        }
+        return list;
     }
     /**
      * @param stop
@@ -424,6 +571,40 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         return json;
     }
     /**
+     * @param stop
+     * @return
+     */
+    private JsonObject toJson(final InterimStopBean stop) {
+        if (stop == null) {
+            return null;
+        }
+
+        final JsonObject json = new JsonObject();
+        json.addProperty("id", stop.getId());
+        json.addProperty("time", stop.getTime());
+        json.addProperty("stopDate", formatDate(stop.getStopDate()));
+        json.add("location", toJson(stop.getLocation()));
+        return json;
+    }
+    /**
+     * @param e JSON element.
+     * @return single shipment interim stop.
+     */
+    private InterimStopBean parseInterimStopBean(final JsonElement e) {
+        if (isNull(e)) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
+
+        final InterimStopBean stop = new InterimStopBean();
+        stop.setId(asLong(json.get("id")));
+        stop.setTime(asInt(json.get("time")));
+        stop.setStopDate(asDate(json.get("stopDate")));
+        stop.setLocation(parseLocationProfileBean(json.get("location")));
+        return stop;
+    }
+    /**
      * @param grp
      * @return
      */
@@ -438,6 +619,23 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("description", grp.getDescription());
 
         return json;
+    }
+    /**
+     * @param e
+     * @return
+     */
+    private DeviceGroupDto parseDeviceGroupDto(final JsonElement e) {
+        if (isNull(e)) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
+
+        final DeviceGroupDto group = new DeviceGroupDto();
+        group.setId(asLong(json.get("groupId")));
+        group.setName(asString(json.get("name")));
+        group.setDescription(asString(json.get("description")));
+        return group;
     }
     /**
      * @param a alert DTO.
@@ -469,6 +667,24 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         return json;
     }
     /**
+     * @param el
+     * @return
+     */
+    private Location parseLocation(final JsonElement el) {
+        if (el == null || el.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = el.getAsJsonObject();
+
+        final Location loc = new Location();
+        loc.setLatitude(asDouble(json.get("latitude")));
+        loc.setLongitude(asDouble(json.get("longitude")));
+
+        return loc;
+    }
+
+    /**
      * @param sched
      * @return
      */
@@ -495,6 +711,13 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
      */
     protected JsonElement toJson(final LocationProfileBean location) {
         return locationSerializer.toJson(location);
+    }
+    /**
+     * @param el JSON element.
+     * @return location profile bean.
+     */
+    private LocationProfileBean parseLocationProfileBean(final JsonElement el) {
+        return locationSerializer.parseLocationProfileDto(el);
     }
 
     //Single shipment bean
@@ -547,8 +770,8 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
 
         json.add("siblings", toJsonArray(s.getSiblings()));
         json.add("alertSummary", createAlertSummaryArray(s.getAlertSummary()));
-        json.add("alertYetToFire", alertsToJson(s.getAlertYetToFire()));
-        json.add("alertFired", alertsToJson(s.getAlertFired()));
+        json.add("alertYetToFire", alertRulesToJson(s.getAlertYetToFire()));
+        json.add("alertFired", alertRulesToJson(s.getAlertFired()));
         json.addProperty("arrivalNotificationTime", formatDate(s.getArrivalNotificationTime()));
         json.addProperty("shutdownTime", formatDate(s.getShutdownTime()));
         json.addProperty("arrivalTime", formatDate(s.getArrivalTime()));
@@ -566,7 +789,7 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         json.add("interimLocationAlternatives", locationsToJson(s.getInterimLocationAlternatives()));
 
         final JsonArray interimStops = new JsonArray();
-        for (final SingleShipmentInterimStop stp : s.getInterimStops()) {
+        for (final InterimStopBean stp : s.getInterimStops()) {
             interimStops.add(toJson(stp));
         }
         json.add("interimStops", interimStops);
@@ -577,10 +800,106 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("arrivalReportSent", s.isArrivalReportSent());
         json.add("userAccess", userAcessToJson(s.getUserAccess()));
         json.add("companyAccess", companyAccessToJson(s.getCompanyAccess()));
-        json.add("sentAlerts", sentAlertsToJson(s.getSentAlerts()));
-        json.add("alertProfile", toJson(s.getAlertProfile()));
+        json.add("sentAlerts", alertsToJson(s.getSentAlerts()));
+        json.add("alertProfile", alertProfileBeanToJson(s.getAlertProfile()));
 
         return json;
+    }
+    public SingleShipmentBean parseSingleShipmentBean(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
+        final SingleShipmentBean s = new SingleShipmentBean();
+
+        s.setShipmentId(asLong(json.get("shipmentId")));
+        s.setCompanyId(asLong(json.get("companyId")));
+        s.setDeviceSN(asString(json.get("deviceSN")));
+        s.setDeviceName(asString(json.get("deviceName")));
+        s.setTripCount(asInt(json.get("tripCount")));
+        s.setShipmentDescription(asString(json.get("shipmentDescription")));
+        s.setPalletId(asString(json.get("palletId")));
+        s.setAssetNum(asString(json.get("assetNum")));
+        s.setAssetType(asString(json.get("assetType")));
+        s.setStatus(ShipmentStatus.valueOf(asString(json.get("status"))));
+        s.setAlertSuppressionMinutes(asInteger(json.get("alertSuppressionMinutes")));
+
+        s.getAlertsNotificationSchedules().addAll(parseNotificationSchedules(
+                json.get("alertsNotificationSchedules").getAsJsonArray()));
+
+        s.setCommentsForReceiver(asString(json.get("commentsForReceiver")));
+        s.setArrivalNotificationWithinKm(asInteger(json.get("arrivalNotificationWithinKm")));
+        s.setExcludeNotificationsIfNoAlerts(asBoolean(json.get("excludeNotificationsIfNoAlerts")));
+
+        s.getArrivalNotificationSchedules().addAll(parseNotificationSchedules(
+                json.get("arrivalNotificationSchedules").getAsJsonArray()));
+
+        s.setSendArrivalReport(asBoolean(json.get("sendArrivalReport")));
+        s.setSendArrivalReportOnlyIfAlerts(asBoolean(json.get("sendArrivalReportOnlyIfAlerts")));
+        s.setShutdownDeviceAfterMinutes(asInteger(json.get("shutdownDeviceAfterMinutes")));
+        s.setNoAlertsAfterArrivalMinutes(asInteger(json.get("noAlertsAfterArrivalMinutes")));
+        s.setShutDownAfterStartMinutes(asInteger(json.get("shutDownAfterStartMinutes")));
+        s.setStartLocation(parseLocationProfileBean(json.get("startLocation")));
+        s.setStartTime(asDate(json.get("startTime")));
+        s.setEndLocation(parseLocationProfileBean(json.get("endLocation")));
+        s.setEta(asDate(json.get("eta")));
+        s.setCurrentLocation(parseLocation(json.get("currentLocation")));
+        s.setCurrentLocationDescription(asString(json.get("currentLocationDescription")));
+        s.setPercentageComplete(asInt(json.get("percentageComplete")));
+
+        s.setMinTemp(asDouble(json.get("minTemp")));
+        s.setMaxTemp(asDouble(json.get("maxTem")));
+        s.setTimeOfFirstReading(asDate(json.get("timeOfFirstReading")));
+
+        final JsonArray locations = json.get("locations").getAsJsonArray();
+        for (final JsonElement el : locations) {
+            s.getLocations().add(parseSingleShipmentLocationBean(el));
+        }
+
+        s.getSiblings().addAll(parseLongList(json.get("siblings").getAsJsonArray()));
+
+        final JsonArray alertSummary = json.get("alertSummary").getAsJsonArray();
+        for (final JsonElement el : alertSummary) {
+            s.getAlertSummary().add(AlertType.valueOf(asString(el)));
+        }
+
+        s.getAlertYetToFire().addAll(parseAlertRuleBeans(
+                json.get("alertYetToFire").getAsJsonArray()));
+        s.getAlertFired().addAll(parseAlertRuleBeans(
+                json.get("alertFired").getAsJsonArray()));
+
+        s.setArrivalNotificationTime(asDate(json.get("arrivalNotificationTime")));
+        s.setShutdownTime(asDate(json.get("shutdownTime")));
+        s.setArrivalTime(asDate(json.get("arrivalTime")));
+        s.setAlertsSuppressed(asBoolean(json.get("alertsSuppressed")));
+        s.setAlertsSuppressionTime(asDate(json.get("alertsSuppressionTime")));
+        s.setFirstReadingTime(asDate(json.get("firstReadingTime")));
+        s.setLastReadingTime(asDate(json.get("lastReadingTime")));
+        s.setLastReadingTemperature(asDouble(json.get("lastReadingTemperature")));
+        s.setBatteryLevel(asInt(json.get("batteryLevel")));
+        s.setNoAlertsAfterStartMinutes(asInteger(json.get("noAlertsAfterStartMinutes")));
+        s.setShipmentType(asString(json.get("shipmentType")));
+
+        s.getStartLocationAlternatives().addAll(parseLocationProfileBans(json.get("startLocationAlternatives")));
+        s.getEndLocationAlternatives().addAll(parseLocationProfileBans(
+                json.get("endLocationAlternatives").getAsJsonArray()));
+        s.getInterimLocationAlternatives().addAll(parseLocationProfileBans(
+                json.get("interimLocationAlternatives").getAsJsonArray()));
+
+        s.getInterimStops().addAll(parseInterimStops(json.get("interimStops").getAsJsonArray()));
+
+        s.getNotes().addAll(parseNotes(json.get("notes").getAsJsonArray()));
+        s.getDeviceGroups().addAll(parseDeviceGroups(json.get("deviceGroups").getAsJsonArray()));
+        s.setDeviceColor(asString(json.get("deviceColor")));
+        s.setLatestShipment(asBoolean(json.get("isLatestShipment")));
+        s.setArrivalReportSent(asBoolean(json.get("arrivalReportSent")));
+        s.getUserAccess().addAll(parseUserAccessArray(json.get("userAccess").getAsJsonArray()));
+        s.getCompanyAccess().addAll(parseCompanyAccessArray(json.get("companyAccess").getAsJsonArray()));
+        s.getSentAlerts().addAll(parseAlertBeans(json.get("sentAlerts").getAsJsonArray()));
+        s.setAlertProfile(parseAlertProfileBean(json.get(("alertProfile"))));
+
+        return s;
     }
     /**
      * @param loc
@@ -596,15 +915,28 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("longitude", loc.getLongitude());
         json.addProperty("temperature", loc.getTemperature());
         json.addProperty("time", formatDate(loc.getTime()));
-
-        final JsonArray array = new JsonArray();
-        for (final AlertBean a : loc.getAlerts()) {
-            array.add(toJson(a));
-        }
-        json.add("alerts", array);
-
+        json.add("alerts", alertsToJson(loc.getAlerts()));
         json.addProperty("type", loc.getType());
         return json;
+    }
+    /**
+     * @param el
+     * @return
+     */
+    private SingleShipmentLocationBean parseSingleShipmentLocationBean(final JsonElement el) {
+        if (el == null || el.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = el.getAsJsonObject();
+        final SingleShipmentLocationBean bean = new SingleShipmentLocationBean();
+        bean.setLatitude(asDouble(json.get("latitude")));
+        bean.setLongitude(asDouble(json.get("longitude")));
+        bean.setTemperature(asDouble(json.get("temperature")));
+        bean.setTime(asDate(json.get("time")));
+        bean.getAlerts().addAll(parseAlertBeans(json.get("alerts").getAsJsonArray()));
+        bean.setType(asString(json.get("type")));
+        return bean;
     }
     /**
      * @param a
@@ -630,6 +962,33 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         return json;
     }
     /**
+     * @param el
+     * @return
+     */
+    private AlertBean parseAlertBean(final JsonElement el) {
+        if (el == null || el.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = el.getAsJsonObject();
+        final boolean isTemperatureAlert = json.has("temperature");
+
+        final AlertBean a = isTemperatureAlert ? new TemperatureAlertBean() : new AlertBean();
+        jsonToNotiticationIssue(json, a);
+
+        a.setType(AlertType.valueOf(asString(json.get("type"))));
+        if (isTemperatureAlert) {
+            final TemperatureAlertBean ta = (TemperatureAlertBean) a;
+
+            ta.setTemperature(asDouble(json.get("temperature")));
+            ta.setMinutes(asInt(json.get("minutes")));
+            ta.setCumulative(asBoolean(json.get("cumulative")));
+            ta.setRuleId(asLong(json.get("ruleId")));
+        }
+
+        return a;
+    }
+    /**
      * @param nb
      * @return
      */
@@ -639,6 +998,15 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("date", formatDate(nb.getDate()));
         json.addProperty("trackerEventId", nb.getTrackerEventId());
         return json;
+    }
+    /**
+     * @param json
+     * @param a
+     */
+    private void jsonToNotiticationIssue(final JsonObject json, final AlertBean a) {
+        a.setId(asLong(json.get("id")));
+        a.setDate(asDate(json.get("date")));
+        a.setTrackerEventId(asLong(json.get("trackerEventId")));
     }
     /**
      * @param s
@@ -652,15 +1020,37 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         return array;
     }
     /**
+     * @param array
+     * @return
+     */
+    private List<NoteDto> parseNotes(final JsonArray array) {
+        final List<NoteDto> notes = new LinkedList<>();
+        for (final JsonElement e : array) {
+            notes.add(noteSerializer.parseNoteDto(e));
+        }
+        return notes;
+    }
+    /**
      * @param alerts
      * @return
      */
-    private JsonArray alertsToJson(final List<AlertRuleBean> alerts) {
+    private JsonArray alertRulesToJson(final List<AlertRuleBean> alerts) {
         final JsonArray array = new JsonArray();
         for (final AlertRuleBean a : alerts) {
             array.add(toJson(a));
         }
         return array;
+    }
+    /**
+     * @param array
+     * @return
+     */
+    private List<AlertRuleBean> parseAlertRuleBeans(final JsonArray array) {
+        final List<AlertRuleBean> list = new LinkedList<>();
+        for (final JsonElement e : array) {
+            list.add(parseAlertRuleBean(e));
+        }
+        return list;
     }
     /**
      * @param r
@@ -681,11 +1071,37 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
             json.addProperty("timeOutMinutes", tr.getTimeOutMinutes());
             json.addProperty("cumulativeFlag", tr.hasCumulativeFlag());
             json.addProperty("maxRateMinutes", tr.getMaxRateMinutes());
-            json.addProperty("maxRateMinutes", tr.getMaxRateMinutes());
             json.add("correctiveActions", toJson(tr.getCorrectiveActions()));
         }
 
         return json;
+    }
+    /**
+     * @param e
+     * @return
+     */
+    private AlertRuleBean parseAlertRuleBean(final JsonElement e) {
+        if (isNull(e)) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
+        final boolean isTemperatureRule = json.has("temperature");
+
+        final AlertRuleBean r = isTemperatureRule ? new TemperatureRuleBean() : new AlertRuleBean();
+        r.setType(AlertType.valueOf(asString(json.get("type"))));
+        r.setId(asLong(json.get("id")));
+
+        if (r instanceof TemperatureRuleBean) {
+            final TemperatureRuleBean tr = (TemperatureRuleBean) r;
+            tr.setTemperature(asDouble(json.get("temperature")));
+            tr.setTimeOutMinutes(asInt(json.get("timeOutMinutes")));
+            tr.setCumulativeFlag(asBoolean(json.get("cumulativeFlag")));
+            tr.setMaxRateMinutes(asInteger(json.get("maxRateMinutes")));
+            tr.setCorrectiveActions(parseCorrectiveActionListBean(json.get("correctiveActions")));
+        }
+
+        return null;
     }
     /**
      * @param actions
@@ -710,6 +1126,29 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         return json;
     }
     /**
+     * @param jsonElement
+     * @return
+     */
+    private CorrectiveActionListBean parseCorrectiveActionListBean(final JsonElement el) {
+        if (isNull(el)) {
+            return null;
+        }
+
+        final JsonObject json = el.getAsJsonObject();
+
+        final CorrectiveActionListBean bean = new CorrectiveActionListBean();
+        bean.setId(asLong(json.get("id")));
+        bean.setName(asString(json.get("name")));
+        bean.setDescription(asString(json.get("description")));
+
+        final JsonArray array = json.get("actions").getAsJsonArray();
+        for (final JsonElement e : array) {
+            bean.getActions().add(parseCorrectiveAction(e));
+        }
+
+        return bean;
+    }
+    /**
      * @param a corrective action.
      * @return JSON object.
      */
@@ -724,6 +1163,22 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
         return json;
     }
     /**
+     * @param e JSON element.
+     * @return corrective action.
+     */
+    private CorrectiveAction parseCorrectiveAction(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = e.getAsJsonObject();
+
+        final CorrectiveAction a = new CorrectiveAction();
+        a.setAction(asString(json.get("action")));
+        a.setRequestVerification(asBoolean(json.get("requestVerification")));
+        return a;
+    }
+    /**
      * @param sched
      * @return
      */
@@ -733,5 +1188,16 @@ public class SingleShipmentSerializer extends AbstractJsonSerializer {
             arrivalNotificationSchedules.add(toJson(item));
         }
         return arrivalNotificationSchedules;
+    }
+    /**
+     * @param array
+     * @return
+     */
+    private List<ListNotificationScheduleItem> parseNotificationSchedules(final JsonArray array) {
+        final List<ListNotificationScheduleItem> list = new LinkedList<>();
+        for (final JsonElement e : array) {
+            list.add(parseListNotificationScheduleItem(e));
+        }
+        return list;
     }
 }

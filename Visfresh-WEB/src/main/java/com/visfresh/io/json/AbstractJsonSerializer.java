@@ -162,6 +162,18 @@ public class AbstractJsonSerializer {
         return list;
     }
     /**
+     * @param array
+     * @return
+     */
+    protected List<Long> parseLongList(final JsonArray array) {
+        final List<Long> list = new LinkedList<>();
+        for (final JsonElement e : array) {
+            list.add(asLong(e));
+        }
+        return list;
+    }
+
+    /**
      * @param e JSON elmeent.
      * @return
      */
@@ -187,6 +199,10 @@ public class AbstractJsonSerializer {
      * @return
      */
     public boolean isNull(final JsonElement... els) {
+        if (els == null) {
+            return true;
+        }
+
         for (final JsonElement e : els) {
             if (e == null || e.isJsonNull()) {
                 return true;

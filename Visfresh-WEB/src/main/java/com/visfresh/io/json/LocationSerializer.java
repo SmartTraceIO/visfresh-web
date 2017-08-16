@@ -5,6 +5,7 @@ package com.visfresh.io.json;
 
 import java.util.TimeZone;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.LocationConstants;
 import com.visfresh.entities.LocationProfile;
@@ -62,12 +63,16 @@ public class LocationSerializer extends AbstractJsonSerializer {
         return location;
     }
     /**
-     * @param obj encoded location profile.
+     * @param el encoded location profile.
      * @return location profile.
      */
-    public LocationProfileBean parseLocationProfileDto(final JsonObject obj) {
+    public LocationProfileBean parseLocationProfileDto(final JsonElement el) {
+        if (el == null || el.isJsonNull()) {
+            return null;
+        }
+
         final LocationProfileBean location = new LocationProfileBean();
-        parseLocationProfile(obj, location);
+        parseLocationProfile(el.getAsJsonObject(), location);
         return location;
     }
     /**
