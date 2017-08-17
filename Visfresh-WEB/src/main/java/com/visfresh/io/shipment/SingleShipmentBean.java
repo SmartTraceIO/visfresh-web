@@ -12,7 +12,6 @@ import java.util.Set;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.io.NoteDto;
 import com.visfresh.lists.ListNotificationScheduleItem;
 
 /**
@@ -22,7 +21,7 @@ import com.visfresh.lists.ListNotificationScheduleItem;
 public class SingleShipmentBean {
     private long shipmentId;
     private Long companyId;
-    private String deviceSN;
+    private String device;
     private String deviceName;
     private int tripCount;
     private String shipmentDescription;
@@ -74,7 +73,7 @@ public class SingleShipmentBean {
     private final List<LocationProfileBean> endLocationAlternatives = new LinkedList<>();
     private final List<LocationProfileBean> interimLocationAlternatives = new LinkedList<>();
     private final List<InterimStopBean> interimStops = new LinkedList<>();
-    private final List<NoteDto> notes = new LinkedList<>();
+    private final List<NoteBean> notes = new LinkedList<>();
     private final List<DeviceGroupDto> deviceGroups = new LinkedList<>();
     private String deviceColor;
     private boolean isLatestShipment;
@@ -106,14 +105,14 @@ public class SingleShipmentBean {
     /**
      * @return the deviceSN
      */
-    public String getDeviceSN() {
-        return deviceSN;
+    public String getDevice() {
+        return device;
     }
     /**
-     * @param deviceSN the deviceSN to set
+     * @param device the deviceSN to set
      */
-    public void setDeviceSN(final String deviceSN) {
-        this.deviceSN = deviceSN;
+    public void setDevice(final String device) {
+        this.device = device;
     }
     /**
      * @return the deviceName
@@ -613,7 +612,7 @@ public class SingleShipmentBean {
     /**
      * @return
      */
-    public List<NoteDto> getNotes() {
+    public List<NoteBean> getNotes() {
         return notes;
     }
 

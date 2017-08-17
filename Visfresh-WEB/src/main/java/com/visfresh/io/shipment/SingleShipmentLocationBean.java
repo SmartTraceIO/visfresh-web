@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.visfresh.entities.TrackerEventType;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -17,7 +19,7 @@ public class SingleShipmentLocationBean {
     private double temperature;
     private Date time;
     private final List<AlertBean> alerts = new LinkedList<>();
-    private String type;
+    private TrackerEventType type;
 
     /**
      * Default constructor.
@@ -84,13 +86,13 @@ public class SingleShipmentLocationBean {
     /**
      * @param eventType
      */
-    public void setType(final String eventType) {
+    public void setType(final TrackerEventType eventType) {
         this.type = eventType;
     }
     /**
      * @return the type
      */
-    public String getType() {
+    public TrackerEventType getType() {
         return type;
     }
 }
