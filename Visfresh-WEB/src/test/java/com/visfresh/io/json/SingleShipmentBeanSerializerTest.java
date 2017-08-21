@@ -155,7 +155,7 @@ public class SingleShipmentBeanSerializerTest {
         s.setTimeOfFirstReading(timeOfFirstReading);
         s.setTripCount(tripCount);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(alertsSuppressed, s.isAlertsSuppressed());
         assertEqualDates(alertsSuppressionTime, s.getAlertsSuppressionTime());
@@ -220,7 +220,7 @@ public class SingleShipmentBeanSerializerTest {
         //add one empty only for check of count
         s.getAlertsNotificationSchedules().add(new ListNotificationScheduleItem());
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getAlertsNotificationSchedules().size());
 
@@ -251,7 +251,7 @@ public class SingleShipmentBeanSerializerTest {
         //add one empty only for check of count
         s.getArrivalNotificationSchedules().add(new ListNotificationScheduleItem());
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getArrivalNotificationSchedules().size());
 
@@ -290,7 +290,7 @@ public class SingleShipmentBeanSerializerTest {
         final SingleShipmentBean s = createBean();
         s.setStartLocation(loc);
 
-        loc = serializer.parseSingleShipmentBean(serializer.toJson(s)).getStartLocation();
+        loc = jsonize(s).getStartLocation();
 
         assertNotNull(loc);
 
@@ -333,7 +333,7 @@ public class SingleShipmentBeanSerializerTest {
         final SingleShipmentBean s = createBean();
         s.setEndLocation(loc);
 
-        loc = serializer.parseSingleShipmentBean(serializer.toJson(s)).getEndLocation();
+        loc = jsonize(s).getEndLocation();
 
         assertNotNull(loc);
 
@@ -369,7 +369,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getLocations().add(loc);
         s.getLocations().add(loc);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
         assertEquals(2, s.getLocations().size());
 
         loc = s.getLocations().get(0);
@@ -403,7 +403,7 @@ public class SingleShipmentBeanSerializerTest {
         final SingleShipmentBean s = createBean();
         s.getLocations().add(loc);
 
-        loc = serializer.parseSingleShipmentBean(serializer.toJson(s)).getLocations().get(0);
+        loc = jsonize(s).getLocations().get(0);
         assertEquals(2, loc.getAlerts().size());
 
         a = loc.getAlerts().get(0);
@@ -445,7 +445,7 @@ public class SingleShipmentBeanSerializerTest {
         final SingleShipmentBean s = createBean();
         s.getLocations().add(loc);
 
-        loc = serializer.parseSingleShipmentBean(serializer.toJson(s)).getLocations().get(0);
+        loc = jsonize(s).getLocations().get(0);
         a = (TemperatureAlertBean) loc.getAlerts().get(0);
 
         assertEqualDates(date, a.getDate());
@@ -468,7 +468,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getSiblings().add(1l);
         s.getSiblings().add(2l);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getSiblings().size());
         assertEquals(new Long(1), s.getSiblings().get(0));
@@ -484,7 +484,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getAlertSummary().add(AlertType.Battery);
         s.getAlertSummary().add(AlertType.CriticalHot);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getAlertSummary().size());
         assertTrue(s.getAlertSummary().contains(AlertType.Battery));
@@ -702,7 +702,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getStartLocationAlternatives().add(loc);
         s.getStartLocationAlternatives().add(loc);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getStartLocationAlternatives().size());
 
@@ -749,7 +749,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getEndLocationAlternatives().add(loc);
         s.getEndLocationAlternatives().add(loc);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getEndLocationAlternatives().size());
 
@@ -796,7 +796,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getInterimLocationAlternatives().add(loc);
         s.getInterimLocationAlternatives().add(loc);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getInterimLocationAlternatives().size());
 
@@ -855,7 +855,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getInterimStops().add(stp);
         s.getInterimStops().add(stp);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
         assertEquals(2, s.getInterimStops().size());
 
         //interim stop
@@ -907,7 +907,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getNotes().add(note);
         s.getNotes().add(note);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getNotes().size());
 
@@ -941,7 +941,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getDeviceGroups().add(group);
         s.getDeviceGroups().add(group);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getDeviceGroups().size());
         group = s.getDeviceGroups().get(0);
@@ -967,7 +967,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getUserAccess().add(u);
         s.getUserAccess().add(u);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getUserAccess().size());
         u = s.getUserAccess().get(0);
@@ -992,7 +992,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getCompanyAccess().add(c);
         s.getCompanyAccess().add(c);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getCompanyAccess().size());
         c = s.getCompanyAccess().get(0);
@@ -1020,7 +1020,7 @@ public class SingleShipmentBeanSerializerTest {
         s.getSentAlerts().add(a);
         s.getSentAlerts().add(a);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         assertEquals(2, s.getSentAlerts().size());
         a = s.getSentAlerts().get(0);
@@ -1058,7 +1058,7 @@ public class SingleShipmentBeanSerializerTest {
         SingleShipmentBean s = createBean();
         s.getSentAlerts().add(a);
 
-        s = serializer.parseSingleShipmentBean(serializer.toJson(s));
+        s = jsonize(s);
 
         a = (TemperatureAlertBean) s.getSentAlerts().get(0);
 
@@ -1102,7 +1102,7 @@ public class SingleShipmentBeanSerializerTest {
         final SingleShipmentBean s = createBean();
         s.setAlertProfile(ap);
 
-        ap = serializer.parseSingleShipmentBean(serializer.toJson(s)).getAlertProfile();
+        ap = jsonize(s).getAlertProfile();
         assertEquals(description, ap.getDescription());
         assertEquals(id, ap.getId());
         assertEquals(lowerTemperatureLimit, ap.getLowerTemperatureLimit(), 0.0001);
@@ -1113,6 +1113,15 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(watchEnterDarkEnvironment, ap.isWatchEnterDarkEnvironment());
         assertEquals(watchMovementStart, ap.isWatchMovementStart());
         assertEquals(watchMovementStop, ap.isWatchMovementStop());
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    private SingleShipmentBean jsonize(final SingleShipmentBean s) {
+        final JsonObject json = serializer.toJson(s);
+        return serializer.parseSingleShipmentBean(json);
     }
 
     private void assertEqualDates(final Date d1, final Date d2) throws AssertionFailedError {

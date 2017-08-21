@@ -506,7 +506,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.add("sentAlerts", alertsToJson(s.getSentAlerts()));
         json.add("alertProfile", alertProfileBeanToJson(s.getAlertProfile()));
 
-        return json;
+        return shorten(json);
     }
     /**
      * @param e JSON element.
@@ -517,7 +517,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
             return null;
         }
 
-        final JsonObject json = e.getAsJsonObject();
+        final JsonObject json = unShorten(e.getAsJsonObject());
         final SingleShipmentBean s = new SingleShipmentBean();
 
         s.setShipmentId(asLong(json.get("shipmentId")));
@@ -607,6 +607,25 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         s.setAlertProfile(parseAlertProfileBean(json.get(("alertProfile"))));
 
         return s;
+    }
+    /**
+     * @param json
+     * @return
+     */
+    private JsonObject shorten(final JsonObject json) {
+        final JsonShortener sh = new JsonShortenerFactory().createDefaultShortener();
+        final JsonObject result = sh.shorten(json);
+        //add shortener version
+        result.addProperty("version", JsonShortenerFactory.DEFAULT_VERSION);
+        return result;
+    }
+    /**
+     * @param json JSON object.
+     * @return unshortened JSON object.
+     */
+    private JsonObject unShorten(final JsonObject json) {
+        final JsonShortener sh = new JsonShortenerFactory().createDefaultShortener(asInteger(json.get("version")));
+        return sh.unShorten(json);
     }
     /**
      * @param loc
