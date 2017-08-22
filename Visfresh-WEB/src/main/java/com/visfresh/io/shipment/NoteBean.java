@@ -5,6 +5,8 @@ package com.visfresh.io.shipment;
 
 import java.util.Date;
 
+import com.visfresh.entities.Note;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -24,6 +26,20 @@ public class NoteBean {
      */
     public NoteBean() {
         super();
+    }
+    /**
+     * @param n note.
+     */
+    public NoteBean(final Note n) {
+        super();
+        setNoteText(n.getNoteText());
+        setTimeOnChart(n.getTimeOnChart());
+        setNoteType(n.getNoteType());
+        setNoteNum(n.getNoteNum());
+        setCreationDate(n.getCreationDate());
+        setCreatedBy(n.getCreatedBy());
+        setActive(n.isActive());
+        setCreateCreatedByName(n.getCreateCreatedByName());
     }
 
     /**

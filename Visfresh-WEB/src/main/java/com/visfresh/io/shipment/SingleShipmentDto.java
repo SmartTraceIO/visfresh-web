@@ -92,7 +92,7 @@ public class SingleShipmentDto {
     private boolean arrivalReportSent;
     private final List<ShipmentUserDto> userAccess = new LinkedList<>();
     private final List<ShipmentCompanyDto> companyAccess = new LinkedList<>();
-    private final List<AlertDto> sentAlerts = new LinkedList<>();
+    private final List<AlertDto> alertsWithCorrectiveActions = new LinkedList<>();
     private AlertProfileDto alertProfile;
 
     /**
@@ -865,8 +865,8 @@ public class SingleShipmentDto {
     /**
      * @return the sentAlerts
      */
-    public List<AlertDto> getSentAlerts() {
-        return sentAlerts;
+    public List<AlertDto> getAlertsWithCorrectiveActions() {
+        return alertsWithCorrectiveActions;
     }
 
     /**

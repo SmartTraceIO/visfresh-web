@@ -73,6 +73,7 @@ import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.impl.services.SingleShipmentServiceImpl;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.SaveShipmentRequest;
@@ -1059,25 +1060,16 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         return result;
     }
+
     /**
      * @param s
      * @param currentTime
      * @param eta
      * @return
      */
-    protected int getPercentageCompleted(final Shipment s,
-            final Date currentTime, final Date eta) {
-        int percentage;
-        if (eta.before(currentTime)) {
-            percentage = 100;
-        } else {
-            double d = currentTime.getTime() - s.getShipmentDate().getTime();
-            d = Math.max(0., d / (eta.getTime() - s.getShipmentDate().getTime()));
-            percentage = (int) Math.round(d);
-        }
-        return percentage;
+    private int getPercentageCompleted(final Shipment s, final Date currentTime, final Date eta) {
+        return SingleShipmentServiceImpl.getPercentageCompleted(s, currentTime, eta);
     }
-
     /**
      * @param authToken authentication token.
      * @param shipmentId shipment ID.
@@ -1500,12 +1492,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     a.setTimeISO(isoFmt.format(alert.getDate()));
                     a.setDescription(ruleBundle.buildDescription(rule, user.getTemperatureUnits()));
 
-                    dto.getSentAlerts().add(a);
+                    dto.getAlertsWithCorrectiveActions().add(a);
                 }
             }
 
             //sort sent alerts
-            Collections.sort(dto.getSentAlerts(), (a1, a2) -> a1.getTimeISO().compareTo(a2.getTimeISO()));
+            Collections.sort(dto.getAlertsWithCorrectiveActions(), (a1, a2) -> a1.getTimeISO().compareTo(a2.getTimeISO()));
 
             alertSummary.putAll(toSummaryMap(alerts));
 
@@ -1713,11 +1705,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
         if (shipment.getEta() != null) {
             final Date eta = shipment.getEta();
-            if (eta != null) {
-                dto.setPercentageComplete(getPercentageCompleted(shipment, new Date(), eta));
-                dto.setEtaIso(isoFmt.format(eta));
-                dto.setEta(prettyFmt.format(eta));
-            }
+            dto.setPercentageComplete(getPercentageCompleted(shipment, new Date(), eta));
+            dto.setEtaIso(isoFmt.format(eta));
+            dto.setEta(prettyFmt.format(eta));
         }
 
         dto.setExcludeNotificationsIfNoAlerts(shipment.isExcludeNotificationsIfNoAlerts());

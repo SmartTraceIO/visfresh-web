@@ -197,7 +197,7 @@ public class SingleShipmentSerializer extends SingleShipmentBeanSerializer {
         json.add("companyAccess", companyAccessToJson(dto.getCompanyAccess()));
 
         //sent alerts
-        json.add("alertsWithCorrectiveActions", sentAlertsToJson(dto.getSentAlerts()));
+        json.add("alertsWithCorrectiveActions", sentAlertsToJson(dto.getAlertsWithCorrectiveActions()));
 
         return json;
     }
