@@ -18,6 +18,7 @@ import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.AlertProfileDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
+import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.lists.ListNotificationScheduleItem;
@@ -342,6 +343,13 @@ public class SingleShipmentSerializer extends SingleShipmentBeanSerializer {
             list.add(s.getPeopleToNotify());
         }
         return StringUtils.combine(list, ", ");
+    }
+    /**
+     * @param s single shipment data.
+     * @return
+     */
+    public JsonObject exportToViewData(final SingleShipmentData s) {
+        throw new InternalError("Should implement");
     }
     /**
      * @param t

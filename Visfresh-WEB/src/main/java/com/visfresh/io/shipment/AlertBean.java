@@ -29,7 +29,6 @@ public class AlertBean extends NotificationIssueBean {
         super(a);
         setType(a.getType());
     }
-
     /**
      * @return the type
      */

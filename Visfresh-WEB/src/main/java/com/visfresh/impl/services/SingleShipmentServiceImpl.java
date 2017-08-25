@@ -5,13 +5,16 @@ package com.visfresh.impl.services;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.AlertDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
 import com.visfresh.dao.DeviceGroupDao;
@@ -19,9 +22,14 @@ import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
+import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
@@ -29,9 +37,13 @@ import com.visfresh.entities.Note;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.io.TrackerEventDto;
+import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.AlertProfileDto;
+import com.visfresh.io.shipment.AlertRuleBean;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.io.shipment.LocationProfileBean;
@@ -39,6 +51,8 @@ import com.visfresh.io.shipment.NoteBean;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
 import com.visfresh.io.shipment.ShipmentUserDto;
 import com.visfresh.io.shipment.SingleShipmentBean;
+import com.visfresh.io.shipment.SingleShipmentData;
+import com.visfresh.io.shipment.SingleShipmentLocationBean;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.services.LocationService;
 import com.visfresh.services.NotificationService;
@@ -74,6 +88,8 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
     private NoteDao noteDao;
     @Autowired
     private DeviceGroupDao deviceGroupDao;
+    @Autowired
+    private AlertDao alertDao;
 
     /**
      * Default constructor.
@@ -83,11 +99,11 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.services.SingleShipmentService#createLiteData()
+     * @see com.visfresh.services.SingleShipmentService#createLiteData(java.lang.Long)
      */
     @Override
-    public SingleShipmentBean createLiteData(final Long shipmentId, final String sn, final Integer tripCount) {
-        final Shipment s = findShipment(shipmentId, sn, tripCount);
+    public SingleShipmentBean createLiteData(final long shipmentId) {
+        final Shipment s = getShipment(shipmentId);
         if (s == null) {
             return null;
         }
@@ -96,11 +112,147 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         addShipmentData(bean, s);
         return bean;
     }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.services.SingleShipmentService#getShipmentData(java.lang.Long)
+     */
     @Override
-    public void addReadingsInfo(final SingleShipmentBean bean, final boolean includeReadings) {
-        if (bean == null) {
-            return;
+    public SingleShipmentData getShipmentData(final long shipmentId) {
+        final Map<Long, SingleShipmentBean> fromDb = getBeanIncludeSiblings(shipmentId);
+        SingleShipmentBean mainShipment = fromDb.get(shipmentId);
+
+        boolean shouldSave = false;
+        if (mainShipment == null) {
+            final Shipment s = getShipment(shipmentId);
+            if (s == null) {
+                return null;
+            }
+
+            mainShipment = createLiteData(s.getId());
+            shouldSave = true;
         }
+
+        final SingleShipmentData data = addReadingsAndSiblings(mainShipment, fromDb);
+
+        if (shouldSave) {
+            saveBean(mainShipment);
+        }
+        return data;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.SingleShipmentService#getShipmentData(java.lang.String, java.lang.Integer)
+     */
+    @Override
+    public SingleShipmentData getShipmentData(final String sn, final int tripCount) {
+        //get cached beans from DB.
+        final Map<Long, SingleShipmentBean> fromDb = getBeanIncludeSiblings(sn, tripCount);
+        //select main shipment by serial number and trip count.
+        SingleShipmentBean mainShipment = selectMainShipment(fromDb, sn, tripCount);
+
+        boolean shouldSave = false;
+        if (mainShipment == null) {
+            final Shipment s = getShipment(sn, tripCount);
+            if (s == null) {
+                return null;
+            }
+
+            mainShipment = createLiteData(s.getId());
+            shouldSave = true;
+        }
+
+        final SingleShipmentData data = addReadingsAndSiblings(mainShipment, fromDb);
+
+        if (shouldSave) {
+            saveBean(mainShipment);
+        }
+
+        return data;
+    }
+
+    /**
+     * @param s shipment bean.
+     * @param fromDb shipment bean and siblings from DB.
+     * @return single shipment data.
+     */
+    protected SingleShipmentData addReadingsAndSiblings(final SingleShipmentBean s,
+            final Map<Long, SingleShipmentBean> fromDb) {
+        final SingleShipmentData data = new SingleShipmentData();
+        processReadings(s, r -> data.getLocations().add(r));
+
+        //add siblings
+        for (final Long id : s.getSiblings()) {
+            SingleShipmentBean sibling = fromDb.get(id);
+            if (sibling == null) {
+                sibling = createLiteData(id);
+                processReadings(sibling, null);
+                saveBean(sibling);
+            }
+
+            data.getSiblings().add(sibling);
+        }
+        return data;
+    }
+    /**
+     * @param shipmentId Shipment ID.
+     * @return map of shipment beans include main bean and its siblings.
+     */
+    protected Map<Long, SingleShipmentBean> getBeanIncludeSiblings(final long shipmentId) {
+        return shipmentDao.getShipmentBeanIncludeSiblings(shipmentId);
+    }
+    /**
+     * @param sn serial number.
+     * @param tripCount trip count.
+     * @return map of shipment beans include main bean and its siblings.
+     */
+    protected Map<Long, SingleShipmentBean> getBeanIncludeSiblings(final String sn, final int tripCount) {
+        return shipmentDao.getShipmentBeanIncludeSiblings(sn, tripCount);
+    }
+
+    /**
+     * @param bean shipment bean.
+     */
+    protected void saveBean(final SingleShipmentBean bean) {
+        shipmentDao.saveShipmentBean(bean);
+    }
+    /**
+     * @param shipmentId shipment ID.
+     * @param sn serial number.
+     * @param tripCount trip count.
+     * @return shipment.
+     */
+    protected Shipment getShipment(final long shipmentId) {
+        return shipmentDao.findOne(shipmentId);
+    }
+    /**
+     * @param sn serial number.
+     * @param tripCount trip count.
+     * @return shipment.
+     */
+    protected Shipment getShipment(final String sn, final int tripCount) {
+        return shipmentDao.findBySnTrip(sn, tripCount);
+    }
+
+    /**
+     * @param fromDb
+     * @param shipmentId
+     * @param sn
+     * @param tripCount
+     * @return
+     */
+    private SingleShipmentBean selectMainShipment(final Map<Long, SingleShipmentBean> fromDb, final String sn,
+            final int tripCount) {
+        //select by serial number and trip count.
+        for (final SingleShipmentBean bean : fromDb.values()) {
+            if (Device.getSerialNumber(bean.getDevice()).equals(sn) && bean.getTripCount() == tripCount) {
+                return bean;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void processReadings(final SingleShipmentBean bean, final Consumer<SingleShipmentLocationBean> c) {
+        final List<AlertBean> alerts = new LinkedList<>(bean.getSentAlerts());
 
         final long shipmentId = bean.getShipmentId();
         final List<TrackerEventDto> events = getReadings(shipmentId).get(shipmentId);
@@ -120,6 +272,10 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
                 } else if (t > maxTemp) {
                     maxTemp = t;
                 }
+
+                if (c != null) {
+                    c.accept(createLocationBean(e, alerts));
+                }
             }
 
             bean.setMaxTemp(maxTemp);
@@ -133,6 +289,27 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
             bean.setLastReadingTemperature(lastReading.getTemperature());
             bean.setLastReadingTime(lastReading.getTime());
         }
+    }
+
+    /**
+     * @param e
+     * @param alerts
+     * @return
+     */
+    private SingleShipmentLocationBean createLocationBean(final TrackerEventDto e, final List<AlertBean> alerts) {
+        final SingleShipmentLocationBean bean = new SingleShipmentLocationBean(e);
+
+        // add alerts
+        final Iterator<AlertBean> iter = alerts.iterator();
+        while (iter.hasNext()) {
+            final AlertBean a = iter.next();
+            if (e.getId().equals(a.getTrackerEventId())) {
+                bean.getAlerts().add(a);
+                iter.remove();
+            }
+        }
+
+        return bean;
     }
 
     /**
@@ -257,26 +434,96 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
             bean.getCompanyAccess().add(new ShipmentCompanyDto(c));
         }
 
-//        //alerts
-//        final List<Alert> alerts = alertDao.getAlerts(s);
-//        for (final Alert alert : alerts) {
-//            final AlertBean a = new AlertBean(alert);
-//            final AlertRule rule = getAlertWithCorrectiveAction(alert);
-//            if (rule != null) {
-//                if (rule instanceof TemperatureRule) {
-//                    a.setCorrectiveActionListId(((TemperatureRule) rule).getCorrectiveActions().getId());
-//                }
-//            }
-//            a.setType(alert.getType());
-//            a.setId(alert.getId());
-//            a.setTime(prettyFmt.format(alert.getDate()));
-//            a.setTimeISO(isoFmt.format(alert.getDate()));
-//            a.setDescription(ruleBundle.buildDescription(rule, user.getTemperatureUnits()));
-//
-//            dto.getAlertsWithCorrectiveActions().add(a);
-//        }
+        //alerts
+        final List<Alert> alerts = getAlerts(s);
+        for (final Alert alert : alerts) {
+            bean.getSentAlerts().add(new AlertBean(alert));
+        }
+
+        bean.getAlertFired().addAll(getAlertFired(s));
+        bean.getAlertYetToFire().addAll(getAlertYetFoFire(s));
+    }
+    /**
+     * @param s shipment.
+     * @return list of alert rules.
+     */
+    private List<AlertRuleBean> getAlertYetFoFire(final Shipment s) {
+        final List<AlertRuleBean> list = new LinkedList<>();
+        for (final AlertRule r : ruleEngine.getAlertYetFoFire(s)) {
+            list.add(new AlertRuleBean(r));
+        }
+        return list;
+    }
+    /**
+     * @param s shipment.
+     * @return list of alert rules.
+     */
+    private List<AlertRuleBean> getAlertFired(final Shipment s) {
+        final List<AlertRuleBean> list = new LinkedList<>();
+        for (final AlertRule r : ruleEngine.getAlertFired(s)) {
+            list.add(new AlertRuleBean(r));
+        }
+        return list;
     }
 
+    /**
+     * @param s shipment.
+     * @return list of alerts.
+     */
+    protected List<Alert> getAlerts(final Shipment s) {
+        return alertDao.getAlerts(s);
+    }
+
+    /**
+     * @param alert.
+     * @return ID of corrective action list if presented.
+     */
+    public static Long getCorrectiveActionListId(final Alert alert) {
+        final AlertProfile alertProfile = alert.getShipment().getAlertProfile();
+
+        if (alert instanceof TemperatureAlert) {
+            final Long ruleId = ((TemperatureAlert) alert).getRuleId();
+            for (final TemperatureRule rule : alertProfile.getAlertRules()) {
+                if (rule.getCorrectiveActions() != null && rule.getId().equals(ruleId)) {
+                    return rule.getCorrectiveActions().getId();
+                }
+            }
+        } else {
+            final AlertType type = alert.getType();
+            if (type == AlertType.Battery && alertProfile.getBatteryLowCorrectiveActions() != null) {
+                return alertProfile.getBatteryLowCorrectiveActions().getId();
+            }
+            if(type == AlertType.LightOn && alertProfile.getLightOnCorrectiveActions() != null) {
+                return alertProfile.getLightOnCorrectiveActions().getId();
+            }
+        }
+
+        return null;
+    }
+    /**
+     * @param alert
+     * @return
+     */
+    public static AlertRule getRuleWithCorrectiveAction(final Alert alert) {
+        final AlertProfile alertProfile = alert.getShipment().getAlertProfile();
+
+        if (alert instanceof TemperatureAlert) {
+            final Long ruleId = ((TemperatureAlert) alert).getRuleId();
+            for (final TemperatureRule rule : alertProfile.getAlertRules()) {
+                if (rule.getCorrectiveActions() != null && rule.getId().equals(ruleId)) {
+                    return rule;
+                }
+            }
+        } else {
+            final AlertType type = alert.getType();
+            if (type == AlertType.Battery && alertProfile.getBatteryLowCorrectiveActions() != null
+                    || type == AlertType.LightOn && alertProfile.getLightOnCorrectiveActions() != null) {
+                return new AlertRule(alert.getType());
+            }
+        }
+
+        return null;
+    }
     /**
      * @param s shipment.
      * @return list of device groups.
@@ -363,20 +610,4 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
     private Arrival getArrival(final Shipment s) {
         return arrivalDao.getArrival(s);
     }
-
-    /**
-     * @param shipmentId
-     * @param sn
-     * @param tripCount
-     * @return
-     */
-    protected Shipment findShipment(final Long shipmentId, final String sn, final Integer tripCount) {
-        if (shipmentId != null) {
-            return shipmentDao.findOne(shipmentId);
-        } else if (sn != null && tripCount != null) {
-            return shipmentDao.findBySnTrip(sn, tripCount);
-        }
-        return null;
-    }
-
 }

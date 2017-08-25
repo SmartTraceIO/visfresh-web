@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.io.TrackerEventDto;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -26,6 +27,17 @@ public class SingleShipmentLocationBean {
      */
     public SingleShipmentLocationBean() {
         super();
+    }
+    /**
+     * @param e tracker event.
+     */
+    public SingleShipmentLocationBean(final TrackerEventDto e) {
+        super();
+        setLatitude(e.getLatitude());
+        setLongitude(e.getLongitude());
+        setTemperature(e.getTemperature());
+        setTime(e.getTime());
+        setType(e.getType());
     }
 
     /**

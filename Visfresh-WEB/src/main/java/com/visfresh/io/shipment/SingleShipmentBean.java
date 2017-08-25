@@ -4,12 +4,9 @@
 package com.visfresh.io.shipment;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.lists.ListNotificationScheduleItem;
@@ -52,9 +49,7 @@ public class SingleShipmentBean {
     private double maxTemp;
     private Date timeOfFirstReading;
 
-    private final List<SingleShipmentLocationBean> locations = new LinkedList<>();
     private final List<Long> siblings = new LinkedList<>();
-    private final Set<AlertType> alertSummary = new HashSet<>();
     private final List<AlertRuleBean> alertYetToFire = new LinkedList<>();
     private final List<AlertRuleBean> alertFired = new LinkedList<>();
     private Date arrivalNotificationTime;
@@ -332,12 +327,6 @@ public class SingleShipmentBean {
         return arrivalNotificationSchedules;
     }
     /**
-     * @return the locations
-     */
-    public List<SingleShipmentLocationBean> getLocations() {
-        return locations;
-    }
-    /**
      * @return the siblings
      */
     public List<Long> getSiblings() {
@@ -396,12 +385,6 @@ public class SingleShipmentBean {
     }
     public int getTrackerPositionLeftPercent() {
         return Math.max(0, 100 - getTrackerPositionFrontPercent());
-    }
-    /**
-     * @return the alertSummary
-     */
-    public Set<AlertType> getAlertSummary() {
-        return alertSummary;
     }
     /**
      * @return

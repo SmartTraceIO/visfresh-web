@@ -48,7 +48,6 @@ import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
@@ -68,7 +67,6 @@ import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.ShortTrackerEvent;
-import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
@@ -91,6 +89,8 @@ import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
 import com.visfresh.io.shipment.ShipmentUserDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
+import com.visfresh.io.shipment.SingleShipmentBean;
+import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
 import com.visfresh.io.shipment.SingleShipmentTimeItem;
@@ -105,6 +105,7 @@ import com.visfresh.services.NotificationService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.RuleEngine;
 import com.visfresh.services.ShipmentAuditService;
+import com.visfresh.services.SingleShipmentService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
 import com.visfresh.utils.LocalizationUtils;
@@ -166,6 +167,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     private NotificationService notificationService;
     @Autowired
     private ShipmentAuditService auditService;
+    @Autowired
+    private SingleShipmentService singleShipmentService;
 
     /**
      * Default constructor.
@@ -1216,17 +1219,22 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             final User user = getLoggedInUser(authToken);
             checkAccess(user, Role.BasicUser);
 
-            final SingleShipmentDto s = shipmentDao.findSingleShipmentBean(shipmentId, sn, trip);
+            final SingleShipmentData s;
+            if (shipmentId != null) {
+                s = singleShipmentService.getShipmentData(shipmentId);
+            } else {
+                s = singleShipmentService.getShipmentData(sn, trip);
+            }
 
             if (s == null) {
                 return createSuccessResponse(null);
             }
 
-            if (!hasViewSingleShipmentAccess(user, s)) {
+            if (!hasViewSingleShipmentAccess(user, s.getBean())) {
                 throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
             }
 
-            auditService.handleShipmentAction(s.getShipmentId(), user, ShipmentAuditAction.Viewed, null);
+            auditService.handleShipmentAction(s.getBean().getShipmentId(), user, ShipmentAuditAction.Viewed, null);
 
             final SingleShipmentSerializer ser = getSingleShipmentSerializer(user);
             return createSuccessResponse(s == null ? null : ser.exportToViewData(s));
@@ -1480,7 +1488,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 final SingleShipmentTimeItem item = getBestCandidate(items, alert);
                 item.getAlerts().add(alert);
 
-                final AlertRule rule = getAlertWithCorrectiveAction(alert);
+                final AlertRule rule = SingleShipmentServiceImpl.getRuleWithCorrectiveAction(alert);
                 if (rule != null) {
                     final AlertDto a = new AlertDto();
                     if (rule instanceof TemperatureRule) {
@@ -1605,30 +1613,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
 
         return dto;
-    }
-    /**
-     * @param alert
-     * @return
-     */
-    private AlertRule getAlertWithCorrectiveAction(final Alert alert) {
-        final AlertProfile alertProfile = alert.getShipment().getAlertProfile();
-
-        if (alert instanceof TemperatureAlert) {
-            final Long ruleId = ((TemperatureAlert) alert).getRuleId();
-            for (final TemperatureRule rule : alertProfile.getAlertRules()) {
-                if (rule.getCorrectiveActions() != null && rule.getId().equals(ruleId)) {
-                    return rule;
-                }
-            }
-        } else {
-            final AlertType type = alert.getType();
-            if (type == AlertType.Battery && alertProfile.getBatteryLowCorrectiveActions() != null
-                    || type == AlertType.LightOn && alertProfile.getLightOnCorrectiveActions() != null) {
-                return new AlertRule(alert.getType());
-            }
-        }
-
-        return null;
     }
     /**
      * @param list
@@ -1956,7 +1940,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param s
      * @return
      */
-    private boolean hasViewSingleShipmentAccess(final User user, final SingleShipmentDto s) {
+    private boolean hasViewSingleShipmentAccess(final User user, final SingleShipmentBean s) {
         if (Role.SmartTraceAdmin.hasRole(user)) {
             return true;
         }

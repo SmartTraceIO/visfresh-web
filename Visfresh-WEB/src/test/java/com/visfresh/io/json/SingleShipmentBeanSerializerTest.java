@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
@@ -46,6 +47,7 @@ public class SingleShipmentBeanSerializerTest {
      * Serializer to test.
      */
     private SingleShipmentBeanSerializer serializer;
+    private static final ShortenerAliasesBuilder aliasesBuilder = new ShortenerAliasesBuilder();
 
     /**
      * Default constructor.
@@ -57,6 +59,16 @@ public class SingleShipmentBeanSerializerTest {
     @Before
     public void setUp() {
         serializer = new SingleShipmentBeanSerializer();
+//        serializer.setShortenerFactory(null);
+    }
+    @BeforeClass
+    public static void beforeClass() {
+        aliasesBuilder.setCollector((name, alias) -> {
+            System.out.println("aliases.put(\""
+                    + name
+                    + "\", \""
+                    + alias
+                    + "\");");});
     }
     /**
      * Tests the bean serialization with default values. Should not throw any exceptions.
@@ -365,14 +377,9 @@ public class SingleShipmentBeanSerializerTest {
         loc.setTime(time);
         loc.setType(eventType);
 
-        SingleShipmentBean s = createBean();
-        s.getLocations().add(loc);
-        s.getLocations().add(loc);
 
-        s = jsonize(s);
-        assertEquals(2, s.getLocations().size());
+        loc = serializer.parseSingleShipmentLocationBean(serializer.toJson(loc));
 
-        loc = s.getLocations().get(0);
         assertEquals(latitude, loc.getLatitude(), 0.001);
         assertEquals(longitude, loc.getLongitude(), 0.001);
         assertEquals(temperature, loc.getTemperature(), 0.001);
@@ -400,11 +407,7 @@ public class SingleShipmentBeanSerializerTest {
         loc.getAlerts().add(a);
         loc.getAlerts().add(a);
 
-        final SingleShipmentBean s = createBean();
-        s.getLocations().add(loc);
-
-        loc = jsonize(s).getLocations().get(0);
-        assertEquals(2, loc.getAlerts().size());
+        loc = serializer.parseSingleShipmentLocationBean(serializer.toJson(loc));
 
         a = loc.getAlerts().get(0);
 
@@ -442,10 +445,7 @@ public class SingleShipmentBeanSerializerTest {
         loc.setType(TrackerEventType.AUT);
         loc.getAlerts().add(a);
 
-        final SingleShipmentBean s = createBean();
-        s.getLocations().add(loc);
-
-        loc = jsonize(s).getLocations().get(0);
+        loc = serializer.parseSingleShipmentLocationBean(serializer.toJson(loc));
         a = (TemperatureAlertBean) loc.getAlerts().get(0);
 
         assertEqualDates(date, a.getDate());
@@ -473,22 +473,6 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(2, s.getSiblings().size());
         assertEquals(new Long(1), s.getSiblings().get(0));
         assertEquals(new Long(2), s.getSiblings().get(1));
-    }
-    /**
-     * Set<AlertType> alertSummary = new HashSet<>();
-     */
-    @Test
-    public void testAlertSummary() {
-        SingleShipmentBean s = createBean();
-
-        s.getAlertSummary().add(AlertType.Battery);
-        s.getAlertSummary().add(AlertType.CriticalHot);
-
-        s = jsonize(s);
-
-        assertEquals(2, s.getAlertSummary().size());
-        assertTrue(s.getAlertSummary().contains(AlertType.Battery));
-        assertTrue(s.getAlertSummary().contains(AlertType.CriticalHot));
     }
     /**
      * List<AlertRuleBean> alertYetToFire = new LinkedList<>();
@@ -1121,6 +1105,7 @@ public class SingleShipmentBeanSerializerTest {
      */
     private SingleShipmentBean jsonize(final SingleShipmentBean s) {
         final JsonObject json = serializer.toJson(s);
+        aliasesBuilder.addProperiesFromJson(json);
         return serializer.parseSingleShipmentBean(json);
     }
 

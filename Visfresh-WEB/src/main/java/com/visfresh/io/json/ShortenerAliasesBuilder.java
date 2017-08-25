@@ -80,7 +80,7 @@ public class ShortenerAliasesBuilder implements JsonPropertyNameHandler {
      */
     @Override
     public void handlePropertyName(final String name) {
-        if (!aliases.contains(name)) {
+        if (!aliases.contains(name) && !"version".equals(name)) {
             final String alias = "a" + generateNextKey(aliases.size());
             aliases.add(name);
             if (this.collector != null) {
