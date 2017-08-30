@@ -5,6 +5,7 @@ package com.visfresh.impl.services;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,7 @@ import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.SingleShipmentBeanDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
@@ -42,8 +44,9 @@ import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.shipment.AlertBean;
-import com.visfresh.io.shipment.AlertProfileDto;
+import com.visfresh.io.shipment.AlertProfileBean;
 import com.visfresh.io.shipment.AlertRuleBean;
+import com.visfresh.io.shipment.ArrivalBean;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.io.shipment.LocationProfileBean;
@@ -90,6 +93,8 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
     private DeviceGroupDao deviceGroupDao;
     @Autowired
     private AlertDao alertDao;
+    @Autowired
+    private SingleShipmentBeanDao shipmentBeanDao;
 
     /**
      * Default constructor.
@@ -118,7 +123,7 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      */
     @Override
     public SingleShipmentData getShipmentData(final long shipmentId) {
-        final Map<Long, SingleShipmentBean> fromDb = getBeanIncludeSiblings(shipmentId);
+        final Map<Long, SingleShipmentBean> fromDb = asMap(getBeanIncludeSiblings(shipmentId));
         SingleShipmentBean mainShipment = fromDb.get(shipmentId);
 
         boolean shouldSave = false;
@@ -145,7 +150,7 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
     @Override
     public SingleShipmentData getShipmentData(final String sn, final int tripCount) {
         //get cached beans from DB.
-        final Map<Long, SingleShipmentBean> fromDb = getBeanIncludeSiblings(sn, tripCount);
+        final Map<Long, SingleShipmentBean> fromDb = asMap(getBeanIncludeSiblings(sn, tripCount));
         //select main shipment by serial number and trip count.
         SingleShipmentBean mainShipment = selectMainShipment(fromDb, sn, tripCount);
 
@@ -170,11 +175,23 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
     }
 
     /**
+     * @param beans beans.
+     * @return map of bean ID's to beans.
+     */
+    private Map<Long, SingleShipmentBean> asMap(final List<SingleShipmentBean> beans) {
+        final Map<Long, SingleShipmentBean> map = new HashMap<>();
+        for (final SingleShipmentBean bean : beans) {
+            map.put(bean.getShipmentId(), bean);
+        }
+        return map;
+    }
+
+    /**
      * @param s shipment bean.
      * @param fromDb shipment bean and siblings from DB.
      * @return single shipment data.
      */
-    protected SingleShipmentData addReadingsAndSiblings(final SingleShipmentBean s,
+    private SingleShipmentData addReadingsAndSiblings(final SingleShipmentBean s,
             final Map<Long, SingleShipmentBean> fromDb) {
         final SingleShipmentData data = new SingleShipmentData();
         processReadings(s, r -> data.getLocations().add(r));
@@ -196,23 +213,23 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      * @param shipmentId Shipment ID.
      * @return map of shipment beans include main bean and its siblings.
      */
-    protected Map<Long, SingleShipmentBean> getBeanIncludeSiblings(final long shipmentId) {
-        return shipmentDao.getShipmentBeanIncludeSiblings(shipmentId);
+    protected List<SingleShipmentBean> getBeanIncludeSiblings(final long shipmentId) {
+        return shipmentBeanDao.getShipmentBeanIncludeSiblings(shipmentId);
     }
     /**
      * @param sn serial number.
      * @param tripCount trip count.
      * @return map of shipment beans include main bean and its siblings.
      */
-    protected Map<Long, SingleShipmentBean> getBeanIncludeSiblings(final String sn, final int tripCount) {
-        return shipmentDao.getShipmentBeanIncludeSiblings(sn, tripCount);
+    protected List<SingleShipmentBean> getBeanIncludeSiblings(final String sn, final int tripCount) {
+        return shipmentBeanDao.getShipmentBeanIncludeSiblings(sn, tripCount);
     }
 
     /**
      * @param bean shipment bean.
      */
     protected void saveBean(final SingleShipmentBean bean) {
-        shipmentDao.saveShipmentBean(bean);
+        shipmentBeanDao.saveShipmentBean(bean);
     }
     /**
      * @param shipmentId shipment ID.
@@ -284,13 +301,11 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
             final TrackerEventDto lastReading = events.get(events.size() - 1);
             bean.setBatteryLevel(lastReading.getBattery());
             bean.setCurrentLocation(new Location(lastReading.getLatitude(), lastReading.getLongitude()));
-            bean.setCurrentLocationDescription(getLocationService().getLocationDescription(
-                    bean.getCurrentLocation()));
+            bean.setCurrentLocationDescription(getLocationDescription(bean.getCurrentLocation()));
             bean.setLastReadingTemperature(lastReading.getTemperature());
             bean.setLastReadingTime(lastReading.getTime());
         }
     }
-
     /**
      * @param e
      * @param alerts
@@ -311,35 +326,17 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
 
         return bean;
     }
-
-    /**
-     * @param shipmentId
-     * @return
-     */
-    protected Map<Long, List<TrackerEventDto>> getReadings(final long shipmentId) {
-        return trackerEventDao.getEventsForShipmentIds(
-                Collections.singleton(shipmentId));
-    }
-
-    /**
-     * @return
-     */
-    protected RuleEngine getRuleEngine() {
-        return ruleEngine;
-    }
-
     /**
      * @param bean
      * @param s
      */
     private void addShipmentData(final SingleShipmentBean bean, final Shipment s) {
         if (s.getAlertProfile() != null) {
-            bean.setAlertProfile(new AlertProfileDto(s.getAlertProfile()));
+            bean.setAlertProfile(new AlertProfileBean(s.getAlertProfile()));
         }
 
-        final RuleEngine engine = getRuleEngine();
-        final Date alertsSuppressedTime = engine.getAlertsSuppressionDate(s);
-        if (alertsSuppressedTime != null || engine.isAlertsSuppressed(s)) {
+        final Date alertsSuppressedTime = getAlertsSuppressionDate(s);
+        if (alertsSuppressedTime != null || isAlertsSuppressed(s)) {
             bean.setAlertsSuppressed(true);
             bean.setAlertsSuppressionTime(alertsSuppressedTime);
         }
@@ -347,11 +344,11 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
 
         final Arrival arrival = getArrival(s);
         if (arrival != null) {
-            bean.setArrivalNotificationTime(arrival.getDate());
+            bean.setArrival(new ArrivalBean(arrival));
         }
 
         bean.setArrivalNotificationWithinKm(s.getArrivalNotificationWithinKm());
-        bean.setArrivalReportSent(getNotificationService().isArrivalReportSent(s));
+        bean.setArrivalReportSent(isArrivalReportSent(s));
         bean.setArrivalTime(s.getArrivalDate());
         bean.setAssetNum(s.getAssetNum());
         bean.setAssetType(s.getAssetType());
@@ -449,7 +446,7 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      */
     private List<AlertRuleBean> getAlertYetFoFire(final Shipment s) {
         final List<AlertRuleBean> list = new LinkedList<>();
-        for (final AlertRule r : ruleEngine.getAlertYetFoFire(s)) {
+        for (final AlertRule r : getAlertYetFoFireImpl(s)) {
             list.add(new AlertRuleBean(r));
         }
         return list;
@@ -460,20 +457,11 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      */
     private List<AlertRuleBean> getAlertFired(final Shipment s) {
         final List<AlertRuleBean> list = new LinkedList<>();
-        for (final AlertRule r : ruleEngine.getAlertFired(s)) {
+        for (final AlertRule r : getAlertFiredImpl(s)) {
             list.add(new AlertRuleBean(r));
         }
         return list;
     }
-
-    /**
-     * @param s shipment.
-     * @return list of alerts.
-     */
-    protected List<Alert> getAlerts(final Shipment s) {
-        return alertDao.getAlerts(s);
-    }
-
     /**
      * @param alert.
      * @return ID of corrective action list if presented.
@@ -533,31 +521,6 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
                 Collections.singleton(s.getId())).get(s.getId());
         return groups == null ? new LinkedList<>() : groups;
     }
-
-    /**
-     * @param s
-     * @return
-     */
-    protected List<Note> getNotes(final Shipment s) {
-        return noteDao.findByShipment(s);
-    }
-
-    /**
-     * @param s
-     * @return
-     */
-    protected List<InterimStop> getInterimStops(final Shipment s) {
-        return interimStopDao.getByShipment(s);
-    }
-
-    /**
-     * @param s shipment.
-     * @return alternative locations.
-     */
-    private AlternativeLocations getAlternativeLocations(final Shipment s) {
-        return alternativeLocationsDao.getBy(s);
-    }
-
     /**
      * @param locs location profiles.
      * @return list of location profile beans.
@@ -569,7 +532,6 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         }
         return list;
     }
-
     /**
      * @param s
      * @param currentTime
@@ -590,24 +552,91 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
     }
 
     /**
+     * @param shipmentId
      * @return
      */
-    protected LocationService getLocationService() {
-        return locationService;
+    protected Map<Long, List<TrackerEventDto>> getReadings(final long shipmentId) {
+        return trackerEventDao.getEventsForShipmentIds(
+                Collections.singleton(shipmentId));
     }
-
     /**
-     * @return notification service.
+     * @param loc
+     * @return
      */
-    protected NotificationService getNotificationService() {
-        return notificationService;
+    protected String getLocationDescription(final Location loc) {
+        return locationService.getLocationDescription(loc);
+    }
+    /**
+     * @param s
+     * @return
+     */
+    protected boolean isArrivalReportSent(final Shipment s) {
+        return notificationService.isArrivalReportSent(s);
+    }
+    /**
+     * @param s shipment.
+     * @return true if alerts suppressed.
+     */
+    protected boolean isAlertsSuppressed(final Shipment s) {
+        return ruleEngine.isAlertsSuppressed(s);
+    }
+    /**
+     * @param s shipment.
+     * @return alerts suppression date.
+     */
+    protected Date getAlertsSuppressionDate(final Shipment s) {
+        return ruleEngine.getAlertsSuppressionDate(s);
+    }
+    /**
+     * @param s
+     * @return
+     */
+    protected List<AlertRule> getAlertYetFoFireImpl(final Shipment s) {
+        return ruleEngine.getAlertYetFoFire(s);
+    }
+    /**
+     * @param s
+     * @return
+     */
+    protected List<AlertRule> getAlertFiredImpl(final Shipment s) {
+        return ruleEngine.getAlertFired(s);
     }
 
     /**
      * @param s shipment.
+     * @return list of alerts.
+     */
+    protected List<Alert> getAlerts(final Shipment s) {
+        return alertDao.getAlerts(s);
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    protected List<Note> getNotes(final Shipment s) {
+        return noteDao.findByShipment(s);
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    protected List<InterimStop> getInterimStops(final Shipment s) {
+        return interimStopDao.getByShipment(s);
+    }
+    /**
+     * @param s shipment.
+     * @return alternative locations.
+     */
+    protected AlternativeLocations getAlternativeLocations(final Shipment s) {
+        return alternativeLocationsDao.getBy(s);
+    }
+    /**
+     * @param s shipment.
      * @return arrival.
      */
-    private Arrival getArrival(final Shipment s) {
+    protected Arrival getArrival(final Shipment s) {
         return arrivalDao.getArrival(s);
     }
 }

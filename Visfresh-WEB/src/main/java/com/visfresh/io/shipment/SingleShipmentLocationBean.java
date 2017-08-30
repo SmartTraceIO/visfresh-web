@@ -15,6 +15,7 @@ import com.visfresh.io.TrackerEventDto;
  *
  */
 public class SingleShipmentLocationBean {
+    private Long id;
     private Double latitude;
     private Double longitude;
     private double temperature;
@@ -33,6 +34,7 @@ public class SingleShipmentLocationBean {
      */
     public SingleShipmentLocationBean(final TrackerEventDto e) {
         super();
+        setId(e.getId());
         setLatitude(e.getLatitude());
         setLongitude(e.getLongitude());
         setTemperature(e.getTemperature());
@@ -40,6 +42,18 @@ public class SingleShipmentLocationBean {
         setType(e.getType());
     }
 
+    /**
+     * @param id
+     */
+    public void setId(final Long id) {
+        this.id = id;
+    }
+    /**
+     * @return the id
+     */
+    public Long getId() {
+        return id;
+    }
     /**
      * @return the latitude
      */

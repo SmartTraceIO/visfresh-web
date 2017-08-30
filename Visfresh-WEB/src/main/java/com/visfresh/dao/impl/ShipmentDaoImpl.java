@@ -25,7 +25,6 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
-import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -740,26 +739,5 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         final List<Map<String, Object>> rows = jdbc.queryForList("select s." + TRIPCOUNT_FIELD + " as tripcount from "
                 + TABLE + " s where s." + ID_FIELD + "=:s", params);
         return rows.size() == 0 ? null : (((Number) rows.get(0).get("tripcount")).intValue());
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.ShipmentDao#saveShipmentBean(com.visfresh.io.shipment.SingleShipmentBean)
-     */
-    @Override
-    public void saveShipmentBean(final SingleShipmentBean bean) {
-        throw new InternalError("Not implemented");
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.ShipmentDao#getShipmentBeanIncludeSiblings(java.lang.Long)
-     */
-    @Override
-    public Map<Long, SingleShipmentBean> getShipmentBeanIncludeSiblings(final Long shipmentId) {
-        throw new InternalError("Not implemented");
-    }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.ShipmentDao#getShipmentBeanIncludeSiblings(java.lang.String, java.lang.Integer)
-     */
-    @Override
-    public Map<Long, SingleShipmentBean> getShipmentBeanIncludeSiblings(final String sn, final Integer tripCount) {
-        throw new InternalError("Not implemented");
     }
 }

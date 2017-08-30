@@ -19,7 +19,7 @@ public class NoteBean {
     private Date creationDate;
     private String createdBy;
     private boolean active = true;
-    private String createCreatedByName;
+    private String createdByName;
 
     /**
      * Default constructor.
@@ -39,7 +39,7 @@ public class NoteBean {
         setCreationDate(n.getCreationDate());
         setCreatedBy(n.getCreatedBy());
         setActive(n.isActive());
-        setCreateCreatedByName(n.getCreateCreatedByName());
+        setCreatedByName(n.getCreateCreatedByName());
     }
 
     /**
@@ -129,13 +129,13 @@ public class NoteBean {
     /**
      * @return the createCreatedByName
      */
-    public String getCreateCreatedByName() {
-        return createCreatedByName;
+    public String getCreatedByName() {
+        return createdByName;
     }
     /**
-     * @param createCreatedByName the createCreatedByName to set
+     * @param name name of creator.
      */
-    public void setCreateCreatedByName(final String createCreatedByName) {
-        this.createCreatedByName = createCreatedByName;
+    public void setCreatedByName(final String name) {
+        this.createdByName = name;
     }
 }

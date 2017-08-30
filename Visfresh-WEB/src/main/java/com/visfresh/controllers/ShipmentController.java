@@ -82,6 +82,7 @@ import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
+import com.visfresh.io.json.SingleShipmentBeanSerializer;
 import com.visfresh.io.json.SingleShipmentSerializer;
 import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.AlertProfileDto;
@@ -991,7 +992,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             dto.setSiblingCount(s.getSiblingCount());
             //alerts
             final List<Alert> alerts = alertDao.getAlerts(s);
-            dto.getAlertSummary().putAll(toSummaryMap(alerts));
+            dto.getAlertSummary().putAll(SingleShipmentBeanSerializer.toSummaryMap(alerts));
 
             //percentage complete.
             if (s.hasFinalStatus()) {
@@ -1236,7 +1237,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
             auditService.handleShipmentAction(s.getBean().getShipmentId(), user, ShipmentAuditAction.Viewed, null);
 
-            final SingleShipmentSerializer ser = getSingleShipmentSerializer(user);
+            final SingleShipmentBeanSerializer ser = new SingleShipmentBeanSerializer(
+                    user.getTimeZone(), user.getLanguage(), user.getTemperatureUnits());
             return createSuccessResponse(s == null ? null : ser.exportToViewData(s));
         } catch (final Exception e) {
             log.error("Failed to get single shipment: " + shipmentId, e);
@@ -1507,7 +1509,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             //sort sent alerts
             Collections.sort(dto.getAlertsWithCorrectiveActions(), (a1, a2) -> a1.getTimeISO().compareTo(a2.getTimeISO()));
 
-            alertSummary.putAll(toSummaryMap(alerts));
+            alertSummary.putAll(SingleShipmentBeanSerializer.toSummaryMap(alerts));
 
             //add arrivals
             final List<Arrival> arrivals = arrivalDao.getArrivals(s);
@@ -1846,27 +1848,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             alert.getLines().add(lines[i]);
         }
         return alert;
-    }
-    /**
-     * @param alerts
-     * @return
-     */
-    public static  Map<AlertType, Integer> toSummaryMap(
-            final List<Alert> alerts) {
-        final Map<AlertType, Integer> map = new HashMap<AlertType, Integer>();
-        for (final Alert alert : alerts) {
-            final AlertType type = alert.getType();
-            if (type != AlertType.LightOff && type != AlertType.LightOn) {
-                Integer numAlerts = map.get(alert.getType());
-                if (numAlerts == null) {
-                    numAlerts = 0;
-                }
-                numAlerts = numAlerts + 1;
-                map.put(alert.getType(), numAlerts);
-            }
-        }
-
-        return map;
     }
     /**
      * @param items tracker events.

@@ -5,14 +5,12 @@ package com.visfresh.dao;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
-import com.visfresh.io.shipment.SingleShipmentBean;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -92,19 +90,4 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment
      * @return first found shipment by given serial number and trip count.
      */
     Shipment findBySnTrip(String sn, int trip);
-    /**
-     * @param bean shipment bean.
-     */
-    void saveShipmentBean(SingleShipmentBean bean);
-    /**
-     * @param shipmentId
-     * @return
-     */
-    Map<Long, SingleShipmentBean> getShipmentBeanIncludeSiblings(Long shipmentId);
-    /**
-     * @param sn
-     * @param tripCount
-     * @return
-     */
-    Map<Long, SingleShipmentBean> getShipmentBeanIncludeSiblings(String sn, Integer tripCount);
 }

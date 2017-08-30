@@ -34,7 +34,7 @@ public class SingleShipmentSerializer extends SingleShipmentBeanSerializer {
     private final NoteSerializer noteSerializer;
 
     public SingleShipmentSerializer(final Language lang, final TimeZone tz, final TemperatureUnits units) {
-        super(tz);
+        super(tz, lang, units);
         this.tempUnits = units;
         noteSerializer = new NoteSerializer(tz);
     }
@@ -206,12 +206,13 @@ public class SingleShipmentSerializer extends SingleShipmentBeanSerializer {
      * @param alert
      * @return
      */
-    private JsonObject toJson(final AlertProfileDto alert) {
+    @Override
+    protected JsonObject toJson(final AlertProfileDto alert) {
         if (alert == null) {
             return null;
         }
 
-        final JsonObject obj = alertProfileBeanToJson(alert);
+        final JsonObject obj = super.toJson(alert);
         obj.addProperty(AlertProfileConstants.LOWER_TEMPERATURE_LIMIT,
                 LocalizationUtils.convertToUnits(alert.getLowerTemperatureLimit(), tempUnits));
         obj.addProperty(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT,

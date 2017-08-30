@@ -13,7 +13,6 @@ import com.visfresh.entities.Language;
 import com.visfresh.entities.NotificationIssue;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.impl.services.NotificationIssueBundle;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.utils.StringUtils;
 

@@ -23,6 +23,7 @@ drop table if exists interimstops;
 drop table if exists alternativelocations;
 drop table if exists autostartlocations;
 drop table if exists autostartshipments;
+drop table if exists singleshipments;
 drop table if exists shipments;
 drop table if exists locationprofiles;
 drop table if exists personalschedules;
@@ -298,6 +299,15 @@ create table shipments (
     siblings longtext default NULL,
     foreign key (device)
         references devices (imei)
+);
+
+create table singleshipments(
+    shipment bigint(20) not null,
+    sn varchar(8) not null,
+    trip int not null,
+    bean longtext not null,
+    FOREIGN KEY (shipment)
+        REFERENCES shipments (id) ON DELETE CASCADE
 );
 
 create table autostartshipments (

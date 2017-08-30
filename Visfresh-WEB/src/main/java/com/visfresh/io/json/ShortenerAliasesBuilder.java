@@ -19,7 +19,6 @@ public class ShortenerAliasesBuilder implements JsonPropertyNameHandler {
     }
 
     private final Set<String> aliases = new HashSet<>();
-    private final char[] alphabet = createAlphabet();
     private ShortenerAliaseCollector collector;
 
     /**
@@ -38,7 +37,7 @@ public class ShortenerAliasesBuilder implements JsonPropertyNameHandler {
     /**
      * @return alphabet.
      */
-    private static char[] createAlphabet() {
+    private static char[] createFullAlphabet() {
         //create array
         final char[] array = new char[('9' - '0') + ('z' - 'a') + ('Z' - 'A') + 3];
 
@@ -81,7 +80,7 @@ public class ShortenerAliasesBuilder implements JsonPropertyNameHandler {
     @Override
     public void handlePropertyName(final String name) {
         if (!aliases.contains(name) && !"version".equals(name)) {
-            final String alias = "a" + generateNextKey(aliases.size());
+            final String alias = generateNextKey(aliases.size());
             aliases.add(name);
             if (this.collector != null) {
                 collector.aliasCreated(name, alias);
@@ -93,16 +92,28 @@ public class ShortenerAliasesBuilder implements JsonPropertyNameHandler {
      * @return
      */
     private String generateNextKey(final int counter) {
-        final int len = alphabet.length;
-
         final StringBuilder sb = new StringBuilder();
-        int c = counter;
-        while (c > 0) {
-            sb.append(alphabet[c % len]);
-            c /= len;
-        }
-
+        final char[] fullAlphabet = createFullAlphabet();
+        toString(counter, sb, fullAlphabet);
         return sb.toString();
+    }
+    /**
+     * @param cipher
+     * @param sb
+     * @param ab
+     */
+    protected void toString(final int cipher, final StringBuilder sb, final char[] ab) {
+        if (cipher == 0) {
+            sb.append(ab[0]);
+        } else {
+            final int len = ab.length;
+
+            int c = cipher;
+            while (c > 0) {
+                sb.insert(0, ab[c % len]);
+                c /= len;
+            }
+        }
     }
     public void clear() {
         aliases.clear();

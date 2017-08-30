@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.impl.services;
+package com.visfresh.l12n;
 
 import static com.visfresh.utils.DateTimeUtils.createDateFormat;
 

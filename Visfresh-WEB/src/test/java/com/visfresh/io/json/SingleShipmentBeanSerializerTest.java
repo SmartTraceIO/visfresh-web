@@ -21,8 +21,9 @@ import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.io.shipment.AlertBean;
-import com.visfresh.io.shipment.AlertProfileDto;
+import com.visfresh.io.shipment.AlertProfileBean;
 import com.visfresh.io.shipment.AlertRuleBean;
+import com.visfresh.io.shipment.ArrivalBean;
 import com.visfresh.io.shipment.CorrectiveActionListBean;
 import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.InterimStopBean;
@@ -86,7 +87,6 @@ public class SingleShipmentBeanSerializerTest {
         final boolean alertsSuppressed = true;
         final Date alertsSuppressionTime = new Date(System.currentTimeMillis() - 100000111l);
         final Integer alertSuppressionMinutes = 34;
-        final Date arrivalNotificationTime = new Date(System.currentTimeMillis() - 123497l);
         final Integer arrivalNotificationWithinKm = 9;
         final boolean arrivalReportSent = true;
         final Date arrivalTime = new Date(System.currentTimeMillis() - 29487392587l);
@@ -129,7 +129,6 @@ public class SingleShipmentBeanSerializerTest {
         s.setAlertsSuppressed(alertsSuppressed);
         s.setAlertsSuppressionTime(alertsSuppressionTime);
         s.setAlertSuppressionMinutes(alertSuppressionMinutes);
-        s.setArrivalNotificationTime(arrivalNotificationTime);
         s.setArrivalNotificationWithinKm(arrivalNotificationWithinKm);
         s.setArrivalReportSent(arrivalReportSent);
         s.setArrivalTime(arrivalTime);
@@ -172,7 +171,6 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(alertsSuppressed, s.isAlertsSuppressed());
         assertEqualDates(alertsSuppressionTime, s.getAlertsSuppressionTime());
         assertEquals(alertSuppressionMinutes, s.getAlertSuppressionMinutes());
-        assertEqualDates(arrivalNotificationTime, s.getArrivalNotificationTime());
         assertEquals(arrivalNotificationWithinKm, s.getArrivalNotificationWithinKm());
         assertEquals(arrivalReportSent, s.isArrivalReportSent());
         assertEqualDates(arrivalTime, s.getArrivalTime());
@@ -241,6 +239,34 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(notificationScheduleId, sched.getNotificationScheduleId());
         assertEquals(notificationScheduleName, sched.getNotificationScheduleName());
         assertEquals(peopleToNotify, sched.getPeopleToNotify());
+    }
+    @Test
+    public void testSerializeArrival() {
+        final Date date = new Date(System.currentTimeMillis() - 19823797l);
+        final Long id = 14l;
+        final Integer notifiedWhenKm = 90000;
+        final Date notifiedAt = new Date(System.currentTimeMillis() - 2395798l);
+        final Long trackerEventId = 8l;
+
+        ArrivalBean arrival = new ArrivalBean();
+
+        arrival.setDate(date);
+        arrival.setId(id);
+        arrival.setMettersForArrival(notifiedWhenKm);
+        arrival.setNotifiedAt(notifiedAt);
+        arrival.setTrackerEventId(trackerEventId);
+
+
+        final SingleShipmentBean s = createBean();
+        s.setArrival(arrival);
+
+        arrival = jsonize(s).getArrival();
+
+        assertEquals(date, arrival.getDate());
+        assertEquals(id, arrival.getId());
+        assertEquals(notifiedWhenKm, arrival.getMettersForArrival());
+        assertEquals(notifiedAt, arrival.getNotifiedAt());
+        assertEquals(trackerEventId, arrival.getTrackerEventId());
     }
     /**
      * List<ListNotificationScheduleItem> arrivalNotificationSchedules = new LinkedList<>();
@@ -364,6 +390,7 @@ public class SingleShipmentBeanSerializerTest {
      */
     @Test
     public void testLocations() {
+        final Long id = 56l;
         final Double latitude = 7.7;
         final Double longitude = 8.8;
         final double temperature = 34.45;
@@ -371,6 +398,7 @@ public class SingleShipmentBeanSerializerTest {
         final TrackerEventType eventType = TrackerEventType.AUT;
 
         SingleShipmentLocationBean loc = new SingleShipmentLocationBean();
+        loc.setId(id);
         loc.setLatitude(latitude);
         loc.setLongitude(longitude);
         loc.setTemperature(temperature);
@@ -380,6 +408,7 @@ public class SingleShipmentBeanSerializerTest {
 
         loc = serializer.parseSingleShipmentLocationBean(serializer.toJson(loc));
 
+        assertEquals(id, loc.getId());
         assertEquals(latitude, loc.getLatitude(), 0.001);
         assertEquals(longitude, loc.getLongitude(), 0.001);
         assertEquals(temperature, loc.getTemperature(), 0.001);
@@ -878,7 +907,7 @@ public class SingleShipmentBeanSerializerTest {
 
         NoteBean note = new NoteBean();
         note.setActive(active);
-        note.setCreateCreatedByName(createCreatedByName);
+        note.setCreatedByName(createCreatedByName);
         note.setCreatedBy(createdBy);
         note.setCreationDate(creationDate);
         note.setNoteNum(noteNum);
@@ -898,7 +927,7 @@ public class SingleShipmentBeanSerializerTest {
         note = s.getNotes().get(0);
 
         assertEquals(active, note.isActive());
-        assertEquals(createCreatedByName, note.getCreateCreatedByName());
+        assertEquals(createCreatedByName, note.getCreatedByName());
         assertEquals(createdBy, note.getCreatedBy());
         assertEqualDates(creationDate, note.getCreationDate());
         assertEquals(noteNum, note.getNoteNum());
@@ -1071,7 +1100,7 @@ public class SingleShipmentBeanSerializerTest {
         final boolean watchMovementStart = true;
         final boolean watchMovementStop = true;
 
-        AlertProfileDto ap = new AlertProfileDto();
+        AlertProfileBean ap = new AlertProfileBean();
         ap.setDescription(description);
         ap.setId(id);
         ap.setLowerTemperatureLimit(lowerTemperatureLimit);
@@ -1097,6 +1126,64 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(watchEnterDarkEnvironment, ap.isWatchEnterDarkEnvironment());
         assertEquals(watchMovementStart, ap.isWatchMovementStart());
         assertEquals(watchMovementStop, ap.isWatchMovementStop());
+    }
+    @Test
+    public void testAlertProfileLightOnCorrectiveAction() {
+        final String description = "Actions description";
+        final Long id = 7l;
+        final String name = "Action list name";
+
+        CorrectiveActionListBean a = new CorrectiveActionListBean();
+        a.setDescription(description);
+        a.setId(id);
+        a.setName(name);
+        a.getActions().add(new CorrectiveAction("A", true));
+        a.getActions().add(new CorrectiveAction("B", false));
+
+        final AlertProfileBean ap = new AlertProfileBean();
+        ap.setLightOnCorrectiveActions(a);
+
+        final SingleShipmentBean s = createBean();
+        s.setAlertProfile(ap);
+
+        a = jsonize(s).getAlertProfile().getLightOnCorrectiveActions();
+
+        assertEquals(description, a.getDescription());
+        assertEquals(id, a.getId());
+        assertEquals(name, a.getName());
+        assertEquals("A", a.getActions().get(0).getAction());
+        assertEquals(true, a.getActions().get(0).isRequestVerification());
+        assertEquals("B", a.getActions().get(1).getAction());
+        assertEquals(false, a.getActions().get(1).isRequestVerification());
+    }
+    @Test
+    public void testAlertProfileBatteryLowCorrectiveAction() {
+        final String description = "Actions description";
+        final Long id = 7l;
+        final String name = "Action list name";
+
+        CorrectiveActionListBean a = new CorrectiveActionListBean();
+        a.setDescription(description);
+        a.setId(id);
+        a.setName(name);
+        a.getActions().add(new CorrectiveAction("A", true));
+        a.getActions().add(new CorrectiveAction("B", false));
+
+        final AlertProfileBean ap = new AlertProfileBean();
+        ap.setBatteryLowCorrectiveActions(a);
+
+        final SingleShipmentBean s = createBean();
+        s.setAlertProfile(ap);
+
+        a = jsonize(s).getAlertProfile().getBatteryLowCorrectiveActions();
+
+        assertEquals(description, a.getDescription());
+        assertEquals(id, a.getId());
+        assertEquals(name, a.getName());
+        assertEquals("A", a.getActions().get(0).getAction());
+        assertEquals(true, a.getActions().get(0).isRequestVerification());
+        assertEquals("B", a.getActions().get(1).getAction());
+        assertEquals(false, a.getActions().get(1).isRequestVerification());
     }
 
     /**

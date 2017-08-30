@@ -52,7 +52,7 @@ public class SingleShipmentBean {
     private final List<Long> siblings = new LinkedList<>();
     private final List<AlertRuleBean> alertYetToFire = new LinkedList<>();
     private final List<AlertRuleBean> alertFired = new LinkedList<>();
-    private Date arrivalNotificationTime;
+    private ArrivalBean arrival;
     private Date shutdownTime;
     private Date arrivalTime;
     private boolean alertsSuppressed;
@@ -76,7 +76,7 @@ public class SingleShipmentBean {
     private final List<ShipmentUserDto> userAccess = new LinkedList<>();
     private final List<ShipmentCompanyDto> companyAccess = new LinkedList<>();
     private final List<AlertBean> sentAlerts = new LinkedList<>();
-    private AlertProfileDto alertProfile;
+    private AlertProfileBean alertProfile;
 
     /**
      * Default constructor.
@@ -488,17 +488,16 @@ public class SingleShipmentBean {
     }
 
     /**
-     * @return the arrivalNotificationTime
+     * @return the arrival
      */
-    public Date getArrivalNotificationTime() {
-        return arrivalNotificationTime;
+    public ArrivalBean getArrival() {
+        return arrival;
     }
-
     /**
-     * @param arrivalNotificationTime the arrivalNotificationTime to set
+     * @param arrival the arrival to set
      */
-    public void setArrivalNotificationTime(final Date arrivalNotificationTime) {
-        this.arrivalNotificationTime = arrivalNotificationTime;
+    public void setArrival(final ArrivalBean arrival) {
+        this.arrival = arrival;
     }
 
     /**
@@ -702,13 +701,13 @@ public class SingleShipmentBean {
     /**
      * @param alertProfileDto
      */
-    public void setAlertProfile(final AlertProfileDto alertProfileDto) {
+    public void setAlertProfile(final AlertProfileBean alertProfileDto) {
         this.alertProfile = alertProfileDto;
     }
     /**
      * @return the alertProfile
      */
-    public AlertProfileDto getAlertProfile() {
+    public AlertProfileBean getAlertProfile() {
         return alertProfile;
     }
     /**
