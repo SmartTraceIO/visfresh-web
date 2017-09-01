@@ -192,6 +192,23 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
 
         jdbc.update(sql, params);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#getShipmentId(java.lang.String, int)
+     */
+    @Override
+    public Long getShipmentId(final String sn, final int tripCount) {
+        final Map<String, Object> map = new HashMap<>();
+        map.put("sn", sn);
+        map.put("trip", tripCount);
+
+        final List<Map<String, Object>> list = jdbc.queryForList("select s.id as id from shipments s "
+                + "where s.device like concat('%', :sn, '_') and s.tripcount = :trip", map);
+        if (list.size() > 0) {
+            return ((Number) list.get(0).get("id")).longValue();
+        }
+
+        return null;
+    }
 
     /**
      * @param params

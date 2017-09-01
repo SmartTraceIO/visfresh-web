@@ -388,6 +388,15 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         assertEquals(s.getId(), dao.findLastShipment(d.getImei()).getId());
     }
     @Test
+    public void testGetShipmentId() {
+        dao.save(createTestEntity());
+        final Shipment s = createTestEntity();
+        dao.save(s);
+
+        assertEquals(s.getId(), dao.getShipmentId(
+                Device.getSerialNumber(s.getDevice().getImei()), s.getTripCount()));
+    }
+    @Test
     public void testFindNextShipmentFor() {
         final Shipment s = createTestEntity();
         dao.save(s);

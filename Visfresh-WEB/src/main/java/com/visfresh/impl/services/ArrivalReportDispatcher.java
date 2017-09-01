@@ -30,7 +30,7 @@ public class ArrivalReportDispatcher extends AbstractAssyncSystemMessageDispatch
     @Autowired
     public ArrivalReportDispatcher(final Environment env) {
         super(SystemMessageType.ArrivalReport);
-        processorId = env.getProperty("main.dispatcher.baseProcessorId", "arrival-report");
+        processorId = buildInstanceId(env, "arrivalreport.dispatcher.id", "arrivalrpt");
         setBatchLimit(Integer.parseInt(env.getProperty("arrival.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("arrival.dispatcher.retryLimit", "5")));
         //number of threads should be hardcoded to 1

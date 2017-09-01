@@ -115,11 +115,4 @@ public class DeviceCommandServiceImpl implements DeviceCommandService, SystemMes
 
         sendCommand(cmd, date);
     }
-    public static void main(final String[] args) {
-        final JsonObject json = new JsonObject();
-        json.addProperty(COMMAND, "timer,1800,2#");
-        json.addProperty(IMEI, "");
-
-        System.out.println(json);
-    }
 }

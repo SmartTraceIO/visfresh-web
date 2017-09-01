@@ -91,7 +91,7 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
      * @see com.visfresh.services.DefaultShipmentAuditService#save(com.visfresh.entities.ShipmentAuditItem)
      */
     @Override
-    protected void save(final ShipmentAuditItem item) {
+    protected void notifyListeners(final ShipmentAuditItem item) {
         items.add(item);
     }
 

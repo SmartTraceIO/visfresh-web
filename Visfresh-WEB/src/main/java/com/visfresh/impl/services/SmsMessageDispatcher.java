@@ -31,7 +31,7 @@ public class SmsMessageDispatcher extends AbstractAssyncSystemMessageDispatcher 
     @Autowired
     public SmsMessageDispatcher(final Environment env) {
         super(SystemMessageType.SMS);
-        processorId = env.getProperty("sms.dispatcher.baseProcessorId", "sms");
+        processorId = buildInstanceId(env, "sms.dispatcher.baseProcessorId", "sms");
 
         setBatchLimit(Integer.parseInt(env.getProperty("sms.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("sms.dispatcher.retryLimit", "3")));

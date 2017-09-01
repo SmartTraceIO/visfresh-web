@@ -21,4 +21,6 @@ public interface ShipmentAuditService {
      */
     void handleShipmentAction(Long shipmentId, User user,
             ShipmentAuditAction action, Map<String, String> details);
+    void addAuditListener(ShipmentAuditListener l);
+    void removeAuditListener(ShipmentAuditListener l);
 }

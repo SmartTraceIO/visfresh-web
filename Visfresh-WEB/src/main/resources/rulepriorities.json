@@ -7,5 +7,6 @@
 	"AutoDetectEndLocation": 49,
 	"ShipmentStatisticsInitializeRule": 49,
 	"LeaveInterimStop": 48,
-	"ArrivalNotification": 10
+	"ArrivalNotification": 10,
+	"SingleShipmentData": -150
 }

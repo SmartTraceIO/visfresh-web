@@ -31,7 +31,7 @@ public class EmailMessageDispatcher extends AbstractAssyncSystemMessageDispatche
     @Autowired
     public EmailMessageDispatcher(final Environment env) {
         super(SystemMessageType.Email);
-        processorId = env.getProperty("email.dispatcher.baseProcessorId", "email");
+        processorId = buildInstanceId(env, "email.dispatcher.baseProcessorId", "email");
 
         setBatchLimit(Integer.parseInt(env.getProperty("email.dispatcher.batchLimit", "10")));
         setRetryLimit(Integer.parseInt(env.getProperty("email.dispatcher.retryLimit", "3")));

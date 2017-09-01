@@ -3,19 +3,20 @@
  */
 package com.visfresh.impl.services;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.controllers.audit.CurrentSessionHolder;
 import com.visfresh.controllers.audit.ShipmentAuditAction;
-import com.visfresh.dao.ShipmentAuditDao;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.ShipmentAuditItem;
 import com.visfresh.entities.User;
+import com.visfresh.services.ShipmentAuditListener;
 import com.visfresh.services.ShipmentAuditService;
 
 /**
@@ -30,14 +31,31 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
      * Shipment audit session property key.
      */
     private static final String SHIPMENT_AUDIT = "ShipmentAudit";
-    @Autowired
-    private ShipmentAuditDao dao;
+    /**
+     * Listener list.
+     */
+    private final List<ShipmentAuditListener> listeners = new CopyOnWriteArrayList<>();
 
     /**
      * Default constructor.
      */
     public DefaultShipmentAuditService() {
         super();
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.services.ShipmentAuditService#addAuditListener(com.visfresh.services.ShipmentAuditListener)
+     */
+    @Override
+    public void addAuditListener(final ShipmentAuditListener l) {
+        listeners.add(l);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.ShipmentAuditService#removeAuditListener(com.visfresh.services.ShipmentAuditListener)
+     */
+    @Override
+    public void removeAuditListener(final ShipmentAuditListener l) {
+        listeners.remove(l);
     }
 
     /* (non-Javadoc)
@@ -78,7 +96,7 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
 
         if (shouldSaveAudit) {
             final ShipmentAuditItem item = createAuditItem(shipmentId, user, action, details);
-            save(item);
+            notifyListeners(item);
         }
     }
 
@@ -110,10 +128,15 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
     /**
      * @param item
      */
-    protected void save(final ShipmentAuditItem item) {
-        dao.save(item);
+    protected void notifyListeners(final ShipmentAuditItem item) {
+        for (final ShipmentAuditListener l : listeners) {
+            try {
+                l.auditItemCreated(item);
+            } catch (final Throwable e) {
+                log.error("Faile to handle audit item with listener " + l.getClass().getName(), e);
+            }
+        }
     }
-
     /**
      * @param shipment the shipment.
      * @param user the user.

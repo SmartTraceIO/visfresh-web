@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.SystemMessageDao;
@@ -114,6 +115,11 @@ public abstract class AbstractSystemMessageDispatcher {
         setRetryLimit(5);
         setNumThreads(1);
         setInactiveTimeOut(3000);
+    }
+    protected String buildInstanceId(final Environment env,
+            final String idPartName, final String idPartDefaultValue) {
+        final String instanceId = env.getProperty("instance.id");
+        return instanceId + "." + env.getProperty(idPartName, idPartDefaultValue);
     }
 
     /**

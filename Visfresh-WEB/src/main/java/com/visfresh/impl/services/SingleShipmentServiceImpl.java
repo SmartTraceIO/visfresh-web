@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +33,6 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
-import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
@@ -68,6 +69,7 @@ import com.visfresh.services.SingleShipmentService;
  */
 @Component
 public class SingleShipmentServiceImpl implements SingleShipmentService {
+    private static final Logger log = LoggerFactory.getLogger(SingleShipmentServiceImpl.class);
     /**
      * Shipment dao.
      */
@@ -103,11 +105,11 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         super();
     }
 
-    /* (non-Javadoc)
-     * @see com.visfresh.services.SingleShipmentService#createLiteData(java.lang.Long)
+    /**
+     * @param shipmentId shipment ID.
+     * @return bean without reading based calculations.
      */
-    @Override
-    public SingleShipmentBean createLiteData(final long shipmentId) {
+    private SingleShipmentBean createLiteBean(final long shipmentId) {
         final Shipment s = getShipment(shipmentId);
         if (s == null) {
             return null;
@@ -116,6 +118,16 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         final SingleShipmentBean bean = new SingleShipmentBean();
         addShipmentData(bean, s);
         return bean;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.SingleShipmentService#rebuildShipmentData(long)
+     */
+    @Override
+    public void rebuildShipmentData(final long shipmentId) {
+        final SingleShipmentBean s = createLiteBean(shipmentId);
+        processReadings(s, null);
+        saveBean(s);
+        log.debug("Single shipment data has rebuilt for shipment " + shipmentId);
     }
 
     /* (non-Javadoc)
@@ -128,16 +140,24 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
 
         boolean shouldSave = false;
         if (mainShipment == null) {
-            final Shipment s = getShipment(shipmentId);
-            if (s == null) {
-                return null;
-            }
-
-            mainShipment = createLiteData(s.getId());
+            mainShipment = createLiteBean(shipmentId);
             shouldSave = true;
         }
 
-        final SingleShipmentData data = addReadingsAndSiblings(mainShipment, fromDb);
+        final SingleShipmentData data = new SingleShipmentData();
+        processReadings(mainShipment, r -> data.getLocations().add(r));
+
+        //add siblings
+        for (final Long id : mainShipment.getSiblings()) {
+            SingleShipmentBean sibling = fromDb.get(id);
+            if (sibling == null) {
+                sibling = createLiteBean(id);
+                processReadings(sibling, null);
+                saveBean(sibling);
+            }
+
+            data.getSiblings().add(sibling);
+        }
 
         if (shouldSave) {
             saveBean(mainShipment);
@@ -149,29 +169,8 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      */
     @Override
     public SingleShipmentData getShipmentData(final String sn, final int tripCount) {
-        //get cached beans from DB.
-        final Map<Long, SingleShipmentBean> fromDb = asMap(getBeanIncludeSiblings(sn, tripCount));
-        //select main shipment by serial number and trip count.
-        SingleShipmentBean mainShipment = selectMainShipment(fromDb, sn, tripCount);
-
-        boolean shouldSave = false;
-        if (mainShipment == null) {
-            final Shipment s = getShipment(sn, tripCount);
-            if (s == null) {
-                return null;
-            }
-
-            mainShipment = createLiteData(s.getId());
-            shouldSave = true;
-        }
-
-        final SingleShipmentData data = addReadingsAndSiblings(mainShipment, fromDb);
-
-        if (shouldSave) {
-            saveBean(mainShipment);
-        }
-
-        return data;
+        final Long id = getShipmentId(sn, tripCount);
+        return id == null ? null : getShipmentData(id);
     }
 
     /**
@@ -186,29 +185,6 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         return map;
     }
 
-    /**
-     * @param s shipment bean.
-     * @param fromDb shipment bean and siblings from DB.
-     * @return single shipment data.
-     */
-    private SingleShipmentData addReadingsAndSiblings(final SingleShipmentBean s,
-            final Map<Long, SingleShipmentBean> fromDb) {
-        final SingleShipmentData data = new SingleShipmentData();
-        processReadings(s, r -> data.getLocations().add(r));
-
-        //add siblings
-        for (final Long id : s.getSiblings()) {
-            SingleShipmentBean sibling = fromDb.get(id);
-            if (sibling == null) {
-                sibling = createLiteData(id);
-                processReadings(sibling, null);
-                saveBean(sibling);
-            }
-
-            data.getSiblings().add(sibling);
-        }
-        return data;
-    }
     /**
      * @param shipmentId Shipment ID.
      * @return map of shipment beans include main bean and its siblings.
@@ -245,35 +221,15 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      * @param tripCount trip count.
      * @return shipment.
      */
-    protected Shipment getShipment(final String sn, final int tripCount) {
-        return shipmentDao.findBySnTrip(sn, tripCount);
+    protected Long getShipmentId(final String sn, final int tripCount) {
+        return shipmentDao.getShipmentId(sn, tripCount);
     }
-
-    /**
-     * @param fromDb
-     * @param shipmentId
-     * @param sn
-     * @param tripCount
-     * @return
-     */
-    private SingleShipmentBean selectMainShipment(final Map<Long, SingleShipmentBean> fromDb, final String sn,
-            final int tripCount) {
-        //select by serial number and trip count.
-        for (final SingleShipmentBean bean : fromDb.values()) {
-            if (Device.getSerialNumber(bean.getDevice()).equals(sn) && bean.getTripCount() == tripCount) {
-                return bean;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void processReadings(final SingleShipmentBean bean, final Consumer<SingleShipmentLocationBean> c) {
+    private void processReadings(final SingleShipmentBean bean, final Consumer<SingleShipmentLocationBean> c) {
         final List<AlertBean> alerts = new LinkedList<>(bean.getSentAlerts());
 
         final long shipmentId = bean.getShipmentId();
         final List<TrackerEventDto> events = getReadings(shipmentId).get(shipmentId);
-        if (events != null) {
+        if (events != null && events.size() > 0) {
             final TrackerEventDto firstReading = events.get(0);
             //first reading data
             bean.setFirstReadingTime(firstReading.getTime());

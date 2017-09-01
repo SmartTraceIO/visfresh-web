@@ -22,7 +22,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentAuditItem;
 import com.visfresh.entities.User;
 import com.visfresh.io.NoteDto;
-import com.visfresh.mock.MockShipmentAuditService;
+import com.visfresh.mock.MockAuditSaver;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
@@ -82,7 +82,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         assertEquals(timeOnChart, isoFormat.format(note.getTimeOnChart()));
 
         //test audit
-        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        final List<ShipmentAuditItem> items = context.getBean(MockAuditSaver.class).getItems();
         assertEquals(1, items.size());
         assertEquals(ShipmentAuditAction.AddedNote, items.get(0).getAction());
     }
@@ -112,7 +112,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         assertEquals(timeOnChart, isoFormat.format(note.getTimeOnChart()));
 
         //test audit
-        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        final List<ShipmentAuditItem> items = context.getBean(MockAuditSaver.class).getItems();
         assertEquals(1, items.size());
         assertEquals(ShipmentAuditAction.AddedNote, items.get(0).getAction());
     }
@@ -164,7 +164,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         assertEquals("B", notes.get(0).getNoteText());
 
         //test audit
-        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        final List<ShipmentAuditItem> items = context.getBean(MockAuditSaver.class).getItems();
         assertEquals(1, items.size());
         assertEquals(ShipmentAuditAction.UpdatedNote, items.get(0).getAction());
     }
@@ -178,7 +178,7 @@ public class NoteControllerTest extends AbstractRestServiceTest {
         assertEquals(2, dao.findByShipment(shipment).size());
 
         //test audit
-        final List<ShipmentAuditItem> items = context.getBean(MockShipmentAuditService.class).getItems();
+        final List<ShipmentAuditItem> items = context.getBean(MockAuditSaver.class).getItems();
         assertEquals(1, items.size());
         assertEquals(ShipmentAuditAction.DeletedNote, items.get(0).getAction());
 

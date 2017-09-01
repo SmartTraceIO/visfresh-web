@@ -25,7 +25,8 @@ import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.ShortTrackerEventWithAlerts;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
-import com.visfresh.mock.MockShipmentAuditService;
+import com.visfresh.mock.JunitShipmentAuditService;
+import com.visfresh.mock.MockAuditSaver;
 import com.visfresh.rules.state.DeviceState;
 import com.visfresh.rules.state.LeaveLocationState;
 import com.visfresh.testutils.InjectUtils;
@@ -44,7 +45,7 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
     private long id;
     private Device device;
     private LocationProfile location;
-    private MockShipmentAuditService auditService;
+    private MockAuditSaver auditSaver;
 
     /**
      * Default constructor.
@@ -71,7 +72,10 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         this.device = d;
 
         //inject audit service
-        auditService = new MockShipmentAuditService();
+        final JunitShipmentAuditService auditService = new JunitShipmentAuditService();
+        auditSaver = new MockAuditSaver();
+        auditService.addAuditListener(auditSaver);
+
         InjectUtils.injectAutowired(this, auditService, false);
     }
 
