@@ -40,6 +40,7 @@ import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.ShipmentTemplateDao;
+import com.visfresh.dao.SingleShipmentBeanDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
@@ -78,6 +79,7 @@ import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.RuleEngine;
+import com.visfresh.services.SingleShipmentService;
 
 import junit.framework.AssertionFailedError;
 
@@ -1155,6 +1157,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         createTemperatureAlert(s, rule1);
         createTemperatureAlert(s, rule2);
 
+        context.getBean(SingleShipmentBeanDao.class).clearShipmentBean(s.getId());
+
         JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
         assertEquals(4, sd.get("alertsWithCorrectiveActions").getAsJsonArray().size());
 
@@ -1165,6 +1169,7 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         rule2.setCorrectiveActions(null);
 
         saveAlertProfileDirectly(alertProfile);
+        context.getBean(SingleShipmentService.class).rebuildShipmentData(s.getId());
 
         sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
         assertEquals(0, sd.get("alertsWithCorrectiveActions").getAsJsonArray().size());

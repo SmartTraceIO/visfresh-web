@@ -121,7 +121,6 @@ public class SingleShipmentBeanSerializerTest {
         final Date shutdownTime = new Date(System.currentTimeMillis() - 192837987987l);
         final Date startTime = new Date(System.currentTimeMillis() - 98709870987l);
         final ShipmentStatus status = ShipmentStatus.Ended;
-        final Date timeOfFirstReading = new Date(System.currentTimeMillis() - 91028470987l);
         final int tripCount = 19;
 
         SingleShipmentBean s = createBean();
@@ -163,7 +162,6 @@ public class SingleShipmentBeanSerializerTest {
         s.setShutdownTime(shutdownTime);
         s.setStartTime(startTime);
         s.setStatus(status);
-        s.setTimeOfFirstReading(timeOfFirstReading);
         s.setTripCount(tripCount);
 
         s = jsonize(s);
@@ -206,7 +204,6 @@ public class SingleShipmentBeanSerializerTest {
         assertEqualDates(shutdownTime, s.getShutdownTime());
         assertEqualDates(startTime, s.getStartTime());
         assertEquals(status, s.getStatus());
-        assertEqualDates(timeOfFirstReading, s.getTimeOfFirstReading());
         assertEquals(tripCount, s.getTripCount());
     }
     /**

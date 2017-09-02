@@ -56,7 +56,7 @@ public class SingleShipmentDto {
 
     private double minTemp;
     private double maxTemp;
-    private String timeOfFirstReading;
+    private String firstReadingTimeIso;
 
     private final List<SingleShipmentLocation> locations = new LinkedList<>();
     private final List<SingleShipmentDto> siblings = new LinkedList<>();
@@ -452,14 +452,14 @@ public class SingleShipmentDto {
     /**
      * @return the timeOfFirstReading
      */
-    public String getTimeOfFirstReading() {
-        return timeOfFirstReading;
+    public String getFirstReadingTimeIso() {
+        return firstReadingTimeIso;
     }
     /**
      * @param timeOfFirstReading the timeOfFirstReading to set
      */
-    public void setTimeOfFirstReading(final String timeOfFirstReading) {
-        this.timeOfFirstReading = timeOfFirstReading;
+    public void setFirstReadingTimeIso(final String timeOfFirstReading) {
+        this.firstReadingTimeIso = timeOfFirstReading;
     }
     /**
      * @return the percentageComplete

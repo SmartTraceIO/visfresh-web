@@ -116,8 +116,11 @@ public final class SerializerUtils {
      * @param pattern pattern object.
      * @return result JSON.
      */
-    public static JsonObject diff(final JsonElement source,
-            final JsonElement result) {
+    public static JsonObject diff(final JsonElement originSource,
+            final JsonElement originResult) {
+        final JsonElement source = originSource == null ? JsonNull.INSTANCE : originSource;
+        final JsonElement result = originResult == null ? JsonNull.INSTANCE : originResult;
+
         final JsonObject diff = new JsonObject();
 
         if (notChangedFastCheck(source, result)) {
@@ -175,7 +178,7 @@ public final class SerializerUtils {
      * @return
      */
     private static boolean notChangedFastCheck(final JsonElement source, final JsonElement result) {
-        if (source == null && result == null) {
+        if ((source == null || source.isJsonNull()) && (result == null || result.isJsonNull())) {
             return true;
         }
         if (source != null && result != null && source.isJsonPrimitive() && source.equals(result)) {
@@ -189,7 +192,8 @@ public final class SerializerUtils {
      * @return
      */
     private static boolean changedAndNotNeedRecursion(final JsonElement source, final JsonElement result) {
-        if (source != null && result == null || source == null && result != null) {
+        if (source != null && (result == null || result.isJsonNull())
+                || (source == null || source.isJsonNull()) && result != null) {
             return true;
         }
         if (source.isJsonArray() && !result.isJsonArray() || !source.isJsonArray() && result.isJsonArray()) {

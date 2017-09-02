@@ -78,11 +78,11 @@ public class SingleShipmentBeanDaoTest extends BaseDaoTest<SingleShipmentBeanDao
         final Shipment s3 = createShipment(d3);
         createShipment(d3);//s4
 
+        setAsSiblings(s1, s2, s3);
+
         createBean(s1);
         createBean(s2);
         createBean(s3);
-
-        setAsSiblings(s1, s2, s3);
 
         assertEquals(3, dao.getShipmentBeanIncludeSiblings(s1.getId()).size());
         assertEquals(3, dao.getShipmentBeanIncludeSiblings(
@@ -96,14 +96,32 @@ public class SingleShipmentBeanDaoTest extends BaseDaoTest<SingleShipmentBeanDao
         final Shipment s3 = createShipment(d3);
         createShipment(d3);//s4
 
+        setAsSiblings(s1, s2, s3);
+
         createBean(s2);
         createBean(s3);
-
-        setAsSiblings(s1, s2, s3);
 
         assertEquals(2, dao.getShipmentBeanIncludeSiblings(s1.getId()).size());
         assertEquals(2, dao.getShipmentBeanIncludeSiblings(
                 Device.getSerialNumber(s1.getDevice().getImei()), s1.getTripCount()).size());
+    }
+    @Test
+    public void testClearShipmentBean() {
+        final Shipment s1 = createShipment(d1);
+        createBean(s1);
+
+        assertEquals(1, dao.getShipmentBeanIncludeSiblings(s1.getId()).size());
+        dao.clearShipmentBean(s1.getId());
+        assertEquals(0, dao.getShipmentBeanIncludeSiblings(s1.getId()).size());
+    }
+    @Test
+    public void testClearShipmentBeanForDevice() {
+        final Shipment s1 = createShipment(d1);
+        createBean(s1);
+
+        assertEquals(1, dao.getShipmentBeanIncludeSiblings(s1.getId()).size());
+        dao.clearShipmentBeanForDevice(s1.getDevice().getImei());
+        assertEquals(0, dao.getShipmentBeanIncludeSiblings(s1.getId()).size());
     }
     /**
      * @param device device.

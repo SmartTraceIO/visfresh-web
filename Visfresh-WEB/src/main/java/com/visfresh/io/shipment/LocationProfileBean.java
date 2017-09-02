@@ -74,6 +74,11 @@ public class LocationProfileBean {
         setStart(p.isStart());
         setInterim(p.isInterim());
         setStop(p.isStop());
+
+        if (p.getLocation() != null) {
+            location.setLatitude(p.getLocation().getLatitude());
+            location.setLongitude(p.getLocation().getLongitude());
+        }
     }
 
     /**

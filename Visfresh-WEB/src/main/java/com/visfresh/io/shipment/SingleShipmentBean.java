@@ -42,12 +42,11 @@ public class SingleShipmentBean {
     private LocationProfileBean endLocation;
     private Date eta;
     private Location currentLocation;
-    private String currentLocationDescription;
+    private String currentLocationDescription = "Not determined";
     private int percentageComplete;
 
     private double minTemp;
     private double maxTemp;
-    private Date timeOfFirstReading;
 
     private final List<Long> siblings = new LinkedList<>();
     private final List<AlertRuleBean> alertYetToFire = new LinkedList<>();
@@ -355,18 +354,6 @@ public class SingleShipmentBean {
      */
     public void setMaxTemp(final double maxTemp) {
         this.maxTemp = maxTemp;
-    }
-    /**
-     * @return the timeOfFirstReading
-     */
-    public Date getTimeOfFirstReading() {
-        return timeOfFirstReading;
-    }
-    /**
-     * @param timeOfFirstReading the timeOfFirstReading to set
-     */
-    public void setTimeOfFirstReading(final Date timeOfFirstReading) {
-        this.timeOfFirstReading = timeOfFirstReading;
     }
     /**
      * @return the percentageComplete

@@ -27,4 +27,12 @@ public interface SingleShipmentBeanDao {
      * @return list with given shipment bean and sibling beans.
      */
     List<SingleShipmentBean> getShipmentBeanIncludeSiblings(String sn, Integer tripCount);
+    /**
+     * @param device
+     */
+    void clearShipmentBeanForDevice(String device);
+    /**
+     * @param shipment
+     */
+    void clearShipmentBean(Long shipment);
 }

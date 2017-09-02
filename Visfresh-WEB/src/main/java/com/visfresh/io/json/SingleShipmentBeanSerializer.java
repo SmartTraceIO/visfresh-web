@@ -444,7 +444,6 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
 
         json.addProperty("minTemp", s.getMinTemp());
         json.addProperty("maxTem", s.getMaxTemp());
-        json.addProperty("timeOfFirstReading", toIsoString(s.getTimeOfFirstReading()));
 
         json.add("siblings", toJsonArray(s.getSiblings()));
         json.add("alertYetToFire", alertRulesToJson(s.getAlertYetToFire()));
@@ -557,7 +556,6 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
 
         s.setMinTemp(asDouble(json.get("minTemp")));
         s.setMaxTemp(asDouble(json.get("maxTem")));
-        s.setTimeOfFirstReading(parseIsoDate(json.get("timeOfFirstReading")));
 
         s.getSiblings().addAll(parseLongList(json.get("siblings").getAsJsonArray()));
 
@@ -868,7 +866,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
             tr.setCorrectiveActions(parseCorrectiveActionListBean(json.get("correctiveActions")));
         }
 
-        return null;
+        return r;
     }
     /**
      * @param actions
@@ -1019,7 +1017,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("status", bean.getStatus().name());
         json.addProperty("alertProfileId", bean.getAlertProfile().getId());
         json.addProperty("alertProfileName", bean.getAlertProfile().getName());
-        json.add("alertProfile", toJson(bean.getAlertProfile()));
+        json.add("alertProfile", exportToView(bean.getAlertProfile()));
         json.addProperty("alertSuppressionMinutes", bean.getAlertSuppressionMinutes());
 
         json.addProperty("alertPeopleToNotify", createPeopleToNotifyString(
@@ -1090,7 +1088,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
 
         json.addProperty("minTemp", convertTemperature(bean.getMinTemp()));
         json.addProperty("maxTemp", convertTemperature(bean.getMaxTemp()));
-        json.addProperty("firstReadingTimeISO", formatIso(bean.getTimeOfFirstReading()));
+        json.addProperty("firstReadingTimeISO", formatIso(bean.getFirstReadingTime()));
         json.addProperty("firstReadingTime", formatPretty(bean.getFirstReadingTime()));
 
         json.addProperty("alertsSuppressed", bean.isAlertsSuppressed());
@@ -1109,7 +1107,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         //interim stops
         final JsonArray interimStops = new JsonArray();
         for (final InterimStopBean stp : bean.getInterimStops()) {
-            exportToViewData(stp);
+            interimStops.add(exportToViewData(stp));
         }
         json.add(ShipmentConstants.INTERIM_STOPS, interimStops);
 
@@ -1120,19 +1118,34 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         }
         json.add("notes", notes);
 
+        //locations
+        final Map<SingleShipmentLocationBean, JsonObject> readingsMap = new HashMap<>();
+
         final JsonArray locations = new JsonArray();
         for (final SingleShipmentLocationBean reading : readings) {
-            final JsonObject loc = exportReadingToViewData(reading, bean);
-            if (arrival != null && reading.getId().equals(arrival.getTrackerEventId())) {
-                addAlertInfo(loc, exportToViewData(arrival, reading, bean));
-            }
+            final JsonObject loc = exportReadingToViewData(reading);
+            readingsMap.put(reading, loc);
             locations.add(loc);
         }
         json.add("locations", locations);
+
         //add first and last locations
         if (locations.size() > 0) {
+            //last reading
             addAlertInfo(locations.get(locations.size() - 1).getAsJsonObject(),
                     createLastReadingAlert(readings.get(readings.size() -1), bean));
+
+            //alerts
+            for (final AlertBean alert : bean.getSentAlerts()) {
+                final SingleShipmentLocationBean candidate = getBestCandidate(readings, alert);
+                addAlertInfo(readingsMap.get(candidate), exportToViewData(alert, candidate, bean));
+            }
+
+            //arrival
+            if (arrival != null) {
+                final SingleShipmentLocationBean candidate = getBestCandidate(readings, arrival);
+                addAlertInfo(readingsMap.get(candidate), exportToViewData(arrival, candidate, bean));
+            }
         }
 
         //add siblings
@@ -1146,11 +1159,43 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         return json;
     }
     /**
-     * @param reading
-     * @param bean
+     * @param items tracker events.
+     * @param issue notification issue.
      * @return
      */
-    private JsonObject exportReadingToViewData(final SingleShipmentLocationBean reading, final SingleShipmentBean bean) {
+    private SingleShipmentLocationBean getBestCandidate(final List<SingleShipmentLocationBean> items,
+            final NotificationIssueBean issue) {
+        //first of all attempt to found by tracker event ID.
+        final Long trackerEventId = issue.getTrackerEventId();
+        if (trackerEventId != null) {
+            //for new alerts the tracker event ID should not be null.
+            for (final SingleShipmentLocationBean i : items) {
+                if (i.getId().equals(trackerEventId)) {
+                    return i;
+                }
+            }
+        }
+
+        //support of old version where tracker event ID is null.
+        final long time = issue.getDate().getTime();
+        long distance = Long.MAX_VALUE;
+
+        SingleShipmentLocationBean best = null;
+        for (final SingleShipmentLocationBean i : items) {
+            final long currentDistance = Math.abs(i.getTime().getTime() - time);
+            if (currentDistance < distance) {
+                distance = currentDistance;
+                best = i;
+            }
+        }
+
+        return best;
+    }
+    /**
+     * @param reading
+     * @return
+     */
+    private JsonObject exportReadingToViewData(final SingleShipmentLocationBean reading) {
         if (reading == null) {
             return null;
         }
@@ -1162,12 +1207,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("timeISO", formatIso(reading.getTime()));
         json.addProperty("time", formatPretty(reading.getTime()));
         json.addProperty("type", eventTypeToString(reading.getType()));
-
-        final JsonArray alerts = new JsonArray();
-        for (final AlertBean alert : reading.getAlerts()) {
-            alerts.add(exportToViewData(alert, reading, bean));
-        }
-        json.add("alerts", alerts);
+        json.add("alerts", new JsonArray());
 
         return json;
     }
@@ -1264,14 +1304,19 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         //company access
         json.add("companyAccess", companyAccessToJson(bean.getCompanyAccess()));
 
+        final List<AlertRuleBean> allRules = new LinkedList<>(bean.getAlertFired());
+        allRules.addAll(bean.getAlertYetToFire());
+
         //alerts with corrective actions.
         final JsonArray alertsWithCorrectiveActions = new JsonArray();
         for (final AlertBean alert : bean.getSentAlerts()) {
-            final AlertRuleBean rule = createRule(alert, bean.getAlertFired());
-            final Long id = getCorrectiveActionListId(rule, bean.getAlertProfile());
-            if (id != null) {
-                final JsonObject corrAction = exportAlertWithCorrectiveActions(alert, bean, rule, id);
-                alertsWithCorrectiveActions.add(corrAction);
+            final AlertRuleBean rule = createRule(alert, allRules);
+            if (rule != null) { //old versions of alert may not have the rule set
+                final Long id = getCorrectiveActionListId(rule, bean.getAlertProfile());
+                if (id != null) {
+                    final JsonObject corrAction = exportAlertWithCorrectiveActions(alert, bean, rule, id);
+                    alertsWithCorrectiveActions.add(corrAction);
+                }
             }
         }
         json.add("alertsWithCorrectiveActions", alertsWithCorrectiveActions);
@@ -1293,7 +1338,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("longitude", stop.getLocation().getLocation().getLongitude());
         json.addProperty("time", stop.getTime());
         json.addProperty("stopDate", formatPretty(stop.getStopDate()));
-        json.addProperty("stopDateISO", formatPretty(stop.getStopDate()));
+        json.addProperty("stopDateISO", formatIso(stop.getStopDate()));
         json.add("location", toJson(stop.getLocation()));
         return json;
     }
@@ -1329,6 +1374,13 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         obj.add("batteryLowCorrectiveActions", toJson(alert.getBatteryLowCorrectiveActions()));
 
         return obj;
+    }
+    /**
+     * @param alert
+     * @return
+     */
+    private JsonObject exportToView(final AlertProfileBean alert) {
+        return toJson((AlertProfileDto) alert);
     }
     /**
      * @param alert
@@ -1555,7 +1607,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      */
     private JsonObject createLastReadingAlert(final SingleShipmentLocationBean reading,
             final SingleShipmentBean shipment) {
-        final String text = this.alertsBundle.buildDescription(null, reading, shipment);
+        final String text = this.alertsBundle.buildTrackerEventDescription(reading, shipment);
         return exportNotificationIssue("LastReading", text);
     }
 }

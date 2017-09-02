@@ -8,16 +8,30 @@ package com.visfresh.controllers.audit;
  *
  */
 public enum ShipmentAuditAction {
-    Autocreated,
-    ManuallyCreated,
+    Autocreated(true),
+    ManuallyCreated(true),
     Viewed,
-    Updated,
+    Updated(true),
     LoadedForEdit,
-    SuppressedAlerts,
+    SuppressedAlerts(true),
     ViewedLite,
-    ManuallyCreatedFromAutostart,
+    ManuallyCreatedFromAutostart(true),
     ViewAccessDenied,
-    AddedNote,
-    DeletedNote,
-    UpdatedNote
+    AddedNote(true),
+    DeletedNote(true),
+    UpdatedNote(true);
+
+    final boolean changesShipment;
+    ShipmentAuditAction() {
+        this(false);
+    }
+    ShipmentAuditAction(final boolean changesShipment) {
+        this.changesShipment = changesShipment;
+    }
+    /**
+     * @return the changesShipment
+     */
+    public boolean isChangesShipment() {
+        return changesShipment;
+    }
 }

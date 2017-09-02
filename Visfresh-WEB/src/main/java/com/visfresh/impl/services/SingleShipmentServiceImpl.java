@@ -57,6 +57,8 @@ import com.visfresh.io.shipment.ShipmentUserDto;
 import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.io.shipment.SingleShipmentLocationBean;
+import com.visfresh.io.shipment.TemperatureAlertBean;
+import com.visfresh.io.shipment.TemperatureRuleBean;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.services.LocationService;
 import com.visfresh.services.NotificationService;
@@ -146,6 +148,7 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
 
         final SingleShipmentData data = new SingleShipmentData();
         processReadings(mainShipment, r -> data.getLocations().add(r));
+        data.setBean(mainShipment);
 
         //add siblings
         for (final Long id : mainShipment.getSiblings()) {
@@ -228,15 +231,14 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         final List<AlertBean> alerts = new LinkedList<>(bean.getSentAlerts());
 
         final long shipmentId = bean.getShipmentId();
+        double minTemp = 1000.;
+        double maxTemp = -273.;
+
         final List<TrackerEventDto> events = getReadings(shipmentId).get(shipmentId);
         if (events != null && events.size() > 0) {
             final TrackerEventDto firstReading = events.get(0);
             //first reading data
             bean.setFirstReadingTime(firstReading.getTime());
-            bean.setTimeOfFirstReading(firstReading.getTime()); //??? seems like duplicate
-
-            double maxTemp = firstReading.getTemperature();
-            double minTemp = maxTemp;
 
             for (final TrackerEventDto e : events) {
                 final double t = e.getTemperature();
@@ -251,8 +253,6 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
                 }
             }
 
-            bean.setMaxTemp(maxTemp);
-            bean.setMinTemp(minTemp);
             //last reading data
             final TrackerEventDto lastReading = events.get(events.size() - 1);
             bean.setBatteryLevel(lastReading.getBattery());
@@ -261,6 +261,9 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
             bean.setLastReadingTemperature(lastReading.getTemperature());
             bean.setLastReadingTime(lastReading.getTime());
         }
+
+        bean.setMaxTemp(maxTemp);
+        bean.setMinTemp(minTemp);
     }
     /**
      * @param e
@@ -341,7 +344,7 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         if (s.getShippedFrom() != null) {
             bean.setStartLocation(new LocationProfileBean(s.getShippedFrom()));
         }
-        bean.setStartTime(s.getStartDate());
+        bean.setStartTime(s.getShipmentDate());
         bean.setStatus(s.getStatus());
         bean.setTripCount(s.getTripCount());
 
@@ -390,7 +393,10 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         //alerts
         final List<Alert> alerts = getAlerts(s);
         for (final Alert alert : alerts) {
-            bean.getSentAlerts().add(new AlertBean(alert));
+            final AlertBean ab = alert instanceof TemperatureAlert ?
+                    new TemperatureAlertBean((TemperatureAlert) alert)
+                    : new AlertBean(alert);
+            bean.getSentAlerts().add(ab);
         }
 
         bean.getAlertFired().addAll(getAlertFired(s));
@@ -403,7 +409,7 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
     private List<AlertRuleBean> getAlertYetFoFire(final Shipment s) {
         final List<AlertRuleBean> list = new LinkedList<>();
         for (final AlertRule r : getAlertYetFoFireImpl(s)) {
-            list.add(new AlertRuleBean(r));
+            list.add(createAlertRuleBean(r));
         }
         return list;
     }
@@ -414,9 +420,20 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
     private List<AlertRuleBean> getAlertFired(final Shipment s) {
         final List<AlertRuleBean> list = new LinkedList<>();
         for (final AlertRule r : getAlertFiredImpl(s)) {
-            list.add(new AlertRuleBean(r));
+            list.add(createAlertRuleBean(r));
         }
         return list;
+    }
+
+    /**
+     * @param r
+     * @return
+     */
+    protected AlertRuleBean createAlertRuleBean(final AlertRule r) {
+        if (r instanceof TemperatureRule) {
+            return new TemperatureRuleBean((TemperatureRule) r);
+        }
+        return new AlertRuleBean(r);
     }
     /**
      * @param alert.
@@ -520,7 +537,8 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      * @return
      */
     protected String getLocationDescription(final Location loc) {
-        return locationService.getLocationDescription(loc);
+        final String desc = locationService.getLocationDescription(loc);
+        return desc == null ? "Not determined" : desc;
     }
     /**
      * @param s

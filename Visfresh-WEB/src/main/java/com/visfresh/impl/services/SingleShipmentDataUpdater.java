@@ -61,7 +61,9 @@ public class SingleShipmentDataUpdater implements ShipmentAuditListener {
      */
     @Override
     public void auditItemCreated(final ShipmentAuditItem item) {
-        helper.addToHandle(item);
+        if (item.getAction().isChangesShipment()) {
+            helper.addToHandle(item);
+        }
     }
     /**
      * @param shipmentId

@@ -1493,9 +1493,17 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 final AlertRule rule = SingleShipmentServiceImpl.getRuleWithCorrectiveAction(alert);
                 if (rule != null) {
                     final AlertDto a = new AlertDto();
+                    Long corrListId = null;
                     if (rule instanceof TemperatureRule) {
-                        a.setCorrectiveActionListId(((TemperatureRule) rule).getCorrectiveActions().getId());
+                        corrListId = ((TemperatureRule) rule).getCorrectiveActions().getId();
+                    } else if (rule.getType() == AlertType.LightOn) {
+                        corrListId = s.getAlertProfile().getLightOnCorrectiveActions() == null
+                                ? null : s.getAlertProfile().getLightOnCorrectiveActions().getId();
+                    } else if (rule.getType() == AlertType.Battery) {
+                        corrListId = s.getAlertProfile().getBatteryLowCorrectiveActions() == null
+                                ? null : s.getAlertProfile().getBatteryLowCorrectiveActions().getId();
                     }
+                    a.setCorrectiveActionListId(corrListId);
                     a.setType(alert.getType());
                     a.setId(alert.getId());
                     a.setTime(prettyFmt.format(alert.getDate()));
@@ -1521,40 +1529,44 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         double minTemp = 1000.;
         double maxTemp = -273.;
+
         Double lastReadingTemperature = null;
-        long timeOfFirstReading = System.currentTimeMillis();
-        long timeOfLastReading = 0;
+        if (events.size() > 0) {
+            long timeOfFirstReading = System.currentTimeMillis() + 100000;
+            long timeOfLastReading = 0;
 
-        for (final TrackerEvent e : events) {
-            final double t = e.getTemperature();
-            final long time = e.getTime().getTime();
+            for (final TrackerEvent e : events) {
+                final double t = e.getTemperature();
+                final long time = e.getTime().getTime();
 
-            if (t < minTemp) {
-                minTemp = t;
-            }
-            if (t > maxTemp) {
-                maxTemp = t;
+                if (t < minTemp) {
+                    minTemp = t;
+                }
+                if (t > maxTemp) {
+                    maxTemp = t;
+                }
+
+                if (timeOfFirstReading > time) {
+                    timeOfFirstReading = time;
+                }
+                if (timeOfLastReading < time) {
+                    timeOfLastReading = time;
+                    lastReadingTemperature = t;
+                }
             }
 
-            if (timeOfFirstReading > time) {
-                timeOfFirstReading = time;
-            }
-            if (timeOfLastReading < time) {
-                timeOfLastReading = time;
-                lastReadingTemperature = t;
-            }
+            dto.setFirstReadingTimeIso(isoFmt.format(new Date(timeOfFirstReading)));
+            dto.setFirstReadingTime(prettyFmt.format(new Date(timeOfFirstReading)));
+            final Date lastReadingTime = new Date(timeOfLastReading);
+            dto.setLastReadingTimeIso(isoFmt.format(lastReadingTime));
+            dto.setLastReadingTime(prettyFmt.format(lastReadingTime));
         }
 
         dto.setMinTemp(minTemp);
         dto.setMaxTemp(maxTemp);
 
-        dto.setTimeOfFirstReading(isoFmt.format(new Date(timeOfFirstReading)));
-        dto.setFirstReadingTime(prettyFmt.format(new Date(timeOfFirstReading)));
         //last readings
         if (lastReadingTemperature != null) {
-            final Date lastReadingTime = new Date(timeOfLastReading);
-            dto.setLastReadingTimeIso(isoFmt.format(lastReadingTime));
-            dto.setLastReadingTime(prettyFmt.format(lastReadingTime));
             dto.setLastReadingTemperature(lastReadingTemperature.doubleValue());
         }
 
@@ -1589,8 +1601,10 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         if (items.size() != 0) {
             final TrackerEvent currentEvent = items.get(0).getEvent();
             if (currentEvent.getLatitude() != null && currentEvent.getLongitude() != null) {
+                final Location currentLocation = new Location(currentEvent.getLatitude(), currentEvent.getLongitude());
                 dto.setCurrentLocation(locationService.getLocationDescription(
-                        new Location(currentEvent.getLatitude(), currentEvent.getLongitude())));
+                        currentLocation));
+                dto.setCurrentLocationForMap(currentLocation);
             }
         }
 
@@ -1682,7 +1696,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         dto.setDeviceName(shipment.getDevice().getName());
         dto.setDeviceSN(shipment.getDevice().getSn());
         dto.setShipmentType(shipment.isAutostart() ? "Autostart": "Manual");
-        dto.setLatestShipment(shipment.getTripCount() == shipment.getDevice().getTripCount()
+        dto.setLatestShipment(shipment.getTripCount() >= shipment.getDevice().getTripCount()
                 && shipment.getStatus() != ShipmentStatus.Ended);
 
         if (shipment.getShippedTo() != null) {

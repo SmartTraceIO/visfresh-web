@@ -97,6 +97,25 @@ public class SingleShipmentBeanDaoImpl implements SingleShipmentBeanDao {
         }
         return beans;
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.SingleShipmentBeanDao#clearShipmentBean(java.lang.Long)
+     */
+    @Override
+    public void clearShipmentBean(final Long shipment) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("shipment", shipment);
+        jdbc.update("delete from singleshipments where shipment = :shipment", params);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.SingleShipmentBeanDao#clearShipmentBeanForDevice(java.lang.String)
+     */
+    @Override
+    public void clearShipmentBeanForDevice(final String device) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("device", device);
+        jdbc.update("delete from singleshipments where shipment in "
+                + "(select s.id from shipments s where s.device = :device)", params);
+    }
     /**
      * @param bean single shipment bean.
      * @return

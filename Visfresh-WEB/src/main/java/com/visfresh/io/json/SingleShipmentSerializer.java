@@ -152,7 +152,7 @@ public class SingleShipmentSerializer extends SingleShipmentBeanSerializer {
 
             json.addProperty("minTemp", convertTemperature(dto.getMinTemp()));
             json.addProperty("maxTemp", convertTemperature(dto.getMaxTemp()));
-            json.addProperty("firstReadingTimeISO", dto.getTimeOfFirstReading());
+            json.addProperty("firstReadingTimeISO", dto.getFirstReadingTimeIso());
             json.addProperty("firstReadingTime", dto.getFirstReadingTime());
 
             json.addProperty("alertsSuppressed", dto.isAlertsSuppressed());
