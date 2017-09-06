@@ -234,8 +234,9 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         double minTemp = 1000.;
         double maxTemp = -273.;
 
-        final List<TrackerEventDto> events = getReadings(shipmentId).get(shipmentId);
+        final List<TrackerEventDto> events = getReadings(shipmentId);
         if (events != null && events.size() > 0) {
+            Location currentLocation = null;
             final TrackerEventDto firstReading = events.get(0);
             //first reading data
             bean.setFirstReadingTime(firstReading.getTime());
@@ -244,19 +245,23 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
                 final double t = e.getTemperature();
                 if (t < minTemp) {
                     minTemp = t;
-                } else if (t > maxTemp) {
+                }
+                if (t > maxTemp) {
                     maxTemp = t;
                 }
 
                 if (c != null) {
                     c.accept(createLocationBean(e, alerts));
                 }
+                if (e.getLatitude() != null && e.getLongitude() != null) {
+                    currentLocation = new Location(e.getLatitude(), e.getLongitude());
+                }
             }
 
             //last reading data
             final TrackerEventDto lastReading = events.get(events.size() - 1);
             bean.setBatteryLevel(lastReading.getBattery());
-            bean.setCurrentLocation(new Location(lastReading.getLatitude(), lastReading.getLongitude()));
+            bean.setCurrentLocation(currentLocation);
             bean.setCurrentLocationDescription(getLocationDescription(bean.getCurrentLocation()));
             bean.setLastReadingTemperature(lastReading.getTemperature());
             bean.setLastReadingTime(lastReading.getTime());
@@ -489,7 +494,7 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      * @param s shipment.
      * @return list of device groups.
      */
-    private List<DeviceGroupDto> getShipmentGroups(final Shipment s) {
+    protected List<DeviceGroupDto> getShipmentGroups(final Shipment s) {
         final List<DeviceGroupDto> groups = deviceGroupDao.getShipmentGroups(
                 Collections.singleton(s.getId())).get(s.getId());
         return groups == null ? new LinkedList<>() : groups;
@@ -528,17 +533,23 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      * @param shipmentId
      * @return
      */
-    protected Map<Long, List<TrackerEventDto>> getReadings(final long shipmentId) {
-        return trackerEventDao.getEventsForShipmentIds(
+    protected List<TrackerEventDto> getReadings(final long shipmentId) {
+        final Map<Long, List<TrackerEventDto>> readings = trackerEventDao.getEventsForShipmentIds(
                 Collections.singleton(shipmentId));
+        return readings.get(shipmentId);
     }
     /**
      * @param loc
      * @return
      */
     protected String getLocationDescription(final Location loc) {
+        final String notDeterminet = "Not determined";
+        if (loc == null) {
+            return notDeterminet;
+        }
+
         final String desc = locationService.getLocationDescription(loc);
-        return desc == null ? "Not determined" : desc;
+        return desc == null ? notDeterminet : desc;
     }
     /**
      * @param s

@@ -220,9 +220,10 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         shipment.setId(id++);
         this.shipmentsToAutostart.add(shipment);
         shipments.add(shipment);
+        final long time = System.currentTimeMillis();
 
         TrackerEvent e = createEvent(location.getLocation().getLatitude(), location.getLocation().getLongitude());
-        e.setTime(new Date(e.getTime().getTime() - CHECK_TIMEOUT - 1000));
+        e.setTime(new Date(time - CHECK_TIMEOUT - 1000));
         RuleContext context = createContext(e);
         final DeviceState state = context.getDeviceState();
 
@@ -232,7 +233,7 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
 
         //just leaving the location
         e = createEvent(location.getLocation().getLatitude() + 10, location.getLocation().getLongitude() + 10);
-        e.setTime(new Date(e.getTime().getTime() - CHECK_TIMEOUT - 100));
+        e.setTime(new Date(time - CHECK_TIMEOUT - 100));
         context = createContext(e);
         context.setDeviceState(state);
 
@@ -240,6 +241,7 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         assertNull(e.getShipment());
 
         e = createEvent(location.getLocation().getLatitude() + 10, location.getLocation().getLongitude() + 10);
+        e.setTime(new Date(time));
         context = createContext(e);
         context.setDeviceState(state);
 
@@ -249,6 +251,7 @@ public class AutoStartOnLeaveStartLocationRuleTest extends
         arrived.setStatus(ShipmentStatus.Arrived);
 
         e = createEvent(location.getLocation().getLatitude() + 10, location.getLocation().getLongitude() + 10);
+        e.setTime(new Date(time));
         e.setShipment(arrived);
 
         //register all existing shipments

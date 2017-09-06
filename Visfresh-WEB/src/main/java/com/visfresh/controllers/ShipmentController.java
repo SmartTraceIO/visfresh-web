@@ -121,8 +121,8 @@ import com.visfresh.utils.StringUtils;
 @RestController("Shipment")
 @RequestMapping("/rest")
 public class ShipmentController extends AbstractShipmentBaseController implements ShipmentConstants {
+    public static final String GET_SINGLE_SHIPMENT_OLD = "getSingleShipmentOld";
     public static final String GET_SINGLE_SHIPMENT = "getSingleShipment";
-    public static final String GET_SINGLE_SHIPMENT_V2 = "getSingleShipmentV2";
     /**
      * 2 hours by default.
      */
@@ -1157,7 +1157,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT + "/{authToken}", method = RequestMethod.GET)
+    @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT_OLD + "/{authToken}", method = RequestMethod.GET)
     public JsonObject getSingleShipment(@PathVariable final String authToken,
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
@@ -1203,7 +1203,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT_V2 + "/{authToken}", method = RequestMethod.GET)
+    @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT + "/{authToken}", method = RequestMethod.GET)
     public JsonObject getSingleShipmentNew(@PathVariable final String authToken,
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,

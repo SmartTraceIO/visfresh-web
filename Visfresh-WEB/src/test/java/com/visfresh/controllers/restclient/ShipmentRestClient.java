@@ -52,8 +52,8 @@ public class ShipmentRestClient extends RestClient {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("shipmentId", shipment.getId().toString());
 
-        final JsonElement result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT), params);
-        final JsonElement v2Result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT_V2), params);
+        final JsonElement result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT_OLD), params);
+        final JsonElement v2Result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT), params);
         final JsonObject diff = SerializerUtils.diff(result, v2Result);
         if (diff != null) {
             throw new AssertionFailedError("Old and new version are not equals: " + diff);
@@ -69,8 +69,8 @@ public class ShipmentRestClient extends RestClient {
             params.put("trip", Integer.toString(trip));
         }
 
-        final JsonElement result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT), params);
-        final JsonElement v2Result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT_V2), params);
+        final JsonElement result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT_OLD), params);
+        final JsonElement v2Result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT), params);
         final JsonObject diff = SerializerUtils.diff(result, v2Result);
         if (diff != null) {
             throw new AssertionFailedError("Old and new version are not equals: " + diff);
