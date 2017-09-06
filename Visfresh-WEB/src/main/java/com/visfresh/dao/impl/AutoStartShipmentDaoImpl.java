@@ -441,7 +441,7 @@ public class AutoStartShipmentDaoImpl
                         + "from " + getTableName() + "\n"
                         //shipment template name and description from shipments table
                         + "join (select "
-                        + ShipmentTemplateDaoImpl.ALERT_FIELD + " as alertProfileId,\n"
+                        + ShipmentTemplateDaoImpl.ALERT_PROFILE_FIELD + " as alertProfileId,\n"
                         + ShipmentTemplateDaoImpl.ID_FIELD + " as shipmentTemplateId,\n"
                         + ShipmentTemplateDaoImpl.NAME_FIELD + " as shipmentTemplateName,\n"
                         + ShipmentTemplateDaoImpl.DESCRIPTION_FIELD + " as shipmentDescription\n"

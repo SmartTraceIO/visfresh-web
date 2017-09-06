@@ -84,7 +84,7 @@ public class JsonShortenerFactory {
         aliases.put("percentageComplete", "r");
         aliases.put("minTemp", "s");
         aliases.put("maxTem", "t");
-        aliases.put("timeOfFirstReading", "u");
+        aliases.put("timeOfFirstReading", "u");//TODO delete
         aliases.put("siblings", "v");
         aliases.put("alertYetToFire", "w");
         aliases.put("alertFired", "x");

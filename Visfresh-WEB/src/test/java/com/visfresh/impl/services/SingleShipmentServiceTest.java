@@ -3,7 +3,9 @@
  */
 package com.visfresh.impl.services;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -73,6 +75,13 @@ public class SingleShipmentServiceTest extends SingleShipmentServiceImpl {
         assertNotNull(data);
         //check bean created
         assertNotNull(this.beans.get(s.getId()));
+    }
+    @Test
+    public void testShipmentNotFound() {
+        final SingleShipmentData data = this.getShipmentData(-111l);
+
+        assertNull(data);
+        assertEquals(0, this.beans.size());
     }
     @Test
     public void testReadingsWithoutLocations() {

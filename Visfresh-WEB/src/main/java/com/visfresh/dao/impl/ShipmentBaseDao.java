@@ -50,7 +50,7 @@ public abstract class ShipmentBaseDao<V extends E, E extends ShipmentBase> exten
     protected static final String ISTEMPLATE_FIELD = "istemplate";
     protected static final String NAME_FIELD = "name";
     protected static final String DESCRIPTION_FIELD = "description";
-    protected static final String ALERT_FIELD = "alert";
+    protected static final String ALERT_PROFILE_FIELD = "alert";
     protected static final String NOALERTIFCOODOWN_FIELD = "noalertsifcooldown";
     protected static final String ARRIVALNOTIFWITHIN_FIELD = "arrivalnotifwithIn";
     protected static final String NONOTIFSIFNOALERTS_FIELD = "nonotifsifnoalerts";
@@ -199,7 +199,7 @@ public abstract class ShipmentBaseDao<V extends E, E extends ShipmentBase> exten
         final Map<String, Object> map= new HashMap<String, Object>();
         map.put(ISTEMPLATE_FIELD, isTemplate());
         map.put(DESCRIPTION_FIELD, s.getShipmentDescription());
-        map.put(ALERT_FIELD, s.getAlertProfile() == null ? null: s.getAlertProfile().getId());
+        map.put(ALERT_PROFILE_FIELD, s.getAlertProfile() == null ? null: s.getAlertProfile().getId());
         map.put(NOALERTIFCOODOWN_FIELD, s.getAlertSuppressionMinutes());
         map.put(ARRIVALNOTIFWITHIN_FIELD, s.getArrivalNotificationWithinKm());
         map.put(NONOTIFSIFNOALERTS_FIELD, s.isExcludeNotificationsIfNoAlerts());
@@ -330,7 +330,7 @@ public abstract class ShipmentBaseDao<V extends E, E extends ShipmentBase> exten
         final V s = createEntity();
 
         s.setId(((Number) map.get(ID_FIELD)).longValue());
-        Number id = (Number) map.get(ALERT_FIELD);
+        Number id = (Number) map.get(ALERT_PROFILE_FIELD);
         if (id != null) {
             s.setAlertProfile(alertProfileDao.findOne(id.longValue()));
         }

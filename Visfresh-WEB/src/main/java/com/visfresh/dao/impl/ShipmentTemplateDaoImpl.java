@@ -56,7 +56,7 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate, S
         propertyToDbFields.put(ShipmentTemplateConstants.SHIPMENT_TEMPLATE_ID,
                 ID_FIELD);
         propertyToDbFields.put(ShipmentTemplateConstants.ALERT_PROFILE_ID,
-                ALERT_FIELD);
+                ALERT_PROFILE_FIELD);
 
     }
     /* (non-Javadoc)
@@ -117,7 +117,7 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate, S
                         + " from " + getTableName()
                     //join alert profiles table
                     + " left outer join " + AlertProfileDaoImpl.TABLE + " ap on ap."
-                    + AlertProfileDaoImpl.ID_FIELD + " = " + ALERT_FIELD + "\n"
+                    + AlertProfileDaoImpl.ID_FIELD + " = " + ALERT_PROFILE_FIELD + "\n"
                     //join location from
                     + " left outer join " + LocationProfileDaoImpl.TABLE + " shipfrom on shipfrom."
                     + LocationProfileDaoImpl.ID_FIELD + " = " + SHIPPEDFROM_FIELD

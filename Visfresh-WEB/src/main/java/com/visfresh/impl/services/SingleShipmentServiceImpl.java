@@ -143,6 +143,10 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         boolean shouldSave = false;
         if (mainShipment == null) {
             mainShipment = createLiteBean(shipmentId);
+            if (mainShipment == null) {
+                //if not found shipment with given ID, should return null data.
+                return null;
+            }
             shouldSave = true;
         }
 

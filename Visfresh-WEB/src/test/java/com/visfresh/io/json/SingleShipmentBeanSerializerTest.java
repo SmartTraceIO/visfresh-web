@@ -6,6 +6,7 @@ package com.visfresh.io.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
@@ -32,6 +33,7 @@ import com.visfresh.io.shipment.NoteBean;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
 import com.visfresh.io.shipment.ShipmentUserDto;
 import com.visfresh.io.shipment.SingleShipmentBean;
+import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.io.shipment.SingleShipmentLocationBean;
 import com.visfresh.io.shipment.TemperatureAlertBean;
 import com.visfresh.io.shipment.TemperatureRuleBean;
@@ -1123,6 +1125,29 @@ public class SingleShipmentBeanSerializerTest {
         assertEquals(watchEnterDarkEnvironment, ap.isWatchEnterDarkEnvironment());
         assertEquals(watchMovementStart, ap.isWatchMovementStart());
         assertEquals(watchMovementStop, ap.isWatchMovementStop());
+    }
+    /**
+     * AlertProfileDto alertProfile;
+     */
+    @Test
+    public void testNullAlertProfile() {
+        final SingleShipmentBean s = createBean();
+        s.setAlertProfile(null);
+
+        assertNull(jsonize(s).getAlertProfile());
+    }
+    /**
+     * AlertProfileDto alertProfile;
+     */
+    @Test
+    public void testExportToViewDataNullAlertProfile() {
+        final SingleShipmentBean s = createBean();
+        s.setAlertProfile(null);
+
+        //check not NullPointerException
+        final SingleShipmentData data = new SingleShipmentData();
+        data.setBean(s);
+        serializer.exportToViewData(data);
     }
     @Test
     public void testAlertProfileLightOnCorrectiveAction() {

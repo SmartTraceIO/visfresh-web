@@ -1015,9 +1015,11 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         json.addProperty("assetNum", bean.getAssetNum());
         json.addProperty("assetType", bean.getAssetType());
         json.addProperty("status", bean.getStatus().name());
-        json.addProperty("alertProfileId", bean.getAlertProfile().getId());
-        json.addProperty("alertProfileName", bean.getAlertProfile().getName());
-        json.add("alertProfile", exportToView(bean.getAlertProfile()));
+
+        final AlertProfileBean ap = bean.getAlertProfile();
+        json.addProperty("alertProfileId", ap == null ? null : ap.getId());
+        json.addProperty("alertProfileName", ap == null ? null : ap.getName());
+        json.add("alertProfile", ap == null ? null : exportToView(ap));
         json.addProperty("alertSuppressionMinutes", bean.getAlertSuppressionMinutes());
 
         json.addProperty("alertPeopleToNotify", createPeopleToNotifyString(

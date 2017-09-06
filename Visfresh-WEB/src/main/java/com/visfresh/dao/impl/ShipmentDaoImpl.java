@@ -65,7 +65,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
      */
     public ShipmentDaoImpl() {
         super();
-        propertyToDbFields.put(ShipmentConstants.ALERT_PROFILE_ID, ALERT_FIELD);
+        propertyToDbFields.put(ShipmentConstants.ALERT_PROFILE_ID, ALERT_PROFILE_FIELD);
         propertyToDbFields.put(ShipmentConstants.ALERT_SUPPRESSION_MINUTES, NOALERTIFCOODOWN_FIELD);
         propertyToDbFields.put(ShipmentConstants.ARRIVAL_NOTIFICATION_WITHIN_KM,
                 ARRIVALNOTIFWITHIN_FIELD);
@@ -79,7 +79,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
 //                );
         propertyToDbFields.put(ShipmentConstants.COMMENTS_FOR_RECEIVER, COMMENTS_FIELD);
         propertyToDbFields.put(ShipmentConstants.SHIPMENT_DESCRIPTION, DESCRIPTION_FIELD);
-        propertyToDbFields.put(ShipmentConstants.ALERT_PROFILE, ALERT_FIELD);
+        propertyToDbFields.put(ShipmentConstants.ALERT_PROFILE, ALERT_PROFILE_FIELD);
         propertyToDbFields.put(ShipmentConstants.DEVICE_IMEI, DEVICE_FIELD);
         propertyToDbFields.put(ShipmentConstants.STATUS, STATUS_FIELD);
         propertyToDbFields.put(ShipmentConstants.CUSTOM_FIELDS, CUSTOMFIELDS_FIELD);
@@ -526,7 +526,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
                     + " , ap." + AlertProfileDaoImpl.LOWERTEMPLIMIT_FIELD + " as lowerTemperatureLimit"
                     + " from " + getTableName()
                     + " left outer join " + AlertProfileDaoImpl.TABLE + " as ap"
-                    + " on " + getTableName() + "." + ALERT_FIELD + " = ap.id"
+                    + " on " + getTableName() + "." + ALERT_PROFILE_FIELD + " = ap.id"
                     + " left outer join " + DeviceDaoImpl.TABLE + " as d"
                     + " on " + getTableName() + "." + DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
                     + " left outer join " + LocationProfileDaoImpl.TABLE + " as sfrom"
