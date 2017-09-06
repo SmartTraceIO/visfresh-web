@@ -73,27 +73,4 @@ public abstract class EntityWithCompanyDaoImplBase<
      * @return
      */
     protected abstract String getCompanyFieldName();
-    @Override
-    public boolean clearCache(final Company c, final ID id) {
-        if (id != null) {
-            if (hasInCache(c, id)) {
-                deleteFromCache(id);
-                return true;
-            }
-        }
-        return false;
-    }
-    /**
-     * @param c company.
-     * @param id entity ID.
-     * @return true if entity by given ID is exist in cache.
-     */
-    @Override
-    public boolean hasInCache(final Company c, final ID id) {
-        final T e = getFromCache(id);
-        if (e != null && e.getCompany() != null && e.getCompany().getId().equals(c.getId())) {
-            return true;
-        }
-        return false;
-    }
 }

@@ -56,14 +56,6 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Alert, Long> implements Ale
     public AlertDaoImpl() {
         super();
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<Long>("AlertsDao", 1000, defaultCacheTimeSeconds, 2 * defaultCacheTimeSeconds);
-    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */

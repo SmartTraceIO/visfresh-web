@@ -31,6 +31,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
      * The listener list.
      */
     private final List<Auditor> listeners = new LinkedList<>();
+    private static final String METHOD_INVOCATION_START = "METHOD_INVOCATION_START";
 
     /**
      * Default constructor.
@@ -46,6 +47,8 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
             throws Exception {
         if (handler instanceof HandlerMethod) {
+            request.setAttribute(METHOD_INVOCATION_START, System.currentTimeMillis());
+
             final ServletWebRequest req = new ServletWebRequest(request, response);
             final HandlerMethod method = (HandlerMethod) handler;
 
@@ -67,6 +70,14 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
     @Override
     public void postHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler,
             final ModelAndView modelAndView) throws Exception {
+        final Long startTime = (Long) request.getAttribute(METHOD_INVOCATION_START);
+        if (startTime != null && handler instanceof HandlerMethod) {
+            final long time = System.currentTimeMillis() - startTime;
+            if (time > 200) {
+                final HandlerMethod m = (HandlerMethod) handler;
+                log.debug("Method invocation too long " + m.getMethod() + ": " + time + "ms");
+            }
+        }
     }
 
     /* (non-Javadoc)

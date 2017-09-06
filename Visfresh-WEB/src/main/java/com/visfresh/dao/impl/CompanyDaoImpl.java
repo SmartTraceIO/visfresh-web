@@ -64,14 +64,6 @@ public class CompanyDaoImpl extends DaoImplBase<Company, Company, Long> implemen
         propertyToDbFields.put(CompanyConstants.LANGUAGE, LANGUAGE_FIELD);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<Long>("CompanyDao", 1000, defaultCacheTimeSeconds, 5 * defaultCacheTimeSeconds);
-    }
-
-    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override

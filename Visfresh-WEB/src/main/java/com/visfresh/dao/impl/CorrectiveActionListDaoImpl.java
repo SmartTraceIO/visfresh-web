@@ -80,14 +80,6 @@ public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<Co
 
         return list;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<Long>("CorrectiveActionListDao", 1000, 10 * 60, 20 * 60);
-    }
-
     private List<String> getFields(final boolean includeId) {
         final List<String> fields = new LinkedList<String>();
         fields.add(NAME_FIELD);

@@ -51,13 +51,6 @@ public class ShipmentNoteDaoImpl extends DaoImplBase<ShipmentNote,ShipmentNote, 
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<>("ShipmentNoteDao", 1000, 60, 3 * 60);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override

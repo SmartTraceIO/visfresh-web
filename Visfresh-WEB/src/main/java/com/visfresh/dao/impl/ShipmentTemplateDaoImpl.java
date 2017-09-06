@@ -67,13 +67,6 @@ public class ShipmentTemplateDaoImpl extends ShipmentBaseDao<ShipmentTemplate, S
         return new ShipmentTemplate();
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<>("ShipmentTemplateDao", 100, 60, 60);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.impl.ShipmentBaseDao#createEntity(java.util.Map, java.util.Map)
      */
     @Override

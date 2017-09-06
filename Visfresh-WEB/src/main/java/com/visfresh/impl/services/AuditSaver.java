@@ -35,7 +35,8 @@ public class AuditSaver implements ShipmentAuditListener {
         @Override
         protected void processEvent(final ShipmentAuditItem e) {
             dao.save(e);
-            log.debug("Audit item saved (" + e.getShipmentId() + ", action: " + e.getAction() + ")");
+            log.debug("Audit item saved (" + e.getShipmentId() + ", action: " + e.getAction()
+                + ") for user: " + e.getUserId());
         }
     };
 

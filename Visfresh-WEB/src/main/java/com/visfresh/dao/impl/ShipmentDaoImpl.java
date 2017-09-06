@@ -104,13 +104,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         return new Shipment();
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<>("ShipmentDao", 1000, 10 * 60, 20 * 60);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#findActiveShipments(com.visfresh.entities.Company)
      */
     @Override
@@ -716,7 +709,6 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
                 + " where " + ID_FIELD + "=:s",
                 params);
 
-        deleteFromCache(s.getId());
         shipmentBeanDao.clearShipmentBean(s.getId());
     }
     /* (non-Javadoc)

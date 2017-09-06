@@ -54,14 +54,6 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Arrival, Long> implemen
         super();
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<Long>("ArrivalDao", 1000, defaultCacheTimeSeconds, 2 * defaultCacheTimeSeconds);
-    }
-
-    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override

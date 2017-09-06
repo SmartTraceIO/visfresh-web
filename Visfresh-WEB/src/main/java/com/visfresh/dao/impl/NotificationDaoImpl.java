@@ -89,13 +89,6 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Notification,
         propertyToDbMap.put(NotificationConstants.PROPERTY_CLOSED, ISREAD_FIELD);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<>("NotificationDao", 1000, 60, 120);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.NotificationDao#findByShipment(java.lang.Long)
      */
     @Override
@@ -133,11 +126,6 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Notification,
 
         jdbc.update("update " + TABLE + " set "
                 + ISREAD_FIELD + " = true where user = :user and (" + idPart + ")", paramMap);
-
-        //clear cache
-        for (final Long id : ids) {
-            deleteFromCache(id);
-        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()

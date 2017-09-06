@@ -99,13 +99,6 @@ public class AutoStartShipmentDaoImpl
         mergeLocations(aut);
         return aut;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<>("AutoStartDao", 1000, defaultCacheTimeSeconds, defaultCacheTimeSeconds);
-    }
     private void mergeLocations(final AutoStartShipment cfg) {
         final List<Long> oldLocFrom = new LinkedList<>();
         final List<Long> oldLocTo = new LinkedList<>();
@@ -414,7 +407,6 @@ public class AutoStartShipmentDaoImpl
     public void delete(final AutoStartShipment entity) {
         //delete template, entity should be deleted by DB trigger
         shipmentTemplateDao.delete(entity.getTemplate().getId());
-        deleteFromCache(entity.getId());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()

@@ -43,13 +43,6 @@ public class DeviceCommandDaoImpl extends DaoImplBase<DeviceCommand, DeviceComma
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<>("DeviceCommandDao", 20, defaultCacheTimeSeconds, defaultCacheTimeSeconds);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override

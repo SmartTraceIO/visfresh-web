@@ -37,16 +37,4 @@ public interface EntityWithCompanyDaoBase
      * @return count of entity for given filtering.
      */
     int getEntityCount(Company company, Filter filter);
-    /**
-     * @param c company.
-     * @param id entity ID.
-     * @return true if the entity successfully deleted from cache.
-     */
-    boolean clearCache(Company c, ID id);
-    /**
-     * @param c company.
-     * @param id entity ID.
-     * @return true if entity by given ID is exist in cache.
-     */
-    boolean hasInCache(Company c, ID id);
 }

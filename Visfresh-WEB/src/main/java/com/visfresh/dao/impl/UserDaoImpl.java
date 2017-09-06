@@ -105,13 +105,6 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, User, Long> 
         return list;
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<>("UserDao", 1000, 60, 20 * 60);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override

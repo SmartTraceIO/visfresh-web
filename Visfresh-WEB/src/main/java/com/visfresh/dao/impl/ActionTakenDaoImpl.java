@@ -73,14 +73,6 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
     public ActionTakenDaoImpl() {
         super();
     }
-
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<Long>("ActionTakenDao", 1000, defaultCacheTimeSeconds, 2 * defaultCacheTimeSeconds);
-    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */

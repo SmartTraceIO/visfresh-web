@@ -62,13 +62,6 @@ public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<Locatio
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<>("LocationProfileDao", 1000, 4 * 60, 20 * 60);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override

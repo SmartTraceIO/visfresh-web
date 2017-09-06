@@ -126,13 +126,6 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         updateTemperatureIssues(ap.getId(), ap.getAlertRules());
         return ap;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<Long>("AlertProfileDao", 1000, 10 * 60, 20 * 60);
-    }
     /**
      * @param id alert profile ID.
      * @param rules temperature rules.

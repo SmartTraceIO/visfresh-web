@@ -11,8 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -38,7 +36,6 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
      */
     @Autowired
     protected NamedParameterJdbcTemplate jdbc;
-    private EntityCache<ID> cache;
 
     /**
      * @param repository class.
@@ -61,7 +58,6 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
     @Override
     public final <S extends T> S save(final S entity) {
         final S s = saveImpl(entity);
-        cache.remove(s.getId());
         return s;
     }
     public abstract <S extends T> S saveImpl(final S entity);
@@ -71,28 +67,16 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
      */
     @Override
     public List<V> findAll(final Collection<ID> originIds) {
+        if (originIds.size() == 0) {
+            return new LinkedList<>();
+        }
         final List<ID> ids = new LinkedList<>(originIds);
         final List<V> result = new LinkedList<>();
-
-        //first of all attempt to get from cache;
-        Iterator<ID> iter = ids.iterator();
-        while (iter.hasNext()) {
-            final ID id = iter.next();
-            final V entity = getFromCache(id);
-            if (entity != null) {
-                result.add(entity);
-                iter.remove();
-            }
-        }
-
-        if (ids.size() == 0) {
-            return result;
-        }
 
         final DefaultCustomFilter idFilter = new DefaultCustomFilter();
 
         //get other from DB
-        iter = ids.iterator();
+        final Iterator<ID> iter = ids.iterator();
         while(iter.hasNext()) {
             final ID id = iter.next();
             idFilter.addValue(SelectAllSupport.DEFAULT_FILTER_KEY_PREFIX + "_id_" + id, id);
@@ -183,31 +167,12 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
      */
     @Override
     public V findOne(final ID id) {
-        final V e = getFromCache(id);
-        if (e != null) {
-            return e;
-        }
-
         final Filter f = new Filter();
         f.addFilter(getIdFieldName(), id);
 
         final List<V> list = findAll(f, null, null);
         return list.size() == 0 ? null : list.get(0);
     }
-    /**
-     * @param id
-     * @return
-     */
-    protected V getFromCache(final ID id) {
-        final Map<String, Object> map = cache.get(id);
-        if (map != null) {
-            final V e = createEntity(map);
-            resolveReferences(e, map, new HashMap<String, Object>());
-            return e;
-        }
-        return null;
-    }
-
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#getEntityCount(com.visfresh.dao.Filter)
      */
@@ -227,7 +192,6 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
      * @return
      */
     protected abstract String getIdFieldName();
-    protected abstract EntityCache<ID> createCache();
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findAll()
      */
@@ -251,8 +215,6 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
         for (final Map<String,Object> map : list) {
             final V t = createEntity(map);
             resolveReferences(t, map, cache);
-            //cache result
-            cacheEntity(t, map);
             result.add(t);
         }
         return result;
@@ -281,14 +243,6 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
      * @return
      */
     protected abstract Map<String, String> getPropertyToDbMap();
-
-    /**
-     * @param t
-     * @param map
-     */
-    protected void cacheEntity(final T t, final Map<String, Object> map) {
-        this.cache.put(t.getId(), map);
-    }
     /**
      * @param t
      * @param map
@@ -310,21 +264,6 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("id", id);
         jdbc.update("delete from " + getTableName() + " where " + getIdFieldName() + " = :id", paramMap);
-        deleteFromCache(id);
-    }
-    public void deleteFromCache(final ID id) {
-        cache.remove(id);
-    }
-    @Autowired
-    public void initCache(final CacheManagerHolder h) {
-        cache = createCache();
-        cache.initialize(h);
-    }
-    @PreDestroy
-    public void destroyCache() {
-        if (cache != null) {
-            cache.destroy();
-        }
     }
     /**
      * @param strings

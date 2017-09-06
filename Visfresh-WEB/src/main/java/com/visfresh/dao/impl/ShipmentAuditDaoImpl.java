@@ -56,14 +56,6 @@ public class ShipmentAuditDaoImpl extends DaoImplBase<ShipmentAuditItem, Shipmen
         propertyToDbFields.put(ShipmentAuditConstants.ACTION, ACTION);
         propertyToDbFields.put(ShipmentAuditConstants.ADDITIONAL_INFO, INFO);
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<Long>("ShipmentAuditDao",
-                1000, defaultCacheTimeSeconds, 5 * defaultCacheTimeSeconds);
-    }
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)

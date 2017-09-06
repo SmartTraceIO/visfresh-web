@@ -50,13 +50,6 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, RestSession, Lo
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.dao.impl.DaoImplBase#createCache()
-     */
-    @Override
-    protected EntityCache<Long> createCache() {
-        return new EntityCache<>("RestSessionDao", 10, 60, 60);
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override

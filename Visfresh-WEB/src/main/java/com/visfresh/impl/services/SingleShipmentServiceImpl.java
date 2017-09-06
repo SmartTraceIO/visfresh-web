@@ -137,7 +137,9 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      */
     @Override
     public SingleShipmentData getShipmentData(final long shipmentId) {
-        final Map<Long, SingleShipmentBean> fromDb = asMap(getBeanIncludeSiblings(shipmentId));
+//        final Map<Long, SingleShipmentBean> fromDb = asMap(getBeanIncludeSiblings(shipmentId));
+        //temporary disable of using cache.
+        final Map<Long, SingleShipmentBean> fromDb = new HashMap<>();
         SingleShipmentBean mainShipment = fromDb.get(shipmentId);
 
         boolean shouldSave = false;
@@ -180,18 +182,18 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         return id == null ? null : getShipmentData(id);
     }
 
-    /**
-     * @param beans beans.
-     * @return map of bean ID's to beans.
-     */
-    private Map<Long, SingleShipmentBean> asMap(final List<SingleShipmentBean> beans) {
-        final Map<Long, SingleShipmentBean> map = new HashMap<>();
-        for (final SingleShipmentBean bean : beans) {
-            map.put(bean.getShipmentId(), bean);
-        }
-        return map;
-    }
-
+//    /**
+//     * @param beans beans.
+//     * @return map of bean ID's to beans.
+//     */
+//    private Map<Long, SingleShipmentBean> asMap(final List<SingleShipmentBean> beans) {
+//        final Map<Long, SingleShipmentBean> map = new HashMap<>();
+//        for (final SingleShipmentBean bean : beans) {
+//            map.put(bean.getShipmentId(), bean);
+//        }
+//        return map;
+//    }
+//
     /**
      * @param shipmentId Shipment ID.
      * @return map of shipment beans include main bean and its siblings.
