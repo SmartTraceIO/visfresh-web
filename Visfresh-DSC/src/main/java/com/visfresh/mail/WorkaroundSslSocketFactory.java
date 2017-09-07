@@ -61,8 +61,7 @@ public class WorkaroundSslSocketFactory extends MailSSLSocketFactory {
 
         // avoid hardcoding a new list, we just remove the entries
         // which cause the exception
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        final List<String> asList = new ArrayList(Arrays.asList(enabledCipherSuites));
+        final List<String> asList = new ArrayList<String>(Arrays.asList(enabledCipherSuites));
 
         // we identified the following entries causeing the problems
         // "Could not generate DH keypair"
