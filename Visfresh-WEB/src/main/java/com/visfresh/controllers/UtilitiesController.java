@@ -5,11 +5,14 @@ package com.visfresh.controllers;
 
 import static com.visfresh.utils.DateTimeUtils.createDateFormat;
 
+import java.time.ZoneId;
+import java.time.format.TextStyle;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -58,7 +61,7 @@ public class UtilitiesController extends AbstractController {
     @RequestMapping(value = "/getTimeZones/{authToken}", method = RequestMethod.GET)
     public JsonObject getTimeZones(@PathVariable final String authToken) {
         try {
-            getLoggedInUser(authToken);
+            final User user = getLoggedInUser(authToken);
 
             final JsonArray array = new JsonArray();
             //add other available time zones
@@ -66,7 +69,7 @@ public class UtilitiesController extends AbstractController {
             Collections.sort(timeZones, createTimeZoneComparator());
 
             for (final TimeZone tz : timeZones) {
-                final JsonObject obj = createTimeZoneElement(tz);
+                final JsonObject obj = createTimeZoneElement(tz, user.getLanguage().getLocale());
                 array.add(obj);
             }
 
@@ -118,11 +121,15 @@ public class UtilitiesController extends AbstractController {
      * @param tz
      * @return
      */
-    private JsonObject createTimeZoneElement(final TimeZone tz) {
+    private JsonObject createTimeZoneElement(final TimeZone tz, final Locale loc) {
         final JsonObject obj = new JsonObject();
         obj.addProperty("id", tz.getID());
-        obj.addProperty("displayName", tz.getDisplayName());
-        obj.addProperty("offset", createOffsetString(tz.getRawOffset()));
+        final ZoneId tzId = ZoneId.of(tz.getID());
+        obj.addProperty("displayName",
+                tzId.getDisplayName(TextStyle.FULL_STANDALONE, loc) + " ("
+                        + tz.getID().replace('_', ' ')
+                        + ")");
+        obj.addProperty("offset", createOffsetString(tz.getOffset(System.currentTimeMillis())));
         return obj;
     }
     public static String createOffsetString(final int rawOffset) {

@@ -335,7 +335,7 @@ public class TemperatureChartRenderer extends XYLineAndShapeRenderer {
             .setTimePeriod(Columns.column(time, Date.class))
             .setTimeAxisFormat(Charts.axisFormat().setLabel(
                     "Time (" + timeZone.getID() + " "
-                    + UtilitiesController.createOffsetString(timeZone.getRawOffset()) + ")"))
+                    + UtilitiesController.createOffsetString(timeZone.getOffset(System.currentTimeMillis())) + ")"))
             .setTimePeriodType(TimePeriod.MILLISECOND)
             .series(Charts.serie(Columns.column(temperature, java.lang.Double.class)))
             .setShowLegend(false)
