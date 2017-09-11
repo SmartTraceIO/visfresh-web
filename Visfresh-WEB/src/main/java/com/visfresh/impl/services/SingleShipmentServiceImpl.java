@@ -118,7 +118,117 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         }
 
         final SingleShipmentBean bean = new SingleShipmentBean();
-        addShipmentData(bean, s);
+        if (s.getAlertProfile() != null) {
+            bean.setAlertProfile(new AlertProfileBean(s.getAlertProfile()));
+        }
+
+        final Date alertsSuppressedTime = getAlertsSuppressionDate(s);
+        if (alertsSuppressedTime != null || isAlertsSuppressed(s)) {
+            bean.setAlertsSuppressed(true);
+            bean.setAlertsSuppressionTime(alertsSuppressedTime);
+        }
+        bean.setAlertSuppressionMinutes(s.getAlertSuppressionMinutes());
+
+        final Arrival arrival = getArrival(s);
+        if (arrival != null) {
+            bean.setArrival(new ArrivalBean(arrival));
+        }
+
+        bean.setArrivalNotificationWithinKm(s.getArrivalNotificationWithinKm());
+        bean.setArrivalReportSent(isArrivalReportSent(s));
+        bean.setArrivalTime(s.getArrivalDate());
+        bean.setAssetNum(s.getAssetNum());
+        bean.setAssetType(s.getAssetType());
+
+        bean.setCommentsForReceiver(s.getCommentsForReceiver());
+        bean.setCompanyId(s.getCompany().getId());
+
+        bean.setDevice(s.getDevice().getImei());
+        if (s.getDevice().getColor() != null) {
+            bean.setDeviceColor(s.getDevice().getColor().name());
+        }
+        bean.setDeviceName(s.getDevice().getName());
+        bean.setEndLocation(s.getShippedTo());
+        bean.setExcludeNotificationsIfNoAlerts(s.isExcludeNotificationsIfNoAlerts());
+
+        bean.setLatestShipment(s.getTripCount() >= s.getDevice().getTripCount()
+                && s.getStatus() != ShipmentStatus.Ended);
+        bean.setNoAlertsAfterArrivalMinutes(s.getNoAlertsAfterArrivalMinutes());
+        bean.setNoAlertsAfterStartMinutes(s.getNoAlertsAfterStartMinutes());
+        bean.setPalletId(s.getPalletId());
+
+        if (s.getEta() != null) {
+            bean.setPercentageComplete(getPercentageCompleted(s, new Date(), s.getEta()));
+            bean.setEta(s.getEta());
+        }
+
+        bean.setSendArrivalReport(s.isSendArrivalReport());
+        bean.setSendArrivalReportOnlyIfAlerts(s.isSendArrivalReportOnlyIfAlerts());
+        bean.setShipmentDescription(s.getShipmentDescription());
+        bean.setShipmentId(s.getId());
+        bean.setShipmentType(s.isAutostart() ? "Autostart": "Manual");
+        bean.setShutDownAfterStartMinutes(s.getShutDownAfterStartMinutes());
+        bean.setShutdownDeviceAfterMinutes(s.getShutdownDeviceAfterMinutes());
+        if (s.getShippedFrom() != null) {
+            bean.setStartLocation(new LocationProfileBean(s.getShippedFrom()));
+        }
+        bean.setStartTime(s.getShipmentDate());
+        bean.setStatus(s.getStatus());
+        bean.setTripCount(s.getTripCount());
+
+        //arrival notifications
+        for (final NotificationSchedule sched: s.getArrivalNotificationSchedules()) {
+            bean.getArrivalNotificationSchedules().add(new ListNotificationScheduleItem(sched));
+        }
+        //alert notification schedule
+        for (final NotificationSchedule sched: s.getAlertsNotificationSchedules()) {
+            bean.getAlertsNotificationSchedules().add(new ListNotificationScheduleItem(sched));
+        }
+
+        //location alternatives
+        final AlternativeLocations alt = getAlternativeLocations(s);
+        if (alt != null) {
+            bean.getStartLocationAlternatives().addAll(toBeans(alt.getFrom()));
+            bean.getEndLocationAlternatives().addAll(toBeans(alt.getTo()));
+            bean.getInterimLocationAlternatives().addAll(toBeans(alt.getInterim()));
+        }
+
+        //interim stops.
+        for (final InterimStop stp : getInterimStops(s)) {
+            bean.getInterimStops().add(new InterimStopBean(stp));
+        }
+
+        //notes
+        for (final Note n : getNotes(s)) {
+            bean.getNotes().add(new NoteBean(n));
+        }
+
+        //device group DAO
+        final List<DeviceGroupDto> deviceGroups = getShipmentGroups(s);
+        for (final DeviceGroupDto grp : deviceGroups) {
+            bean.getDeviceGroups().add(grp);
+        }
+
+        //user access
+        for (final User u : s.getUserAccess()) {
+            bean.getUserAccess().add(new ShipmentUserDto(u));
+        }
+        //company access
+        for (final Company c : s.getCompanyAccess()) {
+            bean.getCompanyAccess().add(new ShipmentCompanyDto(c));
+        }
+
+        //alerts
+        final List<Alert> alerts = getAlerts(s);
+        for (final Alert alert : alerts) {
+            final AlertBean ab = alert instanceof TemperatureAlert ?
+                    new TemperatureAlertBean((TemperatureAlert) alert)
+                    : new AlertBean(alert);
+            bean.getSentAlerts().add(ab);
+        }
+
+        bean.getAlertFired().addAll(getAlertFired(s));
+        bean.getAlertYetToFire().addAll(getAlertYetFoFire(s));
         return bean;
     }
     /* (non-Javadoc)
@@ -137,6 +247,13 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      */
     @Override
     public SingleShipmentData getShipmentData(final long shipmentId) {
+        return getShipmentDataV1(shipmentId);
+    }
+    /**
+     * @param shipmentId
+     * @return
+     */
+    protected SingleShipmentData getShipmentDataV1(final long shipmentId) {
 //        final Map<Long, SingleShipmentBean> fromDb = asMap(getBeanIncludeSiblings(shipmentId));
         //temporary disable of using cache.
         final Map<Long, SingleShipmentBean> fromDb = new HashMap<>();
@@ -295,123 +412,6 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         }
 
         return bean;
-    }
-    /**
-     * @param bean
-     * @param s
-     */
-    private void addShipmentData(final SingleShipmentBean bean, final Shipment s) {
-        if (s.getAlertProfile() != null) {
-            bean.setAlertProfile(new AlertProfileBean(s.getAlertProfile()));
-        }
-
-        final Date alertsSuppressedTime = getAlertsSuppressionDate(s);
-        if (alertsSuppressedTime != null || isAlertsSuppressed(s)) {
-            bean.setAlertsSuppressed(true);
-            bean.setAlertsSuppressionTime(alertsSuppressedTime);
-        }
-        bean.setAlertSuppressionMinutes(s.getAlertSuppressionMinutes());
-
-        final Arrival arrival = getArrival(s);
-        if (arrival != null) {
-            bean.setArrival(new ArrivalBean(arrival));
-        }
-
-        bean.setArrivalNotificationWithinKm(s.getArrivalNotificationWithinKm());
-        bean.setArrivalReportSent(isArrivalReportSent(s));
-        bean.setArrivalTime(s.getArrivalDate());
-        bean.setAssetNum(s.getAssetNum());
-        bean.setAssetType(s.getAssetType());
-
-        bean.setCommentsForReceiver(s.getCommentsForReceiver());
-        bean.setCompanyId(s.getCompany().getId());
-
-        bean.setDevice(s.getDevice().getImei());
-        if (s.getDevice().getColor() != null) {
-            bean.setDeviceColor(s.getDevice().getColor().name());
-        }
-        bean.setDeviceName(s.getDevice().getName());
-        bean.setEndLocation(s.getShippedTo());
-        bean.setExcludeNotificationsIfNoAlerts(s.isExcludeNotificationsIfNoAlerts());
-
-        bean.setLatestShipment(s.getTripCount() >= s.getDevice().getTripCount()
-                && s.getStatus() != ShipmentStatus.Ended);
-        bean.setNoAlertsAfterArrivalMinutes(s.getNoAlertsAfterArrivalMinutes());
-        bean.setNoAlertsAfterStartMinutes(s.getNoAlertsAfterStartMinutes());
-        bean.setPalletId(s.getPalletId());
-
-        if (s.getEta() != null) {
-            bean.setPercentageComplete(getPercentageCompleted(s, new Date(), s.getEta()));
-            bean.setEta(s.getEta());
-        }
-
-        bean.setSendArrivalReport(s.isSendArrivalReport());
-        bean.setSendArrivalReportOnlyIfAlerts(s.isSendArrivalReportOnlyIfAlerts());
-        bean.setShipmentDescription(s.getShipmentDescription());
-        bean.setShipmentId(s.getId());
-        bean.setShipmentType(s.isAutostart() ? "Autostart": "Manual");
-        bean.setShutDownAfterStartMinutes(s.getShutDownAfterStartMinutes());
-        bean.setShutdownDeviceAfterMinutes(s.getShutdownDeviceAfterMinutes());
-        if (s.getShippedFrom() != null) {
-            bean.setStartLocation(new LocationProfileBean(s.getShippedFrom()));
-        }
-        bean.setStartTime(s.getShipmentDate());
-        bean.setStatus(s.getStatus());
-        bean.setTripCount(s.getTripCount());
-
-        //arrival notifications
-        for (final NotificationSchedule sched: s.getArrivalNotificationSchedules()) {
-            bean.getArrivalNotificationSchedules().add(new ListNotificationScheduleItem(sched));
-        }
-        //alert notification schedule
-        for (final NotificationSchedule sched: s.getAlertsNotificationSchedules()) {
-            bean.getAlertsNotificationSchedules().add(new ListNotificationScheduleItem(sched));
-        }
-
-        //location alternatives
-        final AlternativeLocations alt = getAlternativeLocations(s);
-        if (alt != null) {
-            bean.getStartLocationAlternatives().addAll(toBeans(alt.getFrom()));
-            bean.getEndLocationAlternatives().addAll(toBeans(alt.getTo()));
-            bean.getInterimLocationAlternatives().addAll(toBeans(alt.getInterim()));
-        }
-
-        //interim stops.
-        for (final InterimStop stp : getInterimStops(s)) {
-            bean.getInterimStops().add(new InterimStopBean(stp));
-        }
-
-        //notes
-        for (final Note n : getNotes(s)) {
-            bean.getNotes().add(new NoteBean(n));
-        }
-
-        //device group DAO
-        final List<DeviceGroupDto> deviceGroups = getShipmentGroups(s);
-        for (final DeviceGroupDto grp : deviceGroups) {
-            bean.getDeviceGroups().add(grp);
-        }
-
-        //user access
-        for (final User u : s.getUserAccess()) {
-            bean.getUserAccess().add(new ShipmentUserDto(u));
-        }
-        //company access
-        for (final Company c : s.getCompanyAccess()) {
-            bean.getCompanyAccess().add(new ShipmentCompanyDto(c));
-        }
-
-        //alerts
-        final List<Alert> alerts = getAlerts(s);
-        for (final Alert alert : alerts) {
-            final AlertBean ab = alert instanceof TemperatureAlert ?
-                    new TemperatureAlertBean((TemperatureAlert) alert)
-                    : new AlertBean(alert);
-            bean.getSentAlerts().add(ab);
-        }
-
-        bean.getAlertFired().addAll(getAlertFired(s));
-        bean.getAlertYetToFire().addAll(getAlertYetFoFire(s));
     }
     /**
      * @param s shipment.

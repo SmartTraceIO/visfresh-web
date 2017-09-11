@@ -9,7 +9,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,10 +24,12 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -35,6 +40,8 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
     private TemperatureAlert alert;
     private User confirmedBy;
     private User verifiedBy;
+    private final DateFormat dateFormat = DateTimeUtils.createIsoFormat(
+            Language.English, TimeZone.getDefault());
 
     /**
      * Default constructor.
@@ -168,7 +175,8 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         at.setVerifiedComments("Any verified comments");
         at.setConfirmedBy(confirmedBy.getId());
         at.setVerifiedBy(verifiedBy.getId());
-        at.setTime(new Date());
+        at.setTime(parseDate("2001-03-11 12:30"));
+        at.setCreatedOn(parseDate("2001-03-14 12:50"));
         return at;
     }
     /* (non-Javadoc)
@@ -185,7 +193,8 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         assertEquals("Any verified comments", at.getVerifiedComments());
         assertEquals(confirmedBy.getId(), at.getConfirmedBy());
         assertEquals(verifiedBy.getId(), at.getVerifiedBy());
-        assertNotNull(at.getTime());
+        assertTrue(Math.abs(at.getTime().getTime() - parseDate("2001-03-11 12:30").getTime()) < 61000l);
+        assertTrue(Math.abs(at.getCreatedOn().getTime() - parseDate("2001-03-14 12:50").getTime()) < 61000l);
 
         assertTrue(at instanceof ActionTakenView);
 
@@ -245,5 +254,16 @@ public class ActionTakenDaoTest extends BaseCrudTest<ActionTakenDao, ActionTaken
         d.setName("JUnit-" + imei);
         d.setCompany(company);
         return context.getBean(DeviceDao.class).save(d);
+    }
+    /**
+     * @param date to parse.
+     * @return
+     */
+    private Date parseDate(final String date) {
+        try {
+            return dateFormat.parse(date);
+        } catch (final ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -46,6 +46,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
     private static final String COMMENTS = "comments";
     private static final String VERIFIED_COMMENTS = "verifiedcomments";
     private static final String TIME = "time";
+    private static final String CREATED_ON = "createdon";
     private static final String VERIFIED_TIME = "verifiedtime";
 
     //action taken view fields
@@ -107,6 +108,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         paramMap.put(COMMENTS, t.getComments());
         paramMap.put(VERIFIED_COMMENTS, t.getVerifiedComments());
         paramMap.put(TIME, t.getTime());
+        paramMap.put(CREATED_ON, t.getCreatedOn());
         paramMap.put(VERIFIED_TIME, t.getVerifiedTime());
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -131,6 +133,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         fields.add(COMMENTS);
         fields.add(VERIFIED_COMMENTS);
         fields.add(TIME);
+        fields.add(CREATED_ON);
         fields.add(VERIFIED_TIME);
         return fields;
     }
@@ -156,6 +159,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
         t.setConfirmedBy(asLong(map.get(CONFIRMED_BY)));
         t.setId(asLong(map.get(ID)));
         t.setTime((Date) map.get(TIME));
+        t.setCreatedOn((Date) map.get(CREATED_ON));
         t.setVerifiedTime((Date) map.get(VERIFIED_TIME));
         t.setVerifiedBy(asLong(map.get(VERIFIED_BY)));
 

@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.entities.ActionTaken;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.io.json.ActionTakenSerializer;
 import com.visfresh.l12n.RuleBundle;
@@ -32,9 +33,9 @@ public class ActionTakenRestClient extends RestClient {
     /**
      * @param tz time zone.
      */
-    public ActionTakenRestClient(final TimeZone tz, final TemperatureUnits units) {
+    public ActionTakenRestClient(final Language lang, final TimeZone tz, final TemperatureUnits units) {
         super();
-        serializer = new ActionTakenSerializer(tz, units, new RuleBundle());
+        serializer = new ActionTakenSerializer(lang, tz, units, new RuleBundle());
     }
     public List<ActionTaken> getActionTakens(final Long shipmentId) throws IOException, RestServiceException {
         final HashMap<String, String> params = new HashMap<String, String>();

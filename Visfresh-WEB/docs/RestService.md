@@ -4624,20 +4624,24 @@ Response:
       "action": "Check the door opened",
       "requestVerification": false
     },
-    "time": "2017-06-14T09:25",
+    "time": "2017-09-11T10:40",
+    "createdOn": "2017-09-11T10:57",
+    "verifiedTime": null,
     "comments": "Any comments",
-    "verifiedComments": "Verified comments",
-    "alert": 582,
-    "confirmedBy": 1714,
+    "verifiedComments": null,
+    "alert": 19,
+    "confirmedBy": 28,
     "verifiedBy": null,
-    "alertTime": "2017-06-14T09:25", //view only parameter
-    "alertDescription": ">18.0°C for 0 min in total", //view only parameter
-    "confirmedByEmail": "a@b.c", //view only parameter
-    "confirmedByName": "Yury Gagarin", //view only parameter
-    "verifiedByEmail": null, //view only parameter
-    "verifiedByName": "", //view only parameter
-    "shipmentSn": "039485", //view only parameter
-    "shipmentTripCount": 1 //view only parameter
+    "timePretty": "10:40 11 Sep 2017",//read only
+    "createdOnPretty": "10:57 11 Sep 2017",//read only
+    "alertTime": "2017-09-11T10:40",//read only
+    "alertDescription": ">18.0°C for 0 min in total",//read only
+    "confirmedByEmail": "a@b.c",//read only
+    "confirmedByName": "Yury Gagarin",//read only
+    "verifiedByEmail": null,//read only
+    "verifiedByName": "",//read only
+    "shipmentSn": "039485",//read only
+    "shipmentTripCount": 1//read only
   }
 }
 ```
@@ -4651,11 +4655,13 @@ Response:
     "action": "Check the door opened",
     "requestVerification": false
   },
-  "time": "2017-06-14T09:25",
+  "time": "2017-09-11T10:50",
+  "createdOn": "2017-09-11T11:06",
+  "verifiedTime": null,
   "comments": "Any comments",
-  "verifiedComments": "Verified comments",
-  "alert": 576,
-  "confirmedBy": 1705,
+  "verifiedComments": null,
+  "alert": 21,
+  "confirmedBy": 31,
   "verifiedBy": null
 }
 ```  
@@ -4714,18 +4720,22 @@ Response:
   },
   "response": [
     {
-      "id": 118,
+      "id": 23,
       "action": {
         "action": "Check the door opened",
         "requestVerification": false
       },
-      "time": "2017-06-14T09:25",
+      "time": "2017-09-11T10:55",
+      "createdOn": "2017-09-11T11:12",
+      "verifiedTime": null,
       "comments": "Any comments",
-      "verifiedComments": "Verified comments",
-      "alert": 578,
-      "confirmedBy": 1708,
+      "verifiedComments": null,
+      "alert": 33,
+      "confirmedBy": 49,
       "verifiedBy": null,
-      "alertTime": "2017-06-14T09:25",
+      "timePretty": "10:55 11 Sep 2017",
+      "createdOnPretty": "11:12 11 Sep 2017",
+      "alertTime": "2017-09-11T10:55",
       "alertDescription": ">18.0°C for 0 min in total",
       "confirmedByEmail": "a@b.c",
       "confirmedByName": "Yury Gagarin",
@@ -4735,18 +4745,22 @@ Response:
       "shipmentTripCount": 1
     },
     {
-      "id": 119,
+      "id": 24,
       "action": {
-        "action": "Check the door opened",
+        "action": "Close the door",
         "requestVerification": false
       },
-      "time": "2017-06-14T09:40",
+      "time": "2017-09-11T11:10",
+      "createdOn": "2017-09-11T11:12",
+      "verifiedTime": null,
       "comments": "Any comments",
-      "verifiedComments": "Verified comments",
-      "alert": 579,
-      "confirmedBy": 1708,
+      "verifiedComments": null,
+      "alert": 34,
+      "confirmedBy": 49,
       "verifiedBy": null,
-      "alertTime": "2017-06-14T09:40",
+      "timePretty": "11:10 11 Sep 2017",
+      "createdOnPretty": "11:12 11 Sep 2017",
+      "alertTime": "2017-09-11T11:10",
       "alertDescription": "entering bright environment",
       "confirmedByEmail": "a@b.c",
       "confirmedByName": "Yury Gagarin",

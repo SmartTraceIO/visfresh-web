@@ -82,6 +82,15 @@ public class ActionTakenController extends AbstractController {
 
             checkCompanyAccess(user, alert.getShipment());
 
+            //check created on time
+            if (p.getCreatedOn() == null) {
+                if (p.getId() == null) {
+                    p.setCreatedOn(new Date());
+                } else {
+                    throw new IllegalArgumentException("createdOn date could not be NULL");
+                }
+            }
+
             final Long id = dao.save(p).getId();
             return createIdResponse("actionTakenId", id);
         } catch (final Exception e) {
@@ -206,6 +215,7 @@ public class ActionTakenController extends AbstractController {
      * @return
      */
     private ActionTakenSerializer createSerializer(final User user) {
-        return new ActionTakenSerializer(user.getTimeZone(), user.getTemperatureUnits(), ruleBundle);
+        return new ActionTakenSerializer(user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits(),
+                ruleBundle);
     }
 }

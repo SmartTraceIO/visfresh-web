@@ -59,7 +59,7 @@ public class ActionTakenControllerTest extends AbstractRestServiceTest {
             throw new RuntimeException(e);
         }
 
-        client = new ActionTakenRestClient(user.getTimeZone(), user.getTemperatureUnits());
+        client = new ActionTakenRestClient(user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
         client.setServiceUrl(getServiceUrl());
         client.setAuthToken(token);
 

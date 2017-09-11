@@ -18,6 +18,7 @@ import com.visfresh.entities.ActionTaken;
 import com.visfresh.entities.ActionTakenView;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.CorrectiveAction;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.l12n.RuleBundle;
@@ -40,8 +41,8 @@ public class ActionTakenSerializerTest {
     @Before
     public void setUp() {
         bundle = new RuleBundle();
-        serializer = new ActionTakenSerializer(TimeZone.getDefault(), TemperatureUnits.Celsius,
-                bundle);
+        serializer = new ActionTakenSerializer(Language.English, TimeZone.getDefault(),
+                TemperatureUnits.Celsius, bundle);
     }
 
     @Test
@@ -63,6 +64,7 @@ public class ActionTakenSerializerTest {
         final String shipmentSn = "777";
         final int shipmentTripCount = 5;
         final Date time = new Date(1000000l);
+        final Date createdOn = new Date(1111111l);
         final Date verifiedTime = new Date(time.getTime() + 3600000l);
         final Long verifiedBy = 8l;
         final String verifiedByEmail = verifiedBy + "@junit.ru";
@@ -83,6 +85,7 @@ public class ActionTakenSerializerTest {
         at.setShipmentSn(shipmentSn);
         at.setShipmentTripCount(shipmentTripCount);
         at.setTime(time);
+        at.setCreatedOn(createdOn);
         at.setVerifiedTime(verifiedTime);
         at.setVerifiedBy(verifiedBy);
         at.setVerifiedByEmail(verifiedByEmail);
@@ -100,6 +103,7 @@ public class ActionTakenSerializerTest {
         assertEquals(actual.getConfirmedBy(), confirmedBy);
         assertEquals(actual.getId(), id);
         assertTrue(Math.abs(actual.getTime().getTime() - at.getTime().getTime()) < 61000l);
+        assertTrue(Math.abs(actual.getCreatedOn().getTime() - at.getCreatedOn().getTime()) < 61000l);
         assertTrue(Math.abs(actual.getVerifiedTime().getTime() - at.getVerifiedTime().getTime()) < 61000l);
         assertEquals(actual.getVerifiedBy(), verifiedBy);
 

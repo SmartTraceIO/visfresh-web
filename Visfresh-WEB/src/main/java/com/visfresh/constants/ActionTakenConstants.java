@@ -12,6 +12,7 @@ public interface ActionTakenConstants {
     String ID = "id";
     String ACTION = "action";
     String TIME = "time";
+    String CREATED_ON = "createdOn";
     String COMMENTS = "comments";
     String VERIFIED_COMMENTS = "verifiedComments";
     String ALERT = "alert";

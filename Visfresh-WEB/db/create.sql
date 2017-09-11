@@ -416,6 +416,7 @@ create table actiontakens (
     comments longtext,
     verifiedcomments longtext,
     `time` timestamp null default null,
+    createdon timestamp null default null,
     verifiedtime timestamp null default null,
     primary key (id),
     foreign key (alert)

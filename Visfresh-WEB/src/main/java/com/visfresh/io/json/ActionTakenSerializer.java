@@ -3,14 +3,18 @@
  */
 package com.visfresh.io.json;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.TimeZone;
 
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ActionTakenConstants;
 import com.visfresh.entities.ActionTaken;
 import com.visfresh.entities.ActionTakenView;
+import com.visfresh.entities.Language;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.l12n.RuleBundle;
+import com.visfresh.utils.DateTimeUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -19,15 +23,17 @@ import com.visfresh.l12n.RuleBundle;
 public class ActionTakenSerializer extends AbstractJsonSerializer  implements ActionTakenConstants {
     private final TemperatureUnits units;
     private RuleBundle ruleBundle;
+    private final DateFormat prettyFormat;
 
     /**
      * @param tz
      */
-    public ActionTakenSerializer(final TimeZone tz, final TemperatureUnits units,
+    public ActionTakenSerializer(final Language lang, final TimeZone tz, final TemperatureUnits units,
             final RuleBundle ruleBundle) {
         super(tz);
         this.units = units;
         this.ruleBundle = ruleBundle;
+        prettyFormat = DateTimeUtils.createPrettyFormat(lang, tz);
     }
 
     /**
@@ -43,6 +49,7 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
         at.setId(asLong(json.get(ID)));
         at.setAction(CorrectiveActionListSerializer.parseCorrectiveAction(json.get(ACTION)));
         at.setTime(parseDate(asString(json.get(TIME))));
+        at.setCreatedOn(parseDate(asString(json.get(CREATED_ON))));
         at.setVerifiedTime(parseDate(asString(json.get(VERIFIED_TIME))));
         at.setComments(asString(json.get(COMMENTS)));
         at.setVerifiedComments(asString(json.get(VERIFIED_COMMENTS)));
@@ -60,6 +67,9 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
         final JsonObject json = createJsonWithBaseParams(at);
 
         //view constants
+        json.addProperty("timePretty", formatDatePretty(at.getTime()));
+        json.addProperty("createdOnPretty", formatDatePretty(at.getCreatedOn()));
+
         json.addProperty(ALERT_TIME, formatDate(at.getAlertTime()));
         json.addProperty(ALERT_DESCRIPTION, ruleBundle.buildDescription(at.getAlertRule(), units));
         json.addProperty(CONFIRMED_BY_EMAIL, at.getConfirmedByEmail());
@@ -73,6 +83,14 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
     }
 
     /**
+     * @param date
+     * @return
+     */
+    private String formatDatePretty(final Date date) {
+        return date == null ? null : prettyFormat.format(date);
+    }
+
+    /**
      * @param at action taken.
      * @return JSON representation of action taken.
      */
@@ -81,6 +99,7 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
         json.addProperty(ID, at.getId());
         json.add(ACTION, CorrectiveActionListSerializer.toJson(at.getAction()));
         json.addProperty(TIME, formatDate(at.getTime()));
+        json.addProperty(CREATED_ON, formatDate(at.getCreatedOn()));
         json.addProperty(VERIFIED_TIME, formatDate(at.getVerifiedTime()));
         json.addProperty(COMMENTS, at.getComments());
         json.addProperty(VERIFIED_COMMENTS, at.getVerifiedComments());

@@ -18,6 +18,7 @@ public class ActionTaken implements EntityWithId<Long> {
     private String comments;
     private String verifiedComments;
     private Date time;
+    private Date createdOn = new Date(); //by default is current data.
     private Date verifiedTime;
 
     /**
@@ -135,5 +136,17 @@ public class ActionTaken implements EntityWithId<Long> {
      */
     public void setVerifiedComments(final String verifiedComments) {
         this.verifiedComments = verifiedComments;
+    }
+    /**
+     * @return the createdOn
+     */
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+    /**
+     * @param createdOn the createdOn to set
+     */
+    public void setCreatedOn(final Date createdOn) {
+        this.createdOn = createdOn;
     }
 }
