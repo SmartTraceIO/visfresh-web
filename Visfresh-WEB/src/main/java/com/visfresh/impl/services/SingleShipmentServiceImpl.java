@@ -24,7 +24,6 @@ import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.ShipmentDao;
-import com.visfresh.dao.SingleShipmentBeanDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
@@ -97,8 +96,8 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
     private DeviceGroupDao deviceGroupDao;
     @Autowired
     private AlertDao alertDao;
-    @Autowired
-    private SingleShipmentBeanDao shipmentBeanDao;
+//    @Autowired
+//    private SingleShipmentBeanDao shipmentBeanDao;
 
     /**
      * Default constructor.
@@ -175,6 +174,7 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         bean.setStartTime(s.getShipmentDate());
         bean.setStatus(s.getStatus());
         bean.setTripCount(s.getTripCount());
+        bean.getSiblings().addAll(s.getSiblings());
 
         //arrival notifications
         for (final NotificationSchedule sched: s.getArrivalNotificationSchedules()) {
@@ -278,11 +278,18 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
             SingleShipmentBean sibling = fromDb.get(id);
             if (sibling == null) {
                 sibling = createLiteBean(id);
-                processReadings(sibling, null);
-                saveBean(sibling);
+
+                if (sibling != null) {
+                    processReadings(sibling, null);
+                    saveBean(sibling);
+                }
             }
 
-            data.getSiblings().add(sibling);
+            //the sibling can be moved to another company
+            //or other issue
+            if (sibling != null) {
+                data.getSiblings().add(sibling);
+            }
         }
 
         if (shouldSave) {
@@ -316,7 +323,8 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      * @return map of shipment beans include main bean and its siblings.
      */
     protected List<SingleShipmentBean> getBeanIncludeSiblings(final long shipmentId) {
-        return shipmentBeanDao.getShipmentBeanIncludeSiblings(shipmentId);
+//        return shipmentBeanDao.getShipmentBeanIncludeSiblings(shipmentId);
+        return new LinkedList<>();
     }
     /**
      * @param sn serial number.
@@ -324,14 +332,15 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      * @return map of shipment beans include main bean and its siblings.
      */
     protected List<SingleShipmentBean> getBeanIncludeSiblings(final String sn, final int tripCount) {
-        return shipmentBeanDao.getShipmentBeanIncludeSiblings(sn, tripCount);
+//        return shipmentBeanDao.getShipmentBeanIncludeSiblings(sn, tripCount);
+        return new LinkedList<>();
     }
 
     /**
      * @param bean shipment bean.
      */
     protected void saveBean(final SingleShipmentBean bean) {
-        shipmentBeanDao.saveShipmentBean(bean);
+//        shipmentBeanDao.saveShipmentBean(bean);
     }
     /**
      * @param shipmentId shipment ID.

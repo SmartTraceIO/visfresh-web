@@ -6,12 +6,15 @@ package com.visfresh.impl.services;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -76,6 +79,44 @@ public class SingleShipmentServiceTest extends SingleShipmentServiceImpl {
         //check bean created
         assertNotNull(this.beans.get(s.getId()));
     }
+    @Test
+    public void testSiblings() {
+        final Shipment s1 = createShipment(ShipmentStatus.InProgress);
+        final Shipment s2 = createShipment(ShipmentStatus.InProgress);
+        final Shipment s3 = createShipment(ShipmentStatus.InProgress);
+        setAsSiblings(s1, s2, s3);
+
+        //check bean created
+        final SingleShipmentData data = this.getShipmentData(s1.getId());
+        final Set<Long> siblings = new HashSet<>(data.getBean().getSiblings());
+        assertEquals(2, siblings.size());
+        assertTrue(siblings.contains(s2.getId()));
+        assertTrue(siblings.contains(s3.getId()));
+    }
+    /**
+     * @param shipments
+     */
+    private void setAsSiblings(final Shipment... shipments) {
+        //create ID set
+        final Set<Long> ids = new HashSet<>();
+        for (final Shipment s : shipments) {
+            ids.add(s.getId());
+        }
+
+        //set as siblings
+        for (final Shipment s : shipments) {
+            //create copy of ID set
+            final Set<Long> siblings = new HashSet<>(ids);
+            //remove given shipment
+            siblings.remove(s.getId());
+
+            //set as siblings
+            s.getSiblings().clear();
+            s.getSiblings().addAll(siblings);
+            s.setSiblingCount(s.getSiblings().size());
+        }
+    }
+
     @Test
     public void testShipmentNotFound() {
         final SingleShipmentData data = this.getShipmentData(-111l);

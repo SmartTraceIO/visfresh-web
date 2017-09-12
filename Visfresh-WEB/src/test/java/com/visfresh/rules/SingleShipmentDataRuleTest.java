@@ -71,7 +71,9 @@ public class SingleShipmentDataRuleTest extends BaseRuleTest {
 
         //test single shipment data has created.
         assertNotNull(dao.getShipmentBeanIncludeSiblings(shipment.getId()));
-        assertEquals(1, dao.getShipmentBeanIncludeSiblings(shipment.getId()).size());
+        //Uncomment 1 instead 0 when the bean saving will enabled.
+        assertEquals(0, dao.getShipmentBeanIncludeSiblings(shipment.getId()).size());
+//        assertEquals(1, dao.getShipmentBeanIncludeSiblings(shipment.getId()).size());
 
         //test double handle
         assertTrue(rule.accept(context));
