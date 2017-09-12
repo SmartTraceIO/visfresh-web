@@ -69,6 +69,7 @@ public class ActionTakenSerializer extends AbstractJsonSerializer  implements Ac
         //view constants
         json.addProperty("timePretty", formatDatePretty(at.getTime()));
         json.addProperty("createdOnPretty", formatDatePretty(at.getCreatedOn()));
+        json.addProperty("verifiedTimePretty", formatDatePretty(at.getVerifiedTime()));
 
         json.addProperty(ALERT_TIME, formatDate(at.getAlertTime()));
         json.addProperty(ALERT_DESCRIPTION, ruleBundle.buildDescription(at.getAlertRule(), units));
