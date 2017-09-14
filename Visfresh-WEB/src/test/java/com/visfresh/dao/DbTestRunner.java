@@ -16,15 +16,15 @@ import com.visfresh.junit.db.JUnitDbConfig;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DaoTestRunner extends BlockJUnit4ClassRunner {
+public class DbTestRunner extends BlockJUnit4ClassRunner {
     private static AbstractApplicationContext context = createContext();
-    private BaseDaoTest<?> test;
+    private BaseDbTest test;
 
     /**
      * @param klass
      * @throws InitializationError
      */
-    public DaoTestRunner(final Class<?> klass) throws InitializationError {
+    public DbTestRunner(final Class<?> klass) throws InitializationError {
         super(klass);
     }
 
@@ -33,7 +33,7 @@ public class DaoTestRunner extends BlockJUnit4ClassRunner {
      */
     private static AbstractApplicationContext createContext() {
         final AnnotationConfigApplicationContext ctxt = new AnnotationConfigApplicationContext();
-        ctxt.setId(DaoTestRunner.class.getName());
+        ctxt.setId(DbTestRunner.class.getName());
         ctxt.scan(JUnitDbConfig.class.getPackage().getName());
         ctxt.refresh();
         return ctxt;
@@ -45,8 +45,8 @@ public class DaoTestRunner extends BlockJUnit4ClassRunner {
     @Override
     protected Object createTest() throws Exception {
         final Object test = super.createTest();
-        if (test instanceof BaseDaoTest<?>) {
-            this.test = ((BaseDaoTest<?>) test);
+        if (test instanceof BaseDbTest) {
+            this.test = ((BaseDbTest) test);
             this.test.initialize(context);
         }
         return test;

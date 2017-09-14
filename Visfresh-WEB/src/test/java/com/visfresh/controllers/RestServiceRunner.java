@@ -29,7 +29,7 @@ import org.springframework.web.servlet.FrameworkServlet;
 
 import com.visfresh.controllers.init.RestServicesTestConfig;
 import com.visfresh.dao.CompanyDao;
-import com.visfresh.dao.DaoTestRunner;
+import com.visfresh.dao.DbTestRunner;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
@@ -192,7 +192,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
      * Clears the DB and Mock services.
      */
     private void cleanUp() {
-        DaoTestRunner.clearDb(context);
+        DbTestRunner.clearDb(context);
         context.getBean(MockEmailService.class).clear();
         context.getBean(MockAuditSaver.class).clear();
         context.getBean(MockRestSessionManager.class).clear();

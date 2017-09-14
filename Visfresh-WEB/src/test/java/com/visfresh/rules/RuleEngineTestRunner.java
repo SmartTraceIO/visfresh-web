@@ -9,7 +9,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.visfresh.dao.DaoTestRunner;
+import com.visfresh.dao.DbTestRunner;
 import com.visfresh.junit.db.JUnitDbConfig;
 import com.visfresh.mock.MockAuditSaver;
 import com.visfresh.mock.MockEmailService;
@@ -59,7 +59,7 @@ public class RuleEngineTestRunner extends BlockJUnit4ClassRunner {
      *
      */
     private void cleanUp() {
-        DaoTestRunner.clearDb(context);
+        DbTestRunner.clearDb(context);
         try {
             context.getBean(MockEmailService.class).clear();
             context.getBean(MockAuditSaver.class).clear();

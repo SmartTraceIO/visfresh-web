@@ -270,18 +270,18 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
      * @return alerts.
      */
     private List<AlertRule> getAlerts(final Shipment s, final boolean onlyProcessed) {
-        final List<AlertRule> alerts = new LinkedList<AlertRule>();
-
         //check alert profile exists
         final AlertProfile alertProfile = s.getAlertProfile();
         if (alertProfile == null) {
-            return alerts;
+            return new LinkedList<>();
         }
+        final List<TemperatureRule> alertRules = alertProfile.getAlertRules();
 
+        final List<AlertRule> alerts = new LinkedList<AlertRule>();
         //check device state is set.
         final ShipmentSession session = getShipmentSession(s);
         if (session != null) {
-            for (final TemperatureRule rule: alertProfile.getAlertRules()) {
+            for (final TemperatureRule rule: alertRules) {
                 switch (rule.getType()) {
                     case Cold:
                     case CriticalCold:

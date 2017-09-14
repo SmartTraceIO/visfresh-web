@@ -261,7 +261,7 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
                     session = new ShipmentSession();
                     session.setShipmentId(s.getId());
                 }
-                session.setShipmentProperty(ARRIVAL_REPORT_PREFIX + new Date(), "true");
+                setArrivalReportSent(session, new Date());
                 shipmentSessionDao.saveSession(session);
 
                 //create report bean
@@ -287,11 +287,19 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
             }
         }
     }
+
+    /**
+     * @param session
+     * @param arrivalReportDate
+     */
+    public static void setArrivalReportSent(final ShipmentSession session, final Date arrivalReportDate) {
+        session.setShipmentProperty(ARRIVAL_REPORT_PREFIX + arrivalReportDate, "true");
+    }
     @Override
     public boolean isArrivalReportSent(final Shipment shipment) {
         return isArrivalReportSent(shipmentSessionDao.getSession(shipment));
     }
-    private boolean isArrivalReportSent(final ShipmentSession session) {
+    public static boolean isArrivalReportSent(final ShipmentSession session) {
         if (session != null) {
             for (final String key : session.getShipmentKeys()) {
                 if (key.startsWith(ARRIVAL_REPORT_PREFIX)) {

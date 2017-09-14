@@ -1072,7 +1072,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @return
      */
     private int getPercentageCompleted(final Shipment s, final Date currentTime, final Date eta) {
-        return SingleShipmentServiceImpl.getPercentageCompleted(s, currentTime, eta);
+        return SingleShipmentServiceImpl.getPercentageCompleted(s.getShipmentDate(), currentTime, eta);
     }
     /**
      * @param authToken authentication token.

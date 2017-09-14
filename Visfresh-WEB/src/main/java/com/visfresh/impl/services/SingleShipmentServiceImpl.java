@@ -157,7 +157,7 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
         bean.setPalletId(s.getPalletId());
 
         if (s.getEta() != null) {
-            bean.setPercentageComplete(getPercentageCompleted(s, new Date(), s.getEta()));
+            bean.setPercentageComplete(getPercentageCompleted(s.getShipmentDate(), new Date(), s.getEta()));
             bean.setEta(s.getEta());
         }
 
@@ -531,14 +531,14 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      * @param eta
      * @return
      */
-    public static int getPercentageCompleted(final Shipment s,
+    public static int getPercentageCompleted(final Date shipmentDate,
             final Date currentTime, final Date eta) {
         int percentage;
         if (eta.before(currentTime)) {
             percentage = 100;
         } else {
-            double d = currentTime.getTime() - s.getShipmentDate().getTime();
-            d = Math.max(0., d / (eta.getTime() - s.getShipmentDate().getTime()));
+            double d = currentTime.getTime() - shipmentDate.getTime();
+            d = Math.max(0., d / (eta.getTime() - shipmentDate.getTime()));
             percentage = (int) Math.round(d);
         }
         return percentage;
