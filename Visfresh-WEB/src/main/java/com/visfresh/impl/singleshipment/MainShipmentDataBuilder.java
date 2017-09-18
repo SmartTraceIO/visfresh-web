@@ -233,21 +233,4 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         session.setShipmentId(shipmentId);
         return session;
     }
-
-    /**
-     * @param object
-     * @return
-     */
-    private long asLong(final Object object) {
-        final Number num = (Number) object;
-        return num == null ? null : num.longValue();
-    }
-    /**
-     * @param object
-     * @return
-     */
-    private Integer asInteger(final Object object) {
-        final Number num = (Number) object;
-        return num == null ? null : num.intValue();
-    }
 }
