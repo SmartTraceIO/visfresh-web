@@ -536,6 +536,31 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         assertEquals(s3.getId(), result.get(2).getId());
     }
     @Test
+    public void testFilterByDeviceSN() {
+        final Shipment s1 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+        final Shipment s2 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+        final Shipment s3 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+
+        final Device d1 = createDevice("11111131111113");
+        final Device d2 = createDevice("11111121111122");
+        final Device d3 = createDevice("11111111111131");
+
+        s3.setDevice(d1);
+        s2.setDevice(d2);
+        s1.setDevice(d3);
+
+        dao.save(s1);
+        dao.save(s2);
+        dao.save(s3);
+
+        final Filter f = new Filter();
+        f.addFilter(ShipmentConstants.DEVICE_SN, "111112");
+        final List<Shipment> result = dao.findAll(f, null, null);
+
+        assertEquals(1, result.size());
+        assertEquals(d2.getImei(), result.get(0).getDevice().getImei());
+    }
+    @Test
     public void testFindBySnTrip() {
         final String sn = "001111";
         final int trip = 1;

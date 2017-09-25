@@ -627,7 +627,8 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
                     params.put(defaultKey, "%" + value + "%");
                     filters.add(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
                 } else if (ShipmentConstants.DEVICE_SN.equals(property)){
-                    filters.add(ShipmentConstants.DEVICE_SN + " = :" + defaultKey);
+                    params.put(defaultKey, "%" + Device.addZeroSymbolsToSn(String.valueOf(value)) + "_");
+                    filters.add(TABLE + "." + DEVICE_FIELD + " like :" + defaultKey);
                 } else if (ShipmentConstants.GOODS.equals(property)){
                     params.put(defaultKey, "%" + value + "%");
                     final StringBuilder sb = new StringBuilder();
