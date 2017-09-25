@@ -195,7 +195,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
     @Override
     public Long getShipmentId(final String sn, final int tripCount) {
         final Map<String, Object> map = new HashMap<>();
-        map.put("sn", sn);
+        map.put("sn", Device.addZeroSymbolsToSn(sn));
         map.put("trip", tripCount);
 
         final List<Map<String, Object>> list = jdbc.queryForList("select s.id as id from shipments s "

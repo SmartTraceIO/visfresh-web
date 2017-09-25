@@ -74,6 +74,17 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
         return sb.toString();
     }
     /**
+     * @param shortSn canonical serial number without leading zero symbols.
+     * @return serial number with leading zero symbols.
+     */
+    public static String addZeroSymbolsToSn(final String shortSn) {
+        final StringBuilder sb = new StringBuilder(shortSn);
+        while (sb.length() < 6) {
+            sb.insert(0, '0');
+        }
+        return sb.toString();
+    }
+    /**
      * @param battery battery level.
      * @return converts the battery level to charge persents.
      */
