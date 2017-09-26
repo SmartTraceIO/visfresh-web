@@ -4,10 +4,12 @@
 package com.visfresh.impl.singleshipment;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Shipment;
@@ -20,6 +22,8 @@ import com.visfresh.io.shipment.SingleShipmentData;
  */
 public class LocationsDataBuilderTest extends BaseBuilderTest {
     private LocationProfileDao dao;
+    @SuppressWarnings("unused")
+    private AlternativeLocationsDao altLocDao;
 
     /**
      * Default constructor.
@@ -33,6 +37,7 @@ public class LocationsDataBuilderTest extends BaseBuilderTest {
     public void setUp() {
         super.setUp();
         dao = context.getBean(LocationProfileDao.class);
+        altLocDao = context.getBean(AlternativeLocationsDao.class);
     }
 
     @Test
@@ -88,20 +93,90 @@ public class LocationsDataBuilderTest extends BaseBuilderTest {
     }
 
     @Test
-    public void testLeftLocationFrom() {
+    public void testLeftLocationFromTo() {
+        final Shipment s = createShipment();
 
+        final LocationProfile loc = new LocationProfile();
+        loc.setAddress("Odessa. Deribasovskaya 1, 1");
+        loc.setCompany(s.getCompany());
+        loc.setCompanyName("Company name");
+        loc.setInterim(true);
+        loc.setStart(true);
+        loc.setStop(true);
+        loc.setName("Location Name");
+        loc.setNotes("Location notes");
+        loc.setRadius(1500);
+        dao.save(loc);
+
+        shipmentDao.save(s);
+
+        //create siblings with locations
+        final Shipment sib1 = createShipment();
+        shipmentDao.save(sib1);
+
+        setAsSiblings(s, sib1);
+
+        final LocationsDataBuilder builder = new LocationsDataBuilder(jdbc, s.getId());
+        final SingleShipmentBuildContext ctxt = SingleShipmentTestUtils.createContextWithMainData(s, sib1);
+        builder.fetchData();
+        builder.build(ctxt);
+        final SingleShipmentData data = ctxt.getData();
+
+        assertNull(data.getBean().getStartLocation());
     }
     @Test
     public void testLocationTo() {
+        final String address = "Any address";
+        final String companyName = "Any company";
+        final boolean interim = true;
+        final boolean start = false;
+        final boolean stop = true;
+        final String name = "Location name";
+        final String notes = "Location notes";
+        final int radius = 1500;
 
-    }
-    @Test
-    public void testLeftLocationTo() {
+        final Shipment s = createShipment();
 
+        final LocationProfile loc = new LocationProfile();
+        loc.setAddress(address);
+        loc.setCompany(s.getCompany());
+        loc.setCompanyName(companyName);
+        loc.setInterim(interim);
+        loc.setStart(start);
+        loc.setStop(stop);
+        loc.setName(name);
+        loc.setNotes(notes);
+        loc.setRadius(radius);
+        dao.save(loc);
+
+        s.setShippedTo(loc);
+        shipmentDao.save(s);
+
+        //create siblings with locations
+        final Shipment sib1 = createShipment();
+        sib1.setShippedTo(loc);
+        shipmentDao.save(sib1);
+
+        final Shipment sib2 = createShipment();
+        sib2.setShippedTo(createLocation("Sibling location"));
+        shipmentDao.save(sib2);
+
+        setAsSiblings(s, sib1, sib2);
+
+        final LocationsDataBuilder builder = new LocationsDataBuilder(jdbc, s.getId());
+        final SingleShipmentBuildContext ctxt = SingleShipmentTestUtils.createContextWithMainData(s, sib1, sib2);
+        builder.fetchData();
+        builder.build(ctxt);
+        final SingleShipmentData data = ctxt.getData();
+
+        assertEqualsLocations(loc, data.getBean().getEndLocation());
+        assertEqualsLocations(sib1.getShippedTo(), SingleShipmentTestUtils.getSibling(
+                sib1.getId(), data).getEndLocation());
+        assertEqualsLocations(sib2.getShippedTo(), SingleShipmentTestUtils.getSibling(
+                sib2.getId(), data).getEndLocation());
     }
     @Test
     public void testAlternativeLocations() {
-
     }
     @Test
     public void testInterimStops() {
