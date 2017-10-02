@@ -31,6 +31,13 @@ public class AbstractSystemMessageDispatcherTest extends AbstractSystemMessageDi
     }
 
     /* (non-Javadoc)
+     * @see com.visfresh.services.AbstractSystemMessageDispatcher#getCurrentMySqlProcesses()
+     */
+    @Override
+    protected String getCurrentMySqlProcesses() {
+        return "Processes";
+    }
+    /* (non-Javadoc)
      * @see com.visfresh.services.AbstractAssyncSystemMessageDispatcher#getProcessorId()
      */
     @Override
@@ -119,6 +126,16 @@ public class AbstractSystemMessageDispatcherTest extends AbstractSystemMessageDi
 
         //check message has removed immediately
         assertNull(helper.getMessages().get(msg.getId()));
+    }
+    @Test
+    public void testHandleLockWaitTimeOutException() {
+        final SystemMessage msg = helper.createMessage(new Date());
+        saveMessage(msg);
+
+        handleError(msg, new SQLException("Lock wait timeout exceeded"));
+
+        //check message not removed
+        assertNotNull(helper.getMessages().get(msg.getId()));
     }
     @Test
     public void testHandleError() {

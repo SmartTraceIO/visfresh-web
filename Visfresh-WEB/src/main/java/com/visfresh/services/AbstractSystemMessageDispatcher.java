@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.dao.MySqlUtilsDao;
 import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
@@ -61,6 +62,9 @@ public abstract class AbstractSystemMessageDispatcher {
     private SystemMessageDao messageDao;
 
     private int numThreads;
+
+    @Autowired
+    private MySqlUtilsDao mysqlUtilsDao;
 
     private class Dispathcer extends Thread {
         private String id;
@@ -202,6 +206,9 @@ public abstract class AbstractSystemMessageDispatcher {
         if (ExceptionUtils.containsException(e, SQLException.class)) {
             if (isStoped.get()) {
                 log.warn("SQL exception occured because the system is stopped");
+            } else if (ExceptionUtils.isLockWaitTimeOut(e)){
+                log.error("Lock time out exception detected. Process list:\n"
+                        + getCurrentMySqlProcesses(), e);
             } else {
                 log.error("Unexpected SQL exception has occured", e);
             }
@@ -222,7 +229,12 @@ public abstract class AbstractSystemMessageDispatcher {
 
         return false;
     }
-
+    /**
+     * @return
+     */
+    protected String getCurrentMySqlProcesses() {
+        return mysqlUtilsDao.getCurrentProcesses();
+    }
     /**
      * @param msg
      * @param e

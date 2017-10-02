@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -48,10 +49,21 @@ public final class ExceptionUtils {
      * @return true if container exception contains given exception.
      */
     public static boolean containsException(final Throwable container, final Class<? extends Throwable> eclass) {
+        return doRecursive(container, (current) ->
+            {
+                return eclass.isAssignableFrom(current.getClass());
+            });
+    }
+    /**
+     * @param container container exception.
+     * @param exception possible contained exception.
+     * @return true if container exception contains given exception.
+     */
+    public static boolean doRecursive(final Throwable container, final Function<Throwable, Boolean> fun) {
         final Set<Throwable> checked = new HashSet<>();
         Throwable current = container;
         while (current != null && !checked.contains(current)) {
-            if (eclass.isAssignableFrom(current.getClass())) {
+            if (fun.apply(current)) {
                 return true;
             }
 
@@ -61,5 +73,15 @@ public final class ExceptionUtils {
 
         return false;
     }
-
+    /**
+     * @param e
+     * @return
+     */
+    public static boolean isLockWaitTimeOut(final Throwable e) {
+        return doRecursive(e, (current) ->
+        {
+            final String msg = e.getMessage();
+            return msg != null && msg.contains("Lock wait timeout exceeded");
+        });
+    }
 }

@@ -33,6 +33,17 @@ public class ExceptionUtilsTest {
         assertTrue(ExceptionUtils.containsException(e, SQLException.class));
     }
     @Test
+    public void testLockWaitTimeOutExceedException() {
+        final Exception e1 = new Exception("Lock wait timeout exceeded");
+        e1.initCause(new SQLException("ABC"));
+
+        final Exception e2 = new Exception("Message");
+        e2.initCause(new SQLException("ABC"));
+
+        assertTrue(ExceptionUtils.isLockWaitTimeOut(e1));
+        assertFalse(ExceptionUtils.isLockWaitTimeOut(e2));
+    }
+    @Test
     public void testContainsExceptionNullParent() {
         final Exception e = new Exception("DEF");
         e.initCause(null);
