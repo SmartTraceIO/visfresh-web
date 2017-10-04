@@ -6,6 +6,7 @@ select
    true as isStart, 
    false as isStop, 
    false as isInterim,
+   NULL as altLocId, 
    loc.address as address,
    loc.companydetails as companyName,
    loc.start as forStart,
@@ -16,7 +17,6 @@ select
    loc.radius as radius,
    loc.latitude as latitude,
    loc.longitude as longitude,
-   NULL as altLocId, 
    NULL as stopId,
    NULL as stopDate,
    NULL as stopTime
@@ -32,6 +32,7 @@ select
    false as isStart,
    true as isStop,
    false as isInterim,
+   NULL as altLocId, 
    loc.address as address,
    loc.companydetails as companyName,
    loc.start as forStart,
@@ -42,7 +43,6 @@ select
    loc.radius as radius,
    loc.latitude as latitude,
    loc.longitude as longitude,
-   NULL as altLocId, 
    NULL as stopId,
    NULL as stopDate,
    NULL as stopTime
