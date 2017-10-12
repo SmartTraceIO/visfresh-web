@@ -1,38 +1,35 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>web</artifactId>
-	<packaging>war</packaging>
-	<name>Visfresh WEB</name>
-
+	<groupId>com.visfresh</groupId>
+	<artifactId>tools-web</artifactId>
+	<version>0.0.1</version>
+	<packaging>jar</packaging>
+	<name>Smarttrace Tools</name>
+	
 	<parent>
 		<groupId>com.visfresh</groupId>
 		<artifactId>web.parent</artifactId>
 		<version>0.0.1</version>
 	</parent>
-
+	
 	<properties>
-		<spring.version>4.1.4.RELEASE</spring.version>
-		<spring.security.version>3.2.5.RELEASE</spring.security.version>
-		<spring.data.version>1.8.2.RELEASE</spring.data.version>
-		<gtse.version>2.6.0</gtse.version>
-		<drools.varsion>6.3.0.Final</drools.varsion>
+		<mainClass>com.visfresh.reports.shipment.ShipmentReportBuilderTool</mainClass>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jws.out>${project.build.directory}/toos</jws.out>
 	</properties>
-
 	<dependencies>
-		<!-- Tests -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
-			<scope>test</scope>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>example-jetty-embedded</artifactId>
 			<version>9.2.13.v20150730</version>
-			<scope>test</scope>
+			<scope>runtime</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>org.eclipse.jetty.tests</groupId>
@@ -44,8 +41,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-	</dependencies>	
-
+	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -58,12 +55,24 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.6</version>
-				<goals><goal>package</goal></goals>
-				<configuration>
-					<warName>web</warName>
-				</configuration>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+				<executions>
+					<execution>
+						<id>copy-lib</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${jws.out}/lib</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

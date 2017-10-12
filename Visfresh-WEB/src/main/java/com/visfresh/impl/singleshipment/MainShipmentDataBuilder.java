@@ -3,6 +3,7 @@
  */
 package com.visfresh.impl.singleshipment;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import com.visfresh.io.json.ShipmentSessionSerializer;
 import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,6 +34,7 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
     private final Map<Long, ShipmentSession> sessions = new HashMap<>();
     private final ShipmentSessionSerializer sessionSerializer = new ShipmentSessionSerializer();
 
+    private static String QUERY = loadQuery();
     /**
      * @param jdbc JDBC template.
      * @param shipmentId shipment ID.
@@ -40,6 +43,19 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         super();
         this.jdbc = jdbc;
         this.shipmentId = shipmentId;
+    }
+
+    /**
+     * @return
+     */
+    private static String loadQuery() {
+        try {
+            final String str = StringUtils.getContent(LocationsDataBuilder.class.getResource("getMainData.sql"),
+                    "UTF-8");
+            return str.replace("1387", ":shipment");
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /* (non-Javadoc)
@@ -108,56 +124,13 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
     public void fetchData() {
         clear();
 
-        final String query = buildQuery();
         final Map<String, Object> params = new HashMap<>();
         params.put("shipment", shipmentId);
 
-        final List<Map<String, Object>> rows = jdbc.queryForList(query, params);
+        final List<Map<String, Object>> rows = jdbc.queryForList(QUERY, params);
         for (final Map<String, Object> row : rows) {
             processRow(row);
         }
-    }
-
-    /**
-     * @return
-     */
-    private String buildQuery() {
-        return "select  "
-            + " s.id as id"
-            + ", s.noalertsifcooldown as alertSuppressionMinutes"
-            + ", s.arrivalnotifwithIn as arrivalNotificationWithinKm"
-            + ", s.arrivaldate as arrivalDate"
-            + ", s.assetnum as assetNum"
-            + ", s.assettype as assetType"
-            + ", s.comments as commentsForReceiver"
-            + ", s.company as company"
-            + ", s.device as device"
-            + ", d.color as deviceColor"
-            + ", d.name as deviceName"
-            + ", s.nonotifsifnoalerts as excludeNotificationsIfNoAlerts"
-            + ", s.status as status"
-            + ", s.tripcount as tripCount"
-            + ", d.tripcount as deviceTripCount"
-            + ", s.noalertsafterarrivalminutes as noAlertsAfterArrivalMinutes"
-            + ", s.noalertsafterstartminutes as noAlertsAfterStartMinutes"
-            + ", s.palletid as palletId"
-            + ", s.arrivalreport as isSendArrivalReport"
-            + ", s.arrivalreportonlyifalerts as sendArrivalReportOnlyIfAlerts"
-            + ", s.description as description"
-            + ", s.id as id"
-            + ", s.isautostart as autostart"
-            + ", s.shutdownafterstartminutes as shutDownAfterStartMinutes"
-            + ", s.shutdownafterarrivalminutes as shutdownDeviceAfterMinutes"
-            + ", s.shipmentdate as startTime"
-            + ", s.eta as eta"
-            + ", ss.state as session"
-            + " from shipments s"
-            + " left outer join shipmentsessions ss on ss.shipment = s.id"
-            + " join devices d on d.imei = s.device"
-            + " where s.id = :shipment or "
-            + " s.siblings = :shipment or s.siblings like concat(:shipment, ',%')"
-            + " or s.siblings like concat('%,', :shipment, ',%') or s.siblings"
-            + " like concat('%,', :shipment)";
     }
 
     /**
