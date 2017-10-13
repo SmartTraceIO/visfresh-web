@@ -6,17 +6,17 @@
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
 	<name>Smarttrace Tools</name>
-	
+
 	<parent>
 		<groupId>com.visfresh</groupId>
 		<artifactId>web.parent</artifactId>
 		<version>0.0.1</version>
 	</parent>
-	
+
 	<properties>
 		<mainClass>com.visfresh.reports.shipment.ShipmentReportBuilderTool</mainClass>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jws.out>${project.build.directory}/toos</jws.out>
+		<tools.out>${project.build.directory}/toos</tools.out>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -42,7 +42,7 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -66,10 +66,49 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${jws.out}/lib</outputDirectory>
+							<outputDirectory>${tools.out}/lib</outputDirectory>
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>false</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>package-classes</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${tools.out}/lib</outputDirectory>
+							<finalName>visfresh</finalName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>package-tests</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${tools.out}</outputDirectory>
+							<finalName>launcher</finalName>
+							<archive>
+								<manifest>
+									<addClasspath>true</addClasspath>
+									<classpathPrefix>lib/</classpathPrefix>
+									<mainClass>${mainClass}</mainClass>
+								</manifest>
+								<manifestEntries>
+									<Class-Path>lib/visfresh.jar</Class-Path>
+								</manifestEntries>
+							</archive>
 						</configuration>
 					</execution>
 				</executions>

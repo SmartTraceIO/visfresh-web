@@ -49,6 +49,7 @@ import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.l12n.NotificationBundle;
 import com.visfresh.reports.PdfReportBuilder;
+import com.visfresh.reports.shipment.MapRenderingException;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBuilder;
 import com.visfresh.rules.state.ShipmentSession;
@@ -371,6 +372,13 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
 
         try (final OutputStream out = new FileOutputStream(f)) {
             reportBuilder.createShipmentReport(report, user, out);
+        } catch (final MapRenderingException exc) {
+            //unwrap I/O exception
+            if (exc.getCause() instanceof IOException) {
+                throw (IOException) exc.getCause();
+            }
+            //forward exception next
+            throw exc;
         }
 
         return f;

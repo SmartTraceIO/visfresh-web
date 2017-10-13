@@ -3,7 +3,11 @@
  */
 package com.visfresh.reports.shipment;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.Date;
@@ -33,6 +37,7 @@ import com.visfresh.reports.ShortTrackerEventsImporter;
 import com.visfresh.reports.TemperatureStats;
 import com.visfresh.utils.StringUtils;
 
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.JRException;
 
@@ -301,7 +306,28 @@ public final class ShipmentReportBuilderTool {
                 this.ruleBundle = new RuleBundle();
             }
         };
-        builder.createReport(bean, user).show();
+        final JasperReportBuilder report = builder.createReport(bean, user);
+        final OutputStream out = createPdfOut();
+        try {
+            report.toPdf(out);
+        } finally {
+            out.close();
+        }
+    }
+
+    /**
+     * @return
+     * @throws FileNotFoundException
+     */
+    private static OutputStream createPdfOut() throws FileNotFoundException {
+        int i = 0;
+        while (true) {
+            i++;
+            final File f = new File("shrep-" + i + ".pdf");
+            if (!f.exists()) {
+                return new FileOutputStream(f);
+            }
+        }
     }
 
     public static void main(final String[] args) throws Exception {

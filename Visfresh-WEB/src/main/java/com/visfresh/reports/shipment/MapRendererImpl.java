@@ -65,15 +65,14 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
      */
     @Override
     public void render(final JasperReportsContext context,
-            final Graphics2D gOrigin, final Rectangle2D viewArea) throws JRException {
-
+            final Graphics2D gOrigin, final Rectangle2D viewArea) throws JRException, MapRenderingException {
         render(gOrigin, viewArea);
     }
     /**
      * @param gOrigin
      * @param viewArea
      */
-    public void render(final Graphics2D gOrigin, final Rectangle2D viewArea) {
+    public void render(final Graphics2D gOrigin, final Rectangle2D viewArea) throws MapRenderingException {
         final List<Location> coords = new LinkedList<>();
         for (final ShortTrackerEvent e : bean.getReadings()) {
             coords.add(new Location(e.getLatitude(), e.getLongitude()));
@@ -126,7 +125,7 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
             paintArrows(g, coords, p, zoom, viewArea);
             paintMarkers(g, readings, p, zoom);
         } catch (final IOException ioe) {
-            throw new RuntimeException(ioe);
+            throw new MapRenderingException(ioe);
         } finally {
             g.dispose();
         }
