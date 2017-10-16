@@ -66,7 +66,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
     private final LocationSerializer locationSerializer;
     private JsonShortenerFactory shortenerFactory = new JsonShortenerFactory();
 
-    private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSSZ");
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSSZ");
     private final DateFormat isoFormat;
     private final DateFormat prettyFormat;
     private final TemperatureUnits tempUnits;
@@ -280,7 +280,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param array
      * @return
      */
-    private List<InterimStopBean> parseInterimStops(final JsonArray array) {
+    public List<InterimStopBean> parseInterimStops(final JsonArray array) {
         final List<InterimStopBean> list = new LinkedList<>();
         for (final JsonElement e : array) {
             list.add(parseInterimStopBean(e));
@@ -307,7 +307,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param e JSON element.
      * @return single shipment interim stop.
      */
-    protected InterimStopBean parseInterimStopBean(final JsonElement e) {
+    public InterimStopBean parseInterimStopBean(final JsonElement e) {
         if (isNull(e)) {
             return null;
         }
@@ -397,7 +397,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param el JSON element.
      * @return location profile bean.
      */
-    private LocationProfileBean parseLocationProfileBean(final JsonElement el) {
+    public LocationProfileBean parseLocationProfileBean(final JsonElement el) {
         return locationSerializer.parseLocationProfileDto(el);
     }
 
@@ -1611,5 +1611,11 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
             final SingleShipmentBean shipment) {
         final String text = this.alertsBundle.buildTrackerEventDescription(reading, shipment);
         return exportNotificationIssue("LastReading", text);
+    }
+    /**
+     * @param dateFormat the dateFormat to set
+     */
+    public void setDateFormat(final DateFormat dateFormat) {
+        this.dateFormat = dateFormat;
     }
 }

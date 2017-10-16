@@ -38,9 +38,98 @@ select
     bloa.id as bloaId,
     bloa.name as bloaName,
     bloa.description as bloaDesc,
-    bloa.actions as bloaActions
+    bloa.actions as bloaActions,
+    -- interim stops json
+    (select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'location', JSON_OBJECT(
+	    		'locationId', loc.id,
+	    		'companyName', loc.companydetails,
+	    		'locationName', loc.name,
+	    		'notes', loc.notes,
+	    		'address', loc.address,
+	    		'startFlag', IF(loc.start,'Y','N'),
+	    		'interimFlag', IF(loc.interim,'Y','N'),
+	    		'endFlag', IF(loc.stop,'Y','N'),
+	    		'location', JSON_OBJECT(
+	    			'lat', loc.latitude,
+	    			'lon', loc.longitude
+	    		),
+				'radiusMeters', loc.radius
+	    	),
+		    'id', stp.id,
+		    'stopDate', stp.date,
+		    'time', stp.pause
+	    )),
+	    ']'
+    ) from interimstops stp 
+    join locationprofiles loc on stp.location = loc.id
+    where stp.shipment = s.id) as interimStopsJson,
+    -- Shipped from location
+	JSON_OBJECT(
+		'locationId', locFrom.id,
+		'companyName', locFrom.companydetails,
+		'locationName', locFrom.name,
+		'notes', locFrom.notes,
+		'address', locFrom.address,
+		'startFlag', IF(locFrom.start,'Y','N'),
+		'interimFlag', IF(locFrom.interim,'Y','N'),
+		'endFlag', IF(locFrom.stop,'Y','N'),
+		'location', JSON_OBJECT(
+			'lat', locFrom.latitude,
+			'lon', locFrom.longitude
+		),
+		'radiusMeters', locFrom.radius
+	) as shippedFromJson,
+    -- Shipped to location
+	JSON_OBJECT(
+		'locationId', locTo.id,
+		'companyName', locTo.companydetails,
+		'locationName', locTo.name,
+		'notes', locTo.notes,
+		'address', locTo.address,
+		'startFlag', IF(locTo.start,'Y','N'),
+		'interimFlag', IF(locTo.interim,'Y','N'),
+		'endFlag', IF(locTo.stop,'Y','N'),
+		'location', JSON_OBJECT(
+			'lat', locTo.latitude,
+			'lon', locTo.longitude
+		),
+		'radiusMeters', locTo.radius
+	) as shippedToJson,
+	-- alternative locations
+    (select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'location', JSON_OBJECT(
+	    		'locationId', altLoc.id,
+	    		'companyName', altLoc.companydetails,
+	    		'locationName', altLoc.name,
+	    		'notes', altLoc.notes,
+	    		'address', altLoc.address,
+	    		'startFlag', IF(altLoc.start,'Y','N'),
+	    		'interimFlag', IF(altLoc.interim,'Y','N'),
+	    		'endFlag', IF(altLoc.stop,'Y','N'),
+	    		'location', JSON_OBJECT(
+	    			'lat', altLoc.latitude,
+	    			'lon', altLoc.longitude
+	    		),
+				'radiusMeters', altLoc.radius
+	    	),
+		    'locType', alt.loctype
+	    )),
+	    ']'
+    )
+	from alternativelocations alt
+	join locationprofiles altLoc on alt.location = altLoc.id
+    where alt.shipment = s.id) as altLocationJson
 from
     shipments s
+left outer join
+	locationprofiles locFrom on s.shippedfrom = locFrom.id
+left outer join
+	locationprofiles locTo on s.shippedto = locTo.id
 left outer join
     shipmentsessions ss on ss.shipment = s.id
 left outer join

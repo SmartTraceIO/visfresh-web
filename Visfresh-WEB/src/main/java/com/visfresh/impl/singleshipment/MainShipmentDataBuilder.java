@@ -4,22 +4,32 @@
 package com.visfresh.impl.singleshipment;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.impl.services.NotificationServiceImpl;
 import com.visfresh.impl.services.SingleShipmentServiceImpl;
 import com.visfresh.io.json.ShipmentSessionSerializer;
+import com.visfresh.io.json.SingleShipmentBeanSerializer;
+import com.visfresh.io.shipment.InterimStopBean;
+import com.visfresh.io.shipment.LocationProfileBean;
 import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -33,6 +43,7 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
     private final Map<Long, SingleShipmentBean> beans = new HashMap<>();
     private final Map<Long, ShipmentSession> sessions = new HashMap<>();
     private final ShipmentSessionSerializer sessionSerializer = new ShipmentSessionSerializer();
+    private final SingleShipmentBeanSerializer serializer = new SingleShipmentBeanSerializer();
 
     private static String QUERY = loadQuery();
     /**
@@ -43,6 +54,7 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         super();
         this.jdbc = jdbc;
         this.shipmentId = shipmentId;
+        serializer.setDateFormat(new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSSSSS"));
     }
 
     /**
@@ -50,7 +62,8 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
      */
     private static String loadQuery() {
         try {
-            final String str = StringUtils.getContent(LocationsDataBuilder.class.getResource("getMainData.sql"),
+            final String str = StringUtils.getContent(
+                    MainShipmentDataBuilder.class.getResource("getMainData.sql"),
                     "UTF-8");
             return str.replace("1387", ":shipment");
         } catch (final IOException e) {
@@ -188,10 +201,86 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
             bean.setEta(eta);
         }
 
+        //parse interim stops
+        bean.getInterimStops().addAll(parseInterimStops(possibleBinary(row.get("interimStopsJson"))));
+        //parse shipped from
+        bean.setStartLocation(parseLocationProfileBean(
+                SerializerUtils.parseJson(possibleBinary(row.get("shippedFromJson")))));
+        //parse shipped to
+        bean.setEndLocation(parseLocationProfileBean(
+                SerializerUtils.parseJson(possibleBinary(row.get("shippedToJson")))));
+        //parse alternative locations
+        final String altLocJson = possibleBinary(row.get("altLocationJson"));
+        if (altLocJson != null) {
+            final JsonArray array = SerializerUtils.parseJson(altLocJson).getAsJsonArray();
+            for (final JsonElement e : array) {
+                final JsonObject json = e.getAsJsonObject();
+                final LocationProfileBean locBean = parseLocationProfileBean(json.get("location"));
+
+                final String loctype = json.get("locType").getAsString();
+                if (loctype.equals("from")) {
+                    bean.getStartLocationAlternatives().add(locBean);
+                } else if (loctype.equals("to")) {
+                    bean.getEndLocationAlternatives().add(locBean);
+                } else if (loctype.equals("interim")) {
+                    bean.getInterimLocationAlternatives().add(locBean);
+                }
+            }
+        }
+
         beans.put(bean.getShipmentId(), bean);
         sessions.put(bean.getShipmentId(), session);
     }
 
+    /**
+     * @param object
+     * @return
+     */
+    private String possibleBinary(final Object object) {
+        if (object == null) {
+            return null;
+        }
+
+        if (object.getClass() == byte[].class) {
+            try {
+                return new String((byte[]) object, "UTF-8");
+            } catch (final UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return (String) object;
+    }
+
+    /**
+     * @param e
+     * @return
+     */
+    private LocationProfileBean parseLocationProfileBean(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+
+        final JsonElement id = e.getAsJsonObject().get("locationId");
+        if (id == null || id.isJsonNull()) {
+            return null;
+        }
+
+        return serializer.parseLocationProfileBean(e);
+    }
+
+    /**
+     * @param str
+     * @return
+     */
+    private List<InterimStopBean> parseInterimStops(final String str) {
+        final List<InterimStopBean> stops = new LinkedList<>();
+        if (str != null) {
+            final JsonArray array = SerializerUtils.parseJson(str).getAsJsonArray();
+            return this.serializer.parseInterimStops(array);
+        }
+        return stops;
+    }
     /**
      * @param row DB data row.
      * @return shipment session from row.
