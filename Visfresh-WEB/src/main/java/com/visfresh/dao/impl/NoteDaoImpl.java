@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.entities.Note;
 import com.visfresh.entities.Shipment;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -102,21 +103,35 @@ public class NoteDaoImpl implements NoteDao {
                     + " where shipment=:shipment and notenum=:notenum";
             jdbc.update(sql, params);
         } else {
-            synchronized (this) {
-                final List<Map<String, Object>> rows = jdbc.queryForList(
-                        "select max(notenum) + 1 as nextNum from notes where shipment=:shipment",
-                        params);
-                final Number nextNum = (Number) rows.get(0).get("nextNum");
-                final int noteNum = nextNum == null ? 1 : nextNum.intValue();
-                params.put("notenum", noteNum);
-                note.setNoteNum(noteNum);
+//            final List<Map<String, Object>> rows = jdbc.queryForList(
+//                    "select max(notenum) + 1 as nextNum from notes where shipment=:shipment",
+//                    params);
+//            final Number nextNum = (Number) rows.get(0).get("nextNum");
+//            final int noteNum = nextNum == null ? 1 : nextNum.intValue();
+//            params.put("notenum", noteNum);
+//            note.setNoteNum(noteNum);
+//
+//            //insert
+//            final String sql = "insert into notes"
+//                    + "(shipment,notenum,notetext,timeonchart,notetype,createdon,createdby,active)"
+//                    + " values(:shipment,:notenum,:notetext,:timeonchart,:notetype,:createdon,:createdby,:active)";
+//            jdbc.update(sql, params);
+            //insert
+            String sql = "insert into notes"
+                    + "(shipment,notenum,notetext,timeonchart,notetype,createdon,createdby,active)"
+                    + "select :shipment, count(*) + 1,:notetext,:timeonchart,:notetype,:createdon,:createdby,:active"
+                    + " from notes where shipment = :shipment";
+            jdbc.update(sql, params);
 
-                //insert
-                final String sql = "insert into notes"
-                        + "(shipment,notenum,notetext,timeonchart,notetype,createdon,createdby,active)"
-                        + " values(:shipment,:notenum,:notetext,:timeonchart,:notetype,:createdon,:createdby,:active)";
-                jdbc.update(sql, params);
-            }
+            //select latest note for obtain the notenum
+            sql = "select notenum from notes where"
+                    + " shipment = :shipment and notetext = :notetext and"
+                    + " notetype = :notetype and createdby = :createdby and active = :active"
+                    + " order by notenum desc limit 1";
+            final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+
+            final Object noteNum = rows.get(0).get("notenum");
+            note.setNoteNum(((Number) noteNum).intValue());
         }
 
         return note;
@@ -134,26 +149,8 @@ public class NoteDaoImpl implements NoteDao {
         n.setNoteType((String) row.get("notetype"));
         n.setTimeOnChart((Date) row.get("timeonchart"));
         n.setActive((Boolean) row.get("active"));
-        n.setCreatedByName(createCreatedByName((String) row.get("firstName"), (String) row.get("lastName")));
+        n.setCreatedByName(StringUtils.createFullUserName(
+                (String) row.get("firstName"), (String) row.get("lastName")));
         return n;
-    }
-
-    /**
-     * @param firstName
-     * @param lastName
-     * @return
-     */
-    private String createCreatedByName(final String firstName, final String lastName) {
-        final StringBuilder sb = new StringBuilder();
-        if (firstName != null) {
-            sb.append(firstName);
-        }
-        if (lastName != null && lastName.length() > 0) {
-            if (sb.length() > 0) {
-                sb.append(' ');
-            }
-            sb.append(lastName.charAt(0));
-        }
-        return sb.toString();
     }
 }

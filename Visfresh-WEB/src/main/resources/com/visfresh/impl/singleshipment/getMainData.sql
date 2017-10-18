@@ -123,7 +123,88 @@ select
     )
 	from alternativelocations alt
 	join locationprofiles altLoc on alt.location = altLoc.id
-    where alt.shipment = s.id) as altLocationJson
+    where alt.shipment = s.id) as altLocationJson,
+    -- Not user
+    (select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+			'noteText', n.notetext,
+			'timeOnChart', n.timeonchart,
+			'noteType', n.notetype,
+			'noteNum', n.notenum,
+			'creationDate', n.createdon,
+			'createdBy', n.createdby,
+			'active', IF(n.active, 'true', 'false'),
+			'firstName', nu.firstname,
+			'lastName', nu.lastname
+	    )),
+	    ']'
+    )
+	from notes n
+	left outer join users nu on n.createdby = nu.email
+    where n.shipment = s.id) as notesJson,
+    -- arrival
+    arr.id as arrId,
+    arr.nummeters as arrMeters,
+    arr.date as arrDate,
+    arr.event as arrEvent
+    -- alert notification schedules
+    ,(select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'id', sched.id,
+	    	'name', sched.name,
+	    	'description', sched.description
+	    )),
+	    ']'
+        )
+	from alertnotifschedules sc
+	join notificationschedules sched on sc.notification = sched.id
+    where sc.shipment = s.id) as alertNotifSchedJson
+    -- arrival notification schedules
+    ,(select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'id', sched.id,
+	    	'name', sched.name,
+	    	'description', sched.description
+	    )),
+	    ']'
+        )
+	from arrivalnotifschedules sc
+	join notificationschedules sched on sc.notification = sched.id
+    where sc.shipment = s.id) as arrivalNotifSchedJson
+    -- notification schedule users
+    , (select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'schedule', sched.id,
+	    	'firstName', u.firstname,
+	    	'lastName', u.lastname
+	    )),
+	    ']'
+        )
+		from arrivalnotifschedules aa
+		join notificationschedules sched on aa.notification = sched.id
+        join personalschedules ps on ps.schedule = sched.id
+        join users u on u.company = 123321 and ps.user = u.id
+		where aa.shipment = s.id
+    ) as arrivalScheduleUsersJson
+    , (select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'schedule', sched.id,
+	    	'firstName', u.firstname,
+	    	'lastName', u.lastname
+	    )),
+	    ']'
+        )
+		from alertnotifschedules aa
+		join notificationschedules sched on aa.notification = sched.id
+        join personalschedules ps on ps.schedule = sched.id
+        join users u on u.company = 123321 and ps.user = u.id
+		where aa.shipment = s.id
+    ) as alertScheduleUsersJson
 from
     shipments s
 left outer join
@@ -138,6 +219,8 @@ left outer join -- light on corrective actions
     correctiveactions lona on ap.lightonactions = lona.id
 left outer join -- battery low corrective actions
     correctiveactions bloa on ap.batterylowactions = bloa.id
+left outer join -- arrival
+	arrivals arr on arr.shipment = s.id
 join
     devices d on d.imei = s.device
 where

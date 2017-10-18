@@ -24,10 +24,13 @@ import com.visfresh.impl.services.NotificationServiceImpl;
 import com.visfresh.impl.services.SingleShipmentServiceImpl;
 import com.visfresh.io.json.ShipmentSessionSerializer;
 import com.visfresh.io.json.SingleShipmentBeanSerializer;
+import com.visfresh.io.shipment.ArrivalBean;
 import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.io.shipment.LocationProfileBean;
+import com.visfresh.io.shipment.NoteBean;
 import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.io.shipment.SingleShipmentData;
+import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
@@ -38,34 +41,37 @@ import com.visfresh.utils.StringUtils;
  */
 public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
     protected final NamedParameterJdbcTemplate jdbc;
-    protected final Long shipmentId;
 
     private final Map<Long, SingleShipmentBean> beans = new HashMap<>();
     private final Map<Long, ShipmentSession> sessions = new HashMap<>();
     private final ShipmentSessionSerializer sessionSerializer = new ShipmentSessionSerializer();
     private final SingleShipmentBeanSerializer serializer = new SingleShipmentBeanSerializer();
 
-    private static String QUERY = loadQuery();
+    private final Long shipmentId;
+    private final String query;
     /**
      * @param jdbc JDBC template.
      * @param shipmentId shipment ID.
+     * @param companyId company ID.
      */
-    public MainShipmentDataBuilder(final NamedParameterJdbcTemplate jdbc, final Long shipmentId) {
+    public MainShipmentDataBuilder(final NamedParameterJdbcTemplate jdbc,
+            final Long shipmentId, final Long companyId) {
         super();
         this.jdbc = jdbc;
         this.shipmentId = shipmentId;
+        query = loadQuery(shipmentId, companyId);
         serializer.setDateFormat(new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSSSSS"));
     }
 
     /**
      * @return
      */
-    private static String loadQuery() {
+    private String loadQuery(final Long shipment, final Long company) {
         try {
             final String str = StringUtils.getContent(
                     MainShipmentDataBuilder.class.getResource("getMainData.sql"),
                     "UTF-8");
-            return str.replace("1387", ":shipment");
+            return str.replace("1387", shipment.toString()).replace("123321", company.toString());
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -140,7 +146,7 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         final Map<String, Object> params = new HashMap<>();
         params.put("shipment", shipmentId);
 
-        final List<Map<String, Object>> rows = jdbc.queryForList(QUERY, params);
+        final List<Map<String, Object>> rows = jdbc.queryForList(query, params);
         for (final Map<String, Object> row : rows) {
             processRow(row);
         }
@@ -227,9 +233,114 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
                 }
             }
         }
+        bean.getNotes().addAll(parseNotes(possibleBinary(row.get("notesJson"))));
+
+        //arrival
+        if (row.get("arrId") != null) {
+            final ArrivalBean arr = new ArrivalBean();
+            arr.setId(asLong(row.get("arrId")));
+            arr.setMettersForArrival(asInteger(row.get("arrMeters")));
+            arr.setDate((Date) row.get("arrDate"));
+            arr.setNotifiedAt(arr.getDate());
+            arr.setTrackerEventId(asLong(row.get("arrEvent")));
+            bean.setArrival(arr);
+        }
+
+        //notification schedules
+        //process arrival notifications
+        processSchedules(bean.getArrivalNotificationSchedules(),
+                row, "arrivalNotifSchedJson", "arrivalScheduleUsersJson");
+        //process alert notifications
+        processSchedules(bean.getAlertsNotificationSchedules(),
+                row, "alertNotifSchedJson", "alertScheduleUsersJson");
 
         beans.put(bean.getShipmentId(), bean);
         sessions.put(bean.getShipmentId(), session);
+    }
+    /**
+     * @param result
+     * @param row
+     * @param usersJson
+     * @param schedulesJson
+     */
+    private void processSchedules(final List<ListNotificationScheduleItem> result,
+            final Map<String, Object> row, final String schedulesJson, final String usersJson) {
+        final String scheduleUsersJson = possibleBinary(row.get(usersJson));
+        final JsonArray userArray;
+        if (scheduleUsersJson != null) {
+            userArray = SerializerUtils.parseJson(scheduleUsersJson).getAsJsonArray();
+        } else {
+            userArray = new JsonArray();
+        }
+
+        final String jsonStr = possibleBinary(row.get(schedulesJson));
+        if (jsonStr != null) {
+            final Map<Long, List<String>> scheduleUsers = new HashMap<>();
+
+            //create schedule users map
+            for (final JsonElement e : userArray) {
+                final JsonObject json = e.getAsJsonObject();
+                //'schedule', sched.id,
+                //'firstName', u.firstname,
+                //'lastName', u.lastname
+                final Long schedule = json.get("schedule").getAsLong();
+                List<String> users = scheduleUsers.get(schedule);
+                if(users == null) {
+                    users = new LinkedList<>();
+                    scheduleUsers.put(schedule, users);
+                }
+
+                users.add(StringUtils.createFullUserName(
+                        asString(json.get("firstName")),
+                        asString(json.get("lastName"))));
+            }
+
+            //create notification schedules and notification users map map.
+            final JsonArray scheds = SerializerUtils.parseJson(jsonStr).getAsJsonArray();
+            for (final JsonElement e : scheds) {
+                final JsonObject json = e.getAsJsonObject();
+                //'id', sched.id,
+                //'name', sched.name,
+                //'description', sched.description
+                final Long id = json.get("id").getAsLong();
+
+                final ListNotificationScheduleItem item = new ListNotificationScheduleItem();
+                item.setNotificationScheduleId(id);
+                item.setNotificationScheduleName(asString(json.get("name")));
+                item.setNotificationScheduleDescription(asString(json.get("description")));
+
+                final List<String> users = scheduleUsers.get(id);
+                if (users != null) {
+                    item.setPeopleToNotify(StringUtils.combine(users, ","));
+                } else {
+                    item.setPeopleToNotify("");
+                }
+
+                result.add(item);
+            }
+        }
+    }
+    /**
+     * @param str
+     * @return
+     */
+    private List<NoteBean> parseNotes(final String str) {
+        final List<NoteBean> notes = new LinkedList<>();
+
+        if (str != null) {
+            final JsonArray array = SerializerUtils.parseJson(str).getAsJsonArray();
+            for (final JsonElement e : array) {
+                final JsonObject json = e.getAsJsonObject();
+                final NoteBean n = serializer.parseNoteBean(json);
+                //         bean.setCreatedByName(asString(json.get("createCreatedByName")));
+                n.setCreatedByName(StringUtils.createFullUserName(
+                        asString(json.get("firstName")),
+                        asString(json.get("lastName"))));
+                notes.add(n);
+            }
+        }
+
+        return notes;
     }
 
     /**

@@ -777,7 +777,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param e JSON element.
      * @return note bean.
      */
-    private NoteBean parseNoteBean(final JsonElement e) {
+    public NoteBean parseNoteBean(final JsonElement e) {
         if (isNull(e)) {
             return null;
         }

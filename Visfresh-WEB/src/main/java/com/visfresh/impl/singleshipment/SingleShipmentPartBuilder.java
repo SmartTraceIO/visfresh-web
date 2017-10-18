@@ -3,6 +3,8 @@
  */
 package com.visfresh.impl.singleshipment;
 
+import com.google.gson.JsonElement;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -37,11 +39,17 @@ public interface SingleShipmentPartBuilder {
     default double asDouble(final Object object) {
         return ((Number) object).doubleValue();
     }
+    default String asString(final JsonElement e) {
+        if (e == null || e.isJsonNull()) {
+            return null;
+        }
+        return e.getAsString();
+    }
     /**
      * @param object
      * @return
      */
-    default long asLong(final Object object) {
+    default Long asLong(final Object object) {
         final Number num = (Number) object;
         return num == null ? null : num.longValue();
     }

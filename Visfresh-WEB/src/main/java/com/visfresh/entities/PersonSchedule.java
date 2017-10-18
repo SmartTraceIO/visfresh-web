@@ -144,13 +144,29 @@ public class PersonSchedule implements EntityWithId<Long> {
     public void setSendSms(final boolean sendSms) {
         this.sendSms = sendSms;
     }
-
     /**
-     *
+     * @param monday
+     * @param tuesday
+     * @param wednesday
+     * @param thursday
+     * @param friday
+     * @param saturday
+     * @param sunday
+     */
+    public void setWeekDays(final boolean monday, final boolean tuesday, final boolean wednesday,
+            final boolean thursday, final boolean friday, final boolean saturday, final boolean sunday) {
+        this.weekDays[0] = monday;
+        this.weekDays[1] = tuesday;
+        this.weekDays[2] = wednesday;
+        this.weekDays[3] = thursday;
+        this.weekDays[4] = friday;
+        this.weekDays[5] = saturday;
+        this.weekDays[6] = sunday;
+    }
+    /**
+     * Sets all weeks days.
      */
     public void setAllWeek() {
-        for (int i = 0; i < weekDays.length; i++) {
-            weekDays[i] = true;
-        }
+        setWeekDays(true, true, true, true, true, true, true);
     }
 }
