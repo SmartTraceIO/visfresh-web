@@ -15,17 +15,30 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.visfresh.dao.AlertDao;
+import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.AlternativeLocationsDao;
 import com.visfresh.dao.ArrivalDao;
+import com.visfresh.dao.CorrectiveActionListDao;
+import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.InterimStopDao;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.NotificationScheduleDao;
+import com.visfresh.dao.PreliminarySingleShipmentData;
 import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
+import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertProfile;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
 import com.visfresh.entities.Arrival;
+import com.visfresh.entities.Company;
+import com.visfresh.entities.CorrectiveAction;
+import com.visfresh.entities.CorrectiveActionList;
+import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Note;
@@ -34,17 +47,28 @@ import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureAlert;
+import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.impl.services.NotificationServiceImpl;
+import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.AlertProfileBean;
 import com.visfresh.io.shipment.ArrivalBean;
+import com.visfresh.io.shipment.CorrectiveActionListBean;
+import com.visfresh.io.shipment.DeviceGroupDto;
 import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.io.shipment.LocationProfileBean;
 import com.visfresh.io.shipment.NoteBean;
+import com.visfresh.io.shipment.ShipmentCompanyDto;
+import com.visfresh.io.shipment.ShipmentUserDto;
 import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.io.shipment.SingleShipmentData;
+import com.visfresh.io.shipment.TemperatureAlertBean;
+import com.visfresh.io.shipment.TemperatureRuleBean;
 import com.visfresh.lists.ListNotificationScheduleItem;
+import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.utils.StringUtils;
 
@@ -83,9 +107,9 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         setAsSiblings(s1, s2, s3);
 
-        final SingleShipmentBuildContext c = new SingleShipmentBuildContext();
+        final SingleShipmentBuildContext c = createContext();
 
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s1.getId(), s1.getCompany().getId());
+        final MainShipmentDataBuilder b = createBuilder(s1);
         b.fetchData();
         b.build(c);
 
@@ -153,9 +177,9 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         NotificationServiceImpl.setArrivalReportSent(ss, new Date());
         context.getBean(ShipmentSessionDao.class).saveSession(ss);
 
-        final SingleShipmentBuildContext c = new SingleShipmentBuildContext();
+        final SingleShipmentBuildContext c = createContext();
 
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(c);
         final SingleShipmentBean bean = c.getData().getBean();
@@ -206,8 +230,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         inStopDao.save(s, createInterimStop(loc2));
         inStopDao.save(sib1, createInterimStop(loc2));
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -231,8 +255,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         final InterimStop stp = createInterimStop(loc);
         inStopDao.save(s, stp);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -285,8 +309,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         setAsSiblings(s, sib1, sib2);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -323,14 +347,21 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         setAsSiblings(s, sib1);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
         final SingleShipmentData data = ctxt.getData();
 
         assertNull(data.getBean().getStartLocation());
+    }
+
+    /**
+     * @return
+     */
+    protected SingleShipmentBuildContext createContext() {
+        return new SingleShipmentBuildContext(null);
     }
     @Test
     public void testLocationTo() {
@@ -371,8 +402,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         setAsSiblings(s, sib1, sib2);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -411,8 +442,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         altLocDao.save(sib1, sib1Locs);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -469,8 +500,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         altLocDao.save(s, sLocs);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -508,8 +539,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         altLocDao.save(s, sLocs);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -547,8 +578,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         altLocDao.save(s, sLocs);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -581,8 +612,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         altLocDao.save(sib, sibLocs);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -622,8 +653,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         createNote(s, u, "NoteMain2");
         final Note nSib = createNote(sib1, u, "NoteSib");
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -658,8 +689,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         noteDao.save(s, note);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -689,8 +720,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         final Arrival sArr = createArrival(s);
         final Arrival sibArr = createArrival(sib1);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -720,8 +751,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
 
         context.getBean(ArrivalDao.class).save(arrival);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -754,8 +785,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         sib1.getArrivalNotificationSchedules().add(schedSib);
         shipmentDao.save(sib1);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -802,8 +833,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         s.getArrivalNotificationSchedules().add(sched);
         shipmentDao.save(s);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -840,8 +871,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         sib1.getAlertsNotificationSchedules().add(schedSib);
         shipmentDao.save(sib1);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -888,8 +919,8 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         s.getAlertsNotificationSchedules().add(sched);
         shipmentDao.save(s);
 
-        final SingleShipmentBuildContext ctxt = new SingleShipmentBuildContext();
-        final MainShipmentDataBuilder b = new MainShipmentDataBuilder(jdbc, s.getId(), s.getCompany().getId());
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
         b.fetchData();
         b.build(ctxt);
 
@@ -905,6 +936,557 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         assertEquals(sched.getName(), n.getNotificationScheduleName());
         assertTrue(n.getPeopleToNotify().contains(getFullName(u1)));
         assertTrue(n.getPeopleToNotify().contains(getFullName(u1)));
+    }
+    @Test
+    public void testDeviceGroups() {
+        final Shipment s = createShipment(createDevice("234987239847"));
+        final Shipment sib1 = createShipment(createDevice("23957978487"));
+        final Shipment sib2 = createShipment(createDevice("209869879874"));
+
+        setAsSiblings(s, sib1, sib2);
+
+        createDeviceGroup(s.getDevice());
+        createDeviceGroup(s.getDevice());
+        shipmentDao.save(s);
+
+        final DeviceGroup grpSib = createDeviceGroup(sib1.getDevice());
+        shipmentDao.save(sib1);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(2, data.getBean().getDeviceGroups().size());
+
+        final SingleShipmentBean sibBean1 = SingleShipmentTestUtils.getSibling(sib1.getId(), data);
+        assertEquals(1, sibBean1.getDeviceGroups().size());
+        assertEquals(grpSib.getId(), sibBean1.getDeviceGroups().get(0).getId());
+
+        final SingleShipmentBean sibBean2 = SingleShipmentTestUtils.getSibling(sib2.getId(), data);
+        assertEquals(0, sibBean2.getDeviceGroups().size());
+    }
+    @Test
+    public void testDeviceGroupsGroup() {
+        final Shipment s = createShipment();
+
+        final DeviceGroup group = new DeviceGroup();
+        group.setCompany(sharedCompany);
+        group.setDescription("Device group description");
+        group.setName("Device group name");
+
+        context.getBean(DeviceGroupDao.class).save(group);
+        context.getBean(DeviceGroupDao.class).addDevice(group,  s.getDevice());
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(1, data.getBean().getDeviceGroups().size());
+
+        //check equals stops
+        final DeviceGroupDto g = data.getBean().getDeviceGroups().get(0);
+
+        assertEquals(group.getId(), g.getId());
+        assertEquals(group.getDescription(), g.getDescription());
+        assertEquals(group.getName(), g.getName());
+    }
+    @Test
+    public void testUserAccess() {
+        final User u1 = createUser("junit1");
+        final User u2 = createUser("junit2");
+        final User sibU = createUser("junitsib");
+
+        final Shipment s = createShipment();
+        final Shipment sib1 = createShipment();
+        final Shipment sib2 = createShipment();
+
+        setAsSiblings(s, sib1, sib2);
+
+        s.getUserAccess().add(u1);
+        s.getUserAccess().add(u2);
+
+        shipmentDao.save(s);
+
+        sib1.getUserAccess().add(sibU);
+        shipmentDao.save(sib1);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(2, data.getBean().getUserAccess().size());
+
+        final SingleShipmentBean sibBean1 = SingleShipmentTestUtils.getSibling(sib1.getId(), data);
+        assertEquals(1, sibBean1.getUserAccess().size());
+        assertEquals(sibU.getId(), sibBean1.getUserAccess().get(0).getId());
+
+        final SingleShipmentBean sibBean2 = SingleShipmentTestUtils.getSibling(sib2.getId(), data);
+        assertEquals(0, sibBean2.getUserAccess().size());
+    }
+    @Test
+    public void testUserAccessAccess() {
+        final User user = createUser("junit1");
+        final Shipment s = createShipment();
+
+        s.getUserAccess().add(user);
+        shipmentDao.save(s);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(1, data.getBean().getUserAccess().size());
+
+        //check equals stops
+        final ShipmentUserDto n = data.getBean().getUserAccess().get(0);
+
+        assertEquals(user.getId(), n.getId());
+        assertEquals(user.getEmail(), n.getEmail());
+    }
+    @Test
+    public void testCompanyAccess() {
+        final Company c1 = createCompany("junit1");
+        final Company c2 = createCompany("junit2");
+        final Company sibC = createCompany("junitsib");
+
+        final Shipment s = createShipment();
+        final Shipment sib1 = createShipment();
+        final Shipment sib2 = createShipment();
+
+        setAsSiblings(s, sib1, sib2);
+
+        s.getCompanyAccess().add(c1);
+        s.getCompanyAccess().add(c2);
+
+        shipmentDao.save(s);
+
+        sib1.getCompanyAccess().add(sibC);
+        shipmentDao.save(sib1);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(2, data.getBean().getCompanyAccess().size());
+
+        final SingleShipmentBean sibBean1 = SingleShipmentTestUtils.getSibling(sib1.getId(), data);
+        assertEquals(1, sibBean1.getCompanyAccess().size());
+        assertEquals(sibC.getId(), sibBean1.getCompanyAccess().get(0).getId());
+
+        final SingleShipmentBean sibBean2 = SingleShipmentTestUtils.getSibling(sib2.getId(), data);
+        assertEquals(0, sibBean2.getCompanyAccess().size());
+    }
+    @Test
+    public void testCompanyAccessAccess() {
+        final Company company = createCompany("junit1");
+        final Shipment s = createShipment();
+
+        s.getCompanyAccess().add(company);
+        shipmentDao.save(s);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(1, data.getBean().getCompanyAccess().size());
+
+        //check equals stops
+        final ShipmentCompanyDto c = data.getBean().getCompanyAccess().get(0);
+
+        assertEquals(company.getId(), c.getId());
+        assertEquals(company.getName(), c.getName());
+    }
+    @Test
+    public void testAlerts() {
+        final Shipment s = createShipment();
+        final Shipment sib1 = createShipment();
+        final Shipment sib2 = createShipment();
+
+        final TrackerEvent e1 = createTrackerEvent(s);
+        final TrackerEvent e2 = createTrackerEvent(s);
+        final TrackerEvent eSib = createTrackerEvent(sib1);
+
+        createAlert(e1);
+        createAlert(e2);
+        final Alert aSib = createAlert(eSib);
+
+        setAsSiblings(s, sib1, sib2);
+
+        shipmentDao.save(sib1);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(2, data.getBean().getSentAlerts().size());
+
+        final SingleShipmentBean sibBean1 = SingleShipmentTestUtils.getSibling(sib1.getId(), data);
+        assertEquals(1, sibBean1.getSentAlerts().size());
+        assertEquals(aSib.getId(), sibBean1.getSentAlerts().get(0).getId());
+
+        final SingleShipmentBean sibBean2 = SingleShipmentTestUtils.getSibling(sib2.getId(), data);
+        assertEquals(0, sibBean2.getSentAlerts().size());
+    }
+    @Test
+    public void testSendAlertsAlert() {
+        final Shipment s = createShipment();
+
+        final TrackerEvent e = createTrackerEvent(s);
+        final Alert a = new Alert();
+        a.setDate(new Date(System.currentTimeMillis() - 398270l));
+        a.setDevice(device);
+        a.setShipment(e.getShipment());
+        a.setTrackerEventId(e.getId());
+        a.setType(AlertType.Battery);
+
+        context.getBean(AlertDao.class).save(a);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(1, data.getBean().getSentAlerts().size());
+
+        //check equals stops
+        final AlertBean c = data.getBean().getSentAlerts().get(0);
+
+        assertEqualsDates(a.getDate(), c.getDate());
+        assertEquals(a.getId(), c.getId());
+        assertEquals(a.getTrackerEventId(), c.getTrackerEventId());
+        assertEquals(a.getType(), c.getType());
+    }
+    @Test
+    public void testSendAlertsTemperatureAlert() {
+        final Shipment s = createShipment();
+
+        final AlertProfile ap = createAlertProfile(s);
+
+        final TrackerEvent e = createTrackerEvent(s);
+        final TemperatureAlert alert = new TemperatureAlert();
+        alert.setDate(new Date(System.currentTimeMillis() - 398270l));
+        alert.setDevice(device);
+        alert.setShipment(e.getShipment());
+        alert.setTrackerEventId(e.getId());
+        alert.setType(AlertType.Hot);
+        alert.setTemperature(35.);
+        alert.setCumulative(true);
+        alert.setRuleId(createTemperatureRule(ap, AlertType.Cold, -1.).getId());
+        alert.setMinutes(17);
+
+        context.getBean(AlertDao.class).save(alert);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(1, data.getBean().getSentAlerts().size());
+
+        //check equals stops
+        final TemperatureAlertBean a = (TemperatureAlertBean) data.getBean().getSentAlerts().get(0);
+
+        assertEqualsDates(alert.getDate(), a.getDate());
+        assertEquals(alert.getId(), a.getId());
+        assertEquals(alert.getTrackerEventId(), a.getTrackerEventId());
+        assertEquals(alert.getType(), a.getType());
+
+        assertEquals(alert.getTemperature(), a.getTemperature(), 0.001);
+        assertEquals(alert.isCumulative(), a.isCumulative());
+        assertEquals(alert.getRuleId(), a.getRuleId());
+        assertEquals(alert.getMinutes(), a.getMinutes());
+    }
+
+    @Test
+    public void testAlertRules() {
+        final Shipment s = createShipment();
+        context.getBean(ShipmentSessionDao.class).saveSession(new ShipmentSession(s.getId()));
+
+        final Shipment sib1 = createShipment();
+        context.getBean(ShipmentSessionDao.class).saveSession(new ShipmentSession(sib1.getId()));
+
+        final Shipment sib2 = createShipment();
+        context.getBean(ShipmentSessionDao.class).saveSession(new ShipmentSession(sib2.getId()));
+
+        final AlertProfile ap1 = createAlertProfile(s);
+        final AlertProfile apSib = createAlertProfile(sib1);
+
+        createTemperatureRule(ap1, AlertType.Cold, -10.12);
+        createTemperatureRule(ap1, AlertType.Hot, 21.12);
+        final TemperatureRule rSib = createTemperatureRule(apSib, AlertType.Hot, 21.12);
+
+        setAsSiblings(s, sib1, sib2);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(2, data.getBean().getAlertYetToFire().size());
+
+        final SingleShipmentBean sibBean1 = SingleShipmentTestUtils.getSibling(sib1.getId(), data);
+        assertEquals(1, sibBean1.getAlertYetToFire().size());
+        assertEquals(rSib.getId(), sibBean1.getAlertYetToFire().get(0).getId());
+
+        final SingleShipmentBean sibBean2 = SingleShipmentTestUtils.getSibling(sib2.getId(), data);
+        assertEquals(0, sibBean2.getAlertYetToFire().size());
+    }
+    @Test
+    public void testAlertRulesFired() {
+        final Shipment s = createShipment();
+
+        final ShipmentSession session = new ShipmentSession(s.getId());
+
+        final AlertProfile ap1 = createAlertProfile(s);
+
+        final TemperatureRule r = createTemperatureRule(ap1, AlertType.Cold, -10.12);
+        createTemperatureRule(ap1, AlertType.Hot, 21.12);
+        AbstractRuleEngine.setProcessedTemperatureRule(session, r);
+        context.getBean(ShipmentSessionDao.class).saveSession(session);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(1, data.getBean().getAlertFired().size());
+        assertEquals(1, data.getBean().getAlertYetToFire().size());
+    }
+    @Test
+    public void testAlertRulesRule() {
+        final Shipment s = createShipment();
+        final AlertProfile ap = createAlertProfile(s);
+        final ShipmentSession session = new ShipmentSession(s.getId());
+        context.getBean(ShipmentSessionDao.class).saveSession(session);
+
+        final CorrectiveActionList correctiveActions = new CorrectiveActionList();
+        correctiveActions.setCompany(sharedCompany);
+        correctiveActions.setName("CorAct");
+        correctiveActions.setDescription("Corrective action list");
+        correctiveActions.getActions().add(new CorrectiveAction("a1", true));
+        correctiveActions.getActions().add(new CorrectiveAction("a2", false));
+        context.getBean(CorrectiveActionListDao.class).save(correctiveActions);
+
+        final TemperatureRule rule = new TemperatureRule();
+        rule.setCorrectiveActions(correctiveActions);
+        rule.setCumulativeFlag(true);
+        rule.setMaxRateMinutes(170);
+        rule.setTemperature(90.90);
+        rule.setTimeOutMinutes(450);
+        rule.setType(AlertType.Hot);
+
+        ap.getAlertRules().add(rule);
+        context.getBean(AlertProfileDao.class).save(ap);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertEquals(1, data.getBean().getAlertYetToFire().size());
+
+        //check equals stops
+        final TemperatureRuleBean r = (TemperatureRuleBean) data.getBean().getAlertYetToFire().get(0);
+
+        assertEquals(r.getId(), rule.getId());
+        assertEquals(r.getMaxRateMinutes(), rule.getMaxRateMinutes());
+        assertEquals(r.getTemperature(), rule.getTemperature(), 0.001);
+        assertEquals(r.getTimeOutMinutes(), rule.getTimeOutMinutes());
+        assertEquals(r.getType(), rule.getType());
+        assertEquals(r.getCorrectiveActions().getId(), rule.getCorrectiveActions().getId());
+
+        //corrective actions
+        final CorrectiveActionListBean ca = r.getCorrectiveActions();
+        assertEquals(ca.getDescription(), correctiveActions.getDescription());
+        assertEquals(ca.getId(), correctiveActions.getId());
+        assertEquals(ca.getName(), correctiveActions.getName());
+        assertEquals(ca.getActions().size(), correctiveActions.getActions().size());
+
+        //action
+        final CorrectiveAction action = ca.getActions().get(0);
+        assertEquals("a1", action.getAction());
+        assertEquals(true, action.isRequestVerification());
+    }
+    @Test
+    public void testAlertProfile() {
+        final Shipment s = createShipment();
+        final Shipment sib1 = createShipment();
+        final Shipment sib2 = createShipment();
+
+        setAsSiblings(s, sib1, sib2);
+
+        createAlertProfile(s);
+        createAlertProfile(sib1);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        final SingleShipmentData data = ctxt.getData();
+        assertNotNull(data.getBean().getAlertProfile());
+
+        assertNotNull(SingleShipmentTestUtils.getSibling(sib1.getId(), data).getAlertProfile());
+        assertNull(SingleShipmentTestUtils.getSibling(sib2.getId(), data).getAlertProfile());
+    }
+
+    /**
+     * @param s
+     * @return
+     */
+    protected MainShipmentDataBuilder createBuilder(final Shipment s) {
+        final PreliminarySingleShipmentData pd = shipmentDao.getPreliminarySingleShipmentData(
+                s.getId(), null, null);
+        return new MainShipmentDataBuilder(jdbc, pd.getShipment(), pd.getCompany(), pd.getSiblings());
+    }
+    @Test
+    public void testAlertProfileProfile() {
+        final Shipment s = createShipment();
+
+        //battery low corrective action
+        final CorrectiveActionList bloa = new CorrectiveActionList();
+        bloa.setCompany(sharedCompany);
+        bloa.setDescription("Battery low corrective action list");
+        bloa.setName("BloaActions");
+        bloa.getActions().add(new CorrectiveAction("a1", true));
+        bloa.getActions().add(new CorrectiveAction("a2", true));
+        context.getBean(CorrectiveActionListDao.class).save(bloa);
+
+        //battery low corrective action
+        final CorrectiveActionList lona = new CorrectiveActionList();
+        lona.setCompany(sharedCompany);
+        lona.setDescription("Ligth on corrective action list");
+        lona.setName("LonaActions");
+        lona.getActions().add(new CorrectiveAction("a3", true));
+        context.getBean(CorrectiveActionListDao.class).save(lona);
+
+        final AlertProfile ap = new AlertProfile();
+        ap.setBatteryLowCorrectiveActions(bloa);
+        ap.setCompany(sharedCompany);
+        ap.setDescription("Alert profile description");
+        ap.setLightOnCorrectiveActions(lona);
+        ap.setLowerTemperatureLimit(-22.33);
+        ap.setName("AlertProfileName");
+        ap.setUpperTemperatureLimit(33.44);
+        ap.setWatchBatteryLow(true);
+        ap.setWatchEnterBrightEnvironment(true);
+        ap.setWatchEnterDarkEnvironment(true);
+        ap.setWatchMovementStart(true);
+        ap.setWatchMovementStop(true);
+
+        context.getBean(AlertProfileDao.class).save(ap);
+
+        s.setAlertProfile(ap);
+        shipmentDao.save(s);
+
+        final SingleShipmentBuildContext ctxt = createContext();
+        final MainShipmentDataBuilder b = createBuilder(s);
+        b.fetchData();
+        b.build(ctxt);
+
+        //check equals stops
+        final AlertProfileBean apb = ctxt.getData().getBean().getAlertProfile();
+
+        assertEquals(ap.getDescription(), apb.getDescription());
+        assertEquals(ap.getId(), apb.getId());
+        assertEquals(ap.getLowerTemperatureLimit(), apb.getLowerTemperatureLimit(), 0.0001);
+        assertEquals(ap.getName(), apb.getName());
+        assertEquals(ap.getUpperTemperatureLimit(), apb.getUpperTemperatureLimit(), 0.0001);
+
+        //light on temperature action.
+        final CorrectiveActionListBean bloab = apb.getBatteryLowCorrectiveActions();
+        assertEquals(bloa.getActions().size(), bloab.getActions().size());
+        assertEquals(bloa.getDescription(), bloab.getDescription());
+        assertEquals(bloa.getId(), bloab.getId());
+        assertEquals(bloa.getName(), bloab.getName());
+
+        //light on temperature action.
+        final CorrectiveActionListBean lonab = apb.getLightOnCorrectiveActions();
+        assertEquals(lona.getActions().size(), lonab.getActions().size());
+        assertEquals(lona.getDescription(), lonab.getDescription());
+        assertEquals(lona.getId(), lonab.getId());
+        assertEquals(lona.getName(), lonab.getName());
+    }
+    /**
+     * @param s
+     * @return
+     */
+    protected AlertProfile createAlertProfile(final Shipment s) {
+        final AlertProfile ap = new AlertProfile();
+        ap.setCompany(sharedCompany);
+        ap.setName("JUnit");
+        s.setAlertProfile(ap);
+        context.getBean(AlertProfileDao.class).save(ap);
+        shipmentDao.save(s);
+        return ap;
+    }
+    /**
+     * @param type
+     * @param t
+     * @return
+     */
+    private TemperatureRule createTemperatureRule(final AlertProfile ap, final AlertType type, final double t) {
+        final TemperatureRule rule = new TemperatureRule(type);
+        rule.setCumulativeFlag(true);
+        rule.setMaxRateMinutes(100);
+        rule.setTemperature(t);
+        rule.setTimeOutMinutes(200);
+
+        ap.getAlertRules().add(rule);
+        context.getBean(AlertProfileDao.class).save(ap);
+        return rule;
+    }
+
+    /**
+     * @param e tracker event.
+     * @return alert.
+     */
+    private Alert createAlert(final TrackerEvent e) {
+        final Alert a = new Alert(AlertType.Battery);
+        a.setDate(new Date());
+        a.setDevice(e.getDevice());
+        a.setShipment(e.getShipment());
+        a.setTrackerEventId(e.getId());
+        return context.getBean(AlertDao.class).save(a);
+    }
+    /**
+     * @param devices
+     * @return
+     */
+    private DeviceGroup createDeviceGroup(final Device... devices) {
+        final DeviceGroup grp = new DeviceGroup();
+        grp.setCompany(sharedCompany);
+        grp.setDescription("JUnit device group");
+        grp.setName("JUnit");
+
+        final DeviceGroupDao dao = context.getBean(DeviceGroupDao.class);
+        dao.save(grp);
+
+        //add devices to new group
+        for (final Device d : devices) {
+            dao.addDevice(grp, d);
+        }
+
+        return grp;
     }
     /**
      * @param s shipment.
@@ -1051,6 +1633,13 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
      * @return shipment.
      */
     private Shipment createShipment() {
-        return shipmentDao.save(createDefaultNotSavedShipment(device));
+        return createShipment(device);
+    }
+    /**
+     * @param d
+     * @return
+     */
+    protected Shipment createShipment(final Device d) {
+        return shipmentDao.save(createDefaultNotSavedShipment(d));
     }
 }

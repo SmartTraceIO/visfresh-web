@@ -29,6 +29,16 @@ select
     s.eta as eta,
     ss.state as session,
     -- main alert profile properties
+    ap.id as apId,
+    ap.name as apName,
+    ap.description as apDescription,
+	ap.onenterbright as onenterbright,
+	ap.onenterdark as onenterdark,
+	ap.onmovementstart as onmovementstart,
+	ap.onmovementstop as onmovementstop,
+	ap.onbatterylow as onbatterylow,
+	ap.lowertemplimit as lowertemplimit,
+	ap.uppertemplimit as uppertemplimit,
     -- battery low corrective actions properties
     lona.id as lonaId,
     lona.name as lonaName,
@@ -64,7 +74,7 @@ select
 	    )),
 	    ']'
     ) from interimstops stp 
-    join locationprofiles loc on stp.location = loc.id
+    join locationprofiles loc on loc.company = 123321 and stp.location = loc.id
     where stp.shipment = s.id) as interimStopsJson,
     -- Shipped from location
 	JSON_OBJECT(
@@ -122,7 +132,7 @@ select
 	    ']'
     )
 	from alternativelocations alt
-	join locationprofiles altLoc on alt.location = altLoc.id
+	join locationprofiles altLoc on altLoc.company = 123321 and alt.location = altLoc.id
     where alt.shipment = s.id) as altLocationJson,
     -- Not user
     (select CONCAT(
@@ -141,7 +151,7 @@ select
 	    ']'
     )
 	from notes n
-	left outer join users nu on n.createdby = nu.email
+ 	left outer join users nu on nu.company = 123321 and n.createdby = nu.email
     where n.shipment = s.id) as notesJson,
     -- arrival
     arr.id as arrId,
@@ -159,8 +169,9 @@ select
 	    ']'
         )
 	from alertnotifschedules sc
-	join notificationschedules sched on sc.notification = sched.id
-    where sc.shipment = s.id) as alertNotifSchedJson
+	join notificationschedules sched on sched.company = 123321 and sc.notification = sched.id
+	where sc.shipment = s.id
+    ) as alertNotifSchedJson
     -- arrival notification schedules
     ,(select CONCAT(
 	    '[', 
@@ -172,8 +183,9 @@ select
 	    ']'
         )
 	from arrivalnotifschedules sc
-	join notificationschedules sched on sc.notification = sched.id
-    where sc.shipment = s.id) as arrivalNotifSchedJson
+	join notificationschedules sched on sched.company = 123321 and sc.notification = sched.id
+	where sc.shipment = s.id
+    ) as arrivalNotifSchedJson
     -- notification schedule users
     , (select CONCAT(
 	    '[', 
@@ -185,10 +197,10 @@ select
 	    ']'
         )
 		from arrivalnotifschedules aa
-		join notificationschedules sched on aa.notification = sched.id
+		join notificationschedules sched on sched.company = 123321 and aa.notification = sched.id
         join personalschedules ps on ps.schedule = sched.id
         join users u on u.company = 123321 and ps.user = u.id
-		where aa.shipment = s.id
+        where aa.shipment = s.id
     ) as arrivalScheduleUsersJson
     , (select CONCAT(
 	    '[', 
@@ -200,11 +212,86 @@ select
 	    ']'
         )
 		from alertnotifschedules aa
-		join notificationschedules sched on aa.notification = sched.id
+		join notificationschedules sched on sched.company = 123321 and aa.notification = sched.id
         join personalschedules ps on ps.schedule = sched.id
         join users u on u.company = 123321 and ps.user = u.id
-		where aa.shipment = s.id
+        where aa.shipment = s.id
     ) as alertScheduleUsersJson
+    , (select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'groupId', grp.id,
+	    	'name', grp.name,
+	    	'description', grp.description
+	    )),
+	    ']'
+        )
+		from devicegroups grp
+		join devicegrouprelations rel on rel.group = grp.id and grp.company = 123321
+		where rel.device = s.device
+    ) as deviceGroupsJson
+    , (select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'userId', u.id,
+	    	'email', u.email
+	    )),
+	    ']'
+        )
+		from externalusers ex
+		join users u on u.company = 123321 and u.id = ex.user
+		where ex.shipment = s.id
+    ) as userAccessJson
+    , (select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'companyId', c.id,
+	    	'companyName', c.name
+	    )),
+	    ']'
+        )
+		from externalcompanies ex
+		join companies c on c.id = ex.company
+		where ex.shipment = s.id
+    ) as companyAccessJson
+    , (select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	        'id', a.id,
+	        'type', a.type,
+	        'date', a.date,
+	        'trackerEventId', a.event,
+            'temperature', a.temperature,
+            'minutes', a.minutes,
+            'cumulative', IF(a.cumulative, 'true', 'false'),
+            'ruleId', a.rule 
+	    )),
+	    ']'
+        )
+		from alerts a
+		where a.shipment = s.id
+    ) as alertsJson
+    , (select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'id', r.id,
+			'type', r.type,
+			't', r.temp,
+			'timeout', r.timeout, 
+			'cumulative', IF(r.cumulative, 'true', false),
+			'profile', r.alertprofile,
+			'maxrates', r.maxrateminutes, 
+			'actionsId', r.corractions,
+			'actionsName', ca.name,
+			'actionsDesc', ca.description,
+			'actionsActions', ca.actions
+	    )),
+	    ']'
+        )
+		from temperaturerules r
+		left outer join correctiveactions ca on ca.company = 123321 and r.corractions = ca.id
+		where r.alertprofile = ap.id
+    ) as alertRulesJson
 from
     shipments s
 left outer join
@@ -224,7 +311,4 @@ left outer join -- arrival
 join
     devices d on d.imei = s.device
 where
-    s.id = 1387 or s.siblings = 1387
-        or s.siblings like concat(1387, ',%')
-        or s.siblings like concat('%,', 1387, ',%')
-        or s.siblings like concat('%,', 1387)
+    s.id = 1387

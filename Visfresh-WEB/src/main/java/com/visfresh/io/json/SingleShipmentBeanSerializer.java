@@ -131,7 +131,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param array
      * @return
      */
-    private List<ShipmentCompanyDto> parseCompanyAccessArray(final JsonArray array) {
+    public List<ShipmentCompanyDto> parseCompanyAccessArray(final JsonArray array) {
         final List<ShipmentCompanyDto> companies = new LinkedList<>();
         for (final JsonElement e : array) {
             final JsonObject json = e.getAsJsonObject();
@@ -161,7 +161,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param array
      * @return
      */
-    private List<ShipmentUserDto> parseUserAccessArray(final JsonArray array) {
+    public List<ShipmentUserDto> parseUserAccessArray(final JsonArray array) {
         final List<ShipmentUserDto> users = new LinkedList<>();
         for (final JsonElement e : array) {
             final JsonObject json = e.getAsJsonObject();
@@ -341,7 +341,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param e
      * @return
      */
-    private DeviceGroupDto parseDeviceGroupDto(final JsonElement e) {
+    public DeviceGroupDto parseDeviceGroupDto(final JsonElement e) {
         if (isNull(e)) {
             return null;
         }
@@ -689,7 +689,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param el
      * @return
      */
-    private AlertBean parseAlertBean(final JsonElement el) {
+    public AlertBean parseAlertBean(final JsonElement el) {
         if (el == null || el.isJsonNull()) {
             return null;
         }
@@ -931,7 +931,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param e JSON element.
      * @return corrective action.
      */
-    private CorrectiveAction parseCorrectiveAction(final JsonElement e) {
+    public CorrectiveAction parseCorrectiveAction(final JsonElement e) {
         if (e == null || e.isJsonNull()) {
             return null;
         }

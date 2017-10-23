@@ -41,7 +41,7 @@ public class AbstractJsonSerializer {
      * @param e
      * @return
      */
-    protected static double asDouble(final JsonElement e) {
+    public static double asDouble(final JsonElement e) {
         return e == null || e.isJsonNull() ? 0 : e.getAsDouble();
     }
 
@@ -49,14 +49,14 @@ public class AbstractJsonSerializer {
      * @param e
      * @return
      */
-    protected static int asInt(final JsonElement e) {
+    public static int asInt(final JsonElement e) {
         return e == null || e.isJsonNull() ? 0 : e.getAsInt();
     }
     /**
      * @param e
      * @return
      */
-    protected static Integer asInteger(final JsonElement e) {
+    public static Integer asInteger(final JsonElement e) {
         return e == null || e.isJsonNull() ? null : e.getAsInt();
     }
 
@@ -64,7 +64,7 @@ public class AbstractJsonSerializer {
      * @param e JSON element.
      * @return JSON element as long.
      */
-    protected static Long asLong(final JsonElement e) {
+    public static Long asLong(final JsonElement e) {
         return e == null || e.isJsonNull() ? null : e.getAsLong();
     }
 
@@ -72,7 +72,7 @@ public class AbstractJsonSerializer {
      * @param e JSON element.
      * @return JSON element as string.
      */
-    protected static String asString(final JsonElement e) {
+    public static String asString(final JsonElement e) {
         return e == null || e.isJsonNull() ? null : e.getAsString();
     }
 
@@ -80,7 +80,7 @@ public class AbstractJsonSerializer {
      * @param e JSON element.
      * @return JSON element as boolean.
      */
-    protected static Boolean asBoolean(final JsonElement e) {
+    public static Boolean asBoolean(final JsonElement e) {
         return e == null || e.isJsonNull() ? null : e.getAsBoolean();
     }
 
@@ -154,7 +154,7 @@ public class AbstractJsonSerializer {
      * @param array
      * @return
      */
-    protected static List<Long> asLongList(final JsonArray array) {
+    public static List<Long> asLongList(final JsonArray array) {
         final List<Long> list = new LinkedList<Long>();
         for (final JsonElement l : array) {
             list.add(l.getAsLong());
@@ -177,7 +177,7 @@ public class AbstractJsonSerializer {
      * @param e JSON elmeent.
      * @return
      */
-    protected static List<Long> asLongList(final JsonElement e) {
+    public static List<Long> asLongList(final JsonElement e) {
         if (e == null || e.isJsonNull()) {
             return null;
         }

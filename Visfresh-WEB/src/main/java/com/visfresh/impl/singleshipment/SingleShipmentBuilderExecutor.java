@@ -44,7 +44,7 @@ public class SingleShipmentBuilderExecutor {
      * @return the single shipment data.
      * @throws Exception
      */
-    public SingleShipmentData execute() throws Exception {
+    public SingleShipmentData execute(final SingleShipmentBuildContext context) throws Exception {
         sortBuilders(builders);
         final ExecutorService pool = Executors.newFixedThreadPool(builders.size(), threadFactory);
 
@@ -65,7 +65,6 @@ public class SingleShipmentBuilderExecutor {
             throw new TimeoutException("Build the single shipment data timed out");
         }
 
-        final SingleShipmentBuildContext context = new SingleShipmentBuildContext();
         for (final SingleShipmentPartBuilder b : builders) {
             b.build(context);
         }

@@ -276,10 +276,21 @@ public abstract class AbstractRuleEngine implements RuleEngine, SystemMessageHan
             return new LinkedList<>();
         }
         final List<TemperatureRule> alertRules = alertProfile.getAlertRules();
+        final ShipmentSession session = getShipmentSession(s);
 
+        return getFailteredAlertRules(alertRules, session, onlyProcessed);
+    }
+
+    /**
+     * @param alertRules
+     * @param session
+     * @param onlyProcessed
+     * @return
+     */
+    public static List<AlertRule> getFailteredAlertRules(final List<TemperatureRule> alertRules,
+            final ShipmentSession session, final boolean onlyProcessed) {
         final List<AlertRule> alerts = new LinkedList<AlertRule>();
         //check device state is set.
-        final ShipmentSession session = getShipmentSession(s);
         if (session != null) {
             for (final TemperatureRule rule: alertRules) {
                 switch (rule.getType()) {

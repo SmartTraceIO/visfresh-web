@@ -96,4 +96,6 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment
      * @return
      */
     Long getShipmentId(String sn, int tripCount);
+    PreliminarySingleShipmentData getPreliminarySingleShipmentData(
+            Long shipmentId, String sn, Integer tripCount);
 }

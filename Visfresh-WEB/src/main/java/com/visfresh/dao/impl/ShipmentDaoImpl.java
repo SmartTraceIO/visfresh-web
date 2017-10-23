@@ -17,6 +17,7 @@ import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
+import com.visfresh.dao.PreliminarySingleShipmentData;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.SingleShipmentBeanDao;
 import com.visfresh.dao.Sorting;
@@ -425,14 +426,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         //create serial number filter
         final String key = "snKey";
 
-        //build like clause
-        final StringBuilder serialNum = new StringBuilder(sn);
-        while (serialNum.length() < 6) {
-            serialNum.insert(0, '0');
-        }
-        //append
-        serialNum.insert(0, '%');
-        serialNum.append('_');
+        final String snValue = createSerialNumberLikeCause(sn);
 
         final Filter f = new Filter();
         if (company != null) {
@@ -440,7 +434,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         }
 
         final DefaultCustomFilter customFilter = new DefaultCustomFilter();
-        customFilter.addValue(key, serialNum.toString());
+        customFilter.addValue(key, snValue);
         customFilter.setFilter(DEVICE_FIELD + " like :" + key);
         f.addFilter(DEVICE_FIELD, customFilter);
 
@@ -456,6 +450,21 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         }
 
         return null;
+    }
+    /**
+     * @param sn
+     * @return
+     */
+    private String createSerialNumberLikeCause(final String sn) {
+        //build like clause
+        final StringBuilder serialNum = new StringBuilder(sn);
+        while (serialNum.length() < 6) {
+            serialNum.insert(0, '0');
+        }
+        //append
+        serialNum.insert(0, '%');
+        serialNum.append('_');
+        return serialNum.toString();
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#findAllBySnTrip(java.lang.String, int)
@@ -741,6 +750,49 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
 
         jdbc.update("update " + TABLE + " set isautostart = true where " + ID_FIELD + "=:s",
                 params);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#getPreliminarySingleShipmentData(java.lang.Long, java.lang.String, int)
+     */
+    @Override
+    public PreliminarySingleShipmentData getPreliminarySingleShipmentData(
+            final Long shipmentId, final String sn, final Integer tripCount) {
+        if (shipmentId == null && (sn == null || tripCount == null)) {
+            return null;
+        }
+
+        final Map<String, Object> params = new HashMap<String, Object>();
+
+        final StringBuilder query = new StringBuilder("select s.company as company,"
+                + " s.id as shipment, s.siblings as siblings from shipments s where ");
+        if (shipmentId != null) {
+            query.append("s.id = :s");
+            params.put("s", shipmentId);
+        } else {
+            query.append("s.tripcount = :trip and s.device like :sn");
+            params.put("sn", createSerialNumberLikeCause(sn));
+            params.put("trip", tripCount);
+        }
+
+        final List<Map<String, Object>> rows = jdbc.queryForList(query.toString(), params);
+        if (rows.size() == 0) {
+            return null;
+        }
+        final Map<String, Object> row = rows.get(0);
+
+        final PreliminarySingleShipmentData data = new PreliminarySingleShipmentData();
+        data.setCompany(dbLong(row.get("company")));
+        data.setShipment(dbLong(row.get("shipment")));
+
+        //process siblings
+        final String sib = (String) row.get("siblings");
+        if (sib != null) {
+            for (final String str : sib.split(",")) {
+                data.getSiblings().add(Long.parseLong(str));
+            }
+        }
+
+        return data;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#getTripCount(java.lang.Long)

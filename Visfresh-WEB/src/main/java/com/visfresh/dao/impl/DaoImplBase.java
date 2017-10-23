@@ -272,4 +272,39 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
     protected String combine(final String... strings) {
         return StringUtils.combine(strings, ",");
     }
+    /**
+     * @param object
+     * @return
+     */
+    public static final Long dbLong(final Object object) {
+        if (object == null) {
+            return null;
+        }
+        return ((Number) object).longValue();
+    }
+    public static Double dbDouble(final Object object) {
+        if (object == null) {
+            return null;
+        }
+        return ((Number) object).doubleValue();
+    }
+    /**
+     * @param object
+     * @return
+     */
+    public static Integer dbInteger(final Object object) {
+        if (object instanceof String) {
+            return Integer.valueOf((String) object);
+        }
+        final Number num = (Number) object;
+        return num == null ? null : num.intValue();
+    }
+    /**
+     * @param object
+     * @return
+     */
+    public static boolean dbBoolean(final Object object) {
+        return Boolean.TRUE.equals(object);
+    }
+
 }

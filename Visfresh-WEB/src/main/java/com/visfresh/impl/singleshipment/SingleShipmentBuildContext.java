@@ -8,8 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.visfresh.entities.Location;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.rules.state.ShipmentSession;
+import com.visfresh.services.LocationService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -18,12 +20,14 @@ import com.visfresh.rules.state.ShipmentSession;
 public class SingleShipmentBuildContext {
     private SingleShipmentData data;
     private Map<Long, ShipmentSession> sessions = new HashMap<>();
+    private final LocationService locSrv;
 
     /**
      * Default constructor.
      */
-    public SingleShipmentBuildContext() {
+    public SingleShipmentBuildContext(final LocationService locSrv) {
         super();
+        this.locSrv = locSrv;
     }
 
     /**
@@ -49,5 +53,12 @@ public class SingleShipmentBuildContext {
     }
     public void addSession(final ShipmentSession s) {
         sessions.put(s.getShipmentId(), s);
+    }
+    /**
+     * @param loc location.
+     * @return location description.
+     */
+    public String getLocationDescription(final Location loc) {
+        return locSrv.getLocationDescription(loc);
     }
 }

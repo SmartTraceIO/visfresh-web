@@ -714,6 +714,25 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         dao.moveToNewDevice(d1, d2);
         assertEquals(d2.getImei(), dao.findOne(a.getId()).getDevice().getImei());
     }
+    @Test
+    public void testGetPreliminarySingleShipmentDataSnTrip() {
+        final Shipment s = createShipment(sharedCompany, ShipmentStatus.Arrived);
+        final Shipment sib1 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+        final Shipment sib2 = createShipment(sharedCompany, ShipmentStatus.Arrived);
+
+        s.getSiblings().add(sib1.getId());
+        s.getSiblings().add(sib2.getId());
+        s.setSiblingCount(2);
+        dao.save(s);
+
+        final PreliminarySingleShipmentData data = dao.getPreliminarySingleShipmentData(
+                null, s.getDevice().getSn(), s.getTripCount());
+
+        assertEquals(s.getId(), data.getShipment());
+        assertEquals(s.getCompany().getId(), data.getCompany());
+        assertTrue(data.getSiblings().contains(sib1.getId()));
+        assertTrue(data.getSiblings().contains(sib2.getId()));
+    }
     /**
      * @param c company.
      * @param status shipment status.
