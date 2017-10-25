@@ -149,7 +149,7 @@ public class NoteDaoImpl implements NoteDao {
         n.setNoteType((String) row.get("notetype"));
         n.setTimeOnChart((Date) row.get("timeonchart"));
         n.setActive((Boolean) row.get("active"));
-        n.setCreatedByName(StringUtils.createFullUserName(
+        n.setCreatedByName(StringUtils.createShortenedFullUserName(
                 (String) row.get("firstName"), (String) row.get("lastName")));
         return n;
     }

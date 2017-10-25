@@ -394,7 +394,7 @@ public class SingleShipmentBean {
     /**
      * @param batteryLevel the batteryLevel to set
      */
-    public void setBatteryLevel(final int batteryLevel) {
+    public void setBatteryLevel(final Integer batteryLevel) {
         this.batteryLevel = batteryLevel;
     }
     /**

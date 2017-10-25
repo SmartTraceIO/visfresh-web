@@ -79,7 +79,6 @@ import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.services.RuleEngine;
-import com.visfresh.services.SingleShipmentService;
 
 import junit.framework.AssertionFailedError;
 
@@ -1169,7 +1168,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         rule2.setCorrectiveActions(null);
 
         saveAlertProfileDirectly(alertProfile);
-        context.getBean(SingleShipmentService.class).rebuildShipmentData(s.getId());
 
         sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
         assertEquals(0, sd.get("alertsWithCorrectiveActions").getAsJsonArray().size());

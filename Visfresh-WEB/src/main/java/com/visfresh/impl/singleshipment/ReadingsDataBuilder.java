@@ -45,9 +45,9 @@ public class ReadingsDataBuilder implements SingleShipmentPartBuilder {
         this.jdbc = jdbc;
         this.shipmentId = shipmentId;
 
-        beans.put(shipmentId, createBean());
-        for (final Long sib : siblings) {
-            beans.put(sib, createBean());
+        beans.put(shipmentId, null);
+        for (final Long id : siblings) {
+            beans.put(id, null);
         }
     }
 
@@ -56,8 +56,8 @@ public class ReadingsDataBuilder implements SingleShipmentPartBuilder {
      */
     protected SingleShipmentBean createBean() {
         final SingleShipmentBean bean = new SingleShipmentBean();
-        bean.setMinTemp(Double.MAX_VALUE / 2.);
-        bean.setMinTemp(Double.MIN_VALUE / 2.);
+        bean.setMinTemp(1000);
+        bean.setMaxTemp(-273);
         return bean;
     }
 
@@ -96,21 +96,35 @@ public class ReadingsDataBuilder implements SingleShipmentPartBuilder {
                 while (iter.hasNext()) {
                     final AlertBean a = iter.next();
 
-                    boolean foundReading = e.getId().equals(a.getTrackerEventId());
-                    if (!foundReading) {
+                    boolean foundReading = false;
+                    if (e.getId().equals(a.getTrackerEventId())) {
+                        eb.getAlerts().add(a);
+                        alertReadings.remove(a);
+                        iter.remove();
+                        foundReading = true;
+                    } else {
                         final SingleShipmentLocationBean oldEb = alertReadings.get(a);
                         if (oldEb != null
-                                && timeDistance(a.getDate(), e.getTime()) > timeDistance(a.getDate(), eb.getTime())) {
+                                && timeDistance(a.getDate(), e.getTime()) > timeDistance(a.getDate(), oldEb.getTime())) {
+                            oldEb.getAlerts().add(a);
+                            alertReadings.remove(a);
+                            iter.remove();
                             foundReading = true;
                         }
                     }
 
-                    if (foundReading) {
-                        eb.getAlerts().add(a);
-                        alertReadings.remove(a);
-                        iter.remove();
-                    } else {
+                    if (a.getTrackerEventId() == null && !foundReading){
                         alertReadings.put(a, eb);
+                    }
+                }
+            }
+
+            //add nearest alerts to readings if tracker event ID is not set
+            for (final AlertBean a : alerts) {
+                if (a.getTrackerEventId() == null){
+                    final SingleShipmentLocationBean eb = alertReadings.get(a);
+                    if (eb != null) {
+                        eb.getAlerts().add(a);
                     }
                 }
             }
@@ -148,8 +162,10 @@ public class ReadingsDataBuilder implements SingleShipmentPartBuilder {
      * Clears the builder.
      */
     private void clear() {
-        beans.clear();
         events.clear();
+        for (final Long id : new LinkedList<>(beans.keySet())) {
+            beans.put(id, createBean());
+        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.impl.singleshipment.SingleShipmentPartBuilder#fetchData()

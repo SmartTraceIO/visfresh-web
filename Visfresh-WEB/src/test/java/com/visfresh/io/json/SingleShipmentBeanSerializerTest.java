@@ -453,7 +453,7 @@ public class SingleShipmentBeanSerializerTest {
         final Date date = new Date(System.currentTimeMillis() - 9234709l);
         final Long id = 99l;
         final Long trackerEventId = 89l;
-        final AlertType type = AlertType.Battery;
+        final AlertType type = AlertType.Hot;
         final boolean cumulative = true;
         final int minutes = 456;
         final Long ruleId = 87l;
@@ -1051,7 +1051,7 @@ public class SingleShipmentBeanSerializerTest {
         final Date date = new Date(System.currentTimeMillis() - 9234709l);
         final Long id = 99l;
         final Long trackerEventId = 89l;
-        final AlertType type = AlertType.Battery;
+        final AlertType type = AlertType.Hot;
         final boolean cumulative = true;
         final int minutes = 456;
         final Long ruleId = 87l;

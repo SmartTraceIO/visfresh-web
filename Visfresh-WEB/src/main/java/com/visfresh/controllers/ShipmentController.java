@@ -48,6 +48,7 @@ import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.AlternativeLocations;
@@ -67,11 +68,12 @@ import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
-import com.visfresh.impl.services.SingleShipmentServiceImpl;
+import com.visfresh.impl.singleshipment.MainShipmentDataBuilder;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.SaveShipmentRequest;
@@ -1072,7 +1074,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @return
      */
     private int getPercentageCompleted(final Shipment s, final Date currentTime, final Date eta) {
-        return SingleShipmentServiceImpl.getPercentageCompleted(s.getShipmentDate(), currentTime, eta);
+        return MainShipmentDataBuilder.getPercentageCompleted(s.getShipmentDate(), currentTime, eta);
     }
     /**
      * @param authToken authentication token.
@@ -1490,7 +1492,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 final SingleShipmentTimeItem item = getBestCandidate(items, alert);
                 item.getAlerts().add(alert);
 
-                final AlertRule rule = SingleShipmentServiceImpl.getRuleWithCorrectiveAction(alert);
+                final AlertRule rule = getRuleWithCorrectiveAction(alert);
                 if (rule != null) {
                     final AlertDto a = new AlertDto();
                     Long corrListId = null;
@@ -1940,11 +1942,11 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return true;
         }
 
-        final Company usersCompany = user.getCompany();
         if (s == null || s.getCompanyId() == null) {
             return false;
         }
 
+        final Company usersCompany = user.getCompany();
         if (s.getCompanyId().equals(usersCompany.getId())) {
             return true;
         }
@@ -1964,5 +1966,29 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
 
         return false;
+    }
+    /**
+     * @param alert
+     * @return
+     */
+    public static AlertRule getRuleWithCorrectiveAction(final Alert alert) {
+        final AlertProfile alertProfile = alert.getShipment().getAlertProfile();
+
+        if (alert instanceof TemperatureAlert) {
+            final Long ruleId = ((TemperatureAlert) alert).getRuleId();
+            for (final TemperatureRule rule : alertProfile.getAlertRules()) {
+                if (rule.getCorrectiveActions() != null && rule.getId().equals(ruleId)) {
+                    return rule;
+                }
+            }
+        } else {
+            final AlertType type = alert.getType();
+            if (type == AlertType.Battery && alertProfile.getBatteryLowCorrectiveActions() != null
+                    || type == AlertType.LightOn && alertProfile.getLightOnCorrectiveActions() != null) {
+                return new AlertRule(alert.getType());
+            }
+        }
+
+        return null;
     }
 }

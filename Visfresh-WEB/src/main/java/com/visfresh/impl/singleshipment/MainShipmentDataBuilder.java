@@ -27,7 +27,6 @@ import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.impl.services.NotificationServiceImpl;
-import com.visfresh.impl.services.SingleShipmentServiceImpl;
 import com.visfresh.io.json.AbstractJsonSerializer;
 import com.visfresh.io.json.ShipmentSessionSerializer;
 import com.visfresh.io.json.SingleShipmentBeanSerializer;
@@ -225,7 +224,7 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         bean.setStartTime((Date) row.get("startTime"));
         final Date eta = (Date) row.get("eta");
         if (eta != null) {
-            bean.setPercentageComplete(SingleShipmentServiceImpl.getPercentageCompleted(
+            bean.setPercentageComplete(getPercentageCompleted(
                     bean.getStartTime(), new Date(), eta));
             bean.setEta(eta);
         }
@@ -303,7 +302,7 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         //ap.onmovementstart as onmovementstart,
         ap.setWatchMovementStart(DaoImplBase.dbBoolean(row.get("onmovementstart")));
         //ap.onmovementstop as onmovementstop,
-        ap.setWatchMovementStop(DaoImplBase.dbBoolean("onmovementstop"));
+        ap.setWatchMovementStop(DaoImplBase.dbBoolean(row.get("onmovementstop")));
         //ap.onbatterylow as onbatterylow,
         ap.setWatchBatteryLow(DaoImplBase.dbBoolean(row.get("onbatterylow")));
         //ap.lowertemplimit as lowertemplimit,
@@ -535,7 +534,7 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
 
                 final List<String> users = scheduleUsers.get(id);
                 if (users != null) {
-                    item.setPeopleToNotify(StringUtils.combine(users, ","));
+                    item.setPeopleToNotify(StringUtils.combine(users, ", "));
                 } else {
                     item.setPeopleToNotify("");
                 }
@@ -557,7 +556,7 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
                 final JsonObject json = e.getAsJsonObject();
                 final NoteBean n = serializer.parseNoteBean(json);
                 //         bean.setCreatedByName(asString(json.get("createCreatedByName")));
-                n.setCreatedByName(StringUtils.createFullUserName(
+                n.setCreatedByName(StringUtils.createShortenedFullUserName(
                         AbstractJsonSerializer.asString(json.get("firstName")),
                         AbstractJsonSerializer.asString(json.get("lastName"))));
                 notes.add(n);
@@ -629,5 +628,23 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         final ShipmentSession session = sessionSerializer.parseSession(state);
         session.setShipmentId(shipmentId);
         return session;
+    }
+    /**
+     * @param s
+     * @param currentTime
+     * @param eta
+     * @return
+     */
+    public static int getPercentageCompleted(final Date shipmentDate,
+            final Date currentTime, final Date eta) {
+        int percentage;
+        if (eta.before(currentTime)) {
+            percentage = 100;
+        } else {
+            double d = currentTime.getTime() - shipmentDate.getTime();
+            d = Math.max(0., d / (eta.getTime() - shipmentDate.getTime()));
+            percentage = (int) Math.round(d);
+        }
+        return percentage;
     }
 }

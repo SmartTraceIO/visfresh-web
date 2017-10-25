@@ -6,6 +6,7 @@ package com.visfresh.lists;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -37,11 +38,9 @@ public class ListNotificationScheduleItem implements EntityWithId<Long> {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append(ps.getUser().getFirstName());
-            if (ps.getUser().getLastName() != null) {
-                sb.append(' ');
-                sb.append(ps.getUser().getLastName());
-            }
+            final String firstName = ps.getUser().getFirstName();
+            final String lastName = ps.getUser().getLastName();
+            sb.append(StringUtils.createFullUserName(firstName, lastName));
         }
 
         setPeopleToNotify(sb.toString());

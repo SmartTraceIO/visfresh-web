@@ -27,7 +27,6 @@ import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.NotificationScheduleDao;
 import com.visfresh.dao.PreliminarySingleShipmentData;
 import com.visfresh.dao.ShipmentSessionDao;
-import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
@@ -50,7 +49,6 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
 import com.visfresh.impl.services.NotificationServiceImpl;
 import com.visfresh.io.shipment.AlertBean;
@@ -705,7 +703,7 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         assertEqualsDates(creationDate, n.getCreationDate());
         assertNotNull(n.getNoteNum());
         assertEquals(notetext, n.getNoteText());
-        assertEquals(StringUtils.createFullUserName(u.getFirstName(), u.getLastName()), n.getCreatedByName());
+        assertEquals(StringUtils.createShortenedFullUserName(u.getFirstName(), u.getLastName()), n.getCreatedByName());
         assertEquals(notetype, n.getNoteType());
         assertEqualsDates(timeOnChart, n.getTimeOnChart());
     }
@@ -1212,7 +1210,6 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         assertEquals(alert.getRuleId(), a.getRuleId());
         assertEquals(alert.getMinutes(), a.getMinutes());
     }
-
     @Test
     public void testAlertRules() {
         final Shipment s = createShipment();
@@ -1427,48 +1424,6 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         assertEquals(lona.getName(), lonab.getName());
     }
     /**
-     * @param s
-     * @return
-     */
-    protected AlertProfile createAlertProfile(final Shipment s) {
-        final AlertProfile ap = new AlertProfile();
-        ap.setCompany(sharedCompany);
-        ap.setName("JUnit");
-        s.setAlertProfile(ap);
-        context.getBean(AlertProfileDao.class).save(ap);
-        shipmentDao.save(s);
-        return ap;
-    }
-    /**
-     * @param type
-     * @param t
-     * @return
-     */
-    private TemperatureRule createTemperatureRule(final AlertProfile ap, final AlertType type, final double t) {
-        final TemperatureRule rule = new TemperatureRule(type);
-        rule.setCumulativeFlag(true);
-        rule.setMaxRateMinutes(100);
-        rule.setTemperature(t);
-        rule.setTimeOutMinutes(200);
-
-        ap.getAlertRules().add(rule);
-        context.getBean(AlertProfileDao.class).save(ap);
-        return rule;
-    }
-
-    /**
-     * @param e tracker event.
-     * @return alert.
-     */
-    private Alert createAlert(final TrackerEvent e) {
-        final Alert a = new Alert(AlertType.Battery);
-        a.setDate(new Date());
-        a.setDevice(e.getDevice());
-        a.setShipment(e.getShipment());
-        a.setTrackerEventId(e.getId());
-        return context.getBean(AlertDao.class).save(a);
-    }
-    /**
      * @param devices
      * @return
      */
@@ -1513,23 +1468,6 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         context.getBean(NotificationScheduleDao.class).save(sched);
 
         return sched;
-    }
-    /**
-     * @param s shipment.
-     * @return tracker event.
-     */
-    private TrackerEvent createTrackerEvent(final Shipment s) {
-        final TrackerEvent e = new TrackerEvent();
-        e.setBattery(700);
-        e.setCreatedOn(new Date());
-        e.setDevice(s.getDevice());
-        e.setLatitude(30.);
-        e.setLongitude(20.);
-        e.setShipment(s);
-        e.setTemperature(12.);
-        e.setTime(new Date());
-        e.setType(TrackerEventType.AUT);
-        return context.getBean(TrackerEventDao.class).save(e);
     }
     /**
      * @param s shipment.
@@ -1601,13 +1539,6 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
         assertEquals("Notes", loc.getNotes(), b.getNotes());
         assertEquals("Radius", loc.getRadius(), b.getRadius());
     }
-    /**
-     * @param d1 first date.
-     * @param d2 second date.
-     */
-    private void assertEqualsDates(final Date d1, final Date d2) {
-        assertTrue(Math.abs(d1.getTime() - d2.getTime()) < 1000l);
-    }
     private LocationProfile createLocation(final String name) {
         final LocationProfile p = new LocationProfile();
         p.setAddress("Odessa city, Deribasovskaya st. 1, apt. 1");
@@ -1634,12 +1565,5 @@ public class MainShipmentDataBuilderTest extends BaseBuilderTest {
      */
     private Shipment createShipment() {
         return createShipment(device);
-    }
-    /**
-     * @param d
-     * @return
-     */
-    protected Shipment createShipment(final Device d) {
-        return shipmentDao.save(createDefaultNotSavedShipment(d));
     }
 }

@@ -171,4 +171,11 @@ public class TrackerEventDto {
     public void setLongitude(final Double longitude) {
         this.longitude = longitude;
     }
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getType() + " [" + getTime() + ", " + getTemperature() + "]";
+    }
 }

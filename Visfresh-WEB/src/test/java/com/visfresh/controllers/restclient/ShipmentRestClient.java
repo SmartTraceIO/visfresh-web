@@ -52,14 +52,21 @@ public class ShipmentRestClient extends RestClient {
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("shipmentId", shipment.getId().toString());
 
-        final JsonElement result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT_OLD), params);
-        final JsonElement v2Result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT), params);
-        final JsonObject diff = SerializerUtils.diff(result, v2Result);
+        long startTime = System.currentTimeMillis();
+        final JsonElement oldVersionResult = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT_OLD), params);
+        final long oldTime = System.currentTimeMillis() - startTime;
+
+        startTime = System.currentTimeMillis();
+        final JsonElement newVersionResult = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT), params);
+        final long newTime = System.currentTimeMillis() - startTime;
+        System.out.println("Old execution time: " + oldTime + ", new execution time: " + newTime);
+
+        final JsonObject diff = SerializerUtils.diff(oldVersionResult, newVersionResult);
         if (diff != null) {
             throw new AssertionFailedError("Old and new version are not equals: " + diff);
         }
 
-        return result;
+        return newVersionResult;
     }
     public JsonElement getSingleShipment(final String sn, final int trip)
             throws IOException, RestServiceException {
@@ -69,14 +76,21 @@ public class ShipmentRestClient extends RestClient {
             params.put("trip", Integer.toString(trip));
         }
 
-        final JsonElement result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT_OLD), params);
-        final JsonElement v2Result = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT), params);
-        final JsonObject diff = SerializerUtils.diff(result, v2Result);
+        long startTime = System.currentTimeMillis();
+        final JsonElement oldResult = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT_OLD), params);
+        final long oldTime = System.currentTimeMillis() - startTime;
+
+        startTime = System.currentTimeMillis();
+        final JsonElement newResult = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT), params);
+        final long newTime = System.currentTimeMillis() - startTime;
+        System.out.println("Old execution time: " + oldTime + ", new execution time: " + newTime);
+
+        final JsonObject diff = SerializerUtils.diff(oldResult, newResult);
         if (diff != null) {
             throw new AssertionFailedError("Old and new version are not equals: " + diff);
         }
 
-        return result;
+        return newResult;
     }
     /**
      * @param s

@@ -71,7 +71,9 @@ public class SingleShipmentBuilderExecutor {
 
         return context.getData();
     }
-
+    public void addBuilder(final SingleShipmentPartBuilder b) {
+        builders.add(b);
+    }
     /**
      * Sorts the single shipment builders.
      */

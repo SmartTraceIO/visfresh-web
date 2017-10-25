@@ -132,7 +132,7 @@ public final class StringUtils {
      * @param lastName
      * @return
      */
-    public static String createFullUserName(final String firstName, final String lastName) {
+    public static String createShortenedFullUserName(final String firstName, final String lastName) {
         final StringBuilder sb = new StringBuilder();
         if (firstName != null) {
             sb.append(firstName);
@@ -142,6 +142,24 @@ public final class StringUtils {
                 sb.append(' ');
             }
             sb.append(lastName.charAt(0));
+        }
+        return sb.toString();
+    }
+    /**
+     * @param firstName
+     * @param lastName
+     * @return
+     */
+    public static String createFullUserName(final String firstName, final String lastName) {
+        final StringBuilder sb = new StringBuilder();
+        if (firstName != null) {
+            sb.append(firstName);
+        }
+        if (lastName != null && lastName.length() > 0) {
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
+            sb.append(lastName);
         }
         return sb.toString();
     }

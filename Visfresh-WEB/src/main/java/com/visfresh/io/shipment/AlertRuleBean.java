@@ -28,7 +28,6 @@ public class AlertRuleBean {
         setType(r.getType());
         setId(r.getId());
     }
-
     /**
      * @return the type
      */

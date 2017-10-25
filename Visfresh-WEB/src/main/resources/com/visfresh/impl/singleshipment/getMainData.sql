@@ -239,7 +239,7 @@ select
 	    ']'
         )
 		from externalusers ex
-		join users u on u.company = 123321 and u.id = ex.user
+		join users u on u.id = ex.user
 		where ex.shipment = s.id
     ) as userAccessJson
     , (select CONCAT(

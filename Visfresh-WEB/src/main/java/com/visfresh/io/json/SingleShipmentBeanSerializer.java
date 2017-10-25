@@ -695,13 +695,14 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
         }
 
         final JsonObject json = el.getAsJsonObject();
-        final boolean isTemperatureAlert = json.has("temperature");
 
-        final AlertBean a = isTemperatureAlert ? new TemperatureAlertBean() : new AlertBean();
+        final AlertType alertType = AlertType.valueOf(asString(json.get("type")));
+
+        final AlertBean a = alertType.isTemperatureAlert() ? new TemperatureAlertBean() : new AlertBean();
         jsonToNotificationIssue(json, a);
 
-        a.setType(AlertType.valueOf(asString(json.get("type"))));
-        if (isTemperatureAlert) {
+        a.setType(alertType);
+        if (alertType.isTemperatureAlert()) {
             final TemperatureAlertBean ta = (TemperatureAlertBean) a;
             ta.setTemperature(asDouble(json.get("temperature")));
             ta.setMinutes(asInt(json.get("minutes")));
@@ -1311,13 +1312,16 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
 
         //alerts with corrective actions.
         final JsonArray alertsWithCorrectiveActions = new JsonArray();
-        for (final AlertBean alert : bean.getSentAlerts()) {
-            final AlertRuleBean rule = createRule(alert, allRules);
-            if (rule != null) { //old versions of alert may not have the rule set
-                final Long id = getCorrectiveActionListId(rule, bean.getAlertProfile());
-                if (id != null) {
-                    final JsonObject corrAction = exportAlertWithCorrectiveActions(alert, bean, rule, id);
-                    alertsWithCorrectiveActions.add(corrAction);
+        final AlertProfileBean alertProfile = bean.getAlertProfile();
+        if (alertProfile != null) {
+            for (final AlertBean alert : bean.getSentAlerts()) {
+                final AlertRuleBean rule = createRule(alert, allRules);
+                if (rule != null) { //old versions of alert may not have the rule set
+                    final Long id = getCorrectiveActionListId(rule, alertProfile);
+                    if (id != null) {
+                        alertsWithCorrectiveActions.add(
+                                exportAlertWithCorrectiveActions(alert, bean, rule, id));
+                    }
                 }
             }
         }

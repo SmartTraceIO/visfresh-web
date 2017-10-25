@@ -10,7 +10,6 @@ import com.visfresh.io.shipment.SingleShipmentData;
  *
  */
 public interface SingleShipmentService {
-    void rebuildShipmentData(long shipmentId);
     /**
      * @param shipmentId Shipment ID.
      * @return single shipment data.
