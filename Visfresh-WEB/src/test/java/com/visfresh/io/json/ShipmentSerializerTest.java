@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
@@ -44,7 +45,7 @@ public class ShipmentSerializerTest extends AbstractSerializerTest {
      */
     @Before
     public void setUp() {
-        serializer = new ShipmentSerializer(Language.English, UTC);
+        serializer = new ShipmentSerializer(Language.English, UTC, TemperatureUnits.Celsius);
     }
 
     @Test

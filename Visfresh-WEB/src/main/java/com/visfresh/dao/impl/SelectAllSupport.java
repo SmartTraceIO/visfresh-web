@@ -130,13 +130,21 @@ public class SelectAllSupport {
      *
      */
     public void buildSelectAll(final Filter originFilter, final Sorting sorting, final Page page) {
-        final Filter filter = createFilter(originFilter);
-
+        final Filter filter = buildFilter(originFilter);
+        final String selectAll = buildSelectBlockForFindAll(filter);
+        buildSelectAll(selectAll, sorting, page, filter);
+    }
+    /**
+     * @param selectAll
+     * @param sorting
+     * @param page
+     * @param filter
+     */
+    protected void buildSelectAll(final String selectAll, final Sorting sorting, final Page page, final Filter filter) {
         final Map<String, Object> params = new HashMap<String, Object>();
         final List<String> filters = new LinkedList<String>();
         final List<String> sorts = new LinkedList<String>();
 
-        final String selectAll = buildSelectBlockForFindAll(filter);
         if (filter != null) {
             addFiltesForFindAll(filter, params, filters);
         }
@@ -153,7 +161,7 @@ public class SelectAllSupport {
      * @param filter
      */
     public void buildGetCount(final Filter originFilter) {
-        final Filter filter = createFilter(originFilter);
+        final Filter filter = buildFilter(originFilter);
 
         final Map<String, Object> params = new HashMap<String, Object>();
         final List<String> filters = new LinkedList<String>();
@@ -170,7 +178,7 @@ public class SelectAllSupport {
      * @param originFilter
      * @return
      */
-    private Filter createFilter(final Filter originFilter) {
+    protected Filter buildFilter(final Filter originFilter) {
         if (originFilter == null && filters.isEmpty()) {
             return null;
         }

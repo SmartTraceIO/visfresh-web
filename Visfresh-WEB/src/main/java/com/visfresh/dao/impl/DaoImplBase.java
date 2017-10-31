@@ -4,6 +4,7 @@
 package com.visfresh.dao.impl;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,11 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonElement;
 import com.visfresh.dao.DaoBase;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.EntityWithId;
+import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -288,6 +291,33 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
         }
         return ((Number) object).doubleValue();
     }
+    public static JsonElement dbJson(final Object object) {
+        final String str = possibleBinary(object);
+        if (str != null) {
+            return SerializerUtils.parseJson(str);
+        }
+        return null;
+    }
+    /**
+     * @param object
+     * @return
+     */
+    protected static String possibleBinary(final Object object) {
+        if (object == null) {
+            return null;
+        }
+
+        if (object.getClass() == byte[].class) {
+            try {
+                return new String((byte[]) object, "UTF-8");
+            } catch (final UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return (String) object;
+    }
+
     /**
      * @param object
      * @return

@@ -3,17 +3,16 @@
  */
 package com.visfresh.lists;
 
-import java.util.HashMap;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import com.visfresh.entities.AlertType;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.io.KeyLocation;
 import com.visfresh.io.SingleShipmentInterimStop;
+import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.TemperatureRuleBean;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -28,23 +27,19 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private String palettid;
     private String shippedFrom;
     private String shippedTo;
-    private String shipmentDate;
-    private String estArrivalDate;
-    private String estArrivalDateISO;
-    private String actualArrivalDate;
-    private String actualArrivalDateISO;
+    private Date shipmentDate;
+    private Date actualArrivalDate;
     private int percentageComplete;
     private String assetNum;
     private String assetType;
     private Long alertProfileId;
     private String alertProfileName;
-    private final Map<AlertType, Integer> alertSummary = new HashMap<AlertType, Integer>();
     private ShipmentStatus status;
     private int siblingCount = 5;
 
     //last reading data
-    private String lastReadingTime;
-    private String lastReadingTimeISO;
+    private Date lastReadingTime;
+//    private String lastReadingTimeISO;
     private Double lastReadingTemperature;
     private Integer lastReadingBattery;
     private Double lastReadingLat;
@@ -55,17 +50,17 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private Double shippedToLat;
     private Double shippedToLong;
 
-    private String shipmentDateISO;
-
     private Double firstReadingLat;
     private Double firstReadingLong;
-    private String firstReadingTime;
-    private String firstReadingTimeISO;
+    private Date firstReadingTime;
     private final List<SingleShipmentInterimStop> interimStops = new LinkedList<>();
-    private List<KeyLocation> keyLocations;
 
     private boolean sendArrivalReport;
     private boolean sendArrivalReportOnlyIfAlerts;
+    private Date eta;
+    private String device;
+    private final List<AlertBean> sentAlerts = new LinkedList<>();
+    private final List<TemperatureRuleBean> temperatureRules = new LinkedList<>();
 
     /**
      * Default constructor.
@@ -88,9 +83,25 @@ public class ListShipmentItem implements EntityWithId<Long> {
         this.setShippedFrom(s.getShippedFrom() == null ? null : s.getShippedFrom().getName());
         this.setShippedTo(s.getShippedTo() == null ? null : s.getShippedTo().getName());
         this.setStatus(s.getStatus());
-        this.setTripcount(s.getTripCount());
+        this.setTripCount(s.getTripCount());
+        this.setSiblingCount(s.getSiblingCount());
         this.setSendArrivalReport(s.isSendArrivalReport());
         this.setSendArrivalReportOnlyIfAlerts(s.isSendArrivalReportOnlyIfAlerts());
+        this.setEta(s.getEta());
+        this.setLastReadingTime(s.getLastEventDate());
+        this.setShipmentDate(s.getShipmentDate());
+    }
+    /**
+     * @param eta
+     */
+    public void setEta(final Date eta) {
+        this.eta = eta;
+    }
+    /**
+     * @return the eta
+     */
+    public Date getEta() {
+        return eta;
     }
     /**
      * @return the shipmentId
@@ -137,7 +148,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @param count the tripcount to set
      */
-    public void setTripcount(final int count) {
+    public void setTripCount(final int count) {
         this.tripCount = count;
     }
     /**
@@ -188,74 +199,6 @@ public class ListShipmentItem implements EntityWithId<Long> {
     public void setShippedTo(final String shippedTo) {
         this.shippedTo = shippedTo;
     }
-    /**
-     * @return the shipmentDate
-     */
-    public String getShipmentDate() {
-        return shipmentDate;
-    }
-    /**
-     * @param shipmentDate the shipmentDate to set
-     */
-    public void setShipmentDate(final String shipmentDate) {
-        this.shipmentDate = shipmentDate;
-    }
-    /**
-     * @param date
-     */
-    public void setShipmentDateISO(final String date) {
-        this.shipmentDateISO = date;
-    }
-    /**
-     * @return the shipmentDateISO
-     */
-    public String getShipmentDateISO() {
-        return shipmentDateISO;
-    }
-
-    /**
-     * @return the estArrivalDate
-     */
-    public String getEstArrivalDate() {
-        return estArrivalDate;
-    }
-    /**
-     * @param estArrivalDate the estArrivalDate to set
-     */
-    public void setEstArrivalDate(final String estArrivalDate) {
-        this.estArrivalDate = estArrivalDate;
-    }
-    public String getEstArrivalDateISO() {
-        return estArrivalDateISO;
-    }
-    public void setEstArrivalDateISO(final String date) {
-        this.estArrivalDateISO = date;
-    }
-    /**
-     * @return the actualArrivalDate
-     */
-    public String getActualArrivalDate() {
-        return actualArrivalDate;
-    }
-    /**
-     * @param actualArrivalDate the actualArrivalDate to set
-     */
-    public void setActualArrivalDate(final String actualArrivalDate) {
-        this.actualArrivalDate = actualArrivalDate;
-    }
-    /**
-     * @param date
-     */
-    public void setActualArrivalDateISO(final String date) {
-        this.actualArrivalDateISO = date;
-    }
-    /**
-     * @return the actualArrivalDateISO
-     */
-    public String getActualArrivalDateISO() {
-        return actualArrivalDateISO;
-    }
-
     /**
      * @return the percentageCompleted
      */
@@ -329,12 +272,6 @@ public class ListShipmentItem implements EntityWithId<Long> {
         this.status = status;
     }
     /**
-     * @return the alertSummary
-     */
-    public Map<AlertType, Integer> getAlertSummary() {
-        return alertSummary;
-    }
-    /**
      * @return the siblingCount
      */
     public int getSiblingCount() {
@@ -345,30 +282,6 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public void setSiblingCount(final int siblingCount) {
         this.siblingCount = siblingCount;
-    }
-    /**
-     * @return the lastReadingTimeISO
-     */
-    public String getLastReadingTimeISO() {
-        return lastReadingTimeISO;
-    }
-    /**
-     * @param lastReadingTimeISO the lastReadingTimeISO to set
-     */
-    public void setLastReadingTimeISO(final String lastReadingTimeISO) {
-        this.lastReadingTimeISO = lastReadingTimeISO;
-    }
-    /**
-     * @param time
-     */
-    public void setLastReadingTime(final String time) {
-        this.lastReadingTime = time;
-    }
-    /**
-     * @return the lastReadingTime
-     */
-    public String getLastReadingTime() {
-        return lastReadingTime;
     }
     /**
      * @return the lastReadingTemperature
@@ -498,46 +411,10 @@ public class ListShipmentItem implements EntityWithId<Long> {
         this.firstReadingLong = firstReadingLong;
     }
     /**
-     * @param date
-     */
-    public void setFirstReadingTime(final String date) {
-        this.firstReadingTime = date;
-    }
-    /**
-     * @return the firstReadingTime
-     */
-    public String getFirstReadingTime() {
-        return firstReadingTime;
-    }
-    /**
-     * @param date
-     */
-    public void setFirstReadingTimeISO(final String date) {
-        this.firstReadingTimeISO = date;
-    }
-    /**
-     * @return the firstReadingTimeISO
-     */
-    public String getFirstReadingTimeISO() {
-        return firstReadingTimeISO;
-    }
-    /**
      * @return
      */
     public List<SingleShipmentInterimStop> getInterimStops() {
         return interimStops;
-    }
-    /**
-     * @return
-     */
-    public List<KeyLocation> getKeyLocations() {
-        return keyLocations;
-    }
-    /**
-     * @param keyLocations the keyLocations to set
-     */
-    public void setKeyLocations(final List<KeyLocation> keyLocations) {
-        this.keyLocations = keyLocations;
     }
     /**
      * @return the sendArrivalReport
@@ -562,5 +439,77 @@ public class ListShipmentItem implements EntityWithId<Long> {
      */
     public void setSendArrivalReportOnlyIfAlerts(final boolean sendArrivalReportOnlyIfAlerts) {
         this.sendArrivalReportOnlyIfAlerts = sendArrivalReportOnlyIfAlerts;
+    }
+    /**
+     * @return the lastReadingTime
+     */
+    public Date getLastReadingTime() {
+        return lastReadingTime;
+    }
+    /**
+     * @param lastReadingTime the lastReadingTime to set
+     */
+    public void setLastReadingTime(final Date lastReadingTime) {
+        this.lastReadingTime = lastReadingTime;
+    }
+    /**
+     * @return the shipmentDate
+     */
+    public Date getShipmentDate() {
+        return shipmentDate;
+    }
+    /**
+     * @param shipmentDate the shipmentDate to set
+     */
+    public void setShipmentDate(final Date shipmentDate) {
+        this.shipmentDate = shipmentDate;
+    }
+    /**
+     * @return the actualArrivalDate
+     */
+    public Date getActualArrivalDate() {
+        return actualArrivalDate;
+    }
+    /**
+     * @param actualArrivalDate the actualArrivalDate to set
+     */
+    public void setActualArrivalDate(final Date actualArrivalDate) {
+        this.actualArrivalDate = actualArrivalDate;
+    }
+    /**
+     * @return the firstReadingTime
+     */
+    public Date getFirstReadingTime() {
+        return firstReadingTime;
+    }
+    /**
+     * @param firstReadingTime the firstReadingTime to set
+     */
+    public void setFirstReadingTime(final Date firstReadingTime) {
+        this.firstReadingTime = firstReadingTime;
+    }
+    /**
+     * @return device.
+     */
+    public String getDevice() {
+        return device;
+    }
+    /**
+     * @param device the device to set
+     */
+    public void setDevice(final String device) {
+        this.device = device;
+    }
+    /**
+     * @return list of sent alerts.
+     */
+    public List<AlertBean> getSentAlerts() {
+        return sentAlerts;
+    }
+    /**
+     * @return list of temperature rules.
+     */
+    public List<TemperatureRuleBean> getTemperatureRules() {
+        return temperatureRules;
     }
 }

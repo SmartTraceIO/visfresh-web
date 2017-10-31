@@ -44,7 +44,8 @@ public class ShipmentRestClient extends RestClient {
      */
     public ShipmentRestClient(final User user) {
         super();
-        this.serializer = new ShipmentSerializer(user.getLanguage(), user.getTimeZone());
+        this.serializer = new ShipmentSerializer(user.getLanguage(), user.getTimeZone(),
+                user.getTemperatureUnits());
         this.reqParser = new GetShipmentsRequestParser(user.getTimeZone());
     }
     public JsonElement getSingleShipment(final Shipment shipment)

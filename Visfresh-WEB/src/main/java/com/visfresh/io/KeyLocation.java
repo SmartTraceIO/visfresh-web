@@ -3,6 +3,8 @@
  */
 package com.visfresh.io;
 
+import java.util.Date;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -13,7 +15,6 @@ public class KeyLocation implements Comparable<KeyLocation> {
     private Double longitude;
     private long time;
     private String description;
-    private String prettyTime;
 
     /**
      * Default constructor.
@@ -89,18 +90,6 @@ public class KeyLocation implements Comparable<KeyLocation> {
     public String getDescription() {
         return description;
     }
-    /**
-     * @return the prettyTime
-     */
-    public String getPrettyTime() {
-        return prettyTime;
-    }
-    /**
-     * @param prettyTime the prettyTime to set
-     */
-    public void setPrettyTime(final String prettyTime) {
-        this.prettyTime = prettyTime;
-    }
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
@@ -114,7 +103,7 @@ public class KeyLocation implements Comparable<KeyLocation> {
             .append(getLongitude())
             .append(')')
             .append(' ')
-            .append(getPrettyTime())
+            .append(new Date(getTime()))
             .append(": ")
             .append(getDescription());
         return sb.toString();

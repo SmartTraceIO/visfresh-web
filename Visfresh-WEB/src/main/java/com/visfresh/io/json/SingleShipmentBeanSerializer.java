@@ -1485,7 +1485,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param time
      * @return
      */
-    private String formatPretty(final Date time) {
+    protected String formatPretty(final Date time) {
         if (time == null) {
             return null;
         }
@@ -1495,7 +1495,7 @@ public class SingleShipmentBeanSerializer extends AbstractJsonSerializer {
      * @param time time.
      * @return
      */
-    private String formatIso(final Date time) {
+    protected String formatIso(final Date time) {
         if (time == null) {
             return null;
         }

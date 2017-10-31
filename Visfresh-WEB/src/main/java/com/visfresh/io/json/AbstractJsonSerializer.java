@@ -44,6 +44,13 @@ public class AbstractJsonSerializer {
     public static double asDouble(final JsonElement e) {
         return e == null || e.isJsonNull() ? 0 : e.getAsDouble();
     }
+    /**
+     * @param e
+     * @return
+     */
+    public static Double asDoubleObject(final JsonElement e) {
+        return e == null || e.isJsonNull() ? null : e.getAsDouble();
+    }
 
     /**
      * @param e

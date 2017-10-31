@@ -26,7 +26,6 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.reports.AbstractGraphics2DRenderer;
 import com.visfresh.reports.Colors;
@@ -307,7 +306,7 @@ public class MapRendererImpl extends AbstractGraphics2DRenderer {
             final BufferedImage image;
 
             int shift;
-            if (Shipment.isFinalStatus(bean.getStatus())) {
+            if (bean.getStatus().isFinal()) {
                 image = ImagePaintingSupport.scaleImage(
                         ImagePaintingSupport.loadReportPngImage("tinyShippedTo"), size);
                 ImagePaintingSupport.flip(image);

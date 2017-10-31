@@ -4,7 +4,6 @@
 package com.visfresh.impl.singleshipment;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -230,19 +229,19 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         }
 
         //parse interim stops
-        bean.getInterimStops().addAll(parseInterimStops(possibleBinary(row.get("interimStopsJson"))));
+        bean.getInterimStops().addAll(parseInterimStops(DaoImplBase.dbJson(row.get("interimStopsJson"))));
         //parse shipped from
         bean.setStartLocation(parseLocationProfileBean(
-                SerializerUtils.parseJson(possibleBinary(row.get("shippedFromJson")))));
+                DaoImplBase.dbJson(row.get("shippedFromJson"))));
         //parse shipped to
         bean.setEndLocation(parseLocationProfileBean(
-                SerializerUtils.parseJson(possibleBinary(row.get("shippedToJson")))));
+                DaoImplBase.dbJson(row.get("shippedToJson"))));
         //parse alternative locations
-        final String altLocJson = possibleBinary(row.get("altLocationJson"));
+        final JsonElement altLocJson = DaoImplBase.dbJson(row.get("altLocationJson"));
         if (altLocJson != null) {
             addAlternativeLocations(bean, altLocJson);
         }
-        bean.getNotes().addAll(parseNotes(possibleBinary(row.get("notesJson"))));
+        bean.getNotes().addAll(parseNotes(DaoImplBase.dbJson(row.get("notesJson"))));
 
         //arrival
         if (row.get("arrId") != null) {
@@ -259,19 +258,19 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
                 row, "alertNotifSchedJson", "alertScheduleUsersJson");
 
         //device groups
-        bean.getDeviceGroups().addAll(parseDeviceGroups(possibleBinary(row.get("deviceGroupsJson"))));
+        bean.getDeviceGroups().addAll(parseDeviceGroups(DaoImplBase.dbJson(row.get("deviceGroupsJson"))));
 
         //user access
-        bean.getUserAccess().addAll(parseUserAccess(possibleBinary(row.get("userAccessJson"))));
+        bean.getUserAccess().addAll(parseUserAccess(DaoImplBase.dbJson(row.get("userAccessJson"))));
 
         //company access
-        bean.getCompanyAccess().addAll(parseCompanyAccess(possibleBinary(row.get("companyAccessJson"))));
+        bean.getCompanyAccess().addAll(parseCompanyAccess(DaoImplBase.dbJson(row.get("companyAccessJson"))));
 
         //alerts
-        bean.getSentAlerts().addAll(parseAlerts(possibleBinary(row.get("alertsJson"))));
+        bean.getSentAlerts().addAll(parseAlerts(DaoImplBase.dbJson(row.get("alertsJson"))));
 
         //alert rules
-        final List<TemperatureRule> rules = parseRules(possibleBinary(row.get("alertRulesJson")));
+        final List<TemperatureRule> rules = parseRules(DaoImplBase.dbJson(row.get("alertRulesJson")));
         bean.getAlertFired().addAll(toBeans(AbstractRuleEngine.getFailteredAlertRules(rules, session, true)));
         bean.getAlertYetToFire().addAll(toBeans(AbstractRuleEngine.getFailteredAlertRules(rules, session, false)));
 
@@ -349,10 +348,10 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
      * @param data
      * @return
      */
-    private List<TemperatureRule> parseRules(final String data) {
+    private List<TemperatureRule> parseRules(final JsonElement data) {
         final List<TemperatureRule> rules = new LinkedList<>();
         if (data != null) {
-            for (final JsonElement e : SerializerUtils.parseJson(data).getAsJsonArray()) {
+            for (final JsonElement e : data.getAsJsonArray()) {
                 final JsonObject json = e.getAsJsonObject();
                 final TemperatureRule rule = new TemperatureRule();
                 rule.setId(AbstractJsonSerializer.asLong(json.get("id")));
@@ -403,9 +402,9 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
      * @param data
      * @return
      */
-    private List<ShipmentUserDto> parseUserAccess(final String data) {
+    private List<ShipmentUserDto> parseUserAccess(final JsonElement data) {
         if (data != null) {
-            return serializer.parseUserAccessArray(SerializerUtils.parseJson(data).getAsJsonArray());
+            return serializer.parseUserAccessArray(data.getAsJsonArray());
         }
         return new LinkedList<>();
     }
@@ -413,9 +412,9 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
      * @param data
      * @return
      */
-    private List<ShipmentCompanyDto> parseCompanyAccess(final String data) {
+    private List<ShipmentCompanyDto> parseCompanyAccess(final JsonElement data) {
         if (data != null) {
-            return serializer.parseCompanyAccessArray(SerializerUtils.parseJson(data).getAsJsonArray());
+            return serializer.parseCompanyAccessArray(data.getAsJsonArray());
         }
         return new LinkedList<>();
     }
@@ -423,10 +422,10 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
      * @param data
      * @return
      */
-    private List<AlertBean> parseAlerts(final String data) {
+    private List<AlertBean> parseAlerts(final JsonElement data) {
         final List<AlertBean> alerts = new LinkedList<>();
         if (data != null) {
-            for (final JsonElement e : SerializerUtils.parseJson(data).getAsJsonArray()) {
+            for (final JsonElement e : data.getAsJsonArray()) {
                 alerts.add(serializer.parseAlertBean(e));
             }
         }
@@ -436,10 +435,10 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
      * @param data
      * @return
      */
-    private List<DeviceGroupDto> parseDeviceGroups(final String data) {
+    private List<DeviceGroupDto> parseDeviceGroups(final JsonElement data) {
         final List<DeviceGroupDto> groups = new LinkedList<>();
         if (data != null) {
-            for (final JsonElement e : SerializerUtils.parseJson(data).getAsJsonArray()) {
+            for (final JsonElement e : data.getAsJsonArray()) {
                 groups.add(serializer.parseDeviceGroupDto(e));
             }
         }
@@ -450,8 +449,8 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
      * @param bean
      * @param altLocJson
      */
-    protected void addAlternativeLocations(final SingleShipmentBean bean, final String altLocJson) {
-        final JsonArray array = SerializerUtils.parseJson(altLocJson).getAsJsonArray();
+    protected void addAlternativeLocations(final SingleShipmentBean bean, final JsonElement altLocJson) {
+        final JsonArray array = altLocJson.getAsJsonArray();
         for (final JsonElement e : array) {
             final JsonObject json = e.getAsJsonObject();
             final LocationProfileBean locBean = parseLocationProfileBean(json.get("location"));
@@ -488,16 +487,16 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
      */
     private void processSchedules(final List<ListNotificationScheduleItem> result,
             final Map<String, Object> row, final String schedulesJson, final String usersJson) {
-        final String scheduleUsersJson = possibleBinary(row.get(usersJson));
+        final JsonElement scheduleUsersJson = DaoImplBase.dbJson(row.get(usersJson));
         final JsonArray userArray;
         if (scheduleUsersJson != null) {
-            userArray = SerializerUtils.parseJson(scheduleUsersJson).getAsJsonArray();
+            userArray = scheduleUsersJson.getAsJsonArray();
         } else {
             userArray = new JsonArray();
         }
 
-        final String jsonStr = possibleBinary(row.get(schedulesJson));
-        if (jsonStr != null) {
+        final JsonElement jsonEl = DaoImplBase.dbJson(row.get(schedulesJson));
+        if (jsonEl != null) {
             final Map<Long, List<String>> scheduleUsers = new HashMap<>();
 
             //create schedule users map
@@ -519,7 +518,7 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
             }
 
             //create notification schedules and notification users map map.
-            final JsonArray scheds = SerializerUtils.parseJson(jsonStr).getAsJsonArray();
+            final JsonArray scheds = jsonEl.getAsJsonArray();
             for (final JsonElement e : scheds) {
                 final JsonObject json = e.getAsJsonObject();
                 //'id', sched.id,
@@ -544,14 +543,14 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         }
     }
     /**
-     * @param str
+     * @param el
      * @return
      */
-    private List<NoteBean> parseNotes(final String str) {
+    private List<NoteBean> parseNotes(final JsonElement el) {
         final List<NoteBean> notes = new LinkedList<>();
 
-        if (str != null) {
-            final JsonArray array = SerializerUtils.parseJson(str).getAsJsonArray();
+        if (el != null) {
+            final JsonArray array = el.getAsJsonArray();
             for (final JsonElement e : array) {
                 final JsonObject json = e.getAsJsonObject();
                 final NoteBean n = serializer.parseNoteBean(json);
@@ -566,25 +565,6 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
         return notes;
     }
 
-    /**
-     * @param object
-     * @return
-     */
-    private String possibleBinary(final Object object) {
-        if (object == null) {
-            return null;
-        }
-
-        if (object.getClass() == byte[].class) {
-            try {
-                return new String((byte[]) object, "UTF-8");
-            } catch (final UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        return (String) object;
-    }
 
     /**
      * @param e
@@ -604,13 +584,13 @@ public class MainShipmentDataBuilder implements SingleShipmentPartBuilder {
     }
 
     /**
-     * @param str
+     * @param e
      * @return
      */
-    private List<InterimStopBean> parseInterimStops(final String str) {
+    private List<InterimStopBean> parseInterimStops(final JsonElement e) {
         final List<InterimStopBean> stops = new LinkedList<>();
-        if (str != null) {
-            final JsonArray array = SerializerUtils.parseJson(str).getAsJsonArray();
+        if (e != null) {
+            final JsonArray array = e.getAsJsonArray();
             return this.serializer.parseInterimStops(array);
         }
         return stops;

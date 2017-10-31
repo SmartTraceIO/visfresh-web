@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import com.google.gson.JsonArray;
@@ -15,15 +18,19 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.visfresh.constants.ShipmentConstants;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.io.KeyLocation;
 import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.SingleShipmentInterimStop;
+import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.lists.ListShipmentItem;
+import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -36,16 +43,17 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     private static final String START_DATE = "startDate";
     private final DateFormat isoFormat;
     private final DateFormat prettyFormat;
+    private final TemperatureUnits units;
 
     /**
      * @param lang language.
      * @param tz time zone.
      */
-    public ShipmentSerializer(final Language lang, final TimeZone tz) {
+    public ShipmentSerializer(final Language lang, final TimeZone tz, final TemperatureUnits units) {
         super(tz);
-
         this.isoFormat = createIsoFormat(lang, tz);
         this.prettyFormat = createPrettyFormat(lang, tz);
+        this.units = units;
     }
     /**
      * @param obj
@@ -299,7 +307,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
      * @param dto
      * @return
      */
-    public JsonObject toJson(final ListShipmentItem dto) {
+    public JsonObject toJson(final ListShipmentItem dto, final List<KeyLocation> keyLocations) {
         if (dto == null) {
             return null;
         }
@@ -313,8 +321,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         json.addProperty("shipmentId", dto.getShipmentId());
         json.addProperty("shipmentDescription", dto.getShipmentDescription());
-        json.addProperty("shipmentDate", dto.getShipmentDate());
-        json.addProperty("shipmentDateISO", dto.getShipmentDateISO());
+        json.addProperty("shipmentDate", getFormatted(prettyFormat, dto.getShipmentDate()));
+        json.addProperty("shipmentDateISO", getFormatted(isoFormat, dto.getShipmentDate()));
 
         json.addProperty("palletId", dto.getPalettId());
         json.addProperty("assetNum", dto.getAssetNum());
@@ -322,21 +330,23 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
 
         json.addProperty("shippedFrom", dto.getShippedFrom());
         json.addProperty("shippedTo", dto.getShippedTo());
-        json.addProperty("estArrivalDate", dto.getEstArrivalDate());
-        json.addProperty("estArrivalDateISO", dto.getEstArrivalDateISO());
-        json.addProperty("actualArrivalDate", dto.getActualArrivalDate());
-        json.addProperty("actualArrivalDateISO", dto.getActualArrivalDateISO());
+        json.addProperty("estArrivalDate", getFormatted(prettyFormat, dto.getEta()));
+        json.addProperty("estArrivalDateISO", getFormatted(isoFormat, dto.getEta()));
+        json.addProperty("actualArrivalDate", getFormatted(prettyFormat, dto.getActualArrivalDate()));
+        json.addProperty("actualArrivalDateISO", getFormatted(isoFormat, dto.getActualArrivalDate()));
         json.addProperty("percentageComplete", dto.getPercentageComplete());
 
         json.addProperty("alertProfileId", dto.getAlertProfileId());
         json.addProperty("alertProfileName", dto.getAlertProfileName());
-        json.add(ShipmentConstants.ALERT_SUMMARY, SerializerUtils.toJson(dto.getAlertSummary()));
+        json.add(ShipmentConstants.ALERT_SUMMARY, SerializerUtils.toJson(createAlertSummary(dto)));
         json.addProperty(ShipmentConstants.SIBLING_COUNT, dto.getSiblingCount());
 
         //last reading data
-        json.addProperty(ShipmentConstants.LAST_READING_TIME, dto.getLastReadingTime());
-        json.addProperty(ShipmentConstants.LAST_READING_TIME_ISO, dto.getLastReadingTimeISO());
-        json.addProperty(ShipmentConstants.LAST_READING_TEMPERATURE, dto.getLastReadingTemperature());
+        json.addProperty(ShipmentConstants.LAST_READING_TIME, getFormatted(prettyFormat, dto.getLastReadingTime()));
+        json.addProperty(ShipmentConstants.LAST_READING_TIME_ISO, getFormatted(isoFormat, dto.getLastReadingTime()));
+        json.addProperty(ShipmentConstants.LAST_READING_TEMPERATURE,
+                dto.getLastReadingTemperature() == null ? null
+                        : LocalizationUtils.convertToUnits(dto.getLastReadingTemperature(), this.units));
         json.addProperty("lastReadingBattery", dto.getLastReadingBattery());
         json.addProperty("lastReadingLat", dto.getLastReadingLat());
         json.addProperty("lastReadingLong", dto.getLastReadingLong());
@@ -344,24 +354,24 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         //first reading
         json.addProperty("firstReadingLat", dto.getFirstReadingLat());
         json.addProperty("firstReadingLong", dto.getFirstReadingLong());
-        json.addProperty("firstReadingTime", dto.getFirstReadingTime());
-        json.addProperty("firstReadingTimeISO", dto.getFirstReadingTimeISO());
+        json.addProperty("firstReadingTime", getFormatted(prettyFormat, dto.getFirstReadingTime()));
+        json.addProperty("firstReadingTimeISO", getFormatted(isoFormat, dto.getFirstReadingTime()));
 
         int i = 1;
         for (final SingleShipmentInterimStop stp : dto.getInterimStops()) {
             final String prefix = "interimStop" + i;
             json.addProperty(prefix, stp.getLocation().getName());
-            json.addProperty(prefix + "Time", stp.getStopDate());
-            json.addProperty(prefix + "TimeISO", stp.getStopDateIso());
+            json.addProperty(prefix + "Time", getFormatted(prettyFormat, stp.getStopDate()));
+            json.addProperty(prefix + "TimeISO", getFormatted(isoFormat, stp.getStopDate()));
             i++;
         }
 
         //key locations
-        if (dto.getKeyLocations() != null) {
+        if (keyLocations != null && keyLocations.size() > 0) {
             final JsonArray kls = new JsonArray();
             json.add("keyLocations", kls);
 
-            for (final KeyLocation kl : dto.getKeyLocations()) {
+            for (final KeyLocation kl : keyLocations) {
                 kls.add(toJson(kl));
             }
         } else {
@@ -383,6 +393,33 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         return json;
     }
     /**
+     * @param dto
+     * @return
+     */
+    private Map<AlertType, Integer> createAlertSummary(final ListShipmentItem dto) {
+        final Map<AlertType, Integer> map = new HashMap<AlertType, Integer>();
+        for (final AlertBean a : dto.getSentAlerts()) {
+            final AlertType type = a.getType();
+            if (type != AlertType.LightOff && type != AlertType.LightOn) {
+                Integer numAlerts = map.get(type);
+                if (numAlerts == null) {
+                    numAlerts = 0;
+                }
+                numAlerts = numAlerts + 1;
+                map.put(type, numAlerts);
+            }
+        }
+        return map;
+    }
+    /**
+     * @param fmt
+     * @param date
+     * @return
+     */
+    private String getFormatted(final DateFormat fmt, final Date date) {
+        return date == null ? null : fmt.format(date);
+    }
+    /**
      * @param kl key location.
      * @return
      */
@@ -396,7 +433,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("lat", kl.getLatitude());
         json.addProperty("lon", kl.getLongitude());
         json.addProperty("desc", kl.getDescription());
-        json.addProperty("time", kl.getPrettyTime());
+        json.addProperty("time", getFormatted(prettyFormat, new Date(kl.getTime())));
         return json;
     }
     public KeyLocation parseKeyLocation(final JsonElement el) {
@@ -417,7 +454,6 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
             loc.setLongitude(asDouble(lon));
         }
         loc.setDescription(asString(json.get("desc")));
-        loc.setPrettyTime(asString(json.get("time")));
         return loc;
     }
     /**
@@ -431,7 +467,8 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
     }
 
     public static void main(final String[] args) throws Exception {
-        final ShipmentSerializer ser = new ShipmentSerializer(Language.English, TimeZone.getDefault());
+        final ShipmentSerializer ser = new ShipmentSerializer(Language.English, TimeZone.getDefault(),
+                TemperatureUnits.Celsius);
 
         final String req;
         final InputStream in = ShipmentSerializer.class.getResourceAsStream("req.json");

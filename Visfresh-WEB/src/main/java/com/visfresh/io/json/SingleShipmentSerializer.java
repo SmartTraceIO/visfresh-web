@@ -292,8 +292,8 @@ public class SingleShipmentSerializer extends SingleShipmentBeanSerializer {
         json.addProperty("latitude", stop.getLatitude());
         json.addProperty("longitude", stop.getLongitude());
         json.addProperty("time", stop.getTime());
-        json.addProperty("stopDate", stop.getStopDate());
-        json.addProperty("stopDateISO", stop.getStopDateIso());
+        json.addProperty("stopDate", formatPretty(stop.getStopDate()));
+        json.addProperty("stopDateISO", formatIso(stop.getStopDate()));
         json.add("location", toJson(stop.getLocation()));
         return json;
     }
@@ -349,6 +349,7 @@ public class SingleShipmentSerializer extends SingleShipmentBeanSerializer {
      * @param s single shipment data.
      * @return
      */
+    @Override
     public JsonObject exportToViewData(final SingleShipmentData s) {
         throw new InternalError("Should implement");
     }

@@ -11,6 +11,8 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.lists.ListResult;
+import com.visfresh.lists.ListShipmentItem;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -98,4 +100,12 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment
     Long getShipmentId(String sn, int tripCount);
     PreliminarySingleShipmentData getPreliminarySingleShipmentData(
             Long shipmentId, String sn, Integer tripCount);
+    /**
+     * @param companyId company ID.
+     * @param sorting sorting.
+     * @param page page.
+     * @param filter filter.
+     * @return
+     */
+    ListResult<ListShipmentItem> getCompanyShipments(Long companyId, Sorting sorting, Page page, Filter filter);
 }

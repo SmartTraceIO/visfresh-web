@@ -3,6 +3,8 @@
  */
 package com.visfresh.io;
 
+import java.util.Date;
+
 import com.visfresh.io.shipment.LocationProfileBean;
 
 /**
@@ -14,8 +16,7 @@ public class SingleShipmentInterimStop {
     private LocationProfileBean location;
     private double latitude;
     private double longitude;
-    private String stopDate;
-    private String stopDateIso;
+    private Date stopDate;
     private int time;
 
     /**
@@ -76,26 +77,14 @@ public class SingleShipmentInterimStop {
     /**
      * @return the stopDate
      */
-    public String getStopDate() {
+    public Date getStopDate() {
         return stopDate;
     }
     /**
      * @param stopDate the stopDate to set
      */
-    public void setStopDate(final String stopDate) {
+    public void setStopDate(final Date stopDate) {
         this.stopDate = stopDate;
-    }
-    /**
-     * @return the stopDateIso
-     */
-    public String getStopDateIso() {
-        return stopDateIso;
-    }
-    /**
-     * @param stopDateIso the stopDateIso to set
-     */
-    public void setStopDateIso(final String stopDateIso) {
-        this.stopDateIso = stopDateIso;
     }
     /**
      * @param time the time to set

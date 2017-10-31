@@ -3,6 +3,8 @@
  */
 package com.visfresh.dao.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,6 +15,8 @@ import java.util.Map.Entry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.visfresh.constants.ShipmentConstants;
 import com.visfresh.dao.DeviceDao;
 import com.visfresh.dao.Filter;
@@ -22,11 +26,18 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.SingleShipmentBeanDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.io.json.AbstractJsonSerializer;
+import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.TemperatureAlertBean;
+import com.visfresh.io.shipment.TemperatureRuleBean;
+import com.visfresh.lists.ListResult;
+import com.visfresh.lists.ListShipmentItem;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
 
@@ -478,184 +489,15 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
      * @see com.visfresh.dao.impl.DaoImplBase#getSelectAllSupport()
      */
     @Override
-    public SelectAllSupport getSelectAllSupport() {
-        return super.getSelectAllSupport();
+    public ShipmetSelectAllSupport getSelectAllSupport() {
+        return (ShipmetSelectAllSupport) super.getSelectAllSupport();
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#createSelectAllSupport()
      */
     @Override
-    public SelectAllSupport createSelectAllSupport() {
-        return new SelectAllSupport(getTableName()){
-            /* (non-Javadoc)
-             * @see com.visfresh.dao.impl.DaoImplBase#addFiltes(com.visfresh.dao.Filter, java.util.Map, java.util.List, java.util.Map)
-             */
-            @Override
-            protected void addFiltesForFindAll(final Filter filter, final Map<String, Object> params,
-                    final List<String> filters) {
-                final Object value = filter.getFilter(ShipmentConstants.ONLY_WITH_ALERTS);
-                if (value != null) {
-                    filter.removeFilter(ShipmentConstants.ONLY_WITH_ALERTS);
-                }
-
-                super.addFiltesForFindAll(filter, params, filters);
-
-                if (Boolean.TRUE.equals(value)) {
-                    filters.add("exists (select * from alerts where"
-                            + " alerts.shipment = shipments.id and alerts.type <> 'LightOn' and alerts.type <> 'LightOff')");
-                }
-            }
-            /* (non-Javadoc)
-             * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForFindAll()
-             */
-            @Override
-            protected String buildSelectBlockForFindAll(final Filter filter) {
-                String selectAll = "select "
-                    + getTableName()
-                    + ".*"
-                    + " , substring(d." + DeviceDaoImpl.IMEI_FIELD + ", -7, 6)"
-                    + " as " + ShipmentConstants.DEVICE_SN
-                    + " , sfrom." + LocationProfileDaoImpl.NAME_FIELD
-                    + " as " + ShipmentConstants.SHIPPED_FROM_LOCATION_NAME
-                    + " , sto." + LocationProfileDaoImpl.NAME_FIELD
-                    + " as " + ShipmentConstants.SHIPPED_TO_LOCATION_NAME
-                    + " , te.temperature"
-                    + " as " + ShipmentConstants.LAST_READING_TEMPERATURE
-                    + " , (select count(*) from " + AlertDaoImpl.TABLE
-                    + " al where al." + AlertDaoImpl.SHIPMENT_FIELD + " = " + TABLE + "." + ID_FIELD + ")"
-                    + " as " + ShipmentConstants.ALERT_SUMMARY
-                    + " , ap." + AlertProfileDaoImpl.UPPERTEMPLIMIT_FIELD + " as upperTemperatureLimit"
-                    + " , ap." + AlertProfileDaoImpl.LOWERTEMPLIMIT_FIELD + " as lowerTemperatureLimit"
-                    + " from " + getTableName()
-                    + " left outer join " + AlertProfileDaoImpl.TABLE + " as ap"
-                    + " on " + getTableName() + "." + ALERT_PROFILE_FIELD + " = ap.id"
-                    + " left outer join " + DeviceDaoImpl.TABLE + " as d"
-                    + " on " + getTableName() + "." + DEVICE_FIELD + " = d." + DeviceDaoImpl.IMEI_FIELD
-                    + " left outer join " + LocationProfileDaoImpl.TABLE + " as sfrom"
-                    + " on " + getTableName() + "." + SHIPPEDFROM_FIELD + " = sfrom." + LocationProfileDaoImpl.ID_FIELD
-                    + " left outer join " + LocationProfileDaoImpl.TABLE + " as sto"
-                    + " on " + getTableName() + "." + SHIPPEDTO_FIELD + " = sto." + LocationProfileDaoImpl.ID_FIELD
-                    + " left outer join (select"
-                    + " t." + TrackerEventDaoImpl.TEMPERATURE_FIELD + " as temperature,"
-                    + " t." + TrackerEventDaoImpl.SHIPMENT_FIELD + " as shipment"
-                    + " from " + TrackerEventDaoImpl.TABLE + " t"
-                    + " join (select max(id) as id from " + TrackerEventDaoImpl.TABLE
-                    + " group by " + TrackerEventDaoImpl.SHIPMENT_FIELD + ") t1"
-                    + " on t1.id = t.id) te\n"
-                    + "on te.shipment = " + getTableName() + "." + ID_FIELD + "\n";
-                if (filter != null && Boolean.TRUE.equals(filter.getFilter(ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS))) {
-                    selectAll += "\njoin (select max(id) as id, device as device from shipments group by device) newest on "
-                            + TABLE + ".id = newest.id and "
-                            + TABLE + ".device = newest.device\n";
-                }
-
-                return selectAll;
-            }
-            /* (non-Javadoc)
-             * @see com.visfresh.dao.impl.DaoImplBase#buildSelectBlockForEntityCount(com.visfresh.dao.Filter)
-             */
-            @Override
-            protected String buildSelectBlockForEntityCount(final Filter filter) {
-                String selectAll = super.buildSelectBlockForEntityCount(filter);
-                if (filter != null && Boolean.TRUE.equals(filter.getFilter(ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS))) {
-                    selectAll += "\njoin (select max(id) as id, device as device from shipments group by device) newest on "
-                            + TABLE + ".id = newest.id and "
-                            + TABLE + ".device = newest.device\n";
-                }
-                return selectAll;
-            }
-            /* (non-Javadoc)
-             * @see com.visfresh.dao.impl.DaoImplBase#addSortForDbField(java.lang.String, java.util.List, boolean)
-             */
-            @Override
-            protected void addSortForDbField(final String field, final List<String> sorts,
-                    final boolean isAscent) {
-                if (ShipmentConstants.DEVICE_SN.equals(field)) {
-                    //also add the trip count to sort
-                    super.addSortForDbField(field, sorts, isAscent);
-                    super.addSortForDbField(TABLE + "." + TRIPCOUNT_FIELD, sorts, isAscent);
-                } else if (ShipmentConstants.SHIPPED_FROM_LOCATION_NAME.equals(field)){
-                    super.addSortForDbField(field, sorts, isAscent);
-                } else if (ShipmentConstants.SHIPPED_TO_LOCATION_NAME.equals(field)){
-                    super.addSortForDbField(field, sorts, isAscent);
-                } else if (ShipmentConstants.LAST_READING_TEMPERATURE.equals(field)){
-                    super.addSortForDbField(field, sorts, isAscent);
-                } else if (ShipmentConstants.ALERT_SUMMARY.equals(field)){
-                    super.addSortForDbField(field, sorts, isAscent);
-                } else if (ShipmentConstants.SHIPPED_FROM_DATE.equals(field)){
-                    //shipped from date
-                    super.addSortForDbField("COALESCE(" + field
-                            + "," + SHIPMENTDATE_FIELD + ")", sorts, isAscent);
-                } else {
-                    super.addSortForDbField(TABLE + "." + field, sorts, isAscent);
-                }
-            }
-            /* (non-Javadoc)
-             * @see com.visfresh.dao.impl.DaoImplBase#addFilterValue(java.lang.String, java.lang.String, java.lang.Object, java.util.Map, java.util.List)
-             */
-            @Override
-            protected void addFilterValue(final String property, final Object value, final Map<String, Object> params,
-                    final List<String> filters) {
-                final String defaultKey = DEFAULT_FILTER_KEY_PREFIX + property;
-
-                if (STATUS_FIELD.equals(property)) {
-                    super.addFilterValue(property, value == null ? null : value.toString(), params, filters);
-                } else if (ShipmentConstants.SHIPPED_TO.equals(property)){
-                    //create placeholder for 'in' operator
-                    final List<String> in = new LinkedList<String>();
-                    int num = 0;
-                    for (final Object obj : ((List<?>) value)) {
-                        final String key = defaultKey + "_" + num;
-                        params.put(key, obj);
-                        in.add(":" + key);
-                        num++;
-                    }
-
-                    filters.add(TABLE + "." + SHIPPEDTO_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
-                } else if (ShipmentConstants.SHIPPED_FROM.equals(property)){
-                    //create placeholder for 'in' operator
-                    final List<String> in = new LinkedList<String>();
-                    int num = 0;
-                    for (final Object obj : ((List<?>) value)) {
-                        final String key = defaultKey + "_" + num;
-                        params.put(key, obj);
-                        in.add(":" + key);
-                        num++;
-                    }
-
-                    filters.add(SHIPPEDFROM_FIELD + " in (" + StringUtils.combine(in, ",") + ")");
-                } else if (ShipmentConstants.SHIPPED_TO_DATE.equals(property)){
-                    //shipped to date
-                    params.put(defaultKey, value);
-                    filters.add(TABLE + "." + SHIPMENTDATE_FIELD + " <= :" + defaultKey);
-                } else if (ShipmentConstants.SHIPPED_FROM_DATE.equals(property)){
-                    //shipped from date
-                    params.put(defaultKey, value);
-                    filters.add("COALESCE(" + TABLE + "." + LASTEVENT_FIELD + "," + TABLE + "." + SHIPMENTDATE_FIELD + ") >= :" + defaultKey);
-                } else if (ShipmentConstants.SHIPMENT_DESCRIPTION.equals(property)){
-                    params.put(defaultKey, "%" + value + "%");
-                    filters.add(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
-                } else if (ShipmentConstants.DEVICE_SN.equals(property)){
-                    params.put(defaultKey, "%" + Device.addZeroSymbolsToSn(String.valueOf(value)) + "_");
-                    filters.add(TABLE + "." + DEVICE_FIELD + " like :" + defaultKey);
-                } else if (ShipmentConstants.GOODS.equals(property)){
-                    params.put(defaultKey, "%" + value + "%");
-                    final StringBuilder sb = new StringBuilder();
-                    sb.append('(');
-                    sb.append(TABLE + "." + DESCRIPTION_FIELD + " like :" + defaultKey);
-                    sb.append(" or ");
-                    sb.append(TABLE + "." + PALETTID_FIELD + " like :" + defaultKey);
-                    sb.append(" or ");
-                    sb.append(TABLE + "." + ASSETNUM_FIELD + " like :" + defaultKey);
-                    sb.append(')');
-                    filters.add(sb.toString());
-                } else if (ShipmentConstants.EXCLUDE_PRIOR_SHIPMENTS.equals(property)){
-                    //nothing in where clause
-                } else {
-                    super.addFilterValue(property, value, params, filters);
-                }
-            }
-        };
+    public ShipmetSelectAllSupport createSelectAllSupport() {
+        return new ShipmetSelectAllSupport(getTableName());
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#createNewFrom(com.visfresh.entities.ShipmentTemplate)
@@ -809,5 +651,148 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         final List<Map<String, Object>> rows = jdbc.queryForList("select s." + TRIPCOUNT_FIELD + " as tripcount from "
                 + TABLE + " s where s." + ID_FIELD + "=:s", params);
         return rows.size() == 0 ? null : (((Number) rows.get(0).get("tripcount")).intValue());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#getCompanyShipments(java.lang.Long, com.visfresh.dao.Sorting, com.visfresh.dao.Page, com.visfresh.dao.Filter)
+     */
+    @Override
+    public ListResult<ListShipmentItem> getCompanyShipments(final Long companyId,
+            final Sorting sorting, final Page page, final Filter filter) {
+        final ShipmetSelectAllSupport support = getSelectAllSupport();
+        support.buildCompanyShipmentsSelectAll(filter, sorting, page);
+        final String sql = support.getQuery();
+        final List<Map<String, Object>> list = jdbc.queryForList(sql, support.getParameters());
+
+        final ListResult<ListShipmentItem> result = new ListResult<ListShipmentItem>();
+        for (final Map<String,Object> row : list) {
+            //create shipment without resolved entities.
+            final ListShipmentItem item = new ListShipmentItem(createEntity(row));
+
+            //add other fields
+            item.setAlertProfileId(dbLong(row.get("alertProfileId")));
+            item.setAlertProfileName((String) row.get("alertProfileName"));
+            item.setDeviceName((String) row.get("deviceName"));
+            item.setDeviceSN((String) row.get("deviceSn"));
+            item.setDevice((String) row.get("device"));
+            item.setShippedFrom((String) row.get("shippedFromLocationName"));
+            item.setShippedTo((String) row.get("shippedToLocationName"));
+            item.setActualArrivalDate((Date) row.get("arrivalDate"));
+
+            item.setShippedFromLat(dbDouble(row.get("shippedFromLat")));
+            item.setShippedFromLong(dbDouble(row.get("shippedFromLon")));
+
+            item.setShippedToLat(dbDouble(row.get("shippedToLat")));
+            item.setShippedToLong(dbDouble(row.get("shippedToLon")));
+
+            //first reading
+            final JsonElement firstReading = dbJson(row.get("firstReadingJson"));
+            if (firstReading != null) {
+                final JsonObject json = firstReading.getAsJsonObject();
+                item.setFirstReadingTime(parseDbJsonDate(json.get("time")));
+                item.setFirstReadingLat(AbstractJsonSerializer.asDoubleObject(json.get("lat")));
+                item.setFirstReadingLong(AbstractJsonSerializer.asDoubleObject(json.get("lon")));
+            }
+
+            //last reading
+            final JsonElement lastReading = dbJson(row.get("lastReadingJson"));
+            if (lastReading != null) {
+                final JsonObject json = lastReading.getAsJsonObject();
+                item.setLastReadingTime(parseDbJsonDate(json.get("time")));
+                item.setLastReadingTemperature(AbstractJsonSerializer.asInt(json.get("temperature")));
+                item.setLastReadingBattery(AbstractJsonSerializer.asInt(json.get("battery")));
+                item.setLastReadingLat(AbstractJsonSerializer.asDoubleObject(json.get("lat")));
+                item.setLastReadingLong(AbstractJsonSerializer.asDoubleObject(json.get("lon")));
+            }
+
+            //alerts
+            item.getSentAlerts().addAll(parseAlerts(dbJson(row.get("alertsJson"))));
+            //alert rules
+            item.getTemperatureRules().addAll(parseRules(dbJson(row.get("alertRulesJson"))));
+
+            result.getItems().add(item);
+        }
+
+        result.setTotalCount(getEntityCount(filter));
+        return result;
+    }
+    /**
+     * @param jsonElement
+     * @return
+     */
+    private Date parseDbJsonDate(final JsonElement jsonElement) {
+        final String str = jsonElement.getAsString();
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSSSSS").parse(str);
+        } catch (final ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    /**
+     * @param data
+     * @return
+     */
+    private List<TemperatureRuleBean> parseRules(final JsonElement data) {
+        final List<TemperatureRuleBean> rules = new LinkedList<>();
+        if (data != null) {
+            for (final JsonElement e : data.getAsJsonArray()) {
+                final JsonObject json = e.getAsJsonObject();
+                final TemperatureRuleBean rule = new TemperatureRuleBean();
+                rule.setId(AbstractJsonSerializer.asLong(json.get("id")));
+                //        'type', r.type,
+                rule.setType(AlertType.valueOf(AbstractJsonSerializer.asString(json.get("type"))));
+                //        't', r.temp,
+                rule.setTemperature(AbstractJsonSerializer.asDouble(json.get("t")));
+                //        'timeout', r.timeout,
+                rule.setTimeOutMinutes(AbstractJsonSerializer.asInt(json.get("timeout")));
+                //        'cumulative', IF(r.cumulative, 'true', false),
+                rule.setCumulativeFlag(AbstractJsonSerializer.asBoolean(json.get("cumulative")));
+                //        'maxrates', r.maxrateminutes,
+                rule.setMaxRateMinutes(AbstractJsonSerializer.asInteger(json.get("maxrates")));
+                rules.add(rule);
+            }
+        }
+        return rules;
+    }
+    /**
+     * @param data
+     * @return
+     */
+    private List<AlertBean> parseAlerts(final JsonElement data) {
+        final List<AlertBean> alerts = new LinkedList<>();
+        if (data != null) {
+            for (final JsonElement e : data.getAsJsonArray()) {
+                alerts.add(parseAlertBean(e));
+            }
+        }
+        return alerts;
+    }
+    /**
+     * @param el
+     * @return
+     */
+    private AlertBean parseAlertBean(final JsonElement el) {
+        if (el == null || el.isJsonNull()) {
+            return null;
+        }
+
+        final JsonObject json = el.getAsJsonObject();
+
+        final AlertType alertType = AlertType.valueOf(AbstractJsonSerializer.asString(json.get("type")));
+
+        final AlertBean a = alertType.isTemperatureAlert() ? new TemperatureAlertBean() : new AlertBean();
+        a.setId(AbstractJsonSerializer.asLong(json.get("id")));
+        a.setDate(parseDbJsonDate(json.get("date")));
+        a.setTrackerEventId(AbstractJsonSerializer.asLong(json.get("trackerEventId")));
+
+        a.setType(alertType);
+        if (alertType.isTemperatureAlert()) {
+            final TemperatureAlertBean ta = (TemperatureAlertBean) a;
+            ta.setTemperature(AbstractJsonSerializer.asDouble(json.get("temperature")));
+            ta.setMinutes(AbstractJsonSerializer.asInt(json.get("minutes")));
+            ta.setCumulative(AbstractJsonSerializer.asBoolean(json.get("cumulative")));
+            ta.setRuleId(AbstractJsonSerializer.asLong(json.get("ruleId")));
+        }
+
+        return a;
     }
 }

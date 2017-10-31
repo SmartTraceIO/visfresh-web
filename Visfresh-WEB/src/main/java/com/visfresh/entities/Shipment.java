@@ -280,16 +280,7 @@ public class Shipment extends ShipmentBase {
      * @return
      */
     public boolean hasFinalStatus() {
-        final ShipmentStatus s = status;
-        return isFinalStatus(s);
-    }
-
-    /**
-     * @param s
-     * @return
-     */
-    public static boolean isFinalStatus(final ShipmentStatus s) {
-        return s == ShipmentStatus.Arrived || s == ShipmentStatus.Ended;
+        return status != null && status.isFinal();
     }
 
     /* (non-Javadoc)

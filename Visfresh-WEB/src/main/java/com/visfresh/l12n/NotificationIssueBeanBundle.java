@@ -24,6 +24,7 @@ import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.io.shipment.SingleShipmentLocationBean;
 import com.visfresh.io.shipment.TemperatureAlertBean;
 import com.visfresh.io.shipment.TemperatureRuleBean;
+import com.visfresh.lists.ListShipmentItem;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.StringUtils;
@@ -140,6 +141,91 @@ public class NotificationIssueBeanBundle {
         return map;
     }
     /**
+     * @param issue
+     * @param e
+     * @param shipment
+     * @return
+     */
+    private Map<String, String> createReplacementMap(final NotificationIssueBean issue, final SingleShipmentLocationBean e,
+            final ListShipmentItem shipment) {
+
+        final Map<String, String> map = new HashMap<String, String>();
+
+        //supported place holders:
+        //${date} alert issue date include day and year
+        final Date issueDate = issue == null ? e.getTime() : issue.getDate();
+        map.put("date", DateTimeUtils.createPrettyFormat(lang, tz).format(issueDate));
+        //${time} the time in scope of day.
+        final DateFormat sdf = createDateFormat("H:mm", lang, tz);
+        map.put("time", sdf.format(issueDate));
+        //${device} device IMEI
+        map.put("device", shipment.getDevice());
+        //${devicesn} device serial number
+        map.put("devicesn", shipment.getDeviceSN());
+
+        //${tripCount} trip count for given device of shipment.
+        map.put("tripCount", Integer.toString(shipment.getTripCount()));
+        //${shippedFrom}      location shipped from
+        map.put("shippedFrom", shipment.getShippedFrom());
+        //${shippedTo}        location shipped to
+        map.put("shippedTo", shipment.getShippedTo());
+        //${shipmentDescription}  the shipment desc
+        map.put("shipmentDescription", shipment.getShipmentDescription() == null
+                ? "" : shipment.getShipmentDescription());
+        map.put("shipmentId", Long.toString(shipment.getShipmentId()));
+
+        if (e != null) {
+            //${readingTime}      the time reading occured in user's timezone - eg. 4:34
+            map.put("readingTime", createDateFormat("H:mm", lang, tz).format(e.getTime()));
+            //${readingDate}      the date reading occured in user's timezone - eg. 12 Feb 2016
+            map.put("readingDate", createDateFormat("dd MMM yyyy", lang, tz).format(e.getTime()));
+            //${temperature}
+            //${readingTemperature}  the temperature in user's temperature scale (C/F) at time of alert
+            final String t = LocalizationUtils.getTemperatureString(
+                    e.getTemperature(), tu);
+            map.put("readingTemperature", t);
+            map.put("temperature", t);
+        } else {
+            map.put("readingTime", "?");
+            map.put("readingDate", "?");
+            map.put("readingTemperature", "?");
+            map.put("temperature", "?");
+        }
+
+        if (issue instanceof AlertBean) {
+
+            //for temperature alerts:
+            //${type} alert type
+            map.put("type", ((AlertBean) issue).getType().toString());
+
+            if (issue instanceof TemperatureAlertBean) {
+                final TemperatureAlertBean ta = (TemperatureAlertBean) issue;
+                final String period = Integer.toString(ta.getMinutes());
+                map.put("period", period);
+
+                //find rule
+                final TemperatureRuleBean rule = getRule(ta, shipment.getTemperatureRules());
+                if (rule == null) {//old version
+                    //${ruleperiod}       the time period in alert rule
+                    map.put("ruleperiod", period);
+                    //${ruletemperature}  the temperature in alert rule
+                    map.put("ruletemperature", LocalizationUtils.getTemperatureString(
+                            ta.getTemperature(), tu));
+                } else {//new version which supports the rule ID.
+                    map.put("ruleperiod", Integer.toString(rule.getTimeOutMinutes()));
+                    //${ruletemperature}  the temperature in alert rule
+                    map.put("ruletemperature", LocalizationUtils.getTemperatureString(
+                            rule.getTemperature(), tu));
+                }
+            }
+        } else if (issue instanceof ArrivalBean) {
+            final ArrivalBean a = (ArrivalBean) issue;
+            map.put("mettersForArrival", Integer.toString(a.getMettersForArrival()));
+        }
+
+        return map;
+    }
+    /**
      * @param sn serial number.
      * @return normalized serial number.
      */
@@ -154,7 +240,8 @@ public class NotificationIssueBeanBundle {
      * @param ta temperature alert.
      * @return temperature rule.
      */
-    private TemperatureRuleBean getRule(final TemperatureAlertBean ta, final List<AlertRuleBean> rules) {
+    private <R extends AlertRuleBean> TemperatureRuleBean getRule(
+            final TemperatureAlertBean ta, final List<R> rules) {
         if (ta.getRuleId() == null) {
             return null;
         }
@@ -207,6 +294,17 @@ public class NotificationIssueBeanBundle {
         final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME, XmlControl.INSTANCE);
         final String str = bundle.getString(createBundleKey(issue));
         return StringUtils.getMessage(str, createReplacementMap(issue, e, shipment));
+    }
+    /**
+     * @param alert
+     * @param e
+     * @param s
+     * @return
+     */
+    public String buildDescription(final NotificationIssueBean issue, final SingleShipmentLocationBean e, final ListShipmentItem s) {
+        final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME, XmlControl.INSTANCE);
+        final String str = bundle.getString(createBundleKey(issue));
+        return StringUtils.getMessage(str, createReplacementMap(issue, e, s));
     }
     /**
      * @param user user.

@@ -28,7 +28,6 @@ import com.visfresh.entities.AlertRule;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureUnits;
@@ -550,7 +549,7 @@ public class ShipmentReportBuilder {
 
         //shipped to image
         final ImageRenderingInfo im;
-        if (Shipment.isFinalStatus(bean.getStatus())) {
+        if (bean.getStatus().isFinal()) {
             im = new ImageRenderingInfo("shippedTo", true);
         } else {
             im = new ImageRenderingInfo("shippedToToBeDetermined");
@@ -583,7 +582,7 @@ public class ShipmentReportBuilder {
             //wrap by braces
             locations.insert(0, '(').append(')');
 
-            if (!Shipment.isFinalStatus(bean.getStatus())) {
+            if (!bean.getStatus().isFinal()) {
                 locations.insert(0, "To be determined ");
             } else {
                 locations.insert(0, "Not determined ");
@@ -620,7 +619,7 @@ public class ShipmentReportBuilder {
         }
 
         //Who was notified:     Rob Arpas, Rob Arpas
-        if (!Shipment.isFinalStatus(bean.getStatus()) || bean.getStatus() == ShipmentStatus.Arrived) {
+        if (!bean.getStatus().isFinal() || bean.getStatus() == ShipmentStatus.Arrived) {
             final Map<String, Object> whoNotified = new HashMap<>();
 //          If Arrived, can we label it "Arrival Report sent to"
 //          if Default, can we label it "Arrival Report to be sent to"

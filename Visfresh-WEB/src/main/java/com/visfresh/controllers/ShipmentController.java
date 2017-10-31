@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +55,6 @@ import com.visfresh.entities.Arrival;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.InterimStop;
-import com.visfresh.entities.Language;
 import com.visfresh.entities.Location;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.Note;
@@ -86,6 +84,7 @@ import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
 import com.visfresh.io.json.SingleShipmentBeanSerializer;
 import com.visfresh.io.json.SingleShipmentSerializer;
+import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.AlertProfileDto;
 import com.visfresh.io.shipment.DeviceGroupDto;
@@ -96,10 +95,13 @@ import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.io.shipment.SingleShipmentDto;
 import com.visfresh.io.shipment.SingleShipmentLocation;
+import com.visfresh.io.shipment.SingleShipmentLocationBean;
 import com.visfresh.io.shipment.SingleShipmentTimeItem;
 import com.visfresh.l12n.ChartBundle;
+import com.visfresh.l12n.NotificationIssueBeanBundle;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.lists.ListNotificationScheduleItem;
+import com.visfresh.lists.ListResult;
 import com.visfresh.lists.ListShipmentItem;
 import com.visfresh.rules.state.ShipmentSession;
 import com.visfresh.services.AutoStartShipmentService;
@@ -111,7 +113,6 @@ import com.visfresh.services.ShipmentAuditService;
 import com.visfresh.services.SingleShipmentService;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.EntityUtils;
-import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.LocationUtils;
 import com.visfresh.utils.SerializerUtils;
 import com.visfresh.utils.StringUtils;
@@ -491,7 +492,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
             final Filter filter = createFilter(req);
-            final List<ListShipmentItem> shipments = getShipments(
+            final ListResult<ListShipmentItem> shipments = getShipments(
                     user.getCompany(),
                     createSortingShipments(
                             req.getSortColumn(),
@@ -499,21 +500,22 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                             getDefaultListShipmentsSortingOrder(), 2),
                     filter,
                     page, user);
-            final int total = shipmentDao.getEntityCount(user.getCompany(), filter);
 
             //add interim stops
-            addInterimStops(shipments, user);
+            addInterimStops(shipments.getItems(), user);
 
             //add events data
-            addKeyLocations(shipments, user);
+            final Map<ListShipmentItem, List<KeyLocation>> keyLocs = createKeyLocations(
+                    shipments.getItems(), user);
 
-            final ShipmentSerializer shs = new ShipmentSerializer(user.getLanguage(), user.getTimeZone());
+            final ShipmentSerializer shs = new ShipmentSerializer(user.getLanguage(),
+                    user.getTimeZone(), user.getTemperatureUnits());
             final JsonArray array = new JsonArray();
-            for (final ListShipmentItem s : shipments) {
-                array.add(shs.toJson(s));
+            for (final ListShipmentItem s : shipments.getItems()) {
+                array.add(shs.toJson(s, keyLocs.get(s)));
             }
 
-            return createListSuccessResponse(array, total);
+            return createListSuccessResponse(array, shipments.getTotalCount());
         } catch (final Exception e) {
             log.error("Failed to get shipments", e);
             return createErrorResponse(e);
@@ -551,13 +553,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             int page = 1;
             final int limit = 100;
             final Sorting sorting = new Sorting(SHIPMENT_ID);
-            final DateFormat fmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
 
             final List<ListShipmentItem> shipments = new LinkedList<>();
-            List<ListShipmentItem> part;
+            ListResult<ListShipmentItem> part;
             do {
                 part = getShipments(user.getCompany(), sorting, null, new Page(page, limit), user);
-                for (final ListShipmentItem item : part) {
+                for (final ListShipmentItem item : part.getItems()) {
                     //Check date and location nearby
                     final Double itemLat = item.getLastReadingLat();
                     final Double itemLon = item.getLastReadingLong();
@@ -565,8 +566,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     if (itemLat != null && itemLon != null) {
                         final double dinst = LocationUtils.getDistanceMeters(
                                 lat, lon, itemLat, itemLon);
-                        if (dinst <= radius && item.getLastReadingTimeISO() != null) {
-                            final Date lastDate = fmt.parse(item.getLastReadingTimeISO());
+                        if (dinst <= radius && item.getLastReadingTime() != null) {
+                            final Date lastDate = item.getLastReadingTime();
                             //check the last reading time
                             if (!lastDate.before(startDate)) {
                                 shipments.add(item);
@@ -576,18 +577,19 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 }
 
                 page++;
-            } while (part.size() >= limit);
+            } while (part.getItems().size() >= limit);
 
             //add interim stops
             addInterimStops(shipments, user);
 
             //add events data
-            addKeyLocations(shipments, user);
+            final Map<ListShipmentItem, List<KeyLocation>> keyLocs = createKeyLocations(shipments, user);
 
-            final ShipmentSerializer shs = new ShipmentSerializer(user.getLanguage(), user.getTimeZone());
+            final ShipmentSerializer shs = new ShipmentSerializer(user.getLanguage(),
+                    user.getTimeZone(), user.getTemperatureUnits());
             final JsonArray array = new JsonArray();
             for (final ListShipmentItem s : shipments) {
-                array.add(shs.toJson(s));
+                array.add(shs.toJson(s, keyLocs.get(s)));
             }
 
             return createListSuccessResponse(array, shipments.size());
@@ -600,21 +602,22 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param shipments
      * @throws ParseException
      */
-    private void addKeyLocations(final List<ListShipmentItem> shipments, final User user) throws ParseException {
+    private Map<ListShipmentItem, List<KeyLocation>> createKeyLocations(
+            final List<ListShipmentItem> shipments, final User user) throws ParseException {
+        final Map<ListShipmentItem, List<KeyLocation>> result = new HashMap<>();
+
         final Collection<Long> shipmentIds = EntityUtils.getIdList(shipments);
         final Map<Long, List<TrackerEventDto>> eventMap = trackerEventDao.getEventsForShipmentIds(
                 shipmentIds);
-        //alerts
-        final Map<Long, List<Alert>> alertMap = alertDao.getAlertsForShipmentIds(
-                shipmentIds);
-        final DateFormat format = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
+        final NotificationIssueBeanBundle bundle = new NotificationIssueBeanBundle(
+                user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
 
         //events
         for (final ListShipmentItem s : shipments) {
             final List<TrackerEventDto> events = eventMap.get(s.getId());
 
             final List<KeyLocation> keyLocs = buildKeyLocations(events);
-            addInterimStopKeyLocations(keyLocs, s.getInterimStops(), user.getTimeZone());
+            addInterimStopKeyLocations(keyLocs, s.getInterimStops());
 
             //add events
             if (events.size() > 0) {
@@ -660,7 +663,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
                 //alerts
                 boolean lightOnProcessed = false;
-                for (final Alert alert : alertMap.get(s.getId())) {
+                for (final AlertBean alert : s.getSentAlerts()) {
                     final AlertType type = alert.getType();
                     if (type == AlertType.LightOff) {
                         continue;
@@ -673,20 +676,17 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                         }
                     }
 
-                    final KeyLocation loc = buildKeyLocation(alert, events, user);
+                    final KeyLocation loc = buildKeyLocation(alert, events, s, bundle);
                     if (loc != null) {
                         insertKeyLocation(loc, keyLocs);
                     }
                 }
-
-                //set pretty time
-                for (final KeyLocation loc : keyLocs) {
-                    loc.setPrettyTime(format.format(new Date(loc.getTime())));
-                }
             }
 
-            s.setKeyLocations(keyLocs);
+            result.put(s, keyLocs);
         }
+
+        return result;
     }
 
     /**
@@ -694,8 +694,10 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param events
      * @return
      */
-    private KeyLocation buildKeyLocation(final Alert alert,
-            final List<TrackerEventDto> events, final User user) {
+    private KeyLocation buildKeyLocation(final AlertBean alert,
+            final List<TrackerEventDto> events,
+            final ListShipmentItem s,
+            final NotificationIssueBeanBundle bundle) {
         final Long eventId = alert.getTrackerEventId();
 
         if (eventId != null) {
@@ -706,8 +708,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     loc.setLatitude(e.getLatitude());
                     loc.setLongitude(e.getLongitude());
                     loc.setTime(e.getTime().getTime());
-                    loc.setDescription(chartBundle.buildDescription(alert, e,
-                            user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits()));
+                    loc.setDescription(bundle.buildDescription(alert,
+                            new SingleShipmentLocationBean(e), s));
                     return loc;
                 }
             }
@@ -749,15 +751,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @throws ParseException
      */
     private void addInterimStopKeyLocations(final List<KeyLocation> keyLocs,
-            final List<SingleShipmentInterimStop> interimStops, final TimeZone tz) throws ParseException {
-        final DateFormat fmt = DateTimeUtils.createIsoFormat(Language.English, tz);
-
+            final List<SingleShipmentInterimStop> interimStops) throws ParseException {
         for (final SingleShipmentInterimStop stp : interimStops) {
             final KeyLocation loc = createKeyLocation(stp);
-            loc.setTime(fmt.parse(stp.getStopDateIso()).getTime());
+            loc.setTime(stp.getStopDate().getTime());
             insertKeyLocation(loc, keyLocs);
         }
-
     }
     /**
      * @param loc location.
@@ -856,9 +855,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param shipments
      */
     private void addInterimStops(final List<ListShipmentItem> shipments, final User user) {
-        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
-        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
-
         final Map<Long, List<InterimStop>> stopMap = interimStopDao.getByShipmentIds(EntityUtils.getIdList(shipments));
         for (final ListShipmentItem s : shipments) {
             for (final InterimStop stop : stopMap.get(s.getId())) {
@@ -869,8 +865,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                 dto.setLatitude(l.getLocation().getLatitude());
                 dto.setLongitude(l.getLocation().getLongitude());
                 dto.setLocation(l);
-                dto.setStopDate(prettyFmt.format(stop.getDate()));
-                dto.setStopDateIso(isoFmt.format(stop.getDate()));
+                dto.setStopDate(stop.getDate());
 
                 s.getInterimStops().add(dto);
             }
@@ -974,107 +969,47 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param user the user.
      * @return
      */
-    private List<ListShipmentItem> getShipments(final Company company,
+    private ListResult<ListShipmentItem> getShipments(final Company company,
             final Sorting sorting,
             final Filter filter,
             final Page page, final User user) {
-        final List<Shipment> shipments = shipmentDao.findByCompany(company, sorting, page, filter);
-        final List<ListShipmentItem> result = new LinkedList<ListShipmentItem>();
+        final ListResult<ListShipmentItem> shipments = shipmentDao.getCompanyShipments(
+                company.getId(), sorting, page, filter);
 
         final Date currentTime = new Date();
-        final DateFormat isoFmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
-        final DateFormat prettyFmt = DateTimeUtils.createPrettyFormat(user.getLanguage(), user.getTimeZone());
 
         //add alerts to each shipment.
-        for (final Shipment s : shipments) {
-            final ListShipmentItem dto = new ListShipmentItem(s);
-            result.add(dto);
-
-            //siblings.
-            dto.setSiblingCount(s.getSiblingCount());
-            //alerts
-            final List<Alert> alerts = alertDao.getAlerts(s);
-            dto.getAlertSummary().putAll(SingleShipmentBeanSerializer.toSummaryMap(alerts));
-
+        for (final ListShipmentItem dto : shipments.getItems()) {
             //percentage complete.
-            if (s.hasFinalStatus()) {
+            if (dto.getStatus().isFinal()) {
                 dto.setPercentageComplete(100);
             } else {
-                final Date eta = s.getEta();
+                final Date eta = dto.getEta();
                 if (eta != null) {
-                    dto.setEstArrivalDate(prettyFmt.format(eta));
-                    dto.setEstArrivalDateISO(isoFmt.format(eta));
-                    dto.setPercentageComplete(getPercentageCompleted(s, currentTime, eta));
+                    dto.setPercentageComplete(getPercentageCompleted(dto.getShipmentDate(), currentTime, eta));
                 }
             }
 
-            //last reading
-            if (s.getLastEventDate() != null) {
-                dto.setLastReadingTime(prettyFmt.format(s.getLastEventDate()));
-                dto.setLastReadingTimeISO(isoFmt.format(s.getLastEventDate()));
-            }
-
-            //last event
-            final TrackerEvent lastEvent = trackerEventDao.getLastEvent(s);
-            if (lastEvent != null) {
-                //set last reading data
-                dto.setLastReadingTemperature(LocalizationUtils.convertToUnits(
-                        lastEvent.getTemperature(), user.getTemperatureUnits()));
-                dto.setLastReadingBattery(lastEvent.getBattery());
-                dto.setLastReadingLat(lastEvent.getLatitude());
-                dto.setLastReadingLong(lastEvent.getLongitude());
-            }
-
-            //first event
-            final TrackerEvent firstEvent = trackerEventDao.getFirstEvent(s);
-            if (firstEvent != null) {
-                dto.setFirstReadingTime(prettyFmt.format(firstEvent.getTime()));
-                dto.setFirstReadingTimeISO(isoFmt.format(firstEvent.getTime()));
-                dto.setFirstReadingLat(firstEvent.getLatitude());
-                dto.setFirstReadingLong(firstEvent.getLongitude());
-            }
-
-            if (s.getStatus() == ShipmentStatus.Default || s.getStatus() == ShipmentStatus.Ended) {
-                dto.setEstArrivalDate(null);
+            if (dto.getStatus() == ShipmentStatus.Default || dto.getStatus() == ShipmentStatus.Ended) {
+                dto.setEta(null);
                 dto.setActualArrivalDate(null);
-                dto.setActualArrivalDateISO(null);
-                if (s.getStatus() == ShipmentStatus.Default) {
+                if (dto.getStatus() == ShipmentStatus.Default) {
                     dto.setShippedTo(null);
                 }
-            } else if (s.getStatus() == ShipmentStatus.Arrived && s.getArrivalDate() != null) {
-                //arrival date.
-                dto.setActualArrivalDate(prettyFmt.format(s.getArrivalDate()));
-                dto.setActualArrivalDateISO(isoFmt.format(s.getArrivalDate()));
-            }
-
-            if (s.getShipmentDate() != null) {
-                dto.setShipmentDate(prettyFmt.format(s.getShipmentDate()));
-                dto.setShipmentDateISO(isoFmt.format(s.getShipmentDate()));
-            }
-
-            //start location
-            if (s.getShippedFrom() != null) {
-                dto.setShippedFromLat(s.getShippedFrom().getLocation().getLatitude());
-                dto.setShippedFromLong(s.getShippedFrom().getLocation().getLongitude());
-            }
-            //end location
-            if (s.getShippedTo() != null) {
-                dto.setShippedToLat(s.getShippedTo().getLocation().getLatitude());
-                dto.setShippedToLong(s.getShippedTo().getLocation().getLongitude());
             }
         }
 
-        return result;
+        return shipments;
     }
 
     /**
-     * @param s
+     * @param shipmentDate
      * @param currentTime
      * @param eta
      * @return
      */
-    private int getPercentageCompleted(final Shipment s, final Date currentTime, final Date eta) {
-        return MainShipmentDataBuilder.getPercentageCompleted(s.getShipmentDate(), currentTime, eta);
+    private int getPercentageCompleted(final Date shipmentDate, final Date currentTime, final Date eta) {
+        return MainShipmentDataBuilder.getPercentageCompleted(shipmentDate, currentTime, eta);
     }
     /**
      * @param authToken authentication token.
@@ -1117,7 +1052,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @return
      */
     private ShipmentSerializer getSerializer(final User user) {
-        return new ShipmentSerializer(user.getLanguage(), user.getTimeZone());
+        return new ShipmentSerializer(user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
     }
     @RequestMapping(value = "/deleteShipment/{authToken}", method = RequestMethod.GET)
     public JsonObject deleteShipment(@PathVariable final String authToken,
@@ -1406,8 +1341,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             in.setLongitude(l.getLocation().getLongitude());
             in.setLocation(l);
             in.setTime(stp.getTime());
-            in.setStopDate(prettyFormat.format(stp.getDate()));
-            in.setStopDateIso(isoFormat.format(stp.getDate()));
+            in.setStopDate(stp.getDate());
 
             dto.getInterimStops().add(in);
         }
@@ -1707,7 +1641,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         }
         if (shipment.getEta() != null) {
             final Date eta = shipment.getEta();
-            dto.setPercentageComplete(getPercentageCompleted(shipment, new Date(), eta));
+            dto.setPercentageComplete(getPercentageCompleted(shipment.getShipmentDate(), new Date(), eta));
             dto.setEtaIso(isoFmt.format(eta));
             dto.setEta(prettyFmt.format(eta));
         }

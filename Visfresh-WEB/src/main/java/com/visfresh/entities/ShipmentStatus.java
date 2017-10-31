@@ -20,14 +20,35 @@ public enum ShipmentStatus {
      * new shipment data has been uploaded and the device has reached its destination
      * (device may or may not be switched off)
      */
-    Ended(),
+    Ended(true),
     /**
      * new shipment data has been uploaded and the device has reached its destination
      * (device may or may not be switched off)
      */
-    Arrived(),
+    Arrived(true),
     /**
      * new shipment data has been uploaded but for a future time of shipment
      */
-    Pending()
+    Pending();
+
+    private final boolean isFinal;
+
+    /**
+     * Default constructor.
+     */
+    private ShipmentStatus() {
+        this(false);
+    }
+    /**
+     * @param isFinal final status.
+     */
+    private ShipmentStatus(final boolean isFinal) {
+        this.isFinal = isFinal;
+    }
+    /**
+     * @return
+     */
+    public boolean isFinal() {
+        return isFinal;
+    }
 }
