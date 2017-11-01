@@ -229,7 +229,8 @@ public class ReadingsDataBuilderTest extends BaseBuilderTest {
      * @return
      */
     private ReadingsDataBuilder createBuilder(final PreliminarySingleShipmentData pd) {
-        return new ReadingsDataBuilder(jdbc, pd.getShipment(), pd.getSiblings());
+        return new ReadingsDataBuilder(context.getBean(TrackerEventDao.class),
+                pd.getShipment(), pd.getSiblings());
     }
     /**
      * @param s

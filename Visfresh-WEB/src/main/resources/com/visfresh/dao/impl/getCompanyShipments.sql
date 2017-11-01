@@ -68,6 +68,31 @@ select
 		from alerts a
 		where a.shipment = shipments.id
     ) as alertsJson
+  -- interim stops
+    ,(select CONCAT(
+	    '[', 
+	    GROUP_CONCAT(JSON_OBJECT(
+	    	'location', JSON_OBJECT(
+	    	'id', loc.id,
+	    		'company', loc.companydetails,
+	    		'name', loc.name,
+	    		'notes', loc.notes,
+	    		'address', loc.address,
+	    		'start', IF(loc.start,'true','false'),
+	    		'interim', IF(loc.interim,'true','false'),
+	    		'stop', IF(loc.stop,'true','false'),
+    			'lat', loc.latitude,
+    			'lon', loc.longitude,
+				'radiusMeters', loc.radius
+	    	),
+		    'id', stp.id,
+		    'stopDate', stp.date,
+		    'time', stp.pause
+	    )),
+	    ']'
+    ) from interimstops stp 
+    join locationprofiles loc on stp.location = loc.id
+    where stp.shipment = shipments.id) as interimStopsJson  
   -- device
   ,d.name as deviceName,
   substring(d.imei, -7, 6) as deviceSn,

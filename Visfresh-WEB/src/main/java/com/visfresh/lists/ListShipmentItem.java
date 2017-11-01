@@ -10,8 +10,8 @@ import java.util.List;
 import com.visfresh.entities.EntityWithId;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
-import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.io.shipment.TemperatureRuleBean;
 
 /**
@@ -53,7 +53,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     private Double firstReadingLat;
     private Double firstReadingLong;
     private Date firstReadingTime;
-    private final List<SingleShipmentInterimStop> interimStops = new LinkedList<>();
+    private final List<InterimStopBean> interimStops = new LinkedList<>();
 
     private boolean sendArrivalReport;
     private boolean sendArrivalReportOnlyIfAlerts;
@@ -413,7 +413,7 @@ public class ListShipmentItem implements EntityWithId<Long> {
     /**
      * @return
      */
-    public List<SingleShipmentInterimStop> getInterimStops() {
+    public List<InterimStopBean> getInterimStops() {
         return interimStops;
     }
     /**

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -74,6 +75,13 @@ public interface TrackerEventDao extends DaoBase<TrackerEvent, TrackerEvent, Lon
      * @return map of shipment ID to list of tracker event.
      */
     Map<Long, List<TrackerEventDto>> getEventsForShipmentIds(Collection<Long> ids);
+    /**
+     * @param shipments
+     * @param page
+     * @param size
+     * @return list of tracker events.
+     */
+    List<TrackerEventDto> getEventPart(Set<Long> shipments, int page, int size);
     /**
      * @param id tracker event ID.
      * @param s shipment.

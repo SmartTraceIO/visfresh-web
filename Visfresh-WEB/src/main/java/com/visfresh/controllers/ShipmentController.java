@@ -88,6 +88,7 @@ import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.AlertProfileDto;
 import com.visfresh.io.shipment.DeviceGroupDto;
+import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
 import com.visfresh.io.shipment.ShipmentUserDto;
 import com.visfresh.io.shipment.SingleShipmentAlert;
@@ -501,9 +502,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
                     filter,
                     page, user);
 
-            //add interim stops
-            addInterimStops(shipments.getItems(), user);
-
             //add events data
             final Map<ListShipmentItem, List<KeyLocation>> keyLocs = createKeyLocations(
                     shipments.getItems(), user);
@@ -578,9 +576,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
                 page++;
             } while (part.getItems().size() >= limit);
-
-            //add interim stops
-            addInterimStops(shipments, user);
 
             //add events data
             final Map<ListShipmentItem, List<KeyLocation>> keyLocs = createKeyLocations(shipments, user);
@@ -751,8 +746,8 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @throws ParseException
      */
     private void addInterimStopKeyLocations(final List<KeyLocation> keyLocs,
-            final List<SingleShipmentInterimStop> interimStops) throws ParseException {
-        for (final SingleShipmentInterimStop stp : interimStops) {
+            final List<InterimStopBean> interimStops) throws ParseException {
+        for (final InterimStopBean stp : interimStops) {
             final KeyLocation loc = createKeyLocation(stp);
             loc.setTime(stp.getStopDate().getTime());
             insertKeyLocation(loc, keyLocs);
@@ -784,12 +779,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param stp
      * @return
      */
-    private KeyLocation createKeyLocation(final SingleShipmentInterimStop stp) {
+    private KeyLocation createKeyLocation(final InterimStopBean stp) {
         final KeyLocation loc = new KeyLocation();
         loc.setKey("interimStop");
         loc.setDescription(stp.getLocation().getName());
-        loc.setLatitude(stp.getLatitude());
-        loc.setLongitude(stp.getLongitude());
+        loc.setLatitude(stp.getLocation().getLocation().getLatitude());
+        loc.setLongitude(stp.getLocation().getLocation().getLongitude());
         return loc;
     }
     /**
@@ -850,26 +845,6 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             }
         }
         return e;
-    }
-    /**
-     * @param shipments
-     */
-    private void addInterimStops(final List<ListShipmentItem> shipments, final User user) {
-        final Map<Long, List<InterimStop>> stopMap = interimStopDao.getByShipmentIds(EntityUtils.getIdList(shipments));
-        for (final ListShipmentItem s : shipments) {
-            for (final InterimStop stop : stopMap.get(s.getId())) {
-                final SingleShipmentInterimStop dto = new SingleShipmentInterimStop();
-                dto.setId(stop.getId());
-
-                final LocationProfile l = stop.getLocation();
-                dto.setLatitude(l.getLocation().getLatitude());
-                dto.setLongitude(l.getLocation().getLongitude());
-                dto.setLocation(l);
-                dto.setStopDate(stop.getDate());
-
-                s.getInterimStops().add(dto);
-            }
-        }
     }
     private Sorting createSortingShipments(final String sc, final String so,
             final String[] defaultSortOrder, final int maxNumOfSortColumns) {

@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.ShipmentConstants;
@@ -34,6 +35,8 @@ import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.io.json.AbstractJsonSerializer;
 import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.InterimStopBean;
+import com.visfresh.io.shipment.LocationProfileBean;
 import com.visfresh.io.shipment.TemperatureAlertBean;
 import com.visfresh.io.shipment.TemperatureRuleBean;
 import com.visfresh.lists.ListResult;
@@ -708,12 +711,36 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
             item.getSentAlerts().addAll(parseAlerts(dbJson(row.get("alertsJson"))));
             //alert rules
             item.getTemperatureRules().addAll(parseRules(dbJson(row.get("alertRulesJson"))));
+            //interim stops
+            item.getInterimStops().addAll(parseInterimStops(dbJson(row.get("interimStopsJson"))));
 
             result.getItems().add(item);
         }
 
         result.setTotalCount(getEntityCount(filter));
         return result;
+    }
+    /**
+     * @param el
+     * @return
+     */
+    private List<InterimStopBean> parseInterimStops(final JsonElement el) {
+        final List<InterimStopBean> stops = new LinkedList<>();
+        if (el != null) {
+            final JsonArray array = el.getAsJsonArray();
+            for (final JsonElement e : array) {
+                final JsonObject json = e.getAsJsonObject();
+
+                final InterimStopBean stop = new InterimStopBean();
+                stop.setId(AbstractJsonSerializer.asLong(json.get("id")));
+                stop.setTime(AbstractJsonSerializer.asInt(json.get("time")));
+                stop.setStopDate(parseDbJsonDate(json.get("stopDate")));
+                stop.setLocation(parseLocationProfile(json.get("location").getAsJsonObject()));
+
+                stops.add(stop);
+            }
+        }
+        return stops;
     }
     /**
      * @param jsonElement
@@ -794,5 +821,29 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         }
 
         return a;
+    }
+    /**
+     * @param obj
+     * @param location
+     */
+    protected LocationProfileBean parseLocationProfile(final JsonObject json) {
+        final LocationProfileBean l = new LocationProfileBean();
+
+        l.setId(AbstractJsonSerializer.asLong(json.get("id")));
+        l.setCompanyName(AbstractJsonSerializer.asString(json.get("company")));
+        l.setName(AbstractJsonSerializer.asString(json.get("name")));
+        l.setNotes(AbstractJsonSerializer.asString(json.get("notes")));
+        l.setAddress(AbstractJsonSerializer.asString(json.get("address")));
+
+        l.setStart(AbstractJsonSerializer.asBoolean(json.get("start")));
+        l.setInterim(AbstractJsonSerializer.asBoolean(json.get("interim")));
+        l.setStop(AbstractJsonSerializer.asBoolean(json.get("stop")));
+
+        l.getLocation().setLatitude(AbstractJsonSerializer.asDouble(json.get("lat")));
+        l.getLocation().setLongitude(AbstractJsonSerializer.asDouble(json.get("lon")));
+
+        l.setRadius(AbstractJsonSerializer.asInt(json.get("radius")));
+
+        return l;
     }
 }

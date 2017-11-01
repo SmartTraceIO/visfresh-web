@@ -27,8 +27,8 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentBaseDto;
 import com.visfresh.io.ShipmentDto;
-import com.visfresh.io.SingleShipmentInterimStop;
 import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.lists.ListShipmentItem;
 import com.visfresh.utils.LocalizationUtils;
 import com.visfresh.utils.SerializerUtils;
@@ -358,7 +358,7 @@ public class ShipmentSerializer extends AbstractJsonSerializer {
         json.addProperty("firstReadingTimeISO", getFormatted(isoFormat, dto.getFirstReadingTime()));
 
         int i = 1;
-        for (final SingleShipmentInterimStop stp : dto.getInterimStops()) {
+        for (final InterimStopBean stp : dto.getInterimStops()) {
             final String prefix = "interimStop" + i;
             json.addProperty(prefix, stp.getLocation().getName());
             json.addProperty(prefix + "Time", getFormatted(prettyFormat, stp.getStopDate()));

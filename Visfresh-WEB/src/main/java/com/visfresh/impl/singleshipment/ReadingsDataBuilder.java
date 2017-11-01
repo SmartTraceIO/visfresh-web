@@ -11,38 +11,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
-import com.visfresh.dao.impl.DaoImplBase;
+import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Location;
-import com.visfresh.entities.TrackerEventType;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.io.shipment.SingleShipmentLocationBean;
-import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public class ReadingsDataBuilder implements SingleShipmentPartBuilder {
-    protected final NamedParameterJdbcTemplate jdbc;
+    protected final TrackerEventDao dao;
     private Map<Long, SingleShipmentBean> beans = new HashMap<>();
     private final Long shipmentId;
     private List<TrackerEventDto> events = new LinkedList<>();
 
     /**
-     * @param jdbc JDBC template.
+     * @param dao JDBC template.
      * @param shipmentId shipment ID.
      * @param companyId company ID.
      * @param siblings list of siblings.
      */
-    public ReadingsDataBuilder(final NamedParameterJdbcTemplate jdbc,
+    public ReadingsDataBuilder(final TrackerEventDao dao,
             final Long shipmentId, final Set<Long> siblings) {
         super();
-        this.jdbc = jdbc;
+        this.dao = dao;
         this.shipmentId = shipmentId;
 
         beans.put(shipmentId, null);
@@ -179,31 +175,22 @@ public class ReadingsDataBuilder implements SingleShipmentPartBuilder {
 
         //find first previous normal temperature.
         while (true) {
-            final List<Map<String, Object>> rows = jdbc.queryForList(
-                    "select * from trackerevents e where e.shipment in ("
-                            + StringUtils.combine(beans.keySet(), ",") + ") order by e.time, e.id limit "
-                            + (page * size) + "," + size,
-                    new HashMap<String, Object>());
-            for (final Map<String, Object> row : rows) {
-                final Long id = DaoImplBase.dbLong(row.get("shipment"));
-                processRow(beans.get(id), row, id.equals(shipmentId));
+            final List<TrackerEventDto> events = dao.getEventPart(beans.keySet(), page, size);
+            for (final TrackerEventDto e : events) {
+                processRow(beans.get(e.getShipmentId()), e, e.getShipmentId().equals(shipmentId));
             }
-
-            if(rows.size() < size) {
+            if(events.size() < size) {
                 break;
             }
             page++;
         }
     }
-
     /**
      * @param bean single shipment bean.
      * @param row DB row.
      * @param isMainBean
      */
-    private void processRow(final SingleShipmentBean bean, final Map<String, Object> row, final boolean isMainBean) {
-        final TrackerEventDto e = createEvent(row);
-
+    private void processRow(final SingleShipmentBean bean, final TrackerEventDto e, final boolean isMainBean) {
         if (bean.getFirstReadingTime() == null) {
             bean.setFirstReadingTime(e.getTime());
         }
@@ -224,25 +211,5 @@ public class ReadingsDataBuilder implements SingleShipmentPartBuilder {
         if (isMainBean) {
             events.add(e);
         }
-    }
-
-    /**
-     * @param row DB row.
-     * @return tracker event.
-     */
-    private TrackerEventDto createEvent(final Map<String, Object> row) {
-        final TrackerEventDto e = new TrackerEventDto();
-
-        e.setBattery(DaoImplBase.dbInteger(row.get("battery")));
-        e.setCreatedOn((Date) row.get("createdon"));
-        e.setId(DaoImplBase.dbLong(row.get("id")));
-        e.setLatitude(DaoImplBase.dbDouble(row.get("latitude")));
-        e.setLongitude(DaoImplBase.dbDouble(row.get("longitude")));
-        e.setTemperature(DaoImplBase.dbDouble(row.get("temperature")));
-        e.setTime((Date) row.get("time"));
-        e.setType(TrackerEventType.valueOf((String) row.get("type")));
-        e.setShipmentId(DaoImplBase.dbLong(row.get("shipment")));
-        e.setDeviceImei((String) row.get("device"));
-        return e;
     }
 }

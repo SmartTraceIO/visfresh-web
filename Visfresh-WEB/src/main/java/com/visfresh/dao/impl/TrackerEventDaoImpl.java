@@ -575,4 +575,35 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
 
         jdbc.update(sql, map);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#getTrackerEventPart(java.util.Set, int, int)
+     */
+    @Override
+    public List<TrackerEventDto> getEventPart(final Set<Long> shipments, final int page, final int size) {
+        final List<TrackerEventDto> events = new LinkedList<>();
+
+        final List<Map<String, Object>> rows = jdbc.queryForList(
+                "select * from trackerevents e where e.shipment in ("
+                        + StringUtils.combine(shipments, ",") + ") order by e.time, e.id limit "
+                        + (page * size) + "," + size,
+                new HashMap<String, Object>());
+
+        for (final Map<String, Object> row : rows) {
+            final TrackerEventDto e = new TrackerEventDto();
+
+            e.setBattery(DaoImplBase.dbInteger(row.get("battery")));
+            e.setCreatedOn((Date) row.get("createdon"));
+            e.setId(DaoImplBase.dbLong(row.get("id")));
+            e.setLatitude(DaoImplBase.dbDouble(row.get("latitude")));
+            e.setLongitude(DaoImplBase.dbDouble(row.get("longitude")));
+            e.setTemperature(DaoImplBase.dbDouble(row.get("temperature")));
+            e.setTime((Date) row.get("time"));
+            e.setType(TrackerEventType.valueOf((String) row.get("type")));
+            e.setShipmentId(DaoImplBase.dbLong(row.get("shipment")));
+            e.setDeviceImei((String) row.get("device"));
+
+            events.add(e);
+        }
+        return events;
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.PreliminarySingleShipmentData;
 import com.visfresh.dao.ShipmentDao;
+import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.impl.singleshipment.MainShipmentDataBuilder;
 import com.visfresh.impl.singleshipment.ReadingsDataBuilder;
 import com.visfresh.impl.singleshipment.SingleShipmentBuildContext;
@@ -36,6 +37,8 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
      */
     @Autowired
     private ShipmentDao shipmentDao;
+    @Autowired
+    private TrackerEventDao trackerEventDao;
     @Autowired
     private LocationService locationService;
     /**
@@ -84,7 +87,7 @@ public class SingleShipmentServiceImpl implements SingleShipmentService {
             final SingleShipmentBuilderExecutor executor = new SingleShipmentBuilderExecutor();
             executor.addBuilder(new MainShipmentDataBuilder(jdbc, pd.getShipment(), pd.getCompany(),
                     pd.getSiblings()));
-            executor.addBuilder(new ReadingsDataBuilder(jdbc, pd.getShipment(), pd.getSiblings()));
+            executor.addBuilder(new ReadingsDataBuilder(trackerEventDao, pd.getShipment(), pd.getSiblings()));
 
             //launch executor
             final SingleShipmentBuildContext context = new SingleShipmentBuildContext(locationService);
