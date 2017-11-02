@@ -31,7 +31,11 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.TemperatureUnits;
+import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.lists.ListResult;
+import com.visfresh.lists.ListShipmentItem;
 
 import junit.framework.AssertionFailedError;
 
@@ -733,6 +737,148 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         assertTrue(data.getSiblings().contains(sib1.getId()));
         assertTrue(data.getSiblings().contains(sib2.getId()));
     }
+    @Test
+    public void testCompanyShipmentsCompany() {
+        final Company c1 = createCompany("C1");
+        final Company c2 = createCompany("C2");
+
+        createShipment(c1, ShipmentStatus.Arrived);
+        createShipment(c1, ShipmentStatus.Arrived);
+        createShipment(c2, ShipmentStatus.Arrived);
+
+        assertEquals(2, dao.getCompanyShipments(c1.getId(), null, null, null).getItems().size());
+        assertEquals(1, dao.getCompanyShipments(c2.getId(), null, null, null).getItems().size());
+    }
+    @Test
+    public void testCompanyShipmentsPaging() {
+        final Company c1 = createCompany("C1");
+
+        createShipment(c1, ShipmentStatus.Arrived);
+        createShipment(c1, ShipmentStatus.Arrived);
+        createShipment(c1, ShipmentStatus.Arrived);
+
+        assertEquals(2, dao.getCompanyShipments(c1.getId(), null, new Page(1, 2), null).getItems().size());
+        final ListResult<ListShipmentItem> secondPage = dao.getCompanyShipments(
+                c1.getId(), null, new Page(2, 2), null);
+        assertEquals(1, secondPage.getItems().size());
+        assertEquals(3, secondPage.getTotalCount());
+    }
+    @Test
+    public void testCompanyShipmentsMainData() {
+        final Shipment s = new Shipment();
+
+        final AlertProfile ap = new AlertProfile();
+        ap.setName("ApName");
+        ap.setCompany(sharedCompany);
+        context.getBean(AlertProfileDao.class).save(ap);
+
+        final LocationProfile from = createLocationProfile("LocFrom");
+        from.getLocation().setLatitude(12.2);
+        from.getLocation().setLongitude(13.3);
+        from.setCompany(sharedCompany);
+        context.getBean(LocationProfileDao.class).save(from);
+
+        final LocationProfile to = createLocationProfile("LocTo");
+        to.getLocation().setLatitude(12.2);
+        to.getLocation().setLongitude(13.3);
+        to.setCompany(sharedCompany);
+        context.getBean(LocationProfileDao.class).save(to);
+
+        final Date arrivalDate = new Date(System.currentTimeMillis() - 293487l);
+        final String assetNum = "asset num";
+        final String assetType = "any asset type";
+        final Date eta = new Date(System.currentTimeMillis() - 2094587l);
+        final String paletId = "AnyPaletID";
+        final Date shipmentDate = new Date(System.currentTimeMillis() - 239570987l);
+        final String description = "Shipment Description";
+        final ShipmentStatus status = ShipmentStatus.InProgress;
+
+        s.setAlertProfile(ap);
+        s.setShippedFrom(from);
+        s.setShippedTo(to);
+        s.setArrivalDate(arrivalDate);
+        s.setAssetNum(assetNum);
+        s.setAssetType(assetType);
+        s.setEta(eta);
+        s.setPalletId(paletId);
+        s.setShipmentDate(shipmentDate);
+        s.setShipmentDescription(description);
+        s.setStatus(status);
+        s.setDevice(device);
+        s.setCompany(sharedCompany);
+        s.setArrivalDate(arrivalDate);
+
+        dao.save(s);
+
+        //first reading
+        final double firstReadingLat = 14.5;
+        final double firstReadingLon = 13.2;
+        final Date firstReadingTime = new Date(System.currentTimeMillis() - 9238470l);
+        final int firstReadingBattery = 2554;
+        createTrackerEvent(s, firstReadingTime, firstReadingLat, firstReadingLon, firstReadingBattery, 22.33);
+
+        final double lastReadingLat = 14.3;
+        final double lastReadingLon = 17.2;
+        final Date lastReadingTime = new Date(firstReadingTime.getTime() + 1111111l);
+        final int lastReadingBattery = 34987;
+        final double lastReadingTemperature = 36.6;
+        //last reading
+        createTrackerEvent(s, lastReadingTime, lastReadingLat, lastReadingLon,
+                lastReadingBattery, lastReadingTemperature);
+
+        final ListShipmentItem item = dao.getCompanyShipments(
+                s.getCompany().getId(), null, null, null).getItems().get(0);
+
+        //check result
+        assertEqualsDates(arrivalDate, item.getActualArrivalDate());
+        assertEquals(ap.getId(), item.getAlertProfileId());
+        assertEquals(ap.getName(), item.getAlertProfileName());
+        assertEquals(assetNum, item.getAssetNum());
+        assertEquals(assetType, item.getAssetType());
+        assertEquals(device.getImei(), item.getDevice());
+        assertEquals(device.getName(), item.getDeviceName());
+        assertEquals(device.getSn(), item.getDeviceSN());
+        assertEqualsDates(eta, item.getEta());
+        assertEquals(firstReadingLat, item.getFirstReadingLat().doubleValue(), 0.001);
+        assertEquals(firstReadingLon, item.getFirstReadingLong().doubleValue(), 0.001);
+        assertEqualsDates(firstReadingTime, item.getFirstReadingTime());
+        assertEquals(lastReadingBattery, item.getLastReadingBattery().intValue());
+        assertEquals(lastReadingLat, item.getLastReadingLat().doubleValue(), 0.001);
+        assertEquals(lastReadingLon, item.getLastReadingLong().doubleValue(), 0.001);
+        assertEquals(lastReadingTemperature, item.getLastReadingTemperature().doubleValue(), 0.001);
+        assertEqualsDates(lastReadingTime, item.getLastReadingTime());
+        assertEquals(paletId, item.getPalettId());
+        assertEqualsDates(shipmentDate, item.getShipmentDate());
+        assertEquals(description, item.getShipmentDescription());
+        assertEquals(s.getId(), item.getShipmentId());
+        assertEquals(from.getName(), item.getShippedFrom());
+        assertEquals(from.getLocation().getLatitude(), item.getShippedFromLat().doubleValue(), 0.001);
+        assertEquals(from.getLocation().getLongitude(), item.getShippedFromLong().doubleValue(), 0.001);
+        assertEquals(to.getName(), item.getShippedTo());
+        assertEquals(status, item.getStatus());
+        assertEquals(s.getTripCount(), item.getTripCount());
+    }
+    /**
+     * @param time
+     * @param lat
+     * @param lon
+     * @param battery
+     */
+    private TrackerEvent createTrackerEvent(final Shipment s, final Date time, final double lat, final double lon,
+            final int battery, final double t) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setTime(time);
+        e.setCreatedOn(time);
+        e.setBattery(battery);
+        e.setDevice(s.getDevice());
+        e.setShipment(s);
+        e.setTemperature(t);
+        e.setType(TrackerEventType.AUT);
+        e.setLatitude(lat);
+        e.setLongitude(lon);
+        return context.getBean(TrackerEventDao.class).save(e);
+    }
+
     /**
      * @param c company.
      * @param status shipment status.
@@ -805,5 +951,15 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         s.setAddDateShipped(true);
         s.setDetectLocationForShippedFrom(true);
         return shipmentTemplateDao.save(s);
+    }
+    /**
+     * @param arrivalDate
+     * @param actualArrivalDate
+     */
+    private void assertEqualsDates(final Date arrivalDate, final Date actualArrivalDate) {
+        final long diff = Math.abs(arrivalDate.getTime() - actualArrivalDate.getTime());
+        if (diff > 500) {
+            throw new AssertionFailedError("Dates difference: " +  diff);
+        }
     }
 }

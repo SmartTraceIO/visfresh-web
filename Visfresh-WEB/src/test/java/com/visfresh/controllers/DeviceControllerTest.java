@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -476,6 +477,37 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         //type
         assertEquals("SwitchedOn", str[9]);
     }
+    @Test
+    public void testGetReadingsByShipmentId() throws IOException, RestServiceException {
+        final Device d1 = createDevice("1234987039487", true);
+
+        final long dt = 60 * 60 * 1000l; //one hour
+        final long t0 = System.currentTimeMillis() - 5 * dt;
+        createTrackerEvent(d1, new Date(t0 + 1 * dt));
+        createTrackerEvent(d1, new Date(t0 + 2 * dt));
+
+        final Shipment s = createShipment(d1, true);
+        createTrackerEvent(s, 10.);
+        createTrackerEvent(s, 10.);
+        createTrackerEvent(s, 10.);
+        createTrackerEvent(s, 10.);
+
+        //check by shipment parameter
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("shipment", s.getId().toString());
+
+        //should be 5 - header and 4 readings
+        assertEquals(5, client.doSendGetRequest(client.getPathWithToken("getReadings"), params)
+                .split("\n").length);
+
+        //check by shipment parameter
+        params.clear();
+        params.put("shipmentId", s.getId().toString());
+
+        //should be 5 - header and 4 readings
+        assertEquals(5, client.doSendGetRequest(client.getPathWithToken("getReadings"), params)
+                .split("\n").length);
+    }
     /**
      * @param date
      * @param dateStr
@@ -604,6 +636,13 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         a.setDevice(d);
         a.setShipment(s);
         return context.getBean(ArrivalDao.class).save(a);
+    }
+    /**
+     * @param device device.
+     * @param shipment shipment.
+     */
+    private TrackerEvent createTrackerEvent(final Shipment shipment, final double t) {
+        return createTrackerEvent(shipment.getDevice(), shipment, t);
     }
     /**
      * @param device device.

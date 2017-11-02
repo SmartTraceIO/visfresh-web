@@ -97,7 +97,8 @@ select
   ,d.name as deviceName,
   substring(d.imei, -7, 6) as deviceSn,
   -- arrival
-  arr.date as arrivalDate,
+  -- arr.date as arrivalDate,
+  shipments.arrivaldate as arrivalDate,
   -- alert profile
   ap.id as alertProfileId,
   ap.name as alertProfileName,
@@ -108,4 +109,4 @@ left outer join alertprofiles as ap on shipments.alert = ap.id
 left outer join devices as d on shipments.device = d.imei
 left outer join locationprofiles as sfrom on shipments.shippedfrom = sfrom.id
 left outer join locationprofiles as sto on shipments.shippedto = sto.id
-left outer join arrivals as arr on arr.shipment = shipments.id
+-- left outer join arrivals as arr on arr.shipment = shipments.id

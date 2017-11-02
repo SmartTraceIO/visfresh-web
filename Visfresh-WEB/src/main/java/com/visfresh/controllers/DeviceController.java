@@ -521,6 +521,8 @@ public class DeviceController extends AbstractController implements DeviceConsta
             @RequestParam(value = "device", required = false) final String device,
             @RequestParam(value = "sn", required = false) final String sn,
             @RequestParam(value = "trip", required = false) final Integer trip,
+            @RequestParam(value = "shipmentId", required = false) final Long shipmentIdParam,
+            @RequestParam(value = "shipment", required = false) final Long shipmentParam,
             final HttpServletRequest request,
             final HttpServletResponse response
             ) throws Exception {
@@ -538,8 +540,13 @@ public class DeviceController extends AbstractController implements DeviceConsta
         } else if (sn != null && trip != null) {
             events = getTrackerEventByShipment(user.getCompany(), sn, trip);
             file = fileDownload.createTmpFile("readings-" + sn + "(" + trip + ")", "csv");
+        } else if (shipmentIdParam != null || shipmentParam != null) {
+            final Long id = shipmentParam == null ? shipmentIdParam : shipmentParam;
+            events = getTrackerEventByShipment(user.getCompany(), id);
+            file = fileDownload.createTmpFile("readings-" + id, "csv");
         } else {
-            throw new IOException("One from device IMEI or SN and trip count should be presented in arguments");
+            throw new IOException("One from device IMEI or SN and trip count or shipmet or shipmentId"
+                    + " should be presented in arguments");
         }
 
         //create temporary file with report PDF content.
@@ -563,6 +570,19 @@ public class DeviceController extends AbstractController implements DeviceConsta
                 authToken, file.getName()));
     }
     /**
+     * @param company
+     * @param id
+     * @return
+     * @throws FileNotFoundException
+     */
+    private List<ShortTrackerEventWithAlerts> getTrackerEventByShipment(final Company company, final Long id) throws FileNotFoundException {
+        final Shipment s = shipmentDao.findOne(id);
+        if (s == null || !company.getId().equals(s.getCompany().getId())) {
+            throw new FileNotFoundException("Shipment " + id + " not found");
+        }
+        return getTrackerEventByShipment(s);
+    }
+    /**
      * @param company company.
      * @param sn device serial number.
      * @param trip shipment trip count.
@@ -576,6 +596,17 @@ public class DeviceController extends AbstractController implements DeviceConsta
             throw new FileNotFoundException("Shipment " + sn + "(" + trip + ") not found");
         }
 
+        return getTrackerEventByShipment(s);
+    }
+    /**
+     * @param sn
+     * @param trip
+     * @param s
+     * @return
+     * @throws FileNotFoundException
+     */
+    protected List<ShortTrackerEventWithAlerts> getTrackerEventByShipment(
+            final Shipment s) throws FileNotFoundException {
         final List<TrackerEvent> trackerEvents = trackerEventDao.getEvents(s);
 
         final List<ShortTrackerEventWithAlerts> events = new LinkedList<>();

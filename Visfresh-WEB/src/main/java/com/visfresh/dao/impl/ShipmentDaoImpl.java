@@ -660,7 +660,11 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
      */
     @Override
     public ListResult<ListShipmentItem> getCompanyShipments(final Long companyId,
-            final Sorting sorting, final Page page, final Filter filter) {
+            final Sorting sorting, final Page page, final Filter originFilter) {
+        //add company ID as filter.
+        final Filter filter = new Filter(originFilter);
+        filter.addFilter("company", companyId);
+
         final ShipmetSelectAllSupport support = getSelectAllSupport();
         support.buildCompanyShipmentsSelectAll(filter, sorting, page);
         final String sql = support.getQuery();
@@ -701,7 +705,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
             if (lastReading != null) {
                 final JsonObject json = lastReading.getAsJsonObject();
                 item.setLastReadingTime(parseDbJsonDate(json.get("time")));
-                item.setLastReadingTemperature(AbstractJsonSerializer.asInt(json.get("temperature")));
+                item.setLastReadingTemperature(AbstractJsonSerializer.asDouble(json.get("temperature")));
                 item.setLastReadingBattery(AbstractJsonSerializer.asInt(json.get("battery")));
                 item.setLastReadingLat(AbstractJsonSerializer.asDoubleObject(json.get("lat")));
                 item.setLastReadingLong(AbstractJsonSerializer.asDoubleObject(json.get("lon")));
