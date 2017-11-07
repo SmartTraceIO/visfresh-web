@@ -6,8 +6,8 @@ package com.visfresh.controllers;
 import java.util.Iterator;
 import java.util.List;
 
-import com.visfresh.io.NoteDto;
-import com.visfresh.io.shipment.SingleShipmentLocation;
+import com.visfresh.io.shipment.NoteBean;
+import com.visfresh.io.shipment.SingleShipmentLocationBean;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -21,15 +21,15 @@ public class SingleShipmentFilter300 {
         super();
     }
 
-    public void filter(final List<SingleShipmentLocation> locations, final List<NoteDto> notes) {
+    public void filter(final List<SingleShipmentLocationBean> locations, final List<NoteBean> notes) {
         final int skipCnt = locations.size() / 300;
         int tmpCnt = 0;
 
-        final Iterator<SingleShipmentLocation> iter = locations.iterator();
+        final Iterator<SingleShipmentLocationBean> iter = locations.iterator();
         boolean isFirst = true;
 
         while (iter.hasNext()) {
-            final SingleShipmentLocation loc = iter.next();
+            final SingleShipmentLocationBean loc = iter.next();
 
             if(!isFirst){
                 if(++tmpCnt <= skipCnt) {
@@ -57,9 +57,9 @@ public class SingleShipmentFilter300 {
      * @param notes
      * @return
      */
-    private boolean checkHasNote(final SingleShipmentLocation loc, final List<NoteDto> notes) {
-        for (final NoteDto note: notes) {
-            if (note.getTimeOnChart().equals(loc.getTimeIso())) {
+    private boolean checkHasNote(final SingleShipmentLocationBean loc, final List<NoteBean> notes) {
+        for (final NoteBean note: notes) {
+            if (Math.abs(note.getTimeOnChart().getTime() - loc.getTime().getTime()) < 500l) {
                 return true;
             }
         }

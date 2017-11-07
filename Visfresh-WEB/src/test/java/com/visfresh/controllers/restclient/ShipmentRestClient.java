@@ -16,6 +16,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.visfresh.controllers.ShipmentController;
+import com.visfresh.controllers.ShipmentControllerOld;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.User;
@@ -54,7 +55,7 @@ public class ShipmentRestClient extends RestClient {
         params.put("shipmentId", shipment.getId().toString());
 
         long startTime = System.currentTimeMillis();
-        final JsonElement oldVersionResult = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT_OLD), params);
+        final JsonElement oldVersionResult = sendGetRequest(getPathWithToken(ShipmentControllerOld.GET_SINGLE_SHIPMENT_OLD), params);
         final long oldTime = System.currentTimeMillis() - startTime;
 
         startTime = System.currentTimeMillis();
@@ -78,7 +79,7 @@ public class ShipmentRestClient extends RestClient {
         }
 
         long startTime = System.currentTimeMillis();
-        final JsonElement oldResult = sendGetRequest(getPathWithToken(ShipmentController.GET_SINGLE_SHIPMENT_OLD), params);
+        final JsonElement oldResult = sendGetRequest(getPathWithToken(ShipmentControllerOld.GET_SINGLE_SHIPMENT_OLD), params);
         final long oldTime = System.currentTimeMillis() - startTime;
 
         startTime = System.currentTimeMillis();
