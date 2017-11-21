@@ -88,11 +88,19 @@ public class DefaultAuthService implements AuthService {
                 saveUser(user);
             }
 
-            final AuthToken authToken = generateNewToken(user, clientInstance);
+            final AuthToken authToken = generateNewToken(user);
+            authToken.setClientInstanceId(clientInstance);
             sessionManager.createSession(user, authToken);
 
             removeExpiredUsers(user.getEmail());
-            return authToken;
+
+            final AuthToken tokenForUser = new AuthToken(authToken);
+            if (clientInstance == null) {
+                //create instance ID for next login
+                tokenForUser.setClientInstanceId(generateHash(Long.toString(random.nextLong())));
+            }
+
+            return tokenForUser;
         }
 
         throw new AuthenticationException("Authentication failed");
@@ -146,14 +154,12 @@ public class DefaultAuthService implements AuthService {
     }
     /**
      * @param user user.
-     * @param clientId TODO
      * @return
      */
-    protected AuthToken generateNewToken(final User user, final String clientId) {
+    protected AuthToken generateNewToken(final User user) {
         final String token = user.getId() + "-" + generateHash(Long.toString(random.nextLong()));
         final AuthToken t = new AuthToken(token);
         t.setExpirationTime(new Date(System.currentTimeMillis() + DEFAULT_TOKEN_ACTIVE_TIMEOUT));
-        t.setClientInstanceId(clientId);
         return t;
     }
 
@@ -304,7 +310,7 @@ public class DefaultAuthService implements AuthService {
             throw new AuthenticationException("Not authorized or token expired");
         }
 
-        s.setToken(generateNewToken(s.getUser(), s.getToken().getClientInstanceId()));
+        s.setToken(generateNewToken(s.getUser()));
         log.debug("Rest session for user " + s.getUser().getEmail() + " has renewed. Token: "
                 + s.getToken().getToken());
         return s.getToken();

@@ -75,9 +75,23 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         final AuthToken token = login(u.getEmail(), "password", "junit");
         assertNotNull(token);
         assertEquals(u.getId(), getUserForToken(token.getToken()).getId());
+        assertNotNull(token.getClientInstanceId());
 
         assertEquals(1, sessions.size());
         assertEquals(u.getId(), sessions.values().iterator().next().getUser().getId());
+    }
+    @Test
+    public void testLoginWithNullInstance() throws AuthenticationException {
+        //create one user
+        final User u = createUser();
+
+        final AuthToken token = login(u.getEmail(), "password", null);
+
+        //not null instance should be returned to user
+        assertNotNull(token.getClientInstanceId());
+
+        //but session should be stored by null instance.
+        assertNull(sessions.values().iterator().next().getToken().getClientInstanceId());
     }
     @Test
     public void testAuthFailed() {

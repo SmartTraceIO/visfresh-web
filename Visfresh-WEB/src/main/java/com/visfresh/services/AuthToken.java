@@ -41,6 +41,17 @@ public class AuthToken implements Serializable {
     }
 
     /**
+     * @param authToken
+     */
+    public AuthToken(final AuthToken authToken) {
+        super();
+        token = authToken.getToken();
+        createdTime = authToken.getCreatedTime();
+        setExpirationTime(authToken.getExpirationTime());
+        setClientInstanceId(authToken.getClientInstanceId());
+    }
+
+    /**
      * @param expirationTime the expirationTime to set
      */
     public void setExpirationTime(final Date expirationTime) {
