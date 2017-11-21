@@ -72,7 +72,7 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         //create one user
         final User u = createUser();
 
-        final AuthToken token = login(u.getEmail(), "password");
+        final AuthToken token = login(u.getEmail(), "password", "junit");
         assertNotNull(token);
         assertEquals(u.getId(), getUserForToken(token.getToken()).getId());
 
@@ -85,7 +85,7 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         final User u = createUser();
 
         try {
-            login(u.getEmail(), "password1");
+            login(u.getEmail(), "password1", "junit");
             throw new AssertionFailedError("Auth exception should be thrown");
         } catch (final AuthenticationException e) {
             //correct behavior;
@@ -97,7 +97,7 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
     public void testRefreshToken() throws AuthenticationException {
         //create one user
         final User u = createUser();
-        final String token = login(u.getEmail(), "password").getToken();
+        final String token = login(u.getEmail(), "password", "junit").getToken();
 
         final AuthToken newToken = refreshToken(token);
         assertNotNull(sessionManager.getSession(newToken.getToken()));
@@ -106,7 +106,7 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
     @Test
     public void testNotUser() {
         try {
-            login("email@junit.ru", "password1");
+            login("email@junit.ru", "password1", "junit");
             throw new AssertionFailedError("Auth exception should be thrown");
         } catch (final AuthenticationException e) {
             //correct behavior;

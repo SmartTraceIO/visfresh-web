@@ -35,6 +35,7 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, RestSession, Lo
     private static final String ID = "id";
     private static final String USER = "user";
     private static final String TOKEN = "token";
+    private static final String CLIENT = "client";
     private static final String EXPIRED_ON = "expiredon";
     private static final String CREATED_ON = "createdon";
 
@@ -58,6 +59,7 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, RestSession, Lo
         paramMap.put(ID, session.getId());
         paramMap.put(USER, session.getUser().getId());
         paramMap.put(TOKEN, session.getToken().getToken());
+        paramMap.put(CLIENT, session.getToken().getClientInstanceId());
         paramMap.put(EXPIRED_ON, session.getToken().getExpirationTime());
         paramMap.put(CREATED_ON, session.getToken().getCreatedTime());
 
@@ -210,6 +212,7 @@ public class RestSessionDaoImpl extends DaoImplBase<RestSession, RestSession, Lo
         final AuthToken token = new AuthToken((String) map.get(TOKEN));
         token.setExpirationTime((Date) map.get(EXPIRED_ON));
         token.getCreatedTime().setTime(((Date) map.get(CREATED_ON)).getTime());
+        token.setClientInstanceId((String) map.get(CLIENT));
 
         final RestSession s = new RestSession();
         s.setId(((Number) map.get(ID)).longValue());

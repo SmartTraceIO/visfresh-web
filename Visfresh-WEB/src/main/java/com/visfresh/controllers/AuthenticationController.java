@@ -42,9 +42,10 @@ public class AuthenticationController extends AbstractController {
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public JsonObject login(
             final @RequestParam String email,
-            final @RequestParam String password) {
+            final @RequestParam String password,
+            final @RequestParam(required = false) String instance) {
         try {
-            final AuthToken token = authService.login(email, password);
+            final AuthToken token = authService.login(email, password, instance);
             log.debug("Login successes for " + email);
             final User user = authService.getUserForToken(token.getToken());
             return createSuccessResponse(getSerializer(user).toJson(token));

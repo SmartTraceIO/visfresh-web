@@ -29,6 +29,7 @@ public class AuthTokenSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
         obj.addProperty("token", token.getToken());
         obj.addProperty("expired", formatDate(token.getExpirationTime()));
+        obj.addProperty("instance", token.getClientInstanceId());
         return obj;
     }
     /**
@@ -43,6 +44,7 @@ public class AuthTokenSerializer extends AbstractJsonSerializer {
         final JsonObject json = e.getAsJsonObject();
         final AuthToken token = new AuthToken(json.get("token").getAsString());
         token.setExpirationTime(parseDate(json.get("expired").getAsString()));
+        token.setClientInstanceId(asString(json.get("instance")));
         return token;
     }
 }

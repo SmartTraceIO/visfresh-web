@@ -43,7 +43,7 @@ public class DefaultRestSessionManagerTest extends DefaultRestSessionManager {
 
         final RestSession s1 = new RestSession();
         s1.setUser(u1);
-        s1.setToken(generateNewToken(u1));
+        s1.setToken(generateNewToken(u1, null));
 
         saveSession(s1);
 
@@ -52,7 +52,7 @@ public class DefaultRestSessionManagerTest extends DefaultRestSessionManager {
 
         final RestSession s2 = new RestSession();
         s2.setUser(u2);
-        s2.setToken(generateNewToken(u2));
+        s2.setToken(generateNewToken(u2, null));
 
         saveSession(s2);
 
@@ -67,7 +67,7 @@ public class DefaultRestSessionManagerTest extends DefaultRestSessionManager {
     public void testSessionExpired() throws AuthenticationException {
         //create one user
         final User u = createUser();
-        final AuthToken token = generateNewToken(u);
+        final AuthToken token = generateNewToken(u, null);
         createSession(u, token);
 
         token.setExpirationTime(new Date(System.currentTimeMillis() - 100000000l));
@@ -78,16 +78,34 @@ public class DefaultRestSessionManagerTest extends DefaultRestSessionManager {
         //test REST session has removed from DB.
         assertEquals(0, sessions.size());
     }
+    @Test
+    public void testRemoveRedundantSessions() {
+        final User u = createUser();
+
+        createSession(u, generateNewToken(u, "a"));
+        createSession(u, generateNewToken(u, "b"));
+        createSession(u, generateNewToken(u, "b"));
+
+        assertEquals(2, sessions.size());
+
+        createSession(u, generateNewToken(u, null));
+        assertEquals(3, sessions.size());
+
+        createSession(u, generateNewToken(u, null));
+        assertEquals(3, sessions.size());
+
+    }
     /**
      * @return
      */
     private User createUser() {
         final User u = new User();
+        u.setId(lastId++);
         u.setActive(true);
         u.setFirstName("FirstName");
         u.setLastName("LastName");
         u.setPassword(HashGenerator.createMd5Hash("password"));
-        u.setEmail(u.getId() + "@.junit.ru");
+        u.setEmail(u.getId() + "@junit.ru");
         return u;
     }
 
@@ -132,10 +150,11 @@ public class DefaultRestSessionManagerTest extends DefaultRestSessionManager {
      * @param user user.
      * @return
      */
-    private AuthToken generateNewToken(final User user) {
+    private AuthToken generateNewToken(final User user, final String clientId) {
         final String token = user.getId() + "-" + HashGenerator.createMd5Hash(Long.toString(random.nextLong()));
         final AuthToken t = new AuthToken(token);
         t.setExpirationTime(new Date(System.currentTimeMillis() + 14400000l));
+        t.setClientInstanceId(clientId);
         return t;
     }
 }

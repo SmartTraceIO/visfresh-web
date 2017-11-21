@@ -26,6 +26,10 @@ public class AuthToken implements Serializable {
      * Created time.
      */
     private Date createdTime = new Date();
+    /**
+     * Client instance ID.
+     */
+    private String clientInstanceId;
 
     /**
      * Default constructor.
@@ -60,11 +64,23 @@ public class AuthToken implements Serializable {
     public Date getCreatedTime() {
         return createdTime;
     }
+    /**
+     * @return the client instance ID.
+     */
+    public String getClientInstanceId() {
+        return clientInstanceId;
+    }
+    /**
+     * @param id the client instance ID.
+     */
+    public void setClientInstanceId(final String id) {
+        this.clientInstanceId = id;
+    }
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return getToken();
+        return getClientInstanceId() + ":" + getToken() + " expired: " + getExpirationTime();
     }
 }

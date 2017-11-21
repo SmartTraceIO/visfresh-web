@@ -54,7 +54,7 @@ public class ActionTakenControllerTest extends AbstractRestServiceTest {
         user = context.getBean(UserDao.class).findAll(null, null, null).get(0);
         String token;
         try {
-            token = context.getBean(AuthService.class).login(user.getEmail(),"").getToken();
+            token = context.getBean(AuthService.class).login(user.getEmail(),"", "junit").getToken();
         } catch (final AuthenticationException e) {
             throw new RuntimeException(e);
         }

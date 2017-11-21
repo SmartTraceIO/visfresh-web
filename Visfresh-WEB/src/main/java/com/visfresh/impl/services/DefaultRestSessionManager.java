@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
@@ -89,8 +90,10 @@ public class DefaultRestSessionManager implements RestSessionManager,
         final RestSession s = new RestSession();
         s.setUser(user);
         s.setToken(authToken);
+        final List<RestSession> sessionsToClose;
 
         synchronized (sessions) {
+            sessionsToClose = getSessionsToClose(user, authToken.getClientInstanceId());
             sessions.put(s.getToken().getToken(), s);
             saveSession(s);
         }
@@ -114,15 +117,47 @@ public class DefaultRestSessionManager implements RestSessionManager,
             l.sessionCreated(s);
         }
 
+        //close redundant sessions.
+        for (final RestSession sc : sessionsToClose) {
+            closeSession(sc);
+            final AuthToken t = sc.getToken();
+            log.debug("Old session "
+                + t.getToken()
+                + " for user " + sc.getUser().getEmail()
+                + " and client " + t.getClientInstanceId()
+                + " has removed according new login");
+        }
+
         return s;
     }
+    /**
+     * Warning!!! is not tread safe should be called from synchronized block.
+     * @param user user.
+     * @param clientId client instance ID.
+     * @return list of session to close according of new session creation.
+     */
+    private List<RestSession> getSessionsToClose(final User user, final String clientId) {
+        final List<RestSession> result = new LinkedList<>();
+
+        for (final RestSession s : this.sessions.values()) {
+            if (s.getUser().getId().equals(user.getId())
+                    && Objects.equals(s.getToken().getClientInstanceId(), clientId)) {
+                result.add(s);
+            }
+        }
+
+        return result;
+    }
+
     /**
      * @param session
      */
     @Override
     public void closeSession(final RestSession session) {
-        sessions.remove(session.getToken().getToken());
-        deleteSession(session);
+        synchronized (sessions) {
+            sessions.remove(session.getToken().getToken());
+            deleteSession(session);
+        }
 
         for (final SessionManagerListener l : getListeners()) {
             l.sessionClosed(session);

@@ -48,7 +48,7 @@ public class DefaultAuthService implements AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultAuthService.class);
 
-    private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 4 * 60 * 60 * 1000l; //one hour
+    private static final long DEFAULT_TOKEN_ACTIVE_TIMEOUT = 14 * 24 * 60 * 60 * 1000l; //two weeks
     public static final int USER_LOGIN_LIMIT = 1000;
 
     private static final long TIMEOUT = 60000L;
@@ -70,7 +70,7 @@ public class DefaultAuthService implements AuthService {
      * @see com.visfresh.services.AuthService#login(java.lang.String, java.lang.String)
      */
     @Override
-    public AuthToken login(final String email, final String password)
+    public AuthToken login(final String email, final String password, final String clientInstance)
             throws AuthenticationException {
         final User user = findUserByEmail(email);
         if (user == null) {
@@ -88,7 +88,7 @@ public class DefaultAuthService implements AuthService {
                 saveUser(user);
             }
 
-            final AuthToken authToken = generateNewToken(user);
+            final AuthToken authToken = generateNewToken(user, clientInstance);
             sessionManager.createSession(user, authToken);
 
             removeExpiredUsers(user.getEmail());
@@ -146,12 +146,14 @@ public class DefaultAuthService implements AuthService {
     }
     /**
      * @param user user.
+     * @param clientId TODO
      * @return
      */
-    protected AuthToken generateNewToken(final User user) {
+    protected AuthToken generateNewToken(final User user, final String clientId) {
         final String token = user.getId() + "-" + generateHash(Long.toString(random.nextLong()));
         final AuthToken t = new AuthToken(token);
         t.setExpirationTime(new Date(System.currentTimeMillis() + DEFAULT_TOKEN_ACTIVE_TIMEOUT));
+        t.setClientInstanceId(clientId);
         return t;
     }
 
@@ -302,7 +304,7 @@ public class DefaultAuthService implements AuthService {
             throw new AuthenticationException("Not authorized or token expired");
         }
 
-        s.setToken(generateNewToken(s.getUser()));
+        s.setToken(generateNewToken(s.getUser(), s.getToken().getClientInstanceId()));
         log.debug("Rest session for user " + s.getUser().getEmail() + " has renewed. Token: "
                 + s.getToken().getToken());
         return s.getToken();

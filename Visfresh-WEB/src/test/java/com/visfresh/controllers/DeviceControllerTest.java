@@ -365,7 +365,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         context.getBean(AuthService.class).saveUser(u, "", false);
 
         //relogin by smarttrace admin
-        final String token = context.getBean(AuthService.class).login(u.getEmail(),"").getToken();
+        final String token = context.getBean(AuthService.class).login(u.getEmail(),"", "junit").getToken();
         client.setAuthToken(token);
 
         //do move

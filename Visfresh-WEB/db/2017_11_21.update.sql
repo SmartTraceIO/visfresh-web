@@ -1,0 +1,1 @@
+alter table restsessions add column client varchar(50);

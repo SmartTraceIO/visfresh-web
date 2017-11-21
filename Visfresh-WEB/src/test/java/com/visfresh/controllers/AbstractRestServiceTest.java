@@ -399,7 +399,7 @@ public abstract class AbstractRestServiceTest {
      */
     protected String login(final User user) {
         try {
-            return context.getBean(AuthService.class).login(user.getEmail(),"").getToken();
+            return context.getBean(AuthService.class).login(user.getEmail(),"", "junit").getToken();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

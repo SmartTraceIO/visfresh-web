@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.TimeZone;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,6 +41,8 @@ import com.visfresh.services.AuthService;
 import com.visfresh.services.AuthToken;
 import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -190,7 +190,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final AuthService auth = context.getBean(AuthService.class);
 
         //check password
-        assertNotNull(auth.login(u.getEmail(), password));
+        assertNotNull(auth.login(u.getEmail(), password, "junit"));
 
         //check update user
         final String newPhone = "2930847093248";
@@ -204,7 +204,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(newPhone, u2.getPhone());
 
         //check password
-        assertNotNull(auth.login(u.getEmail(), newPassword));
+        assertNotNull(auth.login(u.getEmail(), newPassword, "junit"));
     }
     @Test
     public void testSaveWithoutCompany() throws IOException, RestServiceException, AuthenticationException {
@@ -213,7 +213,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         dao.save(user);
 
         final AuthService auth = context.getBean(AuthService.class);
-        final AuthToken authToken = auth.login(user.getEmail(), "");
+        final AuthToken authToken = auth.login(user.getEmail(), "", "junit");
         client.setAuthToken(authToken.getToken());
 
         //create company
@@ -282,7 +282,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertEquals(newPhone, u2.getPhone());
 
         //check password
-        assertNotNull(auth.login(u.getEmail(), newPassword));
+        assertNotNull(auth.login(u.getEmail(), newPassword, "junit"));
     }
     @Test
     public void testNotLoginInactiveUser() throws AuthenticationException {
@@ -290,14 +290,14 @@ public class UserControllerTest extends AbstractRestServiceTest {
 
         //check login
         final AuthService auth = context.getBean(AuthService.class);
-        assertNotNull(auth.login(u.getEmail(), ""));
+        assertNotNull(auth.login(u.getEmail(), "", "junit"));
 
         //set user to inactive
         u.setActive(false);
         dao.save(u);
 
         try {
-            assertNotNull(auth.login(u.getEmail(), ""));
+            assertNotNull(auth.login(u.getEmail(), "", "junit"));
             throw new AssertionFailedError("Auth exception should be thrown");
         } catch (final AuthenticationException e) {
             // ok
@@ -310,7 +310,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         //check login
         final AuthService auth = context.getBean(AuthService.class);
 
-        assertNotNull(auth.login(u.getEmail(), ""));
+        assertNotNull(auth.login(u.getEmail(), "", "junit"));
         assertNotNull(client.getUser(null));
 
         auth.logout(client.getAuthToken());
@@ -331,8 +331,8 @@ public class UserControllerTest extends AbstractRestServiceTest {
         final UserRestClient c1 = createClient();
         final UserRestClient c2 = createClient();
 
-        c1.setAuthToken(auth.login(u.getEmail(), "").getToken());
-        c2.setAuthToken(auth.login(u.getEmail(), "").getToken());
+        c1.setAuthToken(auth.login(u.getEmail(), "", "junit1").getToken());
+        c2.setAuthToken(auth.login(u.getEmail(), "", "junit2").getToken());
 
         assertNotNull(c1.getUser(null));
         assertNotNull(c2.getUser(null));

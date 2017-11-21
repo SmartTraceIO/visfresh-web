@@ -96,6 +96,7 @@ public class RestSessionDaoTest extends BaseCrudTest<RestSessionDao, RestSession
         assertEquals(user.getId(), session.getUser().getId());
         assertNotNull(session.getToken().getCreatedTime());
         assertNotNull(session.getToken().getToken());
+        assertEquals("JUnit", session.getToken().getClientInstanceId());
         assertNotNull(session.getToken().getExpirationTime());
     }
     /* (non-Javadoc)
@@ -105,6 +106,7 @@ public class RestSessionDaoTest extends BaseCrudTest<RestSessionDao, RestSession
     protected RestSession createTestEntity() {
         final AuthToken token = new AuthToken("authToken_" + (lastId++));
         token.setExpirationTime(new Date(System.currentTimeMillis() + 100000000l));
+        token.setClientInstanceId("JUnit");
 
         final RestSession s = new RestSession();
         s.setUser(user);

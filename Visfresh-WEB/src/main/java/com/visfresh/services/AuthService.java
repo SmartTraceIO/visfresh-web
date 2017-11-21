@@ -13,10 +13,11 @@ public interface AuthService {
     /**
      * @param login login.
      * @param password password.
+     * @param clientInstance client instance ID.
      * @return authentication token.
      * @throws AuthenticationException
      */
-    public AuthToken login(final String login, final String password) throws AuthenticationException;
+    public AuthToken login(final String login, final String password, final String clientInstance) throws AuthenticationException;
     /**
      * @param authToken
      */
