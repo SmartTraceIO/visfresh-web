@@ -125,6 +125,7 @@ public class NotificationServiceTest {
 
         //check email sent
         assertEquals(1, context.getBean(MockEmailService.class).getMessages().size());
+        assertEquals(1, context.getBean(MockEmailService.class).getAttachments().size());
     }
     @Test
     public void testSendSmsNotification() {

@@ -184,6 +184,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     protected void sendEmailAlertNotification(final Alert alert,
             final List<User> users, final TrackerEvent trackerEvent) {
+        final ShipmentReportBean report = createShipmentReport(alert.getShipment(), users);
         for (final User user : users) {
             if (user != null) {
                 try {
@@ -194,8 +195,15 @@ public class NotificationServiceImpl implements NotificationService {
                     final String subject = bundle.getEmailSubject(alert, trackerEvent, lang, tz, tu);
                     final String message = bundle.getEmailMessage(alert, trackerEvent, lang, tz, tu);
 
-                    emailService.sendMessage(new String[] {user.getEmail()}, subject, message);
-                } catch (final MessagingException e) {
+                    final File attachment = createShipmenentReport(user, report);
+
+                    try {
+                        log.debug("Emailing alert to user " + user.getEmail() + " with attached shipment report");
+                        emailService.sendMessage(new String[]{user.getEmail()}, subject, message, attachment);
+                    } finally {
+                        attachment.delete();
+                    }
+                } catch (final MessagingException | IOException e) {
                     log.error("Failed to send email message to " + user, e);
                 }
             } else {
@@ -320,14 +328,7 @@ public class NotificationServiceImpl implements NotificationService {
                 setArrivalReportSent(session, new Date());
                 shipmentSessionDao.saveSession(session);
 
-                //create report bean
-                final ShipmentReportBean report = shipmentReportDao.createReport(s);
-
-                //in this case the list of report receivers is fully determined
-                report.getWhoReceivedReport().clear();
-                for (final User u : users) {
-                    report.getWhoReceivedReport().add(ShipmentReportBuilder.createUserName(u));
-                }
+                final ShipmentReportBean report = createShipmentReport(s, users);
 
                 //send report to users.
                 for (final User user : users) {
@@ -342,6 +343,23 @@ public class NotificationServiceImpl implements NotificationService {
                 log.debug("Shipment (" + s.getId() + ") arrived report is already sent");
             }
         }
+    }
+
+    /**
+     * @param s
+     * @param users
+     * @return
+     */
+    private ShipmentReportBean createShipmentReport(final Shipment s, final List<User> users) {
+        //create report bean
+        final ShipmentReportBean report = shipmentReportDao.createReport(s);
+
+        //in this case the list of report receivers is fully determined
+        report.getWhoReceivedReport().clear();
+        for (final User u : users) {
+            report.getWhoReceivedReport().add(ShipmentReportBuilder.createUserName(u));
+        }
+        return report;
     }
 
     /**
