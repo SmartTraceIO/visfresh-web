@@ -198,8 +198,13 @@ public class NotificationServiceImpl implements NotificationService {
                     final File attachment = createShipmenentReport(user, report);
 
                     try {
-                        log.debug("Emailing alert to user " + user.getEmail() + " with attached shipment report");
                         emailService.sendMessage(new String[]{user.getEmail()}, subject, message, attachment);
+                        log.debug("Emailed alert to user " + user.getEmail() + " with attached shipment report");
+                    } catch (final IOException e) {
+                        log.error("Failed to send alert message with attachement to user "
+                                + user.getEmail(), e);
+                        emailService.sendMessage(new String[]{user.getEmail()}, subject, message);
+                        log.debug("Emailed alert to user " + user.getEmail() + " withthout attachment");
                     } finally {
                         attachment.delete();
                     }
