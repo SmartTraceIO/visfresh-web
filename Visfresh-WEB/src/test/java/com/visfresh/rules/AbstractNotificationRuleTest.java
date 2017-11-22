@@ -39,6 +39,7 @@ public class AbstractNotificationRuleTest {
         dateFormat = new SimpleDateFormat("yyyy-MM-dd mm:ss");
 
         final User u = new User();
+        u.setActive(true);
         u.setId(lastId++);
         u.setEmail("a@b.c");
         this.user = u;

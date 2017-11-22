@@ -113,39 +113,41 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
      * @see com.visfresh.services.NotificationService#sendNotification(com.visfresh.entities.PersonSchedule, com.visfresh.entities.NotificationIssue)
      */
     @Override
-    public void sendNotification(final PersonSchedule s, final NotificationIssue issue,
+    public void sendNotification(final List<PersonSchedule> schedules, final NotificationIssue issue,
             final TrackerEvent trackerEvent) {
-        final User user = s.getUser();
-        final Language lang = user.getLanguage();
-        final TimeZone tz = user.getTimeZone();
-        final TemperatureUnits tu = user.getTemperatureUnits();
+        for (final PersonSchedule s : schedules) {
+            final User user = s.getUser();
+            final Language lang = user.getLanguage();
+            final TimeZone tz = user.getTimeZone();
+            final TemperatureUnits tu = user.getTemperatureUnits();
 
-        //send email
-        if (s.isSendEmail()) {
-            sendEmailNotification(issue, user, trackerEvent, lang, tz, tu);
-        }
-
-        //send SMS
-        if (s.isSendSms()) {
-            final String message = bundle.getSmsMessage(issue, trackerEvent, lang, tz, tu);
+            //send email
+            if (s.isSendEmail()) {
+                sendEmailNotification(issue, user, trackerEvent, lang, tz, tu);
+            }
 
             //send SMS
-            final String phone = user.getPhone();
-            if (phone != null && phone.length() > 0) {
-                smsService.sendMessage(new String[] {phone}, null, message);
-            } else {
-                log.warn("Phone number has not set for personal schedule for "
-                        + getPersonDescription(s) + " , SMS can't be send");
+            if (s.isSendSms()) {
+                final String message = bundle.getSmsMessage(issue, trackerEvent, lang, tz, tu);
+
+                //send SMS
+                final String phone = user.getPhone();
+                if (phone != null && phone.length() > 0) {
+                    smsService.sendMessage(new String[] {phone}, null, message);
+                } else {
+                    log.warn("Phone number has not set for personal schedule for "
+                            + getPersonDescription(s) + " , SMS can't be send");
+                }
             }
+
+            final Notification n = new Notification();
+            n.setIssue(issue);
+            n.setType(issue instanceof Arrival? NotificationType.Arrival : NotificationType.Alert);
+            n.setUser(user);
+            n.setHidden(s.isSendApp());
+
+            notificationDao.save(n);
         }
-
-        final Notification n = new Notification();
-        n.setIssue(issue);
-        n.setType(issue instanceof Arrival? NotificationType.Arrival : NotificationType.Alert);
-        n.setUser(user);
-        n.setHidden(s.isSendApp());
-
-        notificationDao.save(n);
     }
 
     /**

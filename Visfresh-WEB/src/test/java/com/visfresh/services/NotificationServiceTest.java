@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -117,7 +118,7 @@ public class NotificationServiceTest {
         context.getBean(NotificationScheduleDao.class).save(sched);
 
         //send notification
-        service.sendNotification(s, issue, e);
+        service.sendNotification(Arrays.asList(s), issue, e);
 
         //check notification created
         assertEquals(1, context.getBean(NotificationDao.class).findAll(null, null, null).size());
@@ -146,7 +147,7 @@ public class NotificationServiceTest {
         context.getBean(NotificationScheduleDao.class).save(sched);
 
         //send notification
-        service.sendNotification(s, issue, e);
+        service.sendNotification(Arrays.asList(s), issue, e);
 
         //check notification created
         assertEquals(1, context.getBean(NotificationDao.class).findAll(null, null, null).size());

@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -322,7 +323,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         final TrackerEvent e = createTrackerEvent(System.currentTimeMillis(), -10);
 
         final Alert a1 = createAlert(e);
-        final Alert a2 = createAlert(e);
+        createAlert(e);
 
         final User u1 = createUser("U", "1");
         final User u2 = createUser("U", "2");
@@ -344,10 +345,8 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
 
         final NotificationService notificator = context.getBean(NotificationService.class);
 
-        notificator.sendNotification(s1, a1, e);
-        notificator.sendNotification(s2, a2, e);
         //duplicate user
-        notificator.sendNotification(s2, a2, e);
+        notificator.sendNotification(Arrays.asList(s1, s2, s2), a1, e);
 
         final ShipmentReportBean report = dao.createReport(shipment);
         assertEquals(2, report.getWhoWasNotifiedByAlert().size());
@@ -400,8 +399,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         //test with notification sent
         final NotificationService notificator = context.getBean(NotificationService.class);
 
-        notificator.sendNotification(s1, arrival, e);
-        notificator.sendNotification(s2, arrival, e);
+        notificator.sendNotification(Arrays.asList(s1, s2), arrival, e);
 
         report = dao.createReport(shipment);
         assertEquals(2, report.getWhoReceivedReport().size());
@@ -463,8 +461,7 @@ public class ShipmentReportDaoTest extends BaseDaoTest<ShipmentReportDao> {
         //test with notification sent
         final NotificationService notificator = context.getBean(NotificationService.class);
 
-        notificator.sendNotification(s1, arrival, e);
-        notificator.sendNotification(s2, arrival, e);
+        notificator.sendNotification(Arrays.asList(s1, s2), arrival, e);
 
         report = dao.createReport(shipment);
         assertEquals(0, report.getWhoReceivedReport().size());

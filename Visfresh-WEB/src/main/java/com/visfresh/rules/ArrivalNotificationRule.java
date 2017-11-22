@@ -106,7 +106,12 @@ public class ArrivalNotificationRule extends AbstractNotificationRule {
             saveArrival(arrival);
 
             if (!shipment.isExcludeNotificationsIfNoAlerts() || hasTemperatureAlerts(shipment)) {
-                sendNotificaion(arrival, event);
+                //notify subscribers
+                final List<PersonSchedule> schedules = getPersonalSchedules(
+                        event.getShipment().getArrivalNotificationSchedules(), new Date());
+                if (schedules.size() > 0) {
+                    sendNotification(schedules, arrival, event);
+                }
             }
         } else {
             log.debug("Arrival notification not yet needs for " + shipment.getId());
@@ -160,17 +165,6 @@ public class ArrivalNotificationRule extends AbstractNotificationRule {
             }
         }
         return false;
-    }
-    /**
-     * @param arrival
-     */
-    protected void sendNotificaion(final Arrival arrival, final TrackerEvent event) {
-        //notify subscribers
-        final List<PersonSchedule> schedules = getPersonalSchedules(
-                event.getShipment().getArrivalNotificationSchedules(), new Date());
-        for (final PersonSchedule s : schedules) {
-            sendNotification(s, arrival, event);
-        }
     }
     /**
      * @param a alert to save.

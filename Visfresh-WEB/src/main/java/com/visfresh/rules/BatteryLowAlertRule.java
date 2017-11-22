@@ -3,6 +3,7 @@
  */
 package com.visfresh.rules;
 
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.mail.MessagingException;
@@ -121,7 +122,7 @@ public class BatteryLowAlertRule extends AbstractAlertRule {
      * @see com.visfresh.rules.AbstractNotificationRule#sendNotification(com.visfresh.entities.PersonSchedule, com.visfresh.entities.NotificationIssue, com.visfresh.entities.TrackerEvent)
      */
     @Override
-    protected void sendNotification(final PersonSchedule s, final NotificationIssue issue,
+    protected void sendNotification(final List<PersonSchedule> s, final NotificationIssue issue,
             final TrackerEvent trackerEvent) {
         isNotificationSend.set(Boolean.TRUE);
         super.sendNotification(s, issue, trackerEvent);

@@ -93,12 +93,11 @@ public abstract class AbstractAlertRule extends AbstractNotificationRule {
 
         for (final Alert alert : alerts) {
             saveAlert(alert);
-
             //notify subscribers
             final List<PersonSchedule> schedules = getPersonalSchedules(
                     context.getEvent().getShipment().getAlertsNotificationSchedules(), new Date());
-            for (final PersonSchedule s : schedules) {
-                sendNotification(s, alert, context.getEvent());
+            if (schedules.size() > 0) {
+                sendNotification(schedules, alert, context.getEvent());
             }
         }
 

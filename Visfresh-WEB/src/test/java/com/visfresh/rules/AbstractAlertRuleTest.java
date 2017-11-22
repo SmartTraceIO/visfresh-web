@@ -156,9 +156,11 @@ public class AbstractAlertRuleTest extends AbstractAlertRule {
      * @see com.visfresh.rules.AbstractNotificationRule#sendNotification(com.visfresh.entities.PersonSchedule, com.visfresh.entities.NotificationIssue, com.visfresh.entities.TrackerEvent)
      */
     @Override
-    protected void sendNotification(final PersonSchedule s, final NotificationIssue issue,
+    protected void sendNotification(final List<PersonSchedule> schedules, final NotificationIssue issue,
             final TrackerEvent trackerEvent) {
-        notifications.put(s.getId(), issue);
+        for (final PersonSchedule s : schedules) {
+            notifications.put(s.getId(), issue);
+        }
     }
     /**
      * @param users

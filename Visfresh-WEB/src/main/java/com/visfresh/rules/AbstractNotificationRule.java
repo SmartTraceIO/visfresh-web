@@ -11,8 +11,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +30,6 @@ import com.visfresh.services.NotificationService;
  */
 @Component
 public abstract class AbstractNotificationRule implements TrackerEventRule {
-    private static final Logger log = LoggerFactory.getLogger(AbstractNotificationRule.class);
-
     @Autowired
     private AbstractRuleEngine engine;
     @Autowired
@@ -95,7 +91,7 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
         for (final NotificationSchedule schedule : schedules) {
             final List<PersonSchedule> personalSchedules = schedule.getSchedules();
             for (final PersonSchedule s : personalSchedules) {
-                if (matchesTimeFrame(s, calendar)) {
+                if (s.getUser().isActive() && matchesTimeFrame(s, calendar)) {
                     all.add(s);
                 }
             }
@@ -159,18 +155,13 @@ public abstract class AbstractNotificationRule implements TrackerEventRule {
     public abstract String getName();
 
     /**
-     * @param s notification schedule.
+     * @param schedules notification schedules.
      * @param issue notification issue.
      * @param trackerEvent tracker event.
      */
-    protected void sendNotification(final PersonSchedule s, final NotificationIssue issue,
+    protected void sendNotification(final List<PersonSchedule> schedules, final NotificationIssue issue,
             final TrackerEvent trackerEvent) {
-        if (s.getUser().isActive()) {
-            notificationService.sendNotification(s, issue, trackerEvent);
-        } else {
-            log.debug("Notification " + issue.getId() + " will ignored for user "
-                    + s.getUser().getEmail() + " because inactive");
-        }
+        notificationService.sendNotification(schedules, issue, trackerEvent);
     }
 
     /**

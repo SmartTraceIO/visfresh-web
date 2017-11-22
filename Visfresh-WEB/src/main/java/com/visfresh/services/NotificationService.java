@@ -20,11 +20,11 @@ import com.visfresh.entities.User;
  */
 public interface NotificationService {
     /**
-     * @param s person schedule.
+     * @param schedules person schedule.
      * @param issue notification issue.
      * @param trackerEvent tracker event.
      */
-    void sendNotification(final PersonSchedule s, final NotificationIssue issue, TrackerEvent trackerEvent);
+    void sendNotification(final List<PersonSchedule> schedules, final NotificationIssue issue, TrackerEvent trackerEvent);
     /**
      * @param issue notification issue.
      * @param user email address.

@@ -3,6 +3,8 @@
  */
 package com.visfresh.rules;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.visfresh.entities.Alert;
@@ -50,7 +52,8 @@ public class EnterDarkEnvironmentAlertRule extends AbstractAlertRule {
      * @see com.visfresh.rules.AbstractNotificationRule#sendNotification(com.visfresh.entities.PersonSchedule, com.visfresh.entities.NotificationIssue)
      */
     @Override
-    protected void sendNotification(final PersonSchedule s, final NotificationIssue issue, TrackerEvent trackerEvent) {
+    protected void sendNotification(final List<PersonSchedule> s,
+            final NotificationIssue issue, final TrackerEvent trackerEvent) {
         // disable notifications
     }
 
