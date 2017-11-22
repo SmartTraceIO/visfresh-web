@@ -13,5 +13,6 @@ public enum SystemMessageType {
     Email,
     DeviceCommand,
     ArrivalReport,
+    AlertEmail,
     ShutdownShipment
 }

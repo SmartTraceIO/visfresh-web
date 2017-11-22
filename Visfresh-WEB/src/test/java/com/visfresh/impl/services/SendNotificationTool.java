@@ -4,6 +4,8 @@
 package com.visfresh.impl.services;
 
 import java.text.ParseException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TimeZone;
 
 import com.visfresh.entities.Alert;
@@ -14,11 +16,8 @@ import com.visfresh.entities.Language;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
-import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
-import com.visfresh.impl.services.EmailServiceImpl;
-import com.visfresh.impl.services.NotificationServiceImpl;
 import com.visfresh.io.email.EmailServiceHelper;
 import com.visfresh.l12n.NotificationBundle;
 import com.visfresh.services.RetryableException;
@@ -110,12 +109,15 @@ public class SendNotificationTool extends NotificationServiceImpl {
         final SendNotificationTool tool = new SendNotificationTool();
 
         final String[] emails = {"james@smarttrace.com.au", "vyacheslav.soldatov@inbox.ru"};
+
+        final List<User> users = new LinkedList<>();
         for (final String email : emails) {
             final User user = new User();
             user.setEmail(email);
             user.setFirstName(email);
-            tool.sendEmailNotification(a, user, e,
-                    Language.English, TimeZone.getDefault(), TemperatureUnits.Celsius);
+            users.add(user);
         }
+
+        tool.sendEmailNotification(a, users, e);
     }
 }

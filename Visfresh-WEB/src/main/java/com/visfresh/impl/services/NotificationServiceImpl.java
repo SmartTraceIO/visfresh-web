@@ -31,6 +31,7 @@ import com.visfresh.dao.NotificationDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentReportDao;
 import com.visfresh.dao.ShipmentSessionDao;
+import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.Arrival;
@@ -66,18 +67,16 @@ import com.visfresh.utils.SerializerUtils;
  *
  */
 @Component
-public class NotificationServiceImpl implements NotificationService, SystemMessageHandler {
+public class NotificationServiceImpl implements NotificationService {
     /**
      *
      */
     private static final String ARRIVAL_REPORT_PREFIX = "arrReport-";
-    /**
-     *
-     */
-    private static final String USER = "user";
     private static final String USERS = "receivers";
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
     private static final String SHIPMENT = "shipment";
+    private static final String ALERT = "alert";
+    private static final String EVENT = "event";
 
     @Autowired
     private SmsService smsService;
@@ -88,7 +87,9 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     @Autowired
     protected NotificationBundle bundle;
     @Autowired
-    private ArrivalReportDispatcher dispatcher;
+    private ArrivalReportDispatcher arrivalDispatcher;
+    @Autowired
+    private AlertEmailDispatcher alertDispatcher;
     @Autowired
     protected ShipmentDao shipmentDao;
     @Autowired
@@ -101,6 +102,8 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     private UserDao userDao;
     @Autowired
     private ShipmentSessionDao shipmentSessionDao;
+    @Autowired
+    private TrackerEventDao trackerEventDao;
 
     /**
      * Default constructor.
@@ -115,29 +118,19 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     @Override
     public void sendNotification(final List<PersonSchedule> schedules, final NotificationIssue issue,
             final TrackerEvent trackerEvent) {
+        final List<User> emailedUsers = new LinkedList<>();
+
         for (final PersonSchedule s : schedules) {
             final User user = s.getUser();
-            final Language lang = user.getLanguage();
-            final TimeZone tz = user.getTimeZone();
-            final TemperatureUnits tu = user.getTemperatureUnits();
 
             //send email
             if (s.isSendEmail()) {
-                sendEmailNotification(issue, user, trackerEvent, lang, tz, tu);
+                emailedUsers.add(user);
             }
 
             //send SMS
             if (s.isSendSms()) {
-                final String message = bundle.getSmsMessage(issue, trackerEvent, lang, tz, tu);
-
-                //send SMS
-                final String phone = user.getPhone();
-                if (phone != null && phone.length() > 0) {
-                    smsService.sendMessage(new String[] {phone}, null, message);
-                } else {
-                    log.warn("Phone number has not set for personal schedule for "
-                            + getPersonDescription(s) + " , SMS can't be send");
-                }
+                sendSms(issue, user, trackerEvent);
             }
 
             final Notification n = new Notification();
@@ -148,47 +141,96 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
 
             notificationDao.save(n);
         }
+
+        if (emailedUsers.size() > 0) {
+            sendEmailNotification(issue, emailedUsers, trackerEvent);
+        }
     }
 
     /**
      * @param issue
      * @param user
      * @param trackerEvent
-     * @param lang
-     * @param tz
-     * @param tu
+     */
+    private void sendSms(final NotificationIssue issue, final User user, final TrackerEvent trackerEvent) {
+        final String message = bundle.getSmsMessage(issue, trackerEvent,
+                user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
+
+        //send SMS
+        final String phone = user.getPhone();
+        if (phone != null && phone.length() > 0) {
+            smsService.sendMessage(new String[] {phone}, null, message);
+        } else {
+            log.warn("Phone number has not set for personal schedule for "
+                    + getPersonDescription(user) + " , SMS can't be send");
+        }
+    }
+
+    /**
+     * @param issue
+     * @param user
+     * @param trackerEvent
      */
     @Override
     public void sendEmailNotification(final NotificationIssue issue,
-            final User user, final TrackerEvent trackerEvent,
-            final Language lang, final TimeZone tz, final TemperatureUnits tu) {
-        if (user != null) {
-            try {
-                final String subject = bundle.getEmailSubject(issue, trackerEvent, lang, tz, tu);
-                final String message;
-                if (issue instanceof Alert) {
-                    message = bundle.getEmailMessage((Alert) issue, trackerEvent, lang, tz, tu);
-                } else {
-                    final Arrival arrival = (Arrival) issue;
-                    final List<TemperatureAlert> alertsFired = getTemperatureAlerts(arrival.getShipment());
-
-                    message = bundle.getEmailMessage(arrival, trackerEvent, alertsFired, lang, tz, tu);
-                }
-
-                emailService.sendMessage(new String[] {user.getEmail()}, subject, message);
-            } catch (final MessagingException e) {
-                log.error("Failed to send email message to " + user, e);
-            }
+            final List<User> users, final TrackerEvent trackerEvent) {
+        if (issue instanceof Alert) {
+            final JsonObject json = createSendAlertEmailMessage((Alert) issue, users, trackerEvent);
+            arrivalDispatcher.sendSystemMessage(json.toString(), SystemMessageType.AlertEmail);
         } else {
-            log.warn("Email has not set for personal schedule for " + user + " , email can't be send");
+            sendEmailArrivalNotification((Arrival) issue, users, trackerEvent);
+        }
+    }
+
+    protected void sendEmailAlertNotification(final Alert alert,
+            final List<User> users, final TrackerEvent trackerEvent) {
+        for (final User user : users) {
+            if (user != null) {
+                try {
+                    final TimeZone tz = user.getTimeZone();
+                    final Language lang = user.getLanguage();
+                    final TemperatureUnits tu = user.getTemperatureUnits();
+
+                    final String subject = bundle.getEmailSubject(alert, trackerEvent, lang, tz, tu);
+                    final String message = bundle.getEmailMessage(alert, trackerEvent, lang, tz, tu);
+
+                    emailService.sendMessage(new String[] {user.getEmail()}, subject, message);
+                } catch (final MessagingException e) {
+                    log.error("Failed to send email message to " + user, e);
+                }
+            } else {
+                log.warn("Email has not set for personal schedule for " + user + " , email can't be send");
+            }
+        }
+    }
+    private void sendEmailArrivalNotification(final Arrival arrival,
+            final List<User> users, final TrackerEvent trackerEvent) {
+        for (final User user : users) {
+            if (user != null) {
+                try {
+                    final TimeZone tz = user.getTimeZone();
+                    final Language lang = user.getLanguage();
+                    final TemperatureUnits tu = user.getTemperatureUnits();
+
+                    final String subject = bundle.getEmailSubject(arrival, trackerEvent, lang, tz, tu);
+
+                    final List<TemperatureAlert> alertsFired = getTemperatureAlerts(arrival.getShipment());
+                    final String message = bundle.getEmailMessage(arrival, trackerEvent, alertsFired, lang, tz, tu);
+
+                    emailService.sendMessage(new String[] {user.getEmail()}, subject, message);
+                } catch (final MessagingException e) {
+                    log.error("Failed to send email message to " + user, e);
+                }
+            } else {
+                log.warn("Email has not set for personal schedule for " + user + " , email can't be send");
+            }
         }
     }
     /**
      * @param s personal schedule.
      * @return person description.
      */
-    private String getPersonDescription(final PersonSchedule s) {
-        final User u = s.getUser();
+    private String getPersonDescription(final User u) {
         return u.getFirstName() + " " + u.getLastName() + ", "+ u.getPosition() + " of "
                 + u.getCompany().getName();
     }
@@ -199,7 +241,7 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     public void sendShipmentReport(final Shipment shipment, final List<User> users) {
         if (!users.isEmpty()) {
             final JsonObject json = createSendShipmentReportMessage(shipment, users);
-            dispatcher.sendSystemMessage(json.toString(), SystemMessageType.ArrivalReport);
+            arrivalDispatcher.sendSystemMessage(json.toString(), SystemMessageType.ArrivalReport);
         } else {
             log.error("Empty user list for send report to " + shipment.getId());
         }
@@ -221,26 +263,37 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
         json.add(USERS, array);
         return json;
     }
+    /**
+     * @param alert
+     * @param users
+     * @param trackerEvent
+     * @return
+     */
+    protected JsonObject createSendAlertEmailMessage(final Alert alert, final List<User> users, final TrackerEvent trackerEvent) {
+        final JsonObject json = new JsonObject();
+        json.addProperty(ALERT, alert.getId());
+        json.addProperty(EVENT, trackerEvent.getId());
+
+        final JsonArray array = new JsonArray();
+        for (final User u : users) {
+            array.add(new JsonPrimitive(u.getId()));
+        }
+
+        json.add(USERS, array);
+        return json;
+    }
     /* (non-Javadoc)
      * @see com.visfresh.services.SystemMessageHandler#handle(com.visfresh.entities.SystemMessage)
      */
-    @Override
-    public void handle(final SystemMessage msg) throws RetryableException {
+    protected void handleArrivalReportSystemMessage(final SystemMessage msg) throws RetryableException {
         final JsonObject json = SerializerUtils.parseJson(msg.getMessageInfo()).getAsJsonObject();
 
         final long shipmentId = json.get(SHIPMENT).getAsLong();
         final Shipment s = shipmentDao.findOne(shipmentId);
 
         final List<User> users = new LinkedList<>();
-        if (json.has(USER)) { //TODO old schema. Should remove after one day time out
-            final Long userId = json.get(USER).getAsLong();
-            final User user = userDao.findOne(userId);
-            if (user != null) {
-                users.add(user);
-            } else {
-                log.error("User not found: " + userId);
-            }
-        } else if (json.has(USERS)) {
+
+        if (json.has(USERS)) {
             final JsonArray array = json.get(USERS).getAsJsonArray();
             for (final JsonElement el : array) {
                 final User receiver = userDao.findOne(el.getAsLong());
@@ -387,10 +440,56 @@ public class NotificationServiceImpl implements NotificationService, SystemMessa
     }
     @PostConstruct
     public void init() {
-        dispatcher.setSystemMessageHandler(SystemMessageType.ArrivalReport, this);
+        arrivalDispatcher.setSystemMessageHandler(SystemMessageType.ArrivalReport, new SystemMessageHandler() {
+            /* (non-Javadoc)
+             * @see com.visfresh.services.SystemMessageHandler#handle(com.visfresh.entities.SystemMessage)
+             */
+            @Override
+            public void handle(final SystemMessage msg) throws RetryableException {
+                handleArrivalReportSystemMessage(msg);
+            }
+        });
+        alertDispatcher.setSystemMessageHandler(SystemMessageType.AlertEmail, new SystemMessageHandler() {
+            /* (non-Javadoc)
+             * @see com.visfresh.services.SystemMessageHandler#handle(com.visfresh.entities.SystemMessage)
+             */
+            @Override
+            public void handle(final SystemMessage msg) throws RetryableException {
+                handleAlertReportSystemMessage(msg);
+            }
+        });
     }
+    /**
+     * @param msg
+     */
+    protected void handleAlertReportSystemMessage(final SystemMessage msg) {
+        final JsonObject json = SerializerUtils.parseJson(msg.getMessageInfo()).getAsJsonObject();
+
+        final Alert alert = alertDao.findOne(json.get(ALERT).getAsLong());
+        final TrackerEvent trackerEvent = trackerEventDao.findOne(json.get(EVENT).getAsLong());
+
+        final List<User> users = new LinkedList<>();
+
+        if (json.has(USERS)) {
+            final JsonArray array = json.get(USERS).getAsJsonArray();
+            for (final JsonElement el : array) {
+                final User receiver = userDao.findOne(el.getAsLong());
+                if (receiver != null) {
+                    users.add(receiver);
+                } else {
+                    log.error("User not found: " + el.getAsLong());
+                }
+            }
+        }
+
+        if (alert != null && !users.isEmpty()) {
+            sendEmailAlertNotification(alert, users, trackerEvent);
+        }
+    }
+
     @PreDestroy
     public void destroy() {
-        dispatcher.setSystemMessageHandler(SystemMessageType.ArrivalReport, null);
+        arrivalDispatcher.setSystemMessageHandler(SystemMessageType.ArrivalReport, null);
+        alertDispatcher.setSystemMessageHandler(SystemMessageType.AlertEmail, null);
     }
 }
