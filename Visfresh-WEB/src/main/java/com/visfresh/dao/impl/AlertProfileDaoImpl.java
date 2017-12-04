@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PreDestroy;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -50,7 +47,6 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
     private static final String COMPANY_FIELD = "company";
 
     private final Map<String, String> propertyToDbFields = new HashMap<String, String>();
-    private DefaultCache<List<TemperatureRule>, Long> rulesCache;
     private CorrectiveActionListSerializer actionsSerializer = new CorrectiveActionListSerializer(null);
 
     /**
@@ -72,15 +68,6 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         propertyToDbFields.put(AlertProfileConstants.UPPER_TEMPERATURE_LIMIT, UPPERTEMPLIMIT_FIELD);
     }
 
-    @Autowired
-    public void initRulesCache(final CacheManagerHolder h) {
-        rulesCache = new DefaultCache<>("AlertProfileDaoRules", 10000, 60, 20 * 60);
-        rulesCache.initialize(h);
-    }
-    @PreDestroy
-    public void destroyRulesCache() {
-        rulesCache.destroy();
-    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
@@ -188,8 +175,6 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
             jdbc.update("delete from temperaturerules where id = :id and alertprofile = :alertprofile",
                     paramMap);
         }
-
-        rulesCache.remove(id);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.EntityWithCompanyDaoImplBase#resolveReferences(com.visfresh.entities.EntityWithId, java.util.Map, java.util.Map)
@@ -211,8 +196,6 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
         if (t.getLightOnCorrectiveActions() != null) {
             t.getLightOnCorrectiveActions().setCompany(t.getCompany());
         }
-
-        rulesCache.put(t.getId(), t.getAlertRules());
     }
 
     /**

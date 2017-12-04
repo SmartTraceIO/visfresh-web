@@ -53,7 +53,6 @@ public class ShipmentStatisticsDaoTest extends BaseDaoTest<ShipmentStatisticsDao
         ShipmentStatistics s = new ShipmentStatistics(shipment.getId());
         dao.saveStatistics(s);
         s = dao.getStatistics(shipment);
-        dao.clearCache();
 
         assertNotNull(s);
 
@@ -77,7 +76,6 @@ public class ShipmentStatisticsDaoTest extends BaseDaoTest<ShipmentStatisticsDao
         s.setTotalTime(totalTime);
 
         dao.saveStatistics(s);
-        dao.clearCache();
         s = dao.getStatistics(shipment);
 
         assertEquals(avgTemperature, s.getAvgTemperature());

@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -29,7 +27,6 @@ public class ShipmentSessionDaoImpl implements ShipmentSessionDao {
      */
     public static final String TABLE = "shipmentsessions";
     private final ShipmentSessionSerializer stateSerializer = new ShipmentSessionSerializer();
-    private DefaultCache<ShipmentSession, Long> cache;
     /**
      * JDBC template.
      */
@@ -43,31 +40,12 @@ public class ShipmentSessionDaoImpl implements ShipmentSessionDao {
         super();
     }
 
-    @Autowired
-    public void initCache(final CacheManagerHolder h) {
-        cache = new DefaultCache<>("ShipmentSessionDao", 10000, 60, 20 * 60);
-        cache.initialize(h);
-    }
-    @PreDestroy
-    public void destroyCache() {
-        cache.destroy();
-    }
-    @Override
-    public void clearCache() {
-        cache.clear();
-    }
-
     /* (non-Javadoc)
      * @see com.visfresh.dao.DeviceDao#getState(java.lang.String)
      */
     @Override
     public ShipmentSession getSession(final Shipment shipment) {
         final Long shipmentId = shipment.getId();
-        final ShipmentSession session = cache.get(shipmentId);
-        if (session != null) {
-            return session;
-        }
-
         return getSession(shipmentId);
     }
 
@@ -90,9 +68,6 @@ public class ShipmentSessionDaoImpl implements ShipmentSessionDao {
         session = stateSerializer.parseSession(state);
         session.setShipmentId(shipmentId);
 
-        if (session != null) {
-            cache.put(shipmentId, session);
-        }
         return session;
     }
     /* (non-Javadoc)
@@ -113,6 +88,5 @@ public class ShipmentSessionDaoImpl implements ShipmentSessionDao {
         } else {
             jdbc.update("update shipmentsessions set state = :state where shipment = :shipment", params);
         }
-        cache.put(session.getShipmentId(), session);
     }
 }

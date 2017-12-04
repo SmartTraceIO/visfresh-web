@@ -203,7 +203,9 @@ public class AutoStartShipmentRuleTest extends BaseRuleTest {
         assertEquals(lok.getId(), shipment.getShippedFrom().getId());
         // check created from correct template
         assertTrue(shipment.getShipmentDescription().startsWith(tok.getShipmentDescription()));
-        assertEquals(1, getSession(shipment).getShipmentKeys().size());
+        // check not autodetect data saved, because start location is aready assigned
+        // according of matches reading's loation
+        assertEquals(0, getSession(shipment).getShipmentKeys().size());
 
         // check not duplicate handle
         assertFalse(rule.accept(c));

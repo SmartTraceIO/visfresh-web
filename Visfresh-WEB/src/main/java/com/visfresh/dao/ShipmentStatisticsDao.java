@@ -27,8 +27,4 @@ public interface ShipmentStatisticsDao {
      * @param stats shipment shipment statistics.
      */
     void saveStatistics(ShipmentStatistics stats);
-    /**
-     * clears the DAO cache
-     */
-    void clearCache();
 }

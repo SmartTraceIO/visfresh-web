@@ -334,7 +334,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(2, alDao.getBy(s).getTo().size());
 
         //check alternative locations configured in shipment session.
-        sessionDao.clearCache();
         session = sessionDao.getSession(s);
         assertEquals(2, AutoDetectEndLocationRule.getAutoDetectLocations(session).size());
 
@@ -344,7 +343,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         //check locations
         assertEquals(1, alDao.getBy(s).getTo().size());
-        sessionDao.clearCache();
         session = sessionDao.getSession(s);
         assertEquals(1, AutoDetectEndLocationRule.getAutoDetectLocations(session).size());
 
@@ -354,7 +352,6 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         //check locations
         assertEquals(1, alDao.getBy(s).getTo().size());
-        sessionDao.clearCache();
         session = sessionDao.getSession(s);
         assertEquals(1, AutoDetectEndLocationRule.getAutoDetectLocations(session).size());
     }

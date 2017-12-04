@@ -3,7 +3,6 @@
  */
 package com.visfresh.init.jdbc;
 
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
-import com.visfresh.dao.impl.CacheManagerHolder;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -30,8 +28,6 @@ import com.zaxxer.hikari.HikariDataSource;
 public class JdbcConfig implements TransactionManagementConfigurer {
     @Autowired
     private Environment env;
-    @Autowired
-    private CacheManagerHolder cacheManagerHolder;
 
     /**
      * Default constructor.
@@ -40,10 +36,6 @@ public class JdbcConfig implements TransactionManagementConfigurer {
         super();
     }
 
-    @PreDestroy
-    public void destroyCache() {
-        cacheManagerHolder.getCacheManager().shutdown();
-    }
     /**
      * @return JDBC data source.
      */

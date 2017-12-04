@@ -5,13 +5,10 @@ package com.visfresh.dao.impl;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -37,7 +34,6 @@ public class ShipmentStatisticsDaoImpl implements ShipmentStatisticsDao {
     public static final String TABLE = "shipmentstats";
 
     private final ShipmentStatisticsCollectorSerializer serializer = new ShipmentStatisticsCollectorSerializer();
-    private DefaultCache<ShipmentStatistics, Long> cache;
     /**
      * JDBC template.
      */
@@ -51,19 +47,6 @@ public class ShipmentStatisticsDaoImpl implements ShipmentStatisticsDao {
         super();
     }
 
-    @Autowired
-    public void initCache(final CacheManagerHolder h) {
-        cache = new DefaultCache<>("ShipmentStatisticsDao", 10000, 60, 20 * 60);
-        cache.initialize(h);
-    }
-    @PreDestroy
-    public void destroyCache() {
-        cache.destroy();
-    }
-    @Override
-    public void clearCache() {
-        cache.clear();
-    }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentStatisticsDao#getStatistics(com.visfresh.entities.Shipment)
      */
@@ -83,22 +66,11 @@ public class ShipmentStatisticsDaoImpl implements ShipmentStatisticsDao {
         final List<ShipmentStatistics> result = new LinkedList<>();
 
         final List<Long> shipmentIds = new LinkedList<>(EntityUtils.getIdList(shipments));
-        final Iterator<Long> iter = shipmentIds.iterator();
-        while (iter.hasNext()) {
-            final Long id = iter.next();
-            final ShipmentStatistics session = cache.get(id);
-            if (session != null) {
-                result.add(session);
-                iter.remove();
-            }
-        }
-
         if (shipmentIds.size() > 0) {
             result.addAll(getStatisticsImpl(shipmentIds));
         }
         return result;
     }
-
     /**
      * @param shipmentId
      * @return
@@ -112,7 +84,6 @@ public class ShipmentStatisticsDaoImpl implements ShipmentStatisticsDao {
 
         for (final Map<String, Object> map : list) {
             final ShipmentStatistics stats = createStats(map);
-            cache.put(stats.getShipmentId(), stats);
             result.add(stats);
         }
 
@@ -192,8 +163,6 @@ public class ShipmentStatisticsDaoImpl implements ShipmentStatisticsDao {
         jdbc.update(DaoImplBase.createInsertScript(TABLE, new LinkedList<String>(params.keySet()))
                 + " ON DUPLICATE KEY UPDATE "
                 + createUpdateParts(new HashSet<>(params.keySet())), params);
-
-        cache.put(stats.getShipmentId(), stats);
     }
     /**
      * @param params parameters
