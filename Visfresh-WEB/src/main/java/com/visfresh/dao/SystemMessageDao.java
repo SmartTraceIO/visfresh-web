@@ -39,4 +39,9 @@ public interface SystemMessageDao extends DaoBase<SystemMessage, SystemMessage, 
      * @return
      */
     List<SystemMessage> getMessagesForGoup(SystemMessageType messageType, String group, Date readyOn, int batchLimit);
+    /**
+     * Saves message only if there are not other messages for given group.
+     * @param sm system messages.
+     */
+    void saveOnlyOneForGroup(SystemMessage sm);
 }

@@ -108,4 +108,9 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment
      * @return
      */
     ListResult<ListShipmentItem> getCompanyShipments(Long companyId, Sorting sorting, Page page, Filter filter);
+    /**
+     * @param company company ID.
+     * @return list of active shipments for given company.
+     */
+    List<Shipment> findActiveShipments(Long company);
 }

@@ -228,6 +228,10 @@ public class DeviceController extends AbstractController implements DeviceConsta
             alertDao.moveToNewDevice(oldDevice, newDevice);
             trackerEventDao.moveToNewDevice(oldDevice, newDevice);
             shipmentDao.moveToNewDevice(oldDevice, newDevice);
+            //TODO
+            //1. device states
+            //
+            //2. simulators
 
             //close all active shipments
             final List<Shipment> activeShipments = shipmentDao.findActiveShipments(newDevice.getImei());

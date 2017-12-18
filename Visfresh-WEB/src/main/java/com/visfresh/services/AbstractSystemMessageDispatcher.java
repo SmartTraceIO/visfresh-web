@@ -59,7 +59,7 @@ public abstract class AbstractSystemMessageDispatcher {
     protected final Set<SystemMessageType> messageTypes = new LinkedHashSet<>();
 
     @Autowired
-    private SystemMessageDao messageDao;
+    protected SystemMessageDao messageDao;
 
     private int numThreads;
 

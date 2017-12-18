@@ -123,8 +123,15 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
      */
     @Override
     public List<Shipment> findActiveShipments(final Company company) {
+        return findActiveShipments(company.getId());
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#findActiveShipments(java.lang.Long)
+     */
+    @Override
+    public List<Shipment> findActiveShipments(final Long company) {
         final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("company", company.getId());
+        params.put("company", company);
         params.put("st1", ShipmentStatus.Ended.name());
         params.put("st2", ShipmentStatus.Arrived.name());
 

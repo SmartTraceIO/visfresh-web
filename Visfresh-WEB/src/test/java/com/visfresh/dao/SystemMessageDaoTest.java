@@ -149,6 +149,31 @@ public class SystemMessageDaoTest extends
         assertEquals(m1.getId(), messages.get(0).getId());
     }
     @Test
+    public void testSaveOnlyOneForGroup() {
+        final SystemMessage msg = new SystemMessage();
+        msg.setMessageInfo("any message info");
+        msg.setNumberOfRetry(99);
+        msg.setProcessor("proc");
+        msg.setRetryOn(new Date(System.currentTimeMillis() + 10000000l));
+        msg.setTime(new Date(System.currentTimeMillis() - 10000000l));
+        msg.setType(SystemMessageType.Siblings);
+        msg.setGroup("g1");
+
+        dao.saveOnlyOneForGroup(msg);
+
+        assertEquals(1, dao.findAll(null, null, null).size());
+        //test not saves with same group
+
+        msg.setId(null);
+        dao.saveOnlyOneForGroup(msg);
+        assertEquals(1, dao.findAll(null, null, null).size());
+
+        //test save if change group
+        msg.setGroup("g2");
+        dao.saveOnlyOneForGroup(msg);
+        assertEquals(2, dao.findAll(null, null, null).size());
+    }
+    @Test
     public void testFindTrackerEvents() {
         final long dt = 100000;
         final long t = System.currentTimeMillis() - 20 * dt;
