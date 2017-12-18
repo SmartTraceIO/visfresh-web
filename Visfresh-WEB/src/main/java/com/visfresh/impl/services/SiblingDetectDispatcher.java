@@ -27,7 +27,7 @@ import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
-import com.visfresh.entities.TrackerEvent;
+import com.visfresh.io.TrackerEventDto;
 import com.visfresh.services.AbstractAssyncSystemMessageDispatcher;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.SiblingDetectionService;
@@ -165,28 +165,30 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
     public boolean updateSiblings(final Long masterId, final Long companyId) {
         log.debug("Start search of siblings for shipment " + masterId);
 
-        final List<Shipment> shipments = new LinkedList<>(findActiveShipments(companyId));
+        final List<ShipmentSiblingInfo> shipments = new LinkedList<>(findActiveShipments(companyId));
 
         //detect siblings.
         final Map<Long, Set<Long>> siblingMap = new HashMap<>();
         //initialize sibling map
-        for (final Shipment s : shipments) {
+        for (final ShipmentSiblingInfo s : shipments) {
             siblingMap.put(s.getId(), new HashSet<Long>(s.getSiblings()));
         }
 
-        Shipment master = null;
         //remove self
-        final Iterator<Shipment> iter = shipments.iterator();
+        final Iterator<ShipmentSiblingInfo> iter = shipments.iterator();
         while (iter.hasNext()) {
-            final Shipment next = iter.next();
+            final ShipmentSiblingInfo next = iter.next();
             if (masterId.equals(next.getId())) {
-                master = next;
                 iter.remove();
                 break;
             }
         }
 
         if (!shipments.isEmpty()) {
+            //fetch master
+            final ShipmentSiblingInfo master = findShipment(masterId);
+            siblingMap.put(master.getId(), new HashSet<Long>(master.getSiblings()));
+
             //get shipments for group
             findSiblings(master, shipments, siblingMap);
 
@@ -199,7 +201,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
 
                 //update sibling info also for new found siblings
                 for (final Long id : newSiblings) {
-                    final Shipment sibling = EntityUtils.getEntity(shipments, id);
+                    final ShipmentSiblingInfo sibling = EntityUtils.getEntity(shipments, id);
                     final Set<Long> set = new HashSet<>(siblingMap.get(id));
                     set.add(master.getId());
 
@@ -212,8 +214,15 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
             }
         }
 
-        log.debug("End search of siblings for shipment " + master.getId());
+        log.debug("End search of siblings for shipment " + masterId);
         return false;
+    }
+    /**
+     * @param masterId
+     * @return
+     */
+    protected ShipmentSiblingInfo findShipment(final Long masterId) {
+        return shipmentDao.getShipmentSiblingInfo(masterId);
     }
 
     /**
@@ -221,15 +230,15 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @param originShipments
      * @param siblingMap
      */
-    protected void findSiblings(final Shipment master, final List<Shipment> originShipments,
+    protected void findSiblings(final ShipmentSiblingInfo master, final List<ShipmentSiblingInfo> originShipments,
             final Map<Long, Set<Long>> siblingMap) {
-        final List<Shipment> shipments = new LinkedList<>(originShipments);
+        final List<ShipmentSiblingInfo> shipments = new LinkedList<>(originShipments);
 
         //ignore old siblings
         final Set<Long> siblings = master.getSiblings();
-        final Iterator<Shipment> iter = shipments.iterator();
+        final Iterator<ShipmentSiblingInfo> iter = shipments.iterator();
         while (iter.hasNext()) {
-            if (siblings.contains(iter.next())) {
+            if (siblings.contains(iter.next().getId())) {
                 iter.remove();
             }
         }
@@ -237,9 +246,9 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         //continue only if shipment list is not empty
         if (!shipments.isEmpty()) {
             log.debug("Fetch readings for master shipment " + master.getId());
-            final List<TrackerEvent> masterEvents = getTrackeEvents(master);
-            for (final Shipment s : shipments) {
-                final List<TrackerEvent> events = getTrackeEvents(s);
+            final List<TrackerEventDto> masterEvents = getTrackeEvents(master.getId());
+            for (final ShipmentSiblingInfo s : shipments) {
+                final List<TrackerEventDto> events = getTrackeEvents(s.getId());
                 if (isSiblings(masterEvents, events)) {
                     siblingMap.get(master.getId()).add(s.getId());
                     siblingMap.get(s.getId()).add(master.getId());
@@ -251,11 +260,10 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @param master
      * @param set
      */
-    protected void updateSiblingInfo(final Shipment master, final Set<Long> set) {
+    protected void updateSiblingInfo(final ShipmentSiblingInfo master, final Set<Long> set) {
         master.getSiblings().clear();
         master.getSiblings().addAll(set);
-        master.setSiblingCount(master.getSiblings().size());
-        shipmentDao.updateSiblingInfo(master);
+        shipmentDao.updateSiblingInfo(master.getId(), set);
     }
     private Set<Long> getNewSiblings(
             final Set<Long> oldSiblings, final Set<Long> newSiblings) {
@@ -273,20 +281,20 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @param company company.
      * @return list of active shipments for given company.
      */
-    protected List<Shipment> findActiveShipments(final Long company) {
+    protected List<ShipmentSiblingInfo> findActiveShipments(final Long company) {
         return shipmentDao.findActiveShipments(company);
     }
     /**
      * @param shipment shipment.
      * @return array of tracker events.
      */
-    protected List<TrackerEvent> getTrackeEvents(final Shipment shipment) {
-        final List<TrackerEvent> list = getEventsFromDb(shipment);
+    protected List<TrackerEventDto> getTrackeEvents(final Long shipment) {
+        final List<TrackerEventDto> list = getLocationsFromDb(shipment);
 
         //filter events without locations.
-        final Iterator<TrackerEvent> iter = list.iterator();
+        final Iterator<TrackerEventDto> iter = list.iterator();
         while (iter.hasNext()) {
-            final TrackerEvent e = iter.next();
+            final TrackerEventDto e = iter.next();
             if (e.getLatitude() == null || e.getLongitude() == null) {
                 iter.remove();
             }
@@ -298,21 +306,26 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @param shipment
      * @return
      */
-    protected List<TrackerEvent> getEventsFromDb(final Shipment shipment) {
-        return trackerEventDao.getEvents(shipment);
+    protected List<TrackerEventDto> getLocationsFromDb(final Long shipment) {
+        final List<Long> ids = new LinkedList<>();
+        ids.add(shipment);
+        final Map<Long, List<TrackerEventDto>> eventsForShipmentIds = trackerEventDao.getEventsForShipmentIds(ids);
+
+        final List<TrackerEventDto> result = eventsForShipmentIds.get(shipment);
+        return result == null ? new LinkedList<>() : result;
     }
     /**
      * @param originE1
      * @param originE2
      * @return true if siblings.
      */
-    protected boolean isSiblings(final List<TrackerEvent> originE1, final List<TrackerEvent> originE2) {
+    protected boolean isSiblings(final List<TrackerEventDto> originE1, final List<TrackerEventDto> originE2) {
         if (originE1.isEmpty()) {
             return false;
         }
 
-        final List<TrackerEvent> e1 = new LinkedList<>(originE1);
-        final List<TrackerEvent> e2 = new LinkedList<>(originE2);
+        final List<TrackerEventDto> e1 = new LinkedList<>(originE1);
+        final List<TrackerEventDto> e2 = new LinkedList<>(originE2);
 
         //1. ignore events before first
         removeEventsBeforeDate(e2, e1.get(0).getTime());
@@ -336,17 +349,17 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @param minPath
      * @return
      */
-    protected boolean isPathNotLessThen(final List<TrackerEvent> events, final int minPath) {
+    protected boolean isPathNotLessThen(final List<TrackerEventDto> events, final int minPath) {
         if (events.size() == 0) {
             return false;
         }
 
-        final LinkedList<TrackerEvent> list = new LinkedList<>(events);
-        TrackerEvent e;
+        final LinkedList<TrackerEventDto> list = new LinkedList<>(events);
+        TrackerEventDto e;
         while (list.size() > 0) {
             e = list.remove(0);
 
-            final Iterator<TrackerEvent> iter = list.descendingIterator();
+            final Iterator<TrackerEventDto> iter = list.descendingIterator();
             while (iter.hasNext()) {
                 if (getDistance(e, iter.next()) >= minPath) {
                     return true;
@@ -364,22 +377,22 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @return
      */
     private boolean isSiblingsByDistance(
-            final List<TrackerEvent> e1, final List<TrackerEvent> e2, final double maxAvg) {
+            final List<TrackerEventDto> e1, final List<TrackerEventDto> e2, final double maxAvg) {
         //calculate the distance in intersected time
         int count = 0;
         final double maxSumm = maxAvg * e1.size(); // max acceptable summ
         double summ = 0;
 
-        final Iterator<TrackerEvent> iter1 = e1.iterator();
-        final Iterator<TrackerEvent> iter2 = e2.iterator();
+        final Iterator<TrackerEventDto> iter1 = e1.iterator();
+        final Iterator<TrackerEventDto> iter2 = e2.iterator();
 
-        TrackerEvent before = iter2.next();
+        TrackerEventDto before = iter2.next();
         while (iter1.hasNext()) {
-            final TrackerEvent e = iter1.next();
+            final TrackerEventDto e = iter1.next();
 
             if (!e.getTime().before(before.getTime())) {
                 while (iter2.hasNext()) {
-                    final TrackerEvent after = iter2.next();
+                    final TrackerEventDto after = iter2.next();
                     if (!after.getTime().before(e.getTime())) {
                         summ += getDistance(e, before, after);
                         count++;
@@ -410,9 +423,9 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @param e
      * @param startDate
      */
-    private void removeEventsBeforeDate(final List<TrackerEvent> e,
+    private void removeEventsBeforeDate(final List<TrackerEventDto> e,
             final Date startDate) {
-        final Iterator<TrackerEvent> iter = e.iterator();
+        final Iterator<TrackerEventDto> iter = e.iterator();
         while (iter.hasNext()) {
             if (iter.next().getTime().before(startDate)) {
                 iter.remove();
@@ -427,12 +440,12 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @param time
      * @return
      */
-    private List<TrackerEvent> cutEventsAfterDate(final List<TrackerEvent> events,
+    private List<TrackerEventDto> cutEventsAfterDate(final List<TrackerEventDto> events,
             final Date time) {
-        final List<TrackerEvent> list = new LinkedList<>();
-        final Iterator<TrackerEvent> iter = events.iterator();
+        final List<TrackerEventDto> list = new LinkedList<>();
+        final Iterator<TrackerEventDto> iter = events.iterator();
         while (iter.hasNext()) {
-            final TrackerEvent e = iter.next();
+            final TrackerEventDto e = iter.next();
             if (e.getTime().after(time)) {
                 iter.remove();
                 list.add(e);
@@ -448,8 +461,8 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @param me2 second master event.
      * @return distance between given event and the sub path
      */
-    private double getDistance(final TrackerEvent e, final TrackerEvent me1,
-            final TrackerEvent me2) {
+    private double getDistance(final TrackerEventDto e, final TrackerEventDto me1,
+            final TrackerEventDto me2) {
         //not ordinary situations
         final Date mt1 = me1.getTime();
         final Date mt2 = me2.getTime();
@@ -481,7 +494,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      * @param e2 second tracker event.
      * @return distance between two event in meters.
      */
-    private double getDistance(final TrackerEvent e1, final TrackerEvent e2) {
+    private double getDistance(final TrackerEventDto e1, final TrackerEventDto e2) {
         return getDistanceMeters(e1.getLatitude(), e1.getLongitude(),
                 e2.getLatitude(), e2.getLongitude());
     }

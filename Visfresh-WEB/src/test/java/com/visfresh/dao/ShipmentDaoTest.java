@@ -34,6 +34,7 @@ import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.impl.services.ShipmentSiblingInfo;
 import com.visfresh.lists.ListResult;
 import com.visfresh.lists.ListShipmentItem;
 
@@ -480,7 +481,28 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         createShipment(c2, ShipmentStatus.Ended);
         createShipment(c2, ShipmentStatus.Arrived);
 
-        assertEquals(2, dao.findActiveShipments(c1).size());
+        assertEquals(2, dao.findActiveShipments(c1.getId()).size());
+    }
+    @Test
+    public void testGetShipmentSiblingInfo() {
+        final Company c1 = createCompany("C1");
+
+        //create shipments
+        Shipment s1 = createShipment(c1, ShipmentStatus.InProgress);
+        final Shipment s2 = createShipment(c1, ShipmentStatus.Default);
+        final Shipment s3 = createShipment(c1, ShipmentStatus.Ended);
+
+        s1.getSiblings().clear();
+        s1.getSiblings().add(s2.getId());
+        s1.getSiblings().add(s3.getId());
+        s1.setSiblingCount(2);
+
+        s1 = dao.save(s1);
+
+        final ShipmentSiblingInfo info = dao.getShipmentSiblingInfo(s1.getId());
+        assertEquals(2, info.getSiblings().size());
+        assertTrue(info.getSiblings().contains(s2.getId()));
+        assertTrue(info.getSiblings().contains(s3.getId()));
     }
     @Test
     public void testFindActiveShipmentsByImei() {
@@ -668,18 +690,11 @@ public class ShipmentDaoTest extends BaseCrudTest<ShipmentDao, Shipment, Shipmen
         s.setSiblingCount(0);
         s = dao.save(s);
 
-        dao.updateSiblingInfo(s);
-
-        //check sibling group and sibling count updated
-        s = dao.findOne(s.getId());
-        assertEquals(0, s.getSiblingCount());
-        assertEquals(0, s.getSiblings().size());
-
         //add siblings
         s.getSiblings().add(1l);
         s.getSiblings().add(2l);
 
-        dao.updateSiblingInfo(s);
+        dao.updateSiblingInfo(s.getId(), s.getSiblings());
 
         //check sibling group and sibling count updated
         s = dao.findOne(s.getId());

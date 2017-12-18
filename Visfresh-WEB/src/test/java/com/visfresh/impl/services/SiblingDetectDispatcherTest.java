@@ -22,7 +22,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.SystemMessage;
-import com.visfresh.entities.TrackerEvent;
+import com.visfresh.io.TrackerEventDto;
 import com.visfresh.utils.LocationUtils;
 
 /**
@@ -31,7 +31,7 @@ import com.visfresh.utils.LocationUtils;
  */
 public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
     private final List<Shipment> shipments = new LinkedList<>();
-    private final Map<Long, List<TrackerEvent>> trackerEvents = new HashMap<>();
+    private final Map<Long, List<TrackerEventDto>> trackerEvents = new HashMap<>();
     private Company company;
     private final List<SystemMessage> messages = new LinkedList<>();
 
@@ -56,7 +56,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final Shipment notSibling = createShipment(3l);
 
         //crete master event list
-        final List<TrackerEvent> masterEvents = new LinkedList<TrackerEvent>();
+        final List<TrackerEventDto> masterEvents = new LinkedList<>();
         final double x0 = 10.;
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
@@ -74,8 +74,8 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
                     t0 + dt * i + 60 * 1000l);
         }
 
-        assertTrue(isSiblings(getTrackeEvents(sibling), masterEvents));
-        assertFalse(isSiblings(getTrackeEvents(notSibling), masterEvents));
+        assertTrue(isSiblings(getTrackeEvents(sibling.getId()), masterEvents));
+        assertFalse(isSiblings(getTrackeEvents(notSibling.getId()), masterEvents));
     }
     @Test
     public void testExcludeWithSmallPath() {
@@ -84,7 +84,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final Shipment notSibling = createShipment(3l);
 
         //crete master event list
-        final List<TrackerEvent> masterEvents = new LinkedList<TrackerEvent>();
+        final List<TrackerEventDto> masterEvents = new LinkedList<>();
         final double x0 = 10.;
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
@@ -102,8 +102,8 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
                     t0 + dt * i + 60 * 1000l);
         }
 
-        assertFalse(isSiblings(getTrackeEvents(sibling), masterEvents));
-        assertFalse(isSiblings(getTrackeEvents(notSibling), masterEvents));
+        assertFalse(isSiblings(getTrackeEvents(sibling.getId()), masterEvents));
+        assertFalse(isSiblings(getTrackeEvents(notSibling.getId()), masterEvents));
     }
     @Test
     public void testNotIntersectingByTime() {
@@ -111,8 +111,8 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         final Shipment s2 = createShipment(2l);
 
         //crete master event list
-        final List<TrackerEvent> e2 = new LinkedList<TrackerEvent>();
-        final List<TrackerEvent> e1 = new LinkedList<TrackerEvent>();
+        final List<TrackerEventDto> e2 = new LinkedList<>();
+        final List<TrackerEventDto> e1 = new LinkedList<>();
         final double x0 = 10.;
         final double y0 = 10.;
         final long t0 = System.currentTimeMillis() - 1000000l;
@@ -141,13 +141,13 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         long t = 100 * min10;
         double lon = 10.;
 
-        final List<TrackerEvent> l1 = new LinkedList<TrackerEvent>();
+        final List<TrackerEventDto> l1 = new LinkedList<>();
         l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
 
-        final List<TrackerEvent> l2 = new LinkedList<TrackerEvent>();
+        final List<TrackerEventDto> l2 = new LinkedList<>();
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l2.add(createTrackerEvent(lat, lon += dlon, t+= min10));
@@ -167,8 +167,8 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
         long t = 100 * min10;
         double lon = 10.;
 
-        final List<TrackerEvent> l1 = new LinkedList<TrackerEvent>();
-        final List<TrackerEvent> l2 = new LinkedList<TrackerEvent>();
+        final List<TrackerEventDto> l1 = new LinkedList<>();
+        final List<TrackerEventDto> l2 = new LinkedList<>();
 
         l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
         l1.add(createTrackerEvent(lat, lon += dlon, t+= min10));
@@ -305,11 +305,11 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
      * @param time event time.
      * @return tracker event.
      */
-    private TrackerEvent addEvent(final List<TrackerEvent> events, final Shipment shipment,
+    private TrackerEventDto addEvent(final List<TrackerEventDto> events, final Shipment shipment,
             final double latitude, final double longitude, final long time) {
-        final TrackerEvent e = createTrackerEvent(latitude, longitude, time);
-        e.setShipment(shipment);
-        e.setDevice(shipment.getDevice());
+        final TrackerEventDto e = createTrackerEvent(latitude, longitude, time);
+        e.setShipmentId(shipment.getId());
+        e.setDeviceImei(shipment.getDevice().getImei());
         events.add(e);
         return e;
     }
@@ -319,8 +319,8 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
      * @param time
      * @return
      */
-    private TrackerEvent createTrackerEvent(final double latitude, final double longitude, final long time) {
-        final TrackerEvent e = new TrackerEvent();
+    private TrackerEventDto createTrackerEvent(final double latitude, final double longitude, final long time) {
+        final TrackerEventDto e = new TrackerEventDto();
         e.setLatitude(latitude);
         e.setLongitude(longitude);
         e.setTime(new Date(time));
@@ -336,13 +336,13 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
      * @param time event time.
      * @return tracker event.
      */
-    private TrackerEvent addEvent(final Map<Long, List<TrackerEvent>> events,
+    private TrackerEventDto addEvent(final Map<Long, List<TrackerEventDto>> events,
             final Shipment shipment, final double latitude, final double longitude, final long time) {
         final Long id = shipment.getId();
 
-        List<TrackerEvent> list = events.get(id);
+        List<TrackerEventDto> list = events.get(id);
         if (list == null) {
-            list = new LinkedList<TrackerEvent>();
+            list = new LinkedList<>();
             events.put(id, list);
         }
 
@@ -376,11 +376,11 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
      * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#findActiveShipments(com.visfresh.entities.Company)
      */
     @Override
-    protected List<Shipment> findActiveShipments(final Long company) {
-        final LinkedList<Shipment> list = new LinkedList<>();
+    protected List<ShipmentSiblingInfo> findActiveShipments(final Long company) {
+        final LinkedList<ShipmentSiblingInfo> list = new LinkedList<>();
         for (final Shipment s : shipments) {
             if (!s.hasFinalStatus()) {
-                list.add(s);
+                list.add(new ShipmentSiblingInfo(s));
             }
         }
         return list;
@@ -389,23 +389,40 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
      * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#updateSiblingInfo(com.visfresh.entities.Shipment, java.util.Set)
      */
     @Override
-    protected void updateSiblingInfo(final Shipment master, final Set<Long> set) {
-        master.setSiblingCount(set.size());
-        master.getSiblings().clear();
-        master.getSiblings().addAll(set);
-        master.setSiblingCount(set.size());
+    protected void updateSiblingInfo(final ShipmentSiblingInfo info, final Set<Long> set) {
+        for (final Shipment s : shipments) {
+            if (s.getId().equals(info.getId())) {
+                s.setSiblingCount(set.size());
+                s.getSiblings().clear();
+                s.getSiblings().addAll(set);
+                s.setSiblingCount(set.size());
+            }
+        }
     }
     /* (non-Javadoc)
      * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#getEventsFromDb(com.visfresh.entities.Shipment)
      */
     @Override
-    protected List<TrackerEvent> getEventsFromDb(final Shipment shipment) {
-        final List<TrackerEvent> events = trackerEvents.get(shipment.getId());
+    protected List<TrackerEventDto> getLocationsFromDb(final Long shipment) {
+        final List<TrackerEventDto> events = trackerEvents.get(shipment);
         if (events == null) {
             return new LinkedList<>();
         }
-        return new LinkedList<TrackerEvent>(events);
+        return new LinkedList<TrackerEventDto>(events);
     }
+    /* (non-Javadoc)
+     * @see com.visfresh.impl.services.SiblingDetectDispatcher#findShipment(java.lang.Long)
+     */
+    @Override
+    protected ShipmentSiblingInfo findShipment(final Long id) {
+        for (final Shipment s : shipments) {
+            if (s.getId().equals(id)) {
+                return new ShipmentSiblingInfo(s);
+            }
+        }
+        return null;
+    }
+
     /**
      * @param id shipment ID.
      * @return

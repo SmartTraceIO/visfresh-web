@@ -5,12 +5,14 @@ package com.visfresh.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import com.visfresh.dao.impl.SelectAllSupport;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.impl.services.ShipmentSiblingInfo;
 import com.visfresh.lists.ListResult;
 import com.visfresh.lists.ListShipmentItem;
 
@@ -29,11 +31,6 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment
      * @return active shipments for given devcie.
      */
     List<Shipment> findActiveShipments(String imei);
-    /**
-     * @param company company.
-     * @return list of active shipments for given company.
-     */
-    List<Shipment> findActiveShipments(Company company);
     /**
      * @param s the shipment.
      * @return next shipment for given.
@@ -74,9 +71,10 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment
      */
     void updateLastEventDate(Shipment shipment, Date date);
     /**
-     * @param s shipment.
+     * @param shipmentId shipment ID.
+     * @param siblings siblings
      */
-    void updateSiblingInfo(Shipment s);
+    void updateSiblingInfo(Long shipmentId, Set<Long> siblings);
     /**
      * @param shipmentId
      * @return
@@ -112,5 +110,10 @@ public interface ShipmentDao extends EntityWithCompanyDaoBase<Shipment, Shipment
      * @param company company ID.
      * @return list of active shipments for given company.
      */
-    List<Shipment> findActiveShipments(Long company);
+    List<ShipmentSiblingInfo> findActiveShipments(Long company);
+    /**
+     * @param shipmentId shipment ID.
+     * @return shipment sibling info.
+     */
+    ShipmentSiblingInfo getShipmentSiblingInfo(Long shipmentId);
 }

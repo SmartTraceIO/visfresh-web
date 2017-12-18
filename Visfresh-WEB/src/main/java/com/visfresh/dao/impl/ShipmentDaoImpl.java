@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,7 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.impl.services.ShipmentSiblingInfo;
 import com.visfresh.io.json.AbstractJsonSerializer;
 import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.InterimStopBean;
@@ -119,17 +121,10 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
         return new Shipment();
     }
     /* (non-Javadoc)
-     * @see com.visfresh.dao.ShipmentDao#findActiveShipments(com.visfresh.entities.Company)
-     */
-    @Override
-    public List<Shipment> findActiveShipments(final Company company) {
-        return findActiveShipments(company.getId());
-    }
-    /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#findActiveShipments(java.lang.Long)
      */
     @Override
-    public List<Shipment> findActiveShipments(final Long company) {
+    public List<ShipmentSiblingInfo> findActiveShipments(final Long company) {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("company", company);
         params.put("st1", ShipmentStatus.Ended.name());
@@ -144,16 +139,34 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
                 + " order by s." + ID_FIELD + " desc";
         final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
 
-        final Map<String, Object> cache = new HashMap<String, Object>();
-        final List<Shipment> result = new LinkedList<Shipment>();
+        final List<ShipmentSiblingInfo> result = new LinkedList<>();
 
         for (final Map<String, Object> row : rows) {
             final Shipment s = createEntity(row);
-            result.add(s);
-            resolveReferences(s, row, cache);
+            result.add(new ShipmentSiblingInfo(s));
         }
 
         return result;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.ShipmentDao#getShipmentSiblingInfo(java.lang.Long)
+     */
+    @Override
+    public ShipmentSiblingInfo getShipmentSiblingInfo(final Long shipmentId) {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("id", shipmentId);
+
+        final String sql = "select * from " + TABLE + " s"
+                + " where"
+                + " s.id = :id";
+
+        final List<Map<String, Object>> rows = jdbc.queryForList(sql, params);
+        for (final Map<String, Object> row : rows) {
+            final Shipment s = createEntity(row);
+            return new ShipmentSiblingInfo(s);
+        }
+
+        return null;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#findNextShipmentFor(com.visfresh.entities.Shipment)
@@ -557,13 +570,11 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
      * @see com.visfresh.dao.ShipmentDao#updateSiblingInfo(com.visfresh.entities.Shipment)
      */
     @Override
-    public void updateSiblingInfo(final Shipment s) {
-        s.setSiblingCount(s.getSiblings().size());
-
+    public void updateSiblingInfo(final Long shipmentId, final Set<Long> siblings) {
         final Map<String, Object> params = new HashMap<String, Object>();
-        params.put("s", s.getId());
-        params.put("siblings", s.getSiblingCount() == 0 ? null : StringUtils.combine(s.getSiblings(), ","));
-        params.put("siblingCount", s.getSiblingCount());
+        params.put("s", shipmentId);
+        params.put("siblings", siblings.size() == 0 ? null : StringUtils.combine(siblings, ","));
+        params.put("siblingCount", siblings.size());
 
         jdbc.update("update " + TABLE
                 + " set " + SIBLINGCOUNT_FIELD + " = :siblingCount"
@@ -571,7 +582,7 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
                 + " where " + ID_FIELD + "=:s",
                 params);
 
-        shipmentBeanDao.clearShipmentBean(s.getId());
+        shipmentBeanDao.clearShipmentBean(shipmentId);
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.ShipmentDao#updateLastEventDate(com.visfresh.entities.Shipment, java.util.Date)
