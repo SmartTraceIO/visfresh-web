@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import au.smarttrace.security.AccessToken;
 import au.smarttrace.security.AuthInfo;
 import au.smarttrace.security.ClientSessionsDao;
-import au.smarttrace.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -67,8 +66,8 @@ public class ClientSessionsDaoImpl extends AbstractDao implements ClientSessions
         paramMap.put("createdon", new Date());
 
         final List<String> fields = new LinkedList<>(paramMap.keySet());
-        final String sql = "insert into restsessions(" + StringUtils.combine(fields, ",") + ") values (:"
-                + StringUtils.combine(fields, ",:") + ")";
+        final String sql = "insert into restsessions(" + String.join(",", fields) + ") values (:"
+                + String.join(",:", fields) + ")";
 
         jdbc.update(sql, paramMap);
     }

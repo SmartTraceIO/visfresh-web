@@ -9,9 +9,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.TimeZone;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -19,9 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import au.smarttrace.Language;
+import au.smarttrace.MeasurementUnits;
 import au.smarttrace.Roles;
+import au.smarttrace.TemperatureUnits;
 import au.smarttrace.User;
 import au.smarttrace.dao.runner.DaoTestRunner;
+import au.smarttrace.dao.runner.DbSupport;
 import au.smarttrace.junit.AssertUtils;
 import au.smarttrace.junit.categories.DaoTest;
 import au.smarttrace.security.AccessToken;
@@ -42,6 +47,10 @@ public class ClientSessionsDaoTest {
     private ClientSessionsDao dao;
     @Autowired
     private ApplicationContext context;
+    @Autowired
+    private DbSupport dbSupport;
+
+    private Long company;
 
     /**
      * Default constructor.
@@ -58,7 +67,7 @@ public class ClientSessionsDaoTest {
         final AccessToken t = createToken("2304587230957987", new Date());
         dao.createSession(user.getId(), t);
 
-        final String selectSessions = "select user from sessions";
+        final String selectSessions = "select user from restsessions";
         assertEquals(1, jdbc.queryForList(selectSessions, new HashMap<>()).size());
 
         dao.deleteSession(t.getToken());
@@ -67,22 +76,47 @@ public class ClientSessionsDaoTest {
     @Test
     public void getAuthInfo() {
         //create user
-        final String email = "user@junit.org";
-        final String firstName = "Java Developer";
-        final String passwordHash = "230870987349";
+        final boolean active = true;
+        final String deviceGroup = "Device group";
+        final String email = "dev@junit.org";
+        final boolean external = true;
+        final String externalCompany = "External Company";
+        final String firstName = "FirstName";
+        final Language language = Language.German;
+        final String lastName = "LastName";
+        final MeasurementUnits measurementUnits = MeasurementUnits.English;
+        final String phone = "1111111117";
+        final String position = "developer";
+        final TemperatureUnits temperatureUnits = TemperatureUnits.Fahrenheit;
+        final TimeZone timeZone = TimeZone.getTimeZone("PCT");
+        final String title = "Title";
+        final String admin = Roles.Admin;
+        final String smartTraceAdmin = Roles.SmartTraceAdmin;
 
         final User user = new User();
+        user.setActive(active);
+        user.setCompany(company);
+        user.setDeviceGroup(deviceGroup);
         user.setEmail(email);
+        user.setExternal(external);
+        user.setExternalCompany(externalCompany);
         user.setFirstName(firstName);
-        user.getRoles().add(Roles.Admin);
-        user.getRoles().add(Roles.SmartTraceAdmin);
+        user.setLanguage(language);
+        user.setLastName(lastName);
+        user.setMeasurementUnits(measurementUnits);
+        user.setPhone(phone);
+        user.setPosition(position);
+        user.setTemperatureUnits(temperatureUnits);
+        user.setTimeZone(timeZone);
+        user.setTitle(title);
+        user.getRoles().add(admin);
+        user.getRoles().add(smartTraceAdmin);
 
-        context.getBean(UsersDao.class).createUser(user, passwordHash);
+        context.getBean(UsersDao.class).createUser(user, "02385470294387");
 
         //create token
         final String tokenStr = "2398579070987098";
-        final Date createdTime = new Date(System.currentTimeMillis() - 3 * 60 * 60 * 1000l);
-        final Date expirationTime = new Date(createdTime.getTime() + 2 * 60 * 60 * 1000l);
+        final Date expirationTime = new Date(System.currentTimeMillis() + 2 * 60 * 60 * 1000l);
 
         final AccessToken token = new AccessToken(tokenStr);
         token.setExpirationTime(expirationTime);
@@ -94,11 +128,23 @@ public class ClientSessionsDaoTest {
         assertNotNull(info);
 
         //check user
-        assertEquals(email, info.getUser().getEmail());
-        assertEquals(firstName, info.getUser().getFirstName());
-        assertEquals(2, info.getUser().getRoles().size());
-        assertTrue(info.getUser().getRoles().contains(Roles.Admin));
-        assertTrue(info.getUser().getRoles().contains(Roles.SmartTraceAdmin));
+        assertEquals(active, user.isActive());
+        assertEquals(company, user.getCompany());
+        assertEquals(deviceGroup, user.getDeviceGroup());
+        assertEquals(email, user.getEmail());
+        assertEquals(external, user.isExternal());
+        assertEquals(externalCompany, user.getExternalCompany());
+        assertEquals(firstName, user.getFirstName());
+        assertEquals(language, user.getLanguage());
+        assertEquals(lastName, user.getLastName());
+        assertEquals(measurementUnits, user.getMeasurementUnits());
+        assertEquals(phone, user.getPhone());
+        assertEquals(position, user.getPosition());
+        assertEquals(temperatureUnits, user.getTemperatureUnits());
+        assertEquals(timeZone, user.getTimeZone());
+        assertEquals(title, user.getTitle());
+        assertTrue(user.getRoles().contains(admin));
+        assertTrue(user.getRoles().contains(smartTraceAdmin));
 
         //check token
         assertEquals(tokenStr, info.getToken().getToken());
@@ -112,7 +158,7 @@ public class ClientSessionsDaoTest {
         final AccessToken t = createToken("2304587230957987", new Date());
         dao.createSession(user.getId(), t);
 
-        final String selectSessions = "select user from sessions";
+        final String selectSessions = "select user from restsessions";
         assertEquals(1, jdbc.queryForList(selectSessions, new HashMap<>()).size());
     }
     /**
@@ -133,14 +179,18 @@ public class ClientSessionsDaoTest {
         final User user = new User();
         user.setEmail(email);
         user.setFirstName(email);
+        user.setCompany(company);
 
         context.getBean(UsersDao.class).createUser(user, "1234567890");
         return user;
     }
+    @Before
+    public void setUp() {
+        this.company = dbSupport.createSimpleCompany("JUnit");
+    }
     @After
     public void tearDown() {
-        final Map<String, Object> params = new HashMap<>();
-        //delete all users, should automatically delete sessions.
-        jdbc.update("delete from users", params);
+        dbSupport.deleteUsers();
+        dbSupport.deleteCompanies();
     }
 }

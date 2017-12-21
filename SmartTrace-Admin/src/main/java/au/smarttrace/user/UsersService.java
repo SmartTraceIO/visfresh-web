@@ -4,6 +4,7 @@
 package au.smarttrace.user;
 
 import au.smarttrace.User;
+import au.smarttrace.ctrl.res.ListResponse;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -38,4 +39,9 @@ public interface UsersService {
      * @param password password.
      */
     void changePassword(Long userId, String password);
+    /**
+     * @param req request.
+     * @return response with list of selected users.
+     */
+    ListResponse<User> getUsers(GetUsersRequest req);
 }

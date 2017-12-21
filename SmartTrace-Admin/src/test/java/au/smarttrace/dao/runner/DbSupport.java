@@ -1,24 +1,33 @@
 /**
  *
  */
-package au.smarttrace.junit;
+package au.smarttrace.dao.runner;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public final class TestUtils {
+@Component
+public class DbSupport {
+    /**
+     * JDBC template
+     */
+    @Autowired
+    private NamedParameterJdbcTemplate jdbc;
+
     /**
      * Default constructor.
      */
-    private TestUtils() {
+    public DbSupport() {
         super();
     }
 
@@ -27,7 +36,7 @@ public final class TestUtils {
      * @param name company name.
      * @return company ID.
      */
-    public static Long createSimpleCompany(final NamedParameterJdbcTemplate jdbc, final String name) {
+    public Long createSimpleCompany(final String name) {
         final Map<String, Object> params = new HashMap<>();
         params.put("name", name);
 
@@ -38,10 +47,17 @@ public final class TestUtils {
         return keyHolder.getKey().longValue();
     }
     /**
-     * Deletes all companies.
      * @param jdbc JDBC template.
      */
-    public static void deleteCompanies(final NamedParameterJdbcTemplate jdbc) {
+    public void deleteCompanies() {
         jdbc.update("delete from companies", new HashMap<>());
+    }
+
+    /**
+     *
+     */
+    public void deleteUsers() {
+        //delete all users, should automatically delete sessions.
+        jdbc.update("delete from users", new HashMap<>());
     }
 }

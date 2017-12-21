@@ -160,5 +160,6 @@ public class AuthControllerTest {
     public void tearDown() {
         final NamedParameterJdbcTemplate jdbc = context.getBean(NamedParameterJdbcTemplate.class);
         jdbc.update("delete from users", new HashMap<>());
+        jdbc.update("delete from companies", new HashMap<>());
     }
 }

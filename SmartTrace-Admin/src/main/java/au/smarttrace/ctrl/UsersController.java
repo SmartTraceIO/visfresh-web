@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import au.smarttrace.Roles;
+import au.smarttrace.User;
 import au.smarttrace.ctrl.req.SaveUserRequest;
+import au.smarttrace.ctrl.res.ListResponse;
+import au.smarttrace.user.GetUsersRequest;
 import au.smarttrace.user.UsersService;
 
 /**
@@ -53,6 +56,11 @@ public class UsersController {
     public Long updateUser(final @RequestBody SaveUserRequest req) {
         service.updateUser(req, req.getPassword());
         return req.getId();
+    }
+    @RequestMapping(value = "/getUsers", method = RequestMethod.POST)
+    @Secured({"ROLE_" + Roles.SmartTraceAdmin})
+    public ListResponse<User> updateUser(final @RequestBody GetUsersRequest req) {
+        return service.getUsers(req);
     }
     /**
      * Deletes user by given email.

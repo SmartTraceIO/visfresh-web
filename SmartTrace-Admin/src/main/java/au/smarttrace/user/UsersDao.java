@@ -4,6 +4,7 @@
 package au.smarttrace.user;
 
 import au.smarttrace.User;
+import au.smarttrace.ctrl.res.ListResponse;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -41,4 +42,9 @@ public interface UsersDao {
      * @return user by given email.
      */
     User findUserByEmail(String email);
+    /**
+     * @param req request.
+     * @return list of selected users.
+     */
+    ListResponse<User> getUsers(GetUsersRequest req);
 }

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import au.smarttrace.User;
+import au.smarttrace.ctrl.res.ListResponse;
+import au.smarttrace.user.GetUsersRequest;
 import au.smarttrace.user.UsersDao;
 import au.smarttrace.user.UsersService;
 import au.smarttrace.utils.HashGenerator;
@@ -65,5 +67,12 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public void changePassword(final Long userId, final String password) {
         dao.updatePassword(userId, HashGenerator.generateHash(password));
+    }
+    /* (non-Javadoc)
+     * @see au.smarttrace.user.UsersService#getUsers(au.smarttrace.ctrl.req.GetUsersRequest)
+     */
+    @Override
+    public ListResponse<User> getUsers(final GetUsersRequest req) {
+        return dao.getUsers(req);
     }
 }
