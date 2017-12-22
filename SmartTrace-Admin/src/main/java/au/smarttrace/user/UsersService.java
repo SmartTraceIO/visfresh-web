@@ -3,6 +3,8 @@
  */
 package au.smarttrace.user;
 
+import java.util.List;
+
 import au.smarttrace.User;
 import au.smarttrace.ctrl.res.ListResponse;
 
@@ -44,4 +46,8 @@ public interface UsersService {
      * @return response with list of selected users.
      */
     ListResponse<User> getUsers(GetUsersRequest req);
+    /**
+     * @return list of available roles.
+     */
+    List<String> getRoles();
 }

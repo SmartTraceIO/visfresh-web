@@ -15,8 +15,7 @@ public class ApplicationException extends Exception {
      * @param code error code.
      */
     public ApplicationException(final int code) {
-        super();
-        this.statusCode = code;
+        this(null, null, code);
     }
 
     /**
@@ -34,8 +33,7 @@ public class ApplicationException extends Exception {
      * @param message
      */
     public ApplicationException(final String message, final int code) {
-        super(message);
-        this.statusCode = code;
+        this(message, null, code);
     }
 
     /**
@@ -43,8 +41,7 @@ public class ApplicationException extends Exception {
      * @param cause
      */
     public ApplicationException(final Throwable cause, final int code) {
-        super(cause);
-        this.statusCode = code;
+        this(null, cause, code);
     }
     /**
      * @return the statusCode

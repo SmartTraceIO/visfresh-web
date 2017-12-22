@@ -3,9 +3,17 @@
  */
 package au.smarttrace.svc;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import au.smarttrace.Roles;
 import au.smarttrace.User;
 import au.smarttrace.ctrl.res.ListResponse;
 import au.smarttrace.user.GetUsersRequest;
@@ -19,6 +27,7 @@ import au.smarttrace.utils.HashGenerator;
  */
 @Component
 public class UsersServiceImpl implements UsersService {
+    private static final Logger log = LoggerFactory.getLogger(UsersServiceImpl.class);
     @Autowired
     private UsersDao dao;
 
@@ -74,5 +83,24 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public ListResponse<User> getUsers(final GetUsersRequest req) {
         return dao.getUsers(req);
+    }
+    /* (non-Javadoc)
+     * @see au.smarttrace.user.UsersService#getRoles()
+     */
+    @Override
+    public List<String> getRoles() {
+        final List<String> roles = new LinkedList<>();
+
+        final Field[] fields = Roles.class.getFields();
+        for (final Field field : fields) {
+            if ((field.getModifiers() & Modifier.STATIC) != 0)
+            try {
+                roles.add((String) field.get(null));
+            } catch (final Exception e) {
+                log.error("Failed to get value of role " + field.getName());
+            }
+        }
+
+        return roles;
     }
 }

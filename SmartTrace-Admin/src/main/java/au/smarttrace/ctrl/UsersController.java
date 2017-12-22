@@ -3,6 +3,8 @@
  */
 package au.smarttrace.ctrl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,7 +61,7 @@ public class UsersController {
     }
     @RequestMapping(value = "/getUsers", method = RequestMethod.POST)
     @Secured({"ROLE_" + Roles.SmartTraceAdmin})
-    public ListResponse<User> updateUser(final @RequestBody GetUsersRequest req) {
+    public ListResponse<User> getUsers(final @RequestBody GetUsersRequest req) {
         return service.getUsers(req);
     }
     /**
@@ -71,5 +73,9 @@ public class UsersController {
     public String deleteUser(final @RequestParam Long user) {
         service.deleteUser(user);
         return "OK";
+    }
+    @RequestMapping(value = "/getRoles", method = RequestMethod.GET)
+    public List<String> getColors() {
+        return service.getRoles();
     }
 }
