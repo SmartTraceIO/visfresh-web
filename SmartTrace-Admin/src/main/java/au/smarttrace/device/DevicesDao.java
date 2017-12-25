@@ -3,7 +3,6 @@
  */
 package au.smarttrace.device;
 
-import au.smarttrace.Company;
 import au.smarttrace.Device;
 import au.smarttrace.ctrl.res.ListResponse;
 
@@ -37,10 +36,10 @@ public interface DevicesDao {
     void setTripCount(Device d, int tripCount);
     /**
      * @param device device to move.
-     * @param c target company.
+     * @param company target company.
      * @param backup backup device.
      */
-    void moveToNewCompany(Device device, Company c, Device backup);
+    void moveToNewCompany(Device device, Long company, Device backup);
     /**
      * @param d device to create.
      */

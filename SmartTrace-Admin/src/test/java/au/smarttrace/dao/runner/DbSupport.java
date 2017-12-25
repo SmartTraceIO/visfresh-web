@@ -52,12 +52,29 @@ public class DbSupport {
     public void deleteCompanies() {
         jdbc.update("delete from companies", new HashMap<>());
     }
-
+    /**
+     * Deletes shipments.
+     */
+    public void deleteShipments() {
+        jdbc.update("delete from shipments", new HashMap<>());
+    }
     /**
      *
      */
     public void deleteUsers() {
         //delete all users, should automatically delete sessions.
         jdbc.update("delete from users", new HashMap<>());
+    }
+    /**
+     * Deletes devices.
+     */
+    public void deleteDevices() {
+        jdbc.update("delete from devices", new HashMap<>());
+    }
+    /**
+     * @return the jdbc
+     */
+    public NamedParameterJdbcTemplate getJdbc() {
+        return jdbc;
     }
 }

@@ -77,7 +77,7 @@ public class DevicesServiceImpl implements DevicesService {
         final Device backup = createVirtualDevice(oldDevice);
 
         //switch device to new company
-        dao.moveToNewCompany(oldDevice, c, backup);
+        dao.moveToNewCompany(oldDevice, c.getId(), backup);
         return backup;
     }
     /* (non-Javadoc)

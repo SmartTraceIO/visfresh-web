@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import au.smarttrace.Color;
-import au.smarttrace.Company;
 import au.smarttrace.Device;
 import au.smarttrace.ctrl.req.Order;
 import au.smarttrace.ctrl.res.ListResponse;
@@ -80,8 +79,26 @@ public class DevicesDaoImpl extends AbstractDao implements DevicesDao {
     @Override
     public void deleteDevice(final String imei) {
         final Map<String, Object> params = new HashMap<>();
-        params.put("imei", imei);
-        jdbc.update("delete from devices where imei = :imei", params);
+        params.put("device", imei);
+
+        //simulators
+        jdbc.update("delete from simulators where source = :device", params);
+        //device commands
+        jdbc.update("delete from devicecommands where device = :device", params);
+        //groups to new device
+        jdbc.update("delete from devicegrouprelations where device = :device", params);
+        //move arrivals to backup
+        jdbc.update("delete from arrivals where device = :device", params);
+        //alerts
+        jdbc.update("delete from alerts where device = :device", params);
+        //readings
+        jdbc.update("delete from trackerevents where device = :device", params);
+        //shipments
+        jdbc.update("delete from shipments where device = :device", params);
+        //device states
+        jdbc.update("delete from devicestates where device = :device", params);
+        //delete device
+        jdbc.update("delete from devices where imei = :device", params);
     }
 
     /* (non-Javadoc)
@@ -122,7 +139,7 @@ public class DevicesDaoImpl extends AbstractDao implements DevicesDao {
         for (final String key : params.keySet()) {
             sets.add(key + " = :" + key);
         }
-        final String sql = "update users set " + String.join(", ", sets) + " where id = :id";
+        final String sql = "update devices set " + String.join(", ", sets) + " where imei = :imei";
 
         params.put("imei", device.getImei());
         jdbc.update(sql, params);
@@ -160,54 +177,34 @@ public class DevicesDaoImpl extends AbstractDao implements DevicesDao {
     /* (non-Javadoc)
      * @see au.smarttrace.device.DevicesDao#moveToNewCompany(au.smarttrace.Device, au.smarttrace.Company, au.smarttrace.Device)
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public void moveToNewCompany(final Device device, final Company c, final Device backup) {
+    public void moveToNewCompany(final Device device, final Long company, final Device backup) {
         final Map<String, Object> params = new HashMap<>();
         params.put("device", device.getImei());
         params.put("backup", backup.getImei());
-
-        final StringBuilder sql = new StringBuilder();
-        final List<Map<String, Object>> batchValues = new LinkedList<>();
+        params.put("company", company);
 
         //simulators
-        sql.append("delete from simulators where source = :device;\n");
-        batchValues.add(params);
-
+        jdbc.update("delete from simulators where source = :device", params);
         //device commands
-        sql.append("delete from devicecommands where device = :device;\n");
-        batchValues.add(params);
-
+        jdbc.update("delete from devicecommands where device = :device", params);
+        //move device to new company
+        jdbc.update("update devices set company = :company where imei = :device", params);
         //groups to new device
-        sql.append("update devicegrouprelations set device = :backup where device = :device;\n");
-        batchValues.add(params);
-
+        jdbc.update("update devicegrouprelations set device = :backup where device = :device", params);
         //move arrivals to backup
-        sql.append("update arrivals set device = :backup where device = :device;\n");
-        batchValues.add(params);
-
+        jdbc.update("update arrivals set device = :backup where device = :device", params);
         //alerts
-        sql.append("update alerts set device = :backup where device = :device;\n");
-        batchValues.add(params);
-
+        jdbc.update("update alerts set device = :backup where device = :device", params);
         //readings
-        sql.append("update trackerevents set device = :backup where device = :device;\n");
-        batchValues.add(params);
-
+        jdbc.update("update trackerevents set device = :backup where device = :device", params);
         //shipments
-        sql.append("update shipments set device = :backup where device = :device;\n");
-        batchValues.add(params);
-
+        jdbc.update("update shipments set device = :backup where device = :device", params);
         //device states
-        sql.append("delete from devicestates where device = :device;\n");
-        batchValues.add(params);
-
+        jdbc.update("delete from devicestates where device = :device", params);
         //close all active shipments
-        sql.append("update shipments set status = 'Ended' where status <> 'Ended'"
-                + " and  status <> Arrived and not istemplate and device = :backup;\n");
-        batchValues.add(params);
-
-        jdbc.batchUpdate(sql.toString(), (Map<String, ?>[]) batchValues.toArray());
+        jdbc.update("update shipments set status = 'Ended' where status <> 'Ended'"
+                + " and  status <> 'Arrived' and not istemplate and device = :backup", params);
     }
     /* (non-Javadoc)
      * @see au.smarttrace.device.DevicesDao#getDevices(au.smarttrace.device.GetDevicesRequest)
@@ -276,7 +273,7 @@ public class DevicesDaoImpl extends AbstractDao implements DevicesDao {
 
         //if order list empty, add default ordering
         if(orders.size() == 0) {
-            orders.add("id");
+            orders.add("imei");
         }
         sql.append(" order by ");
         sql.append(String.join(",", orders));
@@ -292,7 +289,7 @@ public class DevicesDaoImpl extends AbstractDao implements DevicesDao {
         }
 
         //add total count
-        sql = new StringBuilder("select count(*) as totalCount from users");
+        sql = new StringBuilder("select count(*) as totalCount from devices");
         if (where.size() > 0) {
             sql.append(" where ");
             sql.append(String.join(" and ", where));
