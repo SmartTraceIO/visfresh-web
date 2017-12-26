@@ -92,7 +92,7 @@ public class DevicesServiceImpl implements DevicesService {
      */
     @Override
     public void createDevice(final Device d) {
-        dao.updateDevice(d);
+        dao.createDevice(d);
     }
     /* (non-Javadoc)
      * @see au.smarttrace.device.DevicesService#getDevices(au.smarttrace.device.GetDevicesRequest)

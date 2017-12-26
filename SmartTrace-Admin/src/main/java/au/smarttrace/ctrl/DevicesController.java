@@ -50,7 +50,7 @@ public class DevicesController {
     public Device getDevice(@RequestParam final String imei) {
         return service.getDevice(imei);
     }
-    @RequestMapping(value = "/saveDevice", method = RequestMethod.POST)
+    @RequestMapping(value = "/updateDevice", method = RequestMethod.POST)
     @Secured({"ROLE_" + Roles.SmartTraceAdmin})
     public String saveDevice(@RequestBody final Device d) {
         service.updateDevice(d);
@@ -64,8 +64,8 @@ public class DevicesController {
     }
     @RequestMapping(value = "/deleteDevice", method = RequestMethod.GET)
     @Secured({"ROLE_" + Roles.SmartTraceAdmin})
-    public String deleteDevice(@RequestParam final String imei) {
-        service.deleteDevice(imei);
+    public String deleteDevice(@RequestParam final String device) {
+        service.deleteDevice(device);
         return "OK";
     }
     /**
