@@ -183,7 +183,7 @@ public class NotificationDaoImpl extends DaoImplBase<Notification, Notification,
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends Notification> S saveImpl(final S no) {
+    public <S extends Notification> S save(final S no) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

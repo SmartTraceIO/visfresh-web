@@ -68,7 +68,7 @@ public class AutoStartShipmentDaoImpl
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <E extends AutoStartShipment> E saveImpl(final E aut) {
+    public <E extends AutoStartShipment> E save(final E aut) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         paramMap.put(ID_FIELD, aut.getId());

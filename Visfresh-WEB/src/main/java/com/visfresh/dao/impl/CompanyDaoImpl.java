@@ -67,7 +67,7 @@ public class CompanyDaoImpl extends DaoImplBase<Company, Company, Long> implemen
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends Company> S saveImpl(final S company) {
+    public <S extends Company> S save(final S company) {
         final Map<String, Object> paramMap = createParameterMap(company);
         final LinkedList<String> fields = new LinkedList<String>(paramMap.keySet());
 

@@ -86,7 +86,7 @@ public class TrackerEventDaoImpl extends DaoImplBase<TrackerEvent, TrackerEvent,
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends TrackerEvent> S saveImpl(final S event) {
+    public <S extends TrackerEvent> S save(final S event) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

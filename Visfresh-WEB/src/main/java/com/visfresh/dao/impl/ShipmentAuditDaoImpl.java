@@ -61,7 +61,7 @@ public class ShipmentAuditDaoImpl extends DaoImplBase<ShipmentAuditItem, Shipmen
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends ShipmentAuditItem> S saveImpl(final S item) {
+    public <S extends ShipmentAuditItem> S save(final S item) {
         final Map<String, Object> paramMap = createParameterMap(item);
         final LinkedList<String> fields = new LinkedList<String>(paramMap.keySet());
 

@@ -65,7 +65,7 @@ public class LocationProfileDaoImpl extends EntityWithCompanyDaoImplBase<Locatio
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends LocationProfile> S saveImpl(final S lp) {
+    public <S extends LocationProfile> S save(final S lp) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

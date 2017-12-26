@@ -70,7 +70,7 @@ public class NotificationScheduleDaoImpl extends EntityWithCompanyDaoImplBase<No
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends NotificationSchedule> S saveImpl(final S sched) {
+    public <S extends NotificationSchedule> S save(final S sched) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

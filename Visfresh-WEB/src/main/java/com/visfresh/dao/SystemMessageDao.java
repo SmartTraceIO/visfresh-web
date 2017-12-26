@@ -24,13 +24,11 @@ public interface SystemMessageDao extends DaoBase<SystemMessage, SystemMessage, 
      */
     List<SystemMessage> selectMessagesForProcessing(
             Set<SystemMessageType> messageTypes, String processor, int limit, Date beforeDate);
-
     /**
      * @param b ascent sorting.
      * @return list of system messages.
      */
     List<SystemMessage> findTrackerEvents(boolean b);
-
     /**
      * @param messageType message type
      * @param group device IMEI as group.

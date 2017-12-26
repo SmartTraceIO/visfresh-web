@@ -72,7 +72,7 @@ public class AlertProfileDaoImpl extends EntityWithCompanyDaoImplBase<AlertProfi
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends AlertProfile> S saveImpl(final S ap) {
+    public <S extends AlertProfile> S save(final S ap) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         final List<String> fields = getFields(false);

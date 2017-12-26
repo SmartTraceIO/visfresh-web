@@ -57,7 +57,7 @@ public class ArrivalDaoImpl extends DaoImplBase<Arrival, Arrival, Long> implemen
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends Arrival> S saveImpl(final S arrival) {
+    public <S extends Arrival> S save(final S arrival) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

@@ -58,12 +58,7 @@ public abstract class DaoImplBase<V extends T, T extends EntityWithId<ID>, ID ex
         }
         return result;
     }
-    @Override
-    public final <S extends T> S save(final S entity) {
-        final S s = saveImpl(entity);
-        return s;
-    }
-    public abstract <S extends T> S saveImpl(final S entity);
+    public abstract <S extends T> S save(final S entity);
 
     /* (non-Javadoc)
      * @see com.visfresh.dao.DaoBase#findAll(java.util.Collection)

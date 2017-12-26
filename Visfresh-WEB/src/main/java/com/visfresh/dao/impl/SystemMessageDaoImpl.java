@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.aspectj.NeedRerunWhenDbDeadlock;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.SystemMessageDao;
@@ -48,7 +49,8 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <A extends SystemMessage> A saveImpl(final A msg) {
+    @NeedRerunWhenDbDeadlock
+    public <A extends SystemMessage> A save(final A msg) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;
@@ -107,6 +109,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
      * @see com.visfresh.dao.SystemMessageDao#saveOnlyOneForGroup(com.visfresh.entities.SystemMessage)
      */
     @Override
+    @NeedRerunWhenDbDeadlock
     public void saveOnlyOneForGroup(final SystemMessage msg) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
@@ -163,6 +166,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
      * @see com.visfresh.dao.SystemMessageDao#selectMessagesForProcessing(java.util.Set, java.lang.String)
      */
     @Override
+    @NeedRerunWhenDbDeadlock
     public List<SystemMessage> selectMessagesForProcessing(
             final Set<SystemMessageType> messageTypes, final String processor, final int limit, final Date beforeDate) {
         // mark to process before select
@@ -205,6 +209,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
      * @see com.visfresh.dao.SystemMessageDao#getMessagesForGoup(com.visfresh.entities.SystemMessageType, java.lang.String, int, java.util.Date)
      */
     @Override
+    @NeedRerunWhenDbDeadlock
     public List<SystemMessage> getMessagesForGoup(final SystemMessageType messageType, final String group,
             final Date readyOn, final int batchLimit) {
         final Map<String, Object> params = new HashMap<>();
@@ -228,6 +233,7 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
      * @see com.visfresh.dao.SystemMessageDao#findTrackerEvents(boolean)
      */
     @Override
+    @NeedRerunWhenDbDeadlock
     public List<SystemMessage> findTrackerEvents(final boolean asc) {
         final Filter filter = new Filter();
         filter.addFilter(SystemMessageDaoImpl.TYPE_FIELD, SystemMessageType.Tracker.name());

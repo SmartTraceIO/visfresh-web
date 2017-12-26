@@ -78,7 +78,7 @@ public class ActionTakenDaoImpl extends DaoImplBase<ActionTakenView, ActionTaken
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <A extends ActionTaken> A saveImpl(final A t) {
+    public <A extends ActionTaken> A save(final A t) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         final Set<String> fields = getFields();

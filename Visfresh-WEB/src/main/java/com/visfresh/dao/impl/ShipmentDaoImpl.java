@@ -371,13 +371,13 @@ public class ShipmentDaoImpl extends ShipmentBaseDao<Shipment, Shipment> impleme
      * @see com.visfresh.dao.impl.ShipmentBaseDao#save(com.visfresh.entities.ShipmentBase)
      */
     @Override
-    public <S extends Shipment> S saveImpl(final S s) {
+    public <S extends Shipment> S save(final S s) {
         final boolean insert = s.getId() == null;
         if (insert) {
             s.setTripCount(s.getDevice().getTripCount() + 1);
             s.getDevice().setTripCount(s.getTripCount());
         }
-        final S result = super.saveImpl(s);
+        final S result = super.save(s);
         if (insert) {
             deviceDao.save(s.getDevice());
         }

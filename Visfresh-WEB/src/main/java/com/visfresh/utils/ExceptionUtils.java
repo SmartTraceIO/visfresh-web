@@ -84,4 +84,15 @@ public final class ExceptionUtils {
             return msg != null && msg.contains("Lock wait timeout exceeded");
         });
     }
+    /**
+     * @param e
+     * @return
+     */
+    public static boolean isMySqlDeadLock(final Throwable e) {
+        return doRecursive(e, (current) ->
+        {
+            final String msg = e.getMessage();
+            return msg != null && msg.contains("Deadlock found");
+        });
+    }
 }

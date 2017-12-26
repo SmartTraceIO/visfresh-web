@@ -60,7 +60,7 @@ public class AlertDaoImpl extends DaoImplBase<Alert, Alert, Long> implements Ale
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <A extends Alert> A saveImpl(final A alert) {
+    public <A extends Alert> A save(final A alert) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

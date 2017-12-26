@@ -54,7 +54,7 @@ public class ShipmentNoteDaoImpl extends DaoImplBase<ShipmentNote,ShipmentNote, 
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends ShipmentNote> S saveImpl(final S note) {
+    public <S extends ShipmentNote> S save(final S note) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

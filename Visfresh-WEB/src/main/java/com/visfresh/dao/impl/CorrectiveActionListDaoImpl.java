@@ -52,7 +52,7 @@ public class CorrectiveActionListDaoImpl extends EntityWithCompanyDaoImplBase<Co
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends CorrectiveActionList> S saveImpl(final S list) {
+    public <S extends CorrectiveActionList> S save(final S list) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         final List<String> fields = getFields(false);

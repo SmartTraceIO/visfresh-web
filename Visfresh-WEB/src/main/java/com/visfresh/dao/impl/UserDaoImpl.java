@@ -108,7 +108,7 @@ public class UserDaoImpl extends EntityWithCompanyDaoImplBase<User, User, Long> 
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends User> S saveImpl(final S user) {
+    public <S extends User> S save(final S user) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

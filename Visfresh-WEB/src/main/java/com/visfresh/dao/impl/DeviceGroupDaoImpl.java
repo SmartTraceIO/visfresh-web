@@ -60,7 +60,7 @@ public class DeviceGroupDaoImpl extends EntityWithCompanyDaoImplBase<DeviceGroup
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends DeviceGroup> S saveImpl(final S group) {
+    public <S extends DeviceGroup> S save(final S group) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
 
         String sql;

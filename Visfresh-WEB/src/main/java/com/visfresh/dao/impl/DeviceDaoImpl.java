@@ -82,7 +82,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
      * @see com.visfresh.dao.DaoBase#save(com.visfresh.entities.EntityWithId)
      */
     @Override
-    public <S extends Device> S saveImpl(final S device) {
+    public <S extends Device> S save(final S device) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put(IMEI_FIELD, device.getId());
         paramMap.put(NAME_FIELD, device.getName());
