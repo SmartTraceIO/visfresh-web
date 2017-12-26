@@ -3,13 +3,13 @@
  */
 package au.smarttrace.company;
 
-import au.smarttrace.ctrl.req.AbstractGetRequest;
+import au.smarttrace.ctrl.req.AbstractGetListRequest;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class GetCompaniesRequest extends AbstractGetRequest {
+public class GetCompaniesRequest extends AbstractGetListRequest {
     private String nameFilter;
     private String descriptionFilter;
 

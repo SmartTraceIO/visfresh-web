@@ -60,15 +60,23 @@ public class CompaniesController {
      */
     @RequestMapping(value = "/getCompanies", method = RequestMethod.POST)
     @Secured({"ROLE_" + Roles.SmartTraceAdmin})
-    public ListResponse<Company> updateCompany(final @RequestBody GetCompaniesRequest req) {
+    public ListResponse<Company> getCompanies(final @RequestBody GetCompaniesRequest req) {
         return service.getCompanies(req);
     }
+    /**
+     * @param company ID of company to delete.
+     * @return OK.
+     */
     @RequestMapping(value = "/deleteCompany", method = RequestMethod.GET)
     @Secured({"ROLE_" + Roles.SmartTraceAdmin})
     public String deleteCompany(final @RequestParam Long company) {
         service.deleteCompany(company);
         return "OK";
     }
+    /**
+     * @param id company ID.
+     * @return company.
+     */
     @RequestMapping(value = "/getCompany", method = RequestMethod.GET)
     @Secured({"ROLE_" + Roles.SmartTraceAdmin})
     public Company getCompany(final @RequestParam Long id) {

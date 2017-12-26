@@ -6,13 +6,13 @@ package au.smarttrace.device;
 import java.util.HashSet;
 import java.util.Set;
 
-import au.smarttrace.ctrl.req.AbstractGetRequest;
+import au.smarttrace.ctrl.req.AbstractGetListRequest;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class GetDevicesRequest extends AbstractGetRequest {
+public class GetDevicesRequest extends AbstractGetListRequest {
     //filtering
     private final Set<Long> companyFilter = new HashSet<>();
     private String nameFilter;

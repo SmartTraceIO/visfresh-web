@@ -6,13 +6,13 @@ package au.smarttrace.user;
 import java.util.HashSet;
 import java.util.Set;
 
-import au.smarttrace.ctrl.req.AbstractGetRequest;
+import au.smarttrace.ctrl.req.AbstractGetListRequest;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class GetUsersRequest extends AbstractGetRequest {
+public class GetUsersRequest extends AbstractGetListRequest {
     //filtering
     private final Set<Long> companyFilter = new HashSet<>();
     private String nameFilter;

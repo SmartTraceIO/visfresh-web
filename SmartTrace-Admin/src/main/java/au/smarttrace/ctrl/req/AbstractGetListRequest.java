@@ -10,7 +10,7 @@ import java.util.List;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class AbstractGetRequest {
+public class AbstractGetListRequest {
     private int page;
     private int pageSize = 1000;
     private final List<Order> orders = new LinkedList<>();
@@ -18,7 +18,7 @@ public class AbstractGetRequest {
     /**
      *
      */
-    public AbstractGetRequest() {
+    public AbstractGetListRequest() {
         super();
     }
 
