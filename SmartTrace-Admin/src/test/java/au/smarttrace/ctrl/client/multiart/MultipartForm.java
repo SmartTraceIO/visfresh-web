@@ -1,4 +1,4 @@
-package au.smarttrace.ctrl.client;
+package au.smarttrace.ctrl.client.multiart;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

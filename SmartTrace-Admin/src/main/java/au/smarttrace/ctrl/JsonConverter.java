@@ -9,8 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -41,10 +39,14 @@ public class JsonConverter extends MappingJackson2HttpMessageConverter {
     @Override
     protected void writeInternal(final Object object, final Type type, final HttpOutputMessage outputMessage)
             throws IOException, HttpMessageNotWritableException {
-        final ServiceResponse<Object> resp = new ServiceResponse<Object>();
-        resp.setStatus(new Status(HttpServletResponse.SC_OK, "OK"));
-        resp.setResponseObject(object);
-        super.writeInternal(resp, type, outputMessage);
+        super.writeInternal(object, type, outputMessage);
+    }
+    /* (non-Javadoc)
+     * @see org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter#canWrite(java.lang.Class, org.springframework.http.MediaType)
+     */
+    @Override
+    public boolean canWrite(final Class<?> clazz, final MediaType mediaType) {
+        return canWrite(mediaType);
     }
     /* (non-Javadoc)
      * @see org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter#readInternal(java.lang.Class, org.springframework.http.HttpInputMessage)

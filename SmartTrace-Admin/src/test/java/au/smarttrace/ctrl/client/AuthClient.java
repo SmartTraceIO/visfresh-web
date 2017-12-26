@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import au.smarttrace.ctrl.client.resp.AnyResponse;
+import au.smarttrace.ctrl.client.resp.AuthInfoResponse;
+import au.smarttrace.ctrl.client.resp.TokenResponse;
 import au.smarttrace.security.AccessToken;
 import au.smarttrace.security.AuthInfo;
 

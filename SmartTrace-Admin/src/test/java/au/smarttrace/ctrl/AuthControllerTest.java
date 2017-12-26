@@ -19,8 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import au.smarttrace.Company;
 import au.smarttrace.Roles;
 import au.smarttrace.User;
+import au.smarttrace.company.CompaniesDao;
 import au.smarttrace.ctrl.client.AuthClient;
 import au.smarttrace.ctrl.client.ServiceException;
 import au.smarttrace.ctrl.runner.ControllerTestRunner;
@@ -47,7 +49,10 @@ public class AuthControllerTest {
     private UsersService userService;
     @Autowired
     private AccessService accessService;
+    @Autowired
+    private CompaniesDao companiesDao;
 
+    private Company company;
     /**
      * Default constructor.
      */
@@ -59,10 +64,15 @@ public class AuthControllerTest {
     public void setUp() {
         client = new AuthClient();
         client.setServiceUrl(context.getBean(ServiceUrlHolder.class).getServiceUrl());
+
+        //create company
+        company = new Company();
+        company.setName("JUnit Company");
+        companiesDao.createCompany(company);
     }
 
     @Test
-    public void login() throws ServiceException, IOException {
+    public void testLogin() throws ServiceException, IOException {
         final String login = "u1@junit.org";
         final String password = "p1";
         userService.createUser(createUser(login), password);
@@ -93,7 +103,7 @@ public class AuthControllerTest {
         assertNotNull(auth.getUser());
     }
     @Test
-    public void logout() throws AccessException, ServiceException, IOException {
+    public void testLogout() throws AccessException, ServiceException, IOException {
         final String login = "u1@junit.org";
         final String password = "p1";
         userService.createUser(createUser(login), password);
@@ -105,7 +115,7 @@ public class AuthControllerTest {
         assertNull(accessService.getAuthForToken(info.getToken().getToken()));
     }
     @Test
-    public void refreshToken() throws IOException, ServiceException, AccessException {
+    public void testRefreshToken() throws IOException, ServiceException, AccessException {
         final String login = "u1@junit.org";
         final String password = "p1";
         userService.createUser(createUser(login), password);
@@ -125,7 +135,7 @@ public class AuthControllerTest {
         assertNotSame(info.getToken().getToken(), token.getToken());
     }
     @Test
-    public void getAuthInfo() throws IOException, ServiceException, AccessException {
+    public void testGetAuthInfo() throws IOException, ServiceException, AccessException {
         final String login = "u1@junit.org";
         final String password = "p1";
         userService.createUser(createUser(login), password);
@@ -153,6 +163,7 @@ public class AuthControllerTest {
         u.setEmail(email);
         u.setFirstName("Java");
         u.setLastName("Developer");
+        u.setCompany(company.getId());
         u.getRoles().add(Roles.SmartTraceAdmin);
         return u;
     }

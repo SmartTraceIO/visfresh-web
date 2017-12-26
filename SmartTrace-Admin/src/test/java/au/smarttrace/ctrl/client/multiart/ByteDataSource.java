@@ -2,7 +2,7 @@
  * (c) Drop In Media LLC, All Rights Reserved.
  */
 
-package au.smarttrace.ctrl.client;
+package au.smarttrace.ctrl.client.multiart;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

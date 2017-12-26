@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import au.smarttrace.ctrl.JsonConverter;
 import au.smarttrace.ctrl.ServiceResponse;
+import au.smarttrace.ctrl.client.multiart.MultipartForm;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

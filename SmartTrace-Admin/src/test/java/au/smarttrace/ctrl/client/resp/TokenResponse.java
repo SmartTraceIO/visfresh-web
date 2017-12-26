@@ -1,7 +1,7 @@
 /**
  *
  */
-package au.smarttrace.ctrl.client;
+package au.smarttrace.ctrl.client.resp;
 
 import au.smarttrace.ctrl.ServiceResponse;
 import au.smarttrace.security.AccessToken;

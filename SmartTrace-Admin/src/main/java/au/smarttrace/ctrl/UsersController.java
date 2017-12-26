@@ -59,6 +59,10 @@ public class UsersController {
         service.updateUser(req, req.getPassword());
         return req.getId();
     }
+    /**
+     * @param req request to get user list.
+     * @return list of users.
+     */
     @RequestMapping(value = "/getUsers", method = RequestMethod.POST)
     @Secured({"ROLE_" + Roles.SmartTraceAdmin})
     public ListResponse<User> getUsers(final @RequestBody GetUsersRequest req) {
@@ -74,6 +78,9 @@ public class UsersController {
         service.deleteUser(user);
         return "OK";
     }
+    /**
+     * @return list of available colors.
+     */
     @RequestMapping(value = "/getRoles", method = RequestMethod.GET)
     public List<String> getColors() {
         return service.getRoles();
