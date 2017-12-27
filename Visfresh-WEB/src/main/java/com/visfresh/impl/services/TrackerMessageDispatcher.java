@@ -15,11 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.dao.DeviceLockDao;
+import com.visfresh.dao.SystemMessageDao;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.services.AbstractSystemMessageDispatcher;
-import com.visfresh.services.DeviceLockService;
+import com.visfresh.services.GroupLockService;
 import com.visfresh.services.SystemMessageHandler;
 
 /**
@@ -38,9 +38,9 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
      */
     protected String processorId;
     @Autowired
-    protected DeviceLockService deviceLocker;
+    protected GroupLockService deviceLocker;
     @Autowired
-    private DeviceLockDao deviceLockDao;
+    private SystemMessageDao systemMessageDao;
     private final ThreadLocal<Date> unLockTime = new ThreadLocal<Date>();
 
     /**
@@ -147,9 +147,9 @@ public class TrackerMessageDispatcher extends AbstractSystemMessageDispatcher {
      * @return device IMEI.
      */
     protected String lockFreeDevice(final Date readyOn) {
-        final List<String> devices = deviceLockDao.getNotLockedDevicesWithReadyMessages(readyOn, 10);
+        final List<String> devices = systemMessageDao.getNotLockedDevicesWithReadyMessages(readyOn, 10);
         for (final String device : devices) {
-            if (deviceLocker.lockDevice(device, getProcessorId())) {
+            if (deviceLocker.lockGroup(device, getProcessorId())) {
                 return device;
             }
         }

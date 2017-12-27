@@ -9,22 +9,22 @@ import java.util.Date;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface DeviceLockService {
+public interface GroupLockService {
     /**
-     * @param imei device IMEI.
+     * @param group group ID.
      * @param lockerId locker ID.
      * @return true if the device is locked for given locker.
      */
-    boolean lockDevice(String imei, String lockerId);
+    boolean lockGroup(String group, String lockerId);
     /**
-     * @param device device IMEI.
+     * @param group group ID.
      * @param lockerId locker ID.
      */
-    void unlock(String device, String lockerId);
+    void unlock(String group, String lockerId);
     /**
-     * @param device device IMEI.
+     * @param group group ID.
      * @param lockerId locker ID.
      * @param unlockOn unlock date.
      */
-    void setUnlockOn(String device, String lockerId, Date unlockOn);
+    void setUnlockOn(String group, String lockerId, Date unlockOn);
 }

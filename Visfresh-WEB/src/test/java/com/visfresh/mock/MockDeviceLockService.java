@@ -9,14 +9,14 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.visfresh.services.DeviceLockService;
+import com.visfresh.services.GroupLockService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class MockDeviceLockService implements DeviceLockService {
+public class MockDeviceLockService implements GroupLockService {
     private Map<String, String> locks = new HashMap<>();
     private Map<String, Date> unLockTies = new HashMap<>();
     private static final long MAX_LOCK_TIME = 20 * 60 * 1000l;// 20 minutes
@@ -32,7 +32,7 @@ public class MockDeviceLockService implements DeviceLockService {
      * @see com.visfresh.services.DeviceLockService#lockDevice(java.lang.String, java.lang.String)
      */
     @Override
-    public boolean lockDevice(final String imei, final String lockerId) {
+    public boolean lockGroup(final String imei, final String lockerId) {
         synchronized (this) {
             if (!locks.containsKey(imei)) {
                 locks.put(imei, lockerId);

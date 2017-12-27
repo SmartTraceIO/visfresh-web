@@ -105,48 +105,6 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
 
         return msg;
     }
-    /* (non-Javadoc)
-     * @see com.visfresh.dao.SystemMessageDao#saveOnlyOneForGroup(com.visfresh.entities.SystemMessage)
-     */
-    @Override
-    @NeedRerunWhenDbDeadlock
-    public void saveOnlyOneForGroup(final SystemMessage msg) {
-        final Map<String, Object> paramMap = new HashMap<String, Object>();
-
-        final String sql = "insert into " + TABLE + " (" + combine(
-                TYME_FIELD
-                , TYPE_FIELD
-                , RETRYON_FIELD
-                , PROCESSOR_FIELD
-                , NUMRETRY_FIELD
-                , MESSAGE_FIELD
-                , "`" + GROUP_FIELD + "`"
-            ) + ")" + " select * from (select "
-                + ":"+ TYME_FIELD
-                + ", :" + TYPE_FIELD
-                + ", :" + RETRYON_FIELD
-                + ", :" + PROCESSOR_FIELD
-                + ", :" + NUMRETRY_FIELD
-                + ", :" + MESSAGE_FIELD
-                + ", :" + GROUP_FIELD
-                + ") as tmp where not exists (select id from " + TABLE
-                + " where `" + GROUP_FIELD + "` = :" + GROUP_FIELD + ") limit 1";
-
-        paramMap.put(ID_FIELD, msg.getId());
-        paramMap.put(TYME_FIELD, msg.getTime());
-        paramMap.put(TYPE_FIELD, msg.getType().name());
-        paramMap.put(RETRYON_FIELD, msg.getRetryOn());
-        paramMap.put(PROCESSOR_FIELD, msg.getProcessor());
-        paramMap.put(NUMRETRY_FIELD, msg.getNumberOfRetry());
-        paramMap.put(MESSAGE_FIELD, msg.getMessageInfo());
-        paramMap.put(GROUP_FIELD, msg.getGroup());
-
-        final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbc.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
-        if (keyHolder.getKey() != null) {
-            msg.setId(keyHolder.getKey().longValue());
-        }
-    }
     /**
      * @return list of field names.
      */
@@ -239,6 +197,30 @@ public class SystemMessageDaoImpl extends DaoImplBase<SystemMessage, SystemMessa
         filter.addFilter(SystemMessageDaoImpl.TYPE_FIELD, SystemMessageType.Tracker.name());
         final Sorting sorting = new Sorting(asc, SystemMessageDaoImpl.ID_FIELD);
         return findAll(filter, sorting, null);
+    }
+
+    /* (non-Javadoc)
+     * @see com.visfresh.dao.GroupLockDao#getNotLockedDevicesWithReadyMessages(java.util.Date, int)
+     */
+    @Override
+    public List<String> getNotLockedDevicesWithReadyMessages(final Date retryOn, final int limit) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("retryOn", retryOn);
+        params.put("limit", limit);
+        params.put("messageType", SystemMessageType.Tracker.name());
+
+        final String query = "select sm.group as grp from systemmessages sm"
+                + "\nwhere sm.type  = :messageType"
+                + "\nand sm.retryon <= :retryOn"
+                + "\nand not exists (select * from grouplocks l where sm.group = l.group)"
+                + "\ngroup by sm.group limit :limit";
+        final List<Map<String, Object>> rows = jdbc.queryForList(query, params);
+
+        final List<String> result = new LinkedList<>();
+        for (final Map<String,Object> row : rows) {
+            result.add((String) row.get("grp"));
+        }
+        return result;
     }
     /* (non-Javadoc)
      * @see com.visfresh.dao.impl.DaoImplBase#getPropertyToDbMap()

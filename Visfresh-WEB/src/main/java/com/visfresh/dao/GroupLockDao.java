@@ -4,13 +4,12 @@
 package com.visfresh.dao;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public interface DeviceLockDao {
+public interface GroupLockDao {
     /**
      * @param device device.
      * @param lockKey lock key.
@@ -27,12 +26,6 @@ public interface DeviceLockDao {
      * the locks can be owned by different application instance, possible on remote server.
      */
     void deleteAll();
-    /**
-     * @param readyOn ready on date for messages.
-     * @param limit select limit.
-     * @return list of not locked devices.
-     */
-    List<String> getNotLockedDevicesWithReadyMessages(Date readyOn, int limit);
     /**
      * @param device device.
      * @param lockKey locker key.

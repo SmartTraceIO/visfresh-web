@@ -38,8 +38,9 @@ public interface SystemMessageDao extends DaoBase<SystemMessage, SystemMessage, 
      */
     List<SystemMessage> getMessagesForGoup(SystemMessageType messageType, String group, Date readyOn, int batchLimit);
     /**
-     * Saves message only if there are not other messages for given group.
-     * @param sm system messages.
+     * @param readyOn ready time.
+     * @param limit max number of selected devices.
+     * @return list of not locked devices.
      */
-    void saveOnlyOneForGroup(SystemMessage sm);
+    List<String> getNotLockedDevicesWithReadyMessages(Date readyOn, int limit);
 }

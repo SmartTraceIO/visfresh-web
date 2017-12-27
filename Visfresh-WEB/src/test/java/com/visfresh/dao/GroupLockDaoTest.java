@@ -16,28 +16,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import com.visfresh.entities.SystemMessage;
-import com.visfresh.entities.SystemMessageType;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class DeviceLockDaoTest extends BaseDaoTest<DeviceLockDao> {
+public class GroupLockDaoTest extends BaseDaoTest<GroupLockDao> {
     private NamedParameterJdbcTemplate jdbc;
-    private SystemMessageDao systemMessageDao;
 
     /**
      * Default constructor.
      */
-    public DeviceLockDaoTest() {
-        super(DeviceLockDao.class);
+    public GroupLockDaoTest() {
+        super(GroupLockDao.class);
     }
 
     @Before
     public void setUp() {
         this.jdbc = context.getBean(NamedParameterJdbcTemplate.class);
-        systemMessageDao = context.getBean(SystemMessageDao.class);
     }
     @Test
     public void testLock() {
@@ -96,56 +91,5 @@ public class DeviceLockDaoTest extends BaseDaoTest<DeviceLockDao> {
         dao.unlockOlder(new Date(System.currentTimeMillis() - 100000000l));
 
         assertEquals(1, jdbc.queryForList("select * from grouplocks", new HashMap<>()).size());
-    }
-    @Test
-    public void testGetNotLockedDevicesWithReadyMessagesLimit() {
-        final Date msgReadyOn = new Date(System.currentTimeMillis() - 10000000000l);
-
-        createSystemMessage("d1", msgReadyOn);
-        createSystemMessage("d1", msgReadyOn);
-
-        createSystemMessage("d2", msgReadyOn);
-        createSystemMessage("d2", msgReadyOn);
-
-        final Date readyOn = new Date(System.currentTimeMillis() - 1000000000l);
-        assertEquals(1, dao.getNotLockedDevicesWithReadyMessages(readyOn, 1).size());
-        assertEquals(2, dao.getNotLockedDevicesWithReadyMessages(readyOn, 2).size());
-        assertEquals(2, dao.getNotLockedDevicesWithReadyMessages(readyOn, 3).size());
-
-        //lock one device
-        dao.lock("d1", "junit");
-        assertEquals(1, dao.getNotLockedDevicesWithReadyMessages(readyOn, 2).size());
-    }
-    @Test
-    public void testGetNotLockedDevicesWithReadyMessagesReadyOn() {
-        final Date readyOn1 = new Date(System.currentTimeMillis() - 10000000000l);
-        final Date readyOn2 = new Date(System.currentTimeMillis() - 1000000000l);
-
-        createSystemMessage("d1", readyOn1);
-        createSystemMessage("d1", readyOn1);
-
-        createSystemMessage("d2", readyOn2);
-        createSystemMessage("d2", readyOn2);
-
-        assertEquals(1, dao.getNotLockedDevicesWithReadyMessages(
-                new Date((readyOn1.getTime() + readyOn2.getTime()) / 2), 100).size());
-        assertEquals("d1", dao.getNotLockedDevicesWithReadyMessages(
-                new Date((readyOn1.getTime() + readyOn2.getTime()) / 2), 100).get(0));
-        assertEquals(2, dao.getNotLockedDevicesWithReadyMessages(
-                new Date(readyOn2.getTime() + 100000l), 100).size());
-    }
-    /**
-     * @param device the device.
-     * @param readyOn ready on time.
-     * @return system message.
-     */
-    private SystemMessage createSystemMessage(final String device, final Date readyOn) {
-        final SystemMessage msg = new SystemMessage();
-        msg.setType(SystemMessageType.Tracker);
-        msg.setGroup(device);
-        msg.setMessageInfo("{}");
-        msg.setTime(readyOn);
-        msg.setRetryOn(readyOn);
-        return systemMessageDao.save(msg);
     }
 }

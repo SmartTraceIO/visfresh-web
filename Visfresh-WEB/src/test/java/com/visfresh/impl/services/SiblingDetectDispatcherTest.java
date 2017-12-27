@@ -23,6 +23,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.SystemMessage;
 import com.visfresh.io.TrackerEventDto;
+import com.visfresh.services.RetryableException;
 import com.visfresh.utils.LocationUtils;
 
 /**
@@ -34,6 +35,7 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
     private final Map<Long, List<TrackerEventDto>> trackerEvents = new HashMap<>();
     private Company company;
     private final List<SystemMessage> messages = new LinkedList<>();
+    private final Map<String, Date> groupLocks = new HashMap<>();
 
     /**
      * Default constructor.
@@ -348,29 +350,57 @@ public class SiblingDetectDispatcherTest extends SiblingDetectDispatcher {
 
         return addEvent(list, shipment, latitude, longitude, time);
     }
-
     @Test
     public void testScheduleSiblingDetection() {
         final Shipment s = createShipment(99l);
         scheduleSiblingDetection(s, new Date());
 
         final SystemMessage sm = messages.get(0);
-        assertEquals(s.getId().toString(), sm.getGroup());
+        assertEquals(GROUP_PREFIX + s.getId().toString(), sm.getGroup());
         assertEquals(s.getCompany().getId().toString(), sm.getMessageInfo());
-    }
 
+        //test not repeats the scheduling
+        scheduleSiblingDetection(s, new Date(System.currentTimeMillis() + 100000000l));
+        assertEquals(1, messages.size());
+    }
+    @Test
+    public void testCleanGroupLock() throws RetryableException {
+        final Shipment s = createShipment(99l);
+        scheduleSiblingDetection(s, new Date());
+        //add another (left) lock
+        groupLocks.put("abrakadabra-group", new Date());
+
+        assertEquals(2, groupLocks.size());
+        handle(messages.remove(0));
+
+        assertEquals(1, groupLocks.size());
+        assertTrue(groupLocks.containsKey("abrakadabra-group"));
+    }
     /* (non-Javadoc)
-     * @see com.visfresh.impl.services.SiblingDetectDispatcher#saveOnlyOneForGroup(com.visfresh.entities.SystemMessage)
+     * @see com.visfresh.impl.services.SiblingDetectDispatcher#lockGroup(java.lang.String, java.util.Date)
      */
     @Override
-    protected void saveOnlyOneForGroup(final SystemMessage sm) {
-        for (final SystemMessage m : messages) {
-            if (m.getGroup().equals(sm.getGroup())) {
-                return;
-            }
+    protected boolean lockGroup(final String group, final Date retryOn) {
+        if (groupLocks.containsKey(group)) {
+            return false;
         }
-
-        messages.add(sm);
+        groupLocks.put(group, retryOn);
+        return true;
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.impl.services.SiblingDetectDispatcher#unlockGroup(java.lang.String)
+     */
+    @Override
+    protected void unlockGroup(final String group) {
+        groupLocks.remove(group);
+    }
+    /* (non-Javadoc)
+     * @see com.visfresh.services.AbstractSystemMessageDispatcher#saveMessage(com.visfresh.entities.SystemMessage)
+     */
+    @Override
+    protected SystemMessage saveMessage(final SystemMessage msg) {
+        messages.add(msg);
+        return msg;
     }
     /* (non-Javadoc)
      * @see com.visfresh.mpl.services.siblings.DefaultSiblingDetector#findActiveShipments(com.visfresh.entities.Company)

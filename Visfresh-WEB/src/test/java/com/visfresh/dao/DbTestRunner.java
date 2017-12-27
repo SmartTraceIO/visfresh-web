@@ -70,7 +70,7 @@ public class DbTestRunner extends BlockJUnit4ClassRunner {
      *
      */
     public static void clearDb(final AbstractApplicationContext context) {
-        context.getBean(DeviceLockDao.class).deleteAll();
+        context.getBean(GroupLockDao.class).deleteAll();
         context.getBean(SystemMessageDao.class).deleteAll();
         context.getBean(TrackerEventDao.class).deleteAll();
         context.getBean(DeviceCommandDao.class).deleteAll();

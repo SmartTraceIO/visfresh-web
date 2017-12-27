@@ -29,6 +29,7 @@ import com.visfresh.entities.SystemMessage;
 import com.visfresh.entities.SystemMessageType;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.services.AbstractAssyncSystemMessageDispatcher;
+import com.visfresh.services.GroupLockService;
 import com.visfresh.services.RetryableException;
 import com.visfresh.services.SiblingDetectionService;
 import com.visfresh.services.SystemMessageHandler;
@@ -43,6 +44,7 @@ import com.visfresh.utils.StringUtils;
 @Component
 public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatcher
     implements SiblingDetectionService, SystemMessageHandler {
+    protected static String GROUP_PREFIX = "shp-";
     /**
      * The logger.
      */
@@ -58,6 +60,8 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
     private ShipmentDao shipmentDao;
     @Autowired
     private TrackerEventDao trackerEventDao;
+    @Autowired
+    private GroupLockService locker;
 
     /**
      * Processor ID.
@@ -92,7 +96,7 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
         return processorId;
     }
 
-    @Scheduled(fixedDelay = 300000l)
+    @Scheduled(fixedDelay = 15000l)
     public void processScheduledSiblingDetections() {
         if (isIgnoreSchedulings()) {
             return;
@@ -126,28 +130,63 @@ public class SiblingDetectDispatcher extends AbstractAssyncSystemMessageDispatch
      */
     @Override
     public void handle(final SystemMessage msg) throws RetryableException {
-        updateSiblings(Long.valueOf(msg.getGroup()), Long.valueOf(msg.getMessageInfo()));
-    }
+        final String group = msg.getGroup();
+        //allow to send new sibling detection requests for given device.
+        unlockGroup(group);
 
+        String shipment;
+        if (group.startsWith(GROUP_PREFIX)) {
+            //new schema with 'shp-' prefix.
+            shipment = group.substring(GROUP_PREFIX.length());
+        } else {
+            //old schema should be supported to
+            shipment = group;
+        }
+        updateSiblings(Long.valueOf(shipment), Long.valueOf(msg.getMessageInfo()));
+    }
     /* (non-Javadoc)
      * @see com.visfresh.services.SiblingDetectionService#scheduleSiblingDetection(com.visfresh.entities.Shipment)
      */
     @Override
     public void scheduleSiblingDetection(final Shipment s, final Date retryOn) {
-        final SystemMessage sm = new SystemMessage();
-        sm.setType(SystemMessageType.Siblings);
-        sm.setMessageInfo(s.getCompany().getId().toString());
-        sm.setTime(new Date());
-        sm.setRetryOn(retryOn);
-        sm.setGroup(s.getId().toString());
+        final String group = createGroupId(s);
+        if (lockGroup(group, retryOn)) {
+            log.debug("New sibling detection has scheduled for shipment " + s.getId());
+            final SystemMessage sm = new SystemMessage();
+            sm.setType(SystemMessageType.Siblings);
+            sm.setMessageInfo(s.getCompany().getId().toString());
+            sm.setTime(new Date());
+            sm.setRetryOn(retryOn);
+            sm.setGroup(group);
 
-        saveOnlyOneForGroup(sm);
+            saveMessage(sm);
+        } else {
+            log.debug("Sibling detection is already scheduled for shipment " + s.getId() + ", now ignored");
+        }
     }
     /**
-     * @param sm system message to save.
+     * @param group
+     * @return
      */
-    protected void saveOnlyOneForGroup(final SystemMessage sm) {
-        this.messageDao.saveOnlyOneForGroup(sm);
+    protected boolean lockGroup(final String group, final Date retryOn) {
+        if (locker.lockGroup(group, "any")) {
+            locker.setUnlockOn(group, "any", new Date(retryOn.getTime() + 30000l));
+            return true;
+        }
+        return false;
+    }
+    /**
+     * @param group group to unlock.
+     */
+    protected void unlockGroup(final String group) {
+        locker.unlock(group, "any");
+    }
+    /**
+     * @param s shipment;
+     * @return group ID for given shipment.
+     */
+    private String createGroupId(final Shipment s) {
+        return GROUP_PREFIX + s.getId().toString();
     }
     /**
      * Given method is for overriding in junit service implementation.

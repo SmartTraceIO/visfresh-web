@@ -77,7 +77,7 @@ public class TrackerMessageDispatcherTest extends TrackerMessageDispatcher {
     protected String lockFreeDevice(final Date readyOn) {
         for (final SystemMessage msg : this.helper.getMessages().values()) {
             if (!lockService.getLocks().containsKey(msg.getGroup()) && !msg.getRetryOn().after(readyOn)) {
-                lockService.lockDevice(msg.getGroup(), getProcessorId());
+                lockService.lockGroup(msg.getGroup(), getProcessorId());
                 return msg.getGroup();
             }
         }

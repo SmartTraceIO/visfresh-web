@@ -8,8 +8,6 @@ import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +21,6 @@ import com.visfresh.services.SiblingDetectionService;
  */
 @Component
 public class SiblingDetectionRule implements TrackerEventRule {
-    private static final Logger log = LoggerFactory.getLogger(SiblingDetectionRule.class);
     private static final String NAME = "SiblingDetectionRule";
     private static final long DETECTION_PAUSE = 5 * 60 * 1000l;
     @Autowired
@@ -68,7 +65,6 @@ public class SiblingDetectionRule implements TrackerEventRule {
         context.setProcessed(this);
         final Shipment s = context.getEvent().getShipment();
         scheduleSiblingDetection(s, new Date(System.currentTimeMillis() + DETECTION_PAUSE));
-        log.debug("Sibling detection has scheduled for shipment " + s);
         return false;
     }
 

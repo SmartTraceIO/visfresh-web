@@ -16,21 +16,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.dao.DeviceLockDao;
-import com.visfresh.services.DeviceLockService;
+import com.visfresh.dao.GroupLockDao;
+import com.visfresh.services.GroupLockService;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Component
-public class DeviceLockServiceImpl implements DeviceLockService {
-    private static Logger log = LoggerFactory.getLogger(DeviceLockServiceImpl.class);
+public class GroupLockServiceImpl implements GroupLockService {
+    private static Logger log = LoggerFactory.getLogger(GroupLockServiceImpl.class);
 
     private static final long TIME_OUT = 15 * 1000l; // 15 seconds
 
     @Autowired
-    private DeviceLockDao dao;
+    private GroupLockDao dao;
     private final String instanceId;
 
     private final Timer timer = new Timer("Unlock old lockings");
@@ -39,7 +39,7 @@ public class DeviceLockServiceImpl implements DeviceLockService {
      * Default constructor.
      */
     @Autowired
-    public DeviceLockServiceImpl(final Environment env) {
+    public GroupLockServiceImpl(final Environment env) {
         super();
         instanceId = env.getProperty("instance.id");
     }
@@ -71,25 +71,25 @@ public class DeviceLockServiceImpl implements DeviceLockService {
     }
 
     /* (non-Javadoc)
-     * @see com.visfresh.services.DeviceLockService#lockGroup(java.lang.String, java.lang.String)
+     * @see com.visfresh.services.GroupLockService#lockGroup(java.lang.String, java.lang.String)
      */
     @Override
-    public boolean lockDevice(final String device, final String lockerId) {
-        return dao.lock(device, createLockKey(lockerId));
+    public boolean lockGroup(final String group, final String lockerId) {
+        return dao.lock(group, createLockKey(lockerId));
     }
     /* (non-Javadoc)
-     * @see com.visfresh.services.DeviceLockService#setUnlockOn(java.lang.String, java.lang.String, java.util.Date)
+     * @see com.visfresh.services.GroupLockService#setUnlockOn(java.lang.String, java.lang.String, java.util.Date)
      */
     @Override
-    public void setUnlockOn(final String device, final String lockerId, final Date unlockOn) {
-        dao.setUnlockOn(device, createLockKey(lockerId), unlockOn);
+    public void setUnlockOn(final String group, final String lockerId, final Date unlockOn) {
+        dao.setUnlockOn(group, createLockKey(lockerId), unlockOn);
     }
     /* (non-Javadoc)
-     * @see com.visfresh.services.DeviceLockService#unlock(java.lang.String)
+     * @see com.visfresh.services.GroupLockService#unlock(java.lang.String)
      */
     @Override
-    public void unlock(final String device, final String lockerId) {
-        dao.unlock(device, createLockKey(lockerId));
+    public void unlock(final String group, final String lockerId) {
+        dao.unlock(group, createLockKey(lockerId));
     }
 
     /**

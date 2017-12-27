@@ -149,31 +149,6 @@ public class SystemMessageDaoTest extends
         assertEquals(m1.getId(), messages.get(0).getId());
     }
     @Test
-    public void testSaveOnlyOneForGroup() {
-        final SystemMessage msg = new SystemMessage();
-        msg.setMessageInfo("any message info");
-        msg.setNumberOfRetry(99);
-        msg.setProcessor("proc");
-        msg.setRetryOn(new Date(System.currentTimeMillis() + 10000000l));
-        msg.setTime(new Date(System.currentTimeMillis() - 10000000l));
-        msg.setType(SystemMessageType.Siblings);
-        msg.setGroup("g1");
-
-        dao.saveOnlyOneForGroup(msg);
-
-        assertEquals(1, dao.findAll(null, null, null).size());
-        //test not saves with same group
-
-        msg.setId(null);
-        dao.saveOnlyOneForGroup(msg);
-        assertEquals(1, dao.findAll(null, null, null).size());
-
-        //test save if change group
-        msg.setGroup("g2");
-        dao.saveOnlyOneForGroup(msg);
-        assertEquals(2, dao.findAll(null, null, null).size());
-    }
-    @Test
     public void testFindTrackerEvents() {
         final long dt = 100000;
         final long t = System.currentTimeMillis() - 20 * dt;
@@ -206,6 +181,57 @@ public class SystemMessageDaoTest extends
         msgs = dao.findTrackerEvents(false);
         assertEquals(7, msgs.size());
         assertEquals(mEnd.getId(), msgs.get(0).getId());
+    }
+    @Test
+    public void testGetNotLockedDevicesWithReadyMessagesLimit() {
+        final Date msgReadyOn = new Date(System.currentTimeMillis() - 10000000000l);
+
+        createSystemMessage("d1", msgReadyOn);
+        createSystemMessage("d1", msgReadyOn);
+
+        createSystemMessage("d2", msgReadyOn);
+        createSystemMessage("d2", msgReadyOn);
+
+        final Date readyOn = new Date(System.currentTimeMillis() - 1000000000l);
+        assertEquals(1, dao.getNotLockedDevicesWithReadyMessages(readyOn, 1).size());
+        assertEquals(2, dao.getNotLockedDevicesWithReadyMessages(readyOn, 2).size());
+        assertEquals(2, dao.getNotLockedDevicesWithReadyMessages(readyOn, 3).size());
+
+        //lock one device
+        context.getBean(GroupLockDao.class).lock("d1", "junit");
+        assertEquals(1, dao.getNotLockedDevicesWithReadyMessages(readyOn, 2).size());
+    }
+    @Test
+    public void testGetNotLockedDevicesWithReadyMessagesReadyOn() {
+        final Date readyOn1 = new Date(System.currentTimeMillis() - 10000000000l);
+        final Date readyOn2 = new Date(System.currentTimeMillis() - 1000000000l);
+
+        createSystemMessage("d1", readyOn1);
+        createSystemMessage("d1", readyOn1);
+
+        createSystemMessage("d2", readyOn2);
+        createSystemMessage("d2", readyOn2);
+
+        assertEquals(1, dao.getNotLockedDevicesWithReadyMessages(
+                new Date((readyOn1.getTime() + readyOn2.getTime()) / 2), 100).size());
+        assertEquals("d1", dao.getNotLockedDevicesWithReadyMessages(
+                new Date((readyOn1.getTime() + readyOn2.getTime()) / 2), 100).get(0));
+        assertEquals(2, dao.getNotLockedDevicesWithReadyMessages(
+                new Date(readyOn2.getTime() + 100000l), 100).size());
+    }
+    /**
+     * @param device the device.
+     * @param readyOn ready on time.
+     * @return system message.
+     */
+    private SystemMessage createSystemMessage(final String device, final Date readyOn) {
+        final SystemMessage msg = new SystemMessage();
+        msg.setType(SystemMessageType.Tracker);
+        msg.setGroup(device);
+        msg.setMessageInfo("{}");
+        msg.setTime(readyOn);
+        msg.setRetryOn(readyOn);
+        return dao.save(msg);
     }
 
     private SystemMessage createTrackerEvent(final Date date) {
