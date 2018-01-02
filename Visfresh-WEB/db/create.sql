@@ -56,6 +56,19 @@ create table companies (
     PRIMARY KEY (`id`)
 );
 
+create table correctiveactions (
+    id bigint(20) NOT NULL AUTO_INCREMENT,
+    name varchar(256) NOT NULL,
+    company bigint(20) not null,
+    description varchar(255) default null,
+    actions longtext not null,
+    primary key (id),
+    foreign key (company)
+        references companies (id)
+        ON DELETE CASCADE
+);
+
+
 create table devices (
     description varchar(255),
     imei varchar(30) not null,
@@ -511,7 +524,7 @@ create table externalcompanies (
 create table systemmessages (
     id bigint(20) NOT NULL AUTO_INCREMENT,
     type varchar(128) NOT NULL,
-    group varchar(128),
+    `group` varchar(128),
     time datetime NOT NULL,
     processor varchar(32),
     retryon timestamp NULL default NULL,
@@ -550,18 +563,6 @@ create table notes (
         references shipments (id) on delete cascade
 );
 
-create table correctiveactions (
-    id bigint(20) NOT NULL AUTO_INCREMENT,
-    name varchar(256) NOT NULL,
-    company bigint(20) not null,
-    description varchar(255) default null,
-    actions longtext not null,
-    primary key (id),
-    foreign key (company)
-        references companies (id)
-        ON DELETE CASCADE
-);
-
 create table simulators (
     source varchar(30) not null,
     target varchar(30) not null,
@@ -576,6 +577,6 @@ create table grouplocks (
     `type` varchar(20) not null,
     `group` varchar(128) not null,
     locker varchar(128) not null,
-    lastupdate timestamp null default null,
+    unlockon timestamp null default null,
     primary key (`type`, `group`)
 );
