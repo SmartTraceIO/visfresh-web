@@ -16,6 +16,7 @@ import com.visfresh.init.jdbc.JdbcConfig;
 import com.visfresh.l12n.XmlResourceBundle;
 import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.services.DefaultAuthService;
+import com.visfresh.websecurity.JdbcAuthenticationManager;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -30,6 +31,7 @@ import com.visfresh.services.DefaultAuthService;
         DaoImplBase.class,
         XmlResourceBundle.class,
         PdfReportBuilder.class,
+        JdbcAuthenticationManager.class,
         TrackerMessageDispatcher.class})
 @EnableScheduling
 @PropertySource("classpath:/app.properties")

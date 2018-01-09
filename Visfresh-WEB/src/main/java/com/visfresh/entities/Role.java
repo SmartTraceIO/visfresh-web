@@ -17,11 +17,11 @@ public enum Role {
      * Add company, add initial users, add devices,
      * This user not visible to other users
      */
-    SmartTraceAdmin,
+    SmartTraceAdmin(SpringRoles.SmartTraceAdmin),
     /**
      * Company admin
      */
-    Admin,
+    Admin(SpringRoles.Admin),
     /**
      * View Shipments,
      * Shipment Detail (inc. Suppress Alerts/Shutdown device/AddNotes)
@@ -35,7 +35,7 @@ public enum Role {
      * Trackers (inc. Shutdown Device, but NOT Deactivate Device or Billing)
      * Setup pages (but Users is View Only),
      */
-    BasicUser,
+    BasicUser(SpringRoles.BasicUser),
     /**
      * NOT NewShipment
      * View Shipments,
@@ -43,14 +43,36 @@ public enum Role {
      * Trackers (NOT Shutdown Device, Deactivate Device or Billing)
      * NOT Setup pages
      */
-    NormalUser;
+    NormalUser(SpringRoles.NormalUser);
 
     static {
         NormalUser.includedRoles = new Role[]{BasicUser};
+        checkCorrectSpringRoles();
     }
 
     private Role[] includedRoles = {};
+    private final String springRolePart;
 
+    /**
+     *
+     */
+    private Role(final String springRole) {
+        if (!springRole.startsWith(SpringRoles.SPRING_ROLE_PREFIX)) {
+            throw new RuntimeException("Incorrect spring role name " + springRole);
+        }
+        springRolePart = springRole.substring(SpringRoles.SPRING_ROLE_PREFIX.length());
+    }
+    /**
+     *
+     */
+    private static void checkCorrectSpringRoles() {
+        for (final Role r : values()) {
+            if (!r.name().equals(r.springRolePart)) {
+                throw new RuntimeException("Incorrect spring role name " + SpringRoles.SPRING_ROLE_PREFIX + r.springRolePart);
+            }
+        }
+
+    }
     /**
      * @param r role.
      * @return true if has given role.
