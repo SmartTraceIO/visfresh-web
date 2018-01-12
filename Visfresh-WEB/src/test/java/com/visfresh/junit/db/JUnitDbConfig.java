@@ -5,6 +5,7 @@ package com.visfresh.junit.db;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -17,10 +18,10 @@ import com.visfresh.mock.MockRuleEngine;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Import(JdbcConfig.class)
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackageClasses = {
-        JdbcConfig.class,
         XmlResourceBundle.class,
         MockRuleEngine.class,
         DaoImplBase.class})

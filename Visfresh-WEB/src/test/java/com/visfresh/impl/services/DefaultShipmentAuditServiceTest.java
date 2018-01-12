@@ -11,8 +11,9 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.visfresh.controllers.audit.CurrentSessionHolder;
 import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -22,6 +23,7 @@ import com.visfresh.entities.ShipmentAuditItem;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthToken;
+import com.visfresh.websecurity.JdbcAuthenticationManager;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -35,8 +37,6 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
     private Shipment shipment2;
 
     private long lastId = 1l;
-    private ThreadLocal<RestSession> currentSession;
-
     /**
      * Default constructor.
      */
@@ -46,12 +46,8 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
 
     @Before
     public void setUp() {
-        //get thread local from session holder.
-        new CurrentSessionHolder() {
-            {
-                DefaultShipmentAuditServiceTest.this.currentSession = CurrentSessionHolder.currentSession;
-            }
-        };
+        final SecurityContext ctxt = SecurityContextHolder.createEmptyContext();
+        SecurityContextHolder.setContext(ctxt);
 
         //create company
         company = new Company(7777l);
@@ -84,8 +80,7 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
 
     @After
     public void tearDown() {
-        //clear current session
-        currentSession.set(null);
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
     /* (non-Javadoc)
      * @see com.visfresh.services.DefaultShipmentAuditService#save(com.visfresh.entities.ShipmentAuditItem)
@@ -208,7 +203,7 @@ public class DefaultShipmentAuditServiceTest extends DefaultShipmentAuditService
 
         s.setToken(new AuthToken("111000222-" + s.getId()));
 
-        currentSession.set(s);
+        SecurityContextHolder.getContext().setAuthentication(JdbcAuthenticationManager.createAuthentication(s));
         return s;
     }
 }

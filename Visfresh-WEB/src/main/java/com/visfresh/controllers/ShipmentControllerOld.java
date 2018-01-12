@@ -18,7 +18,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,6 +54,7 @@ import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.ShipmentStatus;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
@@ -178,8 +179,9 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
         addInterimStops(dto, shipment);
         return dto;
     }
-    @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT_OLD + "/{authToken}", method = RequestMethod.GET)
-    public JsonObject getSingleShipmentOld(@PathVariable final String authToken,
+    @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT_OLD + "", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject getSingleShipmentOld(
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip
@@ -192,9 +194,7 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final Shipment s;
             if (shipmentId != null) {
                 s = shipmentDao.findOne(shipmentId);

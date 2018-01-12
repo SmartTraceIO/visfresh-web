@@ -18,7 +18,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,6 +51,7 @@ import com.visfresh.entities.ShipmentBase;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShipmentTemplate;
 import com.visfresh.entities.ShortTrackerEvent;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.impl.singleshipment.MainShipmentDataBuilder;
@@ -134,13 +135,12 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param jsonRequest JSON save shipment request.
      * @return ID of saved shipment.
      */
-    @RequestMapping(value = "/saveShipment/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveShipment(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveShipment", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveShipment(
             final @RequestBody JsonObject jsonRequest) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final ShipmentSerializer serializer = getSerializer(user);
             Long id = serializer.getShipmentIdFromSaveRequest(jsonRequest);
 
@@ -425,14 +425,13 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param pageSize page size.
      * @return list of shipments.
      */
-    @RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.POST)
-    public JsonObject getShipments(@PathVariable final String authToken,
+    @RequestMapping(value = "/getShipments", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getShipments(
             @RequestBody final JsonObject request) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final GetShipmentsRequestParser ser = new GetShipmentsRequestParser(user.getTimeZone());
             final GetFilteredShipmentsRequest req = ser.parseGetFilteredShipmentsRequest(request);
 
@@ -473,16 +472,16 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param pageSize page size.
      * @return list of shipments.
      */
-    @RequestMapping(value = "/getShipmentsNearby/{authToken}", method = RequestMethod.GET)
-    public JsonObject getShipmentsNearby(@PathVariable final String authToken,
+    @RequestMapping(value = "/getShipmentsNearby", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject getShipmentsNearby(
             @RequestParam(value = "lat") final String latStr,
             @RequestParam(value = "lon") final String lonStr,
             @RequestParam final int radius,
             @RequestParam(required = false, value = "from") final String fromStr) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            final User user = getLoggedInUser();
 
             //parse request parameters.
             final double lat = Double.parseDouble(latStr);
@@ -939,14 +938,13 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param shipmentId shipment ID.
      * @return shipment.
      */
-    @RequestMapping(value = "/getShipment/{authToken}", method = RequestMethod.GET)
-    public JsonObject getShipment(@PathVariable final String authToken,
+    @RequestMapping(value = "/getShipment", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getShipment(
             @RequestParam final Long shipmentId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, shipment);
 
@@ -977,14 +975,13 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     private ShipmentSerializer getSerializer(final User user) {
         return new ShipmentSerializer(user.getLanguage(), user.getTimeZone(), user.getTemperatureUnits());
     }
-    @RequestMapping(value = "/deleteShipment/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteShipment(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteShipment", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject deleteShipment(
             @RequestParam final Long shipmentId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final Shipment s = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, s);
 
@@ -995,14 +992,13 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/suppressAlerts/{authToken}", method = RequestMethod.GET)
-    public JsonObject suppressAlerts(@PathVariable final String authToken,
+    @RequestMapping(value = "/suppressAlerts", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject suppressAlerts(
             @RequestParam final Long shipmentId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final Shipment s = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, s);
 
@@ -1017,8 +1013,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT + "/{authToken}", method = RequestMethod.GET)
-    public JsonObject getSingleShipment(@PathVariable final String authToken,
+    @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT + "", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject getSingleShipment(
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip
@@ -1031,9 +1028,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final SingleShipmentData s;
             if (shipmentId != null) {
                 s = singleShipmentService.getShipmentData(shipmentId);
@@ -1059,8 +1054,9 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/getSingleShipmentLite/{authToken}", method = RequestMethod.GET)
-    public JsonObject getSingleShipmentLite(@PathVariable final String authToken,
+    @RequestMapping(value = "/getSingleShipmentLite", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getSingleShipmentLite(
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip
@@ -1073,9 +1069,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final SingleShipmentData s;
             if (shipmentId != null) {
                 s = singleShipmentService.getShipmentData(shipmentId);
@@ -1104,14 +1098,13 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/createNewAutoSthipment/{authToken}", method = RequestMethod.GET)
-    public JsonElement createNewAutoSthipment(@PathVariable final String authToken,
+    @RequestMapping(value = "/createNewAutoSthipment", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonElement createNewAutoSthipment(
             @RequestParam final String device) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             //get device
             final Device d = deviceDao.findByImei(device);
             checkCompanyAccess(user, d);

@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,6 +56,7 @@ import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.ShortTrackerEventWithAlerts;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.TrackerEventType;
@@ -131,13 +132,12 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param device device.
      * @return ID of saved device.
      */
-    @RequestMapping(value = "/saveDevice/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveDevice(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveDevice", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveDevice(
             final @RequestBody JsonObject device) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final DeviceSerializer ser = createSerializer(user);
             Device d = ser.parseDevice(device);
 
@@ -191,14 +191,12 @@ public class DeviceController extends AbstractController implements DeviceConsta
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/moveDevice/{authToken}", method = RequestMethod.GET)
-    public JsonObject moveDevice(@PathVariable final String authToken,
+    @RequestMapping(value = "/moveDevice", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin})
+    public JsonObject moveDevice(
             final @RequestParam String device,
             final @RequestParam Long company) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.SmartTraceAdmin);
-
             //get device
             final Device oldDevice = dao.findByImei(device);
             if (oldDevice == null) {
@@ -284,8 +282,9 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param pageSize page size.
      * @return list of devices.
      */
-    @RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
-    public JsonObject getDevices(@PathVariable final String authToken,
+    @RequestMapping(value = "/getDevices", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getDevices(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -294,9 +293,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final DeviceSerializer ser = createSerializer(user);
 
             final List<ListDeviceItem> devices = dao.getDevices(user.getCompany(),
@@ -382,14 +379,13 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param imei device ID.
      * @return device.
      */
-    @RequestMapping(value = "/getDevice/{authToken}", method = RequestMethod.GET)
-    public JsonObject getDevice(@PathVariable final String authToken,
+    @RequestMapping(value = "/getDevice", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getDevice(
             @RequestParam final String imei) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final Device device = dao.findByImei(imei);
             checkCompanyAccess(user, device);
 
@@ -432,13 +428,12 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param req shipment.
      * @return status.
      */
-    @RequestMapping(value = "/sendCommandToDevice/{authToken}", method = RequestMethod.POST)
-    public JsonObject sendCommandToDevice(@PathVariable final String authToken,
+    @RequestMapping(value = "/sendCommandToDevice", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin})
+    public JsonObject sendCommandToDevice(
             final @RequestBody JsonObject req) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.Admin);
-
+            final User user = getLoggedInUser();
             final DeviceCommand cmd = createSerializer(user).parseDeviceCommand(req);
             checkCompanyAccess(user, cmd.getDevice());
 
@@ -455,13 +450,12 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param req shipment.
      * @return status.
      */
-    @RequestMapping(value = "/shutdownDevice/{authToken}", method = RequestMethod.GET)
-    public JsonObject shutdownDevice(@PathVariable final String authToken,
+    @RequestMapping(value = "/shutdownDevice", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject shutdownDevice(
             final @RequestParam Long shipmentId) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             checkCompanyAccess(user, shipment);
 
@@ -485,13 +479,12 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param req shipment.
      * @return status.
      */
-    @RequestMapping(value = "/initDeviceColors/{authToken}", method = RequestMethod.GET)
-    public JsonObject initDeviceColors(@PathVariable final String authToken,
+    @RequestMapping(value = "/initDeviceColors", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin})
+    public JsonObject initDeviceColors(
             final @RequestParam(required = false) Long company) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.Admin);
-
+            final User user = getLoggedInUser();
             final Company c;
             if (company != null) {
                 c = companyDao.findOne(company);
@@ -516,10 +509,11 @@ public class DeviceController extends AbstractController implements DeviceConsta
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/" + GET_READINGS + "/{authToken}",
+    @RequestMapping(value = "/" + GET_READINGS + "",
             method = RequestMethod.GET, produces = "text/plain")
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public void getTrackerEvents(
-            @PathVariable final String authToken,
+
             @RequestParam(value = "startDate", required = false) final String startDateArg,
             @RequestParam(value = "endDate", required = false) final String endDateArg,
             @RequestParam(value = "device", required = false) final String device,
@@ -532,9 +526,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
             ) throws Exception {
 
         //check logged in.
-        final User user = getLoggedInUser(authToken);
-        checkAccess(user, Role.BasicUser);
-
+        final User user = getLoggedInUser();
         final List<ShortTrackerEventWithAlerts> events;
         File file;
 
@@ -570,6 +562,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         }
 
         final int index = request.getRequestURL().indexOf("/" + GET_READINGS);
+        final String authToken = getSession().getToken().getToken();
         response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
                 authToken, file.getName()));
     }

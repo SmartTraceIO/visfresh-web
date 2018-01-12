@@ -5,33 +5,24 @@ package com.visfresh.controllers;
 
 import static com.visfresh.utils.DateTimeUtils.getTimeRanges;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,27 +35,22 @@ import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.PerformanceReportDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentReportDao;
-import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.UserDao;
 import com.visfresh.dao.impl.TimeAtom;
 import com.visfresh.dao.impl.TimeRanges;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
-import com.visfresh.entities.ShortTrackerEvent;
-import com.visfresh.entities.TrackerEvent;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.EmailShipmentReportRequest;
 import com.visfresh.io.json.ReportsSerializer;
 import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.reports.performance.PerformanceReportBean;
-import com.visfresh.reports.shipment.MapRendererImpl;
 import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBuilder;
 import com.visfresh.rules.AbstractNotificationRule;
 import com.visfresh.services.EmailService;
-import com.visfresh.services.EventsOptimizer;
 import com.visfresh.utils.DateTimeUtils;
 
 /**
@@ -99,13 +85,6 @@ public class ReportsController extends AbstractController {
     @Autowired
     private LocationProfileDao locationProfileDao;
 
-    //TODO remove after test
-    @Autowired
-    private TrackerEventDao trackerEventDao;
-    //TODO remove after test
-    @Autowired
-    private EventsOptimizer eventsOptimizer;
-
     /**
      * Default constructor.
      */
@@ -118,9 +97,10 @@ public class ReportsController extends AbstractController {
      * @param defShipment alert profile.
      * @return ID of saved alert profile.
      */
-    @RequestMapping(value = "/" + GET_PERFORMANCE_REPORT + "/{authToken}", method = RequestMethod.GET)
+    @RequestMapping(value = "/" + GET_PERFORMANCE_REPORT + "", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public void getPerformanceReport(
-            @PathVariable final String authToken,
+
             @RequestParam(required = false, value = "month") final String anchorMonth,
             @RequestParam(required = false, value = "anchor") final String anchorDate,
             @RequestParam(required = false, value = "period") final String period,
@@ -130,9 +110,7 @@ public class ReportsController extends AbstractController {
             )
             throws Exception {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             //period
             TimeAtom atom = TimeAtom.Month;
             if (period != null) {
@@ -179,6 +157,7 @@ public class ReportsController extends AbstractController {
             }
 
             final int index = request.getRequestURL().indexOf("/" + GET_PERFORMANCE_REPORT);
+            final String authToken = getSession().getToken().getToken();
             response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
                     authToken, file.getName()));
 
@@ -228,9 +207,10 @@ public class ReportsController extends AbstractController {
      * @param defShipment alert profile.
      * @return ID of saved alert profile.
      */
-    @RequestMapping(value = "/" + GET_SHIPMENT_REPORT + "/{authToken}", method = RequestMethod.GET)
+    @RequestMapping(value = "/" + GET_SHIPMENT_REPORT + "", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public void getShipmentReport(
-            @PathVariable final String authToken,
+
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip,
@@ -245,10 +225,7 @@ public class ReportsController extends AbstractController {
         }
 
         try {
-            final User user = getLoggedInUser(authToken);
-
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final Shipment s;
             if (shipmentId != null) {
                 s = shipmentDao.findOne(shipmentId);
@@ -267,6 +244,7 @@ public class ReportsController extends AbstractController {
             final File file = createShipmentReport(s, user);
 
             final int index = request.getRequestURL().indexOf("/" + GET_SHIPMENT_REPORT);
+            final String authToken = getSession().getToken().getToken();
             response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
                     authToken, file.getName()));
 
@@ -359,13 +337,12 @@ public class ReportsController extends AbstractController {
      * @param jsonRequest JSON save shipment request.
      * @return ID of saved shipment.
      */
-    @RequestMapping(value = "/emailShipmentReport/{authToken}", method = RequestMethod.POST)
-    public JsonObject emailShipmentReport(@PathVariable final String authToken,
+    @RequestMapping(value = "/emailShipmentReport", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject emailShipmentReport(
             final @RequestBody JsonObject jsonRequest) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final ReportsSerializer serializer = getSerializer();
             final EmailShipmentReportRequest req = serializer.parseEmailShipmentReportRequest(jsonRequest);
 
@@ -408,119 +385,6 @@ public class ReportsController extends AbstractController {
     private ReportsSerializer getSerializer() {
         return new ReportsSerializer();
     }
-
-    @RequestMapping(value = "/demoOptimizer/{authToken}", method = RequestMethod.GET)
-    public void demoOptimizer(@PathVariable final String authToken,
-            @RequestParam(required = false) final Long shipmentId,
-            @RequestParam(required = false) final String sn,
-            @RequestParam(required = false) final Integer trip,
-            final HttpServletRequest request,
-            final HttpServletResponse response
-            ) throws Exception {
-        //check parameters
-        if (shipmentId == null && (sn == null || trip == null)) {
-            throw new IOException("Should be specified shipmentId or (sn and trip) request parameters");
-        }
-
-        try {
-            //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
-            final Shipment s;
-            if (shipmentId != null) {
-                s = shipmentDao.findOne(shipmentId);
-            } else {
-                s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
-            }
-
-            checkCompanyAccess(user, s);
-            if (s == null) {
-                throw new FileNotFoundException("Unknown shipment: " + sn + "(" + trip + ")");
-            }
-
-            log.debug("Get readings from DB");
-            //get readings from DB
-            final List<ShortTrackerEvent> readings = new LinkedList<>();
-            final List<TrackerEvent> events = trackerEventDao.getEvents(s);
-            for (final TrackerEvent e : events) {
-                if (e.getLatitude() != null && e.getLongitude() != null) {
-                    readings.add(new ShortTrackerEvent(e));
-                }
-            }
-
-            //create picture.
-            final BufferedImage image;
-
-            log.debug("Create image with not optimized readings");
-            final BufferedImage im1 = createMapWithPath(readings);
-            log.debug("Create image with optimized readings");
-            final BufferedImage im2 = createMapWithPath(this.eventsOptimizer.optimize(readings));
-
-            log.debug("Create composite image");
-            image = new BufferedImage(
-                    im1.getWidth() + im2.getWidth(),
-                    Math.max(im1.getHeight(), im2.getHeight()),
-                    BufferedImage.TYPE_INT_ARGB);
-            final Graphics2D g = image.createGraphics();
-            try {
-                g.drawImage(im1, 0, 0, null);
-                g.drawImage(im2, im1.getWidth(), 0, null);
-
-                //paint separator.
-                g.setStroke(new BasicStroke(3f));
-                g.setColor(Color.BLACK);
-                g.drawLine(im1.getWidth(), 0, im1.getWidth(), image.getHeight());
-            } finally {
-                g.dispose();
-            }
-
-            log.debug("Write image to file");
-            //write image to file
-            final File file = createTmpFile(s, "gif");
-            ImageIO.write(image, "gif", file);
-
-            log.debug("Do redirect");
-            final int index = request.getRequestURL().indexOf("/demoOptimizer");
-            response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
-                    authToken, file.getName()));
-
-        } catch (final Exception e) {
-            log.error("Failed to create optimizer demo", e);
-            throw e;
-        }
-    }
-
-    /**
-     * @return
-     */
-    @SuppressWarnings("serial")
-    private BufferedImage createMapWithPath(final List<ShortTrackerEvent> readings) {
-        final ShipmentReportBean bean = new ShipmentReportBean();
-        bean.setDeviceColor(Color.RED);
-        bean.getReadings().addAll(readings);
-
-        final Rectangle viewArea = new Rectangle(612, 612);
-
-
-        //use image buffer for avoid of problems with alpha chanel.
-        final BufferedImage image = new BufferedImage(viewArea.width, viewArea.height, BufferedImage.TYPE_INT_ARGB);
-        final Graphics2D g = image.createGraphics();
-
-        try {
-            new MapRendererImpl(bean) {
-                @Override
-                protected List<ShortTrackerEvent> optimize(final List<ShortTrackerEvent> readings) {
-                    return readings;
-                };
-            }.render(g, viewArea);
-        } finally {
-            g.dispose();
-        }
-
-        return image;
-    }
-
     /**
      * @param s shipment.
      * @param extension file extension.

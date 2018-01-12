@@ -8,7 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,9 +21,9 @@ import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentNoteDao;
 import com.visfresh.dao.UserDao;
-import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentNote;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.SaveShipmentNoteRequest;
 import com.visfresh.io.json.ShipmentNoteSerializer;
@@ -63,15 +63,14 @@ public class ShipmentNoteController extends AbstractController {
         super();
     }
 
-    @RequestMapping(value = "/getShipmentNote/{authToken}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getShipmentNote", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getShipmentNote(
-            @PathVariable final String authToken,
+
             @RequestParam final long noteId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final ShipmentNote note = shipmentNoteDao.findOne(noteId);
 
             if (note != null) {
@@ -83,16 +82,15 @@ public class ShipmentNoteController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/getShipmentNotes/{authToken}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getShipmentNotes", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getShipmentNotes(
-            @PathVariable final String authToken,
+
             @RequestParam final long shipmentId,
             @RequestParam final long userId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             //find user and shipment
             final User noteOwner = userDao.findOne(userId);
             final Shipment shipment = shipmentDao.findOne(shipmentId);
@@ -116,14 +114,13 @@ public class ShipmentNoteController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/saveShipmentNote/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveShipmentNote(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveShipmentNote", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveShipmentNote(
             @RequestBody final JsonObject req) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final ShipmentNoteSerializer ser = getSerializer(user);
             final SaveShipmentNoteRequest ssnr = ser.parseSaveShipmentNoteRequest(req);
 

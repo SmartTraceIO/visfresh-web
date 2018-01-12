@@ -89,8 +89,8 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
     public void tearDown() {
         context.getBean(MockEmailService.class).clear();
     }
-    //@RequestMapping(value = "/saveDevice/{authToken}", method = RequestMethod.POST)
-    //public @ResponseBody String saveDevice(@PathVariable final String authToken,
+    //@RequestMapping(value = "/saveDevice", method = RequestMethod.POST)
+    //public @ResponseBody String saveDevice(
     //        final @RequestBody String alert) {
     @Test
     public void testSaveDevice() throws RestServiceException, IOException {
@@ -133,8 +133,8 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
 //        client.deleteDevice(p);
 //        assertNull(dao.findOne(p.getId()));
 //    }
-    //@RequestMapping(value = "/getDevices/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getDevices(@PathVariable final String authToken) {
+    //@RequestMapping(value = "/getDevices", method = RequestMethod.GET)
+    //public @ResponseBody String getDevices() {
     @Test
     public void testGetDevices() throws RestServiceException, IOException {
         createDevice("1111111111111", true);

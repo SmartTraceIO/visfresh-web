@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.visfresh.controllers.audit.CurrentSessionHolder;
+import com.visfresh.controllers.AbstractController;
 import com.visfresh.controllers.audit.ShipmentAuditAction;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.ShipmentAuditItem;
@@ -67,7 +67,7 @@ public class DefaultShipmentAuditService implements ShipmentAuditService {
         boolean shouldSaveAudit = true;
 
         if (user != null) {
-            final RestSession session = CurrentSessionHolder.getCurrentSession();
+            final RestSession session = AbstractController.getSession();
 
             if (session == null) {
                 log.error("Current session is not bound to ThreadLocal for user "

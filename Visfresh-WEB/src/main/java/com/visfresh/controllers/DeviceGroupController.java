@@ -8,7 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,7 +24,7 @@ import com.visfresh.dao.DeviceGroupDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
-import com.visfresh.entities.Role;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.DeviceGroupSerializer;
 import com.visfresh.io.json.DeviceSerializer;
@@ -57,13 +57,12 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      * @param group device group.
      * @return success response.
      */
-    @RequestMapping(value = "/saveDeviceGroup/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveDeviceGroup(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveDeviceGroup", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveDeviceGroup(
             final @RequestBody JsonObject group) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             DeviceGroup g = createSerializer(user).parseDeviceGroup(group);
             g.setCompany(user.getCompany());
 
@@ -83,8 +82,9 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      * @param pageSize page size.
      * @return list of devices.
      */
-    @RequestMapping(value = "/getDeviceGroups/{authToken}", method = RequestMethod.GET)
-    public JsonObject getDeviceGroups(@PathVariable final String authToken,
+    @RequestMapping(value = "/getDeviceGroups", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getDeviceGroups(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -93,9 +93,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final DeviceGroupSerializer ser = createSerializer(user);
 
             final List<DeviceGroup> groups = dao.findByCompany(user.getCompany(),
@@ -120,8 +118,9 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      * @param groupName group name.
      * @return list of devices.
      */
-    @RequestMapping(value = "/getDevicesOfGroup/{authToken}", method = RequestMethod.GET)
-    public JsonObject getDevicesOfGroup(@PathVariable final String authToken,
+    @RequestMapping(value = "/getDevicesOfGroup", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getDevicesOfGroup(
             @RequestParam(required = false) final String groupName,
             @RequestParam(required = false) final Long groupId
             ) {
@@ -132,9 +131,7 @@ public class DeviceGroupController extends AbstractController implements DeviceG
             }
 
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             DeviceGroup group = null;
             if (groupId != null) {
                 group = dao.findOne(groupId);
@@ -171,14 +168,13 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      * @param device device IMEI.
      * @return list of devices.
      */
-    @RequestMapping(value = "/getGroupsOfDevice/{authToken}", method = RequestMethod.GET)
-    public JsonObject getGroupsOfDevice(@PathVariable final String authToken,
+    @RequestMapping(value = "/getGroupsOfDevice", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getGroupsOfDevice(
             @RequestParam final String device) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final Device d = deviceDao.findOne(device);
             checkCompanyAccess(user, d);
 
@@ -201,15 +197,14 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      * @param name device group name.
      * @return JSON response with device group.
      */
-    @RequestMapping(value = "/getDeviceGroup/{authToken}", method = RequestMethod.GET)
-    public JsonObject getDeviceGroup(@PathVariable final String authToken,
+    @RequestMapping(value = "/getDeviceGroup", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getDeviceGroup(
             @RequestParam(required = false) final String name,
             @RequestParam(required = false) final Long id) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             DeviceGroup group = null;
             if (id != null) {
                 group = dao.findOne(id);
@@ -238,15 +233,14 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      * @param name device group name.
      * @return JSON response with device group.
      */
-    @RequestMapping(value = "/deleteDeviceGroup/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteDeviceGroup(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteDeviceGroup", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject deleteDeviceGroup(
             @RequestParam(required = false) final String name,
             @RequestParam(required = false) final Long id) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             DeviceGroup group = null;
             if (id != null) {
                 group = dao.findOne(id);
@@ -276,16 +270,15 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      * @param device device IMEI code.
      * @return response.
      */
-    @RequestMapping(value = "/addDeviceToGroup/{authToken}", method = RequestMethod.GET)
-    public JsonObject addDeviceToGroup(@PathVariable final String authToken,
+    @RequestMapping(value = "/addDeviceToGroup", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject addDeviceToGroup(
             @RequestParam(required = false) final String groupName,
             @RequestParam(required = false) final Long groupId,
             @RequestParam final String device) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             if (groupName == null && groupId == null) {
                 return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
                         "One from 'groupName' or 'groupId' should be specified");
@@ -324,16 +317,15 @@ public class DeviceGroupController extends AbstractController implements DeviceG
      * @param device device IMEI code.
      * @return response.
      */
-    @RequestMapping(value = "/removeDeviceFromGroup/{authToken}", method = RequestMethod.GET)
-    public JsonObject removeDeviceFromGroup(@PathVariable final String authToken,
+    @RequestMapping(value = "/removeDeviceFromGroup", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject removeDeviceFromGroup(
             @RequestParam(required = false) final String groupName,
             @RequestParam(required = false) final Long groupId,
             @RequestParam final String device) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             if (groupName == null && groupId == null) {
                 return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
                         "One from 'groupName' or 'groupId' should be specified");

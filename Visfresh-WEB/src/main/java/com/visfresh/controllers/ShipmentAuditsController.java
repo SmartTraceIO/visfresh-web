@@ -8,7 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,8 +21,8 @@ import com.visfresh.constants.ShipmentAuditConstants;
 import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentAuditDao;
-import com.visfresh.entities.Role;
 import com.visfresh.entities.ShipmentAuditItem;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.ShipmentAuditsSerializer;
 
@@ -56,8 +56,9 @@ public class ShipmentAuditsController extends AbstractController implements Ship
      * @param pageSize the page size.
      * @return list of alert profiles.
      */
-    @RequestMapping(value = "/getShipmentAudits/{authToken}", method = RequestMethod.GET)
-    public JsonElement getShipmentAudits(@PathVariable final String authToken,
+    @RequestMapping(value = "/getShipmentAudits", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin})
+    public JsonElement getShipmentAudits(
             @RequestParam(value = "shipmentId", required = false) final Long shipmentId,
             @RequestParam(value = "userId", required = false) final Integer userId,
             @RequestParam(required = false) final Integer pageIndex,
@@ -69,9 +70,7 @@ public class ShipmentAuditsController extends AbstractController implements Ship
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.Admin);
-
+            final User user = getLoggedInUser();
             //check correct parameters
             if (userId == null && shipmentId == null) {
                 return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,

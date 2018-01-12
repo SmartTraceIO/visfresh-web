@@ -9,7 +9,7 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,8 +25,8 @@ import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.InterimStopDto;
 import com.visfresh.io.json.InterimStopSerializer;
@@ -62,23 +62,21 @@ public class InterimStopController extends AbstractShipmentBaseController implem
      * @param jsonRequest JSON save shipment request.
      * @return ID of saved shipment.
      */
-    @RequestMapping(value = "/addInterimStop/{authToken}", method = RequestMethod.POST)
-    public JsonObject addInterimStop(@PathVariable final String authToken,
-            final @RequestBody JsonObject jsonRequest) {
-        return saveInterimStop(authToken, jsonRequest);
+    @RequestMapping(value = "/addInterimStop", method = RequestMethod.POST)
+    public JsonObject addInterimStop(final @RequestBody JsonObject jsonRequest) {
+        return saveInterimStop(jsonRequest);
     }
     /**
      * @param authToken authentication token.
      * @param jsonRequest JSON save shipment request.
      * @return ID of saved shipment.
      */
-    @RequestMapping(value = "/saveInterimStop/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveInterimStop(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveInterimStop", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveInterimStop(
             final @RequestBody JsonObject jsonRequest) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final InterimStopSerializer serializer = getSerializer(user);
             final InterimStopDto req = serializer.parseInterimStopDto(jsonRequest);
 
@@ -117,14 +115,13 @@ public class InterimStopController extends AbstractShipmentBaseController implem
      * @param jsonRequest JSON save shipment request.
      * @return ID of saved shipment.
      */
-    @RequestMapping(value = "/getInterimStop/{authToken}", method = RequestMethod.GET)
-    public JsonObject getInterimStop(@PathVariable final String authToken,
+    @RequestMapping(value = "/getInterimStop", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject getInterimStop(
             final @RequestParam(value = "shipment") Long shipmentId,
             final @RequestParam Long id) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             //find shipment
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             if (shipment == null) {
@@ -153,14 +150,13 @@ public class InterimStopController extends AbstractShipmentBaseController implem
      * @param jsonRequest JSON save shipment request.
      * @return ID of saved shipment.
      */
-    @RequestMapping(value = "/deleteInterimStop/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteInterimStop(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteInterimStop", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject deleteInterimStop(
             final @RequestParam(value = "shipment") Long shipmentId,
             final @RequestParam Long id) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             //find shipment
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             if (shipment == null) {
@@ -187,13 +183,12 @@ public class InterimStopController extends AbstractShipmentBaseController implem
      * @param jsonRequest JSON save shipment request.
      * @return ID of saved shipment.
      */
-    @RequestMapping(value = "/getInterimStops/{authToken}", method = RequestMethod.GET)
-    public JsonObject getInterimStops(@PathVariable final String authToken,
+    @RequestMapping(value = "/getInterimStops", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject getInterimStops(
             final @RequestParam(value = "shipment") Long shipmentId) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             //find shipment
             final Shipment shipment = shipmentDao.findOne(shipmentId);
             if (shipment == null) {

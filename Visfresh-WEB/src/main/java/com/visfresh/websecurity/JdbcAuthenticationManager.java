@@ -16,9 +16,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.entities.RestSession;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
-import com.visfresh.services.AuthService;
+import com.visfresh.services.RestSessionManager;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -27,7 +28,7 @@ import com.visfresh.services.AuthService;
 @Component
 public class JdbcAuthenticationManager implements AuthenticationManager {
     @Autowired
-    private AuthService service;
+    protected RestSessionManager sessionManager;
 
     /**
      * Default constructor.
@@ -42,19 +43,30 @@ public class JdbcAuthenticationManager implements AuthenticationManager {
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         final String token = (String) authentication.getCredentials();
-        final User auth = service.getUserForToken(token);
+        final RestSession auth = sessionManager.getSession(token);
         if (auth == null) {
             throw new BadCredentialsException("User session for given token not found, possible expired");
         }
 
+        return createAuthentication(auth);
+    }
+
+    /**
+     * @param auth
+     * @return
+     */
+    public static Authentication createAuthentication(final RestSession auth) {
         final Set<GrantedAuthority> roleSet = new HashSet<>();
-        for (final Role role : auth.getRoles()) {
-            final GrantedAuthority ga = new SimpleGrantedAuthority("ROLE_" + role.name());
-            roleSet.add(ga);
+        final User u = auth.getUser();
+        if(u.getRoles() != null) {
+            for (final Role role : u.getRoles()) {
+                final GrantedAuthority ga = new SimpleGrantedAuthority("ROLE_" + role.name());
+                roleSet.add(ga);
+            }
         }
 
         final org.springframework.security.core.userdetails.User user = new org.springframework.security.core.userdetails.User(
-                auth.getEmail(), token, true, true, true, true, roleSet);
+                u.getEmail(), auth.getToken().getToken(), true, true, true, true, roleSet);
         return new PreAuthenticatedAuthenticationToken(user, auth, roleSet);
     }
 }

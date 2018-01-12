@@ -63,8 +63,8 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
         client.setServiceUrl(getServiceUrl());
         client.setAuthToken(login());
     }
-    //@RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getNotifications(@PathVariable final String authToken,
+    //@RequestMapping(value = "/getNotifications", method = RequestMethod.GET)
+    //public @ResponseBody String getNotifications(
     //        @RequestParam final Long shipment) {
     @Test
     public void testGetNotifications() throws IOException, RestServiceException {
@@ -175,8 +175,8 @@ public class NotificationControllerTest extends AbstractRestServiceTest {
         assertEquals(0, client.getNotifications(false, null, null).size());
         assertEquals(1, client.getNotifications(true, null, null).size());
     }
-    //@RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String markNotificationsAsRead(@PathVariable final String authToken,
+    //@RequestMapping(value = "/markNotificationsAsRead", method = RequestMethod.GET)
+    //public @ResponseBody String markNotificationsAsRead(
     //        @RequestBody final String notificationIds) {
     @Test
     public void testMarkNotificationsAsRead() throws IOException, RestServiceException {

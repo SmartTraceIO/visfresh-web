@@ -44,8 +44,8 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
         kutuzov = createUser2();
     }
 
-    //@RequestMapping(value = "/saveNotificationSchedule/{authToken}", method = RequestMethod.POST)
-    //public @ResponseBody String saveNotificationSchedule(@PathVariable final String authToken,
+    //@RequestMapping(value = "/saveNotificationSchedule", method = RequestMethod.POST)
+    //public @ResponseBody String saveNotificationSchedule(
     //        final @RequestBody String schedule) {
     @Test
     public void testSaveNotificationSchedule() throws RestServiceException, IOException {
@@ -54,8 +54,8 @@ public class NotificationScheduleControllerTest extends AbstractRestServiceTest 
 
         assertNotNull(id);
     }
-    //@RequestMapping(value = "/getNotificationSchedules/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getNotificationSchedules(@PathVariable final String authToken) {
+    //@RequestMapping(value = "/getNotificationSchedules", method = RequestMethod.GET)
+    //public @ResponseBody String getNotificationSchedules() {
     @Test
     public void testGetNotificationSchedules() throws RestServiceException, IOException {
         createNotificationSchedule(suvorov, true);

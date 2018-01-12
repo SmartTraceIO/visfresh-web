@@ -5,13 +5,14 @@ package com.visfresh.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonObject;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AuthTokenSerializer;
 import com.visfresh.services.AuthToken;
@@ -57,19 +58,22 @@ public class AuthenticationController extends AbstractController {
     /**
      * @param authToken authentication token.
      */
-    @RequestMapping(value = "/logout/{authToken}", method = RequestMethod.GET)
-    public JsonObject logout(@PathVariable final String authToken) {
-        authService.logout(authToken);
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject logout() {
+        authService.logout(getSession().getToken().getToken());
         return createSuccessResponse(null);
     }
     /**
      * @param authToken old authentication token.
      * @return refreshed authorization token.
      */
-    @RequestMapping(value = "/refreshToken/{authToken}", method = RequestMethod.GET)
-    public JsonObject refreshToken(@PathVariable final String authToken) {
+    @RequestMapping(value = "/refreshToken", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject refreshToken() {
+        final String authToken = getSession().getToken().getToken();
         try {
-            final User user = getLoggedInUser(authToken);
+            final User user = getLoggedInUser();
             final AuthToken token = authService.refreshToken(authToken);
             return createSuccessResponse(getSerializer(user).toJson(token));
         } catch (final Exception e) {

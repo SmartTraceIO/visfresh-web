@@ -54,8 +54,8 @@ public class CorrectiveActionControllerTest extends AbstractRestServiceTest {
         client.setAuthToken(token);
     }
 
-    //@RequestMapping(value = "/saveCorrectiveActionList/{authToken}", method = RequestMethod.POST)
-    //public @ResponseBody String saveCorrectiveActionList(@PathVariable final String authToken,
+    //@RequestMapping(value = "/saveCorrectiveActionList", method = RequestMethod.POST)
+    //public @ResponseBody String saveCorrectiveActionList(
     //        final @RequestBody String alert) {
     @Test
     public void testSaveCorrectiveActionList() throws RestServiceException, IOException {
@@ -93,8 +93,8 @@ public class CorrectiveActionControllerTest extends AbstractRestServiceTest {
         client.deleteCorrectiveActionList(p);
         assertNull(dao.findOne(p.getId()));
     }
-    //@RequestMapping(value = "/getCorrectiveActionLists/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getCorrectiveActionLists(@PathVariable final String authToken) {
+    //@RequestMapping(value = "/getCorrectiveActionLists", method = RequestMethod.GET)
+    //public @ResponseBody String getCorrectiveActionLists() {
     @Test
     public void testGetCorrectiveActionLists() throws RestServiceException, IOException {
         createCorrectiveActionList(true);

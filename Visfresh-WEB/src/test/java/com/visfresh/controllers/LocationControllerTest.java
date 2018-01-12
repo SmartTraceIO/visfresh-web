@@ -50,8 +50,8 @@ public class LocationControllerTest extends AbstractRestServiceTest {
         client.setAuthToken(login());
     }
 
-    //@RequestMapping(value = "/saveLocationProfile/{authToken}", method = RequestMethod.POST)
-    //public @ResponseBody String saveLocationProfile(@PathVariable final String authToken,
+    //@RequestMapping(value = "/saveLocationProfile", method = RequestMethod.POST)
+    //public @ResponseBody String saveLocationProfile(
     //        final @RequestBody String profile) {
     @Test
     public void testSaveLocationProfile() throws RestServiceException, IOException {
@@ -70,8 +70,8 @@ public class LocationControllerTest extends AbstractRestServiceTest {
         client.deleteLocation(lp.getId());
         assertNull(client.getLocation(lp.getId()));
     }
-    //@RequestMapping(value = "/getLocationProfiles/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getLocationProfiles(@PathVariable final String authToken) {
+    //@RequestMapping(value = "/getLocationProfiles", method = RequestMethod.GET)
+    //public @ResponseBody String getLocationProfiles() {
     @Test
     public void testGetLocationProfiles() throws RestServiceException, IOException {
         createLocationProfile(true);

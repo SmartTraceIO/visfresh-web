@@ -34,4 +34,11 @@ public class JsonConverter extends MappingJackson2HttpMessageConverter {
     public boolean canWrite(final Class<?> clazz, final MediaType mediaType) {
         return canWrite(mediaType);
     }
+    /* (non-Javadoc)
+     * @see org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter#canRead(java.lang.Class, org.springframework.http.MediaType)
+     */
+    @Override
+    public boolean canRead(final Class<?> clazz, final MediaType mediaType) {
+        return super.canRead(clazz, mediaType);
+    }
 }

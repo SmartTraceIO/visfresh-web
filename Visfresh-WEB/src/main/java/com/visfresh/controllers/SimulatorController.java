@@ -9,7 +9,7 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,6 +26,7 @@ import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Simulator;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.SimulatorDto;
 import com.visfresh.io.StartSimulatorRequest;
@@ -63,13 +64,12 @@ public class SimulatorController extends AbstractController {
         super();
     }
 
-    @RequestMapping(value = "/saveSimulator/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveSimulator(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveSimulator", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin})
+    public JsonObject saveSimulator(
             final @RequestBody JsonObject json) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.SmartTraceAdmin);
-
+            final User user = getLoggedInUser();
             final SimulatorDto dto = createSerializer(user).parseSimulator(json);
 
             //find source device.
@@ -122,11 +122,12 @@ public class SimulatorController extends AbstractController {
         }
     }
 
-    @RequestMapping(value = "/getSimulator/{authToken}", method = RequestMethod.GET)
-    public JsonObject getSimulator(@PathVariable final String authToken,
+    @RequestMapping(value = "/getSimulator", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getSimulator(
             final @RequestParam(required = false) String user) {
         try {
-            final User currentUser = getLoggedInUser(authToken);
+            final User currentUser = getLoggedInUser();
 
             //find user
             final User u = getSimulatorOwner(user, currentUser);
@@ -143,13 +144,11 @@ public class SimulatorController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/deleteSimulator/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteSimulator(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteSimulator", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin})
+    public JsonObject deleteSimulator(
             final @RequestParam String user) {
         try {
-            final User currentUser = getLoggedInUser(authToken);
-            checkAccess(currentUser, Role.SmartTraceAdmin);
-
             //find user
             final User u = userDao.findByEmail(user);
             if (u == null) {
@@ -165,11 +164,12 @@ public class SimulatorController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/startSimulator/{authToken}", method = RequestMethod.POST)
-    public JsonObject startSimulator(@PathVariable final String authToken,
+    @RequestMapping(value = "/startSimulator", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject startSimulator(
             final @RequestBody JsonObject json) {
         try {
-            final User user = getLoggedInUser(authToken);
+            final User user = getLoggedInUser();
             final SimulatorSerializer ser = createSerializer(user);
 
             final StartSimulatorRequest req = ser.parseStartRequest(json);
@@ -204,11 +204,12 @@ public class SimulatorController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/stopSimulator/{authToken}", method = RequestMethod.GET)
-    public JsonObject stopSimulator(@PathVariable final String authToken,
+    @RequestMapping(value = "/stopSimulator", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject stopSimulator(
             final @RequestParam(required = false) String user) {
         try {
-            final User currentUser = getLoggedInUser(authToken);
+            final User currentUser = getLoggedInUser();
             //find user
             final User u = getSimulatorOwner(user, currentUser);
 

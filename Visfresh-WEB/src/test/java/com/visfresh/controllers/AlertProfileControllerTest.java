@@ -61,8 +61,8 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         client.setAuthToken(token);
     }
 
-    //@RequestMapping(value = "/saveAlertProfile/{authToken}", method = RequestMethod.POST)
-    //public @ResponseBody String saveAlertProfile(@PathVariable final String authToken,
+    //@RequestMapping(value = "/saveAlertProfile", method = RequestMethod.POST)
+    //public @ResponseBody String saveAlertProfile(
     //        final @RequestBody String alert) {
     @Test
     public void testSaveAlertProfile() throws RestServiceException, IOException {
@@ -140,8 +140,8 @@ public class AlertProfileControllerTest extends AbstractRestServiceTest {
         client.deleteAlertProfile(p);
         assertNull(dao.findOne(p.getId()));
     }
-    //@RequestMapping(value = "/getAlertProfiles/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getAlertProfiles(@PathVariable final String authToken) {
+    //@RequestMapping(value = "/getAlertProfiles", method = RequestMethod.GET)
+    //public @ResponseBody String getAlertProfiles() {
     @Test
     public void testGetAlertProfiles() throws RestServiceException, IOException {
         createAlertProfile(true);

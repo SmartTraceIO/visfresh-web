@@ -91,8 +91,8 @@ public class ActionTakenControllerTest extends AbstractRestServiceTest {
         this.lightOnAlert = la;
     }
 
-    //@RequestMapping(value = "/saveActionTaken/{authToken}", method = RequestMethod.POST)
-    //public @ResponseBody String saveActionTaken(@PathVariable final String authToken,
+    //@RequestMapping(value = "/saveActionTaken", method = RequestMethod.POST)
+    //public @ResponseBody String saveActionTaken(
     //        final @RequestBody String alert) {
     @Test
     public void testSaveActionTaken() throws RestServiceException, IOException {
@@ -138,8 +138,8 @@ public class ActionTakenControllerTest extends AbstractRestServiceTest {
         client.deleteActionTaken(p);
         assertNull(dao.findOne(p.getId()));
     }
-    //@RequestMapping(value = "/getActionTakens/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getActionTakens(@PathVariable final String authToken) {
+    //@RequestMapping(value = "/getActionTakens", method = RequestMethod.GET)
+    //public @ResponseBody String getActionTakens() {
     @Test
     public void testGetActionTakens() throws RestServiceException, IOException {
         createActionTaken(temperatureAlert, "Check the door opened");

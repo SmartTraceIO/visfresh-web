@@ -16,7 +16,7 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,7 +32,7 @@ import com.visfresh.dao.LiteShipmentDao;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Language;
-import com.visfresh.entities.Role;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.json.GetShipmentsRequestParser;
@@ -66,14 +66,12 @@ public class LiteShipmentController extends AbstractController {
      * @param pageSize page size.
      * @return list of shipments.
      */
-    @RequestMapping(value = "/getShipments/{authToken}", method = RequestMethod.POST)
-    public JsonObject getShipments(@PathVariable final String authToken,
-            @RequestBody final JsonObject request) {
+    @RequestMapping(value = "/getShipments", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getShipments(@RequestBody final JsonObject request) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final LiteShipmentSerializer ser = getSerializer(user);
             final GetFilteredShipmentsRequest req = new GetShipmentsRequestParser(
                     user.getTimeZone()).parseGetFilteredShipmentsRequest(request);
@@ -112,17 +110,16 @@ public class LiteShipmentController extends AbstractController {
      * @param pageSize page size.
      * @return list of shipments.
      */
-    @RequestMapping(value = "/getShipmentsNearby/{authToken}", method = RequestMethod.GET)
-    public JsonObject getShipmentsNearby(@PathVariable final String authToken,
+    @RequestMapping(value = "/getShipmentsNearby", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getShipmentsNearby(
             @RequestParam(value = "lat") final String latStr,
             @RequestParam(value = "lon") final String lonStr,
             @RequestParam final int radius,
             @RequestParam(required = false, value = "from") final String fromStr) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             //parse request parameters.
             final double lat = Double.parseDouble(latStr);
             final double lon = Double.parseDouble(lonStr);

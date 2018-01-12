@@ -1,9 +1,15 @@
 /**
  *
  */
-package com.visfresh.controllers;
+package com.visfresh.controllers.init;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.util.HashSet;
@@ -12,22 +18,16 @@ import java.util.Set;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletMapping;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.FrameworkServlet;
 
-import com.visfresh.controllers.init.RestServicesTestConfig;
+import com.visfresh.controllers.AbstractRestServiceTest;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DbTestRunner;
 import com.visfresh.entities.Company;
@@ -37,6 +37,7 @@ import com.visfresh.mock.MockAuditSaver;
 import com.visfresh.mock.MockEmailService;
 import com.visfresh.mock.MockRestSessionManager;
 import com.visfresh.services.AuthService;
+import com.visfresh.utils.StringUtils;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -44,48 +45,48 @@ import com.visfresh.services.AuthService;
  */
 public class RestServiceRunner extends BlockJUnit4ClassRunner {
     public static final String SHARED_COMPANY_NAME = "Special JUnit Company";
+    private static final String CONTEXT_PATCH = "/web";
 
     /**
      * WEB application context.
      */
-    protected static AbstractApplicationContext context;
     private static Server server;
     protected static URL url;
-
-    static {
-        final int port = getFreePort();
-        //search free port
-        try {
-            final ServletHandler handler = getServletHandler();
-            server = createServer(handler, port);
-            server.start();
-
-            //get WEB application context.
-            context = (AbstractApplicationContext) ((FrameworkServlet) handler.getServlet("SpringDispatcher").getServlet())
-                    .getWebApplicationContext();
-
-            url = new URL("http://localhost:" + port + "/web/vf");
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static AbstractApplicationContext context = startServer();
     /**
      * @param klass testing class.
      */
     public RestServiceRunner(final Class<?> klass) throws InitializationError {
         super(klass);
     }
+
+    /**
+     * @return
+     */
+    private static AbstractApplicationContext startServer() {
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+        final int port = getFreePort();
+        //search free port
+        try {
+            final WebAppContext handler = getServletHandler();
+            final Server server = createServer(handler, port);
+            server.start();
+
+            //get WEB application context.
+            final AbstractApplicationContext context = (AbstractApplicationContext) ((FrameworkServlet) handler.getServletHandler().getServlet(
+                    "SpringDispatcher").getServlet()).getWebApplicationContext();
+
+            url = new URL("http://localhost:" + port + CONTEXT_PATCH + "/vf");
+            return context;
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     /**
      * @param port
      * @return
      */
-    private static Server createServer(final ServletHandler handler, final int port) {
-        //context handler
-        final ServletContextHandler contextHandler = new ServletContextHandler();
-        contextHandler.setContextPath( "/web" );
-        contextHandler.setHandler(handler);
-        contextHandler.setSessionHandler(new SessionHandler());
-
+    private static Server createServer(final WebAppContext handler, final int port) {
         final QueuedThreadPool pool = new QueuedThreadPool();
         pool.setDaemon(true); // it allows the server to be stopped after tests finished
         final Server server = new Server(pool);
@@ -94,33 +95,49 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
         connector.setPort(port);
         server.setConnectors(new Connector[]{connector});
 
-        server.setHandler(contextHandler);
+        server.setHandler(handler);
         return server;
     }
-
     /**
      * @return
      */
-    protected static ServletHandler getServletHandler() {
-        //configure servlet
-        final ServletHolder holder = new ServletHolder();
+    protected static WebAppContext getServletHandler() {
+        //create test webapp context
+        final File f = new File(System.getProperty("user.home") + File.separatorChar + ".junitwebapp/WEB-INF");
+        if (!f.exists()) {
+            f.mkdirs();
+        }
 
-        holder.setHeldClass(DispatcherServlet.class);
-        holder.setName("SpringDispatcher");
-        holder.setInitParameter("contextClass", AnnotationConfigWebApplicationContext.class.getName());
-        holder.setInitParameter("contextConfigLocation", RestServicesTestConfig.class.getPackage().getName());
+        //create test web.xml
+        final String originWebXml = RestServiceRunner.class.getClassLoader().getResource(".").toString()
+                + "../../src/main/webapp/WEB-INF/web.xml";
+        String webXml;
+        try {
+            webXml = StringUtils.getContent(new URL(originWebXml), "UTF-8");
+            webXml = webXml.replace("com.visfresh.init.prod", RestServicesTestConfig.class.getPackage().getName());
+            writeTo(webXml, new File(f, "web.xml"));
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
 
-        //add servlet mapping
-        final ServletMapping mapping = new ServletMapping();
-        mapping.setPathSpec("/vf/*");
-        mapping.setServletName(holder.getName());
-
-        //set handler to servlet.
-        final ServletHandler handler = new ServletHandler();
-        handler.addServlet(holder);
-        handler.addServletMapping(mapping);
-
-        return handler;
+        final WebAppContext webapp = new WebAppContext(f.getParent(), CONTEXT_PATCH);
+        webapp.setParentLoaderPriority(true);
+        return webapp;
+    }
+    /**
+     * @param webXml web.xml file content.
+     * @param file target file
+     * @throws FileNotFoundException
+     * @throws UnsupportedEncodingException
+     */
+    private static void writeTo(final String webXml, final File file) throws IOException {
+        final Writer out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+        try {
+            out.write(webXml);
+            out.flush();
+        } finally {
+            out.close();
+        }
     }
 
     /**
@@ -140,7 +157,6 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
             throw new RuntimeException(e);
         }
     }
-
     /* (non-Javadoc)
      * @see org.junit.runners.BlockJUnit4ClassRunner#runChild(org.junit.runners.model.FrameworkMethod, org.junit.runner.notification.RunNotifier)
      */
@@ -160,6 +176,7 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
             user.setFirstName("Yury");
             user.setLastName("Gagarin");
             user.setCompany(c);
+
             final Set<Role> roles = new HashSet<Role>();
             roles.add(Role.Admin);
             user.setRoles(roles);
@@ -180,6 +197,10 @@ public class RestServiceRunner extends BlockJUnit4ClassRunner {
      */
     @Override
     protected Object createTest() throws Exception {
+//        final Object test = super.createTest();
+//        final AutowireCapableBeanFactory f = context.getAutowireCapableBeanFactory();
+//        f.autowireBean(test);
+//        return test;
         final Object test = super.createTest();
         if (test instanceof AbstractRestServiceTest) {
             final AbstractRestServiceTest rt = (AbstractRestServiceTest) test;

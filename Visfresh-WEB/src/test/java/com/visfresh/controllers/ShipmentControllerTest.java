@@ -145,8 +145,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         assertEquals(1, shipmentClient.getShipments(1, 10000).size());
         assertEquals(1, currentJsonResponse.get("totalCount").getAsInt());
     }
-    //@RequestMapping(value = "/saveShipment/{authToken}", method = RequestMethod.POST)
-    //public @ResponseBody String saveShipment(@PathVariable final String authToken,
+    //@RequestMapping(value = "/saveShipment", method = RequestMethod.POST)
+    //public @ResponseBody String saveShipment(
     //        final @RequestBody String shipment) {
     @Test
     public void testSaveShipment() throws RestServiceException, IOException {
@@ -1094,8 +1094,8 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
 
         shipmentClient.getSingleShipment(sp).getAsJsonObject();
     }
-    //@RequestMapping(value = "/getShipmentData/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String getShipmentData(@PathVariable final String authToken,
+    //@RequestMapping(value = "/getShipmentData", method = RequestMethod.GET)
+    //public @ResponseBody String getShipmentData(
     //        @RequestParam final String fromDate,
     //        @RequestParam final String toDate,
     //        @RequestParam final String onlyWithAlerts

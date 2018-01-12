@@ -9,16 +9,17 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
-
-import junit.framework.AssertionFailedError;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.visfresh.controllers.restclient.RestClient;
 import com.visfresh.controllers.restclient.UserRestClient;
+import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.io.email.EmailMessage;
 import com.visfresh.mock.MockEmailService;
@@ -26,6 +27,8 @@ import com.visfresh.services.AuthService;
 import com.visfresh.services.DefaultAuthService;
 import com.visfresh.services.DefaultReferenceResolver;
 import com.visfresh.services.RestServiceException;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -80,14 +83,18 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
     @Test
     public void testSupportOfMultipleSessions() throws RestServiceException, IOException {
         final String password = "lkasdlfkj";
+        final Set<Role> roles = new HashSet<>();
+        roles.add(Role.NormalUser);
 
         final User u1 = new User();
         u1.setEmail("user1@visfresh.com");
         u1.setCompany(getCompany());
+        u1.setRoles(roles);
 
         final User u2 = new User();
         u2.setEmail("user2@visfresh.com");
         u2.setCompany(getCompany());
+        u2.setRoles(roles);
 
         authService.saveUser(u1, password, false);
         authService.saveUser(u2, password, false);
@@ -110,14 +117,14 @@ public class AuthServiceControllerTest extends AbstractRestServiceTest {
         final String token = client.getToken();
         assertNotNull(token);
     }
-    //@RequestMapping(value = "/logout/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String logout(@PathVariable final String authToken) {
+    //@RequestMapping(value = "/logout", method = RequestMethod.GET)
+    //public @ResponseBody String logout() {
     @Test
     public void testLogout() throws RestServiceException, IOException {
         client.logout(client.getAuthToken());
     }
-    //@RequestMapping(value = "/refreshToken/{authToken}", method = RequestMethod.GET)
-    //public @ResponseBody String refreshToken(@PathVariable final String authToken) {
+    //@RequestMapping(value = "/refreshToken", method = RequestMethod.GET)
+    //public @ResponseBody String refreshToken() {
     @Test
     public void testRefreshToken() throws IOException, RestServiceException {
         final String token = client.refreshToken();

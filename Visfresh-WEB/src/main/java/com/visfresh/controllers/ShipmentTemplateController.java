@@ -8,7 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,8 +22,8 @@ import com.visfresh.dao.Filter;
 import com.visfresh.dao.Page;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.impl.ShipmentTemplateDaoImpl;
-import com.visfresh.entities.Role;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.ShipmentTemplateDto;
 import com.visfresh.io.json.ShipmentTemplateSerializer;
@@ -55,13 +55,12 @@ public class ShipmentTemplateController extends AbstractShipmentBaseController i
      * @param tpl shipment template.
      * @return ID of saved shipment template.
      */
-    @RequestMapping(value = "/saveShipmentTemplate/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveShipmentTemplate(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveShipmentTemplate", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveShipmentTemplate(
             final @RequestBody JsonObject tpl) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final ShipmentTemplateDto dto = createSerializer(user).parseShipmentTemplate(tpl);
 
             checkCompanyAccess(user, shipmentTemplateDao.findOne(dto.getId()));
@@ -88,8 +87,9 @@ public class ShipmentTemplateController extends AbstractShipmentBaseController i
      * @param pageSize page size.
      * @return list of shipment templates.
      */
-    @RequestMapping(value = "/getShipmentTemplates/{authToken}", method = RequestMethod.GET)
-    public JsonObject getShipmentTemplates(@PathVariable final String authToken,
+    @RequestMapping(value = "/getShipmentTemplates", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getShipmentTemplates(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -99,8 +99,7 @@ public class ShipmentTemplateController extends AbstractShipmentBaseController i
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            final User user = getLoggedInUser();
 
             final Filter filter = new Filter();
             filter.addFilter(ShipmentTemplateDaoImpl.AUTOSTART_FIELD, false);
@@ -139,14 +138,13 @@ public class ShipmentTemplateController extends AbstractShipmentBaseController i
      * @param shipmentTemplateId shipment template ID.
      * @return shipment template.
      */
-    @RequestMapping(value = "/getShipmentTemplate/{authToken}", method = RequestMethod.GET)
-    public JsonObject getShipmentTemplate(@PathVariable final String authToken,
+    @RequestMapping(value = "/getShipmentTemplate", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getShipmentTemplate(
             @RequestParam final Long shipmentTemplateId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final ShipmentTemplate template = shipmentTemplateDao.findOne(shipmentTemplateId);
             checkCompanyAccess(user, template);
 
@@ -165,14 +163,13 @@ public class ShipmentTemplateController extends AbstractShipmentBaseController i
      * @param shipmentTemplateId shipment template ID.
      * @return shipment template.
      */
-    @RequestMapping(value = "/deleteShipmentTemplate/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteShipmentTemplate(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteShipmentTemplate", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject deleteShipmentTemplate(
             @RequestParam final Long shipmentTemplateId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final ShipmentTemplate tpl = shipmentTemplateDao.findOne(shipmentTemplateId);
             checkCompanyAccess(user, tpl);
 

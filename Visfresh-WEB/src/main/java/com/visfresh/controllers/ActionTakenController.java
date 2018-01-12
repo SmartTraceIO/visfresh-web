@@ -8,7 +8,7 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,8 +24,8 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.entities.ActionTaken;
 import com.visfresh.entities.ActionTakenView;
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.ActionTakenSerializer;
 import com.visfresh.l12n.RuleBundle;
@@ -65,12 +65,12 @@ public class ActionTakenController extends AbstractController {
      * @param alert action taken.
      * @return ID of saved action taken.
      */
-    @RequestMapping(value = "/saveActionTaken/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveActionTaken(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveActionTaken", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveActionTaken(
             final @RequestBody JsonObject actionTakenJson) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            final User user = getLoggedInUser();
 
             final ActionTaken p = createSerializer(user).parseActionTaken(actionTakenJson);
 
@@ -103,12 +103,12 @@ public class ActionTakenController extends AbstractController {
      * @param alert action taken.
      * @return ID of saved action taken.
      */
-    @RequestMapping(value = "/verifyActionTaken/{authToken}", method = RequestMethod.POST)
-    public JsonObject verifyActionTaken(@PathVariable final String authToken,
+    @RequestMapping(value = "/verifyActionTaken", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject verifyActionTaken(
             final @RequestBody JsonObject req) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            final User user = getLoggedInUser();
 
             final Long id = req.get("id").getAsLong();
             String comments = null;
@@ -141,13 +141,13 @@ public class ActionTakenController extends AbstractController {
      * @param id action taken ID.
      * @return action taken.
      */
-    @RequestMapping(value = "/getActionTaken/{authToken}", method = RequestMethod.GET)
-    public JsonObject getActionTaken(@PathVariable final String authToken,
+    @RequestMapping(value = "/getActionTaken", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getActionTaken(
             @RequestParam final Long id) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            final User user = getLoggedInUser();
 
             final ActionTakenView actionTaken = dao.findOne(id, user.getCompany());
             return createSuccessResponse(createSerializer(user).toJson(actionTaken));
@@ -161,13 +161,13 @@ public class ActionTakenController extends AbstractController {
      * @param id action taken ID.
      * @return action taken.
      */
-    @RequestMapping(value = "/deleteActionTaken/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteActionTaken(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteActionTaken", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject deleteActionTaken(
             @RequestParam final Long id) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
+            final User user = getLoggedInUser();
 
             final ActionTakenView p = dao.findOne(id, user.getCompany());
             if (p != null) {
@@ -186,14 +186,14 @@ public class ActionTakenController extends AbstractController {
      * @param pageSize the page size.
      * @return list of action takens.
      */
-    @RequestMapping(value = "/getActionTakens/{authToken}", method = RequestMethod.GET)
-    public JsonElement getActionTakens(@PathVariable final String authToken,
+    @RequestMapping(value = "/getActionTakens", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonElement getActionTakens(
             @RequestParam(required = true, value = "shipment") final Long shipmentId
             ) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
+            final User user = getLoggedInUser();
 
             final Shipment shipment = shipmentDao.findOne(shipmentId);
 

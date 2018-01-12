@@ -11,7 +11,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +28,7 @@ import com.visfresh.dao.impl.ShipmentBaseDao;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
 import com.visfresh.entities.ReferenceInfo;
-import com.visfresh.entities.Role;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.NotificationScheduleSerializer;
@@ -66,13 +66,12 @@ public class NotificationScheduleController extends AbstractController implement
      * @param schedule notification schedule.
      * @return ID of saved notification schedule.
      */
-    @RequestMapping(value = "/saveNotificationSchedule/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveNotificationSchedule(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveNotificationSchedule", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveNotificationSchedule(
             final @RequestBody JsonObject schedule) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final NotificationSchedule s = createSerializer(user).parseNotificationSchedule(schedule);
             s.setCompany(user.getCompany());
 
@@ -92,8 +91,9 @@ public class NotificationScheduleController extends AbstractController implement
      * @param pageSize page size.
      * @return list of notification schedules.
      */
-    @RequestMapping(value = "/getNotificationSchedules/{authToken}", method = RequestMethod.GET)
-    public JsonObject getNotificationSchedules(@PathVariable final String authToken,
+    @RequestMapping(value = "/getNotificationSchedules", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getNotificationSchedules(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -103,9 +103,7 @@ public class NotificationScheduleController extends AbstractController implement
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final List<NotificationSchedule> schedules = dao.findByCompany(
                     user.getCompany(),
                     createSorting(sc, so, getDefaultSortOrder(), 2),
@@ -152,16 +150,15 @@ public class NotificationScheduleController extends AbstractController implement
      * @param personScheduleId person schedule ID.
      * @return list of notification schedules.
      */
-    @RequestMapping(value = "/deletePersonSchedule/{authToken}", method = RequestMethod.GET)
-    public JsonObject deletePersonSchedule(@PathVariable final String authToken,
+    @RequestMapping(value = "/deletePersonSchedule", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject deletePersonSchedule(
             @RequestParam final long notificationScheduleId,
             @RequestParam final long personScheduleId) {
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             //find schedule
             final NotificationSchedule s = dao.findOne(notificationScheduleId);
             checkCompanyAccess(user, s);
@@ -188,14 +185,13 @@ public class NotificationScheduleController extends AbstractController implement
      * @param notificationScheduleId notification schedule ID.
      * @return notification schedule.
      */
-    @RequestMapping(value = "/getNotificationSchedule/{authToken}", method = RequestMethod.GET)
-    public JsonObject getNotificationSchedule(@PathVariable final String authToken,
+    @RequestMapping(value = "/getNotificationSchedule", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject getNotificationSchedule(
             @RequestParam final Long notificationScheduleId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final NotificationSchedule s = dao.findOne(notificationScheduleId);
             checkCompanyAccess(user, s);
 
@@ -210,14 +206,13 @@ public class NotificationScheduleController extends AbstractController implement
      * @param notificationScheduleId notification schedule ID.
      * @return notification schedule.
      */
-    @RequestMapping(value = "/deleteNotificationSchedule/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteNotificationSchedule(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteNotificationSchedule", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject deleteNotificationSchedule(
             @RequestParam final Long notificationScheduleId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final NotificationSchedule s = dao.findOne(notificationScheduleId);
             checkCompanyAccess(user, s);
 

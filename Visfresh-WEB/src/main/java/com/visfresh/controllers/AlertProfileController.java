@@ -8,7 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,7 +23,7 @@ import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Company;
-import com.visfresh.entities.Role;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
@@ -61,13 +61,12 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @param alert alert profile.
      * @return ID of saved alert profile.
      */
-    @RequestMapping(value = "/saveAlertProfile/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveAlertProfile(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveAlertProfile", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveAlertProfile(
             final @RequestBody JsonObject alert) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final AlertProfile p = createSerializer(user, user.getCompany()).parseAlertProfile(alert);
 
             final AlertProfile old = dao.findOne(p.getId());
@@ -85,14 +84,13 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @param alertProfileId alert profile ID.
      * @return alert profile.
      */
-    @RequestMapping(value = "/getAlertProfile/{authToken}", method = RequestMethod.GET)
-    public JsonObject getAlertProfile(@PathVariable final String authToken,
+    @RequestMapping(value = "/getAlertProfile", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getAlertProfile(
             @RequestParam final Long alertProfileId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final AlertProfile alert = dao.findOne(alertProfileId);
             checkCompanyAccess(user, alert);
 
@@ -107,14 +105,13 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @param alertProfileId alert profile ID.
      * @return alert profile.
      */
-    @RequestMapping(value = "/deleteAlertProfile/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteAlertProfile(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteAlertProfile", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject deleteAlertProfile(
             @RequestParam final Long alertProfileId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final AlertProfile p = dao.findOne(alertProfileId);
             checkCompanyAccess(user, p);
             dao.delete(p);
@@ -131,8 +128,9 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @param pageSize the page size.
      * @return list of alert profiles.
      */
-    @RequestMapping(value = "/getAlertProfiles/{authToken}", method = RequestMethod.GET)
-    public JsonElement getAlertProfiles(@PathVariable final String authToken,
+    @RequestMapping(value = "/getAlertProfiles", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonElement getAlertProfiles(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -142,9 +140,7 @@ public class AlertProfileController extends AbstractController implements AlertP
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final AlertProfileSerializer ser = createSerializer(user, user.getCompany());
 
             final List<AlertProfile> alerts = dao.findByCompany(

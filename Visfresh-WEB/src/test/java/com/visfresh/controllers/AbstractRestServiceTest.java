@@ -12,6 +12,7 @@ import java.util.TimeZone;
 import org.junit.runner.RunWith;
 import org.springframework.context.support.AbstractApplicationContext;
 
+import com.visfresh.controllers.init.RestServiceRunner;
 import com.visfresh.dao.AlertProfileDao;
 import com.visfresh.dao.CompanyDao;
 import com.visfresh.dao.DeviceDao;

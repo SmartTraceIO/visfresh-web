@@ -23,13 +23,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.visfresh.entities.Role;
-import com.visfresh.entities.User;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 
@@ -101,19 +101,14 @@ public class FileDownloadController extends AbstractController {
      * @throws RestServiceException
      * @throws IOException
      */
-    @RequestMapping(value = "/" + DOWNLOAD_FILE + "/{authToken}/{fileNamePart}", method = RequestMethod.GET)
-    public ResponseEntity<?> downloadFile(@PathVariable final String authToken,
+    @RequestMapping(value = "/" + DOWNLOAD_FILE + "/{fileNamePart}", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public ResponseEntity<?> downloadFile(
             @PathVariable final String fileNamePart,
             final HttpServletRequest req)
             throws AuthenticationException, RestServiceException, IOException {
-
-        //check logged in.
-        final User user = getLoggedInUser(authToken);
-        checkAccess(user, Role.BasicUser);
-
         //extract file name
-        String fileName = req.getRequestURI().substring(req.getRequestURI().indexOf(authToken)
-                + authToken.length() + 1);
+        String fileName = req.getRequestURI().substring(req.getRequestURI().lastIndexOf('/') + 1);
         fileName = URLDecoder.decode(fileName, URL_ENCODING);
 
         final File file = getFile(fileName);

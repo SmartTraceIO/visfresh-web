@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonArray;
@@ -20,6 +22,7 @@ import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.Sorting;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.EntityWithCompany;
+import com.visfresh.entities.RestSession;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
@@ -71,17 +74,6 @@ public abstract class AbstractController {
             throws RestServiceException {
         for (final T t : c) {
             checkCompanyAccess(user, t);
-        }
-    }
-    /**
-     * @param user user.
-     * @param role role.
-     * @throws RestServiceException
-     */
-    protected void checkAccess(final User user, final Role role) throws RestServiceException {
-        if (!role.hasRole(user)) {
-            throw new RestServiceException(ErrorCodes.SECURITY_ERROR,
-                    user.getEmail() + " is not permitted for role " + role);
         }
     }
     /**
@@ -170,17 +162,26 @@ public abstract class AbstractController {
         return status;
     }
     /**
-     * @param authToken authentication token.
      * @return user if logged in.
      * @throws AuthenticationException
      */
-    protected User getLoggedInUser(final String authToken)
+    protected User getLoggedInUser()
             throws AuthenticationException {
-        final User user = authService.getUserForToken(authToken);
-        if (user == null) {
+        final RestSession session = getSession();
+        if (session == null) {
             throw new AuthenticationException("Not logged in");
         }
-        return user;
+        return session.getUser();
+    }
+    /**
+     * @return supplied authentication information.
+     */
+    public static RestSession getSession() {
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getCredentials() != null) {
+            return (RestSession) auth.getCredentials();
+        }
+        return null;
     }
     /**
      * @param sc sort column

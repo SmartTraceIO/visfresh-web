@@ -8,7 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,7 +23,7 @@ import com.visfresh.dao.CorrectiveActionListDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.CorrectiveActionList;
-import com.visfresh.entities.Role;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.CorrectiveActionListSerializer;
 
@@ -56,16 +56,15 @@ public class CorrectiveActionController extends AbstractController implements Co
      * @param list critical action list.
      * @return ID of saved critical action list.
      */
-    @RequestMapping(value = "/saveCorrectiveActionList/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveCorrectiveActionList(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveCorrectiveActionList", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveCorrectiveActionList(
             final @RequestBody JsonObject list) {
         try {
-            final User user = getLoggedInUser(authToken);
+            final User user = getLoggedInUser();
             final CorrectiveActionList p = createSerializer(user.getCompany()).parseCorrectiveActionList(list);
-
-            checkAccess(user, Role.BasicUser);
-
             final CorrectiveActionList old = dao.findOne(p.getId());
+
             checkCompanyAccess(user, old);
 
             final Long id = dao.save(p).getId();
@@ -80,14 +79,13 @@ public class CorrectiveActionController extends AbstractController implements Co
      * @param id critical action list ID.
      * @return critical action list.
      */
-    @RequestMapping(value = "/getCorrectiveActionList/{authToken}", method = RequestMethod.GET)
-    public JsonObject getCorrectiveActionList(@PathVariable final String authToken,
+    @RequestMapping(value = "/getCorrectiveActionList", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getCorrectiveActionList(
             @RequestParam final Long id) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final CorrectiveActionList list = dao.findOne(id);
             checkCompanyAccess(user, list);
 
@@ -102,14 +100,13 @@ public class CorrectiveActionController extends AbstractController implements Co
      * @param id critical action list ID.
      * @return critical action list.
      */
-    @RequestMapping(value = "/deleteCorrectiveActionList/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteCorrectiveActionList(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteCorrectiveActionList", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject deleteCorrectiveActionList(
             @RequestParam final Long id) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final CorrectiveActionList p = dao.findOne(id);
             checkCompanyAccess(user, p);
             dao.delete(p);
@@ -126,8 +123,9 @@ public class CorrectiveActionController extends AbstractController implements Co
      * @param pageSize the page size.
      * @return list of critical action lists.
      */
-    @RequestMapping(value = "/getCorrectiveActionLists/{authToken}", method = RequestMethod.GET)
-    public JsonElement getCorrectiveActionLists(@PathVariable final String authToken,
+    @RequestMapping(value = "/getCorrectiveActionLists", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonElement getCorrectiveActionLists(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -137,9 +135,7 @@ public class CorrectiveActionController extends AbstractController implements Co
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final CorrectiveActionListSerializer ser = createSerializer(user.getCompany());
 
             final List<CorrectiveActionList> lists = dao.findByCompany(

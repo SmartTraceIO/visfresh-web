@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
-import com.visfresh.impl.services.DefaultRestSessionManager;
 import com.visfresh.utils.HashGenerator;
 import com.visfresh.utils.Messages;
 
@@ -44,7 +43,7 @@ public class DefaultAuthService implements AuthService {
     @Autowired
     private EmailService emailService;
     @Autowired
-    protected DefaultRestSessionManager sessionManager;
+    protected RestSessionManager sessionManager;
 
     private static final Logger log = LoggerFactory.getLogger(DefaultAuthService.class);
 

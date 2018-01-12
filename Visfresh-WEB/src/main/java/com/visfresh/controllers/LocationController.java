@@ -9,7 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,8 +23,8 @@ import com.visfresh.constants.LocationConstants;
 import com.visfresh.dao.LocationProfileDao;
 import com.visfresh.dao.Page;
 import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.Role;
 import com.visfresh.entities.ShortShipmentInfo;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.LocationSerializer;
 import com.visfresh.utils.StringUtils;
@@ -55,13 +55,12 @@ public class LocationController extends AbstractController implements LocationCo
      * @param profile location profile.
      * @return ID of saved location profile.
      */
-    @RequestMapping(value = "/saveLocation/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveLocation(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveLocation", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveLocation(
             final @RequestBody JsonObject profile) {
         try {
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final LocationProfile lp = createSerializer(user).parseLocationProfile(profile);
             lp.setCompany(user.getCompany());
 
@@ -81,8 +80,9 @@ public class LocationController extends AbstractController implements LocationCo
      * @param pageSize the page size.
      * @return list of location profiles.
      */
-    @RequestMapping(value = "/getLocations/{authToken}", method = RequestMethod.GET)
-    public JsonObject getLocation(@PathVariable final String authToken,
+    @RequestMapping(value = "/getLocations", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getLocation(
             @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
@@ -91,9 +91,7 @@ public class LocationController extends AbstractController implements LocationCo
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final LocationSerializer ser = createSerializer(user);
 
             final List<LocationProfile> locations = dao.findByCompany(user.getCompany(),
@@ -126,14 +124,13 @@ public class LocationController extends AbstractController implements LocationCo
      * @param locationId location profile ID.
      * @return location profile.
      */
-    @RequestMapping(value = "/getLocation/{authToken}", method = RequestMethod.GET)
-    public JsonObject getLocation(@PathVariable final String authToken,
+    @RequestMapping(value = "/getLocation", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getLocation(
             @RequestParam final Long locationId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final LocationProfile p = dao.findOne(locationId);
             checkCompanyAccess(user, p);
 
@@ -148,14 +145,13 @@ public class LocationController extends AbstractController implements LocationCo
      * @param locationId location profile ID.
      * @return location profile.
      */
-    @RequestMapping(value = "/deleteLocation/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteLocation(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteLocation", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject deleteLocation(
             @RequestParam final Long locationId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final LocationProfile p = dao.findOne(locationId);
             checkCompanyAccess(user, p);
 

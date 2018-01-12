@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,10 +57,10 @@ public class UtilitiesController extends AbstractController {
     public UtilitiesController() {
         super();
     }
-    @RequestMapping(value = "/getTimeZones/{authToken}", method = RequestMethod.GET)
-    public JsonObject getTimeZones(@PathVariable final String authToken) {
+    @RequestMapping(value = "/getTimeZones", method = RequestMethod.GET)
+    public JsonObject getTimeZones() {
         try {
-            final User user = getLoggedInUser(authToken);
+            final User user = getLoggedInUser();
 
             final JsonArray array = new JsonArray();
             //add other available time zones
@@ -149,10 +148,10 @@ public class UtilitiesController extends AbstractController {
         return result;
     }
 
-    @RequestMapping(value = "/getLanguages/{authToken}", method = RequestMethod.GET)
-    public JsonObject getLanguages(@PathVariable final String authToken) {
+    @RequestMapping(value = "/getLanguages", method = RequestMethod.GET)
+    public JsonObject getLanguages() {
         try {
-            getLoggedInUser(authToken);
+            getLoggedInUser();
 
             final JsonArray array = new JsonArray();
             for (final Language lang : Language.values()) {
@@ -165,10 +164,10 @@ public class UtilitiesController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/getMeasurementUnits/{authToken}", method = RequestMethod.GET)
-    public JsonObject getMeasurementUnits(@PathVariable final String authToken) {
+    @RequestMapping(value = "/getMeasurementUnits", method = RequestMethod.GET)
+    public JsonObject getMeasurementUnits() {
         try {
-            getLoggedInUser(authToken);
+            getLoggedInUser();
 
             final JsonArray array = new JsonArray();
             for (final MeasurementUnits units : MeasurementUnits.values()) {
@@ -181,10 +180,10 @@ public class UtilitiesController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/getRoles/{authToken}", method = RequestMethod.GET)
-    public JsonObject getRoles(@PathVariable final String authToken) {
+    @RequestMapping(value = "/getRoles", method = RequestMethod.GET)
+    public JsonObject getRoles() {
         try {
-            getLoggedInUser(authToken);
+            getLoggedInUser();
 
             final JsonArray array = new JsonArray();
             for (final Role role : Role.values()) {
@@ -199,10 +198,10 @@ public class UtilitiesController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/getColors/{authToken}", method = RequestMethod.GET)
-    public JsonObject getColors(@PathVariable final String authToken) {
+    @RequestMapping(value = "/getColors", method = RequestMethod.GET)
+    public JsonObject getColors() {
         try {
-            getLoggedInUser(authToken);
+            getLoggedInUser();
 
             //sort colors by name.
             final Color[] values = Color.values();
@@ -227,10 +226,10 @@ public class UtilitiesController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/getUserTime/{authToken}", method = RequestMethod.GET)
-    public JsonObject getUserTime(@PathVariable final String authToken) {
+    @RequestMapping(value = "/getUserTime", method = RequestMethod.GET)
+    public JsonObject getUserTime() {
         try {
-            final User u = getLoggedInUser(authToken);
+            final User u = getLoggedInUser();
 
             final User user = userDao.findOne(u.getId());
             final TimeZone tz = user.getTimeZone();
@@ -263,8 +262,8 @@ public class UtilitiesController extends AbstractController {
             return createErrorResponse(e);
         }
     }
-    @RequestMapping(value = "/clearCache/{authToken}", method = RequestMethod.GET)
-    public JsonObject clearCache(@PathVariable final String authToken,
+    @RequestMapping(value = "/clearCache", method = RequestMethod.GET)
+    public JsonObject clearCache(
             @RequestParam(required = false) final Long shipment,
             @RequestParam(required = false) final Long location
             ) {

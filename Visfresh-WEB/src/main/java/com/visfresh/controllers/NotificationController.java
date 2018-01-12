@@ -13,7 +13,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,6 +34,7 @@ import com.visfresh.entities.Alert;
 import com.visfresh.entities.Notification;
 import com.visfresh.entities.NotificationType;
 import com.visfresh.entities.Shipment;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
 import com.visfresh.io.NotificationItem;
@@ -73,8 +74,9 @@ public class NotificationController extends AbstractController implements Notifi
      * @param pageSize page size.
      * @return list of shipments.
      */
-    @RequestMapping(value = "/getNotifications/{authToken}", method = RequestMethod.GET)
-    public JsonObject getNotifications(@PathVariable final String authToken,
+    @RequestMapping(value = "/getNotifications", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getNotifications(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final Boolean includeRead) {
@@ -82,7 +84,7 @@ public class NotificationController extends AbstractController implements Notifi
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
+            final User user = getLoggedInUser();
             final NotificationSerializer ser = createSerializer(user);
 
             final Filter filter = new Filter();
@@ -143,14 +145,13 @@ public class NotificationController extends AbstractController implements Notifi
         }
         return map;
     }
-    @RequestMapping(value = "/markNotificationsAsRead/{authToken}", method = RequestMethod.POST)
-    public JsonObject markNotificationsAsRead(@PathVariable final String authToken,
+    @RequestMapping(value = "/markNotificationsAsRead", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject markNotificationsAsRead(
             @RequestBody final JsonArray notificationIds) {
         try {
             //check logged in.
-            final User user = authService.getUserForToken(authToken);
-            getLoggedInUser(authToken);
-
+            final User user = getLoggedInUser();
             final Set<Long> ids = new HashSet<Long>();
 
             for (final JsonElement e : notificationIds) {

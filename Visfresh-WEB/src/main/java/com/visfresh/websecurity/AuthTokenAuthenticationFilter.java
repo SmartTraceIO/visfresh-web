@@ -94,14 +94,18 @@ public class AuthTokenAuthenticationFilter extends AbstractAuthenticationProcess
      * @return
      */
     protected String getToken(final HttpServletRequest request) {
-        final String path = request.getPathInfo();
-        final int index = path.lastIndexOf('/') + 1;
-
-        String token = null;
-        if (index > -1) {
-            token = path.substring(index, path.indexOf('/', index + 1));
+        final String[] path = request.getPathInfo().substring(1).split("/");
+        if (path.length < 2) {
+            return null;
         }
-        return token;
+
+        for (int i = 0; i < path.length; i++) {
+            if (path[i].indexOf('-') > 0) {
+                return path[i];
+            }
+        }
+
+        return null;
     }
     /* (non-Javadoc)
      * @see org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter#afterPropertiesSet()

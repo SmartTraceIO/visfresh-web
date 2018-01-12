@@ -10,8 +10,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,8 +33,8 @@ import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
-import com.visfresh.entities.Role;
 import com.visfresh.entities.ShipmentTemplate;
+import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.AutoStartShipmentDto;
 import com.visfresh.io.json.AutoStartShipmentSerializer;
@@ -77,15 +77,14 @@ public class AutoStartShipmentController extends AbstractController
      * @param defShipment alert profile.
      * @return ID of saved alert profile.
      */
-    @RequestMapping(value = "/saveAutoStartShipment/{authToken}", method = RequestMethod.POST)
-    public JsonObject saveAutoStartShipment(@PathVariable final String authToken,
+    @RequestMapping(value = "/saveAutoStartShipment", method = RequestMethod.POST)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject saveAutoStartShipment(
             final @RequestBody JsonObject defShipment) {
         try {
-            final User user = getLoggedInUser(authToken);
+            final User user = getLoggedInUser();
             final AutoStartShipmentDto dto = createSerializer(user)
                     .parseAutoStartShipmentDto(defShipment);
-
-            checkAccess(user, Role.BasicUser);
 
             AutoStartShipment cfg;
             ShipmentTemplate tpl;
@@ -220,14 +219,13 @@ public class AutoStartShipmentController extends AbstractController
      * @param autoStartShipmentId default shipment ID.
      * @return default shipment as JSON.
      */
-    @RequestMapping(value = "/getAutoStartShipment/{authToken}", method = RequestMethod.GET)
-    public JsonObject getAutoStartShipment(@PathVariable final String authToken,
+    @RequestMapping(value = "/getAutoStartShipment", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonObject getAutoStartShipment(
             @RequestParam final Long autoStartShipmentId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
             checkCompanyAccess(user, cfg);
 
@@ -243,14 +241,13 @@ public class AutoStartShipmentController extends AbstractController
      * @param autoStartShipmentId default shipment ID.
      * @return default shipment.
      */
-    @RequestMapping(value = "/deleteAutoStartShipment/{authToken}", method = RequestMethod.GET)
-    public JsonObject deleteAutoStartShipment(@PathVariable final String authToken,
+    @RequestMapping(value = "/deleteAutoStartShipment", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject deleteAutoStartShipment(
             @RequestParam final Long autoStartShipmentId) {
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.BasicUser);
-
+            final User user = getLoggedInUser();
             final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
             checkCompanyAccess(user, cfg);
             dao.delete(cfg);
@@ -267,8 +264,9 @@ public class AutoStartShipmentController extends AbstractController
      * @param pageSize the page size.
      * @return list of default shipments.
      */
-    @RequestMapping(value = "/getAutoStartShipments/{authToken}", method = RequestMethod.GET)
-    public JsonElement getAutoStartShipments(@PathVariable final String authToken,
+    @RequestMapping(value = "/getAutoStartShipments", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonElement getAutoStartShipments(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
@@ -278,9 +276,7 @@ public class AutoStartShipmentController extends AbstractController
 
         try {
             //check logged in.
-            final User user = getLoggedInUser(authToken);
-            checkAccess(user, Role.NormalUser);
-
+            final User user = getLoggedInUser();
             final AutoStartShipmentSerializer ser = createSerializer(user);
 
             final List<AutoStartShipment> configs = dao.findByCompany(
@@ -307,14 +303,15 @@ public class AutoStartShipmentController extends AbstractController
      * @param pageSize the page size.
      * @return list of default shipments.
      */
-    @RequestMapping(value = "/getAutoStartTemplates/{authToken}", method = RequestMethod.GET)
-    public JsonElement getAutoStartTemplates(@PathVariable final String authToken,
+    @RequestMapping(value = "/getAutoStartTemplates", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
+    public JsonElement getAutoStartTemplates(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
             ) {
-        return getAutoStartShipments(authToken, pageIndex, pageSize, sc, so);
+        return getAutoStartShipments(pageIndex, pageSize, sc, so);
     }
     /**
      * @param user
