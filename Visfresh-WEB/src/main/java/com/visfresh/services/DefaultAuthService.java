@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.visfresh.constants.ErrorCodes;
 import com.visfresh.dao.UserDao;
 import com.visfresh.entities.RestSession;
 import com.visfresh.entities.User;
@@ -70,13 +71,13 @@ public class DefaultAuthService implements AuthService {
      */
     @Override
     public AuthToken login(final String email, final String password, final String clientInstance)
-            throws AuthenticationException {
+            throws RestServiceException {
         final User user = findUserByEmail(email);
         if (user == null) {
-            throw new AuthenticationException("Unknown user " + email);
+            throw new RestServiceException(ErrorCodes.AUTHENTICATION_ERROR, "Unknown user " + email);
         }
         if (!user.isActive()) {
-            throw new AuthenticationException("User is inactive " + email);
+            throw new RestServiceException(ErrorCodes.AUTHENTICATION_ERROR, "User is inactive " + email);
         }
 
         if (user.getPassword().equals(generateHash(password))) {
@@ -102,7 +103,7 @@ public class DefaultAuthService implements AuthService {
             return tokenForUser;
         }
 
-        throw new AuthenticationException("Authentication failed");
+        throw new RestServiceException(ErrorCodes.AUTHENTICATION_ERROR, "Authentication failed");
     }
 
     /**
@@ -216,13 +217,13 @@ public class DefaultAuthService implements AuthService {
      * @see com.visfresh.services.AuthService#startResetPassword(java.lang.String, java.lang.String)
      */
     @Override
-    public void startResetPassword(final String email, final String baseUrl) throws AuthenticationException {
+    public void startResetPassword(final String email, final String baseUrl) throws RestServiceException {
         final Map<String, String> replacements = new HashMap<>();
         replacements.put("email", email);
 
         final User user = findUserByEmail(email);
         if (user == null) {
-            throw new AuthenticationException(Messages.getMessage("passwordreset.userNotFound", replacements));
+            throw new RestServiceException(ErrorCodes.AUTHENTICATION_ERROR, Messages.getMessage("passwordreset.userNotFound", replacements));
         }
 
         PasswordResetRequest reset;
@@ -248,7 +249,7 @@ public class DefaultAuthService implements AuthService {
             log.debug("Reset password URL has send to " + email + " and contains the token "
                     + reset.getSecureString());
         } catch (final MessagingException e) {
-            throw new AuthenticationException("Failed to send password reset message to user " + email, e);
+            throw new RestServiceException(ErrorCodes.AUTHENTICATION_ERROR, "Failed to send password reset message to user " + email, e);
         }
     }
     /**
@@ -267,7 +268,7 @@ public class DefaultAuthService implements AuthService {
      */
     @Override
     public void resetPassword(final String email, final String password, final String token)
-            throws AuthenticationException {
+            throws RestServiceException {
         final Map<String, String> replacements = new HashMap<>();
         replacements.put("email", email);
 
@@ -278,20 +279,20 @@ public class DefaultAuthService implements AuthService {
 
         //check request found
         if (reset == null) {
-            throw new AuthenticationException(Messages.getMessage(
+            throw new RestServiceException(ErrorCodes.AUTHENTICATION_ERROR, Messages.getMessage(
                     "passwordreset.reset.requestNotFound", replacements));
         }
 
         //check token matches
         if (!reset.getSecureString().equals(token)) {
-            throw new AuthenticationException(Messages.getMessage(
+            throw new RestServiceException(ErrorCodes.AUTHENTICATION_ERROR, Messages.getMessage(
                     "passwordreset.reset.tokenNotMatches", replacements));
         }
 
         passwordResets.remove(email);
         final User user = findUserByEmail(email);
         if (user == null) {
-            throw new AuthenticationException(Messages.getMessage("passwordreset.userNotFound", replacements));
+            throw new RestServiceException(ErrorCodes.AUTHENTICATION_ERROR, Messages.getMessage("passwordreset.userNotFound", replacements));
         }
 
         saveUser(user, password, false);
@@ -302,11 +303,10 @@ public class DefaultAuthService implements AuthService {
      * @see com.visfresh.services.AuthService#refreshToken(java.lang.String)
      */
     @Override
-    public AuthToken refreshToken(final String oldToken)
-            throws AuthenticationException {
+    public AuthToken refreshToken(final String oldToken) throws RestServiceException {
         final RestSession s = sessionManager.getSession(oldToken);
         if (s == null) {
-            throw new AuthenticationException("Not authorized or token expired");
+            throw new RestServiceException(ErrorCodes.AUTHENTICATION_ERROR, "Not authorized or token expired");
         }
 
         s.setToken(generateNewToken(s.getUser()));

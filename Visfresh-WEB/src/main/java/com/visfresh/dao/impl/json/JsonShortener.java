@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.io.json;
+package com.visfresh.dao.impl.json;
 
 import com.google.gson.JsonObject;
 

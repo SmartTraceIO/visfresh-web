@@ -54,7 +54,6 @@ import com.visfresh.lists.DeviceDto;
 import com.visfresh.mock.MockEmailService;
 import com.visfresh.mock.MockShipmentShutdownService;
 import com.visfresh.services.AuthService;
-import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.LocalizationUtils;
@@ -310,7 +309,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(ShipmentStatus.Ended, s.getStatus());
     }
     @Test
-    public void testMoveDevice() throws IOException, RestServiceException, BeansException, AuthenticationException {
+    public void testMoveDevice() throws IOException, RestServiceException, BeansException {
         final Company c1 = createCompany("C1");
         final Company c2 = createCompany("C2");
 

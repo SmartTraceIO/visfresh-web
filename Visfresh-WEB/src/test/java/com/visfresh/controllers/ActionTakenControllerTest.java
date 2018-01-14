@@ -26,7 +26,6 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
-import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -55,7 +54,7 @@ public class ActionTakenControllerTest extends AbstractRestServiceTest {
         String token;
         try {
             token = context.getBean(AuthService.class).login(user.getEmail(),"", "junit").getToken();
-        } catch (final AuthenticationException e) {
+        } catch (final RestServiceException e) {
             throw new RuntimeException(e);
         }
 

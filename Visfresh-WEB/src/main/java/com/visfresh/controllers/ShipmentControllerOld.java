@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +35,7 @@ import com.visfresh.dao.NoteDao;
 import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.dao.impl.json.SingleShipmentBeanSerializer;
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
@@ -63,7 +62,6 @@ import com.visfresh.entities.User;
 import com.visfresh.impl.singleshipment.MainShipmentDataBuilder;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.SingleShipmentInterimStop;
-import com.visfresh.io.json.SingleShipmentBeanSerializer;
 import com.visfresh.io.json.SingleShipmentSerializer;
 import com.visfresh.io.shipment.AlertDto;
 import com.visfresh.io.shipment.AlertProfileDto;
@@ -94,11 +92,6 @@ import com.visfresh.utils.StringUtils;
 @RequestMapping("/rest")
 public class ShipmentControllerOld extends AbstractShipmentBaseController implements ShipmentConstants {
     public static final String GET_SINGLE_SHIPMENT_OLD = "getSingleShipmentOld";
-    /**
-     * Logger.
-     */
-    private static final Logger log = LoggerFactory.getLogger(ShipmentControllerOld.class);
-
     @Autowired
     private ShipmentDao shipmentDao;
     @Autowired
@@ -185,44 +178,39 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip
-            ) {
+            ) throws RestServiceException {
         //check parameters
         if (shipmentId == null && (sn == null || trip == null)) {
-            return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
                     "Should be specified shipmentId or (sn and trip) request parameters");
         }
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final Shipment s;
-            if (shipmentId != null) {
-                s = shipmentDao.findOne(shipmentId);
-            } else {
-                s = shipmentDao.findBySnTrip(sn, trip);
-            }
-
-            if (s == null) {
-                return createSuccessResponse(null);
-            }
-
-            if (!hasViewSingleShipmentAccess(user, s)) {
-                throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
-            }
-
-            final SingleShipmentDto dto = createSingleShipmentDto(s, user);
-            addRelevantData(user, s, dto);
-
-            if (dto != null) {
-                auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.Viewed, null);
-            }
-
-            final SingleShipmentSerializer ser = getSingleShipmentSerializer(user);
-            return createSuccessResponse(dto == null ? null : ser.exportToViewData(dto));
-        } catch (final Exception e) {
-            log.error("Failed to get single shipment: " + shipmentId, e);
-            return createErrorResponse(e);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final Shipment s;
+        if (shipmentId != null) {
+            s = shipmentDao.findOne(shipmentId);
+        } else {
+            s = shipmentDao.findBySnTrip(sn, trip);
         }
+
+        if (s == null) {
+            return createSuccessResponse(null);
+        }
+
+        if (!hasViewSingleShipmentAccess(user, s)) {
+            throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
+        }
+
+        final SingleShipmentDto dto = createSingleShipmentDto(s, user);
+        addRelevantData(user, s, dto);
+
+        if (dto != null) {
+            auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.Viewed, null);
+        }
+
+        final SingleShipmentSerializer ser = getSingleShipmentSerializer(user);
+        return createSuccessResponse(dto == null ? null : ser.exportToViewData(dto));
     }
     /**
      * @param user

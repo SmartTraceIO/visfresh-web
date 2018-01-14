@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
@@ -49,11 +47,6 @@ import com.visfresh.services.RestServiceException;
 @RequestMapping("/rest")
 public class AutoStartShipmentController extends AbstractController
         implements AutoStartShipmentConstants {
-    /**
-     * Logger.
-     */
-    private static final Logger log = LoggerFactory.getLogger(AutoStartShipmentController.class);
-
     @Autowired
     private AutoStartShipmentDao dao;
     @Autowired
@@ -76,53 +69,49 @@ public class AutoStartShipmentController extends AbstractController
      * @param authToken authentication token.
      * @param defShipment alert profile.
      * @return ID of saved alert profile.
+     * @throws AuthenticationException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/saveAutoStartShipment", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject saveAutoStartShipment(
-            final @RequestBody JsonObject defShipment) {
-        try {
-            final User user = getLoggedInUser();
-            final AutoStartShipmentDto dto = createSerializer(user)
-                    .parseAutoStartShipmentDto(defShipment);
+    public JsonObject saveAutoStartShipment(final @RequestBody JsonObject defShipment) throws RestServiceException {
+        final User user = getLoggedInUser();
+        final AutoStartShipmentDto dto = createSerializer(user)
+                .parseAutoStartShipmentDto(defShipment);
 
-            AutoStartShipment cfg;
-            ShipmentTemplate tpl;
-            if (dto.getId() != null) {
-                cfg = dao.findOne(dto.getId());
-                tpl = cfg.getTemplate();
+        AutoStartShipment cfg;
+        ShipmentTemplate tpl;
+        if (dto.getId() != null) {
+            cfg = dao.findOne(dto.getId());
+            tpl = cfg.getTemplate();
 
-                checkCompanyAccess(user, cfg);
-                checkCompanyAccess(user, tpl);
-                checkCompanyAccess(user, dao.findOne(dto.getId()));
-            } else {
-                cfg = new AutoStartShipment();
-                cfg.setCompany(user.getCompany());
+            checkCompanyAccess(user, cfg);
+            checkCompanyAccess(user, tpl);
+            checkCompanyAccess(user, dao.findOne(dto.getId()));
+        } else {
+            cfg = new AutoStartShipment();
+            cfg.setCompany(user.getCompany());
 
-                tpl = new ShipmentTemplate();
-                tpl.setCompany(user.getCompany());
+            tpl = new ShipmentTemplate();
+            tpl.setCompany(user.getCompany());
 
-                cfg.setTemplate(tpl);
-            }
-
-            setLocations(cfg, dto, user);
-
-            //set autostart fields
-            cfg.setPriority(dto.getPriority());
             cfg.setTemplate(tpl);
-            cfg.setId(dto.getId());
-            cfg.setStartOnLeaveLocation(dto.isStartOnLeaveLocation());
-
-            //set template fields
-            fillTemplate(dto, tpl, user);
-            shipmentTemplateDao.save(tpl);
-
-            final Long id = dao.save(cfg).getId();
-            return createIdResponse("defaultShipmentId", id);
-        } catch (final Exception e) {
-            log.error("Failed to save autostart template", e);
-            return createErrorResponse(e);
         }
+
+        setLocations(cfg, dto, user);
+
+        //set autostart fields
+        cfg.setPriority(dto.getPriority());
+        cfg.setTemplate(tpl);
+        cfg.setId(dto.getId());
+        cfg.setStartOnLeaveLocation(dto.isStartOnLeaveLocation());
+
+        //set template fields
+        fillTemplate(dto, tpl, user);
+        shipmentTemplateDao.save(tpl);
+
+        final Long id = dao.save(cfg).getId();
+        return createIdResponse("defaultShipmentId", id);
     }
     /**
      * @param cfg
@@ -218,51 +207,46 @@ public class AutoStartShipmentController extends AbstractController
      * @param authToken authentication token.
      * @param autoStartShipmentId default shipment ID.
      * @return default shipment as JSON.
+     * @throws AuthenticationException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/getAutoStartShipment", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getAutoStartShipment(
-            @RequestParam final Long autoStartShipmentId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
-            checkCompanyAccess(user, cfg);
+            @RequestParam final Long autoStartShipmentId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
+        checkCompanyAccess(user, cfg);
 
-            return createSuccessResponse(createSerializer(user).toJson(
-                    new AutoStartShipmentDto(cfg)));
-        } catch (final Exception e) {
-            log.error("Failed to get autostart template", e);
-            return createErrorResponse(e);
-        }
+        return createSuccessResponse(createSerializer(user).toJson(
+                new AutoStartShipmentDto(cfg)));
     }
     /**
      * @param authToken authentication token.
      * @param autoStartShipmentId default shipment ID.
      * @return default shipment.
+     * @throws AuthenticationException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/deleteAutoStartShipment", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public JsonObject deleteAutoStartShipment(
-            @RequestParam final Long autoStartShipmentId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
-            checkCompanyAccess(user, cfg);
-            dao.delete(cfg);
+            @RequestParam final Long autoStartShipmentId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final AutoStartShipment cfg = dao.findOne(autoStartShipmentId);
+        checkCompanyAccess(user, cfg);
+        dao.delete(cfg);
 
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to delete autostart shipmemnt", e);
-            return createErrorResponse(e);
-        }
+        return createSuccessResponse(null);
     }
     /**
      * @param authToken authentication token.
      * @param pageIndex the page index.
      * @param pageSize the page size.
      * @return list of default shipments.
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getAutoStartShipments", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
@@ -271,37 +255,33 @@ public class AutoStartShipmentController extends AbstractController
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
-            ) {
+            ) throws RestServiceException {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final AutoStartShipmentSerializer ser = createSerializer(user);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final AutoStartShipmentSerializer ser = createSerializer(user);
 
-            final List<AutoStartShipment> configs = dao.findByCompany(
-                    user.getCompany(),
-                    createSorting(sc, so, getDefaultSortOrder(), 2),
-                    page,
-                    null);
-            final int total = dao.getEntityCount(user.getCompany(), null);
+        final List<AutoStartShipment> configs = dao.findByCompany(
+                user.getCompany(),
+                createSorting(sc, so, getDefaultSortOrder(), 2),
+                page,
+                null);
+        final int total = dao.getEntityCount(user.getCompany(), null);
 
-            final JsonArray array = new JsonArray();
-            for (final AutoStartShipment cfg : configs) {
-                array.add(ser.toJson(new AutoStartShipmentDto(cfg)));
-            }
-
-            return createListSuccessResponse(array, total);
-        } catch (final Exception e) {
-            log.error("Failed to get autostart templates", e);
-            return createErrorResponse(e);
+        final JsonArray array = new JsonArray();
+        for (final AutoStartShipment cfg : configs) {
+            array.add(ser.toJson(new AutoStartShipmentDto(cfg)));
         }
+
+        return createListSuccessResponse(array, total);
     }
     /**
      * @param authToken authentication token.
      * @param pageIndex the page index.
      * @param pageSize the page size.
      * @return list of default shipments.
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getAutoStartTemplates", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
@@ -310,7 +290,7 @@ public class AutoStartShipmentController extends AbstractController
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
-            ) {
+            ) throws RestServiceException {
         return getAutoStartShipments(pageIndex, pageSize, sc, so);
     }
     /**

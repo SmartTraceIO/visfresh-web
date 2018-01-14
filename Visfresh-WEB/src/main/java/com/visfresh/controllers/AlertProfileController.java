@@ -5,8 +5,6 @@ package com.visfresh.controllers;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +27,7 @@ import com.visfresh.entities.User;
 import com.visfresh.io.json.AlertProfileSerializer;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.lists.ListAlertProfileItem;
+import com.visfresh.services.RestServiceException;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -37,10 +36,6 @@ import com.visfresh.lists.ListAlertProfileItem;
 @RestController("AlertProfile")
 @RequestMapping("/rest")
 public class AlertProfileController extends AbstractController implements AlertProfileConstants {
-    /**
-     * Logger.
-     */
-    private static final Logger log = LoggerFactory.getLogger(AlertProfileController.class);
     /**
      * REST service.
      */
@@ -60,73 +55,62 @@ public class AlertProfileController extends AbstractController implements AlertP
      * @param authToken authentication token.
      * @param alert alert profile.
      * @return ID of saved alert profile.
+     * @throws AuthenticationException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/saveAlertProfile", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public JsonObject saveAlertProfile(
-            final @RequestBody JsonObject alert) {
-        try {
-            final User user = getLoggedInUser();
-            final AlertProfile p = createSerializer(user, user.getCompany()).parseAlertProfile(alert);
+        final @RequestBody JsonObject alert) throws RestServiceException {
+        final User user = getLoggedInUser();
+        final AlertProfile p = createSerializer(user, user.getCompany()).parseAlertProfile(alert);
 
-            final AlertProfile old = dao.findOne(p.getId());
-            checkCompany(old, user.getCompany());
+        final AlertProfile old = dao.findOne(p.getId());
+        checkCompany(old, user.getCompany());
 
-            final Long id = dao.save(p).getId();
-            return createIdResponse("alertProfileId", id);
-        } catch (final Exception e) {
-            log.error("Failed to save alert profile", e);
-            return createErrorResponse(e);
-        }
+        final Long id = dao.save(p).getId();
+        return createIdResponse("alertProfileId", id);
     }
     /**
      * @param authToken authentication token.
      * @param alertProfileId alert profile ID.
      * @return alert profile.
+     * @throws AuthenticationException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/getAlertProfile", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject getAlertProfile(
-            @RequestParam final Long alertProfileId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final AlertProfile alert = dao.findOne(alertProfileId);
-            checkCompanyAccess(user, alert);
-
-            return createSuccessResponse(createSerializer(user, alert.getCompany()).toJson(alert));
-        } catch (final Exception e) {
-            log.error("Failed to get alert profiles", e);
-            return createErrorResponse(e);
-        }
+    public JsonObject getAlertProfile(@RequestParam final Long alertProfileId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final AlertProfile alert = dao.findOne(alertProfileId);
+        checkCompanyAccess(user, alert);
+        return createSuccessResponse(createSerializer(user, alert.getCompany()).toJson(alert));
     }
     /**
      * @param authToken authentication token.
      * @param alertProfileId alert profile ID.
      * @return alert profile.
+     * @throws AuthenticationException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/deleteAlertProfile", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject deleteAlertProfile(
-            @RequestParam final Long alertProfileId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final AlertProfile p = dao.findOne(alertProfileId);
-            checkCompanyAccess(user, p);
-            dao.delete(p);
+    public JsonObject deleteAlertProfile(@RequestParam final Long alertProfileId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final AlertProfile p = dao.findOne(alertProfileId);
+        checkCompanyAccess(user, p);
+        dao.delete(p);
 
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to get alert profiles", e);
-            return createErrorResponse(e);
-        }
+        return createSuccessResponse(null);
     }
     /**
      * @param authToken authentication token.
      * @param pageIndex the page index.
      * @param pageSize the page size.
      * @return list of alert profiles.
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getAlertProfiles", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
@@ -135,41 +119,36 @@ public class AlertProfileController extends AbstractController implements AlertP
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
-            ) {
+            ) throws RestServiceException {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final AlertProfileSerializer ser = createSerializer(user, user.getCompany());
+        //check logged in.
+        final User user = getLoggedInUser();
+        final AlertProfileSerializer ser = createSerializer(user, user.getCompany());
 
-            final List<AlertProfile> alerts = dao.findByCompany(
-                    user.getCompany(),
-                    createSorting(sc, so, getDefaultSortOrder(), 2),
-                    page,
-                    null);
-            final int total = dao.getEntityCount(user.getCompany(), null);
+        final List<AlertProfile> alerts = dao.findByCompany(
+                user.getCompany(),
+                createSorting(sc, so, getDefaultSortOrder(), 2),
+                page,
+                null);
+        final int total = dao.getEntityCount(user.getCompany(), null);
 
-            final JsonArray array = new JsonArray();
-            for (final AlertProfile a : alerts) {
-                //convert profile to profile list item.
-                final ListAlertProfileItem item = new ListAlertProfileItem();
-                item.setAlertProfileId(a.getId());
-                item.setAlertProfileName(a.getName());
-                item.setAlertProfileDescription(a.getDescription());
-                for (final TemperatureRule rule : a.getAlertRules()) {
-                    item.getAlertRuleList().add(
-                            ruleBundle.buildDescription(rule, user.getTemperatureUnits()));
-                }
-
-                array.add(ser.toJson(item));
+        final JsonArray array = new JsonArray();
+        for (final AlertProfile a : alerts) {
+            //convert profile to profile list item.
+            final ListAlertProfileItem item = new ListAlertProfileItem();
+            item.setAlertProfileId(a.getId());
+            item.setAlertProfileName(a.getName());
+            item.setAlertProfileDescription(a.getDescription());
+            for (final TemperatureRule rule : a.getAlertRules()) {
+                item.getAlertRuleList().add(
+                        ruleBundle.buildDescription(rule, user.getTemperatureUnits()));
             }
 
-            return createListSuccessResponse(array, total);
-        } catch (final Exception e) {
-            log.error("Failed to get alert profiles", e);
-            return createErrorResponse(e);
+            array.add(ser.toJson(item));
         }
+
+        return createListSuccessResponse(array, total);
     }
     /**
      * @param user

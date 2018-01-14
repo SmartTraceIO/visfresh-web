@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.visfresh.entities.SpringRoles;
-import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -106,7 +105,7 @@ public class FileDownloadController extends AbstractController {
     public ResponseEntity<?> downloadFile(
             @PathVariable final String fileNamePart,
             final HttpServletRequest req)
-            throws AuthenticationException, RestServiceException, IOException {
+            throws RestServiceException, IOException {
         //extract file name
         String fileName = req.getRequestURI().substring(req.getRequestURI().lastIndexOf('/') + 1);
         fileName = URLDecoder.decode(fileName, URL_ENCODING);

@@ -9,6 +9,7 @@ import java.util.Map;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.visfresh.dao.impl.json.JsonShortener;
 
 /**
  * Warning!!! Is not thread save.

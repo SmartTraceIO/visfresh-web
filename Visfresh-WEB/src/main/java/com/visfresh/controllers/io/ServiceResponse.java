@@ -38,14 +38,14 @@ public class ServiceResponse<T> {
     /**
      * @return the responseObject
      */
-    @JsonGetter("data")
+    @JsonGetter("response")
     public T getResponseObject() {
         return responseObject;
     }
     /**
      * @param responseObject the responseObject to set
      */
-    @JsonSetter("data")
+    @JsonSetter("response")
     public void setResponseObject(final T responseObject) {
         this.responseObject = responseObject;
     }

@@ -1,12 +1,14 @@
 /**
  *
  */
-package com.visfresh.io.json;
+package com.visfresh.dao.impl.json;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import com.google.gson.JsonObject;
+import com.visfresh.io.json.JsonPropertyNameHandler;
+import com.visfresh.io.json.JsonPropertyNamesExplorer;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

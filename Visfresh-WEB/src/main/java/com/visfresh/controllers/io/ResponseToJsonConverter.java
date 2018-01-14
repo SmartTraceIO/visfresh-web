@@ -17,11 +17,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  *
  */
 //@ControllerAdvice
-public class ResponseWrapper implements ResponseBodyAdvice<Object> {
+public class ResponseToJsonConverter implements ResponseBodyAdvice<Object> {
     /**
      * Default constructor.
      */
-    public ResponseWrapper() {
+    public ResponseToJsonConverter() {
         super();
     }
 
@@ -30,7 +30,8 @@ public class ResponseWrapper implements ResponseBodyAdvice<Object> {
      */
     @Override
     public boolean supports(final MethodParameter returnType, final Class<? extends HttpMessageConverter<?>> converterType) {
-        return JsonConverter.class.isAssignableFrom(converterType);
+        //supports all.
+        return true;
     }
 
     /* (non-Javadoc)

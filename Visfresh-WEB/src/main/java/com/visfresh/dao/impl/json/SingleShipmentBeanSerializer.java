@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.visfresh.io.json;
+package com.visfresh.dao.impl.json;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -32,6 +32,8 @@ import com.visfresh.entities.Location;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.entities.TrackerEventType;
+import com.visfresh.io.json.AbstractJsonSerializer;
+import com.visfresh.io.json.LocationSerializer;
 import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.AlertProfileBean;
 import com.visfresh.io.shipment.AlertProfileDto;

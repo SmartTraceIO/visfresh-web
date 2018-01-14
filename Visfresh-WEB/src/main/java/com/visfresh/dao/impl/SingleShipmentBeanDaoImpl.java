@@ -13,8 +13,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.SingleShipmentBeanDao;
+import com.visfresh.dao.impl.json.SingleShipmentBeanSerializer;
 import com.visfresh.entities.Device;
-import com.visfresh.io.json.SingleShipmentBeanSerializer;
 import com.visfresh.io.shipment.SingleShipmentBean;
 import com.visfresh.utils.SerializerUtils;
 

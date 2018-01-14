@@ -33,17 +33,6 @@ public final class SerializerUtils {
         super();
     }
     /**
-     * @param errorCode error code.
-     * @param msg error message.
-     * @return error object.
-     */
-    public static JsonObject createErrorStatus(final int errorCode, final String msg) {
-        final JsonObject obj = new JsonObject();
-        obj.addProperty("code", errorCode);
-        obj.addProperty("message", msg);
-        return obj;
-    }
-    /**
      * @param text JSON text.
      * @return JSON element.
      */

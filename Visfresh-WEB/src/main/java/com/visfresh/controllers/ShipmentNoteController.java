@@ -5,8 +5,6 @@ package com.visfresh.controllers;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,10 +35,6 @@ import com.visfresh.services.RestServiceException;
 @RequestMapping("/rest")
 public class ShipmentNoteController extends AbstractController {
     /**
-     * Logger.
-     */
-    private static final Logger log = LoggerFactory.getLogger(ShipmentNoteController.class);
-    /**
      * Shipment DAO
      */
     @Autowired
@@ -65,108 +59,87 @@ public class ShipmentNoteController extends AbstractController {
 
     @RequestMapping(value = "/getShipmentNote", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject getShipmentNote(
+    public JsonObject getShipmentNote(@RequestParam final long noteId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final ShipmentNote note = shipmentNoteDao.findOne(noteId);
 
-            @RequestParam final long noteId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final ShipmentNote note = shipmentNoteDao.findOne(noteId);
-
-            if (note != null) {
-                checkCompanyAccess(user, note.getShipment());
-            }
-            return createSuccessResponse(getSerializer(user).toJson(note));
-        } catch (final Exception e) {
-            log.error("Failed to get shipment note", e);
-            return createErrorResponse(e);
+        if (note != null) {
+            checkCompanyAccess(user, note.getShipment());
         }
+        return createSuccessResponse(getSerializer(user).toJson(note));
     }
     @RequestMapping(value = "/getShipmentNotes", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject getShipmentNotes(
+    public JsonObject getShipmentNotes(@RequestParam final long shipmentId, @RequestParam final long userId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        //find user and shipment
+        final User noteOwner = userDao.findOne(userId);
+        final Shipment shipment = shipmentDao.findOne(shipmentId);
 
-            @RequestParam final long shipmentId,
-            @RequestParam final long userId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            //find user and shipment
-            final User noteOwner = userDao.findOne(userId);
-            final Shipment shipment = shipmentDao.findOne(shipmentId);
+        checkCompanyAccess(user, noteOwner);
+        checkCompanyAccess(user, shipment);
 
-            checkCompanyAccess(user, noteOwner);
-            checkCompanyAccess(user, shipment);
+        final ShipmentNoteSerializer ser = getSerializer(user);
+        final JsonArray array = new JsonArray();
 
-            final ShipmentNoteSerializer ser = getSerializer(user);
-            final JsonArray array = new JsonArray();
-
-            if (shipment != null && noteOwner != null) {
-                final List<ShipmentNote> notes = shipmentNoteDao.findByUserAndShipment(shipment, noteOwner);
-                for (final ShipmentNote n : notes) {
-                    array.add(ser.toJson(n));
-                }
+        if (shipment != null && noteOwner != null) {
+            final List<ShipmentNote> notes = shipmentNoteDao.findByUserAndShipment(shipment, noteOwner);
+            for (final ShipmentNote n : notes) {
+                array.add(ser.toJson(n));
             }
-
-            return createListSuccessResponse(array, array.size());
-        } catch (final Exception e) {
-            log.error("Failed to get shipment notes", e);
-            return createErrorResponse(e);
         }
+
+        return createListSuccessResponse(array, array.size());
     }
     @RequestMapping(value = "/saveShipmentNote", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject saveShipmentNote(
-            @RequestBody final JsonObject req) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final ShipmentNoteSerializer ser = getSerializer(user);
-            final SaveShipmentNoteRequest ssnr = ser.parseSaveShipmentNoteRequest(req);
+    public JsonObject saveShipmentNote(@RequestBody final JsonObject req) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final ShipmentNoteSerializer ser = getSerializer(user);
+        final SaveShipmentNoteRequest ssnr = ser.parseSaveShipmentNoteRequest(req);
 
-            //find user and shipment
-            final User noteOwner = userDao.findOne(ssnr.getUserId());
-            //check user
-            if (noteOwner == null) {
-                throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Unable to find note owner " + ssnr.getUserId());
-            }
-
-            final Shipment shipment = shipmentDao.findOne(ssnr.getShipmentId());
-            //check shipment
-            if (shipment == null) {
-                throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Unable to find shipment " + ssnr.getShipmentId());
-            }
-
-            ShipmentNote note = null;
-            //attempt to load note from DB.
-            if (ssnr.getNoteId() != null) {
-                note = shipmentNoteDao.findOne(ssnr.getNoteId());
-
-                if (note != null) {
-                    checkCompanyAccess(user, shipment);
-                    checkOwner(note, noteOwner);
-                    checkShipment(note, shipment);
-                }
-            }
-
-            //possible create new note
-            if (note == null) {
-                note = new ShipmentNote();
-                note.setShipment(shipment);
-                note.setUser(user);
-            }
-
-            note.setText(ssnr.getNoteText());
-
-            final Long id = shipmentNoteDao.save(note).getId();
-
-            return createIdResponse("shipmentNoteId", id);
-        } catch (final Exception e) {
-            log.error("Failed to save shipment note", e);
-            return createErrorResponse(e);
+        //find user and shipment
+        final User noteOwner = userDao.findOne(ssnr.getUserId());
+        //check user
+        if (noteOwner == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Unable to find note owner " + ssnr.getUserId());
         }
+
+        final Shipment shipment = shipmentDao.findOne(ssnr.getShipmentId());
+        //check shipment
+        if (shipment == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Unable to find shipment " + ssnr.getShipmentId());
+        }
+
+        ShipmentNote note = null;
+        //attempt to load note from DB.
+        if (ssnr.getNoteId() != null) {
+            note = shipmentNoteDao.findOne(ssnr.getNoteId());
+
+            if (note != null) {
+                checkCompanyAccess(user, shipment);
+                checkOwner(note, noteOwner);
+                checkShipment(note, shipment);
+            }
+        }
+
+        //possible create new note
+        if (note == null) {
+            note = new ShipmentNote();
+            note.setShipment(shipment);
+            note.setUser(user);
+        }
+
+        note.setText(ssnr.getNoteText());
+
+        final Long id = shipmentNoteDao.save(note).getId();
+
+        return createIdResponse("shipmentNoteId", id);
     }
     /**
      * @param note shipment note.
@@ -182,7 +155,6 @@ public class ShipmentNoteController extends AbstractController {
                     "Incorrect note shipment. Expected shipment " + expectedShipmentId
                     + ", actual shipment " + actualShipmentId);
         }
-
     }
     /**
      * @param note shipment note.

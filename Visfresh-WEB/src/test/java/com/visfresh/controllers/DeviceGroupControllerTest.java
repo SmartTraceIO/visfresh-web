@@ -23,7 +23,6 @@ import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
-import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 
 /**
@@ -43,7 +42,7 @@ public class DeviceGroupControllerTest extends AbstractRestServiceTest {
     }
 
     @Before
-    public void setUp() throws BeansException, AuthenticationException {
+    public void setUp() throws BeansException, RestServiceException {
         dao = context.getBean(DeviceGroupDao.class);
         deviceDao = context.getBean(DeviceDao.class);
 

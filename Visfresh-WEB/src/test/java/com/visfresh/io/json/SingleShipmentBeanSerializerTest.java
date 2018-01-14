@@ -16,6 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
+import com.visfresh.dao.impl.json.ShortenerAliasesBuilder;
+import com.visfresh.dao.impl.json.SingleShipmentBeanSerializer;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.CorrectiveAction;
 import com.visfresh.entities.Location;

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -131,120 +132,110 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param authToken authentication token.
      * @param device device.
      * @return ID of saved device.
+     * @throws AuthenticationException
+     * @throws RestServiceException
+     * @throws MessagingException
      */
     @RequestMapping(value = "/saveDevice", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject saveDevice(
-            final @RequestBody JsonObject device) {
-        try {
+    public JsonObject saveDevice(final @RequestBody JsonObject device) throws RestServiceException, MessagingException {
             final User user = getLoggedInUser();
             final DeviceSerializer ser = createSerializer(user);
             Device d = ser.parseDevice(device);
 
-            final Device old = dao.findByImei(d.getImei());
-            if (old == null && !Role.SmartTraceAdmin.hasRole(user)) {
-                log.error("User " + user.getEmail() + " attempts to add new device " + d.getImei());
-                return createErrorResponse(ErrorCodes.SECURITY_ERROR, "Only SmartTrace admin can add new device");
-            }
-            checkCompanyAccess(user, old);
-
-            if (old != null) {
-                //first of all merge saved device with existing. It needs for
-                //avoid of rewriting to NULL values
-                final JsonObject mereged = SerializerUtils.merge(device, ser.toJson(old));
-                d = ser.parseDevice(mereged);
-                d.setCompany(old.getCompany());
-
-                //not allow to overwrite trip count
-                d.setTripCount(old.getTripCount());
-
-                final boolean oldActive = old.isActive();
-                if (!Role.Admin.hasRole(user)) {
-                    //not admin can't change active state
-                    d.setActive(old.isActive());
-                }
-
-                if (oldActive != d.isActive()) {
-                    final StringBuilder msg = new StringBuilder("User ");
-                    msg.append(user.getEmail());
-                    msg.append(" set device ");
-                    msg.append(d.getImei());
-                    msg.append(" to ");
-                    if (d.isActive()) {
-                        msg.append("active");
-                    } else {
-                        msg.append("inactive");
-                    }
-                    msg.append(" state");
-
-                    //notify support team.
-                    emailService.sendMessageToSupport("Device " + d.getImei() + " state changed", msg.toString());
-                }
-            } else {
-                d.setCompany(user.getCompany());
-            }
-
-            dao.save(d);
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to save device", e);
-            return createErrorResponse(e);
+        final Device old = dao.findByImei(d.getImei());
+        if (old == null && !Role.SmartTraceAdmin.hasRole(user)) {
+            log.error("User " + user.getEmail() + " attempts to add new device " + d.getImei());
+            throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Only SmartTrace admin can add new device");
         }
+        checkCompanyAccess(user, old);
+
+        if (old != null) {
+            //first of all merge saved device with existing. It needs for
+            //avoid of rewriting to NULL values
+            final JsonObject mereged = SerializerUtils.merge(device, ser.toJson(old));
+            d = ser.parseDevice(mereged);
+            d.setCompany(old.getCompany());
+
+            //not allow to overwrite trip count
+            d.setTripCount(old.getTripCount());
+
+            final boolean oldActive = old.isActive();
+            if (!Role.Admin.hasRole(user)) {
+                //not admin can't change active state
+                d.setActive(old.isActive());
+            }
+
+            if (oldActive != d.isActive()) {
+                final StringBuilder msg = new StringBuilder("User ");
+                msg.append(user.getEmail());
+                msg.append(" set device ");
+                msg.append(d.getImei());
+                msg.append(" to ");
+                if (d.isActive()) {
+                    msg.append("active");
+                } else {
+                    msg.append("inactive");
+                }
+                msg.append(" state");
+
+                //notify support team.
+                emailService.sendMessageToSupport("Device " + d.getImei() + " state changed", msg.toString());
+            }
+        } else {
+            d.setCompany(user.getCompany());
+        }
+
+        dao.save(d);
+        return createSuccessResponse(null);
     }
     @RequestMapping(value = "/moveDevice", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin})
-    public JsonObject moveDevice(
-            final @RequestParam String device,
-            final @RequestParam Long company) {
-        try {
-            //get device
-            final Device oldDevice = dao.findByImei(device);
-            if (oldDevice == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Not found device for moving to another company " + device);
-            } else if (isVirtualDevice(oldDevice)) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Can't move device beause is virtual " + device);
-            }
-
-            //get company
-            final Company c = companyDao.findOne(company);
-            if (c == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Target company for moving device is not found " + company);
-            }
-
-            //create new device
-            final Device newDevice = createVirtualDevice(oldDevice);
-
-            //switch device to new company
-            dao.moveToNewCompany(oldDevice, c);
-
-            deviceCommandDao.deleteCommandsFor(oldDevice);
-            deviceGroupDao.moveToNewDevice(oldDevice, newDevice);
-            arrivalDao.moveToNewDevice(oldDevice, newDevice);
-            alertDao.moveToNewDevice(oldDevice, newDevice);
-            trackerEventDao.moveToNewDevice(oldDevice, newDevice);
-            shipmentDao.moveToNewDevice(oldDevice, newDevice);
-            //TODO
-            //1. device states
-            //
-            //2. simulators
-
-            //close all active shipments
-            final List<Shipment> activeShipments = shipmentDao.findActiveShipments(newDevice.getImei());
-            for (final Shipment s : activeShipments) {
-                if (!s.hasFinalStatus()) {
-                    s.setStatus(ShipmentStatus.Ended);
-                    shipmentDao.save(s);
-                }
-            }
-
-            return createIdResponse("deviceImei", newDevice.getImei());
-        } catch (final Exception e) {
-            log.error("Failed to move device", e);
-            return createErrorResponse(e);
+    public JsonObject moveDevice(final @RequestParam String device, final @RequestParam Long company) throws RestServiceException {
+        //get device
+        final Device oldDevice = dao.findByImei(device);
+        if (oldDevice == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Not found device for moving to another company " + device);
+        } else if (isVirtualDevice(oldDevice)) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Can't move device beause is virtual " + device);
         }
+
+        //get company
+        final Company c = companyDao.findOne(company);
+        if (c == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Target company for moving device is not found " + company);
+        }
+
+        //create new device
+        final Device newDevice = createVirtualDevice(oldDevice);
+
+        //switch device to new company
+        dao.moveToNewCompany(oldDevice, c);
+
+        deviceCommandDao.deleteCommandsFor(oldDevice);
+        deviceGroupDao.moveToNewDevice(oldDevice, newDevice);
+        arrivalDao.moveToNewDevice(oldDevice, newDevice);
+        alertDao.moveToNewDevice(oldDevice, newDevice);
+        trackerEventDao.moveToNewDevice(oldDevice, newDevice);
+        shipmentDao.moveToNewDevice(oldDevice, newDevice);
+        //TODO
+        //1. device states
+        //
+        //2. simulators
+
+        //close all active shipments
+        final List<Shipment> activeShipments = shipmentDao.findActiveShipments(newDevice.getImei());
+        for (final Shipment s : activeShipments) {
+            if (!s.hasFinalStatus()) {
+                s.setStatus(ShipmentStatus.Ended);
+                shipmentDao.save(s);
+            }
+        }
+
+        return createIdResponse("deviceImei", newDevice.getImei());
     }
     /**
      * @param device device.
@@ -281,6 +272,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return list of devices.
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getDevices", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
@@ -288,10 +280,9 @@ public class DeviceController extends AbstractController implements DeviceConsta
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
-            @RequestParam(required = false) final String so) {
+            @RequestParam(required = false) final String so) throws RestServiceException {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-        try {
             //check logged in.
             final User user = getLoggedInUser();
             final DeviceSerializer ser = createSerializer(user);
@@ -307,10 +298,6 @@ public class DeviceController extends AbstractController implements DeviceConsta
             }
 
             return createListSuccessResponse(array, total);
-        } catch (final Exception e) {
-            log.error("Failed to get devices", e);
-            return createErrorResponse(e);
-        }
     }
     /**
      * @param item
@@ -378,142 +365,123 @@ public class DeviceController extends AbstractController implements DeviceConsta
      * @param authToken authentication token.
      * @param imei device ID.
      * @return device.
+     * @throws AuthenticationException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/getDevice", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject getDevice(
-            @RequestParam final String imei) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final Device device = dao.findByImei(imei);
-            checkCompanyAccess(user, device);
+    public JsonObject getDevice(@RequestParam final String imei) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final Device device = dao.findByImei(imei);
+        checkCompanyAccess(user, device);
 
-            //create result
-            final ListDeviceItem item = new ListDeviceItem(device);
-            //add last reading date
-            final ShortTrackerEvent e = trackerEventDao.getLastEvent(device);
-            if (e != null) {
-                item.setLastReadingTime(e.getTime());
-                item.setBattery(e.getBattery());
-                item.setLatitude(e.getLatitude());
-                item.setLongitude(e.getLongitude());
-                item.setTemperature(e.getTemperature());
+        //create result
+        final ListDeviceItem item = new ListDeviceItem(device);
+        //add last reading date
+        final ShortTrackerEvent e = trackerEventDao.getLastEvent(device);
+        if (e != null) {
+            item.setLastReadingTime(e.getTime());
+            item.setBattery(e.getBattery());
+            item.setLatitude(e.getLatitude());
+            item.setLongitude(e.getLongitude());
+            item.setTemperature(e.getTemperature());
 
-                if (e.getShipmentId() != null) {
-                    item.setShipmentId(e.getShipmentId());
-                    final Shipment s = shipmentDao.findOne(e.getShipmentId());
-                    item.setShipmentStatus(s.getStatus());
-                }
+            if (e.getShipmentId() != null) {
+                item.setShipmentId(e.getShipmentId());
+                final Shipment s = shipmentDao.findOne(e.getShipmentId());
+                item.setShipmentStatus(s.getStatus());
             }
-
-            //add autostart template data
-            if (device.getAutostartTemplateId() != null) {
-                final AutoStartShipment aut = autoStartShipmentDao.findOne(device.getAutostartTemplateId());
-                if (aut != null) {
-                    item.setAutostartTemplateName(aut.getTemplate().getName());
-                }
-            }
-
-            //format result
-            return createSuccessResponse(createSerializer(user).toJson(
-                    createDto(item, user)));
-        } catch (final Exception e) {
-            log.error("Failed to get devices", e);
-            return createErrorResponse(e);
         }
+
+        //add autostart template data
+        if (device.getAutostartTemplateId() != null) {
+            final AutoStartShipment aut = autoStartShipmentDao.findOne(device.getAutostartTemplateId());
+            if (aut != null) {
+                item.setAutostartTemplateName(aut.getTemplate().getName());
+            }
+        }
+
+        //format result
+        return createSuccessResponse(createSerializer(user).toJson(
+                createDto(item, user)));
     }
     /**
      * @param authToken authentication token.
      * @param req shipment.
      * @return status.
+     * @throws AuthenticationException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/sendCommandToDevice", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin})
-    public JsonObject sendCommandToDevice(
-            final @RequestBody JsonObject req) {
-        try {
+    public JsonObject sendCommandToDevice(final @RequestBody JsonObject req) throws RestServiceException {
             final User user = getLoggedInUser();
             final DeviceCommand cmd = createSerializer(user).parseDeviceCommand(req);
-            checkCompanyAccess(user, cmd.getDevice());
-
-            commandService.sendCommand(cmd, new Date());
-
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to send command to device", e);
-            return createErrorResponse(e);
-        }
+        checkCompanyAccess(user, cmd.getDevice());
+        commandService.sendCommand(cmd, new Date());
+        return createSuccessResponse(null);
     }
     /**
      * @param authToken authentication token.
      * @param req shipment.
      * @return status.
+     * @throws AuthenticationException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/shutdownDevice", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject shutdownDevice(
-            final @RequestParam Long shipmentId) {
-        try {
-            final User user = getLoggedInUser();
-            final Shipment shipment = shipmentDao.findOne(shipmentId);
-            checkCompanyAccess(user, shipment);
+    public JsonObject shutdownDevice(final @RequestParam Long shipmentId) throws RestServiceException {
+        final User user = getLoggedInUser();
+        final Shipment shipment = shipmentDao.findOne(shipmentId);
+        checkCompanyAccess(user, shipment);
 
-            //get device to shutdown.
-            final Device device = shipment.getDevice();
-            if (device == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Shipment " + shipmentId + " has not assigned device");
-            }
-            checkCompanyAccess(user, device);
-
-            stopShipmentAndShutdownDevice(shipment, device);
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to shutdown device for shipment " + shipmentId, e);
-            return createErrorResponse(e);
+        //get device to shutdown.
+        final Device device = shipment.getDevice();
+        if (device == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Shipment " + shipmentId + " has not assigned device");
         }
+        checkCompanyAccess(user, device);
+
+        stopShipmentAndShutdownDevice(shipment, device);
+        return createSuccessResponse(null);
     }
     /**
      * @param authToken authentication token.
      * @param req shipment.
      * @return status.
+     * @throws AuthenticationException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/initDeviceColors", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin})
-    public JsonObject initDeviceColors(
-            final @RequestParam(required = false) Long company) {
-        try {
-            final User user = getLoggedInUser();
-            final Company c;
-            if (company != null) {
-                c = companyDao.findOne(company);
-            } else {
-                c = user.getCompany();
-            }
-
-            checkCompanyAccess(user, c);
-            final List<Device> devices = deviceDao.findByCompany(c, null, null, null);
-
-            final ColorInitializeTool tool = new ColorInitializeTool();
-            tool.initColors(devices);
-
-            //save colors.
-            for (final Device d : devices) {
-                deviceDao.updateColor(d, d.getColor());
-                log.debug("Color " + d.getColor().name() + " has set for device " + d.getImei());
-            }
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to initialize device colors for company " + company, e);
-            return createErrorResponse(e);
+    public JsonObject initDeviceColors(final @RequestParam(required = false) Long company) throws RestServiceException {
+        final User user = getLoggedInUser();
+        final Company c;
+        if (company != null) {
+            c = companyDao.findOne(company);
+        } else {
+            c = user.getCompany();
         }
+
+        checkCompanyAccess(user, c);
+        final List<Device> devices = deviceDao.findByCompany(c, null, null, null);
+
+        final ColorInitializeTool tool = new ColorInitializeTool();
+        tool.initColors(devices);
+
+        //save colors.
+        for (final Device d : devices) {
+            deviceDao.updateColor(d, d.getColor());
+            log.debug("Color " + d.getColor().name() + " has set for device " + d.getImei());
+        }
+        return createSuccessResponse(null);
     }
     @RequestMapping(value = "/" + GET_READINGS + "",
             method = RequestMethod.GET, produces = "text/plain")
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public void getTrackerEvents(
-
             @RequestParam(value = "startDate", required = false) final String startDateArg,
             @RequestParam(value = "endDate", required = false) final String endDateArg,
             @RequestParam(value = "device", required = false) final String device,

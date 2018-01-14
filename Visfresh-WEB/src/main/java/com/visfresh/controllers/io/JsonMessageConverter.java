@@ -3,28 +3,34 @@
  */
 package com.visfresh.controllers.io;
 
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.GsonHttpMessageConverter;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class JsonConverter extends MappingJackson2HttpMessageConverter {
-    public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
-
-    public JsonConverter() {
-        super();
-        objectMapper.setDateFormat(new SimpleDateFormat(DATE_FORMAT));
-
-        //add support of text/plain meda type.
+public final class JsonMessageConverter extends GsonHttpMessageConverter {
+    /**
+     * Default constructor.
+     */
+    public JsonMessageConverter() {
         final List<MediaType> media = new LinkedList<>(getSupportedMediaTypes());
         media.add(MediaType.TEXT_PLAIN);
         setSupportedMediaTypes(media);
+
+        final Gson gson = new GsonBuilder()
+                .disableHtmlEscaping()
+                .serializeNulls()
+                .setPrettyPrinting()
+                .create();
+        setGson(gson);
     }
 
     /* (non-Javadoc)
@@ -34,11 +40,12 @@ public class JsonConverter extends MappingJackson2HttpMessageConverter {
     public boolean canWrite(final Class<?> clazz, final MediaType mediaType) {
         return canWrite(mediaType);
     }
+
     /* (non-Javadoc)
      * @see org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter#canRead(java.lang.Class, org.springframework.http.MediaType)
      */
     @Override
     public boolean canRead(final Class<?> clazz, final MediaType mediaType) {
-        return super.canRead(clazz, mediaType);
+        return canRead(mediaType);
     }
 }

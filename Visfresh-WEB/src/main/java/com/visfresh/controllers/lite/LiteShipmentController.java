@@ -9,12 +9,11 @@ import static com.visfresh.constants.ShipmentConstants.SHIPPED_FROM_LOCATION_NAM
 import static com.visfresh.constants.ShipmentConstants.SHIPPED_TO_LOCATION_NAME;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +35,7 @@ import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.GetFilteredShipmentsRequest;
 import com.visfresh.io.json.GetShipmentsRequestParser;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
 
 /**
@@ -45,11 +45,6 @@ import com.visfresh.utils.DateTimeUtils;
 @RestController("LiteShipment")
 @RequestMapping("/lite")
 public class LiteShipmentController extends AbstractController {
-    /**
-     * The logger.
-     */
-    private static final Logger log = LoggerFactory.getLogger(LiteShipmentController.class);
-
     @Autowired
     private LiteShipmentDao dao;
 
@@ -65,43 +60,40 @@ public class LiteShipmentController extends AbstractController {
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return list of shipments.
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getShipments", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject getShipments(@RequestBody final JsonObject request) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final LiteShipmentSerializer ser = getSerializer(user);
-            final GetFilteredShipmentsRequest req = new GetShipmentsRequestParser(
-                    user.getTimeZone()).parseGetFilteredShipmentsRequest(request);
+    public JsonObject getShipments(@RequestBody final JsonObject request) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final LiteShipmentSerializer ser = getSerializer(user);
+        final GetFilteredShipmentsRequest req = new GetShipmentsRequestParser(
+                user.getTimeZone()).parseGetFilteredShipmentsRequest(request);
 
-            final Integer pageIndex = req.getPageIndex();
-            final Integer pageSize = req.getPageSize();
-            final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
+        final Integer pageIndex = req.getPageIndex();
+        final Integer pageSize = req.getPageSize();
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-            final Filter filter = ShipmentController.createFilter(req);
-            final LiteShipmentResult result = dao.getShipments(
-                    user.getCompany(),
-                    createSortingShipments(
-                            req.getSortColumn(),
-                            req.getSortOrder(),
-                            ShipmentController.getDefaultListShipmentsSortingOrder(), 2),
-                    filter,
-                    page);
-            final List<LiteShipment> shipments = result.getResult();
-            final int total = result.getTotalCount();
+        final Filter filter = ShipmentController.createFilter(req);
+        final LiteShipmentResult result = dao.getShipments(
+                user.getCompany(),
+                createSortingShipments(
+                        req.getSortColumn(),
+                        req.getSortOrder(),
+                        ShipmentController.getDefaultListShipmentsSortingOrder(), 2),
+                filter,
+                page);
+        final List<LiteShipment> shipments = result.getResult();
+        final int total = result.getTotalCount();
 
-            final JsonArray array = new JsonArray();
-            for (final LiteShipment s : shipments) {
-                array.add(ser.toJson(s));
-            }
-
-            return createListSuccessResponse(array, total);
-        } catch (final Exception e) {
-            log.error("Failed to get shipments", e);
-            return createErrorResponse(e);
+        final JsonArray array = new JsonArray();
+        for (final LiteShipment s : shipments) {
+            array.add(ser.toJson(s));
         }
+
+        return createListSuccessResponse(array, total);
     }
 
     /**
@@ -109,6 +101,9 @@ public class LiteShipmentController extends AbstractController {
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return list of shipments.
+     * @throws AuthenticationException
+     * @throws ParseException
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/getShipmentsNearby", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
@@ -116,32 +111,27 @@ public class LiteShipmentController extends AbstractController {
             @RequestParam(value = "lat") final String latStr,
             @RequestParam(value = "lon") final String lonStr,
             @RequestParam final int radius,
-            @RequestParam(required = false, value = "from") final String fromStr) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            //parse request parameters.
-            final double lat = Double.parseDouble(latStr);
-            final double lon = Double.parseDouble(lonStr);
-            final Date startDate = fromStr == null
-                    ? new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000l)
-                    : createDateFormat(user.getLanguage(), user.getTimeZone()).parse(fromStr);
+            @RequestParam(required = false, value = "from") final String fromStr) throws ParseException, RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        //parse request parameters.
+        final double lat = Double.parseDouble(latStr);
+        final double lon = Double.parseDouble(lonStr);
+        final Date startDate = fromStr == null
+                ? new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000l)
+                : createDateFormat(user.getLanguage(), user.getTimeZone()).parse(fromStr);
 
-            //request shipments from DB
-            final List<LiteShipment> shipments = dao.getShipmentsNearby(
-                    user.getCompany(), lat, lon, radius, startDate);
+        //request shipments from DB
+        final List<LiteShipment> shipments = dao.getShipmentsNearby(
+                user.getCompany(), lat, lon, radius, startDate);
 
-            final LiteShipmentSerializer ser = getSerializer(user);
-            final JsonArray array = new JsonArray();
-            for (final LiteShipment s : shipments) {
-                array.add(ser.toJson(s));
-            }
-
-            return createListSuccessResponse(array, shipments.size());
-        } catch (final Exception e) {
-            log.error("Failed to get shipments near (" + latStr + ", " + lonStr + "), radius: " + radius, e);
-            return createErrorResponse(e);
+        final LiteShipmentSerializer ser = getSerializer(user);
+        final JsonArray array = new JsonArray();
+        for (final LiteShipment s : shipments) {
+            array.add(ser.toJson(s));
         }
+
+        return createListSuccessResponse(array, shipments.size());
     }
 
     private Sorting createSortingShipments(final String sc, final String so,

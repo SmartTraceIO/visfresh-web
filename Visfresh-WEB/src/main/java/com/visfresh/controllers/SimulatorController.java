@@ -4,6 +4,7 @@
 package com.visfresh.controllers;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -66,159 +67,129 @@ public class SimulatorController extends AbstractController {
 
     @RequestMapping(value = "/saveSimulator", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin})
-    public JsonObject saveSimulator(
-            final @RequestBody JsonObject json) {
-        try {
+    public JsonObject saveSimulator(final @RequestBody JsonObject json) throws RestServiceException {
             final User user = getLoggedInUser();
             final SimulatorDto dto = createSerializer(user).parseSimulator(json);
-
-            //find source device.
-            final Device d = deviceDao.findByImei(dto.getSourceDevice());
-            if (d == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "Source device "
-                        + dto.getSourceDevice() + " not found");
-            }
-
-            //find user
-            final User u = userDao.findByEmail(dto.getUser());
-            if (u == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "User "
-                        + dto.getUser() + " not found");
-            }
-            final AutoStartShipment auto = autoStartShipmentDao.findOne(dto.getAutoStart());
-            if (auto != null && !u.getCompany().getId().equals(auto.getCompany().getId())) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Shipment template should be from same company as user");
-            }
-
-            final String simulatorImei = generateImei(u.getId());
-            Device simulatorDevice = deviceDao.findByImei(simulatorImei);
-            if (simulatorDevice == null) {
-                log.debug("Create simulator device '" + simulatorImei + "' for user " + u.getEmail());
-                simulatorDevice = createSimulatorDevice(simulatorImei, u);
-            }
-
-            //save simulator
-            final Simulator sim = new Simulator();
-            sim.setUser(u);
-            sim.setSource(d);
-            sim.setTarget(simulatorDevice);
-
-            dao.save(sim);
-
-            //set autostart template to virtual device.
-            final Long autoStart = auto == null ? null : auto.getId();
-            final Long oldAutoStart = simulatorDevice.getAutostartTemplateId();
-
-            if (!equals(autoStart, oldAutoStart)) {
-                simulatorDevice.setAutostartTemplateId(autoStart);
-                deviceDao.save(simulatorDevice);
-            }
-
-            return createIdResponse("simulatorDevice", simulatorDevice.getImei());
-        } catch (final Exception e) {
-            log.error("Failed to save simulator", e);
-            return createErrorResponse(e);
+        //find source device.
+        final Device d = deviceDao.findByImei(dto.getSourceDevice());
+        if (d == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA, "Source device "
+                    + dto.getSourceDevice() + " not found");
         }
+
+        //find user
+        final User u = userDao.findByEmail(dto.getUser());
+        if (u == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA, "User "
+                    + dto.getUser() + " not found");
+        }
+        final AutoStartShipment auto = autoStartShipmentDao.findOne(dto.getAutoStart());
+        if (auto != null && !u.getCompany().getId().equals(auto.getCompany().getId())) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Shipment template should be from same company as user");
+        }
+
+        final String simulatorImei = generateImei(u.getId());
+        Device simulatorDevice = deviceDao.findByImei(simulatorImei);
+        if (simulatorDevice == null) {
+            log.debug("Create simulator device '" + simulatorImei + "' for user " + u.getEmail());
+            simulatorDevice = createSimulatorDevice(simulatorImei, u);
+        }
+
+        //save simulator
+        final Simulator sim = new Simulator();
+        sim.setUser(u);
+        sim.setSource(d);
+        sim.setTarget(simulatorDevice);
+
+        dao.save(sim);
+
+        //set autostart template to virtual device.
+        final Long autoStart = auto == null ? null : auto.getId();
+        final Long oldAutoStart = simulatorDevice.getAutostartTemplateId();
+
+        if (!equals(autoStart, oldAutoStart)) {
+            simulatorDevice.setAutostartTemplateId(autoStart);
+            deviceDao.save(simulatorDevice);
+        }
+
+        return createIdResponse("simulatorDevice", simulatorDevice.getImei());
     }
 
     @RequestMapping(value = "/getSimulator", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getSimulator(
-            final @RequestParam(required = false) String user) {
-        try {
-            final User currentUser = getLoggedInUser();
+            final @RequestParam(required = false) String user) throws RestServiceException {
+        final User currentUser = getLoggedInUser();
 
-            //find user
-            final User u = getSimulatorOwner(user, currentUser);
+        //find user
+        final User u = getSimulatorOwner(user, currentUser);
 
-            JsonObject response = null;
-            final SimulatorDto dto = dao.findSimulatorDto(u);
-            if (dto != null) {
-                response = createSerializer(currentUser).toJson(dto);
-            }
-
-            return createSuccessResponse(response);
-        } catch (final Exception e) {
-            log.error("Failed to get simulator", e);
-            return createErrorResponse(e);
+        JsonObject response = null;
+        final SimulatorDto dto = dao.findSimulatorDto(u);
+        if (dto != null) {
+            response = createSerializer(currentUser).toJson(dto);
         }
+
+        return createSuccessResponse(response);
     }
     @RequestMapping(value = "/deleteSimulator", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin})
-    public JsonObject deleteSimulator(
-            final @RequestParam String user) {
-        try {
-            //find user
-            final User u = userDao.findByEmail(user);
-            if (u == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "User "
-                        + user + " not found");
-            }
-
-            service.stopSimulator(u);
-            dao.delete(u);
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to delete simulator", e);
-            return createErrorResponse(e);
+    public JsonObject deleteSimulator(final @RequestParam String user) throws RestServiceException {
+        //find user
+        final User u = userDao.findByEmail(user);
+        if (u == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA, "User "
+                    + user + " not found");
         }
+
+        service.stopSimulator(u);
+        dao.delete(u);
+        return createSuccessResponse(null);
     }
     @RequestMapping(value = "/startSimulator", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject startSimulator(
-            final @RequestBody JsonObject json) {
-        try {
-            final User user = getLoggedInUser();
-            final SimulatorSerializer ser = createSerializer(user);
+    public JsonObject startSimulator(final @RequestBody JsonObject json) throws RestServiceException, ParseException {
+        final User user = getLoggedInUser();
+        final SimulatorSerializer ser = createSerializer(user);
 
-            final StartSimulatorRequest req = ser.parseStartRequest(json);
-            final User u = getSimulatorOwner(req.getUser(), user);
+        final StartSimulatorRequest req = ser.parseStartRequest(json);
+        final User u = getSimulatorOwner(req.getUser(), user);
 
-            //check already started
-            final SimulatorDto sim = dao.findSimulatorDto(u);
-            if (sim == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Simulator not found for user " + u.getEmail());
-            }
-            if (sim.isStarted()) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Simulator already started for user " + u.getEmail());
-            }
-
-            //check correct velosity
-            if (req.getVelosity() < 1) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Invalid velosity " + req.getVelosity() + " should start from 1");
-            }
-
-            final DateFormat fmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
-
-            final Date startDate = req.getStartDate() == null ? null : fmt.parse(req.getStartDate());
-            final Date endDate = req.getEndDate() == null ? null : fmt.parse(req.getEndDate());
-
-            service.startSimulator(u, startDate, endDate, req.getVelosity());
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to delete simulator", e);
-            return createErrorResponse(e);
+        //check already started
+        final SimulatorDto sim = dao.findSimulatorDto(u);
+        if (sim == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Simulator not found for user " + u.getEmail());
         }
+        if (sim.isStarted()) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Simulator already started for user " + u.getEmail());
+        }
+
+        //check correct velosity
+        if (req.getVelosity() < 1) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Invalid velosity " + req.getVelosity() + " should start from 1");
+        }
+
+        final DateFormat fmt = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+
+        final Date startDate = req.getStartDate() == null ? null : fmt.parse(req.getStartDate());
+        final Date endDate = req.getEndDate() == null ? null : fmt.parse(req.getEndDate());
+
+        service.startSimulator(u, startDate, endDate, req.getVelosity());
+        return createSuccessResponse(null);
     }
     @RequestMapping(value = "/stopSimulator", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject stopSimulator(
-            final @RequestParam(required = false) String user) {
-        try {
-            final User currentUser = getLoggedInUser();
-            //find user
-            final User u = getSimulatorOwner(user, currentUser);
+    public JsonObject stopSimulator(final @RequestParam(required = false) String user) throws RestServiceException {
+        final User currentUser = getLoggedInUser();
+        //find user
+        final User u = getSimulatorOwner(user, currentUser);
 
-            service.stopSimulator(u);
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to delete simulator", e);
-            return createErrorResponse(e);
-        }
+        service.stopSimulator(u);
+        return createSuccessResponse(null);
     }
 
     /**

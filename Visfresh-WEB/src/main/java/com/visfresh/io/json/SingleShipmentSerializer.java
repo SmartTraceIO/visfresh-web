@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.visfresh.constants.AlertProfileConstants;
 import com.visfresh.constants.ShipmentConstants;
+import com.visfresh.dao.impl.json.SingleShipmentBeanSerializer;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.TemperatureUnits;
 import com.visfresh.io.NoteDto;

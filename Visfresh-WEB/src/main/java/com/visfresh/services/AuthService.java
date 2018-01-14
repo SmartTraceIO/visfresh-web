@@ -15,9 +15,9 @@ public interface AuthService {
      * @param password password.
      * @param clientInstance client instance ID.
      * @return authentication token.
-     * @throws AuthenticationException
+     * @throws RestServiceException
      */
-    public AuthToken login(final String login, final String password, final String clientInstance) throws AuthenticationException;
+    public AuthToken login(final String login, final String password, final String clientInstance) throws RestServiceException;
     /**
      * @param authToken
      */
@@ -27,7 +27,7 @@ public interface AuthService {
      * @return refreshed authentication token.
      * @exception AuthenticationException
      */
-    public AuthToken refreshToken(String oldToken) throws AuthenticationException;
+    public AuthToken refreshToken(String oldToken) throws RestServiceException;
     /**
      * @param authToken authentication token.
      * @return user.
@@ -42,16 +42,16 @@ public interface AuthService {
     /**
      * @param email email.
      * @param baseUrl part of URL for send to user.
-     * @throws AuthenticationException
+     * @throws RestServiceException
      */
-    public void startResetPassword(String email, String baseUrl) throws AuthenticationException;
+    public void startResetPassword(String email, String baseUrl) throws RestServiceException;
     /**
      * @param email email.
      * @param password password.
      * @param token security token.
-     * @throws AuthenticationException
+     * @throws RestServiceException
      */
-    public void resetPassword(String email, String password, String token) throws AuthenticationException;
+    public void resetPassword(String email, String password, String token) throws RestServiceException;
     /**
      * Closes all user sessions.
      * @param u user.

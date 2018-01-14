@@ -6,8 +6,6 @@ package com.visfresh.controllers;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +25,7 @@ import com.visfresh.entities.ShortShipmentInfo;
 import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.LocationSerializer;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -36,10 +35,6 @@ import com.visfresh.utils.StringUtils;
 @RestController("Location")
 @RequestMapping("/rest")
 public class LocationController extends AbstractController implements LocationConstants {
-    /**
-     * Logger.
-     */
-    private static final Logger log = LoggerFactory.getLogger(LocationController.class);
     @Autowired
     private LocationProfileDao dao;
 
@@ -54,31 +49,28 @@ public class LocationController extends AbstractController implements LocationCo
      * @param authToken authentication token.
      * @param profile location profile.
      * @return ID of saved location profile.
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/saveLocation", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject saveLocation(
-            final @RequestBody JsonObject profile) {
-        try {
-            final User user = getLoggedInUser();
-            final LocationProfile lp = createSerializer(user).parseLocationProfile(profile);
-            lp.setCompany(user.getCompany());
+    public JsonObject saveLocation(final @RequestBody JsonObject profile) throws RestServiceException {
+        final User user = getLoggedInUser();
+        final LocationProfile lp = createSerializer(user).parseLocationProfile(profile);
+        lp.setCompany(user.getCompany());
 
-            final LocationProfile old = dao.findOne(lp.getId());
-            checkCompanyAccess(user, old);
+        final LocationProfile old = dao.findOne(lp.getId());
+        checkCompanyAccess(user, old);
 
-            final long id = dao.save(lp).getId();
-            return createIdResponse("locationId", id);
-        } catch (final Exception e) {
-            log.error("Failed to save location profile.", e);
-            return createErrorResponse(e);
-        }
+        final long id = dao.save(lp).getId();
+        return createIdResponse("locationId", id);
     }
     /**
      * @param authToken authentication token.
      * @param pageIndex the page index.
      * @param pageSize the page size.
      * @return list of location profiles.
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getLocations", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
@@ -86,30 +78,25 @@ public class LocationController extends AbstractController implements LocationCo
             @RequestParam(required = false) final Integer pageIndex, @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
-            ) {
+            ) throws RestServiceException {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final LocationSerializer ser = createSerializer(user);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final LocationSerializer ser = createSerializer(user);
 
-            final List<LocationProfile> locations = dao.findByCompany(user.getCompany(),
-                    createSorting(sc, so, getDefaultSortOrder(), 1),
-                    page,
-                    null);
+        final List<LocationProfile> locations = dao.findByCompany(user.getCompany(),
+                createSorting(sc, so, getDefaultSortOrder(), 1),
+                page,
+                null);
 
-            final int total = dao.getEntityCount(user.getCompany(), null);
-            final JsonArray array = new JsonArray();
-            for (final LocationProfile location : locations) {
-                array.add(ser.toJson(location));
-            }
-
-            return createListSuccessResponse(array, total);
-        } catch (final Exception e) {
-            log.error("Failed to get location profiles", e);
-            return createErrorResponse(e);
+        final int total = dao.getEntityCount(user.getCompany(), null);
+        final JsonArray array = new JsonArray();
+        for (final LocationProfile location : locations) {
+            array.add(ser.toJson(location));
         }
+
+        return createListSuccessResponse(array, total);
     }
     /**
      * @param user
@@ -123,51 +110,43 @@ public class LocationController extends AbstractController implements LocationCo
      * @param authToken authentication token.
      * @param locationId location profile ID.
      * @return location profile.
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getLocation", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject getLocation(
-            @RequestParam final Long locationId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final LocationProfile p = dao.findOne(locationId);
-            checkCompanyAccess(user, p);
+    public JsonObject getLocation(@RequestParam final Long locationId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final LocationProfile p = dao.findOne(locationId);
+        checkCompanyAccess(user, p);
 
-            return createSuccessResponse(createSerializer(user).toJson(p));
-        } catch (final Exception e) {
-            log.error("Failed to get location profiles", e);
-            return createErrorResponse(e);
-        }
+        return createSuccessResponse(createSerializer(user).toJson(p));
     }
     /**
      * @param authToken authentication token.
      * @param locationId location profile ID.
      * @return location profile.
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/deleteLocation", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject deleteLocation(
-            @RequestParam final Long locationId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final LocationProfile p = dao.findOne(locationId);
-            checkCompanyAccess(user, p);
+    public JsonObject deleteLocation(@RequestParam final Long locationId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final LocationProfile p = dao.findOne(locationId);
+        checkCompanyAccess(user, p);
 
-            //check in use
-            final List<ShortShipmentInfo> shipments = dao.getOwnerShipments(p);
-            if (!shipments.isEmpty()) {
-                return createErrorResponse(ErrorCodes.ENTITY_IN_USE, createLocationInUseMessage(shipments));
-            } else {
-                dao.delete(locationId);
-            }
-
-            return createSuccessResponse(null);
-        } catch (final Throwable e) {
-            log.error("Failed to get location profiles", e);
-            return createErrorResponse(e);
+        //check in use
+        final List<ShortShipmentInfo> shipments = dao.getOwnerShipments(p);
+        if (!shipments.isEmpty()) {
+            throw new RestServiceException(ErrorCodes.ENTITY_IN_USE, createLocationInUseMessage(shipments));
+        } else {
+            dao.delete(locationId);
         }
+
+        return createSuccessResponse(null);
     }
     /**
      * @param list

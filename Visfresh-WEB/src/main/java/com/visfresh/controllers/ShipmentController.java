@@ -40,6 +40,7 @@ import com.visfresh.dao.ShipmentSessionDao;
 import com.visfresh.dao.ShipmentTemplateDao;
 import com.visfresh.dao.Sorting;
 import com.visfresh.dao.TrackerEventDao;
+import com.visfresh.dao.impl.json.SingleShipmentBeanSerializer;
 import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
@@ -64,7 +65,6 @@ import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
-import com.visfresh.io.json.SingleShipmentBeanSerializer;
 import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
@@ -134,98 +134,93 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param authToken authentication token.
      * @param jsonRequest JSON save shipment request.
      * @return ID of saved shipment.
+     * @throws Exception
      */
     @RequestMapping(value = "/saveShipment", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject saveShipment(
-            final @RequestBody JsonObject jsonRequest) {
-        try {
-            final User user = getLoggedInUser();
-            final ShipmentSerializer serializer = getSerializer(user);
-            Long id = serializer.getShipmentIdFromSaveRequest(jsonRequest);
+    public JsonObject saveShipment(final @RequestBody JsonObject jsonRequest) throws Exception {
+        final User user = getLoggedInUser();
+        final ShipmentSerializer serializer = getSerializer(user);
+        Long id = serializer.getShipmentIdFromSaveRequest(jsonRequest);
 
-            ShipmentDto oldShipmentDto = null;
-            Shipment oldShipment = null;
+        ShipmentDto oldShipmentDto = null;
+        Shipment oldShipment = null;
 
-            final boolean isNew = id == null;
-            if (!isNew) {
-                //merge the shipment from request by existing shipment
-                //it is required to avoid the set to null the fields
-                //which are absent in save request.
-                oldShipment = shipmentDao.findOne(id);
-                if (oldShipment != null) {
-                    checkCompanyAccess(user, oldShipment);
-                    oldShipmentDto = createShipmentDto(oldShipment);
+        final boolean isNew = id == null;
+        if (!isNew) {
+            //merge the shipment from request by existing shipment
+            //it is required to avoid the set to null the fields
+            //which are absent in save request.
+            oldShipment = shipmentDao.findOne(id);
+            if (oldShipment != null) {
+                checkCompanyAccess(user, oldShipment);
+                oldShipmentDto = createShipmentDto(oldShipment);
 
-                    final JsonObject shipmentFromReqest = serializer.getShipmentFromRequest(
-                            jsonRequest);
-                    final JsonObject merged = SerializerUtils.merge(
-                            shipmentFromReqest,
-                            serializer.toJson(oldShipmentDto).getAsJsonObject());
-                    //correct shipment to save in request
-                    serializer.setShipmentToRequest(jsonRequest, merged);
-                } else {
-                    throw new Exception("Shipment with ID " + id + " not found");
-                }
-            }
-
-            final SaveShipmentRequest req = serializer.parseSaveShipmentRequest(jsonRequest);
-
-            //save shipment
-            final Shipment newShipment = createShipment(req.getShipment(), oldShipment);
-            resolveReferences(user, req.getShipment(), newShipment);
-
-            newShipment.setCompany(user.getCompany());
-            newShipment.setCreatedBy(user.getEmail());
-
-            if (id != null) {
-                if (!canChangeStatus(oldShipmentDto.getStatus(), newShipment.getStatus())) {
-                    log.debug("Is not allowed to change status from " + oldShipmentDto.getStatus()
-                        + " to " + newShipment.getStatus() + " for shipment " + newShipment);
-                    newShipment.setStatus(oldShipmentDto.getStatus());
-                }
-                shipmentDao.save(newShipment);
-
-                //check
-                if (oldShipmentDto.getStatus() != newShipment.getStatus()) {
-                    handleStatusChanged(newShipment, oldShipmentDto.getStatus(), newShipment.getStatus());
-                }
+                final JsonObject shipmentFromReqest = serializer.getShipmentFromRequest(
+                        jsonRequest);
+                final JsonObject merged = SerializerUtils.merge(
+                        shipmentFromReqest,
+                        serializer.toJson(oldShipmentDto).getAsJsonObject());
+                //correct shipment to save in request
+                serializer.setShipmentToRequest(jsonRequest, merged);
             } else {
-                id = saveNewShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
+                throw new Exception("Shipment with ID " + id + " not found");
             }
-
-            saveAlternativeAndInterimLoations(user, newShipment,
-                    req.getShipment().getInterimLocations(),
-                    req.getShipment().getEndLocationAlternatives());
-            updateInterimStops(newShipment, req.getShipment().getInterimStops());
-
-            //build response
-            final SaveShipmentResponse resp = new SaveShipmentResponse();
-            resp.setShipmentId(id);
-
-            if (req.isSaveAsNewTemplate()) {
-                final Long tplId = createShipmentTemplate(
-                        user.getCompany(), newShipment, req.getTemplateName());
-                resp.setTemplateId(tplId);
-            }
-
-            //audit
-            if (isNew) {
-                auditService.handleShipmentAction(newShipment.getId(), user, ShipmentAuditAction.ManuallyCreated, null);
-            } else {
-                final Map<String, String> details = new HashMap<>();
-                final JsonObject diff = SerializerUtils.diff(
-                        serializer.toJson(oldShipmentDto),
-                        serializer.toJson(createShipmentDto(newShipment)));
-                details.put("diff", diff == null ? null : diff.toString());
-                auditService.handleShipmentAction(newShipment.getId(), user, ShipmentAuditAction.Updated, details);
-            }
-
-            return createSuccessResponse(serializer.toJson(resp));
-        } catch (final Exception e) {
-            log.error("Failed to save shipment by request: " + jsonRequest, e);
-            return createErrorResponse(e);
         }
+
+        final SaveShipmentRequest req = serializer.parseSaveShipmentRequest(jsonRequest);
+
+        //save shipment
+        final Shipment newShipment = createShipment(req.getShipment(), oldShipment);
+        resolveReferences(user, req.getShipment(), newShipment);
+
+        newShipment.setCompany(user.getCompany());
+        newShipment.setCreatedBy(user.getEmail());
+
+        if (id != null) {
+            if (!canChangeStatus(oldShipmentDto.getStatus(), newShipment.getStatus())) {
+                log.debug("Is not allowed to change status from " + oldShipmentDto.getStatus()
+                    + " to " + newShipment.getStatus() + " for shipment " + newShipment);
+                newShipment.setStatus(oldShipmentDto.getStatus());
+            }
+            shipmentDao.save(newShipment);
+
+            //check
+            if (oldShipmentDto.getStatus() != newShipment.getStatus()) {
+                handleStatusChanged(newShipment, oldShipmentDto.getStatus(), newShipment.getStatus());
+            }
+        } else {
+            id = saveNewShipment(newShipment, !Boolean.FALSE.equals(req.isIncludePreviousData()));
+        }
+
+        saveAlternativeAndInterimLoations(user, newShipment,
+                req.getShipment().getInterimLocations(),
+                req.getShipment().getEndLocationAlternatives());
+        updateInterimStops(newShipment, req.getShipment().getInterimStops());
+
+        //build response
+        final SaveShipmentResponse resp = new SaveShipmentResponse();
+        resp.setShipmentId(id);
+
+        if (req.isSaveAsNewTemplate()) {
+            final Long tplId = createShipmentTemplate(
+                    user.getCompany(), newShipment, req.getTemplateName());
+            resp.setTemplateId(tplId);
+        }
+
+        //audit
+        if (isNew) {
+            auditService.handleShipmentAction(newShipment.getId(), user, ShipmentAuditAction.ManuallyCreated, null);
+        } else {
+            final Map<String, String> details = new HashMap<>();
+            final JsonObject diff = SerializerUtils.diff(
+                    serializer.toJson(oldShipmentDto),
+                    serializer.toJson(createShipmentDto(newShipment)));
+            details.put("diff", diff == null ? null : diff.toString());
+            auditService.handleShipmentAction(newShipment.getId(), user, ShipmentAuditAction.Updated, details);
+        }
+
+        return createSuccessResponse(serializer.toJson(resp));
     }
     /**
      * @param oldStatus
@@ -424,53 +419,53 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return list of shipments.
+     * @throws ParseException
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getShipments", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject getShipments(
-            @RequestBody final JsonObject request) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final GetShipmentsRequestParser ser = new GetShipmentsRequestParser(user.getTimeZone());
-            final GetFilteredShipmentsRequest req = ser.parseGetFilteredShipmentsRequest(request);
+    public JsonObject getShipments(@RequestBody final JsonObject request) throws ParseException, RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final GetShipmentsRequestParser ser = new GetShipmentsRequestParser(user.getTimeZone());
+        final GetFilteredShipmentsRequest req = ser.parseGetFilteredShipmentsRequest(request);
 
-            final Integer pageIndex = req.getPageIndex();
-            final Integer pageSize = req.getPageSize();
-            final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
+        final Integer pageIndex = req.getPageIndex();
+        final Integer pageSize = req.getPageSize();
+        final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-            final Filter filter = createFilter(req);
-            final ListResult<ListShipmentItem> shipments = getShipments(
-                    user.getCompany(),
-                    createSortingShipments(
-                            req.getSortColumn(),
-                            req.getSortOrder(),
-                            getDefaultListShipmentsSortingOrder(), 2),
-                    filter,
-                    page, user);
+        final Filter filter = createFilter(req);
+        final ListResult<ListShipmentItem> shipments = getShipments(
+                user.getCompany(),
+                createSortingShipments(
+                        req.getSortColumn(),
+                        req.getSortOrder(),
+                        getDefaultListShipmentsSortingOrder(), 2),
+                filter,
+                page, user);
 
-            //add events data
-            final Map<ListShipmentItem, List<KeyLocation>> keyLocs = createKeyLocations(
-                    shipments.getItems(), user);
+        //add events data
+        final Map<ListShipmentItem, List<KeyLocation>> keyLocs = createKeyLocations(
+                shipments.getItems(), user);
 
-            final ShipmentSerializer shs = new ShipmentSerializer(user.getLanguage(),
-                    user.getTimeZone(), user.getTemperatureUnits());
-            final JsonArray array = new JsonArray();
-            for (final ListShipmentItem s : shipments.getItems()) {
-                array.add(shs.toJson(s, keyLocs.get(s)));
-            }
-
-            return createListSuccessResponse(array, shipments.getTotalCount());
-        } catch (final Exception e) {
-            log.error("Failed to get shipments", e);
-            return createErrorResponse(e);
+        final ShipmentSerializer shs = new ShipmentSerializer(user.getLanguage(),
+                user.getTimeZone(), user.getTemperatureUnits());
+        final JsonArray array = new JsonArray();
+        for (final ListShipmentItem s : shipments.getItems()) {
+            array.add(shs.toJson(s, keyLocs.get(s)));
         }
+
+        return createListSuccessResponse(array, shipments.getTotalCount());
     }
     /**
      * @param authToken authentication token.
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return list of shipments.
+     * @throws ParseException
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getShipmentsNearby", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
@@ -478,67 +473,62 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             @RequestParam(value = "lat") final String latStr,
             @RequestParam(value = "lon") final String lonStr,
             @RequestParam final int radius,
-            @RequestParam(required = false, value = "from") final String fromStr) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
+            @RequestParam(required = false, value = "from") final String fromStr) throws ParseException, RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
 
-            //parse request parameters.
-            final double lat = Double.parseDouble(latStr);
-            final double lon = Double.parseDouble(lonStr);
-            final Date startDate;
-            if (fromStr == null) {
-                startDate = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000l);
-            } else {
-                startDate = DateTimeUtils.createDateFormat("yyyy-MM-dd'T'HH-mm-ss",
-                        user.getLanguage(), user.getTimeZone()).parse(fromStr);
-            }
+        //parse request parameters.
+        final double lat = Double.parseDouble(latStr);
+        final double lon = Double.parseDouble(lonStr);
+        final Date startDate;
+        if (fromStr == null) {
+            startDate = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000l);
+        } else {
+            startDate = DateTimeUtils.createDateFormat("yyyy-MM-dd'T'HH-mm-ss",
+                    user.getLanguage(), user.getTimeZone()).parse(fromStr);
+        }
 
-            //request shipments from DB
-            int page = 1;
-            final int limit = 100;
-            final Sorting sorting = new Sorting(SHIPMENT_ID);
+        //request shipments from DB
+        int page = 1;
+        final int limit = 100;
+        final Sorting sorting = new Sorting(SHIPMENT_ID);
 
-            final List<ListShipmentItem> shipments = new LinkedList<>();
-            ListResult<ListShipmentItem> part;
-            do {
-                part = getShipments(user.getCompany(), sorting, null, new Page(page, limit), user);
-                for (final ListShipmentItem item : part.getItems()) {
-                    //Check date and location nearby
-                    final Double itemLat = item.getLastReadingLat();
-                    final Double itemLon = item.getLastReadingLong();
+        final List<ListShipmentItem> shipments = new LinkedList<>();
+        ListResult<ListShipmentItem> part;
+        do {
+            part = getShipments(user.getCompany(), sorting, null, new Page(page, limit), user);
+            for (final ListShipmentItem item : part.getItems()) {
+                //Check date and location nearby
+                final Double itemLat = item.getLastReadingLat();
+                final Double itemLon = item.getLastReadingLong();
 
-                    if (itemLat != null && itemLon != null) {
-                        final double dinst = LocationUtils.getDistanceMeters(
-                                lat, lon, itemLat, itemLon);
-                        if (dinst <= radius && item.getLastReadingTime() != null) {
-                            final Date lastDate = item.getLastReadingTime();
-                            //check the last reading time
-                            if (!lastDate.before(startDate)) {
-                                shipments.add(item);
-                            }
+                if (itemLat != null && itemLon != null) {
+                    final double dinst = LocationUtils.getDistanceMeters(
+                            lat, lon, itemLat, itemLon);
+                    if (dinst <= radius && item.getLastReadingTime() != null) {
+                        final Date lastDate = item.getLastReadingTime();
+                        //check the last reading time
+                        if (!lastDate.before(startDate)) {
+                            shipments.add(item);
                         }
                     }
                 }
-
-                page++;
-            } while (part.getItems().size() >= limit);
-
-            //add events data
-            final Map<ListShipmentItem, List<KeyLocation>> keyLocs = createKeyLocations(shipments, user);
-
-            final ShipmentSerializer shs = new ShipmentSerializer(user.getLanguage(),
-                    user.getTimeZone(), user.getTemperatureUnits());
-            final JsonArray array = new JsonArray();
-            for (final ListShipmentItem s : shipments) {
-                array.add(shs.toJson(s, keyLocs.get(s)));
             }
 
-            return createListSuccessResponse(array, shipments.size());
-        } catch (final Exception e) {
-            log.error("Failed to get shipments near (" + latStr + ", " + lonStr + "), radius: " + radius, e);
-            return createErrorResponse(e);
+            page++;
+        } while (part.getItems().size() >= limit);
+
+        //add events data
+        final Map<ListShipmentItem, List<KeyLocation>> keyLocs = createKeyLocations(shipments, user);
+
+        final ShipmentSerializer shs = new ShipmentSerializer(user.getLanguage(),
+                user.getTimeZone(), user.getTemperatureUnits());
+        final JsonArray array = new JsonArray();
+        for (final ListShipmentItem s : shipments) {
+            array.add(shs.toJson(s, keyLocs.get(s)));
         }
+
+        return createListSuccessResponse(array, shipments.size());
     }
     /**
      * @param shipments
@@ -937,26 +927,22 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @param authToken authentication token.
      * @param shipmentId shipment ID.
      * @return shipment.
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getShipment", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject getShipment(
-            @RequestParam final Long shipmentId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final Shipment shipment = shipmentDao.findOne(shipmentId);
-            checkCompanyAccess(user, shipment);
+    public JsonObject getShipment(@RequestParam final Long shipmentId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final Shipment shipment = shipmentDao.findOne(shipmentId);
+        checkCompanyAccess(user, shipment);
 
-            final ShipmentDto dto = createShipmentDto(shipment);
-            final JsonObject json = getSerializer(user).toJson(dto);
+        final ShipmentDto dto = createShipmentDto(shipment);
+        final JsonObject json = getSerializer(user).toJson(dto);
 
-            auditService.handleShipmentAction(shipment.getId(), user, ShipmentAuditAction.LoadedForEdit, null);
-            return createSuccessResponse(json);
-        } catch (final Exception e) {
-            log.error("Failed to get shipment " + shipmentId, e);
-            return createErrorResponse(e);
-        }
+        auditService.handleShipmentAction(shipment.getId(), user, ShipmentAuditAction.LoadedForEdit, null);
+        return createSuccessResponse(json);
     }
     /**
      * @param shipment
@@ -977,41 +963,29 @@ public class ShipmentController extends AbstractShipmentBaseController implement
     }
     @RequestMapping(value = "/deleteShipment", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject deleteShipment(
-            @RequestParam final Long shipmentId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final Shipment s = shipmentDao.findOne(shipmentId);
-            checkCompanyAccess(user, s);
+    public JsonObject deleteShipment(@RequestParam final Long shipmentId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final Shipment s = shipmentDao.findOne(shipmentId);
+        checkCompanyAccess(user, s);
 
-            shipmentDao.delete(s);
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to delete shipment " + shipmentId, e);
-            return createErrorResponse(e);
-        }
+        shipmentDao.delete(s);
+        return createSuccessResponse(null);
     }
     @RequestMapping(value = "/suppressAlerts", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject suppressAlerts(
-            @RequestParam final Long shipmentId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final Shipment s = shipmentDao.findOne(shipmentId);
-            checkCompanyAccess(user, s);
+    public JsonObject suppressAlerts(@RequestParam final Long shipmentId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final Shipment s = shipmentDao.findOne(shipmentId);
+        checkCompanyAccess(user, s);
 
-            if (s != null) {
-                ruleEngine.suppressNextAlerts(s);
-            }
-
-            auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.SuppressedAlerts, null);
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to delete shipment " + shipmentId, e);
-            return createErrorResponse(e);
+        if (s != null) {
+            ruleEngine.suppressNextAlerts(s);
         }
+
+        auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.SuppressedAlerts, null);
+        return createSuccessResponse(null);
     }
     @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT + "", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
@@ -1019,40 +993,35 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip
-            ) {
+            ) throws RestServiceException {
         //check parameters
         if (shipmentId == null && (sn == null || trip == null)) {
-            return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
                     "Should be specified shipmentId or (sn and trip) request parameters");
         }
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final SingleShipmentData s;
-            if (shipmentId != null) {
-                s = singleShipmentService.getShipmentData(shipmentId);
-            } else {
-                s = singleShipmentService.getShipmentData(sn, trip);
-            }
-
-            if (s == null) {
-                return createSuccessResponse(null);
-            }
-
-            if (!hasViewSingleShipmentAccess(user, s.getBean())) {
-                throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
-            }
-
-            auditService.handleShipmentAction(s.getBean().getShipmentId(), user, ShipmentAuditAction.Viewed, null);
-
-            final SingleShipmentBeanSerializer ser = new SingleShipmentBeanSerializer(
-                    user.getTimeZone(), user.getLanguage(), user.getTemperatureUnits());
-            return createSuccessResponse(s == null ? null : ser.exportToViewData(s));
-        } catch (final Exception e) {
-            log.error("Failed to get single shipment: " + shipmentId, e);
-            return createErrorResponse(e);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final SingleShipmentData s;
+        if (shipmentId != null) {
+            s = singleShipmentService.getShipmentData(shipmentId);
+        } else {
+            s = singleShipmentService.getShipmentData(sn, trip);
         }
+
+        if (s == null) {
+            return createSuccessResponse(null);
+        }
+
+        if (!hasViewSingleShipmentAccess(user, s.getBean())) {
+            throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
+        }
+
+        auditService.handleShipmentAction(s.getBean().getShipmentId(), user, ShipmentAuditAction.Viewed, null);
+
+        final SingleShipmentBeanSerializer ser = new SingleShipmentBeanSerializer(
+                user.getTimeZone(), user.getLanguage(), user.getTemperatureUnits());
+        return createSuccessResponse(s == null ? null : ser.exportToViewData(s));
     }
     @RequestMapping(value = "/getSingleShipmentLite", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
@@ -1060,76 +1029,66 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip
-            ) {
+            ) throws RestServiceException {
         //check parameters
         if (shipmentId == null && (sn == null || trip == null)) {
-            return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
                     "Should be specified shipmentId or (sn and trip) request parameters");
         }
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final SingleShipmentData s;
-            if (shipmentId != null) {
-                s = singleShipmentService.getShipmentData(shipmentId);
-            } else {
-                s = singleShipmentService.getShipmentData(sn, trip);
-            }
-
-            if (s == null) {
-                return createSuccessResponse(null);
-            }
-
-            if (!hasViewSingleShipmentAccess(user, s.getBean())) {
-                throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
-            }
-
-            final SingleShipmentFilter300 filter = new SingleShipmentFilter300();
-            filter.filter(s.getLocations(), s.getBean().getNotes());
-
-            auditService.handleShipmentAction(s.getBean().getShipmentId(), user, ShipmentAuditAction.ViewedLite, null);
-
-            final SingleShipmentBeanSerializer ser = new SingleShipmentBeanSerializer(
-                    user.getTimeZone(), user.getLanguage(), user.getTemperatureUnits());
-            return createSuccessResponse(s == null ? null : ser.exportToViewData(s));
-        } catch (final Exception e) {
-            log.error("Failed to get single shipment: " + shipmentId, e);
-            return createErrorResponse(e);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final SingleShipmentData s;
+        if (shipmentId != null) {
+            s = singleShipmentService.getShipmentData(shipmentId);
+        } else {
+            s = singleShipmentService.getShipmentData(sn, trip);
         }
+
+        if (s == null) {
+            return createSuccessResponse(null);
+        }
+
+        if (!hasViewSingleShipmentAccess(user, s.getBean())) {
+            throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
+        }
+
+        final SingleShipmentFilter300 filter = new SingleShipmentFilter300();
+        filter.filter(s.getLocations(), s.getBean().getNotes());
+
+        auditService.handleShipmentAction(s.getBean().getShipmentId(), user, ShipmentAuditAction.ViewedLite, null);
+
+        final SingleShipmentBeanSerializer ser = new SingleShipmentBeanSerializer(
+                user.getTimeZone(), user.getLanguage(), user.getTemperatureUnits());
+        return createSuccessResponse(s == null ? null : ser.exportToViewData(s));
     }
     @RequestMapping(value = "/createNewAutoSthipment", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonElement createNewAutoSthipment(
-            @RequestParam final String device) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            //get device
-            final Device d = deviceDao.findByImei(device);
-            checkCompanyAccess(user, d);
+            @RequestParam final String device) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        //get device
+        final Device d = deviceDao.findByImei(device);
+        checkCompanyAccess(user, d);
 
-            if (d == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Unable to found device with IMEI '" + device + "'");
-            }
-
-            //get last reading
-            final ShortTrackerEvent e = trackerEventDao.getLastEvent(d);
-            if (e == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Not last event found for device '" + device + "'");
-            }
-
-            final Shipment s = autoStartService.autoStartNewShipment(d, e.getLatitude(), e.getLongitude(), new Date());
-            if (s != null) {
-                auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
-            }
-            return createIdResponse("shipmentId", s.getId());
-        } catch (final Exception e) {
-            log.error("Failed to get autostart templates", e);
-            return createErrorResponse(e);
+        if (d == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Unable to found device with IMEI '" + device + "'");
         }
+
+        //get last reading
+        final ShortTrackerEvent e = trackerEventDao.getLastEvent(d);
+        if (e == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Not last event found for device '" + device + "'");
+        }
+
+        final Shipment s = autoStartService.autoStartNewShipment(d, e.getLatitude(), e.getLongitude(), new Date());
+        if (s != null) {
+            auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
+        }
+        return createIdResponse("shipmentId", s.getId());
     }
     /**
      * @param dto

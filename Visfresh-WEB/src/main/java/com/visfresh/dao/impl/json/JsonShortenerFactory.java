@@ -1,10 +1,12 @@
 /**
  *
  */
-package com.visfresh.io.json;
+package com.visfresh.dao.impl.json;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.visfresh.io.json.DefaultJsonShortener;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>

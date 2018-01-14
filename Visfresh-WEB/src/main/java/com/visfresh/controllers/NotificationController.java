@@ -40,7 +40,7 @@ import com.visfresh.entities.User;
 import com.visfresh.io.NotificationItem;
 import com.visfresh.io.json.NotificationSerializer;
 import com.visfresh.l12n.NotificationBundle;
-import com.visfresh.services.AuthenticationException;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
 
 /**
@@ -73,53 +73,46 @@ public class NotificationController extends AbstractController implements Notifi
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return list of shipments.
+     * @throws RestServiceException
      */
     @RequestMapping(value = "/getNotifications", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getNotifications(
             @RequestParam(required = false) final Integer pageIndex,
             @RequestParam(required = false) final Integer pageSize,
-            @RequestParam(required = false) final Boolean includeRead) {
+            @RequestParam(required = false) final Boolean includeRead) throws RestServiceException {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final NotificationSerializer ser = createSerializer(user);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final NotificationSerializer ser = createSerializer(user);
 
-            final Filter filter = new Filter();
-            filter.addFilter(NotificationDaoImpl.HIDDEN_FIELD, false);
-            if (!Boolean.TRUE.equals(includeRead)) {
-                filter.addFilter(PROPERTY_CLOSED, Boolean.FALSE);
-            }
-
-            final List<Notification> ns = dao.findForUser(user,
-                    true,
-                    new Sorting(false, getDefaultSortOrder()),
-                    filter,
-                    page);
-
-            //create notification to location map
-            final Map<Long, TrackerEvent> events = getTrackerEvents(ns);
-
-            final int total = dao.getEntityCount(user, true, filter);
-            final JsonArray array = new JsonArray();
-            final DateFormat isoFormat = DateTimeUtils.createDateFormat(
-                    "yyyy-MM-dd'T'HH:mm", user.getLanguage(), user.getTimeZone());
-
-            for (final Notification t : ns) {
-                array.add(ser.toJson(createNotificationItem(t, user,
-                        isoFormat, events)));
-            }
-
-            return createListSuccessResponse(array, total);
-        } catch (final AuthenticationException e) {
-            log.error("Failed to get notifications: " + e.getMessage());
-            return createErrorResponse(e);
-        } catch (final Exception e) {
-            log.error("Failed to get notifications", e);
-            return createErrorResponse(e);
+        final Filter filter = new Filter();
+        filter.addFilter(NotificationDaoImpl.HIDDEN_FIELD, false);
+        if (!Boolean.TRUE.equals(includeRead)) {
+            filter.addFilter(PROPERTY_CLOSED, Boolean.FALSE);
         }
+
+        final List<Notification> ns = dao.findForUser(user,
+                true,
+                new Sorting(false, getDefaultSortOrder()),
+                filter,
+                page);
+
+        //create notification to location map
+        final Map<Long, TrackerEvent> events = getTrackerEvents(ns);
+
+        final int total = dao.getEntityCount(user, true, filter);
+        final JsonArray array = new JsonArray();
+        final DateFormat isoFormat = DateTimeUtils.createDateFormat(
+                "yyyy-MM-dd'T'HH:mm", user.getLanguage(), user.getTimeZone());
+
+        for (final Notification t : ns) {
+            array.add(ser.toJson(createNotificationItem(t, user,
+                    isoFormat, events)));
+        }
+
+        return createListSuccessResponse(array, total);
     }
     /**
      * @param ns notifications.
@@ -147,23 +140,17 @@ public class NotificationController extends AbstractController implements Notifi
     }
     @RequestMapping(value = "/markNotificationsAsRead", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject markNotificationsAsRead(
-            @RequestBody final JsonArray notificationIds) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final Set<Long> ids = new HashSet<Long>();
+    public JsonObject markNotificationsAsRead(@RequestBody final JsonArray notificationIds) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final Set<Long> ids = new HashSet<Long>();
 
-            for (final JsonElement e : notificationIds) {
-                ids.add(e.getAsLong());
-            }
-
-            dao.markAsReadenByUserAndId(user, ids);
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to mark notificaiton as read", e);
-            return createErrorResponse(e);
+        for (final JsonElement e : notificationIds) {
+            ids.add(e.getAsLong());
         }
+
+        dao.markAsReadenByUserAndId(user, ids);
+        return createSuccessResponse(null);
     }
     /**
      * @param n notification.

@@ -33,6 +33,7 @@ import com.visfresh.entities.User;
 import com.visfresh.io.UserResolver;
 import com.visfresh.io.json.NotificationScheduleSerializer;
 import com.visfresh.lists.ListNotificationScheduleItem;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.StringUtils;
 
 /**
@@ -65,31 +66,28 @@ public class NotificationScheduleController extends AbstractController implement
      * @param authToken authentication token.
      * @param schedule notification schedule.
      * @return ID of saved notification schedule.
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/saveNotificationSchedule", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject saveNotificationSchedule(
-            final @RequestBody JsonObject schedule) {
-        try {
-            final User user = getLoggedInUser();
-            final NotificationSchedule s = createSerializer(user).parseNotificationSchedule(schedule);
-            s.setCompany(user.getCompany());
+    public JsonObject saveNotificationSchedule(final @RequestBody JsonObject schedule) throws RestServiceException {
+        final User user = getLoggedInUser();
+        final NotificationSchedule s = createSerializer(user).parseNotificationSchedule(schedule);
+        s.setCompany(user.getCompany());
 
-            final NotificationSchedule old = dao.findOne(s.getId());
-            checkCompanyAccess(user, old);
+        final NotificationSchedule old = dao.findOne(s.getId());
+        checkCompanyAccess(user, old);
 
-            final Long id = dao.save(s).getId();
-            return createIdResponse("notificationScheduleId", id);
-        } catch (final Exception e) {
-            log.error("Failed to save notification schedule", e);
-            return createErrorResponse(e);
-        }
+        final Long id = dao.save(s).getId();
+        return createIdResponse("notificationScheduleId", id);
     }
     /**
      * @param authToken authentication token.
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return list of notification schedules.
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getNotificationSchedules", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
@@ -98,31 +96,26 @@ public class NotificationScheduleController extends AbstractController implement
             @RequestParam(required = false) final Integer pageSize,
             @RequestParam(required = false) final String sc,
             @RequestParam(required = false) final String so
-            ) {
+            ) throws RestServiceException {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final List<NotificationSchedule> schedules = dao.findByCompany(
-                    user.getCompany(),
-                    createSorting(sc, so, getDefaultSortOrder(), 2),
-                    page,
-                    null);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final List<NotificationSchedule> schedules = dao.findByCompany(
+                user.getCompany(),
+                createSorting(sc, so, getDefaultSortOrder(), 2),
+                page,
+                null);
 
-            final int total = dao.getEntityCount(user.getCompany(), null);
+        final int total = dao.getEntityCount(user.getCompany(), null);
 
-            final NotificationScheduleSerializer ser = createSerializer(user);
-            final JsonArray array = new JsonArray();
-            for (final NotificationSchedule schedule : schedules) {
-                array.add(ser.toJson(new ListNotificationScheduleItem(schedule)));
-            }
-
-            return createListSuccessResponse(array, total);
-        } catch (final Exception e) {
-            log.error("Failed to get notification schedules", e);
-            return createErrorResponse(e);
+        final NotificationScheduleSerializer ser = createSerializer(user);
+        final JsonArray array = new JsonArray();
+        for (final NotificationSchedule schedule : schedules) {
+            array.add(ser.toJson(new ListNotificationScheduleItem(schedule)));
         }
+
+        return createListSuccessResponse(array, total);
     }
     /**
      * @param user
@@ -149,67 +142,59 @@ public class NotificationScheduleController extends AbstractController implement
      * @param authToken authentication token
      * @param personScheduleId person schedule ID.
      * @return list of notification schedules.
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/deletePersonSchedule", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public JsonObject deletePersonSchedule(
             @RequestParam final long notificationScheduleId,
-            @RequestParam final long personScheduleId) {
+            @RequestParam final long personScheduleId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        //find schedule
+        final NotificationSchedule s = dao.findOne(notificationScheduleId);
+        checkCompanyAccess(user, s);
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            //find schedule
-            final NotificationSchedule s = dao.findOne(notificationScheduleId);
-            checkCompanyAccess(user, s);
-
-            if (s != null && s.getCompany().getId().equals(user.getCompany().getId())) {
-                for (final PersonSchedule ps : s.getSchedules()) {
-                    if (ps.getId().equals(personScheduleId)) {
-                        s.getSchedules().remove(ps);
-                        break;
-                    }
+        if (s != null && s.getCompany().getId().equals(user.getCompany().getId())) {
+            for (final PersonSchedule ps : s.getSchedules()) {
+                if (ps.getId().equals(personScheduleId)) {
+                    s.getSchedules().remove(ps);
+                    break;
                 }
-
-                dao.save(s);
             }
 
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to get notification schedules", e);
-            return createErrorResponse(e);
+            dao.save(s);
         }
+
+        return createSuccessResponse(null);
     }
     /**
      * @param authToken authentication token.
      * @param notificationScheduleId notification schedule ID.
      * @return notification schedule.
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getNotificationSchedule", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject getNotificationSchedule(
-            @RequestParam final Long notificationScheduleId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final NotificationSchedule s = dao.findOne(notificationScheduleId);
-            checkCompanyAccess(user, s);
+    public JsonObject getNotificationSchedule(@RequestParam final Long notificationScheduleId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final NotificationSchedule s = dao.findOne(notificationScheduleId);
+        checkCompanyAccess(user, s);
 
-            return createSuccessResponse(createSerializer(user).toJson(s));
-        } catch (final Exception e) {
-            log.error("Failed to get notification schedules", e);
-            return createErrorResponse(e);
-        }
+        return createSuccessResponse(createSerializer(user).toJson(s));
     }
     /**
      * @param authToken authentication token.
      * @param notificationScheduleId notification schedule ID.
      * @return notification schedule.
+     * @throws Exception
      */
     @RequestMapping(value = "/deleteNotificationSchedule", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject deleteNotificationSchedule(
-            @RequestParam final Long notificationScheduleId) {
+    public JsonObject deleteNotificationSchedule(@RequestParam final Long notificationScheduleId) throws Exception {
         try {
             //check logged in.
             final User user = getLoggedInUser();
@@ -222,9 +207,10 @@ public class NotificationScheduleController extends AbstractController implement
             log.error("Failed to delete notification schedule " + notificationScheduleId, e);
             final List<ReferenceInfo> refs = dao.getDbReferences(notificationScheduleId);
             if (!refs.isEmpty()) {
-                return createErrorResponse(ErrorCodes.ENTITY_IN_USE, createEntityInUseMessage(refs));
+                throw new RestServiceException(ErrorCodes.ENTITY_IN_USE, createEntityInUseMessage(refs));
             }
-            return createErrorResponse(e);
+
+            throw e;
         }
     }
     /**

@@ -5,8 +5,6 @@ package com.visfresh.controllers;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +22,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.json.CompanySerializer;
+import com.visfresh.services.RestServiceException;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,11 +31,6 @@ import com.visfresh.io.json.CompanySerializer;
 @RestController("Company")
 @RequestMapping("/rest")
 public class CompanyController extends AbstractController implements CompanyConstants {
-    /**
-     * Logger.
-     */
-    private static final Logger log = LoggerFactory.getLogger(CompanyController.class);
-
     @Autowired
     private CompanyDao dao;
 
@@ -50,56 +44,49 @@ public class CompanyController extends AbstractController implements CompanyCons
      * @param authToken authentication token.
      * @param companyId company ID.
      * @return company.
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getCompany", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public JsonObject getCompany(
-            @RequestParam(required = false) final Long companyId) {
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final Company company;
-            if (companyId == null || user.getCompany().getId().equals(companyId)) {
-                company = user.getCompany();
-            } else {
-                company = dao.findOne(companyId);
-            }
-
-            checkCompanyAccess(user, company);
-            return createSuccessResponse(getCompanySerializer(user).toJson(company));
-        } catch (final Exception e) {
-            log.error("Failed to get devices", e);
-            return createErrorResponse(e);
+            @RequestParam(required = false) final Long companyId) throws RestServiceException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final Company company;
+        if (companyId == null || user.getCompany().getId().equals(companyId)) {
+            company = user.getCompany();
+        } else {
+            company = dao.findOne(companyId);
         }
+
+        checkCompanyAccess(user, company);
+        return createSuccessResponse(getCompanySerializer(user).toJson(company));
     }
     /**
      * @param authToken authentication token.
      * @param pageIndex page index.
      * @param pageSize page size.
      * @return company.
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getCompanies", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public JsonObject getCompanies(
             @RequestParam(required = false) final Integer pageIndex,
-            @RequestParam(required = false) final Integer pageSize) {
+            @RequestParam(required = false) final Integer pageSize) throws RestServiceException {
         final Page page = (pageIndex != null && pageSize != null) ? new Page(pageIndex, pageSize) : null;
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final List<Company> companies = dao.findAll(null, new Sorting(getDefaultSortOrder()), page);
-            final int total = dao.getEntityCount(null);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final List<Company> companies = dao.findAll(null, new Sorting(getDefaultSortOrder()), page);
+        final int total = dao.getEntityCount(null);
 
-            final JsonArray array = new JsonArray();
-            for (final Company c : companies) {
-                array.add(getCompanySerializer(user).toJson(c));
-            }
-            return createListSuccessResponse(array, total);
-        } catch (final Exception e) {
-            log.error("Failed to get devices", e);
-            return createErrorResponse(e);
+        final JsonArray array = new JsonArray();
+        for (final Company c : companies) {
+            array.add(getCompanySerializer(user).toJson(c));
         }
+        return createListSuccessResponse(array, total);
     }
     /**
      * @param user user.

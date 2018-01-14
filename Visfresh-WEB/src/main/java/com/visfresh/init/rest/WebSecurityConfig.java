@@ -28,11 +28,11 @@ import com.visfresh.websecurity.JdbcAuthenticationManager;
     AbstractController.class,
     LiteShipmentController.class,
     JdbcAuthenticationManager.class})
-public class RestConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * Default constructor.
      */
-    public RestConfig() {
+    public WebSecurityConfig() {
         super();
     }
 

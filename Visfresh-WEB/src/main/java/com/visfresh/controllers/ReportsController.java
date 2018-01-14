@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -51,6 +52,7 @@ import com.visfresh.reports.shipment.ShipmentReportBean;
 import com.visfresh.reports.shipment.ShipmentReportBuilder;
 import com.visfresh.rules.AbstractNotificationRule;
 import com.visfresh.services.EmailService;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
 
 /**
@@ -107,64 +109,59 @@ public class ReportsController extends AbstractController {
             @RequestParam(required = false, value = "location") final Long locationId,
             final HttpServletRequest request,
             final HttpServletResponse response
-            )
-            throws Exception {
-        try {
-            final User user = getLoggedInUser();
-            //period
-            TimeAtom atom = TimeAtom.Month;
-            if (period != null) {
-                atom = TimeAtom.getAtom(period);
-            }
+            )throws Exception {
 
-            //anchor date
-            Date anchor = new Date();
-            if (anchorDate != null) {
-                anchor = parseAnchorDate(anchorDate, user.getTimeZone());
-            } else if (anchorMonth != null) {
-                anchor = parseAnchorDate(anchorMonth, user.getTimeZone());
-            }
-
-            //location
-            final LocationProfile location = locationId == null
-                    ? null : locationProfileDao.findOne(locationId);
-            if (location != null) {
-                checkCompanyAccess(user, location);
-            }
-
-            final TimeRanges ranges = createTimeRanges(anchor, atom);
-
-            //calculate requested date in user's time zone.
-            final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM");
-
-            //create report bean.
-            final PerformanceReportBean bean = performanceReportDao.createReport(
-                    user.getCompany(), new Date(ranges.getStartTime()),
-                    new Date(ranges.getEndTime()),
-                    atom,
-                    location);
-
-            //create report bean.
-            final File file = createPerformanceReportFile(bean, df.format(anchor),
-                    location, user);
-
-            //write report to file
-            final OutputStream out = new FileOutputStream(file);
-            try {
-                reportBuilder.createPerformanceReport(bean, user, out);
-            } finally {
-                out.close();
-            }
-
-            final int index = request.getRequestURL().indexOf("/" + GET_PERFORMANCE_REPORT);
-            final String authToken = getSession().getToken().getToken();
-            response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
-                    authToken, file.getName()));
-
-        } catch (final Exception e) {
-            log.error("Failed to create performance report", e);
-            throw e;
+        final User user = getLoggedInUser();
+        //period
+        TimeAtom atom = TimeAtom.Month;
+        if (period != null) {
+            atom = TimeAtom.getAtom(period);
         }
+
+        //anchor date
+        Date anchor = new Date();
+        if (anchorDate != null) {
+            anchor = parseAnchorDate(anchorDate, user.getTimeZone());
+        } else if (anchorMonth != null) {
+            anchor = parseAnchorDate(anchorMonth, user.getTimeZone());
+        }
+
+        //location
+        final LocationProfile location = locationId == null
+                ? null : locationProfileDao.findOne(locationId);
+        if (location != null) {
+            checkCompanyAccess(user, location);
+        }
+
+        final TimeRanges ranges = createTimeRanges(anchor, atom);
+
+        //calculate requested date in user's time zone.
+        final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM");
+
+        //create report bean.
+        final PerformanceReportBean bean = performanceReportDao.createReport(
+                user.getCompany(), new Date(ranges.getStartTime()),
+                new Date(ranges.getEndTime()),
+                atom,
+                location);
+
+        //create report bean.
+        final File file = createPerformanceReportFile(bean, df.format(anchor),
+                location, user);
+
+        //write report to file
+        final OutputStream out = new FileOutputStream(file);
+        try {
+            reportBuilder.createPerformanceReport(bean, user, out);
+        } finally {
+            out.close();
+        }
+
+        final int index = request.getRequestURL().indexOf("/" + GET_PERFORMANCE_REPORT);
+        final String authToken = getSession().getToken().getToken();
+        response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
+                authToken, file.getName()));
+
     }
     /**
      * @param str
@@ -210,7 +207,6 @@ public class ReportsController extends AbstractController {
     @RequestMapping(value = "/" + GET_SHIPMENT_REPORT + "", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
     public void getShipmentReport(
-
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip,
@@ -224,42 +220,36 @@ public class ReportsController extends AbstractController {
             throw new IOException("Should be specified shipmentId or (sn and trip) request parameters");
         }
 
-        try {
-            final User user = getLoggedInUser();
-            final Shipment s;
-            if (shipmentId != null) {
-                s = shipmentDao.findOne(shipmentId);
-            } else {
-                s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
-            }
-
-            checkCompanyAccess(user, s);
-            if (s == null) {
-                log.error("Shipment not found. Shipment ID: " + shipmentId
-                        + ", SN: " + sn + ", trip count: " + trip);
-                throw new IOException("Shipment not found");
-            }
-
-            //create report bean.
-            final File file = createShipmentReport(s, user);
-
-            final int index = request.getRequestURL().indexOf("/" + GET_SHIPMENT_REPORT);
-            final String authToken = getSession().getToken().getToken();
-            response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
-                    authToken, file.getName()));
-
-        } catch (final Exception e) {
-            log.error("Failed to create shipment report", e);
-            throw e;
+        final User user = getLoggedInUser();
+        final Shipment s;
+        if (shipmentId != null) {
+            s = shipmentDao.findOne(shipmentId);
+        } else {
+            s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
         }
+
+        checkCompanyAccess(user, s);
+        if (s == null) {
+            log.error("Shipment not found. Shipment ID: " + shipmentId
+                    + ", SN: " + sn + ", trip count: " + trip);
+            throw new IOException("Shipment not found");
+        }
+
+        //create report bean.
+        final File file = createShipmentReport(s, user);
+
+        final int index = request.getRequestURL().indexOf("/" + GET_SHIPMENT_REPORT);
+        final String authToken = getSession().getToken().getToken();
+        response.sendRedirect(FileDownloadController.createDownloadUrl(request.getRequestURL().substring(0, index),
+                authToken, file.getName()));
+
     }
     /**
      * @param s shipment.
      * @param user user.
      * @return PDF shipment report.
      */
-    private File createShipmentReport(final Shipment s, final User user)
-            throws IOException {
+    private File createShipmentReport(final Shipment s, final User user)throws IOException {
         final ShipmentReportBean bean = shipmentReportDao.createReport(s);
 
         //correct report recipient list if report really sent
@@ -336,47 +326,46 @@ public class ReportsController extends AbstractController {
      * @param authToken authentication token.
      * @param jsonRequest JSON save shipment request.
      * @return ID of saved shipment.
+     * @throws RestServiceException
+     * @throws IOException
+     * @throws MessagingException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/emailShipmentReport", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
-    public JsonObject emailShipmentReport(
-            final @RequestBody JsonObject jsonRequest) {
-        try {
-            final User user = getLoggedInUser();
-            final ReportsSerializer serializer = getSerializer();
-            final EmailShipmentReportRequest req = serializer.parseEmailShipmentReportRequest(jsonRequest);
+    public JsonObject emailShipmentReport(final @RequestBody JsonObject jsonRequest)
+            throws RestServiceException, IOException, MessagingException {
+        final User user = getLoggedInUser();
+        final ReportsSerializer serializer = getSerializer();
+        final EmailShipmentReportRequest req = serializer.parseEmailShipmentReportRequest(jsonRequest);
 
-            //check parameters
-            if (req.getSn() == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Should be specified sn and trip request parameters");
-            }
-
-            final Shipment s = shipmentDao.findBySnTrip(user.getCompany(), req.getSn(), req.getTrip());
-            if (s == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Unable to found shipment for " + req.getSn() + " (" + req.getTrip()
-                        + ") for given company");
-            }
-
-            final File file = createShipmentReport(s, user);
-            final Set<String> emails = new HashSet<>();
-
-            //add users
-            for (final User u: userDao.findAll(req.getUsers())) {
-                emails.add(u.getEmail());
-            }
-            //add emails
-            emails.addAll(req.getEmails());
-
-            emailService.sendMessage(emails.toArray(new String[emails.size()]),
-                    req.getSubject(), req.getMessageBody(), file);
-
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to save shipment by request: " + jsonRequest, e);
-            return createErrorResponse(e);
+        //check parameters
+        if (req.getSn() == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Should be specified sn and trip request parameters");
         }
+
+        final Shipment s = shipmentDao.findBySnTrip(user.getCompany(), req.getSn(), req.getTrip());
+        if (s == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Unable to found shipment for " + req.getSn() + " (" + req.getTrip()
+                    + ") for given company");
+        }
+
+        final File file = createShipmentReport(s, user);
+        final Set<String> emails = new HashSet<>();
+
+        //add users
+        for (final User u: userDao.findAll(req.getUsers())) {
+            emails.add(u.getEmail());
+        }
+        //add emails
+        emails.addAll(req.getEmails());
+
+        emailService.sendMessage(emails.toArray(new String[emails.size()]),
+                req.getSubject(), req.getMessageBody(), file);
+
+        return createSuccessResponse(null);
     }
 
     /**

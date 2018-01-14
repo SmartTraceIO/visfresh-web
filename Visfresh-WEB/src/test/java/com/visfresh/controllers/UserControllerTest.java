@@ -39,7 +39,6 @@ import com.visfresh.io.ShipmentResolver;
 import com.visfresh.io.UpdateUserDetailsRequest;
 import com.visfresh.services.AuthService;
 import com.visfresh.services.AuthToken;
-import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 
 import junit.framework.AssertionFailedError;
@@ -133,7 +132,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertNotNull(client.getUser(null));
     }
     @Test
-    public void testSaveUser() throws IOException, RestServiceException, AuthenticationException {
+    public void testSaveUser() throws IOException, RestServiceException {
         //create company
         final String firstName = "firstname";
         final String lastName = "LastName";
@@ -207,7 +206,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertNotNull(auth.login(u.getEmail(), newPassword, "junit"));
     }
     @Test
-    public void testSaveWithoutCompany() throws IOException, RestServiceException, AuthenticationException {
+    public void testSaveWithoutCompany() throws IOException, RestServiceException {
         user.getRoles().clear();
         user.getRoles().add(Role.Admin);
         dao.save(user);
@@ -285,7 +284,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         assertNotNull(auth.login(u.getEmail(), newPassword, "junit"));
     }
     @Test
-    public void testNotLoginInactiveUser() throws AuthenticationException {
+    public void testNotLoginInactiveUser() throws RestServiceException {
         final User u = createUser("abra@cada.bra", "James", "Bond", getCompany());
 
         //check login
@@ -299,12 +298,12 @@ public class UserControllerTest extends AbstractRestServiceTest {
         try {
             assertNotNull(auth.login(u.getEmail(), "", "junit"));
             throw new AssertionFailedError("Auth exception should be thrown");
-        } catch (final AuthenticationException e) {
+        } catch (final RestServiceException e) {
             // ok
         }
     }
     @Test
-    public void testLogout() throws AuthenticationException, IOException, RestServiceException {
+    public void testLogout() throws IOException, RestServiceException {
         final User u = createUser("abra@cada.bra", "James", "Bond", getCompany());
 
         //check login
@@ -322,7 +321,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         }
     }
     @Test
-    public void testForceLogout() throws AuthenticationException, IOException, RestServiceException {
+    public void testForceLogout() throws IOException, RestServiceException {
         final User u = createUser("abra@cada.bra", "James", "Bond", getCompany());
 
         //check login
@@ -352,7 +351,7 @@ public class UserControllerTest extends AbstractRestServiceTest {
         }
     }
     @Test
-    public void testSaveWithNullValues() throws IOException, RestServiceException, AuthenticationException {
+    public void testSaveWithNullValues() throws IOException, RestServiceException {
         final String firstName = "firstname";
         final String lastName = "LastName";
         final String email = "abra@cada.bra";

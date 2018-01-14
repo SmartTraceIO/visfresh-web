@@ -64,7 +64,7 @@ public class DefaultRestSessionManagerTest extends DefaultRestSessionManager {
         assertEquals(u2.getId(), getSession(s2.getToken().getToken()).getUser().getId());
     }
     @Test
-    public void testSessionExpired() throws AuthenticationException {
+    public void testSessionExpired() throws RestServiceException {
         //create one user
         final User u = createUser();
         final AuthToken token = generateNewToken(u, null);

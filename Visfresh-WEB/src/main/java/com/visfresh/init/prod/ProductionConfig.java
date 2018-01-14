@@ -13,7 +13,7 @@ import com.visfresh.dao.impl.DaoImplBase;
 import com.visfresh.impl.ruleengine.VisfreshRuleEngine;
 import com.visfresh.impl.services.TrackerMessageDispatcher;
 import com.visfresh.init.jdbc.JdbcConfig;
-import com.visfresh.init.rest.RestConfig;
+import com.visfresh.init.rest.WebConfig;
 import com.visfresh.l12n.XmlResourceBundle;
 import com.visfresh.reports.PdfReportBuilder;
 import com.visfresh.services.DefaultAuthService;
@@ -23,7 +23,7 @@ import com.visfresh.services.DefaultAuthService;
  *
  */
 @Configuration
-@Import({JdbcConfig.class, RestConfig.class})
+@Import({JdbcConfig.class, WebConfig.class})
 @ComponentScan(basePackageClasses = {
         VisfreshRuleEngine.class,
         DefaultAuthService.class,

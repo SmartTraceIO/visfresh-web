@@ -4,11 +4,10 @@
 package com.visfresh.controllers;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +29,7 @@ import com.visfresh.entities.SpringRoles;
 import com.visfresh.entities.User;
 import com.visfresh.io.NoteDto;
 import com.visfresh.io.json.NoteSerializer;
+import com.visfresh.services.RestServiceException;
 import com.visfresh.services.ShipmentAuditService;
 import com.visfresh.utils.DateTimeUtils;
 
@@ -40,10 +40,6 @@ import com.visfresh.utils.DateTimeUtils;
 @RestController("Note")
 @RequestMapping("/rest")
 public class NoteController extends AbstractController implements DeviceConstants {
-    /**
-     * Logger.
-     */
-    private static final Logger log = LoggerFactory.getLogger(NoteController.class);
     @Autowired
     private ShipmentDao shipmentDao;
     @Autowired
@@ -63,6 +59,8 @@ public class NoteController extends AbstractController implements DeviceConstant
      * @param sn
      * @param trip
      * @return
+     * @throws RestServiceException
+     * @throws AuthenticationException
      */
     @RequestMapping(value = "/getNotes", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
@@ -70,44 +68,39 @@ public class NoteController extends AbstractController implements DeviceConstant
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip
-            ) {
+            ) throws RestServiceException {
         //check parameters
         if (shipmentId == null && (sn == null || trip == null)) {
-            return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
                     "Should be specified shipmentId or (sn and trip) request parameters");
         }
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final Shipment s;
-            if (shipmentId != null) {
-                s = shipmentDao.findOne(shipmentId);
-            } else {
-                s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
-            }
-
-            checkCompanyAccess(user, s);
-            if (s == null) {
-                return createSuccessResponse(new JsonArray());
-            }
-
-            final NoteSerializer ser = getSerializer(user);
-            final DateFormat iso = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
-            final List<Note> notes = noteDao.findByShipment(s);
-
-            final JsonArray array = new JsonArray();
-            for (final Note note : notes) {
-                final NoteDto dto = creaetNoteDto(note, s, iso);
-
-                array.add(ser.toJson(dto));
-            }
-
-            return createSuccessResponse(array);
-        } catch (final Exception e) {
-            log.error("Failed to get notes for : " + shipmentId, e);
-            return createErrorResponse(e);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final Shipment s;
+        if (shipmentId != null) {
+            s = shipmentDao.findOne(shipmentId);
+        } else {
+            s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
         }
+
+        checkCompanyAccess(user, s);
+        if (s == null) {
+            return createSuccessResponse(new JsonArray());
+        }
+
+        final NoteSerializer ser = getSerializer(user);
+        final DateFormat iso = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+        final List<Note> notes = noteDao.findByShipment(s);
+
+        final JsonArray array = new JsonArray();
+        for (final Note note : notes) {
+            final NoteDto dto = creaetNoteDto(note, s, iso);
+
+            array.add(ser.toJson(dto));
+        }
+
+        return createSuccessResponse(array);
     }
     @RequestMapping(value = "/deleteNote", method = RequestMethod.GET)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
@@ -116,44 +109,38 @@ public class NoteController extends AbstractController implements DeviceConstant
             @RequestParam(required = false) final String sn,
             @RequestParam(required = false) final Integer trip,
             @RequestParam final Integer noteNum
-            ) {
+            ) throws RestServiceException {
         //check parameters
         if (shipmentId == null && (sn == null || trip == null)) {
-            return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
                     "Should be specified shipmentId or (sn and trip) request parameters");
         }
 
-        try {
-            //check logged in.
-            final User user = getLoggedInUser();
-            final Shipment s;
-            if (shipmentId != null) {
-                s = shipmentDao.findOne(shipmentId);
-            } else {
-                s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
-            }
-
-            checkCompanyAccess(user, s);
-            if (s == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "Shipment not found");
-            }
-
-            final Note note = noteDao.getNote(s, noteNum);
-            if (note == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Note with given number " + noteNum + " not found");
-            }
-
-            note.setActive(false);
-            noteDao.save(s, note);
-
-            auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.DeletedNote, null);
-
-            return createSuccessResponse(null);
-        } catch (final Exception e) {
-            log.error("Failed to delete note: " + shipmentId, e);
-            return createErrorResponse(e);
+        //check logged in.
+        final User user = getLoggedInUser();
+        final Shipment s;
+        if (shipmentId != null) {
+            s = shipmentDao.findOne(shipmentId);
+        } else {
+            s = shipmentDao.findBySnTrip(user.getCompany(), sn, trip);
         }
+
+        checkCompanyAccess(user, s);
+        if (s == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA, "Shipment not found");
+        }
+
+        final Note note = noteDao.getNote(s, noteNum);
+        if (note == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Note with given number " + noteNum + " not found");
+        }
+
+        note.setActive(false);
+        noteDao.save(s, note);
+        auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.DeletedNote, null);
+
+        return createSuccessResponse(null);
     }
     /**
      * @param note
@@ -180,58 +167,51 @@ public class NoteController extends AbstractController implements DeviceConstant
     }
     @RequestMapping(value = "/saveNote", method = RequestMethod.POST)
     @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
-    public JsonObject saveNote(
-            final @RequestBody JsonObject jsonRequest) {
-        try {
+    public JsonObject saveNote(final @RequestBody JsonObject jsonRequest) throws RestServiceException, ParseException {
+        //check logged in.
+        final User user = getLoggedInUser();
+        final NoteSerializer ser = getSerializer(user);
+        final NoteDto dto = ser.parseNoteDto(jsonRequest);
 
-            //check logged in.
-            final User user = getLoggedInUser();
-            final NoteSerializer ser = getSerializer(user);
-            final NoteDto dto = ser.parseNoteDto(jsonRequest);
-
-            //check parameters
-            if (dto.getShipmentId() == null && (dto.getSn() == null || dto.getTrip() == null)) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA,
-                        "Should be specified shipmentId or (sn and trip) request parameters");
-            }
-
-            final Shipment s;
-            if (dto.getShipmentId() != null) {
-                s = shipmentDao.findOne(dto.getShipmentId());
-            } else {
-                s = shipmentDao.findBySnTrip(user.getCompany(), dto.getSn(), dto.getTrip());
-            }
-
-            checkCompanyAccess(user, s);
-            if (s == null) {
-                return createErrorResponse(ErrorCodes.INCORRECT_REQUEST_DATA, "Shipment not found");
-            }
-
-            final DateFormat iso = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
-
-            Note note = new Note();
-            note.setCreationDate(dto.getCreationDate() == null ? new Date() : iso.parse(dto.getCreationDate()));
-            note.setCreatedBy(dto.getCreatedBy() == null ? user.getEmail() : dto.getCreatedBy());
-            note.setNoteNum(dto.getNoteNum());
-            note.setNoteText(dto.getNoteText());
-            note.setNoteType(dto.getNoteType());
-            note.setTimeOnChart(iso.parse(dto.getTimeOnChart()));
-            note.setActive(dto.isActiveFlag());
-
-            final boolean isNew = note.getNoteNum() == null;
-            note = noteDao.save(s, note);
-
-            if (isNew) {
-                auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.AddedNote, null);
-            } else {
-                auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.UpdatedNote, null);
-            }
-
-            return createSuccessResponse(ser.createSaveResponse(note));
-        } catch (final Exception e) {
-            log.error("Failed to save note" + jsonRequest, e);
-            return createErrorResponse(e);
+        //check parameters
+        if (dto.getShipmentId() == null && (dto.getSn() == null || dto.getTrip() == null)) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Should be specified shipmentId or (sn and trip) request parameters");
         }
+
+        final Shipment s;
+        if (dto.getShipmentId() != null) {
+            s = shipmentDao.findOne(dto.getShipmentId());
+        } else {
+            s = shipmentDao.findBySnTrip(user.getCompany(), dto.getSn(), dto.getTrip());
+        }
+
+        checkCompanyAccess(user, s);
+        if (s == null) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA, "Shipment not found");
+        }
+
+        final DateFormat iso = DateTimeUtils.createIsoFormat(user.getLanguage(), user.getTimeZone());
+
+        Note note = new Note();
+        note.setCreationDate(dto.getCreationDate() == null ? new Date() : iso.parse(dto.getCreationDate()));
+        note.setCreatedBy(dto.getCreatedBy() == null ? user.getEmail() : dto.getCreatedBy());
+        note.setNoteNum(dto.getNoteNum());
+        note.setNoteText(dto.getNoteText());
+        note.setNoteType(dto.getNoteType());
+        note.setTimeOnChart(iso.parse(dto.getTimeOnChart()));
+        note.setActive(dto.isActiveFlag());
+
+        final boolean isNew = note.getNoteNum() == null;
+        note = noteDao.save(s, note);
+
+        if (isNew) {
+            auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.AddedNote, null);
+        } else {
+            auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.UpdatedNote, null);
+        }
+
+        return createSuccessResponse(ser.createSaveResponse(note));
     }
     /**
      * @param user the user.

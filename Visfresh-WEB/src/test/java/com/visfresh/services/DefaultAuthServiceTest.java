@@ -68,7 +68,7 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
     }
 
     @Test
-    public void testLogin() throws AuthenticationException {
+    public void testLogin() throws RestServiceException {
         //create one user
         final User u = createUser();
 
@@ -81,7 +81,7 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         assertEquals(u.getId(), sessions.values().iterator().next().getUser().getId());
     }
     @Test
-    public void testLoginWithNullInstance() throws AuthenticationException {
+    public void testLoginWithNullInstance() throws RestServiceException {
         //create one user
         final User u = createUser();
 
@@ -101,14 +101,14 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         try {
             login(u.getEmail(), "password1", "junit");
             throw new AssertionFailedError("Auth exception should be thrown");
-        } catch (final AuthenticationException e) {
+        } catch (final RestServiceException e) {
             //correct behavior;
         }
 
         assertEquals(0, sessions.size());
     }
     @Test
-    public void testRefreshToken() throws AuthenticationException {
+    public void testRefreshToken() throws RestServiceException {
         //create one user
         final User u = createUser();
         final String token = login(u.getEmail(), "password", "junit").getToken();
@@ -122,7 +122,7 @@ public class DefaultAuthServiceTest extends DefaultAuthService {
         try {
             login("email@junit.ru", "password1", "junit");
             throw new AssertionFailedError("Auth exception should be thrown");
-        } catch (final AuthenticationException e) {
+        } catch (final RestServiceException e) {
             //correct behavior;
         }
 

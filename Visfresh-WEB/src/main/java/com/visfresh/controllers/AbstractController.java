@@ -26,7 +26,6 @@ import com.visfresh.entities.RestSession;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.User;
 import com.visfresh.services.AuthService;
-import com.visfresh.services.AuthenticationException;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.SerializerUtils;
 
@@ -125,32 +124,6 @@ public abstract class AbstractController {
         return obj;
     }
     /**
-     * @param e
-     * @return
-     */
-    protected JsonObject createErrorResponse(final Throwable e) {
-        int code = -1;
-        if (e instanceof AuthenticationException) {
-            code = ErrorCodes.AUTHENTICATION_ERROR;
-        } else if (e instanceof RestServiceException) {
-            code = ((RestServiceException) e).getErrorCode();
-        }
-        final String msg = e.getMessage() == null ? e.toString() : e.getMessage();
-        return createErrorResponse(code, msg);
-    }
-    /**
-     * @param code error code.
-     * @param msg error message.
-     * @return error response object.
-     */
-    protected JsonObject createErrorResponse(final int code, final String msg) {
-        final JsonObject obj = new JsonObject();
-        //add status
-        final JsonObject status =  SerializerUtils.createErrorStatus(code, msg);
-        obj.add("status", status);
-        return obj;
-    }
-    /**
      * @param code status code.
      * @param message status description.
      * @return
@@ -165,11 +138,10 @@ public abstract class AbstractController {
      * @return user if logged in.
      * @throws AuthenticationException
      */
-    protected User getLoggedInUser()
-            throws AuthenticationException {
+    protected User getLoggedInUser() throws RestServiceException {
         final RestSession session = getSession();
         if (session == null) {
-            throw new AuthenticationException("Not logged in");
+            throw new RestServiceException(ErrorCodes.AUTHENTICATION_ERROR, "Not logged in");
         }
         return session.getUser();
     }
