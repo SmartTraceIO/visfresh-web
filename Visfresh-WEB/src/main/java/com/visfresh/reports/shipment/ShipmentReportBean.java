@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.visfresh.entities.Alert;
 import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.ShipmentStatus;
@@ -21,6 +22,7 @@ import com.visfresh.reports.TemperatureStats;
  */
 public class ShipmentReportBean {
     private String device;
+    private DeviceModel deviceModel = DeviceModel.SmartTrace;
     private String companyName;
     private int tripCount;
     private LocationProfile shippedFrom;
@@ -331,5 +333,17 @@ public class ShipmentReportBean {
      */
     public void setTemperatureStats(final TemperatureStats s) {
         this.temperatureStats = s;
+    }
+    /**
+     * @return the deviceModel
+     */
+    public DeviceModel getDeviceModel() {
+        return deviceModel;
+    }
+    /**
+     * @param deviceModel the deviceModel to set
+     */
+    public void setDeviceModel(final DeviceModel deviceModel) {
+        this.deviceModel = deviceModel;
     }
 }

@@ -40,6 +40,7 @@ import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.Language;
 import com.visfresh.entities.Role;
 import com.visfresh.entities.Shipment;
@@ -124,7 +125,9 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         createTrackerEvent(ap, s1, 11.);
         createTrackerEvent(ap, s1, 23.456);
 
-        assertNotNull(client.getDevice(ap.getId()));
+        final Device device = client.getDevice(ap.getId());
+        assertNotNull(device);
+        assertEquals(ap.getModel(), device.getModel());
     }
 //    @Test
 //    public void testDeleteDevice() throws RestServiceException, IOException {
@@ -181,6 +184,7 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(d1.getDescription(), item.getDescription());
         assertEquals(d1.getId(), item.getImei());
         assertEquals(d1.getImei(), item.getImei());
+        assertEquals(d1.getModel(), item.getModel());
         assertEquals(d1.getName(), item.getName());
         assertEquals(d1.getSn(), item.getSn());
         assertEquals(tpl.getName(), item.getAutostartTemplateName());
@@ -213,6 +217,25 @@ public class DeviceControllerTest extends AbstractRestServiceTest {
         assertEquals(d1.getImei(), dto.get(0).getImei());
         assertEquals(d2.getImei(), dto.get(1).getImei());
         assertEquals(d3.getImei(), dto.get(2).getImei());
+    }
+    @Test
+    public void testGetDevicesSortByModel() throws RestServiceException, IOException {
+        final Device d1 = createDevice("2222222222222", true);
+        d1.setModel(DeviceModel.TT18);
+        final Device d2 = createDevice("3333333333333", true);
+        d2.setModel(DeviceModel.SmartTrace);
+        dao.save(d1);
+        dao.save(d2);
+
+        List<DeviceDto> dto;
+
+        dto = client.getDevices(DeviceConstants.PROPERTY_MODEL, true, null, null);
+        assertEquals(d2.getImei(), dto.get(0).getImei());
+        assertEquals(d1.getImei(), dto.get(1).getImei());
+
+        dto = client.getDevices(DeviceConstants.PROPERTY_MODEL, false, null, null);
+        assertEquals(d1.getImei(), dto.get(0).getImei());
+        assertEquals(d2.getImei(), dto.get(1).getImei());
     }
     @Test
     public void testSortByShipmentNumber() throws RestServiceException, IOException {

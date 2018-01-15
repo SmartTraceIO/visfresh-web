@@ -72,6 +72,7 @@ create table correctiveactions (
 create table devices (
     description varchar(255),
     imei varchar(30) not null,
+    model varchar(20) not null,
     color varchar(30) default null,
     name varchar(127) not null,
     company bigint(20),

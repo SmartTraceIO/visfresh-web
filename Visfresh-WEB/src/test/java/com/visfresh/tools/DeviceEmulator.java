@@ -353,6 +353,7 @@ public class DeviceEmulator extends AbstractTool implements Runnable {
                 device.setCompany(company);
                 device.setDescription(d.getDescription());
                 device.setImei(d.getImei());
+                device.setModel(d.getModel());
                 device.setName(d.getName());
                 return device;
             }

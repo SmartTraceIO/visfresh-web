@@ -18,6 +18,7 @@ import com.visfresh.entities.AutoStartShipment;
 import com.visfresh.entities.Color;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
@@ -70,6 +71,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         final Device d = new Device();
         d.setImei(imei);
         d.setName("Test Device");
+        d.setModel(DeviceModel.TT18);
         d.setCompany(sharedCompany);
         d.setDescription("Test device");
         d.setTripCount(5);
@@ -90,6 +92,7 @@ public class DeviceDaoTest extends BaseCrudTest<DeviceDao, Device, Device, Strin
         assertEquals(5, d.getTripCount());
         assertEquals(autoStart.getId(), d.getAutostartTemplateId());
         assertEquals(choiseColor(d.getImei()), d.getColor());
+        assertEquals(DeviceModel.TT18, d.getModel());
 
         //test company
         final Company c = d.getCompany();

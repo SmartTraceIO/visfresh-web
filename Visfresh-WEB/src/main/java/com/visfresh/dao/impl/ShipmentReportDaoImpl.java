@@ -96,6 +96,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         bean.setDateShipped(s.getShipmentDate());
         bean.setDescription(s.getShipmentDescription());
         bean.setDevice(s.getDevice().getImei());
+        bean.setDeviceModel(s.getDevice().getModel());
         bean.setNumberOfSiblings(s.getSiblingCount());
         bean.setPalletId(s.getPalletId());
         bean.setShutdownTime(s.getDeviceShutdownTime());

@@ -26,6 +26,7 @@ import com.visfresh.entities.AlertType;
 import com.visfresh.entities.Color;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.LocationProfile;
 import com.visfresh.entities.NotificationSchedule;
 import com.visfresh.entities.PersonSchedule;
@@ -370,6 +371,7 @@ public abstract class AbstractRestServiceTest {
         t.setImei(imei);
         t.setName("Device Name");
         t.setColor(Color.DarkCyan);
+        t.setModel(DeviceModel.TT18);
         if (save) {
             t.setCompany(getCompany());
             context.getBean(DeviceDao.class).save(t);

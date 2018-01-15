@@ -881,6 +881,7 @@ see [ResponseStatus](#markdown-header-response-status)
 {
   "description": "Device description",
   "imei": "0239487043987",
+  "model": "TT18",
   "name": "Device Name",
   "active": true,
   "sn": "043987", // read only property
@@ -2479,6 +2480,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
 {
   "description": "Device description",
   "imei": "0239487043987",
+  "model": "TT18",
   "name": "Device Name",
   "active": true,
   "color": "Crimson",
@@ -2519,6 +2521,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     {
       "description": "Device description",
       "imei": "1111111111111",
+      "model": "TT18",
       "name": "Device Name",
       "sn": "111111",
       "active": true,
@@ -2538,6 +2541,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     {
       "description": "Device description",
       "imei": "2222222222222",
+      "model": "TT18",
       "name": "Device Name",
       "sn": "222222",
       "active": true,
@@ -2556,6 +2560,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     {
       "description": "Device description",
       "imei": "3333333333333",
+      "model": "TT18",
       "name": "Device Name",
       "sn": "333333",
       "active": true,
@@ -2574,6 +2579,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
     {
       "description": "Device description",
       "imei": "4444444444444",
+      "model": "TT18",
       "name": "Device Name",
       "sn": "444444",
       "active": true,
@@ -2941,6 +2947,7 @@ see [Ordinary Alert Object](#markdown-header-alert), [Temperature Alert Object](
   "response": {
     "description": "Device description",
     "imei": "0239487043987",
+    "model": "TT18",
     "name": "Device Name",
     "sn": "704398",
     "color": "Crimson",

@@ -14,6 +14,10 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      */
     private String imei;
     /**
+     * Device type.
+     */
+    private DeviceModel model = DeviceModel.SmartTrace;
+    /**
      * Device name.
      */
     private String name;
@@ -244,6 +248,18 @@ public class Device implements EntityWithId<String>, EntityWithCompany {
      */
     public void setColor(final Color color) {
         this.color = color;
+    }
+    /**
+     * @return the type
+     */
+    public DeviceModel getModel() {
+        return model;
+    }
+    /**
+     * @param type the type to set
+     */
+    public void setModel(final DeviceModel type) {
+        this.model = type;
     }
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

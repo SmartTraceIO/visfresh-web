@@ -255,6 +255,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         d.setCompany(device.getCompany());
         d.setDescription(device.getDescription());
         d.setImei(createVirtualPrefix(device) + device.getImei());
+        d.setModel(device.getModel());
         d.setName(device.getName());
         d.setTripCount(device.getTripCount());
         d.setColor(device.getColor());
@@ -313,6 +314,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
         dto.setActive(item.isActive());
         dto.setDescription(item.getDescription());
         dto.setImei(item.getImei());
+        dto.setModel(item.getModel());
         dto.setSn(Device.getSerialNumber(item.getImei()));
         dto.setName(item.getName());
         dto.setAutostartTemplateId(item.getAutostartTemplateId());
@@ -345,6 +347,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
     private String[] getDefaultSortOrder() {
         return new String[] {
                 PROPERTY_IMEI,
+                PROPERTY_MODEL,
                 PROPERTY_NAME,
                 PROPERTY_DESCRIPTION,
                 PROPERTY_ACTIVE,

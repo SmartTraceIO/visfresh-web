@@ -12,6 +12,7 @@ import com.visfresh.constants.DeviceConstants;
 import com.visfresh.entities.Color;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.io.DeviceResolver;
 import com.visfresh.lists.DeviceDto;
 
@@ -35,6 +36,9 @@ public class DeviceSerializer extends AbstractJsonSerializer {
     public Device parseDevice(final JsonObject json) {
         final Device tr = new Device();
         tr.setImei(asString(json.get(DeviceConstants.PROPERTY_IMEI)));
+        if (has(json, DeviceConstants.PROPERTY_MODEL)) {
+            tr.setModel(DeviceModel.valueOf(asString(json.get(DeviceConstants.PROPERTY_MODEL))));
+        }
         tr.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
         tr.setColor(parseColor(asString(json.get(DeviceConstants.PROPERTY_COLOR))));
         tr.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));
@@ -54,6 +58,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
         obj.addProperty(DeviceConstants.PROPERTY_DESCRIPTION, d.getDescription());
         obj.addProperty(DeviceConstants.PROPERTY_IMEI, d.getImei());
+        obj.addProperty(DeviceConstants.PROPERTY_MODEL, d.getModel().name());
         obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
         obj.addProperty(DeviceConstants.PROPERTY_ACTIVE, d.isActive());
         obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
@@ -70,6 +75,9 @@ public class DeviceSerializer extends AbstractJsonSerializer {
 
         final DeviceDto d = new DeviceDto();
         d.setImei(asString(json.get(DeviceConstants.PROPERTY_IMEI)));
+        if (has(json, DeviceConstants.PROPERTY_MODEL)) {
+            d.setModel(DeviceModel.valueOf(asString(json.get(DeviceConstants.PROPERTY_MODEL))));
+        }
         d.setName(asString(json.get(DeviceConstants.PROPERTY_NAME)));
         d.setDescription(asString(json.get(DeviceConstants.PROPERTY_DESCRIPTION)));
         d.setSn(asString(json.get(DeviceConstants.PROPERTY_SN)));
@@ -105,6 +113,7 @@ public class DeviceSerializer extends AbstractJsonSerializer {
         final JsonObject obj = new JsonObject();
         obj.addProperty(DeviceConstants.PROPERTY_DESCRIPTION, d.getDescription());
         obj.addProperty(DeviceConstants.PROPERTY_IMEI, d.getImei());
+        obj.addProperty(DeviceConstants.PROPERTY_MODEL, d.getModel().name());
         obj.addProperty(DeviceConstants.PROPERTY_NAME, d.getName());
         obj.addProperty(DeviceConstants.PROPERTY_SN, d.getSn());
         obj.addProperty(DeviceConstants.PROPERTY_COLOR, d.getColor());

@@ -22,6 +22,7 @@ import com.visfresh.entities.Color;
 import com.visfresh.entities.Company;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceGroup;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.ListDeviceItem;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.io.json.DeviceStateSerializer;
@@ -51,6 +52,10 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
     /**
      * Name field.
      */
+    public static final String MODEL_FIELD = "model";
+    /**
+     * Name field.
+     */
     public static final String IMEI_FIELD = "imei";
     /**
      * Company name.
@@ -75,6 +80,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
         propertyToDbFields.put(DeviceConstants.PROPERTY_DESCRIPTION, DESCRIPTION_FIELD);
         propertyToDbFields.put(DeviceConstants.PROPERTY_NAME, NAME_FIELD);
         propertyToDbFields.put(DeviceConstants.PROPERTY_IMEI, IMEI_FIELD);
+        propertyToDbFields.put(DeviceConstants.PROPERTY_MODEL, MODEL_FIELD);
         propertyToDbFields.put(DeviceConstants.PROPERTY_ACTIVE, ACTIVE_FIELD);
     }
 
@@ -86,6 +92,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put(IMEI_FIELD, device.getId());
         paramMap.put(NAME_FIELD, device.getName());
+        paramMap.put(MODEL_FIELD, device.getModel().name());
         paramMap.put(DESCRIPTION_FIELD, device.getDescription());
         paramMap.put(IMEI_FIELD, device.getImei());
         paramMap.put(COMPANY_FIELD, device.getCompany().getId());
@@ -137,6 +144,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
     protected Device createEntity(final Map<String, Object> map) {
         final Device d = new Device();
         d.setName((String) map.get(NAME_FIELD));
+        d.setModel(DeviceModel.valueOf((String) map.get(MODEL_FIELD)));
         d.setDescription((String) map.get(DESCRIPTION_FIELD));
         d.setImei((String) map.get(IMEI_FIELD));
         d.setTripCount(((Number) map.get(TRIPCOUNT_FIELD)).intValue());
@@ -271,6 +279,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
         String sql = "select\n"
                 + "d." + IMEI_FIELD + " as " + DeviceConstants.PROPERTY_IMEI + ",\n"
                 + "d." + NAME_FIELD + " as " + DeviceConstants.PROPERTY_NAME + ",\n"
+                + "d." + MODEL_FIELD + " as " + DeviceConstants.PROPERTY_MODEL + ",\n"
                 + "d." + DESCRIPTION_FIELD + " as " + DeviceConstants.PROPERTY_DESCRIPTION + ",\n"
                 + "d." + ACTIVE_FIELD + " as " + DeviceConstants.PROPERTY_ACTIVE + ",\n"
                 + "d." + COLOR_FIELD + " as " + DeviceConstants.PROPERTY_COLOR + ",\n"
@@ -368,6 +377,7 @@ public class DeviceDaoImpl extends EntityWithCompanyDaoImplBase<Device, Device, 
         item.setActive(!Boolean.FALSE.equals(row.get(DeviceConstants.PROPERTY_ACTIVE)));
         item.setDescription((String) row.get(DeviceConstants.PROPERTY_DESCRIPTION));
         item.setImei((String) row.get(DeviceConstants.PROPERTY_IMEI));
+        item.setModel(DeviceModel.valueOf((String) row.get(DeviceConstants.PROPERTY_MODEL)));
         item.setName((String) row.get(DeviceConstants.PROPERTY_NAME));
         item.setColor(parseColor((String) row.get(DeviceConstants.PROPERTY_COLOR)));
         final Number deviceTripCount = (Number) row.get("deviceTripCount");

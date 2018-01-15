@@ -19,6 +19,10 @@ public class ListDeviceItem {
      */
     private String name;
     /**
+     * Device model.
+     */
+    private DeviceModel model;
+    /**
      * Device description
      */
     private String description;
@@ -64,6 +68,7 @@ public class ListDeviceItem {
         setName(d.getName());
         setTripCount(d.getTripCount());
         setColor(d.getColor());
+        setModel(d.getModel());
     }
 
     /**
@@ -245,5 +250,17 @@ public class ListDeviceItem {
      */
     public Color getColor() {
         return color;
+    }
+    /**
+     * @return the model
+     */
+    public DeviceModel getModel() {
+        return model;
+    }
+    /**
+     * @param model the model to set
+     */
+    public void setModel(final DeviceModel model) {
+        this.model = model;
     }
 }

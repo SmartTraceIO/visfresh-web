@@ -12,6 +12,7 @@ public interface DeviceConstants {
     String PROPERTY_NAME = "name";
     String PROPERTY_SN = "sn";
     String PROPERTY_IMEI = "imei";
+    String PROPERTY_MODEL = "model";
     String PROPERTY_ACTIVE = "active";
     String PROPERTY_COLOR = "color";
     String PROPERTY_AUTOSTART_TEMPLATE_ID = "autostartTemplateId";

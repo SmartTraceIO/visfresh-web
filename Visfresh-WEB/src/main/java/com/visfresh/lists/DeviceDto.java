@@ -3,6 +3,7 @@
  */
 package com.visfresh.lists;
 
+import com.visfresh.entities.DeviceModel;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -17,6 +18,10 @@ public class DeviceDto {
      * Device name.
      */
     private String name;
+    /**
+     * Device model.
+     */
+    private DeviceModel model = DeviceModel.SmartTrace;
     /**
      * Device SN.
      */
@@ -248,5 +253,17 @@ public class DeviceDto {
      */
     public String getColor() {
         return color;
+    }
+    /**
+     * @return the model
+     */
+    public DeviceModel getModel() {
+        return model;
+    }
+    /**
+     * @param model the model to set
+     */
+    public void setModel(final DeviceModel model) {
+        this.model = model;
     }
 }

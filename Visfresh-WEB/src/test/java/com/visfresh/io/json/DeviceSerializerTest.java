@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 import com.visfresh.entities.Color;
 import com.visfresh.entities.Device;
 import com.visfresh.entities.DeviceCommand;
+import com.visfresh.entities.DeviceModel;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.lists.DeviceDto;
 
@@ -44,9 +45,11 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         final boolean active = !t.isActive();
         final Long autostartTemplateId = 777l;
         final Color color = Color.Blue;
+        final DeviceModel model = DeviceModel.TT18;
 
         t.setDescription(description);
         t.setImei(imei);
+        t.setModel(model);
         t.setName(name);
         t.setActive(active);
         t.setAutostartTemplateId(autostartTemplateId);
@@ -57,6 +60,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
 
         assertEquals(description, t.getDescription());
         assertEquals(imei, t.getImei());
+        assertEquals(model, t.getModel());
         assertEquals(name, t.getName());
         assertNotNull(t.getSn());
         assertEquals(active, t.isActive());
@@ -98,6 +102,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         final String status = ShipmentStatus.Arrived.name();
         final String sn = "12345";
         final String color = "color";
+        final DeviceModel model = DeviceModel.TT18;
 
         dto.setActive(active);
         dto.setAutostartTemplateId(autostartTemplateId);
@@ -111,6 +116,7 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         dto.setLastReadingTime(lastReadingTime);
         dto.setLastShipmentId(lastShipmentId);
         dto.setName(name);
+        dto.setModel(model);
         dto.setShipmentNumber(shipmentNumber);
         dto.setShipmentStatus(status);
         dto.setSn(sn);
@@ -134,5 +140,6 @@ public class DeviceSerializerTest extends AbstractSerializerTest {
         assertEquals(status, dto.getShipmentStatus());
         assertEquals(sn, dto.getSn());
         assertEquals(color, dto.getColor());
+        assertEquals(model, dto.getModel());
     }
 }

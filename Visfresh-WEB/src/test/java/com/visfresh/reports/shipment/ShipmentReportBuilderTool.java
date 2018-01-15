@@ -92,6 +92,7 @@ public final class ShipmentReportBuilderTool {
         bean.setDateShipped(new Date(System.currentTimeMillis() - 1000000000));
         bean.setDescription("Autostarted by rule");
         bean.setDevice(device.getImei());
+        bean.setDeviceModel(device.getModel());
         bean.setNumberOfSiblings(7);
         bean.setPalletId("12345");
         final List<String> altLocs = new LinkedList<>();
