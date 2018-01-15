@@ -16,6 +16,10 @@ public class Device {
      */
     private String imei;
     /**
+     * Device model.
+     */
+    private DeviceModel model = DeviceModel.SmartTrace;
+    /**
      * Device name.
      */
     private String name;
@@ -126,5 +130,19 @@ public class Device {
     @JsonSetter("color")
     public void setColor(final Color color) {
         this.color = color;
+    }
+    /**
+     * @return the model
+     */
+    @JsonGetter("model")
+    public DeviceModel getModel() {
+        return model;
+    }
+    /**
+     * @param model the model to set
+     */
+    @JsonSetter("model")
+    public void setModel(final DeviceModel model) {
+        this.model = model;
     }
 }

@@ -23,6 +23,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 
 import au.smarttrace.Color;
 import au.smarttrace.Device;
+import au.smarttrace.DeviceModel;
 import au.smarttrace.User;
 import au.smarttrace.ctrl.req.Order;
 import au.smarttrace.dao.runner.DaoTestRunner;
@@ -61,6 +62,7 @@ public class DevicesDaoTest {
         final String description = "Device Description";
         final String imei = "23508209853798";
         final String name = "JUnit Device";
+        final DeviceModel model = DeviceModel.TT18;
 
         Device d = new Device();
         d.setActive(active);
@@ -69,6 +71,7 @@ public class DevicesDaoTest {
         d.setDescription(description);
         d.setImei(imei);
         d.setName(name);
+        d.setModel(model);
 
         dao.createDevice(d);
         d = dao.getByImei(imei);
@@ -79,6 +82,7 @@ public class DevicesDaoTest {
         assertEquals(description, d.getDescription());
         assertEquals(imei, d.getImei());
         assertEquals(name, d.getName());
+        assertEquals(model, d.getModel());
     }
     @Test
     public void testDeleteDevice() {
@@ -98,6 +102,7 @@ public class DevicesDaoTest {
         final Color color = Color.BlueViolet;
         final String description = "Device Description";
         final String name = "JUnit Device";
+        final DeviceModel model = DeviceModel.TT18;
         final Long company = dbSupport.createSimpleCompany("JUnit 1");
 
         d.setActive(active);
@@ -105,6 +110,7 @@ public class DevicesDaoTest {
         d.setCompany(company);
         d.setDescription(description);
         d.setName(name);
+        d.setModel(model);
 
         dao.updateDevice(d);
         d = dao.getByImei(d.getImei());
@@ -114,6 +120,7 @@ public class DevicesDaoTest {
         assertEquals(company, d.getCompany());
         assertEquals(description, d.getDescription());
         assertEquals(name, d.getName());
+        assertEquals(model, d.getModel());
     }
 
     @Test

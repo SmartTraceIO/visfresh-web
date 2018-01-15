@@ -23,6 +23,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import au.smarttrace.Color;
 import au.smarttrace.Company;
 import au.smarttrace.Device;
+import au.smarttrace.DeviceModel;
 import au.smarttrace.Roles;
 import au.smarttrace.User;
 import au.smarttrace.company.CompaniesDao;
@@ -95,6 +96,7 @@ public class DevicesControllerTest {
         final String description = "Device Description";
         final String imei = "23508209853798";
         final String name = "JUnit Device";
+        final DeviceModel model = DeviceModel.TT18;
 
         Device d = new Device();
         d.setActive(active);
@@ -102,6 +104,7 @@ public class DevicesControllerTest {
         d.setCompany(company.getId());
         d.setDescription(description);
         d.setImei(imei);
+        d.setModel(model);
         d.setName(name);
 
         devicesService.createDevice(d);
@@ -112,6 +115,7 @@ public class DevicesControllerTest {
         assertEquals(company.getId(), d.getCompany());
         assertEquals(description, d.getDescription());
         assertEquals(imei, d.getImei());
+        assertEquals(model, d.getModel());
         assertEquals(name, d.getName());
     }
     @Test

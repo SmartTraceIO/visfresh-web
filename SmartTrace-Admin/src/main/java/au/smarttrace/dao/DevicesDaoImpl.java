@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import au.smarttrace.Color;
 import au.smarttrace.Device;
+import au.smarttrace.DeviceModel;
 import au.smarttrace.ctrl.req.Order;
 import au.smarttrace.ctrl.res.ListResponse;
 import au.smarttrace.device.DevicesDao;
@@ -40,6 +41,7 @@ public class DevicesDaoImpl extends AbstractDao implements DevicesDao {
         fieldAliases.put("imei", "imei");
         fieldAliases.put("active", "active");
         fieldAliases.put("company", "company");
+        fieldAliases.put("model", "model");
     }
 
     /* (non-Javadoc)
@@ -67,6 +69,7 @@ public class DevicesDaoImpl extends AbstractDao implements DevicesDao {
         d.setName((String) row.get("name"));
         d.setDescription((String) row.get("description"));
         d.setImei((String) row.get("imei"));
+        d.setModel(DeviceModel.valueOf((String) row.get("model")));
         d.setActive(Boolean.TRUE.equals(row.get("active")));
         d.setColor(parseColor((String) row.get("color")));
         d.setCompany(((Number) row.get("company")).longValue());
@@ -122,6 +125,7 @@ public class DevicesDaoImpl extends AbstractDao implements DevicesDao {
     protected Map<String, Object> toDbFieldsIgnoreImei(final Device device) {
         final Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("name", device.getName());
+        paramMap.put("model", device.getModel().name());
         paramMap.put("description", device.getDescription());
         paramMap.put("company", device.getCompany());
         paramMap.put("active", device.isActive());
