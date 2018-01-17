@@ -6,6 +6,7 @@ package com.visfresh.spring.mock;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 import com.visfresh.dispatcher.mock.JUnitDispatcher;
@@ -18,11 +19,11 @@ import com.visfresh.spring.jdbc.JdbcConfig;
  *
  */
 @Configuration
+@Import(JdbcConfig.class)
 @ComponentScan(basePackageClasses = {
-        JdbcConfig.class,
-        MockEmailSender.class,
-        JUnitDispatcher.class,
-        DeviceMessageService.class})
+    MockEmailSender.class,
+    JUnitDispatcher.class,
+    DeviceMessageService.class})
 @PropertySource("classpath:/application-junit.properties")
 public class JUnitConfig {
     /**

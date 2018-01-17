@@ -5,6 +5,7 @@ package com.visfresh.spring.prod;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 import com.visfresh.dispatcher.AbstractDispatcher;
@@ -17,8 +18,8 @@ import com.visfresh.spring.jdbc.JdbcConfig;
  *
  */
 @Configuration
+@Import(JdbcConfig.class)
 @ComponentScan(basePackageClasses = {
-        JdbcConfig.class,
         EmailSender.class,
         AbstractDispatcher.class,
         DeviceMessageService.class})
