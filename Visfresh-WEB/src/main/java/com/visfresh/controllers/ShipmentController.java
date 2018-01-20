@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -65,6 +66,7 @@ import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.TrackerEventDto;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
+import com.visfresh.io.json.fastxml.JsonSerializerFactory;
 import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.InterimStopBean;
 import com.visfresh.io.shipment.ShipmentCompanyDto;
@@ -1089,6 +1091,39 @@ public class ShipmentController extends AbstractShipmentBaseController implement
             auditService.handleShipmentAction(s.getId(), user, ShipmentAuditAction.ManuallyCreatedFromAutostart, null);
         }
         return createIdResponse("shipmentId", s.getId());
+    }
+    @RequestMapping(value = "/getShipmentData", method = RequestMethod.GET)
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    public JsonObject getShipmentData(
+            @RequestParam(required = false) final Long shipmentId,
+            @RequestParam(required = false) final String sn,
+            @RequestParam(required = false) final Integer trip
+            ) throws RestServiceException, JsonProcessingException {
+        //check parameters
+        if (shipmentId == null && (sn == null || trip == null)) {
+            throw new RestServiceException(ErrorCodes.INCORRECT_REQUEST_DATA,
+                    "Should be specified shipmentId or (sn and trip) request parameters");
+        }
+
+        //check logged in.
+        final User user = getLoggedInUser();
+        final SingleShipmentData s;
+        if (shipmentId != null) {
+            s = singleShipmentService.getShipmentData(shipmentId);
+        } else {
+            s = singleShipmentService.getShipmentData(sn, trip);
+        }
+
+        if (s == null) {
+            return createSuccessResponse(null);
+        }
+
+        if (!hasViewSingleShipmentAccess(user, s.getBean())) {
+            throw new RestServiceException(ErrorCodes.SECURITY_ERROR, "Illegal company access");
+        }
+
+        auditService.handleShipmentAction(s.getBean().getShipmentId(), user, ShipmentAuditAction.Viewed, null);
+        return SerializerUtils.parseJson(JsonSerializerFactory.FACTORY.createDefaultMapper().writeValueAsString(s)).getAsJsonObject();
     }
     /**
      * @param dto

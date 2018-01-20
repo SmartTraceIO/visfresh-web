@@ -4,6 +4,7 @@
 package com.visfresh.controllers.restclient;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +27,8 @@ import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.json.GetShipmentsRequestParser;
 import com.visfresh.io.json.ShipmentSerializer;
+import com.visfresh.io.json.fastxml.JsonSerializerFactory;
+import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.services.RestServiceException;
 import com.visfresh.utils.DateTimeUtils;
 import com.visfresh.utils.SerializerUtils;
@@ -251,5 +254,20 @@ public class ShipmentRestClient extends RestClient {
         }
 
         return shipments;
+    }
+    /**
+     * @param id
+     * @return
+     * @throws RestServiceException
+     * @throws IOException
+     */
+    public SingleShipmentData getGetShipmentData(final Long id) throws IOException, RestServiceException {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("shipmentId", id.toString());
+
+        final String response = doSendGetRequest(getPathWithToken("getShipmentData"), params);
+
+        return JsonSerializerFactory.FACTORY.createSingleShipmentDataParser().readValue(
+                new StringReader(response), SingleShipmentData.class);
     }
 }

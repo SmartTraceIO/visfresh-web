@@ -71,6 +71,7 @@ import com.visfresh.io.SaveShipmentRequest;
 import com.visfresh.io.SaveShipmentResponse;
 import com.visfresh.io.ShipmentDto;
 import com.visfresh.io.json.ShipmentSerializer;
+import com.visfresh.io.shipment.SingleShipmentData;
 import com.visfresh.mock.MockAuditSaver;
 import com.visfresh.rules.AbstractRuleEngine;
 import com.visfresh.rules.AutoDetectEndLocationRule;
@@ -1120,6 +1121,29 @@ public class ShipmentControllerTest extends AbstractRestServiceTest {
         createNote(s, "Note 2");
 
         final JsonObject sd = shipmentClient.getSingleShipment(s).getAsJsonObject();
+        assertNotNull(sd);
+    }
+    @Test
+    public void testGetShipmentData() throws RestServiceException, IOException {
+        final Shipment s = createShipment(true);
+
+        //mark any rules as processed
+        final List<TemperatureRule> firedRules = s.getAlertProfile().getAlertRules();
+        markAsFiredRules(s, firedRules.get(0), firedRules.get(1));
+
+        //add tracker event.
+        createEvent(s, TrackerEventType.AUT);
+        createEvent(s, TrackerEventType.AUT);
+
+        //add alert
+        createAlert(s, AlertType.Battery);
+        createTemperatureAlert(s, AlertType.Hot);
+        createArrival(s);
+
+        createNote(s, "Note 1");
+        createNote(s, "Note 2");
+
+        final SingleShipmentData sd = shipmentClient.getGetShipmentData(s.getId());
         assertNotNull(sd);
     }
     @Test
