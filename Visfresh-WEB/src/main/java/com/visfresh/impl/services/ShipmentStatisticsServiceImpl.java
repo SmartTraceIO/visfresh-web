@@ -20,6 +20,7 @@ import com.visfresh.dao.ShipmentDao;
 import com.visfresh.dao.ShipmentStatisticsDao;
 import com.visfresh.dao.TrackerEventDao;
 import com.visfresh.dao.impl.ShipmentTemperatureStatsCollector;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.rules.state.ShipmentStatistics;
@@ -122,11 +123,15 @@ public class ShipmentStatisticsServiceImpl implements ShipmentStatisticsService 
      */
     @Override
     public ShipmentStatistics calculate(final Shipment s) {
+        final AlertProfile ap = s.getAlertProfile();
+        final double lowerLimit = ap == null ? AlertProfile.DEFAULT_LOWER_TEMPERATURE_LIMIT : ap.getLowerTemperatureLimit();
+        final double upperLimit = ap == null ? AlertProfile.DEFAULT_UPPER_TEMPERATURE_LIMIT : ap.getUpperTemperatureLimit();
+
         final ShipmentTemperatureStatsCollector collector = new ShipmentTemperatureStatsCollector();
 
         final List<TrackerEvent> events = getTrackerEvents(s);
         for (final TrackerEvent e : events) {
-            collector.processEvent(e);
+            collector.processEvent(e, lowerLimit, upperLimit);
         }
 
         final ShipmentStatistics stats = new ShipmentStatistics(s.getId());

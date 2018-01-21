@@ -94,11 +94,12 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
                 c, startDate, endDate, location, new Page(page, 1000))).isEmpty()) {
             for (final TrackerEvent e : events) {
                 if (e.getShipment() != null && e.getShipment().getAlertProfile() != null) {
+                    final AlertProfile ap = e.getShipment().getAlertProfile();
                     if (!shipmentMap.containsKey(e.getShipment().getId())) {
                         shipmentMap.put(e.getShipment().getId(), e.getShipment());
                     }
 
-                    final Long alertProfileId = e.getShipment().getAlertProfile().getId();
+                    final Long alertProfileId = ap.getId();
 
                     Map<TimeRanges, AlertProfileTemperatureStatsCollector> rimeRangesCollectors = profileByTimeRangesCollectors.get(alertProfileId);
                     if (rimeRangesCollectors == null) {
@@ -116,7 +117,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
                     }
 
                     //process event by time ranges collector
-                    collector.processEvent(e);
+                    collector.processEvent(e, ap.getLowerTemperatureLimit(), ap.getUpperTemperatureLimit());
 
                     //shipment stats
                     AlertProfileTemperatureStatsCollector sc = shipmentCollectors.get(e.getShipment().getId());
@@ -125,7 +126,7 @@ public class PerformanceReportDaoImpl implements PerformanceReportDao {
                         shipmentCollectors.put(e.getShipment().getId(), sc);
                     }
 
-                    sc.processEvent(e);
+                    sc.processEvent(e, ap.getLowerTemperatureLimit(), ap.getUpperTemperatureLimit());
                 }
             }
 

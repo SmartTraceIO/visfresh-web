@@ -94,10 +94,7 @@ public class ShipmentStatisticsRuleTest extends ShipmentStatisticsRule {
         assertFalse(accept(new RuleContext(createEvent(null), new SessionHolder())));
     }
     @Test
-    public void testNotAcceptWithoutAlertProfile() {
-        assertFalse(accept(new RuleContext(createEvent(shipment), new SessionHolder())));
-
-        shipment.setAlertProfile(new AlertProfile());
+    public void testAcceptWithoutAlertProfile() {
         assertTrue(accept(new RuleContext(createEvent(shipment), new SessionHolder())));
     }
     @Test
@@ -154,6 +151,22 @@ public class ShipmentStatisticsRuleTest extends ShipmentStatisticsRule {
     @Test
     public void testHandle() {
         shipment.setAlertProfile(new AlertProfile());
+        stats.put(shipment.getId(), new ShipmentStatistics(shipment.getId()));
+        final RuleContext context = new RuleContext(createEvent(shipment), new SessionHolder());
+
+        assertFalse(handle(context));
+    }
+    @Test
+    public void testHandleWithoutAlertProfile() {
+        shipment.setAlertProfile(null);
+        stats.put(shipment.getId(), new ShipmentStatistics(shipment.getId()));
+        final RuleContext context = new RuleContext(createEvent(shipment), new SessionHolder());
+
+        assertFalse(handle(context));
+    }
+    @Test
+    public void testHandleWithoutAlertProfileWithoutPresetStats() {
+        shipment.setAlertProfile(null);
         stats.put(shipment.getId(), new ShipmentStatistics(shipment.getId()));
         final RuleContext context = new RuleContext(createEvent(shipment), new SessionHolder());
 

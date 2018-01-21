@@ -83,7 +83,8 @@ public class TemperatureStatsCollectorTest {
         events.add(createEvent(s2, new Date(startTime + 10 * dt), 0 * dt));
 
         for (final TrackerEvent e : events) {
-            collector.processEvent(e);
+            final AlertProfile ap = e.getShipment().getAlertProfile();
+            collector.processEvent(e, ap.getLowerTemperatureLimit(), ap.getUpperTemperatureLimit());
         }
 
         double summ = 0;
@@ -112,7 +113,8 @@ public class TemperatureStatsCollectorTest {
         events.add(createEvent(s1, new Date(startTime + 3 * dt), 15.7));
 
         for (final TrackerEvent e : events) {
-            collector.processEvent(e);
+            final AlertProfile ap = e.getShipment().getAlertProfile();
+            collector.processEvent(e, ap.getLowerTemperatureLimit(), ap.getUpperTemperatureLimit());
         }
 
         final TemperatureStats stats = collector.getStatistics();
@@ -133,7 +135,8 @@ public class TemperatureStatsCollectorTest {
 
         double summ = 0;
         for (final TrackerEvent e : events) {
-            collector.processEvent(e);
+            final AlertProfile ap = e.getShipment().getAlertProfile();
+            collector.processEvent(e, ap.getLowerTemperatureLimit(), ap.getUpperTemperatureLimit());
             summ += e.getTemperature();
         }
 
@@ -155,7 +158,8 @@ public class TemperatureStatsCollectorTest {
 
         double summ = 0;
         for (final TrackerEvent e : events) {
-            collector.processEvent(e);
+            final AlertProfile ap = e.getShipment().getAlertProfile();
+            collector.processEvent(e, ap.getLowerTemperatureLimit(), ap.getUpperTemperatureLimit());
             summ += e.getTemperature();
         }
         final double avg = summ / events.size();

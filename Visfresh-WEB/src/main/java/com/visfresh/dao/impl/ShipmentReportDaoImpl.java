@@ -132,11 +132,9 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
 
         //add temperature history
+        final AlertProfile ap = s.getAlertProfile();
         if (s.getAlertProfile() != null) {
-            final AlertProfile ap = s.getAlertProfile();
             bean.setAlertProfile(ap.getName());
-            bean.getTemperatureStats().setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
-            bean.getTemperatureStats().setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
         }
 
         //add fired alerts
@@ -173,11 +171,7 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
         }
 
         bean.getWhoReceivedReport().addAll(toNameList(usersReceivedReports));
-
-        if (s.getAlertProfile() != null) {
-            bean.setTemperatureStats(createTemperatureStats(s.getAlertProfile(), events));
-        }
-
+        bean.setTemperatureStats(createTemperatureStats(s.getAlertProfile(), events));
         return bean;
     }
     /**
@@ -210,16 +204,25 @@ public class ShipmentReportDaoImpl implements ShipmentReportDao {
      * @param bean
      * @param events
      */
-    private TemperatureStats createTemperatureStats(final AlertProfile ap,
+    public static TemperatureStats createTemperatureStats(final AlertProfile ap,
             final List<TrackerEvent> originEvents) {
-        final AlertProfileTemperatureStatsCollector c = new AlertProfileTemperatureStatsCollector();
-        for (final TrackerEvent e : originEvents) {
-            c.processEvent(e);
+        final double lowerTemperatureLimit = ap == null ? AlertProfile.DEFAULT_LOWER_TEMPERATURE_LIMIT : ap.getLowerTemperatureLimit();
+        final double upperTemperatureLimit = ap == null ? AlertProfile.DEFAULT_UPPER_TEMPERATURE_LIMIT : ap.getUpperTemperatureLimit();
+
+        final TemperatureStats stats;
+        if (!originEvents.isEmpty()) {
+            final AlertProfileTemperatureStatsCollector c = new AlertProfileTemperatureStatsCollector();
+            for (final TrackerEvent e : originEvents) {
+                c.processEvent(e, lowerTemperatureLimit, upperTemperatureLimit);
+            }
+
+            stats = c.getStatistics();
+        } else {
+            stats = new TemperatureStats();
         }
 
-        final TemperatureStats stats = c.getStatistics();
-        stats.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
-        stats.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
+        stats.setLowerTemperatureLimit(lowerTemperatureLimit);
+        stats.setUpperTemperatureLimit(upperTemperatureLimit);
         return stats;
     }
     /**

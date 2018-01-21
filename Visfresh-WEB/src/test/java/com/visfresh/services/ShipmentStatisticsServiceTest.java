@@ -90,9 +90,23 @@ public class ShipmentStatisticsServiceTest extends ShipmentStatisticsServiceImpl
         return events;
     }
 
-    //tests
     @Test
     public void testCalculate() {
+        final long time = System.currentTimeMillis() - 100000000l;
+
+        addEvent(1., time + 1000l);
+        addEvent(2., time + 2000l);
+        addEvent(3., time + 3000l);
+        addEvent(4., time + 4000l);
+        addEvent(5., time + 5000l);
+
+        final ShipmentStatistics stats = calculate(shipment);
+        assertNotNull(stats);
+        assertEquals(3., stats.getAvgTemperature(), 0.01);
+    }
+    @Test
+    public void testCalculateWithoutAlertProfile() {
+        shipment.setAlertProfile(null);
         final long time = System.currentTimeMillis() - 100000000l;
 
         addEvent(1., time + 1000l);

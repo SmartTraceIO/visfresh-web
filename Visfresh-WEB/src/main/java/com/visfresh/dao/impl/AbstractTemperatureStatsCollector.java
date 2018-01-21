@@ -25,18 +25,15 @@ public abstract class AbstractTemperatureStatsCollector {
     protected long coldTime;
 
     /**
-     *
      */
     public AbstractTemperatureStatsCollector() {
         super();
     }
 
-    public void processEvent(final TrackerEvent e) {
+    public void processEvent(final TrackerEvent e, final double lowerTemperatureLimit, final double upperTemperatureLimit) {
         if (filter(e)) {
             return;
         }
-
-        final Shipment shipment = e.getShipment();
 
         n++;
         final double t = e.getTemperature();
@@ -52,9 +49,9 @@ public abstract class AbstractTemperatureStatsCollector {
 
         final TrackerEvent last = getPreviousEvent(e);
         if (last != null) {
-            if (last.getTemperature() > shipment.getAlertProfile().getUpperTemperatureLimit()) {
+            if (last.getTemperature() > upperTemperatureLimit) {
                 this.hotTime += eventTime - last.getTime().getTime();
-            } else if (last.getTemperature() < shipment.getAlertProfile().getLowerTemperatureLimit()) {
+            } else if (last.getTemperature() < lowerTemperatureLimit) {
                 this.coldTime += eventTime - last.getTime().getTime();
             }
         }
@@ -68,19 +65,17 @@ public abstract class AbstractTemperatureStatsCollector {
     protected boolean filter(final TrackerEvent e) {
         //check possible should ignore
         final Shipment shipment = e.getShipment();
-        if (shipment == null || shipment.getAlertProfile() == null) {
-            return true;
-        }
+        if (shipment != null && shipment.getAlertProfile() != null) {
+            //check alert suppressed.
+            if (shipment.getAlertSuppressionMinutes() > 0
+                    && e.getTime().before(new Date(shipment.getShipmentDate().getTime()
+                    + 60 * 1000l * shipment.getAlertSuppressionMinutes()))) {
+                return true;
+            }
 
-        //check alert suppressed.
-        if (shipment.getAlertSuppressionMinutes() > 0
-                && e.getTime().before(new Date(shipment.getShipmentDate().getTime()
-                + 60 * 1000l * shipment.getAlertSuppressionMinutes()))) {
-            return true;
-        }
-
-        if (shipment.getArrivalDate() != null && e.getTime().after(shipment.getArrivalDate())) {
-            return true;
+            if (shipment.getArrivalDate() != null && e.getTime().after(shipment.getArrivalDate())) {
+                return true;
+            }
         }
 
         return false;

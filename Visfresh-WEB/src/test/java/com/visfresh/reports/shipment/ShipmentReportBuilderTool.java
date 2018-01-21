@@ -3,7 +3,6 @@
  */
 package com.visfresh.reports.shipment;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,12 +14,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
-import com.visfresh.dao.impl.AlertProfileTemperatureStatsCollector;
+import com.visfresh.dao.impl.ShipmentReportDaoImpl;
 import com.visfresh.entities.Alert;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
+import com.visfresh.entities.Color;
 import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
+import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureAlert;
@@ -105,6 +107,7 @@ public final class ShipmentReportBuilderTool extends ShipmentReportBuilder {
         while (true) {
             i++;
             final File f = new File("shrep-" + i + ".pdf");
+            System.out.println(f.getAbsolutePath());
             if (!f.exists()) {
                 return new FileOutputStream(f);
             }
@@ -148,7 +151,7 @@ public final class ShipmentReportBuilderTool extends ShipmentReportBuilder {
         bean.setAlertSuppressionMinutes(s.getAlertSuppressionMinutes());
 
         if (s.getDeviceColor() != null) {
-            bean.setDeviceColor(Color.decode(s.getDeviceColor()));
+            bean.setDeviceColor(java.awt.Color.decode(Color.valueOf(s.getDeviceColor()).getHtmlValue()));
         }
         bean.setShippedFrom(createBean(s.getStartLocation()));
         bean.getInterimStops().addAll(toStops(s.getInterimStops()));
@@ -176,8 +179,6 @@ public final class ShipmentReportBuilderTool extends ShipmentReportBuilder {
         if (s.getAlertProfile() != null) {
             final AlertProfileBean ap = s.getAlertProfile();
             bean.setAlertProfile(ap.getName());
-            bean.getTemperatureStats().setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
-            bean.getTemperatureStats().setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
         }
 
         //add fired alerts
@@ -203,11 +204,7 @@ public final class ShipmentReportBuilderTool extends ShipmentReportBuilder {
             }
         }
 
-        if (s.getAlertProfile() != null) {
-            bean.setTemperatureStats(createTemperatureStats(s.getAlertProfile(), events));
-        }
-
-
+        bean.setTemperatureStats(createTemperatureStats(s, events));
         return bean;
     }
 
@@ -216,17 +213,46 @@ public final class ShipmentReportBuilderTool extends ShipmentReportBuilder {
      * @param events
      * @return
      */
-    private static TemperatureStats createTemperatureStats(final AlertProfileBean ap,
+    private static TemperatureStats createTemperatureStats(final SingleShipmentBean s,
             final List<SingleShipmentLocationBean> events) {
-        final AlertProfileTemperatureStatsCollector c = new AlertProfileTemperatureStatsCollector();
+        //create mock shipment
+        final Shipment shipment = new Shipment();
+        shipment.setStatus(s.getStatus());
+        shipment.setId(s.getShipmentId());
+
+        final List<TrackerEvent> trackerEvents = new LinkedList<>();
         for (final SingleShipmentLocationBean e : events) {
-            c.processEvent(createTrackerEvent(e));
+            final TrackerEvent event = createTrackerEvent(e);
+            event.setShipment(shipment);
+            trackerEvents.add(event);
         }
 
-        final TemperatureStats stats = c.getStatistics();
-        stats.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
-        stats.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
-        return stats;
+        return ShipmentReportDaoImpl.createTemperatureStats(createAlertProfile(s.getAlertProfile()), trackerEvents);
+    }
+
+    /**
+     * @param p
+     * @return
+     */
+    private static AlertProfile createAlertProfile(final AlertProfileBean p) {
+        if (p == null) {
+            return null;
+        }
+
+        final AlertProfile ap = new AlertProfile();
+        ap.setBatteryLowCorrectiveActions(createCorrectiveActions(p.getBatteryLowCorrectiveActions()));
+        ap.setDescription(p.getDescription());
+        ap.setId(p.getId());
+        ap.setLightOnCorrectiveActions(createCorrectiveActions(p.getLightOnCorrectiveActions()));
+        ap.setLowerTemperatureLimit(p.getLowerTemperatureLimit());
+        ap.setName(p.getName());
+        ap.setUpperTemperatureLimit(p.getUpperTemperatureLimit());
+        ap.setWatchBatteryLow(p.isWatchBatteryLow());
+        ap.setWatchEnterBrightEnvironment(p.isWatchEnterBrightEnvironment());
+        ap.setWatchEnterDarkEnvironment(p.isWatchEnterDarkEnvironment());
+        ap.setWatchMovementStart(p.isWatchMovementStart());
+        ap.setWatchMovementStop(p.isWatchMovementStop());
+        return ap;
     }
 
     /**

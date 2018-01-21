@@ -12,6 +12,8 @@ import java.util.List;
  *
  */
 public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
+    public static final double DEFAULT_LOWER_TEMPERATURE_LIMIT = 0.0;
+    public static final double DEFAULT_UPPER_TEMPERATURE_LIMIT = 5.;
     /**
      * ID.
      */
@@ -49,8 +51,8 @@ public class AlertProfile implements EntityWithId<Long>, EntityWithCompany {
     private boolean watchMovementStart;
     private boolean watchMovementStop;
 
-    private double lowerTemperatureLimit = 0.;
-    private double upperTemperatureLimit = 5.;
+    private double lowerTemperatureLimit = DEFAULT_LOWER_TEMPERATURE_LIMIT;
+    private double upperTemperatureLimit = DEFAULT_UPPER_TEMPERATURE_LIMIT;
 
     /**
      * Default constructor.

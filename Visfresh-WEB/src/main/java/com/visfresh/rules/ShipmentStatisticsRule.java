@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.visfresh.dao.ShipmentStatisticsDao;
+import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.Shipment;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.rules.state.ShipmentStatistics;
@@ -52,8 +53,7 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
 
         //check possible should ignore
         final Shipment shipment = e.getShipment();
-        if (context.isProcessed(this) || shipment == null
-                || shipment.getAlertProfile() == null || shipment.hasFinalStatus()) {
+        if (context.isProcessed(this) || shipment == null || shipment.hasFinalStatus()) {
             return false;
         }
 
@@ -85,7 +85,11 @@ public class ShipmentStatisticsRule implements TrackerEventRule {
 
         //process event
         final ShipmentStatistics stats = getStatistics(s);
-        stats.getCollector().processEvent(e);
+
+        final AlertProfile ap = s.getAlertProfile();
+        stats.getCollector().processEvent(e,
+                ap == null ? AlertProfile.DEFAULT_LOWER_TEMPERATURE_LIMIT : ap.getLowerTemperatureLimit(),
+                ap == null ? AlertProfile.DEFAULT_UPPER_TEMPERATURE_LIMIT : ap.getUpperTemperatureLimit());
         stats.synchronizeWithCollector();
 
         saveStatistics(stats);
