@@ -3,39 +3,46 @@
  */
 package com.visfresh.reports.shipment;
 
+import java.awt.Color;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringReader;
-import java.text.ParseException;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.TimeZone;
 
 import com.visfresh.dao.impl.AlertProfileTemperatureStatsCollector;
 import com.visfresh.entities.Alert;
-import com.visfresh.entities.AlertProfile;
 import com.visfresh.entities.AlertRule;
-import com.visfresh.entities.AlertType;
-import com.visfresh.entities.Device;
+import com.visfresh.entities.CorrectiveActionList;
 import com.visfresh.entities.InterimStop;
 import com.visfresh.entities.LocationProfile;
-import com.visfresh.entities.Shipment;
 import com.visfresh.entities.ShipmentStatus;
 import com.visfresh.entities.ShortTrackerEvent;
 import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
-import com.visfresh.entities.TrackerEventType;
 import com.visfresh.entities.User;
+import com.visfresh.io.json.fastxml.JsonSerializerFactory;
+import com.visfresh.io.shipment.AlertBean;
+import com.visfresh.io.shipment.AlertProfileBean;
+import com.visfresh.io.shipment.AlertRuleBean;
+import com.visfresh.io.shipment.ArrivalBean;
+import com.visfresh.io.shipment.CorrectiveActionListBean;
+import com.visfresh.io.shipment.InterimStopBean;
+import com.visfresh.io.shipment.LocationProfileBean;
+import com.visfresh.io.shipment.SingleShipmentBean;
+import com.visfresh.io.shipment.SingleShipmentData;
+import com.visfresh.io.shipment.SingleShipmentLocationBean;
+import com.visfresh.io.shipment.TemperatureAlertBean;
+import com.visfresh.io.shipment.TemperatureRuleBean;
 import com.visfresh.l12n.RuleBundle;
-import com.visfresh.reports.ShortTrackerEventsImporter;
+import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.reports.TemperatureStats;
-import com.visfresh.utils.StringUtils;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.exception.DRException;
@@ -45,24 +52,13 @@ import net.sf.jasperreports.engine.JRException;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public final class ShipmentReportBuilderTool {
-    private static Device device = createDevice();
-    private static Random random = new Random();
+public final class ShipmentReportBuilderTool extends ShipmentReportBuilder {
 
     /**
      * Default constructor.
      */
     public ShipmentReportBuilderTool() {
         super();
-    }
-
-    /**
-     * @return
-     */
-    private static Device createDevice() {
-        final Device d = new Device();
-        d.setImei("1920387091287439");
-        return d;
     }
 
     /**
@@ -76,222 +72,9 @@ public final class ShipmentReportBuilderTool {
         user.setTimeZone(TimeZone.getDefault());
         return user;
     }
-    /**
-     * @param user TODO
-     * @return the bean to visualize.
-     * @throws ParseException
-     * @throws IOException
-     */
-    private static ShipmentReportBean createShipmentReportBean(final User user) throws IOException, ParseException {
-        final ShipmentReportBean bean = new ShipmentReportBean();
 
-        bean.setCompanyName("Test Company");
-        bean.setAssetNum("Test Asset");
-        bean.setComment("Test bean for development");
-        bean.setDateArrived(new Date(System.currentTimeMillis() - 100000000));
-        bean.setDateShipped(new Date(System.currentTimeMillis() - 1000000000));
-        bean.setDescription("Autostarted by rule");
-        bean.setDevice(device.getImei());
-        bean.setDeviceModel(device.getModel());
-        bean.setNumberOfSiblings(7);
-        bean.setPalletId("12345");
-        final List<String> altLocs = new LinkedList<>();
-        altLocs.add("De Costi Office Lidcombe");
-        altLocs.add("Odessa deribasovskaya");
-        altLocs.add("WW DC Sydney");
-        altLocs.add("WW DC Brisbane");
-
-        bean.setPossibleShippedTo(altLocs);
-
-        bean.setStatus(ShipmentStatus.Default);
-        bean.setStatus(ShipmentStatus.Arrived);
-//        bean.setStatus(ShipmentStatus.Ended);
-        bean.setTripCount(14);
-        bean.setAlertSuppressionMinutes(110);
-
-        //add receivers
-        bean.getWhoReceivedReport().add("Max Plank");
-        bean.getWhoReceivedReport().add("Alexander Makedonsky");
-
-        addReadings(bean);
-        final List<ShortTrackerEvent> readings = bean.getReadings();
-
-        if (readings.size() > 0) {
-            final ShortTrackerEvent first = readings.get(0);
-            final LocationProfile from = new LocationProfile();
-            from.setName("De Costi Office Lidcombe");
-            from.getLocation().setLatitude(first.getLatitude());
-            from.getLocation().setLongitude(first.getLongitude());
-            bean.setShippedFrom(from);
-
-            bean.setDateShipped(first.getTime());
-
-            final ShortTrackerEvent arrived = readings.get(readings.size() - Math.min(readings.size(), 10));
-            bean.setDateArrived(arrived.getTime());
-
-            final LocationProfile to = new LocationProfile();
-            to.setName("De Costi Office Lidcombe");
-            to.getLocation().setLatitude(arrived.getLatitude());
-            to.getLocation().setLongitude(arrived.getLongitude());
-
-            bean.setShippedTo(to);
-            //set arrival
-//            final ArrivalBean arrival = new ArrivalBean();
-//            arrival.setNotifiedAt(bean.getDateArrived());
-//            arrival.setNotifiedWhenKm(40);
-//            bean.setArrival(arrival);
-//
-//            bean.setShutdownTime(new Date(arrival.getNotifiedAt().getTime() + 10000000));
-        }
-
-        //add interim stops
-        final int num = readings.size() / 5;
-        int count = num;
-        while (count < readings.size()) {
-            final ShortTrackerEvent e = readings.get(count);
-
-            //create location of interim stop
-            final LocationProfile loc = new LocationProfile();
-            loc.setName("De Costi Office Lidcombe " + bean.getInterimStops().size());
-            loc.getLocation().setLatitude(e.getLatitude());
-            loc.getLocation().setLongitude(e.getLongitude());
-
-            final InterimStop stop = new InterimStop();
-            stop.setLocation(loc);
-            stop.setDate(e.getTime());
-
-            bean.getInterimStops().add(stop);
-
-            count += num;
-        }
-
-        bean.setAlertProfile("Chilled Beef");
-
-        //calculate stats
-        final Shipment s = new Shipment();
-        s.setId(7l);
-
-        final Device device = new Device();
-        device.setImei(bean.getDevice());
-        s.setDevice(device);
-
-        final AlertProfile ap = new AlertProfile();
-        ap.setName(bean.getAlertProfile());
-        ap.setUpperTemperatureLimit(5);
-        ap.setLowerTemperatureLimit(2);
-        s.setAlertProfile(ap);
-
-        final AlertProfileTemperatureStatsCollector collector = new AlertProfileTemperatureStatsCollector();
-        for (final ShortTrackerEvent r : readings) {
-            final TrackerEvent e = new TrackerEvent();
-            e.setShipment(s);
-            e.setDevice(s.getDevice());
-            e.setTime(r.getTime());
-            e.setCreatedOn(r.getCreatedOn());
-            e.setTemperature(r.getTemperature());
-            e.setBattery(r.getBattery());
-            e.setLatitude(r.getLatitude());
-            e.setLongitude(r.getLongitude());
-            e.setType(r.getType());
-
-            collector.processEvent(e);
-        }
-
-        final TemperatureStats stats = collector.getStatistics();
-        stats.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
-        stats.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
-        bean.setTemperatureStats(stats);
-
-        bean.getWhoWasNotifiedByAlert().add("user1@smarttrace.com.au");
-        bean.getWhoWasNotifiedByAlert().add("user2@smarttrace.com.au");
-
-        addFiredAlert(bean, new AlertRule(AlertType.MovementStart));
-        addFiredAlert(bean, AlertType.Cold, 0., 60 * 1000l);
-        addFiredAlert(bean, AlertType.Hot, 10., 30 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalHot, 40., 10 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalHot, 50., 30 * 1000l);
-        addFiredAlert(bean, new AlertRule(AlertType.LightOn));
-        addFiredAlert(bean, new AlertRule(AlertType.LightOff));
-        addFiredAlert(bean, AlertType.Cold, 0., 60 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalCold, -5., 30 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalCold, -10.5, 10 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalHot, 60., 30 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalHot, 70., 30 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalHot, 50., 30 * 1000l);
-        addFiredAlert(bean, new AlertRule(AlertType.LightOn));
-        addFiredAlert(bean, new AlertRule(AlertType.LightOff));
-        addFiredAlert(bean, AlertType.Cold, 0., 60 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalCold, -5., 30 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalCold, -10.5, 10 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalHot, 60., 30 * 1000l);
-        addFiredAlert(bean, AlertType.CriticalHot, 70., 30 * 1000l);
-
-        return bean;
-    }
-    /**
-     * @param bean
-     * @throws ParseException
-     * @throws IOException
-     */
-    private static void addReadings(final ShipmentReportBean bean) throws IOException, ParseException {
-        final String readings = StringUtils.getContent(ShipmentReportBuilderTool.class.getResource("readings.csv"),
-                "UTF-8");
-        final List<ShortTrackerEvent> events = new ShortTrackerEventsImporter(1l) {
-            @Override
-            protected void handleEventImported(final ShortTrackerEvent e) {
-                e.setDeviceImei(bean.getDevice());
-            };
-        }.importEvents(new StringReader(readings));
-        bean.getReadings().addAll(events);
-    }
-
-    /**
-     * @param bean report bean.
-     * @param type alert type.
-     * @param temperature temperature.
-     * @param time time.
-     */
-    private static void addFiredAlert(final ShipmentReportBean bean, final AlertType type,
-            final double temperature, final long time) {
-        final TemperatureRule rule = new TemperatureRule();
-        rule.setType(type);
-        rule.setTemperature(temperature);
-        rule.setTimeOutMinutes((int) (time / (60 * 1000l)));
-        addFiredAlert(bean, rule);
-    }
-    /**
-     * @param bean
-     * @param rule
-     */
-    private static void addFiredAlert(final ShipmentReportBean bean,
-            final AlertRule rule) {
-        final ShortTrackerEvent e = bean.getReadings().get(random.nextInt(bean.getReadings().size()));
-        Alert alert;
-        if (rule instanceof TemperatureRule) {
-            final TemperatureRule tr = (TemperatureRule) rule;
-
-            final TemperatureAlert ta = new TemperatureAlert();
-            ta.setType(rule.getType());
-            ta.setTemperature(e.getTemperature());
-            ta.setCumulative(tr.isCumulativeFlag());
-            ta.setMinutes(tr.getTimeOutMinutes());
-
-            alert = ta;
-        } else {
-            alert = new Alert(rule.getType());
-            if (rule.getType() == AlertType.LightOn) {
-                e.setType(TrackerEventType.BRT);
-            } else if (rule.getType() == AlertType.LightOff) {
-                e.setType(TrackerEventType.DRK);
-            }
-        }
-
-        alert.setDate(e.getTime());
-        alert.setDevice(device);
-        alert.setTrackerEventId(e.getId());
-
-        bean.getAlerts().add(alert);
-        bean.getFiredAlertRules().add(rule);
+    public void setRuleBundle(final RuleBundle b) {
+        this.ruleBundle = b;
     }
     /**
      * @param bean
@@ -302,11 +85,8 @@ public final class ShipmentReportBuilderTool {
      */
     public static void showShipmentReport(final ShipmentReportBean bean, final User user)
             throws DRException, IOException, JRException {
-        final ShipmentReportBuilder builder = new ShipmentReportBuilder() {
-            {
-                this.ruleBundle = new RuleBundle();
-            }
-        };
+        final ShipmentReportBuilderTool builder = new ShipmentReportBuilderTool();
+        builder.setRuleBundle(new RuleBundle());
         final JasperReportBuilder report = builder.createReport(bean, user);
         final OutputStream out = createPdfOut();
         try {
@@ -332,7 +112,297 @@ public final class ShipmentReportBuilderTool {
     }
 
     public static void main(final String[] args) throws Exception {
+        final File f = new File(args[0]);
+        if (!f.exists()) {
+            System.err.println("Shipment data file should exist");
+            return;
+        }
+
         final User user = createUser();
-        showShipmentReport(createShipmentReportBean(user), user);
+        showShipmentReport(createShipmentReportBean(f), user);
+    }
+
+    /**
+     * @param f single shipment data file
+     * @return shipment report bean.
+     * @throws IOException
+     */
+    private static ShipmentReportBean createShipmentReportBean(final File f) throws IOException {
+        final SingleShipmentData data = loadSingleShipmentData(f);
+        final SingleShipmentBean s = data.getBean();
+
+        final ShipmentReportBean bean = new ShipmentReportBean();
+        //populate bean
+        bean.setArrival(createBean(s.getArrival()));
+        bean.setDateArrived(s.getArrivalTime());
+
+        bean.setCompanyName("Report Tool studio");
+        bean.setAssetNum(s.getAssetNum());
+        bean.setComment(s.getCommentsForReceiver());
+        bean.setDateShipped(s.getShutdownTime());
+        bean.setDescription(s.getShipmentDescription());
+        bean.setDevice(s.getDevice());
+        bean.setNumberOfSiblings(data.getSiblings().size());
+        bean.setPalletId(s.getPalletId());
+        bean.setShutdownTime(s.getShutdownTime());
+        bean.setAlertSuppressionMinutes(s.getAlertSuppressionMinutes());
+
+        if (s.getDeviceColor() != null) {
+            bean.setDeviceColor(Color.decode(s.getDeviceColor()));
+        }
+        bean.setShippedFrom(createBean(s.getStartLocation()));
+        bean.getInterimStops().addAll(toStops(s.getInterimStops()));
+
+        if (s.getEndLocation() != null) {
+            bean.setShippedTo(createBean(s.getEndLocation()));
+        } else if (!s.getEndLocationAlternatives().isEmpty()){
+            final List<String> altNames = new LinkedList<>();
+            for (final LocationProfileBean altLoc : s.getEndLocationAlternatives()) {
+                altNames.add(altLoc.getName());
+            }
+
+            bean.setPossibleShippedTo(altNames);
+        }
+        bean.setStatus(s.getStatus());
+        bean.setTripCount(s.getTripCount());
+
+        //add readings
+        final List<SingleShipmentLocationBean> events = data.getLocations();
+        for (final SingleShipmentLocationBean e : events) {
+            bean.getReadings().add(createEvent(s, e));
+        }
+
+        //add temperature history
+        if (s.getAlertProfile() != null) {
+            final AlertProfileBean ap = s.getAlertProfile();
+            bean.setAlertProfile(ap.getName());
+            bean.getTemperatureStats().setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
+            bean.getTemperatureStats().setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
+        }
+
+        //add fired alerts
+        bean.getFiredAlertRules().addAll(toRules(s.getAlertFired()));
+
+        //add notified persons
+        bean.getAlerts().addAll(toAlerts(s.getSentAlerts()));
+
+        //get notifications
+        //notified by alert
+        bean.getWhoWasNotifiedByAlert().add("Not implemented for test tool");
+
+        if (s.getStatus() == ShipmentStatus.Arrived) {
+            if (s.getArrival() != null) {
+                //notified users
+                bean.getWhoReceivedReport().add("Not implemented for test tool");
+            }
+        } else if (!s.getStatus().isFinal()){
+            //user to be notified map. Map - because need to avoid of duplicates.
+            //get not potentially notified users without filtering by time frames
+            for (final ListNotificationScheduleItem schedule : s.getArrivalNotificationSchedules()) {
+                bean.getWhoReceivedReport().add(schedule.getPeopleToNotify());
+            }
+        }
+
+        if (s.getAlertProfile() != null) {
+            bean.setTemperatureStats(createTemperatureStats(s.getAlertProfile(), events));
+        }
+
+
+        return bean;
+    }
+
+    /**
+     * @param ap
+     * @param events
+     * @return
+     */
+    private static TemperatureStats createTemperatureStats(final AlertProfileBean ap,
+            final List<SingleShipmentLocationBean> events) {
+        final AlertProfileTemperatureStatsCollector c = new AlertProfileTemperatureStatsCollector();
+        for (final SingleShipmentLocationBean e : events) {
+            c.processEvent(createTrackerEvent(e));
+        }
+
+        final TemperatureStats stats = c.getStatistics();
+        stats.setLowerTemperatureLimit(ap.getLowerTemperatureLimit());
+        stats.setUpperTemperatureLimit(ap.getUpperTemperatureLimit());
+        return stats;
+    }
+
+    /**
+     * @param bean
+     * @return
+     */
+    private static TrackerEvent createTrackerEvent(final SingleShipmentLocationBean bean) {
+        final TrackerEvent e = new TrackerEvent();
+        e.setCreatedOn(bean.getTime());
+        e.setId(bean.getId());
+        e.setLatitude(bean.getLatitude());
+        e.setLongitude(bean.getLongitude());
+        e.setTemperature(bean.getTemperature());
+        e.setTime(bean.getTime());
+        e.setType(bean.getType());
+        return e;
+    }
+
+    /**
+     * @param beans
+     * @return
+     */
+    private static List<Alert> toAlerts(final List<AlertBean> beans) {
+        final List<Alert> alerts = new LinkedList<>();
+        for (final AlertBean bean : beans) {
+            Alert a;
+            if (bean instanceof TemperatureAlertBean) {
+                final TemperatureAlert ta = new TemperatureAlert();
+                final TemperatureAlertBean tBean = (TemperatureAlertBean) bean;
+
+                ta.setCumulative(tBean.isCumulative());
+                ta.setMinutes(tBean.getMinutes());
+                ta.setRuleId(tBean.getRuleId());
+                ta.setTemperature(tBean.getTemperature());
+
+                a = ta;
+            } else {
+                a = new Alert();
+            }
+
+            a.setDate(bean.getDate());
+            a.setId(bean.getId());
+            a.setTrackerEventId(bean.getTrackerEventId());
+            a.setType(bean.getType());
+
+            alerts.add(a);
+        }
+        return alerts;
+    }
+
+    /**
+     * @param alertFired
+     * @return
+     */
+    private static List<AlertRule> toRules(final List<AlertRuleBean> alertFired) {
+        final List<AlertRule> rules = new LinkedList<>();
+        for (final AlertRuleBean bean : alertFired) {
+            AlertRule r;
+            if (bean instanceof TemperatureRuleBean) {
+                final TemperatureRule tRule = new TemperatureRule();
+                final TemperatureRuleBean tBean = (TemperatureRuleBean) bean;
+
+                tRule.setCorrectiveActions(createCorrectiveActions(tBean.getCorrectiveActions()));
+                tRule.setCumulativeFlag(tBean.hasCumulativeFlag());
+                tRule.setMaxRateMinutes(tBean.getMaxRateMinutes());
+                tRule.setTemperature(tBean.getTemperature());
+                tRule.setTimeOutMinutes(tBean.getTimeOutMinutes());
+
+                r = tRule;
+            } else {
+                r = new AlertRule();
+            }
+
+            r.setId(bean.getId());
+            r.setType(bean.getType());
+
+            rules.add(r);
+        }
+        return rules;
+    }
+
+    /**
+     * @param bean
+     * @return
+     */
+    private static CorrectiveActionList createCorrectiveActions(final CorrectiveActionListBean bean) {
+        final CorrectiveActionList list = new CorrectiveActionList();
+        list.setDescription(bean.getDescription());
+        list.setId(bean.getId());
+        list.setName(bean.getName());
+
+        list.getActions().addAll(bean.getActions());
+        return list;
+    }
+
+    /**
+     * @param bean
+     * @return
+     */
+    private static ShortTrackerEvent createEvent(final SingleShipmentBean s, final SingleShipmentLocationBean bean) {
+        final ShortTrackerEvent e = new ShortTrackerEvent();
+        e.setCreatedOn(bean.getTime());
+        e.setDeviceImei(s.getDevice());
+        e.setId(bean.getId());
+        e.setLatitude(bean.getLatitude());
+        e.setLongitude(bean.getLongitude());
+        e.setShipmentId(s.getShipmentId());
+        e.setTemperature(bean.getTemperature());
+        e.setTime(bean.getTime());
+        e.setType(bean.getType());
+        return e;
+    }
+
+    /**
+     * @param interimStops
+     * @return
+     */
+    private static List<InterimStop> toStops(final List<InterimStopBean> interimStops) {
+        final List<InterimStop> stops = new LinkedList<>();
+        for (final InterimStopBean s : interimStops) {
+            final InterimStop stp = new InterimStop();
+            stp.setDate(s.getStopDate());
+            stp.setId(s.getId());
+            stp.setLocation(createBean(s.getLocation()));
+            stp.setTime(s.getTime());
+            stops.add(stp);
+        }
+        return stops;
+    }
+
+    /**
+     * @param startLocation
+     * @return
+     */
+    private static LocationProfile createBean(final LocationProfileBean loc) {
+        if (loc == null) {
+            return null;
+        }
+        final LocationProfile p = new LocationProfile();
+        p.setAddress(loc.getAddress());
+        p.setId(loc.getId());
+        p.setInterim(loc.isInterim());
+        p.setName(loc.getName());
+        p.setNotes(loc.getNotes());
+        p.setRadius(loc.getRadius());
+        p.setStart(loc.isStart());
+        p.setStop(loc.isStop());
+        return p;
+    }
+
+    /**
+     * @param arrival
+     * @return
+     */
+    private static com.visfresh.reports.shipment.ArrivalBean createBean(final ArrivalBean arrival) {
+        if (arrival == null) {
+            return null;
+        }
+
+        final com.visfresh.reports.shipment.ArrivalBean bean = new com.visfresh.reports.shipment.ArrivalBean();
+        bean.setNotifiedAt(arrival.getNotifiedAt());
+        bean.setNotifiedWhenKm(arrival.getMettersForArrival());
+        return bean;
+    }
+
+    /**
+     * @param f shipment data file.
+     * @return
+     * @throws IOException
+     */
+    private static SingleShipmentData loadSingleShipmentData(final File f) throws IOException {
+        final InputStream in = new FileInputStream(f);
+        try {
+            return JsonSerializerFactory.FACTORY.createSingleShipmentDataParser().readValue(in, SingleShipmentData.class);
+        } finally {
+            in.close();
+        }
     }
 }
