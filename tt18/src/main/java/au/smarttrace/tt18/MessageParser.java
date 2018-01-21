@@ -66,10 +66,10 @@ public class MessageParser {
         final int lbsDataLength = readTwoBytesValue(bytes, 26);
         if (lbsDataLength > 0) {
             // LAC 2 Variable GSM’s location area code 0x25 0x33 means LAC is 2533
-            msg.setLac(intFromBcd(bytes, 28, 2));
+            msg.setLac(Integer.parseInt(stringFromBcd(bytes, 28, 2, false), 16));
 
             //CELL ID 2 Variable GSM’s serving CELL ID 0x78 0x37 means that CELL ID is 7837
-            msg.setCellId(intFromBcd(bytes, 30, 2));
+            msg.setCellId(Integer.parseInt(stringFromBcd(bytes, 30, 2, false), 16));
 
             //MCC 2 Variable Mobile Country Code, ignore the first digital, only 3 digital, 04 60 means that MCC is 460.
             msg.setMcc(getMcc(stringFromBcd(bytes, 32, 2, false)));
@@ -77,7 +77,7 @@ public class MessageParser {
             //MNC 2 Variable Mobile Network Code, 2 or 3 digital. If the first digital is 8 , MNC is 3 digital.
             //If the first digital is 0, MNC is 2
             //digital. 87 56 means that MNC is 756. 00 56 means 56.
-            msg.setMnc(getMnc(stringFromBcd(bytes, 32, 2, false)));
+            msg.setMnc(getMnc(stringFromBcd(bytes, 34, 2, false)));
 
             //Extension bits A=0. For future extending the protocol use, currently, has nothing, does not possess any byte
         }
@@ -166,7 +166,7 @@ public class MessageParser {
             final int b1 = (bytes[offset + i] >> 4);
             final int b2 = bytes[offset + i] & 0x0f;
 
-            res = res * 100 * b1 * 10 + b2;
+            res = res * 100  + b1 * 10 + b2;
         }
         return res;
     }
