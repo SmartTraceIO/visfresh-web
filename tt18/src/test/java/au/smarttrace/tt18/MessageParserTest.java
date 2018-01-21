@@ -9,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -16,6 +17,7 @@ import org.junit.Test;
  *
  */
 public class MessageParserTest {
+    private MessageParser parser;
 
     /**
      * Default constructor.
@@ -24,12 +26,29 @@ public class MessageParserTest {
         super();
     }
 
+    /**
+     * Initializes test.
+     */
+    @Before
+    public void setUp() {
+        parser = new MessageParser();
+    }
     @Test
     public void testReadMessageData() throws IOException {
         final String data[] = IOUtils.toString(MessageParserTest.class.getResource("msg.txt")).split(" +");
-        final byte[] msg = new MessageParser().readMessageData(new ByteArrayInputStream(decode(data)));
+        final byte[] msg = parser.readMessageData(new ByteArrayInputStream(decode(data)));
 
         assertEquals(data.length, msg.length);
+    }
+    @Test
+    public void testParseMessage() throws IOException {
+        final String data[] = IOUtils.toString(MessageParserTest.class.getResource("msg.txt")).split(" +");
+        final byte[] bytes = parser.readMessageData(new ByteArrayInputStream(decode(data)));
+
+        final RawMessage msg = parser.parseMessage(bytes);
+        assertEquals("TZ", msg.getCompany());
+        assertEquals("$$", msg.getProtocolNumber());
+        assertEquals("0403", msg.getHardwareType());
     }
 
     /**
