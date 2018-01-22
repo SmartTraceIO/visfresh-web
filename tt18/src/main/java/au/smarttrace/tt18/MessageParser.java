@@ -17,6 +17,14 @@ import java.util.GregorianCalendar;
 public class MessageParser {
     private static final int _0D0A_suffix = 2;
 
+    private static final int BIT0_MASK = 1;
+    private static final int BIT1_MASK = Integer.parseInt("10", 2);
+    private static final int BIT2_MASK = Integer.parseInt("100", 2);
+    private static final int BIT3_MASK = Integer.parseInt("1000", 2);
+    private static final int BIT4_MASK = Integer.parseInt("10000", 2);
+    private static final int BIT5_MASK = Integer.parseInt("100000", 2);
+    private static final int BIT6_MASK = Integer.parseInt("1000000", 2);
+
     /**
      * Reads only data from one message from stream. Not more extra bytes.
      * @param in input stream.
@@ -82,19 +90,114 @@ public class MessageParser {
             //Extension bits A=0. For future extending the protocol use, currently, has nothing, does not possess any byte
         }
 
+        int offset = 28 + lbsDataLength;
         final int statusDataLength = readTwoBytesValue(bytes, 26);
-        int offset = 28 + lbsDataLength + 2;
+        offset += 2;
+
         if (statusDataLength > 0) {
-            // Alarm type 1 The value of this part has four possibilities, Temperature/humidity included in all the GPRS data.
+            // Alarm type 1 Variable The value of this part has four possibilities, Temperature/humidity included in all the GPRS data.
             //0xAA Interval GPRS data
             //0x10 Low battery Alarm
             //0xA0 Temperature/Humidity over threshold alarm
             //0xA1 Temperature/Humidity sensor abnormal alarm
+            msg.setAlarm(parseAlarm(0xFF & bytes[offset]));
+
+            // Terminal information 1 Variable
+            int b = 0xFF & bytes[offset + 1];
+            //Bit 7 to bit 5 are reserved for future use.
+            //Bit4: 1 RTC time is abnormal
+            //0 RTC time is normal
+            msg.setRtcTimeAbnormal((b & BIT4_MASK) != 0);
+            //Bit3: 1 The temperature/Humidity sensor is
+            //abnormal
+            msg.setTimeHumiditySensorAbnormal((b & BIT3_MASK) != 0);
+            //0 The temperature/Humidity sensor is normal
+            //Bit2: 1 The temperature/Humidity is over threshold
+            //0 The temperature/Humidity is normal
+            msg.setTemparatureHumidityOverTreshold((b & BIT2_MASK) != 0);
+            //Bit1: 1 The battery low voltage
+            //0 The battery is normal
+            msg.setBatteryLow((b & BIT1_MASK) != 0);
+            //Bit0: 1 The machine is charging
+            //0 The machine is not charging
+            msg.setCharging((b & BIT0_MASK) != 0);
+
+            //GMS signal strength 1 Variable CSQ value , Hex code
+            msg.setSignalLevel(0xFF & bytes[offset + 2]);
+
+            //GSM status 1 Variable
+            b = 0xFF & bytes[offset + 3];
+            //Bit 7 to bit 6 are reserved for future use.
+            //Bit 5: 1 Internet connection is established
+            //0 Internet connection is not established
+            msg.setInternetConnectionEstablished((b & BIT5_MASK) != 0);
+            //Bit4: 1 GPRS is registered successfully
+            //0 GPRS is not registered
+            msg.setGprsIsRegistered((b & BIT4_MASK) != 0);
+            //Bit3: 1 The GSM is in roaming mode
+            //0 The GSM is in home network mode
+            msg.setInRoaming((b & BIT3_MASK) != 0);
+            //Bit2: 1 GSM is registered successfully
+            //0 GSM is not registered yet
+            msg.setGsmIsRegistered((b & BIT2_MASK) != 0);
+            //Bit1: 1 Detected SIM card
+            //0 Not detected SIM card
+            msg.setSimCardDetected((b & BIT1_MASK) != 0);
+            //Bit0: 1 The GSM module is started
+            //0 The GSM module is not started yet
+            msg.setGsmModuleStarted((b & BIT0_MASK) != 0);
+
+            //Battery voltage 2 0 Unit:10mv, for example: 0195H=405(DEC), 405*10mV=4.05V.
+            msg.setBattery(readTwoBytesValue(bytes, offset + 4) * 10);
+
+            //Temperature 2 Unit:0.01°C, convert to binary first, mark in the highest bit ,
+            b = readTwoBytesValue(bytes, offset + 6);
+            //1-disconnect
+            //0-connect ,
+            if ((b & 0x8000) >> 1 == 0) {
+                //negative/positive mark
+                //1-the temperature is negative
+                //0-the temperature is positive.
+                double t = (BIT6_MASK & b) != 0 ? -1. : 1.;
+                //Remaining is the temperature value, convert to HEX
+                t = t * ((b << 2) >> 2) / 100.;
+                //first , and multiply 0.01°C.
+                //for example:09 DA=25.22°C , 49 DA= - 25.22°C
+                //80 00= not connect temperature/humidity sensor
+                msg.setTemperature(Double.valueOf(t));
+            }
+
+            //Extension bits B=0 For future use, currently, this part has nothing, does not have any byte
         }
 
         offset += statusDataLength;
-
+        //Extension bits C=0 For future use, currently, this part has nothing, does not have any byte
+        //Packet index 2 Variable The value range of this part is between 1 and 9999
+        msg.setPacketIndex(readTwoBytesValue(bytes, offset));
         return msg;
+    }
+    /**
+     * @param value
+     * @return
+     */
+    private Alarm parseAlarm(final int value) {
+        // Alarm type 1 The value of this part has four possibilities, Temperature/humidity included in all the GPRS data.
+        switch (value) {
+            //0xAA Interval GPRS data
+            case 0xAA:
+            return Alarm.IntervalGPRSdata;
+            //0x10 Low battery Alarm
+            case 0x10:
+            return Alarm.LowBattery;
+            //0xA0 Temperature/Humidity over threshold alarm
+            case 0xA0:
+            return Alarm.TemperatureHumidityOverThreshold;
+            //0xA1 Temperature/Humidity sensor abnormal alarm
+            case 0xA1:
+            return Alarm.TemperatureHumiditySensorAbnormal;
+        }
+
+        return null;
     }
     /**
      * @param str
@@ -153,22 +256,6 @@ public class MessageParser {
             chars[2 * i + 1] = (char) ('0' + (bytes[offset + i] & 0x0f));
         }
         return chars[0] == '0' && cutLeadingZero ? new String(chars, 1, chars.length - 1) : new String(chars);
-    }
-    /**
-     * @param bytes bytes.
-     * @param offset offset.
-     * @param len bytes length.
-     * @return string converted from BCD format.
-     */
-    private int intFromBcd(final byte[] bytes, final int offset, final int len) {
-        int res = 0;
-        for (int i = 0; i < len; i++) {
-            final int b1 = (bytes[offset + i] >> 4);
-            final int b2 = bytes[offset + i] & 0x0f;
-
-            res = res * 100  + b1 * 10 + b2;
-        }
-        return res;
     }
     /**
      * @param b1 first byte.

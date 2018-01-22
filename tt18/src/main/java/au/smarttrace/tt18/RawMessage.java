@@ -54,6 +54,25 @@ public class RawMessage {
      * Mobile network code.
      */
     private int mnc;
+    private Alarm alarm;
+    private boolean rtcTimeAbnormal;
+    private boolean timeHumiditySensorAbnormal;
+    private boolean temparatureHumidityOverTreshold;
+    private boolean batteryLow;
+    private boolean charging;
+    private int signalLevel;
+    private boolean internetConnectionEstablished;
+    private boolean gprsIsRegistered;
+    private boolean inRoaming;
+    private boolean gsmIsRegistered;
+    private boolean simCardDetected;
+    private boolean gsmModuleStarted;
+    /**
+     * Battery level in mB
+     */
+    private int battery;
+    private int packetIndex;
+    private Double temperature;
 
     /**
      * @param companyIdentifier
@@ -186,5 +205,197 @@ public class RawMessage {
      */
     public int getMnc() {
         return mnc;
+    }
+    /**
+     * @param a alarm type.
+     */
+    public void setAlarm(final Alarm a) {
+        alarm = a;
+    }
+    /**
+     * @return the alarm
+     */
+    public Alarm getAlarm() {
+        return alarm;
+    }
+    /**
+     * @param b
+     */
+    public void setRtcTimeAbnormal(final boolean b) {
+        rtcTimeAbnormal = b;
+    }
+    /**
+     * @return the rtcTimeAbnormal
+     */
+    public boolean isRtcTimeAbnormal() {
+        return rtcTimeAbnormal;
+    }
+    /**
+     * @param b
+     */
+    public void setTimeHumiditySensorAbnormal(final boolean b) {
+        timeHumiditySensorAbnormal = b;
+    }
+    /**
+     * @return the timeHumiditySensorAbnormal
+     */
+    public boolean isTimeHumiditySensorAbnormal() {
+        return timeHumiditySensorAbnormal;
+    }
+    /**
+     * @param b
+     */
+    public void setTemparatureHumidityOverTreshold(final boolean b) {
+        temparatureHumidityOverTreshold = b;
+    }
+    /**
+     * @return the temparatureHumidityOverTreshold
+     */
+    public boolean isTemparatureHumidityOverTreshold() {
+        return temparatureHumidityOverTreshold;
+    }
+    /**
+     * @param b
+     */
+    public void setBatteryLow(final boolean b) {
+        batteryLow = b;
+    }
+    /**
+     * @return the batteryLow
+     */
+    public boolean isBatteryLow() {
+        return batteryLow;
+    }
+    /**
+     * @param b
+     */
+    public void setCharging(final boolean b) {
+        charging = b;
+    }
+    /**
+     * @return the charging
+     */
+    public boolean isCharging() {
+        return charging;
+    }
+    /**
+     * @param value
+     */
+    public void setSignalLevel(final int value) {
+        signalLevel = value;
+    }
+    /**
+     * @return the signalLevel
+     */
+    public int getSignalLevel() {
+        return signalLevel;
+    }
+    /**
+     * @param b
+     */
+    public void setInternetConnectionEstablished(final boolean b) {
+        internetConnectionEstablished = b;
+    }
+    /**
+     * @return the internetConnectionEstablished
+     */
+    public boolean isInternetConnectionEstablished() {
+        return internetConnectionEstablished;
+    }
+    /**
+     * @param b
+     */
+    public void setGprsIsRegistered(final boolean b) {
+        gprsIsRegistered = b;
+    }
+    /**
+     * @return the gprsIsRegistered
+     */
+    public boolean isGprsIsRegistered() {
+        return gprsIsRegistered;
+    }
+    /**
+     * @param b
+     */
+    public void setInRoaming(final boolean b) {
+        inRoaming = b;
+    }
+    /**
+     * @return the inRoaming
+     */
+    public boolean isInRoaming() {
+        return inRoaming;
+    }
+    /**
+     * @param b
+     */
+    public void setGsmIsRegistered(final boolean b) {
+        gsmIsRegistered = b;
+    }
+    /**
+     * @return the gsmIsRegistered
+     */
+    public boolean isGsmIsRegistered() {
+        return gsmIsRegistered;
+    }
+    /**
+     * @param b
+     */
+    public void setSimCardDetected(final boolean b) {
+        simCardDetected = b;
+    }
+    /**
+     * @return the simCardDetected
+     */
+    public boolean isSimCardDetected() {
+        return simCardDetected;
+    }
+    /**
+     * @param b
+     */
+    public void setGsmModuleStarted(final boolean b) {
+        gsmModuleStarted = b;
+    }
+    /**
+     * @return the gsmModuleStarted
+     */
+    public boolean isGsmModuleStarted() {
+        return gsmModuleStarted;
+    }
+    /**
+     * @param value
+     */
+    public void setBattery(final int value) {
+        battery = value;
+    }
+    /**
+     * @return the battery
+     */
+    public int getBattery() {
+        return battery;
+    }
+    /**
+     * @param value
+     */
+    public void setPacketIndex(final int value) {
+        packetIndex = value;
+    }
+    /**
+     * @return the packetIndex
+     */
+    public int getPacketIndex() {
+        return packetIndex;
+    }
+    /**
+     * @param value
+     */
+    public void setTemperature(final Double value) {
+        temperature = value;
+    }
+    /**
+     * @return the temperature
+     */
+    public Double getTemperature() {
+        return temperature;
     }
 }
