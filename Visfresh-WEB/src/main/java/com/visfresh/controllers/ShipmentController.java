@@ -470,7 +470,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
      * @throws AuthenticationException
      */
     @RequestMapping(value = "/getShipmentsNearby", method = RequestMethod.GET)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getShipmentsNearby(
             @RequestParam(value = "lat") final String latStr,
             @RequestParam(value = "lon") final String lonStr,
@@ -990,7 +990,7 @@ public class ShipmentController extends AbstractShipmentBaseController implement
         return createSuccessResponse(null);
     }
     @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT + "", method = RequestMethod.GET)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getSingleShipment(
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,

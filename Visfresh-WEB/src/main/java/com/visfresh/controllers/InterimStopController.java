@@ -110,7 +110,7 @@ public class InterimStopController extends AbstractShipmentBaseController implem
      * @throws AuthenticationException
      */
     @RequestMapping(value = "/getInterimStop", method = RequestMethod.GET)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getInterimStop(
             final @RequestParam(value = "shipment") Long shipmentId,
             final @RequestParam Long id) throws RestServiceException {
@@ -172,7 +172,7 @@ public class InterimStopController extends AbstractShipmentBaseController implem
      * @throws AuthenticationException
      */
     @RequestMapping(value = "/getInterimStops", method = RequestMethod.GET)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getInterimStops(
             final @RequestParam(value = "shipment") Long shipmentId) throws RestServiceException {
             final User user = getLoggedInUser();

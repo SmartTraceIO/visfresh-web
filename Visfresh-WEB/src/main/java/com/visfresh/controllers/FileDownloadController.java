@@ -101,7 +101,7 @@ public class FileDownloadController extends AbstractController {
      * @throws IOException
      */
     @RequestMapping(value = "/" + DOWNLOAD_FILE + "/{fileNamePart}", method = RequestMethod.GET)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public ResponseEntity<?> downloadFile(
             @PathVariable final String fileNamePart,
             final HttpServletRequest req)

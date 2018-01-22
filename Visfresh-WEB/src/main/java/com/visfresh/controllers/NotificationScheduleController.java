@@ -177,7 +177,7 @@ public class NotificationScheduleController extends AbstractController implement
      * @throws AuthenticationException
      */
     @RequestMapping(value = "/getNotificationSchedule", method = RequestMethod.GET)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getNotificationSchedule(@RequestParam final Long notificationScheduleId) throws RestServiceException {
         //check logged in.
         final User user = getLoggedInUser();

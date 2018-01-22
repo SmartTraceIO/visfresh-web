@@ -483,7 +483,7 @@ public class DeviceController extends AbstractController implements DeviceConsta
     }
     @RequestMapping(value = "/" + GET_READINGS + "",
             method = RequestMethod.GET, produces = "text/plain")
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public void getTrackerEvents(
             @RequestParam(value = "startDate", required = false) final String startDateArg,
             @RequestParam(value = "endDate", required = false) final String endDateArg,

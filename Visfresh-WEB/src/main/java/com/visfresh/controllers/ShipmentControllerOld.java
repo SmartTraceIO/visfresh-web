@@ -173,7 +173,7 @@ public class ShipmentControllerOld extends AbstractShipmentBaseController implem
         return dto;
     }
     @RequestMapping(value = "/" + GET_SINGLE_SHIPMENT_OLD + "", method = RequestMethod.GET)
-    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser})
+    @Secured({SpringRoles.SmartTraceAdmin, SpringRoles.Admin, SpringRoles.BasicUser, SpringRoles.NormalUser})
     public JsonObject getSingleShipmentOld(
             @RequestParam(required = false) final Long shipmentId,
             @RequestParam(required = false) final String sn,
