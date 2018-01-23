@@ -4,13 +4,17 @@
 package au.smarttrace.tt18;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -41,9 +45,32 @@ public class MessageParserTest {
         assertEquals(data.length, msg.length);
     }
     @Test
+    public void testEmptyStream() throws IOException {
+        assertNull(parser.readMessageData(new ByteArrayInputStream(new byte[0])));
+    }
+    @Test
+    public void testNotFullHeader() throws IOException {
+        final byte[] correctData = readTestMessage();
+        final byte[] bytes = new byte[correctData.length - 10];
+        System.arraycopy(correctData, 0, bytes, 0, bytes.length);
+
+        try {
+            assertNull(parser.readMessageData(new ByteArrayInputStream(bytes)));
+            throw new AssertionFailedError("EOF exception should be thrown");
+        } catch(final EOFException e) {
+        }
+    }
+    @Test
+    public void testNotFullBody() throws IOException {
+        try {
+            assertNull(parser.readMessageData(new ByteArrayInputStream(new byte[2])));
+            throw new AssertionFailedError("EOF exception should be thrown");
+        } catch(final EOFException e) {
+        }
+    }
+    @Test
     public void testParseMessage() throws IOException {
-        final String data[] = IOUtils.toString(MessageParserTest.class.getResource("msg.txt")).split(" +");
-        final byte[] bytes = parser.readMessageData(new ByteArrayInputStream(decode(data)));
+        final byte[] bytes = readTestMessage();
 
         final RawMessage msg = parser.parseMessage(bytes);
         assertEquals("TZ", msg.getCompany());
@@ -61,5 +88,12 @@ public class MessageParserTest {
             bytes[i] = (byte) Integer.parseInt(data[i], 16);
         }
         return bytes;
+    }
+    /**
+     * @return
+     * @throws IOException
+     */
+    protected byte[] readTestMessage() throws IOException {
+        return decode(IOUtils.toString(MessageParserTest.class.getResource("msg.txt")).split(" +"));
     }
 }

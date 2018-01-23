@@ -73,6 +73,7 @@ public class RawMessage {
     private int battery;
     private int packetIndex;
     private Double temperature;
+    private byte[] rawData;
 
     /**
      * @param companyIdentifier
@@ -397,5 +398,17 @@ public class RawMessage {
      */
     public Double getTemperature() {
         return temperature;
+    }
+    /**
+     * @param rawData the rawData to set
+     */
+    public void setRawData(final byte[] rawData) {
+        this.rawData = rawData;
+    }
+    /**
+     * @return the rawData
+     */
+    public byte[] getRawData() {
+        return rawData;
     }
 }

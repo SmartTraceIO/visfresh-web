@@ -16,8 +16,11 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+
+import au.smarttrace.tt18.RawMessageHandler;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -32,6 +35,9 @@ public class Tt18Server {
     private int threadPoolSize;
     private AtomicBoolean isStopped = new AtomicBoolean(false);
     private ThreadPoolExecutor threadPool;
+
+    @Autowired
+    private RawMessageHandler handler;
 
     /**
      * Default constructor.
@@ -88,7 +94,7 @@ public class Tt18Server {
      */
     private void processConnection(final Socket s) throws IOException {
         s.setSoTimeout(this.socketTimeOut);
-        threadPool.execute(new Tt18Session(s));
+        threadPool.execute(new Tt18Session(s, handler));
     }
 
     @PreDestroy
@@ -101,5 +107,7 @@ public class Tt18Server {
                 log.error("Failed to close server socket", e);
             }
         }
+
+        threadPool.shutdown();
     }
 }

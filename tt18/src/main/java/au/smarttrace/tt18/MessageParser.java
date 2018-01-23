@@ -33,7 +33,12 @@ public class MessageParser {
      */
     public byte[] readMessageData(final InputStream in) throws IOException {
         final byte[] header = new byte[4];
-        if (in.read(header) < -1) {
+        int size;
+        if ((size = in.read(header)) < header.length) {
+            if (size == -1) {
+                //correct behavior, not next data.
+                return null;
+            }
             throw new EOFException("Failed to read header data");
         }
 
@@ -44,11 +49,16 @@ public class MessageParser {
         System.arraycopy(header, 0, msg, 0, header.length);
 
         //read message body
-        in.read(msg, header.length, len);
+        if ((size = in.read(msg, header.length, len)) < len) {
+            throw new EOFException("Failed to message body, expected: "
+                    + len + " bytes, actual: " + size);
+        }
+
         return msg;
     }
     public RawMessage parseMessage(final byte[] bytes) {
         final RawMessage msg = new RawMessage();
+        msg.setRawData(bytes);
 
         //header
         // Start bits 2 ‘T’ ‘Z’ Tzone company identifier. This is the header of every packet
