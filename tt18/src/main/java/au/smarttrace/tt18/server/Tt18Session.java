@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
-public class T18Session implements Runnable {
-    private static final Logger log = LoggerFactory.getLogger(T18Session.class);
+public class Tt18Session implements Runnable {
+    private static final Logger log = LoggerFactory.getLogger(Tt18Session.class);
 
     /**
      * Socket.
@@ -26,7 +26,7 @@ public class T18Session implements Runnable {
     /**
      * @param so socket.
      */
-    public T18Session(final Socket so) {
+    public Tt18Session(final Socket so) {
         this.socket = so;
     }
 

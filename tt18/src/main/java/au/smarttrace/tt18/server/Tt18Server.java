@@ -88,7 +88,7 @@ public class Tt18Server {
      */
     private void processConnection(final Socket s) throws IOException {
         s.setSoTimeout(this.socketTimeOut);
-        threadPool.execute(new T18Session(s));
+        threadPool.execute(new Tt18Session(s));
     }
 
     @PreDestroy
