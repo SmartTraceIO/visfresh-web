@@ -13,13 +13,16 @@ import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import au.smarttrace.tt18.junit.FastTest;
 import junit.framework.AssertionFailedError;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
+@Category(FastTest.class)
 public class MessageParserTest {
     private MessageParser parser;
 
@@ -82,7 +85,7 @@ public class MessageParserTest {
      * @param data the data.
      * @return decoded data
      */
-    private byte[] decode(final String[] data) {
+    private static byte[] decode(final String[] data) {
         final byte[] bytes = new byte[data.length];
         for (int i = 0; i < bytes.length; i++) {
             bytes[i] = (byte) Integer.parseInt(data[i], 16);
@@ -93,7 +96,7 @@ public class MessageParserTest {
      * @return
      * @throws IOException
      */
-    protected byte[] readTestMessage() throws IOException {
+    public static byte[] readTestMessage() throws IOException {
         return decode(IOUtils.toString(MessageParserTest.class.getResource("msg.txt")).split(" +"));
     }
 }
