@@ -33,9 +33,10 @@ public class SmartTraceRawMessageHandler implements RawMessageHandler {
     public void handleMessage(final RawMessage msg) {
         final String messageStr = toHexString(msg.getRawData());
         if (msg.getTemperature() == null) {
-            log.warn("Message have null temperature and will ignored " + messageStr);
+            log.warn("Message for " + msg.getImei()
+                    + " have null temperature and will ignored " + messageStr);
         } else {
-            log.debug("New message has received: " + messageStr);
+            log.debug("New message for " + msg.getImei() + " has received: " + messageStr);
             final DeviceMessage m = convert(msg);
             if (dao.checkDevice(m.getImei())) {
                 dao.saveForNextProcessingInDcs(m);

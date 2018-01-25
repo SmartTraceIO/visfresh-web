@@ -8,13 +8,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
+import au.smarttrace.tt18.server.Tt18Server;
+import au.smarttrace.tt18.st.MessageDao;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 @Configuration
 @Import(JdbcConfig.class)
-@ComponentScan(basePackageClasses = {})
+@ComponentScan(basePackageClasses = {Tt18Server.class, MessageDao.class})
 @PropertySource("classpath:/app.properties")
 public class Config {
     /**
