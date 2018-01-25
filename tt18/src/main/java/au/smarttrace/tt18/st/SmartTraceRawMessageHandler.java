@@ -51,6 +51,9 @@ public class SmartTraceRawMessageHandler implements RawMessageHandler {
     private String toHexString(final byte[] rawData) {
         final StringBuilder sb = new StringBuilder();
         for (final byte b : rawData) {
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
             final String s = Integer.toHexString(0xFF & b);
             if (s.length() < 2) {
                 sb.append('0');
