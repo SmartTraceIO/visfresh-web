@@ -1,12 +1,15 @@
 /**
  *
  */
-package au.smarttrace.tt18.init;
+package au.smarttrace.tt18.junit.db;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
+
+import au.smarttrace.tt18.init.JdbcConfig;
+import au.smarttrace.tt18.st.MessageDao;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -14,14 +17,9 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @Import(JdbcConfig.class)
-@ComponentScan(basePackageClasses = {})
-@PropertySource("classpath:/app.properties")
-public class Config {
-    /**
-     *
-     * Default constructor.
-     */
-    public Config() {
-        super();
-    }
+@ComponentScan(basePackageClasses = {
+    MessageDao.class
+})
+@PropertySource("classpath:/junit.app.properties")
+public class DaoTestRunnerConfig {
 }

@@ -78,14 +78,16 @@ public class Tt18Server {
             @Override
             public void run() {
                 runServer();
+                log.debug("TT-18 server has stopped");
             }
         };
-
 
         t.start();
     }
 
     protected void runServer() {
+        log.debug("TT-18 Server has started");
+
         while (true) {
             synchronized (lock) {
                 if (isStopped) {

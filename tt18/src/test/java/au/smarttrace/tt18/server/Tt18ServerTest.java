@@ -99,19 +99,22 @@ public class Tt18ServerTest {
 
                 //read response
                 final StringBuilder sb = new StringBuilder();
-                char b = (char) in.read();
+                int b = in.read();
+                if (b == -1) {
+                    return;
+                }
                 if (b != '@') {
                     throw new IOException("Unexpected first response symbol: " + b);
                 }
 
-                sb.append(b);
+                sb.append((char) b);
                 while (true) {
-                    b = (char) in.read();
+                    b = in.read();
                     if (b == -1) {
                         break;
                     }
 
-                    sb.append(b);
+                    sb.append((char) b);
                     if (b == '#') {
                         //end of response
                         break;

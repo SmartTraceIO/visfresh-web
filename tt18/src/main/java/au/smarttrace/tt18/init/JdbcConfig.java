@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -24,7 +25,7 @@ import com.zaxxer.hikari.HikariDataSource;
  */
 @Configuration
 @ComponentScan(basePackageClasses = {})
-public class JdbcConfig {
+public class JdbcConfig implements TransactionManagementConfigurer {
     @Autowired
     private Environment env;
 
@@ -61,4 +62,13 @@ public class JdbcConfig {
     public DataSource getDataSource(final DataSourceTransactionManager ds) {
         return ds.getDataSource();
     }
+    /* (non-Javadoc)
+     * @see org.springframework.transaction.annotation.TransactionManagementConfigurer#annotationDrivenTransactionManager()
+     */
+    @Bean
+    @Override
+    public DataSourceTransactionManager annotationDrivenTransactionManager() {
+        return new DataSourceTransactionManager(createDataSource());
+    }
+
 }

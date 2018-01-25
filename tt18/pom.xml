@@ -115,6 +115,16 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.6</version>
+				<goals>
+					<goal>package</goal>
+				</goals>
+				<configuration>
+					<warName>tt18</warName>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
