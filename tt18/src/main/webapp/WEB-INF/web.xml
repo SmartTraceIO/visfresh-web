@@ -6,6 +6,6 @@
 	<display-name>Visfresh DSC</display-name>
  
 	<listener>
-		<listener-class>com.visfresh.web.ApplicationInitializer</listener-class>
+		<listener-class>au.smarttrace.tt18.ApplicationInitializer</listener-class>
 	</listener>
 </web-app>
