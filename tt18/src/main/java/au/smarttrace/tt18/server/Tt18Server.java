@@ -43,6 +43,7 @@ public class Tt18Server {
     /**
      * Default constructor.
      */
+    @Autowired
     public Tt18Server(final Environment env) {
         this(
             env.getProperty("tt18.port", Integer.class, 3232),
