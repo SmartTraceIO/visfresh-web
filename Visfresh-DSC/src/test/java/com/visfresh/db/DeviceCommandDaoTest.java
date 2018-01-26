@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.visfresh.Device;
 import com.visfresh.DeviceCommand;
 import com.visfresh.spring.mock.JUnitConfig;
+
+import junit.framework.TestCase;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -61,7 +61,7 @@ public class DeviceCommandDaoTest extends TestCase {
                 + DeviceDao.DESCRIPTION_FIELD
                 + "," + DeviceDao.NAME_FIELD
                 + "," + DeviceDao.IMEI_FIELD
-                + ") values(:description, :name, :imei)";
+                + ",model) values(:description, :name, :imei,'SmartTrace')";
         jdbc.update(sql, params);
         this.device = spring.getBean(DeviceDao.class).getByImei(imei);
     }

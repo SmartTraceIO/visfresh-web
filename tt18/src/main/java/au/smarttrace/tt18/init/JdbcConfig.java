@@ -44,6 +44,7 @@ public class JdbcConfig implements TransactionManagementConfigurer {
         config.setJdbcUrl(env.getProperty("dataSource.url"));
         config.setUsername(env.getProperty("dataSource.username"));
         config.setPassword(env.getProperty("dataSource.password"));
+        config.setMaximumPoolSize(env.getProperty("dataSource.numConnections", Integer.class, 4));
         return new HikariDataSource(config);
     }
     /**

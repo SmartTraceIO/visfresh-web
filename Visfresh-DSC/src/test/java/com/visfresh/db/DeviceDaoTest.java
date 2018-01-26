@@ -6,8 +6,6 @@ package com.visfresh.db;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -15,6 +13,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 
 import com.visfresh.Device;
 import com.visfresh.spring.mock.JUnitConfig;
+
+import junit.framework.TestCase;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -110,7 +110,7 @@ public class DeviceDaoTest extends TestCase {
                 + "," + DeviceDao.NAME_FIELD
                 + "," + DeviceDao.IMEI_FIELD
                 + "," + DeviceDao.ACTIVE_FIELD
-                + ") values(:description, :name, :imei, :active)";
+                + ",model) values(:description, :name, :imei, :active,'SmartTrace')";
 
         jdbc.update(sql, params);
     }
