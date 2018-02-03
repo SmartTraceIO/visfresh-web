@@ -74,6 +74,7 @@ public class RawMessage {
     private int packetIndex;
     private Double temperature;
     private byte[] rawData;
+    private Integer humidity;
 
     /**
      * @param companyIdentifier
@@ -410,5 +411,17 @@ public class RawMessage {
      */
     public byte[] getRawData() {
         return rawData;
+    }
+    /**
+     * @param h
+     */
+    public void setHumidity(final int h) {
+        this.humidity = h;
+    }
+    /**
+     * @return the humidity
+     */
+    public Integer getHumidity() {
+        return humidity;
     }
 }

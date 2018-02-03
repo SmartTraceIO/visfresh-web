@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -23,7 +24,6 @@ public class MessageParser {
     private static final int BIT3_MASK = Integer.parseInt("1000", 2);
     private static final int BIT4_MASK = Integer.parseInt("10000", 2);
     private static final int BIT5_MASK = Integer.parseInt("100000", 2);
-    private static final int BIT6_MASK = Integer.parseInt("1000000", 2);
 
     /**
      * Reads only data from one message from stream. Not more extra bytes.
@@ -84,24 +84,24 @@ public class MessageParser {
         final int lbsDataLength = readTwoBytesValue(bytes, 26);
         if (lbsDataLength > 0) {
             // LAC 2 Variable GSM’s location area code 0x25 0x33 means LAC is 2533
-            msg.setLac(Integer.parseInt(stringFromBcd(bytes, 28, 2, false), 16));
+            msg.setLac(readTwoBytesValue(bytes, 28));
 
             //CELL ID 2 Variable GSM’s serving CELL ID 0x78 0x37 means that CELL ID is 7837
-            msg.setCellId(Integer.parseInt(stringFromBcd(bytes, 30, 2, false), 16));
+            msg.setCellId(readTwoBytesValue(bytes, 30));
 
             //MCC 2 Variable Mobile Country Code, ignore the first digital, only 3 digital, 04 60 means that MCC is 460.
-            msg.setMcc(getMcc(stringFromBcd(bytes, 32, 2, false)));
+            msg.setMcc(getMcc(bytes[32], bytes[33]));
 
             //MNC 2 Variable Mobile Network Code, 2 or 3 digital. If the first digital is 8 , MNC is 3 digital.
             //If the first digital is 0, MNC is 2
             //digital. 87 56 means that MNC is 756. 00 56 means 56.
-            msg.setMnc(getMnc(stringFromBcd(bytes, 34, 2, false)));
+            msg.setMnc(getMnc(bytes[32], bytes[33]));
 
             //Extension bits A=0. For future extending the protocol use, currently, has nothing, does not possess any byte
         }
 
         int offset = 28 + lbsDataLength;
-        final int statusDataLength = readTwoBytesValue(bytes, 26);
+        final int statusDataLength = readTwoBytesValue(bytes, offset);
         offset += 2;
 
         if (statusDataLength > 0) {
@@ -168,13 +168,21 @@ public class MessageParser {
                 //negative/positive mark
                 //1-the temperature is negative
                 //0-the temperature is positive.
-                double t = (BIT6_MASK & b) != 0 ? -1. : 1.;
+                double t = (0x4000 & b) != 0 ? -1. : 1.;
                 //Remaining is the temperature value, convert to HEX
-                t = t * ((b << 2) >> 2) / 100.;
+                t = t * (b & 0x3FFF) / 100.;
                 //first , and multiply 0.01°C.
                 //for example:09 DA=25.22°C , 49 DA= - 25.22°C
                 //80 00= not connect temperature/humidity sensor
                 msg.setTemperature(Double.valueOf(t));
+            }
+
+            final int humidity = 0xFF & bytes[offset + 8];
+            if (humidity != 0xFF) {
+                //Unit:100%, Hex code,
+                //for example: 45=69%,
+                //FF = not connect temperature /humidity sensor
+                msg.setHumidity(Integer.valueOf(humidity));
             }
 
             //Extension bits B=0 For future use, currently, this part has nothing, does not have any byte
@@ -210,25 +218,32 @@ public class MessageParser {
         return null;
     }
     /**
-     * @param str
+     * @param b1
+     * @param b2
+     * @return
+     */
+    private int getMcc(final byte b1, final byte b2) {
+        //MCC 2 Variable Mobile Country Code, ignore the first digital, only 3 digital, 04 60 means that MCC is 460.
+        final int i1 = (0x0F & b1) << 8;
+        final int i2 = 0xFF & b2;
+        return i1 | i2;
+    }
+    /**
      * MNC 2 Variable Mobile Network Code, 2 or 3 digital. If the first digital is 8 , MNC is 3 digital.
      * If the first digital is 0, MNC is 2
      * digital. 87 56 means that MNC is 756. 00 56 means 56.
      * @return mobile network code.
+     * @param b1
+     * @param b2
+     * @return
      */
-    private int getMnc(final String str) {
-        if (str.charAt(0) == '0') {
-            return Integer.parseInt(str.substring(2));
-        } else {
-            return Integer.parseInt(str.substring(1));
+    private int getMnc(final byte b1, final byte b2) {
+        if ((0xF0 & b1) >> 4 == 8) {
+            final int i1 = (0x0F & b1) << 8;
+            final int i2 = 0xFF & b2;
+            return i1 | i2;
         }
-    }
-    /**
-     * @param num MCC number.
-     * @return normalized MMC number.
-     */
-    private int getMcc(final String num) {
-        return Integer.parseInt(num.length() > 3 ? num.substring(1) : num);
+        return 0xFF & b2;
     }
     /**
      * @param b1
@@ -250,7 +265,11 @@ public class MessageParser {
         c.set(Calendar.SECOND, 0xff & b6);
         c.set(Calendar.MILLISECOND, 0);
 
-        return c.getTime();
+        //convert to UTC
+        long t = c.getTimeInMillis();
+        t -= TimeZone.getDefault().getOffset(t);
+
+        return new Date(t);
     }
     /**
      * @param bytes bytes.
@@ -262,8 +281,10 @@ public class MessageParser {
     private String stringFromBcd(final byte[] bytes, final int offset, final int len, final boolean cutLeadingZero) {
         final char[] chars = new char[len * 2];
         for (int i = 0; i < len; i++) {
-            chars[2 * i] = (char) ('0' + (bytes[offset + i] >> 4));
-            chars[2 * i + 1] = (char) ('0' + (bytes[offset + i] & 0x0f));
+            final int  b = bytes[offset + i] & 0xff ;
+
+            chars[2 * i] = (char) ('0' + (b >> 4));
+            chars[2 * i + 1] = (char) ('0' + (b & 0x0f));
         }
         return chars[0] == '0' && cutLeadingZero ? new String(chars, 1, chars.length - 1) : new String(chars);
     }
@@ -277,12 +298,18 @@ public class MessageParser {
     private String createHardwareVersion(final byte b1, final byte b2, final byte b3, final byte b4) {
         final StringBuilder sb = new StringBuilder();
         sb.append((0xFF & b1));
-        sb.append('.');
-        sb.append((0xFF & b2));
-        sb.append('.');
-        sb.append((0xFF & b3));
-        sb.append('.');
-        sb.append((0xFF & b4));
+        if (b2 != 0 || b3 != 0 || b4 != 0) {
+            sb.append('.');
+            sb.append((0xFF & b2));
+        }
+        if (b3 != 0 || b4 != 0) {
+            sb.append('.');
+            sb.append((0xFF & b3));
+        }
+        if (b4 != 0) {
+            sb.append('.');
+            sb.append((0xFF & b4));
+        }
         return sb.toString();
     }
     /**
@@ -337,7 +364,9 @@ public class MessageParser {
      * @return
      */
     private int readTwoBytesValue(final byte[] bytes, final int offset) {
-        return 0xFF & ((bytes[offset] << 8) | bytes[offset + 1]);
+        final int i1 = (0xFF & bytes[offset]) << 8;
+        final int i2 = 0xFF & bytes[offset + 1];
+        return i1 | i2;
     }
     /**
      * @param b byte.

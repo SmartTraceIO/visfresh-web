@@ -63,6 +63,8 @@ public class Tt18Session implements Runnable {
 
         byte[] bytes;
         while ((bytes = parser.readMessageData(in)) != null) {
+            log.debug("Message has recieved: " + toHexString(bytes));
+
             final RawMessage msg = parser.parseMessage(bytes);
             handler.handleMessage(msg);
             numRead++;
@@ -74,6 +76,26 @@ public class Tt18Session implements Runnable {
 
         log.debug(numRead + " message have successfully readen by one connection session");
     }
+
+    /**
+     * @param rawData
+     * @return
+     */
+    private String toHexString(final byte[] rawData) {
+        final StringBuilder sb = new StringBuilder();
+        for (final byte b : rawData) {
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
+            final String s = Integer.toHexString(0xFF & b);
+            if (s.length() < 2) {
+                sb.append('0');
+            }
+            sb.append(s);
+        }
+        return sb.toString();
+    }
+
     /**
      * @return the handler
      */

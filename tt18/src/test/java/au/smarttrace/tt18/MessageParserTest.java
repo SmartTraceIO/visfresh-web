@@ -97,6 +97,14 @@ public class MessageParserTest {
      * @throws IOException
      */
     public static byte[] readTestMessage() throws IOException {
-        return decode(IOUtils.toString(MessageParserTest.class.getResource("msg.txt")).split(" +"));
+        final String msg = IOUtils.toString(MessageParserTest.class.getResource("msg.txt"));
+        return decodeMessage(msg);
+    }
+    /**
+     * @param msg
+     * @return
+     */
+    public static byte[] decodeMessage(final String msg) {
+        return decode(msg.split(" +"));
     }
 }

@@ -99,6 +99,11 @@ public class Tt18Server {
             try {
                 server = new ServerSocket(port);
                 while (true) {
+                    synchronized (lock) {
+                        if (isStopped) {
+                            break;
+                        }
+                    }
                     processConnection(server.accept());
                 }
             } catch (final Exception e) {

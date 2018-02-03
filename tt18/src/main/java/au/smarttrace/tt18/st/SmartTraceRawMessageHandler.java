@@ -31,38 +31,17 @@ public class SmartTraceRawMessageHandler implements RawMessageHandler {
      */
     @Override
     public void handleMessage(final RawMessage msg) {
-        final String messageStr = toHexString(msg.getRawData());
         if (msg.getTemperature() == null) {
             log.warn("Message for " + msg.getImei()
-                    + " have null temperature and will ignored " + messageStr);
+                    + " have null temperature and will ignored");
         } else {
-            log.debug("New message for " + msg.getImei() + " has received: " + messageStr);
+            log.debug("New message for " + msg.getImei() + " has received");
             final DeviceMessage m = convert(msg);
             if (dao.checkDevice(m.getImei())) {
                 dao.saveForNextProcessingInDcs(m);
             }
         }
     }
-
-    /**
-     * @param rawData
-     * @return
-     */
-    private String toHexString(final byte[] rawData) {
-        final StringBuilder sb = new StringBuilder();
-        for (final byte b : rawData) {
-            if (sb.length() > 0) {
-                sb.append(' ');
-            }
-            final String s = Integer.toHexString(0xFF & b);
-            if (s.length() < 2) {
-                sb.append('0');
-            }
-            sb.append(s);
-        }
-        return sb.toString();
-    }
-
     /**
      * @param raw raw message.
      * @return
