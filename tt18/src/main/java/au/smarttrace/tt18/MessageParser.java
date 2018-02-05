@@ -95,7 +95,7 @@ public class MessageParser {
             //MNC 2 Variable Mobile Network Code, 2 or 3 digital. If the first digital is 8 , MNC is 3 digital.
             //If the first digital is 0, MNC is 2
             //digital. 87 56 means that MNC is 756. 00 56 means 56.
-            msg.setMnc(getMnc(bytes[32], bytes[33]));
+            msg.setMnc(getMnc(bytes[34], bytes[35]));
 
             //Extension bits A=0. For future extending the protocol use, currently, has nothing, does not possess any byte
         }
@@ -224,9 +224,7 @@ public class MessageParser {
      */
     private int getMcc(final byte b1, final byte b2) {
         //MCC 2 Variable Mobile Country Code, ignore the first digital, only 3 digital, 04 60 means that MCC is 460.
-        final int i1 = (0x0F & b1) << 8;
-        final int i2 = 0xFF & b2;
-        return i1 | i2;
+        return Integer.parseInt(stringFromBcd(new byte[] {(byte) (0x0F & b1), b2}, 0, 2, true));
     }
     /**
      * MNC 2 Variable Mobile Network Code, 2 or 3 digital. If the first digital is 8 , MNC is 3 digital.
@@ -239,11 +237,9 @@ public class MessageParser {
      */
     private int getMnc(final byte b1, final byte b2) {
         if ((0xF0 & b1) >> 4 == 8) {
-            final int i1 = (0x0F & b1) << 8;
-            final int i2 = 0xFF & b2;
-            return i1 | i2;
+            return Integer.parseInt(stringFromBcd(new byte[] {(byte) (0x0F & b1), b2}, 0, 2, true));
         }
-        return 0xFF & b2;
+        return Integer.parseInt(stringFromBcd(new byte[] {b2}, 0, 1, true));
     }
     /**
      * @param b1

@@ -110,12 +110,6 @@ public class Tt18Server {
                 if (!isStopped) {
                     log.error("Server socket crushed", e);
                 }
-            } finally {
-                try {
-                    server.close();
-                } catch (final IOException e) {
-                    log.error("Failed to close server socket", e);
-                }
             }
         }
     }
@@ -173,6 +167,11 @@ public class Tt18Server {
             synchronized (lock) {
                 isStopped = true;
                 lock.notifyAll();
+            }
+            try {
+                server.close();
+            } catch (final IOException e) {
+                e.printStackTrace();
             }
         }
     }
