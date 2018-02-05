@@ -119,9 +119,16 @@ public class UnwiredLabsLocationService implements LocationService {
     /**
      * @param response
      * @return
+     * @throws Exception
      */
-    protected Location parseLocation(final String response) {
+    protected Location parseLocation(final String response) throws Exception {
         final JsonObject json = getJson(response);
+
+        //check error
+        //{"status":"error","message":"No valid cell IDs or LACs provided","balance":50,"balance_slots":865}
+        if (json.has("status") && "error".equals(json.get("status").getAsString())) {
+            throw new Exception("UnwiredLabs error: " + json.get("message").getAsString());
+        }
 
         final Location loc = new Location();
         loc.setLatitude(json.get("lat").getAsDouble());
