@@ -29,7 +29,6 @@ import com.visfresh.entities.TemperatureAlert;
 import com.visfresh.entities.TemperatureRule;
 import com.visfresh.entities.TrackerEvent;
 import com.visfresh.entities.User;
-import com.visfresh.io.json.fastxml.JsonSerializerFactory;
 import com.visfresh.io.shipment.AlertBean;
 import com.visfresh.io.shipment.AlertProfileBean;
 import com.visfresh.io.shipment.AlertRuleBean;
@@ -45,6 +44,7 @@ import com.visfresh.io.shipment.TemperatureRuleBean;
 import com.visfresh.l12n.RuleBundle;
 import com.visfresh.lists.ListNotificationScheduleItem;
 import com.visfresh.reports.TemperatureStats;
+import com.visfresh.tools.SingleShipmentUtils;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.exception.DRException;
@@ -426,7 +426,7 @@ public final class ShipmentReportBuilderTool extends ShipmentReportBuilder {
     private static SingleShipmentData loadSingleShipmentData(final File f) throws IOException {
         final InputStream in = new FileInputStream(f);
         try {
-            return JsonSerializerFactory.FACTORY.createSingleShipmentDataParser().readValue(in, SingleShipmentData.class);
+            return SingleShipmentUtils.parseSingleShipmentDataJson(in);
         } finally {
             in.close();
         }
