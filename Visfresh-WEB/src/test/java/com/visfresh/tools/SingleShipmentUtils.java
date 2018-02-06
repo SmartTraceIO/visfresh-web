@@ -179,6 +179,10 @@ public class SingleShipmentUtils {
      * @return
      */
     private static LocationProfile createLocationProfile(final LocationProfileBean bean, final Company company) {
+        if (bean == null) {
+            return null;
+        }
+
         final LocationProfile p = new LocationProfile();
         p.setAddress(bean.getAddress());
         p.setCompany(company);
@@ -277,8 +281,11 @@ public class SingleShipmentUtils {
      * @param bean
      * @return
      */
-    private static CorrectiveActionList createCorrectiveActionList(
-            final CorrectiveActionListBean bean, final Company company) {
+    private static CorrectiveActionList createCorrectiveActionList(final CorrectiveActionListBean bean, final Company company) {
+        if (bean == null) {
+            return null;
+        }
+
         final CorrectiveActionList al = new CorrectiveActionList();
         al.setCompany(company);
         al.setDescription(bean.getDescription());
@@ -288,19 +295,22 @@ public class SingleShipmentUtils {
         al.getActions().addAll(bean.getActions());
         return al;
     }
-    public List<TrackerEvent> getTrackerEvents(final List<SingleShipmentLocationBean> locs, final Shipment s) {
+    public static List<TrackerEvent> getTrackerEvents(final List<SingleShipmentLocationBean> locs, final Shipment s) {
         final List<TrackerEvent> events = new LinkedList<>();
         for (final SingleShipmentLocationBean bean : locs) {
             events.add(createTrackerEvent(bean, s));
         }
         return events;
     }
+    public static List<TrackerEvent> getTrackerEvents(final SingleShipmentData data) {
+        return getTrackerEvents(data.getLocations(), createShipment(data.getBean()));
+    }
     /**
      * @param bean tracker event bean.
      * @param s shipment.
      * @return tracker event.
      */
-    private TrackerEvent createTrackerEvent(final SingleShipmentLocationBean bean, final Shipment s) {
+    private static TrackerEvent createTrackerEvent(final SingleShipmentLocationBean bean, final Shipment s) {
         final TrackerEvent e = new TrackerEvent();
         //e.setBattery(bean.get);
         e.setCreatedOn(bean.getTime());

@@ -1,0 +1,1636 @@
+{
+  "bean": {
+    "shipmentId": 8704,
+    "companyId": 2,
+    "device": "354430070005203",
+    "deviceName": "Tracker E 520",
+    "tripCount": 8,
+    "shipmentDescription": "testing various trips 10:26 5Feb2018 +10",
+    "palletId": null,
+    "assetNum": null,
+    "assetType": null,
+    "status": "Default",
+    "alertSuppressionMinutes": 0,
+    "alertsNotificationSchedules": [
+      {
+        "notificationScheduleId": 19,
+        "notificationScheduleName": "James by email",
+        "notificationScheduleDescription": null,
+        "peopleToNotify": "JamesDev Richtest"
+      }
+    ],
+    "commentsForReceiver": null,
+    "arrivalNotificationWithinKm": null,
+    "excludeNotificationsIfNoAlerts": false,
+    "arrivalNotificationSchedules": [
+      {
+        "notificationScheduleId": 19,
+        "notificationScheduleName": "James by email",
+        "notificationScheduleDescription": null,
+        "peopleToNotify": "JamesDev Richtest"
+      }
+    ],
+    "sendArrivalReport": true,
+    "sendArrivalReportOnlyIfAlerts": false,
+    "shutdownDeviceAfterMinutes": 120,
+    "noAlertsAfterArrivalMinutes": null,
+    "shutDownAfterStartMinutes": null,
+    "startLocation": {
+      "id": 64,
+      "name": "Leichardt 2",
+      "companyName": null,
+      "notes": null,
+      "address": "35 Balmain Rd, Leichhardt NSW 2040, Australia",
+      "radius": 1000,
+      "start": true,
+      "interim": true,
+      "stop": true,
+      "location": {
+        "latitude": -33.88652121343675,
+        "longitude": 151.1596032165528
+      }
+    },
+    "startTime": "2018-02-04T23:24:35+0000",
+    "endLocation": null,
+    "eta": null,
+    "currentLocation": {
+      "latitude": -33.797019,
+      "longitude": 151.17117
+    },
+    "currentLocationDescription": "Bankstown Warehouse",
+    "percentageComplete": 0,
+    "minTemp": -11.5,
+    "maxTemp": 26.0,
+    "siblings": [],
+    "alertYetToFire": [],
+    "alertFired": [
+      {
+        "type": "Cold",
+        "id": 58,
+        "temperature": 5.0,
+        "timeOutMinutes": 10,
+        "cumulativeFlag": false,
+        "maxRateMinutes": null,
+        "correctiveActions": {
+          "id": null,
+          "name": null,
+          "description": null,
+          "actions": []
+        }
+      },
+      {
+        "type": "CriticalCold",
+        "id": 59,
+        "temperature": -10.600000381469727,
+        "timeOutMinutes": 10,
+        "cumulativeFlag": false,
+        "maxRateMinutes": null,
+        "correctiveActions": {
+          "id": null,
+          "name": null,
+          "description": null,
+          "actions": []
+        }
+      },
+      {
+        "type": "Hot",
+        "id": 60,
+        "temperature": 3.0,
+        "timeOutMinutes": 10,
+        "cumulativeFlag": false,
+        "maxRateMinutes": null,
+        "correctiveActions": {
+          "id": null,
+          "name": null,
+          "description": null,
+          "actions": []
+        }
+      },
+      {
+        "type": "CriticalHot",
+        "id": 136,
+        "temperature": 2.0,
+        "timeOutMinutes": 10,
+        "cumulativeFlag": true,
+        "maxRateMinutes": null,
+        "correctiveActions": {
+          "id": null,
+          "name": null,
+          "description": null,
+          "actions": []
+        }
+      }
+    ],
+    "arrival": null,
+    "shutdownTime": null,
+    "arrivalTime": null,
+    "alertsSuppressed": false,
+    "alertsSuppressionTime": null,
+    "firstReadingTime": "2018-02-04T23:24:35+0000",
+    "lastReadingTime": "2018-02-05T21:34:39+0000",
+    "lastReadingTemperature": 23.1200008392334,
+    "batteryLevel": 3806,
+    "noAlertsAfterStartMinutes": null,
+    "shipmentType": "Autostart",
+    "startLocationAlternatives": [],
+    "endLocationAlternatives": [],
+    "interimLocationAlternatives": [],
+    "interimStops": [],
+    "notes": [],
+    "deviceGroups": [
+      {
+        "id": 8,
+        "name": "group1",
+        "description": "Group #1"
+      },
+      {
+        "id": 9,
+        "name": "group1",
+        "description": "Group #1"
+      }
+    ],
+    "deviceColor": "SlateBlue",
+    "isLatestShipment": true,
+    "arrivalReportSent": false,
+    "userAccess": [],
+    "companyAccess": [],
+    "sentAlerts": [
+      {
+        "id": 27349,
+        "date": "2018-02-04T23:34:39+0000",
+        "trackerEventId": 2641979,
+        "type": "Hot",
+        "temperature": 3.0,
+        "minutes": 10,
+        "cumulative": false,
+        "ruleId": 60
+      },
+      {
+        "id": 27350,
+        "date": "2018-02-04T23:34:39+0000",
+        "trackerEventId": 2641979,
+        "type": "CriticalHot",
+        "temperature": 2.0,
+        "minutes": 10,
+        "cumulative": true,
+        "ruleId": 136
+      },
+      {
+        "id": 27367,
+        "date": "2018-02-05T00:04:47+0000",
+        "trackerEventId": 2642423,
+        "type": "Cold",
+        "temperature": 5.0,
+        "minutes": 19,
+        "cumulative": false,
+        "ruleId": 58
+      },
+      {
+        "id": 27375,
+        "date": "2018-02-05T02:04:54+0000",
+        "trackerEventId": 2643406,
+        "type": "CriticalCold",
+        "temperature": -10.600000381469727,
+        "minutes": 20,
+        "cumulative": false,
+        "ruleId": 59
+      },
+      {
+        "id": 27379,
+        "date": "2018-02-05T06:42:52+0000",
+        "trackerEventId": 2646057,
+        "type": "LightOn"
+      },
+      {
+        "id": 27380,
+        "date": "2018-02-05T07:29:22+0000",
+        "trackerEventId": 2646460,
+        "type": "LightOff"
+      }
+    ],
+    "alertProfile": {
+      "id": 23,
+      "name": "Range of Alerts",
+      "description": "afafda",
+      "watchEnterBrightEnvironment": true,
+      "watchEnterDarkEnvironment": true,
+      "watchBatteryLow": true,
+      "watchMovementStart": false,
+      "watchMovementStop": true,
+      "lowerTemperatureLimit": 0.0,
+      "upperTemperatureLimit": 5.0,
+      "lightOnCorrectiveActions": null,
+      "batteryLowCorrectiveActions": null
+    }
+  },
+  "siblings": [],
+  "locations": [
+    {
+      "id": 2641829,
+      "latitude": -33.885874,
+      "longitude": 151.155078,
+      "temperature": 14.869999885559082,
+      "time": "2018-02-04T23:24:35+0000",
+      "alerts": [],
+      "type": "INIT"
+    },
+    {
+      "id": 2641974,
+      "latitude": -33.886355,
+      "longitude": 151.156052,
+      "temperature": 16.8700008392334,
+      "time": "2018-02-04T23:26:28+0000",
+      "alerts": [],
+      "type": "VIB"
+    },
+    {
+      "id": 2641976,
+      "latitude": -33.886574,
+      "longitude": 151.157071,
+      "temperature": 15.869999885559082,
+      "time": "2018-02-04T23:27:50+0000",
+      "alerts": [],
+      "type": "STP"
+    },
+    {
+      "id": 2641979,
+      "latitude": -33.886452,
+      "longitude": 151.156669,
+      "temperature": 8.5,
+      "time": "2018-02-04T23:34:39+0000",
+      "alerts": [
+        {
+          "id": 27349,
+          "date": "2018-02-04T23:34:39+0000",
+          "trackerEventId": 2641979,
+          "type": "Hot",
+          "temperature": 3.0,
+          "minutes": 10,
+          "cumulative": false,
+          "ruleId": 60
+        },
+        {
+          "id": 27350,
+          "date": "2018-02-04T23:34:39+0000",
+          "trackerEventId": 2641979,
+          "type": "CriticalHot",
+          "temperature": 2.0,
+          "minutes": 10,
+          "cumulative": true,
+          "ruleId": 136
+        }
+      ],
+      "type": "AUT"
+    },
+    {
+      "id": 2642081,
+      "latitude": -33.886604,
+      "longitude": 151.157508,
+      "temperature": 2.0,
+      "time": "2018-02-04T23:44:46+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2642082,
+      "latitude": -33.886355,
+      "longitude": 151.156052,
+      "temperature": 1.6200000047683716,
+      "time": "2018-02-04T23:45:45+0000",
+      "alerts": [],
+      "type": "VIB"
+    },
+    {
+      "id": 2642083,
+      "latitude": -33.887573,
+      "longitude": 151.158755,
+      "temperature": 4.75,
+      "time": "2018-02-04T23:47:38+0000",
+      "alerts": [],
+      "type": "STP"
+    },
+    {
+      "id": 2642264,
+      "latitude": -33.886771,
+      "longitude": 151.157447,
+      "temperature": 1.8700000047683716,
+      "time": "2018-02-04T23:54:47+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2642423,
+      "latitude": -33.888226,
+      "longitude": 151.159961,
+      "temperature": -2.0,
+      "time": "2018-02-05T00:04:47+0000",
+      "alerts": [
+        {
+          "id": 27367,
+          "date": "2018-02-05T00:04:47+0000",
+          "trackerEventId": 2642423,
+          "type": "Cold",
+          "temperature": 5.0,
+          "minutes": 19,
+          "cumulative": false,
+          "ruleId": 58
+        }
+      ],
+      "type": "AUT"
+    },
+    {
+      "id": 2642442,
+      "latitude": -33.888023,
+      "longitude": 151.159506,
+      "temperature": -5.369999885559082,
+      "time": "2018-02-05T00:14:38+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2642573,
+      "latitude": -33.887944,
+      "longitude": 151.159263,
+      "temperature": -5.869999885559082,
+      "time": "2018-02-05T00:24:47+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2642717,
+      "latitude": -33.887966,
+      "longitude": 151.159408,
+      "temperature": -7.369999885559082,
+      "time": "2018-02-05T00:34:44+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2642718,
+      "latitude": -33.888119,
+      "longitude": 151.15972,
+      "temperature": -8.869999885559082,
+      "time": "2018-02-05T00:44:43+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2642822,
+      "latitude": -33.886771,
+      "longitude": 151.157249,
+      "temperature": -8.75,
+      "time": "2018-02-05T00:54:45+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2642928,
+      "latitude": -33.888844,
+      "longitude": 151.161711,
+      "temperature": -9.619999885559082,
+      "time": "2018-02-05T01:04:41+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2643023,
+      "latitude": -33.887781,
+      "longitude": 151.159838,
+      "temperature": -10.25,
+      "time": "2018-02-05T01:14:39+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2643025,
+      "latitude": -33.887169,
+      "longitude": 151.161145,
+      "temperature": -9.869999885559082,
+      "time": "2018-02-05T01:24:35+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2643135,
+      "latitude": -33.886625,
+      "longitude": 151.156944,
+      "temperature": -10.5,
+      "time": "2018-02-05T01:34:43+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2643297,
+      "latitude": -33.886547,
+      "longitude": 151.157677,
+      "temperature": -11.0,
+      "time": "2018-02-05T01:44:52+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2643404,
+      "latitude": -33.886523,
+      "longitude": 151.157865,
+      "temperature": -10.5,
+      "time": "2018-02-05T01:54:39+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2643406,
+      "latitude": -33.88653,
+      "longitude": 151.157526,
+      "temperature": -11.5,
+      "time": "2018-02-05T02:04:54+0000",
+      "alerts": [
+        {
+          "id": 27375,
+          "date": "2018-02-05T02:04:54+0000",
+          "trackerEventId": 2643406,
+          "type": "CriticalCold",
+          "temperature": -10.600000381469727,
+          "minutes": 20,
+          "cumulative": false,
+          "ruleId": 59
+        }
+      ],
+      "type": "AUT"
+    },
+    {
+      "id": 2643546,
+      "latitude": -33.886684,
+      "longitude": 151.157093,
+      "temperature": -11.119999885559082,
+      "time": "2018-02-05T02:14:46+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2643656,
+      "latitude": -33.886713,
+      "longitude": 151.157232,
+      "temperature": -10.619999885559082,
+      "time": "2018-02-05T02:24:49+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2643764,
+      "latitude": -33.886691,
+      "longitude": 151.157151,
+      "temperature": -11.5,
+      "time": "2018-02-05T02:34:44+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2643767,
+      "latitude": -33.886679,
+      "longitude": 151.15694,
+      "temperature": -11.0,
+      "time": "2018-02-05T02:44:46+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2643873,
+      "latitude": -33.886883,
+      "longitude": 151.157757,
+      "temperature": -10.619999885559082,
+      "time": "2018-02-05T02:54:40+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2644035,
+      "latitude": -33.886668,
+      "longitude": 151.156949,
+      "temperature": -11.369999885559082,
+      "time": "2018-02-05T03:04:53+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2644154,
+      "latitude": -33.886597,
+      "longitude": 151.156911,
+      "temperature": -10.869999885559082,
+      "time": "2018-02-05T03:14:46+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2644155,
+      "latitude": -33.885226,
+      "longitude": 151.152045,
+      "temperature": -10.75,
+      "time": "2018-02-05T03:24:44+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2644464,
+      "latitude": -33.886623,
+      "longitude": 151.156883,
+      "temperature": -11.369999885559082,
+      "time": "2018-02-05T03:34:40+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2644562,
+      "latitude": -33.886668,
+      "longitude": 151.156949,
+      "temperature": -10.869999885559082,
+      "time": "2018-02-05T03:44:47+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2644676,
+      "latitude": -33.886491,
+      "longitude": 151.15772,
+      "temperature": -10.75,
+      "time": "2018-02-05T03:54:51+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2644677,
+      "latitude": -33.886674,
+      "longitude": 151.157006,
+      "temperature": -11.369999885559082,
+      "time": "2018-02-05T04:04:39+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2644793,
+      "latitude": -33.88665,
+      "longitude": 151.157009,
+      "temperature": -10.869999885559082,
+      "time": "2018-02-05T04:14:42+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2644794,
+      "latitude": -33.886501,
+      "longitude": 151.157107,
+      "temperature": -10.5,
+      "time": "2018-02-05T04:17:59+0000",
+      "alerts": [],
+      "type": "VIB"
+    },
+    {
+      "id": 2644913,
+      "latitude": -33.887301,
+      "longitude": 151.16033,
+      "temperature": -0.25,
+      "time": "2018-02-05T04:22:42+0000",
+      "alerts": [],
+      "type": "STP"
+    },
+    {
+      "id": 2644915,
+      "latitude": -33.88669,
+      "longitude": 151.15839,
+      "temperature": 1.75,
+      "time": "2018-02-05T04:24:36+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645025,
+      "latitude": -33.887691,
+      "longitude": 151.159088,
+      "temperature": 8.619999885559082,
+      "time": "2018-02-05T04:34:39+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645026,
+      "latitude": -33.887119,
+      "longitude": 151.160769,
+      "temperature": 12.25,
+      "time": "2018-02-05T04:42:36+0000",
+      "alerts": [],
+      "type": "VIB"
+    },
+    {
+      "id": 2645027,
+      "latitude": -33.887919,
+      "longitude": 151.161326,
+      "temperature": 13.0,
+      "time": "2018-02-05T04:44:35+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645109,
+      "latitude": -33.87227,
+      "longitude": 151.183673,
+      "temperature": 15.5,
+      "time": "2018-02-05T04:51:20+0000",
+      "alerts": [],
+      "type": "STP"
+    },
+    {
+      "id": 2645111,
+      "latitude": -33.874494,
+      "longitude": 151.179637,
+      "temperature": 15.869999885559082,
+      "time": "2018-02-05T04:52:23+0000",
+      "alerts": [],
+      "type": "VIB"
+    },
+    {
+      "id": 2645112,
+      "latitude": -33.86993,
+      "longitude": 151.190836,
+      "temperature": 16.5,
+      "time": "2018-02-05T04:54:38+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645255,
+      "latitude": -33.81821,
+      "longitude": 151.184454,
+      "temperature": 19.0,
+      "time": "2018-02-05T05:04:45+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645256,
+      "latitude": -33.796364,
+      "longitude": 151.173656,
+      "temperature": 20.6200008392334,
+      "time": "2018-02-05T05:12:46+0000",
+      "alerts": [],
+      "type": "STP"
+    },
+    {
+      "id": 2645345,
+      "latitude": -33.79817,
+      "longitude": 151.170947,
+      "temperature": 21.1200008392334,
+      "time": "2018-02-05T05:14:37+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645347,
+      "latitude": -33.796815,
+      "longitude": 151.172603,
+      "temperature": 21.75,
+      "time": "2018-02-05T05:18:07+0000",
+      "alerts": [],
+      "type": "VIB"
+    },
+    {
+      "id": 2645348,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 22.6200008392334,
+      "time": "2018-02-05T05:20:54+0000",
+      "alerts": [],
+      "type": "STP"
+    },
+    {
+      "id": 2645349,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 23.25,
+      "time": "2018-02-05T05:24:45+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645464,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 24.25,
+      "time": "2018-02-05T05:34:52+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645561,
+      "latitude": -33.798569,
+      "longitude": 151.16725,
+      "temperature": 24.75,
+      "time": "2018-02-05T05:44:39+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645681,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 25.25,
+      "time": "2018-02-05T05:54:48+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645682,
+      "latitude": -33.798569,
+      "longitude": 151.16725,
+      "temperature": 25.3700008392334,
+      "time": "2018-02-05T06:04:42+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645800,
+      "latitude": -33.798895,
+      "longitude": 151.16972,
+      "temperature": 25.6200008392334,
+      "time": "2018-02-05T06:14:53+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645942,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 25.75,
+      "time": "2018-02-05T06:24:48+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2645943,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 25.75,
+      "time": "2018-02-05T06:34:44+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646056,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 25.8700008392334,
+      "time": "2018-02-05T06:42:49+0000",
+      "alerts": [],
+      "type": "VIB"
+    },
+    {
+      "id": 2646057,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 25.8700008392334,
+      "time": "2018-02-05T06:42:52+0000",
+      "alerts": [
+        {
+          "id": 27379,
+          "date": "2018-02-05T06:42:52+0000",
+          "trackerEventId": 2646057,
+          "type": "LightOn"
+        }
+      ],
+      "type": "BRT"
+    },
+    {
+      "id": 2646094,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 26.0,
+      "time": "2018-02-05T06:44:26+0000",
+      "alerts": [],
+      "type": "STP"
+    },
+    {
+      "id": 2646095,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 26.0,
+      "time": "2018-02-05T06:44:44+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646187,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 26.0,
+      "time": "2018-02-05T06:54:49+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646326,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 25.8700008392334,
+      "time": "2018-02-05T07:04:55+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646328,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 25.75,
+      "time": "2018-02-05T07:14:45+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646458,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 25.75,
+      "time": "2018-02-05T07:24:45+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646460,
+      "latitude": -33.79708,
+      "longitude": 151.167721,
+      "temperature": 25.75,
+      "time": "2018-02-05T07:29:22+0000",
+      "alerts": [
+        {
+          "id": 27380,
+          "date": "2018-02-05T07:29:22+0000",
+          "trackerEventId": 2646460,
+          "type": "LightOff"
+        }
+      ],
+      "type": "DRK"
+    },
+    {
+      "id": 2646533,
+      "latitude": -33.798996,
+      "longitude": 151.169928,
+      "temperature": 25.6200008392334,
+      "time": "2018-02-05T07:34:42+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646645,
+      "latitude": -33.798226,
+      "longitude": 151.171573,
+      "temperature": 25.5,
+      "time": "2018-02-05T07:44:49+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646647,
+      "latitude": -33.798357,
+      "longitude": 151.171156,
+      "temperature": 25.3700008392334,
+      "time": "2018-02-05T07:54:38+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646772,
+      "latitude": -33.79275,
+      "longitude": 151.177573,
+      "temperature": 25.25,
+      "time": "2018-02-05T08:04:51+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646856,
+      "latitude": -33.798565,
+      "longitude": 151.168196,
+      "temperature": 25.25,
+      "time": "2018-02-05T08:14:46+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646951,
+      "latitude": -33.79876,
+      "longitude": 151.170181,
+      "temperature": 25.1200008392334,
+      "time": "2018-02-05T08:24:48+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2646953,
+      "latitude": -33.796254,
+      "longitude": 151.172318,
+      "temperature": 25.0,
+      "time": "2018-02-05T08:34:36+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2647107,
+      "latitude": -33.798841,
+      "longitude": 151.170089,
+      "temperature": 25.0,
+      "time": "2018-02-05T08:44:43+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2647200,
+      "latitude": -33.798746,
+      "longitude": 151.170276,
+      "temperature": 24.8700008392334,
+      "time": "2018-02-05T08:54:47+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2647288,
+      "latitude": -33.798334,
+      "longitude": 151.1715,
+      "temperature": 24.8700008392334,
+      "time": "2018-02-05T09:04:39+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2647294,
+      "latitude": -33.798919,
+      "longitude": 151.170016,
+      "temperature": 24.75,
+      "time": "2018-02-05T09:14:36+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2647454,
+      "latitude": -33.798832,
+      "longitude": 151.170146,
+      "temperature": 24.75,
+      "time": "2018-02-05T09:24:37+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2647648,
+      "latitude": -33.796495,
+      "longitude": 151.171956,
+      "temperature": 24.75,
+      "time": "2018-02-05T09:34:41+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2647759,
+      "latitude": -33.79275,
+      "longitude": 151.177573,
+      "temperature": 24.75,
+      "time": "2018-02-05T09:44:37+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2647760,
+      "latitude": -33.798846,
+      "longitude": 151.170051,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T09:54:44+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2647892,
+      "latitude": -33.798653,
+      "longitude": 151.170439,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T10:04:55+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2647979,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.5,
+      "time": "2018-02-05T10:14:36+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648082,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T10:24:42+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648083,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T10:34:55+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648201,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T10:44:38+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648266,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T10:54:40+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648367,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T11:04:45+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648369,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T11:14:36+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648481,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T11:24:35+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648583,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T11:34:40+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648682,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.6200008392334,
+      "time": "2018-02-05T11:44:49+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648683,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.5,
+      "time": "2018-02-05T11:54:38+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648830,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.5,
+      "time": "2018-02-05T12:04:51+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2648905,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.5,
+      "time": "2018-02-05T12:14:36+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649025,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.5,
+      "time": "2018-02-05T12:24:46+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649026,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.5,
+      "time": "2018-02-05T12:34:48+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649145,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.5,
+      "time": "2018-02-05T12:44:47+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649244,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.3700008392334,
+      "time": "2018-02-05T12:54:50+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649318,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.5,
+      "time": "2018-02-05T13:04:38+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649321,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.3700008392334,
+      "time": "2018-02-05T13:14:51+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649443,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.3700008392334,
+      "time": "2018-02-05T13:24:39+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649555,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.3700008392334,
+      "time": "2018-02-05T13:34:52+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649675,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.25,
+      "time": "2018-02-05T13:44:36+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649676,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.25,
+      "time": "2018-02-05T13:54:44+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649795,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.25,
+      "time": "2018-02-05T14:04:52+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649880,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.25,
+      "time": "2018-02-05T14:14:37+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2649882,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.1200008392334,
+      "time": "2018-02-05T14:24:43+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650000,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.1200008392334,
+      "time": "2018-02-05T14:34:51+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650102,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.1200008392334,
+      "time": "2018-02-05T14:44:37+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650196,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.1200008392334,
+      "time": "2018-02-05T14:54:42+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650199,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.0,
+      "time": "2018-02-05T15:04:46+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650333,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.0,
+      "time": "2018-02-05T15:14:38+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650432,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.0,
+      "time": "2018-02-05T15:24:39+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650555,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 24.0,
+      "time": "2018-02-05T15:34:41+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650556,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.8700008392334,
+      "time": "2018-02-05T15:44:48+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650677,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.8700008392334,
+      "time": "2018-02-05T15:54:52+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650789,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.8700008392334,
+      "time": "2018-02-05T16:04:41+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650889,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.8700008392334,
+      "time": "2018-02-05T16:14:51+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2650890,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.8700008392334,
+      "time": "2018-02-05T16:24:42+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651019,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.75,
+      "time": "2018-02-05T16:34:53+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651150,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.75,
+      "time": "2018-02-05T16:44:44+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651284,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.75,
+      "time": "2018-02-05T16:54:46+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651287,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.75,
+      "time": "2018-02-05T17:04:52+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651397,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.6200008392334,
+      "time": "2018-02-05T17:14:54+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651467,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.6200008392334,
+      "time": "2018-02-05T17:24:53+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651585,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.6200008392334,
+      "time": "2018-02-05T17:34:36+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651586,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.6200008392334,
+      "time": "2018-02-05T17:44:47+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651697,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.5,
+      "time": "2018-02-05T17:54:51+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651817,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.5,
+      "time": "2018-02-05T18:04:38+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651945,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.5,
+      "time": "2018-02-05T18:14:42+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2651946,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.5,
+      "time": "2018-02-05T18:24:52+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2652173,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.5,
+      "time": "2018-02-05T18:34:40+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2652272,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.5,
+      "time": "2018-02-05T18:44:43+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2652400,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.5,
+      "time": "2018-02-05T18:54:50+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2652401,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.3700008392334,
+      "time": "2018-02-05T19:04:41+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2652576,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.3700008392334,
+      "time": "2018-02-05T19:14:48+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2652706,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.3700008392334,
+      "time": "2018-02-05T19:24:36+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2652840,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.25,
+      "time": "2018-02-05T19:34:42+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2652841,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.25,
+      "time": "2018-02-05T19:44:51+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2652963,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.25,
+      "time": "2018-02-05T19:54:36+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2653069,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.25,
+      "time": "2018-02-05T20:04:41+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2653071,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.25,
+      "time": "2018-02-05T20:14:54+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2653190,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.1200008392334,
+      "time": "2018-02-05T20:24:49+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2653330,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.1200008392334,
+      "time": "2018-02-05T20:34:53+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2653462,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.1200008392334,
+      "time": "2018-02-05T20:44:39+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2653463,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.1200008392334,
+      "time": "2018-02-05T20:54:53+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2653616,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.1200008392334,
+      "time": "2018-02-05T21:04:35+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2653747,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.1200008392334,
+      "time": "2018-02-05T21:14:44+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2653867,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.1200008392334,
+      "time": "2018-02-05T21:24:51+0000",
+      "alerts": [],
+      "type": "AUT"
+    },
+    {
+      "id": 2653869,
+      "latitude": -33.797019,
+      "longitude": 151.17117,
+      "temperature": 23.1200008392334,
+      "time": "2018-02-05T21:34:39+0000",
+      "alerts": [],
+      "type": "AUT"
+    }
+  ]
+}
