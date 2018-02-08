@@ -4,6 +4,7 @@
 package au.st.messaging;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,7 +17,7 @@ import au.st.messaging.ExecutionContext.LoadLevel;
  */
 public abstract class AbstractDispatcher {
     private ThreadPoolExecutor executor;
-    private int corePoolSize = 0;
+    private int corePoolSize = 10;
     private int maxPoolSize = 10;
     private long keepAliveTime = 15000l;
     private long mainThreadTimeOut = 1000l;
@@ -34,12 +35,42 @@ public abstract class AbstractDispatcher {
      * Starts dispatcher.
      */
     public void start() {
+        checkInitialized();
+
         context = createContext();
-        executor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+
+        final ThreadGroup group = Thread.currentThread().getThreadGroup();
+        final AtomicInteger num = new AtomicInteger();
+        executor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
+                @Override
+                public Thread newThread(final Runnable r) {
+                    final Thread t = new Thread(group, r, "Dispatcher worker-" + num.incrementAndGet());
+                    t.setDaemon(false);
+                    return t;
+                }
+            });
 
         //start main thread
         final Thread t = new Thread(() -> runDispatcherThread(), "Dispatcher Thread");
         t.start();
+    }
+    /**
+     * Check correct initialized.
+     */
+    protected void checkInitialized() {
+        if (getCorePoolSize() < 1) {
+            throw new RuntimeException("Invalid core pool size " + getCorePoolSize());
+        }
+        if (getMaxPoolSize() < getCorePoolSize()) {
+            throw new RuntimeException("Invalid max pool size " + getMaxPoolSize());
+        }
+        if (getKeepAliveTime() < 0l) {
+            throw new RuntimeException("Invalid keep alive time out " + getKeepAliveTime());
+        }
+        if (getMainThreadTimeOut() < 1l) {
+            throw new RuntimeException("Invalid main thread time out " + getMainThreadTimeOut());
+        }
     }
 
     /**
@@ -54,34 +85,44 @@ public abstract class AbstractDispatcher {
      * @throws InterruptedException
      */
     public void stop() throws InterruptedException {
+        if (context == null || executor.isShutdown()) {
+            //not started
+            return;
+        }
         context.setStopped(true);
         executor.shutdown();
-
-        //wait for finishing all workers
-        while (numThreads.get() > 0) {
-            Thread.sleep(500l);
-        }
+        executor.awaitTermination(5, TimeUnit.MINUTES);
     }
 
     private void runDispatcherThread() {
         while (!context.isStopped()) {
-            doDispatch();
+            doOneIteration();
         }
     }
     /**
      *
      */
-    protected void doDispatch() {
-        if (hasMessagesInternal()) {
-            if (numThreads.incrementAndGet() <= maxPoolSize) {
+    protected void doOneIteration() {
+        if (hasDataToProcessInternal()) {
+            if (numThreads.incrementAndGet() < maxPoolSize) {
                 //launch executor
-                executor.execute(()-> {
-                    try {
-                        executeWorker(new ExecutionContextImpl(context));
-                    } finally {
-                        numThreads.decrementAndGet();
+                try {
+                    executor.execute(()-> {
+                        try {
+                            if (!context.isStopped()) {
+                                executeWorker(new ExecutionContextImpl(context));
+                            }
+                        } finally {
+                            numThreads.decrementAndGet();
+                        }
+                    });
+                } catch (final RuntimeException e) {
+                    //can be rejected because stoped
+                    numThreads.decrementAndGet();
+                    if (!context.isStopped()) {
+                        throw e;
                     }
-                });
+                }
             } else {
                 numThreads.decrementAndGet();
             }
@@ -97,17 +138,17 @@ public abstract class AbstractDispatcher {
     /**
      * @return true if has messages.
      */
-    private boolean hasMessagesInternal() {
+    private boolean hasDataToProcessInternal() {
         if (context.getCurrentLoadLevel() != LoadLevel.Nothing) {
             return true;
         }
-        return hasMessages();
+        return hasDataToProcess();
     }
 
     /**
-     * @return true if has messags.
+     * @return true if has data to process.
      */
-    protected abstract boolean hasMessages();
+    protected abstract boolean hasDataToProcess();
     /**
      * @param context TODO
      *

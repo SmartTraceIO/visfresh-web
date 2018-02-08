@@ -59,5 +59,5 @@ public interface SystemMessageDao {
      * @param maxGroupCount TODO
      * @return set of groups of ready messages.
      */
-    Set<String> getReadyGroups(Date date, int maxGroupCount);
+    Set<String> getReadyUnlockingGroups(Date date, int maxGroupCount);
 }

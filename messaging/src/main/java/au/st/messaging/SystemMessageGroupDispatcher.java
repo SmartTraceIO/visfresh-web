@@ -47,12 +47,10 @@ public class SystemMessageGroupDispatcher extends SystemMessageDispatcher {
      */
     @Override
     protected int lockReadyMessages(final String processor, final Set<String> types, final Date date, final int batch) {
-        final Set<String> groups = getMessageDao().getReadyGroups(new Date(), getNumGroupsToLock());
+        final Set<String> groups = getMessageDao().getReadyUnlockingGroups(new Date(), getNumGroupsToLock());
         for (final String g : groups) {
             if (groupLockDao.lockGroup(processor, g, new Date(System.currentTimeMillis() + getMaxGroupLockTime()))) {
                 return getMessageDao().lockGroupMessages(processor, g, date, batch);
-            } else {
-                //TODO possible expand lock to new message(s).
             }
         }
 

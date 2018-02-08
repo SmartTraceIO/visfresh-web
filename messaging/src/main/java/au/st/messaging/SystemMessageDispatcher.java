@@ -48,9 +48,8 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
     @Override
     public void start() {
         parser = createDefaultMapper();
-        checkInitialized();
-
         id = generateId();
+
         super.start();
     }
     /* (non-Javadoc)
@@ -86,7 +85,10 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
     /**
      * Check dispatcher is correct initialized.
      */
+    @Override
     protected void checkInitialized() {
+        super.checkInitialized();
+
         if (messageDao == null) {
             throw new RuntimeException("SystemMessage DAO should not be null");
         }
@@ -108,7 +110,7 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
      * @see au.st.messaging.AbstractDispatcher#hasMessages()
      */
     @Override
-    protected boolean hasMessages() {
+    protected boolean hasDataToProcess() {
         if (handlers.size() == 0) {
             return false;
         }
@@ -125,9 +127,9 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
      * @see au.st.messaging.AbstractDispatcher#doDispatch()
      */
     @Override
-    protected void doDispatch() {
+    protected void doOneIteration() {
         logDispatcherActive();
-        super.doDispatch();
+        super.doOneIteration();
     }
     /**
      *
