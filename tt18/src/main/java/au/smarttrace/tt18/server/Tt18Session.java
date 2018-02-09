@@ -72,16 +72,17 @@ public class Tt18Session implements Runnable {
             final RawMessage msg = parser.parseMessage(bytes);
             if (shouldCorrecteDate(msg.getTime())) {
                 //should only correct data on device and not handle message next
-                log.debug("Message for device " + msg.getImei() + " requres time correction."
-                        + " Time correction will automatically sent");
+                log.debug("Message for device " + msg.getImei() + " requres time "
+                        + msg.getTime() + " correction. Time correction will automatically sent");
                 sendCorrectTimeResponse(out);
             } else {
                 handler.handleMessage(msg);
                 numRead++;
+
+                //write OK response
+                out.write(("@ACK," + msg.getPacketIndex() + "#").getBytes());
             }
 
-            //write OK response
-            out.write(("@ACK," + msg.getPacketIndex() + "#").getBytes());
             out.flush();
         }
 
@@ -112,8 +113,8 @@ public class Tt18Session implements Runnable {
         final String utcTime = df.format(new Date(t));
 
         //write date correction
-        out.write("Welcome to SmartTrace Gateway Server\n".getBytes());
-        out.write(("@UTC," + utcTime + "#Server UTC time:" + utcTime + "\n").getBytes());
+        //UTC time:2016-08-02 01:19:48
+        out.write(("UTC time:" + utcTime).getBytes());
     }
 
     /**

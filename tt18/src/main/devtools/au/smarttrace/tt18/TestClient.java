@@ -10,8 +10,6 @@ import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import org.apache.commons.io.IOUtils;
-
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -51,15 +49,43 @@ public class TestClient {
                 out.flush();
 
                 //read response
-                int b;
-                while ((b = in.read()) > -1) {
-                    System.out.print("" + ((char) b));
-                    System.out.flush();
-                }
+                System.out.println(readResponse(in));
             }
         } finally {
             s.close();
         }
+    }
+    /**
+     * @param in
+     * @return
+     * @throws IOException
+     */
+    private String readResponse(final InputStream in) throws IOException {
+        //Welcome to TZONE Gateway Server
+        //@UTC,2018-02-09 19:31:32#Server UTC time:2018-02-09 19:31:32
+        //@ACK,10#
+        final String ack = "@ACK,";
+
+        //read response
+        final StringBuilder sb = new StringBuilder();
+        boolean inEnd = false;
+        int b;
+        while ((b = in.read()) > -1) {
+            sb.append((char) b);
+
+            if (inEnd) {
+                if (b == '#') {
+                    break;
+                }
+            } else {
+                final int len = sb.length();
+                if (len > 4 && sb.substring(len - ack.length(), len).equals(ack)) {
+                    inEnd = true;
+                }
+            }
+        }
+
+        return sb.toString();
     }
     /**
      * @param data the data.
@@ -72,15 +98,9 @@ public class TestClient {
         }
         return bytes;
     }
-    /**
-     * @return
-     * @throws IOException
-     */
-    private static byte[] readTestMessage() throws IOException {
-        return decode(IOUtils.toString(TestClient.class.getResource("msg.txt")).split(" +"));
-    }
 
     public static void main(final String[] args) throws IOException {
+        final String str = "54 5a 00 2f 24 24 04 03 01 0f 00 00 08 66 71 00 33 76 80 91 12 02 09 16 13 17 00 08 07 eb 52 78 05 05 00 03 00 09 aa 00 0e 37 01 9c 09 53 4d 00 8c 70 ae 0d 0a";
         final TestClient client = new TestClient("gateway.gotracking.net", 54929);
 
         final LineNumberReader lnr = new LineNumberReader(new InputStreamReader(System.in));
@@ -91,7 +111,7 @@ public class TestClient {
                 break;
             }
 
-            client.send(readTestMessage());
+            client.send(decode(str.split(" +")));
         }
     }
 }

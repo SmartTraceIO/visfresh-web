@@ -4,6 +4,7 @@
 package au.smarttrace.tt18.server;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,7 +90,7 @@ public class Tt18ServerTest {
                 + "01 01 05 03 0D 00 08 25 33 78 37 04 60 00 01 00 09 AA 00 17 37 01 95 09 DA 45 00 0A 57 0A 0D 0A";
 
         final String response = send(MessageParserTest.decodeMessage(message)).get(0);
-        assertEquals(3, response.split("\\n").length);
+        assertTrue(response.startsWith("UTC"));
     }
     /**
      * @param msgs
@@ -124,27 +125,46 @@ public class Tt18ServerTest {
         //Welcome to TZONE Gateway Server
         //@UTC,2018-02-09 19:31:32#Server UTC time:2018-02-09 19:31:32
         //@ACK,10#
+        //UTC time:2016-08-02 01:19:48
         final String ack = "@ACK,";
+        final int timeCorrectionLen = "UTC time:2016-08-02 01:19:48".length();
 
         //read response
         final StringBuilder sb = new StringBuilder();
-        boolean inEnd = false;
+        boolean isEndNormal = false;
+        boolean isTimeCorrection = false;
         int b;
         while ((b = in.read()) > -1) {
             sb.append((char) b);
 
-            if (inEnd) {
+            if (isEndNormal) {
                 if (b == '#') {
                     break;
                 }
-            } else {
-                final int len = sb.length();
-                if (len > 4 && sb.substring(len - ack.length(), len).equals(ack)) {
-                    inEnd = true;
+            } else if (isTimeCorrection) {
+                if (sb.length() == timeCorrectionLen) {
+                    break;
                 }
+            } else if (endsWith(sb, ack)) {
+                isEndNormal = true;
+            } else if (endsWith(sb, "UTC")) {
+                isTimeCorrection = true;
             }
         }
 
         return sb.toString();
+    }
+
+    /**
+     * @param sb
+     * @param test
+     * @return
+     */
+    private boolean endsWith(final StringBuilder sb, final String test) {
+        final int len = sb.length();
+        if (len >= test.length() && sb.substring(len - test.length(), len).equals(test)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -27,7 +27,7 @@ import au.smarttrace.tt18.RawMessageHandler;
 public class Tt18Server {
     private static final int DEFAULT_THREAD_POOL_SIZE = 100;
     private static final int DEFAULT_TCP_TIMEOUT = 10000;
-    public static final long MIN_ALLOWED_TIME = new GregorianCalendar(2011, 1, 1).getTimeInMillis();
+    public static final long MIN_ALLOWED_TIME = new GregorianCalendar(2018, 0, 1).getTimeInMillis();
 
     private static final Logger log = LoggerFactory.getLogger(Tt18Server.class);
 
