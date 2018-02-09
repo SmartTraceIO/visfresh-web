@@ -16,7 +16,7 @@ public final class MessageDumpTool {
     }
 
     public static void main(final String[] args) {
-        final String str = "54 5a 00 2f 24 24 04 03 01 0f 00 00 08 67 79 30 32 08 97 83 12 02 02 09 22 1a 00 08 07 ec 52 65 05 05 00 03 00 09 aa 00 14 37 01 a1 09 7b 33 00 49 06 a6 0d 0a";
+        final String str = "54 5a 00 2f 24 24 04 03 01 0f 00 00 08 67 79 30 32 03 72 61 09 01 05 0c 06 0b 00 08 07 eb 59 75 05 05 00 03 00 09 aa 10 18 37 01 8f 0b 00 38 00 12 4c 07 0d 0a";
         final byte[] msg = MessageParserTest.decodeMessage(str);
 
         final RawMessage m = new MessageParser().parseMessage(msg);

@@ -45,7 +45,7 @@ public class Tt18ServerTest {
         port = ss.getLocalPort();
         ss.close();
 
-        server = new Tt18Server(port, 3000, 5) {};
+        server = new Tt18Server(port, 300000, 5) {};
         //set default handler
         server.setHandler(m -> {});
         server.start();
@@ -83,11 +83,20 @@ public class Tt18ServerTest {
         send(msg, corrupted);
         assertEquals(1, msgs.size());
     }
+    @Test
+    public void testCorrectTime() throws IOException {
+        final String message = "54 5A 00 2F 24 24 04 03 01 07 00 00 08 66 10 40 27 00 34 28 09 "
+                + "01 01 05 03 0D 00 08 25 33 78 37 04 60 00 01 00 09 AA 00 17 37 01 95 09 DA 45 00 0A 57 0A 0D 0A";
+
+        final String response = send(MessageParserTest.decodeMessage(message)).get(0);
+        assertEquals(3, response.split("\\n").length);
+    }
     /**
      * @param msgs
      * @throws IOException
      */
-    private void send(final byte[]... msgs) throws IOException {
+    private List<String> send(final byte[]... msgs) throws IOException {
+        final List<String> responses = new LinkedList<>();
         final Socket  s = new Socket("127.0.0.1", port);
         try {
             final OutputStream out = s.getOutputStream();
@@ -97,34 +106,45 @@ public class Tt18ServerTest {
                 out.write(bytes);
                 out.flush();
 
-                //read response
-                final StringBuilder sb = new StringBuilder();
-                int b = in.read();
-                if (b == -1) {
-                    return;
-                }
-                if (b != '@') {
-                    throw new IOException("Unexpected first response symbol: " + b);
-                }
-
-                sb.append((char) b);
-                while (true) {
-                    b = in.read();
-                    if (b == -1) {
-                        break;
-                    }
-
-                    sb.append((char) b);
-                    if (b == '#') {
-                        //end of response
-                        break;
-                    }
-                }
-
-                System.out.println(sb);
+                responses.add(readResponse(in));
             }
         } finally {
             s.close();
         }
+
+        return responses;
+    }
+
+    /**
+     * @param in
+     * @return
+     * @throws IOException
+     */
+    private String readResponse(final InputStream in) throws IOException {
+        //Welcome to TZONE Gateway Server
+        //@UTC,2018-02-09 19:31:32#Server UTC time:2018-02-09 19:31:32
+        //@ACK,10#
+        final String ack = "@ACK,";
+
+        //read response
+        final StringBuilder sb = new StringBuilder();
+        boolean inEnd = false;
+        int b;
+        while ((b = in.read()) > -1) {
+            sb.append((char) b);
+
+            if (inEnd) {
+                if (b == '#') {
+                    break;
+                }
+            } else {
+                final int len = sb.length();
+                if (len > 4 && sb.substring(len - ack.length(), len).equals(ack)) {
+                    inEnd = true;
+                }
+            }
+        }
+
+        return sb.toString();
     }
 }

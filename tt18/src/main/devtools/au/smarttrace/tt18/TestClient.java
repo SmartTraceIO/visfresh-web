@@ -51,30 +51,11 @@ public class TestClient {
                 out.flush();
 
                 //read response
-                final StringBuilder sb = new StringBuilder();
-                int b = in.read();
-                if (b == -1) {
-                    return;
+                int b;
+                while ((b = in.read()) > -1) {
+                    System.out.print("" + ((char) b));
+                    System.out.flush();
                 }
-                if (b != '@') {
-                    throw new IOException("Unexpected first response symbol: " + b);
-                }
-
-                sb.append((char) b);
-                while (true) {
-                    b = in.read();
-                    if (b == -1) {
-                        break;
-                    }
-
-                    sb.append((char) b);
-                    if (b == '#') {
-                        //end of response
-                        break;
-                    }
-                }
-
-                System.out.println(sb);
             }
         } finally {
             s.close();
@@ -100,7 +81,7 @@ public class TestClient {
     }
 
     public static void main(final String[] args) throws IOException {
-        final TestClient client = new TestClient();
+        final TestClient client = new TestClient("gateway.gotracking.net", 54929);
 
         final LineNumberReader lnr = new LineNumberReader(new InputStreamReader(System.in));
         String line;

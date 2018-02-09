@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +70,15 @@ public class Tt18Session implements Runnable {
             log.debug("Message has recieved: " + toHexString(bytes));
 
             final RawMessage msg = parser.parseMessage(bytes);
-            handler.handleMessage(msg);
-            numRead++;
+            if (shouldCorrecteDate(msg.getTime())) {
+                //should only correct data on device and not handle message next
+                log.debug("Message for device " + msg.getImei() + " requres time correction."
+                        + " Time correction will automatically sent");
+                sendCorrectTimeResponse(out);
+            } else {
+                handler.handleMessage(msg);
+                numRead++;
+            }
 
             //write OK response
             out.write(("@ACK," + msg.getPacketIndex() + "#").getBytes());
@@ -75,6 +86,34 @@ public class Tt18Session implements Runnable {
         }
 
         log.debug(numRead + " message have successfully readen by one connection session");
+    }
+
+    /**
+     * @param time
+     * @return
+     */
+    private boolean shouldCorrecteDate(final Date time) {
+        return time.getTime() < Tt18Server.MIN_ALLOWED_TIME;
+    }
+
+    /**
+     * Welcome to TZONE Gateway Server
+     * @UTC,2018-02-09 19:31:32#Server UTC time:2018-02-09 19:31:32
+     * @ACK,10#
+     * @param out
+     * @throws IOException
+     */
+    private void sendCorrectTimeResponse(final OutputStream out) throws IOException {
+        //create date string.
+        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        long t = System.currentTimeMillis();
+        t += TimeZone.getDefault().getOffset(t);
+        final String utcTime = df.format(new Date(t));
+
+        //write date correction
+        out.write("Welcome to SmartTrace Gateway Server\n".getBytes());
+        out.write(("@UTC," + utcTime + "#Server UTC time:" + utcTime + "\n").getBytes());
     }
 
     /**
