@@ -29,6 +29,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import junit.framework.AssertionFailedError;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
@@ -74,6 +76,42 @@ public class SystemMessageGroupDispatcherTest extends MockSystemMessageGroupDisp
         unlockService.setGroupLockDao(groupLockDao);
 
         start();
+    }
+    @Test
+    public void testIncorrectNumGroupsToLock() throws InterruptedException {
+        stop();
+        setNumGroupsToLock(-1);
+
+        try {
+            start();
+            throw new AssertionFailedError("Incorrect keep alive time should be detected");
+        } catch (final Exception e) {
+            // correct
+        }
+    }
+    @Test
+    public void testIncorrectMaxGroupLockTime() throws InterruptedException {
+        stop();
+        setMaxGroupLockTime(-1l);
+
+        try {
+            start();
+            throw new AssertionFailedError("Incorrect max thread time out should be detected");
+        } catch (final Exception e) {
+            // correct
+        }
+    }
+    @Test
+    public void testNullGroupLockDao() throws InterruptedException {
+        stop();
+        setGroupLockDao(null);
+
+        try {
+            start();
+            throw new AssertionFailedError("Null group lock DAO should be detected");
+        } catch (final Exception e) {
+            // correct
+        }
     }
     @Test
     public void testLockMessageOnDispatch() {
@@ -184,7 +222,7 @@ public class SystemMessageGroupDispatcherTest extends MockSystemMessageGroupDisp
             throw e;
         });
 
-        executeWorker();
+        executeWorker(new ExecutionContextImpl(context));
 
         assertEquals(1, messages.size());
         assertFalse(getGroupLockDao().lockGroup(getId(), group, new Date()));

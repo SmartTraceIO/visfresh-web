@@ -92,10 +92,11 @@ public abstract class AbstractDispatcher {
      * @throws InterruptedException
      */
     public void stop() throws InterruptedException {
-        if (context == null || executor.isShutdown()) {
+        if (context == null || executor != null) {
             //not started
             return;
         }
+
         context.setStopped(true);
         stopThreads();
     }
@@ -104,8 +105,10 @@ public abstract class AbstractDispatcher {
      * @throws InterruptedException
      */
     protected void stopThreads() throws InterruptedException {
-        executor.shutdown();
-        executor.awaitTermination(5, TimeUnit.MINUTES);
+        if (!executor.isShutdown()) {
+            executor.shutdown();
+            executor.awaitTermination(5, TimeUnit.MINUTES);
+        }
     }
 
     private void runDispatcherThread() {

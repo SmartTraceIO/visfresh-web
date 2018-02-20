@@ -209,9 +209,9 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
     protected void handleRetryableException(final SystemMessage m, final SystemMessageException e,
             final ExecutionContext context, final int maxRetry) {
         if (canRetry(m, e, maxRetry)) {
-            handleNotRetryableException(m, e, context);
-        } else {
             messageDao.unlockAndRetryOn(m, e.getRetryOn());
+        } else {
+            handleNotRetryableException(m, e, context);
         }
     }
 
@@ -222,7 +222,7 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
      * @return
      */
     protected boolean canRetry(final SystemMessage m, final SystemMessageException e, final int maxRetry) {
-        return e.getRetryOn() == null || m.getNumberOfRetry() + 1 > maxRetry;
+        return e.getRetryOn() == null || m.getNumberOfRetry() < maxRetry;
     }
     /**
      * @param m message.
