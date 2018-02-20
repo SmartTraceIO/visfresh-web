@@ -68,7 +68,7 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
         String newId;
         do {
             newId = "d-v2.0.0-" + Long.toHexString(System.currentTimeMillis());
-            if (dispatcherIdDao.saveHandlerId(newId)) {
+            if (dispatcherIdDao.saveHandlerId(newId, new Date(System.currentTimeMillis() + getMaxInactiveTime()))) {
                 break;
             }
 
@@ -114,7 +114,7 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
         if (handlers.size() == 0) {
             return false;
         }
-        return messageDao.hasMessages(getListenTypes());
+        return messageDao.hasMessages(getListenTypes(), new Date());
     }
     /**
      * @return
@@ -128,16 +128,16 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
      */
     @Override
     protected void doOneIteration() {
-        logDispatcherActive();
+        notifyDispatcherActive();
         super.doOneIteration();
     }
     /**
      *
      */
-    private void logDispatcherActive() {
+    private void notifyDispatcherActive() {
         final long t = System.currentTimeMillis();
         if (t - lastActivityUpdate > getUpdateActivityTimeOut()) {
-            dispatcherIdDao.updateHandlerActivity(id, new Date(t + getMaxInactiveTime()));
+            dispatcherIdDao.updateExpiedTime(id, new Date(t + getMaxInactiveTime()));
             lastActivityUpdate = t;
         }
     }
@@ -173,7 +173,7 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
 
     /**
      * @param m message.
-     * @param context TODO
+     * @param context execution context.
      */
     protected void handleMessage(final SystemMessage m, final ExecutionContext context) {
         final MessageHandler<?> h = handlers.get(m.getType());
@@ -182,7 +182,7 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
                 handle(h, m.getPayload(), context);
                 handleSuccess(m);
             } catch (final SystemMessageException sme) {
-                handleRetryableException(m, sme, context);
+                handleRetryableException(m, sme, context, h.getMaxNumberOfRetry());
             } catch (final Exception exc) {
                 handleNotRetryableException(m, exc, context);
             }
@@ -195,19 +195,20 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
     /**
      * @param m message.
      * @param exc exception.
-     * @param context TODO
+     * @param context execution context.
      */
     protected void handleNotRetryableException(final SystemMessage m, final Exception exc, final ExecutionContext context) {
         messageDao.delete(m);
     }
-
     /**
      * @param m message.
      * @param e exception.
-     * @param context TODO
+     * @param context execution context.
+     * @param maxRetry max number of retry.
      */
-    protected void handleRetryableException(final SystemMessage m, final SystemMessageException e, final ExecutionContext context) {
-        if (e.getRetryOn() == null) {
+    protected void handleRetryableException(final SystemMessage m, final SystemMessageException e,
+            final ExecutionContext context, final int maxRetry) {
+        if (canRetry(m, e, maxRetry)) {
             handleNotRetryableException(m, e, context);
         } else {
             messageDao.unlockAndRetryOn(m, e.getRetryOn());
@@ -215,30 +216,36 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
     }
 
     /**
+     * @param m
+     * @param e
+     * @param maxRetry
+     * @return
+     */
+    protected boolean canRetry(final SystemMessage m, final SystemMessageException e, final int maxRetry) {
+        return e.getRetryOn() == null || m.getNumberOfRetry() + 1 > maxRetry;
+    }
+    /**
      * @param m message.
      */
     protected void handleSuccess(final SystemMessage m) {
         messageDao.delete(m);
     }
-
     /**
      * @param h
      * @param payload
-     * @param context TODO
+     * @param context execution context.
      */
     protected <T> void handle(final MessageHandler<T> h, final String payload, final ExecutionContext context) throws Exception {
         final T value = parser.readValue(payload, h.getMessageClass());
         h.handle(value);
     }
-
     /**
      * @param dispatcher dispatcher ID.
      * @return list of messages locked by given dispatcher.
      */
     protected List<SystemMessage> getMessages(final String dispatcher) {
-        return messageDao.getMessages(dispatcher);
+        return messageDao.getLockedMessages(dispatcher);
     }
-
     /**
      * @param processor dispatcher ID.
      * @param types message types.
@@ -249,7 +256,6 @@ public class SystemMessageDispatcher extends AbstractDispatcher {
     protected int lockReadyMessages(final String processor, final Set<String> types, final Date date, final int batch) {
         return messageDao.lockReadyMessages(processor, types, new Date(), batch);
     }
-
     /**
      * Adds message handler.
      * @param h message handler.

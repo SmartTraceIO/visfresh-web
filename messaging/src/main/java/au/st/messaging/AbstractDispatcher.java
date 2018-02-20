@@ -21,7 +21,7 @@ public abstract class AbstractDispatcher {
     private int maxPoolSize = 10;
     private long keepAliveTime = 15000l;
     private long mainThreadTimeOut = 1000l;
-    private DispatcherContext context;
+    protected DispatcherContext context;
     private AtomicInteger numThreads = new AtomicInteger();
 
     /**
@@ -39,6 +39,13 @@ public abstract class AbstractDispatcher {
 
         context = createContext();
 
+        startThreads();
+    }
+
+    /**
+     *
+     */
+    protected void startThreads() {
         final ThreadGroup group = Thread.currentThread().getThreadGroup();
         final AtomicInteger num = new AtomicInteger();
         executor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
@@ -90,6 +97,13 @@ public abstract class AbstractDispatcher {
             return;
         }
         context.setStopped(true);
+        stopThreads();
+    }
+
+    /**
+     * @throws InterruptedException
+     */
+    protected void stopThreads() throws InterruptedException {
         executor.shutdown();
         executor.awaitTermination(5, TimeUnit.MINUTES);
     }

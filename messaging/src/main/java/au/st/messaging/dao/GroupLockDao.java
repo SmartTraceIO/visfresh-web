@@ -4,6 +4,7 @@
 package au.st.messaging.dao;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
@@ -18,12 +19,16 @@ public interface GroupLockDao {
      */
     boolean lockGroup(String processor, String group, Date unlockOn);
     /**
-     * @param dispatcher locker ID for unlock.
+     * @param dispatcher dispatcher ID.
      */
-    void unlockGroups(String dispatcher);
+    void unlockAllForLock(String dispatcher);
     /**
-     * @param group message group.
-     * @param retryOn unlock time.
+     * @param date expiration date.
+     * @return set of groups.
      */
-    void setUnlockTime(String group, Date retryOn);
+    Set<String> getGroupsWithExpiredLock(Date date);
+    /**
+     * @param group group.
+     */
+    void unlockGroup(String group);
 }

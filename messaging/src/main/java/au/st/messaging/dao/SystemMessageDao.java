@@ -16,9 +16,10 @@ import au.st.messaging.SystemMessage;
 public interface SystemMessageDao {
     /**
      * @param listenTypes set of listen types.
+     * @param date TODO
      * @return true if has message of given type.
      */
-    boolean hasMessages(Set<String> listenTypes);
+    boolean hasMessages(Set<String> listenTypes, Date date);
     /**
      * @param dispatcher dispatcher ID.
      * @param listenTypes set of listener types.
@@ -31,7 +32,7 @@ public interface SystemMessageDao {
      * @param dispatcher dispatcher ID.
      * @return list of system messages locked by given dispatcher.
      */
-    List<SystemMessage> getMessages(String dispatcher);
+    List<SystemMessage> getLockedMessages(String dispatcher);
     /**
      * Unlocks message.
      * @param m message to unlock.
@@ -59,5 +60,13 @@ public interface SystemMessageDao {
      * @param maxGroupCount TODO
      * @return set of groups of ready messages.
      */
-    Set<String> getReadyUnlockingGroups(Date date, int maxGroupCount);
+    Set<String> getReadyUnlockedGroups(Date date, int maxGroupCount);
+    /**
+     * @param dispatcher dispatcher ID.
+     */
+    void unlockAllForLock(String dispatcher);
+    /**
+     * @param group group.
+     */
+    void unlockAllByGroup(String group);
 }

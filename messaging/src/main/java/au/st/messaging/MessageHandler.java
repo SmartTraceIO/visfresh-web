@@ -11,4 +11,5 @@ public interface MessageHandler<M> {
     String getMessageType();
     Class<M> getMessageClass();
     void handle(M m) throws SystemMessageException;
+    int getMaxNumberOfRetry();
 }

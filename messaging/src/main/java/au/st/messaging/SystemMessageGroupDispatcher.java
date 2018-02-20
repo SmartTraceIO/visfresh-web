@@ -47,7 +47,7 @@ public class SystemMessageGroupDispatcher extends SystemMessageDispatcher {
      */
     @Override
     protected int lockReadyMessages(final String processor, final Set<String> types, final Date date, final int batch) {
-        final Set<String> groups = getMessageDao().getReadyUnlockingGroups(new Date(), getNumGroupsToLock());
+        final Set<String> groups = getMessageDao().getReadyUnlockedGroups(new Date(), getNumGroupsToLock());
         for (final String g : groups) {
             if (groupLockDao.lockGroup(processor, g, new Date(System.currentTimeMillis() + getMaxGroupLockTime()))) {
                 return getMessageDao().lockGroupMessages(processor, g, date, batch);
@@ -61,17 +61,17 @@ public class SystemMessageGroupDispatcher extends SystemMessageDispatcher {
      * @see au.st.messaging.SystemMessageDispatcher#handleRetryableException(au.st.messaging.SystemMessage, au.st.messaging.SystemMessageException, au.st.messaging.ExecutionContext)
      */
     @Override
-    protected void handleRetryableException(final SystemMessage m, final SystemMessageException e, final ExecutionContext context) {
-        if (e.getRetryOn() != null && e instanceof SystemMessageGroupException) {
+    protected void handleRetryableException(final SystemMessage m, final SystemMessageException e,
+            final ExecutionContext context, final int maxRetry) {
+        if (canRetry(m, e, maxRetry) && e instanceof SystemMessageGroupException) {
             final SystemMessageGroupException mge = (SystemMessageGroupException) e;
             if (mge.isShouldPauseGroup()) {
                 context.setAttribute(PAUSE_GROUP_FOR, e.getRetryOn());
-                groupLockDao.setUnlockTime(m.getGroup(), e.getRetryOn());
                 return;
             }
         }
 
-        super.handleRetryableException(m, e, context);
+        super.handleRetryableException(m, e, context, maxRetry);
     }
     /* (non-Javadoc)
      * @see au.st.messaging.SystemMessageDispatcher#handle(au.st.messaging.MessageHandler, java.lang.String, au.st.messaging.ExecutionContext)
@@ -89,10 +89,9 @@ public class SystemMessageGroupDispatcher extends SystemMessageDispatcher {
     protected void executeWorker(final ExecutionContext context) {
         super.executeWorker(context);
         if (context.getAttribute(PAUSE_GROUP_FOR) == null) {
-            groupLockDao.unlockGroups(getId());
+            groupLockDao.unlockAllForLock(getId());
         }
     }
-
     /**
      * @return the numGroupsToLock
      */
@@ -114,7 +113,7 @@ public class SystemMessageGroupDispatcher extends SystemMessageDispatcher {
     /**
      * @param groupLockDao the groupLockDao to set
      */
-    public void setGroupLockDao(final GroupLockDao groupLockDao) {
+    protected void setGroupLockDao(final GroupLockDao groupLockDao) {
         this.groupLockDao = groupLockDao;
     }
     /**
