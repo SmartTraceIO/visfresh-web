@@ -3,10 +3,12 @@
  */
 package au.smarttrace.tt18;
 
+import java.util.List;
+
 /**
  * @author Vyacheslav Soldatov <vyacheslav.soldatov@inbox.ru>
  *
  */
 public interface RawMessageHandler {
-    void handleMessage(RawMessage msg);
+    List<String> handleMessage(RawMessage msg);
 }

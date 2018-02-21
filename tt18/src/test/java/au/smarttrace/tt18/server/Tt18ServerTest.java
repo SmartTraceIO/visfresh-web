@@ -48,7 +48,9 @@ public class Tt18ServerTest {
 
         server = new Tt18Server(port, 300000, 5) {};
         //set default handler
-        server.setHandler(m -> {});
+        server.setHandler(m -> {
+            return new LinkedList<>();
+        });
         server.start();
     }
     @After
@@ -63,12 +65,35 @@ public class Tt18ServerTest {
 
         //check read two messages
         final List<RawMessage> msgs = new LinkedList<>();
-        server.setHandler(m -> msgs.add(m));
+        server.setHandler(m -> {
+            msgs.add(m);
+            return new LinkedList<>();
+        });
 
         send(msg, msg);
 
         assertEquals(2, msgs.size());
     }
+    @Test
+    public void testMessageWithCommands() throws IOException {
+        final byte[] msg = MessageParserTest.readTestMessage();
+
+        //check read two messages
+        server.setHandler(m -> {
+            final LinkedList<String> cmd = new LinkedList<>();
+            cmd.add("cmd1");
+            cmd.add("cmd2");
+            return cmd;
+        });
+
+        final List<String> msgs= send(msg);
+
+        assertEquals(1, msgs.size());
+        final String[] lines = new String(msgs.get(0)).split("\n");
+
+        assertEquals(3, lines.length);
+    }
+
     @Test
     public void testCorruptedMessage() throws IOException {
         final byte[] msg = MessageParserTest.readTestMessage();
@@ -79,7 +104,10 @@ public class Tt18ServerTest {
 
         //check read two messages
         final List<RawMessage> msgs = new LinkedList<>();
-        server.setHandler(m -> msgs.add(m));
+        server.setHandler(m -> {
+            msgs.add(m);
+            return new LinkedList<>();
+        });
 
         send(msg, corrupted);
         assertEquals(1, msgs.size());

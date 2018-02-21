@@ -4,6 +4,8 @@
 package au.smarttrace.tt18.st;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +27,14 @@ public class SmartTraceRawMessageHandler implements RawMessageHandler {
     private static final Logger log = LoggerFactory.getLogger(SmartTraceRawMessageHandler.class);
     @Autowired
     private MessageDao dao;
+    @Autowired
+    private DeviceCommandDao deviceCommandDao;
 
     /* (non-Javadoc)
      * @see au.smarttrace.tt18.RawMessageHandler#handleMessage(au.smarttrace.tt18.RawMessage)
      */
     @Override
-    public void handleMessage(final RawMessage msg) {
+    public List<String> handleMessage(final RawMessage msg) {
         if (msg.getTemperature() == null) {
             log.warn("Message for " + msg.getImei()
                     + " have null temperature and will ignored");
@@ -39,8 +43,23 @@ public class SmartTraceRawMessageHandler implements RawMessageHandler {
             final DeviceMessage m = convert(msg);
             if (dao.checkDevice(m.getImei())) {
                 dao.saveForNextProcessingInDcs(m);
+                //get commands
+                final List<DeviceCommand> commands = deviceCommandDao.getFoDevice(m.getImei());
+
+                final List<String> cmd = new LinkedList<>();
+                for (final DeviceCommand c : commands) {
+                    try {
+                        deviceCommandDao.delete(c);
+                        cmd.add(c.getCommand());
+                    } catch (final Exception e) {
+                    }
+                }
+
+                return cmd;
             }
         }
+
+        return new LinkedList<String>();
     }
     /**
      * @param raw raw message.

@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -76,10 +77,15 @@ public class Tt18Session implements Runnable {
                         + msg.getTime() + " correction. Time correction will automatically sent");
                 sendCorrectTimeResponse(out);
             } else {
-                handler.handleMessage(msg);
+                final List<String> commands = handler.handleMessage(msg);
                 numRead++;
 
                 //write OK response
+                if (!commands.isEmpty()) {
+                    log.debug("Sending command list " + commands + " to device " + msg.getImei());
+                    out.write(String.join("\n", commands).getBytes());
+                    out.write('\n');
+                }
                 out.write(("@ACK," + msg.getPacketIndex() + "#").getBytes());
             }
 

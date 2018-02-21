@@ -42,7 +42,9 @@ public class Tt18SessionTest {
     public void setUp() {
         session = new AccessibleTt18Session();
         //set default handler.
-        session.setHandler(m -> {});
+        session.setHandler(m -> {
+            return new LinkedList<>();
+        });
     }
 
     @Test
@@ -66,7 +68,10 @@ public class Tt18SessionTest {
 
         //check read two messages
         final List<RawMessage> msgs = new LinkedList<>();
-        session.setHandler(m -> msgs.add(m));
+        session.setHandler(m -> {
+            msgs.add(m);
+            return new LinkedList<>();
+        });
 
         session.processConnection(new ByteArrayInputStream(input), new NullOutputStream());
 
@@ -83,7 +88,12 @@ public class Tt18SessionTest {
 
         //check read two messages
         final List<RawMessage> msgs = new LinkedList<>();
-        session.setHandler(m -> msgs.add(m));
+        session.setHandler(m ->
+            {
+                msgs.add(m);
+                return new LinkedList<>();
+            }
+        );
 
         try {
             session.processConnection(new ByteArrayInputStream(input), new NullOutputStream());
