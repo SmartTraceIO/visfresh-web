@@ -25,14 +25,17 @@ public class MessageParser {
     private static final int BIT4_MASK = Integer.parseInt("10000", 2);
     private static final int BIT5_MASK = Integer.parseInt("100000", 2);
 
+    private static final int HEADER_SIZE = 4;
+
     /**
      * Reads only data from one message from stream. Not more extra bytes.
      * @param in input stream.
      * @return message data.
      * @throws IOException
+     * @throws IncorrectPacketLengthException
      */
-    public byte[] readMessageData(final InputStream in) throws IOException {
-        final byte[] header = new byte[4];
+    public byte[] readMessageData(final InputStream in) throws IOException, IncorrectPacketLengthException {
+        final byte[] header = new byte[HEADER_SIZE];
         int size;
         if ((size = in.read(header)) < header.length) {
             if (size == -1) {
@@ -49,13 +52,36 @@ public class MessageParser {
         System.arraycopy(header, 0, msg, 0, header.length);
 
         //read message body
-        if ((size = in.read(msg, header.length, len)) < len) {
-            throw new EOFException("Failed to message body, expected: "
-                    + len + " bytes, actual: " + size);
-        }
+        readBody(in, msg);
 
         return msg;
     }
+    /**
+     * @param in
+     * @param header
+     * @param len
+     * @param msg
+     * @throws IOException
+     * @throws IncorrectPacketLengthException
+     * @throws EOFException
+     */
+    protected void readBody(final InputStream in, final byte[] msg)
+            throws IOException, IncorrectPacketLengthException {
+        final int len = msg.length - HEADER_SIZE;
+        int offset = 0;
+
+        while (offset < len) {
+            final int readen = in.read(msg, HEADER_SIZE + offset, len - offset);
+            if (readen < 0) {
+                final byte[] actual = new byte[HEADER_SIZE + offset];
+                System.arraycopy(msg, 0, actual, 0, actual.length);
+
+                throw new IncorrectPacketLengthException(msg.length, actual);
+            }
+            offset += readen;
+        }
+    }
+
     public RawMessage parseMessage(final byte[] bytes) {
         final RawMessage msg = new RawMessage();
         msg.setRawData(bytes);

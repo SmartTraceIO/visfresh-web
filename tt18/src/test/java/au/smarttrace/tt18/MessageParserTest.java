@@ -41,14 +41,14 @@ public class MessageParserTest {
         parser = new MessageParser();
     }
     @Test
-    public void testReadMessageData() throws IOException {
+    public void testReadMessageData() throws IOException, IncorrectPacketLengthException {
         final String data[] = IOUtils.toString(MessageParserTest.class.getResource("msg.txt")).split(" +");
         final byte[] msg = parser.readMessageData(new ByteArrayInputStream(decode(data)));
 
         assertEquals(data.length, msg.length);
     }
     @Test
-    public void testEmptyStream() throws IOException {
+    public void testEmptyStream() throws IOException, IncorrectPacketLengthException {
         assertNull(parser.readMessageData(new ByteArrayInputStream(new byte[0])));
     }
     @Test
@@ -60,11 +60,11 @@ public class MessageParserTest {
         try {
             assertNull(parser.readMessageData(new ByteArrayInputStream(bytes)));
             throw new AssertionFailedError("EOF exception should be thrown");
-        } catch(final EOFException e) {
+        } catch(final IncorrectPacketLengthException e) {
         }
     }
     @Test
-    public void testNotFullBody() throws IOException {
+    public void testNotFullBody() throws IOException, IncorrectPacketLengthException {
         try {
             assertNull(parser.readMessageData(new ByteArrayInputStream(new byte[2])));
             throw new AssertionFailedError("EOF exception should be thrown");

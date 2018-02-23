@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import au.smarttrace.tt18.IncorrectPacketLengthException;
 import au.smarttrace.tt18.MessageParserTest;
 import au.smarttrace.tt18.RawMessage;
 import au.smarttrace.tt18.junit.FastTest;
@@ -48,7 +48,7 @@ public class Tt18SessionTest {
     }
 
     @Test
-    public void testResponse() throws IOException {
+    public void testResponse() throws IOException, IncorrectPacketLengthException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         session.processConnection(new ByteArrayInputStream(MessageParserTest.readTestMessage()), out);
@@ -58,7 +58,7 @@ public class Tt18SessionTest {
         assertTrue(resp.endsWith("#"));
     }
     @Test
-    public void testTwoMessages() throws IOException {
+    public void testTwoMessages() throws IOException, IncorrectPacketLengthException {
         final byte[] msg = MessageParserTest.readTestMessage();
 
         //create two messages stream
@@ -98,7 +98,7 @@ public class Tt18SessionTest {
         try {
             session.processConnection(new ByteArrayInputStream(input), new NullOutputStream());
             throw new AssertionFailedError("EOF exception should be thrown");
-        } catch (final EOFException e) {
+        } catch (final IncorrectPacketLengthException e) {
             //correct
         }
 

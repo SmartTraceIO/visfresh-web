@@ -16,6 +16,7 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import au.smarttrace.tt18.IncorrectPacketLengthException;
 import au.smarttrace.tt18.MessageParser;
 import au.smarttrace.tt18.RawMessage;
 import au.smarttrace.tt18.RawMessageHandler;
@@ -49,6 +50,11 @@ public class Tt18Session implements Runnable {
     public void run() {
         try {
             processConnection(socket.getInputStream(), socket.getOutputStream());
+        } catch (final IncorrectPacketLengthException e) {
+            log.error("Failed to read message body, expected: "
+                    + e.getExpected() + " bytes, actual: " + e.getActual().length
+                    + ", received message as text: " + new String(e.getActual()));
+
         } catch(final Exception e) {
             log.error("Error while processing incomming connection", e);
         } finally {
@@ -62,8 +68,10 @@ public class Tt18Session implements Runnable {
      * @param in input stream.
      * @param out output stream.
      * @throws IOException
+     * @throws IncorrectPacketLengthException
      */
-    protected void processConnection(final InputStream in, final OutputStream out) throws IOException {
+    protected void processConnection(final InputStream in, final OutputStream out)
+            throws IOException, IncorrectPacketLengthException {
         int numRead = 0;
 
         byte[] bytes;

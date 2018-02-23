@@ -46,7 +46,7 @@ public class Tt18ServerTest {
         port = ss.getLocalPort();
         ss.close();
 
-        server = new Tt18Server(port, 300000, 5) {};
+        server = new Tt18Server(port, 3000, 5) {};
         //set default handler
         server.setHandler(m -> {
             return new LinkedList<>();
