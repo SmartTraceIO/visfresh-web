@@ -72,35 +72,60 @@ public class Tt18Session implements Runnable {
      */
     protected void processConnection(final InputStream in, final OutputStream out)
             throws IOException, IncorrectPacketLengthException {
-        int numRead = 0;
+        boolean isCommandSent = false;
+        String device = null;
 
-        byte[] bytes;
-        while ((bytes = parser.readMessageData(in)) != null) {
-            log.debug("Message has recieved: " + toHexString(bytes));
+        try {
+            byte[] bytes;
+            while ((bytes = parser.readMessageData(in)) != null) {
+                log.debug("Message has recieved: " + toHexString(bytes));
 
-            final RawMessage msg = parser.parseMessage(bytes);
-            if (shouldCorrecteDate(msg.getTime())) {
-                //should only correct data on device and not handle message next
-                log.debug("Message for device " + msg.getImei() + " requres time "
-                        + msg.getTime() + " correction. Time correction will automatically sent");
-                sendCorrectTimeResponse(out);
-            } else {
-                final List<String> commands = handler.handleMessage(msg);
-                numRead++;
+                final RawMessage msg = parser.parseMessage(bytes);
+                device = msg.getImei();
 
-                //write OK response
-                if (!commands.isEmpty()) {
-                    log.debug("Sending command list " + commands + " to device " + msg.getImei());
-                    out.write(String.join("\n", commands).getBytes());
-                    out.write('\n');
+                if (shouldCorrecteDate(msg.getTime())) {
+                    //should only correct data on device and not handle message next
+                    log.debug("Message for device " + msg.getImei() + " requres time "
+                            + msg.getTime() + " correction. Time correction will automatically sent");
+                    sendCorrectTimeResponse(out);
+                } else {
+                    try {
+                        final List<String> commands = handler.handleMessage(msg);
+
+                        //write OK response
+                        if (!commands.isEmpty()) {
+                            isCommandSent = true;
+
+                            //send command list
+                            log.debug("Sending command list " + commands + " to device " + msg.getImei());
+                            out.write(String.join("\n", commands).getBytes());
+                            out.write('\n');
+                        }
+                    } catch (final Exception e) {
+                        log.debug("Failed to get commands from DB", e);
+                    }
+
+                    out.write(("@ACK," + msg.getPacketIndex() + "#").getBytes());
                 }
-                out.write(("@ACK," + msg.getPacketIndex() + "#").getBytes());
+
+                out.flush();
+
+                //not return if send command. Need receive confirmation message or error
+                if (!isCommandSent) { //is command sent
+                    //just break and close the stream.
+                    break;
+                } // else continue of receiving data by given session.
             }
-
-            out.flush();
+        } catch (final IncorrectPacketLengthException e) {
+            if (isCommandSent) {
+                //if is command sent, not need to propagate error next
+                //because it is the response for device command
+                log.debug("Response to device " + device
+                        + " command has received " + new String(e.getActual()));
+            } else {
+                throw e;
+            }
         }
-
-        log.debug(numRead + " message have successfully readen by one connection session");
     }
 
     /**

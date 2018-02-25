@@ -58,33 +58,12 @@ public class Tt18SessionTest {
         assertTrue(resp.endsWith("#"));
     }
     @Test
-    public void testTwoMessages() throws IOException, IncorrectPacketLengthException {
-        final byte[] msg = MessageParserTest.readTestMessage();
-
-        //create two messages stream
-        final byte[] input = new byte[msg.length * 2];
-        System.arraycopy(msg, 0, input, 0, msg.length);
-        System.arraycopy(msg, 0, input, msg.length, msg.length);
-
-        //check read two messages
-        final List<RawMessage> msgs = new LinkedList<>();
-        session.setHandler(m -> {
-            msgs.add(m);
-            return new LinkedList<>();
-        });
-
-        session.processConnection(new ByteArrayInputStream(input), new NullOutputStream());
-
-        assertEquals(2, msgs.size());
-    }
-    @Test
     public void testCorruptedMessage() throws IOException {
         final byte[] msg = MessageParserTest.readTestMessage();
 
         //create two messages stream
-        final byte[] input = new byte[msg.length  +  msg.length / 2];
-        System.arraycopy(msg, 0, input, 0, msg.length);
-        System.arraycopy(msg, 0, input, msg.length, msg.length / 2);
+        final byte[] input = new byte[msg.length / 2];
+        System.arraycopy(msg, 0, input, 0, input.length);
 
         //check read two messages
         final List<RawMessage> msgs = new LinkedList<>();
@@ -102,6 +81,6 @@ public class Tt18SessionTest {
             //correct
         }
 
-        assertEquals(1, msgs.size());
+        assertEquals(0, msgs.size());
     }
 }

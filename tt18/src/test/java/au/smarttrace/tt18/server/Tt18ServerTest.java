@@ -60,21 +60,6 @@ public class Tt18ServerTest {
         }
     }
     @Test
-    public void testTwoMessages() throws IOException {
-        final byte[] msg = MessageParserTest.readTestMessage();
-
-        //check read two messages
-        final List<RawMessage> msgs = new LinkedList<>();
-        server.setHandler(m -> {
-            msgs.add(m);
-            return new LinkedList<>();
-        });
-
-        send(msg, msg);
-
-        assertEquals(2, msgs.size());
-    }
-    @Test
     public void testMessageWithCommands() throws IOException {
         final byte[] msg = MessageParserTest.readTestMessage();
 
@@ -109,8 +94,8 @@ public class Tt18ServerTest {
             return new LinkedList<>();
         });
 
-        send(msg, corrupted);
-        assertEquals(1, msgs.size());
+        send(corrupted);
+        assertEquals(0, msgs.size());
     }
     @Test
     public void testCorrectTime() throws IOException {
@@ -121,22 +106,20 @@ public class Tt18ServerTest {
         assertTrue(response.startsWith("UTC"));
     }
     /**
-     * @param msgs
+     * @param msg
      * @throws IOException
      */
-    private List<String> send(final byte[]... msgs) throws IOException {
+    private List<String> send(final byte[] msg) throws IOException {
         final List<String> responses = new LinkedList<>();
         final Socket  s = new Socket("127.0.0.1", port);
         try {
             final OutputStream out = s.getOutputStream();
             final InputStream in = s.getInputStream();
 
-            for (final byte[] bytes : msgs) {
-                out.write(bytes);
-                out.flush();
+            out.write(msg);
+            out.flush();
 
-                responses.add(readResponse(in));
-            }
+            responses.add(readResponse(in));
         } finally {
             s.close();
         }
