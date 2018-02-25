@@ -33,7 +33,7 @@ public final class DetectingSiblingsTool {
      * @throws JsonParseException
      */
     public static void main(final String[] args) throws JsonParseException, JsonMappingException, IOException {
-        final List<TrackerEventDto> e2 = loadEvents("s2.json");
+        final List<TrackerEventDto> e2 = loadEvents("s1.json");
         final List<TrackerEventDto> e1 = loadEvents("s2.json");
 
         final boolean isSiblings = new SiblingDetectDispatcher(){}.isSiblings(e1, e2);
@@ -48,6 +48,9 @@ public final class DetectingSiblingsTool {
      * @throws JsonParseException
      */
     private static List<TrackerEventDto> loadEvents(final String resource) throws JsonParseException, JsonMappingException, IOException {
+        int totalEvents = 0;
+        int eventsWithNullCoordinates = 0;
+
         final SingleShipmentData data = SingleShipmentUtils.parseSingleShipmentDataJson(
                 DetectingSiblingsTool.class.getResource(resource));
         final List<TrackerEvent> events = SingleShipmentUtils.getTrackerEvents(data);
@@ -64,8 +67,17 @@ public final class DetectingSiblingsTool {
             dto.setTemperature(e.getTemperature());
             dto.setTime(e.getTime());
             dto.setType(e.getType());
-            list.add(dto);
+
+            totalEvents++;
+            if (dto.getLatitude() == null || dto.getLongitude() == null) {
+                eventsWithNullCoordinates++;
+            } else {
+                list.add(dto);
+            }
         }
+
+        System.out.println("Readen for resource " + resource + ": " + totalEvents
+                + ", has not coordinates: " + eventsWithNullCoordinates);
         return list;
     }
 }
